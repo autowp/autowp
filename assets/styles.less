@@ -275,6 +275,26 @@ img.avatar {
 
 .thumbnails .thumbnail {
     margin-bottom: 20px;
+    
+    &.no-photo {
+        text-align: center;
+        min-height: 116px;
+        line-height: 116px;
+        opacity: 0.5;
+        
+        .fa-lg {
+            vertical-align: middle;
+        }
+        
+        a.text-success {
+            float: right;
+            margin: 5px 5px 0 -17px;
+            
+            &:hover {
+                text-decoration: none;
+            }
+        }
+    }
 }
 
 .well {

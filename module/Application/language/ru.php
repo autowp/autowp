@@ -168,6 +168,8 @@ return array_replace(include 'root.php', [
     'count 0'    => 'нет',
 
     /* CAR LIST */
+    'carlist/no-photo'       => 'Нет фотоматериалов',
+    'carlist/no-photo/add'   => 'Добавить фотографию',
     'carlist/all pictures'   => 'все картинки',
     'carlist/details'        => 'подробнее',
     'carlist/twins'          => 'автомобили-близнецы',
@@ -319,7 +321,7 @@ return array_replace(include 'root.php', [
 Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.',
     'upload/only-registered' => 'Только зарегистрированный пользователи могут загружать изображения
 
-[Авторизируйтесь](/login/) или [зарегистрируйтесь](/registration/)',
+[Авторизируйтесь](/login) или [зарегистрируйтесь](/registration)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Другие изображения %1$s',
@@ -1029,6 +1031,10 @@ return array_replace(include 'root.php', [
     'page/205/name'        => 'Комментарии',
     'page/205/title'       => 'Комментарии',
     'page/205/breadcrumbs' => 'Комментарии',
+    
+    'page/208/name'        => 'Двигатели %BRAND_NAME%',
+    'page/208/title'       => 'Двигатели %BRAND_NAME%',
+    'page/208/breadcrumbs' => 'Двигатели %BRAND_NAME%',
 
     'moder-menu/title' => 'Меню модератора',
     'moder-menu/inbox' => 'Инбокс',

@@ -6,7 +6,7 @@
         ],
         'pageId' => 26,
         'args'   => [
-            'TWINS_GROUP_NAME' => $this->group['name'],
+            'TWINS_GROUP_NAME' => $this->car()->textTitle($this->group),
             'TWINS_GROUP_ID'   => $this->group['id']
         ]
     ]);

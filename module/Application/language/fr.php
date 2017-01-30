@@ -159,6 +159,8 @@ return array_replace(include 'root.php', [
     'count 0'                 => 'non',
 
     /* CAR LIST */
+    'carlist/no-photo'        => 'No photos available',
+    'carlist/no-photo/add'    => 'Add photo',
     'carlist/all pictures'    => 'toutes les images',
     'carlist/details'         => 'détails',
     'carlist/twins'           => 'des jumeaux',
@@ -306,7 +308,7 @@ Exigences pour les images ajoutées:
 S'il vous plaît noter que l'ajout d'images modérés. c'est-à-dire toutes les photos avant d'ajouter au catalogue seront testés par moderateurs.",
     'upload/only-registered' => 'Seuls les utilisateurs enregistrés peuvent télécharger des images
 
-[Login](/login/) or [Enregistrer](/registration/)',
+[Login](/login) or [Enregistrer](/registration)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Autres photos de %1$s',
@@ -1016,6 +1018,10 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/205/name'        => 'Commentaires',
     'page/205/title'       => 'Commentaires',
     'page/205/breadcrumbs' => 'Commentaires',
+    
+    'page/208/name'        => '%BRAND_NAME% Engines',
+    'page/208/title'       => '%BRAND_NAME% Engines',
+    'page/208/breadcrumbs' => '%BRAND_NAME% Engines',
 
     'moder-menu/title' => 'Menu modérateur',
     'moder-menu/inbox' => 'Inbox',

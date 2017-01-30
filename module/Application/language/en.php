@@ -159,6 +159,8 @@ return array_replace(include 'root.php', [
     'count 0'                 => 'none',
 
     /* CAR LIST */
+    'carlist/no-photo'        => 'No photos available',
+    'carlist/no-photo/add'    => 'Add photo',
     'carlist/all pictures'    => 'all pictures',
     'carlist/details'         => 'details',
     'carlist/twins'           => 'twins',
@@ -306,7 +308,7 @@ return array_replace(include 'root.php', [
 Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.',
     'upload/only-registered' => 'Only registered users can upload pictures
 
-[Login](/login/) or [register](/registration/)',
+[Login](/login) or [register](/registration)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Other pictures of %1$s',
@@ -1020,6 +1022,10 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/205/name'        => 'Comments',
     'page/205/title'       => 'Comments',
     'page/205/breadcrumbs' => 'Comments',
+    
+    'page/208/name'        => '%BRAND_NAME% Engines',
+    'page/208/title'       => '%BRAND_NAME% Engines',
+    'page/208/breadcrumbs' => '%BRAND_NAME% Engines',
 
     'moder-menu/title' => 'Moderator menu',
     'moder-menu/inbox' => 'Inbox',

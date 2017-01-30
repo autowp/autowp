@@ -150,6 +150,8 @@ return array_replace(include 'root.php', [
     'count 0'                 => '暂无',
 
     /* CAR LIST */
+    'carlist/no-photo'        => 'No photos available',
+    'carlist/no-photo/add'    => 'Add photo',
     'carlist/all pictures'    => '全部图片',
     'carlist/details'         => '详细分类',
     'carlist/twins'           => '姊妹车型',
@@ -293,7 +295,7 @@ return array_replace(include 'root.php', [
 请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。',
     'upload/only-registered' => '只有注册用户才能上传图片
 
-[注册](/login/)或[登录](/registration/)',
+[注册](/login)或[登录](/registration)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => '%1$s的其它图片',
@@ -996,6 +998,10 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/205/name'        => '评论',
     'page/205/title'       => '评论',
     'page/205/breadcrumbs' => '评论',
+    
+    'page/208/name'        => '%BRAND_NAME% Engines',
+    'page/208/title'       => '%BRAND_NAME% Engines',
+    'page/208/breadcrumbs' => '%BRAND_NAME% Engines',
 
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',

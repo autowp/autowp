@@ -1,5 +1,5 @@
 <?php foreach ($this->groups as $twinsGroup) { ?>
-    <h3><?=$this->escapeHtml($twinsGroup['name'])?></h3>
+    <h3><?=$this->car()->htmlTitle($twinsGroup['name'])?></h3>
 
     <?php while ($items = array_splice($twinsGroup['cars'], 0, 4)) { ?>
         <div class="thumbnails twins row">

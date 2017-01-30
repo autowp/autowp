@@ -67,6 +67,18 @@ class PictureItemController extends AbstractActionController
         }
 
         $this->pictureItem->remove($picture->id, $item->id);
+        
+        $this->log(sprintf(
+            'Картинка %s отвязана от %s',
+            htmlspecialchars('#' . $picture->id),
+            htmlspecialchars('#' . $item->id)
+        ), [$item, $picture]);
+        
+        if ($picture->image_id) {
+            $this->imageStorage()->changeImageName($picture->image_id, [
+                'pattern' => $picture->getFileNamePattern(),
+            ]);
+        }
 
         return $this->redirect()->toUrl($this->getPictureUrl($picture));
     }

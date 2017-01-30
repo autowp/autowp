@@ -264,9 +264,10 @@ class Twins
         }
 
         return [
-            'id'      => $row->id,
-            'name'    => $row->name,
-            'text_id' => null//$row->text_id
+            'id'         => $row['id'],
+            'name'       => $row['name'],
+            'begin_year' => $row['begin_year'],
+            'end_year'   => $row['end_year']
         ];
     }
 

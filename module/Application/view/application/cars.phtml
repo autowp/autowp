@@ -36,28 +36,51 @@ $numberFormatter = NumberFormatter::create($this->language(), NumberFormatter::D
         <?php } ?>
 
         <div class="row thumbnails">
-            <?php foreach ($item['pictures'] as $idx => $picture) { ?>
-                <?php
-                    $col = $item['largeFormat'] && $idx == 0  ? 6 : 3;
-                    $colSm = $item['largeFormat'] && $idx == 0  ? 12 : 6;
-                ?>
-                <div class="col-md-<?=$col?> col-sm-<?=$colSm?>">
-                    <?php if ($picture) { ?>
-                        <?=$this->htmlA(
-                            [
-                                'href'  => $picture['url'],
-                                'class' => 'thumbnail'
-                            ],
-                            $this->htmlImg([
-                                'src'   => $picture['src'],
-                                'alt'   => $this->pic()->textTitle($picture['name']),
-                                'title' => $this->pic()->textTitle($picture['name']),
-                            ]),
-                            false
-                        )?>
-                    <?php } else { ?>
-                        <div class="no-photo">&#xa0;</div>
-                    <?php } ?>
+            <?php
+                $havePhoto = false;
+                foreach ($item['pictures'] as $picture) {
+                    if ($picture) {
+                        $havePhoto = true;
+                        break;
+                    }
+                }
+            ?>
+        
+            <?php if ($havePhoto) { ?>
+                <?php foreach ($item['pictures'] as $idx => $picture) { ?>
+                    <?php
+                        $col = $item['largeFormat'] && $idx == 0  ? 6 : 3;
+                        $colSm = $item['largeFormat'] && $idx == 0  ? 12 : 6;
+                    ?>
+                    <div class="col-md-<?=$col?> col-sm-<?=$colSm?>">
+                        <?php if ($picture) { ?>
+                            <?=$this->htmlA(
+                                [
+                                    'href'  => $picture['url'],
+                                    'class' => 'thumbnail'
+                                ],
+                                $this->htmlImg([
+                                    'src'   => $picture['src'],
+                                    'alt'   => $this->pic()->textTitle($picture['name']),
+                                    'title' => $this->pic()->textTitle($picture['name']),
+                                ]),
+                                false
+                            )?>
+                        <?php } else { ?>
+                            &#xa0;
+                        <?php } ?>
+                    </div>
+                <?php } ?>
+            <?php } else { ?>
+                <div class="col-md-3 col-sm-3">
+                <div class="thumbnail no-photo" title="<?=$this->escapeHtmlAttr($this->translate('carlist/no-photo'))?>">
+                    <?=$this->htmlA([
+                        'title' => $this->translate('carlist/no-photo/add'),
+                        'href'  => $item['uploadUrl'],
+                        'class' => 'fa fa-plus-circle text-success'
+                    ], '') ?>
+                    <span class="fa fa-camera fa-lg fa-4x" aria-hidden="true"></span>
+                </div>
                 </div>
             <?php } ?>
         </div>

@@ -92,11 +92,6 @@ class Picture extends Table
         return $result;
     }
 
-    private static function mbUcfirst($str)
-    {
-        return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
-    }
-
     public function getNameData($rows, array $options = [])
     {
         $result = [];
@@ -234,37 +229,6 @@ class Picture extends Table
             $isFirstTimeAccepted = true;
         }
         $picture->save();
-
-        return true;
-    }
-
-    public function addToCar(PictureItem $pictureItem, $pictureId, $id, $userId, Log $log)
-    {
-        $picture = $this->find($pictureId)->current();
-        if (! $picture) {
-            return false;
-        }
-
-        $itemTable = new Item();
-        $car = $itemTable->find($id)->current();
-
-        if (! $car) {
-            return false;
-        }
-
-        $pictureItem->add($picture->id, $car->id);
-
-        if ($picture->image_id) {
-            $this->imageStorage->changeImageName($picture->image_id, [
-                'pattern' => $picture->getFileNamePattern(),
-            ]);
-        }
-
-        $log->addEvent($userId, sprintf(
-            'Картинка %s связана с автомобилем %s',
-            htmlspecialchars($picture->id),
-            htmlspecialchars('#' . $car->id)
-        ), [$car, $picture]);
 
         return true;
     }

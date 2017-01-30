@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Moder;
 
+use Zend\Db\Sql;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
@@ -77,12 +78,12 @@ class CommentsController extends AbstractActionController
 
             if ($values['item_id']) {
                 $options['type'] = \Application\Comments::PICTURES_TYPE_ID;
-                $options['callback'] = function (\Zend_Db_Select $select) use ($values) {
+                $options['callback'] = function (Sql\Select $select) use ($values) {
                     $select
-                        ->join('pictures', 'comment_message.item_id = pictures.id', null)
-                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                        ->where('item_parent_cache.parent_id = ?', $values['item_id']);
+                        ->join('pictures', 'comment_message.item_id = pictures.id', [])
+                        ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
+                        ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
+                        ->where(['item_parent_cache.parent_id = ?' => $values['item_id']]);
                 };
             }
         }

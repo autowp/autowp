@@ -2197,4 +2197,48 @@ class CatalogueController extends AbstractActionController
             return $data;
         });
     }
+    
+    public function enginesAction()
+    {
+        return $this->doBrandAction(function ($brand) {
+            $select = $this->catalogue()->getItemTable()->select(true)
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
+                ->where('item_parent.parent_id = ?', $brand['id'])
+                ->order($this->carsOrder());
+        
+            $paginator = $this->carsPaginator($select, $this->params('page'));
+        
+            if ($paginator->getTotalItemCount() <= 0) {
+                return $this->notFoundAction();
+            }
+        
+            $itemParentTable = new DbTable\Item\ParentTable();
+        
+            $this->sidebar()->brand([
+                'brand_id' => $brand['id']
+            ]);
+        
+            return [
+                'paginator' => $paginator,
+                'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
+                    'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                        'type'                 => null,
+                        'onlyExactlyPictures'  => false,
+                        'dateSort'             => false,
+                        'disableLargePictures' => false,
+                        'perspectivePageId'    => null,
+                        'onlyChilds'           => []
+                    ]),
+                    'listBuilder' => new \Application\Model\Item\ListBuilder\Catalogue([
+                        'catalogue'       => $this->catalogue(),
+                        'router'          => $this->getEvent()->getRouter(),
+                        'picHelper'       => $this->getPluginManager()->get('pic'),
+                        'brand'           => $brand,
+                        'specsService'    => $this->specsService,
+                        'itemParentTable' => $itemParentTable
+                    ])
+                ])
+            ];
+        });
+    }
 }

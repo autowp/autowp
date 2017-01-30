@@ -2030,25 +2030,35 @@ class PicturesController extends AbstractActionController
             $userId = $this->user()->get()->id;
 
             $perspectiveId = (int)$this->params('perspective_id');
+            
+            $dstItem = $itemTable->find($itemId)->current();
+            
+            if (! $dstItem) {
+                return $this->notFoundAction();
+            }
 
             if ($srcItem) {
-                $this->pictureItem->changePictureItem($picture->id, $srcItem->id, $itemId);
+                $this->pictureItem->changePictureItem($picture->id, $srcItem->id, $dstItem->id);
+                
+                $this->log->addEvent($userId, sprintf(
+                    'Картинка %s перемещена из %s в %s',
+                    htmlspecialchars('#' . $picture->id),
+                    htmlspecialchars('#' . $srcItem->id),
+                    htmlspecialchars('#' . $dstItem->id)
+                ), [$srcItem, $dstItem, $picture]);
+                
             } else {
-                $success = $this->table->addToCar(
-                    $this->pictureItem,
-                    $picture->id,
-                    $itemId,
-                    $userId,
-                    $this->log
-                );
+                $this->pictureItem->add($picture->id, $dstItem->id);
 
-                if (! $success) {
-                    return $this->notFoundAction();
-                }
+                $this->log->addEvent($userId, sprintf(
+                    'Картинка %s связана с %s',
+                    htmlspecialchars('#' . $picture->id),
+                    htmlspecialchars('#' . $dstItem->id)
+                ), [$dstItem, $picture]);
             }
 
             if ($perspectiveId) {
-                $this->pictureItem->setProperties($picture->id, $itemId, [
+                $this->pictureItem->setProperties($picture->id, $dstItem->id, [
                     'perspective' => $perspectiveId
                 ]);
             }

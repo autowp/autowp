@@ -424,7 +424,7 @@ class BrandNav
             'SIDEBAR',
             $brand['id'],
             $language,
-            '39'
+            '40'
         ]);
 
         $sections = $this->cache->getItem($cacheKey, $success);
@@ -459,7 +459,13 @@ class BrandNav
                 'engine' => [
                     'name'        => 'catalogue/section/engines',
                     'car_type_id' => null,
-                    'item_type_id' => DbTable\Item\Type::ENGINE
+                    'item_type_id' => DbTable\Item\Type::ENGINE,
+                    'url'          => $this->router->assemble([
+                        'brand_catname' => $brand['catname'],
+                        'action'        => 'engines'
+                    ], [
+                        'name' => 'catalogue'
+                    ])
                 ]
             ];
 
@@ -479,6 +485,7 @@ class BrandNav
 
                 $sections[] = [
                     'name'   => $sectionsPreset['name'],
+                    'url'    => isset($sectionsPreset['url']) ? $sectionsPreset['url'] : null,
                     'groups' => $sectionGroups
                 ];
             }

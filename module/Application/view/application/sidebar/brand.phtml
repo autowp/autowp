@@ -1,16 +1,25 @@
-<div class="well">
-    <?php foreach ($this->sections as $sectoin) { ?>
-        <?php if (count($sectoin['groups'])) { ?>
-            <?php if ($sectoin['name']) { ?>
-                <h5><?=$this->escapeHtml($this->translate($sectoin['name']))?></h5>
-            <?php } ?>
-            <ul class="nav nav-pills nav-stacked">
-                <?php foreach ($sectoin['groups'] as $group) { ?>
-                    <li<?=isset($group['active']) && $group['active'] ? ' class="active"' : ''?>>
-                        <?=$this->htmlA($group['url'], $this->escapeHtml($group['name']) . (isset($group['count']) ? ' ' .$this->count($group['count']) : ''), false) ?>
+<div class="well well-sm">
+    <ul class="nav nav-pills nav-stacked">
+        <?php foreach ($this->sections as $sectoin) { ?>
+            <?php if (count($sectoin['groups'])) { ?>
+                <?php if ($sectoin['name']) { ?>
+                    <li>
+                        <?php if ($sectoin['url']) { ?>
+                            <?=$this->htmlA([
+                                'href'  => $sectoin['url'],
+                                'style' => 'font-weight:bold'
+                            ], $this->translate($sectoin['name']))?>
+                        <?php } else { ?>
+                            <h5 style="padding:10px 15px;margin:0;font-weight:bold"><?=$this->escapeHtml($this->translate($sectoin['name']))?></h5>
+                        <?php } ?>
                     </li>
                 <?php } ?>
-            </ul>
+                    <?php foreach ($sectoin['groups'] as $group) { ?>
+                        <li<?=isset($group['active']) && $group['active'] ? ' class="active"' : ''?>>
+                            <?=$this->htmlA($group['url'], $this->escapeHtml($group['name']) . (isset($group['count']) ? ' ' .$this->count($group['count']) : ''), false) ?>
+                        </li>
+                    <?php } ?>
+            <?php } ?>
         <?php } ?>
-    <?php } ?>
+    </ul>
 </div>

@@ -132,17 +132,17 @@ class CategoryController extends AbstractActionController
         ];
     }
 
-    private function categoriesMenuActive(&$menu, $currentCategory, $isOther)
+    private function categoriesMenuActive(&$menu, $categoryParentIds, $isOther)
     {
         $activeFound = false;
         foreach ($menu as &$item) {
             $item['active'] = false;
 
-            if (($item['isOther'] ? $isOther : ! $isOther) && ($item['id'] == $currentCategory->id)) {
+            if (($item['isOther'] ? $isOther : ! $isOther) && in_array($item['id'], $categoryParentIds)) {
                 $activeFound = true;
                 $item['active'] = true;
             }
-            if ($this->categoriesMenuActive($item['categories'], $currentCategory, $isOther)) {
+            if ($this->categoriesMenuActive($item['categories'], $categoryParentIds, $isOther)) {
                 $activeFound = true;
                 $item['active'] = true;
             }
@@ -158,41 +158,71 @@ class CategoryController extends AbstractActionController
         $otherCategoriesName = $this->translate('categories/other');
 
         if ($maxDeep > 0) {
-            $select = $this->itemTable->select(true)
-                ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                ->order($this->catalogue()->itemOrdering());
+            
+            $db = $this->itemTable->getAdapter();
+            
+            $expr = 'COUNT(IF(ip_cat2car.timestamp > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
+            
+            $select = $db->select(true)
+                ->from(['category' => 'item'], [
+                    'id',
+                    'name',
+                    'catname',
+                    'cars_count'     => 'COUNT(ip_cat2car.item_id)',
+                    'new_cars_count' => new Zend_Db_Expr($expr)
+                ])
+                ->where('category.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                ->order(['category.begin_order_cache', 'category.end_order_cache', 'category.name'])
+                ->join(['ipc_cat2cat' => 'item_parent_cache'], 'category.id = ipc_cat2cat.parent_id', null)
+                ->join(['low_cat' => 'item'], 'ipc_cat2cat.item_id = low_cat.id', null)
+                ->where('low_cat.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                ->join(['ip_cat2car' => 'item_parent'], 'ipc_cat2cat.item_id = ip_cat2car.parent_id', null)
+                ->join(['top_car' => 'item'], 'ip_cat2car.item_id = top_car.id', null)
+                ->where('top_car.item_type_id IN (?)', [
+                    DbTable\Item\Type::VEHICLE,
+                    DbTable\Item\Type::ENGINE
+                ])
+                ->group('category.id');
 
             if ($parent) {
                 $select
-                    ->join('item_parent', 'item.id = item_parent.item_id', null)
-                    ->where('item_parent.parent_id = ?', $parent->id);
+                    ->join(
+                        ['category_item_parent' => 'item_parent'], 
+                        'category.id = category_item_parent.item_id', 
+                        null
+                    )
+                    ->where('category_item_parent.parent_id = ?', $parent['id']);
             } else {
                 $select
-                    ->joinLeft('item_parent', 'item.id = item_parent.item_id', null)
-                    ->where('item_parent.parent_id IS NULL');
+                    ->joinLeft(
+                        ['category_item_parent' => 'item_parent'], 
+                        'category.id = category_item_parent.item_id', 
+                        null
+                    )
+                    ->where('category_item_parent.parent_id IS NULL');
             }
 
-            $rows = $this->itemTable->fetchAll($select);
+            $rows = $db->fetchAll($select);
             foreach ($rows as $row) {
                 $langRow = $this->itemLanguageTable->fetchRow([
                     'language = ?' => $language,
-                    'item_id = ?'   => $row->id
+                    'item_id = ?'   => $row['id']
                 ]);
 
-                $carsCount = $this->itemTable->getVehiclesAndEnginesCount($row->id);
+                //$carsCount = $row['cars_count'];//$this->itemTable->getVehiclesAndEnginesCount($row['id']);
 
                 $category = [
-                    'id'             => $row->id,
+                    'id'             => $row['id'],
                     'url'            => $this->url()->fromRoute('categories', [
                         'action'           => 'category',
-                        'category_catname' => $row->catname,
+                        'category_catname' => $row['catname'],
                         'other'            => false,
                         'page'             => null
                     ]),
-                    'name'           => $langRow ? $langRow->name : $row->name,
-                    'short_name'     => $langRow ? $langRow->name : $row->name,//$langRow ? $langRow->short_name : $row->short_name,
-                    'cars_count'     => $carsCount,
-                    'new_cars_count' => 0,
+                    'name'           => $langRow ? $langRow['name'] : $row['name'],
+                    'short_name'     => $langRow ? $langRow['name'] : $row['name'],//$langRow ? $langRow->short_name : $row->short_name,
+                    'cars_count'     => $row['cars_count'],
+                    'new_cars_count' => $row['new_cars_count'],
                     'categories'     => $this->categoriesMenu($row, $language, $maxDeep - 1),
                     'isOther'        => false
                 ];
@@ -201,13 +231,13 @@ class CategoryController extends AbstractActionController
             }
 
             if ($parent && count($categories)) {
-                $ownCarsCount = $this->getOwnVehiclesAndEnginesCount($parent->id);
+                $ownCarsCount = $this->getOwnVehiclesAndEnginesCount($parent['id']);
                 if ($ownCarsCount > 0) {
                     $categories[] = [
-                        'id'             => $parent->id,
+                        'id'             => $parent['id'],
                         'url'            => $this->url()->fromRoute('categories', [
                             'action'           => 'category',
-                            'category_catname' => $parent->catname,
+                            'category_catname' => $parent['catname'],
                             'other'            => true,
                             'page'             => null
                         ]),
@@ -328,7 +358,7 @@ class CategoryController extends AbstractActionController
                 'name' => $this->car()->formatName($childCar, $language),
                 'url'  => $this->url()->fromRoute('categories', [
                     'action'           => 'category',
-                    'category_catname' => $currentCategory->catname,
+                    'category_catname' => $currentCategory['catname'],
                     'other'            => false,
                     'path'             => $breadcrumbsPath,
                     'page'             => 1
@@ -338,7 +368,7 @@ class CategoryController extends AbstractActionController
             $currentCar = $childCar;
         }
 
-        $key = 'CATEGORY_MENU334_' . $topCategory->id . '_' . $language;
+        $key = 'CATEGORY_MENU339_' . $topCategory->id . '_' . $language;
 
         $menu = $this->cache->getItem($key, $success);
         if (! $success) {
@@ -346,8 +376,15 @@ class CategoryController extends AbstractActionController
 
             $this->cache->setItem($key, $menu);
         }
+        
+        $db = $this->itemTable->getAdapter();
+        $categoryParentIds = $db->fetchCol(
+            $db->select()
+                ->from('item_parent_cache', 'parent_id')
+                ->where('item_id = ?', $currentCategory['id'])
+        );
 
-        $this->categoriesMenuActive($menu, $currentCategory, $isOther);
+        $this->categoriesMenuActive($menu, $categoryParentIds, $isOther);
 
         $sideBarModel = new ViewModel([
             'categories' => $menu,

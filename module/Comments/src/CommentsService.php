@@ -347,11 +347,11 @@ class CommentsService
             ]);
         }
 
-        $this->updateVote($message);
+        $newVote = $this->updateVote($message);
 
         return [
             'success' => true,
-            'vote'    => $message['vote']
+            'vote'    => $newVote
         ];
     }
 
@@ -371,6 +371,8 @@ class CommentsService
         ], [
             'id = ?' => $message['id']
         ]);
+        
+        return $row['count'];
     }
 
     /**
