@@ -164,7 +164,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
                 ]
             ]
         ]);
-        $this->dispatch('https://www.autowp.ru/upload/index/type/1/item_id/1', Request::METHOD_POST, [], true);
+        $this->dispatch('https://www.autowp.ru/upload/send/type/1/item_id/1', Request::METHOD_POST, [], true);
 
         $this->assertResponseStatusCode(200);
         $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
