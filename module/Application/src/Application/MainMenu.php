@@ -11,8 +11,8 @@ use Zend\Router\Http\TreeRouteStack;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
-use Application\Model\DbTable;
 use Application\Language;
+use Application\Model\Categories;
 
 class MainMenu
 {
@@ -35,6 +35,11 @@ class MainMenu
      * @var StorageInterface
      */
     private $cache;
+    
+    /**
+     * @var Categories
+     */
+    private $categories;
 
     /**
      * @var array
@@ -74,7 +79,8 @@ class MainMenu
         $translator,
         LanguagePicker $languagePicker,
         MessageService $message,
-        Adapter $adapter
+        Adapter $adapter,
+        Categories $categories
     ) {
 
         $this->router = $router;
@@ -87,6 +93,7 @@ class MainMenu
         $this->translator = $translator;
         $this->languagePicker = $languagePicker;
         $this->message = $message;
+        $this->categories = $categories;
     }
 
     /**
@@ -137,42 +144,11 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_CATEGORY_MENU_8_' . $language;
+        $key = 'ZF2_CATEGORY_MENU_9_' . $language;
 
         $categories = $this->cache->getItem($key, $success);
         if (! $success) {
-            $categories = [];
-
-            $itemTable = new DbTable\Item();
-            $itemLangTable = new DbTable\Item\Language();
-
-            $rows = $itemTable->fetchAll(
-                $itemTable->select(true)
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft('item_parent', 'item.id = item_parent.item_id', null)
-                    ->where('item_parent.item_id IS NULL')
-                    ->order('item.name')
-            );
-
-            foreach ($rows as $row) {
-                $langRow = $itemLangTable->fetchRow([
-                    'language = ?' => $language,
-                    'item_id = ?'  => $row['id']
-                ]);
-
-                $categories[] = [
-                    'id'             => $row['id'],
-                    'url'            => $this->router->assemble([
-                        'action'           => 'category',
-                        'category_catname' => $row->catname
-                    ], [
-                        'name' => 'categories'
-                    ]),
-                    'name'           => $langRow && $langRow['name'] ? $langRow['name'] : $row['name'],
-                    'cars_count'     => $itemTable->getVehiclesAndEnginesCount($row['id']),
-                    'new_cars_count' => 0,//$row->getWeekCarsCount(),
-                ];
-            }
+            $categories = $this->categories->getCategoriesList(null, $language, null, 'name');
 
             $this->cache->setItem($key, $categories);
         }

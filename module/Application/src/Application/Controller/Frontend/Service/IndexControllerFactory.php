@@ -15,7 +15,8 @@ class IndexControllerFactory implements FactoryInterface
             $container->get('fastCache'),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\Model\CarOfDay::class),
-            $container->get(\Application\ItemNameFormatter::class)
+            $container->get(\Application\ItemNameFormatter::class),
+            $container->get(\Application\Model\Categories::class)
         );
     }
 }

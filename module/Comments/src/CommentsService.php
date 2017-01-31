@@ -993,13 +993,33 @@ class CommentsService
 
         return $paginator->getTotalItemCount();
     }
+    
+    private function deleteRecursive($typeId, $itemId, $parentId)
+    {
+        $filter = [
+            'type_id = ?' => (int)$typeId,
+            'item_id = ?' => (int)$itemId
+        ];
+        
+        if ($parentId) {
+            $filter['parent_id = ?'] = $parentId;
+        } else {
+            $filter[] = 'parent_id is null';
+        } 
+        
+        $select = new Sql\Select($this->messageTable->getTable());
+        $select->where($filter);
+        
+        foreach ($this->messageTable->selectWith($select) as $row) {
+            $this->deleteRecursive($typeId, $itemId, $row['id']);
+            
+            $this->messageTable->delete($filter);
+        }
+    }
 
     public function deleteItemComments($typeId, $itemId)
     {
-        $this->messageTable->delete([
-            'type_id = ?' => (int)$typeId,
-            'item_id = ?' => (int)$itemId
-        ]);
+        $this->deleteRecursive($typeId, $itemId, null);
 
         $this->topicTable->delete([
             'type_id = ?' => (int)$typeId,

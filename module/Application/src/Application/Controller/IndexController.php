@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\CarOfDay;
+use Application\Model\Categories;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\Twins;
@@ -43,12 +44,14 @@ class IndexController extends AbstractActionController
         $cache,
         SpecificationsService $specsService,
         CarOfDay $carOfDay,
-        ItemNameFormatter $itemNameFormatter
+        ItemNameFormatter $itemNameFormatter,
+        Categories $categories
     ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->carOfDay = $carOfDay;
         $this->itemNameFormatter = $itemNameFormatter;
+        $this->categories = $categories;
     }
 
     /**
@@ -560,66 +563,12 @@ class IndexController extends AbstractActionController
         ]);
 
         // categories
-        $cacheKey = 'INDEX_CATEGORY10_' . $language;
-        $destinations = $this->cache->getItem($cacheKey, $success);
+        $cacheKey = 'INDEX_CATEGORY13_' . $language;
+        $categories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $categoryAdapter = $itemTable->getAdapter();
-            $itemLangTable = new DbTable\Item\Language();
+            $categories = $this->categories->getCategoriesList(null, $language, 15, 'count');
 
-            $expr = 'COUNT(IF(item_parent.timestamp > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
-
-            $items = $categoryAdapter->fetchAll(
-                $categoryAdapter->select()
-                    ->from(
-                        ['category' => $itemTable->info('name')],
-                        [
-                            'id',
-                            'cars_count'     => 'COUNT(1)',
-                            'new_cars_count' => new Zend_Db_Expr($expr)
-                        ]
-                    )
-                    ->where('category.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft(
-                        ['top_category_parent' => 'item_parent'],
-                        'category.id = top_category_parent.item_id',
-                        null
-                    )
-                    ->where('top_category_parent.parent_id is null')
-                    ->join('item_parent', 'category.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
-                    ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
-                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
-                    ->join('item', 'item_parent_cache.item_id = item.id', null)
-                    ->where('not item.is_group')
-                    ->group('category.id')
-                    ->order('new_cars_count DESC')
-                    ->limit(15)
-            );
-
-            $destinations = [];
-            foreach ($items as $item) {
-                $row = $itemTable->find($item['id'])->current();
-                if (! $row) {
-                    continue;
-                }
-
-                $langRow = $itemLangTable->fetchRow([
-                    'language = ?' => $language,
-                    'item_id = ?'  => $row->id
-                ]);
-
-                $destinations[] = [
-                    'url'            => $this->url()->fromRoute('categories', [
-                        'action'           => 'category',
-                        'category_catname' => $row->catname,
-                    ]),
-                    'short_name'     => $langRow ? $langRow->name : $row->name,
-                    'cars_count'     => $item['cars_count'],
-                    'new_cars_count' => $item['new_cars_count']
-                ];
-            }
-
-            $this->cache->setItem($cacheKey, $destinations);
+            $this->cache->setItem($cacheKey, $categories);
         }
 
         // БЛИЗНЕЦЫ
@@ -701,7 +650,7 @@ class IndexController extends AbstractActionController
             'brands'      => $this->brands(),
             'factories'   => $this->factories(),
             'twinsBlock'  => $twinsBlock,
-            'categories'  => $destinations,
+            'categories'  => $categories,
             'newPictures' => $newPicturesData,
             'carOfDay'    => $this->carOfDay(),
             'specsCars'   => $specsCars,

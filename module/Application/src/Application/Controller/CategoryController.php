@@ -9,6 +9,7 @@ use Zend\View\Model\ViewModel;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
+use Application\Model\Categories;
 use Application\Model\DbTable;
 
 use Zend_Db_Expr;
@@ -28,11 +29,17 @@ class CategoryController extends AbstractActionController
      * @var DbTable\Item\Language
      */
     private $itemLanguageTable;
+    
+    /**
+     * @var Categories
+     */
+    private $categories;
 
-    public function __construct($cache, $textStorage)
+    public function __construct($cache, $textStorage, Categories $categories)
     {
         $this->cache = $cache;
         $this->textStorage = $textStorage;
+        $this->categories = $categories;
 
         $this->itemTable = new DbTable\Item();
         $this->itemLanguageTable = new DbTable\Item\Language();
@@ -161,74 +168,13 @@ class CategoryController extends AbstractActionController
             
             $db = $this->itemTable->getAdapter();
             
-            $expr = 'COUNT(IF(ip_cat2car.timestamp > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
+            $categories = $this->categories->getCategoriesList($parent['id'], $language, null, 'name');
             
-            $select = $db->select(true)
-                ->from(['category' => 'item'], [
-                    'id',
-                    'name',
-                    'catname',
-                    'cars_count'     => 'COUNT(ip_cat2car.item_id)',
-                    'new_cars_count' => new Zend_Db_Expr($expr)
-                ])
-                ->where('category.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                ->order(['category.begin_order_cache', 'category.end_order_cache', 'category.name'])
-                ->join(['ipc_cat2cat' => 'item_parent_cache'], 'category.id = ipc_cat2cat.parent_id', null)
-                ->join(['low_cat' => 'item'], 'ipc_cat2cat.item_id = low_cat.id', null)
-                ->where('low_cat.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                ->join(['ip_cat2car' => 'item_parent'], 'ipc_cat2cat.item_id = ip_cat2car.parent_id', null)
-                ->join(['top_car' => 'item'], 'ip_cat2car.item_id = top_car.id', null)
-                ->where('top_car.item_type_id IN (?)', [
-                    DbTable\Item\Type::VEHICLE,
-                    DbTable\Item\Type::ENGINE
-                ])
-                ->group('category.id');
-
-            if ($parent) {
-                $select
-                    ->join(
-                        ['category_item_parent' => 'item_parent'], 
-                        'category.id = category_item_parent.item_id', 
-                        null
-                    )
-                    ->where('category_item_parent.parent_id = ?', $parent['id']);
-            } else {
-                $select
-                    ->joinLeft(
-                        ['category_item_parent' => 'item_parent'], 
-                        'category.id = category_item_parent.item_id', 
-                        null
-                    )
-                    ->where('category_item_parent.parent_id IS NULL');
+            foreach ($categories as &$category) {
+                $category['categories'] = $this->categoriesMenu($category, $language, $maxDeep - 1);
+                $category['isOther'] = false; 
             }
-
-            $rows = $db->fetchAll($select);
-            foreach ($rows as $row) {
-                $langRow = $this->itemLanguageTable->fetchRow([
-                    'language = ?' => $language,
-                    'item_id = ?'   => $row['id']
-                ]);
-
-                //$carsCount = $row['cars_count'];//$this->itemTable->getVehiclesAndEnginesCount($row['id']);
-
-                $category = [
-                    'id'             => $row['id'],
-                    'url'            => $this->url()->fromRoute('categories', [
-                        'action'           => 'category',
-                        'category_catname' => $row['catname'],
-                        'other'            => false,
-                        'page'             => null
-                    ]),
-                    'name'           => $langRow ? $langRow['name'] : $row['name'],
-                    'short_name'     => $langRow ? $langRow['name'] : $row['name'],//$langRow ? $langRow->short_name : $row->short_name,
-                    'cars_count'     => $row['cars_count'],
-                    'new_cars_count' => $row['new_cars_count'],
-                    'categories'     => $this->categoriesMenu($row, $language, $maxDeep - 1),
-                    'isOther'        => false
-                ];
-
-                $categories[] = $category;
-            }
+            unset($category); // prevent bugs
 
             if ($parent && count($categories)) {
                 $ownCarsCount = $this->getOwnVehiclesAndEnginesCount($parent['id']);
@@ -368,7 +314,7 @@ class CategoryController extends AbstractActionController
             $currentCar = $childCar;
         }
 
-        $key = 'CATEGORY_MENU339_' . $topCategory->id . '_' . $language;
+        $key = 'CATEGORY_MENU341_' . $topCategory->id . '_' . $language;
 
         $menu = $this->cache->getItem($key, $success);
         if (! $success) {

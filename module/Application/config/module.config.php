@@ -109,6 +109,7 @@ return [
             Model\BrandNav::class                => Model\Service\BrandNavFactory::class,
             Model\BrandVehicle::class            => Model\Service\BrandVehicleFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
+            Model\Categories::class              => Model\Service\CategoriesFactory::class,
             Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
             Model\Log::class                     => Model\Service\LogFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,

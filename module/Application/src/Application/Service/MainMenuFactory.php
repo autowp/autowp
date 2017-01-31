@@ -19,7 +19,8 @@ class MainMenuFactory implements FactoryInterface
             $container->get('MvcTranslator'),
             $container->get(\Application\LanguagePicker::class),
             $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+            $container->get(\Zend\Db\Adapter\AdapterInterface::class),
+            $container->get(\Application\Model\Categories::class)
         );
     }
 }
