@@ -131,15 +131,7 @@ html {
             </div>
 
             <div class="col-md-6">
-                <h4><?=$this->escapeHtml($this->page(22)->name) ?> <small><?=$this->htmlA('/category', $this->translate('all-link'))?></small></h4>
-                <p>
-                    <?php foreach ($this->categories as $category) { ?>
-                        <?=$this->htmlA($category['url'], $category['short_name'])?>&#xa0;<span class="count">(<?=$category['cars_count']-$category['new_cars_count'] ?><?php if ($category['new_cars_count'] > 0) { ?><span>+<?=$category['new_cars_count'] ?></span><?php } ?>)</span>,
-                    <?php } ?>
-                </p>
-                <?php if (in_array($this->language(), ['ru', 'zh', 'fr'])) { ?>
-                    <?=$this->markdown($this->translate('index/categories/description'))?>
-                <?php } ?>
+                <?=$this->render('application/index/partial/categories')?>
             </div>
         </div>
 

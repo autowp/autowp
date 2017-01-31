@@ -724,4 +724,54 @@ class CategoryController extends AbstractActionController
             ]));
         });
     }
+    
+    public function newcarsAction()
+    {
+        $itemTable = new DbTable\Item();
+    
+        $category = $itemTable->fetchRow([
+            'item_type_id = ?' => DbTable\Item\Type::CATEGORY,
+            'id = ?'           => (int)$this->params('item_id')
+        ]);
+        if (! $category) {
+            return $this->notFoundAction();
+        }
+    
+        $language = $this->language();
+        $itemLangTable = new DbTable\Item\Language();
+        $itemLang = $itemLangTable->fetchRow([
+            'item_id = ?'  => $category->id,
+            'language = ?' => $language
+        ]);
+    
+    
+        $rows = $itemTable->fetchAll(
+            $itemTable->select(true)
+                ->where('item.item_type_id IN (?)', [
+                    DbTable\Item\Type::VEHICLE,
+                    DbTable\Item\Type::ENGINE
+                ])
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
+                ->join(['low_cat' => 'item'], 'item_parent.parent_id = low_cat.id', null)
+                ->where('low_cat.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                ->join('item_parent_cache', 'low_cat.id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $category->id)
+                ->where('item_parent.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)', Categories::NEW_DAYS)
+                ->group('item.id')
+                ->order(['item_parent.timestamp DESC'])
+                ->limit(20)
+        );
+    
+        $items = [];
+        foreach ($rows as $row) {
+            $items[] = $row->getNameData($language);
+        }
+    
+        $viewModel = new ViewModel([
+            'items' => $items
+        ]);
+        $viewModel->setTerminal(true);
+    
+        return $viewModel;
+    }
 }

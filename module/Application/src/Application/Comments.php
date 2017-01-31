@@ -2,6 +2,8 @@
 
 namespace Application;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\Comments\CommentsService;
@@ -31,11 +33,20 @@ class Comments
      * @var TreeRouteStack
      */
     private $router;
+    
+    /**
+     * @var Adapter
+     */
+    private $adapter;
 
-    public function __construct(CommentsService $service, TreeRouteStack $router)
-    {
+    public function __construct(
+        CommentsService $service, 
+        TreeRouteStack $router,
+        Adapter $adapter
+    ) {
         $this->service = $service;
         $this->router = $router;
+        $this->adapter = $adapter;
     }
 
     public function getMessageUrl($messageId, $canonical = false, $uri = null)
@@ -115,8 +126,10 @@ class Comments
                 break;
 
             case self::ARTICLES_TYPE_ID:
-                $articleTable = new DbTable\Article();
-                $article = $articleTable->find($message['item_id'])->current();
+                $articleTable = new TableGateway('articles', $this->adapter);
+                $article = $articleTable->select([
+                    'id = ?' => $message['item_id']
+                ])->current();
                 if (! $article) {
                     throw new Exception("Article `{$message['item_id']}` not found");
                 }

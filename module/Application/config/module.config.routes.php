@@ -340,6 +340,16 @@ return [
                     ],
                 ]
             ],
+            'category-newcars' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'  => '/category/newcars/:item_id',
+                    'defaults' => [
+                        'controller' => Controller\CategoryController::class,
+                        'action'     => 'newcars',
+                    ]
+                ]
+            ],
             'chart' => [
                 'type' => Literal::class,
                 'options' => [
