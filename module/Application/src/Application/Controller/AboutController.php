@@ -8,8 +8,7 @@ use Zend\Permissions\Acl\Acl;
 use Autowp\Comments;
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Item;
+use Application\Model\DbTable;
 
 class AboutController extends AbstractActionController
 {
@@ -71,7 +70,7 @@ class AboutController extends AbstractActionController
 
         ksort($contributors, SORT_NUMERIC);
 
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
         $pictureTableAdapter = $pictureTable->getAdapter();
         $pictureTableName = $pictureTable->info('name');
 
@@ -81,7 +80,7 @@ class AboutController extends AbstractActionController
         );
         $totalPictures = round($totalPictures, -4);
 
-        $itemTable = new Item();
+        $itemTable = new DbTable\Item();
         $itemTableAdapter = $itemTable->getAdapter();
         $totalCars = $itemTableAdapter->fetchOne(
             $itemTableAdapter->select()

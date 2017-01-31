@@ -4,9 +4,9 @@ namespace Application;
 
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\EventManager\EventInterface as Event;
+use Zend\Mail;
 use Zend\ModuleManager\Feature;
 use Zend\Mvc\MvcEvent;
-
 
 use Zend_Cache_Manager;
 use Zend_Db_Table;
@@ -106,9 +106,38 @@ class Module implements
     {
         $exception = $e->getParam('exception');
         if ($exception) {
-            $sm = $e->getApplication()->getServiceManager();
-            $sm->get('ErrorLog')->crit($exception);
+            $serviceManager = $e->getApplication()->getServiceManager();
+            $serviceManager->get('ErrorLog')->crit($exception);
+            
+            $filePath = __DIR__ . '/../../data/email-error';
+            if (file_exists($filePath)) {
+                $mtime = filemtime($filePath);
+                $diff = time() - $mtime;
+                if ($diff > 60) {
+                    touch($filePath);
+                    $this->sendErrorEmail($exception, $serviceManager);
+                }
+            }
         }
+    }
+    
+    private function sendErrorEmail($exception, $serviceManager)
+    {
+        $message = get_class($exception) . PHP_EOL .
+                   'File: ' . $exception->getFile() . PHP_EOL .
+                   'Message: ' . $exception->getMessage() . PHP_EOL .
+                   'Trace: ' . PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
+                
+        $mail = new Mail\Message();
+        $mail
+            ->setEncoding('utf-8')
+            ->setBody($message)
+            ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
+            ->addTo('dvp@autowp.ru')
+            ->setSubject('autowp exception: ' . get_class($exception));
+        
+        $transport = $serviceManager->get(Mail\Transport\TransportInterface::class);
+        $transport->send($mail);
     }
 
     public function getConsoleBanner(Console $console)
