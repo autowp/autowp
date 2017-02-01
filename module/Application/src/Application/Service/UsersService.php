@@ -452,6 +452,8 @@ class UsersService
                 ->where('pmf.from_user_id is null')
                 ->joinLeft(['pmt' => 'personal_messages'], 'users.id = pmt.to_user_id', null)
                 ->where('pmt.to_user_id is null')
+                ->joinLeft('log_events', 'users.id = log_events.user_id', null)
+                ->where('log_events.user_id is null')
                 ->limit(1000)
         );
 

@@ -243,7 +243,7 @@ class CommentsService
      * @param int $id
      * @return boolean
      */
-    public function deleteMessage($id, $userId)
+    public function queueDeleteMessage($id, $userId)
     {
         $comment = $this->getMessageRow($id);
 
@@ -1075,6 +1075,79 @@ class CommentsService
             $this->updateTopicStat($row['type_id'], $row['item_id']);
         }
 
+        return $affected;
+    }
+    
+    public function getList(array $options)
+    {
+        $defaults = [
+            'type'     => null,
+            'callback' => null
+        ];
+        $options = array_replace($defaults, $options);
+        
+        $select = new Sql\Select($this->messageTable->getTable());
+        
+        $select->order('datetime');
+        
+        if ($options['type']) {
+            $select->where(['type_id = ?' => (int)$options['type']]);
+        }
+            
+        if ($options['callback']) {
+            $options['callback']($select);
+        }
+        
+        $items = [];
+        
+        foreach ($this->messageTable->selectWith($select) as $row) {
+            $items[] = [
+                'id'      => $row['id'],
+                'item_id' => $row['item_id'],
+                'type_id' => $row['type_id']
+            ];
+        }
+        
+        return $items;
+    }
+    
+    public function deleteMessage($id)
+    {
+        $message = $this->getMessageRow($id);
+        
+        $affected = $this->messageTable->delete([
+            'id' => $message['id']
+        ]);
+        
+        $this->updateTopicStat($message['type_id'], $message['item_id']);
+        
+        return $affected;
+    }
+    
+    public function cleanTopics()
+    {
+        $adapter = $this->topicViewTable->getAdapter();
+        $result = $adapter->query('
+            DELETE comment_topic_view
+                FROM comment_topic_view
+                    LEFT JOIN comment_message on comment_topic_view.item_id=comment_message.item_id
+                        and comment_topic_view.type_id=comment_message.type_id
+            WHERE comment_message.type_id is null
+        ', $adapter::QUERY_MODE_EXECUTE);
+        
+        $affected = $result->getAffectedRows();
+        
+        $adapter = $this->topicTable->getAdapter();
+        $result = $adapter->query('
+            DELETE comment_topic
+                FROM comment_topic
+                    LEFT JOIN comment_message on comment_topic.item_id=comment_message.item_id
+                        and comment_topic.type_id=comment_message.type_id
+            WHERE comment_message.type_id is null
+        ', $adapter::QUERY_MODE_EXECUTE);
+        
+        $affected += $result->getAffectedRows();
+        
         return $affected;
     }
 }

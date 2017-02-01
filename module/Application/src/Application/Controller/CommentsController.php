@@ -269,7 +269,7 @@ class CommentsController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $success = $this->comments->service()->deleteMessage(
+        $success = $this->comments->service()->queueDeleteMessage(
             $this->params()->fromPost('comment_id'),
             $this->user()->get()->id
         );

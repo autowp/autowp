@@ -4,8 +4,6 @@ namespace Application\Controller\Console;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Autowp\User\Model\DbTable\User;
-
 use Application\Service\SpecificationsService;
 
 class SpecsController extends AbstractActionController
@@ -48,15 +46,6 @@ class SpecsController extends AbstractActionController
         $userId = $this->params('user_id');
 
         $this->specsService->refreshUserConflicts($userId);
-
-        return "done\n";
-    }
-
-    public function updateSpecsVolumesAction()
-    {
-        $userTable = new User();
-
-        $userTable->updateSpecsVolumes();
 
         return "done\n";
     }

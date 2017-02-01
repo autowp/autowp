@@ -100,6 +100,9 @@ class Module implements
 
         $languageListener = new LanguageRouteListener();
         $languageListener->attach($eventManager);
+        
+        $maintenance = new Maintenance();
+        $maintenance->attach($serviceManager->get('CronEventManager'));
     }
 
     public function handleError(MvcEvent $e)

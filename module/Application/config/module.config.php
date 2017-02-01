@@ -3,6 +3,7 @@
 namespace Application;
 
 use Zend\Permissions\Acl\Acl;
+use Zend\EventManager;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
@@ -97,6 +98,7 @@ return [
 
     'service_manager' => [
         'factories' => [
+            'CronEventManager'                   => Service\CronEventManagerFactory::class,
             Acl::class                           => Permissions\AclFactory::class,
             Comments::class                      => Service\CommentsFactory::class,
             DuplicateFinder::class               => Service\DuplicateFinderFactory::class,

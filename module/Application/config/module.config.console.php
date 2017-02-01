@@ -7,16 +7,13 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 return [
     'controllers' => [
         'factories' => [
-            Controller\Console\BuildController::class       => InvokableFactory::class,
-            Controller\Console\CatalogueController::class   => Controller\Console\Service\CatalogueControllerFactory::class,
-            Controller\Console\MaintenanceController::class => Controller\Console\Service\MaintenanceControllerFactory::class,
-            Controller\Console\MidnightController::class    => Controller\Console\Service\MidnightControllerFactory::class,
-            Controller\Console\PicturesController::class    => Controller\Console\Service\PicturesControllerFactory::class,
-            Controller\Console\RefererController::class     => InvokableFactory::class,
-            Controller\Console\SpecsController::class       => Controller\Console\Service\SpecsControllerFactory::class,
-            Controller\Console\TelegramController::class    => Controller\Console\Service\TelegramControllerFactory::class,
-            Controller\Console\TwitterController::class     => Controller\Console\Service\TwitterControllerFactory::class,
-            Controller\Console\UsersController::class       => Controller\Console\Service\UsersControllerFactory::class,
+            Controller\Console\BuildController::class     => InvokableFactory::class,
+            Controller\Console\CatalogueController::class => Controller\Console\Service\CatalogueControllerFactory::class,
+            Controller\Console\CronController::class      => Controller\Console\Service\CronControllerFactory::class,
+            Controller\Console\PicturesController::class  => Controller\Console\Service\PicturesControllerFactory::class,
+            Controller\Console\RefererController::class   => InvokableFactory::class,
+            Controller\Console\SpecsController::class     => Controller\Console\Service\SpecsControllerFactory::class,
+            Controller\Console\TelegramController::class  => Controller\Console\Service\TelegramControllerFactory::class
         ]
     ],
     'console' => [
@@ -38,25 +35,17 @@ return [
                         ]
                     ]
                 ],
-                'maintenance' => [
+                'cron' => [
                     'options' => [
-                        'route'    => 'maintenance (dump|clear-sessions):action',
+                        'route'    => 'cron (daily-maintenance|midnight):action',
                         'defaults' => [
-                            'controller' => Controller\Console\MaintenanceController::class,
-                        ]
-                    ]
-                ],
-                'midnight' => [
-                    'options' => [
-                        'route'    => 'midnight (car-of-day):action',
-                        'defaults' => [
-                            'controller' => Controller\Console\MidnightController::class,
+                            'controller' => Controller\Console\CronController::class,
                         ]
                     ]
                 ],
                 'pictures' => [
                     'options' => [
-                        'route'    => 'pictures (clear-queue|fill-point):action',
+                        'route'    => 'pictures (fill-point):action',
                         'defaults' => [
                             'controller' => Controller\Console\PicturesController::class,
                         ]
@@ -72,7 +61,7 @@ return [
                 ],
                 'specs' => [
                     'options' => [
-                        'route'    => 'specs (refresh-conflict-flags|refresh-users-stat|update-specs-volumes):action',
+                        'route'    => 'specs (refresh-conflict-flags|refresh-users-stat):action',
                         'defaults' => [
                             'controller' => Controller\Console\SpecsController::class,
                         ]
@@ -112,23 +101,7 @@ return [
                             'action'     => 'notify-inbox'
                         ]
                     ]
-                ],
-                'twitter' => [
-                    'options' => [
-                        'route'    => 'twitter (car-of-day):action',
-                        'defaults' => [
-                            'controller' => Controller\Console\TwitterController::class,
-                        ]
-                    ]
-                ],
-                'app-users' => [
-                    'options' => [
-                        'route'    => 'users (refresh-vote-limits|restore-votes|delete-unused):action',
-                        'defaults' => [
-                            'controller' => Controller\Console\UsersController::class,
-                        ]
-                    ]
-                ],
+                ]
             ]
         ]
     ],

@@ -2,16 +2,23 @@
 
 namespace Autowp\Message;
 
-use Zend\Console\Adapter\AdapterInterface as Console;
+use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
-    Feature\ConsoleUsageProviderInterface,
-    Feature\ConsoleBannerProviderInterface,
-    //Feature\ControllerProviderInterface,
+    Feature\BootstrapListenerInterface,
     Feature\ConfigProviderInterface
 {
+    public function onBootstrap(EventInterface $e)
+    {
+        $application = $e->getApplication();
+        $serviceManager = $application->getServiceManager();
+        
+        $maintenance = new Maintenance();
+        $maintenance->attach($serviceManager->get('CronEventManager')); // TODO: move CronEventManager to zf-components
+    }
+    
     /**
      * @return array
      */
@@ -19,8 +26,6 @@ class Module implements
     {
         $provider = new ConfigProvider();
         return [
-            'console'         => $provider->getConsoleConfig(),
-            'controllers'     => $provider->getControllersConfig(),
             'service_manager' => $provider->getDependencyConfig()
         ];
     }
@@ -33,19 +38,6 @@ class Module implements
                     __NAMESPACE__ => __DIR__ . '/src',
                 ],
             ],
-        ];
-    }
-
-    public function getConsoleBanner(Console $console)
-    {
-        return __NAMESPACE__ . ' Module';
-    }
-
-    public function getConsoleUsage(Console $console)
-    {
-        return [
-            'message clear-old-system-pm' => 'Clear old system messages',
-            'message clear-deleted-pm'    => 'Clear deleted messages'
         ];
     }
 }

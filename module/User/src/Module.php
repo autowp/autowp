@@ -2,16 +2,12 @@
 
 namespace Autowp\User;
 
-use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\EventManager\EventInterface as Event;
 use Zend\ModuleManager\Feature;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\BootstrapListenerInterface,
-    Feature\ConsoleUsageProviderInterface,
-    Feature\ConsoleBannerProviderInterface,
-    Feature\ControllerProviderInterface,
     Feature\ConfigProviderInterface
 {
     /**
@@ -21,9 +17,7 @@ class Module implements
     {
         $provider = new ConfigProvider();
         return [
-            'console'            => $provider->getConsoleConfig(),
             'controller_plugins' => $provider->getControllerPluginConfig(),
-            'controllers'        => $provider->getControllersConfig(),
             'view_helpers'       => $provider->getViewHelperConfig(),
         ];
     }
@@ -43,28 +37,12 @@ class Module implements
     {
         $application = $e->getApplication();
         $eventManager = $application->getEventManager();
+        $serviceManager = $application->getServiceManager();
 
         $authRememberListener = new Auth\RememberDispatchListener();
         $authRememberListener->attach($eventManager);
-    }
-
-    public function getConsoleBanner(Console $console)
-    {
-        return __NAMESPACE__ . ' Module';
-    }
-
-    public function getConsoleUsage(Console $console)
-    {
-        return [
-            'users clear-password-remind' => 'Clear old password remind tokens',
-            'users clear-remember'        => 'Clear old remember tokens',
-            'users clear-renames'         => 'Clear old renames',
-        ];
-    }
-
-    public function getControllerConfig()
-    {
-        $provider = new ConfigProvider();
-        return $provider->getControllersConfig();
+        
+        $maintenance = new Maintenance();
+        $maintenance->attach($serviceManager->get('CronEventManager')); // TODO: move CronEventManager to zf-components
     }
 }

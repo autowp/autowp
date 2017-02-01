@@ -2,8 +2,6 @@
 
 namespace Autowp\User;
 
-use Zend\ServiceManager\Factory\InvokableFactory;
-
 class ConfigProvider
 {
     /**
@@ -12,31 +10,8 @@ class ConfigProvider
     public function __invoke()
     {
         return [
-            'console'            => $this->getConsoleConfig(),
             'controller_plugins' => $this->getControllerPluginConfig(),
-            'controllers'        => $this->getControllersConfig(),
             'view_helpers'       => $this->getViewHelperConfig(),
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getConsoleConfig()
-    {
-        return [
-            'router' => [
-                'routes' => [
-                    'users' => [
-                        'options' => [
-                            'route'    => 'users (clear-password-remind|clear-remember|clear-renames):action',
-                            'defaults' => [
-                                'controller' => Controller\ConsoleController::class,
-                            ]
-                        ]
-                    ],
-                ]
-            ]
         ];
     }
 
@@ -53,18 +28,6 @@ class ConfigProvider
             'factories' => [
                 Controller\Plugin\User::class => Controller\Plugin\Service\UserFactory::class,
             ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getControllersConfig()
-    {
-        return [
-            'factories' => [
-                Controller\ConsoleController::class => InvokableFactory::class
-            ]
         ];
     }
 
