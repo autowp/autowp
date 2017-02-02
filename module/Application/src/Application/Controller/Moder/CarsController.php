@@ -698,7 +698,7 @@ class CarsController extends AbstractActionController
                     $values = $formModerCarEditMeta->getData();
 
                     $user = $this->user()->get();
-                    $ucsTable = new DbTable\User\CarSubscribe();
+                    $ucsTable = new DbTable\User\ItemSubscribe();
                     $ucsTable->subscribe($user, $car);
 
                     $forceIsGroup = in_array($car->item_type_id, [
@@ -750,7 +750,7 @@ class CarsController extends AbstractActionController
                     $this->log($message, $car);
 
                     $user = $this->user()->get();
-                    foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
+                    foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
                         if ($subscriber && ($subscriber->id != $user->id)) {
                             $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
@@ -826,7 +826,7 @@ class CarsController extends AbstractActionController
                 ->where('picture_item.item_id = ?', $car->id)
         );
 
-        $ucsTable = new DbTable\User\CarSubscribe();
+        $ucsTable = new DbTable\User\ItemSubscribe();
 
         $user = $this->user()->get();
         $ucsRow = $ucsTable->fetchRow([
@@ -1140,7 +1140,7 @@ class CarsController extends AbstractActionController
         }
 
         $user = $this->user()->get();
-        $ucsTable = new DbTable\User\CarSubscribe();
+        $ucsTable = new DbTable\User\ItemSubscribe();
         $ucsTable->subscribe($user, $car);
 
         return new JsonModel([
@@ -1166,7 +1166,7 @@ class CarsController extends AbstractActionController
         }
 
         $user = $this->user()->get();
-        $ucsTable = new DbTable\User\CarSubscribe();
+        $ucsTable = new DbTable\User\ItemSubscribe();
         $ucsTable->unsubscribe($user, $car);
 
         return new JsonModel([
@@ -2548,7 +2548,7 @@ class CarsController extends AbstractActionController
                 $this->specificationsService->updateActualValues($newCar->id);
 
                 $user = $this->user()->get();
-                $ucsTable = new DbTable\User\CarSubscribe();
+                $ucsTable = new DbTable\User\ItemSubscribe();
                 $ucsTable->subscribe($user, $newCar);
 
                 return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
@@ -2763,7 +2763,7 @@ class CarsController extends AbstractActionController
                 ), $car);
 
                 $user = $this->user()->get();
-                $ucsTable = new DbTable\User\CarSubscribe();
+                $ucsTable = new DbTable\User\ItemSubscribe();
                 $ucsTable->subscribe($user, $car);
 
                 if ($parentCar) {
@@ -2942,7 +2942,7 @@ class CarsController extends AbstractActionController
                 $this->specificationsService->updateActualValues($newCar->id);
 
                 $user = $this->user()->get();
-                $ucsTable = new DbTable\User\CarSubscribe();
+                $ucsTable = new DbTable\User\ItemSubscribe();
                 $ucsTable->subscribe($user, $newCar);
 
                 return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));

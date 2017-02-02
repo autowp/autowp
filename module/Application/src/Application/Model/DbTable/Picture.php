@@ -5,8 +5,6 @@ namespace Application\Model\DbTable;
 use Autowp\Image;
 
 use Autowp\Commons\Db\Table;
-use Application\Model\PictureItem;
-use Application\Model\Log;
 
 use Zend_Db_Expr;
 
@@ -100,7 +98,7 @@ class Picture extends Table
         $large = isset($options['large']) && $options['large'];
 
         // prefetch
-        $carIds = [];
+        $itemIds = [];
         $perspectiveIds = [];
         foreach ($rows as $index => $row) {
             $db = $this->getAdapter();
@@ -110,15 +108,15 @@ class Picture extends Table
                     ->where('picture_id = ?', $row['id'])
             );
             foreach ($pictureItemRows as $pictureItemRow) {
-                $carIds[$pictureItemRow['item_id']] = true;
+                $itemIds[$pictureItemRow['item_id']] = true;
                 if (in_array($pictureItemRow['perspective_id'], $this->prefixedPerspectives)) {
                     $perspectiveIds[$pictureItemRow['perspective_id']] = true;
                 }
             }
         }
 
-        $cars = [];
-        if (count($carIds)) {
+        $items = [];
+        if (count($itemIds)) {
             $table = new Item();
 
             $db = $table->getAdapter();
@@ -139,7 +137,7 @@ class Picture extends Table
 
             $select = $db->select()
                 ->from('item', $columns)
-                ->where('item.id in (?)', array_keys($carIds))
+                ->where('item.id in (?)', array_keys($itemIds))
                 ->joinLeft('spec', 'item.spec_id = spec.id', null)
                 ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :language', null);
 
@@ -159,7 +157,7 @@ class Picture extends Table
                     $data['begin_month'] = $row['begin_month'];
                     $data['end_month'] = $row['end_month'];
                 }
-                $cars[$row['id']] = $data;
+                $items[$row['id']] = $data;
             }
         }
 
@@ -190,12 +188,12 @@ class Picture extends Table
 
             $items = [];
             foreach ($pictureItemRows as $pictureItemRow) {
-                $carId = $pictureItemRow['item_id'];
+                $itemId = $pictureItemRow['item_id'];
                 $perspectiveId = $pictureItemRow['perspective_id'];
 
-                $car = isset($cars[$carId]) ? $cars[$carId] : [];
+                $item = isset($items[$itemId]) ? $items[$itemId] : [];
 
-                $items[] = array_replace($car, [
+                $items[] = array_replace($item, [
                     'perspective' => isset($perspectives[$perspectiveId])
                         ? $perspectives[$perspectiveId]
                         : null

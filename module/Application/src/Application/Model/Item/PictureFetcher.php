@@ -52,7 +52,7 @@ abstract class PictureFetcher
             : $this->pictureTable = new DbTable\Picture();
     }
 
-    protected function getPictureSelect($carId, array $options)
+    protected function getPictureSelect($itemId, array $options)
     {
         $defaults = [
             'perspectiveGroup'    => false,
@@ -90,12 +90,12 @@ abstract class PictureFetcher
         $order = [];
 
         if ($options['onlyExactlyPictures']) {
-            $select->where('picture_item.item_id = ?', $carId);
+            $select->where('picture_item.item_id = ?', $itemId);
         } else {
             $select
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->join('item', 'picture_item.item_id = item.id', null)
-                ->where('item_parent_cache.parent_id = ?', $carId);
+                ->where('item_parent_cache.parent_id = ?', $itemId);
 
             $order[] = 'item.is_concept asc';
             $order[] = 'item_parent_cache.sport asc';
