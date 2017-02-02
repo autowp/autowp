@@ -212,16 +212,50 @@
                         false
                     );
                 }
-
-
+            }
+            
+            $uploadUrlCount = 0;
+            foreach ($this->items as $item) {
                 if ($item['uploadUrl']) {
-                    $list[] = $this->htmlA(
-                        $item['uploadUrl'],
-                        '<i class="fa fa-upload"></i> ' .
+                    $uploadUrlCount++;
+                }
+            }
+            
+            if ($uploadUrlCount > 1) {
+                $uploads = [];
+                foreach ($this->items as $item) {
+                    if ($item['uploadUrl']) {
+                        $uploads[] = $this->htmlA(
+                            $item['uploadUrl'],
+                            '<i class="fa fa-upload"></i> ' .
                             $this->escapeHtml($this->page(29)->name) . ' ' .
                             $this->car()->htmlTitle($item['name']),
-                        false
-                    );
+                            false
+                        );
+                    }
+                }
+                
+                $list[] = '<div class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        ' . $this->escapeHtml($this->page(29)->name) .'
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li>' . implode('</li><li>', $uploads) . '</li>
+                    </ul>
+                </div>';
+                
+            } else {
+                foreach ($this->items as $item) {
+                    if ($item['uploadUrl']) {
+                        $list[] = $this->htmlA(
+                            $item['uploadUrl'],
+                            '<i class="fa fa-upload"></i> ' .
+                            $this->escapeHtml($this->page(29)->name) . ' ' .
+                            $this->car()->htmlTitle($item['name']),
+                            false
+                        );
+                    }
                 }
             }
 

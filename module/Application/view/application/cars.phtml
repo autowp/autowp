@@ -37,6 +37,13 @@ $numberFormatter = NumberFormatter::create($this->language(), NumberFormatter::D
 
         <div class="row thumbnails">
             <?php
+                $canHavePhoto = in_array($item['itemTypeId'], [
+                    Application\Model\DbTable\Item\Type::VEHICLE,
+                    Application\Model\DbTable\Item\Type::ENGINE,
+                    Application\Model\DbTable\Item\Type::BRAND,
+                    Application\Model\DbTable\Item\Type::FACTORY,
+                    Application\Model\DbTable\Item\Type::MUSEUM
+                ]);
                 $havePhoto = false;
                 foreach ($item['pictures'] as $picture) {
                     if ($picture) {
@@ -71,7 +78,7 @@ $numberFormatter = NumberFormatter::create($this->language(), NumberFormatter::D
                         <?php } ?>
                     </div>
                 <?php } ?>
-            <?php } else { ?>
+            <?php } elseif ($canHavePhoto) { ?>
                 <div class="col-md-3 col-sm-3">
                 <div class="thumbnail no-photo" title="<?=$this->escapeHtmlAttr($this->translate('carlist/no-photo'))?>">
                     <?=$this->htmlA([

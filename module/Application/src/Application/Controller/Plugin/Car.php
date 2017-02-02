@@ -408,6 +408,7 @@ class Car extends AbstractPlugin
 
             $item = [
                 'id'               => $car->id,
+                'itemTypeId'       => $car['item_type_id'],
                 'name'             => $car->name,
                 'nameData'         => $car->getNameData($language),
                 'langName'         => isset($carsLangName[$car->id]) ? $carsLangName[$car->id] : null,

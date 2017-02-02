@@ -467,7 +467,6 @@ class Pic extends AbstractPlugin
             $text = null;
             $fullText = null;
             $specsEditUrl = null;
-            $uploadUrl = null;
 
             if ($itemsCount == 1) {
                 $twinsGroupsRows = $itemTable->fetchAll(
@@ -570,13 +569,14 @@ class Pic extends AbstractPlugin
                         'item_id' => $item['id']
                     ]);
                 }
-
-                if ($controller->user()->logedIn()) {
-                    $uploadUrl = $controller->url()->fromRoute('upload/params', [
-                        'action'  => 'index',
-                        'item_id' => $item['id']
-                    ]);
-                }
+            }
+            
+            $uploadUrl = null;
+            if ($controller->user()->logedIn()) {
+                $uploadUrl = $controller->url()->fromRoute('upload/params', [
+                    'action'  => 'index',
+                    'item_id' => $item['id']
+                ]);
             }
 
             // alt names
