@@ -41,7 +41,7 @@ class Module implements
 
         $authRememberListener = new Auth\RememberDispatchListener();
         $authRememberListener->attach($eventManager);
-        
+
         $maintenance = new Maintenance();
         $maintenance->attach($serviceManager->get('CronEventManager')); // TODO: move CronEventManager to zf-components
     }

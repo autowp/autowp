@@ -104,11 +104,11 @@ class Catalogue implements RouteInterface
                         'brand_catname' => $brand->catname,
                     ], $length);
                 }
-                
+
                 if (preg_match('|^page([0-9]+)$|', $path[0], $match)) {
                     $page = intval($match[1]);
                     array_shift($path);
-                
+
                     if (! $path) {
                         // :brand/engines/pageX
                         return $this->assembleMatch([
@@ -117,13 +117,13 @@ class Catalogue implements RouteInterface
                             'page'          => $page
                         ], $length);
                     }
-                
+
                     return false;
                 }
-                
+
                 return false;
                 break;
-                
+
             case 'mosts':
                 array_shift($path);
 
@@ -903,7 +903,7 @@ class Catalogue implements RouteInterface
                     $url[] = 'page' . $data['page'];
                 }
                 break;
-                
+
             case 'engines':
                 $url[] = $data['action'];
                 if (isset($data['page']) && $data['page'] > 1) {

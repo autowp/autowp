@@ -12,19 +12,19 @@ class Log extends AbstractPlugin
      * @var Model
      */
     private $log;
-    
+
     public function __construct(Model $log)
     {
         $this->log = $log;
     }
-    
+
     public function __invoke($message, $objects)
     {
         $user = $this->getController()->user()->get();
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User id not detected');
         }
-        
+
         $this->log->addEvent($user->id, $message, $objects);
     }
 }

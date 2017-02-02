@@ -433,7 +433,7 @@ class Car extends AbstractPlugin
             if (count($item['pictures']) < $item['totalPictures']) {
                 $item['allPicturesUrl'] = $listBuilder->getPicturesUrl($car);
             }
-            
+
             $item['uploadUrl'] = $controller->url()->fromRoute('upload/params', [
                 'action'  => 'index',
                 'item_id' => $car['id']

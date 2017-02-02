@@ -567,7 +567,7 @@ class IndexController extends AbstractActionController
         $categories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             $categories = $this->categories->getCategoriesList(null, $language, 15, 'count');
-            
+
             foreach ($categories as &$category) {
                 $category['new_cars_url'] = $this->url()->fromRoute('category-newcars', [
                     'item_id' => $category['id']

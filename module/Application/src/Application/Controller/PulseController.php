@@ -18,7 +18,7 @@ class PulseController extends AbstractActionController
      * @var TableGateway
      */
     private $logTable;
-    
+
     private $lastColor = 0;
 
     private $colors = [
@@ -35,7 +35,7 @@ class PulseController extends AbstractActionController
         '#880088',
         '#008888',
     ];
-    
+
     public function __construct(Adapter $adapter)
     {
         $this->logTable = new TableGateway('log_events', $adapter);
@@ -49,7 +49,7 @@ class PulseController extends AbstractActionController
     public function indexAction()
     {
         $userTable = new User();
-        
+
         $now = new DateTime();
 
         switch ($this->params()->fromQuery('period')) {
@@ -92,14 +92,14 @@ class PulseController extends AbstractActionController
                 ];
                 break;
         }
-        
+
         $select = new Sql\Select($this->logTable->getTable());
         $select
             ->columns($columns)
             ->where([
                 new Sql\Predicate\Between(
-                    'add_datetime', 
-                    $from->format(MYSQL_DATETIME_FORMAT), 
+                    'add_datetime',
+                    $from->format(MYSQL_DATETIME_FORMAT),
                     $now->format(MYSQL_DATETIME_FORMAT)
                 )
             ])

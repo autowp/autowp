@@ -639,25 +639,25 @@ class UploadController extends AbstractActionController
             'src' => $image->getSrc()
         ]);
     }
-    
+
     public function sendAction()
     {
         $user = $this->user()->get();
-        
+
         if (! $user || $user->deleted) {
             return $this->forward()->dispatch(self::class, [
                 'action' => 'only-registered'
             ]);
         }
-        
+
         $request = $this->getRequest();
-        
+
         if (! $request->isPost()) {
             return $this->forbiddenAction();
         }
-        
+
         $pictureTable = $this->catalogue()->getPictureTable();
-        
+
         $replace = $this->params('replace');
         $replacePicture = false;
         if ($replace) {
@@ -665,9 +665,9 @@ class UploadController extends AbstractActionController
                 'identity = ?' => $replace
             ]);
         }
-        
+
         $perspectiveId = null;
-        
+
         if ($replacePicture) {
             $itemIds = $this->pictureItem->getPictureItems($replacePicture->id);
         } else {
@@ -675,18 +675,18 @@ class UploadController extends AbstractActionController
             $itemIds = $itemId ? [$itemId] : [];
             $perspectiveId = (int)$this->params('perspective_id');
         }
-        
+
         $itemTable = new DbTable\Item();
         $selectedItems = $itemTable->find($itemIds);
-        
+
         if (count($selectedItems) <= 0) {
             return $this->forbiddenAction();
         }
-        
+
         $form = new UploadForm(null, [
             'multipleFiles' => ! $replacePicture,
         ]);
-        
+
         $data = array_merge_recursive(
             $request->getPost()->toArray(),
             $request->getFiles()->toArray()
@@ -696,7 +696,7 @@ class UploadController extends AbstractActionController
             $this->getResponse()->setStatusCode(400);
             return new JsonModel($form->getMessages());
         }
-        
+
         $pictures = $this->saveUpload($form, $itemIds, $perspectiveId, $replacePicture);
 
         $result = [];

@@ -100,7 +100,7 @@ class Module implements
 
         $languageListener = new LanguageRouteListener();
         $languageListener->attach($eventManager);
-        
+
         $maintenance = new Maintenance();
         $maintenance->attach($serviceManager->get('CronEventManager'));
     }
@@ -111,7 +111,7 @@ class Module implements
         if ($exception) {
             $serviceManager = $e->getApplication()->getServiceManager();
             $serviceManager->get('ErrorLog')->crit($exception);
-            
+
             $filePath = __DIR__ . '/../../data/email-error';
             if (file_exists($filePath)) {
                 $mtime = filemtime($filePath);
@@ -123,14 +123,14 @@ class Module implements
             }
         }
     }
-    
+
     private function sendErrorEmail($exception, $serviceManager)
     {
         $message = get_class($exception) . PHP_EOL .
                    'File: ' . $exception->getFile() . PHP_EOL .
                    'Message: ' . $exception->getMessage() . PHP_EOL .
                    'Trace: ' . PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
-                
+
         $mail = new Mail\Message();
         $mail
             ->setEncoding('utf-8')
@@ -138,7 +138,7 @@ class Module implements
             ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
             ->addTo('dvp@autowp.ru')
             ->setSubject('autowp exception: ' . get_class($exception));
-        
+
         $transport = $serviceManager->get(Mail\Transport\TransportInterface::class);
         $transport->send($mail);
     }

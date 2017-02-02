@@ -2197,7 +2197,7 @@ class CatalogueController extends AbstractActionController
             return $data;
         });
     }
-    
+
     public function enginesAction()
     {
         return $this->doBrandAction(function ($brand) {
@@ -2205,19 +2205,19 @@ class CatalogueController extends AbstractActionController
                 ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $brand['id'])
                 ->order($this->carsOrder());
-        
+
             $paginator = $this->carsPaginator($select, $this->params('page'));
-        
+
             if ($paginator->getTotalItemCount() <= 0) {
                 return $this->notFoundAction();
             }
-        
+
             $itemParentTable = new DbTable\Item\ParentTable();
-        
+
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
             ]);
-        
+
             return [
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [

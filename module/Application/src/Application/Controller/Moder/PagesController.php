@@ -28,7 +28,7 @@ class PagesController extends AbstractActionController
     private function getPagesList($parentId)
     {
         $result = [];
-        
+
         $select = new Sql\Select($this->table->getTable());
 
         $select->order('position');
@@ -168,7 +168,7 @@ class PagesController extends AbstractActionController
                         } else {
                             $select->where('parent_id is null');
                         }
-                        
+
                         $sql = new Sql\Sql($this->table->getAdapter());
                         $statement = $sql->prepareStatementForSqlObject($select);
                         $result = $statement->execute();
@@ -180,7 +180,7 @@ class PagesController extends AbstractActionController
                     $select
                         ->columns(['position' => new Sql\Expression('MAX(position)')])
                         ->where(['parent_id' => $values['parent_id']]);
-                    
+
                     $sql = new Sql\Sql($this->table->getAdapter());
                     $statement = $sql->prepareStatementForSqlObject($select);
                     $result = $statement->execute();
@@ -263,7 +263,7 @@ class PagesController extends AbstractActionController
         if (! $page) {
             return $this->notFoundAction();
         }
-        
+
         $select = new Sql\Select($this->table->getTable());
         $select
             ->where([

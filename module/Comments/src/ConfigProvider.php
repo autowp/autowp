@@ -85,7 +85,7 @@ class ConfigProvider
                             'attributes' => [
                                 'cols'      => 80,
                                 'rows'      => 5,
-                                'maxlength' => 1024*16
+                                'maxlength' => 1024 * 16
                             ]
                         ],
                     ],
@@ -122,7 +122,7 @@ class ConfigProvider
                                 'name' => 'StringLength',
                                 'options' => [
                                     'min' => 0,
-                                    'max' => 1024*16
+                                    'max' => 1024 * 16
                                 ]
                             ]
                         ]

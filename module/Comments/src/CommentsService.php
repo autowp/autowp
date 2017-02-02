@@ -371,7 +371,7 @@ class CommentsService
         ], [
             'id = ?' => $message['id']
         ]);
-        
+
         return $row['count'];
     }
 
@@ -993,26 +993,26 @@ class CommentsService
 
         return $paginator->getTotalItemCount();
     }
-    
+
     private function deleteRecursive($typeId, $itemId, $parentId)
     {
         $filter = [
             'type_id = ?' => (int)$typeId,
             'item_id = ?' => (int)$itemId
         ];
-        
+
         if ($parentId) {
             $filter['parent_id = ?'] = $parentId;
         } else {
             $filter[] = 'parent_id is null';
-        } 
-        
+        }
+
         $select = new Sql\Select($this->messageTable->getTable());
         $select->where($filter);
-        
+
         foreach ($this->messageTable->selectWith($select) as $row) {
             $this->deleteRecursive($typeId, $itemId, $row['id']);
-            
+
             $this->messageTable->delete($filter);
         }
     }
@@ -1053,14 +1053,14 @@ class CommentsService
             ->quantifier(Sql\Select::QUANTIFIER_DISTINCT)
             ->columns(['parent_id'])
             ->where(['parent_id']);
-        
+
         $select = new Sql\Select($this->messageTable->getTable());
         $select->columns(['id', 'type_id', 'item_id'])
             ->where([
             new Sql\Predicate\NotIn('id', $subSelect),
             'deleted',
             new Sql\Predicate\Expression('delete_date < DATE_SUB(NOW(), INTERVAL ? DAY)', [self::DELETE_TTL_DAYS])
-        ]);
+            ]);
 
         $rows = $this->messageTable->selectWith($select);
 
@@ -1077,7 +1077,7 @@ class CommentsService
 
         return $affected;
     }
-    
+
     public function getList(array $options)
     {
         $defaults = [
@@ -1085,21 +1085,21 @@ class CommentsService
             'callback' => null
         ];
         $options = array_replace($defaults, $options);
-        
+
         $select = new Sql\Select($this->messageTable->getTable());
-        
+
         $select->order('datetime');
-        
+
         if ($options['type']) {
             $select->where(['type_id = ?' => (int)$options['type']]);
         }
-            
+
         if ($options['callback']) {
             $options['callback']($select);
         }
-        
+
         $items = [];
-        
+
         foreach ($this->messageTable->selectWith($select) as $row) {
             $items[] = [
                 'id'      => $row['id'],
@@ -1107,23 +1107,23 @@ class CommentsService
                 'type_id' => $row['type_id']
             ];
         }
-        
+
         return $items;
     }
-    
+
     public function deleteMessage($id)
     {
         $message = $this->getMessageRow($id);
-        
+
         $affected = $this->messageTable->delete([
             'id' => $message['id']
         ]);
-        
+
         $this->updateTopicStat($message['type_id'], $message['item_id']);
-        
+
         return $affected;
     }
-    
+
     public function cleanTopics()
     {
         $adapter = $this->topicViewTable->getAdapter();
@@ -1134,9 +1134,9 @@ class CommentsService
                         and comment_topic_view.type_id=comment_message.type_id
             WHERE comment_message.type_id is null
         ', $adapter::QUERY_MODE_EXECUTE);
-        
+
         $affected = $result->getAffectedRows();
-        
+
         $adapter = $this->topicTable->getAdapter();
         $result = $adapter->query('
             DELETE comment_topic
@@ -1145,9 +1145,9 @@ class CommentsService
                         and comment_topic.type_id=comment_message.type_id
             WHERE comment_message.type_id is null
         ', $adapter::QUERY_MODE_EXECUTE);
-        
+
         $affected += $result->getAffectedRows();
-        
+
         return $affected;
     }
 }

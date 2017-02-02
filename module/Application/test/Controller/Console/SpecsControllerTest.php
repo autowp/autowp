@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Controller\Frontend;
+namespace ApplicationTest\Controller\Console;
 
 use Application\Controller\Console\SpecsController;
 use Application\Test\AbstractConsoleControllerTestCase;
@@ -50,17 +50,6 @@ class SpecsControllerTest extends AbstractConsoleControllerTestCase
         $this->assertControllerName(SpecsController::class);
         $this->assertMatchedRouteName('specs');
         $this->assertActionName('refresh-users-stat');
-        $this->assertConsoleOutputContains('done');
-    }
-
-    public function testUpdateSpecsVolumes()
-    {
-        $this->dispatch('specs update-specs-volumes');
-
-        $this->assertModuleName('application');
-        $this->assertControllerName(SpecsController::class);
-        $this->assertMatchedRouteName('specs');
-        $this->assertActionName('update-specs-volumes');
         $this->assertConsoleOutputContains('done');
     }
 }

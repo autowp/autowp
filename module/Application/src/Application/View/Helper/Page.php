@@ -87,13 +87,13 @@ class Page extends AbstractHelper
         if (isset($this->pages[$id])) {
             return $this->pages[$id];
         }
-        
+
         $row = $this->pageTable->select([
             'id' => (int)$id
         ])->current();
 
         $this->pages[$id] = $row;
-        
+
         return $row;
     }
 
@@ -102,7 +102,7 @@ class Page extends AbstractHelper
         if (! $parent || ! $child) {
             return false;
         }
-        
+
         $childId = $child['id'];
         $parentId = $parent['id'];
 
