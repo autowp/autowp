@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Controller\Frontend;
+namespace ApplicationTest\Controller\Console;
 
 use Application\Controller\Console\SpecsController;
 use Application\Test\AbstractConsoleControllerTestCase;

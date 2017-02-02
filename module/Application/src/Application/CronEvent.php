@@ -9,9 +9,9 @@ class CronEvent extends Event
 {
     const EVENT_DAILY_MAINTENANCE = 'daily.maintenance';
     const EVENT_MIDNIGHT = 'midnight';
-    
+
     protected $application;
-    
+
     /**
      * Set application instance
      *
@@ -24,7 +24,7 @@ class CronEvent extends Event
         $this->application = $application;
         return $this;
     }
-    
+
     /**
      * Get application instance
      *

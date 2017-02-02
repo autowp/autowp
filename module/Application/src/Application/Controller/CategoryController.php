@@ -29,7 +29,7 @@ class CategoryController extends AbstractActionController
      * @var DbTable\Item\Language
      */
     private $itemLanguageTable;
-    
+
     /**
      * @var Categories
      */
@@ -165,14 +165,13 @@ class CategoryController extends AbstractActionController
         $otherCategoriesName = $this->translate('categories/other');
 
         if ($maxDeep > 0) {
-            
             $db = $this->itemTable->getAdapter();
-            
+
             $categories = $this->categories->getCategoriesList($parent['id'], $language, null, 'name');
-            
+
             foreach ($categories as &$category) {
                 $category['categories'] = $this->categoriesMenu($category, $language, $maxDeep - 1);
-                $category['isOther'] = false; 
+                $category['isOther'] = false;
             }
             unset($category); // prevent bugs
 
@@ -322,7 +321,7 @@ class CategoryController extends AbstractActionController
 
             $this->cache->setItem($key, $menu);
         }
-        
+
         $db = $this->itemTable->getAdapter();
         $categoryParentIds = $db->fetchCol(
             $db->select()
@@ -724,11 +723,11 @@ class CategoryController extends AbstractActionController
             ]));
         });
     }
-    
+
     public function newcarsAction()
     {
         $itemTable = new DbTable\Item();
-    
+
         $category = $itemTable->fetchRow([
             'item_type_id = ?' => DbTable\Item\Type::CATEGORY,
             'id = ?'           => (int)$this->params('item_id')
@@ -736,15 +735,15 @@ class CategoryController extends AbstractActionController
         if (! $category) {
             return $this->notFoundAction();
         }
-    
+
         $language = $this->language();
         $itemLangTable = new DbTable\Item\Language();
         $itemLang = $itemLangTable->fetchRow([
             'item_id = ?'  => $category->id,
             'language = ?' => $language
         ]);
-    
-    
+
+
         $rows = $itemTable->fetchAll(
             $itemTable->select(true)
                 ->where('item.item_type_id IN (?)', [
@@ -761,17 +760,17 @@ class CategoryController extends AbstractActionController
                 ->order(['item_parent.timestamp DESC'])
                 ->limit(20)
         );
-    
+
         $items = [];
         foreach ($rows as $row) {
             $items[] = $row->getNameData($language);
         }
-    
+
         $viewModel = new ViewModel([
             'items' => $items
         ]);
         $viewModel->setTerminal(true);
-    
+
         return $viewModel;
     }
 }

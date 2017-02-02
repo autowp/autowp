@@ -418,7 +418,7 @@ class Forums
 
         $db = $this->topicTable->getAdapter();
 
-        if (!$values['ip']) {
+        if (! $values['ip']) {
             $values['ip'] = '127.0.0.1';
         }
 
@@ -695,7 +695,7 @@ class Forums
 
     public function addMessage($values)
     {
-        if (!$values['ip']) {
+        if (! $values['ip']) {
             $values['ip'] = '127.0.0.1';
         }
 

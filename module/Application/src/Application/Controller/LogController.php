@@ -12,7 +12,7 @@ class LogController extends AbstractActionController
      * @var Log
      */
     private $log;
-    
+
     public function __construct(Log $log)
     {
         $this->log = $log;
@@ -23,7 +23,7 @@ class LogController extends AbstractActionController
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-        
+
         $data = $this->log->getList([
             'article_id' => $this->params('article_id'),
             'item_id'    => $this->params('item_id'),

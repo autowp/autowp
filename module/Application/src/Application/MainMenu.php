@@ -35,7 +35,7 @@ class MainMenu
      * @var StorageInterface
      */
     private $cache;
-    
+
     /**
      * @var Categories
      */
@@ -70,7 +70,7 @@ class MainMenu
      * @var MessageService
      */
     private $message;
-    
+
     public function __construct(
         TreeRouteStack $router,
         Language $language,
@@ -105,7 +105,7 @@ class MainMenu
     private function getMenuData($id, $logedIn, $language)
     {
         $db = $this->pageTable->getAdapter();
-        
+
         $select = new Sql\Select($this->pageTable->getTable());
         $select
             ->columns(['id', 'url', 'class'])
