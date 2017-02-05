@@ -11,6 +11,7 @@ use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
 
+use Application\HostManager;
 use Application\Service\UsersService;
 
 class RestorePasswordController extends AbstractActionController
@@ -31,13 +32,24 @@ class RestorePasswordController extends AbstractActionController
     private $newPasswordForm;
 
     private $transport;
+    
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
 
-    public function __construct(UsersService $service, Form $restorePasswordForm, Form $newPasswordForm, $transport)
-    {
+    public function __construct(
+        UsersService $service, 
+        Form $restorePasswordForm, 
+        Form $newPasswordForm, 
+        $transport,
+        HostManager $hostManager
+    ) {
         $this->service = $service;
         $this->restorePasswordForm = $restorePasswordForm;
         $this->newPasswordForm = $newPasswordForm;
         $this->transport = $transport;
+        $this->hostManager = $hostManager;
     }
 
     public function indexAction()

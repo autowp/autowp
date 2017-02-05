@@ -12,6 +12,7 @@ class Referer extends Table
     protected $_primary = ['url'];
 
     const MAX_URL = 1000;
+    const MAX_ACCEPT = 1000;
 
     public function addUrl($url, $accept)
     {
@@ -27,10 +28,10 @@ class Referer extends Table
 
             $this->getAdapter()->query('
                 insert into referer (host, url, count, last_date, accept)
-                values (?, ?, 1, NOW(), ?)
+                values (?, ?, 1, NOW(), LEFT(?, ?))
                 on duplicate key
                 update count=count+1, host=VALUES(host), last_date=VALUES(last_date), accept=VALUES(accept)
-            ', [$host, $url, $accept]);
+            ', [$host, $url, $accept, self::MAX_ACCEPT]);
         }
     }
 
