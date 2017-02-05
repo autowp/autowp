@@ -560,9 +560,9 @@ class CarsController extends AbstractActionController
             $this->log($message, $car);
 
             $user = $this->user()->get();
-            $ucsTable = new DbTable\User\CarSubscribe();
+            $ucsTable = new DbTable\User\ItemSubscribe();
 
-            foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
+            foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
                     $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
@@ -615,9 +615,9 @@ class CarsController extends AbstractActionController
             $this->log($message, $car);
 
             $user = $this->user()->get();
-            $ucsTable = new DbTable\User\CarSubscribe();
+            $ucsTable = new DbTable\User\ItemSubscribe();
 
-            foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
+            foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
                     $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
@@ -736,7 +736,7 @@ class CarsController extends AbstractActionController
         $this->specsService->updateActualValues($car->id);
 
         $user = $this->user()->get();
-        $ucsTable = new DbTable\User\CarSubscribe();
+        $ucsTable = new DbTable\User\ItemSubscribe();
 
         $message = sprintf(
             'Автомобилю %s назначен двигатель %s',
@@ -745,7 +745,7 @@ class CarsController extends AbstractActionController
         );
         $this->log($message, $car);
 
-        foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
+        foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
             if ($subscriber && ($subscriber->id != $user->id)) {
                 $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 

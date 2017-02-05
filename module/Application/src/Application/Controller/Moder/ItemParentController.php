@@ -131,7 +131,7 @@ class ItemParentController extends AbstractActionController
         $this->model->create($brandRow->id, $vehicleRow->id);
 
         $user = $this->user()->get();
-        $ucsTable = new DbTable\User\CarSubscribe();
+        $ucsTable = new DbTable\User\ItemSubscribe();
         $ucsTable->subscribe($user, $vehicleRow);
 
         $message = sprintf(
@@ -169,7 +169,7 @@ class ItemParentController extends AbstractActionController
 
         if ($success) {
             $user = $this->user()->get();
-            $ucsTable = new DbTable\User\CarSubscribe();
+            $ucsTable = new DbTable\User\ItemSubscribe();
             $ucsTable->subscribe($user, $vehicleRow);
 
             $message = sprintf(

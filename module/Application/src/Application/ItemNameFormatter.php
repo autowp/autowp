@@ -28,7 +28,7 @@ class ItemNameFormatter
         return $this->translator->translate($string, 'default', $language);
     }
 
-    public function formatHtml(array $car, $language)
+    public function formatHtml(array $item, $language)
     {
         $defaults = [
             'begin_model_year' => null,
@@ -43,36 +43,36 @@ class ItemNameFormatter
             'begin_month'      => null,
             'end_month'        => null
         ];
-        $car = array_replace($defaults, $car);
+        $item = array_replace($defaults, $item);
 
-        $result = $this->renderer->escapeHtml($car['name']);
+        $result = $this->renderer->escapeHtml($item['name']);
 
-        if ($car['spec']) {
+        if ($item['spec']) {
             $attrs = ['class="label label-primary"'];
-            if ($car['spec_full']) {
+            if ($item['spec_full']) {
                 $attrs = array_merge($attrs, [
-                    'title="' . $this->renderer->escapeHtmlAttr($car['spec_full']) . '"',
+                    'title="' . $this->renderer->escapeHtmlAttr($item['spec_full']) . '"',
                     'data-toggle="tooltip"',
                     'data-placement="top"'
                 ]);
             }
-            $escapedSpec = $this->renderer->escapeHtml($car['spec']);
+            $escapedSpec = $this->renderer->escapeHtml($item['spec']);
             $result .= ' <span '.implode(' ', $attrs).'>' . $escapedSpec . '</span>';
         }
 
-        if (strlen($car['body']) > 0) {
-            $result .= ' ('.$this->renderer->escapeHtml($car['body']).')';
+        if (strlen($item['body']) > 0) {
+            $result .= ' ('.$this->renderer->escapeHtml($item['body']).')';
         }
 
-        $by = (int)$car['begin_year'];
-        $bm = (int)$car['begin_month'];
-        $ey = (int)$car['end_year'];
-        $em = (int)$car['end_month'];
+        $by = (int)$item['begin_year'];
+        $bm = (int)$item['begin_month'];
+        $ey = (int)$item['end_year'];
+        $em = (int)$item['end_month'];
         $cy = (int)date('Y');
         $cm = (int)date('m');
 
-        $bmy = (int)$car['begin_model_year'];
-        $emy = (int)$car['end_model_year'];
+        $bmy = (int)$item['begin_model_year'];
+        $emy = (int)$item['end_model_year'];
 
         $bs = (int)($by / 100);
         $es = (int)($ey / 100);
@@ -90,7 +90,7 @@ class ItemNameFormatter
             $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/model-years', $language));
             $result = '<span title="' . $title . '">' .
                           $this->renderer->escapeHtml(
-                              $this->getModelYearsPrefix($bmy, $emy, $car['today'], $language)
+                              $this->getModelYearsPrefix($bmy, $emy, $item['today'], $language)
                           ) .
                       '</span> ' .
                       $result;
@@ -101,7 +101,7 @@ class ItemNameFormatter
                     '<small>'.
                         ' \'<span class="realyears" title="'.$title.'">' .
                             $this->renderYearsHtml(
-                                $car['today'],
+                                $item['today'],
                                 $by,
                                 $bm,
                                 $ey,
@@ -117,7 +117,7 @@ class ItemNameFormatter
         } else {
             if ($by > 0 || $ey > 0) {
                 $result .= " '" . $this->renderYearsHtml(
-                    $car['today'],
+                    $item['today'],
                     $by,
                     $bm,
                     $ey,
@@ -133,7 +133,7 @@ class ItemNameFormatter
         return $result;
     }
 
-    public function format(array $car, $language)
+    public function format(array $item, $language)
     {
         $defaults = [
             'begin_model_year' => null,
@@ -148,26 +148,26 @@ class ItemNameFormatter
             'begin_month'      => null,
             'end_month'        => null
         ];
-        $car = array_replace($defaults, $car);
+        $item = array_replace($defaults, $item);
 
-        $result = $car['name'];
+        $result = $item['name'];
 
-        if ($car['spec']) {
-            $result .= ' ' . $car['spec'];
+        if ($item['spec']) {
+            $result .= ' ' . $item['spec'];
         }
 
-        if (strlen($car['body']) > 0) {
-            $result .= ' ('.$car['body'].')';
+        if (strlen($item['body']) > 0) {
+            $result .= ' ('.$item['body'].')';
         }
 
-        $by = (int)$car['begin_year'];
-        $bm = (int)$car['begin_month'];
-        $ey = (int)$car['end_year'];
-        $em = (int)$car['end_month'];
+        $by = (int)$item['begin_year'];
+        $bm = (int)$item['begin_month'];
+        $ey = (int)$item['end_year'];
+        $em = (int)$item['end_month'];
         $cy = (int)date('Y');
 
-        $bmy = (int)$car['begin_model_year'];
-        $emy = (int)$car['end_model_year'];
+        $bmy = (int)$item['begin_model_year'];
+        $emy = (int)$item['end_model_year'];
 
         $bs = (int)($by / 100);
         $es = (int)($ey / 100);
@@ -179,12 +179,12 @@ class ItemNameFormatter
         $equalM = $equalY && $bm && $em && ($bm == $em);
 
         if ($useModelYear) {
-            $result = $this->getModelYearsPrefix($bmy, $emy, $car['today'], $language) . ' ' . $result;
+            $result = $this->getModelYearsPrefix($bmy, $emy, $item['today'], $language) . ' ' . $result;
         }
 
         if ($by > 0 || $ey > 0) {
             $result .= " '" . $this->renderYears(
-                $car['today'],
+                $item['today'],
                 $by,
                 $bm,
                 $ey,

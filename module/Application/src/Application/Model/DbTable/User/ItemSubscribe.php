@@ -8,7 +8,7 @@ use Autowp\User\Model\DbTable\User\Row as UserRow;
 use Autowp\Commons\Db\Table;
 use Application\Model\DbTable;
 
-class CarSubscribe extends Table
+class ItemSubscribe extends Table
 {
     protected $_name = 'user_item_subscribe';
     protected $_primary = ['user_id', 'item_id'];
@@ -51,7 +51,7 @@ class CarSubscribe extends Table
         }
     }
 
-    public function getCarSubscribers(DbTable\Item\Row $car)
+    public function getItemSubscribers(DbTable\Item\Row $car)
     {
         $uTable = new User();
 

@@ -272,10 +272,10 @@ class Twins
     }
 
     /**
-     * @param int $carId
+     * @param int $itemId
      * @return array
      */
-    public function getCarGroups($carId)
+    public function getCarGroups($itemId)
     {
         $groupTable = $this->getItemTable();
 
@@ -283,7 +283,7 @@ class Twins
             $groupTable->select(true)
                 ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', (int)$carId)
+                ->where('item_parent_cache.item_id = ?', (int)$itemId)
                 ->group('item.id')
         );
 
@@ -299,10 +299,10 @@ class Twins
     }
 
     /**
-     * @param array $carIds
+     * @param array $itemIds
      * @return array
      */
-    public function getCarsGroups(array $carIds)
+    public function getCarsGroups(array $itemIds)
     {
         $groupTable = $this->getItemTable();
 
@@ -313,17 +313,17 @@ class Twins
                 ->from($groupTable->info('name'), ['id', 'name'])
                 ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', 'item_id')
-                ->where('item_parent_cache.item_id IN (?)', $carIds)
+                ->where('item_parent_cache.item_id IN (?)', $itemIds)
                 ->group(['item_parent_cache.item_id', 'item.id'])
         );
 
         $result = [];
-        foreach ($carIds as $carId) {
-            $result[(int)$carId] = [];
+        foreach ($itemIds as $itemId) {
+            $result[(int)$itemId] = [];
         }
         foreach ($rows as $row) {
-            $carId = (int)$row['item_id'];
-            $result[$carId][] = [
+            $itemId = (int)$row['item_id'];
+            $result[$itemId][] = [
                 'id'   => $row['id'],
                 'name' => $row['name']
             ];
