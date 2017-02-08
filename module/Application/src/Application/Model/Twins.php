@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Application\Model\Brand;
 use Application\Model\DbTable;
 
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
@@ -51,47 +52,34 @@ class Twins
             'language' => 'en',
             'limit'    => null
         ];
-        $options = array_merge($defaults, $options);
+        $options = array_replace($defaults, $options);
 
-        $language = $options['language'];
         $limit = $options['limit'];
-
-        $itemTable = $this->getItemTable();
-        $db = $itemTable->getAdapter();
-
-        $langExpr = $db->quoteInto('item.id = item_language.item_id and item_language.language = ?', $language);
-
-        $select = $db->select(true)
-            ->from('item', [
-                'id',
-                'name'      => 'IFNULL(item_language.name, item.name)',
-                'catname',
+        
+        $brandModel = new Brand();
+        
+        return $brandModel->getList([
+            'language' => $options['language'],
+            'columns'  => [
                 'count'     => new Zend_Db_Expr('count(distinct twins.id)'),
                 'new_count' => new Zend_Db_Expr(
                     'count(distinct if(twins.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), twins.id, null))'
                 ),
-            ])
-            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
-            ->joinLeft('item_language', $langExpr, null)
-            ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', null)
-            ->join('item_parent', 'ipc1.item_id = item_parent.item_id', null)
-            ->join(['twins' => 'item'], 'item_parent.parent_id = twins.id', null)
-            ->where('twins.item_type_id = ?', DbTable\Item\Type::TWINS)
-            ->group('item.id');
-
-        if ($limit > 0) {
+            ]
+        ], function ($select) use ($limit) {
             $select
-                ->order('count desc')
-                ->limit($limit);
-        }
-
-        $brandList = $db->fetchAll($select);
-
-        usort($brandList, function ($a, $b) {
-            return strcoll($a['name'], $b['name']);
+                ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', null)
+                ->join('item_parent', 'ipc1.item_id = item_parent.item_id', null)
+                ->join(['twins' => 'item'], 'item_parent.parent_id = twins.id', null)
+                ->where('twins.item_type_id = ?', DbTable\Item\Type::TWINS)
+                ->group('item.id');
+            
+            if ($limit > 0) {
+                $select
+                    ->order('count desc')
+                    ->limit($limit);
+            }
         });
-
-        return $brandList;
     }
 
     /**

@@ -66,7 +66,7 @@ class TwinsController extends AbstractActionController
     {
         $language = $this->language();
 
-        $key = 'TWINS_SIDEBAR_7_' . $language;
+        $key = 'TWINS_SIDEBAR_8_' . $language;
 
         $arr = $this->cache->getItem($key, $success);
         if (! $success) {

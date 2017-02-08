@@ -579,7 +579,7 @@ class IndexController extends AbstractActionController
         }
 
         // БЛИЗНЕЦЫ
-        $cacheKey = 'INDEX_INTERESTS_TWINS_BLOCK_26_' . $language;
+        $cacheKey = 'INDEX_INTERESTS_TWINS_BLOCK_27_' . $language;
         $twinsBlock = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             $twins = new Twins();
