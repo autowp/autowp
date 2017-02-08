@@ -2202,6 +2202,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandAction(function ($brand) {
             $select = $this->catalogue()->getItemTable()->select(true)
+                ->where('item.item_type_id = ?', DbTable\Item\Type::ENGINE)
                 ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $brand['id'])
                 ->order($this->carsOrder());

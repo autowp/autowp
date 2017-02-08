@@ -26,7 +26,7 @@ class NewCommand extends Command
         if ($arguments) {
             $itemTable = new DbTable\Item();
 
-            $brandRow = $brandTable->fetchRow([
+            $brandRow = $itemTable->fetchRow([
                 'name = ?'         => (string)$arguments,
                 'item_type_id = ?' => DbTable\Item\Type::BRAND
             ]);

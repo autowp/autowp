@@ -25,8 +25,8 @@ class Maintenance extends AbstractListenerAggregate
         
         $service = $serviceManager->get(MessageService::class);
         
-        $count = $service->recycleSystem();
-        print sprintf("%d messages was deleted\n", $count);
+        /*$count = $service->recycleSystem();
+        print sprintf("%d messages was deleted\n", $count);*/
         
         $count = $service->recycle();
         print sprintf("%d messages was deleted\n", $count);

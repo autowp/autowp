@@ -160,7 +160,7 @@ class Picture extends Table
                 $items[$row['id']] = $data;
             }
         }
-
+        
         $perspectives = [];
         if (count($perspectiveIds)) {
             $perspectiveTable = new Perspective();
@@ -186,14 +186,14 @@ class Picture extends Table
                     ->where('picture_id = ?', $row['id'])
             );
 
-            $items = [];
+            $resultItems = [];
             foreach ($pictureItemRows as $pictureItemRow) {
                 $itemId = $pictureItemRow['item_id'];
                 $perspectiveId = $pictureItemRow['perspective_id'];
 
                 $item = isset($items[$itemId]) ? $items[$itemId] : [];
 
-                $items[] = array_replace($item, [
+                $resultItems[] = array_replace($item, [
                     'perspective' => isset($perspectives[$perspectiveId])
                         ? $perspectives[$perspectiveId]
                         : null
@@ -201,7 +201,7 @@ class Picture extends Table
             }
 
             $result[$row['id']] = [
-                'items' => $items
+                'items' => $resultItems
             ];
         }
 

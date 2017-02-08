@@ -374,7 +374,7 @@ class Pic extends AbstractPlugin
             $id = (int)$row['id'];
 
             $name = isset($names[$id]) ? $names[$id] : null;
-
+            
             if ($urlCallback) {
                 $url = $urlCallback($row);
             } else {

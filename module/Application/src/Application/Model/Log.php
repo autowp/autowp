@@ -88,10 +88,16 @@ class Log
 
             if ($col && $tableName) {
                 $table = new TableGateway($tableName, $this->adapter);
-                $table->insert([
-                    'log_event_id' => $id,
-                    $col           => $item['id']
-                ]);
+                try {
+                    $table->insert([
+                        'log_event_id' => $id,
+                        $col           => $item['id']
+                    ]);
+                } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $e) {
+                    if (strpos($e->getMessage(), 'Duplicate entry') === false) {
+                        throw $e;
+                    }
+                }
             }
         }
         return $this;

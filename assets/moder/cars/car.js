@@ -178,7 +178,7 @@ module.exports = {
                         }
                     })
                     .on('typeahead:select', function(ev, car) {
-                        $('<form method="post"></form>').attr('action', car.url).submit();
+                        $('<form method="post"></form>').attr('action', car.url).appendTo(document.body).submit();
                     });
             });
         });
