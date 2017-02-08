@@ -61,8 +61,8 @@
                             </td><td style="width:<?=$width ?>%">
                         <?php } ?>
                         <?=$this->htmlA($this->url(null, [
-                            'brand_id' => $brand->id
-                        ], [], true), $brand->name) ?><br />
+                            'brand_id' => $brand['id']
+                        ], [], true), $brand['name']) ?><br />
                         <?php $idx++ ?>
                     <?php } ?>
                 </td>
@@ -102,8 +102,8 @@
                             </td><td style="width:<?=$width ?>%">
                         <?php } ?>
                         <?=$this->htmlA($this->url(null, [
-                            'brand_id' => $brand->id
-                        ], [], true), $brand->name) ?><br />
+                            'brand_id' => $brand['id']
+                        ], [], true), $brand['name']) ?><br />
                         <?php $idx++ ?>
                     <?php } ?>
                 </td>

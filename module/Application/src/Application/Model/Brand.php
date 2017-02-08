@@ -335,7 +335,7 @@ class Brand
         return null;
     }
 
-    public function getList($options, callable $callback)
+    public function getList($options, callable $callback = null)
     {
         if (is_string($options)) {
             $options = [
@@ -354,6 +354,7 @@ class Brand
         $columns = [
             'id',
             'catname',
+            'position',
             'name'    => 'IF(' .
                 'item_language.name IS NOT NULL and LENGTH(item_language.name)>0,' .
                 'item_language.name,' .
@@ -390,11 +391,18 @@ class Brand
                 'language' => (string)$options['language']
             ]);
 
-        $callback($select);
+        if ($callback) {
+            $callback($select);
+        }
 
         $items = $db->fetchAll($select);
 
         usort($items, function ($a, $b) use ($options) {
+            
+            if ($a['position'] != $b['position']) {
+                return ($a['position'] < $b['position']) ? -1 : 1;
+            }
+            
             return $this->compareName($a['name'], $b['name'], $options['language']);
         });
 

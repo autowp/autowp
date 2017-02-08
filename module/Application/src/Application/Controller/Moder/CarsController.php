@@ -2297,9 +2297,12 @@ class CarsController extends AbstractActionController
                     $cars[] = $this->carSelectParentWalk($row, $car->item_type_id);
                 }
             } else {
-                $brands = $itemTable->fetchAll([
-                    'item_type_id = ?' => DbTable\Item\Type::BRAND
-                ], ['item.position', 'item.name']);
+                
+                $brandModel = new \Application\Model\Brand();
+                
+                $brands = $brandModel->getList([
+                    'language' => $this->language()
+                ], null);
             }
         } elseif ($tab == 'categories') {
             $rows = $itemTable->fetchAll(
@@ -2347,16 +2350,19 @@ class CarsController extends AbstractActionController
                     ];
                 }
             } else {
-                $brands = $itemTable->fetchAll(
-                    $itemTable->select(true)
-                        ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
-                        ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', null)
-                        ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
-                        ->join(['twins' => 'item'], 'ipc2.parent_id = twins.id', null)
+                
+                $brandModel = new \Application\Model\Brand();
+                
+                $brands = $brandModel->getList([
+                    'language' => $this->language()
+                ], function ($select) {
+                    $select
+                        ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', null)
+                        ->join('item_parent', 'ipc1.item_id = item_parent.item_id', null)
+                        ->join(['twins' => 'item'], 'item_parent.parent_id = twins.id', null)
                         ->where('twins.item_type_id = ?', DbTable\Item\Type::TWINS)
-                        ->group('item.id')
-                        ->order(['item.position', 'item.name'])
-                );
+                        ->group('item.id');
+                });
             }
         } elseif ($tab == 'factories') {
             $rows = $itemTable->fetchAll(
