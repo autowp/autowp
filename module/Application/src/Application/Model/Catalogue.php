@@ -162,11 +162,13 @@ class Catalogue
 
         $defaults = [
             'breakOnFirst' => false,
-            'toBrand'      => null
+            'toBrand'      => null,
+            'stockFirst'   => false
         ];
         $options = array_replace($defaults, $options);
 
         $breakOnFirst = (bool)$options['breakOnFirst'];
+        $stockFirst = (bool)$options['stockFirst'];
         $toBrand = (int)$options['toBrand'];
 
         $result = [];
@@ -190,7 +192,8 @@ class Catalogue
                 'type'          => 'brand',
                 'brand_catname' => $brand['catname'],
                 'car_catname'   => null,
-                'path'          => []
+                'path'          => [],
+                'stock'         => true
             ];
 
             if ($breakOnFirst && count($result)) {
@@ -201,11 +204,14 @@ class Catalogue
 
         $select = new Sql\Select($this->itemParentTable2->getTable());
         $select
-            ->columns(['parent_id', 'catname'])
-            ->where(['item_id' => $id])
-            ->order([
+            ->columns(['parent_id', 'catname', 'type'])
+            ->where(['item_id' => $id]);
+            
+        if ($stockFirst) {
+            $select->order([
                 new Sql\Expression('type = ? desc', [DbTable\Item\ParentTable::TYPE_DEFAULT])
             ]);
+        }
 
         $parentRows = $this->itemParentTable2->selectWith($select);
 
@@ -218,7 +224,8 @@ class Catalogue
                             'type'          => 'brand-item',
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $parentRow['catname'],
-                            'path'          => []
+                            'path'          => [],
+                            'stock'         => $parentRow['type'] == DbTable\Item\ParentTable::TYPE_DEFAULT
                         ];
                         break;
                     case 'brand-item':
@@ -226,11 +233,36 @@ class Catalogue
                             'type'          => $path['type'],
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
-                            'path'          => array_merge($path['path'], [$parentRow['catname']])
+                            'path'          => array_merge($path['path'], [$parentRow['catname']]),
+                            'stock'         => $path['stock'] && ($parentRow['type'] == DbTable\Item\ParentTable::TYPE_DEFAULT)
                         ];
                         break;
                 }
             }
+            
+            if ($stockFirst) {
+                usort($result, function($a, $b) {
+                    if ($a['stock']) {
+                        return $b['stock'] ? 0 : -1;
+                    }
+                    return $b['stock'] ? 1 : 0;
+                });
+            }
+            
+            if ($breakOnFirst && count($result)) {
+                $result = [$result[0]]; // truncate to first
+                if ($stockFirst) {
+                    if ($result[0]['stock']) {
+                        return $result;
+                    }
+                } else {
+                    return [$result[0]];
+                }
+            }
+        }
+        
+        if ($breakOnFirst && count($result) > 1) {
+            $result = [$result[0]]; // truncate to first
         }
 
         return $result;

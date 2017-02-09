@@ -125,7 +125,8 @@ class Pic extends AbstractPlugin
         if ($carIds) {
             $carId = $carIds[0];
             $paths = $controller->catalogue()->getCataloguePaths($carId, [
-                'breakOnFirst' => true
+                'breakOnFirst' => true,
+                'stockFirst'   => true
             ]);
 
             if (count($paths) > 0) {

@@ -1157,7 +1157,7 @@ class CatalogueController extends AbstractActionController
                         'picHelper'        => $this->getPluginManager()->get('pic'),
                         'brand'            => $brand,
                         'specsService'     => $this->specsService,
-                        'itemParentTable'  => $itemParentTable,
+                        //'itemParentTable'  => $itemParentTable,
                         'brandItemCatname' => $brandItemCatname,
                         'itemId'           => $currentCarId,
                         'path'             => $path

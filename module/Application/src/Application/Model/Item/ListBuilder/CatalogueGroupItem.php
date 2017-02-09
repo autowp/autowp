@@ -30,12 +30,19 @@ class CatalogueGroupItem extends CatalogueItem
     private $type;
 
     private $itemParentRows = [];
+    
+    private $itemParentTable;
 
     public function __construct(array $options)
     {
         parent::__construct($options);
 
         $this->itemLanguageTable = new DbTable\Item\Language();
+    }
+    
+    public function setItemParentTable($table)
+    {
+        $this->itemParentTable = $table;
     }
 
     public function setLanguage($language)
