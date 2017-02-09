@@ -2,6 +2,9 @@
 
 namespace Application\Controller;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\User\Model\DbTable\User;
@@ -39,19 +42,27 @@ class IndexController extends AbstractActionController
      * @var ItemNameFormatter
      */
     private $itemNameFormatter;
+    
+    /**
+     * @var TableGateway
+     */
+    private $itemTable;
 
     public function __construct(
         $cache,
         SpecificationsService $specsService,
         CarOfDay $carOfDay,
         ItemNameFormatter $itemNameFormatter,
-        Categories $categories
+        Categories $categories,
+        Adapter $adapter
     ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->carOfDay = $carOfDay;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->categories = $categories;
+        
+        $this->itemTable = new TableGateway('item', $adapter);
     }
 
     /**
@@ -512,32 +523,51 @@ class IndexController extends AbstractActionController
 
     private function factories()
     {
-        $cacheKey = 'INDEX_FACTORIES_3';
+        $cacheKey = 'INDEX_FACTORIES_5';
         $factories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $itemTable = $this->catalogue()->getItemTable();
+            
+            $select = new Sql\Select($this->itemTable->getTable());
+            $select
+                ->columns([
+                    'id',
+                    'name',
+                    'count'     => new Sql\Expression('COUNT(1)'),
+                    'new_count' => new Sql\Expression(
+                        'COUNT(IF(item_parent.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY), 1, NULL))',
+                        7
+                    )
+                ])
+                ->where([
+                    'item.item_type_id = ?' => DbTable\Item\Type::FACTORY,
+                    new Sql\Predicate\In('product.item_type_id', [
+                        DbTable\Item\Type::VEHICLE,
+                        DbTable\Item\Type::ENGINE
+                    ])
+                ])
+                ->join('item_parent', 'item.id = item_parent.parent_id', [])
+                ->join(['product' => 'item'], 'item_parent.item_id = product.id', [])
+                ->group('item.id')
+                ->order(['new_count desc', 'count desc'])
+                ->limit(8);
 
-            $db = $itemTable->getAdapter();
+            $items = $this->itemTable->selectWith($select);
 
-            $factories = $db->fetchAll(
-                $db->select()
-                    ->from('item', ['id', 'name', 'count' => new Zend_Db_Expr('count(1)')])
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::FACTORY)
-                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                    ->where('item_parent_cache.item_id <> item_parent_cache.parent_id', null)
-                    ->where('not item_parent_cache.tuning')
-                    ->where('not item_parent_cache.sport')
-                    ->group('item.id')
-                    ->order('count desc')
-                    ->limit(8)
-            );
-
-            foreach ($factories as &$factory) {
-                $factory['url'] = $this->url()->fromRoute('factories/factory', [
-                    'id' => $factory['id']
-                ]);
+            $factories = [];
+            foreach ($items as $item) {
+                $factories[] = [
+                    'id'        => $item['id'],
+                    'name'      => $item['name'],
+                    'count'     => $item['count'],
+                    'new_count' => $item['new_count'],
+                    'url'       => $this->url()->fromRoute('factories/factory', [
+                        'id' => $item['id']
+                    ]),
+                    'new_url'   => $this->url()->fromRoute('factories/newcars', [
+                        'item_id' => $item['id']
+                    ])
+                ];
             }
-            unset($factory);
 
             $this->cache->setItem($cacheKey, $factories);
         }

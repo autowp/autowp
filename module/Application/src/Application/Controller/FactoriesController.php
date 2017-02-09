@@ -3,6 +3,7 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
 
 use Application\Model\DbTable;
 
@@ -214,5 +215,46 @@ class FactoriesController extends AbstractActionController
             ]),
             'paginator' => $paginator
         ];
+    }
+    
+    public function newcarsAction()
+    {
+        $itemTable = new DbTable\Item();
+    
+        $factory = $itemTable->fetchRow([
+            'item_type_id = ?' => DbTable\Item\Type::FACTORY,
+            'id = ?'           => (int)$this->params('item_id')
+        ]);
+        if (! $factory) {
+            return $this->notFoundAction();
+        }
+    
+        $language = $this->language();
+    
+        $rows = $itemTable->fetchAll(
+            $itemTable->select(true)
+                ->where('item.item_type_id IN (?)', [
+                    DbTable\Item\Type::VEHICLE,
+                    DbTable\Item\Type::ENGINE
+                ])
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
+                ->where('item_parent.parent_id = ?', $factory->id)
+                ->where('item_parent.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)', 7)
+                ->group('item.id')
+                ->order(['item_parent.timestamp DESC'])
+                ->limit(20)
+        );
+    
+        $items = [];
+        foreach ($rows as $row) {
+            $items[] = $row->getNameData($language);
+        }
+    
+        $viewModel = new ViewModel([
+            'items' => $items
+        ]);
+        $viewModel->setTerminal(true);
+    
+        return $viewModel;
     }
 }

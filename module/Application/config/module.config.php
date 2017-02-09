@@ -3,7 +3,6 @@
 namespace Application;
 
 use Zend\Permissions\Acl\Acl;
-use Zend\EventManager;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;

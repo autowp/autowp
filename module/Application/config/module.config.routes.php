@@ -524,7 +524,16 @@ return [
                                 'action' => 'factory-cars',
                             ],
                         ]
-                    ]
+                    ],
+                    'newcars' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route'  => '/newcars/:item_id',
+                            'defaults' => [
+                                'action' => 'newcars',
+                            ]
+                        ]
+                    ],
                 ]
             ],
             'feedback' => [
