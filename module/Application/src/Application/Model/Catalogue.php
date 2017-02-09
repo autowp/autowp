@@ -10,6 +10,8 @@ use Autowp\Image\Storage\Request;
 
 use Application\Model\DbTable;
 
+use InvalidArgumentException;
+
 class Catalogue
 {
     private $picturesPerPage = 20;
@@ -153,6 +155,11 @@ class Catalogue
      */
     public function getCataloguePaths($id, array $options = [])
     {
+        $id = (int)$id;
+        if (! $id) {
+            throw new InvalidArgumentException("Unexpected `id`");
+        }
+
         $defaults = [
             'breakOnFirst' => false,
             'toBrand'      => null
@@ -197,7 +204,7 @@ class Catalogue
             ->columns(['parent_id', 'catname'])
             ->where(['item_id' => $id])
             ->order([
-                new Sql\Expression('type = ? desc', DbTable\Item\ParentTable::TYPE_DEFAULT)
+                new Sql\Expression('type = ? desc', [DbTable\Item\ParentTable::TYPE_DEFAULT])
             ]);
 
         $parentRows = $this->itemParentTable2->selectWith($select);
