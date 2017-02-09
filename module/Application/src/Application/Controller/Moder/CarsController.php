@@ -2297,9 +2297,8 @@ class CarsController extends AbstractActionController
                     $cars[] = $this->carSelectParentWalk($row, $car->item_type_id);
                 }
             } else {
-                
                 $brandModel = new \Application\Model\Brand();
-                
+
                 $brands = $brandModel->getList([
                     'language' => $this->language()
                 ], null);
@@ -2350,9 +2349,8 @@ class CarsController extends AbstractActionController
                     ];
                 }
             } else {
-                
                 $brandModel = new \Application\Model\Brand();
-                
+
                 $brands = $brandModel->getList([
                     'language' => $this->language()
                 ], function ($select) {

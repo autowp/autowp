@@ -160,7 +160,7 @@ class Picture extends Table
                 $items[$row['id']] = $data;
             }
         }
-        
+
         $perspectives = [];
         if (count($perspectiveIds)) {
             $perspectiveTable = new Perspective();

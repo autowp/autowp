@@ -398,11 +398,11 @@ class Brand
         $items = $db->fetchAll($select);
 
         usort($items, function ($a, $b) use ($options) {
-            
+
             if ($a['position'] != $b['position']) {
                 return ($a['position'] < $b['position']) ? -1 : 1;
             }
-            
+
             return $this->compareName($a['name'], $b['name'], $options['language']);
         });
 

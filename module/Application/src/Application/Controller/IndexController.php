@@ -524,7 +524,6 @@ class IndexController extends AbstractActionController
         $cacheKey = 'INDEX_FACTORIES_5';
         $factories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-
             $select = new Sql\Select($this->itemTable->getTable());
             $select
                 ->columns([

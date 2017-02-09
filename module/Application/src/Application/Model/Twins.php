@@ -55,9 +55,9 @@ class Twins
         $options = array_replace($defaults, $options);
 
         $limit = $options['limit'];
-        
+
         $brandModel = new Brand();
-        
+
         return $brandModel->getList([
             'language' => $options['language'],
             'columns'  => [
@@ -73,7 +73,7 @@ class Twins
                 ->join(['twins' => 'item'], 'item_parent.parent_id = twins.id', null)
                 ->where('twins.item_type_id = ?', DbTable\Item\Type::TWINS)
                 ->group('item.id');
-            
+
             if ($limit > 0) {
                 $select
                     ->order('count desc')

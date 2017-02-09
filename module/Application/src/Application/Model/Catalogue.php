@@ -166,7 +166,7 @@ class Catalogue
 
         $brand = null;
 
-        if (!$toBrand || $id == $toBrand) {
+        if (! $toBrand || $id == $toBrand) {
             $select = new Sql\Select($this->itemTable2->getTable());
             $select
                 ->columns(['catname'])
@@ -203,7 +203,6 @@ class Catalogue
         $parentRows = $this->itemParentTable2->selectWith($select);
 
         foreach ($parentRows as $parentRow) {
-
             $paths = $this->getCataloguePaths($parentRow['parent_id'], $options);
             foreach ($paths as $path) {
                 switch ($path['type']) {

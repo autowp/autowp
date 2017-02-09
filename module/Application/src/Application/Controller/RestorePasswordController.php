@@ -32,16 +32,16 @@ class RestorePasswordController extends AbstractActionController
     private $newPasswordForm;
 
     private $transport;
-    
+
     /**
      * @var HostManager
      */
     private $hostManager;
 
     public function __construct(
-        UsersService $service, 
-        Form $restorePasswordForm, 
-        Form $newPasswordForm, 
+        UsersService $service,
+        Form $restorePasswordForm,
+        Form $newPasswordForm,
         $transport,
         HostManager $hostManager
     ) {
