@@ -82,7 +82,6 @@ class MostsController extends AbstractActionController
             'language' => $language
         ]);
 
-        $itemParentTable = new DbTable\Item\ParentTable();
         $itemLanguageTable = new DbTable\Item\Language();
 
         $idx = 0;
@@ -111,7 +110,7 @@ class MostsController extends AbstractActionController
 
             $pictures = [];
 
-            $paths = $itemParentTable->getPaths($car['car']['id'], [
+            $paths = $this->catalogue()->getCataloguePaths($car['car']['id'], [
                 'breakOnFirst' => true
             ]);
 

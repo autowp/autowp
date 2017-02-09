@@ -42,7 +42,7 @@ class IndexController extends AbstractActionController
      * @var ItemNameFormatter
      */
     private $itemNameFormatter;
-    
+
     /**
      * @var TableGateway
      */
@@ -61,7 +61,7 @@ class IndexController extends AbstractActionController
         $this->carOfDay = $carOfDay;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->categories = $categories;
-        
+
         $this->itemTable = new TableGateway('item', $adapter);
     }
 
@@ -216,7 +216,7 @@ class IndexController extends AbstractActionController
                 ];
             }
         } else {
-            $cataloguePaths = $this->catalogue()->cataloguePaths($car);
+            $cataloguePaths = $this->catalogue()->getCataloguePaths($car['id']);
 
             if ($totalPictures > 6) {
                 foreach ($cataloguePaths as $path) {
@@ -446,9 +446,7 @@ class IndexController extends AbstractActionController
                         'language' => $language
                     ]);
 
-                    $itemParentTable = new DbTable\Item\ParentTable();
-
-                    $paths = $itemParentTable->getPaths($carOfDay->id, [
+                    $paths = $this->catalogue()->getCataloguePaths($carOfDay->id, [
                         'breakOnFirst' => true
                     ]);
 
@@ -526,7 +524,7 @@ class IndexController extends AbstractActionController
         $cacheKey = 'INDEX_FACTORIES_5';
         $factories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            
+
             $select = new Sql\Select($this->itemTable->getTable());
             $select
                 ->columns([

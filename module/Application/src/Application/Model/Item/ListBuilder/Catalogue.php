@@ -9,11 +9,6 @@ use Application\Service\SpecificationsService;
 class Catalogue extends ListBuilder
 {
     /**
-     * @var DbTable\Item\ParentTable
-     */
-    protected $itemParentTable;
-
-    /**
      * @var array
      */
     protected $brand;
@@ -27,13 +22,6 @@ class Catalogue extends ListBuilder
      * @var array
      */
     private $pathsToBrand = [];
-
-    public function setItemParentTable(DbTable\Item\ParentTable $itemParentTable)
-    {
-        $this->itemParentTable = $itemParentTable;
-
-        return $this;
-    }
 
     public function setBrand(array $brand)
     {
@@ -57,7 +45,8 @@ class Catalogue extends ListBuilder
     private function getPathsToBrand($itemId, $brandId)
     {
         if (! isset($this->pathsToBrand[$itemId][$brandId])) {
-            $paths = $this->itemParentTable->getPathsToBrand($itemId, $brandId, [
+            $paths = $this->catalogue->getCataloguePaths($itemId, [
+                'toBrand'      => $brandId,
                 'breakOnFirst' => true
             ]);
             $this->pathsToBrand[$itemId][$brandId] = $paths;

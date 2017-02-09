@@ -236,8 +236,6 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $itemParentTable = new DbTable\Item\ParentTable();
-
             $this->sidebar()->brand([
                 'brand_id'    => $brand['id'],
                 'is_concepts' => true
@@ -251,8 +249,7 @@ class CatalogueController extends AbstractActionController
                         'router'          => $this->getEvent()->getRouter(),
                         'picHelper'       => $this->getPluginManager()->get('pic'),
                         'brand'           => $brand,
-                        'specsService'    => $this->specsService,
-                        'itemParentTable' => $itemParentTable
+                        'specsService'    => $this->specsService
                     ]),
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
                         'type'                 => null,
@@ -336,8 +333,6 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $itemParentTable = new DbTable\Item\ParentTable();
-
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
             ]);
@@ -360,8 +355,7 @@ class CatalogueController extends AbstractActionController
                         'router'          => $this->getEvent()->getRouter(),
                         'picHelper'       => $this->getPluginManager()->get('pic'),
                         'brand'           => $brand,
-                        'specsService'    => $this->specsService,
-                        'itemParentTable' => $itemParentTable
+                        'specsService'    => $this->specsService
                     ])
                 ])
             ];
@@ -463,7 +457,8 @@ class CatalogueController extends AbstractActionController
                             return $this->pic()->url($picture['identity']);
                         }
 
-                        $paths = $itemParentTable->getPathsToBrand($carId, $brand['id'], [
+                        $paths = $this->catalogue()->getCataloguePaths($carId, [
+                            'toBrand'      => $brand['id'],
                             'breakOnFirst' => true
                         ]);
 
@@ -2149,13 +2144,11 @@ class CatalogueController extends AbstractActionController
                 'language' => $language
             ]);
 
-            $itemParentTable = new DbTable\Item\ParentTable();
-
             $idx = 0;
             foreach ($data['carList']['cars'] as &$car) {
                 $pictures = [];
 
-                $paths = $itemParentTable->getPaths($car['car']['id'], [
+                $paths = $this->catalogue()->getCataloguePaths($car['car']['id'], [
                     'breakOnFirst' => true
                 ]);
 
@@ -2213,8 +2206,6 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $itemParentTable = new DbTable\Item\ParentTable();
-
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
             ]);
@@ -2235,8 +2226,7 @@ class CatalogueController extends AbstractActionController
                         'router'          => $this->getEvent()->getRouter(),
                         'picHelper'       => $this->getPluginManager()->get('pic'),
                         'brand'           => $brand,
-                        'specsService'    => $this->specsService,
-                        'itemParentTable' => $itemParentTable
+                        'specsService'    => $this->specsService
                     ])
                 ])
             ];

@@ -53,12 +53,12 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
-            'catalogue'       => Controller\Plugin\Catalogue::class,
             'pictureVote'     => Controller\Plugin\PictureVote::class,
             'forbiddenAction' => Controller\Plugin\ForbiddenAction::class
         ],
         'factories' => [
             'car'       => Controller\Plugin\Service\CarFactory::class,
+            'catalogue' => Controller\Plugin\Service\CatalogueFactory::class,
             'fileSize'  => Controller\Plugin\Service\FileSizeFactory::class,
             'language'  => Controller\Plugin\Service\LanguageFactory::class,
             'log'       => Controller\Plugin\Service\LogFactory::class,
@@ -110,6 +110,7 @@ return [
             Model\BrandNav::class                => Model\Service\BrandNavFactory::class,
             Model\BrandVehicle::class            => Model\Service\BrandVehicleFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
+            Model\Catalogue::class               => Model\Service\CatalogueFactory::class,
             Model\Categories::class              => Model\Service\CategoriesFactory::class,
             Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
             Model\Log::class                     => Model\Service\LogFactory::class,

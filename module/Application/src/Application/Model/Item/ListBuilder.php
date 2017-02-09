@@ -73,7 +73,7 @@ class ListBuilder
     {
         $id = $item['id'];
         if (! isset($this->cataloguePaths[$id])) {
-            $this->cataloguePaths[$id] = $this->catalogue->cataloguePaths($item);
+            $this->cataloguePaths[$id] = $this->catalogue->getCataloguePaths($item['id']);
         }
 
         return $this->cataloguePaths[$id];

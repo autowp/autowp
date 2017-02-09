@@ -13,6 +13,11 @@ class Catalogue extends AbstractPlugin
      */
     private $catalogue;
 
+    public function __construct(CatalogueModel $catalogue)
+    {
+        $this->catalogue = $catalogue;
+    }
+
     /**
      * @return CatalogueModel
      */
@@ -26,8 +31,6 @@ class Catalogue extends AbstractPlugin
      */
     public function getCatalogue()
     {
-        return $this->catalogue
-            ? $this->catalogue
-            : $this->catalogue = new CatalogueModel();
+        return $this->catalogue;
     }
 }

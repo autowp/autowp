@@ -61,7 +61,6 @@ class FactoriesController extends AbstractActionController
             ], $this->catalogue()->itemOrdering());
 
             $catalogue = $this->catalogue();
-            $itemParentTable = new DbTable\Item\ParentTable();
 
             foreach ($cars as $car) {
                 $select = $pictureTable->select(true)
@@ -101,7 +100,7 @@ class FactoriesController extends AbstractActionController
                     $src = $imagesInfo->getSrc();
                 }
 
-                $cataloguePaths = $itemParentTable->getPaths($car->id, [
+                $cataloguePaths = $catalogue->getCataloguePaths($car->id, [
                     'breakOnFirst' => true
                 ]);
 
@@ -216,11 +215,11 @@ class FactoriesController extends AbstractActionController
             'paginator' => $paginator
         ];
     }
-    
+
     public function newcarsAction()
     {
         $itemTable = new DbTable\Item();
-    
+
         $factory = $itemTable->fetchRow([
             'item_type_id = ?' => DbTable\Item\Type::FACTORY,
             'id = ?'           => (int)$this->params('item_id')
@@ -228,9 +227,9 @@ class FactoriesController extends AbstractActionController
         if (! $factory) {
             return $this->notFoundAction();
         }
-    
+
         $language = $this->language();
-    
+
         $rows = $itemTable->fetchAll(
             $itemTable->select(true)
                 ->where('item.item_type_id IN (?)', [
@@ -244,17 +243,17 @@ class FactoriesController extends AbstractActionController
                 ->order(['item_parent.timestamp DESC'])
                 ->limit(20)
         );
-    
+
         $items = [];
         foreach ($rows as $row) {
             $items[] = $row->getNameData($language);
         }
-    
+
         $viewModel = new ViewModel([
             'items' => $items
         ]);
         $viewModel->setTerminal(true);
-    
+
         return $viewModel;
     }
 }

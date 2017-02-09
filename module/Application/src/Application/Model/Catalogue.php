@@ -2,11 +2,13 @@
 
 namespace Application\Model;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+
 use Autowp\Image\Storage\Request;
 
 use Application\Model\DbTable;
-
-use Exception;
 
 class Catalogue
 {
@@ -33,6 +35,28 @@ class Catalogue
      * @var DbTable\Picture
      */
     private $pictureTable;
+
+    /**
+     * @var Adapter
+     */
+    private $adapter;
+
+    /**
+     * @var TableGateway
+     */
+    private $itemTable2;
+
+    /**
+     * @var TableGateway
+     */
+    private $itemParentTable2;
+
+    public function __construct(Adapter $adapter)
+    {
+        $this->adapter = $adapter;
+        $this->itemTable2 = new TableGateway('item', $adapter);
+        $this->itemParentTable2 = new TableGateway('item_parent', $adapter);
+    }
 
     /**
      * @return array
@@ -123,50 +147,87 @@ class Catalogue
     }
 
     /**
-     * @param DbTable\Item\Row $car
-     * @return array
-     */
-    public function cataloguePaths(DbTable\Item\Row $car)
-    {
-        return $this->walkUpUntilBrand($car->id, []);
-    }
-
-    /**
      * @param int $id
-     * @param array $path
-     * @throws Exception
+     * @param array $options
      * @return array
      */
-    private function walkUpUntilBrand($id, array $path)
+    public function getCataloguePaths($id, array $options = [])
     {
-        $urls = [];
+        $defaults = [
+            'breakOnFirst' => false,
+            'toBrand'      => null
+        ];
+        $options = array_replace($defaults, $options);
 
-        $parentRows = $this->getCarParentTable()->fetchAll([
-            'item_id = ?' => $id
-        ]);
+        $breakOnFirst = (bool)$options['breakOnFirst'];
+        $toBrand = (int)$options['toBrand'];
 
-        foreach ($parentRows as $parentRow) {
-            $brand = $this->getItemTable()->fetchRow([
-                'id = ?'           => $parentRow->parent_id,
-                'item_type_id = ?' => DbTable\Item\Type::BRAND
-            ]);
-            if ($brand) {
-                $urls[] = [
-                    'brand_catname' => $brand->catname,
-                    'car_catname'   => $parentRow->catname,
-                    'path'          => $path
-                ];
+        $result = [];
+
+        $brand = null;
+
+        if (!$toBrand || $id == $toBrand) {
+            $select = new Sql\Select($this->itemTable2->getTable());
+            $select
+                ->columns(['catname'])
+                ->where([
+                    'id'           => $id,
+                    'item_type_id' => DbTable\Item\Type::BRAND
+                ]);
+
+            $brand = $this->itemTable2->selectWith($select)->current();
+        }
+
+        if ($brand) {
+            $result[] = [
+                'type'          => 'brand',
+                'brand_catname' => $brand['catname'],
+                'car_catname'   => null,
+                'path'          => []
+            ];
+
+            if ($breakOnFirst && count($result)) {
+                return $result;
             }
         }
 
+
+        $select = new Sql\Select($this->itemParentTable2->getTable());
+        $select
+            ->columns(['parent_id', 'catname'])
+            ->where(['item_id' => $id])
+            ->order([
+                new Sql\Expression('type = ? desc', DbTable\Item\ParentTable::TYPE_DEFAULT)
+            ]);
+
+        $parentRows = $this->itemParentTable2->selectWith($select);
+
         foreach ($parentRows as $parentRow) {
-            $urls = array_merge(
-                $urls,
-                $this->walkUpUntilBrand($parentRow->parent_id, array_merge([$parentRow->catname], $path))
-            );
+
+            $paths = $this->getCataloguePaths($parentRow['parent_id'], $options);
+            foreach ($paths as $path) {
+                switch ($path['type']) {
+                    case 'brand':
+                        $result[] = [
+                            'type'          => 'brand-item',
+                            'brand_catname' => $path['brand_catname'],
+                            'car_catname'   => $parentRow['catname'],
+                            'path'          => []
+                        ];
+                        break;
+                    case 'brand-item':
+                        $result[] = [
+                            'type'          => $path['type'],
+                            'brand_catname' => $path['brand_catname'],
+                            'car_catname'   => $path['car_catname'],
+                            'path'          => array_merge($path['path'], [$parentRow['catname']])
+                        ];
+                        break;
+                }
+            }
         }
 
-        return $urls;
+        return $result;
     }
 
     private static function between($a, $min, $max)

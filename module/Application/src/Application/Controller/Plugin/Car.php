@@ -568,7 +568,7 @@ class Car extends AbstractPlugin
                 'id in (?)' => $ids
             ], $catalogue->itemOrdering());
             foreach ($rows as $row) {
-                $cataloguePaths = $catalogue->cataloguePaths($row);
+                $cataloguePaths = $catalogue->getCataloguePaths($row['id']);
                 foreach ($cataloguePaths as $cPath) {
                     $result[] = [
                         'name' => $row->getNameData($language),

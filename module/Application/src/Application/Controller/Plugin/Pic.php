@@ -124,8 +124,7 @@ class Pic extends AbstractPlugin
         $carIds = $this->pictureItem->getPictureItems($row['id']);
         if ($carIds) {
             $carId = $carIds[0];
-            $itemParentTable = new DbTable\Item\ParentTable();
-            $paths = $itemParentTable->getPaths($carId, [
+            $paths = $controller->catalogue()->getCataloguePaths($carId, [
                 'breakOnFirst' => true
             ]);
 
@@ -374,7 +373,7 @@ class Pic extends AbstractPlugin
             $id = (int)$row['id'];
 
             $name = isset($names[$id]) ? $names[$id] : null;
-            
+
             if ($urlCallback) {
                 $url = $urlCallback($row);
             } else {
@@ -536,7 +535,7 @@ class Pic extends AbstractPlugin
                 }
 
                 if ((bool)$fullText) {
-                    foreach ($catalogue->cataloguePaths($item) as $path) {
+                    foreach ($catalogue->getCataloguePaths($item['id']) as $path) {
                         $detailsUrl = $controller->url()->fromRoute('catalogue', [
                             'action'        => 'brand-item',
                             'brand_catname' => $path['brand_catname'],
@@ -570,7 +569,7 @@ class Pic extends AbstractPlugin
                     ]);
                 }
             }
-            
+
             $uploadUrl = null;
             if ($controller->user()->logedIn()) {
                 $uploadUrl = $controller->url()->fromRoute('upload/params', [
@@ -661,7 +660,7 @@ class Pic extends AbstractPlugin
 
             $hasSpecs = $this->specsService->hasSpecs($item->id);
             $specsUrl = null;
-            foreach ($catalogue->cataloguePaths($item) as $path) {
+            foreach ($catalogue->getCataloguePaths($item['id']) as $path) {
                 $specsUrl = $this->getController()->url()->fromRoute('catalogue', [
                     'action'        => 'brand-item-specifications',
                     'brand_catname' => $path['brand_catname'],
@@ -725,7 +724,7 @@ class Pic extends AbstractPlugin
                 ], $catalogue->itemOrdering());
 
                 foreach ($carRows as $carRow) {
-                    $cataloguePaths = $catalogue->cataloguePaths($carRow);
+                    $cataloguePaths = $catalogue->getCataloguePaths($carRow['id']);
 
                     foreach ($cataloguePaths as $cPath) {
                         $vehicles[] = [
@@ -746,7 +745,7 @@ class Pic extends AbstractPlugin
             $hasSpecs = $this->specsService->hasSpecs($engineRow->id);
 
             if ($hasSpecs) {
-                $cataloguePaths = $catalogue->cataloguePaths($engineRow);
+                $cataloguePaths = $catalogue->getCataloguePaths($engineRow['id']);
 
                 foreach ($cataloguePaths as $path) {
                     $specsUrl = $controller->url()->fromRoute('catalogue', [
@@ -821,7 +820,7 @@ class Pic extends AbstractPlugin
                 }
 
                 foreach ($carRows as $carRow) {
-                    $cataloguePaths = $catalogue->cataloguePaths($carRow);
+                    $cataloguePaths = $catalogue->getCataloguePaths($carRow['id']);
 
                     foreach ($cataloguePaths as $cPath) {
                         $factoryCars[] = [
@@ -1009,8 +1008,7 @@ class Pic extends AbstractPlugin
             $url = null;
             $carRow = $itemTable->find($mRow->item_id)->current();
             if ($carRow) {
-                $itemParentTable = new DbTable\Item\ParentTable();
-                $paths = $itemParentTable->getPaths($carRow->id, [
+                $paths = $catalogue->getCataloguePaths($carRow->id, [
                     'breakOnFirst' => true
                 ]);
                 if (count($paths) > 0) {
