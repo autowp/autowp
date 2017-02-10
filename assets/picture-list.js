@@ -1,13 +1,9 @@
-define(
-    ['jquery'], 
-    function($) {
+var $ = require('jquery');
         
-        var PictureList = function(element) {
-            $('[data-toggle="tooltip"]', element).tooltip();
-        };
-        
-        return function(element) {
-            new PictureList(element);
-        };
-    }
-);
+var PictureList = function(element) {
+    $('[data-toggle="tooltip"]', element).tooltip();
+};
+
+module.exports = function(element) {
+    new PictureList(element);
+};

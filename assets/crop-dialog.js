@@ -2,28 +2,6 @@ var $ = require("jquery");
 require('jcrop-0.9.12/css/jquery.Jcrop.css');
 require('jcrop-0.9.12/js/jquery.Jcrop');
 
-var markup = 
-    '<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="modal-dialog modal-lg">' +
-            '<div class="modal-content">' +
-                '<div class="modal-header">' +
-                    '<button type="button" class="close" data-dismiss="modal">' +
-                        '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>'+
-                    '</button>' +
-                    '<h4 class="modal-title">Cropper</h4>' +
-                '</div>' +
-                '<div class="modal-body">' +
-                '</div>' +
-                '<div class="modal-footer">' +
-                    '<button type="button" class="btn btn-default pull-left select-all"><i class="fa fa-arrows-alt"></i> Select all</button>' +
-                    '<button type="button" disabled class="btn btn-default pull-left selection"></button>' +
-                    '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-                    '<button type="button" class="btn btn-primary">Save changes</button>' +
-                '</div>' +
-            '</div>' +
-        '</div>' +
-    '</div>';
-
 var Dialog = function(options) {
     this.init(options);
 };
@@ -39,7 +17,7 @@ Dialog.prototype = {
         this.sourceUrl = options.sourceUrl;
         this.minSize = options.minSize ? options.minSize : [400, 300];
         
-        this.$modal = $(markup);
+        this.$modal = $(require('./crop-dialog.html'));
         
         this.$body = this.$modal.find('.modal-body');
         this.$selection = this.$modal.find('.selection');
