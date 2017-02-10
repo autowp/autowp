@@ -10,5 +10,9 @@
     "crop-dialog/close": "Закрыть",
     "crop-dialog/select-all": "Выделить всё",
     "crop-dialog/save": "Сохранить",
-    "crop-dialog/resolution-%s-aspect-%s": "%s (пропорции %s)"
+    "crop-dialog/resolution-%s-aspect-%s": "%s (пропорции %s)",
+    
+    "who-online/title": "На сайте",
+    "who-online/refresh": "Обновить",
+    "who-online/close": "Закрыть"
 }

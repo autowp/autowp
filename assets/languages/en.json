@@ -10,5 +10,9 @@
     "crop-dialog/close": "Close",
     "crop-dialog/select-all": "Select all",
     "crop-dialog/save": "Save changes",
-    "crop-dialog/resolution-%s-aspect-%s": "%s (aspect is about %s)"
+    "crop-dialog/resolution-%s-aspect-%s": "%s (aspect is about %s)",
+    
+    "who-online/title": "Online",
+    "who-online/refresh": "Refresh",
+    "who-online/close": "Close"
 }
