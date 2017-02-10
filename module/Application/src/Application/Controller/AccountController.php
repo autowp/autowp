@@ -133,8 +133,8 @@ class AccountController extends AbstractActionController
         $picsCount = $db->fetchOne(
             $db->select()
                  ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                 ->where('owner_id=?', $user->id)
-                 ->where('status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                 ->where('owner_id = ?', $user->id)
+                 ->where('status = ?', Picture::STATUS_ACCEPTED)
         );
 
         $subscribesCount = $db->fetchOne(
@@ -149,7 +149,7 @@ class AccountController extends AbstractActionController
             $pictures->select()
                 ->from($pictures, new Zend_Db_Expr('COUNT(1)'))
                 ->where('owner_id = ?', $user->id)
-                ->where('status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_INBOX])
+                ->where('status = ?', Picture::STATUS_INBOX)
         );
 
         return [
@@ -666,7 +666,7 @@ class AccountController extends AbstractActionController
 
         $select = $pictures->select(true)
             ->where('owner_id = ?', $this->user()->get()->id)
-            ->where('status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_INBOX])
+            ->where('status = ?', Picture::STATUS_INBOX)
             ->order(['add_date DESC']);
 
         $paginator = new \Zend\Paginator\Paginator(

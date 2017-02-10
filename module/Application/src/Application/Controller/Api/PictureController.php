@@ -26,7 +26,7 @@ class PictureController extends AbstractActionController
         $pictureTable = new Picture();
 
         $select = $pictureTable->select(true)
-            ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->order('rand() desc')
             ->limit(1);
 
@@ -54,7 +54,7 @@ class PictureController extends AbstractActionController
         $pictureTable = new Picture();
 
         $select = $pictureTable->select(true)
-            ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->order('accept_datetime desc')
             ->limit(1);
 
@@ -92,7 +92,7 @@ class PictureController extends AbstractActionController
                 foreach ([31, null] as $groupId) {
                     $select = $pictureTable->select(true)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                        ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                         ->where('item_parent_cache.parent_id = ?', $carRow->id)
                         ->limit(1);

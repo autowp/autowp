@@ -1142,7 +1142,7 @@ class Pic extends AbstractPlugin
 
         $itemsPerPage = 10;
 
-        $galleryStatuses = [DbTable\Picture::STATUS_ACCEPTED, DbTable\Picture::STATUS_NEW];
+        $galleryStatuses = [DbTable\Picture::STATUS_ACCEPTED];
 
         $gallery = [];
 

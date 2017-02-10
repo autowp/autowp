@@ -202,7 +202,7 @@ class Row extends \Autowp\Commons\Db\Table\Row
 
     public function canAccept()
     {
-        if (! in_array($this->status, [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_INBOX])) {
+        if (! in_array($this->status, [DbTable\Picture::STATUS_INBOX])) {
             return false;
         }
 
@@ -220,7 +220,7 @@ class Row extends \Autowp\Commons\Db\Table\Row
 
     public function canDelete()
     {
-        if (! in_array($this->status, [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_INBOX])) {
+        if (! in_array($this->status, [DbTable\Picture::STATUS_INBOX])) {
             return false;
         }
 

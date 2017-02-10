@@ -1088,10 +1088,7 @@ class SpecificationsService
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->where('pictures.status in (?)', [
-                    DbTable\Picture::STATUS_ACCEPTED,
-                    DbTable\Picture::STATUS_NEW
-                ])
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->order($order)
                 ->limit(1)
         );

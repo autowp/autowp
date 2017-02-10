@@ -488,7 +488,6 @@ class CarsController extends AbstractActionController
         $randomPicture = false;
         $statuses = [
             DbTable\Picture::STATUS_ACCEPTED,
-            DbTable\Picture::STATUS_NEW,
             DbTable\Picture::STATUS_INBOX,
             DbTable\Picture::STATUS_REMOVING
         ];

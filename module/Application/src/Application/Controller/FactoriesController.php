@@ -64,10 +64,7 @@ class FactoriesController extends AbstractActionController
 
             foreach ($cars as $car) {
                 $select = $pictureTable->select(true)
-                    ->where('pictures.status IN (?)', [
-                        DbTable\Picture::STATUS_NEW,
-                        DbTable\Picture::STATUS_ACCEPTED
-                    ])
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item', 'picture_item.item_id = item.id', null)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)

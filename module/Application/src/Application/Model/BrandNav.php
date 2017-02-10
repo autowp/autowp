@@ -146,7 +146,7 @@ class BrandNav
             $logoPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('pictures.status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->where('picture_item.perspective_id = ?', 22)
                     ->where('picture_item.item_id = ?', $brand['id'])
@@ -166,7 +166,7 @@ class BrandNav
             $mixedPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('pictures.status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->where('picture_item.perspective_id = ?', 25)
                     ->where('picture_item.item_id = ?', $brand['id'])
@@ -186,7 +186,7 @@ class BrandNav
             $unsortedPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('pictures.status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->where('picture_item.perspective_id NOT IN (?) OR picture_item.perspective_id IS NULL', [22, 25])
                     ->where('picture_item.item_id = ?', $brand['id'])

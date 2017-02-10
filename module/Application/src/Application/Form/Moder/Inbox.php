@@ -45,7 +45,6 @@ class Inbox extends Form implements InputFilterProviderInterface
                     'options' => [
                         ''                       => 'moder/picture/filter/status/any',
                         DbTable\Picture::STATUS_INBOX    => 'moder/picture/filter/status/inbox',
-                        DbTable\Picture::STATUS_NEW      => 'moder/picture/filter/status/new',
                         DbTable\Picture::STATUS_ACCEPTED => 'moder/picture/filter/status/accepted',
                         DbTable\Picture::STATUS_REMOVING => 'moder/picture/filter/status/removing',
                         'custom1'                => 'moder/picture/filter/status/all-except-removing'

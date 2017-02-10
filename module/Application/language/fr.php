@@ -497,7 +497,6 @@ Bonne chance.',
     'picture/location' => 'Coordinates',
     'picture/status:' => 'Titre de l\'image:',
     'picture/status/inbox' => 'Une décision ne se fait pas',
-    'picture/status/new' => 'Nouveau',
     'picture/status/accepted' => 'Reçu',
     'picture/status/removing' => 'Retrait en attente',
     'picture/propose-image-replacement' => 'Propose de remplacer l\'image',
@@ -1018,7 +1017,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/205/name'        => 'Commentaires',
     'page/205/title'       => 'Commentaires',
     'page/205/breadcrumbs' => 'Commentaires',
-    
+
     'page/208/name'        => '%BRAND_NAME% Engines',
     'page/208/title'       => '%BRAND_NAME% Engines',
     'page/208/breadcrumbs' => '%BRAND_NAME% Engines',
@@ -1041,7 +1040,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/filter/status' => 'Statut',
     'moder/picture/filter/status/any' => 'tout',
     'moder/picture/filter/status/inbox' => 'inbox',
-    'moder/picture/filter/status/new' => 'pas modéré (ancien)',
     'moder/picture/filter/status/accepted' => 'accepté',
     'moder/picture/filter/status/removing' => "Dans la file d'attente de supprimer",
     'moder/picture/filter/status/all-except-removing' => 'tous, sauf la suppression',
@@ -1250,7 +1248,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/acceptance/removed' => 'Deleted',
     'moder/picture/acceptance/removing' => 'Deleting',
     'moder/picture/acceptance/inbox' => 'Inbox',
-    'moder/picture/acceptance/new' => 'New',
     'moder/picture/acceptance/reason' => 'Reason',
 
     'moder/picture/acceptance/want-accept' => 'Want accept',

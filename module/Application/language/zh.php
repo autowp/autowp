@@ -484,7 +484,6 @@ return array_replace(include 'root.php', [
     'picture/location' => 'Coordinates',
     'picture/status:' => '图片状态:',
     'picture/status/inbox' => '尚未审核',
-    'picture/status/new' => '新图片',
     'picture/status/accepted' => '已通过',
     'picture/status/removing' => '被删除',
     'picture/propose-image-replacement' => '建议替换图片',
@@ -998,7 +997,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/205/name'        => '评论',
     'page/205/title'       => '评论',
     'page/205/breadcrumbs' => '评论',
-    
+
     'page/208/name'        => '%BRAND_NAME% Engines',
     'page/208/title'       => '%BRAND_NAME% Engines',
     'page/208/breadcrumbs' => '%BRAND_NAME% Engines',
@@ -1021,7 +1020,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/filter/status' => '状态',
     'moder/picture/filter/status/any' => 'any',
     'moder/picture/filter/status/inbox' => '收件箱',
-    'moder/picture/filter/status/new' => '未裁决(先前)',
     'moder/picture/filter/status/accepted' => '已接受',
     'moder/picture/filter/status/removing' => '位于删除队列',
     'moder/picture/filter/status/all-except-removing' => 'all, except removing',
@@ -1230,7 +1228,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/acceptance/removed' => '已删除',
     'moder/picture/acceptance/removing' => 'Deleting',
     'moder/picture/acceptance/inbox' => 'Inbox',
-    'moder/picture/acceptance/new' => 'New',
     'moder/picture/acceptance/reason' => 'Reason',
 
     'moder/picture/acceptance/want-accept' => '求通过',

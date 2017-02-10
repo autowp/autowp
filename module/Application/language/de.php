@@ -497,7 +497,6 @@ Good luck.',
     'picture/location' => 'Coordinates',
     'picture/status:' => 'Picture status:',
     'picture/status/inbox' => 'Undecided',
-    'picture/status/new' => 'New',
     'picture/status/accepted' => 'Accepted',
     'picture/status/removing' => 'Removing',
     'picture/propose-image-replacement' => 'Propose image replacement',
@@ -1020,7 +1019,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/205/name'        => 'Comments',
     'page/205/title'       => 'Comments',
     'page/205/breadcrumbs' => 'Comments',
-    
+
     'page/208/name'        => '%BRAND_NAME% Engines',
     'page/208/title'       => '%BRAND_NAME% Engines',
     'page/208/breadcrumbs' => '%BRAND_NAME% Engines',
@@ -1043,7 +1042,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/filter/status' => 'Status',
     'moder/picture/filter/status/any' => 'any',
     'moder/picture/filter/status/inbox' => 'inbox',
-    'moder/picture/filter/status/new' => 'not moderated (old)',
     'moder/picture/filter/status/accepted' => 'accepted',
     'moder/picture/filter/status/removing' => 'in delete queue',
     'moder/picture/filter/status/all-except-removing' => 'all, except removing',
@@ -1252,7 +1250,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/acceptance/removed' => 'Deleted',
     'moder/picture/acceptance/removing' => 'Deleting',
     'moder/picture/acceptance/inbox' => 'Inbox',
-    'moder/picture/acceptance/new' => 'New',
     'moder/picture/acceptance/reason' => 'Reason',
 
     'moder/picture/acceptance/want-accept' => 'Want accept',

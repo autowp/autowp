@@ -98,10 +98,7 @@ class IndexController extends AbstractActionController
 
             $select = $pTable->select(true)
                 ->where('mp.group_id = ?', $groupId)
-                ->where('pictures.status IN (?)', [
-                    DbTable\Picture::STATUS_ACCEPTED,
-                    DbTable\Picture::STATUS_NEW
-                ])
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
@@ -153,10 +150,7 @@ class IndexController extends AbstractActionController
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->where('pictures.status IN (?)', [
-                    DbTable\Picture::STATUS_ACCEPTED,
-                    DbTable\Picture::STATUS_NEW
-                ])
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 //->order('ratio DESC')
                 ->limit(count($left));
 
@@ -186,10 +180,7 @@ class IndexController extends AbstractActionController
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->where('pictures.status IN (?)', [
-                    DbTable\Picture::STATUS_NEW,
-                    DbTable\Picture::STATUS_ACCEPTED
-                ])
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
         );
 
         $language = $this->language();

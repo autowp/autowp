@@ -94,10 +94,7 @@ class Twins
 
         $select = $db->select()
             ->from($pictureTable->info('name'), null)
-            ->where('pictures.status IN (?)', [
-                DbTable\Picture::STATUS_ACCEPTED,
-                DbTable\Picture::STATUS_NEW
-            ])
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null);
 
@@ -224,10 +221,7 @@ class Twins
         $select = $this->getPictureTable()->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->where('pictures.status IN (?)', [
-                DbTable\Picture::STATUS_NEW,
-                DbTable\Picture::STATUS_ACCEPTED
-            ])
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
             ->where('item_parent_cache.parent_id = ?', (int)$groupId);
 
         if ($ordering) {

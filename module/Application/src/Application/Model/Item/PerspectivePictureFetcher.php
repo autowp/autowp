@@ -170,9 +170,7 @@ class PerspectivePictureFetcher extends PictureFetcher
                         'image_id', 'crop_left', 'crop_top',
                         'crop_width', 'crop_height', 'width', 'height', 'identity'
                     ])
-                    ->where('pictures.status IN (?)', [
-                        DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED
-                    ])
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->where('picture_item.perspective_id = ?', 17) // under the hood
                     ->join('item', 'picture_item.item_id = item.id', null)

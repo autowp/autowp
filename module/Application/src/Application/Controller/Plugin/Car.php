@@ -97,10 +97,7 @@ class Car extends AbstractPlugin
             $pictureTableAdapter = $pictureTable->getAdapter();
 
             $select = $pictureTableAdapter->select()
-                ->where('pictures.status IN (?)', [
-                    DbTable\Picture::STATUS_NEW,
-                    DbTable\Picture::STATUS_ACCEPTED
-                ]);
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
 
             if ($onlyExactly) {
                 $select

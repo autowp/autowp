@@ -280,7 +280,6 @@ class PicturesController extends AbstractActionController
         if (strlen($formdata['status'])) {
             switch ($formdata['status']) {
                 case Picture::STATUS_INBOX:
-                case Picture::STATUS_NEW:
                 case Picture::STATUS_ACCEPTED:
                 case Picture::STATUS_REMOVING:
                     $select->where('pictures.status = ?', $formdata['status']);
@@ -359,7 +358,6 @@ class PicturesController extends AbstractActionController
 
                 switch ($formdata['status']) {
                     case Picture::STATUS_INBOX:
-                    case Picture::STATUS_NEW:
                     case Picture::STATUS_ACCEPTED:
                     case Picture::STATUS_REMOVING:
                         $select->where('similar.status = ?', $formdata['status']);
@@ -915,7 +913,7 @@ class PicturesController extends AbstractActionController
         $prevNewPicture = $this->table->fetchRow(
             $this->table->select(true)
                  ->where('id < ?', $picture->id)
-                 ->where('status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_INBOX])
+                 ->where('status = ?', Picture::STATUS_INBOX)
                  ->order('id DESC')
                  ->limit(1)
         );
@@ -923,7 +921,7 @@ class PicturesController extends AbstractActionController
         $nextNewPicture = $this->table->fetchRow(
             $this->table->select(true)
                  ->where('id > ?', $picture->id)
-                 ->where('status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_INBOX])
+                 ->where('status = ?', Picture::STATUS_INBOX)
                  ->order('id')
                  ->limit(1)
         );
@@ -1346,13 +1344,13 @@ class PicturesController extends AbstractActionController
 
     private function canNormalize(DbTable\Picture\Row $picture)
     {
-        return in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])
+        return in_array($picture->status, [Picture::STATUS_INBOX])
             && $this->user()->isAllowed('picture', 'normalize');
     }
 
     private function canFlop(DbTable\Picture\Row $picture)
     {
-        return in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX, Picture::STATUS_REMOVING])
+        return in_array($picture->status, [Picture::STATUS_INBOX, Picture::STATUS_REMOVING])
             && $this->user()->isAllowed('picture', 'flop');
     }
 
@@ -1706,7 +1704,6 @@ class PicturesController extends AbstractActionController
                 break;
 
             case Picture::STATUS_INBOX:
-            case Picture::STATUS_NEW:
                 $can1 = $this->user()->isAllowed('picture', 'accept');
                 break;
         }
@@ -1719,7 +1716,6 @@ class PicturesController extends AbstractActionController
                 break;
 
             case Picture::STATUS_INBOX:
-            case Picture::STATUS_NEW:
                 $can2 = $this->user()->isAllowed('picture', 'remove_by_vote');
                 break;
 

@@ -44,8 +44,7 @@ class PictureController extends AbstractActionController
         $pictureTable = $this->catalogue()->getPictureTable();
 
         $galleryStatuses = [
-            DbTable\Picture::STATUS_ACCEPTED,
-            DbTable\Picture::STATUS_NEW
+            DbTable\Picture::STATUS_ACCEPTED
         ];
 
         if (in_array($picture->status, $galleryStatuses)) {

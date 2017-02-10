@@ -510,7 +510,6 @@ return array_replace(include 'root.php', [
     'picture/location' => 'Координаты',
     'picture/status:' => 'Статус изображения:',
     'picture/status/inbox' => 'Решение не вынесено',
-    'picture/status/new' => 'Новое',
     'picture/status/accepted' => 'Принято',
     'picture/status/removing' => 'Поставлено в очередь на удаление',
     'picture/propose-image-replacement' => 'Предложить замену картинке',
@@ -1031,7 +1030,7 @@ return array_replace(include 'root.php', [
     'page/205/name'        => 'Комментарии',
     'page/205/title'       => 'Комментарии',
     'page/205/breadcrumbs' => 'Комментарии',
-    
+
     'page/208/name'        => 'Двигатели %BRAND_NAME%',
     'page/208/title'       => 'Двигатели %BRAND_NAME%',
     'page/208/breadcrumbs' => 'Двигатели %BRAND_NAME%',
@@ -1054,7 +1053,6 @@ return array_replace(include 'root.php', [
     'moder/picture/filter/status' => 'Статус',
     'moder/picture/filter/status/any' => 'любой',
     'moder/picture/filter/status/inbox' => 'инбокс',
-    'moder/picture/filter/status/new' => 'немодерированые (old)',
     'moder/picture/filter/status/accepted' => 'принятый',
     'moder/picture/filter/status/removing' => 'в очереди на удаление',
     'moder/picture/filter/status/all-except-removing' => 'все, кроме удалённых',
@@ -1263,7 +1261,6 @@ return array_replace(include 'root.php', [
     'moder/picture/acceptance/removed' => 'Удалено',
     'moder/picture/acceptance/removing' => 'Удаляется',
     'moder/picture/acceptance/inbox' => 'Входящее',
-    'moder/picture/acceptance/new' => 'Новое',
     'moder/picture/acceptance/reason' => 'Причина',
 
     'moder/picture/acceptance/want-accept' => 'Хочу принять',

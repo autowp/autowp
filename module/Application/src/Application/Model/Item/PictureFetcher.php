@@ -81,10 +81,7 @@ abstract class PictureFetcher
                 'pictures.id = picture_item.picture_id',
                 ['perspective_id', 'item_id']
             )
-            ->where('pictures.status IN (?)', [
-                DbTable\Picture::STATUS_ACCEPTED,
-                DbTable\Picture::STATUS_NEW
-            ])
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
             ->limit(1);
 
         $order = [];

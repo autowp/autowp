@@ -107,11 +107,6 @@ class CommentsController extends AbstractActionController
                                     $this->translate('moder/picture/acceptance/accepted') .
                                 '</span>';
                             break;
-                        case DbTable\Picture::STATUS_NEW:
-                            $status = '<span class="label label-warning">' .
-                                    $this->translate('moder/picture/acceptance/new') .
-                                '</span>';
-                            break;
                         case DbTable\Picture::STATUS_INBOX:
                             $status = '<span class="label label-warning">' .
                                     $this->translate('moder/picture/acceptance/inbox') .

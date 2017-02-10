@@ -123,10 +123,7 @@ class CatalogueController extends AbstractActionController
         $select = $this->catalogue()->getPictureTable()->select(true);
 
         if ($onlyAccepted) {
-            $select->where('pictures.status IN (?)', [
-                DbTable\Picture::STATUS_NEW,
-                DbTable\Picture::STATUS_ACCEPTED
-            ]);
+            $select->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
         }
 
         return $select;
@@ -430,10 +427,7 @@ class CatalogueController extends AbstractActionController
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id = ?', $brand['id'])
-                    ->where('pictures.status IN (?)', [
-                        DbTable\Picture::STATUS_ACCEPTED,
-                        DbTable\Picture::STATUS_NEW
-                    ])
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->group('pictures.id')
                     ->limit(12);
 
@@ -712,10 +706,7 @@ class CatalogueController extends AbstractActionController
                     $select->where('pictures.status = ?', DbTable\Picture::STATUS_REMOVING);
                     break;
                 default:
-                    $select->where('pictures.status in (?)', [
-                        DbTable\Picture::STATUS_NEW,
-                        DbTable\Picture::STATUS_ACCEPTED
-                    ]);
+                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
                     break;
             }
 
@@ -1268,7 +1259,7 @@ class CatalogueController extends AbstractActionController
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
             )
-            ->where('pictures.status IN (?)', [DbTable\Picture::STATUS_ACCEPTED, DbTable\Picture::STATUS_NEW])
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
             ->where('item_parent_cache.parent_id = ?', $carId)
@@ -1876,9 +1867,7 @@ class CatalogueController extends AbstractActionController
         } elseif ($picture->status == DbTable\Picture::STATUS_INBOX) {
             $select->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX);
         } else {
-            $select->where('pictures.status IN (?)', [
-                DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED
-            ]);
+            $select->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
         }
 
         return $callback($select, $picture);
@@ -1936,10 +1925,7 @@ class CatalogueController extends AbstractActionController
                     $select->where('pictures.status = ?', DbTable\Picture::STATUS_REMOVING);
                     break;
                 default:
-                    $select->where('pictures.status in (?)', [
-                        DbTable\Picture::STATUS_NEW,
-                        DbTable\Picture::STATUS_ACCEPTED
-                    ]);
+                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
                     break;
             }
 

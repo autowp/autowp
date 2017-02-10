@@ -104,7 +104,7 @@ class UsersController extends AbstractActionController
             $pictureAdapter->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
                 ->where('owner_id = ?', $user->id)
-                ->where('status IN (?)', [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED])
+                ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
         );
 
         $pictureTable = $this->catalogue()->getPictureTable();
@@ -211,7 +211,7 @@ class UsersController extends AbstractActionController
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                 ->where('pictures.owner_id = ?', $user->id)
-                ->where('pictures.status IN (?)', [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED])
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->group('item.id');
         });
 
@@ -257,7 +257,7 @@ class UsersController extends AbstractActionController
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
             ->where('pictures.owner_id = ?', $user->id)
-            ->where('pictures.status IN (?)', [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED])
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
             ->where('item_parent_cache.parent_id = ?', $brand['id'])
             ->group('pictures.id')
             ->order(['pictures.add_date DESC', 'pictures.id DESC']);

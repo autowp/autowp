@@ -111,10 +111,7 @@ class CategoryController extends AbstractActionController
                 $pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->where('pictures.status IN (?)', [
-                        DbTable\Picture::STATUS_ACCEPTED,
-                        DbTable\Picture::STATUS_NEW
-                    ])
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->where('item_parent_cache.parent_id = ?', $category['id'])
                     ->order([
                         new Zend_Db_Expr('picture_item.perspective_id = 7 DESC'),
@@ -510,10 +507,7 @@ class CategoryController extends AbstractActionController
                 $pictureTable = new DbTable\Picture();
                 $pictureRows = $pictureTable->fetchAll(
                     $pictureTable->select(true)
-                        ->where('pictures.status IN (?)', [
-                            DbTable\Picture::STATUS_NEW,
-                            DbTable\Picture::STATUS_ACCEPTED
-                        ])
+                        ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item', 'picture_item.item_id = item.id', null)
                         ->where('item.item_type_id IN (?)', [
@@ -580,10 +574,7 @@ class CategoryController extends AbstractActionController
 
             $select = $pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->where('pictures.status IN (?)', [
-                    DbTable\Picture::STATUS_NEW,
-                    DbTable\Picture::STATUS_ACCEPTED
-                ])
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->order($this->catalogue()->picturesOrdering())
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $currentCar ? $currentCar->id : $currentCategory->id)
@@ -637,10 +628,7 @@ class CategoryController extends AbstractActionController
 
             $select = $pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->where('pictures.status IN (?)', [
-                    DbTable\Picture::STATUS_NEW,
-                    DbTable\Picture::STATUS_ACCEPTED
-                ])
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->order($this->catalogue()->picturesOrdering())
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $currentCar ? $currentCar->id : $currentCategory->id);
@@ -692,10 +680,7 @@ class CategoryController extends AbstractActionController
 
             $select = $pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->where('pictures.status IN (?)', [
-                    DbTable\Picture::STATUS_NEW,
-                    DbTable\Picture::STATUS_ACCEPTED
-                ])
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->order($this->catalogue()->picturesOrdering())
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->group('pictures.id')

@@ -11,7 +11,6 @@ use Zend_Db_Expr;
 class Picture extends Table
 {
     const
-        STATUS_NEW      = 'new',
         STATUS_ACCEPTED = 'accepted',
         STATUS_REMOVING = 'removing',
         STATUS_REMOVED  = 'removed',

@@ -84,10 +84,7 @@ class Row extends \Autowp\Commons\Db\Table\Row
                     ->where('mp.group_id=?', $groupId)
                     ->where('item_parent_cache.parent_id = ?', $this->id)
                     ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
-                    ->where('pictures.status IN (?)', [
-                        DbTable\Picture::STATUS_ACCEPTED,
-                        DbTable\Picture::STATUS_NEW
-                    ])
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->order([
                         'mp.position',
                         new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', DbTable\Picture::STATUS_ACCEPTED)),
@@ -117,10 +114,7 @@ class Row extends \Autowp\Commons\Db\Table\Row
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id = ?', $this->id)
                     ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
-                    ->where('pictures.status IN (?)', [
-                        DbTable\Picture::STATUS_ACCEPTED,
-                        DbTable\Picture::STATUS_NEW
-                    ])
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->limit(1);
 
                 if (count($ids) > 0) {

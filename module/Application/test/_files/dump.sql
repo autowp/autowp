@@ -2185,7 +2185,7 @@ CREATE TABLE `pictures` (
   `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `note` varchar(255) NOT NULL DEFAULT '',
   `crc` int(11) DEFAULT NULL,
-  `status` enum('new','accepted','removing','removed','inbox') NOT NULL,
+  `status` enum('accepted','removing','removed','inbox') NOT NULL,
   `_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `removing_date` date DEFAULT NULL,
   `_brand_id` int(10) unsigned DEFAULT NULL,
