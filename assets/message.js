@@ -1,7 +1,9 @@
 var $ = require("jquery");
+var i18next = require('i18next');
 
 module.exports = {
     showDialog: function(userId, message, sentCallback, cancelCallback) {
+        
         var self = this;
         
         var $modal = $(require('./message/modal.html'));
@@ -11,6 +13,14 @@ module.exports = {
         var $btnSend = $form.find('.btn-primary').button();
         var $btnCancel = $form.find('.cancel').button();
         var $textarea = $form.find('textarea');
+        
+        $modal.find('.modal-title').text(i18next.t("personal-message-dialog/title"));
+        $btnSend.attr('data-loading-text', i18next.t("personal-message-dialog/sending"));
+        $btnSend.attr('data-complete-text', i18next.t("personal-message-dialog/sent"));
+        $btnSend.attr('data-send-text', i18next.t("personal-message-dialog/send"));
+        $btnSend.text(i18next.t("personal-message-dialog/send"));
+        $btnCancel.text(i18next.t("personal-message-dialog/cancel"));
+        $textarea.attr('placeholder', i18next.t("personal-message-dialog/placeholder"));
         
         if (message) {
             $textarea.val(message);
@@ -33,7 +43,9 @@ module.exports = {
         
         $textarea.bind('change keyup click', function() {
             $textarea.parent().removeClass('error');
-            $btnSend.text('отправить').removeClass('btn-success').prop('disabled', $(this).val().length <= 0);
+            $btnSend.text(i18next.t("personal-message-dialog/send"))
+                .removeClass('btn-success')
+                .prop('disabled', $(this).val().length <= 0);
         }).triggerHandler('change');
         
         $form.find('button.cancel, a.close').on('click', function(e) {

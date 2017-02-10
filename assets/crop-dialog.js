@@ -1,6 +1,8 @@
 var $ = require("jquery");
 require('jcrop-0.9.12/css/jquery.Jcrop.css');
 require('jcrop-0.9.12/js/jquery.Jcrop');
+var i18next = require('i18next');
+var sprintf = require("sprintf-js").sprintf;
 
 var Dialog = function(options) {
     this.init(options);
@@ -18,6 +20,11 @@ Dialog.prototype = {
         this.minSize = options.minSize ? options.minSize : [400, 300];
         
         this.$modal = $(require('./crop-dialog.html'));
+        
+        this.$modal.find('.modal-title').text(i18next.t("crop-dialog/title"));
+        this.$modal.find('.btn-primary').text(i18next.t("crop-dialog/save"));
+        this.$modal.find('.btn-close').text(i18next.t("crop-dialog/close"));
+        this.$modal.find('.select-all span').text(i18next.t("crop-dialog/select-all"));
         
         this.$body = this.$modal.find('.modal-body');
         this.$selection = this.$modal.find('.selection');
@@ -53,7 +60,12 @@ Dialog.prototype = {
         var pw = 4;
         var ph = pw * this.currentCrop.h / this.currentCrop.w;
         var phRound = Math.round(ph * 10) / 10;
-        this.$selection.text(text + ' (aspect is about ' + pw + ':' + phRound + ')');
+        this.$selection.text(
+            sprintf(
+                i18next.t("crop-dialog/resolution-%s-aspect-%s"), 
+                text, pw+':'+phRound
+            )
+        );
     },
     afterShown: function() {
         var scale = this.width / this.$body.width(),

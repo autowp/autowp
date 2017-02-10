@@ -1,3 +1,14 @@
 {
-    "personal-message-dialog/title": "Отправить личное сообщение"
+    "personal-message-dialog/title": "Отправить личное сообщение",
+    "personal-message-dialog/send": "отправить",
+    "personal-message-dialog/sending": "отправляется ...",
+    "personal-message-dialog/sent": "отправлено",
+    "personal-message-dialog/cancel": "отменить",
+    "personal-message-dialog/placeholder": "Текст сообщения",
+    
+    "crop-dialog/title": "Кадрирование",
+    "crop-dialog/close": "Закрыть",
+    "crop-dialog/select-all": "Выделить всё",
+    "crop-dialog/save": "Сохранить",
+    "crop-dialog/resolution-%s-aspect-%s": "%s (пропорции %s)"
 }

@@ -1,10 +1,23 @@
 var Navbar = require("navbar/navbar.js");
 var $ = require("jquery");
+var i18next = require('i18next');
 
 require("bootstrap/bootstrap");
 require("styles.less");
 require("flags/flags.js");
 require("font-awesome-webpack");
+
+var resources = {};
+$.map(['en', 'de', 'fr', 'ru', 'zh'], function(language) {
+    resources[language] = {
+        translation: require("languages/"+language+".json")
+    }
+});
+
+i18next.init({
+    lng: $(document.documentElement).attr('lang'),
+    resources: resources
+});
 
 var doc = document;
 $(function() {

@@ -1,3 +1,14 @@
 {
-    "personal-message-dialog/title": "Send personal message"
+    "personal-message-dialog/title": "Send personal message",
+    "personal-message-dialog/send": "send",
+    "personal-message-dialog/sending": "sending ...",
+    "personal-message-dialog/sent": "sent",
+    "personal-message-dialog/cancel": "cancel",
+    "personal-message-dialog/placeholder": "Message",
+    
+    "crop-dialog/title": "Cropper",
+    "crop-dialog/close": "Close",
+    "crop-dialog/select-all": "Select all",
+    "crop-dialog/save": "Save changes",
+    "crop-dialog/resolution-%s-aspect-%s": "%s (aspect is about %s)"
 }
