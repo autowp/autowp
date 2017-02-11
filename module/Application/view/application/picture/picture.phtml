@@ -1,12 +1,13 @@
 <?php
-    if ($this->previewUrl) {
+    $this->headMeta()
+        ->appendProperty('twitter:card', 'photo')
+        ->appendProperty('og:title', $this->pic()->textTitle($this->name));
+            
+    if ($this->preview) {
         $this->headMeta()
-            ->appendName('photo',                              'twitter:card' )
-            ->appendName($this->pic()->textTitle($this->name), 'twitter:title')
-            ->appendName('twitter:image', $this->previewUrl)
-            ->appendName('og:image', $this->previewUrl);
-            /*->headMeta('twitter:image:width',  $image->width() )
-            ->headMeta('twitter:image:height', $image->height());*/
+            ->appendProperty('og:image', $this->preview->getSrc())
+            ->appendProperty('og:image:width',  $this->preview->getWidth() )
+            ->appendProperty('og:image:height', $this->preview->getHeight());
     }
 
     $this->layout()->moduleName = 'default/picture';
@@ -65,6 +66,13 @@
                 <?php } ?>
             <?php } ?>
         </div>
+        
+        <?=$this->partial('application/share', [
+            'url'     => $this->canonicalUrl,
+            'text'    => $this->pic()->textTitle($this->name),
+            'picture' => $this->preview
+        ])?>
+        
         <?php if ($this->copyrights) { ?>
             <div>
                 <?=$this->markdown($this->copyrights) ?>

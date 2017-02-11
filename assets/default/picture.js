@@ -1,8 +1,11 @@
 var $ = require("jquery");
 var Gallery = require("gallery/gallery");
+var share = require('share/share');
 
 module.exports = {
     init: function(options) {
+        
+        share('.share');
         
         var gallery;
         

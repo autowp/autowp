@@ -1055,7 +1055,11 @@ class Pic extends AbstractPlugin
             'ofLinks'           => $ofLinks,
             'moderVotes'        => $moderVotes,
             'sourceUrl'         => $sourceUrl,
+            'preview'           => $preview,
             'previewUrl'        => $previewUrl,
+            'canonicalUrl'      => $this->url($picture['identity'], [
+                'canonical' => true
+            ]),
             'replacePicture'    => $replacePicture,
             'gallery'           => [
                 'current' => $picture->id
