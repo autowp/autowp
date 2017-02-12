@@ -166,7 +166,9 @@ class Inbox extends Form implements InputFilterProviderInterface
                         7 => 'moder/pictures/filter/order/commented',
                         8 => 'moder/pictures/filter/order/views',
                         9 => 'moder/pictures/filter/order/moder-votes',
-                        11 => 'moder/pictures/filter/order/removing-date'
+                        11 => 'moder/pictures/filter/order/removing-date',
+                        12 => 'moder/pictures/filter/order/likes',
+                        13 => 'moder/pictures/filter/order/dislikes'
                     ],
                     'value' => '1',
                 ]

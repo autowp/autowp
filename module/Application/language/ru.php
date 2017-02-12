@@ -1093,6 +1093,8 @@ return array_replace(include 'root.php', [
     'moder/pictures/filter/order/views' => 'Просмотры',
     'moder/pictures/filter/order/moder-votes' => 'Заявки на принятие/удаление',
     'moder/pictures/filter/order/removing-date' => 'Дата удаления',
+    'moder/pictures/filter/order/likes' => 'Лайки',
+    'moder/pictures/filter/order/dislikes' => 'Дизлайки',
 
     'moder/pictures/acceptance/message' => 'Сообщение',
     'moder/pictures/picture/inbox-mark' => '(новое)',

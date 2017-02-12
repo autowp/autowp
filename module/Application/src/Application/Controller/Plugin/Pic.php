@@ -13,6 +13,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
 use Application\Model\PictureItem;
+use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
 use Application\ItemNameFormatter;
@@ -65,6 +66,11 @@ class Pic extends AbstractPlugin
      * @var Comments\CommentsService
      */
     private $comments;
+    
+    /**
+     * @var PictureVote
+     */
+    private $pictureVote;
 
     public function __construct(
         $textStorage,
@@ -74,7 +80,8 @@ class Pic extends AbstractPlugin
         SpecificationsService $specsService,
         PictureItem $pictureItem,
         $httpRouter,
-        Comments\CommentsService $comments
+        Comments\CommentsService $comments,
+        PictureVote $pictureVote
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -84,6 +91,7 @@ class Pic extends AbstractPlugin
         $this->pictureItem = $pictureItem;
         $this->httpRouter = $httpRouter;
         $this->comments = $comments;
+        $this->pictureVote = $pictureVote;
 
         $this->pictureTable = new DbTable\Picture();
     }
@@ -1042,6 +1050,9 @@ class Pic extends AbstractPlugin
         }
 
         $itemIds = $this->pictureItem->getPictureItems($picture['id']);
+        
+        $user = $controller->user()->get();
+        $votes = $this->pictureVote->getVote($picture['id'], $user ? $user->id : null);
 
         $data = [
             'id'                => $picture['id'],
@@ -1074,7 +1085,8 @@ class Pic extends AbstractPlugin
             //'picturePerspectives' => $picturePerspectives,
             'items'             => $this->picPageItemsData($picture, $itemIds),
             'engines'           => $this->picPageEnginesData($picture, $itemIds),
-            'factories'         => $this->picPageFactoriesData($picture)
+            'factories'         => $this->picPageFactoriesData($picture),
+            'votes'             => $votes
         ];
 
         // refresh views count

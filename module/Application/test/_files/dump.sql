@@ -2935,6 +2935,34 @@ CREATE TABLE `df_hash` (
  CONSTRAINT `df_hash_ibfk_1` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `picture_vote` (
+  `picture_id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `value` tinyint(4) NOT NULL,
+  `timestamp` timestamp NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `picture_vote`
+  ADD PRIMARY KEY (`picture_id`,`user_id`),
+  ADD KEY `user_id` (`user_id`);
+
+ALTER TABLE `picture_vote`
+  ADD CONSTRAINT `picture_vote_ibfk_1` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `picture_vote_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+
+CREATE TABLE `picture_vote_summary` (
+  `picture_id` int(10) UNSIGNED NOT NULL,
+  `positive` int(11) NOT NULL DEFAULT '0',
+  `negative` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `picture_vote_summary`
+  ADD PRIMARY KEY (`picture_id`);
+
+ALTER TABLE `picture_vote_summary`
+  ADD CONSTRAINT `picture_vote_summary_ibfk_1` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE;
+
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

@@ -1159,6 +1159,18 @@ return [
                             ]
                         ]
                     ],
+                    'picture-vote' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/picture-vote/:id',
+                            'constraints' => [
+                                'id' => '[0-9]+'
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\Api\PictureVoteController::class
+                            ],
+                        ],
+                    ],
                     'users' => [
                         'type' => Literal::class,
                         'options' => [

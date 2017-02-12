@@ -244,7 +244,9 @@ class PicturesController extends AbstractActionController
             8 => ['sql' => 'picture_view.views DESC'],
             9 => ['sql' => 'pdr.day_date DESC'],
             10 => ['sql' => 'df_distance.distance ASC'],
-            11 => ['sql' => ['pictures.removing_date DESC', 'pictures.id']]
+            11 => ['sql' => ['pictures.removing_date DESC', 'pictures.id']],
+            12 => ['sql' => 'picture_vote_summary.positive DESC'],
+            13 => ['sql' => 'picture_vote_summary.negative DESC'],
         ];
 
         if ($this->getRequest()->isPost()) {
@@ -431,6 +433,16 @@ class PicturesController extends AbstractActionController
                     break;
                 case 9:
                     $joinPdr = true;
+                    break;
+                case 12:
+                    $select
+                        ->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', null)
+                        ->where('picture_vote_summary.positive > 0');
+                    break; 
+                case 13:
+                    $select
+                        ->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', null)
+                        ->where('picture_vote_summary.negative > 0');
                     break;
             }
         } else {

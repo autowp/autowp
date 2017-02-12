@@ -3,7 +3,6 @@ var $ = require('jquery');
 require('./share.less');
 
 module.exports = function(element) {
-    console.log(element);
     var $element = $(element);
     
     $element.find('a').on('click', function(event) {

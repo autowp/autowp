@@ -67,11 +67,41 @@
             <?php } ?>
         </div>
         
-        <?=$this->partial('application/share', [
-            'url'     => $this->canonicalUrl,
-            'text'    => $this->pic()->textTitle($this->name),
-            'picture' => $this->preview
-        ])?>
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="picture-vote" data-id="<?=(int)$this->picture['id']?>">
+                    <?php if ($this->user()->logedIn()) { ?>
+                        <?=$this->htmlA([
+                            'href'  => '#',
+                            'class' => 'fa vote-up ' . ($this->votes['value'] > 0 ? 'fa-thumbs-up' : 'fa-thumbs-o-up')
+                        ], '')?>
+                    <?php } else { ?>
+                        <i class="fa fa-thumbs-o-up"></i>
+                    <?php } ?>
+                    <span class="positive<?=$this->votes['positive'] ? '' : ' zero'?>"><?=$this->votes['positive']?></span>
+                    <?php if ($this->user()->logedIn()) { ?>
+                        <?=$this->htmlA([
+                            'href'  => '#',
+                            'class' => 'fa vote-down ' . ($this->votes['value'] < 0 ? 'fa-thumbs-down' : 'fa-thumbs-o-down')
+                        ], '')?>
+                    <?php } else { ?>
+                        <i class="fa fa-thumbs-o-down"></i>
+                    <?php } ?>
+                    <span class="negative<?=$this->votes['negative'] ? '' : ' zero'?>"><?=$this->votes['negative']?></span>
+                </div>
+            </div>
+            <div class="col-xs-6 text-right">
+                <a href="#" class="fa fa-share-alt btn-share-dialog" title="Share ..."></a>
+            </div>
+        </div>
+        
+        <div class="share-dialog">
+            <?=$this->partial('application/share', [
+                'url'     => $this->canonicalUrl,
+                'text'    => $this->pic()->textTitle($this->name),
+                'picture' => $this->preview
+            ])?>
+        </div>
         
         <?php if ($this->copyrights) { ?>
             <div>
