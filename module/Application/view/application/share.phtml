@@ -103,6 +103,15 @@
         'title'  => 'Telegram'
     ], '')?>
     
+    <?php /*=$this->htmlA([
+        'href'   => 'viber://forward?' . http_build_query([
+            'text' => $this->text . "\n" . $this->url
+        ]),
+        'target' => "_blank",
+        'class'  => "fa fa-viber,
+        'title'  => 'Viber'
+    ], '')*/?>
+    
     <?=$this->htmlA([
         'href'   => 'mailto:?' . http_build_query([
             'subject' => $this->text,

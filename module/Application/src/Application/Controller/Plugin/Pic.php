@@ -1053,6 +1053,11 @@ class Pic extends AbstractPlugin
         
         $user = $controller->user()->get();
         $votes = $this->pictureVote->getVote($picture['id'], $user ? $user->id : null);
+        
+        $subscribed = false;
+        if ($user) {
+            $subscribed = $this->comments->userSubscribed(\Application\Comments::PICTURES_TYPE_ID, $picture['id'], $user['id']);
+        }
 
         $data = [
             'id'                => $picture['id'],
@@ -1086,7 +1091,12 @@ class Pic extends AbstractPlugin
             'items'             => $this->picPageItemsData($picture, $itemIds),
             'engines'           => $this->picPageEnginesData($picture, $itemIds),
             'factories'         => $this->picPageFactoriesData($picture),
-            'votes'             => $votes
+            'votes'             => $votes,
+            'subscribed'        => $subscribed,
+            'subscribeUrl'      => $controller->url()->fromRoute('api/comments/subscribe', [
+                'item_id' => $picture['id'],
+                'type_id' => \Application\Comments::PICTURES_TYPE_ID
+            ]),
         ];
 
         // refresh views count

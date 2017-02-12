@@ -43,7 +43,6 @@ class CommentsController extends AbstractRestfulController
         MessageService $message,
         Comments $comments
     ) {
-
         $this->hostManager = $hostManager;
         $this->form = $form;
         $this->comments = $comments;
@@ -93,8 +92,6 @@ class CommentsController extends AbstractRestfulController
             'nextMessageTime' => $this->nextMessageTime()
         ];
     }
-
-
 
     public function addAction()
     {
@@ -190,11 +187,12 @@ class CommentsController extends AbstractRestfulController
                     $this->comments->service()->completeMessage($values['parent_id']);
                 }
             }
+            
+            $userTable = new User();
 
             if ($values['parent_id']) {
                 $authorId = $this->comments->service()->getMessageAuthorId($values['parent_id']);
                 if ($authorId && ($authorId != $user->id)) {
-                    $userTable = new User();
                     $parentMessageAuthor = $userTable->find($authorId)->current();
                     if ($parentMessageAuthor && ! $parentMessageAuthor->deleted) {
                         $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor->language);
@@ -215,6 +213,8 @@ class CommentsController extends AbstractRestfulController
                     }
                 }
             }
+            
+            $this->comments->notifySubscribers($messageId);
 
             $backUrl = $this->comments->getMessageUrl($messageId);
 

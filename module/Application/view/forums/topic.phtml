@@ -37,22 +37,12 @@
             ]) ?>
         </div>
         <div class="col-sm-6 text-right">
-            <?php if ($this->canSubscribe) { ?>
-                <form action="<?=$this->escapeHtmlAttr($this->subscribeUrl) ?>" method="post"><div>
+            <?php if ($this->user()->logedIn()) { ?>
+                <button class="btn btn-link subscription<?=$this->subscribed ? ' subscribed' : ''?>" data-url="<?=$this->escapeHtmlAttr($this->subscribeUrl) ?>">
                     <i class="fa fa-envelope"></i>
-                    <a href="#" onclick="this.parentNode.parentNode.submit();return false;">
-                        <?=$this->escapeHtml($this->translate('forums/subscribe'))?>
-                    </a>
-                </div></form>
-            <?php } ?>
-            <?php if ($this->canUnsubscribe) { ?>
-                <form action="<?=$this->escapeHtmlAttr($this->unsubscribeUrl) ?>" method="post"><div>
-                    <i class="fa fa-envelope"></i>
-                    <?=$this->escapeHtml($this->translate('forums/subscribed'))?>
-                    <a href="#" onclick="this.parentNode.parentNode.submit();return false;">
-                        <?=$this->escapeHtml($this->translate('forums/unsubscribe'))?>
-                    </a>
-                </div></form>
+                    <span class="subscribe"><?=$this->escapeHtml($this->translate('comments/subscribe'))?></span>
+                    <span class="unsubscribe"><?=$this->escapeHtml($this->translate('comments/unsubscribe'))?></span>
+                </button>
             <?php } ?>
         </div>
     </div>

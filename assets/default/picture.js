@@ -2,6 +2,7 @@ var $ = require("jquery");
 var Gallery = require("gallery/gallery");
 var share = require('share/share');
 var pictureVote = require('picture-vote/picture-vote');
+var subscription = require('subscription/subscription');
 
 module.exports = {
     init: function(options) {
@@ -31,5 +32,7 @@ module.exports = {
                 gallery.rewindToId(options.gallery.current);
             }
         });
+        
+        subscription('.subscription');
     }
 };

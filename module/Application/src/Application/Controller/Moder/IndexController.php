@@ -104,9 +104,9 @@ class IndexController extends AbstractActionController
                 'total'    => $totalBrands,
                 'value'    => $db->fetchOne('
                     select count(1)
-                    from brands
-                    where img is not null
-                ')
+                    from item
+                    where logo_id is not null and item_type_id = ?
+                ', [DbTable\Item\Type::BRAND])
             ],
             [
                 'name'    => 'moder/statistics/from-years',

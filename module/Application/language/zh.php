@@ -360,6 +360,8 @@ return array_replace(include 'root.php', [
     'comments/message/restore' => '恢复',
     'comments/message/move' => '移动',
     'comments/vote/no-more-votes' => '今日表决次数已用尽',
+    'comments/subscribe' => '订阅新回复通知',
+    'comments/unsubscribe' => '取消订阅',
 
     /*perspectives*/
     'perspective/front'          => '前方',
@@ -1479,6 +1481,7 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'pm/user-%s-set-inherited-vehicle-engine-%s-%s' => '%s为车型%s ( %s )设定了继承发动机%s',
     'pm/user-%s-set-vehicle-engine-%s-%s-%s' => '%s为车型 %s ( %s )设定了发动机%s',
     'pm/user-%s-replies-to-you-%s' => "%s回复了您\n%s",
+    'pm/user-%s-post-new-message-%s' => "%s posted new message\n%s",
 
     'moder/vehicle/changes/name-%s-%s' => 'vehicle name from "%s" to "%s"',
     'moder/vehicle/changes/body-%s-%s' => 'body number from "%s" to "%s"',

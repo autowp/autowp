@@ -373,6 +373,8 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'comments/message/restore' => 'Restore',
     'comments/message/move' => 'Move',
     'comments/vote/no-more-votes' => 'Today vote limit reached',
+    'comments/subscribe' => 'Subscribe to new replies notifications',
+    'comments/unsubscribe' => 'Unsubscribe from notifications',
 
     /*perspectives*/
     'perspective/front'          => 'front',
@@ -1501,6 +1503,7 @@ Don\'t forget it.',
     'pm/user-%s-set-inherited-vehicle-engine-%s-%s' => '%s set inherited engine to vehicle %s ( %s )',
     'pm/user-%s-set-vehicle-engine-%s-%s-%s' => '%s set engine %s to vehicle %s ( %s )',
     'pm/user-%s-replies-to-you-%s' => "%s replies to you\n%s",
+    'pm/user-%s-post-new-message-%s' => "%s posted new message\n%s",
 
     'moder/vehicle/changes/name-%s-%s' => 'vehicle name from "%s" to "%s"',
     'moder/vehicle/changes/body-%s-%s' => 'body number from "%s" to "%s"',

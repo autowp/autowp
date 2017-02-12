@@ -46,6 +46,7 @@ return [
             Controller\UsersController::class           => Controller\Frontend\Service\UsersControllerFactory::class,
             Controller\UploadController::class          => Controller\Frontend\Service\UploadControllerFactory::class,
             Controller\VotingController::class          => Controller\Frontend\Service\VotingControllerFactory::class,
+            Controller\Api\CommentsController::class    => Controller\Api\Service\CommentsControllerFactory::class,
             Controller\Api\ContactsController::class    => InvokableFactory::class,
             Controller\Api\PictureController::class     => Controller\Api\Service\PictureControllerFactory::class,
             Controller\Api\PictureVoteController::class => Controller\Api\Service\PictureVoteControllerFactory::class,

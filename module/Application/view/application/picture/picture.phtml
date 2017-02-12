@@ -73,25 +73,31 @@
                     <?php if ($this->user()->logedIn()) { ?>
                         <?=$this->htmlA([
                             'href'  => '#',
-                            'class' => 'fa vote-up ' . ($this->votes['value'] > 0 ? 'fa-thumbs-up' : 'fa-thumbs-o-up')
+                            'class' => 'fa fa-2x vote-up ' . ($this->votes['value'] > 0 ? 'fa-thumbs-up' : 'fa-thumbs-o-up')
                         ], '')?>
                     <?php } else { ?>
-                        <i class="fa fa-thumbs-o-up"></i>
+                        <i class="fa fa-2x fa-thumbs-o-up"></i>
                     <?php } ?>
                     <span class="positive<?=$this->votes['positive'] ? '' : ' zero'?>"><?=$this->votes['positive']?></span>
                     <?php if ($this->user()->logedIn()) { ?>
                         <?=$this->htmlA([
                             'href'  => '#',
-                            'class' => 'fa vote-down ' . ($this->votes['value'] < 0 ? 'fa-thumbs-down' : 'fa-thumbs-o-down')
+                            'class' => 'fa fa-2x vote-down ' . ($this->votes['value'] < 0 ? 'fa-thumbs-down' : 'fa-thumbs-o-down')
                         ], '')?>
                     <?php } else { ?>
-                        <i class="fa fa-thumbs-o-down"></i>
+                        <i class="fa fa-2x fa-thumbs-o-down"></i>
                     <?php } ?>
                     <span class="negative<?=$this->votes['negative'] ? '' : ' zero'?>"><?=$this->votes['negative']?></span>
                 </div>
             </div>
             <div class="col-xs-6 text-right">
-                <a href="#" class="fa fa-share-alt btn-share-dialog" title="Share ..."></a>
+                <?php if ($this->user()->logedIn()) { ?>
+                    <a href="#" class="picture-subscription subscription<?=$this->subscribed ? ' subscribed' : ''?>" data-url="<?=$this->escapeHtmlAttr($this->subscribeUrl) ?>">
+                        <span class="fa fa-2x fa-envelope-o subscribe" title="<?=$this->escapeHtmlAttr($this->translate('comments/subscribe'))?>"></span>
+                        <span class="fa fa-2x fa-envelope unsubscribe" title="<?=$this->escapeHtmlAttr($this->translate('comments/unsubscribe'))?>"></span>
+                    </a>
+                <?php } ?>
+                <a href="#" class="fa fa-2x fa-share-alt btn-share-dialog" title="Share ..."></a>
             </div>
         </div>
         

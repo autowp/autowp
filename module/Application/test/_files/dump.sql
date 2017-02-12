@@ -2964,6 +2964,21 @@ ALTER TABLE `picture_vote_summary`
   ADD CONSTRAINT `picture_vote_summary_ibfk_1` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE;
 
 
+CREATE TABLE `comment_topic_subscribe` (
+  `item_id` int(11) UNSIGNED NOT NULL,
+  `type_id` tinyint(4) UNSIGNED NOT NULL,
+  `user_id` int(11) UNSIGNED NOT NULL,
+  `sent` tinyint(4) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `comment_topic_subscribe`
+  ADD KEY `comment_topic_subscribe_ibfk_1` (`user_id`);
+
+ALTER TABLE `comment_topic_subscribe`
+  ADD CONSTRAINT `comment_topic_subscribe_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

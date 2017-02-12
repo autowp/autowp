@@ -30,16 +30,6 @@ return [
     'forums/topic/name' => '标题',
     'forums/topic/text' => '站内信',
     'forums/topic/subscribe-to-new-messages' => '发送新消息',
-    'forums/notification-mail/from' => 'wheelsage.org自动提示',
-    'forums/notification-mail/subject' => '新论坛消息',
-    'forums/notification-mail/body' =>
-    "您好.\n\n" .
-    "新消息在顶部显示 `%1\$s`\n" .
-    "阅读请点击链接 %2\$s\n\n" .
-    "您可以在帐户设置退订通知消息，\n\n" .
-    "诚挚的www.wheelsage.org机器人\n",
-    'forums/subscribe' => '订阅新回复通知',
-    'forums/subscribed' => '您已订阅新回复通知',
     'forums/unsubscribe' => '取消订阅',
     'forums/topic-closed-text' => '主题已被管理员关闭',
     'forums/need-wait-to-post' => '，您需要等待一段时间后才能添加新的消息',

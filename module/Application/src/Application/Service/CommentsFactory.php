@@ -12,7 +12,10 @@ class CommentsFactory implements FactoryInterface
         return new \Application\Comments(
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get('HttpRouter'),
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+            $container->get(\Zend\Db\Adapter\AdapterInterface::class),
+            $container->get(\Application\HostManager::class),
+            $container->get(\Autowp\Message\MessageService::class),
+            $container->get('MvcTranslator')
         );
     }
 }

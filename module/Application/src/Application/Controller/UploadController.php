@@ -241,6 +241,12 @@ class UploadController extends AbstractActionController
                     'moderatorAttention' => Comments\Attention::NONE
                 ]);
             }
+            
+            $this->comments->subscribe(
+                \Application\Comments::PICTURES_TYPE_ID, 
+                $picture->id, 
+                $user['id']
+            );
 
             // read gps
             $exif = $this->imageStorage()->getImageEXIF($picture->image_id);

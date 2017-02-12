@@ -386,6 +386,8 @@ return array_replace(include 'root.php', [
     'comments/message/restore' => 'Восстановить',
     'comments/message/move' => 'Переместить',
     'comments/vote/no-more-votes' => 'На сегодня у вас не осталось больше голосов',
+    'comments/subscribe' => 'Подписаться на уведомления о сообщениях',
+    'comments/unsubscribe' => 'Отписаться от уведомлений',
 
     /*perspectives*/
     'perspective/front'          => 'спереди',
@@ -1514,6 +1516,7 @@ return array_replace(include 'root.php', [
     'pm/user-%s-set-inherited-vehicle-engine-%s-%s' => '%s установил наследование двигателя автомобилю %s ( %s )',
     'pm/user-%s-set-vehicle-engine-%s-%s-%s' => '%s назначил двигатель %s автомобилю %s ( %s )',
     'pm/user-%s-replies-to-you-%s' => "%s ответил на ваше сообщение\n%s",
+    'pm/user-%s-post-new-message-%s' => "%s написал сообщение\n%s",
 
     'moder/vehicle/changes/name-%s-%s' => 'название автомобиля с "%s" на "%s"',
     'moder/vehicle/changes/body-%s-%s' => 'номер кузова с "%s" на "%s"',

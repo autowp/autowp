@@ -8,7 +8,10 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\Comments\CommentsService;
+use Autowp\Message\MessageService;
+use Autowp\User\Model\DbTable\User;
 
+use Application\HostManager;
 use Application\Model\DbTable;
 use Application\StringUtils;
 
@@ -39,15 +42,33 @@ class Comments
      * @var Adapter
      */
     private $adapter;
+    
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
+    
+    /**
+     * @var MessageService
+     */
+    private $message;
+    
+    private $translator;
 
     public function __construct(
         CommentsService $service,
         TreeRouteStack $router,
-        Adapter $adapter
+        Adapter $adapter,
+        HostManager $hostManager,
+        MessageService $message,
+        $translator
     ) {
         $this->service = $service;
         $this->router = $router;
         $this->adapter = $adapter;
+        $this->hostManager = $hostManager;
+        $this->message = $message;
+        $this->translator = $translator;
     }
 
     public function getMessageUrl($messageId, $canonical = false, $uri = null)
@@ -244,5 +265,52 @@ class Comments
         }
 
         return $affected;
+    }
+    
+    public function notifySubscribers($messageId)
+    {
+        $comment = $this->service->getMessageRow($messageId);
+        
+        if (! $comment) {
+            return false;
+        }
+        
+        $userTable = new User();
+        
+        $author = $userTable->find($comment['author_id'])->current();
+        
+        if (! $author) {
+            return false;
+        }
+    
+        $ids = $this->service->getSubscribersIds($comment['type_id'], $comment['item_id'], true);
+        $subscribers = $userTable->find($ids);
+    
+        foreach ($subscribers as $subscriber) {
+            if ($subscriber->id == $author->id) {
+                continue;
+            }
+    
+            $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+    
+            $url = $this->getMessageUrl($messageId, true, $uri) . '#msg' . $messageId;
+            
+            $userUrl = $this->router->assemble([
+                'user_id' => $author->identity ? $author->identity : 'user' . $author->id
+            ], [
+                'name'            => 'users/user',
+                'force_canonical' => true,
+                'uri'             => $uri
+            ]);
+            
+            $message = sprintf(
+                $this->translator->translate('pm/user-%s-post-new-message-%s', 'default', $subscriber->language),
+                $userUrl,
+                $url
+            );
+            $this->message->send(null, $subscriber->id, $message);
+            
+            $this->service->markSubscriptionSent($comment['type_id'], $comment['item_id'], $messageId);
+        }
     }
 }

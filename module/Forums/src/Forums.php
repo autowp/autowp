@@ -33,11 +33,6 @@ class Forums
     private $topicTable;
 
     /**
-     * @var TableGateway
-     */
-    private $subscriberTable;
-
-    /**
      * @var Comments\CommentsService
      */
     private $comments;
@@ -50,7 +45,6 @@ class Forums
 
         $this->themeTable = new TableGateway('forums_themes', $adapter);
         $this->topicTable = new TableGateway('forums_topics', $adapter);
-        $this->subscriberTable = new TableGateway('forums_topics_subscribers', $adapter);
     }
 
     public function getThemeList($themeId, $isModerator)
@@ -144,44 +138,27 @@ class Forums
 
     public function userSubscribed($topicId, $userId)
     {
-        return (bool)$this->subscriberTable->select([
-            'topic_id' => (int)$topicId,
-            'user_id'  => (int)$userId
-        ])->current();
+        return $this->comments->userSubscribed(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     public function canSubscribe($topicId, $userId)
     {
-        return ! $this->userSubscribed($topicId, $userId);
+        return $this->comments->canSubscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     public function canUnSubscribe($topicId, $userId)
     {
-        return $this->userSubscribed($topicId, $userId);
+        return $this->comments->canUnSubscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     public function subscribe($topicId, $userId)
     {
-        if (! $this->canSubscribe($topicId, $userId)) {
-            throw new \Exception('Already subscribed');
-        }
-
-        $this->subscriberTable->insert([
-            'topic_id' => (int)$topicId,
-            'user_id'  => (int)$userId
-        ]);
+        return $this->comments->subscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     public function unSubscribe($topicId, $userId)
     {
-        if (! $this->canUnSubscribe($topicId, $userId)) {
-            throw new \Exception('User not subscribed');
-        }
-
-        $this->subscriberTable->delete([
-            'topic_id = ?' => (int)$topicId,
-            'user_id = ?'  => (int)$userId
-        ]);
+        return $this->comments->unSubscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     public function open($topicId)
@@ -676,20 +653,17 @@ class Forums
             $page
         );
 
-        $canSubscribe = false;
-        $canUnsubscribe = false;
+        $subscribed = false;
         if ($userId) {
-            $canSubscribe = $this->canSubscribe($topic['id'], $userId);
-            $canUnsubscribe = $this->canUnSubscribe($topic['id'], $userId);
+            $subscribed = $this->userSubscribed($topic['id'], $userId);
         }
 
         return [
-            'topic'          => $topic,
-            'theme'          => $theme,
-            'paginator'      => $paginator,
-            'messages'       => $messages,
-            'canSubscribe'   => $canSubscribe,
-            'canUnsubscribe' => $canUnsubscribe,
+            'topic'      => $topic,
+            'theme'      => $theme,
+            'paginator'  => $paginator,
+            'messages'   => $messages,
+            'subscribed' => $subscribed
         ];
     }
 
@@ -722,17 +696,7 @@ class Forums
 
     public function getSubscribersIds($topicId)
     {
-        $select = new Sql\Select($this->subscriberTable->getTable());
-        $select
-            ->columns(['user_id'])
-            ->where(['topic_id = ?' => (int)$topicId]);
-
-        $ids = [];
-        foreach ($this->subscriberTable->selectWith($select) as $row) {
-            $ids[] = $row['user_id'];
-        }
-
-        return $ids;
+        return $this->comments->getSubscribersIds(\Application\Comments::FORUMS_TYPE_ID, $topicId);
     }
 
     public function getSubscribedTopics($userId)
@@ -740,16 +704,16 @@ class Forums
         $select = new Sql\Select($this->topicTable->getTable());
         $select
             ->join(
-                'forums_topics_subscribers',
-                'forums_topics.id = forums_topics_subscribers.topic_id',
+                'comment_topic_subscribe',
+                'forums_topics.id = comment_topic_subscribe.item_id',
                 []
             )
             ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', [])
-            ->where(
-                ['forums_topics_subscribers.user_id = ?' => (int)$userId,
-                'comment_topic.type_id = ?'              => \Application\Comments::FORUMS_TYPE_ID
-                ]
-            )
+            ->where([
+                'comment_topic_subscribe.user_id' => (int)$userId,
+                'comment_topic.type_id'           => \Application\Comments::FORUMS_TYPE_ID,
+                'comment_topic_subscribe.type_id' => \Application\Comments::FORUMS_TYPE_ID,
+            ])
             ->order('comment_topic.last_update DESC');
         $rows = $this->topicTable->selectWith($select);
 

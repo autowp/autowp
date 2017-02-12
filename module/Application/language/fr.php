@@ -373,7 +373,9 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'comments/message/restore' => 'Restaurer',
     'comments/message/move' => 'Déplacer',
     'comments/vote/no-more-votes' => 'La limite de vote quotidienne est atteint.',
-
+    'comments/subscribe' => "S'abonner à des notifications de nouvelles réponses",
+    'comments/unsubscribe' => 'Se désabonner à des notifications',
+    
     /*perspectives*/
     'perspective/front'          => 'avant',
     'perspective/back'           => 'derrière',
@@ -1498,6 +1500,7 @@ Certains d'entre eux, trouvés par d'autres utilisateurs, vous pouvez trouver [i
     'pm/user-%s-set-inherited-vehicle-engine-%s-%s' => '%s set inherited engine to vehicle %s ( %s )',
     'pm/user-%s-set-vehicle-engine-%s-%s-%s' => '%s set engine %s to vehicle %s ( %s )',
     'pm/user-%s-replies-to-you-%s' => "%s replies to you\n%s",
+    'pm/user-%s-post-new-message-%s' => "%s posted new message\n%s",
 
     'moder/vehicle/changes/name-%s-%s' => 'vehicle name from "%s" to "%s"',
     'moder/vehicle/changes/body-%s-%s' => 'body number from "%s" to "%s"',

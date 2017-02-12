@@ -1105,6 +1105,27 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes' => [
+                    'comments' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/comments',
+                            'defaults' => [
+                                'controller' => Controller\Api\CommentsController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'subscribe' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/subscribe/:type_id/:item_id',
+                                    'defaults' => [
+                                        'action' => 'subscribe'
+                                    ],
+                                ],
+                            ]
+                        ]
+                    ],
                     'contacts' => [
                         'type' => Segment::class,
                         'options' => [

@@ -30,16 +30,6 @@ return [
     'forums/topic/name' => 'Title',
     'forums/topic/text' => 'Message',
     'forums/topic/subscribe-to-new-messages' => 'Subscribe to new messages',
-    'forums/notification-mail/from' => 'Robot wheelsage.org',
-    'forums/notification-mail/subject' => 'New forum message',
-    'forums/notification-mail/body' =>
-    "Hello.\n\n" .
-    "New message in topic `%1\$s`\n" .
-    "To go to the viewing messages, use the link %2\$s\n\n" .
-    "Unsubscribe from the receipt of the notification, you can in account settings\n\n" .
-    "Sincerely, robot www.wheelsage.org\n",
-    'forums/subscribe' => 'Subscribe to new replies notifications',
-    'forums/subscribed' => 'You are subscribed to new replies notifications',
     'forums/unsubscribe' => 'Unsubscribe',
     'forums/topic-closed-text' => 'Topic is closed by site administration',
     'forums/need-wait-to-post' => 'Для добавления нового сообщения вам необходимо подождать некоторое время',

@@ -6,10 +6,11 @@ use Zend\Mail;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
-use Autowp\Comments;
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
+
+use Application\Comments;
 
 use DateTime;
 
@@ -17,8 +18,6 @@ use Zend_Db_Expr;
 
 class FrontendController extends AbstractActionController
 {
-    private $transport;
-
     private $newTopicForm;
 
     private $commentForm;
@@ -29,7 +28,7 @@ class FrontendController extends AbstractActionController
     private $message;
 
     /**
-     * @var Comments\CommentsService
+     * @var Comments
      */
     private $comments;
 
@@ -42,14 +41,12 @@ class FrontendController extends AbstractActionController
         Forums $model,
         $newTopicForm,
         $commentForm,
-        $transport,
         MessageService $message,
-        Comments\CommentsService $comments
+        Comments $comments
     ) {
         $this->model = $model;
         $this->newTopicForm = $newTopicForm;
         $this->commentForm = $commentForm;
-        $this->transport = $transport;
         $this->message = $message;
         $this->comments = $comments;
     }
@@ -128,27 +125,6 @@ class FrontendController extends AbstractActionController
         ]);
     }
 
-    private function sendMessageEmailNotification($email, $topicName, $url)
-    {
-        $subject = $this->translate('forums/notification-mail/subject');
-
-        $message = sprintf(
-            $this->translate('forums/notification-mail/body'),
-            $topicName,
-            $url
-        );
-
-        $mail = new Mail\Message();
-        $mail
-            ->setEncoding('utf-8')
-            ->setBody($message)
-            ->setFrom('no-reply@autowp.ru', $this->translate('forums/notification-mail/from'))
-            ->addTo($email)
-            ->setSubject($subject);
-
-        $this->transport->send($mail);
-    }
-
     public function topicAction()
     {
         $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
@@ -198,7 +174,7 @@ class FrontendController extends AbstractActionController
                         $userTable = new User();
 
                         if ($values['parent_id']) {
-                            $authorId = $this->comments->getMessageAuthorId($values['parent_id']);
+                            $authorId = $this->comments->service()->getMessageAuthorId($values['parent_id']);
                             if ($authorId && ($authorId != $user->id)) {
                                 $parentMessageAuthor = $userTable->fetchRow([
                                     'id = ?' => $authorId,
@@ -220,19 +196,8 @@ class FrontendController extends AbstractActionController
                                 }
                             }
                         }
-
-                        $ids = $this->model->getSubscribersIds($topic['id']);
-                        $subscribers = $userTable->find($ids);
-
-                        foreach ($subscribers as $subscriber) {
-                            if ($subscriber->id == $user->id) {
-                                continue;
-                            }
-
-                            if ($subscriber->e_mail) {
-                                $this->sendMessageEmailNotification($subscriber->e_mail, $topic['name'], $messageUrl);
-                            }
-                        }
+                        
+                        $this->comments->notifySubscribers($messageId);
 
                         return $this->redirect()->toUrl($this->topicMessageUrl($messageId));
                     }
@@ -252,6 +217,10 @@ class FrontendController extends AbstractActionController
         if (! $data) {
             return $this->notFoundAction();
         }
+        
+        if ($user) {
+            $this->comments->service()->markSubscriptionAwaiting(Comments::FORUMS_TYPE_ID, $topic['id'], $user['id']);
+        }
 
         $canRemoveComments = $this->user()->isAllowed('comment', 'remove');
         $canViewIp = $this->user()->isAllowed('user', 'ip');
@@ -264,11 +233,9 @@ class FrontendController extends AbstractActionController
             'canRemoveComments' => $canRemoveComments,
             'canMoveMessage'    => $forumAdmin,
             'canViewIp'         => $canViewIp,
-            'subscribeUrl'      => $this->url()->fromRoute('forums/subscribe', [
-                'topic_id' => $topic['id']
-            ]),
-            'unsubscribeUrl'    => $this->url()->fromRoute('forums/unsubscribe', [
-                'topic_id' => $topic['id']
+            'subscribeUrl'      => $this->url()->fromRoute('api/comments/subscribe', [
+                'item_id' => $topic['id'],
+                'type_id' => Comments::FORUMS_TYPE_ID
             ]),
             'moveMessageRoute'  => 'forums/move-message',
             'moveMessageUrl'    => [

@@ -43,6 +43,11 @@ class CommentsService
      * @var TableGateway
      */
     private $messageTable;
+    
+    /**
+     * @var TableGateway
+     */
+    private $topicSubscribeTable;
 
     public function __construct(Adapter $adapter)
     {
@@ -52,6 +57,7 @@ class CommentsService
         $this->topicTable = new TableGateway('comment_topic', $this->adapter);
         $this->messageTable = new TableGateway('comment_message', $this->adapter);
         $this->topicViewTable = new TableGateway('comment_topic_view', $this->adapter);
+        $this->topicSubscribeTable = new TableGateway('comment_topic_subscribe', $this->adapter);
     }
 
     /**
@@ -1149,5 +1155,97 @@ class CommentsService
         $affected += $result->getAffectedRows();
 
         return $affected;
+    }
+    
+    public function userSubscribed($typeId, $itemId, $userId)
+    {
+        return (bool)$this->topicSubscribeTable->select([
+            'type_id' => (int)$typeId,
+            'item_id' => (int)$itemId,
+            'user_id' => (int)$userId
+        ])->current();
+    }
+    
+    public function canSubscribe($typeId, $itemId, $userId)
+    {
+        return ! $this->userSubscribed($typeId, $itemId, $userId);
+    }
+    
+    public function canUnSubscribe($typeId, $itemId, $userId)
+    {
+        return $this->userSubscribed($typeId, $itemId, $userId);
+    }
+    
+    public function subscribe($typeId, $itemId, $userId)
+    {
+        if (! $this->canSubscribe($typeId, $itemId, $userId)) {
+            throw new \Exception('Already subscribed');
+        }
+    
+        $this->topicSubscribeTable->insert([
+            'type_id' => (int)$typeId,
+            'item_id' => (int)$itemId,
+            'user_id' => (int)$userId,
+            'sent'    => 0
+        ]);
+    }
+    
+    public function unSubscribe($typeId, $itemId, $userId)
+    {
+        if (! $this->canUnSubscribe($typeId, $itemId, $userId)) {
+            throw new \Exception('User not subscribed');
+        }
+    
+        $this->topicSubscribeTable->delete([
+            'type_id' => (int)$typeId,
+            'item_id' => (int)$itemId,
+            'user_id' => (int)$userId,
+        ]);
+    }
+    
+    public function getSubscribersIds($typeId, $itemId, $onlyAwaiting = false)
+    {
+        $where = [
+            'type_id' => (int)$typeId,
+            'item_id' => (int)$itemId
+        ];
+        
+        if ($onlyAwaiting) {
+            $where[] = 'NOT sent';
+        }
+        
+        $select = new Sql\Select($this->topicSubscribeTable->getTable());
+        $select
+            ->columns(['user_id'])
+            ->where($where);
+    
+        $ids = [];
+        foreach ($this->topicSubscribeTable->selectWith($select) as $row) {
+            $ids[] = $row['user_id'];
+        }
+    
+        return $ids;
+    }
+    
+    public function markSubscriptionSent($typeId, $itemId, $userId)
+    {
+        $this->topicSubscribeTable->update([
+            'sent' => 1
+        ], [
+            'type_id' => (int)$typeId,
+            'item_id' => (int)$itemId,
+            'user_id' => (int)$userId,
+        ]);
+    }
+    
+    public function markSubscriptionAwaiting($typeId, $itemId, $userId)
+    {
+        $this->topicSubscribeTable->update([
+            'sent' => 0
+        ], [
+            'type_id' => (int)$typeId,
+            'item_id' => (int)$itemId,
+            'user_id' => (int)$userId,
+        ]);
     }
 }

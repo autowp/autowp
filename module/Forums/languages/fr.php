@@ -30,16 +30,6 @@ return [
     'forums/topic/name' => 'Titre',
     'forums/topic/text' => 'Message',
     'forums/topic/subscribe-to-new-messages' => 'Abonnez-vous à de nouveaux messages',
-    'forums/notification-mail/from' => 'Robot wheelsage.org',
-    'forums/notification-mail/subject' => 'Nouveau message de forum',
-    'forums/notification-mail/body' =>
-    "Bonjour.\n\n" .
-    "Nouveau message dans le sujet `%1\$s`\n" .
-    "Pour aller aux messages de visualisation, utilisez le lien %2\$s\n\n" .
-    "Se désabonner de la réception de la notification, vous pouvez dans les paramètres du compte\n\n" .
-    "Sincèrement, robot www.wheelsage.org\n",
-    'forums/subscribe' => "S'abonner à des notifications de nouvelles réponses",
-    'forums/subscribed' => 'Vous êtes abonné aux notifications de nouvelles réponses',
     'forums/unsubscribe' => 'Se désabonner',
     'forums/topic-closed-text' => "Sujet est fermé par l'administration du site",
     'forums/need-wait-to-post' => 'Pour ajouter un nouveau message, vous devez attendre un certain temps',

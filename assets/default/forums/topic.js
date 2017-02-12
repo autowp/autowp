@@ -1,4 +1,5 @@
 var $ = require('jquery');
+var subscription = require('subscription/subscription');
 
 module.exports = {
     init: function() {
@@ -32,5 +33,7 @@ module.exports = {
             $(document.body).append(div);
             return false;
         });
+        
+        subscription('.subscription');
     }
 };
