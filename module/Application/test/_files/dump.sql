@@ -1908,6 +1908,7 @@ CREATE TABLE `of_day` (
   `picture_id` int(10) unsigned DEFAULT NULL,
   `item_id` int(10) unsigned DEFAULT NULL,
   `twitter_sent` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `facebook_sent` tinyint(4) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`day_date`),
   KEY `of_day_fk` (`picture_id`),
   KEY `FK_of_day_item_id` (`item_id`),

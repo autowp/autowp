@@ -151,6 +151,12 @@ return [
             'oauth_token_secret' => ''
         ]
     ],
+    
+    'facebook' => [
+        'app_id' => '',
+        'app_secret' => '',
+        'page_access_token' => ''
+    ],
 
     'hosts' => [
         'ru' => [

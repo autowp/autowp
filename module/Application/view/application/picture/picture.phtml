@@ -1,10 +1,18 @@
 <?php
     $this->headMeta()
-        ->appendProperty('twitter:card', 'photo')
-        ->appendProperty('og:title', $this->pic()->textTitle($this->name));
+        ->appendName('twitter:card', 'summary_large_image')
+        ->appendName('twitter:site', '@autowp')
+        ->appendName('twitter:title', $this->pic()->textTitle($this->name))
+        ->appendName('twitter:description', $this->pic()->textTitle($this->name))
+        ->appendProperty('og:title', $this->pic()->textTitle($this->name))
+        ->appendProperty('og:description', $this->pic()->textTitle($this->name))
+        ->appendProperty('og:url', $this->url(null, [], [
+            'force_canonical' => true
+        ], true));
             
     if ($this->preview) {
         $this->headMeta()
+            ->appendName('twitter:image', $this->preview->getSrc())
             ->appendProperty('og:image', $this->preview->getSrc())
             ->appendProperty('og:image:width',  $this->preview->getWidth() )
             ->appendProperty('og:image:height', $this->preview->getHeight());

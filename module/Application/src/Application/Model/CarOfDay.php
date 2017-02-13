@@ -8,6 +8,8 @@ use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
 use Application\ItemNameFormatter;
 
+use Facebook;
+
 use Zend_Db_Expr;
 use Zend_Oauth_Token_Access;
 use Zend_Service_Twitter;
@@ -176,5 +178,85 @@ class CarOfDay
         } else {
             print_r($response->getErrors());
         }
+    }
+    
+    public function putCurrentToFacebook(array $fbOptions)
+    {
+        $dayRow = $this->table->fetchRow([
+            'day_date = CURDATE()',
+            'not facebook_sent'
+        ]);
+        
+        if (! $dayRow) {
+            print 'Day row not found or already sent' . PHP_EOL;
+            return;
+        }
+        
+        $itemTable = new Item();
+        
+        $car = $itemTable->fetchRow([
+            'id = ?' => (int)$dayRow->item_id
+        ]);
+        
+        if (! $car) {
+            print 'Car of day not found' . PHP_EOL;
+            return;
+        }
+        
+        $pictureTable = new Picture();
+        
+        /* Hardcoded perspective priority list */
+        $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
+        
+        foreach ($perspectives as $perspective) {
+            $picture = $this->pictureByPerspective($pictureTable, $car, $perspective);
+            if ($picture) {
+                break;
+            }
+        }
+        
+        if (! $picture) {
+            $picture = $this->pictureByPerspective($pictureTable, $car, false);
+        }
+        
+        if (! $picture) {
+            print 'Picture not found' . PHP_EOL;
+            return;
+        }
+        
+        $url = 'http://wheelsage.org/picture/' . $picture->identity;
+        
+        $text = sprintf(
+            'Vehicle of the day: %s %s',
+            $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
+            $url
+        );
+        
+        $fb = new Facebook\Facebook([
+            'app_id'                => $fbOptions['app_id'],
+            'app_secret'            => $fbOptions['app_secret'],
+            'default_graph_version' => 'v2.8'
+        ]);
+
+        $linkData = [
+            'link'    => $url,
+            'message' => 'Vehicle of the day: ' . $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
+        ];
+        
+        try {
+            // Returns a `Facebook\FacebookResponse` object
+            $response = $fb->post('/296027603807350/feed', $linkData, $fbOptions['page_access_token']);
+        } catch(Facebook\Exceptions\FacebookResponseException $e) {
+            echo 'Graph returned an error: ' . $e->getMessage();
+            return;
+        } catch(Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            return;
+        }
+        
+        $dayRow->facebook_sent = true;
+        $dayRow->save();
+    
+        print 'ok' . PHP_EOL;
     }
 }

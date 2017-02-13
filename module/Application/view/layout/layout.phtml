@@ -47,7 +47,8 @@
         <?php
             echo $this->headMeta()
                 ->appendName('keywords', $this->translate('layout/meta/keywords'))
-                ->appendName('description', $this->translate('layout/meta/description'));
+                ->appendName('description', $this->translate('layout/meta/description'))
+                ->appendProperty('fb:app_id', '258693154144687');
             echo $this->headTitle();
             echo $this->headLink();
             echo $this->headScript()
