@@ -1023,7 +1023,7 @@ class CommentsService
         }
     }
 
-    public function deleteItemComments($typeId, $itemId)
+    public function deleteTopic($typeId, $itemId)
     {
         $this->deleteRecursive($typeId, $itemId, null);
 
@@ -1033,6 +1033,11 @@ class CommentsService
         ]);
 
         $this->topicViewTable->delete([
+            'type_id = ?' => (int)$typeId,
+            'item_id = ?' => (int)$itemId
+        ]);
+        
+        $this->topicSubscribeTable->delete([
             'type_id = ?' => (int)$typeId,
             'item_id = ?' => (int)$itemId
         ]);

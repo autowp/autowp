@@ -310,7 +310,7 @@ class Comments
             );
             $this->message->send(null, $subscriber->id, $message);
             
-            $this->service->markSubscriptionSent($comment['type_id'], $comment['item_id'], $messageId);
+            $this->service->markSubscriptionSent($comment['type_id'], $comment['item_id'], $subscriber->id);
         }
     }
 }

@@ -1,21 +1,26 @@
 <?php
     $this->headMeta()
         ->appendName('twitter:card', 'summary_large_image')
-        ->appendName('twitter:site', '@autowp')
         ->appendName('twitter:title', $this->pic()->textTitle($this->name))
         ->appendName('twitter:description', $this->pic()->textTitle($this->name))
+        ->appendName('medium', 'image')
+        ->appendProperty('og:type', 'website')
         ->appendProperty('og:title', $this->pic()->textTitle($this->name))
         ->appendProperty('og:description', $this->pic()->textTitle($this->name))
         ->appendProperty('og:url', $this->url(null, [], [
             'force_canonical' => true
         ], true));
-            
-    if ($this->preview) {
+        
+    if ($this->twitterCreatorId) {
+        $this->headMeta()->appendName('twitter:creator:id', $this->twitterCreatorId);
+    }
+        
+    if ($this->galleryImage) {
         $this->headMeta()
-            ->appendName('twitter:image', $this->preview->getSrc())
-            ->appendProperty('og:image', $this->preview->getSrc())
-            ->appendProperty('og:image:width',  $this->preview->getWidth() )
-            ->appendProperty('og:image:height', $this->preview->getHeight());
+            ->appendProperty('og:image', $this->galleryImage->getSrc())
+            ->appendProperty('og:image:width',  $this->galleryImage->getWidth())
+            ->appendProperty('og:image:height', $this->galleryImage->getHeight())
+            ->appendName('twitter:image', $this->galleryImage->getSrc());
     }
 
     $this->layout()->moduleName = 'default/picture';

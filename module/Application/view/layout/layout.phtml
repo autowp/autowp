@@ -48,7 +48,9 @@
             echo $this->headMeta()
                 ->appendName('keywords', $this->translate('layout/meta/keywords'))
                 ->appendName('description', $this->translate('layout/meta/description'))
-                ->appendProperty('fb:app_id', '258693154144687');
+                ->appendProperty('fb:app_id', '258693154144687')
+                ->appendProperty('og:site_name', 'WheelsAge.org')
+                ->appendName('twitter:site', '@autowp');
             echo $this->headTitle();
             echo $this->headLink();
             echo $this->headScript()

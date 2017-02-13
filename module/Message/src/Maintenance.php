@@ -28,7 +28,7 @@ class Maintenance extends AbstractListenerAggregate
         /*$count = $service->recycleSystem();
         print sprintf("%d messages was deleted\n", $count);*/
         
-        $count = $service->recycle();
-        print sprintf("%d messages was deleted\n", $count);
+        /*$count = $service->recycle();
+        print sprintf("%d messages was deleted\n", $count);*/
     }
 }

@@ -111,6 +111,7 @@ class Categories
 
             $category = [
                 'id'             => $item['id'],
+                'catname'        => $item['catname'],
                 'url'            => $this->router->assemble([
                     'action'           => 'category',
                     'category_catname' => $item['catname']

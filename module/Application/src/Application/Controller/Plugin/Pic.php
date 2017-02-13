@@ -935,6 +935,7 @@ class Pic extends AbstractPlugin
         $preview = $imageStorage->getFormatedImage($picture->getFormatRequest(), 'picture-medium');
         $previewUrl = $preview ? $preview->getSrc() : null;
 
+        $galleryImage = $imageStorage->getFormatedImage($picture->getFormatRequest(), 'picture-gallery');
 
         $paginator = false;
         $pageNumbers = false;
@@ -1058,6 +1059,18 @@ class Pic extends AbstractPlugin
         if ($user) {
             $subscribed = $this->comments->userSubscribed(\Application\Comments::PICTURES_TYPE_ID, $picture['id'], $user['id']);
         }
+        
+        $twitterCreatorId = null;
+        if ($picture['owner_id']) {
+            $userAccountTable = new DbTable\User\Account();
+            $twitterAccountRow = $userAccountTable->fetchRow([
+                'user_id = ?'    => $picture['owner_id'],
+                'service_id = ?' => 'twitter'
+            ]);
+            if ($twitterAccountRow) {
+                $twitterCreatorId = $twitterAccountRow->external_id;
+            }
+        }
 
         $data = [
             'id'                => $picture['id'],
@@ -1097,6 +1110,8 @@ class Pic extends AbstractPlugin
                 'item_id' => $picture['id'],
                 'type_id' => \Application\Comments::PICTURES_TYPE_ID
             ]),
+            'galleryImage'      => $galleryImage,
+            'twitterCreatorId'  => $twitterCreatorId
         ];
 
         // refresh views count

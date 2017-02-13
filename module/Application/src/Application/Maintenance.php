@@ -169,7 +169,7 @@ class Maintenance extends AbstractListenerAggregate
             $progressBar = new Zend_ProgressBar($adapter, 0, count($pictures));
 
             foreach ($pictures as $idx => $picture) {
-                $comments->deleteItemComments(
+                $comments->deleteTopic(
                     \Application\Comments::PICTURES_TYPE_ID,
                     $picture->id
                 );

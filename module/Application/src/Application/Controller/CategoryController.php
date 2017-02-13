@@ -310,7 +310,7 @@ class CategoryController extends AbstractActionController
             $currentCar = $childCar;
         }
 
-        $key = 'CATEGORY_MENU341_' . $topCategory->id . '_' . $language;
+        $key = 'CATEGORY_MENU344_' . $topCategory->id . '_' . $language;
 
         $menu = $this->cache->getItem($key, $success);
         if (! $success) {
