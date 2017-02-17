@@ -157,13 +157,23 @@ class Brand
             'language' => $language,
             'columns'  => [
                 'logo_id',
-                'cars_count' => $this->countExpr(),
+                'cars_count' => new Zend_Db_Expr(
+                    'COUNT(subitem.id)'
+                ),
                 'new_cars_count' => new Zend_Db_Expr(
                     'COUNT(IF(subitem.add_datetime > DATE_SUB(NOW(), INTERVAL :new_days DAY), 1, NULL))'
                 ),
-                /*'carpictures_count', 'enginepictures_count',
-                'logopictures_count', 'mixedpictures_count',
-                'unsortedpictures_count'*/
+                'pictures_count' => new Zend_Db_Expr(
+                    '(' . 
+                        $this->table->getAdapter()->select()
+                            ->from(['ipc_all' => 'item_parent_cache'], 'COUNT(DISTINCT pictures.id)')
+                            ->join('picture_item', 'ipc_all.item_id = picture_item.item_id', null)
+                            ->join('pictures', 'picture_item.picture_id = pictures.id', null)
+                            ->where('item.id = ipc_all.parent_id')
+                            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                            ->assemble() .
+                    ')'
+                ),
             ]
         ], function ($select) use ($language) {
             $select
@@ -247,7 +257,7 @@ class Brand
                 'name'           => $name,
                 'catname'        => $row['catname'],
                 'logo_id'        => $row['logo_id'],
-                'totalPictures'  => 0, //$picturesCount,
+                'totalPictures'  => $row['pictures_count'],
                 'newCars'        => $row['new_cars_count'],
                 'totalCars'      => $row['cars_count']
             ];
@@ -394,6 +404,8 @@ class Brand
         if ($callback) {
             $callback($select);
         }
+        
+        //print $select->assemble(); exit;
 
         $items = $db->fetchAll($select);
 

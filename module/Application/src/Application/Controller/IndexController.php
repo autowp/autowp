@@ -15,9 +15,6 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
-use Application\ItemNameFormatter;
-
-use Zend_Db_Expr;
 
 class IndexController extends AbstractActionController
 {
@@ -29,19 +26,9 @@ class IndexController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var DbTable\Item\ParentTable
-     */
-    private $vehicleParentTable;
-
-    /**
      * @var CarOfDay
      */
     private $carOfDay;
-
-    /**
-     * @var ItemNameFormatter
-     */
-    private $itemNameFormatter;
 
     /**
      * @var TableGateway
@@ -52,248 +39,15 @@ class IndexController extends AbstractActionController
         $cache,
         SpecificationsService $specsService,
         CarOfDay $carOfDay,
-        ItemNameFormatter $itemNameFormatter,
         Categories $categories,
         Adapter $adapter
     ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->carOfDay = $carOfDay;
-        $this->itemNameFormatter = $itemNameFormatter;
         $this->categories = $categories;
 
         $this->itemTable = new TableGateway('item', $adapter);
-    }
-
-    /**
-     * @return DbTable\Item\ParentTable
-     */
-    private function getVehicleParentTable()
-    {
-        return $this->vehicleParentTable
-            ? $this->vehicleParentTable
-            : $this->vehicleParentTable = new DbTable\Item\ParentTable();
-    }
-
-    private function getOrientedPictureList($car)
-    {
-        $perspectivesGroups = new DbTable\Perspective\Group();
-
-        $db = $perspectivesGroups->getAdapter();
-        $perspectivesGroupIds = $db->fetchCol(
-            $db->select()
-                ->from($perspectivesGroups->info('name'), 'id')
-                ->where('page_id = ?', 6)
-                ->order('position')
-        );
-
-        $pTable = $this->catalogue()->getPictureTable();
-        $pictures = [];
-
-        $db = $pTable->getAdapter();
-        $usedIds = [];
-
-        foreach ($perspectivesGroupIds as $groupId) {
-            $picture = null;
-
-            $select = $pTable->select(true)
-                ->where('mp.group_id = ?', $groupId)
-                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->joinRight(
-                    ['mp' => 'perspectives_groups_perspectives'],
-                    'picture_item.perspective_id = mp.perspective_id',
-                    null
-                )
-                ->order([
-                    'item_parent_cache.sport', 'item_parent_cache.tuning', 'mp.position',
-                    'pictures.width DESC', 'pictures.height DESC'
-                ])
-                ->limit(1);
-            if ($usedIds) {
-                $select->where('pictures.id not in (?)', $usedIds);
-            }
-            $picture = $pTable->fetchRow($select);
-
-            if ($picture) {
-                $pictures[] = $picture;
-                $usedIds[] = $picture->id;
-            } else {
-                $pictures[] = null;
-            }
-        }
-
-        $resorted = [];
-        foreach ($pictures as $picture) {
-            if ($picture) {
-                $resorted[] = $picture;
-            }
-        }
-        foreach ($pictures as $picture) {
-            if (! $picture) {
-                $resorted[] = null;
-            }
-        }
-        $pictures = $resorted;
-
-        $left = [];
-        foreach ($pictures as $key => $picture) {
-            if (! $picture) {
-                $left[] = $key;
-            }
-        }
-
-        if (count($left) > 0) {
-            $select = $pTable->select(true)
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
-                //->order('ratio DESC')
-                ->limit(count($left));
-
-            if (count($usedIds) > 0) {
-                $select->where('pictures.id NOT IN (?)', $usedIds);
-            }
-
-            foreach ($pTable->fetchAll($select) as $pic) {
-                $key = array_shift($left);
-                $pictures[$key] = $pic;
-            }
-        }
-
-        return $pictures;
-    }
-
-    private function carLinks(DbTable\Item\Row $car)
-    {
-        $items = [];
-
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $db = $itemTable->getAdapter();
-        $totalPictures = $db->fetchOne(
-            $db->select()
-                ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
-        );
-
-        $language = $this->language();
-
-        if ($car->item_type_id == DbTable\Item\Type::CATEGORY) {
-            $items[] = [
-                'icon'  => 'align-left',
-                'url'   => $this->url()->fromRoute('categories', [
-                    'action'           => 'category',
-                    'category_catname' => $car->catname,
-                ]),
-                'text'  => $this->translate('carlist/details')
-            ];
-
-            if ($totalPictures > 6) {
-                $items[] = [
-                    'icon'  => 'th',
-                    'url'   => $this->url()->fromRoute('categories', [
-                        'action'           => 'category-pictures',
-                        'category_catname' => $car->catname,
-                    ]),
-                    'text'  => $this->translate('carlist/all pictures'),
-                    'count' => $totalPictures
-                ];
-            }
-        } else {
-            $cataloguePaths = $this->catalogue()->getCataloguePaths($car['id']);
-
-            if ($totalPictures > 6) {
-                foreach ($cataloguePaths as $path) {
-                    $url = $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-item-pictures',
-                        'brand_catname' => $path['brand_catname'],
-                        'car_catname'   => $path['car_catname'],
-                        'path'          => $path['path']
-                    ]);
-                    $items[] = [
-                        'icon'  => 'th',
-                        'url'   => $url,
-                        'text'  => $this->translate('carlist/all pictures'),
-                        'count' => $totalPictures
-                    ];
-                    break;
-                }
-            }
-
-            if ($this->specsService->hasSpecs($car->id)) {
-                foreach ($cataloguePaths as $path) {
-                    $items[] = [
-                        'icon'  => 'list-alt',
-                        'url'   => $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-specifications',
-                            'brand_catname' => $path['brand_catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path']
-                        ]),
-                        'text'  => $this->translate('carlist/specifications')
-                    ];
-                    break;
-                }
-            }
-
-            $twins = new Twins();
-            foreach ($twins->getCarGroups($car->id) as $twinsGroup) {
-                $items[] = [
-                    'icon'  => 'adjust',
-                    'url'   => $this->url()->fromRoute('twins/group', [
-                        'id' => $twinsGroup['id']
-                    ]),
-                    'text'  => $this->translate('carlist/twins')
-                ];
-            }
-
-            $categoryRows = $db->fetchAll(
-                $db->select()
-                    ->from($itemTable->info('name'), [
-                        'catname', 'begin_year', 'end_year',
-                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,item.name)')
-                    ])
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft(
-                        'item_language',
-                        'item.id = item_language.item_id and item_language.language = :language',
-                        null
-                    )
-                    ->join('item_parent', 'item.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
-                    ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
-                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
-                    ->where('item_parent_cache.item_id = :item_id')
-                    ->group(['item_parent_cache.item_id', 'item.id'])
-                    ->bind([
-                        'language' => $language,
-                        'item_id'  => $car['id']
-                    ])
-            );
-
-            foreach ($categoryRows as $category) {
-                $items[] = [
-                    'icon'  => 'tag',
-                    'url'   => $this->url()->fromRoute('categories', [
-                        'action'           => 'category',
-                        'category_catname' => $category['catname'],
-                    ]),
-                    'text'  => $this->itemNameFormatter->format(
-                        $category,
-                        $language
-                    )
-                ];
-            }
-        }
-
-        return $items;
     }
 
     private function brands()
@@ -329,65 +83,6 @@ class IndexController extends AbstractActionController
         return $brands;
     }
 
-    public function getCategoryPaths($carId, array $options = [])
-    {
-        $carId = (int)$carId;
-        if (! $carId) {
-            throw new Exception("carId not provided");
-        }
-
-        $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
-
-        $result = [];
-
-        $db = $this->getVehicleParentTable()->getAdapter();
-
-        $select = $db->select()
-            ->from('item_parent', 'item_id')
-            ->join('item', 'item_parent.parent_id = item.id', 'catname')
-            ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-            ->where('item_parent.item_id = ?', $carId);
-
-        if ($breakOnFirst) {
-            $select->limit(1);
-        }
-
-        $categoryVehicleRows = $db->fetchAll($select);
-        foreach ($categoryVehicleRows as $categoryVehicleRow) {
-            $result[] = [
-                'category_catname' => $categoryVehicleRow['catname'],
-                'item_id'          => $categoryVehicleRow['item_id'],
-                'path'             => []
-            ];
-        }
-
-        if ($breakOnFirst && count($result)) {
-            return $result;
-        }
-
-        $parents = $this->getVehicleParentTable()->fetchAll([
-            'item_id = ?' => $carId
-        ]);
-
-        foreach ($parents as $parent) {
-            $paths = $this->getCategoryPaths($parent->parent_id, $options);
-
-            foreach ($paths as $path) {
-                $result[] = [
-                    'category_catname' => $path['category_catname'],
-                    'item_id'          => $path['item_id'],
-                    'path'             => array_merge($path['path'], [$parent->catname])
-                ];
-            }
-
-            if ($breakOnFirst && count($result)) {
-                return $result;
-            }
-        }
-
-        return $result;
-    }
-
     private function carOfDay()
     {
         $language = $this->language();
@@ -395,119 +90,21 @@ class IndexController extends AbstractActionController
 
         $carId = $this->carOfDay->getCurrent();
 
-        $carOfDayName = null;
-        $carOfDayPicturesData = null;
-        $carOfDayLinks = [];
+        $carOfDayInfo = null;
 
         if ($carId) {
-            $itemTable = $this->catalogue()->getItemTable();
-            $carOfDay = $itemTable->find($carId)->current();
-            if ($carOfDay) {
-                $key = 'CAR_OF_DAY_95_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
+            $key = 'CAR_OF_DAY_98_' . $carId . '_' . $language . '_' . $httpsFlag;
 
-                $carOfDayInfo = $this->cache->getItem($key, $success);
-                if (! $success) {
-                    $carOfDayPictures = $this->getOrientedPictureList($carOfDay);
+            $carOfDayInfo = $this->cache->getItem($key, $success);
+            if (! $success) {
+                
+                $carOfDayInfo = $this->carOfDay->getItemOfDay($carId, null, $language);
 
-                    // images
-                    $formatRequests = [];
-                    foreach ($carOfDayPictures as $idx => $picture) {
-                        if ($picture) {
-                            $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
-                            $formatRequests[$format][$idx] = $picture->getFormatRequest();
-                        }
-                    }
-
-                    $imageStorage = $this->imageStorage();
-
-                    $imagesInfo = [];
-                    foreach ($formatRequests as $format => $requests) {
-                        $imagesInfo[$format] = $imageStorage->getFormatedImages($requests, $format);
-                    }
-
-                    // names
-                    $notEmptyPics = [];
-                    foreach ($carOfDayPictures as $idx => $picture) {
-                        if ($picture) {
-                            $notEmptyPics[] = $picture;
-                        }
-                    }
-                    $pictureTable = $this->catalogue()->getPictureTable();
-                    $names = $pictureTable->getNameData($notEmptyPics, [
-                        'language' => $language
-                    ]);
-
-                    $paths = $this->catalogue()->getCataloguePaths($carOfDay->id, [
-                        'breakOnFirst' => true
-                    ]);
-
-                    $categoryPath = false;
-                    if (! $paths) {
-                        $categoryPaths = $this->getCategoryPaths($carOfDay->id, [
-                            'breakOnFirst' => true
-                        ]);
-                    }
-
-                    $carOfDayPicturesData = [];
-                    foreach ($carOfDayPictures as $idx => $row) {
-                        if ($row) {
-                            $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
-
-                            $url = null;
-                            foreach ($paths as $path) {
-                                $url = $this->url()->fromRoute('catalogue', [
-                                    'action'        => 'brand-item-picture',
-                                    'brand_catname' => $path['brand_catname'],
-                                    'car_catname'   => $path['car_catname'],
-                                    'path'          => $path['path'],
-                                    'picture_id'    => $row['identity']
-                                ]);
-                            }
-
-                            if (! $url) {
-                                foreach ($categoryPaths as $path) {
-                                    $url = $this->url()->fromRoute('categories', [
-                                        'action'           => 'category-picture',
-                                        'category_catname' => $path['category_catname'],
-                                        'item_id'          => $path['item_id'],
-                                        'path'             => $path['path'],
-                                        'picture_id'       => $row['identity']
-                                    ]);
-                                }
-                            }
-
-                            $carOfDayPicturesData[] = [
-                                'src'  => isset($imagesInfo[$format][$idx])
-                                    ? $imagesInfo[$format][$idx]->getSrc()
-                                    : null,
-                                'name' => isset($names[$row['id']]) ? $names[$row['id']] : null,
-                                'url'  => $url
-                            ];
-                        }
-                    }
-
-                    $carOfDayName = $carOfDay->getNameData($language);
-
-                    $carOfDayInfo = [
-                        'name'     => $carOfDayName,
-                        'pictures' => $carOfDayPicturesData,
-                    ];
-
-                    $this->cache->setItem($key, $carOfDayInfo);
-                } else {
-                    $carOfDayName = $carOfDayInfo['name'];
-                    $carOfDayPicturesData = $carOfDayInfo['pictures'];
-                }
+                $this->cache->setItem($key, $carOfDayInfo);
             }
-
-            $carOfDayLinks = $this->carLinks($carOfDay);
         }
 
-        return [
-            'name'     => $carOfDayName,
-            'pictures' => $carOfDayPicturesData,
-            'links'    => $carOfDayLinks
-        ];
+        return $carOfDayInfo;
     }
 
     private function factories()

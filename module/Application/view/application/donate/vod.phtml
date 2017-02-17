@@ -1,0 +1,159 @@
+<?php 
+
+$this->pageEnv([
+    'layout' => [
+        'blankPage' => false,
+        'needRight' => true
+    ],
+    'pageId' => 196,
+]);
+
+$dateFormatter = new IntlDateFormatter($this->language(), IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+?>
+
+<?=$this->markdown($this->translate('donate/vod/text'))?>
+
+<h1><?=$this->escapeHtml($this->translate('donate/vod/select-date'))?></h1>
+<div class="well">
+    <ul>
+        <?php foreach ($this->dates as $date) { ?>
+            <li>
+                <?php if ($date['free']) { ?>
+                    <?php if ($date['date_str'] == $this->selectedDate) { ?>
+                        <strong><?=$dateFormatter->format($date['date'])?></strong>
+                        <span class="fa fa-check"></span>
+                    <?php } else { ?>
+                        <?=$this->htmlA([
+                            'href' => $this->url('donate/vod/params', [
+                                'date' => $date['date_str']
+                            ], [], true)
+                        ], $dateFormatter->format($date['date']))?>
+                    <?php } ?>
+                <?php } else { ?>
+                    <span class="muted"><?=$dateFormatter->format($date['date'])?></span> (<?=$this->escapeHtml($this->translate('donate/vod/date-busy'))?>)
+                <?php } ?>
+            </li>
+        <?php } ?>
+    </ul>
+</div>
+
+<h1><?=$this->escapeHtml($this->translate('donate/vod/select-item'))?></h1>
+<div class="well">
+
+    <?=$this->markdown($this->translate('donate/vod/select-item-text'))?>
+
+    <?php if ($this->selectedItem) { ?>
+        <p>
+            <?=$this->escapeHtml($this->translate('donate/vod/select-item/selection:'))?>
+            <strong><?=$this->car()->htmlTitle($this->selectedItem->getNameData($this->language()), $this->language()) ?></strong>
+        </p>
+    <?php } ?>
+    <?=$this->htmlA([
+        'href'  => $this->url('donate/vod/select-item/params', [
+            'date' => $this->selectedDate ? $this->selectedDate : null
+        ]),
+        'class' => 'btn btn-primary btn-lg'
+    ], $this->translate('donate/vod/select-item/select'))?>
+</div>
+
+<h1><?=$this->escapeHtml($this->translate('donate/vod/preview'))?></h1>
+
+<div class="well">
+    <div class="form-group">
+        <div class="btn-group">
+            <?=$this->htmlA([
+                'href' => $this->url('donate/vod/params', [
+                    'anonymous' => 1
+                ], [], true),
+                'class' => 'btn btn-default' . ($this->anonymous ? ' active' : '')
+            ], $this->translate('donate/vod/anonymous'))?>
+            <?=$this->htmlA([
+                'href' => $this->url('donate/vod/params', [
+                    'anonymous' => 0
+                ], [], true),
+                'class' => 'btn btn-default' . ($this->anonymous ? '' : ' active') . ($this->userId ? '' : ' disabled'),
+            ], $this->translate('donate/vod/with-name'))?>
+        </div>
+    </div>
+</div>
+
+<?php if ($this->itemOfDay) { ?>
+    <div class="row"><div class="col-sm-9">
+        <?=$this->partial('application/index/partial/item-of-day', [
+            'itemOfDay' => $this->itemOfDay
+        ])?>
+    </div></div>
+<?php } ?>
+
+<h1><?=$this->escapeHtml($this->translate('donate/vod/make-donation'))?></h1>
+
+<div class="well">
+    <form method="post" action="https://money.yandex.ru/quickpay/confirm.xml">
+        <?php if ($this->selectedDate && $this->selectedItem) { ?>
+            <?php 
+                $label = 'vod/'.$this->selectedDate.'/'.$this->selectedItem['id'].'/' . ($this->anonymous ? 0 : (int)$this->userId);
+            
+                $params = [
+                    'receiver'      => '41001161017513',
+                    'sum'           => $this->sum,
+                    'need-email'    => 'false',
+                    'need-fio'      => 'false',
+                    'need-phone'    => 'false',
+                    'need-address'  => 'false',
+                    'formcomment'   => $this->translate('donate/vod/order-message'),
+                    'short-dest'    => $this->translate('donate/vod/order-message'),
+                    'label'         => $label,
+                    'quickpay-form' => 'donate',
+                    'targets'       => sprintf($this->translate('donate/vod/order-target'), $label),
+                    'successURL'    => $this->url('donate/vod/success', [], [
+                        'force_canonical' => true
+                    ])
+                ];
+            ?>
+            <?php foreach ($params as $key => $value) { ?>
+                <input type="hidden" name="<?=$this->escapeHtmlAttr($key)?>" value="<?=$this->escapeHtmlAttr($value)?>" />
+            <?php } ?>
+            <div class="form-group">
+                <textarea name="comment" placeholder="<?=$this->escapeHtmlAttr($this->translate('donate/vod/message'))?>" class="form-control" value="" maxlength="200"></textarea>
+            </div>
+        <?php } ?>
+        <p>
+            <?=$this->escapeHtml($this->translate('donate/vod/price:'))?>
+            <strong><?=$this->sum?><?=$this->escapeHtml($this->translate('donate/vod/price/currency'))?></strong>
+            (<?=$this->escapeHtml(sprintf($this->translate('donate/vod/price-aroud'), round($this->sum / 57.22, 2)))?>)
+        </p>
+        <?php if ($this->selectedDate && $this->selectedItem) { ?>
+            <div class="form-group">
+                <div class="btn-group" data-toggle="buttons"> 
+                    <label class="btn btn-default active">
+                        <input type="radio" name="paymentType" value="AC" autocomplete="off" checked>
+                        <span class="fa fa-credit-card"></span>
+                        <?=$this->escapeHtml($this->translate('donate/vod/method/credit-card'))?>
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="radio" name="paymentType" value="MC" autocomplete="off">
+                        <span class="fa fa-mobile"></span>
+                        <?=$this->escapeHtml($this->translate('donate/vod/method/mobile'))?>
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="radio" name="paymentType" value="PC" autocomplete="off">
+                        <?=$this->escapeHtml($this->translate('donate/vod/method/yandex.money'))?>
+                    </label>
+                </div>
+            </div>
+            <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('donate/vod/send'))?>" class="btn btn-primary" />
+        <?php } else { ?>
+            <button class="btn btn-default" disabled>
+                <span class="fa fa-credit-card"></span>
+                <?=$this->escapeHtml($this->translate('donate/vod/method/credit-card'))?>
+            </button>
+            <button class="btn btn-default" disabled>
+                <span class="fa fa-mobile"></span>
+                <?=$this->escapeHtml($this->translate('donate/vod/method/mobile'))?>
+            </button>
+            <button class="btn btn-default" disabled>
+                <?=$this->escapeHtml($this->translate('donate/vod/method/yandex.money'))?>
+            </button>
+        <?php } ?>
+    </form>
+</div>

@@ -493,6 +493,75 @@ return [
                                 'action' => 'success',
                             ],
                         ]
+                    ],
+                    'vod' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/vod',
+                            'defaults' => [
+                                'action' => 'vod',
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => Router\Http\WildcardSafe::class
+                            ],
+                            'success' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/success',
+                                    'defaults' => [
+                                        'action' => 'vod-success',
+                                    ],
+                                ]
+                            ],
+                            'select-item' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/vod-select-item',
+                                    'defaults' => [
+                                        'action' => 'vod-select-item',
+                                    ],
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'params' => [
+                                        'type' => Router\Http\WildcardSafe::class
+                                    ],
+                                ]
+                            ],
+                            'vehicle-childs' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/vehicle-childs',
+                                    'defaults' => [
+                                        'action' => 'vehicle-childs',
+                                    ],
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'params' => [
+                                        'type' => Router\Http\WildcardSafe::class
+                                    ],
+                                ]
+                            ],
+                            'concepts' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/concepts/:brand_id',
+                                    'defaults' => [
+                                        'action' => 'concepts',
+                                    ],
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'params' => [
+                                        'type' => Router\Http\WildcardSafe::class
+                                    ],
+                                ]
+                            ]
+                        ]
                     ]
                 ]
             ],
@@ -1097,7 +1166,27 @@ return [
                     ]
                 ]
             ],*/
-
+            'yandex' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/yandex',
+                    'defaults' => [
+                        'controller' => Controller\Frontend\YandexController::class,
+                    ],
+                ],
+                'may_terminate' => false,
+                'child_routes'  => [
+                    'informing' => [
+                        'type'    => Literal::class,
+                        'options' => [
+                            'route' => '/informing',
+                            'defaults' => [
+                                'action' => 'informing'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'api' => [
                 'type' => Literal::class,
                 'options' => [

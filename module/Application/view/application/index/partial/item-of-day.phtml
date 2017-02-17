@@ -1,0 +1,83 @@
+<?php if ($this->itemOfDay['name']) { ?>
+    <h2>
+        <?=$this->car()->htmlTitle($this->itemOfDay['name'])?>
+        <small>
+            <?=$this->escapeHtml($this->translate('car-of-day')) ?>
+            <?php if ($this->itemOfDay['userId']) { ?>
+                <span style="white-space:nowrap">by <?=$this->user($this->itemOfDay['userId'])?></span>
+            <?php } ?>
+        </small>
+    </h2>
+
+    <?php if ($this->itemOfDay['pictures']) { ?>
+        <div class="row thumbnails">
+            <?php foreach ($this->itemOfDay['pictures'] as $idx => $picture) { ?>
+                <?php if ($idx == 0) { ?>
+                    <?php if ($picture) { ?>
+                        <div class="col-sm-8">
+                            <?=$this->htmlA([
+                                'href'  => $picture['url'],
+                                'class' => 'thumbnail'
+                            ], $this->htmlImg([
+                                'src'   => $picture['src'],
+                                'title' => $this->pic()->textTitle($picture['name']),
+                                'alt'   => $this->pic()->textTitle($picture['name']),
+                            ]), false)?>
+                        </div>
+                    <?php } ?>
+                <?php } ?>
+            <?php } ?>
+            <div class="col-sm-4">
+                <?php foreach ($this->itemOfDay['pictures'] as $idx => $picture) { ?>
+                    <?php if ($idx == 1 || $idx == 2) { ?>
+                        <?php if ($picture) { ?>
+                            <?=$this->htmlA([
+                                'href'  => $picture['url'],
+                                'class' => 'thumbnail'
+                            ], $this->htmlImg([
+                                'src'   => $picture['src'],
+                                'title' => $this->pic()->textTitle($picture['name']),
+                                'alt'   => $this->pic()->textTitle($picture['name']),
+                            ]), false)?>
+                        <?php } ?>
+                    <?php } ?>
+                <?php } ?>
+            </div>
+        </div>
+        <div class="row thumbnails">
+            <div class="col-md-12">
+                <div class="row">
+                    <?php foreach ($this->itemOfDay['pictures'] as $idx => $picture) { ?>
+                        <?php if ($idx > 2) { ?>
+                            <?php if ($picture) { ?>
+                                <div class="col-sm-4">
+                                    <?=$this->htmlA([
+                                        'href'  => $picture['url'],
+                                        'class' => 'thumbnail'
+                                    ], $this->htmlImg([
+                                        'src'   => $picture['src'],
+                                        'title' => $this->pic()->textTitle($picture['name']),
+                                        'alt'   => $this->pic()->textTitle($picture['name']),
+                                    ]), false)?>
+                                </div>
+                            <?php } ?>
+                        <?php } ?>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <?php if ($this->itemOfDay['links']) { ?>
+            <?=$this->htmlA([
+                'class' => 'pull-right',
+                'href'  => $this->url('donate/vod')
+            ], $this->translate('donate/vod/wants-to-select?'))?>
+            <p>
+                <?php foreach ($this->itemOfDay['links'] as $i => $item) { ?>
+                    <?php if ($i) { ?> &#xa0; <?php } ?>
+                    <span class="fa fa-<?=$item['icon']?>"></span>
+                    <?=$this->htmlA($item['url'], $item['text'] . (isset($item['count']) ? ' ('.$item['count'].')' : ''))?>
+                <?php } ?>
+            </p>
+        <?php } ?>
+    <?php } ?>
+<?php } ?>

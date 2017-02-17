@@ -3,16 +3,22 @@
 namespace Application\Model;
 
 use Autowp\Commons\Db\Table;
+use Autowp\Image;
 
+use Application\ItemNameFormatter;
+use Application\Model\Catalogue;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
-use Application\ItemNameFormatter;
+use Application\Service\SpecificationsService;
 
 use Facebook;
 
 use Zend_Db_Expr;
 use Zend_Oauth_Token_Access;
 use Zend_Service_Twitter;
+
+use DateInterval;
+use DateTime;
 
 class CarOfDay
 {
@@ -25,15 +31,60 @@ class CarOfDay
      * @var ItemNameFormatter
      */
     private $itemNameFormatter;
+    
+    /**
+     * @var Image\Storage
+     */
+    private $imageStorage;
+    
+    /**
+     * @var Catalogue
+     */
+    private $catalogue;
+    
+    private $router;
+    
+    private $translator;
+    
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+    
+    /**
+     * @var DbTable\Item\ParentTable
+     */
+    private $itemParentTable;
 
-    public function __construct(ItemNameFormatter $itemNameFormatter)
-    {
+    public function __construct(
+        ItemNameFormatter $itemNameFormatter,
+        Image\Storage $imageStorage,
+        Catalogue $catalogue,
+        $router,
+        $translator,
+        SpecificationsService $specsService
+    ) {
         $this->itemNameFormatter = $itemNameFormatter;
+        $this->imageStorage = $imageStorage;
+        $this->catalogue = $catalogue;
+        $this->router = $router;
+        $this->translator = $translator;
+        $this->specsService = $specsService;
 
         $this->table = new Table([
             'name'    => 'of_day',
             'primary' => 'day_date'
         ]);
+    }
+    
+    /**
+     * @return DbTable\Item\ParentTable
+     */
+    private function getItemParentTable()
+    {
+        return $this->itemParentTable
+            ? $this->itemParentTable
+            : $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     public function getCarOfDayCadidate()
@@ -58,26 +109,12 @@ class CarOfDay
 
     public function pick()
     {
-        $dayRow = $this->table->fetchRow([
-            'day_date = CURDATE()'
-        ]);
-
-        $db = $this->table->getAdapter();
-
-        if (! $dayRow) {
-            $dayRow = $this->table->createRow([
-                'day_date' => new Zend_Db_Expr('CURDATE()')
-            ]);
-        }
-
-        if (! $dayRow['item_id']) {
-            $row = $this->getCarOfDayCadidate();
-            if ($row) {
-                print $row['id']  ."\n";
-
-                $dayRow->item_id = $row['id'];
-                $dayRow->save();
-            }
+        $row = $this->getCarOfDayCadidate();
+        if ($row) {
+            print $row['id']  ."\n";
+        
+            $now = new DateTime();
+            $this->setItemOfDay($now, $row['id'], null);
         }
     }
 
@@ -258,5 +295,464 @@ class CarOfDay
         $dayRow->save();
     
         print 'ok' . PHP_EOL;
+    }
+    
+    public function getNextDates()
+    {
+        $now = new DateTime();
+        $interval = new DateInterval('P1D');
+        
+        $result = [];
+        
+        for ($i=0; $i<10; $i++) {
+            
+            $dayRow = $this->table->fetchRow([
+                'day_date = ?' => $now->format('Y-m-d'),
+                'item_id is not null'
+            ]);
+            
+            $result[] = [
+                'date' => clone $now,
+                'free' => !$dayRow
+            ];
+            
+            $now->add($interval);
+        }
+        
+        return $result;
+    }
+    
+    public function getItemOfDay($itemId, $userId, $language)
+    {
+        $itemTable = new DbTable\Item();
+        $carOfDay = $itemTable->find($itemId)->current();
+        
+        $carOfDayPictures = $this->getOrientedPictureList($carOfDay);
+        
+        // images
+        $formatRequests = [];
+        foreach ($carOfDayPictures as $idx => $picture) {
+            if ($picture) {
+                $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
+                $formatRequests[$format][$idx] = $picture->getFormatRequest();
+            }
+        }
+                
+        $imagesInfo = [];
+        foreach ($formatRequests as $format => $requests) {
+            $imagesInfo[$format] = $this->imageStorage->getFormatedImages($requests, $format);
+        }
+        
+        // names
+        $notEmptyPics = [];
+        foreach ($carOfDayPictures as $idx => $picture) {
+            if ($picture) {
+                $notEmptyPics[] = $picture;
+            }
+        }
+        $pictureTable = $this->catalogue->getPictureTable();
+        $names = $pictureTable->getNameData($notEmptyPics, [
+            'language' => $language
+        ]);
+        
+        $paths = $this->catalogue->getCataloguePaths($carOfDay->id, [
+            'breakOnFirst' => true
+        ]);
+        
+        $categoryPath = false;
+        if (! $paths) {
+            $categoryPaths = $this->getCategoryPaths($carOfDay->id, [
+                'breakOnFirst' => true
+            ]);
+        }
+        
+        $carOfDayPicturesData = [];
+        foreach ($carOfDayPictures as $idx => $row) {
+            if ($row) {
+                $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
+        
+                $url = null;
+                foreach ($paths as $path) {
+                    $url = $this->router->assemble([
+                        'action'        => 'brand-item-picture',
+                        'brand_catname' => $path['brand_catname'],
+                        'car_catname'   => $path['car_catname'],
+                        'path'          => $path['path'],
+                        'picture_id'    => $row['identity']
+                    ], [
+                        'name' => 'catalogue'
+                    ]);
+                }
+        
+                if (! $url) {
+                    foreach ($categoryPaths as $path) {
+                        $url = $this->router->assemble([
+                            'action'           => 'category-picture',
+                            'category_catname' => $path['category_catname'],
+                            'item_id'          => $path['item_id'],
+                            'path'             => $path['path'],
+                            'picture_id'       => $row['identity']
+                        ], [
+                            'name' => 'categories'
+                        ]);
+                    }
+                }
+        
+                $carOfDayPicturesData[] = [
+                    'src'  => isset($imagesInfo[$format][$idx])
+                        ? $imagesInfo[$format][$idx]->getSrc()
+                        : null,
+                    'name' => isset($names[$row['id']]) ? $names[$row['id']] : null,
+                    'url'  => $url
+                ];
+            }
+        }
+        
+        return [
+            'name'     => $carOfDay->getNameData($language),
+            'pictures' => $carOfDayPicturesData,
+            'links'    => $this->carLinks($carOfDay, $language),
+            'userId'   => $userId
+        ];
+    }
+    
+    private function getOrientedPictureList($car)
+    {
+        $perspectivesGroups = new DbTable\Perspective\Group();
+    
+        $db = $perspectivesGroups->getAdapter();
+        $perspectivesGroupIds = $db->fetchCol(
+            $db->select()
+                ->from($perspectivesGroups->info('name'), 'id')
+                ->where('page_id = ?', 6)
+                ->order('position')
+        );
+    
+        $pTable = $this->catalogue->getPictureTable();
+        $pictures = [];
+    
+        $db = $pTable->getAdapter();
+        $usedIds = [];
+    
+        foreach ($perspectivesGroupIds as $groupId) {
+            $picture = null;
+    
+            $select = $pTable->select(true)
+                ->where('mp.group_id = ?', $groupId)
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $car->id)
+                ->joinRight(
+                    ['mp' => 'perspectives_groups_perspectives'],
+                    'picture_item.perspective_id = mp.perspective_id',
+                    null
+                )
+                ->order([
+                    'item_parent_cache.sport', 'item_parent_cache.tuning', 'mp.position',
+                    'pictures.width DESC', 'pictures.height DESC'
+                ])
+                ->limit(1);
+            if ($usedIds) {
+                $select->where('pictures.id not in (?)', $usedIds);
+            }
+            $picture = $pTable->fetchRow($select);
+
+            if ($picture) {
+                $pictures[] = $picture;
+                $usedIds[] = $picture->id;
+            } else {
+                $pictures[] = null;
+            }
+        }
+    
+        $resorted = [];
+        foreach ($pictures as $picture) {
+            if ($picture) {
+                $resorted[] = $picture;
+            }
+        }
+        foreach ($pictures as $picture) {
+            if (! $picture) {
+                $resorted[] = null;
+            }
+        }
+        $pictures = $resorted;
+    
+        $left = [];
+        foreach ($pictures as $key => $picture) {
+            if (! $picture) {
+                $left[] = $key;
+            }
+        }
+    
+        if (count($left) > 0) {
+            $select = $pTable->select(true)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $car->id)
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                //->order('ratio DESC')
+                ->limit(count($left));
+    
+            if (count($usedIds) > 0) {
+                $select->where('pictures.id NOT IN (?)', $usedIds);
+            }
+    
+            foreach ($pTable->fetchAll($select) as $pic) {
+                $key = array_shift($left);
+                $pictures[$key] = $pic;
+            }
+        }
+    
+        return $pictures;
+    }
+    
+    private function carLinks(DbTable\Item\Row $car, $language)
+    {
+        $items = [];
+    
+        $itemTable = $this->catalogue->getItemTable();
+    
+        $db = $itemTable->getAdapter();
+        $totalPictures = $db->fetchOne(
+            $db->select()
+                ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $car->id)
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+        );
+    
+        if ($car->item_type_id == DbTable\Item\Type::CATEGORY) {
+            $items[] = [
+                'icon'  => 'align-left',
+                'url'   => $this->router->assemble([
+                    'action'           => 'category',
+                    'category_catname' => $car->catname,
+                ], [
+                    'name' => 'categories'
+                ]),
+                'text'  => $this->translator->translate('carlist/details')
+            ];
+    
+            if ($totalPictures > 6) {
+                $items[] = [
+                    'icon'  => 'th',
+                    'url'   => $this->router->assemble([
+                        'action'           => 'category-pictures',
+                        'category_catname' => $car->catname,
+                    ], [
+                    'name' => 'categories'
+                ]),
+                    'text'  => $this->translator->translate('carlist/all pictures'),
+                    'count' => $totalPictures
+                ];
+            }
+        } else {
+            $cataloguePaths = $this->catalogue->getCataloguePaths($car['id']);
+    
+            if ($totalPictures > 6) {
+                foreach ($cataloguePaths as $path) {
+                    $url = $this->router->assemble([
+                        'action'        => 'brand-item-pictures',
+                        'brand_catname' => $path['brand_catname'],
+                        'car_catname'   => $path['car_catname'],
+                        'path'          => $path['path']
+                    ], [
+                        'name' => 'catalogue'
+                    ]);
+                    $items[] = [
+                        'icon'  => 'th',
+                        'url'   => $url,
+                        'text'  => $this->translator->translate('carlist/all pictures'),
+                        'count' => $totalPictures
+                    ];
+                    break;
+                }
+            }
+    
+            if ($this->specsService->hasSpecs($car->id)) {
+                foreach ($cataloguePaths as $path) {
+                    $items[] = [
+                        'icon'  => 'list-alt',
+                        'url'   => $this->router->assemble([
+                            'action'        => 'brand-item-specifications',
+                            'brand_catname' => $path['brand_catname'],
+                            'car_catname'   => $path['car_catname'],
+                            'path'          => $path['path']
+                        ], [
+                            'name' => 'catalogue'
+                        ]),
+                        'text'  => $this->translator->translate('carlist/specifications')
+                    ];
+                    break;
+                }
+            }
+    
+            $twins = new Twins();
+            foreach ($twins->getCarGroups($car->id) as $twinsGroup) {
+                $items[] = [
+                    'icon'  => 'adjust',
+                    'url'   => $this->router->assemble([
+                        'id' => $twinsGroup['id']
+                    ], [
+                        'name' => 'twins/group'
+                    ]),
+                    'text'  => $this->translator->translate('carlist/twins')
+                ];
+            }
+    
+            $categoryRows = $db->fetchAll(
+                $db->select()
+                    ->from($itemTable->info('name'), [
+                        'catname', 'begin_year', 'end_year',
+                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,item.name)')
+                    ])
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->joinLeft(
+                        'item_language',
+                        'item.id = item_language.item_id and item_language.language = :language',
+                        null
+                        )
+                    ->join('item_parent', 'item.id = item_parent.parent_id', null)
+                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
+                    ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
+                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
+                    ->where('item_parent_cache.item_id = :item_id')
+                    ->group(['item_parent_cache.item_id', 'item.id'])
+                    ->bind([
+                        'language' => $language,
+                        'item_id'  => $car['id']
+                    ])
+            );
+    
+            foreach ($categoryRows as $category) {
+                $items[] = [
+                    'icon'  => 'tag',
+                    'url'   => $this->router->assemble([
+                        'action'           => 'category',
+                        'category_catname' => $category['catname'],
+                    ], [
+                        'name' => 'categories'
+                    ]),
+                    'text'  => $this->itemNameFormatter->format(
+                        $category,
+                        $language
+                    )
+                ];
+            }
+        }
+    
+        return $items;
+    }
+    
+    private function getCategoryPaths($carId, array $options = [])
+    {
+        $carId = (int)$carId;
+        if (! $carId) {
+            throw new Exception("carId not provided");
+        }
+    
+        $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
+    
+        $result = [];
+    
+        $db = $this->getItemParentTable()->getAdapter();
+    
+        $select = $db->select()
+            ->from('item_parent', 'item_id')
+            ->join('item', 'item_parent.parent_id = item.id', 'catname')
+            ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+            ->where('item_parent.item_id = ?', $carId);
+    
+        if ($breakOnFirst) {
+            $select->limit(1);
+        }
+    
+        $categoryVehicleRows = $db->fetchAll($select);
+        foreach ($categoryVehicleRows as $categoryVehicleRow) {
+            $result[] = [
+                'category_catname' => $categoryVehicleRow['catname'],
+                'item_id'          => $categoryVehicleRow['item_id'],
+                'path'             => []
+            ];
+        }
+    
+        if ($breakOnFirst && count($result)) {
+            return $result;
+        }
+    
+        $parents = $this->getItemParentTable()->fetchAll([
+            'item_id = ?' => $carId
+        ]);
+    
+        foreach ($parents as $parent) {
+            $paths = $this->getCategoryPaths($parent->parent_id, $options);
+    
+            foreach ($paths as $path) {
+                $result[] = [
+                    'category_catname' => $path['category_catname'],
+                    'item_id'          => $path['item_id'],
+                    'path'             => array_merge($path['path'], [$parent->catname])
+                ];
+            }
+    
+            if ($breakOnFirst && count($result)) {
+                return $result;
+            }
+        }
+    
+        return $result;
+    }
+    
+    public function isComplies($itemId)
+    {
+        $db = $this->table->getAdapter();
+        $sql = '
+            SELECT item.id, count(distinct pictures.id) AS p_count
+            FROM item 
+                INNER JOIN item_parent_cache AS cpc ON item.id = cpc.parent_id
+                INNER JOIN picture_item ON cpc.item_id = picture_item.item_id
+                INNER JOIN pictures ON picture_item.picture_id = pictures.id
+            WHERE pictures.status = ?
+                AND item.id NOT IN (SELECT item_id FROM of_day WHERE item_id)
+                AND item.id = ?
+            HAVING p_count >= 3
+            LIMIT 1
+        ';
+        return (bool)$db->fetchRow($sql, [Picture::STATUS_ACCEPTED, (int)$itemId]);
+    }
+    
+    public function setItemOfDay(DateTime $dateTime, $itemId, $userId)
+    {
+        $itemId = (int)$itemId;
+        $userId = (int)$userId;
+        
+        if (! $this->isComplies($itemId)) {
+            return false;
+        }
+        
+        $dateStr = $dateTime->format('Y-m-d');
+        
+        $dayRow = $this->table->fetchRow([
+            'day_date = ?' => $dateStr
+        ]);
+        
+        if (!$dayRow) {
+            $dayRow = $this->table->createRow([
+                'day_date' => $dateStr
+            ]);
+        }
+        
+        if ($dayRow['item_id']) {
+            return false;
+        }
+        
+        $dayRow->item_id = $itemId;
+        $dayRow->user_id = $userId ? $userId : null;
+        $dayRow->save();
+        
+        return true;
     }
 }

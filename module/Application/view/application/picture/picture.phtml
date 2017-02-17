@@ -6,10 +6,10 @@
         ->appendName('medium', 'image')
         ->appendProperty('og:type', 'website')
         ->appendProperty('og:title', $this->pic()->textTitle($this->name))
-        ->appendProperty('og:description', $this->pic()->textTitle($this->name))
         ->appendProperty('og:url', $this->url(null, [], [
             'force_canonical' => true
-        ], true));
+        ], true))
+        ->appendProperty('og:description', $this->pic()->textTitle($this->name));
         
     if ($this->twitterCreatorId) {
         $this->headMeta()->appendName('twitter:creator:id', $this->twitterCreatorId);

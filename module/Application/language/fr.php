@@ -608,6 +608,42 @@ Nous ne recueillons pas d\'informations sur les donateurs, mais, si vous insiste
     'donate/success-text' => 'Merci pour votre soutien.
 
 Allons essayer de ne pas vous décevoir.',
+    
+    'donate/vod/text' => 'The little that we can offer in return for financial assistance of the site - it is an opportunity to choose the next "vehicle of the day".
+    
+Follow the instructions below.
+    
+We will be happy if you want to [perform selfless donation](/donate) to an arbitrary amount.',
+    'donate/vod/select-date' => '1. Choose a date',
+    'donate/vod/date-busy' => 'busy',
+    'donate/vod/select-item' => '2. Choose vehicle',
+    'donate/vod/select-item-text' => 'Almost any vehicle can be "Vehicle of the day", but there are some limitations:
+
+- the vehicle must be selected for the first time
+- the vehicle must have at least 3 photos',
+    'donate/vod/select-item/selection:' => 'Selection: ',
+    'donate/vod/select-item/select' => 'Choose ...',
+    'donate/vod/preview' => '3. Preview',
+    'donate/vod/anonymous' => 'Anonymously',
+    'donate/vod/with-name' => 'With the name (registration required)',
+    'donate/vod/make-donation' => '4. Make a donation',
+    'donate/vod/order-message' => 'WheelsAge.org: vehicle of the day',
+    'donate/vod/order-target' => 'Order %s',
+    'donate/vod/message' => 'Your wishes',
+    'donate/vod/price:' => 'Price:',
+    'donate/vod/price/currency' => ' rubles',
+    'donate/vod/price-aroud' => 'about $%s',
+    'donate/vod/method/credit-card' => 'Credit card',
+    'donate/vod/method/mobile' => 'Mobile operator account',
+    'donate/vod/method/yandex.money' => 'Yandex.Money',
+    'donate/vod/send' => 'Pay',
+    
+    'donate/vod/success-text' => 'When the information about your donation comes to us your choice will be carried out.
+
+Thank you for your support.
+
+We will try not to disappoint you.',
+    'donate/vod/wants-to-select?' => 'Wants choose next?',
 
     'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s ]',
 

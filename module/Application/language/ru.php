@@ -620,6 +620,42 @@ return array_replace(include 'root.php', [
     'donate/success-text' => 'Благодарим вас за оказанную поддержку.
 
 Постараемся вас не разочаровать.',
+    
+    'donate/vod/text' => 'То немногое, что мы можем предложить взамен финансовой помощи в существовании сайта – это возможность выбрать ближайший "автомобиль дня".
+
+Для этого следуйте инструкциям ниже.
+
+Мы будем рады, если вы захотите [совершить бескорыстное пожертвование](/donate) на произвольную сумму.',
+    'donate/vod/select-date' => '1. Выберите дату',
+    'donate/vod/date-busy' => 'занято',
+    'donate/vod/select-item' => '2. Выберите автомобиль',
+    'donate/vod/select-item-text' => 'На роль автомобиля дня подойдет почти любой, из имеющихся, но есть некоторые ограничения:
+
+- автомобиль должен быть выбран впервые
+- автомобиль должен иметь по крайней мере 3 фотографии',
+    'donate/vod/select-item/selection:' => 'Выбор: ',
+    'donate/vod/select-item/select' => 'Выбрать ...',
+    'donate/vod/preview' => '3. Предварительный просмотр',
+    'donate/vod/anonymous' => 'Анонимно',
+    'donate/vod/with-name' => 'С указанием имени (требуется регистрация)',
+    'donate/vod/make-donation' => '4. Сделайте пожертвование',
+    'donate/vod/order-message' => 'AutoWP.ru: автомобиль дня',
+    'donate/vod/order-target' => 'Order %s',
+    'donate/vod/message' => 'Ваши пожелания',
+    'donate/vod/price:' => 'Сумма:', 
+    'donate/vod/price/currency' => 'руб.',
+    'donate/vod/price-aroud' => 'примерно $%s',
+    'donate/vod/method/credit-card' => 'Банковская карта',
+    'donate/vod/method/mobile' => 'Счёт мобильного оператора',
+    'donate/vod/method/yandex.money' => 'Яндекс.Деньги',
+    'donate/vod/send' => 'Оплатить',
+    
+    'donate/vod/success-text' => 'В ближайшее время информация о пожертвовании автоматически поступит к нам и ваш выбор будет осуществлён.
+    
+Благодарим вас за оказанную поддержку.
+
+Постараемся вас не разочаровать.',
+    'donate/vod/wants-to-select?' => 'Желаете выбрать следующий?',
 
     'message/user-cancel-car-engine' => '%1$s отменил двигатель %2$s для автомобиля %3$s ( %4$s ]',
 

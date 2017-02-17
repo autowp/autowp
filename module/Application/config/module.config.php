@@ -21,7 +21,7 @@ return [
             Controller\CategoryController::class        => Controller\Frontend\Service\CategoryControllerFactory::class,
             Controller\ChartController::class           => Controller\Frontend\Service\ChartControllerFactory::class,
             Controller\CommentsController::class        => Controller\Frontend\Service\CommentsControllerFactory::class,
-            Controller\DonateController::class          => InvokableFactory::class,
+            Controller\DonateController::class          => Controller\Frontend\Service\DonateControllerFactory::class,
             Controller\FactoriesController::class       => Controller\Frontend\Service\FactoriesControllerFactory::class,
             Controller\FeedbackController::class        => Controller\Frontend\Service\FeedbackControllerFactory::class,
             Controller\ForumsController::class          => Controller\Frontend\Service\ForumsControllerFactory::class,
@@ -46,6 +46,7 @@ return [
             Controller\UsersController::class           => Controller\Frontend\Service\UsersControllerFactory::class,
             Controller\UploadController::class          => Controller\Frontend\Service\UploadControllerFactory::class,
             Controller\VotingController::class          => Controller\Frontend\Service\VotingControllerFactory::class,
+            Controller\Frontend\YandexController::class => Controller\Frontend\Service\YandexControllerFactory::class,
             Controller\Api\CommentsController::class    => Controller\Api\Service\CommentsControllerFactory::class,
             Controller\Api\ContactsController::class    => InvokableFactory::class,
             Controller\Api\PictureController::class     => Controller\Api\Service\PictureControllerFactory::class,
@@ -252,5 +253,10 @@ return [
         'prefix'   => '/dist/'
     ],
 
-    'mosts_min_vehicles_count' => 200
+    'mosts_min_vehicles_count' => 200,
+    
+    'yandex' => [
+        'secret' => '',
+        'price'  => 0
+    ]
 ];

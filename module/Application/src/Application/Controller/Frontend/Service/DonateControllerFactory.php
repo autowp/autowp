@@ -5,18 +5,16 @@ namespace Application\Controller\Frontend\Service;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\Controller\IndexController as Controller;
+use Application\Controller\DonateController as Controller;
 
-class IndexControllerFactory implements FactoryInterface
+class DonateControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $config = $container->get('Config');
         return new Controller(
-            $container->get('fastCache'),
-            $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\Model\CarOfDay::class),
-            $container->get(\Application\Model\Categories::class),
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+            $config['yandex']
         );
     }
 }
