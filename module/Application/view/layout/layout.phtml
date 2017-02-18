@@ -66,13 +66,15 @@
     </head>
     <body>
         <?php if (!$isAdminPage) { ?>
-<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KGMHT4"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KGMHT4');</script>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-24654784-1', <?=\Zend\Json\Json::encode($this->hostManager()->getCookieDomain($this->language()))?>);
+ga('send', 'pageview');
+</script>
         <?php } ?>
 
         <?php if (!$blankPage && $this->user()->inheritsRole('moder')) { ?>
@@ -127,6 +129,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                             <p class="links">
                                 <a href="https://twitter.com/autowp_ru" title="Twitter" data-toggle="tooltip" data-placement="top"><i class="fa fa-twitter"></i></a>
                                 <a href="https://www.facebook.com/WheelsAge" title="Facebook" data-toggle="tooltip" data-placement="top"><i class="fa fa-facebook"></i></a>
+                                <a href="https://vk.com/wheelsage" title="VK" data-toggle="tooltip" data-placement="top"><i class="fa fa-vk" aria-hidden="true"></i></a>
                                 <a href="https://github.com/autowp/autowp" title="GitHub" data-toggle="tooltip" data-placement="top"><i class="fa fa-github"></i></a>
                                 <a href="https://play.google.com/store/apps/details?id=com.autowp.wallpaper" title="Android wallpaper" data-toggle="tooltip" data-placement="top"><i class="fa fa-android"></i></a>
                                 <a href="/telegram" title="Telegram" data-toggle="tooltip" data-placement="top"><i class="fa fa-telegram"></i></a>

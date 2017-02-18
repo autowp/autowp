@@ -166,7 +166,7 @@ class User extends AbstractHelper
             // gravatar
             return $this->view->gravatar($user->e_mail, [
                 'img_size'    => 70,
-                'default_img' => 'http://www.autowp.ru/_.gif'
+                'default_img' => 'https://www.autowp.ru/_.gif'
             ])->__toString();
         }
 

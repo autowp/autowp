@@ -56,6 +56,8 @@ var Comments = function(element) {
                     $vote.find('.vote-down').addClass('active');
                     $vote.find('.vote-up').removeClass('active');
                 }
+                
+                ga('send', 'event', 'comment-vote', value > 0 ? 'like' : 'dislike');
             });
         }
         

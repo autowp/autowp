@@ -52,6 +52,7 @@ return [
             'car'            => View\Helper\Service\CarFactory::class,
             'comments'       => View\Helper\Service\CommentsFactory::class,
             'fileSize'       => View\Helper\Service\FileSizeFactory::class,
+            'hostManager'    => View\Helper\Service\HostManagerFactory::class,
             'inlinePicture'  => View\Helper\Service\InlinePictureFactory::class,
             'language'       => View\Helper\Service\LanguageFactory::class,
             'languagePicker' => View\Helper\Service\LanguagePickerFactory::class,

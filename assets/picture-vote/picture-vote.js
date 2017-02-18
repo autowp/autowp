@@ -30,6 +30,9 @@ module.exports = function(element) {
                 value: value
             }
         }).done(function(data) {
+            
+            ga('send', 'event', 'vote', value > 0 ? 'like' : 'dislike');
+            
             $element.find('.positive').text(data.positive).toggleClass('zero', data.positive <= 0);
             $element.find('.negative').text(data.negative).toggleClass('zero', data.negative <= 0);
             $voteUp.toggleClass('fa-thumbs-up', data.value > 0);

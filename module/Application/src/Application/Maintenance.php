@@ -73,6 +73,9 @@ class Maintenance extends AbstractListenerAggregate
         
         $facebookConfig = $serviceManager->get('Config')['facebook'];
         $carOfDay->putCurrentToFacebook($facebookConfig);
+        
+        $vkConfig = $serviceManager->get('Config')['vk'];
+        $carOfDay->putCurrentToVk($vkConfig);
 
         $usersService = $serviceManager->get(Service\UsersService::class);
 

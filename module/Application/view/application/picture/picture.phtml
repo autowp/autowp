@@ -21,6 +21,8 @@
             ->appendProperty('og:image:width',  $this->galleryImage->getWidth())
             ->appendProperty('og:image:height', $this->galleryImage->getHeight())
             ->appendName('twitter:image', $this->galleryImage->getSrc());
+        
+        $this->headLink(['rel' => 'image_src', 'href' => $this->galleryImage->getSrc()]);
     }
 
     $this->layout()->moduleName = 'default/picture';

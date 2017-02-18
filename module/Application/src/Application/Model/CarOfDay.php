@@ -297,6 +297,90 @@ class CarOfDay
         print 'ok' . PHP_EOL;
     }
     
+    public function putCurrentToVk(array $vkOptions)
+    {
+        $language = 'ru';
+        
+        $dayRow = $this->table->fetchRow([
+            'day_date = CURDATE()',
+            'not vk_sent'
+        ]);
+    
+        if (! $dayRow) {
+            print 'Day row not found or already sent' . PHP_EOL;
+            return;
+        }
+    
+        $itemTable = new Item();
+    
+        $car = $itemTable->fetchRow([
+            'id = ?' => (int)$dayRow->item_id
+        ]);
+    
+        if (! $car) {
+            print 'Car of day not found' . PHP_EOL;
+            return;
+        }
+    
+        $pictureTable = new Picture();
+    
+        /* Hardcoded perspective priority list */
+        $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
+    
+        foreach ($perspectives as $perspective) {
+            $picture = $this->pictureByPerspective($pictureTable, $car, $perspective);
+            if ($picture) {
+                break;
+            }
+        }
+    
+        if (! $picture) {
+            $picture = $this->pictureByPerspective($pictureTable, $car, false);
+        }
+    
+        if (! $picture) {
+            print 'Picture not found' . PHP_EOL;
+            return;
+        }
+        
+        
+    
+        $url = 'http://autowp.ru/picture/' . $picture->identity;
+        
+        $text = sprintf(
+            'Автомобиль дня: %s',
+            $this->itemNameFormatter->format($car->getNameData($language), $language)
+        );
+            
+        $client = new \Zend\Http\Client('https://api.vk.com/method/wall.post');
+        $response = $client
+            ->setMethod(\Zend\Http\Request::METHOD_POST)
+            ->setParameterPost([
+                'owner_id'     => $vkOptions['owner_id'],
+                'from_group'   => 1,
+                'message'      => $text,
+                'attachments'  => $url,
+                'access_token' => $vkOptions['token'],
+                /*'captcha_sid' => '954673112942',
+                'captcha_key' => 'q2d2due'*/
+            ])
+            ->send();
+    
+        if (! $response->isSuccess()) {
+            throw new \Exception("Failed to post to vk" . $response->getReasonPhrase());
+        }
+        
+        $json = \Zend\Json\Json::decode($response->getBody(), \Zend\Json\Json::TYPE_ARRAY);
+        if (isset($json['error'])) {
+            throw new \Exception("Failed to post to vk" . $json['error']['error_msg']);
+        }
+        
+        $dayRow->vk_sent = true;
+        $dayRow->save();
+        
+        print 'ok' . PHP_EOL;
+    }
+    
     public function getNextDates()
     {
         $now = new DateTime();

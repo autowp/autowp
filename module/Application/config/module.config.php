@@ -258,5 +258,10 @@ return [
     'yandex' => [
         'secret' => '',
         'price'  => 0
-    ]
+    ],
+    
+    'vk' => [
+        'token'    => '',
+        'owner_id' => ''
+    ],
 ];
