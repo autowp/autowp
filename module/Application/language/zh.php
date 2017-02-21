@@ -28,8 +28,8 @@ return array_replace(include 'root.php', [
         '%1$s 个主题',
     ],
 
-    'year' => 'Year',
-    'month' => 'Month',
+    'year' => '年',
+    'month' => '月',
 
     'contributor' => '贡献者',
     'contributors' => '贡献者',
@@ -53,7 +53,7 @@ return array_replace(include 'root.php', [
                        '所有图片仅用于传播知识。<br />' .
                        '<a href="mailto:autowp@yandex.ru">举报侵权行为</a>',
 
-    'layout/language-contributing' => 'Want to contribute?',
+    'layout/language-contributing' => '想要加入更多语言?',
 
     /* Picture preview */
     'picture-preview/no-comments' => '暂无评论',
@@ -150,8 +150,8 @@ return array_replace(include 'root.php', [
     'count 0'                 => '暂无',
 
     /* CAR LIST */
-    'carlist/no-photo'        => 'No photos available',
-    'carlist/no-photo/add'    => 'Add photo',
+    'carlist/no-photo'        => '无图片',
+    'carlist/no-photo/add'    => '添加图片',
     'carlist/all pictures'    => '全部图片',
     'carlist/details'         => '详细分类',
     'carlist/twins'           => '姊妹车型',
@@ -170,7 +170,7 @@ return array_replace(include 'root.php', [
 
     'picturelist/engine' => '发动机',
     'picturelist/engine-%s' => '%s 发动机',
-    'picturelist/factory' => 'Factory',
+    'picturelist/factory' => '工厂',
 
     'present-time-abbr'       => '至今',
 
@@ -260,8 +260,8 @@ return array_replace(include 'root.php', [
     'mosts/period/all-time'   => '所有年份',
 
     /* upload */
-    'upload/image-file' => 'Image file',
-    'upload/note' => 'Note',
+    'upload/image-file' => '图片文件',
+    'upload/note' => '备注',
     'upload/picture/crop' => '剪切',
     'upload/picture/cropped-to' => '剪切到 %s',
     'upload/select/unsorted' => '未分类',
@@ -304,7 +304,7 @@ return array_replace(include 'root.php', [
     'catalogue/brand/links' => '链接',
     'catalogue/brand/popular-images' => '热门图片',
     'catalogue/brand/new-pictures' => '按上传时间',
-    'catalogue/brand/inbox/by-brand' => 'Brand inbox',
+    'catalogue/brand/inbox/by-brand' => '按品牌',
     'catalogue/brand/factories' => '工厂',
     'catalogue/link-category/official' => '官方网站',
     'catalogue/link-category/helper'   => '协助发展',
@@ -321,10 +321,10 @@ return array_replace(include 'root.php', [
     'catalogue/specifications-of-%1$s' => '%1$s的性能参数',
     'catalogue/specifications' => '性能参数',
     'catalogue/other-photos' => '其它图片',
-    'catalogue/section/moto' => 'Moto',
-    'catalogue/section/tractors' => 'Tractors',
-    'catalogue/section/buses' => 'Buses',
-    'catalogue/section/trucks' => 'Trucks',
+    'catalogue/section/moto' => '摩托车',
+    'catalogue/section/tractors' => '拖拉机',
+    'catalogue/section/buses' => '巴士',
+    'catalogue/section/trucks' => '客车',
     'catalogue/section/engines' => '发动机',
 
     'catalogue/engine-menu/vehicles' => '车型',
@@ -352,7 +352,7 @@ return array_replace(include 'root.php', [
 
 这是由于为了防止灌水和其他不端行为，每小时发送的消息数受到限制。
 
-现在您可以在"%s"中发表评论，建议使用清晰易懂的措辞表达您的看法:',
+现在您可以在"%s"中发表评论，建议使用清晰易懂的措辞表达您的看法：',
 
     'comments/author/anonymous' => '匿名',
     'comments/message-deleted-by-admin' => '消息已通过网站管理删除',
@@ -425,7 +425,7 @@ return array_replace(include 'root.php', [
     'account/profile/votes-left' => '剩余表决',
     'account/profile/timezone' => '时区',
     'account/profile/language' => '语言',
-    'account/profile/saved' => 'Data saved',
+    'account/profile/saved' => '数据已保存',
 
     'account/access/change-password' => '修改密码',
     'account/access/change-password/current' => '当前密码',
@@ -516,10 +516,10 @@ return array_replace(include 'root.php', [
     'users/user/upload-pictures:' => '已上传图片: ',
     'users/user/pictures-left-on-site:' => '被采纳图片: ',
 
-    'users/comments/order/new' => 'New',
-    'users/comments/order/old' => 'Old',
-    'users/comments/order/positive' => 'Positive',
-    'users/comments/order/negative' => 'Negative',
+    'users/comments/order/new' => '新',
+    'users/comments/order/old' => '老',
+    'users/comments/order/positive' => '赞',
+    'users/comments/order/negative' => '踩',
 
     'users/for-moderators' => '管理员页面',
     'users/for-moderators/remove-photo' => '删除用户图片',
@@ -591,45 +591,41 @@ return array_replace(include 'root.php', [
     'donate/target' => '为了维持网站运营',
     'donate/project' => 'WheelsAge.org',
     'donate/comment-hint' => '您的建议',
-    'donate/success-text' => '感谢您的支持.
-
+    'donate/success-text' => '感谢您的支持。 
 我们尽己所能让您满意。',
     
-    'donate/vod/text' => 'The little that we can offer in return for financial assistance of the site - it is an opportunity to choose the next "vehicle of the day".
+    'donate/vod/text' => '我们可以做出一点微小的工作作为回报-您有机会钦定下一个“今日之车”
+ 
+无论您做出任意数额的 [无条件捐助](/donate) 我们都会很高兴。',
+    'donate/vod/select-date' => '1. 选择日期',
+    'donate/vod/date-busy' => '日期已被占用',
+    'donate/vod/select-item' => '2. 选择车型',
+    'donate/vod/select-item-text' => '几乎所有车型都可以被选作 "今日之车"，但还是有一些限制:
 
-Follow the instructions below.
-
-We will be happy if you want to [perform selfless donation](/donate) to an arbitrary amount.',
-    'donate/vod/select-date' => '1. Choose a date',
-    'donate/vod/date-busy' => 'busy',
-    'donate/vod/select-item' => '2. Choose vehicle',
-    'donate/vod/select-item-text' => 'Almost any vehicle can be "Vehicle of the day", but there are some limitations:
-
-- the vehicle must be selected for the first time
-- the vehicle must have at least 3 photos',
-    'donate/vod/select-item/selection:' => 'Selection: ',
-    'donate/vod/select-item/select' => 'Choose ...',
-    'donate/vod/preview' => '3. Preview',
-    'donate/vod/anonymous' => 'Anonymously',
-    'donate/vod/with-name' => 'With the name (registration required)',
-    'donate/vod/make-donation' => '4. Make a donation',
-    'donate/vod/order-message' => 'WheelsAge.org: vehicle of the day',
+- 车辆是首次作为今日之车
+- 车辆至少有3张图片',
+    'donate/vod/select-item/selection:' => '选择: ',
+    'donate/vod/select-item/select' => '选择 ...',
+    'donate/vod/preview' => '3. 预览',
+    'donate/vod/anonymous' => '匿名捐助',
+    'donate/vod/with-name' => '记名捐助 (需要注册)',
+    'donate/vod/make-donation' => '4. 做出捐助',
+    'donate/vod/order-message' => 'WheelsAge.org: 今日制车',
     'donate/vod/order-target' => 'Order %s',
-    'donate/vod/message' => 'Your wishes',
-    'donate/vod/price:' => 'Price:',
-    'donate/vod/price/currency' => ' rubles',
-    'donate/vod/price-aroud' => 'about $%s',
-    'donate/vod/method/credit-card' => 'Credit card',
-    'donate/vod/method/mobile' => 'Mobile operator account',
+    'donate/vod/message' => '您的期许',
+    'donate/vod/price:' => '金额:',
+    'donate/vod/price/currency' => ' 卢布',
+    'donate/vod/price-aroud' => '约 $%s',
+    'donate/vod/method/credit-card' => '信用卡',
+    'donate/vod/method/mobile' => '手机运营商账户',
     'donate/vod/method/yandex.money' => 'Yandex.Money',
-    'donate/vod/send' => 'Pay',
+    'donate/vod/send' => '支付',
     
-    'donate/vod/success-text' => 'When the information about your donation comes to us your choice will be carried out.
+    'donate/vod/success-text' => '收到来自您的捐款信息后我们将会执行您的选择。 
+感谢您的支持。 
 
-Thank you for your support.
-
-We will try not to disappoint you.',
-    'donate/vod/wants-to-select?' => 'Wants choose next?',
+我们尽己所能让您满意。',
+    'donate/vod/wants-to-select?' => '钦定更多今日之车?',
 
     'message/user-cancel-car-engine' => '%1$s为%2$s车型取消%3$s( %4$s )发动机',
 
@@ -762,7 +758,7 @@ We will try not to disappoint you.',
 ### 支持我们
 
 您可以通过[捐助](/donate) 或[反馈意见](/feedback)支持我们网站
-Take part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.',
+欲添加更多语言请参与 [翻译网站](https://github.com/autowp/autowp/tree/master/module/Application/language) 。',
 
     'page/1/name' => "主页",
     'page/2/name' => "主目录",
@@ -881,7 +877,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/189/name' => "纠纷",
     'page/196/name' => "捐助",
     'page/197/name' => "历史标题",
-    'page/198/name' => "联系方式",
+    'page/198/name' => "好友",
 
     'page/1/title' => "汽车图片的百科全书。WheelsAge.org",
     'page/14/title' => "%BRAND_NAME%按推出时间排序",
@@ -970,7 +966,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/189/title' => "争议",
     'page/196/title' => "捐助",
     'page/197/title' => "历史标题",
-    'page/198/title' => "联系方式",
+    'page/198/title' => "好友",
 
     'page/14/breadcrumbs' => "按推出时间排序",
     'page/15/breadcrumbs' => "最新图片",
@@ -1992,13 +1988,13 @@ Transmission is not considered',
     'specs/attrs/84/165/options/80' => 'aluminum alloy (forging)',
     'specs/attrs/82' => 'emissions',
     'specs/attrs/157' => 'emission standard',
-    'specs/attrs/157/options/71' => '欧1',
-    'specs/attrs/157/options/72' => '欧2',
-    'specs/attrs/157/options/73' => '欧3',
-    'specs/attrs/157/options/74' => '欧4',
-    'specs/attrs/157/options/75' => '欧5',
-    'specs/attrs/157/options/76' => '欧5+',
-    'specs/attrs/157/options/77' => '欧6',
+    'specs/attrs/157/options/71' => '欧I',
+    'specs/attrs/157/options/72' => '欧II',
+    'specs/attrs/157/options/73' => '欧III',
+    'specs/attrs/157/options/74' => '欧IV',
+    'specs/attrs/157/options/75' => '欧V',
+    'specs/attrs/157/options/76' => '欧V+',
+    'specs/attrs/157/options/77' => '欧VI',
     'specs/attrs/170' => '生产地',
 
     'specs/unit/1/abbr' => 'mm',
