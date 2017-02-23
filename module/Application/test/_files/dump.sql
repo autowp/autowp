@@ -1904,17 +1904,18 @@ DROP TABLE IF EXISTS `of_day`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `of_day` (
-  `day_date` date NOT NULL,
-  `picture_id` int(10) unsigned DEFAULT NULL,
-  `item_id` int(10) unsigned DEFAULT NULL,
-  `twitter_sent` tinyint(4) unsigned NOT NULL DEFAULT '0',
-  `facebook_sent` tinyint(4) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`day_date`),
-  KEY `of_day_fk` (`picture_id`),
-  KEY `FK_of_day_item_id` (`item_id`),
-  CONSTRAINT `FK_of_day_item_id` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `of_day_fk` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB; (`picture_id`)';
+ `day_date` date NOT NULL,
+ `picture_id` int(10) unsigned DEFAULT NULL,
+ `item_id` int(10) unsigned DEFAULT NULL,
+ `user_id` int(10) unsigned DEFAULT NULL,
+ `twitter_sent` tinyint(4) unsigned NOT NULL DEFAULT '0',
+ `facebook_sent` tinyint(4) NOT NULL DEFAULT '0',
+ `vk_sent` tinyint(4) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`day_date`),
+ KEY `of_day_fk` (`picture_id`),
+ KEY `FK_of_day_cars_id` (`item_id`),
+ KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB; (`picture_id`) REFER `autowp/picture'
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2964,6 +2965,10 @@ ALTER TABLE `picture_vote_summary`
 ALTER TABLE `picture_vote_summary`
   ADD CONSTRAINT `picture_vote_summary_ibfk_1` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE;
 
+ALTER TABLE `of_day`
+  ADD CONSTRAINT `FK_of_day_cars_id` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `of_day_fk` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `of_day_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 CREATE TABLE `comment_topic_subscribe` (
   `item_id` int(11) UNSIGNED NOT NULL,
