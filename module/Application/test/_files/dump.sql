@@ -1915,7 +1915,7 @@ CREATE TABLE `of_day` (
  KEY `of_day_fk` (`picture_id`),
  KEY `FK_of_day_cars_id` (`item_id`),
  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB; (`picture_id`) REFER `autowp/picture'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB; (`picture_id`) REFER `autowp/picture';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
