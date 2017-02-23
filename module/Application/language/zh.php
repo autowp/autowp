@@ -389,6 +389,7 @@ return array_replace(include 'root.php', [
     'perspective/mascot'         => '立标',
     'perspective/sketch'         => 'sketch',
     'perspective/mixed'          => 'mixed',
+    'perspective/exterior-details' => 'exterior details',
 
     'login/sign-in' => '登录',
     'login/sign-out' => '注销',
@@ -552,6 +553,8 @@ return array_replace(include 'root.php', [
 
     'users/rating/specifications' => '性能参数',
     'users/rating/pictures' => '图片',
+    'users/rating/likes' => 'Likes',
+    'users/rating/picture-likes' => 'Picture likes',
     'users/rating/specs-volume' => '数量',
     'users/rating/weight' => '权重',
 

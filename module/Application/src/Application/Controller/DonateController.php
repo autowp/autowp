@@ -366,4 +366,62 @@ class DonateController extends AbstractActionController
     
         return $viewModel->setTerminal(true);
     }
+    
+    public function logAction()
+    {
+        $data = [
+            [
+                'sum'      => 972.02,
+                'currency' => 'руб.',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2017-02-17'),
+                'user_id'  => 11022
+            ],
+            [
+                'sum'      => 95.30,
+                'currency' => '$',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2016-12-27'),
+                'user_id'  => null
+            ],
+            [
+                'sum'      => 147,
+                'currency' => 'руб.',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2016-10-10'),
+                'user_id'  => 2960
+            ],
+            [
+                'sum'      => 99.50,
+                'currency' => 'руб.',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2016-08-18'),
+                'user_id'  => null
+            ],
+            [
+                'sum'      => 99.50,
+                'currency' => 'руб.',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2016-05-23'),
+                'user_id'  => null
+            ],
+            [
+                'sum'      => 343,
+                'currency' => 'руб.',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2016-04-19'),
+                'user_id'  => null
+            ],
+            [
+                'sum'      => 294,
+                'currency' => 'руб.',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2016-02-16'),
+                'user_id'  => null
+            ],
+            [
+                'sum'      => 98,
+                'currency' => 'руб.',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2016-01-21'),
+                'user_id'  => null
+            ]
+        ];
+        
+        return [
+            'items' => $data
+        ];
+    }
 }

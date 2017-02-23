@@ -124,7 +124,10 @@ class CarOfDay
             'day_date <= CURDATE()'
         ], 'day_date DESC');
 
-        return $row ? $row->item_id : null;
+        return $row ? [
+            'item_id' => $row['item_id'],
+            'user_id' => $row['user_id']
+        ] : null;
     }
 
     private function pictureByPerspective($pictureTable, $car, $perspective)

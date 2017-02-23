@@ -66,11 +66,11 @@
                 </div>
             </div>
         </div>
+        <?=$this->htmlA([
+            'class' => 'pull-right',
+            'href'  => $this->url('donate/vod')
+        ], $this->translate('donate/vod/wants-to-select?'))?>
         <?php if ($this->itemOfDay['links']) { ?>
-            <?=$this->htmlA([
-                'class' => 'pull-right',
-                'href'  => $this->url('donate/vod')
-            ], $this->translate('donate/vod/wants-to-select?'))?>
             <p>
                 <?php foreach ($this->itemOfDay['links'] as $i => $item) { ?>
                     <?php if ($i) { ?> &#xa0; <?php } ?>

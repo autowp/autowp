@@ -79,15 +79,15 @@ class PictureController extends AbstractActionController
 
     public function carOfDayPictureAction()
     {
-        $carId = $this->carOfDay->getCurrent();
+        $itemOfDay = $this->carOfDay->getCurrent();
 
         $pictureRow = null;
 
-        if ($carId) {
+        if ($itemOfDay) {
             $itemTable = new Item();
             $pictureTable = new Picture();
 
-            $carRow = $itemTable->find($carId)->current();
+            $carRow = $itemTable->find($itemOfDay['item_id'])->current();
             if ($carRow) {
                 foreach ([31, null] as $groupId) {
                     $select = $pictureTable->select(true)

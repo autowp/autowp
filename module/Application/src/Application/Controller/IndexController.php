@@ -88,17 +88,17 @@ class IndexController extends AbstractActionController
         $language = $this->language();
         $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
-        $carId = $this->carOfDay->getCurrent();
+        $carOfDay = $this->carOfDay->getCurrent();
 
         $carOfDayInfo = null;
 
-        if ($carId) {
-            $key = 'CAR_OF_DAY_98_' . $carId . '_' . $language . '_' . $httpsFlag;
+        if ($carOfDay) {
+            $key = 'CAR_OF_DAY_100_' . $carOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
 
             $carOfDayInfo = $this->cache->getItem($key, $success);
             if (! $success) {
                 
-                $carOfDayInfo = $this->carOfDay->getItemOfDay($carId, null, $language);
+                $carOfDayInfo = $this->carOfDay->getItemOfDay($carOfDay['item_id'], $carOfDay['user_id'], $language);
 
                 $this->cache->setItem($key, $carOfDayInfo);
             }

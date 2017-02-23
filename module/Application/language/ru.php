@@ -415,6 +415,7 @@ return array_replace(include 'root.php', [
     'perspective/mascot'         => 'маскот',
     'perspective/sketch'         => 'эскиз',
     'perspective/mixed'          => 'разное',
+    'perspective/exterior-details' => 'детали экстерьера',
 
     'login/sign-in' => 'Вход',
     'login/sign-out' => 'Выход',
@@ -578,6 +579,8 @@ return array_replace(include 'root.php', [
 
     'users/rating/specifications' => 'Технические х-ки',
     'users/rating/pictures' => 'Изображения',
+    'users/rating/likes' => 'Лайки',
+    'users/rating/picture-likes' => 'Лайки к фото',
     'users/rating/specs-volume' => 'Х-ки',
     'users/rating/weight' => 'Вес',
 

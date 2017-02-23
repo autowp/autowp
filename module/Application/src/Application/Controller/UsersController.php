@@ -448,6 +448,70 @@ class UsersController extends AbstractActionController
             'valueTitle' => $valueTitle
         ];
     }
+    
+    private function likesRating()
+    {
+        $userTable = new User();
+        $itemTable = new DbTable\Item();
+        
+        $db = $userTable->getAdapter();
+        
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from('comment_message', ['author_id', 'volume' => new Zend_Db_Expr('sum(vote)')])
+                ->group('author_id')
+                ->order('volume DESC')
+                ->limit(30)
+        );
+    
+        $users = [];
+        foreach ($rows as $row) {
+            $users[] = [
+                'row'    => $userTable->find($row['author_id'])->current(),
+                'volume' => $row['volume'],
+                'brands' => []
+            ];
+        }
+    
+        return [
+            'users'      => $users,
+            'rating'     => 'likes',
+            'valueTitle' => 'users/rating/likes'
+        ];
+    }
+    
+    private function pictureLikesRating()
+    {
+        $userTable = new User();
+        $itemTable = new DbTable\Item();
+    
+        $db = $userTable->getAdapter();
+    
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from('pictures', ['owner_id'])
+                ->join('picture_vote', 'pictures.id = picture_vote.picture_id', ['volume' => new Zend_Db_Expr('sum(value)')])
+                ->where('pictures.owner_id <> picture_vote.user_id')
+                ->group('pictures.owner_id')
+                ->order('volume DESC')
+                ->limit(30)
+        );
+    
+        $users = [];
+        foreach ($rows as $row) {
+            $users[] = [
+                'row'    => $userTable->find($row['owner_id'])->current(),
+                'volume' => $row['volume'],
+                'brands' => []
+            ];
+        }
+    
+        return [
+            'users'      => $users,
+            'rating'     => 'picture-likes',
+            'valueTitle' => 'users/rating/picture-likes'
+        ];
+    }
 
     public function ratingAction()
     {
@@ -460,6 +524,14 @@ class UsersController extends AbstractActionController
 
             case 'pictures':
                 return $this->picturesRating();
+                break;
+                
+            case 'likes':
+                return $this->likesRating();
+                break;
+                
+            case 'picture-likes':
+                return $this->pictureLikesRating();
                 break;
         }
 

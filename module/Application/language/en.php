@@ -402,6 +402,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'perspective/mascot'         => 'mascot',
     'perspective/sketch'         => 'sketch',
     'perspective/mixed'          => 'mixed',
+    'perspective/exterior-details' => 'exterior details',
 
     'login/sign-in' => 'Sign in',
     'login/sign-out' => 'Sign out',
@@ -568,6 +569,8 @@ Good luck.',
 
     'users/rating/specifications' => 'Specifications',
     'users/rating/pictures' => 'Pictures',
+    'users/rating/likes' => 'Likes',
+    'users/rating/picture-likes' => 'Picture likes',
     'users/rating/specs-volume' => 'Specs volume',
     'users/rating/weight' => 'Weight',
 

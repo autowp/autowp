@@ -14,6 +14,12 @@
     <li<?=$this->rating == 'pictures' ? ' class="active"' : ''?>>
         <?=$this->htmlA($this->url('users/rating/pictures'), $this->translate('users/rating/pictures'))?>
     </li>
+    <li<?=$this->rating == 'likes' ? ' class="active"' : ''?>>
+        <?=$this->htmlA($this->url('users/rating/likes'), $this->translate('users/rating/likes'))?>
+    </li>
+    <li<?=$this->rating == 'picture-likes' ? ' class="active"' : ''?>>
+        <?=$this->htmlA($this->url('users/rating/picture-likes'), $this->translate('users/rating/picture-likes'))?>
+    </li>
 </ul>
 <table class="table">
     <thead>

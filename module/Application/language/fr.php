@@ -402,6 +402,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'perspective/mascot'         => 'mascot',
     'perspective/sketch'         => 'sketch',
     'perspective/mixed'          => 'mixed',
+    'perspective/exterior-details' => 'exterior details',
 
     'login/sign-in' => 'Entrée',
     'login/sign-out' => 'Sortie',
@@ -565,6 +566,8 @@ Bonne chance.',
 
     'users/rating/specifications' => 'Caractéristiques',
     'users/rating/pictures' => 'Images',
+    'users/rating/likes' => 'Likes',
+    'users/rating/picture-likes' => 'Picture likes',
     'users/rating/specs-volume' => 'Volume',
     'users/rating/weight' => 'Poids',
 

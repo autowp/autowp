@@ -485,6 +485,15 @@ return [
                 ],
                 'may_terminate' => true,
                 'child_routes'  => [
+                    'log' => [
+                        'type'    => Literal::class,
+                        'options' => [
+                            'route' => '/log',
+                            'defaults' => [
+                                'action' => 'log',
+                            ]
+                        ]
+                    ],
                     'success' => [
                         'type' => Literal::class,
                         'options' => [
@@ -1083,6 +1092,26 @@ return [
                                     'defaults' => [
                                         'action' => 'rating',
                                         'rating' =>  'pictures'
+                                    ],
+                                ],
+                            ],
+                            'likes' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/likes',
+                                    'defaults' => [
+                                        'action' => 'rating',
+                                        'rating' =>  'likes'
+                                    ],
+                                ],
+                            ],
+                            'picture-likes' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/picture-likes',
+                                    'defaults' => [
+                                        'action' => 'rating',
+                                        'rating' =>  'picture-likes'
                                     ],
                                 ],
                             ]
