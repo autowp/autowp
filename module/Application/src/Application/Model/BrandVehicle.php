@@ -253,6 +253,11 @@ class BrandVehicle
 
         return $catname;
     }
+    
+    public function isAllowedCombination($itemTypeId, $parentItemTypeId)
+    {
+        return isset($this->allowedCombinations[$parentItemTypeId][$itemTypeId]);
+    }
 
     public function create($parentId, $itemId, array $options = [])
     {
@@ -266,7 +271,7 @@ class BrandVehicle
             throw new Exception("Only groups can have childs");
         }
 
-        if (! isset($this->allowedCombinations[$parentRow->item_type_id][$itemRow->item_type_id])) {
+        if (! $this->isAllowedCombination($itemRow->item_type_id, $parentRow->item_type_id)) {
             throw new Exception("That type of parent is not allowed for this type");
         }
 

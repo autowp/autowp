@@ -184,7 +184,7 @@ return [
         ],
         'zh' => [
             'hostname' => 'zh.wheelsage.org',
-            'timezone' => 'Asia/Beijing',
+            'timezone' => 'Asia/Shanghai',
             'name'     => '中文 (beta)',
             'flag'     => 'flag-icon flag-icon-cn',
             'cookie'   => '.wheelsage.org'

@@ -590,7 +590,9 @@ return array_replace(include 'root.php', [
 
 在捐助的同时可以告诉我们您对网站的愿景。
 
-原则上我们进行不记名捐助，但如果您要求，我们会标记您的贡献。',
+原则上我们进行不记名捐助，但如果您要求，我们会标记您的贡献。
+
+In addition we can offer in return to [choose the next vehicle of the day](/donate/vod)',
     'donate/target' => '为了维持网站运营',
     'donate/project' => 'WheelsAge.org',
     'donate/comment-hint' => '您的建议',

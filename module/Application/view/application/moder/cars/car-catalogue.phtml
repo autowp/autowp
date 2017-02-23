@@ -150,7 +150,42 @@
             <?php } ?>
 
             <?php if ($this->canMove) { ?>
-                <?php if ($this->car['item_type_id'] == Application\Model\DbTable\Item\Type::CATEGORY) { ?>
+                <?php if ($this->car['item_type_id'] == Application\Model\DbTable\Item\Type::BRAND) { ?>
+                    <tr>
+                        <td colspan="2">
+                            <i class="fa fa-plus"></i>
+                            <?=$this->htmlA(
+                                $this->url('moder/cars/params', [
+                                    'action'       => 'new',
+                                    'parent_id'    => $this->car->id,
+                                    'item_type_id' => Application\Model\DbTable\Item\Type::ENGINE
+                                ]),
+                                $this->translate('moder/vehicle/catalogue/add-engine')
+                            )?>
+                        </td>
+                        <td class="urls"></td>
+                        <?php if ($this->canMove) { ?>
+                            <td></td>
+                        <?php } ?>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <i class="fa fa-plus"></i>
+                            <?=$this->htmlA(
+                                $this->url('moder/cars/params', [
+                                    'action'       => 'new',
+                                    'parent_id'    => $this->car->id,
+                                    'item_type_id' => Application\Model\DbTable\Item\Type::VEHICLE
+                                ]),
+                                $this->translate('moder/vehicle/catalogue/add-vehicle')
+                            )?>
+                        </td>
+                        <td class="urls"></td>
+                        <?php if ($this->canMove) { ?>
+                            <td></td>
+                        <?php } ?>
+                    </tr>
+                <?php } elseif ($this->car['item_type_id'] == Application\Model\DbTable\Item\Type::CATEGORY) { ?>
                     <tr>
                         <td colspan="2">
                             <i class="fa fa-plus"></i>

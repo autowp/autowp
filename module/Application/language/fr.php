@@ -604,7 +604,9 @@ Si vous avez le désir et la capacité de nous soutenir vous pouvez le faire en 
 
 Avec un don, vous pouvez nous envoyer  quelques lignes sur l\'endroit où vous souhaitez voir le développement du site et nous nous sentirons un peu plus obligés.
 
-Nous ne recueillons pas d\'informations sur les donateurs, mais, si vous insistez, nous pouvons noter votre contribution.',
+Nous ne recueillons pas d\'informations sur les donateurs, mais, si vous insistez, nous pouvons noter votre contribution.
+
+In addition we can offer in return to [choose the next vehicle of the day](/donate/vod)',
     'donate/target' => 'Sur le site',
     'donate/project' => 'WheelsAge.org',
     'donate/comment-hint' => 'Votre souhait',

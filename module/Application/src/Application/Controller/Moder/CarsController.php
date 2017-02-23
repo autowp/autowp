@@ -2692,9 +2692,12 @@ class CarsController extends AbstractActionController
         $itemTable = $this->catalogue()->getItemTable();
 
         $parentCar = $itemTable->fetchRow([
-            'id = ?'           => (int)$this->params('parent_id'),
-            'item_type_id = ?' => $itemTypeId
+            'id = ?' => (int)$this->params('parent_id')
         ]);
+        
+        if (! $this->brandVehicle->isAllowedCombination($itemTypeId, $parentCar['item_type_id'])) {
+            return $this->forbiddenAction();
+        }
 
         $specTable = new DbTable\Spec();
         $specOptions = $this->loadSpecs($specTable, null, 0);
