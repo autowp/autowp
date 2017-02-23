@@ -14,6 +14,7 @@ use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\PictureItem;
+use Application\Model\UserPicture;
 use Application\Service\TelegramService;
 
 use geoPHP;
@@ -51,19 +52,26 @@ class UploadController extends AbstractActionController
      * @var Comments\CommentsService
      */
     private $comments;
+    
+    /**
+     * @var UserPicture
+     */
+    private $userPicture;
 
     public function __construct(
         $partial,
         TelegramService $telegram,
         PictureItem $pictureItem,
         DuplicateFinder $duplicateFinder,
-        Comments\CommentsService $comments
+        Comments\CommentsService $comments,
+        UserPicture $userPicture
     ) {
         $this->partial = $partial;
         $this->telegram = $telegram;
         $this->pictureItem = $pictureItem;
         $this->duplicateFinder = $duplicateFinder;
         $this->comments = $comments;
+        $this->userPicture = $userPicture;
     }
 
     private function getCarParentTable()
@@ -220,8 +228,7 @@ class UploadController extends AbstractActionController
 
             // increment uploads counter
             if ($user) {
-                $user->pictures_added = new Zend_Db_Expr('pictures_added+1');
-                $user->save();
+                $this->userPicture->incrementUploads($user['id']);
             }
 
             // rename file to new

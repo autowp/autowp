@@ -119,6 +119,7 @@ return [
             Model\Log::class                     => Model\Service\LogFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,
             Model\PictureVote::class             => Model\Service\PictureVoteFactory::class,
+            Model\UserPicture::class             => Model\Service\UserPictureFactory::class,
             PictureNameFormatter::class          => Service\PictureNameFormatterFactory::class,
             Service\SpecificationsService::class => Service\SpecificationsServiceFactory::class,
             Service\TelegramService::class       => Service\TelegramServiceFactory::class,

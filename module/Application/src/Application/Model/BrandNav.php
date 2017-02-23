@@ -234,7 +234,9 @@ class BrandNav
             'item_id = ?' => $brand['id']
         ]);
         foreach ($brandAliasRows as $brandAliasRow) {
-            $aliases[] = $brandAliasRow->name;
+            if ($brandAliasRow->name) {
+                $aliases[] = $brandAliasRow->name;
+            }
         }
 
         $brandLangTable = new DbTable\Item\Language();
@@ -242,7 +244,9 @@ class BrandNav
             'item_id = ?' => $brand['id']
         ]);
         foreach ($brandLangRows as $brandLangRow) {
-            $aliases[] = $brandLangRow->name;
+            if ($brandLangRow->name) {
+                $aliases[] = $brandLangRow->name;
+            }
         }
 
         usort($aliases, function ($a, $b) {

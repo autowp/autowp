@@ -24,6 +24,7 @@ use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
 use Application\Model\Log;
 use Application\Model\PictureItem;
+use Application\Model\UserPicture;
 use Application\PictureNameFormatter;
 use Application\Service\TelegramService;
 
@@ -100,6 +101,11 @@ class PicturesController extends AbstractActionController
      * @var Comments\CommentsService
      */
     private $comments;
+    
+    /**
+     * @var UserPicture
+     */
+    private $userPicture;
 
     private function getCarParentTable()
     {
@@ -123,7 +129,8 @@ class PicturesController extends AbstractActionController
         PictureItem $pictureItem,
         DuplicateFinder $duplicateFinder,
         Comments\CommentsService $comments,
-        Log $log
+        Log $log,
+        UserPicture $userPicture
     ) {
 
         $this->hostManager = $hostManager;
@@ -141,6 +148,7 @@ class PicturesController extends AbstractActionController
         $this->duplicateFinder = $duplicateFinder;
         $this->comments = $comments;
         $this->log = $log;
+        $this->userPicture = $userPicture;
     }
 
     public function ownerTypeaheadAction()
@@ -1092,6 +1100,10 @@ class PicturesController extends AbstractActionController
                     'change_status_user_id' => $user->id
                 ]);
                 $picture->save();
+                
+                if ($picture->owner_id) {
+                    $this->userPicture->refreshPicturesCount($picture->owner_id);
+                }
 
                 $this->log(sprintf(
                     'С картинки %s снят статус "принято"',
@@ -1823,6 +1835,10 @@ class PicturesController extends AbstractActionController
                 $picture->accept_datetime = new Zend_Db_Expr('NOW()');
             }
             $picture->save();
+            
+            if ($picture->owner_id) {
+                $this->userPicture->refreshPicturesCount($picture->owner_id);
+            }
         }
 
         if (! in_array($replacePicture->status, [Picture::STATUS_REMOVING, Picture::STATUS_REMOVED])) {
@@ -1832,6 +1848,9 @@ class PicturesController extends AbstractActionController
                 'change_status_user_id' => $user->id
             ]);
             $replacePicture->save();
+            if ($replacePicture->owner_id) {
+                $this->userPicture->refreshPicturesCount($replacePicture->owner_id);
+            }
         }
 
         // comments
@@ -1907,21 +1926,29 @@ class PicturesController extends AbstractActionController
             $pictureTable = new Picture();
 
             $success = $pictureTable->accept($picture->id, $user->id, $isFirstTimeAccepted);
-            if ($success && $isFirstTimeAccepted) {
+            if ($success) {
                 $owner = $picture->findParentRow(User::class, 'Owner');
-                if ($owner && ($owner->id != $user->id)) {
-                    $uri = $this->hostManager->getUriByLanguage($owner->language);
-
-                    $message = sprintf(
-                        $this->translate('pm/your-picture-accepted-%s', 'default', $owner->language),
-                        $this->pic()->url($picture->identity, true, $uri)
-                    );
-
-                    $this->message->send(null, $owner->id, $message);
+                
+                if ($owner) {
+                    $this->userPicture->refreshPicturesCount($owner['id']);
                 }
 
-                $this->telegram->notifyPicture($picture->id);
+                if ($isFirstTimeAccepted) {
+                    if ($owner && ($owner->id != $user->id)) {
+                        $uri = $this->hostManager->getUriByLanguage($owner->language);
+                
+                        $message = sprintf(
+                            $this->translate('pm/your-picture-accepted-%s', 'default', $owner->language),
+                            $this->pic()->url($picture->identity, true, $uri)
+                            );
+                
+                        $this->message->send(null, $owner->id, $message);
+                    }
+                
+                    $this->telegram->notifyPicture($picture->id);
+                }
             }
+            
 
             if ($previousStatusUserId != $user->id) {
                 $userTable = new User();

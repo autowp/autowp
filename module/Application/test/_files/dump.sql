@@ -2983,7 +2983,7 @@ ALTER TABLE `comment_topic_subscribe`
 ALTER TABLE `comment_topic_subscribe`
   ADD CONSTRAINT `comment_topic_subscribe_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
-
+ALTER TABLE `users` ADD `pictures_total` INT NOT NULL DEFAULT '0' AFTER `pictures_added`, ADD INDEX (`pictures_total`);
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

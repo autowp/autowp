@@ -399,8 +399,8 @@ class UsersController extends AbstractActionController
         $select = $userTable->select(true)
             ->where('not deleted')
             ->limit(30)
-            ->where('pictures_added > 0')
-            ->order('pictures_added desc');
+            ->where('pictures_total > 0')
+            ->order('pictures_total desc');
 
         $valueTitle = 'users/rating/pictures';
 
@@ -437,7 +437,7 @@ class UsersController extends AbstractActionController
 
             $users[] = [
                 'row'    => $user,
-                'volume' => $user->pictures_added,
+                'volume' => $user->pictures_total,
                 'brands' => $brands
             ];
         }

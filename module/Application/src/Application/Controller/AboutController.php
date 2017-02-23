@@ -62,7 +62,7 @@ class AboutController extends AbstractActionController
 
         $picturesUsers = $userTable->fetchAll([
             'not deleted',
-        ], 'pictures_added desc', 20);
+        ], 'pictures_total desc', 20);
 
         foreach ($picturesUsers as $greenUser) {
             $contributors[$greenUser->id] = $greenUser;

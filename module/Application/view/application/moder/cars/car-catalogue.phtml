@@ -202,7 +202,7 @@
                             <td></td>
                         <?php } ?>
                     </tr>
-                <?php } elseif ($this->car['item_type_id'] != Application\Model\DbTable\Item\Type::FACTORY) { ?>
+                <?php } elseif (! in_array($this->car['item_type_id'], [Application\Model\DbTable\Item\Type::FACTORY, Application\Model\DbTable\Item\Type::TWINS])) { ?>
                     <tr>
                         <td colspan="2">
                             <i class="fa fa-plus"></i>
