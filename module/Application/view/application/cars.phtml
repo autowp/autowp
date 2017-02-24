@@ -1,5 +1,11 @@
 <?php 
 $numberFormatter = NumberFormatter::create($this->language(), NumberFormatter::DECIMAL);
+if (isset($this->thumbColumns) && $this->thumbColumns) {
+    $thumbColumns = $this->thumbColumns;
+} else {
+    $thumbColumns = 4;
+}
+$singleThumbPart = round(12 / $thumbColumns);
 ?>
 <?php foreach ($this->items as $item) { ?>
     <div class="car item-list-item" data-module="car-list">
@@ -56,7 +62,7 @@ $numberFormatter = NumberFormatter::create($this->language(), NumberFormatter::D
             <?php if ($havePhoto) { ?>
                 <?php foreach ($item['pictures'] as $idx => $picture) { ?>
                     <?php
-                        $col = $item['largeFormat'] && $idx == 0  ? 6 : 3;
+                        $col = $item['largeFormat'] && $idx == 0  ? 2*$singleThumbPart : $singleThumbPart;
                         $colSm = $item['largeFormat'] && $idx == 0  ? 12 : 6;
                     ?>
                     <div class="col-md-<?=$col?> col-sm-<?=$colSm?>">
@@ -79,15 +85,15 @@ $numberFormatter = NumberFormatter::create($this->language(), NumberFormatter::D
                     </div>
                 <?php } ?>
             <?php } elseif ($canHavePhoto) { ?>
-                <div class="col-md-3 col-sm-3">
-                <div class="thumbnail no-photo" title="<?=$this->escapeHtmlAttr($this->translate('carlist/no-photo'))?>">
-                    <?=$this->htmlA([
-                        'title' => $this->translate('carlist/no-photo/add'),
-                        'href'  => $item['uploadUrl'],
-                        'class' => 'fa fa-plus-circle text-success'
-                    ], '') ?>
-                    <span class="fa fa-camera fa-lg fa-4x" aria-hidden="true"></span>
-                </div>
+                <div class="col-md-<?=$singleThumbPart?> col-sm-6">
+                    <div class="thumbnail no-photo" title="<?=$this->escapeHtmlAttr($this->translate('carlist/no-photo'))?>">
+                        <?=$this->htmlA([
+                            'title' => $this->translate('carlist/no-photo/add'),
+                            'href'  => $item['uploadUrl'],
+                            'class' => 'fa fa-plus-circle text-success'
+                        ], '') ?>
+                        <span class="fa fa-camera fa-lg fa-4x" aria-hidden="true"></span>
+                    </div>
                 </div>
             <?php } ?>
         </div>

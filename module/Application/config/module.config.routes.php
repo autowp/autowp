@@ -797,11 +797,38 @@ return [
             'new' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route' => '/new[/:date][/page:page]',
+                    'route' => '/new',
                     'defaults' => [
                         'controller' => Controller\NewController::class,
                         'action'     => 'index'
                     ]
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'date' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/:date',
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'page' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/page:page',
+                                ],
+                            ],
+                            'item' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route'    => '/item/:item_id[/page:page]',
+                                    'defaults' => [
+                                        'action' => 'item',
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ],
                 ]
             ],
             'picture' => [

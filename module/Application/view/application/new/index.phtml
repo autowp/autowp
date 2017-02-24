@@ -1,11 +1,11 @@
 <?php
-    $this->pageEnv([
-        'layout' => [
-            'blankPage' => false,
-            'needRight' => false
-        ],
-        'pageId' => 51,
-    ]);
+$this->pageEnv([
+    'layout' => [
+        'blankPage' => false,
+        'needRight' => false
+    ],
+    'pageId' => 51,
+]);
 ?>
 <div class="row">
     <div class="col-lg-4 col-md-4">
@@ -29,7 +29,14 @@
         <?php } ?></h3>
     </div>
 </div>
-<?=$this->partial('application/pictures', $this->picturesData)?>
+<?php foreach ($this->items as $item) { ?>
+    <?php if ($item['type'] == 'item') { ?>
+        <?=$this->partial('application/cars', $item['listData'])?>
+    <?php } else { ?>
+        <?=$this->partial('application/pictures', $item['picture'])?>
+    <?php } ?>
+<?php } ?>
 <?=$this->paginationControl($this->paginator, null, null, [
+    'route'     => $this->paginatorRoute,
     'urlParams' => $this->urlParams
 ]) ?>

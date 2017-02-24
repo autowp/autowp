@@ -162,7 +162,7 @@ class DayPictures
     }
 
     /**
-     * @return string
+     * @return DateTime
      */
     public function getCurrentDate()
     {

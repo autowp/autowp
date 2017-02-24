@@ -1,0 +1,19 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needRight' => false
+        ],
+        'pageId' => 210,
+        'args'   => [
+            'DATE'      => $this->humanDate($this->dateTime),
+            'DATE_STR'  => $this->dateStr,
+            'ITEM_NAME' => $this->carFullName
+        ]
+    ]);
+?>
+<?=$this->partial('application/pictures', $this->picturesData)?>
+<?=$this->paginationControl($this->paginator, null, null, [
+    'route'     => $this->paginatorRoute,
+    'urlParams' => $this->urlParams
+]) ?>

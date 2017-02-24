@@ -4,6 +4,8 @@ namespace Application\Model\Item;
 
 use Application\Model\DbTable;
 
+use Zend_Db_Expr;
+
 abstract class PictureFetcher
 {
     /**
@@ -58,10 +60,13 @@ abstract class PictureFetcher
             'perspectiveGroup'    => false,
             'type'                => null,
             'exclude'             => [],
+            'ids'                 => [],
             'excludeItems'        => null,
             'dateSort'            => false,
+            'acceptedSort'        => false,
             'onlyChilds'          => null,
-            'onlyExactlyPictures' => false
+            'onlyExactlyPictures' => false,
+            'limit'               => 1
         ];
         $options = array_merge($defaults, $options);
 
@@ -82,7 +87,7 @@ abstract class PictureFetcher
                 ['perspective_id', 'item_id']
             )
             ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
-            ->limit(1);
+            ->limit($options['limit']);
 
         $order = [];
 
@@ -123,6 +128,10 @@ abstract class PictureFetcher
 
                 $order[] = 'mp.position';
         }
+        
+        if ($options['ids']) {
+            $select->where('pictures.id in (?)', $options['ids']);
+        }
 
         if ($options['exclude']) {
             $select->where('pictures.id not in (?)', $options['exclude']);
@@ -136,6 +145,11 @@ abstract class PictureFetcher
             $select->join(['picture_car' => 'item'], 'item.id = picture_car.id', null);
             $order = array_merge($order, ['picture_car.begin_order_cache', 'picture_car.end_order_cache']);
         }
+        
+        if ($options['acceptedSort']) {
+            $order[] = 'pictures.accept_datetime DESC';
+        }
+        
         $order = array_merge($order, ['pictures.width DESC', 'pictures.height DESC']);
 
         $select->order($order);
@@ -155,5 +169,38 @@ abstract class PictureFetcher
         }
 
         return $select;
+    }
+    
+    public function getTotalPictures(array $itemIds, $onlyExactly)
+    {
+        $result = [];
+        foreach ($itemIds as $itemId) {
+            $result[$itemId] = null;
+        }
+        if (count($itemIds)) {
+            $pictureTable = $this->getPictureTable();
+            $pictureTableAdapter = $pictureTable->getAdapter();
+        
+            $select = $pictureTableAdapter->select()
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+        
+            if ($onlyExactly) {
+                $select
+                    ->from($pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->where('picture_item.item_id IN (?)', $itemIds)
+                    ->group('picture_item.item_id');
+            } else {
+                $select
+                    ->from($pictureTable->info('name'), ['item_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id IN (?)', $itemIds)
+                    ->group('item_parent_cache.parent_id');
+            }
+        
+            $result = array_replace($result, $pictureTableAdapter->fetchPairs($select));
+        }
+        return $result;
     }
 }

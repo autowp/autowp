@@ -86,39 +86,6 @@ class Car extends AbstractPlugin
         return $this;
     }
 
-    private function carsTotalPictures(array $carIds, $onlyExactly)
-    {
-        $result = [];
-        foreach ($carIds as $carId) {
-            $result[$carId] = null;
-        }
-        if (count($carIds)) {
-            $pictureTable = $this->getPictureTable();
-            $pictureTableAdapter = $pictureTable->getAdapter();
-
-            $select = $pictureTableAdapter->select()
-                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
-
-            if ($onlyExactly) {
-                $select
-                    ->from($pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->where('picture_item.item_id IN (?)', $carIds)
-                    ->group('picture_item.item_id');
-            } else {
-                $select
-                    ->from($pictureTable->info('name'), ['item_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id IN (?)', $carIds)
-                    ->group('item_parent_cache.parent_id');
-            }
-
-            $result = array_replace($result, $pictureTableAdapter->fetchPairs($select));
-        }
-        return $result;
-    }
-
     private function getCategoryPictureFetcher()
     {
         return $this->categoryPictureFetcher
@@ -144,6 +111,7 @@ class Car extends AbstractPlugin
         $disableSpecs         = isset($options['disableSpecs']) && $options['disableSpecs'];
         $disableCategories    = isset($options['disableCategories']) && $options['disableCategories'];
         $callback             = isset($options['callback']) && $options['callback'] ? $options['callback'] : null;
+        $thumbColumns         = isset($options['thumbColumns']) && $options['thumbColumns'] ? $options['thumbColumns'] : 4;
 
         $controller = $this->getController();
         $pluginManager = $controller->getPluginManager();
@@ -303,7 +271,7 @@ class Car extends AbstractPlugin
         }
 
         // total pictures
-        $carsTotalPictures = $this->carsTotalPictures($carIds, $onlyExactlyPictures);
+        $carsTotalPictures = $pictureFetcher->getTotalPictures($carIds, $onlyExactlyPictures);
         $items = [];
         foreach ($cars as $car) {
             $totalPictures = isset($carsTotalPictures[$car->id]) ? $carsTotalPictures[$car->id] : null;
@@ -542,6 +510,7 @@ class Car extends AbstractPlugin
             'disableDetailsLink' => $disableDetailsLink,
             'disableTitle'       => $disableTitle,
             'items'              => $items,
+            'thumbColumns'       => $thumbColumns
         ];
     }
 

@@ -2695,8 +2695,10 @@ class CarsController extends AbstractActionController
             'id = ?' => (int)$this->params('parent_id')
         ]);
         
-        if (! $this->brandVehicle->isAllowedCombination($itemTypeId, $parentCar['item_type_id'])) {
-            return $this->forbiddenAction();
+        if ($parentCar) {
+            if (! $this->brandVehicle->isAllowedCombination($itemTypeId, $parentCar['item_type_id'])) {
+                return $this->forbiddenAction();
+            }
         }
 
         $specTable = new DbTable\Spec();

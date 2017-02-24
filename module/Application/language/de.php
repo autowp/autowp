@@ -604,7 +604,9 @@ If you want to help to our everyday work, you can send us some money through Pay
 
 With a money donation you can send us your vision about the future of the encyclopedia and the way it must move and we\'ll be much more obligated and grateful to your words.
 
-We do not collect information about our donators, however if you wish, we can mark your contribution.',
+We do not collect information about our donators, however if you wish, we can mark your contribution.
+
+In addition we can offer in return to [choose the next vehicle of the day](/donate/vod)',
     'donate/target' => 'For website work',
     'donate/project' => 'WheelsAge.org',
     'donate/comment-hint' => 'Your wish',

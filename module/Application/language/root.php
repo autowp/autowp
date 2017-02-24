@@ -194,4 +194,12 @@ return [
 
     'page/131/title' => "",
     'page/131/breadcrumbs' => "",
+    
+    'page/209/name' => '%DATE%',
+    'page/209/title' => '%DATE%',
+    'page/209/breadcrumbs' => '%DATE%',
+    
+    'page/210/name' => '%ITEM_NAME%',
+    'page/210/title' => '%ITEM_NAME%',
+    'page/210/breadcrumbs' => '%ITEM_NAME%',
 ];

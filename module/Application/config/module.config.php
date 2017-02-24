@@ -33,7 +33,7 @@ return [
             Controller\MapController::class             => Controller\Frontend\Service\MapControllerFactory::class,
             Controller\MostsController::class           => Controller\Frontend\Service\MostsControllerFactory::class,
             Controller\MuseumsController::class         => Controller\Frontend\Service\MuseumsControllerFactory::class,
-            Controller\NewController::class             => InvokableFactory::class,
+            Controller\NewController::class             => Controller\Frontend\Service\NewControllerFactory::class,
             Controller\PerspectiveController::class     => InvokableFactory::class,
             Controller\PictureController::class         => InvokableFactory::class,
             Controller\PictureFileController::class     => InvokableFactory::class,
