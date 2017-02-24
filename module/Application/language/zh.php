@@ -113,31 +113,31 @@ return array_replace(include 'root.php', [
 
     'item/type/1/name' => '车辆',
     'item/type/1/name-plural' => '车辆',
-    'item/type/1/new-item' => 'New vehicle',
+    'item/type/1/new-item' => '新增车辆',
     'item/type/1/add-sub-item' => 'Add sub-vehicle',
     'item/type/2/name' => '发动机',
     'item/type/2/name-plural' => '发动机',
-    'item/type/2/new-item' => 'New engine',
+    'item/type/2/new-item' => '新增发动机',
     'item/type/2/add-sub-item' => 'Add sub-engine',
-    'item/type/3/name' => 'Category',
-    'item/type/3/name-plural' => 'Categories',
-    'item/type/3/new-item' => 'New category',
+    'item/type/3/name' => '分类',
+    'item/type/3/name-plural' => '分类',
+    'item/type/3/new-item' => '新增分类',
     'item/type/3/add-sub-item' => 'Add sub-category',
-    'item/type/4/name' => 'Twins',
-    'item/type/4/name-plural' => 'Twins',
-    'item/type/4/new-item' => 'New twnis group',
+    'item/type/4/name' => '姊妹车型',
+    'item/type/4/name-plural' => '姊妹车型',
+    'item/type/4/new-item' => '新增姊妹车型',
     'item/type/4/add-sub-item' => 'Add sub-twins',
-    'item/type/5/name' => 'Brand',
-    'item/type/5/name-plural' => 'Brands',
-    'item/type/5/new-item' => 'New brand',
+    'item/type/5/name' => '品牌',
+    'item/type/5/name-plural' => '品牌',
+    'item/type/5/new-item' => '新增品牌',
     'item/type/5/add-sub-item' => 'Add sub-brand',
-    'item/type/6/name' => 'Factory',
-    'item/type/6/name-plural' => 'Factories',
-    'item/type/6/new-item' => 'New factory',
+    'item/type/6/name' => '工厂',
+    'item/type/6/name-plural' => '工厂',
+    'item/type/6/new-item' => '新增工厂',
     'item/type/6/add-sub-item' => 'Add sub-factory',
-    'item/type/7/name' => 'Museum',
-    'item/type/7/name-plural' => 'Museums',
-    'item/type/7/new-item' => 'New museum',
+    'item/type/7/name' => '博物馆',
+    'item/type/7/name-plural' => '博物馆',
+    'item/type/7/new-item' => '新增博物馆',
     'item/type/7/add-sub-item' => 'Add sub-museum',
 
     /* BRAND PAGE*/
@@ -387,9 +387,9 @@ return array_replace(include 'root.php', [
     'perspective/boot'           => '后备箱',
     'perspective/logo'           => '商标',
     'perspective/mascot'         => '立标',
-    'perspective/sketch'         => 'sketch',
+    'perspective/sketch'         => '草图',
     'perspective/mixed'          => 'mixed',
-    'perspective/exterior-details' => 'exterior details',
+    'perspective/exterior-details' => '外观细节',
 
     'login/sign-in' => '登录',
     'login/sign-out' => '注销',
@@ -553,8 +553,8 @@ return array_replace(include 'root.php', [
 
     'users/rating/specifications' => '性能参数',
     'users/rating/pictures' => '图片',
-    'users/rating/likes' => 'Likes',
-    'users/rating/picture-likes' => 'Picture likes',
+    'users/rating/likes' => '赞',
+    'users/rating/picture-likes' => '收到赞',
     'users/rating/specs-volume' => '数量',
     'users/rating/weight' => '权重',
 
@@ -592,18 +592,16 @@ return array_replace(include 'root.php', [
 
 原则上我们进行不记名捐助，但如果您要求，我们会标记您的贡献。
 
-In addition we can offer in return to [choose the next vehicle of the day](/donate/vod)',
+我们还可以让您[钦定今日之车](/donate/vod)做为回报',
     'donate/target' => '为了维持网站运营',
     'donate/project' => 'WheelsAge.org',
     'donate/comment-hint' => '您的建议',
     'donate/success-text' => '感谢您的支持。 
 我们尽己所能让您满意。',
     
-    'donate/vod/text' => '我们可以做出一点微小的工作作为回报-您有机会钦定下一个“今日之车”
- 
-无论您做出任意数额的 [无条件捐助](/donate) 我们都会很高兴。',
+    'donate/vod/text' => '我们可以做出一点微小的工作作为回报-您有机会钦定下一个“今日之车”，无论您做出任意数额的[无条件捐助](/donate) 我们都会很高兴。',
     'donate/vod/select-date' => '1. 选择日期',
-    'donate/vod/date-busy' => '日期已被占用',
+    'donate/vod/date-busy' => '日期已有安排',
     'donate/vod/select-item' => '2. 选择车型',
     'donate/vod/select-item-text' => '几乎所有车型都可以被选作 "今日之车"，但还是有一些限制:
 
@@ -615,12 +613,12 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'donate/vod/anonymous' => '匿名捐助',
     'donate/vod/with-name' => '记名捐助 (需要注册)',
     'donate/vod/make-donation' => '4. 做出捐助',
-    'donate/vod/order-message' => 'WheelsAge.org: 今日制车',
-    'donate/vod/order-target' => 'Order %s',
+    'donate/vod/order-message' => 'WheelsAge.org: 今日之车',
+    'donate/vod/order-target' => '订单%s',
     'donate/vod/message' => '您的期许',
     'donate/vod/price:' => '金额:',
     'donate/vod/price/currency' => ' 卢布',
-    'donate/vod/price-aroud' => '约 $%s',
+    'donate/vod/price-aroud' => '约合$%s',
     'donate/vod/method/credit-card' => '信用卡',
     'donate/vod/method/mobile' => '手机运营商账户',
     'donate/vod/method/yandex.money' => 'Yandex.Money',
@@ -630,7 +628,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 感谢您的支持。 
 
 我们尽己所能让您满意。',
-    'donate/vod/wants-to-select?' => '钦定更多今日之车?',
+    'donate/vod/wants-to-select?' => '想要钦定今日之车?',
 
     'message/user-cancel-car-engine' => '%1$s为%2$s车型取消%3$s( %4$s )发动机',
 
