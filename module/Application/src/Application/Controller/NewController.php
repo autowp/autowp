@@ -78,7 +78,7 @@ class NewController extends AbstractActionController
         $items = [];
         foreach ($paginator->getCurrentItems() as $pictureRow) {
             $itemIds = $pictureItem->getPictureItems($pictureRow['id']);
-            if (count($itemIds) > 1) {
+            if (count($itemIds) != 1) {
                 $items[] = [
                     'type'    => 'picture',
                     'picture' => $pictureRow
@@ -87,8 +87,8 @@ class NewController extends AbstractActionController
                 $itemId = $itemIds[0];
 
                 $found = false;
-                foreach ($items as $idx => &$item) {
-                    if ($item['item_id'] == $itemId) {
+                foreach ($items as &$item) {
+                    if ($item['type'] == 'item' && $item['item_id'] == $itemId) {
                         $item['pictures'][] = $pictureRow;
                         $found = true;
                         break;
@@ -170,6 +170,8 @@ class NewController extends AbstractActionController
 
                 $item['listData'] = $this->car()->listData([$itemRow], [
                     'thumbColumns'   => 6,
+                    'disableDetailsLink' => true,
+                    'disableSpecs'       => true,
                     'pictureFetcher' => new \Application\Model\Item\NewPictureFetcher([
                         'pictureIds' => $ids
                     ]),

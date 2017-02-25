@@ -10,6 +10,10 @@ var Carousel = function (element, options) {
     this.$items      = null;
     this.onSlide     = options.slide;
 
+    this.$element.carousel({
+        interval: false,
+        wrap: false
+    });
     this.$element.on('keydown.bs.carousel', $.proxy(this.keydown, this));
 };
 

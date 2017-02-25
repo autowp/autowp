@@ -844,6 +844,10 @@ class PicturesController extends AbstractActionController
                         $picture->status = Picture::STATUS_INBOX;
                         $picture->save();
                     }
+                    
+                    if ((! $vote) && $picture->status == Picture::STATUS_ACCEPTED) {
+                        $this->unaccept($picture);
+                    }
 
                     $message = sprintf(
                         $vote
@@ -1092,36 +1096,8 @@ class PicturesController extends AbstractActionController
 
         if ($canUnaccept) {
             if ($request->isPost() && $this->params('form') == 'picture-unaccept') {
-                $previousStatusUserId = $picture->change_status_user_id;
-
-                $user = $this->user()->get();
-                $picture->setFromArray([
-                    'status'                => Picture::STATUS_INBOX,
-                    'change_status_user_id' => $user->id
-                ]);
-                $picture->save();
                 
-                if ($picture->owner_id) {
-                    $this->userPicture->refreshPicturesCount($picture->owner_id);
-                }
-
-                $this->log(sprintf(
-                    'С картинки %s снят статус "принято"',
-                    htmlspecialchars($this->pic()->name($picture, $this->language()))
-                ), $picture);
-
-
-                $pictureUrl = $this->pic()->url($picture->identity, true);
-                if ($previousStatusUserId != $user->id) {
-                    $userTable = new User();
-                    foreach ($userTable->find($previousStatusUserId) as $prevUser) {
-                        $message = sprintf(
-                            'С картинки %s снят статус "принято"',
-                            $pictureUrl
-                        );
-                        $this->message->send(null, $prevUser->id, $message);
-                    }
-                }
+                $this->unaccept($picture);
 
                 $referer = $this->getRequest()->getServer('HTTP_REFERER');
                 return $this->redirect()->toUrl($referer ? $referer : $this->url()->fromRoute(null, [], [], true));
@@ -1913,6 +1889,40 @@ class PicturesController extends AbstractActionController
     {
         return $picture->canAccept() && $this->user()->isAllowed('picture', 'accept');
     }
+    
+    private function unaccept(DbTable\Picture\Row $picture)
+    {
+        $previousStatusUserId = $picture->change_status_user_id;
+        
+        $user = $this->user()->get();
+        $picture->setFromArray([
+            'status'                => Picture::STATUS_INBOX,
+            'change_status_user_id' => $user->id
+        ]);
+        $picture->save();
+        
+        if ($picture->owner_id) {
+            $this->userPicture->refreshPicturesCount($picture->owner_id);
+        }
+        
+        $this->log(sprintf(
+            'С картинки %s снят статус "принято"',
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
+        ), $picture);
+        
+        
+        $pictureUrl = $this->pic()->url($picture->identity, true);
+        if ($previousStatusUserId != $user->id) {
+            $userTable = new User();
+            foreach ($userTable->find($previousStatusUserId) as $prevUser) {
+                $message = sprintf(
+                    'С картинки %s снят статус "принято"',
+                    $pictureUrl
+                );
+                $this->message->send(null, $prevUser->id, $message);
+            }
+        }
+    }
 
     private function accept(DbTable\Picture\Row $picture)
     {
@@ -1940,7 +1950,7 @@ class PicturesController extends AbstractActionController
                         $message = sprintf(
                             $this->translate('pm/your-picture-accepted-%s', 'default', $owner->language),
                             $this->pic()->url($picture->identity, true, $uri)
-                            );
+                        );
                 
                         $this->message->send(null, $owner->id, $message);
                     }
@@ -2026,6 +2036,10 @@ class PicturesController extends AbstractActionController
                 if ($vote && $picture->status == Picture::STATUS_REMOVING) {
                     $picture->status = Picture::STATUS_INBOX;
                     $picture->save();
+                }
+                
+                if ((! $vote) && $picture->status == Picture::STATUS_ACCEPTED) {
+                    $this->unaccept($picture);
                 }
 
                 $message = sprintf(

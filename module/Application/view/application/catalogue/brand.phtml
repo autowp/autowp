@@ -92,6 +92,18 @@
                 )?>
             </li>
         <?php } ?>
+        <?php if ($this->user()->inheritsRole('moder')) { ?>
+            <li>
+                <?=$this->htmlA(
+                    $this->url('moder/cars/params', [
+                        'action'              => 'car',
+                        'item_id'             => $this->brand['id']
+                    ]), 
+                    '<i class="fa fa-cog"></i> ' . $this->translate('moder/edit-object'),
+                    false
+                ) ?>
+            </li>
+        <?php } ?>
     </ul>
 </header>
 
