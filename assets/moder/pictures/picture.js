@@ -82,6 +82,10 @@ define(
                     
                     areaDialog.show();
                 });
+                
+                $('.perspective-selector').on('change', function() {
+                    $.post($(this).data('url'), {perspective_id: $(this).val()});
+                });
             }
         };
     }

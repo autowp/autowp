@@ -1064,6 +1064,10 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/208/name'        => '%BRAND_NAME% Engines',
     'page/208/title'       => '%BRAND_NAME% Engines',
     'page/208/breadcrumbs' => '%BRAND_NAME% Engines',
+    
+    'page/211/name'        => 'Contacts',
+    'page/211/title'       => 'Contacts',
+    'page/211/breadcrumbs' => 'Contacts',
 
     'moder-menu/title' => 'Menu modérateur',
     'moder-menu/inbox' => 'Inbox',

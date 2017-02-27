@@ -9,6 +9,7 @@ module.exports = {
         this.cropMsg = options.cropMsg;
         this.croppedToMsg = options.croppedToMsg;
         this.cropSaveUrl = options.cropSaveUrl;
+        this.perspectives = options.perspectives;
         
         var $progress = $('.progress-area');
         this.$pictures = $('.pictures');
@@ -212,5 +213,23 @@ module.exports = {
             });
         
         $picture.append($cropBtn);
+        
+        if (picture.perspectiveUrl) {
+            var $perspective = $('<select class="form-control input-sm"><option value="">--</option></select>');
+            $.map(this.perspectives, function(name, value) {
+                $perspective.append(
+                    $("<option></option>")
+                        .attr("value", value).text(name)
+                );
+            });
+            
+            $perspective.on('change', function(e) {
+                $.post(picture.perspectiveUrl, {perspective_id: $(this).val()})
+            });
+            
+            $picture.append($perspective);
+            
+            $perspective.val(picture.perspectiveId ? picture.perspectiveId : '');
+        }
     }
 };

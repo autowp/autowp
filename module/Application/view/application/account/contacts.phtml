@@ -9,6 +9,8 @@
 
     $cols = 2;
     $rows = ceil(count($this->users) / $cols);
+    
+    $this->layout()->moduleName = 'default/account/contacts';
 ?>
 
 <div class="row">
@@ -30,6 +32,9 @@
                                     <?php } ?>
                                 </div>
                                 <div class="media-body">
+                                    <a href="#" class="close" data-url="<?=$this->escapeHtmlAttr($this->url('api/contacts', [
+                                        'id' => $user->id
+                                    ]))?>">&times;</a>
                                     <h4 class="media-heading"><?=$this->user($user)?></h4>
                                     <?php if ($lastOnline = $user->getDateTime('last_online')) { ?>
                                         <p><?=$this->escapeHtml($this->humanTime($lastOnline))?></p>

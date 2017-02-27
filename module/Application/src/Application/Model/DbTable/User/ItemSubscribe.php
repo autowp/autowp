@@ -61,4 +61,11 @@ class ItemSubscribe extends Table
                 ->where('user_item_subscribe.item_id = ?', $car->id)
         );
     }
+    
+    public function unsubscribeAll($userId)
+    {
+        $this->delete([
+            'user_id = ?' => $userId
+        ]);
+    }
 }

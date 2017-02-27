@@ -657,10 +657,9 @@ class Pic extends AbstractPlugin
             if ($isModer) {
                 $perspective = [
                     'options' => $multioptions,
-                    'url'     => $this->getController()->url()->fromRoute('moder/pictures/params', [
-                        'action'     => 'picture-perspective',
-                        'picture_id' => $picture->id,
-                        'item_id'    => $item->id
+                    'url'     => $controller->url()->fromRoute('api/picture-item', [
+                        'picture_id' => $picture['id'],
+                        'item_id'    => $item['id']
                     ]),
                     'value'   => $this->pictureItem->getPerspective($picture->id, $item->id),
                     'name'    => $item->getNameData($language)

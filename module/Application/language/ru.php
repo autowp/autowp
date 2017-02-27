@@ -1075,6 +1075,10 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'page/208/name'        => 'Двигатели %BRAND_NAME%',
     'page/208/title'       => 'Двигатели %BRAND_NAME%',
     'page/208/breadcrumbs' => 'Двигатели %BRAND_NAME%',
+    
+    'page/211/name'        => 'Контакты',
+    'page/211/title'       => 'Контакты',
+    'page/211/breadcrumbs' => 'Контакты',
 
     'moder-menu/title' => 'Меню модератора',
     'moder-menu/inbox' => 'Инбокс',

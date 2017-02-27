@@ -50,6 +50,7 @@ return [
             Controller\Api\CommentsController::class    => Controller\Api\Service\CommentsControllerFactory::class,
             Controller\Api\ContactsController::class    => InvokableFactory::class,
             Controller\Api\PictureController::class     => Controller\Api\Service\PictureControllerFactory::class,
+            Controller\Api\PictureItemController::class => Controller\Api\Service\PictureItemControllerFactory::class,
             Controller\Api\PictureVoteController::class => Controller\Api\Service\PictureVoteControllerFactory::class,
             Controller\Api\UsersController::class       => InvokableFactory::class,
         ],

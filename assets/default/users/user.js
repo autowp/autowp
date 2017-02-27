@@ -7,8 +7,6 @@ define(
                     var $btn = $(this);
                     var value = $btn.hasClass('in-contacts');
                     
-                    console.log(value ? 'DELETE' : 'PUT');
-                    
                     $.ajax({
                         url: options.contactApiUrl,
                         method: value ? 'DELETE' : 'PUT',

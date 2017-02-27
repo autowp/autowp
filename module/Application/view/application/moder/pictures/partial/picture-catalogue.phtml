@@ -24,16 +24,15 @@
                         ]), $this->car()->htmlTitle($item['row']->getNameData($this->language())), false) ?>
                     </td>
                     <td>
-                        <form method="post" action="<?=$this->escapeHtmlAttr($item['perspective']['url'])?>" class="tiny" data-module="perspective-selector">
-                            <?=$this->formElement(
-                                (new Zend\Form\Element\Select('perspective_id'))
-                                    ->setAttributes([
-                                        'class' => 'form-control input-sm'
-                                    ])
-                                    ->setValueOptions($item['perspective']['options'])
-                                    ->setValue($item['perspective']['value'])
-                            )?>
-                        </form>
+                        <?=$this->formElement(
+                            (new Zend\Form\Element\Select('perspective_id'))
+                                ->setAttributes([
+                                    'class'    => 'form-control input-sm perspective-selector',
+                                    'data-url' => $item['perspective']['url']
+                                ])
+                                ->setValueOptions($item['perspective']['options'])
+                                ->setValue($item['perspective']['value'])
+                        )?>
                     </td>
                     <?php if ($this->canCrop) { ?>
                         <td>

@@ -136,11 +136,19 @@ class UploadController extends AbstractActionController
                 'action' => 'send'
             ], [], true));
         }
-
+        
+        $perspectiveTable = new DbTable\Perspective();
+        
+        $perspectives = [];
+        foreach ($perspectiveTable->fetchAll(null, 'position') as $row) {
+            $perspectives[$row['id']] = $this->translate($row['name']);
+        }
+        
         return [
             'form'         => $form,
             'selected'     => $selected,
             'selectedName' => $selectedName,
+            'perspectives' => $perspectives
         ];
     }
 
@@ -149,8 +157,6 @@ class UploadController extends AbstractActionController
         $user = $this->user()->get();
 
         $values = $form->getData();
-
-        $perspectiveId = null;
 
         $pictureTable = $this->catalogue()->getPictureTable();
 
@@ -219,8 +225,8 @@ class UploadController extends AbstractActionController
 
             if ($itemIds) {
                 $this->pictureItem->setPictureItems($picture->id, $itemIds);
-                if ($perspectiveId) {
-                    $this->pictureItem->setProperties($picture->id, $brandId, [
+                if ($perspectiveId && count($itemIds) == 1) {
+                    $this->pictureItem->setProperties($picture->id, $itemIds[0], [
                         'perspective' => $perspectiveId
                     ]);
                 }
@@ -683,6 +689,9 @@ class UploadController extends AbstractActionController
 
         if ($replacePicture) {
             $itemIds = $this->pictureItem->getPictureItems($replacePicture->id);
+            if (count($itemIds) == 1) {
+                $perspectiveId = $this->pictureItem->getPerspective($replacePicture->id, $itemIds[0]);
+            }
         } else {
             $itemId = (int)$this->params('item_id');
             $itemIds = $itemId ? [$itemId] : [];
@@ -729,13 +738,26 @@ class UploadController extends AbstractActionController
                         'isModer'          => false
                     ]
                 ));
+                
+                $cPerspectiveId = null;
+                $perspectiveUrl = null;
+                if (count($itemIds) == 1) {
+                    $itemId = $itemIds[0];
+                    $cPerspectiveId = $this->pictureItem->getPerspective($picture['id'], $itemId);
+                    $perspectiveUrl = $this->url()->fromRoute('api/picture-item', [
+                        'picture_id' => $picture['id'],
+                        'item_id'    => $itemId
+                    ]);
+                }
 
                 $result[] = [
-                    'id'     => $picture->id,
+                    'id'     => $picture['id'],
                     'html'   => $html,
                     'width'  => $picture->width,
                     'height' => $picture->height,
-                    'src'    => $image->getSrc()
+                    'src'    => $image->getSrc(),
+                    'perspectiveUrl' => $perspectiveUrl,
+                    'perspectiveId'  => $cPerspectiveId
                 ];
             }
         }

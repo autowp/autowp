@@ -16,10 +16,8 @@ use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Rename as UserRename;
 
 use Application\Controller\LoginController;
-use Application\Model\DbTable\LoginState;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User\Account as UserAccount;
-use Application\Model\DbTable\Item;
+use Application\Model\Contact;
+use Application\Model\DbTable;
 use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
@@ -134,7 +132,7 @@ class AccountController extends AbstractActionController
             $db->select()
                  ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
                  ->where('owner_id = ?', $user->id)
-                 ->where('status = ?', Picture::STATUS_ACCEPTED)
+                 ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
         );
 
         $subscribesCount = $db->fetchOne(
@@ -149,7 +147,7 @@ class AccountController extends AbstractActionController
             $pictures->select()
                 ->from($pictures, new Zend_Db_Expr('COUNT(1)'))
                 ->where('owner_id = ?', $user->id)
-                ->where('status = ?', Picture::STATUS_INBOX)
+                ->where('status = ?', DbTable\Picture::STATUS_INBOX)
         );
 
         return [
@@ -238,7 +236,7 @@ class AccountController extends AbstractActionController
             return $this->forwardToLogin();
         }
 
-        $uaTable = new UserAccount();
+        $uaTable = new DbTable\User\Account();
 
         $uaRows = $uaTable->fetchAll([
             'user_id = ?' => $user->id
@@ -267,7 +265,7 @@ class AccountController extends AbstractActionController
 
             //print $loginUrl; exit;
 
-            $table = new LoginState();
+            $table = new DbTable\LoginState();
             $row = $table->createRow([
                 'state'    => $service->getState(),
                 'time'     => new Zend_Db_Expr('now()'),
@@ -306,7 +304,7 @@ class AccountController extends AbstractActionController
             return true;
         }
 
-        $uaTable = new UserAccount();
+        $uaTable = new DbTable\User\Account();
         $uaRow = $uaTable->fetchRow([
             'user_id = ?'     => $this->user()->get()->id,
             'service_id <> ?' => $serviceId
@@ -328,7 +326,7 @@ class AccountController extends AbstractActionController
 
         $serviceId = (string)$this->params('service');
 
-        $uaTable = new UserAccount();
+        $uaTable = new DbTable\User\Account();
         $uaRow = $uaTable->fetchRow([
             'user_id = ?'    => $user->id,
             'service_id = ?' => $serviceId
@@ -666,7 +664,7 @@ class AccountController extends AbstractActionController
 
         $select = $pictures->select(true)
             ->where('owner_id = ?', $this->user()->get()->id)
-            ->where('status = ?', Picture::STATUS_INBOX)
+            ->where('status = ?', DbTable\Picture::STATUS_INBOX)
             ->order(['add_date DESC']);
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -776,6 +774,26 @@ class AccountController extends AbstractActionController
                 } else {
                     $user->deleted = true;
                     $user->save();
+                    
+                    // delete from contacts
+                    $contactModel = new Contact();
+                    $contactModel->deleteUserEverywhere($user['id']);
+                    
+                    // unsubscribe from telegram
+                    $telegramChatTable = new DbTable\Telegram\Chat();
+                    $telegramChatTable->delete([
+                        'user_id = ?' => $user['id']
+                    ]);
+                    
+                    // delete linked profiles
+                    $uaTable = new DbTable\User\Account();
+                    $uaTable->delete([
+                        'user_id = ?' => $user['id']
+                    ]);
+                    
+                    // unsubscribe from items
+                    $ucsTable = new DbTable\User\ItemSubscribe();
+                    $ucsTable->unsubscribeAll($user['id']);
 
                     $auth = new AuthenticationService();
                     $auth->clearIdentity();
@@ -814,7 +832,7 @@ class AccountController extends AbstractActionController
         $paginator = $data['paginator'];
 
         $userTable = new User();
-        $itemTable = new Item();
+        $itemTable = new DbTable\Item();
 
         foreach ($conflicts as &$conflict) {
             foreach ($conflict['values'] as &$value) {

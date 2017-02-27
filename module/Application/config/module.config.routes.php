@@ -1337,6 +1337,16 @@ return [
                             ],
                         ],
                     ],
+                    'picture-item' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/picture-item/:picture_id/:item_id',
+                            'defaults' => [
+                                'controller' => Controller\Api\PictureItemController::class,
+                                'action'     => 'item'
+                            ],
+                        ],
+                    ],
                     'users' => [
                         'type' => Literal::class,
                         'options' => [

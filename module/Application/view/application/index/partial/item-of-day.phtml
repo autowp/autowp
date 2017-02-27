@@ -66,18 +66,18 @@
                 </div>
             </div>
         </div>
-        <?=$this->htmlA([
-            'class' => 'pull-right',
-            'href'  => $this->url('donate/vod')
-        ], $this->translate('donate/vod/wants-to-select?'))?>
-        <?php if ($this->itemOfDay['links']) { ?>
-            <p>
-                <?php foreach ($this->itemOfDay['links'] as $i => $item) { ?>
-                    <?php if ($i) { ?> &#xa0; <?php } ?>
-                    <span class="fa fa-<?=$item['icon']?>"></span>
-                    <?=$this->htmlA($item['url'], $item['text'] . (isset($item['count']) ? ' ('.$item['count'].')' : ''))?>
-                <?php } ?>
-            </p>
-        <?php } ?>
+        <p>
+            <?php foreach ($this->itemOfDay['links'] as $i => $item) { ?>
+                <?php if ($i) { ?> &#xa0; <?php } ?>
+                <span class="fa fa-<?=$item['icon']?>"></span>
+                <?=$this->htmlA($item['url'], $item['text'] . (isset($item['count']) ? ' ('.$item['count'].')' : ''))?>
+            <?php } ?>
+            
+            <?php if ($this->itemOfDay['links']) { ?> &#xa0; <?php } ?>
+            <span class="fa fa-trophy"></span>
+            <?=$this->htmlA([
+                'href'  => $this->url('donate/vod')
+            ], $this->translate('donate/vod/wants-to-select?'))?>
+        </p>
     <?php } ?>
 <?php } ?>

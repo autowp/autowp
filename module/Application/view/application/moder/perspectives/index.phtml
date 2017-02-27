@@ -22,7 +22,7 @@
                             <?php foreach ($group['perspectives'] as $perspective) { ?>
                                 <li>
                                     [<?=$this->escapeHtml($perspective['id'])?>]
-                                    <?=$this->escapeHtml($perspective['name'])?>
+                                    <?=$this->escapeHtml($this->translate($perspective['name']))?>
                                 </li>
                             <?php } ?>
                         </ul>

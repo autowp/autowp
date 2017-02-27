@@ -1038,6 +1038,10 @@ return array_replace(include 'root.php', [
     'page/208/name'        => '%BRAND_NAME% Engines',
     'page/208/title'       => '%BRAND_NAME% Engines',
     'page/208/breadcrumbs' => '%BRAND_NAME% Engines',
+    
+    'page/211/name'        => '好友',
+    'page/211/title'       => '好友',
+    'page/211/breadcrumbs' => '好友',
 
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',

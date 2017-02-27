@@ -514,8 +514,7 @@ class PicturesController extends AbstractActionController
 
                     $pictureItem['perspective'] = [
                         'options' => $multioptions,
-                        'url'     => $this->url()->fromRoute('moder/pictures/params', [
-                            'action'     => 'picture-perspective',
+                        'url'     => $this->url()->fromRoute('api/picture-item', [
                             'picture_id' => $pictureItem['id'],
                             'item_id'    => $itemId
                         ]),
@@ -694,37 +693,6 @@ class PicturesController extends AbstractActionController
         ], [
             'force_canonical' => $full,
             'uri'             => $uri
-        ]);
-    }
-
-    public function picturePerspectiveAction()
-    {
-        $picture = $this->table->find($this->params('picture_id'))->current();
-        if (! $picture) {
-            return $this->notFoundAction();
-        }
-
-        $perspectives = new Perspective();
-
-        $request = $this->getRequest();
-
-        if ($request->isPost()) {
-            $user = $this->user()->get();
-            $itemId = (int)$this->params('item_id');
-            $perspectiveId = (int)$this->params()->fromPost('perspective_id');
-
-            $this->pictureItem->setProperties($picture->id, $itemId, [
-                'perspective' => $perspectiveId ? $perspectiveId : null
-            ]);
-
-            $this->log(sprintf(
-                'Установка ракурса картинки %s',
-                htmlspecialchars($this->pic()->name($picture, $this->language()))
-            ), [$picture]);
-        }
-
-        return new JsonModel([
-            'ok' => true
         ]);
     }
 
@@ -1224,9 +1192,8 @@ class PicturesController extends AbstractActionController
                 'row'         => $item,
                 'perspective' => [
                     'options' => $multioptions,
-                    'url'     => $this->url()->fromRoute('moder/pictures/params', [
-                        'action'     => 'picture-perspective',
-                        'picture_id' => $picture->id,
+                    'url'     => $this->url()->fromRoute('api/picture-item', [
+                        'picture_id' => $picture['id'],
                         'item_id'    => $item['id']
                     ]),
                     'value'   => $this->pictureItem->getPerspective($picture->id, $item['id'])

@@ -44,6 +44,7 @@ class ContactsController extends AbstractRestfulController
         $contact->create($currentUser->id, $user->id);
 
         $this->getResponse()->setStatusCode(200);
+        
         return new JsonModel([
             'status' => true
         ]);
@@ -70,8 +71,7 @@ class ContactsController extends AbstractRestfulController
 
         $userTable = new User();
         $user = $userTable->fetchRow([
-            'id = ?' => (int)$id,
-            'not deleted'
+            'id = ?' => (int)$id
         ]);
 
         if (! $user) {
@@ -81,5 +81,9 @@ class ContactsController extends AbstractRestfulController
         $contact->delete($currentUser->id, $user->id);
 
         $this->getResponse()->setStatusCode(204);
+        
+        return new JsonModel([
+            'status' => true
+        ]);
     }
 }

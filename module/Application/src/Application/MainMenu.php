@@ -51,7 +51,8 @@ class MainMenu
         48  => 'fa fa-fw fa-user',
         90  => 'fa fa-fw fa-sign-out',
         124 => 'fa fa-fw fa fa-users',
-        91  => 'fa fa-fw fa fa-pencil'
+        91  => 'fa fa-fw fa fa-pencil',
+        211 => 'fa fa-fw fa-address-book'
     ];
 
     /**
@@ -164,7 +165,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '13_' . $language;
+        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '14_' . $language;
 
         $secondMenu = $this->cache->getItem($key, $success);
         if (! $success) {

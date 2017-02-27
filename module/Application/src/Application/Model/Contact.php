@@ -56,4 +56,15 @@ class Contact
         ]);
         return (bool)$row;
     }
+    
+    public function deleteUserEverywhere($userId)
+    {
+        $this->table->delete([
+            'user_id = ?' => (int)$userId
+        ]);
+        
+        $this->table->delete([
+            'contact_user_id = ?' => (int)$userId
+        ]);
+    }
 }
