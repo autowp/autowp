@@ -404,11 +404,16 @@ class CarsController extends AbstractActionController
      */
     private function carModerUrl(DbTable\Item\Row $car, $full = false, $tab = null, $uri = null)
     {
-        return $this->url()->fromRoute('moder/cars/params', [
+        $params = [
             'action'  => 'car',
             'item_id' => $car->id,
-            'tab'     => $tab
-        ], [
+        ];
+        
+        if ($tab) {
+            $params['tab'] = $tab;
+        }
+        
+        return $this->url()->fromRoute('moder/cars/params', $params, [
             'force_canonical' => $full,
             'uri'             => $uri
         ]);
@@ -1244,6 +1249,40 @@ class CarsController extends AbstractActionController
             htmlspecialchars($this->car()->formatName($car, 'en'))
         );
         $this->log($message, [$car, $parentCar]);
+        
+        
+        $ucsTable = new DbTable\User\ItemSubscribe();
+        $user = $this->user()->get();
+        
+        $subscribers = [];
+        foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
+            $subscribers[$subscriber->id] = $subscriber;
+        }
+        
+        foreach ($ucsTable->getItemSubscribers($parentCar) as $subscriber) {
+            $subscribers[$subscriber->id] = $subscriber;
+        }
+        
+        foreach ($subscribers as $subscriber) {
+            if ($subscriber->id != $user->id) {
+                $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+        
+                $message = sprintf(
+                    $this->translate(
+                        'pm/user-%s-removed-item-%s-%s-from-item-%s-%s',
+                        'default',
+                        $subscriber->language
+                    ),
+                    $this->userModerUrl($user, true, $uri),
+                    $this->car()->formatName($car, $subscriber->language),
+                    $this->carModerUrl($car, true, null, $uri),
+                    $this->car()->formatName($parentCar, $subscriber->language),
+                    $this->carModerUrl($parentCar, true, null, $uri)
+                );
+        
+                $this->message->send(null, $subscriber->id, $message);
+            }
+        }
 
         return $this->redirect()->toUrl($this->getRequest()->getServer('HTTP_REFERER'));
     }
@@ -1291,6 +1330,40 @@ class CarsController extends AbstractActionController
             htmlspecialchars($this->car()->formatName($car, 'en'))
         );
         $this->log($message, [$car, $parentCar]);
+        
+        $ucsTable = new DbTable\User\ItemSubscribe();
+        $user = $this->user()->get();
+        
+        $subscribers = [];
+        foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
+            $subscribers[$subscriber->id] = $subscriber;
+        }
+        
+        foreach ($ucsTable->getItemSubscribers($parentCar) as $subscriber) {
+            $subscribers[$subscriber->id] = $subscriber;
+        }
+        
+        foreach ($subscribers as $subscriber) {
+            if ($subscriber->id != $user->id) {
+                $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+        
+                $message = sprintf(
+                    $this->translate(
+                        'pm/user-%s-adds-item-%s-%s-to-item-%s-%s',
+                        'default',
+                        $subscriber->language
+                    ),
+                    $this->userModerUrl($user, true, $uri),
+                    $this->car()->formatName($car, $subscriber->language),
+                    $this->carModerUrl($car, true, null, $uri),
+                    $this->car()->formatName($parentCar, $subscriber->language),
+                    $this->carModerUrl($parentCar, true, null, $uri)
+                );
+        
+                $this->message->send(null, $subscriber->id, $message);
+            }
+        }
+        
 
         $url = $this->url()->fromRoute('moder/cars/params', [
             'action' => 'car',

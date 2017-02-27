@@ -645,31 +645,33 @@ class PicturesController extends AbstractActionController
         $picture->save();
 
         if ($owner = $picture->findParentRow(User::class, 'Owner')) {
-            $uri = $this->hostManager->getUriByLanguage($owner->language);
-
-            $requests = new DbTable\Picture\ModerVote();
-            $deleteRequests = $requests->fetchAll(
-                $requests->select()
-                    ->where('picture_id = ?', $picture->id)
-                    ->where('vote = 0')
-            );
-
-            $reasons = [];
-            if (count($deleteRequests)) {
-                foreach ($deleteRequests as $request) {
-                    if ($user = $request->findParentRow(User::class)) {
-                        $reasons[] = $this->userModerUrl($user, true, $uri) . ' : ' . $request->reason;
+            if ($owner->id != $user->id) {
+                $uri = $this->hostManager->getUriByLanguage($owner->language);
+    
+                $requests = new DbTable\Picture\ModerVote();
+                $deleteRequests = $requests->fetchAll(
+                    $requests->select()
+                        ->where('picture_id = ?', $picture->id)
+                        ->where('vote = 0')
+                );
+    
+                $reasons = [];
+                if (count($deleteRequests)) {
+                    foreach ($deleteRequests as $request) {
+                        if ($user = $request->findParentRow(User::class)) {
+                            $reasons[] = $this->userModerUrl($user, true, $uri) . ' : ' . $request->reason;
+                        }
                     }
                 }
+    
+                $message = sprintf(
+                    $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner->language),
+                    $this->pic()->url($picture->identity, true, $uri),
+                    implode("\n", $reasons)
+                );
+    
+                $this->message->send(null, $owner->id, $message);
             }
-
-            $message = sprintf(
-                $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner->language),
-                $this->pic()->url($picture->identity, true, $uri),
-                implode("\n", $reasons)
-            );
-
-            $this->message->send(null, $owner->id, $message);
         }
 
         $this->log(sprintf(

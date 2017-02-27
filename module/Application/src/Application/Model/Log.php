@@ -78,7 +78,7 @@ class Log
                     $col = 'article_id';
                     $tableName = 'log_events_articles';
                     break;
-                case $table instanceof DbTable\User:
+                case $table instanceof User:
                     $col = 'user_id';
                     $tableName = 'log_events_user';
                     break;

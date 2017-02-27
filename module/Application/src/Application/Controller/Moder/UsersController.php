@@ -7,7 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable\Session as SessionTable;
+use Application\Service\UsersService;
 
 class UsersController extends AbstractActionController
 {
@@ -15,9 +15,16 @@ class UsersController extends AbstractActionController
      * @var User
      */
     private $table;
+    
+    /**
+     * @var UsersService
+     */
+    private $userService;
 
-    public function __construct()
+    public function __construct(UsersService $userService)
     {
+        $this->userService = $userService;
+        
         $this->table = new User();
     }
 
@@ -92,23 +99,9 @@ class UsersController extends AbstractActionController
         if (! $row) {
             return $this->notFoundAction();
         }
-
-        $oldImageId = $row->img;
-        if ($oldImageId) {
-            $row->img = null;
-            $row->save();
-            $this->imageStorage()->removeImage($oldImageId);
-        }
-
-        $row->deleted = 1;
-        $row->save();
-
-        $sessionTable = new SessionTable();
-
-        $sessionTable->delete([
-            'user_id = ?' => $row->id
-        ]);
-
+        
+        $this->userService->markDeleted($row['id']);
+        
         $this->log(sprintf(
             'Удаление пользователя №%s',
             $row->id

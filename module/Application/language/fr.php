@@ -1531,6 +1531,8 @@ Certains d'entre eux, trouvés par d'autres utilisateurs, vous pouvez trouver [i
     'pm/user-%s-edited-vehicle-full-description-%s-%s' => 'User %s edited vehicle full description %s ( %s )',
     'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s' => "User %s edited vehicle meta-data %s ( %s )\n%s",
     'pm/user-%s-edited-vehicle-description-%s-%s' => 'User %s edited vehicle description %s ( %s )',
+    'pm/user-%s-adds-item-%s-%s-to-item-%s-%s' => 'User %s added %s ( %s ) to %s ( %s )',
+    'pm/user-%s-removed-item-%s-%s-from-item-%s-%s' => 'User %s removed %s ( %s ) from %s ( %s )',
     'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s' => 'User %s cancel link vehicle %s ( %s ) with categories: %s',
     'pm/user-%s-edited-factory-description-%s-%s' => 'User %s edited factory description %s ( %s )',
     'pm/your-picture-%s-enqueued-to-remove-%s' => "Your picture %s enqueued to remove\n%s",

@@ -1545,6 +1545,8 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'pm/user-%s-edited-vehicle-full-description-%s-%s' => 'Пользователь %s редактировал полное описание автомобиля %s ( %s )',
     'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s' => "Пользователь %s редактировал информацию об автомобиле %s ( %s )\n%s",
     'pm/user-%s-edited-vehicle-description-%s-%s' => 'Пользователь %s редактировал описание автомобиля %s ( %s )',
+    'pm/user-%s-adds-item-%s-%s-to-item-%s-%s' => 'Пользователь %s добавил %s ( %s ) в %s ( %s )',
+    'pm/user-%s-removed-item-%s-%s-from-item-%s-%s' => 'Пользователь %s удалил %s ( %s ) из %s ( %s )',
     'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s' => 'Пользователь %s отменил вашу привязку автомобиля %s ( %s ) к категориям: %s',
     'pm/user-%s-edited-factory-description-%s-%s' => 'Пользователь %s редактировал описание завода %s ( %s )',
     'pm/your-picture-%s-enqueued-to-remove-%s' => "Добавленная вами картинка %s поставлена в очередь на удаление\n%s",

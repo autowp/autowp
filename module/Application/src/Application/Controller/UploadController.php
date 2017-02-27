@@ -141,7 +141,10 @@ class UploadController extends AbstractActionController
         
         $perspectives = [];
         foreach ($perspectiveTable->fetchAll(null, 'position') as $row) {
-            $perspectives[$row['id']] = $this->translate($row['name']);
+            $perspectives[] = [
+                'id'   => $row['id'],
+                'name' => $this->translate($row['name'])
+            ];
         }
         
         return [

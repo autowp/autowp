@@ -775,25 +775,7 @@ class AccountController extends AbstractActionController
                     $user->deleted = true;
                     $user->save();
                     
-                    // delete from contacts
-                    $contactModel = new Contact();
-                    $contactModel->deleteUserEverywhere($user['id']);
-                    
-                    // unsubscribe from telegram
-                    $telegramChatTable = new DbTable\Telegram\Chat();
-                    $telegramChatTable->delete([
-                        'user_id = ?' => $user['id']
-                    ]);
-                    
-                    // delete linked profiles
-                    $uaTable = new DbTable\User\Account();
-                    $uaTable->delete([
-                        'user_id = ?' => $user['id']
-                    ]);
-                    
-                    // unsubscribe from items
-                    $ucsTable = new DbTable\User\ItemSubscribe();
-                    $ucsTable->unsubscribeAll($user['id']);
+                    $this->service->markDeleted($user->id);
 
                     $auth = new AuthenticationService();
                     $auth->clearIdentity();

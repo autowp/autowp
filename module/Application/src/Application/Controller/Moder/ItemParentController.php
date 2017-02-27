@@ -5,6 +5,7 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\HostManager;
 use Application\Model\DbTable;
 use Application\Model\BrandVehicle;
 
@@ -16,11 +17,20 @@ class ItemParentController extends AbstractActionController
      * @var BrandVehicle
      */
     private $model;
+    
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
 
-    public function __construct(BrandVehicle $model, array $languages)
-    {
+    public function __construct(
+        BrandVehicle $model, 
+        array $languages,
+        HostManager $hostManager
+    ) {
         $this->model = $model;
         $this->languages = $languages;
+        $this->hostManager = $hostManager;
     }
 
     /**
@@ -116,32 +126,62 @@ class ItemParentController extends AbstractActionController
 
         $itemTable = $this->catalogue()->getItemTable();
 
-        $brandRow = $itemTable->fetchRow([
+        $parentRow = $itemTable->fetchRow([
             'item_type_id = ?' => DbTable\Item\Type::BRAND,
             'id = ?'           => (int)$this->params('brand_id')
         ]);
-        $vehicleRow = $itemTable->fetchRow([
+        $itemRow = $itemTable->fetchRow([
             'id = ?'              => (int)$this->params('vehicle_id'),
             'item_type_id IN (?)' => [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE]
         ]);
-        if (! $brandRow || ! $vehicleRow) {
+        if (! $parentRow || ! $itemRow) {
             return $this->notFoundAction();
         }
 
-        $this->model->create($brandRow->id, $vehicleRow->id);
+        $this->model->create($parentRow->id, $itemRow->id);
 
         $user = $this->user()->get();
         $ucsTable = new DbTable\User\ItemSubscribe();
-        $ucsTable->subscribe($user, $vehicleRow);
+        $ucsTable->subscribe($user, $itemRow);
 
         $message = sprintf(
             'Автомобиль %s добавлен к бренду %s',
-            htmlspecialchars($this->car()->formatName($vehicleRow, 'en')),
-            $brandRow->name
+            htmlspecialchars($this->car()->formatName($itemRow, 'en')),
+            $parentRow->name
         );
-        $this->log($message, [$brandRow, $vehicleRow]);
+        $this->log($message, [$parentRow, $itemRow]);
+        
+        $subscribers = [];
+        foreach ($ucsTable->getItemSubscribers($itemRow) as $subscriber) {
+            $subscribers[$subscriber->id] = $subscriber;
+        }
+        
+        foreach ($ucsTable->getItemSubscribers($parentRow) as $subscriber) {
+            $subscribers[$subscriber->id] = $subscriber;
+        }
+        
+        foreach ($subscribers as $subscriber) {
+            if ($subscriber->id != $user->id) {
+                $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+            
+                $message = sprintf(
+                    $this->translate(
+                        'pm/user-%s-adds-item-%s-%s-to-item-%s-%s',
+                        'default',
+                        $subscriber->language
+                    ),
+                    $this->userModerUrl($user, true, $uri),
+                    $this->car()->formatName($itemRow, $subscriber->language),
+                    $this->carModerUrl($itemRow, true, null, $uri),
+                    $this->car()->formatName($parentRow, $subscriber->language),
+                    $this->carModerUrl($parentRow, true, null, $uri)
+                );
+            
+                $this->message->send(null, $subscriber->id, $message);
+            }
+        }
 
-        return $this->redirectToCar($vehicleRow, 'catalogue');
+        return $this->redirectToCar($itemRow, 'catalogue');
     }
 
     public function deleteAction()

@@ -1506,6 +1506,8 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'pm/user-%s-edited-vehicle-full-description-%s-%s' => '用户%s编辑了车型的完整介绍%s ( %s )',
     'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s' => "用户%s编辑了车型基本数据%s ( %s )\n%s",
     'pm/user-%s-edited-vehicle-description-%s-%s' => '用户%s编辑了车型介绍%s ( %s )',
+    'pm/user-%s-adds-item-%s-%s-to-item-%s-%s' => 'User %s added %s ( %s ) to %s ( %s )',
+    'pm/user-%s-removed-item-%s-%s-from-item-%s-%s' => 'User %s removed %s ( %s ) from %s ( %s )',
     'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s' => '用户%s为车型%s ( %s )取消了到目录: %s的关联',
     'pm/user-%s-edited-factory-description-%s-%s' => '用户%s编辑了工厂介绍%s ( %s )',
     'pm/your-picture-%s-enqueued-to-remove-%s' => "您的图片%s已被删除\n%s",

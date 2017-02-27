@@ -216,10 +216,10 @@ module.exports = {
         
         if (picture.perspectiveUrl) {
             var $perspective = $('<select class="form-control input-sm"><option value="">--</option></select>');
-            $.map(this.perspectives, function(name, value) {
+            $.map(this.perspectives, function(perspective) {
                 $perspective.append(
                     $("<option></option>")
-                        .attr("value", value).text(name)
+                        .attr("value", perspective.id).text(perspective.name)
                 );
             });
             

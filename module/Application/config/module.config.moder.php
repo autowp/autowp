@@ -281,7 +281,7 @@ return [
             Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
             Controller\Moder\PicturesController::class     => Controller\Moder\Service\PicturesControllerFactory::class,
             Controller\Moder\RightsController::class       => Controller\Moder\Service\RightsControllerFactory::class,
-            Controller\Moder\UsersController::class        => InvokableFactory::class,
+            Controller\Moder\UsersController::class        => Controller\Moder\Service\UsersControllerFactory::class,
         ]
     ],
     'forms' => [
