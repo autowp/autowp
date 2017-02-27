@@ -14,19 +14,19 @@ class CommentsController extends AbstractRestfulController
      * @var Comments
      */
     private $comments;
-    
+
     public function __construct(Comments $comments)
     {
         $this->comments = $comments;
     }
-    
+
     public function subscribeAction()
     {
         $user = $this->user()->get();
         if (! $user) {
             return $this->forbiddenAction();
         }
-        
+
         $itemId = (int)$this->params('item_id');
         $typeId = (int)$this->params('type_id');
 
@@ -34,15 +34,15 @@ class CommentsController extends AbstractRestfulController
             case Request::METHOD_POST:
             case Request::METHOD_PUT:
                 $this->comments->service()->subscribe($typeId, $itemId, $user['id']);
-                
+
                 return new JsonModel([
                     'status' => true
                 ]);
                 break;
-                
+
             case Request::METHOD_DELETE:
                 $this->comments->service()->unSubscribe($typeId, $itemId, $user['id']);
-                
+
                 return new JsonModel([
                     'status' => true
                 ]);

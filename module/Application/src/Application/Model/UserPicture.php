@@ -15,7 +15,7 @@ class UserPicture
         $this->pictureTable = new TableGateway('pictures', $adapter);
         $this->userTable = new TableGateway('users', $adapter);
     }
-    
+
     public function refreshAllPicturesCount()
     {
         $select = new Sql\Select($this->pictureTable->getTable());
@@ -25,7 +25,7 @@ class UserPicture
         ])
             ->where(['status' => DbTable\Picture::STATUS_ACCEPTED])
             ->group(['owner_id']);
-        
+
         $userIds = [];
         foreach ($this->pictureTable->selectWith($select) as $row) {
             $userIds[] = $row['owner_id'];
@@ -35,19 +35,19 @@ class UserPicture
                 'id' => $row['owner_id']
             ]);
         }
-        
+
         $filter = [];
         if ($userIds) {
             $filter = [
                 new Sql\Predicate\NotIn('id', $userIds)
             ];
         }
-        
+
         $this->userTable->update([
             'pictures_total' => 0
         ], $filter);
     }
-    
+
     public function refreshPicturesCount($userId)
     {
         $select = new Sql\Select($this->pictureTable->getTable());
@@ -56,16 +56,16 @@ class UserPicture
                 'owner_id' => $userId,
                 'status'   => DbTable\Picture::STATUS_ACCEPTED
             ]);
-        
+
         $row = $this->pictureTable->selectWith($select)->current();
-        
+
         $this->userTable->update([
             'pictures_total' => $row ? $row['count'] : 0
         ], [
             'id' => (int)$userId
         ]);
     }
-    
+
     public function incrementUploads($userId)
     {
         $this->userTable->update([

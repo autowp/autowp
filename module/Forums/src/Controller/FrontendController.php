@@ -196,7 +196,7 @@ class FrontendController extends AbstractActionController
                                 }
                             }
                         }
-                        
+
                         $this->comments->notifySubscribers($messageId);
 
                         return $this->redirect()->toUrl($this->topicMessageUrl($messageId));
@@ -217,7 +217,7 @@ class FrontendController extends AbstractActionController
         if (! $data) {
             return $this->notFoundAction();
         }
-        
+
         if ($user) {
             $this->comments->service()->markSubscriptionAwaiting(Comments::FORUMS_TYPE_ID, $topic['id'], $user['id']);
         }

@@ -52,7 +52,7 @@ class UploadController extends AbstractActionController
      * @var Comments\CommentsService
      */
     private $comments;
-    
+
     /**
      * @var UserPicture
      */
@@ -136,9 +136,9 @@ class UploadController extends AbstractActionController
                 'action' => 'send'
             ], [], true));
         }
-        
+
         $perspectiveTable = new DbTable\Perspective();
-        
+
         $perspectives = [];
         foreach ($perspectiveTable->fetchAll(null, 'position') as $row) {
             $perspectives[] = [
@@ -146,7 +146,7 @@ class UploadController extends AbstractActionController
                 'name' => $this->translate($row['name'])
             ];
         }
-        
+
         return [
             'form'         => $form,
             'selected'     => $selected,
@@ -257,10 +257,10 @@ class UploadController extends AbstractActionController
                     'moderatorAttention' => Comments\Attention::NONE
                 ]);
             }
-            
+
             $this->comments->subscribe(
-                \Application\Comments::PICTURES_TYPE_ID, 
-                $picture->id, 
+                \Application\Comments::PICTURES_TYPE_ID,
+                $picture->id,
                 $user['id']
             );
 
@@ -741,7 +741,7 @@ class UploadController extends AbstractActionController
                         'isModer'          => false
                     ]
                 ));
-                
+
                 $cPerspectiveId = null;
                 $perspectiveUrl = null;
                 if (count($itemIds) == 1) {

@@ -17,14 +17,14 @@ class ItemParentController extends AbstractActionController
      * @var BrandVehicle
      */
     private $model;
-    
+
     /**
      * @var HostManager
      */
     private $hostManager;
 
     public function __construct(
-        BrandVehicle $model, 
+        BrandVehicle $model,
         array $languages,
         HostManager $hostManager
     ) {
@@ -150,20 +150,20 @@ class ItemParentController extends AbstractActionController
             $parentRow->name
         );
         $this->log($message, [$parentRow, $itemRow]);
-        
+
         $subscribers = [];
         foreach ($ucsTable->getItemSubscribers($itemRow) as $subscriber) {
             $subscribers[$subscriber->id] = $subscriber;
         }
-        
+
         foreach ($ucsTable->getItemSubscribers($parentRow) as $subscriber) {
             $subscribers[$subscriber->id] = $subscriber;
         }
-        
+
         foreach ($subscribers as $subscriber) {
             if ($subscriber->id != $user->id) {
                 $uri = $this->hostManager->getUriByLanguage($subscriber->language);
-            
+
                 $message = sprintf(
                     $this->translate(
                         'pm/user-%s-adds-item-%s-%s-to-item-%s-%s',
@@ -176,7 +176,7 @@ class ItemParentController extends AbstractActionController
                     $this->car()->formatName($parentRow, $subscriber->language),
                     $this->carModerUrl($parentRow, true, null, $uri)
                 );
-            
+
                 $this->message->send(null, $subscriber->id, $message);
             }
         }

@@ -30,7 +30,7 @@ class CatalogueGroupItem extends CatalogueItem
     private $type;
 
     private $itemParentRows = [];
-    
+
     private $itemParentTable;
 
     public function __construct(array $options)
@@ -39,7 +39,7 @@ class CatalogueGroupItem extends CatalogueItem
 
         $this->itemLanguageTable = new DbTable\Item\Language();
     }
-    
+
     public function setItemParentTable($table)
     {
         $this->itemParentTable = $table;

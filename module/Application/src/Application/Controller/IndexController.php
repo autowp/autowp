@@ -97,7 +97,6 @@ class IndexController extends AbstractActionController
 
             $carOfDayInfo = $this->cache->getItem($key, $success);
             if (! $success) {
-                
                 $carOfDayInfo = $this->carOfDay->getItemOfDay($carOfDay['item_id'], $carOfDay['user_id'], $language);
 
                 $this->cache->setItem($key, $carOfDayInfo);

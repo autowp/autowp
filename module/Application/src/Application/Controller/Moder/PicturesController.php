@@ -101,7 +101,7 @@ class PicturesController extends AbstractActionController
      * @var Comments\CommentsService
      */
     private $comments;
-    
+
     /**
      * @var UserPicture
      */
@@ -446,7 +446,7 @@ class PicturesController extends AbstractActionController
                     $select
                         ->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', null)
                         ->where('picture_vote_summary.positive > 0');
-                    break; 
+                    break;
                 case 13:
                     $select
                         ->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', null)
@@ -647,14 +647,14 @@ class PicturesController extends AbstractActionController
         if ($owner = $picture->findParentRow(User::class, 'Owner')) {
             if ($owner->id != $user->id) {
                 $uri = $this->hostManager->getUriByLanguage($owner->language);
-    
+
                 $requests = new DbTable\Picture\ModerVote();
                 $deleteRequests = $requests->fetchAll(
                     $requests->select()
                         ->where('picture_id = ?', $picture->id)
                         ->where('vote = 0')
                 );
-    
+
                 $reasons = [];
                 if (count($deleteRequests)) {
                     foreach ($deleteRequests as $request) {
@@ -663,13 +663,13 @@ class PicturesController extends AbstractActionController
                         }
                     }
                 }
-    
+
                 $message = sprintf(
                     $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner->language),
                     $this->pic()->url($picture->identity, true, $uri),
                     implode("\n", $reasons)
                 );
-    
+
                 $this->message->send(null, $owner->id, $message);
             }
         }
@@ -814,7 +814,7 @@ class PicturesController extends AbstractActionController
                         $picture->status = Picture::STATUS_INBOX;
                         $picture->save();
                     }
-                    
+
                     if ((! $vote) && $picture->status == Picture::STATUS_ACCEPTED) {
                         $this->unaccept($picture);
                     }
@@ -1066,7 +1066,6 @@ class PicturesController extends AbstractActionController
 
         if ($canUnaccept) {
             if ($request->isPost() && $this->params('form') == 'picture-unaccept') {
-                
                 $this->unaccept($picture);
 
                 $referer = $this->getRequest()->getServer('HTTP_REFERER');
@@ -1780,7 +1779,7 @@ class PicturesController extends AbstractActionController
                 $picture->accept_datetime = new Zend_Db_Expr('NOW()');
             }
             $picture->save();
-            
+
             if ($picture->owner_id) {
                 $this->userPicture->refreshPicturesCount($picture->owner_id);
             }
@@ -1858,28 +1857,28 @@ class PicturesController extends AbstractActionController
     {
         return $picture->canAccept() && $this->user()->isAllowed('picture', 'accept');
     }
-    
+
     private function unaccept(DbTable\Picture\Row $picture)
     {
         $previousStatusUserId = $picture->change_status_user_id;
-        
+
         $user = $this->user()->get();
         $picture->setFromArray([
             'status'                => Picture::STATUS_INBOX,
             'change_status_user_id' => $user->id
         ]);
         $picture->save();
-        
+
         if ($picture->owner_id) {
             $this->userPicture->refreshPicturesCount($picture->owner_id);
         }
-        
+
         $this->log(sprintf(
             'С картинки %s снят статус "принято"',
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), $picture);
-        
-        
+
+
         $pictureUrl = $this->pic()->url($picture->identity, true);
         if ($previousStatusUserId != $user->id) {
             $userTable = new User();
@@ -1907,7 +1906,7 @@ class PicturesController extends AbstractActionController
             $success = $pictureTable->accept($picture->id, $user->id, $isFirstTimeAccepted);
             if ($success) {
                 $owner = $picture->findParentRow(User::class, 'Owner');
-                
+
                 if ($owner) {
                     $this->userPicture->refreshPicturesCount($owner['id']);
                 }
@@ -1915,19 +1914,19 @@ class PicturesController extends AbstractActionController
                 if ($isFirstTimeAccepted) {
                     if ($owner && ($owner->id != $user->id)) {
                         $uri = $this->hostManager->getUriByLanguage($owner->language);
-                
+
                         $message = sprintf(
                             $this->translate('pm/your-picture-accepted-%s', 'default', $owner->language),
                             $this->pic()->url($picture->identity, true, $uri)
                         );
-                
+
                         $this->message->send(null, $owner->id, $message);
                     }
-                
+
                     $this->telegram->notifyPicture($picture->id);
                 }
             }
-            
+
 
             if ($previousStatusUserId != $user->id) {
                 $userTable = new User();
@@ -2006,7 +2005,7 @@ class PicturesController extends AbstractActionController
                     $picture->status = Picture::STATUS_INBOX;
                     $picture->save();
                 }
-                
+
                 if ((! $vote) && $picture->status == Picture::STATUS_ACCEPTED) {
                     $this->unaccept($picture);
                 }

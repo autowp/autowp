@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Application\Model;
 
@@ -12,22 +12,22 @@ class PictureVote
      * @var TableGateway
      */
     private $voteTable;
-    
+
     /**
      * @var TableGateway
      */
     private $summaryTable;
-    
+
     public function __construct(Adapter $adapter)
     {
         $this->voteTable = new TableGateway('picture_vote', $adapter);
         $this->summaryTable = new TableGateway('picture_vote_summary', $adapter);
     }
-    
+
     public function vote($pictureId, $userId, $value)
     {
         $value = $value > 0 ? 1 : -1;
-        
+
         $sql = '
             insert into picture_vote (picture_id, user_id, value, timestamp)
             values (?, ?, ?, now())
@@ -35,13 +35,13 @@ class PictureVote
                 value = VALUES(value),
                 timestamp = VALUES(timestamp)
         ';
-        
+
         $statement = $this->voteTable->getAdapter()->query($sql);
         $statement->execute([(int)$pictureId, (int)$userId, $value]);
-        
+
         $this->updatePictureSummary($pictureId);
     }
-    
+
     public function getVote($pictureId, $userId)
     {
         $row = null;
@@ -51,22 +51,22 @@ class PictureVote
                 'user_id'    => (int)$userId,
             ])->current();
         }
-        
+
         $summary = $this->summaryTable->select([
             'picture_id' => (int)$pictureId
         ])->current();
-        
+
         return [
             'value'    => $row ? $row['value'] : null,
             'positive' => $summary ? $summary['positive'] : 0,
             'negative' => $summary ? $summary['negative'] : 0
         ];
     }
-    
+
     private function updatePictureSummary($pictureId)
     {
         $pictureId = (int)$pictureId;
-        
+
         $sql = '
             insert into picture_vote_summary (picture_id, positive, negative) 
             values (

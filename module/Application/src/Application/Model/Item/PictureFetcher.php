@@ -128,7 +128,7 @@ abstract class PictureFetcher
 
                 $order[] = 'mp.position';
         }
-        
+
         if ($options['ids']) {
             $select->where('pictures.id in (?)', $options['ids']);
         }
@@ -145,11 +145,11 @@ abstract class PictureFetcher
             $select->join(['picture_car' => 'item'], 'item.id = picture_car.id', null);
             $order = array_merge($order, ['picture_car.begin_order_cache', 'picture_car.end_order_cache']);
         }
-        
+
         if ($options['acceptedSort']) {
             $order[] = 'pictures.accept_datetime DESC';
         }
-        
+
         $order = array_merge($order, ['pictures.width DESC', 'pictures.height DESC']);
 
         $select->order($order);
@@ -170,7 +170,7 @@ abstract class PictureFetcher
 
         return $select;
     }
-    
+
     public function getTotalPictures(array $itemIds, $onlyExactly)
     {
         $result = [];
@@ -180,10 +180,10 @@ abstract class PictureFetcher
         if (count($itemIds)) {
             $pictureTable = $this->getPictureTable();
             $pictureTableAdapter = $pictureTable->getAdapter();
-        
+
             $select = $pictureTableAdapter->select()
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
-        
+
             if ($onlyExactly) {
                 $select
                     ->from($pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
@@ -198,7 +198,7 @@ abstract class PictureFetcher
                     ->where('item_parent_cache.parent_id IN (?)', $itemIds)
                     ->group('item_parent_cache.parent_id');
             }
-        
+
             $result = array_replace($result, $pictureTableAdapter->fetchPairs($select));
         }
         return $result;

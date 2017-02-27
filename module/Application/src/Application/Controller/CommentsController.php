@@ -187,7 +187,7 @@ class CommentsController extends AbstractRestfulController
                     $this->comments->service()->completeMessage($values['parent_id']);
                 }
             }
-            
+
             $userTable = new User();
 
             if ($values['parent_id']) {
@@ -213,7 +213,7 @@ class CommentsController extends AbstractRestfulController
                     }
                 }
             }
-            
+
             $this->comments->notifySubscribers($messageId);
 
             $backUrl = $this->comments->getMessageUrl($messageId);

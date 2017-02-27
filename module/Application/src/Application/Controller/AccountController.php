@@ -774,7 +774,7 @@ class AccountController extends AbstractActionController
                 } else {
                     $user->deleted = true;
                     $user->save();
-                    
+
                     $this->service->markDeleted($user->id);
 
                     $auth = new AuthenticationService();

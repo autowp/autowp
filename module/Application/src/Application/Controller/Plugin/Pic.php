@@ -66,7 +66,7 @@ class Pic extends AbstractPlugin
      * @var Comments\CommentsService
      */
     private $comments;
-    
+
     /**
      * @var PictureVote
      */
@@ -1050,15 +1050,15 @@ class Pic extends AbstractPlugin
         }
 
         $itemIds = $this->pictureItem->getPictureItems($picture['id']);
-        
+
         $user = $controller->user()->get();
         $votes = $this->pictureVote->getVote($picture['id'], $user ? $user->id : null);
-        
+
         $subscribed = false;
         if ($user) {
             $subscribed = $this->comments->userSubscribed(\Application\Comments::PICTURES_TYPE_ID, $picture['id'], $user['id']);
         }
-        
+
         $twitterCreatorId = null;
         if ($picture['owner_id']) {
             $userAccountTable = new DbTable\User\Account();
