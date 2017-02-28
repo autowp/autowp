@@ -1072,6 +1072,10 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/211/name'        => 'Contacts',
     'page/211/title'       => 'Contacts',
     'page/211/breadcrumbs' => 'Contacts',
+    
+    'page/212/name'        => 'Picture vote templates',
+    'page/212/title'       => 'Picture vote templates',
+    'page/212/breadcrumbs' => 'Picture vote templates',
 
     'moder-menu/title' => 'Moderator menu',
     'moder-menu/inbox' => 'Inbox',
@@ -1135,7 +1139,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/pictures/filter/order/dislikes' => 'Dislikes',
 
     'moder/pictures/acceptance/message' => 'Message',
-    'moder/pictures/picture/inbox-mark' => '(new)',
 
     'moder/items/filter' => 'Filter',
     'moder/items/filter/name' => 'Name',
@@ -1302,6 +1305,9 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/acceptance/removing' => 'Deleting',
     'moder/picture/acceptance/inbox' => 'Inbox',
     'moder/picture/acceptance/reason' => 'Reason',
+    'moder/picture/acceptance/custom' => 'Custom ...',
+    'moder/picture/acceptance/add-reason' => 'Add template',
+    'moder/picture/acceptance/vote' => 'Vote',
 
     'moder/picture/acceptance/want-accept' => 'Want accept',
     'moder/picture/acceptance/want-delete' => 'Want delete',

@@ -1325,6 +1325,18 @@ return [
                             ]
                         ]
                     ],
+                    'picture-moder-vote' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/picture-moder-vote/:id',
+                            'constraints' => [
+                                'id' => '[0-9]+'
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\Api\PictureModerVoteController::class
+                            ],
+                        ],
+                    ],
                     'picture-vote' => [
                         'type' => Segment::class,
                         'options' => [

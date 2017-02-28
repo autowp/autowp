@@ -32,6 +32,8 @@ class IndexController extends AbstractActionController
 
         $menu['/moder/index/stat'] = 'page/119/name';
         $menu[$this->url()->fromRoute('moder/hotlink')] = 'Hotlinks';
+        
+        $menu[$this->url()->fromRoute('moder/picture-vote-template')] = 'page/212/name';
 
         return [
             'menu' => $menu,

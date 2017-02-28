@@ -769,5 +769,51 @@ return [
                 ]
             ]
         ],
+        'PictureModerVoteTemplateForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'moder/picture/acceptance/add-reason',
+            ],
+            'elements' => [
+                'reason' => [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'reason',
+                        'options' => [
+                            'label' => 'moder/picture/acceptance/reason'
+                        ],
+                        'attributes' => [
+                            'maxlength'    => 50,
+                            'size'         => 50
+                        ]
+                    ],
+                ],
+                'vote' => [
+                    'spec' => [
+                        'type'    => 'Select',
+                        'name'    => 'vote',
+                        'options' => [
+                            'label'   => 'moder/picture/acceptance/vote',
+                            'options' => [
+                                -1 => 'Negative',
+                                 1 => 'Positive'
+                            ]
+                        ]
+                    ]
+                ],
+            ],
+            'input_filter' => [
+                'reason' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'vote' => [
+                    'required'   => true
+                ]
+            ],
+        ],
     ]
 ];

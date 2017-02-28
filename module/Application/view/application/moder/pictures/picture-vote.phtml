@@ -1,28 +1,47 @@
 <?php if ($this->canVote) { ?>
-    <form action="<?=$this->escapeHtmlAttr($this->pictureVoteUrl)?>" class="form-inline" method="post">
-        <div data-module="moder-vote-reason">
-            <?=$this->formElement(
-                (new Zend\Form\Element\Select('reason_select'))
-                    ->setAttributes([
-                        'id'    => 'reason_select',
-                        'class' => 'form-control'
-                    ])
-                    ->setValueOptions($this->voteOptions)
-            )?>
-            <?php foreach ($this->voteOptions as $value) { ?>
-                <input type="text" name="reason" id="reason" value="<?=$this->escapeHtmlAttr($value)?>" style="display: none" class="form-control">
-            <?php break; } ?>
-        </div>
-
-        <div class="btn-group btn-group-sm">
-            <button type="submit" name="vote" value="1" class="btn btn-success">
+    <div class="btn-group" role="group" data-module="picture-moder-vote" data-url="<?=$this->escapeHtmlAttr($this->voteUrl)?>">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-accept'))?>
+                <span class="caret"></span>
             </button>
-            <button type="submit" name="vote" value="0" class="btn btn-danger">
-                <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-delete'))?>
-            </button>
+            <ul class="dropdown-menu">
+                <?php foreach ($this->voteOptions['positive'] as $value) { ?>
+                    <li><?=$this->htmlA([
+                        'data-vote'   => 1,
+                        'data-reason' => $value,
+                        'href'        => '#'
+                    ], $value)?></li>
+                <?php } ?>
+                <li role="separator" class="divider"></li>
+                <li><?=$this->htmlA([
+                    'data-vote' => 1,
+                    'href'      => '#'
+                ], $this->translate('moder/picture/acceptance/custom'))?></li>
+            </ul>
         </div>
-    </form>
+    
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-delete'))?>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <?php foreach ($this->voteOptions['negative'] as $value) { ?>
+                    <li><?=$this->htmlA([
+                        'data-vote'   => -1,
+                        'data-reason' => $value,
+                        'href'        => '#'
+                    ], $value)?></li>
+                <?php } ?>
+                <li role="separator" class="divider"></li>
+                <li><?=$this->htmlA([
+                    'data-vote' => -1,
+                    'href'      => '#'
+                ], $this->translate('moder/picture/acceptance/custom'))?></li>
+            </ul>
+        </div>
+    </div>
 <?php } ?>
 
 <?php if ($this->voteExists) { ?>

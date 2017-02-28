@@ -1079,6 +1079,10 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'page/211/name'        => 'Контакты',
     'page/211/title'       => 'Контакты',
     'page/211/breadcrumbs' => 'Контакты',
+    
+    'page/212/name'        => 'Шаблоны модераторских голосов',
+    'page/212/title'       => 'Шаблоны модераторских голосов',
+    'page/212/breadcrumbs' => 'Шаблоны модераторских голосов',
 
     'moder-menu/title' => 'Меню модератора',
     'moder-menu/inbox' => 'Инбокс',
@@ -1142,7 +1146,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/pictures/filter/order/dislikes' => 'Дизлайки',
 
     'moder/pictures/acceptance/message' => 'Сообщение',
-    'moder/pictures/picture/inbox-mark' => '(новое)',
 
     'moder/items/filter' => 'Фильтр',
     'moder/items/filter/name' => 'Название',
@@ -1309,6 +1312,9 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/picture/acceptance/removing' => 'Удаляется',
     'moder/picture/acceptance/inbox' => 'Входящее',
     'moder/picture/acceptance/reason' => 'Причина',
+    'moder/picture/acceptance/custom' => 'Своя ...',
+    'moder/picture/acceptance/add-reason' => 'Добавить шаблон',
+    'moder/picture/acceptance/vote' => 'Голос',
 
     'moder/picture/acceptance/want-accept' => 'Хочу принять',
     'moder/picture/acceptance/want-delete' => 'Хочу удалить',

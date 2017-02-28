@@ -146,6 +146,12 @@ class CarOfDay
         }
         return $pictureTable->fetchRow($select);
     }
+    
+    private static function mb_ucfirst($str) 
+    {
+        $fc = mb_strtoupper(mb_substr($str, 0, 1));
+        return $fc.mb_substr($str, 1);
+    }
 
     public function putCurrentToTwitter(array $twOptions)
     {
@@ -192,9 +198,15 @@ class CarOfDay
         }
 
         $url = 'http://wheelsage.org/picture/' . $picture->identity;
+        
+        if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
+            $title = $this->translator->translate('car-of-day', 'default', 'en');
+        } else {
+            $title = $this->translator->translate('theme-of-day', 'default', 'en');
+        }
 
         $text = sprintf(
-            'Vehicle of the day: %s %s',
+            self::mb_ucfirst($title) . ': %s %s',
             $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
             $url
         );
@@ -266,8 +278,14 @@ class CarOfDay
         
         $url = 'http://wheelsage.org/picture/' . $picture->identity;
         
+        if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
+            $title = $this->translator->translate('car-of-day', 'default', 'en');
+        } else {
+            $title = $this->translator->translate('theme-of-day', 'default', 'en');
+        }
+        
         $text = sprintf(
-            'Vehicle of the day: %s %s',
+            self::mb_ucfirst($title) . ': %s %s',
             $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
             $url
         );
@@ -350,8 +368,14 @@ class CarOfDay
     
         $url = 'http://autowp.ru/picture/' . $picture->identity;
         
+        if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
+            $title = $this->translator->translate('car-of-day', 'default', 'ru');
+        } else {
+            $title = $this->translator->translate('theme-of-day', 'default', 'ru');
+        }
+        
         $text = sprintf(
-            'Автомобиль дня: %s',
+            self::mb_ucfirst($title) . ': %s',
             $this->itemNameFormatter->format($car->getNameData($language), $language)
         );
             
@@ -496,10 +520,11 @@ class CarOfDay
         }
         
         return [
-            'name'     => $carOfDay->getNameData($language),
-            'pictures' => $carOfDayPicturesData,
-            'links'    => $this->carLinks($carOfDay, $language),
-            'userId'   => $userId
+            'itemTypeId' => $carOfDay['item_type_id'],
+            'name'       => $carOfDay->getNameData($language),
+            'pictures'   => $carOfDayPicturesData,
+            'links'      => $this->carLinks($carOfDay, $language),
+            'userId'     => $userId
         ];
     }
     

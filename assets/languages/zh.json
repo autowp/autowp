@@ -14,5 +14,11 @@
     
     "who-online/title": "Online",
     "who-online/refresh": "Refresh",
-    "who-online/close": "Close"
+    "who-online/close": "Close",
+    
+    "picture-moder-vote/custom/title": "Custom reason",
+    "picture-moder-vote/custom/sending": "Sending",
+    "picture-moder-vote/custom/send": "Send",
+    "picture-moder-vote/custom/cancel": "Cancel",
+    "picture-moder-vote/custom/save": "Save as template"
 }

@@ -2,6 +2,9 @@
 
 namespace Application\Controller\Moder;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -106,6 +109,11 @@ class PicturesController extends AbstractActionController
      * @var UserPicture
      */
     private $userPicture;
+    
+    /**
+     * @var TableGateway
+     */
+    private $voteTemplateTable;
 
     private function getCarParentTable()
     {
@@ -130,7 +138,8 @@ class PicturesController extends AbstractActionController
         DuplicateFinder $duplicateFinder,
         Comments\CommentsService $comments,
         Log $log,
-        UserPicture $userPicture
+        UserPicture $userPicture,
+        Adapter $adapter
     ) {
 
         $this->hostManager = $hostManager;
@@ -149,6 +158,8 @@ class PicturesController extends AbstractActionController
         $this->comments = $comments;
         $this->log = $log;
         $this->userPicture = $userPicture;
+        
+        $this->voteTemplateTable = new TableGateway('picture_moder_vote_template', $adapter);
     }
 
     public function ownerTypeaheadAction()
@@ -538,23 +549,24 @@ class PicturesController extends AbstractActionController
         }
         unset($pictureItem);
 
-        $reasons = [
-            'плохое качество',
-            'дубль',
-            'любительское фото',
-            'не по теме сайта',
-            'не сток',
-            'другая',
-            'своя'
-        ];
-        $reasons = array_combine($reasons, $reasons);
-        if (isset($_COOKIE['customReason'])) {
-            foreach ((array)unserialize($_COOKIE['customReason']) as $reason) {
-                if (strlen($reason) && ! in_array($reason, $reasons)) {
-                    $reasons[$reason] = $reason;
-                }
+        $reasons = [];
+        
+        $user = $this->user()->get();
+        
+        if ($user) {
+            $select = new Sql\Select($this->voteTemplateTable->getTable());
+            $select
+                ->columns(['reason', 'vote'])
+                ->where(['user_id' => $user['id']])
+                ->order('reason');
+        
+            foreach ($this->voteTemplateTable->selectWith($select) as $row) {
+                $reasons[] = $row['reason'];
             }
         }
+        
+        $reasons = array_combine($reasons, $reasons);
+
 
         return [
             'paginator'    => $paginator,
@@ -781,62 +793,6 @@ class PicturesController extends AbstractActionController
                 'form'       => 'picture-vote',
                 'picture_id' => $picture->id
             ], [], true));
-
-            if ($request->isPost() && $this->params('form') == 'picture-vote') {
-                $this->voteForm->setData($this->params()->fromPost());
-                if ($this->voteForm->isValid()) {
-                    $values = $this->voteForm->getData();
-
-                    if ($customReason = $request->getCookie('customReason')) {
-                        $customReason = (array)unserialize($customReason);
-                    } else {
-                        $customReason = [];
-                    }
-
-                    $customReason[] = $values['reason'];
-                    $customReason = array_unique($customReason);
-
-                    setcookie('customReason', serialize($customReason), time() + 60 * 60 * 24 * 30, '/');
-
-                    $vote = (bool)($values['vote']);
-
-                    $user = $this->user()->get();
-                    $moderVotes = new DbTable\Picture\ModerVote();
-                    $moderVotes->insert([
-                        'user_id'    => $user->id,
-                        'picture_id' => $picture->id,
-                        'day_date'   => new Zend_Db_Expr('NOW()'),
-                        'reason'     => $values['reason'],
-                        'vote'       => $vote ? 1 : 0
-                    ]);
-
-                    if ($vote && $picture->status == Picture::STATUS_REMOVING) {
-                        $picture->status = Picture::STATUS_INBOX;
-                        $picture->save();
-                    }
-                    
-                    if ((! $vote) && $picture->status == Picture::STATUS_ACCEPTED) {
-                        $this->unaccept($picture);
-                    }
-
-                    $message = sprintf(
-                        $vote
-                            ? 'Подана заявка на принятие картинки %s'
-                            : 'Подана заявка на удаление картинки %s',
-                        htmlspecialchars($this->pic()->name($picture, $this->language()))
-                    );
-                    $this->log($message, $picture);
-
-                    $this->notifyVote($picture, $vote, $values['reason']);
-
-                    $referer = $request->getServer('HTTP_REFERER');
-                    if ($referer) {
-                        return $this->redirect()->toUrl($this->pictureUrl($picture));
-                    }
-
-                    return $this->redirect()->toRoute(null, [], [], true);
-                }
-            }
         }
 
         if ($voteExists) {

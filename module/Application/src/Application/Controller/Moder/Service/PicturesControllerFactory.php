@@ -27,7 +27,8 @@ class PicturesControllerFactory implements FactoryInterface
             $container->get(\Application\DuplicateFinder::class),
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get(\Application\Model\Log::class),
-            $container->get(\Application\Model\UserPicture::class)
+            $container->get(\Application\Model\UserPicture::class),
+            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
         );
     }
 }

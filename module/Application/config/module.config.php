@@ -51,25 +51,26 @@ return [
             Controller\Api\ContactsController::class    => InvokableFactory::class,
             Controller\Api\PictureController::class     => Controller\Api\Service\PictureControllerFactory::class,
             Controller\Api\PictureItemController::class => Controller\Api\Service\PictureItemControllerFactory::class,
+            Controller\Api\PictureModerVoteController::class => Controller\Api\Service\PictureModerVoteControllerFactory::class,
             Controller\Api\PictureVoteController::class => Controller\Api\Service\PictureVoteControllerFactory::class,
             Controller\Api\UsersController::class       => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
         'invokables' => [
-            'pictureVote'     => Controller\Plugin\PictureVote::class,
             'forbiddenAction' => Controller\Plugin\ForbiddenAction::class
         ],
         'factories' => [
-            'car'       => Controller\Plugin\Service\CarFactory::class,
-            'catalogue' => Controller\Plugin\Service\CatalogueFactory::class,
-            'fileSize'  => Controller\Plugin\Service\FileSizeFactory::class,
-            'language'  => Controller\Plugin\Service\LanguageFactory::class,
-            'log'       => Controller\Plugin\Service\LogFactory::class,
-            'oauth2'    => Factory\OAuth2PluginFactory::class,
-            'pic'       => Controller\Plugin\Service\PicFactory::class,
-            'sidebar'   => Controller\Plugin\Service\SidebarFactory::class,
-            'translate' => Controller\Plugin\Service\TranslateFactory::class,
+            'car'         => Controller\Plugin\Service\CarFactory::class,
+            'catalogue'   => Controller\Plugin\Service\CatalogueFactory::class,
+            'fileSize'    => Controller\Plugin\Service\FileSizeFactory::class,
+            'language'    => Controller\Plugin\Service\LanguageFactory::class,
+            'log'         => Controller\Plugin\Service\LogFactory::class,
+            'oauth2'      => Factory\OAuth2PluginFactory::class,
+            'pic'         => Controller\Plugin\Service\PicFactory::class,
+            'pictureVote' => Controller\Plugin\Service\PictureVoteFactory::class,
+            'sidebar'     => Controller\Plugin\Service\SidebarFactory::class,
+            'translate'   => Controller\Plugin\Service\TranslateFactory::class,
         ]
     ],
     'translator' => [

@@ -1042,6 +1042,10 @@ return array_replace(include 'root.php', [
     'page/211/name'        => '好友',
     'page/211/title'       => '好友',
     'page/211/breadcrumbs' => '好友',
+    
+    'page/212/name'        => 'Picture vote templates',
+    'page/212/title'       => 'Picture vote templates',
+    'page/212/breadcrumbs' => 'Picture vote templates',
 
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',
@@ -1105,7 +1109,6 @@ return array_replace(include 'root.php', [
     'moder/pictures/filter/order/dislikes' => 'Dislikes',
 
     'moder/pictures/acceptance/message' => '站内信',
-    'moder/pictures/picture/inbox-mark' => '(new)',
 
     'moder/items/filter' => 'Filter',
     'moder/items/filter/name' => 'Name',
@@ -1272,6 +1275,9 @@ return array_replace(include 'root.php', [
     'moder/picture/acceptance/removing' => 'Deleting',
     'moder/picture/acceptance/inbox' => 'Inbox',
     'moder/picture/acceptance/reason' => 'Reason',
+    'moder/picture/acceptance/custom' => 'Custom ...',
+    'moder/picture/acceptance/add-reason' => 'Add template',
+    'moder/picture/acceptance/vote' => 'Vote',
 
     'moder/picture/acceptance/want-accept' => '求通过',
     'moder/picture/acceptance/want-delete' => '求删除',

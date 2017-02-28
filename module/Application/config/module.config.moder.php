@@ -232,6 +232,22 @@ return [
                             ]
                         ]
                     ],
+                    'picture-vote-template' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/picture-vote-template[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\PictureVoteTemplateController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => Router\Http\WildcardSafe::class
+                            ]
+                        ]
+                    ],
                     'rights' => [
                         'type' => Segment::class,
                         'options' => [
@@ -280,6 +296,7 @@ return [
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
             Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
             Controller\Moder\PicturesController::class     => Controller\Moder\Service\PicturesControllerFactory::class,
+            Controller\Moder\PictureVoteTemplateController::class => Controller\Moder\Service\PictureVoteTemplateControllerFactory::class,
             Controller\Moder\RightsController::class       => Controller\Moder\Service\RightsControllerFactory::class,
             Controller\Moder\UsersController::class        => Controller\Moder\Service\UsersControllerFactory::class,
         ]
@@ -603,6 +620,63 @@ return [
                 ],
                 'vote' => [
                     'required' => true
+                ]
+            ]
+        ],
+        'ModerPictureVoteForm2' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post'
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'reason',
+                        'options' => [
+                            'label' => 'moder/picture/acceptance/reason',
+                        ],
+                        'attributes' => [
+                            'size'      => 60,
+                            'maxlength' => 255,
+                            'class'     => 'form-control',
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type'    => 'Select',
+                        'name'    => 'vote',
+                        'options' => [
+                            'options' => [
+                                 '1' => 'moder/picture/acceptance/want-accept',
+                                '-1' => 'moder/picture/acceptance/want-delete'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type'    => 'Checkbox',
+                        'name'    => 'save',
+                        'options' => [
+                            'label' => 'Save as template?',
+                        ],
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'reason' => [
+                    'required' => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'vote' => [
+                    'required' => true
+                ],
+                'save' => [
+                    'required' => false
                 ]
             ]
         ],

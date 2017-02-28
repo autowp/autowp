@@ -2,7 +2,11 @@
     <h2>
         <?=$this->car()->htmlTitle($this->itemOfDay['name'])?>
         <small>
-            <?=$this->escapeHtml($this->translate('car-of-day')) ?>
+            <?php if ($this->itemOfDay['itemTypeId'] == Application\Model\DbTable\Item\Type::VEHICLE) { ?>
+                <?=$this->escapeHtml($this->translate('car-of-day')) ?>
+            <?php } else { ?>
+                <?=$this->escapeHtml($this->translate('theme-of-day')) ?>
+            <?php } ?>
             <?php if ($this->itemOfDay['userId']) { ?>
                 <span style="white-space:nowrap">by <?=$this->user($this->itemOfDay['userId'])?></span>
             <?php } ?>

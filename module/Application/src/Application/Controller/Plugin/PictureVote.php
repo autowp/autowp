@@ -2,6 +2,9 @@
 
 namespace Application\Controller\Plugin;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\DbTable;
@@ -14,10 +17,16 @@ class PictureVote extends AbstractPlugin
      * @var DbTable\Picture
      */
     private $table;
+    
+    /**
+     * @var TableGateway
+     */
+    private $voteTemplateTable;
 
-    public function __construct()
+    public function __construct(Adapter $adapter)
     {
         $this->table = new DbTable\Picture();
+        $this->voteTemplateTable = new TableGateway('picture_moder_vote_template', $adapter);
     }
 
     private function isLastPicture($picture)
@@ -63,31 +72,29 @@ class PictureVote extends AbstractPlugin
 
         return $result;
     }
-
-    private function getVoteOptions()
+    
+    private function getVoteOptions2()
     {
-        $voteOptions = [
-            'плохое качество',
-            'дубль',
-            'любительское фото',
-            'не по теме сайта',
-            'другая',
-            'единственное фото',
-            'не сток',
-            'своя',
+        $result = [
+            'positive' => [],
+            'negative' => []
         ];
-
-        $cookies = $this->getController()->getRequest()->getCookie();
-
-        if (isset($cookies['customReason'])) {
-            foreach ((array)unserialize($cookies['customReason']) as $reason) {
-                if (strlen($reason) && ! in_array($reason, $voteOptions)) {
-                    $voteOptions[] = $reason;
-                }
+        
+        $user = $this->getController()->user()->get();
+    
+        if ($user) {
+            $select = new Sql\Select($this->voteTemplateTable->getTable());
+            $select
+                ->columns(['reason', 'vote'])
+                ->where(['user_id' => $user['id']])
+                ->order('reason');
+        
+            foreach ($this->voteTemplateTable->selectWith($select) as $row) {
+                $result[$row['vote'] > 0 ? 'positive' : 'negative'][] = $row['reason'];
             }
         }
-
-        return array_combine($voteOptions, $voteOptions);
+    
+        return $result;
     }
 
     public function __invoke($pictureId, $options)
@@ -128,12 +135,10 @@ class PictureVote extends AbstractPlugin
                 'form'       => 'picture-unvote',
                 'picture_id' => $picture->id
             ]),
-            'pictureVoteUrl'    => $controller->url()->fromRoute('moder/pictures/params', [
-                'action'     => 'picture-vote',
-                'form'       => 'picture-vote',
-                'picture_id' => $picture->id
+            'voteOptions' => $this->getVoteOptions2(),
+            'voteUrl' => $controller->url()->fromRoute('api/picture-moder-vote', [
+                'id' => $picture->id
             ]),
-            'voteOptions' => $this->getVoteOptions()
         ];
     }
 

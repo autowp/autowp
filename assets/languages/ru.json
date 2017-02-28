@@ -14,5 +14,11 @@
     
     "who-online/title": "На сайте",
     "who-online/refresh": "Обновить",
-    "who-online/close": "Закрыть"
+    "who-online/close": "Закрыть",
+    
+    "picture-moder-vote/custom/title": "Своя причина",
+    "picture-moder-vote/custom/sending": "отправляется ...",
+    "picture-moder-vote/custom/send": "отправлено",
+    "picture-moder-vote/custom/cancel": "отменить",
+    "picture-moder-vote/custom/save": "Сохранить как шаблон"
 }
