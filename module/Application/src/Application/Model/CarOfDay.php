@@ -31,26 +31,26 @@ class CarOfDay
      * @var ItemNameFormatter
      */
     private $itemNameFormatter;
-    
+
     /**
      * @var Image\Storage
      */
     private $imageStorage;
-    
+
     /**
      * @var Catalogue
      */
     private $catalogue;
-    
+
     private $router;
-    
+
     private $translator;
-    
+
     /**
      * @var SpecificationsService
      */
     private $specsService = null;
-    
+
     /**
      * @var DbTable\Item\ParentTable
      */
@@ -76,7 +76,7 @@ class CarOfDay
             'primary' => 'day_date'
         ]);
     }
-    
+
     /**
      * @return DbTable\Item\ParentTable
      */
@@ -112,7 +112,7 @@ class CarOfDay
         $row = $this->getCarOfDayCadidate();
         if ($row) {
             print $row['id']  ."\n";
-        
+
             $now = new DateTime();
             $this->setItemOfDay($now, $row['id'], null);
         }
@@ -231,51 +231,51 @@ class CarOfDay
             print_r($response->getErrors());
         }
     }
-    
+
     public function putCurrentToFacebook(array $fbOptions)
     {
         $dayRow = $this->table->fetchRow([
             'day_date = CURDATE()',
             'not facebook_sent'
         ]);
-        
+
         if (! $dayRow) {
             print 'Day row not found or already sent' . PHP_EOL;
             return;
         }
-        
+
         $itemTable = new Item();
-        
+
         $car = $itemTable->fetchRow([
             'id = ?' => (int)$dayRow->item_id
         ]);
-        
+
         if (! $car) {
             print 'Car of day not found' . PHP_EOL;
             return;
         }
-        
+
         $pictureTable = new Picture();
-        
+
         /* Hardcoded perspective priority list */
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
-        
+
         foreach ($perspectives as $perspective) {
             $picture = $this->pictureByPerspective($pictureTable, $car, $perspective);
             if ($picture) {
                 break;
             }
         }
-        
+
         if (! $picture) {
             $picture = $this->pictureByPerspective($pictureTable, $car, false);
         }
-        
+
         if (! $picture) {
             print 'Picture not found' . PHP_EOL;
             return;
         }
-        
+
         $url = 'http://wheelsage.org/picture/' . $picture->identity;
         
         if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
@@ -289,7 +289,7 @@ class CarOfDay
             $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
             $url
         );
-        
+
         $fb = new Facebook\Facebook([
             'app_id'                => $fbOptions['app_id'],
             'app_secret'            => $fbOptions['app_secret'],
@@ -300,72 +300,72 @@ class CarOfDay
             'link'    => $url,
             'message' => 'Vehicle of the day: ' . $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
         ];
-        
+
         try {
             // Returns a `Facebook\FacebookResponse` object
             $response = $fb->post('/296027603807350/feed', $linkData, $fbOptions['page_access_token']);
-        } catch(Facebook\Exceptions\FacebookResponseException $e) {
+        } catch (Facebook\Exceptions\FacebookResponseException $e) {
             echo 'Graph returned an error: ' . $e->getMessage();
             return;
-        } catch(Facebook\Exceptions\FacebookSDKException $e) {
+        } catch (Facebook\Exceptions\FacebookSDKException $e) {
             echo 'Facebook SDK returned an error: ' . $e->getMessage();
             return;
         }
-        
+
         $dayRow->facebook_sent = true;
         $dayRow->save();
-    
+
         print 'ok' . PHP_EOL;
     }
-    
+
     public function putCurrentToVk(array $vkOptions)
     {
         $language = 'ru';
-        
+
         $dayRow = $this->table->fetchRow([
             'day_date = CURDATE()',
             'not vk_sent'
         ]);
-    
+
         if (! $dayRow) {
             print 'Day row not found or already sent' . PHP_EOL;
             return;
         }
-    
+
         $itemTable = new Item();
-    
+
         $car = $itemTable->fetchRow([
             'id = ?' => (int)$dayRow->item_id
         ]);
-    
+
         if (! $car) {
             print 'Car of day not found' . PHP_EOL;
             return;
         }
-    
+
         $pictureTable = new Picture();
-    
+
         /* Hardcoded perspective priority list */
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
-    
+
         foreach ($perspectives as $perspective) {
             $picture = $this->pictureByPerspective($pictureTable, $car, $perspective);
             if ($picture) {
                 break;
             }
         }
-    
+
         if (! $picture) {
             $picture = $this->pictureByPerspective($pictureTable, $car, false);
         }
-    
+
         if (! $picture) {
             print 'Picture not found' . PHP_EOL;
             return;
         }
-        
-        
-    
+
+
+
         $url = 'http://autowp.ru/picture/' . $picture->identity;
         
         if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
@@ -378,7 +378,7 @@ class CarOfDay
             self::mb_ucfirst($title) . ': %s',
             $this->itemNameFormatter->format($car->getNameData($language), $language)
         );
-            
+
         $client = new \Zend\Http\Client('https://api.vk.com/method/wall.post');
         $response = $client
             ->setMethod(\Zend\Http\Request::METHOD_POST)
@@ -392,54 +392,53 @@ class CarOfDay
                 'captcha_key' => 'q2d2due'*/
             ])
             ->send();
-    
+
         if (! $response->isSuccess()) {
             throw new \Exception("Failed to post to vk" . $response->getReasonPhrase());
         }
-        
+
         $json = \Zend\Json\Json::decode($response->getBody(), \Zend\Json\Json::TYPE_ARRAY);
         if (isset($json['error'])) {
             throw new \Exception("Failed to post to vk" . $json['error']['error_msg']);
         }
-        
+
         $dayRow->vk_sent = true;
         $dayRow->save();
-        
+
         print 'ok' . PHP_EOL;
     }
-    
+
     public function getNextDates()
     {
         $now = new DateTime();
         $interval = new DateInterval('P1D');
-        
+
         $result = [];
-        
-        for ($i=0; $i<10; $i++) {
-            
+
+        for ($i = 0; $i < 10; $i++) {
             $dayRow = $this->table->fetchRow([
                 'day_date = ?' => $now->format('Y-m-d'),
                 'item_id is not null'
             ]);
-            
+
             $result[] = [
                 'date' => clone $now,
-                'free' => !$dayRow
+                'free' => ! $dayRow
             ];
-            
+
             $now->add($interval);
         }
-        
+
         return $result;
     }
-    
+
     public function getItemOfDay($itemId, $userId, $language)
     {
         $itemTable = new DbTable\Item();
         $carOfDay = $itemTable->find($itemId)->current();
-        
+
         $carOfDayPictures = $this->getOrientedPictureList($carOfDay);
-        
+
         // images
         $formatRequests = [];
         foreach ($carOfDayPictures as $idx => $picture) {
@@ -448,12 +447,12 @@ class CarOfDay
                 $formatRequests[$format][$idx] = $picture->getFormatRequest();
             }
         }
-                
+
         $imagesInfo = [];
         foreach ($formatRequests as $format => $requests) {
             $imagesInfo[$format] = $this->imageStorage->getFormatedImages($requests, $format);
         }
-        
+
         // names
         $notEmptyPics = [];
         foreach ($carOfDayPictures as $idx => $picture) {
@@ -465,23 +464,23 @@ class CarOfDay
         $names = $pictureTable->getNameData($notEmptyPics, [
             'language' => $language
         ]);
-        
+
         $paths = $this->catalogue->getCataloguePaths($carOfDay->id, [
             'breakOnFirst' => true
         ]);
-        
+
         $categoryPath = false;
         if (! $paths) {
             $categoryPaths = $this->getCategoryPaths($carOfDay->id, [
                 'breakOnFirst' => true
             ]);
         }
-        
+
         $carOfDayPicturesData = [];
         foreach ($carOfDayPictures as $idx => $row) {
             if ($row) {
                 $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
-        
+
                 $url = null;
                 foreach ($paths as $path) {
                     $url = $this->router->assemble([
@@ -494,7 +493,7 @@ class CarOfDay
                         'name' => 'catalogue'
                     ]);
                 }
-        
+
                 if (! $url) {
                     foreach ($categoryPaths as $path) {
                         $url = $this->router->assemble([
@@ -508,7 +507,7 @@ class CarOfDay
                         ]);
                     }
                 }
-        
+
                 $carOfDayPicturesData[] = [
                     'src'  => isset($imagesInfo[$format][$idx])
                         ? $imagesInfo[$format][$idx]->getSrc()
@@ -518,7 +517,7 @@ class CarOfDay
                 ];
             }
         }
-        
+
         return [
             'itemTypeId' => $carOfDay['item_type_id'],
             'name'       => $carOfDay->getNameData($language),
@@ -527,11 +526,11 @@ class CarOfDay
             'userId'     => $userId
         ];
     }
-    
+
     private function getOrientedPictureList($car)
     {
         $perspectivesGroups = new DbTable\Perspective\Group();
-    
+
         $db = $perspectivesGroups->getAdapter();
         $perspectivesGroupIds = $db->fetchCol(
             $db->select()
@@ -539,16 +538,16 @@ class CarOfDay
                 ->where('page_id = ?', 6)
                 ->order('position')
         );
-    
+
         $pTable = $this->catalogue->getPictureTable();
         $pictures = [];
-    
+
         $db = $pTable->getAdapter();
         $usedIds = [];
-    
+
         foreach ($perspectivesGroupIds as $groupId) {
             $picture = null;
-    
+
             $select = $pTable->select(true)
                 ->where('mp.group_id = ?', $groupId)
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
@@ -577,7 +576,7 @@ class CarOfDay
                 $pictures[] = null;
             }
         }
-    
+
         $resorted = [];
         foreach ($pictures as $picture) {
             if ($picture) {
@@ -590,14 +589,14 @@ class CarOfDay
             }
         }
         $pictures = $resorted;
-    
+
         $left = [];
         foreach ($pictures as $key => $picture) {
             if (! $picture) {
                 $left[] = $key;
             }
         }
-    
+
         if (count($left) > 0) {
             $select = $pTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
@@ -606,26 +605,26 @@ class CarOfDay
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 //->order('ratio DESC')
                 ->limit(count($left));
-    
+
             if (count($usedIds) > 0) {
                 $select->where('pictures.id NOT IN (?)', $usedIds);
             }
-    
+
             foreach ($pTable->fetchAll($select) as $pic) {
                 $key = array_shift($left);
                 $pictures[$key] = $pic;
             }
         }
-    
+
         return $pictures;
     }
-    
+
     private function carLinks(DbTable\Item\Row $car, $language)
     {
         $items = [];
-    
+
         $itemTable = $this->catalogue->getItemTable();
-    
+
         $db = $itemTable->getAdapter();
         $totalPictures = $db->fetchOne(
             $db->select()
@@ -635,7 +634,7 @@ class CarOfDay
                 ->where('item_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
         );
-    
+
         if ($car->item_type_id == DbTable\Item\Type::CATEGORY) {
             $items[] = [
                 'icon'  => 'align-left',
@@ -647,7 +646,7 @@ class CarOfDay
                 ]),
                 'text'  => $this->translator->translate('carlist/details')
             ];
-    
+
             if ($totalPictures > 6) {
                 $items[] = [
                     'icon'  => 'th',
@@ -656,14 +655,14 @@ class CarOfDay
                         'category_catname' => $car->catname,
                     ], [
                     'name' => 'categories'
-                ]),
+                    ]),
                     'text'  => $this->translator->translate('carlist/all pictures'),
                     'count' => $totalPictures
                 ];
             }
         } else {
             $cataloguePaths = $this->catalogue->getCataloguePaths($car['id']);
-    
+
             if ($totalPictures > 6) {
                 foreach ($cataloguePaths as $path) {
                     $url = $this->router->assemble([
@@ -683,7 +682,7 @@ class CarOfDay
                     break;
                 }
             }
-    
+
             if ($this->specsService->hasSpecs($car->id)) {
                 foreach ($cataloguePaths as $path) {
                     $items[] = [
@@ -701,7 +700,7 @@ class CarOfDay
                     break;
                 }
             }
-    
+
             $twins = new Twins();
             foreach ($twins->getCarGroups($car->id) as $twinsGroup) {
                 $items[] = [
@@ -714,7 +713,7 @@ class CarOfDay
                     'text'  => $this->translator->translate('carlist/twins')
                 ];
             }
-    
+
             $categoryRows = $db->fetchAll(
                 $db->select()
                     ->from($itemTable->info('name'), [
@@ -726,7 +725,7 @@ class CarOfDay
                         'item_language',
                         'item.id = item_language.item_id and item_language.language = :language',
                         null
-                        )
+                    )
                     ->join('item_parent', 'item.id = item_parent.parent_id', null)
                     ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
@@ -738,7 +737,7 @@ class CarOfDay
                         'item_id'  => $car['id']
                     ])
             );
-    
+
             foreach ($categoryRows as $category) {
                 $items[] = [
                     'icon'  => 'tag',
@@ -755,33 +754,33 @@ class CarOfDay
                 ];
             }
         }
-    
+
         return $items;
     }
-    
+
     private function getCategoryPaths($carId, array $options = [])
     {
         $carId = (int)$carId;
         if (! $carId) {
             throw new Exception("carId not provided");
         }
-    
+
         $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
-    
+
         $result = [];
-    
+
         $db = $this->getItemParentTable()->getAdapter();
-    
+
         $select = $db->select()
             ->from('item_parent', 'item_id')
             ->join('item', 'item_parent.parent_id = item.id', 'catname')
             ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
             ->where('item_parent.item_id = ?', $carId);
-    
+
         if ($breakOnFirst) {
             $select->limit(1);
         }
-    
+
         $categoryVehicleRows = $db->fetchAll($select);
         foreach ($categoryVehicleRows as $categoryVehicleRow) {
             $result[] = [
@@ -790,18 +789,18 @@ class CarOfDay
                 'path'             => []
             ];
         }
-    
+
         if ($breakOnFirst && count($result)) {
             return $result;
         }
-    
+
         $parents = $this->getItemParentTable()->fetchAll([
             'item_id = ?' => $carId
         ]);
-    
+
         foreach ($parents as $parent) {
             $paths = $this->getCategoryPaths($parent->parent_id, $options);
-    
+
             foreach ($paths as $path) {
                 $result[] = [
                     'category_catname' => $path['category_catname'],
@@ -809,15 +808,15 @@ class CarOfDay
                     'path'             => array_merge($path['path'], [$parent->catname])
                 ];
             }
-    
+
             if ($breakOnFirst && count($result)) {
                 return $result;
             }
         }
-    
+
         return $result;
     }
-    
+
     public function isComplies($itemId)
     {
         $db = $this->table->getAdapter();
@@ -835,36 +834,36 @@ class CarOfDay
         ';
         return (bool)$db->fetchRow($sql, [Picture::STATUS_ACCEPTED, (int)$itemId]);
     }
-    
+
     public function setItemOfDay(DateTime $dateTime, $itemId, $userId)
     {
         $itemId = (int)$itemId;
         $userId = (int)$userId;
-        
+
         if (! $this->isComplies($itemId)) {
             return false;
         }
-        
+
         $dateStr = $dateTime->format('Y-m-d');
-        
+
         $dayRow = $this->table->fetchRow([
             'day_date = ?' => $dateStr
         ]);
-        
-        if (!$dayRow) {
+
+        if (! $dayRow) {
             $dayRow = $this->table->createRow([
                 'day_date' => $dateStr
             ]);
         }
-        
+
         if ($dayRow['item_id']) {
             return false;
         }
-        
+
         $dayRow->item_id = $itemId;
         $dayRow->user_id = $userId ? $userId : null;
         $dayRow->save();
-        
+
         return true;
     }
 }

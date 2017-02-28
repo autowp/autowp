@@ -206,7 +206,7 @@ class Catalogue
         $select
             ->columns(['parent_id', 'catname', 'type'])
             ->where(['item_id' => $id]);
-            
+
         if ($stockFirst) {
             $select->order([
                 new Sql\Expression('type = ? desc', [DbTable\Item\ParentTable::TYPE_DEFAULT])
@@ -239,16 +239,16 @@ class Catalogue
                         break;
                 }
             }
-            
+
             if ($stockFirst) {
-                usort($result, function($a, $b) {
+                usort($result, function ($a, $b) {
                     if ($a['stock']) {
                         return $b['stock'] ? 0 : -1;
                     }
                     return $b['stock'] ? 1 : 0;
                 });
             }
-            
+
             if ($breakOnFirst && count($result)) {
                 $result = [$result[0]]; // truncate to first
                 if ($stockFirst) {
@@ -260,7 +260,7 @@ class Catalogue
                 }
             }
         }
-        
+
         if ($breakOnFirst && count($result) > 1) {
             $result = [$result[0]]; // truncate to first
         }

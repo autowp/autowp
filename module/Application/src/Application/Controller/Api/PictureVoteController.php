@@ -15,12 +15,12 @@ class PictureVoteController extends AbstractRestfulController
      * @var PictureVote
      */
     private $model;
-    
+
     public function __construct(PictureVote $model)
     {
         $this->model = $model;
     }
-    
+
     /**
      * Update an existing resource
      *
@@ -34,13 +34,13 @@ class PictureVoteController extends AbstractRestfulController
         if (! $currentUser) {
             return $this->forbiddenAction();
         }
-        
+
         $value = isset($data['value']) ? $data['value'] : null;
 
         $this->model->vote($id, $currentUser['id'], $value);
 
         $this->getResponse()->setStatusCode(200);
-        
+
         return new JsonModel($this->model->getVote($id, $currentUser['id']));
     }
 }

@@ -448,14 +448,14 @@ class UsersController extends AbstractActionController
             'valueTitle' => $valueTitle
         ];
     }
-    
+
     private function likesRating()
     {
         $userTable = new User();
         $itemTable = new DbTable\Item();
-        
+
         $db = $userTable->getAdapter();
-        
+
         $rows = $db->fetchAll(
             $db->select()
                 ->from('comment_message', ['author_id', 'volume' => new Zend_Db_Expr('sum(vote)')])
@@ -463,7 +463,7 @@ class UsersController extends AbstractActionController
                 ->order('volume DESC')
                 ->limit(30)
         );
-    
+
         $users = [];
         foreach ($rows as $row) {
             $users[] = [
@@ -472,21 +472,21 @@ class UsersController extends AbstractActionController
                 'brands' => []
             ];
         }
-    
+
         return [
             'users'      => $users,
             'rating'     => 'likes',
             'valueTitle' => 'users/rating/likes'
         ];
     }
-    
+
     private function pictureLikesRating()
     {
         $userTable = new User();
         $itemTable = new DbTable\Item();
-    
+
         $db = $userTable->getAdapter();
-    
+
         $rows = $db->fetchAll(
             $db->select()
                 ->from('pictures', ['owner_id'])
@@ -496,7 +496,7 @@ class UsersController extends AbstractActionController
                 ->order('volume DESC')
                 ->limit(30)
         );
-    
+
         $users = [];
         foreach ($rows as $row) {
             $users[] = [
@@ -505,7 +505,7 @@ class UsersController extends AbstractActionController
                 'brands' => []
             ];
         }
-    
+
         return [
             'users'      => $users,
             'rating'     => 'picture-likes',
@@ -525,11 +525,11 @@ class UsersController extends AbstractActionController
             case 'pictures':
                 return $this->picturesRating();
                 break;
-                
+
             case 'likes':
                 return $this->likesRating();
                 break;
-                
+
             case 'picture-likes':
                 return $this->pictureLikesRating();
                 break;

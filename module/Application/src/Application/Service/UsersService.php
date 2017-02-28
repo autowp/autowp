@@ -512,44 +512,44 @@ class UsersService
             setcookie('remember', $hash, time() + 3600 * 24 * 30, '/', $domain);
         }
     }
-    
+
     public function markDeleted($userId)
     {
         $row = $this->getTable()->find($userId)->current();
         if (! $row) {
             return false;
         }
-        
+
         $oldImageId = $row->img;
         if ($oldImageId) {
             $row->img = null;
             $row->save();
             $this->imageStorage->removeImage($oldImageId);
         }
-        
+
         $row->deleted = 1;
         $row->save();
-        
+
         // delete from contacts
         $contactModel = new Contact();
         $contactModel->deleteUserEverywhere($row['id']);
-        
+
         // unsubscribe from telegram
         $telegramChatTable = new DbTable\Telegram\Chat();
         $telegramChatTable->delete([
             'user_id = ?' => $row['id']
         ]);
-        
+
         // delete linked profiles
         $uaTable = new DbTable\User\Account();
         $uaTable->delete([
             'user_id = ?' => $row['id']
         ]);
-        
+
         // unsubscribe from items
         $ucsTable = new DbTable\User\ItemSubscribe();
         $ucsTable->unsubscribeAll($row['id']);
-        
+
         return true;
     }
 }

@@ -15,7 +15,7 @@ class UsersController extends AbstractActionController
      * @var User
      */
     private $table;
-    
+
     /**
      * @var UsersService
      */
@@ -24,7 +24,7 @@ class UsersController extends AbstractActionController
     public function __construct(UsersService $userService)
     {
         $this->userService = $userService;
-        
+
         $this->table = new User();
     }
 
@@ -99,9 +99,9 @@ class UsersController extends AbstractActionController
         if (! $row) {
             return $this->notFoundAction();
         }
-        
+
         $this->userService->markDeleted($row['id']);
-        
+
         $this->log(sprintf(
             'Удаление пользователя №%s',
             $row->id

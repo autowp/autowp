@@ -164,7 +164,7 @@ class Brand
                     'COUNT(IF(subitem.add_datetime > DATE_SUB(NOW(), INTERVAL :new_days DAY), 1, NULL))'
                 ),
                 'pictures_count' => new Zend_Db_Expr(
-                    '(' . 
+                    '(' .
                         $this->table->getAdapter()->select()
                             ->from(['ipc_all' => 'item_parent_cache'], 'COUNT(DISTINCT pictures.id)')
                             ->join('picture_item', 'ipc_all.item_id = picture_item.item_id', null)
@@ -404,7 +404,7 @@ class Brand
         if ($callback) {
             $callback($select);
         }
-        
+
         //print $select->assemble(); exit;
 
         $items = $db->fetchAll($select);

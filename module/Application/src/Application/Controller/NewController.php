@@ -25,7 +25,7 @@ class NewController extends AbstractActionController
 
     public function __construct(
         ItemNameFormatter $itemNameFormatter
-        ) {
+    ) {
             $this->itemNameFormatter = $itemNameFormatter;
     }
 
@@ -70,7 +70,7 @@ class NewController extends AbstractActionController
 
         $paginator = new Paginator(
             new Zend1DbTableSelect($select)
-            );
+        );
         $paginator
         ->setItemCountPerPage(self::PER_PAGE)
         ->setCurrentPageNumber($this->params('page'));
@@ -96,7 +96,7 @@ class NewController extends AbstractActionController
                 }
                 unset($item);
 
-                if (!$found) {
+                if (! $found) {
                     $items[] = [
                         'item_id'  => $itemId,
                         'type'     => 'item',
@@ -133,7 +133,6 @@ class NewController extends AbstractActionController
         $picturesBuffer = [];
         foreach ($tmpItems as $itemId => $item) {
             if ($item['type'] == 'item') {
-
                 if (count($picturesBuffer) > 0) {
                     $items[] = [
                         'type'     => 'pictures',
@@ -160,7 +159,6 @@ class NewController extends AbstractActionController
 
         foreach ($items as &$item) {
             if ($item['type'] == 'item') {
-
                 $itemRow = $itemTable->find($item['item_id'])->current();
 
                 $ids = [];
@@ -183,7 +181,6 @@ class NewController extends AbstractActionController
                         'picHelper'  => $this->getPluginManager()->get('pic')
                     ])
                 ]);
-
             } else {
                 $item['picture'] = $listData = $this->pic()->listData($item['pictures'], [
                     'width' => 6
@@ -264,7 +261,7 @@ class NewController extends AbstractActionController
         $carFullName = $this->itemNameFormatter->format(
             $item->getNameData($language),
             $language
-            );
+        );
 
         return [
             'picturesData' => $picturesData,

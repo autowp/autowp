@@ -14,30 +14,30 @@ use Zend_Db_Expr;
 class DonateController extends AbstractActionController
 {
     private $carOfDay;
-    
+
     /**
      * @var DbTable\Item\ParentTable
      */
     private $itemParentTable;
-    
+
     /**
      * @var array
      */
     private $yandexConfig;
-    
+
     public function __construct(CarOfDay $carOfDay, array $yandexConfig)
     {
         $this->carOfDay = $carOfDay;
         $this->yandexConfig = $yandexConfig;
     }
-    
+
     private function getItemParentTable()
     {
         return $this->itemParentTable
             ? $this->itemParentTable
             : $this->itemParentTable = new DbTable\Item\ParentTable();
     }
-    
+
     public function indexAction()
     {
     }
@@ -45,16 +45,16 @@ class DonateController extends AbstractActionController
     public function successAction()
     {
     }
-    
+
     public function vodAction()
     {
         $dates = $this->carOfDay->getNextDates();
-        
+
         foreach ($dates as &$nextDate) {
             $nextDate['date_str'] = $nextDate['date']->format('Y-m-d');
         }
         unset($nextDate);
-        
+
         $date = (string)$this->params('date');
         $selectedDate = null;
         foreach ($dates as $nextDate) {
@@ -63,13 +63,13 @@ class DonateController extends AbstractActionController
                 break;
             }
         }
-        
+
         $itemId = (int)$this->params('item_id');
-        
+
         $itemId = $this->carOfDay->isComplies($itemId) ? $itemId : null;
-        
+
         $itemTable = new DbTable\Item();
-        
+
         $item = null;
         if ($itemId) {
             $item = $itemTable->fetchRow([
@@ -77,20 +77,20 @@ class DonateController extends AbstractActionController
                 'item_type_id = ?' => DbTable\Item\Type::VEHICLE
             ]);
         }
-        
+
         $userId = null;
         $user = $this->user()->get();
         if ($user) {
             $userId = $user->id;
         }
-        
+
         $anonymous = (bool)$this->params('anonymous');
-        
+
         $itemOfDay = null;
         if ($item) {
             $itemOfDay = $this->carOfDay->getItemOfDay($item['id'], $anonymous ? null : $userId, $this->language());
         }
-        
+
         return [
             'dates'        => $dates,
             'selectedDate' => $selectedDate,
@@ -101,39 +101,39 @@ class DonateController extends AbstractActionController
             'itemOfDay'    => $itemOfDay
         ];
     }
-    
+
     public function vodSuccessAction()
     {
-    
     }
-    
+
     public function vodSelectItemAction()
     {
         $brandModel = new BrandModel();
-    
+
         $language = $this->language();
-    
+
         $brand = $brandModel->getBrandById($this->params('brand_id'), $language);
-        if (!$brand) {
-            $rows = $brandModel->getList($language, function ($select) {});
-            
+        if (! $brand) {
+            $rows = $brandModel->getList($language, function ($select) {
+            });
+
             return [
                 'brand'  => null,
                 'brands' => $rows
             ];
         }
-        
+
         $itemTable = new DbTable\Item();
-        
+
         $haveConcepts = (bool)$itemTable->fetchRow(
             $itemTable->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $brand['id'])
                 ->where('item.is_concept')
         );
-        
+
         $db = $itemTable->getAdapter();
-        
+
         $rows = $db->fetchAll(
             $db->select()
                 ->from('item', [
@@ -164,7 +164,7 @@ class DonateController extends AbstractActionController
                 ])
         );
         $vehicles = $this->prepareVehicles($rows);
-        
+
         $rows = $db->fetchAll(
             $db->select()
                 ->from('item', [
@@ -193,7 +193,7 @@ class DonateController extends AbstractActionController
                     'lang' => $this->language()
                 ])
         );
-        
+
         return [
             'brand'        => $brand,
             'vehicles'     => $vehicles,
@@ -203,12 +203,12 @@ class DonateController extends AbstractActionController
             ], [], true),
         ];
     }
-    
+
     private function prepareVehicles($rows)
     {
         $itemParentTable = $this->getItemParentTable();
         $itemParentAdapter = $itemParentTable->getAdapter();
-    
+
         $items = [];
         foreach ($rows as $row) {
             $haveChilds = (bool)$itemParentAdapter->fetchOne(
@@ -238,21 +238,21 @@ class DonateController extends AbstractActionController
                 'isComplies' => $this->carOfDay->isComplies($row['id'])
             ];
         }
-    
+
         return $items;
     }
-    
+
     public function vehicleChildsAction()
     {
         $itemTable = new DbTable\Item();
-    
+
         $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notfoundAction();
         }
-    
+
         $db = $itemTable->getAdapter();
-    
+
         $rows = $db->fetchAll(
             $db->select()
                 ->from('item', [
@@ -274,19 +274,19 @@ class DonateController extends AbstractActionController
                     'lang' => $this->language()
                 ])
         );
-    
+
         $viewModel = new ViewModel([
             'cars' => $this->prepareItemParentRows($rows)
         ]);
-    
+
         return $viewModel->setTerminal(true);
     }
-    
+
     private function prepareItemParentRows($rows)
     {
         $itemParentTable = $this->getItemParentTable();
         $itemParentAdapter = $itemParentTable->getAdapter();
-    
+
         $items = [];
         foreach ($rows as $row) {
             $haveChilds = (bool)$itemParentAdapter->fetchOne(
@@ -317,10 +317,10 @@ class DonateController extends AbstractActionController
                 'isComplies' => $this->carOfDay->isComplies($row['id'])
             ];
         }
-    
+
         return $items;
     }
-    
+
     public function conceptsAction()
     {
         $itemTable = new DbTable\Item();
@@ -331,9 +331,9 @@ class DonateController extends AbstractActionController
         if (! $brand) {
             return $this->notfoundAction();
         }
-    
+
         $db = $itemTable->getAdapter();
-    
+
         $rows = $db->fetchAll(
             $db->select()
                 ->from('item', [
@@ -357,16 +357,16 @@ class DonateController extends AbstractActionController
                     'lang' => $this->language()
                 ])
         );
-    
+
         $concepts = $this->prepareVehicles($rows);
-    
+
         $viewModel = new ViewModel([
             'concepts' => $concepts,
         ]);
-    
+
         return $viewModel->setTerminal(true);
     }
-    
+
     public function logAction()
     {
         $data = [
@@ -425,7 +425,7 @@ class DonateController extends AbstractActionController
                 'user_id'  => null
             ]
         ];
-        
+
         return [
             'items' => $data
         ];

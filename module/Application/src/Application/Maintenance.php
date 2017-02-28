@@ -70,10 +70,10 @@ class Maintenance extends AbstractListenerAggregate
 
         $twitterConfig = $serviceManager->get('Config')['twitter'];
         $carOfDay->putCurrentToTwitter($twitterConfig);
-        
+
         $facebookConfig = $serviceManager->get('Config')['facebook'];
         $carOfDay->putCurrentToFacebook($facebookConfig);
-        
+
         $vkConfig = $serviceManager->get('Config')['vk'];
         $carOfDay->putCurrentToVk($vkConfig);
 

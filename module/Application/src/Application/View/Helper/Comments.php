@@ -51,7 +51,7 @@ class Comments extends AbstractHelper
             ]));
             // TODO: 'canModeratorAttention' => $this->view->user()->isAllowed('comment', 'moderator-attention'),
         }
-        
+
         if ($user) {
             $this->comments->markSubscriptionAwaiting($type, $item, $user['id']);
         }

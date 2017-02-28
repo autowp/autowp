@@ -12,7 +12,7 @@ class NewPicturesListBuilder extends \Application\Model\Item\ListBuilder
      * @var string
      */
     protected $date;
-    
+
     /**
      * @var array
      */
@@ -24,11 +24,11 @@ class NewPicturesListBuilder extends \Application\Model\Item\ListBuilder
 
         return $this;
     }
-    
+
     public function setPictureIds($pictureIds)
     {
         $this->pictureIds = $pictureIds;
-    
+
         return $this;
     }
 

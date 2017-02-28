@@ -253,7 +253,7 @@ class BrandVehicle
 
         return $catname;
     }
-    
+
     public function isAllowedCombination($itemTypeId, $parentItemTypeId)
     {
         return isset($this->allowedCombinations[$parentItemTypeId][$itemTypeId]);

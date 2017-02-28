@@ -9,9 +9,9 @@ use Zend_Db_Expr;
 class NewPictureFetcher extends PictureFetcher
 {
     const COUNT = 6;
-    
+
     private $pictureIds = [];
-    
+
     public function setPictureIds(array $pictureIds)
     {
         $this->pictureIds = $pictureIds;
@@ -20,7 +20,7 @@ class NewPictureFetcher extends PictureFetcher
     public function fetch(array $item, array $options = [])
     {
         $pictureTable = $this->getPictureTable();
-        
+
         $select = $pictureTable->select();
 
         $select = $this->getPictureSelect($item['id'], [
@@ -28,10 +28,10 @@ class NewPictureFetcher extends PictureFetcher
             'limit' => 6,
             'acceptedSort' => true
         ]);
-        
+
         $db = $pictureTable->getAdapter();
         $db->fetchRow($select);
-        
+
         $result = [];
         foreach ($db->fetchAll($select) as $row) {
             $result[] = [
@@ -42,7 +42,7 @@ class NewPictureFetcher extends PictureFetcher
 
         return $result;
     }
-  
+
     public function getTotalPictures(array $itemIds, $onlyExactly)
     {
         $result = [];
@@ -52,7 +52,7 @@ class NewPictureFetcher extends PictureFetcher
         if (count($itemIds)) {
             $pictureTable = $this->getPictureTable();
             $pictureTableAdapter = $pictureTable->getAdapter();
-    
+
             $select = $pictureTableAdapter->select()
                 ->from($pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
                 ->where('pictures.id IN (?)', $this->pictureIds)
@@ -60,7 +60,7 @@ class NewPictureFetcher extends PictureFetcher
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('picture_item.item_id IN (?)', $itemIds)
                 ->group('picture_item.item_id');
-    
+
             $result = array_replace($result, $pictureTableAdapter->fetchPairs($select));
         }
         return $result;

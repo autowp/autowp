@@ -408,11 +408,11 @@ class CarsController extends AbstractActionController
             'action'  => 'car',
             'item_id' => $car->id,
         ];
-        
+
         if ($tab) {
             $params['tab'] = $tab;
         }
-        
+
         return $this->url()->fromRoute('moder/cars/params', $params, [
             'force_canonical' => $full,
             'uri'             => $uri
@@ -1249,24 +1249,24 @@ class CarsController extends AbstractActionController
             htmlspecialchars($this->car()->formatName($car, 'en'))
         );
         $this->log($message, [$car, $parentCar]);
-        
-        
+
+
         $ucsTable = new DbTable\User\ItemSubscribe();
         $user = $this->user()->get();
-        
+
         $subscribers = [];
         foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
             $subscribers[$subscriber->id] = $subscriber;
         }
-        
+
         foreach ($ucsTable->getItemSubscribers($parentCar) as $subscriber) {
             $subscribers[$subscriber->id] = $subscriber;
         }
-        
+
         foreach ($subscribers as $subscriber) {
             if ($subscriber->id != $user->id) {
                 $uri = $this->hostManager->getUriByLanguage($subscriber->language);
-        
+
                 $message = sprintf(
                     $this->translate(
                         'pm/user-%s-removed-item-%s-%s-from-item-%s-%s',
@@ -1279,7 +1279,7 @@ class CarsController extends AbstractActionController
                     $this->car()->formatName($parentCar, $subscriber->language),
                     $this->carModerUrl($parentCar, true, null, $uri)
                 );
-        
+
                 $this->message->send(null, $subscriber->id, $message);
             }
         }
@@ -1330,23 +1330,23 @@ class CarsController extends AbstractActionController
             htmlspecialchars($this->car()->formatName($car, 'en'))
         );
         $this->log($message, [$car, $parentCar]);
-        
+
         $ucsTable = new DbTable\User\ItemSubscribe();
         $user = $this->user()->get();
-        
+
         $subscribers = [];
         foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
             $subscribers[$subscriber->id] = $subscriber;
         }
-        
+
         foreach ($ucsTable->getItemSubscribers($parentCar) as $subscriber) {
             $subscribers[$subscriber->id] = $subscriber;
         }
-        
+
         foreach ($subscribers as $subscriber) {
             if ($subscriber->id != $user->id) {
                 $uri = $this->hostManager->getUriByLanguage($subscriber->language);
-        
+
                 $message = sprintf(
                     $this->translate(
                         'pm/user-%s-adds-item-%s-%s-to-item-%s-%s',
@@ -1359,11 +1359,11 @@ class CarsController extends AbstractActionController
                     $this->car()->formatName($parentCar, $subscriber->language),
                     $this->carModerUrl($parentCar, true, null, $uri)
                 );
-        
+
                 $this->message->send(null, $subscriber->id, $message);
             }
         }
-        
+
 
         $url = $this->url()->fromRoute('moder/cars/params', [
             'action' => 'car',
@@ -2767,7 +2767,7 @@ class CarsController extends AbstractActionController
         $parentCar = $itemTable->fetchRow([
             'id = ?' => (int)$this->params('parent_id')
         ]);
-        
+
         if ($parentCar) {
             if (! $this->brandVehicle->isAllowedCombination($itemTypeId, $parentCar['item_type_id'])) {
                 return $this->forbiddenAction();
