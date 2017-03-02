@@ -15,7 +15,8 @@ class PictureModerVoteControllerFactory implements FactoryInterface
             $container->get(\Zend\Db\Adapter\AdapterInterface::class),
             $container->get(\Application\HostManager::class),
             $container->get(\Autowp\Message\MessageService::class),
-            $container->get('ModerPictureVoteForm2')
+            $container->get('ModerPictureVoteForm2'),
+            $container->get(\Application\Model\UserPicture::class)
         );
     }
 }

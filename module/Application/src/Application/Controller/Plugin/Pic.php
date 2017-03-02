@@ -828,18 +828,44 @@ class Pic extends AbstractPlugin
                 }
 
                 foreach ($carRows as $carRow) {
-                    $cataloguePaths = $catalogue->getCataloguePaths($carRow['id']);
+                    $cataloguePaths = $catalogue->getCataloguePaths($carRow['id'], [
+                        'breakOnFirst' => true,
+                        'toBrand'      => null,
+                        'stockFirst'   => true
+                    ]);
 
                     foreach ($cataloguePaths as $cPath) {
-                        $factoryCars[] = [
-                            'name' => $controller->car()->formatName($carRow, $language),
-                            'url'  => $controller->url()->fromRoute('catalogue', [
-                                'action'        => 'brand-item',
-                                'brand_catname' => $cPath['brand_catname'],
-                                'car_catname'   => $cPath['car_catname'],
-                                'path'          => $cPath['path']
-                            ])
-                        ];
+                        switch ($cPath['type']) {
+                            case 'brand-item':
+                                $factoryCars[] = [
+                                    'name' => $controller->car()->formatName($carRow, $language),
+                                    'url'  => $controller->url()->fromRoute('catalogue', [
+                                        'action'        => 'brand-item',
+                                        'brand_catname' => $cPath['brand_catname'],
+                                        'car_catname'   => $cPath['car_catname'],
+                                        'path'          => $cPath['path']
+                                    ])
+                                ];
+                                break;
+                            case 'brand':
+                                $factoryCars[] = [
+                                    'name' => $controller->car()->formatName($carRow, $language),
+                                    'url'  => $controller->url()->fromRoute('catalogue', [
+                                        'action'        => 'brand',
+                                        'brand_catname' => $cPath['brand_catname']
+                                    ])
+                                ];
+                                break;
+                            case 'category':
+                                $factoryCars[] = [
+                                    'name' => $controller->car()->formatName($carRow, $language),
+                                    'url'  => $controller->url()->fromRoute('categories', [
+                                        'action'           => 'category',
+                                        'category_catname' => $cPath['category_catname']
+                                    ])
+                                ];
+                                break;
+                        }
                         break;
                     }
                 }

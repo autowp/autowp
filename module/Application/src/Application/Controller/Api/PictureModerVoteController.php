@@ -14,6 +14,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
 use Application\Model\DbTable;
+use Application\Model\UserPicture;
 
 use Zend_Db_Expr;
 
@@ -34,16 +35,34 @@ class PictureModerVoteController extends AbstractRestfulController
      */
     private $message;
     
+    /**
+     * @var UserPicture
+     */
+    private $userPicture;
+    
     public function __construct(
         Adapter $adapter,
         HostManager $hostManager,
         MessageService $message,
-        Form $voteForm
+        Form $voteForm,
+        UserPicture $userPicture
     ) {
         $this->hostManager = $hostManager;
         $this->message = $message;
         $this->voteForm = $voteForm;
         $this->templateTable = new TableGateway('picture_moder_vote_template', $adapter);
+        $this->userPicture = $userPicture;
+    }
+    
+    private function pictureUrl(DbTable\Picture\Row $picture, $forceCanonical = false, $uri = null)
+    {
+        return $this->url()->fromRoute('moder/pictures/params', [
+            'action'     => 'picture',
+            'picture_id' => $picture->id
+        ], [
+            'force_canonical' => $forceCanonical,
+            'uri'             => $uri
+        ]);
     }
     
     private function pictureVoteExists($picture, $user)
@@ -79,6 +98,40 @@ class PictureModerVoteController extends AbstractRestfulController
                 );
     
                 $this->message->send(null, $owner->id, $message);
+            }
+        }
+    }
+    
+    private function unaccept(DbTable\Picture\Row $picture)
+    {
+        $previousStatusUserId = $picture->change_status_user_id;
+    
+        $user = $this->user()->get();
+        $picture->setFromArray([
+            'status'                => DbTable\Picture::STATUS_INBOX,
+            'change_status_user_id' => $user->id
+        ]);
+        $picture->save();
+    
+        if ($picture->owner_id) {
+            $this->userPicture->refreshPicturesCount($picture->owner_id);
+        }
+    
+        $this->log(sprintf(
+            'С картинки %s снят статус "принято"',
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
+        ), $picture);
+    
+    
+        $pictureUrl = $this->pic()->url($picture->identity, true);
+        if ($previousStatusUserId != $user->id) {
+            $userTable = new User();
+            foreach ($userTable->find($previousStatusUserId) as $prevUser) {
+                $message = sprintf(
+                    'С картинки %s снят статус "принято"',
+                    $pictureUrl
+                );
+                $this->message->send(null, $prevUser->id, $message);
             }
         }
     }
@@ -190,5 +243,46 @@ class PictureModerVoteController extends AbstractRestfulController
         return new JsonModel([
             'status' => true
         ]);
+    }
+    
+    /**
+     * Delete an existing resource
+     *
+     * @param  mixed $id
+     * @return mixed
+     */
+    public function delete($id)
+    {
+        $pictureTable = new DbTable\Picture();
+        $picture = $pictureTable->find($this->params('id'))->current();
+        if (! $picture) {
+            return $this->notFoundAction();
+        }
+        
+        $user = $this->user()->get();
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+        
+        $voteExists = $this->pictureVoteExists($picture, $user);
+        if (! $voteExists) {
+            return $this->notFoundAction();
+        }
+        
+        $moderVotes = new DbTable\Picture\ModerVote();
+        $moderVotes->delete([
+            'user_id = ?'    => $user->id,
+            'picture_id = ?' => $picture->id
+        ]);
+        
+        $message = sprintf(
+            $vote
+                ? 'Отменена заявка на принятие картинки %s'
+                : 'Отменена заявка на удаление картинки %s',
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
+        );
+        $this->log($message, $picture);
+        
+        return $this->getResponse()->setStatusCode(204);
     }
 }

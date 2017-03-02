@@ -105,6 +105,7 @@ return array_replace(include 'root.php', [
 
     'Picture of the day'       => 'Image du jour',
     'car-of-day'               => 'voiture de la journée',
+    'theme-of-day'             => 'theme of the day',
     'day ahead'                => 'journée à l\'avance',
     'day ago'                  => 'il y a jour',
     'Cars by destination'      => 'Voitures par destination',

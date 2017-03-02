@@ -169,13 +169,17 @@ class Catalogue
 
         $breakOnFirst = (bool)$options['breakOnFirst'];
         $stockFirst = (bool)$options['stockFirst'];
-        $toBrand = (int)$options['toBrand'];
+        if (isset($options['toBrand'])) {
+            $toBrand = is_bool($options['toBrand']) ? $options['toBrand'] : true;
+            $toBrandId = is_bool($options['toBrand']) ? null : (int)$options['toBrand'];
+        } else {
+            $toBrand = true;
+            $toBrandId = null;
+        }
 
         $result = [];
 
-        $brand = null;
-
-        if (! $toBrand || $id == $toBrand) {
+        if (! $toBrandId || $id == $toBrandId) {
             $select = new Sql\Select($this->itemTable2->getTable());
             $select
                 ->columns(['catname'])
@@ -185,22 +189,45 @@ class Catalogue
                 ]);
 
             $brand = $this->itemTable2->selectWith($select)->current();
-        }
-
-        if ($brand) {
-            $result[] = [
-                'type'          => 'brand',
-                'brand_catname' => $brand['catname'],
-                'car_catname'   => null,
-                'path'          => [],
-                'stock'         => true
-            ];
-
-            if ($breakOnFirst && count($result)) {
-                return $result;
+            
+            if ($brand) {
+                $result[] = [
+                    'type'          => 'brand',
+                    'brand_catname' => $brand['catname'],
+                    'car_catname'   => null,
+                    'path'          => [],
+                    'stock'         => true
+                ];
+            
+                if ($breakOnFirst && count($result)) {
+                    return $result;
+                }
             }
         }
 
+        if ($toBrand === false) {
+            //print '123';
+            $select = new Sql\Select($this->itemTable2->getTable());
+            $select
+                ->columns(['catname'])
+                ->where([
+                    'id'           => $id,
+                    'item_type_id' => DbTable\Item\Type::CATEGORY
+                ]);
+        
+            $category = $this->itemTable2->selectWith($select)->current();
+            
+            if ($category) {
+                $result[] = [
+                    'type'             => 'category',
+                    'category_catname' => $category['catname']
+                ];
+            
+                if ($breakOnFirst && count($result)) {
+                    return $result;
+                }
+            }
+        }
 
         $select = new Sql\Select($this->itemParentTable2->getTable());
         $select

@@ -105,7 +105,10 @@ class ListBuilder
 
     public function getSpecificationsUrl(DbTable\Item\Row $item)
     {
-        foreach ($this->getCataloguePath($item) as $path) {
+        $cataloguePaths = $this->getCataloguePath($item, [
+            'toBrand' => true
+        ]);
+        foreach ($cataloguePaths as $path) {
             return $this->router->assemble([
                 'action'        => 'brand-item-specifications',
                 'brand_catname' => $path['brand_catname'],

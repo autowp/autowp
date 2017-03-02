@@ -7,6 +7,17 @@ var Widget = function(element) {
     var $select = $element.find('select');
     var $text = $element.find(':text');
     
+    $element.on('click', '.btn-cancel-vote', function(e) {
+        e.preventDefault();
+        
+        $.ajax({
+            method: 'DELETE',
+            url: $(this).closest('[data-module]').data('url')
+        }).done(function() {
+            window.location = window.location;
+        });
+    });
+    
     $element.on('click', '[data-vote]', function(e) {
         e.preventDefault();
         

@@ -202,6 +202,11 @@ class Row extends \Autowp\Commons\Db\Table\Row
             $parentIds = $db->fetchCol(
                 $db->select()
                     ->from('item_parent_cache', 'parent_id')
+                    ->join('item', 'item_parent_cache.parent_id = item.id', null)
+                    ->where('item.item_type_id IN (?)', [
+                        Type::VEHICLE,
+                        Type::ENGINE
+                    ])
                     ->where('item_id = ?', $carId)
                     ->where('item_id <> parent_id')
                     ->order('diff desc')

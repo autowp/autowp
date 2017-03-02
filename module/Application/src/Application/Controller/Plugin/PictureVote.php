@@ -130,11 +130,6 @@ class PictureVote extends AbstractPlugin
                 'action'     => 'delete-picture',
                 'picture_id' => $picture->id
             ]),
-            'pictureUnvoteUrl'  => $controller->url()->fromRoute('moder/pictures/params', [
-                'action'     => 'picture-vote',
-                'form'       => 'picture-unvote',
-                'picture_id' => $picture->id
-            ]),
             'voteOptions' => $this->getVoteOptions2(),
             'voteUrl' => $controller->url()->fromRoute('api/picture-moder-vote', [
                 'id' => $picture->id

@@ -298,7 +298,7 @@ class CarOfDay
 
         $linkData = [
             'link'    => $url,
-            'message' => 'Vehicle of the day: ' . $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
+            'message' => self::mb_ucfirst($title) . ': ' . $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
         ];
 
         try {
@@ -466,15 +466,16 @@ class CarOfDay
         ]);
 
         $paths = $this->catalogue->getCataloguePaths($carOfDay->id, [
-            'breakOnFirst' => true
+            'breakOnFirst' => true,
+            'toBrand'      => false
         ]);
 
-        $categoryPath = false;
-        if (! $paths) {
+        $categoryPaths = [];
+        /*if (! $paths) {
             $categoryPaths = $this->getCategoryPaths($carOfDay->id, [
                 'breakOnFirst' => true
             ]);
-        }
+        }*/
 
         $carOfDayPicturesData = [];
         foreach ($carOfDayPictures as $idx => $row) {
@@ -483,18 +484,32 @@ class CarOfDay
 
                 $url = null;
                 foreach ($paths as $path) {
-                    $url = $this->router->assemble([
-                        'action'        => 'brand-item-picture',
-                        'brand_catname' => $path['brand_catname'],
-                        'car_catname'   => $path['car_catname'],
-                        'path'          => $path['path'],
-                        'picture_id'    => $row['identity']
-                    ], [
-                        'name' => 'catalogue'
-                    ]);
+                    switch ($path['type']) {
+                        case 'brand-item':
+                            $url = $this->router->assemble([
+                                'action'        => 'brand-item-picture',
+                                'brand_catname' => $path['brand_catname'],
+                                'car_catname'   => $path['car_catname'],
+                                'path'          => $path['path'],
+                                'picture_id'    => $row['identity']
+                            ], [
+                                'name' => 'catalogue'
+                            ]);
+                            break;
+                        case 'category':
+                            $url = $this->router->assemble([
+                                'action'           => 'category-picture',
+                                'category_catname' => $path['category_catname'],
+                                'picture_id'       => $row['identity']
+                            ], [
+                                'name' => 'categories'
+                            ]);
+                            break;
+                    }
+                    
                 }
 
-                if (! $url) {
+                /*if (! $url) {
                     foreach ($categoryPaths as $path) {
                         $url = $this->router->assemble([
                             'action'           => 'category-picture',
@@ -506,7 +521,7 @@ class CarOfDay
                             'name' => 'categories'
                         ]);
                     }
-                }
+                }*/
 
                 $carOfDayPicturesData[] = [
                     'src'  => isset($imagesInfo[$format][$idx])

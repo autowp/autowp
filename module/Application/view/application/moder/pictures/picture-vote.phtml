@@ -45,9 +45,11 @@
 <?php } ?>
 
 <?php if ($this->voteExists) { ?>
-    <form action="<?=$this->escapeHtmlAttr($this->pictureUnvoteUrl)?>" method="post">
-        <input type="submit" name="send" id="send" value="<?=$this->escapeHtmlAttr($this->translate('moder/picture/acceptance/cancel-vote'))?>" class="btn btn-default">
-    </form>
+    <div data-module="picture-moder-vote" data-url="<?=$this->escapeHtmlAttr($this->voteUrl)?>">
+        <button type="submit" class="btn btn-default btn-cancel-vote">
+            <?=$this->escapeHtml($this->translate('moder/picture/acceptance/cancel-vote'))?>
+        </button>
+    </div>
 <?php } ?>
 
 <?php if (isset($this->moderVotes) && count($this->moderVotes) > 0) { ?>

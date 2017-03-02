@@ -795,22 +795,6 @@ class PicturesController extends AbstractActionController
             ], [], true));
         }
 
-        if ($voteExists) {
-            if ($request->isPost() && $this->params('form') == 'picture-unvote') {
-                $moderVotes = new DbTable\Picture\ModerVote();
-
-                $user = $this->user()->get();
-                $moderVotes->delete([
-                    'user_id = ?'    => $user->id,
-                    'picture_id = ?' => $picture->id
-                ]);
-
-                $referer = $request->getServer('HTTP_REFERER');
-                $url = $referer ? $referer : $this->pictureUrl($picture);
-                return $this->redirect()->toUrl($url);
-            }
-        }
-
         $moderVotes = null;
         if (! $hideVote) {
             $moderVotes = $picture->findDependentRowset(DbTable\Picture\ModerVote::class);
