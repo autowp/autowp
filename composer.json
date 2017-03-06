@@ -46,7 +46,7 @@
         "zendframework/zend-view": ">=2.7",
         "zendframework/zendframework1": "1.*",
         "zfcampus/zf-oauth2": "^1.3",
-        "autowp/image": "dev-master",
+        "autowp/image": "v2.x-dev",
         "jenssegers/imagehash": "^0.4.1",
         "facebook/graph-sdk": "^5.4"
     },

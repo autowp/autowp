@@ -2985,6 +2985,20 @@ ALTER TABLE `comment_topic_subscribe`
 
 ALTER TABLE `users` ADD `pictures_total` INT NOT NULL DEFAULT '0' AFTER `pictures_added`, ADD INDEX (`pictures_total`);
 
+CREATE TABLE `picture_moder_vote_template` (
+  `id` int(11) NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `reason` varchar(50) NOT NULL,
+  `vote` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `picture_moder_vote_template`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+ALTER TABLE `picture_moder_vote_template`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
