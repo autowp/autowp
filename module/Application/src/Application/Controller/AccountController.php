@@ -263,8 +263,6 @@ class AccountController extends AbstractActionController
 
             $loginUrl = $service->getLoginUrl();
 
-            //print $loginUrl; exit;
-
             $table = new DbTable\LoginState();
             $row = $table->createRow([
                 'state'    => $service->getState(),
