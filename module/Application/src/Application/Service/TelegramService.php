@@ -89,22 +89,28 @@ class TelegramService
 
     public function sendMessage(array $params)
     {
+        if (! isset($params['chat_id'])) {
+            throw new \Exception("`chat_id` not provided");
+        }
+        
         try {
             $this->getApi()->sendMessage($params);
-        } catch (TelegramResponseException $e) {
-            if ($e->getMessage() == 'Forbidden: Bot was blocked by the user') {
-                if (isset($params['chat_id'])) {
-                    $this->unsubscribeChat($params['chat_id']);
-                    return;
-                }
+        } catch (\Exception $e) {
+            if (strpos($e->getMessage(), 'blocked') !== false) {
+                $this->unsubscribeChat($params['chat_id']);
+                return;
             }
-
             throw $e;
         }
     }
 
     private function unsubscribeChat($chatId)
     {
+        $chatId = (int) $chatId;
+        if (! $chatId) {
+            throw new Exception("`chat_id` is invalid");
+        }
+        
         $telegramBrandTable = new DbTable\Telegram\Brand();
         $telegramBrandTable->delete([
             'chat_id = ?' => (int)$chatId

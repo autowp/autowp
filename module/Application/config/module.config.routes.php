@@ -759,6 +759,15 @@ return [
                                 'action' => 'data',
                             ],
                         ]
+                    ],
+                    'index2' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/index2',
+                            'defaults' => [
+                                'action' => 'index2',
+                            ],
+                        ]
                     ]
                 ]
             ],

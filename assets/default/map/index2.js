@@ -31,7 +31,7 @@ module.exports = {
             
             var defaultZoom = 4;
             
-            self.map = leaflet.map(this).setView([50, 20], defaultZoom);
+            self.map = leaflet.map(this).setView([13.45, 0], defaultZoom);
             self.map.on('zoom', function() {
                 //console.log('viewreset');
             }); 

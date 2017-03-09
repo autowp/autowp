@@ -2079,7 +2079,24 @@ La transmission n'est pas pris en compte.",
     'specs/unit/20/abbr' => 'm³',
     'specs/unit/20/name' => 'cubic meter',
 
-    'telegram/info' => 'To make you WheelsAge surfing more convenient we just created a "bot" for [telegram](https://telegram.org/) app. We hope it could be useful and easy to use.
+    'telegram/info' => '[Telegram](https://telegram.org/) - is primarily a system of instant messaging, like whatsapp or viber.
+
+In addition to the messaging and file transfer, there are many other possibilities, which will go to the description of a lot of time.
+
+We only use two of them: a public groups and bots.
+
+# Public group
+
+There is an public english-language and russian-language groups for all site visitors.
+
+Join them is very simple - just click the link and follow the instructions:
+
+* [English-language](https://t.me/joinchat/AAAAAAvxJESUMQcUM-I5YA)
+* [Russian-language](https://t.me/joinchat/AAAAAA0NvB5g7SEsWv61Rw)
+
+# Bot
+
+To make you WheelsAge surfing more convenient we just created a "bot" for [telegram](https://telegram.org/) app. We hope it could be useful and easy to use.
 
 The bot name: [@autowp_bot](tg:msg).
 

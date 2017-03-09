@@ -4,6 +4,8 @@ namespace Application\Model;
 
 use Application\Model\DbTable;
 
+use Zend_Db_Expr;
+
 class Item
 {
     public function getEngineVehiclesGroups($engineId, array $options = [])
@@ -82,5 +84,23 @@ class Item
         }
 
         return $resultIds;
+    }
+    
+    public function getName($itemId, $language)
+    {
+        $carLangTable = new DbTable\Item\Language();
+        
+        $db = $carLangTable->getAdapter();
+        
+        $languages = array_merge([$language], ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'zh', 'xx']);
+        
+        $select = $db->select()
+            ->from('item_language', ['name'])
+            ->where('item_id = ?', (int)$itemId)
+            ->where('length(name) > 0')
+            ->order(new Zend_Db_Expr($db->quoteInto('FIELD(language, ?)', $languages)))
+            ->limit(1);
+        
+        return $db->fetchOne($select);
     }
 }

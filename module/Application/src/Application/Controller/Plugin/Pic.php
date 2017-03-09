@@ -315,7 +315,8 @@ class Pic extends AbstractPlugin
                     'pictures.width', 'pictures.height',
                     'pictures.crop_left', 'pictures.crop_top',
                     'pictures.crop_width', 'pictures.crop_height',
-                    'pictures.status', 'pictures.image_id'
+                    'pictures.status', 'pictures.image_id',
+                    'pictures.owner_id'
                 ]);
 
             $select
@@ -348,8 +349,6 @@ class Pic extends AbstractPlugin
         } else {
             throw new Exception("Unexpected type of pictures");
         }
-
-        //print $select;
 
         // prefetch
         $requests = [];
@@ -404,6 +403,10 @@ class Pic extends AbstractPlugin
                 if ($userId) {
                     $newMsgCount = isset($newMessages[$id]) ? $newMessages[$id] : $msgCount;
                 }
+                
+                $likes = 5;
+                
+                $votes = $this->pictureVote->getVote($row['id'], null);
 
                 $item = array_replace($item, [
                     'resolution'     => (int)$row['width'] . '×' . (int)$row['height'],
@@ -413,6 +416,9 @@ class Pic extends AbstractPlugin
                     'views'          => (int)$row['views'],
                     'msgCount'       => $msgCount,
                     'newMsgCount'    => $newMsgCount,
+                    'likes'          => $likes,
+                    'ownerId'        => $row['owner_id'],
+                    'votes'          => $votes
                 ]);
             }
 
@@ -592,11 +598,11 @@ class Pic extends AbstractPlugin
             $altNames2 = [];
 
             $carLangRows = $itemLanguageTable->fetchAll([
-                'item_id = ?' => $item->id
+                'item_id = ?'   => $item->id,
+                'language <> ?' => 'xx'
             ]);
 
             $currentLangName = null;
-            $defaultName = $item->name;
             foreach ($carLangRows as $carLangRow) {
                 $name = $carLangRow->name;
                 if (! isset($altNames[$name])) {

@@ -1,4 +1,4 @@
-<p class="picture-behaviour">
+<p class="picture-behaviour clearfix">
     <?php if ($this->isModer) { ?>
         <span title="Status">
             <?php
@@ -43,4 +43,18 @@
             <?php } ?>
         </span>
     </span>
+    
+    <?php if ($this->ownerId || $this->votes['positive'] > 0) { ?>
+        <br />
+        <?php if ($this->ownerId) { ?>
+            <?=$this->user($this->ownerId)?>
+        <?php } ?>
+        
+        <?php if ($this->votes['positive'] > 0) { ?>
+            <span class="pull-right">
+                <?=$this->votes['positive']?>
+                <i class="fa fa-thumbs-up"></i>
+            </span>
+        <?php } ?>
+    <?php } ?>
 </p>

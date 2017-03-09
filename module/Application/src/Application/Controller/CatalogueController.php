@@ -420,14 +420,15 @@ class CatalogueController extends AbstractActionController
 
             $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
-            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_6_' . $language . '_' . $httpsFlag;
+            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_7_' . $language . '_' . $httpsFlag;
             $topPictures = $this->cache->getItem($key, $success);
             if (! $success) {
-                $select = $this->selectOrderFromPictures()
+                $select = $this->selectFromPictures(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id = ?', $brand['id'])
-                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                    ->joinLeft('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', null)
+                    ->order(['picture_vote_summary.positive DESC', 'pictures.add_date DESC', 'pictures.id DESC'])
                     ->group('pictures.id')
                     ->limit(12);
 

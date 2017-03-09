@@ -3,6 +3,7 @@
 namespace Application\Model\DbTable\Item;
 
 use Application\Model\DbTable;
+use Application\Model\Item as ItemModel;
 
 use DateTime;
 use Exception;
@@ -32,13 +33,16 @@ class Row extends \Autowp\Commons\Db\Table\Row
             throw new Exception('`language` is not string');
         }
 
-        $carLangTable = new DbTable\Item\Language();
+        /*$carLangTable = new DbTable\Item\Language();
         $carLangRow = $carLangTable->fetchRow([
             'item_id = ?'  => $this->id,
             'language = ?' => (string)$language
         ]);
 
-        $name = $carLangRow && $carLangRow->name ? $carLangRow->name : $this->name;
+        $name = $carLangRow && $carLangRow->name ? $carLangRow->name : $this->name;*/
+        
+        $itemModel = new ItemModel();
+        $name = $itemModel->getName($this['id'], $language);
 
         $spec = null;
         $specFull = null;

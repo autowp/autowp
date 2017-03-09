@@ -718,6 +718,8 @@ class CarsController extends AbstractActionController
                     }
 
                     $car->setFromArray($this->prepareCarMetaToSave($values))->save();
+                    
+                    $this->setLanguageName($car['id'], 'xx', $values['name']);
 
                     $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
 
@@ -845,6 +847,7 @@ class CarsController extends AbstractActionController
             $carLangTable->getAdapter()->select()
                 ->from('item_language', 'count(1)')
                 ->where('item_id = ?', $car->id)
+                ->where('language <> ?', 'xx')
         );
 
         $catalogueLinksCount = $db->fetchOne(
@@ -1475,7 +1478,9 @@ class CarsController extends AbstractActionController
         $select = $itemTable->select(true)
             ->where('item.is_group')
             ->where('item.item_type_id IN (?)', $allowedItemTypes)
-            ->where('item.name like ?', $query . '%')
+            ->join('item_language', 'item.id = item_language.item_id', null)
+            ->where('item_language.name like ?', $query . '%')
+            ->group('item.id')
             ->order(['length(item.name)', 'item.is_group desc', 'item.name'])
             ->limit(15);
 
@@ -2568,6 +2573,8 @@ class CarsController extends AbstractActionController
                 );
                 $newCar->item_type_id = $car->item_type_id;
                 $newCar->save();
+                
+                $this->setLanguageName($newCar['id'], 'xx', $values['name']);
 
                 $vehicleType->setVehicleTypes($newCar->id, (array)$values['vehicle_type_id']);
 
@@ -2819,6 +2826,8 @@ class CarsController extends AbstractActionController
                         $this->setItemPoint($car, null);
                     }
                 }
+                
+                $this->setLanguageName($car['id'], 'xx', $values['name']);
 
                 $vehicleType = new VehicleType();
                 $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
@@ -2879,6 +2888,25 @@ class CarsController extends AbstractActionController
             'action'     => 'picture',
             'picture_id' => $picture->id
         ]);
+    }
+    
+    private function setLanguageName($carId, $language, $name)
+    {
+        $carLangTable = new DbTable\Item\Language();
+        
+        $carLangRow = $carLangTable->fetchRow([
+            'item_id = ?'  => $carId,
+            'language = ?' => $language
+        ]);
+        
+        if (! $carLangRow) {
+            $carLangRow = $carLangTable->createRow([
+                'item_id'  => $carId,
+                'language' => $language
+            ]);
+        }
+        $carLangRow['name'] = $name;
+        $carLangRow->save();
     }
 
     public function organizePicturesAction()
@@ -2970,6 +2998,8 @@ class CarsController extends AbstractActionController
                 );
                 $newCar->item_type_id = $car->item_type_id;
                 $newCar->save();
+                
+                $this->setLanguageName($newCar['id'], 'xx', $values['name']);
 
                 $vehicleType->setVehicleTypes($newCar->id, (array)$values['vehicle_type_id']);
 

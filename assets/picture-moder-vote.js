@@ -4,8 +4,6 @@ var i18next = require('i18next');
 var Widget = function(element) {
     
     var $element = $(element);
-    var $select = $element.find('select');
-    var $text = $element.find(':text');
     
     $element.on('click', '.btn-cancel-vote', function(e) {
         e.preventDefault();
