@@ -1,9 +1,9 @@
 var $ = require('jquery');
         
-var PerspectiveSelector = function(element) {
+var CarList = function(element) {
     $('[data-toggle="tooltip"]', element).tooltip();
 };
 
 module.exports = function(element) {
-    new PerspectiveSelector(element);
+    new CarList(element);
 };

@@ -5,7 +5,7 @@ var popupMarkup = require('./popup.html');
 require("./index.less");
 
 require('webgl-heatmap-leaflet/dist/webgl-heatmap');
-require('imports?L=leaflet!webgl-heatmap-leaflet/dist/webgl-heatmap-leaflet');
+require('webgl-heatmap-leaflet/dist/webgl-heatmap-leaflet');
 
 delete leaflet.Icon.Default.prototype._getIconUrl;
 leaflet.Icon.Default.mergeOptions({

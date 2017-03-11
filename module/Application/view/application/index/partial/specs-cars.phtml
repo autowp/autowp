@@ -7,7 +7,7 @@
     <div class="row">
         <?php foreach (array_slice($this->items, $i*$rows, $cols) as $item) { ?>
             <div class="col-md-6">
-                <div class="car" style="margin-bottom: 2em">
+                <div class="car item-list-item" data-module="car-list">
 
                     <h3>
                         <?=$this->car()->htmlTitle($item['nameData'])?>

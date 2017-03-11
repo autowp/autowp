@@ -5,7 +5,6 @@ var i18next = require('i18next');
 require("bootstrap/bootstrap");
 require("styles.less");
 require("flags/flags.js");
-require("font-awesome-webpack");
 
 var resources = {};
 $.map(['en', 'de', 'fr', 'ru', 'zh'], function(language) {
@@ -93,16 +92,16 @@ $(function() {
     
     $('[data-module]').each(function() {
         var element = this;
-        var module = './' + $(this).data('module');
-        require([module], function(Module) {
+        var moduleName = $(this).data('module');
+        require(['widget/' + moduleName], function(Module) {
             Module(element);
         });
     });
     
     $('[data-page-module]').each(function() {
-        var module = './' + $(this).data('page-module');
+        var moduleName = $(this).data('page-module');
         var moduleOptions = $(this).data('page-module-options');
-        require([module], function(Module) {
+        require(['pages/' + moduleName], function(Module) {
             Module.init(moduleOptions);
         });
     });
