@@ -192,8 +192,8 @@ module.exports = {
         })
     ],
     output: {
-        path: path.join(__dirname, "public_html/dist2"),
+        path: path.join(__dirname, "public_html/dist"),
         filename: "js/[name].[chunkhash].js",
-        publicPath: "/dist2/"
+        publicPath: "/dist/"
     }
 }
