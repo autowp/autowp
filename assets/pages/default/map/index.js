@@ -1,23 +1,14 @@
 var $ = require("jquery");
-var leaflet = require("leaflet");
-require("leaflet/dist/leaflet.css");
+var leaflet = require("leaflet-bundle");
 var popupMarkup = require('./popup.html'); 
 require("./index.less");
 
 require('webgl-heatmap-leaflet/dist/webgl-heatmap');
 require('webgl-heatmap-leaflet/dist/webgl-heatmap-leaflet');
 
-delete leaflet.Icon.Default.prototype._getIconUrl;
-leaflet.Icon.Default.mergeOptions({
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-    iconUrl: require('leaflet/dist/images/marker-icon.png'),
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-});
-
 module.exports = {
     init: function(options) {
         this.currentPopup = null;
-        this.googlemaps = null;
         
         this.xhrTimeout = null;
         

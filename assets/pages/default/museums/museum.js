@@ -1,5 +1,5 @@
 var $ = require("jquery");
-var ol = require("openlayers");
+var leaflet = require("leaflet-bundle");
 
 module.exports = {
     init: function(options) {
@@ -13,37 +13,12 @@ module.exports = {
                     margin: '0 0 40px'
                 });
                 
-                var center = ol.proj.fromLonLat([options.lng, options.lat]);
-                
-                var map = new ol.Map({
-                    target: this,
-                    layers: [
-                        new ol.layer.Tile({
-                            source: new ol.source.OSM()
-                        })
-                    ],
-                    view: new ol.View({
-                        center: center,
-                        zoom: 17
-                    })
-                });
-                
-                var vectorLayer = new ol.layer.Vector();
-                map.addLayer(vectorLayer);
-                
-                var iconFeature = new ol.Feature({
-                    geometry: new ol.geom.Point(center)
-                });
-                
-                iconFeature.setStyle(require('map/icon-style'));
-                
-                var vectorSource = new ol.source.Vector({
-                    features: [
-                        iconFeature
-                    ]
-                });
-
-                vectorLayer.setSource(vectorSource);
+                var map = leaflet.map(this).setView([options.lat, options.lng], 17);
+                leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+                }).addTo(map);
+              
+                leaflet.marker([options.lat, options.lng]).addTo(map);
             });
         }
     }
