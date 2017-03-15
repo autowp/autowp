@@ -1151,6 +1151,9 @@ return array_replace(include 'root.php', [
     'moder/vehicle/is-concept/inherited-no' => '无继承性',
     'moder/vehicle/is-concept/inherited-yes' => '有继承性',
     'moder/vehicle/is-concept/inherited' => '已有继承性',
+    
+    'moder/item/short-description' => 'Short description',
+    'moder/item/full-description' => 'Full description',
 
     'moder/vehicle/tabs/meta' => 'Meta',
     'moder/vehicle/tabs/name' => '车名&描述',
@@ -1509,9 +1512,8 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'specifications-editor/admin/move' => '移动',
 
     'pm/user-%s-edited-brand-description-%s-%s' => '用户%s编辑了品牌介绍%s ( %s )',
-    'pm/user-%s-edited-vehicle-full-description-%s-%s' => '用户%s编辑了车型的完整介绍%s ( %s )',
+    'pm/user-%s-edited-item-language-%s-%s' => "User %s edited language data %s ( %s )\n%s",
     'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s' => "用户%s编辑了车型基本数据%s ( %s )\n%s",
-    'pm/user-%s-edited-vehicle-description-%s-%s' => '用户%s编辑了车型介绍%s ( %s )',
     'pm/user-%s-adds-item-%s-%s-to-item-%s-%s' => 'User %s added %s ( %s ) to %s ( %s )',
     'pm/user-%s-removed-item-%s-%s-from-item-%s-%s' => 'User %s removed %s ( %s ) from %s ( %s )',
     'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s' => '用户%s为车型%s ( %s )取消了到目录: %s的关联',

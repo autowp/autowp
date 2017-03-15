@@ -1188,6 +1188,9 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/vehicle/is-concept/inherited-no' => 'унаследовано (нет)',
     'moder/vehicle/is-concept/inherited-yes' => 'унаследовано (да)',
     'moder/vehicle/is-concept/inherited' => 'унаследовано',
+    
+    'moder/item/short-description' => 'Краткое описание',
+    'moder/item/full-description' => 'Полное описание',
 
     'moder/vehicle/tabs/meta' => 'Мета',
     'moder/vehicle/tabs/name' => 'Название и описание',
@@ -1548,9 +1551,8 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'specifications-editor/admin/move' => 'Перенести',
 
     'pm/user-%s-edited-brand-description-%s-%s' => 'Пользователь %s редактировал описание бренда %s ( %s )',
-    'pm/user-%s-edited-vehicle-full-description-%s-%s' => 'Пользователь %s редактировал полное описание автомобиля %s ( %s )',
+    'pm/user-%s-edited-item-language-%s-%s' => "Пользователь %s редактировал языковую информацию %s ( %s )\n%s",
     'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s' => "Пользователь %s редактировал информацию об автомобиле %s ( %s )\n%s",
-    'pm/user-%s-edited-vehicle-description-%s-%s' => 'Пользователь %s редактировал описание автомобиля %s ( %s )',
     'pm/user-%s-adds-item-%s-%s-to-item-%s-%s' => 'Пользователь %s добавил %s ( %s ) в %s ( %s )',
     'pm/user-%s-removed-item-%s-%s-from-item-%s-%s' => 'Пользователь %s удалил %s ( %s ) из %s ( %s )',
     'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s' => 'Пользователь %s отменил вашу привязку автомобиля %s ( %s ) к категориям: %s',

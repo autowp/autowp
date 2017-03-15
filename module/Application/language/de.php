@@ -1179,6 +1179,9 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicle/is-concept/inherited-no' => 'inherited (no)',
     'moder/vehicle/is-concept/inherited-yes' => 'inherited (yes)',
     'moder/vehicle/is-concept/inherited' => 'inherited',
+    
+    'moder/item/short-description' => 'Short description',
+    'moder/item/full-description' => 'Full description',
 
     'moder/vehicle/tabs/meta' => 'Meta',
     'moder/vehicle/tabs/name' => 'Name & description',
@@ -1537,9 +1540,8 @@ Don\'t forget it.',
     'specifications-editor/admin/move' => 'Move',
 
     'pm/user-%s-edited-brand-description-%s-%s' => 'User %s edited brand description %s ( %s )',
-    'pm/user-%s-edited-vehicle-full-description-%s-%s' => 'User %s edited vehicle full description %s ( %s )',
+    'pm/user-%s-edited-item-language-%s-%s' => "User %s edited language data %s ( %s )\n%s",
     'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s' => "User %s edited vehicle meta-data %s ( %s )\n%s",
-    'pm/user-%s-edited-vehicle-description-%s-%s' => 'User %s edited vehicle description %s ( %s )',
     'pm/user-%s-adds-item-%s-%s-to-item-%s-%s' => 'User %s added %s ( %s ) to %s ( %s )',
     'pm/user-%s-removed-item-%s-%s-from-item-%s-%s' => 'User %s removed %s ( %s ) from %s ( %s )',
     'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s' => 'User %s cancel link vehicle %s ( %s ) with categories: %s',

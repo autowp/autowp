@@ -18,7 +18,7 @@ class ItemLanguage extends Form implements InputFilterProviderInterface
                 'name' => 'name',
                 'type' => 'Text',
                 'options' => [
-                    'label' => 'Name',
+                    'label' => 'moder/vehicle/name',
                 ],
                 'attributes' => [
                     'maxlength'  => 255,
@@ -28,7 +28,7 @@ class ItemLanguage extends Form implements InputFilterProviderInterface
                 'name' => 'text',
                 'type' => 'Textarea',
                 'options' => [
-                    'label' => 'Short description',
+                    'label' => 'moder/item/short-description',
                 ],
                 'attributes' => [
                     'maxlength'  => 65536,
@@ -39,7 +39,7 @@ class ItemLanguage extends Form implements InputFilterProviderInterface
                 'name' => 'full_text',
                 'type' => 'Textarea',
                 'options' => [
-                    'label' => 'Full description',
+                    'label' => 'moder/item/full-description',
                 ],
                 'attributes' => [
                     'maxlength'  => 65536,

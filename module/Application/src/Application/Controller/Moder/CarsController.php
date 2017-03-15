@@ -1970,10 +1970,9 @@ class CarsController extends AbstractActionController
                             'item_id'  => $car->id,
                             'language' => $lang
                         ]);
-                        $nameChanged = true;
-                    } else {
-                        $nameChanged = ($name != $langRow->name);
                     }
+                    
+                    $nameChanged = ($name != $langRow->name);
 
                     $langRow->setFromArray([
                         'name' => $name,
@@ -2010,118 +2009,55 @@ class CarsController extends AbstractActionController
                     }
 
                     if ($nameChanged) {
-                        $changes[$lang][] = 'name';
+                        $changes[$lang][] = 'moder/vehicle/name';
                     }
 
                     if ($textChanged) {
-                        $changes[$lang][] = 'text';
+                        $changes[$lang][] = 'moder/item/short-description';
                     }
 
                     if ($fullTextChanged) {
-                        $changes[$lang][] = 'full_text';
+                        $changes[$lang][] = 'moder/item/full-description';
                     }
                 }
 
                 $this->brandVehicle->refreshAutoByVehicle($car->id);
 
-                /*if ($changes) {
-                    $userIds = $this->textStorage->getTextUserIds($car->full_text_id);
-
-                    $userTable = new \Autowp\User\Model\DbTable\User();
-                    foreach ($userIds as $userId) {
-                        if ($userId != $user->id) {
-                            foreach ($userTable->find($userId) as $userRow) {
-                                $uri = $this->hostManager->getUriByLanguage($userRow->language);
-
-                                $message = sprintf(
-                                    $this->translate(
-                                        'pm/user-%s-edited-vehicle-full-description-%s-%s',
+                if ($changes) {
+                    $ucsTable = new DbTable\User\ItemSubscribe();
+                    $ucsTable->subscribe($user, $car);
+                    
+                    foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
+                        if ($subscriber && ($subscriber->id != $user->id)) {
+                            $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+                    
+                            $changesStr = [];
+                            foreach ($changes as $language => $fields) {
+                                foreach ($fields as $field) {
+                                    $changesStr[] = $this->translate(
+                                        $field, 
                                         'default',
-                                        $userRow->language
-                                    ),
-                                    $this->userModerUrl($user, true, $uri),
-                                    $this->car()->formatName($car, $userRow->language),
-                                    $this->carModerUrl($car, true, null, $uri)
-                                );
-
-                                $this->message->send(null, $userRow->id, $message);
-                            }
-                        }
-                    }
-                }*/
-                /*
-                    if ($car->text_id) {
-                        $userIds = $this->textStorage->getTextUserIds($car->text_id);
-
-                        $userTable = new \Autowp\User\Model\DbTable\User();
-                        foreach ($userIds as $userId) {
-                            if ($userId != $user->id) {
-                                foreach ($userTable->find($userId) as $userRow) {
-                                    $uri = $this->hostManager->getUriByLanguage($userRow->language);
-
-                                    $message = sprintf(
-                                        $this->translate(
-                                            'pm/user-%s-edited-vehicle-description-%s-%s',
-                                            'default',
-                                            $userRow->language
-                                        ),
-                                        $this->userModerUrl($user, true, $uri),
-                                        $this->car()->formatName($car, $userRow->language),
-                                        $this->carModerUrl($car, true, null, $uri)
-                                    );
-
-                                    $this->message->send(null, $userRow->id, $message);
+                                        $subscriber->language
+                                    ) . ' (' . $language . ')';
                                 }
                             }
-                        }
-                    }
-
-                $changes = [];
-
-                foreach ($this->allowedLanguages as $lang) {
-                    $value = trim($this->params()->fromPost($lang));
-
-                    $row = $carLangTable->fetchRow([
-                        'item_id = ?'   => $car->id,
-                        'language = ?' => $lang
-                    ]);
-
-                    if ($value) {
-                        if (! $row) {
-                            $row = $carLangTable->createRow([
-                                'item_id'   => $car->id,
-                                'language' => $lang
-                            ]);
-                        }
-
-                        if ($row->name != $value) {
-                            $changes[] = 'Установлено ' . strtoupper($lang) . ': ' . $value;
-                        }
-
-                        $row->name = $value;
-                        $row->save();
-                    } else {
-                        if ($row) {
-                            $changes[] = 'Удалено ' . strtoupper($lang) . ': ' . $row->name;
-                            $row->delete();
+                    
+                            $message = sprintf(
+                                $this->translate(
+                                    'pm/user-%s-edited-item-language-%s-%s',
+                                    'default',
+                                    $subscriber->language
+                                ),
+                                $this->userModerUrl($user, true, $uri),
+                                $this->car()->formatName($car, $subscriber->language),
+                                $this->carModerUrl($car, true, null, $uri),
+                                implode("\n", $changesStr)
+                            );
+                    
+                            $this->message->send(null, $subscriber->id, $message);
                         }
                     }
                 }
-
-                if ($changes) {
-                    foreach ($changes as &$change) {
-                        $change = htmlspecialchars($change);
-                    }
-                    unset($change); // prevent future bugs
-                    $message = sprintf(
-                        'Редактирование названий автомобиля %s',
-                        htmlspecialchars($this->car()->formatName($car, 'en')).
-                        ( count($changes) ? '<p>'.implode('<br />', $changes).'</p>' : '')
-                    );
-                    $this->log($message, $car);
-                }
-
-                */
 
                 $this->log(sprintf(
                     'Редактирование языковых названия, описания и полного описания автомобиля %s',
