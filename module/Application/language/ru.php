@@ -29,6 +29,12 @@ return array_replace(include 'root.php', [
         '%1$s комментария',
         '%1$s комментариев',
     ],
+    'ng/%1$s-comments' => '{count, plural,
+        one {{count} комментарий}
+        few {{count} комментария}
+        many {{count} комментариев}
+        other {{count} комментариев}
+    }',
     '%1$s messages'      => [
         '%1$s сообщение',
         '%1$s сообщения',
@@ -57,15 +63,24 @@ return array_replace(include 'root.php', [
     'layout/personal-messages' => 'Личные сообщения',
     'layout/you-have-%1$s-new-messages' => [
         'У вас %1$s новое сообщение',
-        'У вас %1$s новое сообщения',
-        'У вас %1$s новое сообщений',
+        'У вас %1$s новых сообщения',
+        'У вас %1$s новых сообщений',
     ],
+    'ng-layout/you-have-new-messages' => '{messages, plural,
+        one {У вас {messages} новое сообщение}
+        few {У вас {messages} новых сообщения}
+        many {У вас {messages} новых сообщений}
+        other {У вас {messages} новых сообщений}
+    }',
 
     'layout/search' => 'Поиск',
-    'layout/footer' => 'Обращаем ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br />' .
-                       'Администрация сайта не располагает информацией о правомерности публикования этих материалов.<br />' .
-                       'Все изображения размещены в ознакомительных целях.<br />' .
-                       '<a href="mailto:autowp@yandex.ru">Сообщить о нарушении авторских прав</a>.',
+    'layout/footer' => 'Обращаем ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.
+
+Администрация сайта не располагает информацией о правомерности публикования этих материалов.
+
+Все изображения размещены в ознакомительных целях.
+
+[Сообщить о нарушении авторских прав](mailto:autowp@yandex.ru)',
 
     'layout/language-contributing' => 'Хотите помочь?',
 
@@ -1589,14 +1604,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/vehicle/changes/boolean/true' => 'да',
     'moder/vehicle/changes/boolean/false' => 'нет',
 
-    'moder/statistics/photos-with-copyrights' => 'Фотографий с копирайтами',
-    'moder/statistics/vehicles-with-4-or-more-photos' => 'Автомобилей с 4 и более фото',
-    'moder/statistics/specifications-values' => 'Заполненных значений ТТХ',
-    'moder/statistics/brand-logos' => 'Логотипов брендов',
-    'moder/statistics/from-years' => 'Годы начала выпуска автомобилей',
-    'moder/statistics/from-and-to-years' => 'Годы начала и окончания выпуска автомобилей',
-    'moder/statistics/from-and-to-years-and-months' => 'Годы и месяцы начала и окончания выпуска автомобилей',
-
     'specifications/no-value-text' => 'нет значения',
     'specifications/boolean/false' => 'нет',
     'specifications/boolean/true' => 'да',
@@ -2166,4 +2173,35 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 Отправьте `/me 123456789 ХХХХХХХХХХХХХХХХ`, чтобы завершить процесс ассоциации вашей учётной записи telegram с пользователем найшего сайта.
 
 Здесь `ХХХХХХХХХХХХХХХХ` - код, который будет отправлен вам через [систему личных сообщений](/account/pm/system)',
+    
+    'personal-message-dialog/title' => 'Отправить личное сообщение',
+    'personal-message-dialog/send' => 'отправить',
+    'personal-message-dialog/sending' => 'отправляется ...',
+    'personal-message-dialog/sent' => 'отправлено',
+    'personal-message-dialog/cancel' => 'отменить',
+    'personal-message-dialog/placeholder' => 'Текст сообщения',
+    
+    'crop-dialog/title' => 'Кадрирование',
+    'crop-dialog/close' => 'Закрыть',
+    'crop-dialog/select-all' => 'Выделить всё',
+    'crop-dialog/save' => 'Сохранить',
+    'crop-dialog/resolution-%s-aspect-%s' => '%s (пропорции %s)',
+    
+    'who-online/title' => 'На сайте',
+    'who-online/refresh' => 'Обновить',
+    'who-online/close' => 'Закрыть',
+    
+    'picture-moder-vote/custom/title' => 'Своя причина',
+    'picture-moder-vote/custom/sending' => 'отправляется ...',
+    'picture-moder-vote/custom/send' => 'отправлено',
+    'picture-moder-vote/custom/cancel' => 'отменить',
+    'picture-moder-vote/custom/save' => 'Сохранить как шаблон',
+    
+    'moder/statistics/photos-with-copyrights' => 'Фотографий с копирайтами',
+    'moder/statistics/vehicles-with-4-or-more-photos' => 'Автомобилей с 4 и более фото',
+    'moder/statistics/specifications-values' => 'Заполненных значений ТТХ',
+    'moder/statistics/brand-logos' => 'Логотипов брендов',
+    'moder/statistics/from-years' => 'Годы начала выпуска автомобилей',
+    'moder/statistics/from-and-to-years' => 'Годы начала и окончания выпуска автомобилей',
+    'moder/statistics/from-and-to-years-and-months' => 'Годы и месяцы начала и окончания выпуска автомобилей'
 ]);

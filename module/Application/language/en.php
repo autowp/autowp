@@ -25,6 +25,10 @@ return array_replace(include 'root.php', [
         '%1$s comment',
         '%1$s comments',
     ],
+    'ng/%1$s-comments' => '{count, plural,
+        one {{count} comment}
+        other {{count} comments}
+    }',
     '%1$s messages'      => [
         '%1$s message',
         '%1$s messages',
@@ -53,12 +57,19 @@ return array_replace(include 'root.php', [
         'You have %1$s new message',
         'You have %1$s new messages',
     ],
+    'ng-layout/you-have-new-messages' => '{messages, plural,
+        one {You have {messages} new message}
+        other {You have {messages} new messages}
+    }',
 
     'layout/search' => 'Search',
-    'layout/footer' => 'Please note that all material on this server autowp.ru, added visitors.<br />' .
-                       'The site administration does not have information on the legality of the publication of these materials.<br />' .
-                       'All images are posted for educational purposes.<br />' .
-                       '<a href="mailto:autowp@yandex.ru">Report copyright violation</a>.',
+    'layout/footer' => 'Please note that all material on this server autowp.ru, added visitors.
+
+The site administration does not have information on the legality of the publication of these materials.
+
+All images are posted for educational purposes.
+
+[Report copyright violation](mailto:autowp@yandex.ru)',
 
     'layout/language-contributing' => 'Want to contribute?',
 
@@ -1580,14 +1591,6 @@ Don\'t forget it.',
     'moder/vehicle/changes/boolean/true' => 'yes',
     'moder/vehicle/changes/boolean/false' => 'no',
 
-    'moder/statistics/photos-with-copyrights' => 'Photos with copyrights',
-    'moder/statistics/vehicles-with-4-or-more-photos' => 'Vehicles with 4 or more photos',
-    'moder/statistics/specifications-values' => 'Specifications values',
-    'moder/statistics/brand-logos' => 'Brand logotypes',
-    'moder/statistics/from-years' => 'Years of begin production',
-    'moder/statistics/from-and-to-years' => 'Years of begin and end production',
-    'moder/statistics/from-and-to-years-and-months' => 'Years and months of begin and end production',
-
     'specifications/no-value-text' => 'no value',
     'specifications/boolean/false' => 'no',
     'specifications/boolean/true' => 'yes',
@@ -2157,4 +2160,35 @@ Confirmation code will be sent to you via [the private messaging system](/accoun
 Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish process of association your telegram account with out website user.
 
 Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/account/pm/system)',
+    
+    'personal-message-dialog/title' => 'Send personal message',
+    'personal-message-dialog/send' => 'send',
+    'personal-message-dialog/sending' => 'sending ...',
+    'personal-message-dialog/sent' => 'sent',
+    'personal-message-dialog/cancel' => 'cancel',
+    'personal-message-dialog/placeholder' => 'Message',
+    
+    'crop-dialog/title' => 'Cropper',
+    'crop-dialog/close' => 'Close',
+    'crop-dialog/select-all' => 'Select all',
+    'crop-dialog/save' => 'Save changes',
+    'crop-dialog/resolution-%s-aspect-%s' => '%s (aspect is about %s)',
+    
+    'who-online/title' => 'Online',
+    'who-online/refresh' => 'Refresh',
+    'who-online/close' => 'Close',
+    
+    'picture-moder-vote/custom/title' => 'Custom reason',
+    'picture-moder-vote/custom/sending' => 'Sending',
+    'picture-moder-vote/custom/send' => 'Send',
+    'picture-moder-vote/custom/cancel' => 'Cancel',
+    'picture-moder-vote/custom/save' => 'Save as template',
+    
+    'moder/statistics/photos-with-copyrights' => 'Photos with copyrights',
+    'moder/statistics/vehicles-with-4-or-more-photos' => 'Vehicles with 4 or more photos',
+    'moder/statistics/specifications-values' => 'Specifications values',
+    'moder/statistics/brand-logos' => 'Brand logotypes',
+    'moder/statistics/from-years' => 'Years of begin production',
+    'moder/statistics/from-and-to-years' => 'Years of begin and end production',
+    'moder/statistics/from-and-to-years-and-months' => 'Years and months of begin and end production'
 ]);

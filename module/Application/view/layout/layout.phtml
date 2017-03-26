@@ -23,9 +23,6 @@
     $this->gulpRev([
         'stylesheets' => [
             'application.css'
-        ],
-        'scripts' => [
-            'application.js'
         ]
     ]);
 
@@ -142,7 +139,9 @@ ga('send', 'pageview');
                             </p>
                         </div>
                         <div class="col-md-6">
-                            <p class="copyrights"><?=$this->translate('layout/footer')?></p>
+                            <div class="copyrights">
+                                <?=$this->markdown($this->translate('layout/footer'))?>
+                            </div>
                         </div>
                     </div>
                     <p class="language-picker">
@@ -162,5 +161,6 @@ ga('send', 'pageview');
                 </footer>
             <?php } ?>
         </div>
+        <?=$this->gulpRev()->script('application.js')?>
     </body>
 </html>

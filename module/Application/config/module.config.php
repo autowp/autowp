@@ -47,13 +47,6 @@ return [
             Controller\UploadController::class          => Controller\Frontend\Service\UploadControllerFactory::class,
             Controller\VotingController::class          => Controller\Frontend\Service\VotingControllerFactory::class,
             Controller\Frontend\YandexController::class => Controller\Frontend\Service\YandexControllerFactory::class,
-            Controller\Api\CommentsController::class    => Controller\Api\Service\CommentsControllerFactory::class,
-            Controller\Api\ContactsController::class    => InvokableFactory::class,
-            Controller\Api\PictureController::class     => Controller\Api\Service\PictureControllerFactory::class,
-            Controller\Api\PictureItemController::class => Controller\Api\Service\PictureItemControllerFactory::class,
-            Controller\Api\PictureModerVoteController::class => Controller\Api\Service\PictureModerVoteControllerFactory::class,
-            Controller\Api\PictureVoteController::class => Controller\Api\Service\PictureVoteControllerFactory::class,
-            Controller\Api\UsersController::class       => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [

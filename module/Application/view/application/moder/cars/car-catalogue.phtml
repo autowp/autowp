@@ -3,13 +3,20 @@
         Application\Model\DbTable\Item\Type::TWINS,
         Application\Model\DbTable\Item\Type::FACTORY
     ]);
+    
+    $organizeTypeId = $this->car['item_type_id'];
+    switch ($organizeTypeId) {
+        case Application\Model\DbTable\Item\Type::BRAND:
+            $organizeTypeId = Application\Model\DbTable\Item\Type::VEHICLE;
+            break;
+    }
 ?>
 <?php if ($this->canUseTree) { ?>
     <?php if ($this->car['is_group']) { ?>
         <?=$this->htmlA([
             'href'  => $this->url(null, [
                 'action'       => 'organize',
-                'item_type_id' => $this->car['item_type_id']
+                'item_type_id' => $organizeTypeId
             ], [], true),
             'class' => 'btn btn-default',
         ], $this->translate('moder/vehicle/catalogue/turbo-group-creator'))?>

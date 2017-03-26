@@ -74,9 +74,6 @@ class Maintenance extends AbstractListenerAggregate
         $facebookConfig = $serviceManager->get('Config')['facebook'];
         $carOfDay->putCurrentToFacebook($facebookConfig);
 
-        $vkConfig = $serviceManager->get('Config')['vk'];
-        $carOfDay->putCurrentToVk($vkConfig);
-
         $usersService = $serviceManager->get(Service\UsersService::class);
 
         $usersService->restoreVotes();
@@ -84,6 +81,9 @@ class Maintenance extends AbstractListenerAggregate
 
         $affected = $usersService->updateUsersVoteLimits();
         print sprintf("Updated %s users vote limits\n", $affected);
+        
+        $vkConfig = $serviceManager->get('Config')['vk'];
+        $carOfDay->putCurrentToVk($vkConfig);
 
         print "Midnight done\n";
     }

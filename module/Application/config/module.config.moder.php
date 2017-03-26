@@ -52,22 +52,6 @@ return [
                             ]
                         ]
                     ],
-                    'comments' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/comments[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\CommentsController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'hotlink' => [
                         'type' => Literal::class,
                         'options' => [
@@ -289,7 +273,6 @@ return [
             Controller\Moder\AttrsController::class        => Controller\Moder\Service\AttrsControllerFactory::class,
             Controller\Moder\ItemParentController::class   => Controller\Moder\Service\ItemParentControllerFactory::class,
             Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
-            Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
             Controller\Moder\IndexController::class        => InvokableFactory::class,
             Controller\Moder\PagesController::class        => Controller\Moder\Service\PagesControllerFactory::class,
@@ -342,7 +325,7 @@ return [
                         'options' => [
                             'label'   => 'moder/comments/filter/moderator_attention',
                             'options' => [
-                                ''                            => 'moder/comments/filter/moderator_attention/not-matters',
+                                ''                                    => 'moder/comments/filter/moderator_attention/not-matters',
                                 \Autowp\Comments\Attention::NONE      => 'moder/comments/filter/moderator_attention/not-required',
                                 \Autowp\Comments\Attention::REQUIRED  => 'moder/comments/filter/moderator_attention/required',
                                 \Autowp\Comments\Attention::COMPLETED => 'moder/comments/filter/moderator_attention/resolved',

@@ -18,14 +18,21 @@ class Sidebar extends AbstractHtmlElement
         $this->message = $message;
     }
 
-    public function __invoke()
+    public function __invoke($data = false)
     {
         $newPersonalMessages = null;
         if ($this->view->user()->logedIn()) {
             $count = $this->message->getNewCount($this->view->user()->get()->id);
 
-            $newPersonalMessages = $count;
+            $newPersonalMessages = (int)$count;
         }
+        
+        if ($data) {
+            return [
+                'newPersonalMessages' => $newPersonalMessages
+            ];
+        }
+        
         return $this->view->partial('application/sidebar-right', [
             'newPersonalMessages' => $newPersonalMessages
         ]);

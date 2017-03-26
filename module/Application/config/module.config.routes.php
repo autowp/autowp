@@ -4,11 +4,23 @@ namespace Application;
 
 use Zend\Router\Http\Hostname;
 use Zend\Router\Http\Literal;
+use Zend\Router\Http\Regex;
 use Zend\Router\Http\Segment;
 
 return [
     'router' => [
         'routes' => [
+           'ng' => [
+                'type' => Regex::class,
+                'options' => [
+                    'regex'    => '/ng/(?<path>[/a-zA-Z0-9_-]+)?',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'ng',
+                    ],
+                    'spec' => '/ng/%path%',
+                ]
+            ],
             'picture-file' => [
                 'type' => Router\Http\PictureFile::class,
                 'options' => [
@@ -1252,142 +1264,7 @@ return [
                     ]
                 ]
             ],
-            'api' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/api',
-                ],
-                'may_terminate' => false,
-                'child_routes' => [
-                    'comments' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/comments',
-                            'defaults' => [
-                                'controller' => Controller\Api\CommentsController::class
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes' => [
-                            'subscribe' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route' => '/subscribe/:type_id/:item_id',
-                                    'defaults' => [
-                                        'action' => 'subscribe'
-                                    ],
-                                ],
-                            ]
-                        ]
-                    ],
-                    'contacts' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/contacts/:id',
-                            'constraints' => [
-                                'id' => '[0-9]+'
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\Api\ContactsController::class
-                            ],
-                        ],
-                    ],
-                    'picture' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/picture',
-                            'defaults' => [
-                                'controller' => Controller\Api\PictureController::class
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes' => [
-                            'random_picture' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route'    => '/random-picture',
-                                    'defaults' => [
-                                        'controller' => Controller\Api\PictureController::class,
-                                        'action' => 'random-picture'
-                                    ],
-                                ]
-                            ],
-                            'new-picture' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route'    => '/new-picture',
-                                    'defaults' => [
-                                        'controller' => Controller\Api\PictureController::class,
-                                        'action' => 'new-picture'
-                                    ],
-                                ]
-                            ],
-                            'car-of-day-picture' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route'    => '/car-of-day-picture',
-                                    'defaults' => [
-                                        'controller' => Controller\Api\PictureController::class,
-                                        'action' => 'car-of-day-picture'
-                                    ],
-                                ]
-                            ]
-                        ]
-                    ],
-                    'picture-moder-vote' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/picture-moder-vote/:id',
-                            'constraints' => [
-                                'id' => '[0-9]+'
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\Api\PictureModerVoteController::class
-                            ],
-                        ],
-                    ],
-                    'picture-vote' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/picture-vote/:id',
-                            'constraints' => [
-                                'id' => '[0-9]+'
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\Api\PictureVoteController::class
-                            ],
-                        ],
-                    ],
-                    'picture-item' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/picture-item/:picture_id/:item_id',
-                            'defaults' => [
-                                'controller' => Controller\Api\PictureItemController::class,
-                                'action'     => 'item'
-                            ],
-                        ],
-                    ],
-                    'users' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/users',
-                            'defaults' => [
-                                'controller' => Controller\Api\UsersController::class
-                            ]
-                        ],
-                        'may_terminate' => true,
-                        'child_routes' => [
-                            'user' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route' => '/:id'
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+            
         ]
     ]
 ];

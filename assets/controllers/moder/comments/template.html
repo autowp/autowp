@@ -1,0 +1,48 @@
+<div class="row">
+    <div class="col-md-4">
+        <h2 translate>moder/comments/filter</h2>
+        <div class="well">
+            <form method="post" name="form" class=" form-vertical">
+                <fieldset>
+                    <div class="form-group">
+                        <label for="user" translate>moder/comments/filter/user-id</label>
+                        <input type="text" name="user" ng-model="user" ng-change="load()" ng-model-options="{debounce:300}" class="form-control" value="" />
+                    </div>
+                    <div class="form-group">
+                        <label for="moderator_attention" translate>moder/comments/filter/moderator_attention</label>
+                        <select name="moderator_attention" class="form-control" ng-model="moderator_attention" ng-change="load()" ng-model-options="{debounce:300}">
+                            <option value="" translate>moder/comments/filter/moderator_attention/not-matters</option>
+                            <option value="0" translate>moder/comments/filter/moderator_attention/not-required</option>
+                            <option value="1" translate selected="selected">moder/comments/filter/moderator_attention/required</option>
+                            <option value="2" translate>moder/comments/filter/moderator_attention/resolved</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="item_id" translate>moder/comments/filter/vehicle-id</label>
+                        <input type="text" name="item_id" class="form-control" value="" ng-model="item_id" ng-change="load()" ng-model-options="{debounce:300}" />
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <h2>
+            {{'moder/comments/title'|translate}}
+            <small ng-if="paginator.totalItemCount" translate="ng/%1$s-comments" translate-values="{count:paginator.totalItemCount}"></small>
+        </h2>
+        
+        <div layout="row" layout-sm="column" layout-align="space-around" ng-show="loading">
+            <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+        </div>
+        
+        <ul class="comments">
+            <li ng-repeat="comment in comments">
+                <span class="label label-warning" ng-if="comment.new" translate>moder/comments/not-readed</span>
+                <span class="label label-{{comment.status.class}}" ng-if="comment.status">{{comment.status.name|translate}}</span>
+                <a ng-href="{{comment.url}}" ng-bind="comment.preview"></a>
+                <autowp-user user="comment.user"></autowp-user>
+            </li>
+        </ul>
+        <autowp-paginator data="paginator" ng-if="paginator"></autowp-paginator>
+    </div>
+</div>

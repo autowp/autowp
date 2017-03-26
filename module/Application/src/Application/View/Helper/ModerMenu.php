@@ -20,7 +20,7 @@ class ModerMenu extends AbstractHtmlElement
         $this->comments = $comments;
     }
 
-    public function __invoke()
+    public function __invoke($data = false)
     {
         $items = [];
 
@@ -44,9 +44,10 @@ class ModerMenu extends AbstractHtmlElement
             ]);
 
             $items[] = [
-                'href'  => $this->view->url('moder/comments/params', [
-                    'action'              => 'index',
-                    'moderator_attention' => Comments\Attention::REQUIRED
+                'href'  => $this->view->url('ng', ['path' => 'moder/comments'], [
+                    'query' => [
+                        'moderator_attention' => Comments\Attention::REQUIRED
+                    ]
                 ]),
                 'label' => $this->view->page(110)->name,
                 'count' => $attentionCount,
@@ -66,6 +67,10 @@ class ModerMenu extends AbstractHtmlElement
                 'label' => $this->view->page(131)->name,
                 'icon'  => 'fa fa-car'
             ];
+        }
+        
+        if ($data) {
+            return $items;
         }
 
         return $this->view->partial('application/moder-menu', [

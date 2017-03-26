@@ -224,7 +224,7 @@ module.exports = {
             });
             
             $perspective.on('change', function(e) {
-                $.post(picture.perspectiveUrl, {perspective_id: $(this).val()})
+                $.post(picture.perspectiveUrl, {perspective_id: $(this).val()});
             });
             
             $picture.append($perspective);

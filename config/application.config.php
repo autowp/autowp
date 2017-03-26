@@ -13,6 +13,7 @@ return [
         'Zend\\Filter',
         'Zend\\I18n',
         'Zend\\InputFilter',
+        'Zend\\Hydrator',
         'Zend\\Log',
         'Zend\\Mail',
         'Zend\\Mvc\\I18n',

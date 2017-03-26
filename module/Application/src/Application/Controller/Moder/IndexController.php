@@ -22,7 +22,7 @@ class IndexController extends AbstractActionController
             $menu[$this->url()->fromRoute('moder/rights')] = 'page/71/name';
         }
 
-        $menu[$this->url()->fromRoute('moder/comments')] = 'page/110/name';
+        $menu['ng/moder/comments'] = 'page/110/name';
 
         $menu['/moder/users'] = 'page/203/name';
 

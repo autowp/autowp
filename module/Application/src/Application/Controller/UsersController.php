@@ -498,11 +498,34 @@ class UsersController extends AbstractActionController
         );
 
         $users = [];
-        foreach ($rows as $row) {
+        foreach ($rows as $idx => $row) {
+            
+            $fans = [];
+            if ($idx < 10) {
+                
+                $fanRows = $db->fetchAll(
+                    $db->select()
+                        ->from('picture_vote', ['user_id', 'volume' => new Zend_Db_Expr('count(1)')])
+                        ->join('pictures', 'pictures.id = picture_vote.picture_id', null)
+                        ->where('pictures.owner_id = ?', $row['owner_id'])
+                        ->group('user_id')
+                        ->order('volume desc')
+                        ->limit(2)
+                );
+                foreach ($fanRows as $fanRow) {
+                    $fans[] = [
+                        'user_id' => $fanRow['user_id'],
+                        'volume'  => $fanRow['volume'],
+                    ];
+                }
+                
+            }
+            
             $users[] = [
                 'row'    => $userTable->find($row['owner_id'])->current(),
                 'volume' => $row['volume'],
-                'brands' => []
+                'brands' => [],
+                'fans'   => $fans
             ];
         }
 

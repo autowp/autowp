@@ -46,6 +46,15 @@
                             //echo ' <span class="label label-default">'.$brand['value'] .'</span>';
                         } ?>, …
                     <?php } ?>
+                    <?php if (isset($user['fans']) && count($user['fans'])) { ?>
+                        <small>
+                            <?php foreach ($user['fans'] as $j => $fan) {
+                                if ($j != 0) { ?>, <?php }
+                                echo $this->user($fan['user_id']);
+                                echo ' <span class="badge">' . ($fan['volume'] > 0 ? '+' : '') . $fan['volume'] .'</span>';
+                            } ?>, …
+                        </small>
+                    <?php } ?>
                 </td>
                 <td class="text-right"><?=number_format($user['volume'], 0 , '.', ' ')?></td>
                 <?php if ($this->rating == 'specs') { ?>

@@ -84,7 +84,7 @@ $.extend(Carousel.prototype, {
 
         if ($.support.transition && this.$element.hasClass('slide')) {
             $next.addClass(type);
-            $next[0].offsetWidth; // force reflow
+            $next[0].offsetWidth; // jshint ignore:line 
             $active.addClass(direction);
             $next.addClass(direction);
             $active

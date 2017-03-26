@@ -17,10 +17,14 @@ class MainMenu extends AbstractHtmlElement
         $this->mainMenu = $mainMenu;
     }
 
-    public function __invoke()
+    public function __invoke($data = false)
     {
         $user = $this->view->user()->get();
         $menu = $this->mainMenu->getMenu($user ? $user : null);
+        
+        if ($data) {
+            return $menu;
+        }
 
         return $this->view->partial('application/main-menu', $menu);
     }

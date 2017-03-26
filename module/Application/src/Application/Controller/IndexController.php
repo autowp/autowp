@@ -283,4 +283,21 @@ class IndexController extends AbstractActionController
             ]
         ];
     }
+    
+    public function ngAction()
+    {
+        $path = $this->params('path');
+        
+        if ($path) {
+            $uri = $this->getRequest()->getUri();
+            
+            $query = $uri->getQuery();
+            
+            return $this->redirect()->toRoute('ng', [
+                'path' => ''
+            ], [
+                'fragment' => '!/'.$path . ($query ? '?'.$query : '')
+            ], false);
+        }
+    }
 }

@@ -6,6 +6,9 @@ var CompressionPlugin = require("compression-webpack-plugin");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
+var ENV = process.env.npm_lifecycle_event;
+var isProd = ENV === 'start';
+
 module.exports = {
     context: __dirname,
     entry: {
@@ -25,7 +28,24 @@ module.exports = {
     },
     module: {
         rules: [
-            { test: /webgl-heatmap-leaflet/, use: {
+            {
+                test: /\.js$/, // include .js files
+                exclude: /node_modules/, // exclude any and all files in the node_modules folder
+                use:[
+                  'jshint-loader',
+                  {
+                      loader: "jshint-loader",
+                      options: { 
+                          camelcase: false, 
+                          emitErrors: false, 
+                          failOnHint: false
+                      }
+                  }
+                ]
+            }, { test: /angular-markdown-directive/, use: {
+                loader: 'imports-loader',
+                options: {'showdown': 'showdown'}
+            }}, { test: /webgl-heatmap-leaflet/, use: {
                 loader: 'imports-loader',
                 options: {'L': 'leaflet'}
             }},
@@ -46,7 +66,7 @@ module.exports = {
                 use: {
                     loader: "html-loader",
                     options: {
-                        minimize: true
+                        minimize: isProd
                     }
                 }
             },
@@ -81,7 +101,7 @@ module.exports = {
                     {
                         loader: 'image-webpack-loader',
                         options: {
-                            //bypassOnDebug: true,
+                            bypassOnDebug: !isProd,
                             optipng: {
                                 optimizationLevel: 5,
                             },
@@ -125,8 +145,8 @@ module.exports = {
     },
     plugins: [
         new webpack.LoaderOptionsPlugin({
-            minimize: true,
-            debug: false
+            minimize: isProd,
+            debug: !isProd
         }),
         new webpack.optimize.UglifyJsPlugin({
             compress: {

@@ -21,6 +21,9 @@ return array_replace(include 'root.php', [
     '%1$s comments'      => [
         '%1$s 个评论',
     ],
+    'ng/%1$s-comments' => '{count, plural,
+        other {{count} 个评论}
+    }',
     '%1$s messages'      => [
         '%1$s 个站内信',
     ],
@@ -46,12 +49,18 @@ return array_replace(include 'root.php', [
     'layout/you-have-%1$s-new-messages' => [
         '你有-%1$s-条未读站内信'
     ],
+    'ng-layout/you-have-new-messages' => '{messages, plural,
+        other {你有-{messages}-条未读站内信}
+    }',
 
     'layout/search' => '搜索',
-    'layout/footer' => '请知悉，autowp服务器中全部素材都是由浏览者添加的。<br />' .
-                       '站长没有这些素材的相关法律信息。<br />' .
-                       '所有图片仅用于传播知识。<br />' .
-                       '<a href="mailto:autowp@yandex.ru">举报侵权行为</a>',
+    'layout/footer' => '请知悉，autowp服务器中全部素材都是由浏览者添加的。
+
+站长没有这些素材的相关法律信息。
+
+所有图片仅用于传播知识。
+
+[举报侵权行为](mailto:autowp@yandex.ru)',
 
     'layout/language-contributing' => '想要加入更多语言?',
 
@@ -1550,14 +1559,6 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/vehicle/changes/boolean/true' => '是',
     'moder/vehicle/changes/boolean/false' => '否',
 
-    'moder/statistics/photos-with-copyrights' => '有版权图片',
-    'moder/statistics/vehicles-with-4-or-more-photos' => '有4张以上图片的车型',
-    'moder/statistics/specifications-values' => '性能参数数据',
-    'moder/statistics/brand-logos' => '商标',
-    'moder/statistics/from-years' => '投产年份',
-    'moder/statistics/from-and-to-years' => '停产年份',
-    'moder/statistics/from-and-to-years-and-months' => '投产及停产年月',
-
     'specifications/no-value-text' => '无数据',
     'specifications/boolean/false' => '否',
     'specifications/boolean/true' => '是',
@@ -2126,4 +2127,35 @@ Confirmation code will be sent to you via [the private messaging system](/accoun
 Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish process of association your telegram account with out website user.
 
 Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/account/pm/system)',
+    
+    'personal-message-dialog/title' => 'Send personal message',
+    'personal-message-dialog/send' => 'send',
+    'personal-message-dialog/sending' => 'sending ...',
+    'personal-message-dialog/sent' => 'sent',
+    'personal-message-dialog/cancel' => 'cancel',
+    'personal-message-dialog/placeholder' => 'Message',
+    
+    'crop-dialog/title' => 'Cropper',
+    'crop-dialog/close' => 'Close',
+    'crop-dialog/select-all' => 'Select all',
+    'crop-dialog/save' => 'Save changes',
+    'crop-dialog/resolution-%s-aspect-%s' => '%s (aspect is about %s)',
+    
+    'who-online/title' => 'Online',
+    'who-online/refresh' => 'Refresh',
+    'who-online/close' => 'Close',
+    
+    'picture-moder-vote/custom/title' => 'Custom reason',
+    'picture-moder-vote/custom/sending' => 'Sending',
+    'picture-moder-vote/custom/send' => 'Send',
+    'picture-moder-vote/custom/cancel' => 'Cancel',
+    'picture-moder-vote/custom/save' => 'Save as template',
+    
+    'moder/statistics/photos-with-copyrights' => '有版权图片',
+    'moder/statistics/vehicles-with-4-or-more-photos' => '有4张以上图片的车型',
+    'moder/statistics/specifications-values' => '性能参数数据',
+    'moder/statistics/brand-logos' => '商标',
+    'moder/statistics/from-years' => '投产年份',
+    'moder/statistics/from-and-to-years' => '停产年份',
+    'moder/statistics/from-and-to-years-and-months' => '投产及停产年月'
 ]);

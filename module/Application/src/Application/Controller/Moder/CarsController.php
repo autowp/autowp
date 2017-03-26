@@ -342,62 +342,6 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    public function alphaAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $itemTable = $this->catalogue()->getItemTable();
-        $carAdapter = $itemTable->getAdapter();
-        $chars = $carAdapter->fetchCol(
-            $carAdapter->select()
-                ->distinct()
-                ->from('item', ['char' => new Zend_Db_Expr('UPPER(LEFT(name, 1))')])
-                ->order('char')
-        );
-
-
-        $groups = [
-            'numbers' => [],
-            'english' => [],
-            'other'   => []
-        ];
-
-        foreach ($chars as $char) {
-            if (preg_match('|^["0-9-]$|isu', $char)) {
-                $groups['numbers'][] = $char;
-            } elseif (preg_match('|^[A-Za-z]$|isu', $char)) {
-                $groups['english'][] = $char;
-            } else {
-                $groups['other'][] = $char;
-            }
-        }
-
-        $cars = [];
-        $char = null;
-
-        $c = $this->params('char');
-
-        if ($c) {
-            $char = mb_substr(trim($c), 0, 1);
-
-            $char = $char;
-            $cars = $itemTable->fetchAll(
-                $itemTable->select(true)
-                    ->where('name LIKE ?', $char.'%')
-                    ->order(['name', 'begin_year', 'end_year'])
-            );
-        }
-
-        return [
-            'chars'  => $chars,
-            'char'   => $char,
-            'groups' => $groups,
-            'cars'   => $cars
-        ];
-    }
-
     /**
      * @param DbTable\Item\Row $car
      * @return string
@@ -2476,9 +2420,16 @@ class CarsController extends AbstractActionController
                 $inheritedSpec = $avgSpec->short_name;
             }
         }
+        
+        $organizeItemTypeId = $car['item_type_id'];
+        switch ($organizeItemTypeId) {
+            case DbTable\Item\Type::BRAND:
+                $organizeItemTypeId = DbTable\Item\Type::VEHICLE;
+                break;
+        }
 
         $form = new CarOrganizeForm(null, [
-            'itemType'           => $car->item_type_id,
+            'itemType'           => $organizeItemTypeId,
             'language'           => $this->language(),
             'childOptions'       => $childs,
             'inheritedIsConcept' => $car->is_concept,
@@ -2507,7 +2458,7 @@ class CarsController extends AbstractActionController
                 $newCar = $itemTable->createRow(
                     $this->prepareCarMetaToSave($values)
                 );
-                $newCar->item_type_id = $car->item_type_id;
+                $newCar->item_type_id = $organizeItemTypeId;
                 $newCar->save();
                 
                 $this->setLanguageName($newCar['id'], 'xx', $values['name']);

@@ -2,6 +2,8 @@ var Navbar = require("navbar/navbar.js");
 var $ = require("jquery");
 var i18next = require('i18next');
 
+require("angular.app");
+require('app.module');
 require("bootstrap/bootstrap");
 require("styles.less");
 require("flags/flags.js");
@@ -10,7 +12,7 @@ var resources = {};
 $.map(['en', 'de', 'fr', 'ru', 'zh'], function(language) {
     resources[language] = {
         translation: require("languages/"+language+".json")
-    }
+    };
 });
 
 i18next.init({

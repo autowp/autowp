@@ -80,10 +80,11 @@
         <?php if ($this->requireAttention) { ?>
             <li>
                 <?=$this->htmlA(
-                    $this->url('moder/comments/params', [
-                        'action'              => 'index',
-                        'item_id'             => $this->brand['id'],
-                        'moderator_attention' => '1'
+                    $this->url('ng', ['path' => 'moder/comments'], [
+                        'query' => [
+                            'item_id'             => $this->brand['id'],
+                            'moderator_attention' => '1'
+                        ]
                     ]),
                     '<i class="fa fa-comment"></i> ' .
                         $this->escapeHtml($this->translate('catalogue/vehicle/comments')) .

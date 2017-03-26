@@ -25,6 +25,10 @@ return array_replace(include 'root.php', [
         '%1$s commentaire',
         '%1$s commentaires',
     ],
+    'ng/%1$s-comments' => '{count, plural,
+        one {{count} comment}
+        other {{count} comments}
+    }',
     '%1$s messages'      => [
         '%1$s message',
         '%1$s messages',
@@ -53,12 +57,19 @@ return array_replace(include 'root.php', [
         'Vous avez %1$s nouveau message',
         'Vous avez %1$s nouveaux messages',
     ],
+    'ng-layout/you-have-new-messages' => '{messages, plural,
+        one {Vous avez {messages} nouveau message}
+        other {Vous avez {messages} nouveaux messages}
+    }',
 
     'layout/search' => 'Rechercher',
-    'layout/footer' => 'S\'il vous plaît noter que tous les documents sur ce autowp.ru, sont ajouté par  les visiteurs.<br />' .
-                       'L\'administration du site ne dispose pas d\'informations de la légalité de la publication de ces matériaux.<br />' .
-                       'Toutes les images sont disponibles à des fins éducatives.<br />' .
-                       '<a href="mailto:autowp@yandex.ru">Signaler une violation de copyright</a>.',
+    'layout/footer' => 'S\'il vous plaît noter que tous les documents sur ce autowp.ru, sont ajouté par  les visiteurs.
+
+L\'administration du site ne dispose pas d\'informations de la légalité de la publication de ces matériaux.
+
+Toutes les images sont disponibles à des fins éducatives.
+
+[Signaler une violation de copyright](mailto:autowp@yandex.ru)',
 
     'layout/language-contributing' => 'Vous souhaitez contribuer?',
 
@@ -1576,14 +1587,6 @@ Certains d'entre eux, trouvés par d'autres utilisateurs, vous pouvez trouver [i
     'moder/vehicle/changes/boolean/true' => 'yes',
     'moder/vehicle/changes/boolean/false' => 'no',
 
-    'moder/statistics/photos-with-copyrights' => 'Photos with copyrights',
-    'moder/statistics/vehicles-with-4-or-more-photos' => 'Vehicles with 4 or more photos',
-    'moder/statistics/specifications-values' => 'Specifications values',
-    'moder/statistics/brand-logos' => 'Brand logotypes',
-    'moder/statistics/from-years' => 'Years of begin production',
-    'moder/statistics/from-and-to-years' => 'Years of begin and end production',
-    'moder/statistics/from-and-to-years-and-months' => 'Years and months of begin and end production',
-
     'specifications/no-value-text' => 'Non valeur',
     'specifications/boolean/false' => 'Non',
     'specifications/boolean/true' => 'Oui',
@@ -2152,4 +2155,35 @@ Confirmation code will be sent to you via [the private messaging system](/accoun
 Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish process of association your telegram account with out website user.
 
 Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/account/pm/system)',
+    
+    'personal-message-dialog/title' => 'Send personal message',
+    'personal-message-dialog/send' => 'send',
+    'personal-message-dialog/sending' => 'sending ...',
+    'personal-message-dialog/sent' => 'sent',
+    'personal-message-dialog/cancel' => 'cancel',
+    'personal-message-dialog/placeholder' => 'Message',
+    
+    'crop-dialog/title' => 'Cropper',
+    'crop-dialog/close' => 'Close',
+    'crop-dialog/select-all' => 'Select all',
+    'crop-dialog/save' => 'Save changes',
+    'crop-dialog/resolution-%s-aspect-%s' => '%s (aspect is about %s)',
+    
+    'who-online/title' => 'Online',
+    'who-online/refresh' => 'Refresh',
+    'who-online/close' => 'Close',
+    
+    'picture-moder-vote/custom/title' => 'Custom reason',
+    'picture-moder-vote/custom/sending' => 'Sending',
+    'picture-moder-vote/custom/send' => 'Send',
+    'picture-moder-vote/custom/cancel' => 'Cancel',
+    'picture-moder-vote/custom/save' => 'Save as template',
+    
+    'moder/statistics/photos-with-copyrights' => 'Photos with copyrights',
+    'moder/statistics/vehicles-with-4-or-more-photos' => 'Vehicles with 4 or more photos',
+    'moder/statistics/specifications-values' => 'Specifications values',
+    'moder/statistics/brand-logos' => 'Brand logotypes',
+    'moder/statistics/from-years' => 'Years of begin production',
+    'moder/statistics/from-and-to-years' => 'Years of begin and end production',
+    'moder/statistics/from-and-to-years-and-months' => 'Years and months of begin and end production'
 ]);

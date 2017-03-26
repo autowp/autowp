@@ -264,7 +264,7 @@ class Car extends AbstractPlugin
                 'brandName' => $designCarsRow['brand_name'],
                 'url'       => $controller->url()->fromRoute('catalogue', [
                     'action'        => 'brand-item',
-                    'brand_catname' => $designCarsRow['brand_catname'],
+                    'brand_catname' => $designCarsRow['brand_catname'] ? $designCarsRow['brand_catname'] : 'test',
                     'car_catname'   => $designCarsRow['brand_item_catname']
                 ])
             ];

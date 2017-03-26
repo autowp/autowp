@@ -20,4 +20,23 @@ class BuildController extends AbstractActionController
 
         return "done\n";
     }
+    
+    public function translationsAction()
+    {
+        $languages = ['en', 'ru', 'zh', 'de', 'fr'];
+        
+        foreach ($languages as $language) {
+            $srcPath = __DIR__ . '/../../../../language/' . $language . '.php';
+            $translations = include $srcPath;
+            
+            $json = \Zend\Json\Json::encode($translations);
+            
+            $dstPath = __DIR__ . '/../../../../../../assets/languages/' . $language . '.json';
+            
+            print $dstPath . PHP_EOL;
+            file_put_contents($dstPath, $json);
+        }
+        
+        return "done\n";
+    }
 }

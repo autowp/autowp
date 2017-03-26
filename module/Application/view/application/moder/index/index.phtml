@@ -21,9 +21,7 @@
 
                     <li>
                         <i class="fa fa-sort-alpha-asc"></i>
-                        <?=$this->htmlA($this->url('moder/cars', [
-                            'action' => 'alpha'
-                        ]), $this->page(74)->name)?>
+                        <?=$this->htmlA('/ng/moder/cars/alpha', $this->page(74)->name)?>
                     </li>
 
                     <?php if ($this->user()->isAllowed('car', 'add')) { ?>

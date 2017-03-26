@@ -78,10 +78,10 @@
 
         <?php if ($this->requireAttention) { ?>
             <i class="fa fa-comment"></i>
-            <?=$this->htmlA($this->url('moder/comments/params', [
-                'action'              => 'index',
-                'item_id'             => $this->car['id'],
-                'moderator_attention' => '1'
+            <?=$this->htmlA($this->url('ng', ['path' => 'moder/comments'], [
+                'query' => [
+                    'item_id' => $this->car['id']
+                ]
             ]), $this->translate('catalogue/vehicle/comments') . ' ('.$this->requireAttention.')')?>
         <?php } ?>
     </p>

@@ -48,7 +48,8 @@
         "zfcampus/zf-oauth2": "^1.3",
         "autowp/image": "v2.x-dev",
         "jenssegers/imagehash": "^0.4.1",
-        "facebook/graph-sdk": "^5.4"
+        "facebook/graph-sdk": "^5.4",
+        "zendframework/zend-hydrator": "^2.2"
     },
     "autoload": {
         "psr-4": {
