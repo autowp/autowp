@@ -13,6 +13,10 @@ return array_replace(include 'root.php', [
         '%1$s picture',
         '%1$s pictures',
     ],
+    'ng/%1$s-picures' => '{count, plural,
+        one {{count} picure}
+        other {{count} picures}
+    }',
     '%1$s items'      => [
         '%1$s item',
         '%1$s items',
@@ -1110,8 +1114,8 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/filter/status/removing' => 'in delete queue',
     'moder/picture/filter/status/all-except-removing' => 'all, except removing',
     'moder/picture/filter/vehicle-type' => 'Vehicle type',
-    'moder/picture/filter/item' => 'Item (id)',
-    'moder/picture/filter/owner' => 'Uploaded by (id)',
+    'moder/picture/filter/item' => 'Item',
+    'moder/picture/filter/owner' => 'Uploaded by',
     'moder/picture/filter/special-name' => 'Special name only',
     'moder/picture/filter/not-linked' => 'Not linked',
     'moder/picture/filter/gps' => 'With coordinates',
@@ -1442,7 +1446,7 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/comments/filter/moderator_attention/not-required' => 'Not required',
     'moder/comments/filter/moderator_attention/required' => 'Required',
     'moder/comments/filter/moderator_attention/resolved' => 'Resolved',
-    'moder/comments/filter/vehicle-id' => 'Vehicle №',
+    'moder/comments/filter/vehicle-id' => 'Item',
     'moder/comments/not-readed' => 'not readed',
 
     'engine/name' => 'Name',

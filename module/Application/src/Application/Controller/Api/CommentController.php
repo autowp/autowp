@@ -5,16 +5,16 @@ namespace Application\Controller\Api;
 use Zend\Db\Sql;
 use Zend\Form\Form;
 use Zend\Http\Request;
-use Zend\Hydrator\AbstractHydrator;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Autowp\User\Model\DbTable\User;
 
 use Application\Comments;
+use Application\Hydrator\Api\RestHydrator;
 use Application\Model\DbTable;
 
-class CommentsController extends AbstractRestfulController
+class CommentController extends AbstractRestfulController
 {
     /**
      * @var Form
@@ -27,11 +27,11 @@ class CommentsController extends AbstractRestfulController
     private $comments;
     
     /**
-     * @var AbstractHydrator
+     * @var RestHydrator
      */
     private $hydrator;
 
-    public function __construct(Comments $comments, Form $form, AbstractHydrator $hydrator)
+    public function __construct(Comments $comments, Form $form, RestHydrator $hydrator)
     {
         $this->comments = $comments;
         $this->form = $form;
@@ -75,6 +75,8 @@ class CommentsController extends AbstractRestfulController
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
+        
+        $user = $this->user()->get();
         
         $itemTable = new DbTable\Item();
         $userTable = new User();
@@ -126,6 +128,11 @@ class CommentsController extends AbstractRestfulController
             ->setItemCountPerPage(50)
             ->setCurrentPageNumber($this->params()->fromQuery('page'));
         
+        $this->hydrator->setOptions([
+            //'fields'   => $data['fields'],
+            'user_id' => $user ? $user['id'] : null
+        ]);
+            
         $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $comments[] = $this->hydrator->extract($commentRow);

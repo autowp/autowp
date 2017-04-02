@@ -5,19 +5,27 @@ namespace Application\Hydrator\Api;
 use DateTime;
 use DateInterval;
 
-use Zend\Hydrator\AbstractHydrator;
 use Zend\Permissions\Acl\Acl;
 
 use Autowp\User\Model\DbTable\User;
 
-class UserHydrator extends AbstractHydrator
+class UserHydrator extends RestHydrator
 {
+    /**
+     * @var int|null
+     */
+    protected $userId = null;
+    
     private $acl;
     
-    public function __construct($router, Acl $acl)
+    private $router;
+    
+    public function __construct($serviceManager)
     {
-        $this->router = $router;
-        $this->acl = $acl;
+        parent::__construct();
+        
+        $this->router = $serviceManager->get('HttpRouter');
+        $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
     }
     
     public function extract($object)
@@ -68,5 +76,12 @@ class UserHydrator extends AbstractHydrator
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");
+    }
+    
+    public function setUserId($userId)
+    {
+        $this->userId = $userId;
+    
+        return $this;
     }
 }

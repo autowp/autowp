@@ -8,7 +8,8 @@ angular.module(Module)
         return {
             restirct: 'E',
             scope: {
-                user: '='
+                user: '=',
+                isModer: '='
             },
             template: template,
             transclude: true,

@@ -1,0 +1,64 @@
+<div ng-class="{'picture-preview': true, 'vote-accept': picture.moderVote.vote > 0, 'vote-remove': picture.moderVote.vote < 0, 'vote-neutral': picture.moderVote.count > 0 && picture.moderVote.vote == 0}">
+    <div class="thumbnail">
+        <a href="{{picture.url}}" ng-if="picture.thumbnail">
+            <img ng-src="{{picture.thumbnail.src}}" alt="{{picture.name}}" title="{{picture.name}}">
+        </a>
+        <div class="name">
+            <p><a href="{{picture.url}}" ng-bind-html="picture.nameHtml"></a></p>
+
+            <p class="picture-behaviour clearfix" ng-if="!disableBehaviour">
+                <span title="Status" ng-if="isModer">
+                    <i class="fa fa-check text-success" ng-if="picture.status=='accepted'"></i>
+                    <i class="fa fa-hourglass text-warning" ng-if="picture.status=='inbox'"></i>
+                    <i class="fa fa-trash text-danger" ng-if="picture.status=='removed'"></i>
+                    <i class="fa fa-trash text-danger" ng-if="picture.status=='removing'"></i>
+                </span>
+            
+                <span title="{{'Resolution'|translate}}">
+                    {{picture.resolution}}
+                    <i ng-if="isModer && picture.cropped" class="fa fa-scissors" style="cursor:help" title="{{'picture-preview/crop-desc'|translate}} ({{picture.cropResolution}})"></i>
+                </span>
+            
+                <span class="pull-right">
+            
+                    <span title="{{'Views'|translate}}">
+                        {{picture.views > 1000 ? Math.round(picture.views/1000) + 'K' : picture.views}}
+                        <i class="fa fa-eye"></i>
+                    </span>
+            
+                    <span title="{{'Comments count'|translate}}">
+                        <a ng-href="{{picture.url}}" ng-if="picture.newMsgCount > 0">
+                            {{picture.msgCount > picture.newMsgCount ? picture.msgCount - picture.newMsgCount : ''}}
+                            <span class="text-danger">+{{picture.newMsgCount}}</span>
+                            <i class="fa fa-comment text-danger"></i>
+                        </a>
+                        <a ng-href="{{picture.url}}" ng-if="picture.newMsgCount == 0">
+                            {{picture.msgCount}} <i class="fa fa-comment"></i>
+                        </a>
+                    </span>
+                </span>
+                
+                <br ng-if="picture.owner || picture.votes.positive > 0" />
+                <autowp-user user="picture.owner" ng-if="picture.owner"></autowp-user>
+                
+                <span class="pull-right" ng-if="picture.votes.positive > 0">
+                    {{picture.votes.positive}}
+                    <i class="fa fa-thumbs-up"></i>
+                </span>
+            </p>
+        </div>
+        <button type="button" class="btn btn-default btn-sm pull-left" data-toggle="button" aria-pressed="false" ng-click="onPictureSelect($event, picture)">
+            <i class="fa fa-check"></i>
+        </button>
+        <div style="margin-left:35px;">
+            <select class="form-control input-sm" ng-model="picture.perspective_item.perspective_id" ng-if="picture.perspective_item" ng-change="savePerspective()">
+                <option value="">--</option>
+                <option ng-repeat="item in perspectiveOptions" ng-value="{{item.id}}">{{item.name|translate}}</option>
+            </select>
+        </div>
+        <p class="alert alert-warning" role="alert" style="margin-bottom:-1px" ng-if="picture.similar">
+            <span class="fa fa-file-image-o"></span>
+            <a ng-href="{{picture.similar.url}}">Similar picture: {{picture.similar.distance}}</a>
+        </p>
+    </div>
+</div>

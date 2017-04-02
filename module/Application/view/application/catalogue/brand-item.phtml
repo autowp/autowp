@@ -69,8 +69,7 @@
 
         <?php if ($this->canAcceptPicture && $this->inboxCount) { ?>
             <i class="fa fa-th"></i>
-            <?=$this->htmlA($this->url('moder/pictures/params', [
-                'action'  => 'index',
+            <?=$this->htmlA('/ng/moder/pictures?' . http_build_query([
                 'item_id' => $this->car['id'],
                 'status'  => 'inbox'
             ]), $this->translate('catalogue/vehicle/inbox') . ' ('.$this->inboxCount.')')?>
@@ -80,7 +79,8 @@
             <i class="fa fa-comment"></i>
             <?=$this->htmlA($this->url('ng', ['path' => 'moder/comments'], [
                 'query' => [
-                    'item_id' => $this->car['id']
+                    'item_id' => $this->car['id'],
+                    'moderator_attention' => 1
                 ]
             ]), $this->translate('catalogue/vehicle/comments') . ' ('.$this->requireAttention.')')?>
         <?php } ?>

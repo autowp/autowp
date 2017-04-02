@@ -45,7 +45,8 @@
         'needRight'  => $needRight,
         'mainMenu'   => $this->mainMenu(true),
         'moderMenu'  => null,
-        'sidebar'    => $this->sidebar(true)
+        'sidebar'    => $this->sidebar(true),
+        'isModer'    => $this->user()->inheritsRole('moder')
     ];
     
     if (!$blankPage && $this->user()->inheritsRole('moder')) {
@@ -99,7 +100,7 @@ ga('send', 'pageview');
                         </a>
                     </li>
                     <li class="divider"></li>
-                    <li><a href="/moder">
+                    <li><a ui-sref="moder">
                         <i class="fa fa-cog"></i>
                         {{'page/67/name'|translate}}
                     </a></li>
@@ -182,7 +183,7 @@ ga('send', 'pageview');
                             </a>
                             <ul class="dropdown-menu">
                                 <li ng-class="{active: language.active}" ng-repeat="language in languages">
-                                    <a ng-href="{{language.url}}">
+                                    <a ng-href="{{language.url + path.substring(1)}}">
                                         <i class="{{language.flag}}"></i>
                                         {{language.name}}
                                     </a>

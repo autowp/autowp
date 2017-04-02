@@ -3,28 +3,79 @@
 namespace Application;
 
 use Zend\Router\Http\Literal;
+use Zend\Router\Http\Method;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 return [
     'hydrators' => [
         'factories' => [
-            Hydrator\Api\CommentHydrator::class => Hydrator\Api\Service\CommentHydratorFactory::class,
-            Hydrator\Api\UserHydrator::class    => Hydrator\Api\Service\UserHydratorFactory::class
+            Hydrator\Api\CommentHydrator::class => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemHydrator::class    => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PerspectiveHydrator::class => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PerspectiveGroupHydrator::class => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PerspectivePageHydrator::class => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PictureHydrator::class => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\UserHydrator::class    => Hydrator\Api\RestHydratorFactory::class
         ]
     ],
     'controllers' => [
         'factories' => [
-            Controller\Api\CommentsController::class    => Controller\Api\Service\CommentsControllerFactory::class,
-            Controller\Api\ContactsController::class    => InvokableFactory::class,
-            Controller\Api\ItemsController::class       => Controller\Api\Service\ItemsControllerFactory::class,
-            Controller\Api\PictureController::class     => Controller\Api\Service\PictureControllerFactory::class,
-            Controller\Api\PictureItemController::class => Controller\Api\Service\PictureItemControllerFactory::class,
+            Controller\Api\CommentController::class      => Controller\Api\Service\CommentControllerFactory::class,
+            Controller\Api\ContactsController::class     => InvokableFactory::class,
+            Controller\Api\ItemController::class         => Controller\Api\Service\ItemControllerFactory::class,
+            Controller\Api\PerspectiveController::class  => Controller\Api\Service\PerspectiveControllerFactory::class,
+            Controller\Api\PerspectivePageController::class => Controller\Api\Service\PerspectivePageControllerFactory::class,
+            Controller\Api\PictureController::class      => Controller\Api\Service\PictureControllerFactory::class,
+            Controller\Api\PictureItemController::class  => Controller\Api\Service\PictureItemControllerFactory::class,
             Controller\Api\PictureModerVoteController::class => Controller\Api\Service\PictureModerVoteControllerFactory::class,
-            Controller\Api\PictureVoteController::class => Controller\Api\Service\PictureVoteControllerFactory::class,
-            Controller\Api\StatController::class        => InvokableFactory::class,
-            Controller\Api\UsersController::class       => InvokableFactory::class,
+            Controller\Api\PictureModerVoteTemplateController::class => Controller\Api\Service\PictureModerVoteTemplateControllerFactory::class,
+            Controller\Api\PictureVoteController::class  => Controller\Api\Service\PictureVoteControllerFactory::class,
+            Controller\Api\StatController::class         => InvokableFactory::class,
+            Controller\Api\UsersController::class        => InvokableFactory::class,
+            Controller\Api\UserController::class         => Controller\Api\Service\UserControllerFactory::class,
+            Controller\Api\VehicleTypesController::class => InvokableFactory::class,
         ]
+    ],
+    'input_filter_specs' => [
+        'api_item_list' => [
+            'limit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 500
+                        ]
+                    ]
+                ]
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => []]
+                    ]
+                ]
+            ]
+        ],
+        'api_perspective_page_list' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['groups']]
+                    ]
+                ]
+            ]
+        ],
     ],
     'router' => [
         'routes' => [
@@ -35,12 +86,12 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes' => [
-                    'comments' => [
+                    'comment' => [
                         'type' => Literal::class,
                         'options' => [
-                            'route'    => '/comments',
+                            'route'    => '/comment',
                             'defaults' => [
-                                'controller' => Controller\Api\CommentsController::class,
+                                'controller' => Controller\Api\CommentController::class,
                                 'action'     => 'index'
                             ],
                         ],
@@ -68,6 +119,36 @@ return [
                                 'controller' => Controller\Api\ContactsController::class
                             ],
                         ],
+                    ],
+                    'item' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/item',
+                            'defaults' => [
+                                'controller' => Controller\Api\ItemController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'list' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
+                            ],
+                            'alpha' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/alpha',
+                                    'defaults' => [
+                                        'action' => 'alpha'
+                                    ]
+                                ]
+                            ]
+                        ]
                     ],
                     'picture' => [
                         'type' => Literal::class,
@@ -108,6 +189,33 @@ return [
                                         'action' => 'car-of-day-picture'
                                     ],
                                 ]
+                            ],
+                            'index' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
+                            ],
+                            'picture' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/:id'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'update' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'put',
+                                            'defaults' => [
+                                                'action' => 'update'
+                                            ]
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ],
@@ -145,6 +253,27 @@ return [
                             ],
                         ],
                     ],
+                    'user' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/user',
+                            'defaults' => [
+                                'controller' => Controller\Api\UserController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'list' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
                     'users' => [
                         'type' => Literal::class,
                         'options' => [
@@ -159,36 +288,6 @@ return [
                                 'type' => Segment::class,
                                 'options' => [
                                     'route' => '/:id'
-                                ]
-                            ]
-                        ]
-                    ],
-                    'items' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/items',
-                            'defaults' => [
-                                'controller' => Controller\Api\ItemsController::class
-                            ]
-                        ],
-                        'may_terminate' => true,
-                        'child_routes' => [
-                            'alpha' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route' => '/alpha',
-                                    'defaults' => [
-                                        'action' => 'alpha'
-                                    ]
-                                ]
-                            ],
-                            'alpha-items' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route' => '/alpha-items',
-                                    'defaults' => [
-                                        'action' => 'alpha-items'
-                                    ]
                                 ]
                             ]
                         ]
@@ -213,7 +312,47 @@ return [
                                 ]
                             ]
                         ]
-                    ]
+                    ],
+                    'vehicle-types' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/vehicle-types',
+                            'defaults' => [
+                                'controller' => Controller\Api\VehicleTypesController::class,
+                                'action'     => 'index'
+                            ],
+                        ]
+                    ],
+                    'perspective' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/perspective',
+                            'defaults' => [
+                                'controller' => Controller\Api\PerspectiveController::class,
+                                'action'     => 'index'
+                            ],
+                        ]
+                    ],
+                    'perspective-page' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/perspective-page',
+                            'defaults' => [
+                                'controller' => Controller\Api\PerspectivePageController::class,
+                                'action'     => 'index'
+                            ],
+                        ]
+                    ],
+                    'picture-moder-vote-template' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/picture-moder-vote-template',
+                            'defaults' => [
+                                'controller' => Controller\Api\PictureModerVoteTemplateController::class,
+                                'action'     => 'index'
+                            ],
+                        ]
+                    ],
                 ]
             ]
         ]

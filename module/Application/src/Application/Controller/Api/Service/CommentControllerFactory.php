@@ -5,9 +5,9 @@ namespace Application\Controller\Api\Service;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\Controller\Api\CommentsController as Controller;
+use Application\Controller\Api\CommentController as Controller;
 
-class CommentsControllerFactory implements FactoryInterface
+class CommentControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

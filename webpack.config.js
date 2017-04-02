@@ -6,8 +6,7 @@ var CompressionPlugin = require("compression-webpack-plugin");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
-var ENV = process.env.npm_lifecycle_event;
-var isProd = ENV === 'start';
+var prod = process.argv.indexOf('-p') !== -1;
 
 module.exports = {
     context: __dirname,
@@ -64,10 +63,7 @@ module.exports = {
             { 
                 test: /.html$/,
                 use: {
-                    loader: "html-loader",
-                    options: {
-                        minimize: isProd
-                    }
+                    loader: "html-loader"
                 }
             },
             {
@@ -101,7 +97,6 @@ module.exports = {
                     {
                         loader: 'image-webpack-loader',
                         options: {
-                            bypassOnDebug: !isProd,
                             optipng: {
                                 optimizationLevel: 5,
                             },
@@ -144,38 +139,10 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.LoaderOptionsPlugin({
-            minimize: isProd,
-            debug: !isProd
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false,
-                screw_ie8: true,
-                conditionals: true,
-                unused: true,
-                comparisons: true,
-                sequences: true,
-                dead_code: true,
-                evaluate: true,
-                if_return: true,
-                join_vars: true,
-            },
-            output: {
-                comments: false,
-            },
-        }),
         new ExtractTextPlugin({
             filename: "css/[name].[hash].css"
         }),
         new ManifestPlugin(),
-        new CompressionPlugin({
-            asset: "[path].gz[query]",
-            algorithm: "gzip",
-            test: /\.js$|\.css$|\.svg$|\.eot$|\.woff2?$|\.ttf$/,
-            threshold: 10240,
-            minRatio: 0.8
-        }),
         //new webpack.optimize.CommonsChunkPlugin("vendor", "js/vendor.bundle.js"), //.[chunkhash]
         new HtmlWebpackPlugin(),
         new FaviconsWebpackPlugin({ // Your source logo
@@ -210,7 +177,15 @@ module.exports = {
                 windows: true
             }
         })
-    ],
+    ].concat(prod ? [
+        new CompressionPlugin({
+            asset: "[path].gz[query]",
+            algorithm: "gzip",
+            test: /\.js$|\.css$|\.svg$|\.eot$|\.woff2?$|\.ttf$/,
+            threshold: 10240,
+            minRatio: 0.8
+        })
+    ] : []),
     output: {
         path: path.join(__dirname, "public_html/dist"),
         filename: "js/[name].[chunkhash].js",

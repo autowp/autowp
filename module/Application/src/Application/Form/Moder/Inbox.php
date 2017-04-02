@@ -114,7 +114,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                         ''  => 'moder/pictures/filter/votes/not-matters',
                         '0' => 'moder/pictures/filter/votes/none',
                         '1' => 'moder/pictures/filter/votes/accept',
-                        '2' => 'moder/pictures/filter/votes/accept',
+                        '2' => 'moder/pictures/filter/votes/delete',
                         '3' => 'moder/pictures/filter/votes/any',
                     ],
                 ]

@@ -447,7 +447,8 @@ class Brand
 
             if ($img) {
                 $img = str_replace('http://i.wheelsage.org/', PUBLIC_DIR . '/', $img);
-                $images[$brand['catname']] = escapeshellarg($img);
+                $catname = str_replace('.', '_', $brand['catname']);
+                $images[$catname] = escapeshellarg($img);
             }
         }
 
@@ -463,7 +464,10 @@ class Brand
         );
 
         //print $cmd . PHP_EOL;
-        exec($cmd);
+        print passthru($cmd, $returnVar);
+
+        //file_put_contents('./cmd.sh', $cmd);
+        //var_dump($returnVar);
 
         $css = [];
         $index = 0;

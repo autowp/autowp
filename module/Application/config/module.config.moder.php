@@ -174,16 +174,6 @@ return [
                             ]
                         ]
                     ],
-                    'perspectives' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/perspectives',
-                            'defaults' => [
-                                'controller' => Controller\Moder\PerspectivesController::class,
-                                'action'     => 'index'
-                            ]
-                        ]
-                    ],
                     'picture-item' => [
                         'type' => Segment::class,
                         'options' => [
@@ -276,7 +266,6 @@ return [
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
             Controller\Moder\IndexController::class        => InvokableFactory::class,
             Controller\Moder\PagesController::class        => Controller\Moder\Service\PagesControllerFactory::class,
-            Controller\Moder\PerspectivesController::class => InvokableFactory::class,
             Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
             Controller\Moder\PicturesController::class     => Controller\Moder\Service\PicturesControllerFactory::class,
             Controller\Moder\PictureVoteTemplateController::class => Controller\Moder\Service\PictureVoteTemplateControllerFactory::class,

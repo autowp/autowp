@@ -799,7 +799,7 @@ class CommentsService
                 ]);
         })->current();
 
-        return $countRow['count'];
+        return (int)$countRow['count'];
     }
 
     /**
@@ -857,6 +857,20 @@ class CommentsService
         })->current();
 
         return $countRow['count'];
+    }
+    
+    public function getMessagesCount($typeId, $itemId)
+    {
+        $row = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemId) {
+            $select
+                ->columns(['messages'])
+                ->where([
+                    'type_id = ?' => $typeId,
+                    'item_id = ?' => $itemId
+                ]);
+        })->current();
+
+        return $row ? (int)$row['messages'] : 0;
     }
 
     public function getMessagesCounts($typeId, array $itemIds)

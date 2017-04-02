@@ -14,6 +14,7 @@ angular.module(Module).controller(CONTROLLER_NAME, [
         setSidebars(opt.needLeft, opt.needRight);
         
         $scope.user = true;
+        $scope.isModer = opt.isModer;
         $scope.newPersonalMessages = opt.sidebar.newPersonalMessages;
         $scope.mainMenu = opt.mainMenu;
         $scope.moderMenu = opt.moderMenu;

@@ -70,8 +70,7 @@
         <?php } ?>
         <?php if ($this->inboxPictures) { ?>
             <li>
-                <?=$this->htmlA($this->url('moder/pictures/params', [
-                    'action'  => 'index',
+                <?=$this->htmlA('/ng/moder/pictures?' . http_build_query([
                     'status'  => Application\Model\DbTable\Picture::STATUS_INBOX,
                     'item_id' => $this->brand['id'],
                 ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge">' . $this->inboxPictures . '</span>', false)?>

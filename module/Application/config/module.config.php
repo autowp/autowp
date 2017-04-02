@@ -260,4 +260,10 @@ return [
         'token'    => '',
         'owner_id' => ''
     ],
+    
+    'input_filters' => [
+        'abstract_factories' => [
+            \Zend\InputFilter\InputFilterAbstractServiceFactory::class
+        ]
+    ],
 ];

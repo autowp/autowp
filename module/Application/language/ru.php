@@ -14,6 +14,12 @@ return array_replace(include 'root.php', [
         '%1$s изображения',
         '%1$s изображений'
     ],
+    'ng/%1$s-picures' => '{count, plural,
+        one {{count} изображение}
+        few {{count} изображения}
+        many {{count} изображений}
+        other {{count} изображений}
+    }',
     '%1$s items'      => [
         '%1$s единица данных',
         '%1$s единицы данных',
@@ -1121,8 +1127,8 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/picture/filter/status/removing' => 'в очереди на удаление',
     'moder/picture/filter/status/all-except-removing' => 'все, кроме удалённых',
     'moder/picture/filter/vehicle-type' => 'Тип кузова',
-    'moder/picture/filter/item' => 'Единица данных (id)',
-    'moder/picture/filter/owner' => 'Добавил (id)',
+    'moder/picture/filter/item' => 'Единица данных',
+    'moder/picture/filter/owner' => 'Добавил',
     'moder/picture/filter/special-name' => 'Только с особым названием',
     'moder/picture/filter/not-linked' => 'Без привязки',
     'moder/picture/filter/gps' => 'С координатами',
@@ -1455,7 +1461,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/comments/filter/moderator_attention/not-required' => 'Не требуется',
     'moder/comments/filter/moderator_attention/required' => 'Требуется',
     'moder/comments/filter/moderator_attention/resolved' => 'Выполнено',
-    'moder/comments/filter/vehicle-id' => 'Автомобиль №',
+    'moder/comments/filter/vehicle-id' => 'Единица данных',
     'moder/comments/not-readed' => 'не прочитано',
 
     'engine/name' => 'Название',

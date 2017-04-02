@@ -33,7 +33,7 @@ class ModerMenu extends AbstractHtmlElement
             );
 
             $items[] = [
-                'href'  => '/moder/pictures/index/order/1/status/inbox',
+                'href'  => '/ng/moder/pictures?order=1&status=inbox',
                 'label' => $this->view->translate('moder-menu/inbox'),
                 'count' => $inboxCount,
                 'icon'  => 'fa fa-th'

@@ -61,7 +61,10 @@ class PictureItemController extends AbstractRestfulController
         $request = $this->getRequest();
 
         if ($request->isPost() || $request->isPut()) {
-            $perspectiveId = (int)$this->params()->fromPost('perspective_id');
+            
+            $data = $this->processBodyContent($request);
+            
+            $perspectiveId = isset($data['perspective_id']) ? (int)$data['perspective_id'] : null;
 
             $this->pictureItem->setProperties($picture->id, $itemId, [
                 'perspective' => $perspectiveId ? $perspectiveId : null

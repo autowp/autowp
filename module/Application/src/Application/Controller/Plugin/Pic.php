@@ -1137,7 +1137,7 @@ class Pic extends AbstractPlugin
             'factories'         => $this->picPageFactoriesData($picture),
             'votes'             => $votes,
             'subscribed'        => $subscribed,
-            'subscribeUrl'      => $controller->url()->fromRoute('api/comments/subscribe', [
+            'subscribeUrl'      => $controller->url()->fromRoute('api/comment/subscribe', [
                 'item_id' => $picture['id'],
                 'type_id' => \Application\Comments::PICTURES_TYPE_ID
             ]),

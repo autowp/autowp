@@ -1,28 +1,45 @@
 <div class="row">
     <div class="col-md-4">
         <h2 translate>moder/comments/filter</h2>
-        <div class="well">
-            <form method="post" name="form" class=" form-vertical">
-                <fieldset>
-                    <div class="form-group">
-                        <label for="user" translate>moder/comments/filter/user-id</label>
-                        <input type="text" name="user" ng-model="user" ng-change="load()" ng-model-options="{debounce:300}" class="form-control" value="" />
-                    </div>
-                    <div class="form-group">
-                        <label for="moderator_attention" translate>moder/comments/filter/moderator_attention</label>
-                        <select name="moderator_attention" class="form-control" ng-model="moderator_attention" ng-change="load()" ng-model-options="{debounce:300}">
-                            <option value="" translate>moder/comments/filter/moderator_attention/not-matters</option>
-                            <option value="0" translate>moder/comments/filter/moderator_attention/not-required</option>
-                            <option value="1" translate selected="selected">moder/comments/filter/moderator_attention/required</option>
-                            <option value="2" translate>moder/comments/filter/moderator_attention/resolved</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="item_id" translate>moder/comments/filter/vehicle-id</label>
-                        <input type="text" name="item_id" class="form-control" value="" ng-model="item_id" ng-change="load()" ng-model-options="{debounce:300}" />
-                    </div>
-                </fieldset>
-            </form>
+        <div class="well" layout="column">
+            <md-autocomplete 
+                md-input-name="owner_id"
+                md-input-minlength="1"
+                md-selected-item="selectedUser"
+                md-search-text="user_name"
+                md-items="item in queryUserName(user_name)"
+                md-item-text="item.name"
+                md-floating-label="{{'moder/comments/filter/user-id'|translate}}"
+                md-require-match="true"
+                md-selected-item-change="load()">
+                <md-item-template>
+                    <span md-highlight-text="owner_name">{{item.name}}</span>
+                </md-item-template>
+            </md-autocomplete>
+            <md-input-container>
+                <label translate>moder/comments/filter/moderator_attention</label>
+                <md-select ng-model="moderator_attention" ng-change="load()">
+                    <md-option ng-value=""><em>{{'moder/comments/filter/moderator_attention/not-matters'|translate}}</em></md-option>
+                    <md-option ng-value="0">{{'moder/comments/filter/moderator_attention/not-required'|translate}}</md-option>
+                    <md-option ng-value="1">{{'moder/comments/filter/moderator_attention/required'|translate}}</md-option>
+                    <md-option ng-value="2">{{'moder/comments/filter/moderator_attention/resolved'|translate}}</md-option>
+                </md-select>
+            </md-input-container>
+            <md-autocomplete  
+                md-input-name="item_id"
+                md-input-minlength="1"
+                md-selected-item="selectedItem"
+                md-search-text="item_name"
+                md-items="item in queryItemName(item_name)"
+                md-item-text="item.name"
+                md-floating-label="{{'moder/comments/filter/vehicle-id'|translate}}"
+                ng-model-options="{debounce:300}"
+                md-require-match="true"
+                md-selected-item-change="load()">
+                <md-item-template>
+                    <span md-highlight-text="item_name">{{item.name}}</span>
+                </md-item-template>
+            </md-autocomplete>
         </div>
     </div>
     <div class="col-md-8">

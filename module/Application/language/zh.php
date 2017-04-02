@@ -12,6 +12,9 @@ return array_replace(include 'root.php', [
     '%1$s picures'       => [
         '%1$s 张图片',
     ],
+    'ng/%1$s-picures' => '{count, plural,
+        other {{count} 张图片}
+    }',
     '%1$s items'      => [
         '%1$s items'
     ],
@@ -1078,8 +1081,8 @@ return array_replace(include 'root.php', [
     'moder/picture/filter/status/removing' => '位于删除队列',
     'moder/picture/filter/status/all-except-removing' => 'all, except removing',
     'moder/picture/filter/vehicle-type' => '车型',
-    'moder/picture/filter/item' => 'Item (id)',
-    'moder/picture/filter/owner' => '由(id)上传',
+    'moder/picture/filter/item' => 'Item',
+    'moder/picture/filter/owner' => '由上传',
     'moder/picture/filter/special-name' => 'Special name only',
     'moder/picture/filter/not-linked' => 'Not linked',
     'moder/picture/filter/gps' => 'With coordinates',
@@ -1410,7 +1413,7 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/comments/filter/moderator_attention/not-required' => 'Not required',
     'moder/comments/filter/moderator_attention/required' => 'Required',
     'moder/comments/filter/moderator_attention/resolved' => 'Resolved',
-    'moder/comments/filter/vehicle-id' => '车型№',
+    'moder/comments/filter/vehicle-id' => 'Item',
     'moder/comments/not-readed' => '未读',
 
     'engine/name' => 'Name',

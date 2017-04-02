@@ -2,17 +2,12 @@
 
 namespace Application\Hydrator\Api;
 
-use DateTime;
-use DateInterval;
-
-use Zend\Hydrator\AbstractHydrator;
-
 use Autowp\User\Model\DbTable\User;
 
 use Application\Comments;
 use Application\Model\DbTable;
 
-class CommentHydrator extends AbstractHydrator
+class CommentHydrator extends RestHydrator
 {
     /**
      * @var Comments
@@ -31,16 +26,61 @@ class CommentHydrator extends AbstractHydrator
     
     private $hydratorManager;
     
-    public function __construct($hydratorManager, Comments $comments, $router)
+    /**
+     * @var int|null
+     */
+    private $userId = null;
+    
+    public function __construct($serviceManager)
     {
-        $this->hydratorManager = $hydratorManager;
-        $this->comments = $comments;
-        $this->router = $router;
+        parent::__construct();
+        
+        $this->hydratorManager = $serviceManager->get('HydratorManager');
+        $this->comments = $serviceManager->get(\Application\Comments::class);
+        $this->router = $serviceManager->get('HttpRouter');
         
         $this->pictureTable = new DbTable\Picture();
         $this->userTable = new User();
         
-        $this->currentUserId = null;
+        $this->userId = null;
+    }
+    
+    /**
+     * @param  array|Traversable $options
+     * @return RestHydrator
+     * @throws \Zend\Hydrator\Exception\InvalidArgumentException
+     */
+    public function setOptions($options)
+    {
+        parent::setOptions($options);
+    
+        if ($options instanceof \Traversable) {
+            $options = ArrayUtils::iteratorToArray($options);
+        } elseif (! is_array($options)) {
+            throw new \Zend\Hydrator\Exception\InvalidArgumentException(
+                'The options parameter must be an array or a Traversable'
+            );
+        }
+    
+        if (isset($options['user_id'])) {
+            $this->setUserId($options['user_id']);
+        }
+    
+        return $this;
+    }
+    
+    /**
+     * @param int|null $userId
+     * @return Comment
+     */
+    public function setUserId($userId = null)
+    {
+        $this->userId = $userId;
+    
+        //$this->getStrategy('content')->setUser($user);
+        //$this->getStrategy('replies')->setUser($user);
+    
+        return $this;
     }
     
     public function extract($object)
@@ -89,12 +129,14 @@ class CommentHydrator extends AbstractHydrator
             }
         }
         
+        //var_dump($this->userId); exit;
+        
         return [
             'url'     => $this->comments->getMessageRowUrl($object),
             'preview' => $this->comments->getMessagePreview($object['message']),
             'user'    => $user,
             'status'  => $status,
-            'new'     => $this->comments->service()->isNewMessage($object, $this->currentUserId)
+            'new'     => $this->comments->service()->isNewMessage($object, $this->userId)
         ];
     }
     
