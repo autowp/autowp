@@ -21,43 +21,43 @@ class ItemController extends AbstractRestfulController
      * @var User
      */
     private $table;
-    
+
     /**
      * @var RestHydrator
      */
     private $hydrator;
-    
+
     /**
      * @var ItemNameFormatter
      */
     private $itemNameFormatter;
-    
+
     public function __construct(
-        RestHydrator $hydrator, 
+        RestHydrator $hydrator,
         ItemNameFormatter $itemNameFormatter,
         InputFilter $listInputFilter
     ) {
         $this->hydrator = $hydrator;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->listInputFilter = $listInputFilter;
-        
+
         $this->table = new DbTable\Item();
     }
-    
+
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-        
+
         $this->listInputFilter->setData($this->params()->fromQuery());
-        
+
         if (! $this->listInputFilter->isValid()) {
             return $this->inputFilterResponse($this->listInputFilter);
         }
-        
+
         $data = $this->listInputFilter->getValues();
-        
+
         $select = $this->table->select(true)
             ->order([
                 'item.name',
@@ -66,52 +66,54 @@ class ItemController extends AbstractRestfulController
                 'item.begin_order_cache',
                 'item.end_order_cache'
             ]);
-        
+
         $search = $this->params()->fromQuery('search');
         if ($search) {
             $select
                 ->join('item_language', 'item.id = item_language.item_id', null)
                 ->where('item_language.name like ?', $search . '%');
         }
-        
+
         $id = (int)$this->params()->fromQuery('id');
         if ($id) {
             $select->where('item.id = ?', $id);
         }
-        
+
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)
         );
-        
+
+        $limit = $data['limit'] ? $data['limit'] : 1;
+
         $paginator
-            ->setItemCountPerPage($data['limit'])
-            ->setCurrentPageNumber($this->params()->fromQuery('page'));
-        
+            ->setItemCountPerPage($limit)
+            ->setCurrentPageNumber($data['page']);
+
         $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-        
+
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields']
             //'user_id'  => $user ? $user['id'] : null
         ]);
-        
+
         $items = [];
         foreach ($this->table->fetchAll($select) as $row) {
             $items[] = $this->hydrator->extract($row);
         }
-        
+
         return new JsonModel([
             'paginator' => get_object_vars($paginator->getPages()),
             'items'     => $items
         ]);
     }
-    
+
     public function alphaAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-    
+
         $itemTable = $this->catalogue()->getItemTable();
         $carAdapter = $itemTable->getAdapter();
         $chars = $carAdapter->fetchCol(
@@ -120,13 +122,13 @@ class ItemController extends AbstractRestfulController
                 ->from('item', ['char' => new Zend_Db_Expr('UPPER(LEFT(name, 1))')])
                 ->order('char')
         );
-    
+
         $groups = [
             'numbers' => [],
             'english' => [],
             'other'   => []
         ];
-    
+
         foreach ($chars as $char) {
             if (preg_match('|^["0-9-]$|isu', $char)) {
                 $groups['numbers'][] = $char;
@@ -136,7 +138,7 @@ class ItemController extends AbstractRestfulController
                 $groups['other'][] = $char;
             }
         }
-    
+
         return new JsonModel([
             'groups' => $groups
         ]);

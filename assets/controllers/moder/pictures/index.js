@@ -146,9 +146,10 @@ angular.module(Module)
             
             $scope.acceptPictures = function() {
                 angular.forEach(selected, function(id) {
+                    var promises = [];
                     angular.forEach($scope.pictures, function(picture) {
                         if (picture.id == id) {
-                            $http({
+                            var q = $http({
                                 method: 'PUT',
                                 url: '/api/picture/' + picture.id,
                                 data: {
@@ -157,7 +158,13 @@ angular.module(Module)
                             }).then(function(response) {
                                 picture.status = 'accepted';
                             });
+                            
+                            promises.push(q);
                         }
+                    });
+                    
+                    $q.all(promises).then(function() { 
+                        $scope.load();
                     });
                 });
                 selected = [];
@@ -166,10 +173,16 @@ angular.module(Module)
             
             $scope.votePictures = function(vote, reason) {
                 angular.forEach(selected, function(id) {
+                    var promises = [];
                     angular.forEach($scope.pictures, function(picture) {
                         if (picture.id == id) {
-                            ModerVoteService.vote(picture.id, vote, reason);
+                            var q = ModerVoteService.vote(picture.id, vote, reason);
+                            promises.push(q);
                         }
+                    });
+                    
+                    $q.all(promises).then(function() { 
+                        $scope.load();
                     });
                 });
                 selected = [];
@@ -179,7 +192,9 @@ angular.module(Module)
             $scope.queryUserName = function(query) { 
                 var deferred = $q.defer();
                 
-                var params = {};
+                var params = {
+                    limit: 10
+                };
                 if (query.substring(0, 1) == '#') {
                     params.id = query.substring(1);
                 } else {
@@ -189,7 +204,7 @@ angular.module(Module)
                 $http({
                     method: 'GET',
                     url: '/api/user',
-                    params: params
+                    params: params 
                 }).then(function(response) {
                     deferred.resolve(response.data.items);
                 }, function() {

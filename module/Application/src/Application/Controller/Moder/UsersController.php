@@ -28,28 +28,6 @@ class UsersController extends AbstractActionController
         $this->table = new User();
     }
 
-    public function indexAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $select = $this->table->select(true)
-            ->order('id');
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
-        );
-
-        $paginator
-            ->setItemCountPerPage(30)
-            ->setCurrentPageNumber($this->params('page'));
-
-        return [
-            'paginator' => $paginator
-        ];
-    }
-
     public function removeUserPhotoAction()
     {
         if (! $this->getRequest()->isPost()) {

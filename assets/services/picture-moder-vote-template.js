@@ -26,6 +26,50 @@ angular.module(Module)
             });
         };
         
+        this.deleteTemplate = function(id) {
+            return $q(function(resolve, reject) {
+                $http({
+                    method: 'DELETE',
+                    url: '/api/picture-moder-vote-template/' + id
+                }).then(function(response) {
+                    if (templates) {
+                        for (var i=0; i<templates.length; i++) {
+                            if (templates[i].id == id) {
+                                templates.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
+                    resolve();
+                }, function() {
+                    reject();
+                });
+            });
+        };
+        
+        this.createTemplate = function(template) {
+            return $q(function(resolve, reject) {
+                $http({
+                    method: 'POST',
+                    url: '/api/picture-moder-vote-template',
+                    data: template
+                }).then(function(response) {
+                    var location = response.headers('Location');
+                    
+                    $http({
+                        method: 'GET',
+                        url: location
+                    }).then(function(response) {
+                        templates.push(response.data);
+                        resolve(response.data);
+                    }, function() {
+                        reject(null);
+                    });
+                }, function() {
+                    reject();
+                });
+            });
+        };
     }]);
 
 export default SERVICE_NAME;

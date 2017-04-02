@@ -9,3 +9,5 @@ import './controllers/moder/index/stat';
 import './controllers/moder/comments';
 import './controllers/moder/pictures';
 import './controllers/moder/perspectives';
+import './controllers/moder/users';
+import './controllers/moder/picture-vote-templates';

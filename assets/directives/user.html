@@ -1,4 +1,4 @@
-<span ng-class="{user: true, muted: user.deleted, 'long-away': user.longAway, 'green-man': user.green}">
+<span ng-class="{user: true, muted: user.deleted, 'long-away': user.long_away, 'green-man': user.green}">
     <i class="fa fa-user"></i>
     <span ng-if="user.deleted">{{'deleted-user'|translate}}</span>
     <a ng-href="{{user.url}}" ng-bind="user.name" ng-if="!user.deleted"></a>

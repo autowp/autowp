@@ -1,0 +1,36 @@
+<table class="table">
+    <tr ng-repeat="template in templates">
+        <td>
+            <i class="fa fa-thumbs-up text-success" ng-if="template.vote > 0"></i>
+            <i class="fa fa-thumbs-down text-danger" ng-if="template.vote < 0"></i>
+        </td>
+        <td ng-bind="template.name"></td>
+        <td>
+            <md-button class="md-icon-button md-warn" aria-label="Delete" ng-click="deleteTemplate(template)">
+                <span class="fa fa-times"></span>
+            </md-button>
+        </td>
+    </tr>
+</table>
+
+<form name="add" layout="row">
+    <div flex="100" flex-gt-sm="50" flex-offset-gt-sm="25" layout="column">
+        <h2 translate>moder/picture/acceptance/add-reason</h2>
+        <md-input-container class="md-block">
+            <label translate>moder/picture/acceptance/reason</label>
+            <input md-maxlength="50" required name="name" ng-model="name">
+        </md-input-container>
+        <md-input-container>
+            <label translate>moder/picture/acceptance/vote</label>
+            <md-select ng-model="vote" required>
+                <md-option ng-value="-1">
+                    <i class="fa fa-thumbs-down text-danger"></i> Negative
+                </md-option>
+                <md-option ng-value="1">
+                    <i class="fa fa-thumbs-up text-success"></i> Positive
+                </md-option>
+            </md-select>
+        </md-input-container>
+        <md-button class="md-raised md-primary" ng-click="createTemplate()">{{'submit'|translate}}</md-button>
+    </div>
+</form>

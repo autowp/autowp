@@ -233,7 +233,7 @@ class FrontendController extends AbstractActionController
             'canRemoveComments' => $canRemoveComments,
             'canMoveMessage'    => $forumAdmin,
             'canViewIp'         => $canViewIp,
-            'subscribeUrl'      => $this->url()->fromRoute('api/comments/subscribe', [
+            'subscribeUrl'      => $this->url()->fromRoute('api/comment/subscribe', [
                 'item_id' => $topic['id'],
                 'type_id' => Comments::FORUMS_TYPE_ID
             ]),

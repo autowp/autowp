@@ -51,7 +51,8 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
-            'forbiddenAction' => Controller\Plugin\ForbiddenAction::class
+            'forbiddenAction' => Controller\Plugin\ForbiddenAction::class,
+            'inputFilterResponse' => Controller\Api\Plugin\InputFilterResponse::class 
         ],
         'factories' => [
             'car'         => Controller\Plugin\Service\CarFactory::class,

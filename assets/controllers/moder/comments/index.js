@@ -74,7 +74,9 @@ angular.module(Module)
             $scope.queryUserName = function(query) { 
                 var deferred = $q.defer();
                 
-                var params = {};
+                var params = {
+                    limit: 10
+                };
                 if (query.substring(0, 1) == '#') {
                     params.id = query.substring(1);
                 } else {

@@ -2,10 +2,9 @@
 
 namespace Application\Controller\Api;
 
+use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
@@ -18,56 +17,73 @@ class UserController extends AbstractRestfulController
      * @var User
      */
     private $table;
-    
+
     /**
      * @var RestHydrator
      */
     private $hydrator;
-    
-    public function __construct(RestHydrator $hydrator)
+
+    /**
+     * @var InputFilter
+     */
+    private $listInputFilter;
+
+    public function __construct(RestHydrator $hydrator, InputFilter $listInputFilter)
     {
         $this->hydrator = $hydrator;
-        
+        $this->listInputFilter = $listInputFilter;
+
         $this->table = new User();
     }
-    
+
     public function indexAction()
     {
-        $perPage = 24;
-        
+        $user = $this->user()->get();
+
+        $this->listInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->listInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->listInputFilter);
+        }
+
+        $data = $this->listInputFilter->getValues();
+
         $select = $this->table->select(true)
             ->where('not deleted');
-        
-        $search = $this->params()->fromQuery('search');
+
+        $search = $data['search'];
         if ($search) {
             $select->where('name like ?', $search . '%');
         }
-        
-        $id = (int)$this->params()->fromQuery('id');
+
+        $id = (int)$data['id'];
         if ($id) {
             $select->where('id = ?', $id);
         }
-        
+
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)
         );
-        
+
+        $limit = $data['limit'] ? $data['limit'] : 1;
+
         $paginator
-            ->setItemCountPerPage($perPage)
-            ->setCurrentPageNumber($this->params()->fromQuery('page'));
-        
+            ->setItemCountPerPage($limit)
+            ->setCurrentPageNumber($data['page']);
+
         $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-        
+
         $this->hydrator->setOptions([
             'language' => $this->language(),
-            //'user_id'  => $user ? $user['id'] : null
+            'fields'   => $data['fields'],
+            'user_id'  => $user ? $user['id'] : null
         ]);
-        
+
         $items = [];
         foreach ($this->table->fetchAll($select) as $row) {
             $items[] = $this->hydrator->extract($row);
         }
-        
+
         return new JsonModel([
             'paginator' => get_object_vars($paginator->getPages()),
             'items'     => $items
