@@ -43,7 +43,8 @@ class BrandVehicle
         ],
         DbTable\Item\Type::CATEGORY => [
             DbTable\Item\Type::VEHICLE  => true,
-            DbTable\Item\Type::CATEGORY => true
+            DbTable\Item\Type::CATEGORY => true,
+            DbTable\Item\Type::BRAND    => true
         ],
         DbTable\Item\Type::TWINS => [
             DbTable\Item\Type::VEHICLE => true

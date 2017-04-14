@@ -662,7 +662,7 @@ class CarsController extends AbstractActionController
                     }
 
                     $car->setFromArray($this->prepareCarMetaToSave($values))->save();
-                    
+
                     $this->setLanguageName($car['id'], 'xx', $values['name']);
 
                     $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
@@ -1417,6 +1417,7 @@ class CarsController extends AbstractActionController
 
         if (in_array($carRow->item_type_id, [DbTable\Item\Type::BRAND])) {
             $allowedItemTypes[] = DbTable\Item\Type::BRAND;
+            $allowedItemTypes[] = DbTable\Item\Type::CATEGORY;
         }
 
         $select = $itemTable->select(true)
@@ -1915,7 +1916,7 @@ class CarsController extends AbstractActionController
                             'language' => $lang
                         ]);
                     }
-                    
+
                     $nameChanged = ($name != $langRow->name);
 
                     $langRow->setFromArray([
@@ -1970,22 +1971,22 @@ class CarsController extends AbstractActionController
                 if ($changes) {
                     $ucsTable = new DbTable\User\ItemSubscribe();
                     $ucsTable->subscribe($user, $car);
-                    
+
                     foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
                         if ($subscriber && ($subscriber->id != $user->id)) {
                             $uri = $this->hostManager->getUriByLanguage($subscriber->language);
-                    
+
                             $changesStr = [];
                             foreach ($changes as $language => $fields) {
                                 foreach ($fields as $field) {
                                     $changesStr[] = $this->translate(
-                                        $field, 
+                                        $field,
                                         'default',
                                         $subscriber->language
                                     ) . ' (' . $language . ')';
                                 }
                             }
-                    
+
                             $message = sprintf(
                                 $this->translate(
                                     'pm/user-%s-edited-item-language-%s-%s',
@@ -1997,7 +1998,7 @@ class CarsController extends AbstractActionController
                                 $this->carModerUrl($car, true, null, $uri),
                                 implode("\n", $changesStr)
                             );
-                    
+
                             $this->message->send(null, $subscriber->id, $message);
                         }
                     }
@@ -2420,7 +2421,7 @@ class CarsController extends AbstractActionController
                 $inheritedSpec = $avgSpec->short_name;
             }
         }
-        
+
         $organizeItemTypeId = $car['item_type_id'];
         switch ($organizeItemTypeId) {
             case DbTable\Item\Type::BRAND:
@@ -2460,7 +2461,7 @@ class CarsController extends AbstractActionController
                 );
                 $newCar->item_type_id = $organizeItemTypeId;
                 $newCar->save();
-                
+
                 $this->setLanguageName($newCar['id'], 'xx', $values['name']);
 
                 $vehicleType->setVehicleTypes($newCar->id, (array)$values['vehicle_type_id']);
@@ -2713,7 +2714,7 @@ class CarsController extends AbstractActionController
                         $this->setItemPoint($car, null);
                     }
                 }
-                
+
                 $this->setLanguageName($car['id'], 'xx', $values['name']);
 
                 $vehicleType = new VehicleType();
@@ -2776,16 +2777,16 @@ class CarsController extends AbstractActionController
             'picture_id' => $picture->id
         ]);
     }
-    
+
     private function setLanguageName($carId, $language, $name)
     {
         $carLangTable = new DbTable\Item\Language();
-        
+
         $carLangRow = $carLangTable->fetchRow([
             'item_id = ?'  => $carId,
             'language = ?' => $language
         ]);
-        
+
         if (! $carLangRow) {
             $carLangRow = $carLangTable->createRow([
                 'item_id'  => $carId,
@@ -2885,7 +2886,7 @@ class CarsController extends AbstractActionController
                 );
                 $newCar->item_type_id = $car->item_type_id;
                 $newCar->save();
-                
+
                 $this->setLanguageName($newCar['id'], 'xx', $values['name']);
 
                 $vehicleType->setVehicleTypes($newCar->id, (array)$values['vehicle_type_id']);
