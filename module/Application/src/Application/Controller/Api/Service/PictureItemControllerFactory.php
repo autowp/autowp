@@ -11,8 +11,14 @@ class PictureItemControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $hydrators = $container->get('HydratorManager');
+        $filters = $container->get('InputFilterManager');
+        
         return new Controller(
-            $container->get(\Application\Model\PictureItem::class)
+            $container->get(\Application\Model\PictureItem::class),
+            $container->get(\Application\Model\Log::class),
+            $hydrators->get(\Application\Hydrator\Api\PictureItemHydrator::class),
+            $filters->get('api_picture_item_item')
         );
     }
 }

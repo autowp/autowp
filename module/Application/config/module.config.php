@@ -96,7 +96,6 @@ return [
 
     'service_manager' => [
         'factories' => [
-            'CronEventManager'                   => Service\CronEventManagerFactory::class,
             Acl::class                           => Permissions\AclFactory::class,
             Comments::class                      => Service\CommentsFactory::class,
             DuplicateFinder::class               => Service\DuplicateFinderFactory::class,

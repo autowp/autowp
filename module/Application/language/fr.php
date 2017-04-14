@@ -391,7 +391,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'comments/vote/no-more-votes' => 'La limite de vote quotidienne est atteint.',
     'comments/subscribe' => "S'abonner à des notifications de nouvelles réponses",
     'comments/unsubscribe' => 'Se désabonner à des notifications',
-    
+
     /*perspectives*/
     'perspective/front'          => 'avant',
     'perspective/back'           => 'derrière',
@@ -629,11 +629,11 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'donate/success-text' => 'Merci pour votre soutien.
 
 Allons essayer de ne pas vous décevoir.',
-    
+
     'donate/vod/text' => 'The little that we can offer in return for financial assistance of the site - it is an opportunity to choose the next "vehicle of the day".
-    
+
 Follow the instructions below.
-    
+
 We will be happy if you want to [perform selfless donation](/donate) to an arbitrary amount.',
     'donate/vod/select-date' => '1. Choose a date',
     'donate/vod/date-busy' => 'busy',
@@ -658,7 +658,7 @@ We will be happy if you want to [perform selfless donation](/donate) to an arbit
     'donate/vod/method/mobile' => 'Mobile operator account',
     'donate/vod/method/yandex.money' => 'Yandex.Money',
     'donate/vod/send' => 'Pay',
-    
+
     'donate/vod/success-text' => 'When the information about your donation comes to us your choice will be carried out.
 
 Thank you for your support.
@@ -1080,11 +1080,11 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/208/name'        => '%BRAND_NAME% Engines',
     'page/208/title'       => '%BRAND_NAME% Engines',
     'page/208/breadcrumbs' => '%BRAND_NAME% Engines',
-    
+
     'page/211/name'        => 'Contacts',
     'page/211/title'       => 'Contacts',
     'page/211/breadcrumbs' => 'Contacts',
-    
+
     'page/212/name'        => 'Picture vote templates',
     'page/212/title'       => 'Picture vote templates',
     'page/212/breadcrumbs' => 'Picture vote templates',
@@ -1093,6 +1093,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder-menu/inbox' => 'Inbox',
 
     'moder/database-id-%s' => 'Base de données id: %s',
+    'ng/moder/database-id-n' => 'Base de données id: {id}',
     'moder/log-of-events' => 'Log des événements',
 
     'moder/picture/inbox' => 'Inbox',
@@ -1193,7 +1194,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicle/is-concept/inherited-no' => 'inherited (no)',
     'moder/vehicle/is-concept/inherited-yes' => 'inherited (yes)',
     'moder/vehicle/is-concept/inherited' => 'inherited',
-    
+
     'moder/item/short-description' => 'Short description',
     'moder/item/full-description' => 'Full description',
 
@@ -1329,6 +1330,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/acceptance/cancel-vote' => 'Cancel my vote',
     'moder/picture/acceptance/already-voted' => 'Already voted: ',
     'moder/picture/acceptance/that-is-one-accepted-picture' => 'That is single picture of that vehicle',
+    'ng/moder/picture/acceptance/accepted-pictures-is-n' => 'Accepted pictures count still {count}',
     'moder/picture/acceptance/accepted-pictures-is-%s' => 'Accepted pictures count still %s',
 
     'moder/picture/public-url:' => 'Public URL: ',
@@ -1388,7 +1390,7 @@ Few manuals:
 [2](https://guides.github.com/features/mastering-markdown/),
 [3](https://daringfireball.net/projects/markdown/basics),
 
-Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins>',
+Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*',
     'moder/markdown/edit' => 'Edit',
     'moder/markdown/preview' => 'Preview',
     'moder/markdown/history' => 'History',
@@ -2159,30 +2161,31 @@ Confirmation code will be sent to you via [the private messaging system](/accoun
 Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish process of association your telegram account with out website user.
 
 Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/account/pm/system)',
-    
+
     'personal-message-dialog/title' => 'Send personal message',
     'personal-message-dialog/send' => 'send',
     'personal-message-dialog/sending' => 'sending ...',
     'personal-message-dialog/sent' => 'sent',
     'personal-message-dialog/cancel' => 'cancel',
     'personal-message-dialog/placeholder' => 'Message',
-    
+
     'crop-dialog/title' => 'Cropper',
     'crop-dialog/close' => 'Close',
     'crop-dialog/select-all' => 'Select all',
     'crop-dialog/save' => 'Save changes',
     'crop-dialog/resolution-%s-aspect-%s' => '%s (aspect is about %s)',
-    
+    'crop-dialog/resolution-x-aspect-y' => '{resolution} (aspect is about {aspect})',
+
     'who-online/title' => 'Online',
     'who-online/refresh' => 'Refresh',
     'who-online/close' => 'Close',
-    
+
     'picture-moder-vote/custom/title' => 'Custom reason',
     'picture-moder-vote/custom/sending' => 'Sending',
     'picture-moder-vote/custom/send' => 'Send',
     'picture-moder-vote/custom/cancel' => 'Cancel',
     'picture-moder-vote/custom/save' => 'Save as template',
-    
+
     'moder/statistics/photos-with-copyrights' => 'Photos with copyrights',
     'moder/statistics/vehicles-with-4-or-more-photos' => 'Vehicles with 4 or more photos',
     'moder/statistics/specifications-values' => 'Specifications values',

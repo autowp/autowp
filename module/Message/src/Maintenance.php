@@ -2,7 +2,7 @@
 
 namespace Autowp\Message;
 
-use Application\CronEvent; //TODO: extract to zf-components
+use Autowp\Cron;
 
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
@@ -15,10 +15,10 @@ class Maintenance extends AbstractListenerAggregate
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $this->listeners[] = $events->attach(CronEvent::EVENT_DAILY_MAINTENANCE, [$this, 'dailyMaintenance']);
+        $this->listeners[] = $events->attach(Cron\CronEvent::EVENT_DAILY_MAINTENANCE, [$this, 'dailyMaintenance']);
     }
     
-    public function dailyMaintenance(CronEvent $event)
+    public function dailyMaintenance(Cron\CronEvent $event)
     {
         $application = $event->getApplication();
         $serviceManager = $application->getServiceManager();

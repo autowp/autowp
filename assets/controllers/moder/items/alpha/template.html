@@ -12,7 +12,7 @@
     <div class="well">
         <md-progress-circular md-mode="indeterminate" ng-show="loading"></md-progress-circular>
         <div ng-repeat="item in items">
-            <a ng-href="{{item.moderUrl}}" ng-bind="item.name"></a>
+            <a ng-href="{{item.moder_url}}" ng-bind="item.name"></a>
         </div>
         <autowp-paginator data="paginator" ng-if="paginator"></autowp-paginator>
     </div>

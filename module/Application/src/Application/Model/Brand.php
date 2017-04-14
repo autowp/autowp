@@ -466,7 +466,7 @@ class Brand
         //print $cmd . PHP_EOL;
         print passthru($cmd, $returnVar);
 
-        //file_put_contents('./cmd.sh', $cmd);
+        file_put_contents('/tmp/cmd.sh', $cmd);
         //var_dump($returnVar);
 
         $css = [];

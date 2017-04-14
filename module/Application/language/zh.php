@@ -610,7 +610,7 @@ return array_replace(include 'root.php', [
     'donate/comment-hint' => '您的建议',
     'donate/success-text' => '感谢您的支持。 
 我们尽己所能让您满意。',
-    
+
     'donate/vod/text' => '我们可以做出一点微小的工作作为回报-您有机会钦定下一个“今日之车”，无论您做出任意数额的[无条件捐助](/donate) 我们都会很高兴。',
     'donate/vod/select-date' => '1. 选择日期',
     'donate/vod/date-busy' => '日期已有安排',
@@ -635,7 +635,7 @@ return array_replace(include 'root.php', [
     'donate/vod/method/mobile' => '手机运营商账户',
     'donate/vod/method/yandex.money' => 'Yandex.Money',
     'donate/vod/send' => '支付',
-    
+
     'donate/vod/success-text' => '收到来自您的捐款信息后我们将会执行您的选择。 
 感谢您的支持。 
 
@@ -1050,11 +1050,11 @@ return array_replace(include 'root.php', [
     'page/208/name'        => '%BRAND_NAME% Engines',
     'page/208/title'       => '%BRAND_NAME% Engines',
     'page/208/breadcrumbs' => '%BRAND_NAME% Engines',
-    
+
     'page/211/name'        => '好友',
     'page/211/title'       => '好友',
     'page/211/breadcrumbs' => '好友',
-    
+
     'page/212/name'        => 'Picture vote templates',
     'page/212/title'       => 'Picture vote templates',
     'page/212/breadcrumbs' => 'Picture vote templates',
@@ -1063,6 +1063,7 @@ return array_replace(include 'root.php', [
     'moder-menu/inbox' => '收件箱',
 
     'moder/database-id-%s' => '数据库id: %s',
+    'ng/moder/database-id-n' => '数据库id: {id}',
     'moder/log-of-events' => '操作日志',
 
     'moder/picture/inbox' => '收件箱',
@@ -1163,7 +1164,7 @@ return array_replace(include 'root.php', [
     'moder/vehicle/is-concept/inherited-no' => '无继承性',
     'moder/vehicle/is-concept/inherited-yes' => '有继承性',
     'moder/vehicle/is-concept/inherited' => '已有继承性',
-    
+
     'moder/item/short-description' => 'Short description',
     'moder/item/full-description' => 'Full description',
 
@@ -1299,6 +1300,7 @@ return array_replace(include 'root.php', [
     'moder/picture/acceptance/cancel-vote' => '取消我的表决',
     'moder/picture/acceptance/already-voted' => '已表决: ',
     'moder/picture/acceptance/that-is-one-accepted-picture' => '此车唯一的图片',
+    'ng/moder/picture/acceptance/accepted-pictures-is-n' => '接受的图片仍然属于{count}',
     'moder/picture/acceptance/accepted-pictures-is-%s' => '接受的图片仍然属于%s',
 
     'moder/picture/public-url:' => 'Public URL: ',
@@ -1358,7 +1360,7 @@ return array_replace(include 'root.php', [
 [2](https://guides.github.com/features/mastering-markdown/),
 [3](https://daringfireball.net/projects/markdown/basics),
 
-Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins>',
+Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*',
     'moder/markdown/edit' => '编辑',
     'moder/markdown/preview' => '预览',
     'moder/markdown/history' => '历史',
@@ -2130,30 +2132,31 @@ Confirmation code will be sent to you via [the private messaging system](/accoun
 Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish process of association your telegram account with out website user.
 
 Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/account/pm/system)',
-    
+
     'personal-message-dialog/title' => 'Send personal message',
     'personal-message-dialog/send' => 'send',
     'personal-message-dialog/sending' => 'sending ...',
     'personal-message-dialog/sent' => 'sent',
     'personal-message-dialog/cancel' => 'cancel',
     'personal-message-dialog/placeholder' => 'Message',
-    
+
     'crop-dialog/title' => 'Cropper',
     'crop-dialog/close' => 'Close',
     'crop-dialog/select-all' => 'Select all',
     'crop-dialog/save' => 'Save changes',
     'crop-dialog/resolution-%s-aspect-%s' => '%s (aspect is about %s)',
-    
+    'crop-dialog/resolution-x-aspect-y' => '{resolution} (aspect is about {aspect})',
+
     'who-online/title' => 'Online',
     'who-online/refresh' => 'Refresh',
     'who-online/close' => 'Close',
-    
+
     'picture-moder-vote/custom/title' => 'Custom reason',
     'picture-moder-vote/custom/sending' => 'Sending',
     'picture-moder-vote/custom/send' => 'Send',
     'picture-moder-vote/custom/cancel' => 'Cancel',
     'picture-moder-vote/custom/save' => 'Save as template',
-    
+
     'moder/statistics/photos-with-copyrights' => '有版权图片',
     'moder/statistics/vehicles-with-4-or-more-photos' => '有4张以上图片的车型',
     'moder/statistics/specifications-values' => '性能参数数据',

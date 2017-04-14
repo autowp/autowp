@@ -6,7 +6,7 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
+use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Hydrator\Api\RestHydrator;
@@ -58,29 +58,66 @@ class ItemController extends AbstractRestfulController
 
         $data = $this->listInputFilter->getValues();
 
-        $select = $this->table->select(true)
-            ->order([
-                'item.name',
-                'item.body',
-                'item.spec_id',
-                'item.begin_order_cache',
-                'item.end_order_cache'
-            ]);
+        $select = $this->table->getAdapter()->select()
+            ->from('item');
+        
+        if ($data['last_item']) {
+            $namespace = new \Zend\Session\Container('Moder_Car');
+            if (isset($namespace->lastCarId)) {
+                $select->where('item.id = ?', (int)$namespace->lastCarId);
+            } else {
+                $select->where(new Zend_Db_Expr('0'));
+            }
+        }
 
-        $search = $this->params()->fromQuery('search');
-        if ($search) {
+        switch ($data['order']) {
+            case 'childs_count':
+                $select
+                    ->columns(['childs_count' => new Zend_Db_Expr('count(item_parent.item_id)')])
+                    ->join('item_parent', 'item_parent.parent_id = item.id', null)
+                    ->group('item.id')
+                    ->order('childs_count desc');
+                break;
+            default:
+                $select->order([
+                    'item.name',
+                    'item.body',
+                    'item.spec_id',
+                    'item.begin_order_cache',
+                    'item.end_order_cache'
+                ]);
+                break;
+        }
+
+        if ($data['search']) {
             $select
                 ->join('item_language', 'item.id = item_language.item_id', null)
-                ->where('item_language.name like ?', $search . '%');
+                ->where('item_language.name like ?', $data['search'] . '%');
         }
 
         $id = (int)$this->params()->fromQuery('id');
         if ($id) {
             $select->where('item.id = ?', $id);
         }
+        
+        if ($data['descendant']) {
+            $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                ->where('item_parent_cache.item_id = ?', $data['descendant'])
+                ->group('item.id');
+        }
+        
+        if ($data['type_id']) {
+            $select->where('item.item_type_id = ?', $data['type_id']);
+        }
+        
+        if ($data['parent_id']) {
+            $select
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
+                ->where('item_parent.parent_id = ?', $data['parent_id']);
+        }
 
         $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
+            new Zend1DbSelect($select)
         );
 
         $limit = $data['limit'] ? $data['limit'] : 1;
@@ -98,7 +135,7 @@ class ItemController extends AbstractRestfulController
         ]);
 
         $items = [];
-        foreach ($this->table->fetchAll($select) as $row) {
+        foreach ($this->table->getAdapter()->fetchAll($select) as $row) {
             $items[] = $this->hydrator->extract($row);
         }
 

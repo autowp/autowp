@@ -5,6 +5,7 @@ namespace Autowp\User;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
 
+use Autowp\Cron;
 use Autowp\User\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
 use Autowp\User\Model\DbTable\User\Remember as UserRemember;
 use Autowp\User\Model\DbTable\User\Rename as UserRename;
@@ -21,10 +22,10 @@ class Maintenance extends AbstractListenerAggregate
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $this->listeners[] = $events->attach(CronEvent::EVENT_DAILY_MAINTENANCE, [$this, 'dailyMaintenance']);
+        $this->listeners[] = $events->attach(Cron\CronEvent::EVENT_DAILY_MAINTENANCE, [$this, 'dailyMaintenance']);
     }
 
-    public function dailyMaintenance(CronEvent $event)
+    public function dailyMaintenance(Cron\CronEvent $event)
     {
         $this->clearUserRemember();
         $this->clearUserPasswordRemind();

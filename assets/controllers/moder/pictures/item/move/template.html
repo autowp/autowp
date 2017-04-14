@@ -1,0 +1,74 @@
+<ul class="nav nav-pills" style="margin-bottom: 30px" ng-if="!src_item">
+    <li ng-class="{active: !show_factories && !show_museums}">
+        <a ui-sref=".({show_factories: null, show_museums: null})" translate>moder/pciture/move/brands</a>
+    </li>
+    <li ng-class="{active: show_factories}">
+        <a ui-sref=".({show_factories: 1, show_museums: null})" translate>moder/pciture/move/factories</a>
+    </li>
+    <li ng-class="{active: show_museums}">
+        <a ui-sref=".({show_factories: null, show_museums: 1})" translate>item/type/7/name-plural</a>
+    </li>
+</ul>
+
+<div ng-if="show_museums && !src_item">
+    <md-content layout-padding>
+        <a href="#" ng-repeat-start="item in museums" ng-click="selectItem(item.id)" ng-bind="item.name"></a>
+        <br ng-repeat-end />
+    </md-content>
+    
+    <autowp-paginator data="museums_paginator" ng-if="museums_paginator"></autowp-paginator>
+</div>
+
+<div ng-if="show_factories && !src_item">
+
+    <md-content layout-padding>
+        <a href="#" ng-repeat-start="item in factories" ng-click="selectItem(item.id)" ng-bind="item.name"></a>
+        <br ng-repeat-end />
+    </md-content>
+    
+    <autowp-paginator data="factories_paginator" ng-if="factories_paginator"></autowp-paginator>
+</div>
+
+<div ng-if="!show_factories && !show_museums">
+    <div ng-if="!brand_id">
+    
+        <md-content layout-padding layout="row">
+            <div layout="column" ng-repeat="chunk in brands" flex="20">
+                <a ng-repeat="item in chunk" ui-sref=".({page: null, brand_id: item.id})" ng-bind="item.name"></a>
+            </div>
+        </md-content>
+        
+        <autowp-paginator data="brands_paginator" ng-if="brands_paginator"></autowp-paginator>
+    </div>
+    <div ng-if="brand_id">
+        <div class="select-in-brand">
+
+            <div style="margin: 5px 0" ng-if="vehicles">
+                <autowp-moder-picture-move-item item="item" select-item="selectItem" ng-repeat="item in vehicles"></autowp-moder-picture-move-item>
+            </div>
+
+            <h5 translate ng-if="engines">item/type/2/name-plural</h5>
+            <div style="margin: 5px 0" ng-if="engines">
+                <autowp-moder-picture-move-item item="item" select-item="selectItem" ng-repeat="item in engines"></autowp-moder-picture-move-item>
+            </div>
+
+            <div style="margin: 5px 0" ng-if="concepts">
+                <a href="" class="arrow" ng-click="toggleConcepts()">
+                    <i class="fa fa-plus-circle" ng-show="!concepts_expanded"></i>
+                    <i class="fa fa-minus-circle" ng-show="concepts_expanded"></i>
+                    {{'upload/select/concepts'|translate}}
+                </a>
+                <div style="margin:0 0 4px 18px" ng-show="concepts_expanded">
+                    <autowp-moder-picture-move-item item="item" select-item="selectItem" ng-repeat="item in concepts"></autowp-moder-picture-move-item>
+                </div>
+            </div>
+
+            <div style="margin: 5px 0" ng-if="!src_item">
+                <a href="" ng-click="selectItem(brand_id, 22)" translate>upload/select/logo</a><br />
+                <a href="" ng-click="selectItem(brand_id, 25)" translate>upload/select/mixed-long</a><br />
+                <a href="" ng-click="selectItem(brand_id)" translate>upload/select/unsorted-long</a><br />
+            </div>
+
+        </div>
+    </div>
+</div>

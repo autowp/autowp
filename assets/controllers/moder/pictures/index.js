@@ -133,6 +133,9 @@ angular.module(Module)
                     location: 'replace'
                 });
                 
+                params.fields = 'owner,thumbnail,moder_vote,votes,similar,comments_count,perspective_item';
+                params.limit = 24;
+                
                 $http({
                     method: 'GET',
                     url: '/api/picture',

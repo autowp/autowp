@@ -747,7 +747,7 @@ class UploadController extends AbstractActionController
                 if (count($itemIds) == 1) {
                     $itemId = $itemIds[0];
                     $cPerspectiveId = $this->pictureItem->getPerspective($picture['id'], $itemId);
-                    $perspectiveUrl = $this->url()->fromRoute('api/picture-item', [
+                    $perspectiveUrl = $this->url()->fromRoute('api/picture-item/update', [
                         'picture_id' => $picture['id'],
                         'item_id'    => $itemId
                     ]);

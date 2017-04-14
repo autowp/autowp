@@ -7,16 +7,21 @@ use Zend\Router\Http\Method;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
+use Application\Model\DbTable;
+
 return [
     'hydrators' => [
         'factories' => [
-            Hydrator\Api\CommentHydrator::class => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemHydrator::class    => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PerspectiveHydrator::class => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\CommentHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemParentHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PerspectiveHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectiveGroupHydrator::class => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PerspectivePageHydrator::class => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PictureHydrator::class => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\UserHydrator::class    => Hydrator\Api\RestHydratorFactory::class
+            Hydrator\Api\PerspectivePageHydrator::class  => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PictureHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PictureItemHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\SimilarHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\UserHydrator::class             => Hydrator\Api\RestHydratorFactory::class
         ]
     ],
     'controllers' => [
@@ -24,6 +29,7 @@ return [
             Controller\Api\CommentController::class      => Controller\Api\Service\CommentControllerFactory::class,
             Controller\Api\ContactsController::class     => InvokableFactory::class,
             Controller\Api\ItemController::class         => Controller\Api\Service\ItemControllerFactory::class,
+            Controller\Api\ItemParentController::class   => Controller\Api\Service\ItemParentControllerFactory::class,
             Controller\Api\PerspectiveController::class  => Controller\Api\Service\PerspectiveControllerFactory::class,
             Controller\Api\PerspectivePageController::class => Controller\Api\Service\PerspectivePageControllerFactory::class,
             Controller\Api\PictureController::class      => Controller\Api\Service\PictureControllerFactory::class,
@@ -39,6 +45,52 @@ return [
     ],
     'input_filter_specs' => [
         'api_item_list' => [
+            'last_item' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'descendant' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'parent_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'type_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                DbTable\Item\Type::VEHICLE,
+                                DbTable\Item\Type::ENGINE,
+                                DbTable\Item\Type::CATEGORY,
+                                DbTable\Item\Type::TWINS,
+                                DbTable\Item\Type::BRAND,
+                                DbTable\Item\Type::FACTORY,
+                                DbTable\Item\Type::MUSEUM,
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'limit' => [
                 'required' => false,
                 'filters'  => [
@@ -76,10 +128,120 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_online', 'reg_date', 'image']]
+                        'options' => ['fields' => ['childs_count', 'name_html', 'brands']]
                     ]
                 ]
+            ],
+            'order' => [
+                'required'   => false,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'name',
+                                'childs_count'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'search' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
             ]
+        ],
+        'api_item_parent_list' => [
+            'ancestor_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'concept' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ],
+            'item_type_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'parent_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'limit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 500
+                        ]
+                    ]
+                ]
+            ],
+            'page' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['item']]
+                    ]
+                ]
+            ],
+            'order' => [
+                'required'   => false,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'name',
+                                'childs_count'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
         ],
         'api_perspective_page_list' => [
             'fields' => [
@@ -88,6 +250,239 @@ return [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => ['groups']]
+                    ]
+                ]
+            ]
+        ],
+        'api_picture_list' => [
+            'limit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 500
+                        ]
+                    ]
+                ]
+            ],
+            'page' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => [
+                            'owner', 'thumbnail', 'moder_vote', 'votes',
+                            'similar', 'comments_count', 'add_date', 'iptc',
+                            'exif', 'image', 'items', 'special_name',
+                            'copyrights', 'change_status_user', 'rights',
+                            'moder_votes', 'moder_voted', 'is_last',
+                            'accepted_count', 'crop', 'replaceable', 'perspective_item'
+                        ]]
+                    ]
+                ]
+            ],
+            'status' => [
+                'required' => false
+            ],
+            'car_type_id' => [
+                'required' => false
+            ],
+            'perspective_id' => [
+                'required' => false
+            ],
+            'item_id' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'type_id' => [
+                'required' => false
+            ],
+            'comments' => [
+                'required' => false
+            ],
+            'owner_id' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'replace' => [
+                'required' => false
+            ],
+            'requests' => [
+                'required' => false
+            ],
+            'special_name' => [
+                'required' => false
+            ],
+            'lost' => [
+                'required' => false
+            ],
+            'gps' => [
+                'required' => false
+            ],
+            'order' => [
+                'required' => false
+            ],
+            'similar' => [
+                'required' => false
+            ]
+        ],
+        'api_picture_edit' => [
+            'status' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                DbTable\Picture::STATUS_INBOX,
+                                DbTable\Picture::STATUS_ACCEPTED,
+                                DbTable\Picture::STATUS_REMOVING,
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'special_name' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => 0,
+                            'max' => DbTable\Picture::MAX_NAME,
+                        ]
+                    ]
+                ]
+            ],
+            'copyrights' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => 0,
+                            'max' => 65536,
+                        ]
+                    ]
+                ]
+            ],
+            'crop' => [
+                'required' => false,
+                'left' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'top' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'width' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
+                'height' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ]
+            ],
+            'replace_picture_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ]
+        ],
+        'api_picture_item' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => [
+                            'owner', 'thumbnail', 'moder_vote', 'votes',
+                            'similar', 'comments_count', 'add_date', 'iptc',
+                            'exif', 'image', 'items', 'special_name',
+                            'copyrights', 'change_status_user', 'rights',
+                            'moder_votes', 'moder_voted', 'is_last',
+                            'accepted_count', 'crop', 'replaceable', 'perspective_item'
+                        ]]
+                    ]
+                ]
+            ]
+        ],
+        'api_picture_item_item' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => [
+                            'area'
+                        ]]
                     ]
                 ]
             ]
@@ -166,13 +561,6 @@ return [
                 ],
                 'validators' => [
                     ['name' => 'Digits'],
-                    [
-                        'name'    => 'Between',
-                        'options' => [
-                            'min' => 1,
-                            'max' => 500
-                        ]
-                    ]
                 ]
             ],
             'fields' => [
@@ -259,6 +647,27 @@ return [
                             ]
                         ]
                     ],
+                    'item-parent' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/item-parent',
+                            'defaults' => [
+                                'controller' => Controller\Api\ItemParentController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'list' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb'     => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
                     'picture' => [
                         'type' => Literal::class,
                         'options' => [
@@ -269,36 +678,6 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes' => [
-                            'random_picture' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route'    => '/random-picture',
-                                    'defaults' => [
-                                        'controller' => Controller\Api\PictureController::class,
-                                        'action' => 'random-picture'
-                                    ],
-                                ]
-                            ],
-                            'new-picture' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route'    => '/new-picture',
-                                    'defaults' => [
-                                        'controller' => Controller\Api\PictureController::class,
-                                        'action' => 'new-picture'
-                                    ],
-                                ]
-                            ],
-                            'car-of-day-picture' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route'    => '/car-of-day-picture',
-                                    'defaults' => [
-                                        'controller' => Controller\Api\PictureController::class,
-                                        'action' => 'car-of-day-picture'
-                                    ],
-                                ]
-                            ],
                             'index' => [
                                 'type' => Method::class,
                                 'options' => [
@@ -315,6 +694,81 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
+                                    'accept-replace' => [
+                                        'type' => Literal::class,
+                                        'options' => [
+                                            'route'    => '/accept-replace',
+                                            'defaults' => [
+                                                'action' => 'accept-replace'
+                                            ],
+                                        ],
+                                    ],
+                                    'normalize' => [
+                                        'type' => Literal::class,
+                                        'options' => [
+                                            'route'    => '/normalize',
+                                            'defaults' => [
+                                                'action' => 'normalize'
+                                            ],
+                                        ],
+                                    ],
+                                    'flop' => [
+                                        'type' => Literal::class,
+                                        'options' => [
+                                            'route'    => '/flop',
+                                            'defaults' => [
+                                                'action' => 'flop'
+                                            ],
+                                        ],
+                                    ],
+                                    'repair' => [
+                                        'type' => Literal::class,
+                                        'options' => [
+                                            'route'    => '/repair',
+                                            'defaults' => [
+                                                'action' => 'repair'
+                                            ],
+                                        ],
+                                    ],
+                                    'correct-file-names' => [
+                                        'type' => Literal::class,
+                                        'options' => [
+                                            'route'    => '/correct-file-names',
+                                            'defaults' => [
+                                                'action' => 'correct-file-names'
+                                            ],
+                                        ],
+                                    ],
+                                    'similar' => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route' => '/similar/:similar_picture_id',
+                                            'constraints' => [
+                                                'similar_picture_id' => '[0-9]+'
+                                            ],
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'delete' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'delete',
+                                                    'defaults' => [
+                                                        'action' => 'delete-similar'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ],
+                                    'item' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'item'
+                                            ]
+                                        ]
+                                    ],
                                     'update' => [
                                         'type' => Method::class,
                                         'options' => [
@@ -325,7 +779,34 @@ return [
                                         ]
                                     ]
                                 ]
-                            ]
+                            ],
+                            'random_picture' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/random-picture',
+                                    'defaults' => [
+                                        'action' => 'random-picture'
+                                    ],
+                                ]
+                            ],
+                            'new-picture' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/new-picture',
+                                    'defaults' => [
+                                        'action' => 'new-picture'
+                                    ],
+                                ]
+                            ],
+                            'car-of-day-picture' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/car-of-day-picture',
+                                    'defaults' => [
+                                        'action' => 'car-of-day-picture'
+                                    ],
+                                ]
+                            ],
                         ]
                     ],
                     'picture-moder-vote' => [
@@ -358,9 +839,47 @@ return [
                             'route' => '/picture-item/:picture_id/:item_id',
                             'defaults' => [
                                 'controller' => Controller\Api\PictureItemController::class,
-                                'action'     => 'item'
                             ],
                         ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'item' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb'     => 'get',
+                                    'defaults' => [
+                                        'action' => 'item'
+                                    ]
+                                ]
+                            ],
+                            'create' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb'     => 'post',
+                                    'defaults' => [
+                                        'action' => 'create'
+                                    ]
+                                ]
+                            ],
+                            'update' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb'     => 'put',
+                                    'defaults' => [
+                                        'action' => 'update'
+                                    ]
+                                ]
+                            ],
+                            'delete' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb'     => 'delete',
+                                    'defaults' => [
+                                        'action' => 'delete'
+                                    ]
+                                ]
+                            ],
+                        ]
                     ],
                     'user' => [
                         'type' => Literal::class,

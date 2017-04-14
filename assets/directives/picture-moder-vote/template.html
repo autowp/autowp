@@ -1,0 +1,46 @@
+<div layout="row">
+    <md-menu ng-if="!picture.moder_voted">
+        <md-button class="md-raised md-primary" ng-click="$mdMenu.open($event);">
+            {{'moder/picture/acceptance/want-accept'|translate}}
+            <i class="fa fa-caret-down" aria-hidden="true"></i>
+        </md-button>
+        <md-menu-content>
+            <md-menu-item ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote > 0">
+                <md-button class="md-primary" ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePicture(template.vote, template.name)"></md-button>
+            </md-menu-item>
+            <md-menu-divider></md-menu-divider>
+            <md-menu-item>
+                <md-button ng-click="showCustomDialog($event, 1)">{{'moder/picture/acceptance/custom'|translate}}</md-button>
+            </md-menu-item>
+        </md-menu-content>
+    </md-menu>
+    <md-menu ng-if="!picture.moder_voted">
+        <md-button class="md-raised md-warn" ng-click="$mdMenu.open($event);">
+            {{'moder/picture/acceptance/want-delete'|translate}}
+            <i class="fa fa-caret-down" aria-hidden="true"></i>
+        </md-button>
+        <md-menu-content>
+            <md-menu-item ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote < 0">
+                <md-button class="md-warn" ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePicture(template.vote, template.name)"></md-button>
+            </md-menu-item>
+            <md-menu-divider></md-menu-divider>
+            <md-menu-item>
+                <md-button ng-click="showCustomDialog($event, -1)">{{'moder/picture/acceptance/custom'|translate}}</md-button>
+            </md-menu-item>
+        </md-menu-content>
+    </md-menu>
+    <md-button class="md-raised" ng-if="picture.moder_voted" ng-click="cancelVotePicture()">
+        {{'moder/picture/acceptance/cancel-vote'|translate}}
+    </md-button>
+</div>
+
+<div ng-if="picture.moder_votes.length">
+    {{'moder/picture/acceptance/already-voted'|translate}}
+    <ul class="list-unstyled">
+        <li ng-repeat="moder_vote in picture.moder_votes">
+            <i style="color:green" class="fa fa-thumbs-up"></i>
+            <autowp-user user="moder_vote.user"></autowp-user>
+            <span style="color:{{moder_vote.vote > 0 ? 'green' : 'red'}}" ng-bind="moder_vote.reason"></span>
+        </li>
+    </ul>
+</div>

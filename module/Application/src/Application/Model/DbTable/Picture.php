@@ -16,6 +16,8 @@ class Picture extends Table
         STATUS_REMOVED  = 'removed',
         STATUS_INBOX    = 'inbox';
 
+    const MAX_NAME = 255;
+
     protected $_name = 'pictures';
 
     protected $_rowClass = Picture\Row::class;

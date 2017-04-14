@@ -84,7 +84,13 @@ define(
                 });
                 
                 $('.perspective-selector').on('change', function() {
-                    $.post($(this).data('url'), {perspective_id: $(this).val()});
+                    $.ajax({
+                        method: 'PUT',
+                        url: $(this).data('url'), 
+                        data: {
+                            perspective_id: $(this).val()
+                        }
+                    });
                 });
             }
         };

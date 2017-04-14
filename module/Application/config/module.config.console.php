@@ -9,7 +9,6 @@ return [
         'factories' => [
             Controller\Console\BuildController::class     => InvokableFactory::class,
             Controller\Console\CatalogueController::class => Controller\Console\Service\CatalogueControllerFactory::class,
-            Controller\Console\CronController::class      => Controller\Console\Service\CronControllerFactory::class,
             Controller\Console\PicturesController::class  => Controller\Console\Service\PicturesControllerFactory::class,
             Controller\Console\RefererController::class   => InvokableFactory::class,
             Controller\Console\SpecsController::class     => Controller\Console\Service\SpecsControllerFactory::class,
@@ -32,14 +31,6 @@ return [
                         'route'    => 'catalogue (refresh-brand-vehicle|rebuild-car-order-cache):action',
                         'defaults' => [
                             'controller' => Controller\Console\CatalogueController::class,
-                        ]
-                    ]
-                ],
-                'cron' => [
-                    'options' => [
-                        'route'    => 'cron (daily-maintenance|midnight):action',
-                        'defaults' => [
-                            'controller' => Controller\Console\CronController::class,
                         ]
                     ]
                 ],

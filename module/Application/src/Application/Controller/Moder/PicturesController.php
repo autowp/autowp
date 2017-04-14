@@ -18,7 +18,6 @@ use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Application\DuplicateFinder;
-use Application\Form\Moder\Inbox as InboxForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
@@ -109,7 +108,7 @@ class PicturesController extends AbstractActionController
      * @var UserPicture
      */
     private $userPicture;
-    
+
     /**
      * @var TableGateway
      */
@@ -158,7 +157,7 @@ class PicturesController extends AbstractActionController
         $this->comments = $comments;
         $this->log = $log;
         $this->userPicture = $userPicture;
-        
+
         $this->voteTemplateTable = new TableGateway('picture_moder_vote_template', $adapter);
     }
 
@@ -773,7 +772,7 @@ class PicturesController extends AbstractActionController
                 'row'         => $item,
                 'perspective' => [
                     'options' => $multioptions,
-                    'url'     => $this->url()->fromRoute('api/picture-item', [
+                    'url'     => $this->url()->fromRoute('api/picture-item/update', [
                         'picture_id' => $picture['id'],
                         'item_id'    => $item['id']
                     ]),

@@ -4,6 +4,7 @@ import template from './thumbnail.html';
 import sprintf from 'sprintf';
 import PERSPECTIVE_SERVICE from 'services/perspective';
 import PICTURE_ITEM_SERVICE from 'services/picture-item';
+import './thumbnail/styles.less';
 
 angular.module(Module)
     .directive('autowpThumbnail', function() {

@@ -14,17 +14,6 @@ class PicturesControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
 
-    public function testIndexForbidden()
-    {
-        $this->dispatch('https://www.autowp.ru/moder/pictures', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(403);
-        $this->assertModuleName('application');
-        $this->assertControllerName(PicturesController::class);
-        $this->assertMatchedRouteName('moder/pictures');
-        $this->assertActionName('forbidden');
-    }
-
     public function testPicture()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

@@ -644,7 +644,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'donate/success-text' => 'Благодарим вас за оказанную поддержку.
 
 Постараемся вас не разочаровать.',
-    
+
     'donate/vod/text' => 'То немногое, что мы можем предложить взамен финансовой помощи в существовании сайта – это возможность выбрать ближайший "автомобиль дня".
 
 Для этого следуйте инструкциям ниже.
@@ -666,16 +666,16 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'donate/vod/order-message' => 'AutoWP.ru: автомобиль дня',
     'donate/vod/order-target' => 'Order %s',
     'donate/vod/message' => 'Ваши пожелания',
-    'donate/vod/price:' => 'Сумма:', 
+    'donate/vod/price:' => 'Сумма:',
     'donate/vod/price/currency' => 'руб.',
     'donate/vod/price-aroud' => 'примерно $%s',
     'donate/vod/method/credit-card' => 'Банковская карта',
     'donate/vod/method/mobile' => 'Счёт мобильного оператора',
     'donate/vod/method/yandex.money' => 'Яндекс.Деньги',
     'donate/vod/send' => 'Оплатить',
-    
+
     'donate/vod/success-text' => 'В ближайшее время информация о пожертвовании автоматически поступит к нам и ваш выбор будет осуществлён.
-    
+
 Благодарим вас за оказанную поддержку.
 
 Постараемся вас не разочаровать.',
@@ -1096,11 +1096,11 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'page/208/name'        => 'Двигатели %BRAND_NAME%',
     'page/208/title'       => 'Двигатели %BRAND_NAME%',
     'page/208/breadcrumbs' => 'Двигатели %BRAND_NAME%',
-    
+
     'page/211/name'        => 'Контакты',
     'page/211/title'       => 'Контакты',
     'page/211/breadcrumbs' => 'Контакты',
-    
+
     'page/212/name'        => 'Шаблоны модераторских голосов',
     'page/212/title'       => 'Шаблоны модераторских голосов',
     'page/212/breadcrumbs' => 'Шаблоны модераторских голосов',
@@ -1109,6 +1109,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder-menu/inbox' => 'Инбокс',
 
     'moder/database-id-%s' => 'В базе данных чиcлится под номером %s',
+    'ng/moder/database-id-n' => 'В базе данных чиcлится под номером {id}',
     'moder/log-of-events' => 'Журнал событий',
 
     'moder/picture/inbox' => 'Инбокс',
@@ -1209,7 +1210,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/vehicle/is-concept/inherited-no' => 'унаследовано (нет)',
     'moder/vehicle/is-concept/inherited-yes' => 'унаследовано (да)',
     'moder/vehicle/is-concept/inherited' => 'унаследовано',
-    
+
     'moder/item/short-description' => 'Краткое описание',
     'moder/item/full-description' => 'Полное описание',
 
@@ -1345,6 +1346,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/picture/acceptance/cancel-vote' => 'Отменить мою заявку',
     'moder/picture/acceptance/already-voted' => 'Уже подали: ',
     'moder/picture/acceptance/that-is-one-accepted-picture' => 'Это единственная принятая картинка этого автомобиля',
+    'ng/moder/picture/acceptance/accepted-pictures-is-n' => 'Принятых картинок этого автомобиля всего {count}',
     'moder/picture/acceptance/accepted-pictures-is-%s' => 'Принятых картинок этого автомобиля всего %s',
 
     'moder/picture/public-url:' => 'На сайте: ',
@@ -1406,7 +1408,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 [4](https://daringfireball.net/projects/markdown/basics),
 [5](http://rukeba.com/by-the-way/markdown-sintaksis-po-russki)
 
-Ссылки на внутрисайтовые страницы следует писать не полностью: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins>',
+Ссылки на внутрисайтовые страницы следует писать не полностью: ~~http://autowp.ru/bmw/~~ */bmw/*',
     'moder/markdown/edit' => 'Редактировать',
     'moder/markdown/preview' => 'Предварительный просмотр',
     'moder/markdown/history' => 'История',
@@ -2179,30 +2181,31 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 Отправьте `/me 123456789 ХХХХХХХХХХХХХХХХ`, чтобы завершить процесс ассоциации вашей учётной записи telegram с пользователем найшего сайта.
 
 Здесь `ХХХХХХХХХХХХХХХХ` - код, который будет отправлен вам через [систему личных сообщений](/account/pm/system)',
-    
+
     'personal-message-dialog/title' => 'Отправить личное сообщение',
     'personal-message-dialog/send' => 'отправить',
     'personal-message-dialog/sending' => 'отправляется ...',
     'personal-message-dialog/sent' => 'отправлено',
     'personal-message-dialog/cancel' => 'отменить',
     'personal-message-dialog/placeholder' => 'Текст сообщения',
-    
+
     'crop-dialog/title' => 'Кадрирование',
     'crop-dialog/close' => 'Закрыть',
     'crop-dialog/select-all' => 'Выделить всё',
     'crop-dialog/save' => 'Сохранить',
     'crop-dialog/resolution-%s-aspect-%s' => '%s (пропорции %s)',
-    
+    'crop-dialog/resolution-x-aspect-y' => '{resolution} (пропорции {aspect})',
+
     'who-online/title' => 'На сайте',
     'who-online/refresh' => 'Обновить',
     'who-online/close' => 'Закрыть',
-    
+
     'picture-moder-vote/custom/title' => 'Своя причина',
     'picture-moder-vote/custom/sending' => 'отправляется ...',
     'picture-moder-vote/custom/send' => 'отправлено',
     'picture-moder-vote/custom/cancel' => 'отменить',
     'picture-moder-vote/custom/save' => 'Сохранить как шаблон',
-    
+
     'moder/statistics/photos-with-copyrights' => 'Фотографий с копирайтами',
     'moder/statistics/vehicles-with-4-or-more-photos' => 'Автомобилей с 4 и более фото',
     'moder/statistics/specifications-values' => 'Заполненных значений ТТХ',

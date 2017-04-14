@@ -25,17 +25,30 @@ angular.module(Module).controller(CONTROLLER_NAME, [
             setSidebars(data.layout.needLeft, data.layout.needRight);
             $scope.isAdminPage = data.layout.isAdminPage;
             
-            var nameKey = 'page/' + data.pageId + '/name';
-            var titleKey = 'page/' + data.pageId + '/title';
-            $translate([nameKey, titleKey]).then(function (translations) {
-                var name = translations[nameKey];
-                var title = translations[titleKey];
-                $scope.pageName = name;
-                $scope.title = title ? title : name;
-            }, function () {
-                $scope.pageName = nameKey;
-                $scope.title = titleKey;
+            var args = data.args ? data.args : {};
+            var preparedUrlArgs = {};
+            var preparedNameArgs = {};
+            angular.forEach(args, function(value, key) {
+                preparedUrlArgs['%' + key + '%'] = encodeURIComponent(value);
+                preparedNameArgs['%' + key + '%'] = value;
             });
+            
+            if (data.pageId) {
+                var nameKey = 'page/' + data.pageId + '/name';
+                var titleKey = 'page/' + data.pageId + '/title';
+                $translate([nameKey, titleKey]).then(function (translations) {
+                    var name = replaceArgs(translations[nameKey], preparedNameArgs);
+                    var title = replaceArgs(translations[titleKey], preparedNameArgs);
+                    $scope.pageName = name;
+                    $scope.title = title ? title : name;
+                }, function () {
+                    $scope.pageName = nameKey;
+                    $scope.title = titleKey;
+                });
+            } else {
+                $scope.pageName = null;
+                $scope.title = null;
+            }
         };
         
         $scope.isSecondaryMenuItems = function(page) {
@@ -49,6 +62,13 @@ angular.module(Module).controller(CONTROLLER_NAME, [
             $scope.spanLeft = left ? 4 : 0;
             $scope.spanRight = right ? 4 : 0;
             $scope.spanCenter = 12 - $scope.spanLeft - $scope.spanRight;
+        }
+        
+        function replaceArgs(str, args) {
+            angular.forEach(args, function(value, key) {
+                str = str.replace(key, value);
+            });
+            return str;
         }
     }
 ]);

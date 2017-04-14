@@ -1,0 +1,332 @@
+<div class="row">
+    <div class="col-md-6 text-right">
+        <p>
+            <a ng-href="picture.prev_picture.moder_url" ng-if="picture.prev_picture" translate>moder/picture/previous</a>
+            <br ng-if="picture.prev_picture" />
+            <a ng-href="picture.prev_new_picture.moder_url" ng-if="picture.prev_new_picture" translate>moder/picture/previous-new</a>
+        </p>
+    </div>
+    <div class="col-md-6">
+        <p>
+            <a ng-href="picture.next_picture.moder_url" ng-if="picture.next_picture" translate>moder/picture/next</a>
+            <br ng-if="picture.next_picture" />
+            <a ng-href="picture.next_new_picture.moder_url" ng-if="picture.next_new_picture" translate>moder/picture/next-new</a>
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+        <img ng-src="{{picture.thumbnail.src}}" ng-if="picture.thumbnail" />
+    </div>
+    <div class="col-md-5">
+        <md-content layout-padding>
+            <p translate="ng/moder/database-id-n" translate-values="{id: picture.id}"></p>
+            <p>
+                {{'moder/picture/public-url:'|translate}}
+                <a ng-href="{{picture.url}}" ng-bind="picture.url"></a>
+            </p>
+            <p ng-if="picture.image" style="overflow: hidden; text-overflow: ellipsis;">
+                {{'moder/picture/image:'|translate}}
+                <a ng-href="{{picture.image.src}}" ng-bind="picture.image.src"></a>
+            </p>
+            <a ng-href="/log/index/picture_id/{{picture.id}}" translate>moder/log-of-events</a>
+        </md-content>
+    </div>
+    <div class="col-md-5">
+        <md-content layout-padding>
+            <p>{{'moder/picture/resolution:'|translate}}
+            <b>{{picture.width}}×{{picture.height}}</b></p>
+            <p ng-if="picture.dpi_x || picture.dpi_y">
+                DPI: <b>{{picture.dpi_x}}×{{picture.dpi_y}}</b>
+            </p>
+            <p>{{'moder/picture/filesize:'|translate}} <b ng-bind="picture.filesize | filesize"></b></p>
+            <p>{{'moder/picture/upload-date:'|translate}} <b ng-bind="picture.add_date | date : 'fullDate'"></b></p>
+        </md-content>
+    </div>
+</div>
+
+<h3 translate>moder/picture/catalogue</h3>
+<md-content layout-padding>
+    <table class="table" ng-if="picture.items.length">
+        <thead>
+            <tr>
+                <td>Item</td>
+                <td translate>moder/picture/perspective</td>
+                <td ng-if="picture.rights.crop">Area</td>
+                <td ng-if="picture.rights.move">Move</td>
+                <td ng-if="picture.rights.move"></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="item in picture.items">
+                <td>
+                    <a ng-href="{{item.item.moder_url}}" ng-bind-html="item.item.name_html"></a>
+                </td>
+                <td>
+                    <md-select ng-model="item.perspective_id" ng-change="savePerspective(item)" style="margin:0" aria-label="Perspective">
+                        <md-option><em>--</em></md-option>
+                        <md-option ng-repeat="perspective in perspectives" ng-value="perspective.id">
+                            {{perspective.name | translate}}
+                        </md-option>
+                    </md-select>
+                </td>
+                <td ng-if="picture.rights.crop">
+                    <md-button ui-sref="moder-pictures-item-area({id: picture.id, item_id: item.item_id})" arial-label="Area" style="margin:0">
+                        <i class="fa fa-crop"></i>
+                        {{'moder/picture/catalogue/pick-item-area'|translate}}
+                    </md-button>
+                </td>
+                <td ng-if="picture.rights.move">
+                    <div class="btn-group" style="white-space:nowrap">
+                        <a ui-sref="moder-pictures-item-move({id: picture.id, src_item_id: item.item_id})" class="btn btn-default">
+                            <i class="fa fa-arrow-right"></i>
+                            {{'moder/picture/catalogue/move-to'|translate}} ...
+                        </a>
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li ng-if="last_item && !hasItem(last_item.id)">
+                                <a href="" ng-click="moveItem(item.item_id, last_item.id)">
+                                    <i class="fa fa-arrow-right"></i>
+                                    {{'moder/picture/catalogue/move-to'|translate}}
+                                    <span ng-bind-html="last_item.name_html"></span>
+                                </a>
+                            </li>
+                            <li ng-repeat="brand in item.item.brands">
+                                <a ui-sref="moder-pictures-item-move({id: picture.id, src_item_id: item.item_id, brand_id: brand.id})">
+                                    <i class="fa fa-arrow-right"></i>
+                                    {{'moder/picture/catalogue/move-to'|translate}}
+                                    <span ng-bind-html="brand.name_html"></span> ...
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+                <td ng-if="picture.rights.move">
+                    <md-button class="md-warn" ng-click="deletePictureItem(item.item_id)" aria-label="Delete" style="margin:0">
+                        <span class="fa fa-times"></span>
+                    </md-button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div ng-if="picture.rights.move">
+        <div ng-if="last_item && !hasItem(last_item.id)">
+            <md-button ng-click="addItem(last_item.id)">
+                <i class="fa fa-plus"></i>
+                {{'moder/picture/catalogue/add-to'|translate}}
+                <span ng-bind-html="last_item.name_html"></span>
+            </md-button>
+        </div>
+        <div>
+            <md-button ui-sref="moder-pictures-item-move({id: picture.id})">
+                <i class="fa fa-plus"></i>
+                {{'moder/picture/catalogue/add-to'|translate}} ...
+            </md-button>
+        </div>
+    </div>
+    
+    <md-progress-linear md-mode="indeterminate" ng-show="pictureItemLoading"></md-progress-linear>
+</md-content>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3 translate>moder/picture/settings</h3>
+        <md-content layout-padding layout="column">
+            <div>
+                <p class="text-danger">Achtung! High Voltage! Ты сюда не ходи!</p>
+                <p class="text-danger">Поле использовать в ИСКЛЮЧИТЕЛЬНЫХ случаях. А лучше вообще никогда не использовать.</p>
+            </div>
+            
+            <div layout="row">
+                <md-input-container class="md-block" flex="80">
+                    <label translate>moder/picture/edit/special-name</label>
+                    <input md-maxlength="255" name="special_name" ng-model="picture.special_name">
+                </md-input-container>
+                
+                <div flex="20">
+                    <md-button class="md-raised md-primary" ng-click="saveSpecialName()">{{'submit'|translate}}</md-button>
+                </div>
+            </div>
+            
+            <md-progress-linear md-mode="indeterminate" ng-show="specialNameLoading"></md-progress-linear>
+        </md-content>
+
+        <h3 translate>moder/picture/copyrights</h3>
+        <md-content layout-padding layout="column">
+            <autowp-markdown-edit save="saveCopyrights" text="picture.copyrights"></autowp-markdown-edit>
+            <p ng-if="picture.copyrights_text_id">
+                <a ng-href="/info/text/id/{{picture.copyrights_text_id}}">History</a>
+            </p>
+            
+            <md-progress-linear md-mode="indeterminate" ng-show="copyrightsLoading"></md-progress-linear>
+        </md-content>
+
+        <h3 ng-if="picture.iptc">IPTC</h3>
+        <div class="well small" style="overflow:auto" ng-if="picture.iptc" ng-bind-html="picture.iptc"></div>
+
+        <h3 ng-if="picture.exif">EXIF</h3>
+        <div class="well small" style="overflow:auto" ng-if="picture.exif" ng-bind-html="picture.exif"></div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <h3 translate ng-if="picture.replaceable">moder/picture/replacement</h3>
+        <md-content layout-padding ng-if="picture.replaceable">
+            <div>
+                <p>
+                    {{'moder/picture/replacement/photo-suggested-to-replace'|translate}}
+                    <a ng-href="{{picture.replaceable.url}}">{{picture.replaceable.url}}</a>
+                </p>
+                <md-button class="md-raised md-primary" ng-if="picture.rights.accept" ng-click="acceptReplace()">
+                    <i class="fa fa-exchange"></i>
+                    {{'moder/picture/replacement/accept-and-delete-double'|translate}}
+                </md-button>
+                <md-button class="md-raised md-warn" ng-if="picture.rights.accept" ng-click="cancelReplace()">
+                    <i class="fa fa-times"></i>
+                    {{'moder/picture/replacement/cancel'|translate}}
+                </md-button>
+            </div>
+            <md-progress-linear md-mode="indeterminate" ng-show="replaceLoading"></md-progress-linear>
+        </md-content>
+
+
+        <h3 translate>moder/picture/acceptance</h3>
+        <md-content layout-padding layout="column">
+            <autowp-user user="picture.change_status_user" ng-if="picture.change_status_user"></autowp-user>
+
+            <div ng-if="picture.status == 'inbox'">
+                <p><strong class="label label-warning" translate>moder/picture/acceptance/not-accepted</strong></p>
+                
+                <md-button class="md-raised md-primary md-primary" ng-click="acceptPicture()" ng-if="picture.rights.accept">
+                    {{'moder/picture/acceptance/accept'|translate}}
+                </md-button>
+                <md-button class="md-raised md-primary md-warn" ng-click="deletePicture()" ng-if="picture.rights.delete">
+                    {{'moder/picture/acceptance/delete'|translate}}
+                </md-button>
+            </div>
+
+            <div ng-show="picture.status == 'accepted'">
+                <p><strong class="label label-success" translate>moder/picture/acceptance/accepted</strong></p>
+                
+                <md-button class="md-raised md-primary md-warn" ng-click="unacceptPicture()" ng-if="picture.rights.unaccept">
+                    {{'moder/picture/acceptance/unaccept'|translate}}
+                </md-button>
+            </div>
+
+            <div ng-if="picture.status == 'removing'">
+                <p><strong class="label label-danger" translate>moder/picture/acceptance/in-delete-queue</strong></p>
+
+                <md-button class="md-raised md-primary md-warn" ng-click="restorePicture()" ng-if="picture.rights.restore">
+                    {{'moder/picture/acceptance/restore'|translate}}
+                </md-button>
+            </div>
+
+            <div ng-if="picture.status == 'removed'">
+                <p><strong class="label label-danger" translate>moder/picture/acceptance/removed</strong></p>
+            </div>
+            
+            <autowp-picture-moder-vote picture="picture" change="pictureVoted"></autowp-picture-moder-vote>
+            
+            <p ng-if="picture.is_last">
+                <span class="label label-warning" translate>moder/picture/acceptance/that-is-one-accepted-picture</span>
+            </p>
+            <p ng-if="!picture.is_last && (picture.accepted_count <= 4)">
+                <span class="label label-warning" translate="ng/moder/picture/acceptance/accepted-pictures-is-n" translate-values="{count: picture.accepted_count}"></span>
+            </p>
+            
+            <md-progress-linear md-mode="indeterminate" ng-show="statusLoading"></md-progress-linear>
+        </md-content>
+
+        <h3 translate>moder/picture/edit-and-repair</h3>
+        <md-content layout-padding layout="column" ng-if="picture.rights.normalize || picture.rights.flop || picture.rights.crop">
+            <div layout="row">
+                <md-button class="md-raised md-warn" ng-click="normalizePicture()" ng-if="picture.rights.normalize" ng-disabled="repairLoading">
+                    <i class="fa fa-signal"></i>
+                    {{'moder/picture/edit-and-repair/normalize'|translate}}
+                </md-button>
+                <md-button class="md-raised md-warn" ng-click="flopPicture()" ng-if="picture.rights.flop" ng-disabled="repairLoading">
+                    <i class="fa fa-arrows-h"></i>
+                    {{'moder/picture/edit-and-repair/flop'|translate}}
+                </md-button>
+                <md-button class="md-raised" ui-sref="moder-pictures-item-crop({id: picture.id})" ng-if="picture.rights.crop" ng-disabled="repairLoading">
+                    <i class="fa fa-crop"></i>
+                    {{'moder/picture/edit-and-repair/crop'|translate}}
+                </md-button>
+            </div>
+
+            <div layout="row">
+                <md-button class="md-raised" ng-click="repairPicture()" ng-disabled="repairLoading">
+                    <i class="fa fa-wrench"></i>
+                    {{'moder/picture/edit-and-repair/repair-all-files'|translate}}
+                </md-button>
+                <md-button class="md-raised" ng-click="correctFileNames()" ng-disabled="repairLoading">
+                    <i class="fa fa-wrench"></i>
+                    {{'moder/picture/edit-and-repair/rebuild-files-names'|translate}}
+                </md-button>
+            </div>
+            
+            <md-progress-linear md-mode="indeterminate" ng-show="repairLoading"></md-progress-linear>
+        </md-content>
+        
+        <h3 ng-if="picture.similar">Similar picture</h3>
+        <md-content ng-if="picture.similar" layout-padding>
+            <p class="alert alert-warning" role="alert">
+                <span class="fa fa-file-image-o"></span>
+                <a ui-sref="moder-pictures-item({id: picture.similar.picture_id})">
+                    Similar picture: {{picture.similar.distance}}
+                </a>
+            </p>
+            <p>
+                <a ui-sref="moder-pictures-item({id: picture.similar.picture_id})">
+                    <img ng-if="picture.similar.picture.thumbnail" ng-src="{{picture.similar.picture.thumbnail.src}}" />
+                </a>
+            </p>
+            <md-button ng-click="cancelSimilar()">That is not similar</md-button>
+            <md-progress-linear md-mode="indeterminate" ng-show="repairLoading"></md-progress-linear>
+        </md-content>
+
+        <h3 translate>moder/picture/uploader</h3>
+        <md-content layout-padding>
+            <autowp-user user="picture.owner" ng-if="picture.owner" />
+            <span translate ng-if="!picture.owner">moder/picture/uploader/unknown</span>
+            <div ng-if="picture.ip">
+                {{'moder/picture/uploader/id-address:'|translate}}
+                <b><?=$this->escapeHtml(inet_ntop($this->picture->ip))?></b><br />
+                <?php if ($this->ban) { ?>
+                    <p>
+                        <?=$this->escapeHtml($this->translate('ban/that-address-is-banned'))?>
+                        <?php if ($this->ban['user']) { ?>
+                            <?=$this->user($this->ban['user']) ?>
+                        <?php } ?>
+                        <?php if ($this->ban['up_to']) { ?>
+                            <?=$this->escapeHtml($this->translate('ban/until'))?>
+                            <?=$this->ban['up_to']->format(MYSQL_DATETIME_FORMAT) ?>
+                            <?php if ($this->ban['reason']) { ?>
+                                (<?=$this->escapeHtml($this->ban['reason'])?>)
+                            <?php } ?>
+                        <?php } ?>
+                    </p>
+
+                    <?php if ($this->canBan) { ?>
+                        <form action="<?=$this->url('ban/unban-ip', [
+                            'ip' => inet_ntop($this->picture->ip)
+                        ]) ?>" method="post" style="margin:10px 0">
+                            <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('ban/unban'))?>" />
+                        </form>
+                    <?php } ?>
+                <?php } ?>
+
+                <?php if ($this->canBan) { ?>
+                    <?=$this->partial('application/forms/bootstrap-horizontal', [
+                        'form' => $this->banForm
+                    ])?>
+                <?php } ?>
+            </div>
+        </md-content>
+    </div>
+</div>

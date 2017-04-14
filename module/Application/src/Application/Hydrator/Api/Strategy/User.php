@@ -32,7 +32,7 @@ class User extends HydratorStrategy
         $hydrator = $this->getHydrator();
         
         $hydrator->setUserId($this->userId);
-        //$hydrator->setFields($this->fields);
+        $hydrator->setFields($this->fields);
         
         return $hydrator->extract($value);
     }

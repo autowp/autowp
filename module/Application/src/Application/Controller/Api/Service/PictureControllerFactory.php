@@ -12,6 +12,7 @@ class PictureControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $hydrators = $container->get('HydratorManager');
+        $filters = $container->get('InputFilterManager');
         return new Controller(
             $hydrators->get(\Application\Hydrator\Api\PictureHydrator::class),
             $container->get(\Application\Model\PictureItem::class),
@@ -22,7 +23,12 @@ class PictureControllerFactory implements FactoryInterface
             $container->get(\Application\HostManager::class),
             $container->get(\Application\Service\TelegramService::class),
             $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Application\Model\CarOfDay::class)
+            $container->get(\Application\Model\CarOfDay::class),
+            $filters->get('api_picture_item'),
+            $filters->get('api_picture_list'),
+            $filters->get('api_picture_edit'),
+            $container->get(\Autowp\TextStorage\Service::class),
+            $container->get(\Autowp\Comments\CommentsService::class)
         );
     }
 }

@@ -23,6 +23,11 @@ abstract class HydratorStrategy implements StrategyInterface
      * @var array
      */
     protected $fields = [];
+    
+    /**
+     * @var string
+     */
+    protected $language;
 
     public function __construct(ContainerInterface $serviceManager)
     {
@@ -39,6 +44,7 @@ abstract class HydratorStrategy implements StrategyInterface
         $hydrator = $this->getHydrator();
 
         $hydrator->setFields($this->fields);
+        $hydrator->setLanguage($this->language);
 
         return $hydrator->extract($value);
     }
@@ -56,6 +62,17 @@ abstract class HydratorStrategy implements StrategyInterface
     {
         $this->fields = $fields;
 
+        return $this;
+    }
+    
+    /**
+     * @param string $language
+     * @return HydratorStrategy
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+    
         return $this;
     }
 }

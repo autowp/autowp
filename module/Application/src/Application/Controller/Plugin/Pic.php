@@ -663,7 +663,7 @@ class Pic extends AbstractPlugin
             if ($isModer) {
                 $perspective = [
                     'options' => $multioptions,
-                    'url'     => $controller->url()->fromRoute('api/picture-item', [
+                    'url'     => $controller->url()->fromRoute('api/picture-item/update', [
                         'picture_id' => $picture['id'],
                         'item_id'    => $item['id']
                     ]),
@@ -1158,10 +1158,7 @@ class Pic extends AbstractPlugin
         $language = $controller->language();
 
         $links = [];
-        $links[$controller->url()->fromRoute('moder/pictures/params', [
-            'action'     => 'picture',
-            'picture_id' => $picture->id
-        ])] = sprintf($this->translator->translate('moder/picture/edit-picture-%s'), $picture->id);
+        $links['/ng/moder/pictures/' . $picture->id] = sprintf($this->translator->translate('moder/picture/edit-picture-%s'), $picture->id);
 
         $carIds = $this->pictureItem->getPictureItems($picture['id']);
         if ($carIds) {

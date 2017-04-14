@@ -9,12 +9,13 @@ import angularTranslateInterpolationMessageformat from 'angular-translate-interp
 import angularSanitize from 'angular-sanitize';
 import angularMarkdown from 'angular-markdown-directive';
 import materialCss from 'angular-material/angular-material.css';
+import 'angular-filesize-filter/angular-filesize-filter';
 
 const MODULE_NAME = 'App';
 
-angular.module(MODULE_NAME, [angularMaterial, angularAnimate, angularAria, angularRouter, angularTranslate, 'btford.markdown', angularSanitize])
-    .config(['$urlRouterProvider', '$locationProvider', '$translateProvider',
-        function config($urlRouterProvider, $locationProvider, $translateProvider) {
+angular.module(MODULE_NAME, [angularMaterial, angularAnimate, angularAria, angularRouter, angularTranslate, 'btford.markdown', angularSanitize, "ngFilesizeFilter"])
+    .config(['$urlRouterProvider', '$locationProvider', '$translateProvider', '$mdGestureProvider',
+        function config($urlRouterProvider, $locationProvider, $translateProvider, $mdGestureProvider) {
             $locationProvider.html5Mode(true).hashPrefix('!');
     
             //$urlRouterProvider.when('', '/');
@@ -33,6 +34,8 @@ angular.module(MODULE_NAME, [angularMaterial, angularAnimate, angularAria, angul
             $translateProvider.fallbackLanguage('en');
             $translateProvider.preferredLanguage(lang);
             $translateProvider.use(lang);
+            
+            $mdGestureProvider.skipClickHijack();
         }
     ]);
 

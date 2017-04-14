@@ -1,0 +1,18 @@
+<md-progress-circular md-mode="indeterminate" ng-show="loading"></md-progress-circular>
+
+<table class="table" ng-hide="loading">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="item in items">
+            <td ng-bind="item.id"></td>
+            <td><a ng-href="{{item.moder_url}}" ng-bind="item.name"></a></td>
+            <td ng-bind="item.childs_count"></td>
+        </tr>
+    </tbody>
+</table>

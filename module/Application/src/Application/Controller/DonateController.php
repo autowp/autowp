@@ -371,6 +371,18 @@ class DonateController extends AbstractActionController
     {
         $data = [
             [
+                'sum'      => 294,
+                'currency' => 'руб.',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2017-04-04'),
+                'user_id'  => null
+            ],
+            [
+                'sum'      => 979.02,
+                'currency' => 'руб.',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2017-03-30'),
+                'user_id'  => 22075
+            ],
+            [
                 'sum'      => 979.02,
                 'currency' => 'руб.',
                 'date'     => \DateTime::createFromFormat('Y-m-d', '2017-03-24'),

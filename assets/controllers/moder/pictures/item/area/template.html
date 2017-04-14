@@ -1,0 +1,18 @@
+<h1>{{'crop-dialog/title'|translate}}</h1>
+<div class="crop-area">
+    <img ng-src="{{picture.image.src}}" />
+</div>
+
+<div layout="row" style="margin-bottom:50px">
+    <span translate="crop-dialog/resolution-x-aspect-y" translate-values="{resolution: resolution, aspect: aspect}"></span>
+    <md-button ng-click="selectAll()" class="md-raised">
+        {{'crop-dialog/select-all'|translate}}
+    </md-button>
+    <span flex></span>
+    <md-button ui-sref="moder-pictures-item({id: picture.id})" class="md-raised">
+        {{'crop-dialog/close'|translate}}
+    </md-button>
+    <md-button ng-click="saveCrop()" class="md-raised md-primary">
+        {{'crop-dialog/save'|translate}}
+    </md-button>
+</div>

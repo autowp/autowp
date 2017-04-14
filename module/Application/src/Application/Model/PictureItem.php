@@ -158,6 +158,27 @@ class PictureItem
                 ->where('picture_id = ?', $pictureId)
         );
     }
+    
+    public function getPictureItemData($pictureId, $itemId)
+    {
+        $db = $this->table->getAdapter();
+        return $db->fetchRow(
+            $db->select()
+                ->from($this->table->info('name'))
+                ->where('picture_id = ?', $pictureId)
+                ->where('item_id = ?', $itemId)
+        );
+    }
+    
+    public function getPictureItemsData($pictureId)
+    {
+        $db = $this->table->getAdapter();
+        return $db->fetchAll(
+            $db->select()
+                ->from($this->table->info('name'))
+                ->where('picture_id = ?', $pictureId)
+        );
+    }
 
     public function getPictureItemsByType($pictureId, $type)
     {

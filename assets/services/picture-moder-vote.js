@@ -28,6 +28,23 @@ angular.module(Module)
                 }
             });
         };
+        
+        this.cancel = function(pictureId) {
+            return $q(function(resolve, reject) {
+                if (templates === null) {
+                    $http({
+                        method: 'DELETE',
+                        url: '/api/picture-moder-vote/' + pictureId
+                    }).then(function() {
+                        resolve();
+                    }, function() {
+                        reject();
+                    });
+                } else {
+                    resolve();
+                }
+            });
+        };
     }]);
 
 export default SERVICE_NAME;

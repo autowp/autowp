@@ -11,7 +11,6 @@ use Zend\Permissions\Acl\Acl;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Hydrator\Api\Strategy\Image as HydratorImageStrategy;
-use Application\Model\DbTable;
 
 class UserHydrator extends RestHydrator
 {
@@ -19,6 +18,8 @@ class UserHydrator extends RestHydrator
      * @var int|null
      */
     protected $userId = null;
+
+    private $userRole = null;
 
     private $acl;
 
@@ -114,7 +115,6 @@ class UserHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('image')) {
-                $lastOnline = $object->getDateTime('reg_date');
                 $user['image'] = $this->extractValue('image', [
                     'image'  => $object['img']
                 ]);
@@ -134,7 +134,7 @@ class UserHydrator extends RestHydrator
                 $canViewLogin= $this->isModer();
             }
 
-            if ($canViewLogin&& $this->filterComposite->filter('login')) {
+            if ($canViewLogin && $this->filterComposite->filter('login')) {
                 $user['login'] = $object['login'];
             }
         }

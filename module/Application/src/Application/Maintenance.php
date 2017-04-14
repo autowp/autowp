@@ -6,6 +6,7 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Session\SessionManager;
 
+use Autowp\Cron;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable\Picture;
@@ -24,11 +25,11 @@ class Maintenance extends AbstractListenerAggregate
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $this->listeners[] = $events->attach(CronEvent::EVENT_DAILY_MAINTENANCE, [$this, 'dailyMaintenance']);
-        $this->listeners[] = $events->attach(CronEvent::EVENT_MIDNIGHT, [$this, 'midnight']);
+        $this->listeners[] = $events->attach(Cron\CronEvent::EVENT_DAILY_MAINTENANCE, [$this, 'dailyMaintenance']);
+        $this->listeners[] = $events->attach(Cron\CronEvent::EVENT_MIDNIGHT, [$this, 'midnight']);
     }
 
-    public function dailyMaintenance(CronEvent $event)
+    public function dailyMaintenance(Cron\CronEvent $event)
     {
         print "Daily maintenance\n";
 
@@ -58,7 +59,7 @@ class Maintenance extends AbstractListenerAggregate
         print "Daily maintenance done\n";
     }
 
-    public function midnight(CronEvent $event)
+    public function midnight(Cron\CronEvent $event)
     {
         print "Midnight\n";
 
