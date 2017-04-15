@@ -194,12 +194,7 @@ class Log
                 $id = $picturesRow->id;
                 $pictures[] = [
                     'name' => isset($names[$id]) ? $names[$id] : null,
-                    'url'  => $this->router->assemble([
-                        'action'     => 'picture',
-                        'picture_id' => $picturesRow->id
-                    ], [
-                        'name' => 'moder/pictures/params'
-                    ])
+                    'url'  => '/ng/moder/pictures/' . $picturesRow->id
                 ];
             }
 

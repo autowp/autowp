@@ -56,13 +56,10 @@ class PictureModerVoteController extends AbstractRestfulController
     
     private function pictureUrl(DbTable\Picture\Row $picture, $forceCanonical = false, $uri = null)
     {
-        return $this->url()->fromRoute('moder/pictures/params', [
-            'action'     => 'picture',
-            'picture_id' => $picture->id
-        ], [
+        return $this->url()->fromRoute('index', [], [
             'force_canonical' => $forceCanonical,
             'uri'             => $uri
-        ]);
+        ]) . 'ng/moder/pictures/' . $picture->id;
     }
     
     private function pictureVoteExists($picture, $user)

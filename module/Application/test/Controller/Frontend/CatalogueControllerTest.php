@@ -75,15 +75,6 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testRecent()
     {
-        /*$this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/pictures/move/picture_id/4/type/1/item_id/204', Request::METHOD_POST);
-
-        $this->assertResponseStatusCode(302);
-        $this->assertModuleName('application');
-        $this->assertMatchedRouteName('moder/pictures/params');
-        $this->assertActionName('move');*/
-
-        $this->reset();
         $this->dispatch('https://www.autowp.ru/bmw/recent', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);

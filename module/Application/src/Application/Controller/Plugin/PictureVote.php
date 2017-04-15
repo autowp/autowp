@@ -126,10 +126,6 @@ class PictureVote extends AbstractPlugin
             'moderVotes'        => $options['hideVote']
                 ? null
                 : $picture->findDependentRowset(DbTable\Picture\ModerVote::class),
-            'pictureDeleteUrl'  => $controller->url()->fromRoute('moder/pictures/params', [
-                'action'     => 'delete-picture',
-                'picture_id' => $picture->id
-            ]),
             'voteOptions' => $this->getVoteOptions2(),
             'voteUrl' => $controller->url()->fromRoute('api/picture-moder-vote', [
                 'id' => $picture->id

@@ -64,12 +64,6 @@
     <?php } ?>
 <?php } ?>
 
-<?php if ($this->canDelete) { ?>
-    <form action="<?=$this->escapeHtmlAttr($this->pictureDeleteUrl)?>" method="post">
-        <input type="submit" name="send" id="send" value="<?=$this->escapeHtmlAttr($this->translate('moder/picture/acceptance/delete'))?>" class="btn btn-danger">
-    </form>
-<?php } ?>
-
 <?php if ($this->isLastPicture) { ?>
     <p><span class="label label-warning">
         <?=$this->escapeHtml($this->translate('moder/picture/acceptance/that-is-one-accepted-picture'))?>

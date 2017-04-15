@@ -2772,10 +2772,7 @@ class CarsController extends AbstractActionController
 
     private function pictureUrl(DbTable\Picture\Row $picture)
     {
-        return $this->url()->fromRoute('moder/pictures/params', [
-            'action'     => 'picture',
-            'picture_id' => $picture->id
-        ]);
+        return '/ng/moder/pictures/' . $picture->id;
     }
 
     private function setLanguageName($carId, $language, $name)
