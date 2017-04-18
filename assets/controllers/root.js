@@ -4,8 +4,8 @@ import Module from 'app.module';
 const CONTROLLER_NAME = 'RootController';
 
 angular.module(Module).controller(CONTROLLER_NAME, [
-    '$scope', '$http', '$location', '$translate',
-    function($scope, $http, $location,  $translate) {
+    '$scope', '$http', '$location', '$translate', '$rootScope',
+    function($scope, $http, $location,  $translate, $rootScope) {
         var that = this;
         
         $scope.languages = opt.languages;
@@ -47,7 +47,7 @@ angular.module(Module).controller(CONTROLLER_NAME, [
                 });
             } else {
                 $scope.pageName = null;
-                $scope.title = null;
+                $scope.title = data.title ? data.title : null;
             }
         };
         
@@ -70,6 +70,10 @@ angular.module(Module).controller(CONTROLLER_NAME, [
             });
             return str;
         }
+        
+        $rootScope.$on('$stateChangeSuccess', function() {
+            document.body.scrollTop = document.documentElement.scrollTop = 0;
+        }); 
     }
 ]);
 

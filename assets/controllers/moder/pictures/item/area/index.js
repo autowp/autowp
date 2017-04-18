@@ -32,7 +32,7 @@ angular.module(Module)
                         blankPage: false,
                         needRight: false
                     },
-                    pageId: 72
+                    pageId: 148
                 });
                 
                 $scope.aspect = '';
@@ -83,7 +83,6 @@ angular.module(Module)
                 });
                 
                 $q.all([getPicturePromise, getPictureItemPromise]).then(function(data) {
-                    console.log(data);
                     var area = data[1].data.area;
                     
                     var response = data[0];
@@ -142,6 +141,8 @@ angular.module(Module)
                             
                         }, 100);
                     });
+                }, function() {
+                    $state.go('error-404');
                 });
 
                 function updateSelectionText() {

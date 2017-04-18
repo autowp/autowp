@@ -5,6 +5,7 @@ import './directives/user';
 import './directives/markdown-edit';
 
 import './controllers/root';
+import './controllers/error/404';
 import './controllers/moder';
 import './controllers/moder/items/alpha';
 import './controllers/moder/items/too-big';
@@ -13,5 +14,6 @@ import './controllers/moder/comments';
 import './controllers/moder/pictures';
 import './controllers/moder/pictures/item';
 import './controllers/moder/perspectives';
+import './controllers/moder/traffic';
 import './controllers/moder/users';
 import './controllers/moder/picture-vote-templates';

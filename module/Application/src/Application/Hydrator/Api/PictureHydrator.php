@@ -118,6 +118,7 @@ class PictureHydrator extends RestHydrator
         
         $strategy = new Strategy\Picture($serviceManager);
         $this->addStrategy('replaceable', $strategy);
+        $this->addStrategy('siblings', $strategy);
     }
 
     /**
@@ -461,6 +462,56 @@ class PictureHydrator extends RestHydrator
                 }
             }
         }
+        
+        if ($this->filterComposite->filter('siblings')) {
+            $picture['siblings'] = [
+                'prev' => null,
+                'next' => null,
+                'prev_new' => null,
+                'next_new' => null
+            ];
+            $prevPicture = $this->pictureTable->fetchRow(
+                $this->pictureTable->select(true)
+                    ->where('id < ?', $object['id'])
+                    ->order('id DESC')
+                    ->limit(1)
+            );
+            if ($prevPicture) {
+                $picture['siblings']['prev'] = $this->extractValue('siblings', $prevPicture);
+            }
+            
+            $nextPicture = $this->pictureTable->fetchRow(
+                $this->pictureTable->select(true)
+                    ->where('id > ?', $object['id'])
+                    ->order('id')
+                    ->limit(1)
+            );
+            if ($nextPicture) {
+                $picture['siblings']['next'] = $this->extractValue('siblings', $nextPicture);
+            }
+            
+            $prevNewPicture = $this->pictureTable->fetchRow(
+                $this->pictureTable->select(true)
+                    ->where('id < ?', $object['id'])
+                    ->where('status = ?', DbTable\Picture::STATUS_INBOX)
+                    ->order('id DESC')
+                    ->limit(1)
+            );
+            if ($prevNewPicture) {
+                $picture['siblings']['prev_new'] = $this->extractValue('siblings', $prevNewPicture);
+            }
+            
+            $nextNewPicture = $this->pictureTable->fetchRow(
+                $this->pictureTable->select(true)
+                    ->where('id > ?', $object['id'])
+                    ->where('status = ?', DbTable\Picture::STATUS_INBOX)
+                    ->order('id')
+                    ->limit(1)
+            );
+            if ($nextNewPicture) {
+                $picture['siblings']['next_new'] = $this->extractValue('siblings', $nextNewPicture);
+            }
+        }
 
         return $picture;
     }
@@ -494,21 +545,41 @@ class PictureHydrator extends RestHydrator
         if (! $picture->canDelete()) {
             return false;
         }
-
+        
         $role = $this->getUserRole();
-        if (!$role) {
+        if (! $role) {
             return false;
         }
-
-        if (! $this->acl->isAllowed($role, 'picture', 'remove')) {
+        
+        if ($this->acl->isAllowed($role, 'picture', 'remove')) {
+            if ($this->pictureVoteExists($picture)) {
+                return true;
+            }
+        }
+        
+        if (! $this->acl->isAllowed($role, 'picture', 'remove_by_vote')) {
             return false;
         }
-
+        
         if (! $this->pictureVoteExists($picture)) {
             return false;
         }
+        
+        $db = $this->pictureTable->getAdapter();
+        $acceptVotes = (int)$db->fetchOne(
+            $db->select()
+                ->from('pictures_moder_votes', [new Zend_Db_Expr('COUNT(1)')])
+                ->where('picture_id = ?', $picture->id)
+                ->where('vote > 0')
+        );
+        $deleteVotes = (int)$db->fetchOne(
+            $db->select()
+                ->from('pictures_moder_votes', [new Zend_Db_Expr('COUNT(1)')])
+                ->where('picture_id = ?', $picture->id)
+                ->where('vote = 0')
+        );
 
-        return true;
+        return $deleteVotes > $acceptVotes;
     }
 
     private function pictureVoteExists($picture)
@@ -519,7 +590,7 @@ class PictureHydrator extends RestHydrator
             $db->select()
                 ->from('pictures_moder_votes', new Zend_Db_Expr('COUNT(1)'))
                 ->where('picture_id = ?', $picture->id)
-                ->where('user_id = ?', $this->userId)
+                ->where('user_id = ?', (int)$this->userId)
         );
     }
 }

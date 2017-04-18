@@ -1,0 +1,43 @@
+<ul class="nav nav-pills">
+    <li class="active">
+        <a ui-sref="moder-traffic">Traffic</a>
+    </li>
+    <li>
+        <a ui-sref="moder-traffic-whitelist">Whitelist</a>
+    </li>
+</ul>
+<table class="table table-striped">
+    <tbody>
+        <tr ng-repeat="item in items">
+            <td ng-bind="item.ip"></td>
+            <td ng-bind="item.count"></td>
+            <td>
+                <autowp-user user="user" ng-repeat="user in item.users"></autowp-user>
+            </td>
+            <td>{{item.hostname ? item.hostname : item.ip}}</td>
+            <td>
+                <md-button ng-if="ban" ng-click="unbanIp(item.ip)">{{'ban/unban'|translate}}</md-button>
+                <md-button class="md-warn" ng-if="!ban" ng-click="banIp(item.ip)">{{'ban/ban'|translate}}</md-button>
+            </td>
+            <td>
+                <md-button ng-if="!item.whitelist" ng-click="addToWhitelist(item.ip)">Whitelist</md-button>
+            </td>
+            <td>
+                <div ng-if="item.ban">
+                    {{'ban/until'|translate}}
+                    {{item.ban.up_to | date : 'fullDate'}}
+                    <span ng-if="item.ban.user">
+                        by <autowp-user user="item.ban.user"></autowp-user>
+                        <span ng-if="item.ban.reason">
+                            {{'ban/reason'|translate}}
+                            {{item.ban.reason}}
+                        </span>
+                    </span>
+                </div>
+            </td>
+            <td>
+                <md-button ng-href="{{item.whois_url}}">whois</md-button>
+            </td>
+        </tr>
+    </tbody>
+</table>

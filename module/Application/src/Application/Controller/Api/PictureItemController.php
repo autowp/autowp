@@ -183,6 +183,9 @@ class PictureItemController extends AbstractRestfulController
             'perspective' => $perspectiveId ? $perspectiveId : null
         ]);
         
+        $namespace = new \Zend\Session\Container('Moder_Car');
+        $namespace->lastCarId = $item['id'];
+        
         $this->log->addEvent($userId, sprintf(
             'Картинка %s связана с %s',
             htmlspecialchars('#' . $picture->id),
@@ -311,7 +314,7 @@ class PictureItemController extends AbstractRestfulController
             ), [$srcItem, $dstItem, $picture]);
             
             $namespace = new \Zend\Session\Container('Moder_Car');
-            $namespace->lastCarId = $itemId;
+            $namespace->lastCarId = $dstItem->id;
         }
 
         return $this->getResponse()->setStatusCode(200);

@@ -1,16 +1,28 @@
 <div class="row">
     <div class="col-md-6 text-right">
         <p>
-            <a ng-href="picture.prev_picture.moder_url" ng-if="picture.prev_picture" translate>moder/picture/previous</a>
-            <br ng-if="picture.prev_picture" />
-            <a ng-href="picture.prev_new_picture.moder_url" ng-if="picture.prev_new_picture" translate>moder/picture/previous-new</a>
+            <a ui-sref="moder-pictures-item({id: picture.siblings.prev.id})" ng-if="picture.siblings.prev">
+                <md-tooltip md-direction="top">{{picture.siblings.prev.name}}</md-tooltip>
+                <span translate>moder/picture/previous</span>
+            </a>
+            <br ng-if="picture.siblings.prev" />
+            <a ui-sref="moder-pictures-item({id: picture.siblings.prev_new.id})" ng-if="picture.siblings.prev_new">
+                <md-tooltip>{{picture.siblings.prev_new.name}}</md-tooltip>
+                <span translate>moder/picture/previous-new</span>
+            </a>
         </p>
     </div>
     <div class="col-md-6">
         <p>
-            <a ng-href="picture.next_picture.moder_url" ng-if="picture.next_picture" translate>moder/picture/next</a>
-            <br ng-if="picture.next_picture" />
-            <a ng-href="picture.next_new_picture.moder_url" ng-if="picture.next_new_picture" translate>moder/picture/next-new</a>
+            <a ui-sref="moder-pictures-item({id: picture.siblings.next.id})" ng-if="picture.siblings.next">
+                <md-tooltip md-direction="top">{{picture.siblings.next.name}}</md-tooltip>
+                <span translate>moder/picture/next</span>
+            </a>
+            <br ng-if="picture.siblings.next" />
+            <a ui-sref="moder-pictures-item({id: picture.siblings.next_new.id})" ng-if="picture.siblings.next_new">
+                <md-tooltip>{{picture.siblings.next_new.name}}</md-tooltip>
+                <span translate>moder/picture/next-new</span>
+            </a>
         </p>
     </div>
 </div>

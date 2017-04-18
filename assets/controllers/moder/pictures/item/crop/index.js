@@ -31,7 +31,7 @@ angular.module(Module)
                         blankPage: false,
                         needRight: false
                     },
-                    pageId: 72
+                    pageId: 148
                 });
                 
                 $scope.picture = null;

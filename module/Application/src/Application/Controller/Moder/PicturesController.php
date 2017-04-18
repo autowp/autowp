@@ -46,37 +46,6 @@ class PicturesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $prevPicture = $this->table->fetchRow(
-            $this->table->select(true)
-                 ->where('id < ?', $picture->id)
-                 ->order('id DESC')
-                 ->limit(1)
-        );
-
-        $nextPicture = $this->table->fetchRow(
-            $this->table->select(true)
-                 ->where('id > ?', $picture->id)
-                 ->order('id')
-                 ->limit(1)
-        );
-
-        $prevNewPicture = $this->table->fetchRow(
-            $this->table->select(true)
-                 ->where('id < ?', $picture->id)
-                 ->where('status = ?', Picture::STATUS_INBOX)
-                 ->order('id DESC')
-                 ->limit(1)
-        );
-
-        $nextNewPicture = $this->table->fetchRow(
-            $this->table->select(true)
-                 ->where('id > ?', $picture->id)
-                 ->where('status = ?', Picture::STATUS_INBOX)
-                 ->order('id')
-                 ->limit(1)
-        );
-
-
         $ban = false;
         $canBan = $this->user()->isAllowed('user', 'ban') && $picture->ip !== null && $picture->ip !== '';
         $canViewIp = $this->user()->isAllowed('user', 'ip');
@@ -102,10 +71,6 @@ class PicturesController extends AbstractActionController
             'ban'             => $ban,
             'canBan'          => $canBan,
             'canViewIp'       => $canViewIp,
-            'prevPicture'     => $prevPicture,
-            'nextPicture'     => $nextPicture,
-            'prevNewPicture'  => $prevNewPicture,
-            'nextNewPicture'  => $nextNewPicture,
             'banForm'         => $this->banForm,
         ];
     }

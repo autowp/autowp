@@ -20,6 +20,7 @@ return [
             Hydrator\Api\PerspectivePageHydrator::class  => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PictureHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PictureItemHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\TrafficHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\SimilarHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\UserHydrator::class             => Hydrator\Api\RestHydratorFactory::class
         ]
@@ -28,6 +29,7 @@ return [
         'factories' => [
             Controller\Api\CommentController::class      => Controller\Api\Service\CommentControllerFactory::class,
             Controller\Api\ContactsController::class     => InvokableFactory::class,
+            Controller\Api\IpController::class           => InvokableFactory::class,
             Controller\Api\ItemController::class         => Controller\Api\Service\ItemControllerFactory::class,
             Controller\Api\ItemParentController::class   => Controller\Api\Service\ItemParentControllerFactory::class,
             Controller\Api\PerspectiveController::class  => Controller\Api\Service\PerspectiveControllerFactory::class,
@@ -38,6 +40,7 @@ return [
             Controller\Api\PictureModerVoteTemplateController::class => Controller\Api\Service\PictureModerVoteTemplateControllerFactory::class,
             Controller\Api\PictureVoteController::class  => Controller\Api\Service\PictureVoteControllerFactory::class,
             Controller\Api\StatController::class         => InvokableFactory::class,
+            Controller\Api\TrafficController::class      => Controller\Api\Service\TrafficControllerFactory::class,
             Controller\Api\UsersController::class        => InvokableFactory::class,
             Controller\Api\UserController::class         => Controller\Api\Service\UserControllerFactory::class,
             Controller\Api\VehicleTypesController::class => InvokableFactory::class,
@@ -298,7 +301,8 @@ return [
                             'exif', 'image', 'items', 'special_name',
                             'copyrights', 'change_status_user', 'rights',
                             'moder_votes', 'moder_voted', 'is_last',
-                            'accepted_count', 'crop', 'replaceable', 'perspective_item'
+                            'accepted_count', 'crop', 'replaceable', 
+                            'perspective_item', 'siblings'
                         ]]
                     ]
                 ]
@@ -468,7 +472,8 @@ return [
                             'exif', 'image', 'items', 'special_name',
                             'copyrights', 'change_status_user', 'rights',
                             'moder_votes', 'moder_voted', 'is_last',
-                            'accepted_count', 'crop', 'replaceable', 'perspective_item'
+                            'accepted_count', 'crop', 'replaceable', 
+                            'perspective_item', 'siblings'
                         ]]
                     ]
                 ]
@@ -616,6 +621,27 @@ return [
                                 'controller' => Controller\Api\ContactsController::class
                             ],
                         ],
+                    ],
+                    'ip' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/ip/:ip',
+                            'defaults' => [
+                                'controller' => Controller\Api\IpController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'item' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'item'
+                                    ]
+                                ]
+                            ],
+                        ]
                     ],
                     'item' => [
                         'type' => Literal::class,
@@ -879,6 +905,27 @@ return [
                                     ]
                                 ]
                             ],
+                        ]
+                    ],
+                    'traffic' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/traffic',
+                            'defaults' => [
+                                'controller' => Controller\Api\TrafficController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'list' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'list'
+                                    ]
+                                ]
+                            ]
                         ]
                     ],
                     'user' => [

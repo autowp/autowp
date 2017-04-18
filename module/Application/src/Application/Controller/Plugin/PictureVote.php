@@ -121,6 +121,9 @@ class PictureVote extends AbstractPlugin
             'isLastPicture'     => $this->isLastPicture($picture),
             'acceptedCount'     => $this->getAcceptedCount($picture),
             'canDelete'         => $this->pictureCanDelete($picture),
+            'apiUrl'            => $controller->url()->fromRoute('api/picture/picture/update', [
+                'id' => $picture->id
+            ]),
             'canVote'           => ! $voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
             'voteExists'        => $voteExists,
             'moderVotes'        => $options['hideVote']

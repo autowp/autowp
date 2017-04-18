@@ -64,6 +64,12 @@
     <?php } ?>
 <?php } ?>
 
+<?php if ($this->canDelete) { ?>
+    <button data-module="picture-delete-button" class="btn btn-danger" data-url="<?=$this->escapeHtmlAttr($this->apiUrl)?>">
+        <?=$this->escapeHtml($this->translate('moder/picture/acceptance/delete'))?>
+    </button>
+<?php } ?>
+
 <?php if ($this->isLastPicture) { ?>
     <p><span class="label label-warning">
         <?=$this->escapeHtml($this->translate('moder/picture/acceptance/that-is-one-accepted-picture'))?>
