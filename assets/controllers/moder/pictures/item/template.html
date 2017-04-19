@@ -304,40 +304,30 @@
 
         <h3 translate>moder/picture/uploader</h3>
         <md-content layout-padding>
-            <autowp-user user="picture.owner" ng-if="picture.owner" />
-            <span translate ng-if="!picture.owner">moder/picture/uploader/unknown</span>
-            <div ng-if="picture.ip">
+            <autowp-user user="picture.owner" ng-if="picture.owner"></autowp-user>
+            <span ng-if="!picture.owner" translate>moder/picture/uploader/unknown</span>
+            <div ng-if="picture.ip.address">
                 {{'moder/picture/uploader/id-address:'|translate}}
-                <b><?=$this->escapeHtml(inet_ntop($this->picture->ip))?></b><br />
-                <?php if ($this->ban) { ?>
-                    <p>
-                        <?=$this->escapeHtml($this->translate('ban/that-address-is-banned'))?>
-                        <?php if ($this->ban['user']) { ?>
-                            <?=$this->user($this->ban['user']) ?>
-                        <?php } ?>
-                        <?php if ($this->ban['up_to']) { ?>
-                            <?=$this->escapeHtml($this->translate('ban/until'))?>
-                            <?=$this->ban['up_to']->format(MYSQL_DATETIME_FORMAT) ?>
-                            <?php if ($this->ban['reason']) { ?>
-                                (<?=$this->escapeHtml($this->ban['reason'])?>)
-                            <?php } ?>
-                        <?php } ?>
-                    </p>
+                <b ng-bind="picture.ip.address"></b><br />
+                <p ng-if="picture.ip.blacklist">
+                    {{'ban/that-address-is-banned'|translate}}
+                    <autowp-user user="picture.ip.blacklist.user" ng-if="picture.ip.blacklist.user"></autowp-user>
+                    {{'ban/until'|translate}}
+                    {{picture.ip.blacklist.up_to|date}}
+                    <span ng-if="picture.ip.blacklist.reason" ng-bind="picture.ip.blacklist.reason"></span>
+                </p>
+                
+                <md-button ng-if="picture.ip.blacklist && picture.ip.rights.remove_from_blacklist" class="md-raised" ng-click="removeFromBlacklist(picture.ip.address)">
+                    {{'ban/unban'|translate}}
+                </md-button>
 
-                    <?php if ($this->canBan) { ?>
-                        <form action="<?=$this->url('ban/unban-ip', [
-                            'ip' => inet_ntop($this->picture->ip)
-                        ]) ?>" method="post" style="margin:10px 0">
-                            <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('ban/unban'))?>" />
-                        </form>
-                    <?php } ?>
-                <?php } ?>
-
+<!-- 
                 <?php if ($this->canBan) { ?>
                     <?=$this->partial('application/forms/bootstrap-horizontal', [
                         'form' => $this->banForm
                     ])?>
                 <?php } ?>
+ -->
             </div>
         </md-content>
     </div>

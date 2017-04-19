@@ -2,19 +2,54 @@
 
 namespace Application\Controller\Api;
 
+use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+use Application\Hydrator\Api\RestHydrator;
+
 class IpController extends AbstractRestfulController
 {
+    /**
+     * @var RestHydrator
+     */
+    private $hydrator;
+    
+    /**
+     * @var InputFilter
+     */
+    private $itemInputFilter;
+    
+    public function __construct(
+        RestHydrator $hydrator,
+        InputFilter $itemInputFilter
+    ) {
+        $this->hydrator = $hydrator;
+        $this->itemInputFilter = $itemInputFilter;
+    }
+    
     public function itemAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
         
-        return new JsonModel([
-            'host' => gethostbyaddr($this->params('ip'))
+        $this->itemInputFilter->setData($this->params()->fromQuery());
+        
+        if (! $this->itemInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->itemInputFilter);
+        }
+        
+        $data = $this->itemInputFilter->getValues();
+        
+        $user = $this->user()->get();
+        
+        $this->hydrator->setOptions([
+            'language' => $this->language(),
+            'user_id'  => $user ? $user['id'] : null,
+            'fields'   => $data['fields']
         ]);
+        
+        return new JsonModel($this->hydrator->extract($this->params('ip')));
     }
 }

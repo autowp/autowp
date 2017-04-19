@@ -13,9 +13,12 @@ angular.module(Module)
                 if (! hostnames.hasOwnProperty(ip)) {
                     $http({
                         method: 'GET',
-                        url: '/api/ip/' + ip
+                        url: '/api/ip/' + ip,
+                        params: {
+                            fields: 'hostname'
+                        }
                     }).then(function(response) {
-                        hostnames[ip] = response.data.host;
+                        hostnames[ip] = response.data.hostname;
                         resolve(hostnames[ip]);
                     }, function() {
                         reject(null);

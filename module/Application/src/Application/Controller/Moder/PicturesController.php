@@ -48,15 +48,6 @@ class PicturesController extends AbstractActionController
 
         $ban = false;
         $canBan = $this->user()->isAllowed('user', 'ban') && $picture->ip !== null && $picture->ip !== '';
-        $canViewIp = $this->user()->isAllowed('user', 'ip');
-
-        if ($canBan) {
-            $ban = $this->trafficControl->getBanInfo(inet_ntop($picture->ip));
-            if ($ban) {
-                $userTable = new User();
-                $ban['user'] = $userTable->find($ban['user_id'])->current();
-            }
-        }
 
         if ($canBan) {
             $this->banForm->setAttribute('action', $this->url()->fromRoute('ban/ban-ip', [
@@ -68,9 +59,6 @@ class PicturesController extends AbstractActionController
         }
 
         return [
-            'ban'             => $ban,
-            'canBan'          => $canBan,
-            'canViewIp'       => $canViewIp,
             'banForm'         => $this->banForm,
         ];
     }

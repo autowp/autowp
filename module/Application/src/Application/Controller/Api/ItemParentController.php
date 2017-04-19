@@ -10,10 +10,7 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Hydrator\Api\RestHydrator;
-use Application\ItemNameFormatter;
 use Application\Model\DbTable;
-
-use Zend_Db_Expr;
 
 class ItemParentController extends AbstractRestfulController
 {

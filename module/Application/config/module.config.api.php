@@ -13,6 +13,7 @@ return [
     'hydrators' => [
         'factories' => [
             Hydrator\Api\CommentHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\IpHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemParentHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectiveHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
@@ -29,7 +30,7 @@ return [
         'factories' => [
             Controller\Api\CommentController::class      => Controller\Api\Service\CommentControllerFactory::class,
             Controller\Api\ContactsController::class     => InvokableFactory::class,
-            Controller\Api\IpController::class           => InvokableFactory::class,
+            Controller\Api\IpController::class           => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class         => Controller\Api\Service\ItemControllerFactory::class,
             Controller\Api\ItemParentController::class   => Controller\Api\Service\ItemParentControllerFactory::class,
             Controller\Api\PerspectiveController::class  => Controller\Api\Service\PerspectiveControllerFactory::class,
@@ -47,6 +48,17 @@ return [
         ]
     ],
     'input_filter_specs' => [
+        'api_ip_item' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['hostname', 'rights', 'blacklist']]
+                    ]
+                ]
+            ],
+        ],
         'api_item_list' => [
             'last_item' => [
                 'required' => false,
@@ -302,7 +314,7 @@ return [
                             'copyrights', 'change_status_user', 'rights',
                             'moder_votes', 'moder_voted', 'is_last',
                             'accepted_count', 'crop', 'replaceable', 
-                            'perspective_item', 'siblings'
+                            'perspective_item', 'siblings', 'ip'
                         ]]
                     ]
                 ]
@@ -473,7 +485,7 @@ return [
                             'copyrights', 'change_status_user', 'rights',
                             'moder_votes', 'moder_voted', 'is_last',
                             'accepted_count', 'crop', 'replaceable', 
-                            'perspective_item', 'siblings'
+                            'perspective_item', 'siblings', 'ip'
                         ]]
                     ]
                 ]
