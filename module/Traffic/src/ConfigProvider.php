@@ -17,7 +17,6 @@ class ConfigProvider
             'controllers'  => $this->getControllersConfig(),
             'dependencies' => $this->getDependencyConfig(),
             'router'       => $this->getRouterConfig(),
-            'view_manager' => $this->getViewManagerConfig(),
         ];
     }
 
@@ -50,7 +49,6 @@ class ConfigProvider
         return [
             'factories' => [
                 Controller\ConsoleController::class => Controller\Service\ConsoleControllerFactory::class,
-                Controller\ModerController::class   => Controller\Service\ModerControllerFactory::class,
                 Controller\BanController::class     => Controller\Service\BanControllerFactory::class,
             ]
         ];
@@ -125,73 +123,8 @@ class ConfigProvider
                             ]
                         ],
                     ]
-                ],
-                'moder' => [
-                    'child_routes' => [
-                        'traffic' => [
-                            'type' => Literal::class,
-                            'options' => [
-                                'route' => '/traffic',
-                                'defaults' => [
-                                    'controller' => Controller\ModerController::class,
-                                    'action'     => 'index'
-                                ]
-                            ],
-                            'may_terminate' => true,
-                            'child_routes'  => [
-                                'host-by-addr' => [
-                                    'type' => Literal::class,
-                                    'options' => [
-                                        'route' => '/host-by-addr',
-                                        'defaults' => [
-                                            'action' => 'host-by-addr'
-                                        ]
-                                    ]
-                                ],
-                                'whitelist' => [
-                                    'type' => Literal::class,
-                                    'options' => [
-                                        'route' => '/whitelist',
-                                        'defaults' => [
-                                            'action' => 'whitelist'
-                                        ]
-                                    ]
-                                ],
-                                'whitelist-remove' => [
-                                    'type' => Literal::class,
-                                    'options' => [
-                                        'route' => '/whitelist-remove',
-                                        'defaults' => [
-                                            'action' => 'whitelist-remove'
-                                        ]
-                                    ]
-                                ],
-                                'whitelist-add' => [
-                                    'type' => Literal::class,
-                                    'options' => [
-                                        'route' => '/whitelist-add',
-                                        'defaults' => [
-                                            'action' => 'whitelist-add'
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ],
-                    ]
                 ]
             ]
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getViewManagerConfig()
-    {
-        return [
-            'template_path_stack' => [
-                __DIR__ . '/../view',
-            ],
         ];
     }
 }

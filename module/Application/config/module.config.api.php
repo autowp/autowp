@@ -925,6 +925,87 @@ return [
                                         'action' => 'list'
                                     ]
                                 ]
+                            ],
+                            'whitelist' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/whitelist'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'list' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'whitelist-list'
+                                            ]
+                                        ]
+                                    ],
+                                    'create' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'post',
+                                            'defaults' => [
+                                                'action' => 'whitelist-create'
+                                            ]
+                                        ]
+                                    ],
+                                    'item' => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route' => '/:ip'
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'delete' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'delete',
+                                                    'defaults' => [
+                                                        'action' => 'whitelist-item-delete'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'blacklist' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/blacklist'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'create' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'post',
+                                            'defaults' => [
+                                                'action' => 'blacklist-create'
+                                            ]
+                                        ]
+                                    ],
+                                    'item' => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route' => '/:ip'
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'delete' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'delete',
+                                                    'defaults' => [
+                                                        'action' => 'blacklist-item-delete'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ],

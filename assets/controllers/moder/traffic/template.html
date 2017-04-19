@@ -6,38 +6,32 @@
         <a ui-sref="moder-traffic-whitelist">Whitelist</a>
     </li>
 </ul>
-<table class="table table-striped">
-    <tbody>
-        <tr ng-repeat="item in items">
-            <td ng-bind="item.ip"></td>
-            <td ng-bind="item.count"></td>
-            <td>
-                <autowp-user user="user" ng-repeat="user in item.users"></autowp-user>
-            </td>
-            <td>{{item.hostname ? item.hostname : item.ip}}</td>
-            <td>
-                <md-button ng-if="ban" ng-click="unbanIp(item.ip)">{{'ban/unban'|translate}}</md-button>
-                <md-button class="md-warn" ng-if="!ban" ng-click="banIp(item.ip)">{{'ban/ban'|translate}}</md-button>
-            </td>
-            <td>
-                <md-button ng-if="!item.whitelist" ng-click="addToWhitelist(item.ip)">Whitelist</md-button>
-            </td>
-            <td>
-                <div ng-if="item.ban">
-                    {{'ban/until'|translate}}
-                    {{item.ban.up_to | date : 'fullDate'}}
-                    <span ng-if="item.ban.user">
-                        by <autowp-user user="item.ban.user"></autowp-user>
-                        <span ng-if="item.ban.reason">
-                            {{'ban/reason'|translate}}
-                            {{item.ban.reason}}
-                        </span>
-                    </span>
-                </div>
-            </td>
-            <td>
-                <md-button ng-href="{{item.whois_url}}">whois</md-button>
-            </td>
-        </tr>
-    </tbody>
-</table>
+
+<div layout="row" ng-repeat="item in items" layout-wrap>
+    <div flex-xs="20" flex-gt-xs="10">
+        <h3 ng-bind="item.count"></h3>
+    </div>
+    <div flex-xs="80" flex-gt-xs="40">
+        <h3>{{item.ip}} <a ng-href="{{item.whois_url}}">whois</a></h3>
+        <h4 ng-if="item.users"><autowp-user user="user" ng-repeat="user in item.users"></autowp-user></h4>
+        <p>{{item.hostname ? item.hostname : item.ip}}</p>
+    </div>
+    <div flex-xs="100" flex-gt-xs="50">
+        <div ng-if="item.ban">
+            {{'ban/until'|translate}}
+            {{item.ban.up_to | date : 'fullDate'}}
+            <span ng-if="item.ban.user">
+                by <autowp-user user="item.ban.user"></autowp-user>
+                <span ng-if="item.ban.reason">
+                    {{'ban/reason'|translate}}
+                    {{item.ban.reason}}
+                </span>
+            </span>
+        </div>
+        <div>
+            <md-button ng-if="item.ban" ng-click="removeFromBlacklist(item.ip)">{{'ban/unban'|translate}}</md-button>
+            <md-button class="md-warn" ng-if="!item.ban" ng-click="addToBlacklist(item.ip)">{{'ban/ban'|translate}}</md-button>
+            <md-button ng-if="!item.whitelist" ng-click="addToWhitelist(item.ip)">Whitelist</md-button>
+        </div>
+    </div>
+</div>

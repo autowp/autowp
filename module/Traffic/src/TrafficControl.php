@@ -313,7 +313,7 @@ class TrafficControl
 
         $row = $table->select([
             'ip = inet6_aton(?)' => $ip
-        ]);
+        ])->current();
 
         if (! $row) {
             $table->insert([
