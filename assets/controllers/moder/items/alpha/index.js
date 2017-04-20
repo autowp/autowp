@@ -1,6 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
+import ACL_SERVICE_NAME from 'services/acl';
 
 const STATE_NAME = 'moder-cars-alpha';
 const CONTROLLER_NAME = 'ModerItemsAlphaController';
@@ -13,7 +14,12 @@ angular.module(Module)
                 url: '/moder/cars/alpha?char&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: template,
+                resolve: {
+                    access: [ACL_SERVICE_NAME, function (Acl) {
+                        return Acl.inheritsRole('moder', 'unauthorized');
+                    }]
+                }
             });
         }
     ])

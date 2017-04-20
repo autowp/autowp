@@ -1,9 +1,4 @@
 <?php
-    $blankPage = isset($this->layout()->blankPage) ? $this->layout()->blankPage : $this->blankPage;
-    $needLeft  = isset($this->sidebar);
-    $needRight = true;
-    $isAdminPage = isset($this->layout()->isAdminPage) ? $this->layout()->isAdminPage : $this->isAdminPage;
-
     $flash = $this->flashMessenger();
 
     $flash
@@ -20,38 +15,6 @@
             'application.css'
         ]
     ]);
-    
-    $languages = [];
-    foreach ($this->languagePicker() as $item) {
-        $active = $item['language'] == $this->language();
-        $languages[] = [
-            'url'    => $item['url'],
-            'name'   => $item['name'],
-            'flag'   => $item['flag'],
-            'active' => $active
-        ];
-        if (! $active){ 
-            $this->headLink([
-                'rel'      => 'alternate',
-                'href'     => $item['url'],
-                'hreflang' => $item['language']
-            ]);
-        }
-    }
-    
-    $data = [
-        'languages'  => $languages,
-        'needLeft'   => $needLeft,
-        'needRight'  => $needRight,
-        'mainMenu'   => $this->mainMenu(true),
-        'moderMenu'  => null,
-        'sidebar'    => $this->sidebar(true),
-        'isModer'    => $this->user()->inheritsRole('moder')
-    ];
-    
-    if (!$blankPage && $this->user()->inheritsRole('moder')) {
-        $data['moderMenu'] = $this->moderMenu(true);
-    }
 ?>
 <?=$this->doctype() . PHP_EOL ?>
 <html ng-app="App" dir="ltr" lang="<?=$this->language()?>" ng-controller="RootController">
@@ -73,7 +36,7 @@
         <title ng-bind="title"></title>
     </head>
     <body ng-cloak>
-        <?php if (!$isAdminPage) { ?>
+        
 <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -83,7 +46,6 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 ga('create', 'UA-24654784-1', <?=\Zend\Json\Json::encode($this->hostManager()->getCookieDomain($this->language()))?>);
 ga('send', 'pageview');
 </script>
-        <?php } ?>
         
         <div id="moderatorMenuContainer" style="z-index:100" ng-if="moderMenu">
             <div class="btn-group dropup" >
@@ -208,7 +170,7 @@ ga('send', 'pageview');
         <div class="container">
 
             <div class="row">
-                <div class="col-sm-{{spanCenter}} col-sm-push-{{spanLeft}}">
+                <div class="col-sm-{{spanCenter}}">
                     <?php /*=$this->breadcrumbs() */ ?>
                     <div class="page-header" ng-if="pageName">
                         <h1 ng-bind="pageName"></h1>
@@ -220,15 +182,10 @@ ga('send', 'pageview');
 
                     <ui-view></ui-view>
                 </div>
-                <div class="col-sm-{{spanLeft}} col-sm-pull-{{spanCenter}}" ng-if="needLeft">
-                    <?php if (isset($this->sidebar)) { ?>
-                        <?=$this->sidebar ?>
-                    <?php } ?>
-                </div>
                 <div class="col-sm-{{spanRight}}" ng-if="needRight">
                     <div class="well" ng-if="user">
                         <div>
-                            <?=$this->user() ?><br />
+                            <autowp-user user="user"></autowp-user><br />
                             <a href="/account/profile" translate>page/48/name</a><br />
                             <i class="fa fa-sign-out"></i> <a href="/login/logout" translate>login/sign-out</a>
                         </div>
@@ -301,7 +258,7 @@ ga('send', 'pageview');
             </footer>
         </div>
         <script type="text/javascript">
-var opt = <?=Zend\Json\Json::encode($data)?>
+var opt = <?=Zend\Json\Json::encode($this->apiData())?>
         </script>
         <?=$this->gulpRev()->script('application.js')?>
     </body>

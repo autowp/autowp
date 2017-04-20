@@ -2,6 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import IP_SERVICE_NAME from 'services/ip';
+import ACL_SERVICE_NAME from 'services/acl';
 
 const CONTROLLER_NAME = 'ModerTrafficWhitelistController';
 const STATE_NAME = 'moder-traffic-whitelist';
@@ -14,7 +15,12 @@ angular.module(Module)
                 url: '/moder/traffic/whitelist',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: template,
+                resolve: {
+                    access: [ACL_SERVICE_NAME, function (Acl) {
+                        return Acl.inheritsRole('moder', 'unauthorized');
+                    }]
+                }
             });
         }
     ])

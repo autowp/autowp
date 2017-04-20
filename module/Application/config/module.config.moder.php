@@ -170,22 +170,6 @@ return [
                             ]
                         ]
                     ],
-                    'pictures' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/pictures[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\PicturesController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'rights' => [
                         'type' => Segment::class,
                         'options' => [
@@ -230,7 +214,6 @@ return [
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
             Controller\Moder\PagesController::class        => Controller\Moder\Service\PagesControllerFactory::class,
             Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
-            Controller\Moder\PicturesController::class     => Controller\Moder\Service\PicturesControllerFactory::class,
             Controller\Moder\RightsController::class       => Controller\Moder\Service\RightsControllerFactory::class,
             Controller\Moder\UsersController::class        => Controller\Moder\Service\UsersControllerFactory::class,
         ]

@@ -2,6 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import MODER_VOTE_TEMPLATE_SERVICE from 'services/picture-moder-vote-template';
+import ACL_SERVICE_NAME from 'services/acl';
 
 const CONTROLLER_NAME = 'ModerPictureVoteTemplatesController';
 const STATE_NAME = 'moder-picture-vote-templates';
@@ -14,7 +15,12 @@ angular.module(Module)
                 url: '/moder/picture-vote-templates',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: template,
+                resolve: {
+                    access: [ACL_SERVICE_NAME, function (Acl) {
+                        return Acl.inheritsRole('moder', 'unauthorized');
+                    }]
+                }
             });
         }
     ])

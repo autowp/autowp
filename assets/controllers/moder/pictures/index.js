@@ -5,6 +5,7 @@ import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
 import PERSPECTIVE_SERVICE from 'services/perspective';
 import MODER_VOTE_TEMPLATE_SERVICE from 'services/picture-moder-vote-template';
 import MODER_VOTE_SERVICE from 'services/picture-moder-vote';
+import ACL_SERVICE_NAME from 'services/acl';
 
 const CONTROLLER_NAME = 'ModerPicturesController';
 const STATE_NAME = 'moder-pictures';
@@ -17,7 +18,12 @@ angular.module(Module)
                 url: '/moder/pictures?status&car_type_id&perspective_id&item_id&comments&owner_id&replace&requests&special_name&lost&gps&similar&order&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: template,
+                resolve: {
+                    access: [ACL_SERVICE_NAME, function (Acl) {
+                        return Acl.inheritsRole('moder', 'unauthorized');
+                    }]
+                }
             });
         }
     ])

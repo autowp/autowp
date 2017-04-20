@@ -3,6 +3,7 @@ import Module from 'app.module';
 import template from './template.html';
 import './item'; // directive
 import PICTURE_ITEM_SERVICE from 'services/picture-item';
+import ACL_SERVICE_NAME from 'services/acl';
 
 const CONTROLLER_NAME = 'ModerPicturesItemMoveController';
 const STATE_NAME = 'moder-pictures-item-move';
@@ -24,7 +25,12 @@ angular.module(Module)
                 url: '/moder/pictures/{id}/move?show_museums&show_factories&brand_id&src_item_id&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: template,
+                resolve: {
+                    access: [ACL_SERVICE_NAME, function (Acl) {
+                        return Acl.inheritsRole('moder', 'unauthorized');
+                    }]
+                }
             });
         }
     ])

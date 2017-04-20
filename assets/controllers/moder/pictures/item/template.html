@@ -320,6 +320,24 @@
                 <md-button ng-if="picture.ip.blacklist && picture.ip.rights.remove_from_blacklist" class="md-raised" ng-click="removeFromBlacklist(picture.ip.address)">
                     {{'ban/unban'|translate}}
                 </md-button>
+               
+                <div layout="row" ng-if="!picture.ip.blacklist && picture.ip.rights.add_to_blacklist">
+                    <md-input-container>
+                        <label translate>ban/period</label>
+                        <md-select ng-model="ctrl.banPeriod" required>
+                            <md-option ng-repeat="(value, name) in banPeriods" ng-value="value">
+                                {{name|translate}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container>
+                        <label translate>ban/reason</label>
+                        <input md-maxlength="50" ng-model="ctrl.banReason" />
+                    </md-input-container>
+                    <md-button class="md-raised md-warn" ng-click="addToBlacklist(picture.ip.address)">
+                        {{'ban/ban'|translate}}
+                    </md-button>
+                </div>
 
 <!-- 
                 <?php if ($this->canBan) { ?>

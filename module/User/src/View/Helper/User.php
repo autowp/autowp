@@ -193,6 +193,7 @@ class User extends AbstractHelper
     {
         return $this->user
             && $this->user->role
+            && $this->acl->hasRole($inherit)
             && $this->acl->inheritsRole($this->user->role, $inherit);
     }
 

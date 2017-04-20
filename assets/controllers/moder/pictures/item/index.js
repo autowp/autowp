@@ -3,6 +3,7 @@ import Module from 'app.module';
 import template from './template.html';
 import PERSPECTIVE_SERVICE from 'services/perspective';
 import PICTURE_ITEM_SERVICE from 'services/picture-item';
+import ACL_SERVICE_NAME from 'services/acl';
 import './crop';
 import './move';
 import './area';
@@ -19,13 +20,20 @@ angular.module(Module)
                 url: '/moder/pictures/{id}',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: template,
+                resolve: {
+                    access: [ACL_SERVICE_NAME, function (Acl) {
+                        return Acl.inheritsRole('moder', 'unauthorized');
+                    }]
+                }
             });
         }
     ])
     .controller(CONTROLLER_NAME, [
         '$scope', '$http', '$state', '$q', '$translate', PERSPECTIVE_SERVICE, PICTURE_ITEM_SERVICE,
         function($scope, $http, $state, $q, $translate, PerspectiveService, PictureItemService) {
+            
+            var that = this;
             
             $scope.picture = null;
             $scope.last_item = null;
@@ -36,6 +44,18 @@ angular.module(Module)
             $scope.similarLoading = false;
             $scope.pictureItemLoading = false;
             $scope.replaceLoading = false;
+            
+            $scope.banPeriods = {
+                1: 'ban/period/hour',
+                2: 'ban/period/2-hours',
+                4: 'ban/period/4-hours',
+                8: 'ban/period/8-hours',
+                16: 'ban/period/16-hours',
+                24: 'ban/period/day',
+                48: 'ban/period/2-days'
+            };
+            that.banPeriod = 1;
+            that.banReason = null;
             
             function loadPicture(callback) {
                 $http({
@@ -348,6 +368,21 @@ angular.module(Module)
                 $http({
                     method: 'DELETE',
                     url: '/api/traffic/blacklist/' + ip
+                }).then(function(response) {
+                    loadPicture();
+                });
+            };
+            
+            $scope.addToBlacklist = function(ip) {
+                console.log(that.banPeriod, that.banReason);
+                $http({
+                    method: 'POST',
+                    url: '/api/traffic/blacklist',
+                    data: {
+                        ip: ip,
+                        period: that.banPeriod,
+                        reason: that.banReason
+                    }
                 }).then(function(response) {
                     loadPicture();
                 });

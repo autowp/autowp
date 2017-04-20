@@ -5,6 +5,7 @@ import './directives/user';
 import './directives/markdown-edit';
 
 import './controllers/root';
+import './controllers/error/403';
 import './controllers/error/404';
 import './controllers/moder';
 import './controllers/moder/items/alpha';

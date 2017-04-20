@@ -1,6 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
+import ACL_SERVICE_NAME from 'services/acl';
 
 const CONTROLLER_NAME = 'ModerUsersController';
 const STATE_NAME = 'moder-users';
@@ -13,7 +14,12 @@ angular.module(Module)
                 url: '/moder/users?page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: template,
+                resolve: {
+                    access: [ACL_SERVICE_NAME, function (Acl) {
+                        return Acl.inheritsRole('moder', 'unauthorized');
+                    }]
+                }
             });
         }
     ])

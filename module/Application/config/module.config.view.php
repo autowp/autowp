@@ -50,6 +50,7 @@ return [
             'favicons'                     => View\Helper\Favicons::class,
         ],
         'factories' => [
+            'apiData'        => View\Helper\Service\ApiDataFactory::class,
             'car'            => View\Helper\Service\CarFactory::class,
             'comments'       => View\Helper\Service\CommentsFactory::class,
             'fileSize'       => View\Helper\Service\FileSizeFactory::class,

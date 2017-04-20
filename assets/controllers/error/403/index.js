@@ -1,38 +1,32 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import ACL_SERVICE_NAME from 'services/acl';
 
-const CONTROLLER_NAME = 'ModerController';
-const STATE_NAME = 'moder';
+const CONTROLLER_NAME = 'Error403Controller';
+const STATE_NAME = 'error-403';
 
 angular.module(Module)
     .config(['$stateProvider',
         function config($stateProvider) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder',
+                url: '/error/403',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template,
-                resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
-                        return Acl.inheritsRole('moder', 'unauthorized');
-                    }]
-                }
+                template: template
             });
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope',
-        function($scope) {
+        '$scope', '$http', '$state', '$q',
+        function($scope, $http, $state, $q) {
             $scope.pageEnv({
                 layout: {
                     isAdminPage: true,
                     blankPage: false,
-                    needRight: false
+                    needRight: true
                 },
-                pageId: 67
+                title: '403 Forbidden'
             });
         }
     ]);

@@ -1,6 +1,8 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
+import ACL_SERVICE_NAME from 'services/acl';
+
 var $ = require("jquery");
 require('jcrop-0.9.12/css/jquery.Jcrop.css');
 require('jcrop-0.9.12/js/jquery.Jcrop');
@@ -17,7 +19,12 @@ angular.module(Module)
                 url: '/moder/pictures/{id}/crop',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: template,
+                resolve: {
+                    access: [ACL_SERVICE_NAME, function (Acl) {
+                        return Acl.inheritsRole('moder', 'unauthorized');
+                    }]
+                }
             });
         }
     ])

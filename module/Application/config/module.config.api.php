@@ -28,6 +28,7 @@ return [
     ],
     'controllers' => [
         'factories' => [
+            Controller\Api\AclController::class          => InvokableFactory::class,
             Controller\Api\CommentController::class      => Controller\Api\Service\CommentControllerFactory::class,
             Controller\Api\ContactsController::class     => InvokableFactory::class,
             Controller\Api\IpController::class           => Controller\Api\Service\IpControllerFactory::class,
@@ -600,6 +601,27 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes' => [
+                    'acl' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/acl',
+                            'defaults' => [
+                                'controller' => Controller\Api\AclController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'roles' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/roles',
+                                    'defaults' => [
+                                        'action' => 'roles'
+                                    ],
+                                ]
+                            ],
+                        ]
+                    ],
                     'comment' => [
                         'type' => Literal::class,
                         'options' => [

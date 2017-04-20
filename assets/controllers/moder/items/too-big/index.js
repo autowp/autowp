@@ -1,6 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
+import ACL_SERVICE_NAME from 'services/acl';
 
 const STATE_NAME = 'moder-items-too-big';
 const CONTROLLER_NAME = 'ModerItemsTooBigController';
@@ -13,7 +14,12 @@ angular.module(Module)
                 url: '/moder/item/too-big',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: template,
+                resolve: {
+                    access: [ACL_SERVICE_NAME, function (Acl) {
+                        return Acl.inheritsRole('moder', 'unauthorized');
+                    }]
+                }
             });
         }
     ])

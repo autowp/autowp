@@ -6,6 +6,7 @@ require('jcrop-0.9.12/css/jquery.Jcrop.css');
 require('jcrop-0.9.12/js/jquery.Jcrop');
 var sprintf = require("sprintf-js").sprintf;
 import PICTURE_ITEM_SERVICE from 'services/picture-item';
+import ACL_SERVICE_NAME from 'services/acl';
 
 const CONTROLLER_NAME = 'ModerPicturesItemAreaController';
 const STATE_NAME = 'moder-pictures-item-area';
@@ -18,7 +19,12 @@ angular.module(Module)
                 url: '/moder/pictures/{id}/area?item_id',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: template,
+                resolve: {
+                    access: [ACL_SERVICE_NAME, function (Acl) {
+                        return Acl.inheritsRole('moder', 'unauthorized');
+                    }]
+                }
             });
         }
     ])
