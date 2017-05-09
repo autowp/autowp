@@ -2,7 +2,8 @@
 
 namespace ApplicationTest\Controller\Console;
 
-use Application\Controller\Console\CronController;
+use Autowp\Cron\CronController;
+
 use Application\Test\AbstractConsoleControllerTestCase;
 
 class CronControllerTest extends AbstractConsoleControllerTestCase

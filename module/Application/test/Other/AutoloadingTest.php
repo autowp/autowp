@@ -2,7 +2,7 @@
 
 namespace ApplicationTest\Other;
 
-class AutoloadingTest extends \PHPUnit_Framework_TestCase
+class AutoloadingTest extends \PHPUnit\Framework\TestCase
 {
     public function testProjectIsAutoloads()
     {

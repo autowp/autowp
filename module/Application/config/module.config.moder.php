@@ -22,7 +22,7 @@ return [
                             'route' => '/attrs[/:action]',
                             'defaults' => [
                                 'controller' => Controller\Moder\AttrsController::class,
-                                'action'     => 's'
+                                'action'     => 'index'
                             ],
                         ],
                         'may_terminate' => true,

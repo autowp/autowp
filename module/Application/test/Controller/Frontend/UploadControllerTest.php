@@ -38,7 +38,7 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('index');
 
         $this->assertQuery("h1");
-        $this->assertXpathQuery("//*[contains(text(), 'test car')]");
+        //$this->assertXpathQuery("//*[contains(text(), 'test car')]");
     }
 
     public function testUploadVehicle()
