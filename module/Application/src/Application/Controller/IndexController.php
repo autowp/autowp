@@ -93,7 +93,7 @@ class IndexController extends AbstractActionController
         $carOfDayInfo = null;
 
         if ($carOfDay) {
-            $key = 'CAR_OF_DAY_105_' . $carOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
+            $key = 'CAR_OF_DAY_107_' . $carOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
 
             $carOfDayInfo = $this->cache->getItem($key, $success);
             if (! $success) {
@@ -283,16 +283,16 @@ class IndexController extends AbstractActionController
             ]
         ];
     }
-    
+
     public function ngAction()
     {
         $path = $this->params('path');
-        
+
         if ($path) {
             $uri = $this->getRequest()->getUri();
-            
+
             $query = $uri->getQuery();
-            
+
             return $this->redirect()->toRoute('ng', [
                 'path' => ''
             ], [

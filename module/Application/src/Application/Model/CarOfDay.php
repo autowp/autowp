@@ -146,8 +146,8 @@ class CarOfDay
         }
         return $pictureTable->fetchRow($select);
     }
-    
-    private static function mb_ucfirst($str) 
+
+    private static function mb_ucfirst($str)
     {
         $fc = mb_strtoupper(mb_substr($str, 0, 1));
         return $fc.mb_substr($str, 1);
@@ -198,7 +198,7 @@ class CarOfDay
         }
 
         $url = 'http://wheelsage.org/picture/' . $picture->identity;
-        
+
         if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
         } else {
@@ -277,13 +277,13 @@ class CarOfDay
         }
 
         $url = 'http://wheelsage.org/picture/' . $picture->identity;
-        
+
         if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'en');
         }
-        
+
         $text = sprintf(
             self::mb_ucfirst($title) . ': %s %s',
             $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
@@ -367,13 +367,13 @@ class CarOfDay
 
 
         $url = 'http://autowp.ru/picture/' . $picture->identity;
-        
+
         if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'ru');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'ru');
         }
-        
+
         $text = sprintf(
             self::mb_ucfirst($title) . ': %s',
             $this->itemNameFormatter->format($car->getNameData($language), $language)
@@ -506,7 +506,7 @@ class CarOfDay
                             ]);
                             break;
                     }
-                    
+
                 }
 
                 /*if (! $url) {
@@ -574,8 +574,10 @@ class CarOfDay
                     'picture_item.perspective_id = mp.perspective_id',
                     null
                 )
+                ->joinLeft('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', null)
                 ->order([
                     'item_parent_cache.sport', 'item_parent_cache.tuning', 'mp.position',
+                    'picture_vote_summary.positive DESC',
                     'pictures.width DESC', 'pictures.height DESC'
                 ])
                 ->limit(1);
@@ -837,7 +839,7 @@ class CarOfDay
         $db = $this->table->getAdapter();
         $sql = '
             SELECT item.id, count(distinct pictures.id) AS p_count
-            FROM item 
+            FROM item
                 INNER JOIN item_parent_cache AS cpc ON item.id = cpc.parent_id
                 INNER JOIN picture_item ON cpc.item_id = picture_item.item_id
                 INNER JOIN pictures ON picture_item.picture_id = pictures.id

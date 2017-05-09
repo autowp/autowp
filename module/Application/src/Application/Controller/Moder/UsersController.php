@@ -4,7 +4,6 @@ namespace Application\Controller\Moder;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Service\UsersService;
