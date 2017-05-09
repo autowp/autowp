@@ -17,5 +17,4 @@ class Similar extends HydratorStrategy
 
         return $this->hydrator;
     }
-
 }

@@ -13,19 +13,19 @@ class AclController extends AbstractRestfulController
         if (! $user) {
             return $this->forbiddenAction();
         }
-        
+
         $user = $this->user()->get();
         $result = [
             $user->role => true
         ];
-        
+
         $roles = $this->params()->fromQuery('roles');
         $roles = explode(',', $roles);
 
         foreach ($roles as $role) {
             $result[$role] = $this->user()->inheritsRole($role);
         }
-        
+
         return new JsonModel($result);
     }
 }

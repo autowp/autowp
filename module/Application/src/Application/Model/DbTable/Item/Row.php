@@ -40,7 +40,7 @@ class Row extends \Autowp\Commons\Db\Table\Row
         ]);
 
         $name = $carLangRow && $carLangRow->name ? $carLangRow->name : $this->name;*/
-        
+
         $itemModel = new ItemModel();
         $name = $itemModel->getName($this['id'], $language);
 

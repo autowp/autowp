@@ -17,5 +17,4 @@ class Item extends HydratorStrategy
 
         return $this->hydrator;
     }
-
 }

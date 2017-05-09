@@ -68,7 +68,7 @@ class ModerMenu extends AbstractHtmlElement
                 'icon'  => 'fa fa-car'
             ];
         }
-        
+
         if ($data) {
             return $items;
         }

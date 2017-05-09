@@ -17,7 +17,7 @@ class PictureVote extends AbstractPlugin
      * @var DbTable\Picture
      */
     private $table;
-    
+
     /**
      * @var TableGateway
      */
@@ -72,28 +72,28 @@ class PictureVote extends AbstractPlugin
 
         return $result;
     }
-    
+
     private function getVoteOptions2()
     {
         $result = [
             'positive' => [],
             'negative' => []
         ];
-        
+
         $user = $this->getController()->user()->get();
-    
+
         if ($user) {
             $select = new Sql\Select($this->voteTemplateTable->getTable());
             $select
                 ->columns(['reason', 'vote'])
                 ->where(['user_id' => $user['id']])
                 ->order('reason');
-        
+
             foreach ($this->voteTemplateTable->selectWith($select) as $row) {
                 $result[$row['vote'] > 0 ? 'positive' : 'negative'][] = $row['reason'];
             }
         }
-    
+
         return $result;
     }
 

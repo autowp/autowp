@@ -30,10 +30,10 @@ class User extends HydratorStrategy
     public function extract($value)
     {
         $hydrator = $this->getHydrator();
-        
+
         $hydrator->setUserId($this->userId);
         $hydrator->setFields($this->fields);
-        
+
         return $hydrator->extract($value);
     }
 
@@ -41,11 +41,11 @@ class User extends HydratorStrategy
     {
         return null;
     }
-    
+
     public function setUserId($userId)
     {
         $this->userId = $userId;
-    
+
         return $this;
     }
 }

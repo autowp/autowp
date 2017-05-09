@@ -92,7 +92,7 @@ class TelegramService
         if (! isset($params['chat_id'])) {
             throw new \Exception("`chat_id` not provided");
         }
-        
+
         try {
             $this->getApi()->sendMessage($params);
         } catch (\Exception $e) {
@@ -110,7 +110,7 @@ class TelegramService
         if (! $chatId) {
             throw new Exception("`chat_id` is invalid");
         }
-        
+
         $telegramBrandTable = new DbTable\Telegram\Brand();
         $telegramBrandTable->delete([
             'chat_id = ?' => (int)$chatId

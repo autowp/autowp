@@ -23,7 +23,7 @@ abstract class HydratorStrategy implements StrategyInterface
      * @var array
      */
     protected $fields = [];
-    
+
     /**
      * @var string
      */
@@ -64,7 +64,7 @@ abstract class HydratorStrategy implements StrategyInterface
 
         return $this;
     }
-    
+
     /**
      * @param string $language
      * @return HydratorStrategy
@@ -72,7 +72,7 @@ abstract class HydratorStrategy implements StrategyInterface
     public function setLanguage($language)
     {
         $this->language = $language;
-    
+
         return $this;
     }
 }

@@ -12,7 +12,7 @@ class ApiData extends AbstractHelper
      * @var RestHydrator
      */
     private $userHydrator;
-    
+
     public function __construct(RestHydrator $userHydrator)
     {
         $this->userHydrator = $userHydrator;
@@ -21,7 +21,7 @@ class ApiData extends AbstractHelper
     public function __invoke()
     {
         $language = $this->view->language();
-        
+
         $languages = [];
         foreach ($this->view->languagePicker() as $item) {
             $active = $item['language'] == $language;
@@ -31,7 +31,7 @@ class ApiData extends AbstractHelper
                 'flag'   => $item['flag'],
                 'active' => $active
             ];
-            if (! $active){
+            if (! $active) {
                 $this->view->headLink([
                     'rel'      => 'alternate',
                     'href'     => $item['url'],
@@ -39,12 +39,12 @@ class ApiData extends AbstractHelper
                 ]);
             }
         }
-        
+
         $moderMenu = null;
         if ($this->view->user()->inheritsRole('moder')) {
             $moderMenu = $this->view->moderMenu(true);
         }
-        
+
         $user = $this->view->user()->get();
         $userData = null;
         if ($user) {
@@ -55,7 +55,7 @@ class ApiData extends AbstractHelper
             ]);
             $userData = $this->userHydrator->extract($user);
         }
-        
+
         return [
             'languages'  => $languages,
             'isModer'    => $this->view->user()->inheritsRole('moder'),

@@ -112,14 +112,14 @@ class PictureHydrator extends RestHydrator
 
         $strategy = new HydratorPictureItemsStrategy($serviceManager);
         $this->addStrategy('items', $strategy);
-        
+
         $strategy = new HydratorSimilarStrategy($serviceManager);
         $this->addStrategy('similar', $strategy);
-        
+
         $strategy = new Strategy\Picture($serviceManager);
         $this->addStrategy('replaceable', $strategy);
         $this->addStrategy('siblings', $strategy);
-        
+
         $strategy = new Strategy\Ip($serviceManager);
         $this->addStrategy('ip', $strategy);
     }
@@ -154,7 +154,7 @@ class PictureHydrator extends RestHydrator
             $this->userId = $userId;
             $this->userRole = null;
         }
-        
+
         $this->getStrategy('ip')->setUserId($this->userId);
 
         return $this;
@@ -188,9 +188,9 @@ class PictureHydrator extends RestHydrator
             'height'         => (int)$object['height'],
             'filesize'       => $object['filesize']
         ];
-        
+
         if ($this->filterComposite->filter('crop')) {
-            if ($cropped) { 
+            if ($cropped) {
                 $picture['crop'] = [
                     'left'   => (int)$object['crop_left'],
                     'top'    => (int)$object['crop_top'],
@@ -207,7 +207,6 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('exif')) {
-
             $exif = $this->imageStorage->getImageEXIF($object['image_id']);
             $exifStr = '';
             $notSections = ['FILE', 'COMPUTED'];
@@ -328,9 +327,9 @@ class PictureHydrator extends RestHydrator
                 $picture['similar'] = $this->extractValue('similar', $similar);
                 /*$similarRow = $this->pictureTable->find($similar['picture_id'])->current();
                 if ($similarRow) {
-                    
+
                     $similarRow->getFormatRequest()
-                    
+
                     $picture['similar'] = [
                         'url'      => $this->router->assemble([
                             'picture_id' => $similarRow['identity']
@@ -348,14 +347,14 @@ class PictureHydrator extends RestHydrator
                 DbTable\Item\Type::VEHICLE,
                 DbTable\Item\Type::BRAND
             ]);
-            
+
             $picture['perspective_item'] = null;
-    
+
             if (count($itemIds) == 1) {
                 $itemId = $itemIds[0];
-    
+
                 $perspective = $this->pictureItem->getPerspective($object['id'], $itemId);
-    
+
                 $picture['perspective_item'] = [
                     'item_id'        => (int)$itemId,
                     'perspective_id' => $perspective ? (int)$perspective : null
@@ -417,7 +416,6 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('is_last')) {
-
             $isLastPicture = null;
             if ($object['status'] == DbTable\Picture::STATUS_ACCEPTED) {
                 $db = $this->pictureTable->getAdapter();
@@ -440,7 +438,6 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('accepted_count')) {
-
             $db = $this->pictureTable->getAdapter();
             $acceptedCount = (int)$db->fetchOne(
                 $db->select()
@@ -457,7 +454,7 @@ class PictureHydrator extends RestHydrator
 
             $picture['accepted_count'] = $acceptedCount;
         }
-        
+
         if ($this->filterComposite->filter('replaceable')) {
             $picture['replaceable'] = null;
             if ($object['replace_picture_id']) {
@@ -467,7 +464,7 @@ class PictureHydrator extends RestHydrator
                 }
             }
         }
-        
+
         if ($this->filterComposite->filter('siblings')) {
             $picture['siblings'] = [
                 'prev' => null,
@@ -484,7 +481,7 @@ class PictureHydrator extends RestHydrator
             if ($prevPicture) {
                 $picture['siblings']['prev'] = $this->extractValue('siblings', $prevPicture);
             }
-            
+
             $nextPicture = $this->pictureTable->fetchRow(
                 $this->pictureTable->select(true)
                     ->where('id > ?', $object['id'])
@@ -494,7 +491,7 @@ class PictureHydrator extends RestHydrator
             if ($nextPicture) {
                 $picture['siblings']['next'] = $this->extractValue('siblings', $nextPicture);
             }
-            
+
             $prevNewPicture = $this->pictureTable->fetchRow(
                 $this->pictureTable->select(true)
                     ->where('id < ?', $object['id'])
@@ -505,7 +502,7 @@ class PictureHydrator extends RestHydrator
             if ($prevNewPicture) {
                 $picture['siblings']['prev_new'] = $this->extractValue('siblings', $prevNewPicture);
             }
-            
+
             $nextNewPicture = $this->pictureTable->fetchRow(
                 $this->pictureTable->select(true)
                     ->where('id > ?', $object['id'])
@@ -517,7 +514,7 @@ class PictureHydrator extends RestHydrator
                 $picture['siblings']['next_new'] = $this->extractValue('siblings', $nextNewPicture);
             }
         }
-        
+
         if ($this->filterComposite->filter('ip') && $this->acl->isAllowed($role, 'user', 'ip')) {
             $picture['ip'] = $object['ip'] ? $this->extractValue('ip', inet_ntop($object['ip'])) : null;
         }
@@ -554,26 +551,26 @@ class PictureHydrator extends RestHydrator
         if (! $picture->canDelete()) {
             return false;
         }
-        
+
         $role = $this->getUserRole();
         if (! $role) {
             return false;
         }
-        
+
         if ($this->acl->isAllowed($role, 'picture', 'remove')) {
             if ($this->pictureVoteExists($picture)) {
                 return true;
             }
         }
-        
+
         if (! $this->acl->isAllowed($role, 'picture', 'remove_by_vote')) {
             return false;
         }
-        
+
         if (! $this->pictureVoteExists($picture)) {
             return false;
         }
-        
+
         $db = $this->pictureTable->getAdapter();
         $acceptVotes = (int)$db->fetchOne(
             $db->select()

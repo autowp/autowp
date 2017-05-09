@@ -59,22 +59,22 @@ class ItemParentController extends AbstractRestfulController
                 'item.begin_order_cache',
                 'item.end_order_cache'
             ]);
-            
+
         if ($data['ancestor_id']) {
             $select
                 ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.item_id', [])
                 ->where('item_parent_cache.parent_id = ?', $data['ancestor_id'])
                 ->group(['item_parent.item_id']);
         }
-        
+
         if ($data['item_type_id']) {
             $select->where('item.item_type_id = ?', $data['item_type_id']);
         }
-        
+
         if ($data['concept']) {
             $select->where('item.is_concept');
         }
-            
+
         if ($data['parent_id']) {
             $select->where('item_parent.parent_id = ?', $data['parent_id']);
         }

@@ -8,17 +8,17 @@ class PerspectiveHydrator extends RestHydrator
     {
         parent::__construct();
     }
-    
+
     public function extract($object)
     {
         $result = [
             'id'   => (int)$object['id'],
             'name' => $object['name']
         ];
-        
+
         return $result;
     }
-    
+
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

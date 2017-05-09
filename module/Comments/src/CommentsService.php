@@ -858,7 +858,7 @@ class CommentsService
 
         return $countRow['count'];
     }
-    
+
     public function getMessagesCount($typeId, $itemId)
     {
         $row = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemId) {

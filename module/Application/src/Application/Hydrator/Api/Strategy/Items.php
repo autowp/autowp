@@ -21,10 +21,10 @@ class Items extends HydratorStrategy
     public function extract($value)
     {
         $hydrator = $this->getHydrator();
-    
+
         $hydrator->setFields($this->fields);
         $hydrator->setLanguage($this->language);
-    
+
         $result = [];
         foreach ($value as $row) {
             $result[] = $hydrator->extract($row);

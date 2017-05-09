@@ -17,21 +17,21 @@ class Ip extends HydratorStrategy
 
         return $this->hydrator;
     }
-    
+
     public function extract($value)
     {
         $hydrator = $this->getHydrator();
-    
+
         $hydrator->setUserId($this->userId);
         $hydrator->setFields($this->fields);
-    
+
         return $hydrator->extract($value);
     }
 
     public function setUserId($userId)
     {
         $this->userId = $userId;
-    
+
         return $this;
     }
 }

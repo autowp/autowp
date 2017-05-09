@@ -15,12 +15,12 @@ class VehicleTypesController extends AbstractRestfulController
      * @var DbTable\Vehicle\Type
      */
     private $table;
-    
-    public function __construct() 
+
+    public function __construct()
     {
         $this->table = new DbTable\Vehicle\Type();
     }
-    
+
     private function getCarTypeOptions($parentId = null)
     {
         if ($parentId) {
@@ -30,7 +30,7 @@ class VehicleTypesController extends AbstractRestfulController
         } else {
             $filter = 'parent_id is null';
         }
-    
+
         $rows = $this->table->fetchAll($filter, 'position');
         $result = [];
         foreach ($rows as $row) {
@@ -40,7 +40,7 @@ class VehicleTypesController extends AbstractRestfulController
                 'childs' => $this->getCarTypeOptions($row->id)
             ];
         }
-    
+
         return $result;
     }
 

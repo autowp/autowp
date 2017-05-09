@@ -16,13 +16,13 @@ class PictureItemHydrator extends RestHydrator
         $serviceManager
     ) {
         parent::__construct();
-        
+
         $this->itemTable = new DbTable\Item();
-        
+
         $strategy = new HydratorItemStrategy($serviceManager);
         $this->addStrategy('item', $strategy);
     }
-    
+
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
@@ -31,7 +31,7 @@ class PictureItemHydrator extends RestHydrator
     public function setOptions($options)
     {
         parent::setOptions($options);
-    
+
         if ($options instanceof \Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
@@ -39,14 +39,14 @@ class PictureItemHydrator extends RestHydrator
                 'The options parameter must be an array or a Traversable'
             );
         }
-    
+
         if (isset($options['user_id'])) {
             $this->setUserId($options['user_id']);
         }
-    
+
         return $this;
     }
-    
+
     /**
      * @param int|null $userId
      * @return Comment
@@ -54,13 +54,13 @@ class PictureItemHydrator extends RestHydrator
     public function setUserId($userId = null)
     {
         $this->userId = $userId;
-    
+
         //$this->getStrategy('content')->setUser($user);
         //$this->getStrategy('replies')->setUser($user);
-    
+
         return $this;
     }
-    
+
     public function extract($object)
     {
         $result = [
@@ -68,14 +68,13 @@ class PictureItemHydrator extends RestHydrator
             'item_id'        => (int)$object['item_id'],
             'perspective_id' => (int)$object['perspective_id'],
         ];
-        
+
         if ($this->filterComposite->filter('item')) {
-            
             $row = $this->itemTable->find($object['item_id'])->current();
-            
+
             $result['item'] = $row ? $this->extractValue('item', $row->toArray()) : null;
         }
-        
+
         if ($this->filterComposite->filter('area')) {
             $hasArea = $object['crop_width'] && $object['crop_height'];
             $result['area'] = null;
@@ -88,10 +87,10 @@ class PictureItemHydrator extends RestHydrator
                 ];
             }
         }
-        
+
         return $result;
     }
-    
+
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

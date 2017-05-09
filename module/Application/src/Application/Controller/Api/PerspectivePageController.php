@@ -17,12 +17,12 @@ class PerspectivePageController extends AbstractRestfulController
      * @var DbTable\Perspective
      */
     private $table;
-    
+
     /**
      * @var RestHydrator
      */
     private $hydrator;
-    
+
     /**
      * @var InputFilter
      */
@@ -40,15 +40,15 @@ class PerspectivePageController extends AbstractRestfulController
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-        
+
         $this->listInputFilter->setData($this->params()->fromQuery());
-        
+
         if (! $this->listInputFilter->isValid()) {
             return $this->inputFilterResponse($this->listInputFilter);
         }
-        
+
         $data = $this->listInputFilter->getValues();
-        
+
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields']

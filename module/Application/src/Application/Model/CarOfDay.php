@@ -506,7 +506,6 @@ class CarOfDay
                             ]);
                             break;
                     }
-
                 }
 
                 /*if (! $url) {

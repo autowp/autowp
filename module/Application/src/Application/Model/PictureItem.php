@@ -158,7 +158,7 @@ class PictureItem
                 ->where('picture_id = ?', $pictureId)
         );
     }
-    
+
     public function getPictureItemData($pictureId, $itemId)
     {
         $db = $this->table->getAdapter();
@@ -169,7 +169,7 @@ class PictureItem
                 ->where('item_id = ?', $itemId)
         );
     }
-    
+
     public function getPictureItemsData($pictureId)
     {
         $db = $this->table->getAdapter();

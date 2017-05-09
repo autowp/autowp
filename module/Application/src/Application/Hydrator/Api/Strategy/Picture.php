@@ -17,5 +17,4 @@ class Picture extends HydratorStrategy
 
         return $this->hydrator;
     }
-
 }

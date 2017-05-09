@@ -21,7 +21,7 @@ class MainMenu extends AbstractHtmlElement
     {
         $user = $this->view->user()->get();
         $menu = $this->mainMenu->getMenu($user ? $user : null);
-        
+
         if ($data) {
             return $menu;
         }

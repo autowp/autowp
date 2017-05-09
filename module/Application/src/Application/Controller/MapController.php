@@ -31,7 +31,7 @@ class MapController extends AbstractActionController
     public function indexAction()
     {
     }
-    
+
     public function index2Action()
     {
     }
@@ -60,7 +60,7 @@ class MapController extends AbstractActionController
             new Point($lngLo, $latLo),
         ]);
         $polygon = new Polygon([$line]);
-        
+
         $pointsOnly = (bool)$this->params()->fromQuery('points-only', 14);
 
         $pictureTable = new Picture();
@@ -75,7 +75,7 @@ class MapController extends AbstractActionController
         $factories = $db->fetchAll(
             $db->select()
                 ->from(
-                    'item', 
+                    'item',
                     $pointsOnly
                         ? []
                         : ['id', 'name', 'begin_year', 'end_year', 'item_type_id']
@@ -98,9 +98,8 @@ class MapController extends AbstractActionController
                     'lng'  => $point ? $point->x() : null,
                 ],
             ];
-            
-            if (!$pointsOnly) {
-                
+
+            if (! $pointsOnly) {
                 $url = null;
                 switch ($item['item_type_id']) {
                     case DbTable\Item\Type::FACTORY:
@@ -108,15 +107,15 @@ class MapController extends AbstractActionController
                             'id' => $item['id']
                         ]);
                         break;
-                
+
                     case DbTable\Item\Type::MUSEUM:
                         $url = $this->url()->fromRoute('museums/museum', [
                             'id' => $item['id']
                         ]);
                         break;
                 }
-                
-                
+
+
                 $row = array_replace($row, [
                     'id'   => 'factory' . $item['id'],
                     'name' => $this->itemNameFormatter->format(
@@ -132,14 +131,13 @@ class MapController extends AbstractActionController
                         ->where('picture_item.item_id = ?', $item['id'])
                         ->limit(1)
                 );
-    
+
                 if ($picture) {
                     $image = $imageStorage->getFormatedImage($picture->getFormatRequest(), 'format9');
                     if ($image) {
                         $row['image'] = $image->getSrc();
                     }
                 }
-            
             }
 
             $data[] = $row;

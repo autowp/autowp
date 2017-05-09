@@ -13,7 +13,7 @@ class PictureItemControllerFactory implements FactoryInterface
     {
         $hydrators = $container->get('HydratorManager');
         $filters = $container->get('InputFilterManager');
-        
+
         return new Controller(
             $container->get(\Application\Model\PictureItem::class),
             $container->get(\Application\Model\Log::class),

@@ -403,9 +403,9 @@ class Pic extends AbstractPlugin
                 if ($userId) {
                     $newMsgCount = isset($newMessages[$id]) ? $newMessages[$id] : $msgCount;
                 }
-                
+
                 $likes = 5;
-                
+
                 $votes = $this->pictureVote->getVote($row['id'], null);
 
                 $item = array_replace($item, [

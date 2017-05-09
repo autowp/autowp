@@ -69,7 +69,7 @@ abstract class RestHydrator extends AbstractHydrator implements HydratorOptionsI
     public function setLanguage($language)
     {
         $this->language = $language;
-        
+
         foreach ($this->strategies as $strategy) {
             if ($strategy instanceof HydratorStrategy) {
                 $strategy->setLanguage($language);

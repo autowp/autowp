@@ -60,7 +60,7 @@ class ItemController extends AbstractRestfulController
 
         $select = $this->table->getAdapter()->select()
             ->from('item');
-        
+
         if ($data['last_item']) {
             $namespace = new \Zend\Session\Container('Moder_Car');
             if (isset($namespace->lastCarId)) {
@@ -99,17 +99,17 @@ class ItemController extends AbstractRestfulController
         if ($id) {
             $select->where('item.id = ?', $id);
         }
-        
+
         if ($data['descendant']) {
             $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->where('item_parent_cache.item_id = ?', $data['descendant'])
                 ->group('item.id');
         }
-        
+
         if ($data['type_id']) {
             $select->where('item.item_type_id = ?', $data['type_id']);
         }
-        
+
         if ($data['parent_id']) {
             $select
                 ->join('item_parent', 'item.id = item_parent.item_id', null)

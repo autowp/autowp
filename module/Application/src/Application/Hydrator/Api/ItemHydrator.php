@@ -14,24 +14,24 @@ class ItemHydrator extends RestHydrator
      * @var int|null
      */
     private $userId = null;
-    
+
     /**
      * @var ItemNameFormatter
      */
     private $itemNameFormatter;
-    
+
     private $router;
-    
+
     /**
      * @var DbTable\Spec
      */
     private $specTable;
-    
+
     /**
      * @var DbTable\Item
      */
     private $itemTable;
-    
+
     /**
      * @return DbTable\Spec
      */
@@ -41,22 +41,22 @@ class ItemHydrator extends RestHydrator
             ? $this->specTable
             : $this->specTable = new DbTable\Spec();
     }
-    
+
     public function __construct(
         $serviceManager
     ) {
         parent::__construct();
-        
+
         $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
         $this->router = $serviceManager->get('HttpRouter');
-        
+
         $this->itemParentTable = new DbTable\Item\ParentTable();
         $this->itemTable = new DbTable\Item();
-        
+
         $strategy = new Strategy\Items($serviceManager);
         $this->addStrategy('brands', $strategy);
     }
-    
+
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
@@ -65,7 +65,7 @@ class ItemHydrator extends RestHydrator
     public function setOptions($options)
     {
         parent::setOptions($options);
-    
+
         if ($options instanceof \Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
@@ -73,14 +73,14 @@ class ItemHydrator extends RestHydrator
                 'The options parameter must be an array or a Traversable'
             );
         }
-    
+
         if (isset($options['user_id'])) {
             $this->setUserId($options['user_id']);
         }
-    
+
         return $this;
     }
-    
+
     /**
      * @param int|null $userId
      * @return Comment
@@ -88,22 +88,22 @@ class ItemHydrator extends RestHydrator
     public function setUserId($userId = null)
     {
         $this->userId = $userId;
-    
+
         //$this->getStrategy('content')->setUser($user);
         //$this->getStrategy('replies')->setUser($user);
-    
+
         return $this;
     }
-    
+
     private function getNameData(array $object, $language = 'en')
     {
         if (! is_string($language)) {
             throw new \Exception('`language` is not string');
         }
-    
+
         $itemModel = new ItemModel();
         $name = $itemModel->getName($object['id'], $language);
-    
+
         $spec = null;
         $specFull = null;
         if ($object['spec_id']) {
@@ -113,7 +113,7 @@ class ItemHydrator extends RestHydrator
                 $specFull = $specRow->name;
             }
         }
-    
+
         $result = [
             'begin_model_year' => $object['begin_model_year'],
             'end_model_year'   => $object['end_model_year'],
@@ -127,18 +127,18 @@ class ItemHydrator extends RestHydrator
             'begin_month'      => $object['begin_month'],
             'end_month'        => $object['end_month']
         ];
-        
+
         return $result;
     }
-    
+
     public function extract($object)
     {
         $nameData = $this->getNameData($object, $this->language);
-        
+
         $result = [
             'id' => (int)$object['id'],
             'name' => $this->itemNameFormatter->format(
-                $nameData, 
+                $nameData,
                 $this->language
             ),
             'moder_url' => $this->router->assemble([
@@ -149,7 +149,7 @@ class ItemHydrator extends RestHydrator
             ]),
             'item_type_id' => (int)$object['item_type_id']
         ];
-        
+
         if ($this->filterComposite->filter('childs_count')) {
             if (isset($object['childs_count'])) {
                 $result['childs_count'] = (int)$object['childs_count'];
@@ -162,16 +162,15 @@ class ItemHydrator extends RestHydrator
                 );
             }
         }
-        
+
         if ($this->filterComposite->filter('name_html')) {
             $result['name_html'] = $this->itemNameFormatter->formatHtml(
-                $nameData, 
+                $nameData,
                 $this->language
             );
         }
-        
+
         if ($this->filterComposite->filter('brands')) {
-            
             $rows = $this->itemTable->fetchAll(
                 $this->itemTable->select(true)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
@@ -179,13 +178,13 @@ class ItemHydrator extends RestHydrator
                     ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
                     ->group('item.id')
             );
-            
+
             $result['brands'] = $this->extractValue('brands', $rows->toArray());
         }
 
         return $result;
     }
-    
+
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

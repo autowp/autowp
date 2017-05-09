@@ -24,7 +24,7 @@ class TrafficHydrator extends RestHydrator
     private $acl;
 
     private $router;
-    
+
     /**
      * @var User
      */
@@ -39,10 +39,10 @@ class TrafficHydrator extends RestHydrator
 
         $strategy = new DateTimeFormatterStrategy();
         $this->addStrategy('up_to', $strategy);
-        
+
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('ban_user', $strategy);
-        
+
         $this->userTable = new User();
     }
 
@@ -75,7 +75,7 @@ class TrafficHydrator extends RestHydrator
         /*$row['users'] = $users->fetchAll([
             'last_ip = inet_aton(inet6_ntoa(?))' => $row['ip']
         ]);*/
-        
+
         if ($object['ban']) {
             $date = \Autowp\Commons\Db\Table\Row::getDateTimeByColumnType('timestamp', $object['ban']['up_to']);
             $object['ban']['up_to'] = $this->extractValue('up_to', $date);
@@ -87,11 +87,11 @@ class TrafficHydrator extends RestHydrator
                 }
             }
         }
-        
+
         $object['whois_url'] = 'http://nic.ru/whois/?query='.urlencode($object['ip']);
         //print_r($object); exit;
         unset($object['ban']['ip']);
-        
+
 
         return $object;
     }

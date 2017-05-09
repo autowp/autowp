@@ -13,38 +13,38 @@ class CommentHydrator extends RestHydrator
      * @var Comments
      */
     private $comments;
-    
+
     /**
      * @var DbTable\Picture
      */
     private $pictureTable;
-    
+
     /**
      * @var User
      */
     private $userTable;
-    
+
     private $hydratorManager;
-    
+
     /**
      * @var int|null
      */
     private $userId = null;
-    
+
     public function __construct($serviceManager)
     {
         parent::__construct();
-        
+
         $this->hydratorManager = $serviceManager->get('HydratorManager');
         $this->comments = $serviceManager->get(\Application\Comments::class);
         $this->router = $serviceManager->get('HttpRouter');
-        
+
         $this->pictureTable = new DbTable\Picture();
         $this->userTable = new User();
-        
+
         $this->userId = null;
     }
-    
+
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
@@ -53,7 +53,7 @@ class CommentHydrator extends RestHydrator
     public function setOptions($options)
     {
         parent::setOptions($options);
-    
+
         if ($options instanceof \Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
@@ -61,14 +61,14 @@ class CommentHydrator extends RestHydrator
                 'The options parameter must be an array or a Traversable'
             );
         }
-    
+
         if (isset($options['user_id'])) {
             $this->setUserId($options['user_id']);
         }
-    
+
         return $this;
     }
-    
+
     /**
      * @param int|null $userId
      * @return Comment
@@ -76,13 +76,13 @@ class CommentHydrator extends RestHydrator
     public function setUserId($userId = null)
     {
         $this->userId = $userId;
-    
+
         //$this->getStrategy('content')->setUser($user);
         //$this->getStrategy('replies')->setUser($user);
-    
+
         return $this;
     }
-    
+
     public function extract($object)
     {
         $status = null;
@@ -117,7 +117,7 @@ class CommentHydrator extends RestHydrator
                 }
             }
         }
-        
+
         $user = null;
         if ($object['author_id']) {
             $userRow = $this->userTable->fetchRow([
@@ -128,9 +128,9 @@ class CommentHydrator extends RestHydrator
                 $user = $userHydrator->extract($userRow);
             }
         }
-        
+
         //var_dump($this->userId); exit;
-        
+
         return [
             'url'     => $this->comments->getMessageRowUrl($object),
             'preview' => $this->comments->getMessagePreview($object['message']),
@@ -139,7 +139,7 @@ class CommentHydrator extends RestHydrator
             'new'     => $this->comments->service()->isNewMessage($object, $this->userId)
         ];
     }
-    
+
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

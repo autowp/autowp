@@ -26,13 +26,13 @@ class Sidebar extends AbstractHtmlElement
 
             $newPersonalMessages = (int)$count;
         }
-        
+
         if ($data) {
             return [
                 'newPersonalMessages' => $newPersonalMessages
             ];
         }
-        
+
         return $this->view->partial('application/sidebar-right', [
             'newPersonalMessages' => $newPersonalMessages
         ]);

@@ -92,7 +92,7 @@ class PictureController extends AbstractRestfulController
     private $editInputFilter;
 
     private $textStorage;
-    
+
     /**
      * @var \Autowp\Comments\CommentsService
      */
@@ -266,7 +266,7 @@ class PictureController extends AbstractRestfulController
                 ->select()
                 ->from('perspectives', ['id', 'name'])
                 ->order('position')
-                ),
+            ),
             'brandOptions'       => [
                 '' => 'moder/pictures/filter/brand/any'
             ] + $brandMultioptions,
@@ -587,21 +587,21 @@ class PictureController extends AbstractRestfulController
         }
 
         $data = $this->editInputFilter->getValues();
-        
+
         if (array_key_exists('replace_picture_id', $data)) {
             if ($picture->replace_picture_id && ! $data['replace_picture_id']) {
                 $replacePicture = $this->table->find($picture->replace_picture_id)->current();
                 if (! $replacePicture) {
                     return $this->notFoundAction();
                 }
-                
+
                 if (! $this->user()->isAllowed('picture', 'move')) {
                     return $this->forbiddenAction();
                 }
-                
+
                 $picture->replace_picture_id = null;
                 $picture->save();
-                
+
                 // log
                 $this->log(sprintf(
                     'Замена %s на %s отклонена',
@@ -610,27 +610,27 @@ class PictureController extends AbstractRestfulController
                 ), [$picture, $replacePicture]);
             }
         }
-        
+
         if (isset($data['crop'])) {
             if (! $this->user()->isAllowed('picture', 'crop')) {
                 return $this->forbiddenAction();
             }
-            
+
             $left = round($data['crop']['left']);
             $top = round($data['crop']['top']);
             $width = round($data['crop']['width']);
             $height = round($data['crop']['height']);
-            
+
             $left = max(0, $left);
             $left = min($picture->width, $left);
             $width = max(1, $width);
             $width = min($picture->width, $width);
-            
+
             $top = max(0, $top);
             $top = min($picture->height, $top);
             $height = max(1, $height);
             $height = min($picture->height, $height);
-            
+
             if ($left > 0 || $top > 0 || $width < $picture->width || $height < $picture->height) {
                 $picture->setFromArray([
                     'crop_left'   => $left,
@@ -647,11 +647,11 @@ class PictureController extends AbstractRestfulController
                 ]);
             }
             $picture->save();
-            
+
             $this->imageStorage()->flush([
                 'image' => $picture->image_id
             ]);
-            
+
             $this->log(sprintf(
                 'Выделение области на картинке %s',
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
@@ -709,7 +709,6 @@ class PictureController extends AbstractRestfulController
         }
 
         if (isset($data['status'])) {
-
             $user = $this->user()->get();
             $previousStatusUserId = $picture->change_status_user_id;
 
@@ -763,9 +762,7 @@ class PictureController extends AbstractRestfulController
             }
 
             if ($data['status'] == DbTable\Picture::STATUS_INBOX) {
-
                 if ($picture['status'] == DbTable\Picture::STATUS_REMOVING) {
-
                     $canRestore = $this->user()->isAllowed('picture', 'restore');
                     if (! $canRestore) {
                         return $this->forbiddenAction();
@@ -781,11 +778,9 @@ class PictureController extends AbstractRestfulController
                         'Картинки `%s` восстановлена из очереди удаления',
                         htmlspecialchars($this->pic()->name($picture, $this->language()))
                     ), $picture);
-
                 } elseif ($picture['status'] == DbTable\Picture::STATUS_ACCEPTED) {
-
                     $canUnaccept = $this->user()->isAllowed('picture', 'unaccept');
-                    if (!$canUnaccept) {
+                    if (! $canUnaccept) {
                         return $this->forbiddenAction();
                     }
 
@@ -947,123 +942,123 @@ class PictureController extends AbstractRestfulController
                 ->where('user_id = ?', $user->id)
         );
     }
-    
+
     public function normalizeAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-        
+
         $row = $this->table->find($this->params('id'))->current();
         if (! $row) {
             return $this->notFoundAction();
         }
-        
+
         $canNormalize = $row['status'] == DbTable\Picture::STATUS_INBOX
                      && $this->user()->isAllowed('picture', 'normalize');
-        
+
         if (! $canNormalize) {
             return $this->forbiddenAction();
         }
-        
+
         if ($row->image_id) {
             $this->imageStorage()->normalize($row->image_id);
         }
-        
+
         $this->log(sprintf(
             'К картинке %s применён normalize',
             htmlspecialchars($this->pic()->name($row, $this->language()))
         ), $row);
-        
+
         return $this->getResponse()->setStatusCode(200);
     }
-    
+
     public function flopAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-    
+
         $row = $this->table->find($this->params('id'))->current();
         if (! $row) {
             return $this->notFoundAction();
         }
-    
+
         $canFlop = $row['status'] == DbTable\Picture::STATUS_INBOX
                 && $this->user()->isAllowed('picture', 'flop');
-    
+
         if (! $canFlop) {
             return $this->forbiddenAction();
         }
-    
+
         if ($row->image_id) {
             $this->imageStorage()->flop($row->image_id);
         }
-    
+
         $this->log(sprintf(
             'К картинке %s применён flop',
             htmlspecialchars($this->pic()->name($row, $this->language()))
         ), $row);
-    
+
         return $this->getResponse()->setStatusCode(200);
     }
-    
+
     public function repairAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-    
+
         $row = $this->table->find($this->params('id'))->current();
         if (! $row) {
             return $this->notFoundAction();
         }
-    
+
         if ($row->image_id) {
             $this->imageStorage()->flush([
                 'image' => $row->image_id
             ]);
         }
-    
+
         return $this->getResponse()->setStatusCode(200);
     }
-    
+
     public function correctFileNamesAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-    
+
         $row = $this->table->find($this->params('id'))->current();
         if (! $row) {
             return $this->notFoundAction();
         }
-    
+
         if ($row->image_id) {
             $this->imageStorage()->changeImageName($row->image_id, [
                 'pattern' => $row->getFileNamePattern(),
             ]);
         }
-    
+
         return $this->getResponse()->setStatusCode(200);
     }
-    
+
     public function deleteSimilarAction()
     {
         $srcPicture = $this->table->find($this->params('id'))->current();
         $dstPicture = $this->table->find($this->params('similar_picture_id'))->current();
-        
+
         if (! $srcPicture || ! $dstPicture) {
             return $this->notFoundAction();
         }
-        
+
         $this->duplicateFinder->hideSimilar($srcPicture['id'], $dstPicture['id']);
-        
+
         $this->log('Отменёно предупреждение о повторе', [$srcPicture, $dstPicture]);
-        
+
         return $this->getResponse()->setStatusCode(204);
     }
-    
+
     private function canReplace($picture, $replacedPicture)
     {
         $can1 = false;
@@ -1071,58 +1066,58 @@ class PictureController extends AbstractRestfulController
             case DbTable\Picture::STATUS_ACCEPTED:
                 $can1 = true;
                 break;
-    
+
             case DbTable\Picture::STATUS_INBOX:
                 $can1 = $this->user()->isAllowed('picture', 'accept');
                 break;
         }
-    
+
         $can2 = false;
         switch ($replacedPicture->status) {
             case DbTable\Picture::STATUS_ACCEPTED:
                 $can2 = $this->user()->isAllowed('picture', 'unaccept')
                      && $this->user()->isAllowed('picture', 'remove_by_vote');
                 break;
-    
+
             case DbTable\Picture::STATUS_INBOX:
                 $can2 = $this->user()->isAllowed('picture', 'remove_by_vote');
                 break;
-    
+
             case DbTable\Picture::STATUS_REMOVING:
             case DbTable\Picture::STATUS_REMOVED:
                 $can2 = true;
                 break;
         }
-    
+
         return $can1 && $can2 && $this->user()->isAllowed('picture', 'move');
     }
-    
+
     public function acceptReplaceAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-        
+
         $picture = $this->table->find($this->params('id'))->current();
         if (! $picture) {
             return $this->notFoundAction();
         }
-        
+
         if (! $picture->replace_picture_id) {
             return $this->notFoundAction();
         }
-        
+
         $replacePicture = $this->table->find($picture->replace_picture_id)->current();
         if (! $replacePicture) {
             return $this->notFoundAction();
         }
-        
+
         if (! $this->canReplace($picture, $replacePicture)) {
             return $this->forbiddenAction();
         }
-        
+
         $user = $this->user()->get();
-        
+
         // statuses
         if ($picture->status != DbTable\Picture::STATUS_ACCEPTED) {
             $picture->setFromArray([
@@ -1133,12 +1128,12 @@ class PictureController extends AbstractRestfulController
                 $picture->accept_datetime = new Zend_Db_Expr('NOW()');
             }
             $picture->save();
-        
+
             if ($picture->owner_id) {
                 $this->userPicture->refreshPicturesCount($picture->owner_id);
             }
         }
-        
+
         if (! in_array($replacePicture->status, [DbTable\Picture::STATUS_REMOVING, DbTable\Picture::STATUS_REMOVED])) {
             $replacePicture->setFromArray([
                 'status'                => DbTable\Picture::STATUS_REMOVING,
@@ -1150,7 +1145,7 @@ class PictureController extends AbstractRestfulController
                 $this->userPicture->refreshPicturesCount($replacePicture->owner_id);
             }
         }
-        
+
         // comments
         $this->comments->moveMessages(
             \Application\Comments::PICTURES_TYPE_ID,
@@ -1158,7 +1153,7 @@ class PictureController extends AbstractRestfulController
             \Application\Comments::PICTURES_TYPE_ID,
             $picture->id
         );
-        
+
         // pms
         $owner = $picture->findParentRow(User::class, 'Owner');
         $replaceOwner = $replacePicture->findParentRow(User::class, 'Owner');
@@ -1173,35 +1168,35 @@ class PictureController extends AbstractRestfulController
         if ($recepients) {
             foreach ($recepients as $recepient) {
                 $uri = $this->hostManager->getUriByLanguage($recepient->language);
-        
+
                 $url = $this->pic()->url($picture->identity, true, $uri);
                 $replaceUrl = $this->pic()->url($replacePicture->identity, true, $uri);
-        
+
                 $moderUrl = $this->url()->fromRoute('users/user', [
                     'user_id' => $user->identity ? $user->identity : 'user' . $user->id
                 ], [
                     'force_canonical' => true,
                     'uri'             => $uri
                 ]);
-        
+
                 $message = sprintf(
                     $this->translate('pm/user-%s-accept-replace-%s-%s', 'default', $recepient->language),
                     $moderUrl,
                     $replaceUrl,
                     $url
                 );
-        
+
                 $this->message->send(null, $recepient->id, $message);
             }
         }
-        
+
         // log
         $this->log(sprintf(
             'Замена %s на %s',
             htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), [$picture, $replacePicture]);
-        
+
         return $this->getResponse()->setStatusCode(200);
     }
 }

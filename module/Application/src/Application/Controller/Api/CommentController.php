@@ -25,7 +25,7 @@ class CommentController extends AbstractRestfulController
      * @var Comments
      */
     private $comments;
-    
+
     /**
      * @var RestHydrator
      */
@@ -69,31 +69,31 @@ class CommentController extends AbstractRestfulController
 
         return $this->notFoundAction();
     }
-    
+
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-        
+
         $user = $this->user()->get();
-        
+
         $itemTable = new DbTable\Item();
         $userTable = new User();
-        
+
         $options = [
             'order' => 'comment_message.datetime DESC'
         ];
-        
+
         $this->form->setData($this->params()->fromQuery());
-        
+
         if (! $this->form->isValid()) {
             $this->getResponse()->setStatusCode(400);
             return new JsonModel($this->form->getMessages());
         }
-        
+
         $values = $this->form->getData();
-    
+
         if ($values['user']) {
             if (! is_numeric($values['user'])) {
                 $userRow = $userTable->fetchRow([
@@ -103,14 +103,14 @@ class CommentController extends AbstractRestfulController
                     $values['user'] = $userRow->id;
                 }
             }
-    
+
             $options['user'] = $values['user'];
         }
-    
+
         if (strlen($values['moderator_attention'])) {
             $options['attention'] = $values['moderator_attention'];
         }
-    
+
         if ($values['item_id']) {
             $options['type'] = \Application\Comments::PICTURES_TYPE_ID;
             $options['callback'] = function (Sql\Select $select) use ($values) {
@@ -123,21 +123,21 @@ class CommentController extends AbstractRestfulController
         }
 
         $paginator = $this->comments->service()->getMessagesPaginator($options);
-        
+
         $paginator
             ->setItemCountPerPage(50)
             ->setCurrentPageNumber($this->params()->fromQuery('page'));
-        
+
         $this->hydrator->setOptions([
             //'fields'   => $data['fields'],
             'user_id' => $user ? $user['id'] : null
         ]);
-            
+
         $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $comments[] = $this->hydrator->extract($commentRow);
         }
-        
+
         return new JsonModel([
             'paginator' => get_object_vars($paginator->getPages()),
             'comments'  => $comments

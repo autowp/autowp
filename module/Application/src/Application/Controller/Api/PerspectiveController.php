@@ -14,13 +14,13 @@ class PerspectiveController extends AbstractRestfulController
      * @var DbTable\Perspective
      */
     private $table;
-    
+
     /**
      * @var RestHydrator
      */
     private $hydrator;
-    
-    public function __construct(RestHydrator $hydrator) 
+
+    public function __construct(RestHydrator $hydrator)
     {
         $this->hydrator = $hydrator;
         $this->table = new DbTable\Perspective();
@@ -31,12 +31,12 @@ class PerspectiveController extends AbstractRestfulController
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-        
+
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => []
         ]);
-        
+
         $rows = $this->table->fetchAll([], 'position');
         $items = [];
         foreach ($rows as $row) {

@@ -131,7 +131,7 @@ class UserHydrator extends RestHydrator
 
             $canViewLogin = $object['id'] == $this->userId;
             if (! $canViewLogin) {
-                $canViewLogin= $this->isModer();
+                $canViewLogin = $this->isModer();
             }
 
             if ($canViewLogin && $this->filterComposite->filter('login')) {

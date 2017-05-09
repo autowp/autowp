@@ -82,7 +82,7 @@ class Maintenance extends AbstractListenerAggregate
 
         $affected = $usersService->updateUsersVoteLimits();
         print sprintf("Updated %s users vote limits\n", $affected);
-        
+
         $vkConfig = $serviceManager->get('Config')['vk'];
         $carOfDay->putCurrentToVk($vkConfig);
 

@@ -189,7 +189,7 @@ class Catalogue
                 ]);
 
             $brand = $this->itemTable2->selectWith($select)->current();
-            
+
             if ($brand) {
                 $result[] = [
                     'type'          => 'brand',
@@ -198,7 +198,7 @@ class Catalogue
                     'path'          => [],
                     'stock'         => true
                 ];
-            
+
                 if ($breakOnFirst && count($result)) {
                     return $result;
                 }
@@ -214,15 +214,15 @@ class Catalogue
                     'id'           => $id,
                     'item_type_id' => DbTable\Item\Type::CATEGORY
                 ]);
-        
+
             $category = $this->itemTable2->selectWith($select)->current();
-            
+
             if ($category) {
                 $result[] = [
                     'type'             => 'category',
                     'category_catname' => $category['catname']
                 ];
-            
+
                 if ($breakOnFirst && count($result)) {
                     return $result;
                 }

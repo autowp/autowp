@@ -499,10 +499,8 @@ class UsersController extends AbstractActionController
 
         $users = [];
         foreach ($rows as $idx => $row) {
-            
             $fans = [];
             if ($idx < 10) {
-                
                 $fanRows = $db->fetchAll(
                     $db->select()
                         ->from('picture_vote', ['user_id', 'volume' => new Zend_Db_Expr('count(1)')])
@@ -518,9 +516,8 @@ class UsersController extends AbstractActionController
                         'volume'  => $fanRow['volume'],
                     ];
                 }
-                
             }
-            
+
             $users[] = [
                 'row'    => $userTable->find($row['owner_id'])->current(),
                 'volume' => $row['volume'],
