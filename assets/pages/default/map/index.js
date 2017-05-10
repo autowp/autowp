@@ -3,8 +3,7 @@ var leaflet = require("leaflet-bundle");
 var popupMarkup = require('./popup.html'); 
 require("./index.less");
 
-require('webgl-heatmap-leaflet/dist/webgl-heatmap');
-require('webgl-heatmap-leaflet/dist/webgl-heatmap-leaflet');
+require('leaflet-webgl-heatmap/dist/leaflet-webgl-heatmap.min');
 
 module.exports = {
     init: function(options) {

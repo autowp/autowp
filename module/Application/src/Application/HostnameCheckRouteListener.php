@@ -16,11 +16,12 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
     /**
      * @var array
      */
-    private $hostnameWhitelist = [
-        'www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
-        'i.wheelsage.org', 'en.wheelsage.org', 'fr.wheelsage.org',
-        'zh.wheelsage.org', 'www.wheelsage.org', 'wheelsage.org'
-    ];
+    private $hostnameWhitelist = ['localhost'];
+
+    public function __construct(array $whitelist)
+    {
+        $this->hostnameWhitelist = $whitelist;
+    }
 
     /**
      * @param EventManagerInterface $events

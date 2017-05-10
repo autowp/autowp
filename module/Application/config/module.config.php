@@ -52,7 +52,7 @@ return [
     'controller_plugins' => [
         'invokables' => [
             'forbiddenAction' => Controller\Plugin\ForbiddenAction::class,
-            'inputFilterResponse' => Controller\Api\Plugin\InputFilterResponse::class 
+            'inputFilterResponse' => Controller\Api\Plugin\InputFilterResponse::class
         ],
         'factories' => [
             'car'         => Controller\Plugin\Service\CarFactory::class,
@@ -102,6 +102,7 @@ return [
             ExternalLoginServiceFactory::class   => Service\ExternalLoginServiceFactory::class,
             FileSize::class                      => InvokableFactory::class,
             HostManager::class                   => Service\HostManagerFactory::class,
+            HostnameCheckRouteListener::class    => HostnameCheckRouteListenerFactory::class,
             Language::class                      => Service\LanguageFactory::class,
             LanguagePicker::class                => Service\LanguagePickerFactory::class,
             MainMenu::class                      => Service\MainMenuFactory::class,
@@ -148,7 +149,7 @@ return [
             'oauth_token_secret' => ''
         ]
     ],
-    
+
     'facebook' => [
         'app_id' => '',
         'app_secret' => '',
@@ -185,6 +186,10 @@ return [
             'cookie'   => '.wheelsage.org'
         ]
     ],
+
+    'hostname_whitelist' => ['www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
+        'i.wheelsage.org', 'en.wheelsage.org', 'fr.wheelsage.org',
+        'zh.wheelsage.org', 'www.wheelsage.org', 'wheelsage.org'],
 
     'content_languages' => ['ru', 'en', 'it', 'fr', 'zh', 'de', 'es', 'pt'],
 
@@ -250,17 +255,17 @@ return [
     ],
 
     'mosts_min_vehicles_count' => 200,
-    
+
     'yandex' => [
         'secret' => '',
         'price'  => 0
     ],
-    
+
     'vk' => [
         'token'    => '',
         'owner_id' => ''
     ],
-    
+
     'input_filters' => [
         'abstract_factories' => [
             \Zend\InputFilter\InputFilterAbstractServiceFactory::class

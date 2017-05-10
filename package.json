@@ -86,7 +86,7 @@
     "sprintf": "^0.1.5",
     "sprintf-js": "^1.x",
     "typeahead.js": "^0.x",
-    "webgl-heatmap-leaflet": "git+https://git@github.com/ursudio/webgl-heatmap-leaflet.git"
+    "webgl-heatmap-leaflet": "git+https://git@github.com/ursudio/leaflet-webgl-heatmap.git"
   },
   "scripts": {
     "start": "node_modules/.bin/webpack --progress --colors -p --config webpack.config.js",

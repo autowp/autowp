@@ -96,8 +96,7 @@ class Module implements
         $urlCorrectionListener = new UrlCorrectionRouteListener();
         $urlCorrectionListener->attach($eventManager);
 
-        $hostnameCheckListener = new HostnameCheckRouteListener();
-        $hostnameCheckListener->attach($eventManager);
+        $serviceManager->get(HostnameCheckRouteListener::class)->attach($eventManager);
 
         $languageListener = new LanguageRouteListener();
         $languageListener->attach($eventManager);
