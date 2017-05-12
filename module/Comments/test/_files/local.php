@@ -94,4 +94,25 @@ return [
             ]
         ],
     ],
+
+    'hosts' => [
+        'ru' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+        'en' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+        'fr' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+        'zh' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+    ],
+
+    'hostname_whitelist' => ['localhost'],
 ];

@@ -122,5 +122,26 @@ return [
             ]
         ]
     ],
-    'mosts_min_vehicles_count' => 1
+    'mosts_min_vehicles_count' => 1,
+
+    'hosts' => [
+        'ru' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+        'en' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+        'fr' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+        'zh' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+    ],
+
+    'hostname_whitelist' => ['localhost'],
 ];

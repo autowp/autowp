@@ -164,7 +164,6 @@ return [
             'flag'     => 'flag-icon flag-icon-ru',
             'cookie'   => '.autowp.ru',
             'aliases'  => [
-                'www.autowp.ru',
                 'ru.autowp.ru'
             ]
         ],
