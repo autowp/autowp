@@ -4,8 +4,7 @@
   "version": "0.0.2",
   "description": "WheelsAge",
   "devDependencies": {
-    "bootstrap-webpack": "0.0.5",
-    "compression-webpack-plugin": "^0.3.2",
+    "compression-webpack-plugin": "^0.4.0",
     "css-loader": "^0.x",
     "exports-loader": "^0.x",
     "extract-text-webpack-plugin": "^2.x",
@@ -19,7 +18,7 @@
     "jshint-loader": "^0.8.4",
     "json-loader": "^0.x",
     "less": "^2.x",
-    "less-loader": "^3.x",
+    "less-loader": "^4.x",
     "scriptjs": "^2.x",
     "style-loader": "^0.x",
     "svg-inline-loader": "^0.x",
