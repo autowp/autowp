@@ -5,7 +5,7 @@ $imageDir = __DIR__ . DIRECTORY_SEPARATOR . 'image' . DIRECTORY_SEPARATOR;
 return [
     'zf1db' => [
         'params' => [
-            'host'     => '127.0.0.1',
+            'host'     => 'localhost',
             'username' => 'autowp_test',
             'password' => 'test',
             'dbname'   => 'autowp_test',
@@ -18,7 +18,7 @@ return [
     'db' => [
         'driver'         => 'Pdo',
         'pdodriver'      => 'mysql',
-        'host'           => '127.0.0.1',
+        'host'           => 'localhost',
         'charset'        => 'utf8',
         'dbname'         => 'autowp_test',
         'username'       => 'autowp_test',
@@ -119,5 +119,26 @@ return [
                 ]
             ]
         ]
-    ]
+    ],
+
+    'hosts' => [
+        'ru' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+        'en' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+        'fr' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+        'zh' => [
+            'hostname' => 'localhost',
+            'cookie'   => ''
+        ],
+    ],
+
+    'hostname_whitelist' => ['localhost'],
 ];
