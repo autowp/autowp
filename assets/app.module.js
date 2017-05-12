@@ -1,5 +1,5 @@
 import angular from 'angular';
-import angularRouter from 'angular-ui-router';
+import angularRouter from '@uirouter/angularjs';
 import angularMaterial from 'angular-material';
 import angularAnimate from 'angular-animate';
 import angularAria from 'angular-aria';
