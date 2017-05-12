@@ -891,7 +891,7 @@ class CarsController extends AbstractActionController
             unset($tabs['links']);
         }
 
-        if ($car->item_type_id != DbTable\Item\Type::BRAND) {
+        if ($car->item_type_id != DbTable\Item\Type::BRAND || !$this->user()->isAllowed('brand', 'logo')) {
             unset($tabs['logo']);
         }
 

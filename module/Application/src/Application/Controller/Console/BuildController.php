@@ -10,8 +10,8 @@ class BuildController extends AbstractActionController
 {
     public function brandsSpriteAction()
     {
-        $destSprite = 'assets/brandicon/brands.png';
-        $destCss = 'assets/brandicon/brands.css';
+        $destSprite = 'public_html/dist/brands.png';
+        $destCss = 'public_html/dist/brands.css';
 
         $imageStorage = $this->imageStorage();
 

@@ -1,1 +1,1 @@
-require("brandicon/brandicon");
+require("brandicon");

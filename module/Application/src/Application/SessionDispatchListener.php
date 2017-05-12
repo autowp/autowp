@@ -28,12 +28,13 @@ class SessionDispatchListener extends AbstractListenerAggregate
         $request = $e->getRequest();
         if ($request instanceof Request) {
             $serviceManager = $e->getApplication()->getServiceManager();
+            $config = $serviceManager->get('Config');
             $sessionManager = $serviceManager->get(ManagerInterface::class);
-            $config = $sessionManager->getConfig();
+            $sessionConfig = $sessionManager->getConfig();
 
-            $cookieDomain = $this->getHostCookieDomain($request);
+            $cookieDomain = $this->getHostCookieDomain($request, $config['hosts']);
             if ($cookieDomain) {
-                $config->setCookieDomain($cookieDomain);
+                $sessionConfig->setCookieDomain($cookieDomain);
                 //$sessionManager->start();
             }
 
@@ -45,16 +46,19 @@ class SessionDispatchListener extends AbstractListenerAggregate
         }
     }
 
-    private function getHostCookieDomain(Request $request)
+    private function getHostCookieDomain(Request $request, $hosts)
     {
         $hostname = $request->getUri()->getHost();
 
-        switch ($hostname) {
-            case 'www.autowp.ru':
-            case 'autowp.ru':
-                return '.autowp.ru';
-            default:
-                return '.wheelsage.org';
+        foreach ($hosts as $hostLanguage => $host) {
+            if ($host['hostname'] == $hostname) {
+                return $host['cookie'];
+            }
+
+            if (in_array($hostname, $host['aliases'])) {
+                return $host['cookie'];
+            }
+
         }
 
         return null;

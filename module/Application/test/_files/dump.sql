@@ -63,9 +63,10 @@ CREATE TABLE `acl_resources_privileges` (
 --
 
 /*!40000 ALTER TABLE `acl_resources_privileges` DISABLE KEYS */;
-INSERT INTO `acl_resources_privileges` (`id`, `resource_id`, `name`) 
+INSERT IGNORE INTO `acl_resources_privileges` (`id`, `resource_id`, `name`) 
 VALUES (4,4,'add'),(1,4,'edit_meta'),(5,4,'move'),(8,5,'move'),
-(2,11,'edit'),(3,13,'ban'),(7,17,'edit'),(9,17,'edit-engine'),(6,21,'edit'),(10,6,'remove'),(11,9,'edit'),(12,10,'moderate');
+(2,11,'edit'),(3,13,'ban'),(7,17,'edit'),(9,17,'edit-engine'),(6,21,'edit'),
+(10,6,'remove'),(11,9,'edit'),(12,10,'moderate'),(13,1,'logo');
 
 
 
@@ -141,8 +142,8 @@ CREATE TABLE `acl_roles_privileges_allowed` (
 --
 
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` DISABLE KEYS */;
-INSERT INTO `acl_roles_privileges_allowed` (`role_id`, `privilege_id`) 
-VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9),(5,10),(5,11),(5,12);
+INSERT IGNORE INTO `acl_roles_privileges_allowed` (`role_id`, `privilege_id`) 
+VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9),(5,10),(5,11),(5,12),(5, 13);
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` ENABLE KEYS */;
 
 --

@@ -14,28 +14,6 @@ class LanguageRouteListener extends AbstractListenerAggregate
     /**
      * @var array
      */
-    private $whitelist = [
-        'fr.wheelsage.org' => 'fr',
-        'en.wheelsage.org' => 'en',
-        'zh.wheelsage.org' => 'zh',
-        'autowp.ru'        => 'ru',
-        'www.autowp.ru'    => 'ru',
-        'ru.autowp.ru'     => 'ru'
-    ];
-
-    /**
-     * @var array
-     */
-    private $redirects = [
-        'www.wheelsage.org' => 'en.wheelsage.org',
-        'wheelsage.org'     => 'en.wheelsage.org',
-        'en.autowp.ru'      => 'en.wheelsage.org',
-        'ru.autowp.ru'      => 'www.autowp.ru'
-    ];
-
-    /**
-     * @var array
-     */
     private $userDetectable = [
         'wheelsage.org'
     ];
@@ -70,6 +48,8 @@ class LanguageRouteListener extends AbstractListenerAggregate
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
             $serviceManager = $e->getApplication()->getServiceManager();
 
+            $hosts = $serviceManager->get('Config')['hosts'];
+
             $language = $this->defaultLanguage;
 
             $hostname = $request->getUri()->getHost();
@@ -79,11 +59,9 @@ class LanguageRouteListener extends AbstractListenerAggregate
             }
 
             if (in_array($hostname, $this->userDetectable)) {
-                $languageWhitelist = array_keys($serviceManager->get('Config')['hosts']);
+                $languageWhitelist = array_keys($hosts);
 
                 $userLanguage = $this->detectUserLanguage($request, $languageWhitelist);
-
-                $hosts = $serviceManager->get('Config')['hosts'];
 
                 if (isset($hosts[$userLanguage])) {
                     $redirectUrl = $request->getUri()->getScheme() . '://' .
@@ -93,15 +71,20 @@ class LanguageRouteListener extends AbstractListenerAggregate
                 }
             }
 
-            if (isset($this->redirects[$hostname])) {
-                $redirectUrl = $request->getUri()->getScheme() . '://' .
-                    $this->redirects[$hostname] . $request->getRequestUri();
+            foreach ($hosts as $host) {
+                if (in_array($hostname, $host['aliases'])) {
+                    $redirectUrl = $request->getUri()->getScheme() . '://' .
+                        $host['hostname'] . $request->getRequestUri();
 
-                return $this->redirect($e, $redirectUrl);
+                    return $this->redirect($e, $redirectUrl);
+                }
             }
 
-            if (isset($this->whitelist[$hostname])) {
-                $language = $this->whitelist[$hostname];
+            foreach ($hosts as $hostLanguage => $host) {
+                if ($host['hostname'] == $hostname) {
+                    $language = $hostLanguage;
+                    break;
+                }
             }
 
             $translator = $serviceManager->get('MvcTranslator');

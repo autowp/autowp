@@ -162,28 +162,39 @@ return [
             'timezone' => 'Europe/Moscow',
             'name'     => 'Русский',
             'flag'     => 'flag-icon flag-icon-ru',
-            'cookie'   => '.autowp.ru'
+            'cookie'   => '.autowp.ru',
+            'aliases'  => [
+                'www.autowp.ru',
+                'ru.autowp.ru'
+            ]
         ],
         'en' => [
             'hostname' => 'en.wheelsage.org',
             'timezone' => 'Europe/London',
             'name'     => 'English (beta)',
             'flag'     => 'flag-icon flag-icon-gb',
-            'cookie'   => '.wheelsage.org'
+            'cookie'   => '.wheelsage.org',
+            'aliases'  => [
+                'en.autowp.ru',
+                'wheelsage.org',
+                'www.wheelsage.org'
+            ]
         ],
         'fr' => [
             'hostname' => 'fr.wheelsage.org',
             'timezone' => 'Europe/Paris',
             'name'     => 'Français (beta)',
             'flag'     => 'flag-icon flag-icon-fr',
-            'cookie'   => '.wheelsage.org'
+            'cookie'   => '.wheelsage.org',
+            'aliases'  => []
         ],
         'zh' => [
             'hostname' => 'zh.wheelsage.org',
             'timezone' => 'Asia/Shanghai',
             'name'     => '中文 (beta)',
             'flag'     => 'flag-icon flag-icon-cn',
-            'cookie'   => '.wheelsage.org'
+            'cookie'   => '.wheelsage.org',
+            'aliases'  => []
         ]
     ],
 

@@ -2,12 +2,14 @@
 
 namespace Application\Model;
 
+use Collator;
+use Transliterator;
+
+use Autowp\Image;
+
 use Application\Model\DbTable;
 
 use Zend_Db_Expr;
-
-use Collator;
-use Transliterator;
 
 class Brand
 {
@@ -419,7 +421,7 @@ class Brand
         return $items;
     }
 
-    public function createIconsSprite($imageStorage, $destImg, $destCss)
+    public function createIconsSprite(Image\Storage $imageStorage, $destImg, $destCss)
     {
         $list = $this->getList([
             'language' => 'en',
@@ -439,10 +441,7 @@ class Brand
         foreach ($list as $brand) {
             $img = false;
             if ($brand['logo_id']) {
-                $imageInfo = $imageStorage->getFormatedImage($brand['logo_id'], self::ICON_FORMAT);
-                if ($imageInfo) {
-                    $img = $imageInfo->getSrc();
-                }
+                $img = $imageStorage->getFormatedImagePath($brand['logo_id'], self::ICON_FORMAT);
             }
 
             if ($img) {
@@ -454,6 +453,9 @@ class Brand
 
         $count = count($images);
         $width = (int)ceil(sqrt($count));
+        if ($width <= 0) {
+            $width = 1;
+        }
         $height = ceil($count / $width);
 
         $cmd = sprintf(
@@ -463,11 +465,10 @@ class Brand
             escapeshellarg($destImg)
         );
 
-        //print $cmd . PHP_EOL;
-        print passthru($cmd, $returnVar);
-
-        file_put_contents('/tmp/cmd.sh', $cmd);
-        //var_dump($returnVar);
+        $cmdFilename = tempnam(sys_get_temp_dir(), 'brandicons');
+        file_put_contents($cmdFilename, $cmd);
+        chmod($cmdFilename, 0700);
+        exec($cmdFilename);
 
         $css = [];
         $index = 0;

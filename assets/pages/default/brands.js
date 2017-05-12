@@ -1,5 +1,5 @@
 var BrandPopover = require("brand-popover");
-require("brandicon/brandicon");
+require("brandicon");
 
 module.exports = {
     init: function() {
