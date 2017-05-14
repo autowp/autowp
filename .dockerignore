@@ -1,0 +1,5 @@
+.settings
+.git
+.project
+Dockerfile
+docker-compose.yml
