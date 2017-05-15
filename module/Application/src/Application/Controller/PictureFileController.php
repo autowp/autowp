@@ -59,7 +59,7 @@ class PictureFileController extends AbstractActionController
                     ->getHeaders()
                     ->addHeaders([
                         'Content-Type'     => 'image/gif',
-                        'X-Accel-Redirect' => '/img/hotlinking.gif'
+                        'X-Accel-Redirect' => '/hotlinking.gif'
                     ]);
             }
 
