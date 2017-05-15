@@ -48,8 +48,6 @@ RUN cd /app && npm install
 
 ADD . /app
 
-RUN ./node_modules/.bin/webpack -p
-
 RUN rm /etc/nginx/sites-enabled/default
 ADD ./nginx.conf /etc/nginx/conf.d/default.conf
 
@@ -59,6 +57,8 @@ ADD ./php.ini /etc/php/7.0/cli/php.ini
 RUN mkdir -p /var/run/php/
 RUN rm /etc/php/7.0/fpm/pool.d/www.conf
 ADD fpm-pool.conf /etc/php/7.0/fpm/pool.d/autowp.conf
+
+RUN ./node_modules/.bin/webpack -p
 
 EXPOSE 80
 
