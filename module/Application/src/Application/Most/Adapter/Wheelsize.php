@@ -69,7 +69,7 @@ class Wheelsize extends AbstractAdapter
             ->where('radius.attribute_id = ?', $radius->id)
             ->where('radius.value > 0')
             ->group('item.id')
-            ->order(new Zend_Db_Expr('tyrewidth.value*tyreseries.value/100+radius.value*25.4 ' . $this->order));
+            ->order(new Zend_Db_Expr('2*tyrewidth.value*tyreseries.value/100+radius.value*25.4 ' . $this->order));
 
         $cars = $select->getTable()->fetchAll($select);
 
