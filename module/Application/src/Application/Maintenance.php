@@ -13,7 +13,6 @@ use Application\Model\DbTable\Picture;
 
 use Exception;
 
-use Zend_Db_Adapter_Abstract;
 use Zend_ProgressBar;
 use Zend_ProgressBar_Adapter_Console;
 
@@ -53,9 +52,6 @@ class Maintenance extends AbstractListenerAggregate
         $usersService = $serviceManager->get(Service\UsersService::class);
         $usersService->deleteUnused();
 
-        $db = $serviceManager->get(Zend_Db_Adapter_Abstract::class);
-        $this->dump($db);
-
         print "Daily maintenance done\n";
     }
 
@@ -87,51 +83,6 @@ class Maintenance extends AbstractListenerAggregate
         $carOfDay->putCurrentToVk($vkConfig);
 
         print "Midnight done\n";
-    }
-
-    private function dump(Zend_Db_Adapter_Abstract $db)
-    {
-        $config = $db->getConfig();
-
-        $dir = __DIR__ . '/../../../../data/dump';
-
-        if (! is_dir($dir)) {
-            if (! mkdir($dir, null, true)) {
-                throw new Exception("Error creating dir `$dir`");
-            }
-        }
-
-        $destFile = realpath($dir) . '/' . date('Y-m-d_H.i.s') . '.dump.sql';
-
-        print 'Dumping ... ';
-
-        $cmd = sprintf(
-            'mysqldump -u%s -p%s -h%s --set-gtid-purged=OFF --hex-blob %s -r %s',
-            escapeshellarg($config['username']),
-            escapeshellarg($config['password']),
-            escapeshellarg($config['host']),
-            escapeshellarg($config['dbname']),
-            escapeshellarg($destFile)
-        );
-
-        exec($cmd);
-
-        if (! file_exists($destFile)) {
-            throw new Exception('Error creating dump');
-        }
-
-        print "ok\n";
-
-        print 'Gzipping ... ';
-
-        $cmd = sprintf(
-            'gzip %s',
-            escapeshellarg($destFile)
-        );
-
-        exec($cmd);
-
-        return "ok\n";
     }
 
     private function clearSessions($sessionManager)
