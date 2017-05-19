@@ -10,7 +10,7 @@ class BuildController extends AbstractActionController
 {
     public function brandsSpriteAction()
     {
-        $dir = 'public_html/dist';
+        $dir = 'public_html/img';
         if (! is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
