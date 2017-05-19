@@ -35,7 +35,11 @@ class SessionDispatchListener extends AbstractListenerAggregate
             $cookieDomain = $this->getHostCookieDomain($request, $config['hosts']);
             if ($cookieDomain) {
                 $sessionConfig->setCookieDomain($cookieDomain);
-                //$sessionManager->start();
+                try {
+                    $sessionManager->start();
+                } catch (\Exception $e) {
+                    session_unset();
+                }
             }
 
             /*$cookies = $request->getCookie();
