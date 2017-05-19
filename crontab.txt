@@ -1,0 +1,7 @@
+ *  * * * * root cd /app && ./zf traffic autoban
+33 23 * * * root cd /app && ./zf traffic google
+41  3 * * * root cd /app && ./zf traffic gc
+42  3 * * * root cd /app && ./zf traffic clear-referer-monitoring
+
+ 0  0 * * * root cd /app && ./zf cron midnight
+27  4 * * * root cd /app && ./zf cron daily-maintenance
