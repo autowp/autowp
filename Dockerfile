@@ -9,6 +9,7 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install --no-install-re
     bash \
     build-essential \
     ca-certificates \
+    cron \
     curl \
     dh-autoreconf \
     git \
@@ -47,6 +48,8 @@ ADD package.json /app/package.json
 RUN cd /app && npm install
 
 ADD . /app
+
+ADD ./crontab.txt /etc/cron.d/crontab
 
 RUN rm /etc/nginx/sites-enabled/default
 ADD ./nginx.conf /etc/nginx/conf.d/default.conf
