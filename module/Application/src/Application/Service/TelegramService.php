@@ -13,7 +13,6 @@ use Application\Telegram\Command\StartCommand;
 use Application\Telegram\Command\MessagesCommand;
 
 use Telegram\Bot\Api;
-use Telegram\Bot\Exceptions\TelegramResponseException;
 
 use Zend\Router\Http\TreeRouteStack;
 

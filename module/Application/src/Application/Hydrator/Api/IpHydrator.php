@@ -7,8 +7,6 @@ use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable;
-
 class IpHydrator extends RestHydrator
 {
     /**

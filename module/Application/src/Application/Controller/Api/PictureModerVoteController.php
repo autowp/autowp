@@ -3,7 +3,6 @@
 namespace Application\Controller\Api;
 
 use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractRestfulController;

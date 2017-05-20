@@ -2,15 +2,10 @@
 
 namespace Application\Hydrator\Api;
 
-use DateTime;
-use DateInterval;
-
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Permissions\Acl\Acl;
 
 use Autowp\User\Model\DbTable\User;
-
-use Application\Hydrator\Api\Strategy\Image as HydratorImageStrategy;
 
 class TrafficHydrator extends RestHydrator
 {

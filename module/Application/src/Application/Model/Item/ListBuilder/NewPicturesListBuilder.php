@@ -4,8 +4,6 @@ namespace Application\Model\Item\ListBuilder;
 
 use Application\Model\DbTable;
 
-use Zend_Db_Expr;
-
 class NewPicturesListBuilder extends \Application\Model\Item\ListBuilder
 {
     /**

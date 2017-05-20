@@ -2,10 +2,6 @@
 
 namespace Application\Hydrator\Api\Strategy;
 
-use Interop\Container\ContainerInterface;
-
-use Autowp\Image\Storage;
-
 use Application\Hydrator\Api\UserHydrator as Hydrator;
 
 class User extends HydratorStrategy
