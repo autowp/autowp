@@ -41,17 +41,6 @@ class UrlCorrectionRouteListener extends AbstractListenerAggregate
                     return $this->redirect($e, $redirectUrl);
                 }
             }
-
-            $pattern = '/pictures/';
-            if (strncmp($uri, $pattern, strlen($pattern)) == 0) {
-                $host = 'i.wheelsage.org';
-                if ($request->getUri()->getHost() != $host) {
-                    $redirectUrl = $request->getUri()->getScheme() . '://' .
-                        $host . $uri;
-
-                    return $this->redirect($e, $redirectUrl);
-                }
-            }
         }
     }
 

@@ -9,22 +9,34 @@ use Application\Model\Referer\Blacklist;
 
 class PictureFileController extends AbstractActionController
 {
+    /**
+     * @var string
+     */
+    private $picturesHostname = null;
+
+    public function __construct($picturesHostname)
+    {
+        $this->picturesHostname = $picturesHostname;
+    }
+
     public function indexAction()
     {
         $request = $this->getRequest();
 
-        $hostname = $this->params('hostname');
         $file = $this->params('file');
 
-        if ($hostname != 'i.wheelsage.org') {
-            $sourceUrl = $this->url()->fromRoute('picture-file', [
-                'hostname' => 'i.wheelsage.org',
-                'file'     => $file
-            ], [
-                'force_canonical' => true
-            ]);
+        if ($this->picturesHostname) {
+            $hostname = $this->params('hostname');
+            if ($hostname != $this->picturesHostname) {
+                $sourceUrl = $this->url()->fromRoute('picture-file', [
+                    'hostname' => $this->picturesHostname,
+                    'file'     => $file
+                ], [
+                    'force_canonical' => true
+                ]);
 
-            return $this->redirect()->toUrl($sourceUrl);
+                return $this->redirect()->toUrl($sourceUrl);
+            }
         }
 
         $file = str_replace('/../', '/', $file);

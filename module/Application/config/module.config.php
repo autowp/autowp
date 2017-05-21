@@ -36,7 +36,7 @@ return [
             Controller\NewController::class             => Controller\Frontend\Service\NewControllerFactory::class,
             Controller\PerspectiveController::class     => InvokableFactory::class,
             Controller\PictureController::class         => InvokableFactory::class,
-            Controller\PictureFileController::class     => InvokableFactory::class,
+            Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
             Controller\PulseController::class           => Controller\Frontend\Service\PulseControllerFactory::class,
             Controller\RegistrationController::class    => Controller\Frontend\Service\RegistrationControllerFactory::class,
             Controller\RestorePasswordController::class => Controller\Frontend\Service\RestorePasswordControllerFactory::class,
@@ -200,6 +200,8 @@ return [
     'hostname_whitelist' => ['www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
         'i.wheelsage.org', 'en.wheelsage.org', 'fr.wheelsage.org',
         'zh.wheelsage.org', 'www.wheelsage.org', 'wheelsage.org'],
+
+    'pictures_hostname' => 'i.wheelsage.org',
 
     'content_languages' => ['ru', 'en', 'it', 'fr', 'zh', 'de', 'es', 'pt'],
 
