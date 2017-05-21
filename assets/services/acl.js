@@ -13,7 +13,7 @@ angular.module(Module)
                 if (!cache.hasOwnProperty(role)) {
                     $http({
                         method: 'GET',
-                        url: '/api/acl/roles',
+                        url: '/api/acl/inherit-roles',
                         params: {
                             roles: role
                         }

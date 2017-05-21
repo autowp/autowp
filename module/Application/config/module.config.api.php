@@ -28,7 +28,7 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Api\AclController::class          => InvokableFactory::class,
+            Controller\Api\AclController::class          => Controller\Api\Service\AclControllerFactory::class,
             Controller\Api\CommentController::class      => Controller\Api\Service\CommentControllerFactory::class,
             Controller\Api\ContactsController::class     => InvokableFactory::class,
             Controller\Api\IpController::class           => Controller\Api\Service\IpControllerFactory::class,
@@ -49,6 +49,59 @@ return [
         ]
     ],
     'input_filter_specs' => [
+        'api_acl_roles_list' => [
+            'recursive' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+        ],
+        'api_acl_roles_post' => [
+            'name' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+        ],
+        'api_acl_roles_role_parents_post' => [
+            'role' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+        ],
+        'api_acl_rules_post' => [
+            'role' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'resource' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'privilege' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'allowed' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits']
+                ]
+            ]
+        ],
         'api_ip_item' => [
             'fields' => [
                 'required' => false,
@@ -314,7 +367,7 @@ return [
                             'exif', 'image', 'items', 'special_name',
                             'copyrights', 'change_status_user', 'rights',
                             'moder_votes', 'moder_voted', 'is_last',
-                            'accepted_count', 'crop', 'replaceable', 
+                            'accepted_count', 'crop', 'replaceable',
                             'perspective_item', 'siblings', 'ip'
                         ]]
                     ]
@@ -485,7 +538,7 @@ return [
                             'exif', 'image', 'items', 'special_name',
                             'copyrights', 'change_status_user', 'rights',
                             'moder_votes', 'moder_voted', 'is_last',
-                            'accepted_count', 'crop', 'replaceable', 
+                            'accepted_count', 'crop', 'replaceable',
                             'perspective_item', 'siblings', 'ip'
                         ]]
                     ]
@@ -611,12 +664,123 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes' => [
+                            'inherit-roles' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/inherit-roles',
+                                    'defaults' => [
+                                        'action' => 'inherit-roles'
+                                    ],
+                                ]
+                            ],
                             'roles' => [
                                 'type' => Literal::class,
                                 'options' => [
-                                    'route'    => '/roles',
+                                    'route'    => '/roles'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'roles'
+                                            ]
+                                        ]
+                                    ],
+                                    'post' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'post',
+                                            'defaults' => [
+                                                'action' => 'roles-post'
+                                            ]
+                                        ]
+                                    ],
+                                    'role' => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route' => '/:role',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'get' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'role'
+                                                    ]
+                                                ]
+                                            ],
+                                            'parents' => [
+                                                'type' => Literal::class,
+                                                'options' => [
+                                                    'route'    => '/parents',
+                                                    'defaults' => [
+                                                        'action' => 'role-parents'
+                                                    ],
+                                                ],
+                                                'may_terminate' => false,
+                                                'child_routes' => [
+                                                    'get' => [
+                                                        'type' => Method::class,
+                                                        'options' => [
+                                                            'verb' => 'get',
+                                                            'defaults' => [
+                                                                'action' => 'role-parents'
+                                                            ]
+                                                        ]
+                                                    ],
+                                                    'post' => [
+                                                        'type' => Method::class,
+                                                        'options' => [
+                                                            'verb' => 'post',
+                                                            'defaults' => [
+                                                                'action' => 'role-parents-post'
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            'resources' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/resources',
                                     'defaults' => [
-                                        'action' => 'roles'
+                                        'action' => 'resources'
+                                    ],
+                                ]
+                            ],
+                            'rules' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/rules'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'rules'
+                                            ]
+                                        ]
+                                    ],
+                                    'post' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'post',
+                                            'defaults' => [
+                                                'action' => 'rules-post'
+                                            ]
+                                        ]
                                     ],
                                 ]
                             ],

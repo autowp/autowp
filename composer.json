@@ -29,10 +29,10 @@
 		"zendframework/zend-captcha" : "^2.7",
 		"zendframework/zend-db" : "^2.8",
 		"zendframework/zend-file" : ">=2.7",
-		"zendframework/zend-form" : ">=2.10.1",
-		"zendframework/zend-i18n" : ">=2.7.3",
+		"zendframework/zend-form" : ">=2.10.2",
+		"zendframework/zend-i18n" : ">=2.7.4",
 		"zendframework/zend-i18n-resources" : ">=2.5.2",
-		"zendframework/zend-log" : "^2.9.1",
+		"zendframework/zend-log" : "^2.9.2",
 		"zendframework/zend-mail" : ">=2.7.3",
 		"zendframework/zend-mvc" : ">=3.1.0",
 		"zendframework/zend-mvc-console" : ">=1.1.11",
@@ -49,7 +49,9 @@
 		"jenssegers/imagehash" : "^0.4.1",
 		"facebook/graph-sdk" : "^5.4",
 		"zendframework/zend-hydrator" : "^2.2.1",
-		"autowp/cron" : "^0.1.1"
+		"autowp/cron" : "^0.1.1",
+		"zendframework/zend-filter": ">=2.7.2",
+		"zendframework/zend-inputfilter": ">=2.7.4"
 	},
 	"autoload" : {
 		"psr-4" : {

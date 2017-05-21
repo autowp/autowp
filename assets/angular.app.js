@@ -15,6 +15,7 @@ import './controllers/moder/comments';
 import './controllers/moder/pictures';
 import './controllers/moder/pictures/item';
 import './controllers/moder/perspectives';
+import './controllers/moder/rights';
 import './controllers/moder/traffic';
 import './controllers/moder/users';
 import './controllers/moder/picture-vote-templates';

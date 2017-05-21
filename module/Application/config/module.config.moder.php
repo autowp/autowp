@@ -170,22 +170,6 @@ return [
                             ]
                         ]
                     ],
-                    'rights' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/rights[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\RightsController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'users' => [
                         'type' => Segment::class,
                         'options' => [
@@ -214,7 +198,6 @@ return [
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
             Controller\Moder\PagesController::class        => Controller\Moder\Service\PagesControllerFactory::class,
             Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
-            Controller\Moder\RightsController::class       => Controller\Moder\Service\RightsControllerFactory::class,
             Controller\Moder\UsersController::class        => Controller\Moder\Service\UsersControllerFactory::class,
         ]
     ],
@@ -301,133 +284,6 @@ return [
                 ]
             ]
         ],
-        'ModerAclRoleForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-                'legend' => 'moder/acl/add-role'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'Text',
-                        'name' => 'role',
-                        'options' => [
-                            'label' => 'moder/acl/role',
-                        ],
-                        'attributes' => [
-                            'maxlength' => 80
-                        ]
-                    ]
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'parent_role_id',
-                        'options' => [
-                            'label' => 'moder/acl/parent-role',
-                        ]
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'role' => [
-                    'required' => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ]
-                ],
-                'parent_role_id' => [
-                    'required' => true
-                ]
-            ]
-        ],
-        'ModerAclRuleForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-                'legend' => 'moder/acl/add-rule',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'role_id',
-                        'options' => [
-                            'label' => 'moder/acl/role',
-                        ]
-                    ]
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'privilege_id',
-                        'options' => [
-                            'label' => 'moder/acl/privilege',
-                        ]
-                    ]
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'what',
-                        'options' => [
-                            'label'   => 'moder/acl/add-rule/action',
-                            'options' => [
-                                '0' => 'moder/acl/add-rule/action/deny',
-                                '1' => 'moder/acl/add-rule/action/allow'
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'role_id' => [
-                    'required' => true
-                ],
-                'privilege_id' => [
-                    'required' => true
-                ],
-                'what' => [
-                    'required' => true
-                ]
-            ]
-        ],
-        'ModerAclRoleParentForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-                'legend' => 'moder/acl/add-parent',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'role_id',
-                        'options' => [
-                            'label' => 'moder/acl/role',
-                        ]
-                    ]
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'parent_role_id',
-                        'options' => [
-                            'label' => 'moder/acl/parent-role',
-                        ]
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'role_id' => [
-                    'required' => true
-                ],
-                'parent_role_id' => [
-                    'required' => true
-                ]
-            ]
-        ],
         'ModerPictureVoteForm2' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
@@ -484,46 +340,6 @@ return [
                     'required' => false
                 ]
             ]
-        ],
-        'ModerBrandItem' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type'    => 'Text',
-                        'name'    => 'catname',
-                        'options' => [
-                            'label' => 'Catname',
-                        ],
-                        'attributes' => [
-                            'maxlength' => 50
-                        ]
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'catname' => [
-                    'required' => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim'],
-                        ['name' => 'SingleSpaces'],
-                        ['name' => 'StringToLower'],
-                        ['name' => 'FilenameSafe']
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'min' => 1,
-                                'max' => 50
-                            ]
-                        ]
-                    ]
-                ]
-            ],
         ],
         'ModerCarParent' => [
             'type'     => 'Zend\Form\Form',

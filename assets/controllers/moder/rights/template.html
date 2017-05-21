@@ -1,0 +1,87 @@
+<autowp-roles-tree roles="ctrl.rolesTree"></autowp-roles-tree>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>role</th>
+            <th>resource</th>
+            <th>privilege</th>
+            <th>allowed</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="rule in ctrl.rules">
+            <td ng-bind="rule.role"></td>
+            <td ng-bind="rule.resource"></td>
+            <td ng-bind="rule.privilege"></td>
+            <td>
+                <i class="fa fa-check-circle" ng-if="rule.allowed"></i>
+                <i class="fa fa-times-circle" ng-if="!rule.allowed"></i>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<md-content layout-padding>
+    <form name="add-role-parent" layout="column" ng-submit="ctrl.addRoleParent()">
+        <h3 translate>moder/acl/add-parent</h3>
+        <md-input-container class="md-block">
+            <label translate>moder/acl/role</label>
+            <md-select name="role" ng-model="ctrl.addRoleParentForm.role" required>
+                <md-option ng-repeat="role in ctrl.roles" ng-value="role.name">{{role.name}}</md-option>
+            </md-select>
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label translate>moder/acl/parent-role</label>
+            <md-select name="parent_role" ng-model="ctrl.addRoleParentForm.parentRole" required>
+                <md-option ng-repeat="role in ctrl.roles" ng-value="role.name">{{role.name}}</md-option>
+            </md-select>
+        </md-input-container>
+        <div>
+            <md-button type="submit" class="md-raised md-primary">send</md-button>
+        </div>
+    </form>
+</md-content>
+
+<md-content layout-padding>
+    <form name="add-rule" layout="column" ng-submit="ctrl.addRule()">
+        <h3 translate>moder/acl/add-rule</h3>
+        <md-input-container class="md-block">
+            <label translate>moder/acl/role</label>
+            <md-select name="role" ng-model="ctrl.addRuleForm.role" required>
+                <md-option ng-repeat="role in ctrl.roles" ng-value="role.name">{{role.name}}</md-option>
+            </md-select>
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label translate>moder/acl/privilege</label>
+            <md-select name="privilege" ng-model="ctrl.addRuleForm.privilege" required>
+                <md-optgroup label="{{resource.name}}" ng-repeat="resource in ctrl.resources">
+                    <md-option ng-repeat="privilege in resource.privileges" ng-value="{privilege: privilege.name, resource: resource.name}">{{privilege.name}}</md-option>
+                </md-optgroup>
+            </md-select>
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label translate>moder/acl/add-rule/action</label>
+            <md-select name="what" ng-model="ctrl.addRuleForm.allowed" required>
+                <md-option ng-value="0">{{'moder/acl/add-rule/action/deny'|translate}}</md-option>
+                <md-option ng-value="1">{{'moder/acl/add-rule/action/allow'|translate}}</md-option>
+            </md-select>
+        </md-input-container>
+        <div>
+            <md-button type="submit" class="md-raised md-primary">send</md-button>
+        </div>
+    </form>
+</md-content>
+
+<md-content layout-padding>
+    <form name="add-role" layout="column" ng-submit="ctrl.addRole()">
+        <h3 translate>moder/acl/add-role</h3>
+        <md-input-container class="md-block">
+            <label translate>moder/acl/role</label>
+            <input type="text" md-maxlength="255" name="name" ng-model="ctrl.addRoleForm.name" required />
+        </md-input-container>
+        <div>
+            <md-button type="submit" class="md-raised md-primary">send</md-button>
+        </div>
+    </form>
+</md-content>
