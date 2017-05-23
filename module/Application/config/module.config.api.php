@@ -31,6 +31,7 @@ return [
             Controller\Api\AclController::class          => Controller\Api\Service\AclControllerFactory::class,
             Controller\Api\CommentController::class      => Controller\Api\Service\CommentControllerFactory::class,
             Controller\Api\ContactsController::class     => InvokableFactory::class,
+            Controller\Api\HotlinksController::class     => InvokableFactory::class,
             Controller\Api\IpController::class           => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class         => Controller\Api\Service\ItemControllerFactory::class,
             Controller\Api\ItemParentController::class   => Controller\Api\Service\ItemParentControllerFactory::class,
@@ -673,6 +674,15 @@ return [
                                     ],
                                 ]
                             ],
+                            'is-allowed' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/is-allowed',
+                                    'defaults' => [
+                                        'action' => 'is-allowed'
+                                    ],
+                                ]
+                            ],
                             'roles' => [
                                 'type' => Literal::class,
                                 'options' => [
@@ -819,6 +829,102 @@ return [
                                 'controller' => Controller\Api\ContactsController::class
                             ],
                         ],
+                    ],
+                    'hotlinks' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/hotlinks',
+                            'defaults' => [
+                                'controller' => Controller\Api\HotlinksController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'blacklist' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/blacklist'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'post' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'post',
+                                            'defaults' => [
+                                                'action' => 'blacklist-post'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            'whitelist' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/whitelist'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'post' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'post',
+                                            'defaults' => [
+                                                'action' => 'whitelist-post'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            'hosts' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/hosts'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'hosts'
+                                            ]
+                                        ]
+                                    ],
+                                    'delete' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'delete',
+                                            'defaults' => [
+                                                'action' => 'hosts-delete'
+                                            ]
+                                        ]
+                                    ],
+                                    'host' => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route' => '/:host',
+                                            'defaults' => [
+                                                'action' => 'host'
+                                            ]
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'delete' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'delete',
+                                                    'defaults' => [
+                                                        'action' => 'host-delete'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ],
+                                ]
+                            ],
+                        ]
                     ],
                     'ip' => [
                         'type' => Segment::class,

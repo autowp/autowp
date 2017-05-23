@@ -1,0 +1,31 @@
+<md-button class="md-raised md-warn" ng-click="ctrl.clearAll()" ng-if="ctrl.canManage">Clear all</md-button>
+
+<table class="table table-border">
+    <thead>
+        <tr>
+            <th>Host</th>
+            <th>URL</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="host in ctrl.hosts">
+            <td>
+                <div ng-bind="host.host"></div>
+                <md-button class="md-warn" ng-click="ctrl.clear(host.host)" ng-if="ctrl.canManage">Clear</md-button>
+                <md-button class="md-primary" ng-click="ctrl.addToWhitelist(host.host)" ng-if="ctrl.canManage && !host.whitelisted">Whitelist</md-button>
+                <md-button class="md-primary" ng-click="ctrl.addToWhitelistAndClear(host.host)" ng-if="ctrl.canManage && !host.whitelisted">Whitelist&amp;Clear</md-button>
+                <md-button class="md-warn" ng-click="ctrl.addToBlacklist(host.host)" ng-if="ctrl.canManage && !host.blacklisted">Blacklist</md-button>
+            </td>
+            <td>
+                <div ng-repeat="link in host.links">
+                    {{link.last_date}}
+                    <a ng-href="{{link.url}}">{{link.url | limitTo : 70}}</a>
+                    <small>({{link.count}})</small><br />
+                    {{link.accept}}
+                </div>
+            </td>
+            <td ng-bind="host.count"></td>
+        </tr>
+    </tbody>
+</table>

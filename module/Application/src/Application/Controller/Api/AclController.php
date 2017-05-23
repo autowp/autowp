@@ -99,7 +99,17 @@ class AclController extends AbstractRestfulController
 
     public function isAllowedAction()
     {
+        $user = $this->user()->get();
+        if (! $user) {
+            return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
+        }
 
+        return new JsonModel([
+            'result' => $this->user()->isAllowed(
+                $this->params()->fromQuery('resource'),
+                $this->params()->fromQuery('privilege')
+            )
+        ]);
     }
 
     public function inheritRolesAction()

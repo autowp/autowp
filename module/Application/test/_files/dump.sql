@@ -66,7 +66,7 @@ CREATE TABLE `acl_resources_privileges` (
 INSERT IGNORE INTO `acl_resources_privileges` (`id`, `resource_id`, `name`) 
 VALUES (4,4,'add'),(1,4,'edit_meta'),(5,4,'move'),(8,5,'move'),
 (2,11,'edit'),(3,13,'ban'),(7,17,'edit'),(9,17,'edit-engine'),(6,21,'edit'),
-(10,6,'remove'),(11,9,'edit'),(12,10,'moderate'),(13,1,'logo'),(14,15,'view');
+(10,6,'remove'),(11,9,'edit'),(12,10,'moderate'),(13,1,'logo'),(14,15,'view'),(15,15,'manage');
 
 
 

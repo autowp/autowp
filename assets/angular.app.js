@@ -12,6 +12,7 @@ import './controllers/moder/items/alpha';
 import './controllers/moder/items/too-big';
 import './controllers/moder/index/stat';
 import './controllers/moder/comments';
+import './controllers/moder/hotlinks';
 import './controllers/moder/pictures';
 import './controllers/moder/pictures/item';
 import './controllers/moder/perspectives';
