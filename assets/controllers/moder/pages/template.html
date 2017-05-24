@@ -1,0 +1,31 @@
+<md-button ui-sref="moder-pages-add" class="md-raised md-primary">{{'moder/pages/new'|translate}}</md-button>
+
+<table class="table table-striped table-condensed">
+    <thead>
+        <tr>
+            <th>move</th>
+            <th>N</th>
+            <th translate>page/name</th>
+            <th>Breadcrumbs</th>
+            <th>IsGroup?</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="data-row" ng-repeat="page in ctrl.items">
+            <td style="white-space:nowrap">
+                <md-button class="md-icon-button md-raised" ng-disabled="!page.moveUp" aria-label="move up" ng-click="ctrl.move(page, 'up')"><i class="fa fa-arrow-up"></i></md-button>
+                <md-button class="md-icon-button md-raised" ng-disabled="!page.moveDown" aria-label="move down" ng-click="ctrl.move(page, 'down')"><i class="fa fa-arrow-down"></i></md-button>
+            </td>
+            <td ng-bind="page.id"></td>
+            <td style="padding-left:{{page.level * 20}}px" ng-bind="page.name"></td>
+            <td ng-bind="page.breadcrumbs"></td>
+            <td>{{page.isGroupNode ? 'yes' : 'no'}}</td>
+            <td style="white-space:nowrap">
+                <md-button class="md-primary md-icon-button md-raised" ng-click="addChild" aria-label="add"><i class="fa fa-plus"></i></md-button>
+                <md-button class="md-icon-button md-raised" ui-sref="moder-pages-edit({id: page.id})" aria-label="edit"><i class="fa fa-pencil"></i></md-button>
+                <md-button class="md-warn md-icon-button md-raised" ng-click="deletePage(page)" aria-label="delete"><i class="fa fa-times"></i></md-button>
+            </td>
+        </tr>
+    </tbody>
+</table>

@@ -8,6 +8,7 @@ use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Application\Model\DbTable;
+use Autowp\ZFComponents\Filter\SingleSpaces;
 
 return [
     'hydrators' => [
@@ -35,6 +36,7 @@ return [
             Controller\Api\IpController::class           => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class         => Controller\Api\Service\ItemControllerFactory::class,
             Controller\Api\ItemParentController::class   => Controller\Api\Service\ItemParentControllerFactory::class,
+            Controller\Api\PageController::class         => Controller\Api\Service\PageControllerFactory::class,
             Controller\Api\PerspectiveController::class  => Controller\Api\Service\PerspectiveControllerFactory::class,
             Controller\Api\PerspectivePageController::class => Controller\Api\Service\PerspectivePageControllerFactory::class,
             Controller\Api\PictureController::class      => Controller\Api\Service\PictureControllerFactory::class,
@@ -312,6 +314,109 @@ return [
                     ]
                 ]
             ],
+        ],
+        'api_page_put' => [
+            'parent_id' => [
+                'required' => false
+            ],
+            'name' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_NAME
+                        ]
+                    ]
+                ]
+            ],
+            'title' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_TITLE
+                        ]
+                    ]
+                ]
+            ],
+            'breadcrumbs' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_BREADCRUMBS
+                        ]
+                    ]
+                ]
+            ],
+            'url' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_URL
+                        ]
+                    ]
+                ]
+            ],
+            'is_group_node' => [
+                'required' => false
+            ],
+            'registered_only' => [
+                'required' => false
+            ],
+            'guest_only' => [
+                'required' => false
+            ],
+            'class' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_CLASS
+                        ]
+                    ]
+                ]
+            ],
+            'position' => [
+                'required' => false,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'up',
+                                'down'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ],
         'api_perspective_page_list' => [
             'fields' => [
@@ -994,6 +1099,54 @@ return [
                                     'defaults' => [
                                         'action' => 'index'
                                     ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'page' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/page',
+                            'defaults' => [
+                                'controller' => Controller\Api\PageController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'list' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
+                            ],
+                            'item' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/:id'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'item'
+                                            ]
+                                        ]
+                                    ],
+                                    'put' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'put',
+                                            'defaults' => [
+                                                'action' => 'item-put'
+                                            ]
+                                        ]
+                                    ],
                                 ]
                             ]
                         ]
