@@ -14,7 +14,8 @@ class PageControllerFactory implements FactoryInterface
         $filters = $container->get('InputFilterManager');
         return new Controller(
             $container->get(\Zend\Db\Adapter\AdapterInterface::class),
-            $filters->get('api_page_put')
+            $filters->get('api_page_put'),
+            $filters->get('api_page_post')
         );
     }
 }

@@ -28,10 +28,19 @@ class PageController extends AbstractRestfulController
      */
     private $putInputFilter;
 
-    public function __construct(Adapter $adapter, InputFilter $putInputFilter)
-    {
+    /**
+     * @var InputFilter
+     */
+    private $postInputFilter;
+
+    public function __construct(
+        Adapter $adapter,
+        InputFilter $putInputFilter,
+        InputFilter $postInputFilter
+    ) {
         $this->table = new TableGateway('pages', $adapter, new RowGatewayFeature('id'));
         $this->putInputFilter = $putInputFilter;
+        $this->postInputFilter = $postInputFilter;
     }
 
     public function indexAction()
@@ -227,5 +236,77 @@ class PageController extends AbstractRestfulController
         }
 
         return $this->getResponse()->setStatusCode(200);
+    }
+
+    public function postAction()
+    {
+        if (! $this->user()->inheritsRole('moder')) {
+            return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
+        }
+
+        $data = $this->processBodyContent($this->getRequest());
+
+        $this->postInputFilter->setData($data);
+
+        if (! $this->postInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->postInputFilter);
+        }
+
+        $data = $this->postInputFilter->getValues();
+
+        $select = new Sql\Select($this->table->getTable());
+        $select->columns(['position' => new Sql\Expression('MAX(position)')]);
+
+        if ($data['parent_id']) {
+            $select->where(['parent_id' => $data['parent_id']]);
+        } else {
+            $select->where(['parent_id IS NULL']);
+        }
+
+        $sql = new Sql\Sql($this->table->getAdapter());
+        $statement = $sql->prepareStatementForSqlObject($select);
+        $result = $statement->execute();
+        $row = $result->current();
+        $position = 1 + $row['position'];
+
+        $insert = [
+            'parent_id'       => $data['parent_id'] ? (int)$data['parent_id'] : null,
+            'name'            => $data['name'],
+            'title'           => $data['title'],
+            'breadcrumbs'     => $data['breadcrumbs'],
+            'url'             => $data['url'],
+            'class'           => $data['class'],
+            'is_group_node'   => $data['is_group_node'] ? 1 : 0,
+            'registered_only' => $data['registered_only'] ? 1 : 0,
+            'guest_only'      => $data['guest_only'] ? 1 : 0,
+            'position'        => $position
+        ];
+
+        $this->table->insert($insert);
+
+        $id = $this->table->getLastInsertValue();
+
+        $url = $this->url()->fromRoute('api/page/item/get', [
+            'id' => $id
+        ]);
+        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
+
+        return $this->getResponse()->setStatusCode(201);
+    }
+
+    public function itemDeleteAction()
+    {
+        if (! $this->user()->inheritsRole('moder')) {
+            return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
+        }
+
+        $page = $this->table->select(['id' => (int)$this->params('id')])->current();
+        if (! $page) {
+            return new ApiProblemResponse(new ApiProblem(404, 'Not found'));
+        }
+
+        $page->delete();
+
+        return $this->getResponse()->setStatusCode(204);
     }
 }

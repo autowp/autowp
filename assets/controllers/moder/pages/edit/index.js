@@ -17,7 +17,7 @@ angular.module(Module)
                 template: template,
                 resolve: {
                     access: [ACL_SERVICE_NAME, function (Acl) {
-                        return Acl.inheritsRole('moder', 'unauthorized');
+                        return Acl.inheritsRole('pages-moder', 'unauthorized');
                     }]
                 }
             });

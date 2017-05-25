@@ -315,6 +315,95 @@ return [
                 ]
             ],
         ],
+        'api_page_post' => [
+            'parent_id' => [
+                'required' => false
+            ],
+            'name' => [
+                'required' => true,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_NAME
+                        ]
+                    ]
+                ]
+            ],
+            'title' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_TITLE
+                        ]
+                    ]
+                ]
+            ],
+            'breadcrumbs' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_BREADCRUMBS
+                        ]
+                    ]
+                ]
+            ],
+            'url' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_URL
+                        ]
+                    ]
+                ]
+            ],
+            'is_group_node' => [
+                'required' => false
+            ],
+            'registered_only' => [
+                'required' => false
+            ],
+            'guest_only' => [
+                'required' => false
+            ],
+            'class' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => Model\Page::MAX_CLASS
+                        ]
+                    ]
+                ]
+            ]
+        ],
         'api_page_put' => [
             'parent_id' => [
                 'required' => false
@@ -1122,6 +1211,15 @@ return [
                                     ]
                                 ]
                             ],
+                            'post' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'post',
+                                    'defaults' => [
+                                        'action' => 'post'
+                                    ]
+                                ]
+                            ],
                             'item' => [
                                 'type' => Segment::class,
                                 'options' => [
@@ -1144,6 +1242,15 @@ return [
                                             'verb' => 'put',
                                             'defaults' => [
                                                 'action' => 'item-put'
+                                            ]
+                                        ]
+                                    ],
+                                    'delete' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'delete',
+                                            'defaults' => [
+                                                'action' => 'item-delete'
                                             ]
                                         ]
                                     ],

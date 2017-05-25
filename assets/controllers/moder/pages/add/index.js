@@ -2,18 +2,16 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import ACL_SERVICE_NAME from 'services/acl';
-import './add';
-import './edit';
 
-const CONTROLLER_NAME = 'ModerPagesController';
-const STATE_NAME = 'moder-pages';
+const CONTROLLER_NAME = 'ModerPagesAddController';
+const STATE_NAME = 'moder-pages-add';
 
 angular.module(Module)
     .config(['$stateProvider',
         function config($stateProvider) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/pages',
+                url: '/moder/pages/add',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template,
@@ -26,38 +24,22 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$mdDialog', ACL_SERVICE_NAME,
-        function($scope, $http, $mdDialog, Acl) {
+        '$scope', '$http', '$state', ACL_SERVICE_NAME,
+        function($scope, $http, $state, Acl) {
             $scope.pageEnv({
                 layout: {
                     isAdminPage: true,
                     blankPage: false,
                     needRight: false
                 },
-                pageId: 68
+                pageId: 69
             });
             
             var ctrl = this;
-            ctrl.items = [];
+            ctrl.item = {};
             
-            ctrl.canManage = false;
-            Acl.isAllowed('hotlinks', 'manage').then(function() {
-                ctrl.canManage = true;
-            }, function() {
-                ctrl.canManage = false;
-            });
-            
-            var load = function() {
-                $http({
-                    method: 'GET',
-                    url: '/api/page'
-                }).then(function(response) {
-                    ctrl.items = toPlainArray(response.data.items, 0);
-                });
-            };
-            
-            load();
-            
+            ctrl.loading = 0;
+
             function toPlainArray(pages, level) {
                 var result = [];
                 angular.forEach(pages, function(page, i) {
@@ -72,36 +54,51 @@ angular.module(Module)
                 return result;
             }
             
-            ctrl.move = function(page, direction) {
+            $http({
+                method: 'GET',
+                url: '/api/page'
+            }).then(function(response) {
+                ctrl.pages = toPlainArray(response.data.items, 0);
+            });
+            
+            ctrl.save = function() {
+                ctrl.loading++;
                 $http({
-                    method: 'PUT',
-                    url: '/api/page/' + page.id,
+                    method: 'POST',
+                    url: '/api/page',
                     data: {
-                        position: direction
+                        parent_id: ctrl.item.parent_id,
+                        name: ctrl.item.name,
+                        title: ctrl.item.title,
+                        breadcrumbs: ctrl.item.breadcrumbs,
+                        url: ctrl.item.url,
+                        is_group_node: ctrl.item.is_group_node ? 1 : 0,
+                        registered_only: ctrl.item.registered_only ? 1 : 0,
+                        guest_only: ctrl.item.guest_only ? 1 : 0,
+                        'class': ctrl.item['class']
                     }
                 }).then(function(response) {
-                    load();
+                    ctrl.loading--;
+                    
+                    ctrl.loading++;
+                    $http({
+                        method: 'GET',
+                        url: response.headers('Location')
+                    }).then(function(response) {
+                        ctrl.loading--;
+                        
+                        $state.go('moder-pages-edit', {
+                            id: response.data.id
+                        });
+                    }, function() {
+                        ctrl.loading--;
+                    });
+
+                }, function() {
+                    ctrl.loading--;
                 });
             };
             
-            ctrl.deletePage = function(ev, page) {
-                var confirm = $mdDialog.confirm()
-                    .title('Would you like to delete page?')
-                    .textContent('That can not be undone.')
-                    .ariaLabel('Lucky day')
-                    .targetEvent(ev)
-                    .ok('Yes')
-                    .cancel('Nope');
-
-                $mdDialog.show(confirm).then(function() {
-                    $http({
-                        method: 'DELETE',
-                        url: '/api/page/' + page.id
-                    }).then(function(response) {
-                        load();
-                    });
-                });
-            };
         }
     ]);
 
