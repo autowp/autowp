@@ -32,17 +32,6 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $this->assertXpathQuery("//h1[contains(text(), 'test car')]|//*[@value='test car']");
     }
 
-    public function testIndex()
-    {
-        $this->dispatch('https://www.autowp.ru/moder/cars', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(403);
-        $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars');
-        $this->assertActionName('forbidden');
-    }
-
     public function testCreateCarAndAddToBrand()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
