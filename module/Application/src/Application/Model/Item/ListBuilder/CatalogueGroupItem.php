@@ -107,23 +107,23 @@ class CatalogueGroupItem extends CatalogueItem
         return $this->itemParentRows[$itemId][$parentId];
     }
 
-    public function getDetailsUrl(DbTable\Item\Row $item)
+    public function getDetailsUrl($item)
     {
         $itemParentAdapter = $this->itemParentTable->getAdapter();
         $hasChilds = (bool)$itemParentAdapter->fetchOne(
             $itemParentAdapter->select()
                 ->from($this->itemParentTable->info('name'), new Zend_Db_Expr('1'))
-                ->where('parent_id = ?', $item->id)
+                ->where('parent_id = ?', $item['id'])
         );
 
-        $hasHtml = $this->isItemHasFullText($item->id);
+        $hasHtml = $this->isItemHasFullText($item['id']);
 
         if (! $hasChilds && ! $hasHtml) {
             return null;
         }
 
         // found parent row
-        $itemParentRow = $this->getItemParentRow($item->id, $this->itemId);
+        $itemParentRow = $this->getItemParentRow($item['id'], $this->itemId);
         if (! $itemParentRow) {
             return null;
         }
@@ -140,10 +140,10 @@ class CatalogueGroupItem extends CatalogueItem
         ]);
     }
 
-    public function getPicturesUrl(DbTable\Item\Row $item)
+    public function getPicturesUrl($item)
     {
         //TODO: more than 1 levels diff fails here
-        $itemParentRow = $this->getItemParentRow($item->id, $this->itemId);
+        $itemParentRow = $this->getItemParentRow($item['id'], $this->itemId);
         if (! $itemParentRow) {
             return null;
         }
@@ -161,10 +161,10 @@ class CatalogueGroupItem extends CatalogueItem
         ]);
     }
 
-    public function getSpecificationsUrl(DbTable\Item\Row $item)
+    public function getSpecificationsUrl($item)
     {
-        if ($this->hasChildSpecs[$item->id]) {
-            $itemParentRow = $this->getItemParentRow($item->id, $this->itemId);
+        if ($this->hasChildSpecs[$item['id']]) {
+            $itemParentRow = $this->getItemParentRow($item['id'], $this->itemId);
             if ($itemParentRow) {
                 return $this->router->assemble([
                     'action'        => 'brand-item-specifications',
@@ -179,7 +179,7 @@ class CatalogueGroupItem extends CatalogueItem
             }
         }
 
-        if (! $this->specsService->hasSpecs($item->id)) {
+        if (! $this->specsService->hasSpecs($item['id'])) {
             return false;
         }
 
@@ -243,10 +243,10 @@ class CatalogueGroupItem extends CatalogueItem
         ]);
     }
 
-    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
+    public function getPictureUrl($item, array $picture)
     {
         // found parent row
-        $itemParentRow = $this->getItemParentRow($item->id, $this->itemId);
+        $itemParentRow = $this->getItemParentRow($item['id'], $this->itemId);
         if (! $itemParentRow) {
             return $this->picHelper->url($picture['identity']);
         }

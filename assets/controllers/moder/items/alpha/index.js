@@ -50,9 +50,10 @@ angular.module(Module)
                 $scope.loading = true;
                 $http.get('/api/item', {
                     params: {
-                        search: char,
+                        name: char + '%',
                         page: $scope.page,
-                        limit: 500
+                        limit: 500,
+                        fields: 'moder_url,name_html'
                     }
                 }).then(function(response) {
                     $scope.paginator = response.data.paginator;

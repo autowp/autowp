@@ -11,7 +11,7 @@
     <tbody>
         <tr ng-repeat="item in items">
             <td ng-bind="item.id"></td>
-            <td><a ng-href="{{item.moder_url}}" ng-bind="item.name"></a></td>
+            <td><a ng-href="{{item.moder_url}}" ng-bind-html="item.name_html"></a></td>
             <td ng-bind="item.childs_count"></td>
         </tr>
     </tbody>

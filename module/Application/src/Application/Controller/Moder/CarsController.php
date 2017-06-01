@@ -20,7 +20,6 @@ use Application\Model\PictureItem;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 
 use geoPHP;
@@ -59,11 +58,6 @@ class CarsController extends AbstractActionController
     private $itemParentForm;
 
     /**
-     * @var Form
-     */
-    private $filterForm;
-
-    /**
      * @var HostManager
      */
     private $hostManager;
@@ -100,7 +94,6 @@ class CarsController extends AbstractActionController
         Form $descForm,
         Form $textForm,
         Form $itemParentForm,
-        Form $filterForm,
         Form $logoForm,
         BrandVehicle $brandVehicle,
         MessageService $message,
@@ -114,7 +107,6 @@ class CarsController extends AbstractActionController
         $this->descForm = $descForm;
         $this->textForm = $textForm;
         $this->itemParentForm = $itemParentForm;
-        $this->filterForm = $filterForm;
         $this->logoForm = $logoForm;
         $this->brandVehicle = $brandVehicle;
         $this->message = $message;
@@ -149,197 +141,6 @@ class CarsController extends AbstractActionController
         }
 
         return $result;
-    }
-
-    public function indexAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $specTable = new DbTable\Spec();
-        $specOptions = $this->loadSpecs($specTable, null, 0);
-
-        $vehicleTypeTable = new DbTable\Vehicle\Type();
-        $vehicleTypeOptions = $this->getVehicleTypeOptions($vehicleTypeTable, null);
-
-        $this->filterForm->setAttribute('action', $this->url()->fromRoute(null, [], [], true));
-
-        $this->filterForm->get('spec')->setValueOptions(array_replace(['' => '--'], $specOptions));
-        $this->filterForm->get('vehicle_type_id')->setValueOptions(array_replace([
-            ''      => '--',
-            'empty' => 'moder/items/filter/vehicle-type/empty'
-        ], $vehicleTypeOptions));
-        $this->filterForm->get('vehicle_childs_type_id')->setValueOptions(array_replace([
-            '' => '--'
-        ], $vehicleTypeOptions));
-
-        if ($this->getRequest()->isPost()) {
-            $this->filterForm->setData($this->params()->fromPost());
-            if ($this->filterForm->isValid()) {
-                $params = $this->filterForm->getData();
-                foreach ($params as $key => $value) {
-                    if (strlen($value) <= 0) {
-                        unset($params[$key]);
-                    }
-                }
-
-                return $this->redirect()->toRoute('moder/cars/params', array_replace($params, [
-                    'action' => 'index'
-                ]));
-            }
-        }
-
-        $this->filterForm->setData(array_replace(['order' => '1'], $this->params()->fromRoute()));
-
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $select = $itemTable->select(true);
-
-        if ($this->filterForm->isValid()) {
-            $values = $this->filterForm->getData();
-
-            $group = false;
-
-            if ($values['name']) {
-                $select->where('item.name like ?', '%' . $values['name'] . '%');
-            }
-
-            if ($values['no_name']) {
-                $select->where('item.name not like ?', '%' . $values['no_name'] . '%');
-            }
-
-            if ($values['item_type_id']) {
-                $select->where('item.item_type_id = ?', $values['item_type_id']);
-            }
-
-            if ($values['vehicle_type_id']) {
-                if ($values['vehicle_type_id'] == 'empty') {
-                    $select
-                        ->joinLeft('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
-                        ->where('vehicle_vehicle_type.vehicle_id is null');
-                } else {
-                    $select
-                        ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
-                        ->where('vehicle_vehicle_type.vehicle_type_id = ?', $values['vehicle_type_id']);
-                }
-            }
-
-            if ($values['vehicle_childs_type_id']) {
-                $group = true;
-                $select
-                    ->join(
-                        ['cpc_childs' => 'item_parent_cache'],
-                        'item.id = cpc_childs.parent_id',
-                        null
-                    )
-                    ->join(
-                        ['vvt_child' => 'vehicle_vehicle_type'],
-                        'cpc_childs.item_id = vvt_child.vehicle_id',
-                        null
-                    )
-                    ->join('car_types_parents', 'vvt_child.vehicle_type_id = car_types_parents.id', null)
-                    ->where('car_types_parents.parent_id = ?', $values['vehicle_childs_type_id']);
-            }
-
-            if ($values['spec']) {
-                $select->where('item.spec_id = ?', $values['spec']);
-            }
-
-            if ($values['from_year']) {
-                $select->where('item.begin_year = ?', $values['from_year']);
-            }
-
-            if ($values['to_year']) {
-                $select->where('item.end_year = ?', $values['to_year']);
-            }
-
-            if ($values['parent_id']) {
-                $select
-                    ->join(['item_parent_cache'], 'item.id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $values['parent_id']);
-            }
-
-            /*if ($values['no_category']) {
-                $itemParentTable = new DbTable\Item\ParentTable();
-
-                $ids = $itemParentTable->getAdapter()->fetchCol(
-                    $itemParentTable->getAdapter()->select()
-                        ->from('item_parent_cache', 'item_id')
-                        ->where('parent_id = ?', $values['no_category'])
-                );
-
-                if ($ids) {
-                    $expr = $itemTable->getAdapter()->quoteInto(
-                        'item.id = no_category.item_id and no_category.parent_id in (?)',
-                        $ids
-                    );
-                    $select
-                        ->joinLeft(['no_category' => 'item_parent_cache'], $expr, null)
-                        ->where('no_category.item_id is null');
-                }
-            }*/
-
-            if ($values['no_parent']) {
-                $select
-                    ->joinLeft(
-                        'item_parent_cache',
-                        'item.id = item_parent_cache.item_id and item.id <> item_parent_cache.parent_id',
-                        null
-                    )
-                    ->where('item_parent_cache.item_id IS NULL');
-            }
-
-            if ($values['text']) {
-                $select
-                    ->join('item_language', 'item.id = item_language.item_id', null)
-                    ->join('textstorage_text', 'item_language.text_id = textstorage_text.id', null)
-                    ->where('textstorage_text.text like ?', '%' . $values['text'] . '%');
-            }
-
-            switch ($values['order']) {
-                case '0':
-                    $select->order('id asc');
-                    break;
-
-                default:
-                case '1':
-                    $select->order('id desc');
-                    break;
-            }
-
-            if ($group) {
-                $select->group('item.id');
-            }
-        }
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
-        );
-
-        $paginator
-            ->setItemCountPerPage(10)
-            ->setCurrentPageNumber($this->params('page'));
-
-        return [
-            'form'      => $this->filterForm,
-            'paginator' => $paginator,
-            'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
-                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'type'                 => null,
-                    'onlyExactlyPictures'  => false,
-                    'dateSort'             => false,
-                    'disableLargePictures' => false,
-                    'perspectivePageId'    => null,
-                    'onlyChilds'           => []
-                ]),
-                'listBuilder' => new \Application\Model\Item\ListBuilder([
-                    'catalogue' => $this->catalogue(),
-                    'router'    => $this->getEvent()->getRouter(),
-                    'picHelper' => $this->getPluginManager()->get('pic')
-                ]),
-            ])
-        ];
     }
 
     /**

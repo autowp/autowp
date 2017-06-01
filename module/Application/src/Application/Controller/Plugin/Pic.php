@@ -10,6 +10,7 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User as UserTable;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\Catalogue;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
 use Application\Model\PictureItem;
@@ -72,6 +73,11 @@ class Pic extends AbstractPlugin
      */
     private $pictureVote;
 
+    /**
+     * @var Catalogue
+     */
+    private $catalogue;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -81,7 +87,8 @@ class Pic extends AbstractPlugin
         PictureItem $pictureItem,
         $httpRouter,
         Comments\CommentsService $comments,
-        PictureVote $pictureVote
+        PictureVote $pictureVote,
+        Catalogue $catalogue
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -92,6 +99,7 @@ class Pic extends AbstractPlugin
         $this->httpRouter = $httpRouter;
         $this->comments = $comments;
         $this->pictureVote = $pictureVote;
+        $this->catalogue = $catalogue;
 
         $this->pictureTable = new DbTable\Picture();
     }
@@ -125,14 +133,12 @@ class Pic extends AbstractPlugin
         ];
         $options = array_replace($defaults, $options);
 
-        $controller = $this->getController();
-
         $url = null;
 
         $carIds = $this->pictureItem->getPictureItems($row['id']);
         if ($carIds) {
             $carId = $carIds[0];
-            $paths = $controller->catalogue()->getCataloguePaths($carId, [
+            $paths = $this->catalogue->getCataloguePaths($carId, [
                 'breakOnFirst' => true,
                 'stockFirst'   => true
             ]);
@@ -141,13 +147,14 @@ class Pic extends AbstractPlugin
                 $path = $paths[0];
 
                 if ($path['car_catname']) {
-                    $url = $controller->url()->fromRoute('catalogue', [
+                    $url = $this->httpRouter->assemble([
                         'action'        => 'brand-item-picture',
                         'brand_catname' => $path['brand_catname'],
                         'car_catname'   => $path['car_catname'],
                         'path'          => $path['path'],
                         'picture_id'    => $row['identity']
                     ], [
+                        'name'            => 'catalogue',
                         'force_canonical' => $options['canonical']
                     ]);
                 } else {
@@ -165,11 +172,12 @@ class Pic extends AbstractPlugin
                             break;
                     }
 
-                    $url = $controller->url()->fromRoute('catalogue', [
+                    $url = $this->httpRouter->assemble([
                         'action'        => $action,
                         'brand_catname' => $path['brand_catname'],
                         'picture_id'    => $row['identity']
                     ], [
+                        'name' => 'catalogue',
                         'force_canonical' => $options['canonical']
                     ]);
                 }
@@ -439,12 +447,11 @@ class Pic extends AbstractPlugin
     private function picPageItemsData($picture, $carIds)
     {
         $controller = $this->getController();
-        $catalogue = $controller->catalogue();
 
         $language = $controller->language();
         $isModer = $controller->user()->inheritsRole('moder');
 
-        $itemTable = $catalogue->getItemTable();
+        $itemTable = $this->catalogue->getItemTable();
         $itemLanguageTable = new DbTable\Item\Language();
 
         $db = $this->pictureTable->getAdapter();
@@ -492,8 +499,10 @@ class Pic extends AbstractPlugin
 
                 foreach ($twinsGroupsRows as $twinsGroup) {
                     $twins[] = [
-                        'url' => $controller->url()->fromRoute('twins/group', [
+                        'url' => $this->httpRouter->assemble([
                             'id' => $twinsGroup->id
+                        ], [
+                            'name' => 'twins/group'
                         ])
                     ];
                 }
@@ -514,10 +523,12 @@ class Pic extends AbstractPlugin
                 if ($designCarsRow) {
                     $designProject = [
                         'brand' => $designCarsRow['brand_name'],
-                        'url'   => $controller->url()->fromRoute('catalogue', [
+                        'url'   => $this->httpRouter->assemble([
                             'action'        => 'brand-item',
                             'brand_catname' => $designCarsRow['brand_catname'],
                             'car_catname'   => $designCarsRow['brand_item_catname']
+                        ], [
+                            'name' => 'catalogue'
                         ])
                     ];
                 }
@@ -550,12 +561,14 @@ class Pic extends AbstractPlugin
                 }
 
                 if ((bool)$fullText) {
-                    foreach ($catalogue->getCataloguePaths($item['id']) as $path) {
-                        $detailsUrl = $controller->url()->fromRoute('catalogue', [
+                    foreach ($this->catalogue->getCataloguePaths($item['id']) as $path) {
+                        $detailsUrl = $this->httpRouter->assemble([
                             'action'        => 'brand-item',
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path']
+                        ], [
+                            'name' => 'catalogue'
                         ]);
                         break;
                     }
@@ -571,25 +584,31 @@ class Pic extends AbstractPlugin
                 foreach ($factoryRows as $factoryRow) {
                     $factories[] = [
                         'name' => $factoryRow->name,
-                        'url'  => $controller->url()->fromRoute('factories/factory', [
+                        'url'  => $this->httpRouter->assemble([
                             'id' => $factoryRow->id
+                        ], [
+                            'name' => 'factories/factory'
                         ])
                     ];
                 }
 
                 if ($controller->user()->isAllowed('specifications', 'edit')) {
-                    $specsEditUrl = $controller->url()->fromRoute('cars/params', [
+                    $specsEditUrl = $this->httpRouter->assemble([
                         'action'  => 'car-specifications-editor',
                         'item_id' => $item['id']
+                    ], [
+                        'name' => 'cars/params'
                     ]);
                 }
             }
 
             $uploadUrl = null;
             if ($controller->user()->logedIn()) {
-                $uploadUrl = $controller->url()->fromRoute('upload/params', [
+                $uploadUrl = $this->httpRouter->assemble([
                     'action'  => 'index',
                     'item_id' => $item['id']
+                ], [
+                    'name' => 'upload/params'
                 ]);
             }
 
@@ -652,9 +671,11 @@ class Pic extends AbstractPlugin
             foreach ($categoryRows as $row) {
                 $categories[$row['id']] = [
                     'name' => $row,
-                    'url'  => $controller->url()->fromRoute('categories', [
+                    'url'  => $this->httpRouter->assemble([
                         'action'           => 'category',
                         'category_catname' => $row['catname'],
+                    ], [
+                        'name' => 'categories'
                     ])
                 ];
             }
@@ -663,9 +684,11 @@ class Pic extends AbstractPlugin
             if ($isModer) {
                 $perspective = [
                     'options' => $multioptions,
-                    'url'     => $controller->url()->fromRoute('api/picture-item/update', [
+                    'url'     => $this->httpRouter->assemble([
                         'picture_id' => $picture['id'],
                         'item_id'    => $item['id']
+                    ], [
+                        'name' => 'api/picture-item/update'
                     ]),
                     'value'   => $this->pictureItem->getPerspective($picture->id, $item->id),
                     'name'    => $item->getNameData($language)
@@ -674,12 +697,14 @@ class Pic extends AbstractPlugin
 
             $hasSpecs = $this->specsService->hasSpecs($item->id);
             $specsUrl = null;
-            foreach ($catalogue->getCataloguePaths($item['id']) as $path) {
-                $specsUrl = $this->getController()->url()->fromRoute('catalogue', [
+            foreach ($this->catalogue->getCataloguePaths($item['id']) as $path) {
+                $specsUrl = $this->httpRouter->assemble([
                     'action'        => 'brand-item-specifications',
                     'brand_catname' => $path['brand_catname'],
                     'car_catname'   => $path['car_catname'],
                     'path'          => $path['path']
+                ], [
+                    'name' => 'catalogue'
                 ]);
                 break;
             }
@@ -711,11 +736,10 @@ class Pic extends AbstractPlugin
     private function picPageEnginesData($picture, $itemIds)
     {
         $controller = $this->getController();
-        $catalogue = $controller->catalogue();
 
         $language = $controller->language();
 
-        $itemTable = $catalogue->getItemTable();
+        $itemTable = $this->catalogue->getItemTable();
         $itemModel = new \Application\Model\Item();
 
         $engineRows = [];
@@ -735,19 +759,21 @@ class Pic extends AbstractPlugin
             if ($vehicleIds) {
                 $carRows = $itemTable->fetchAll([
                     'id in (?)' => $vehicleIds
-                ], $catalogue->itemOrdering());
+                ], $this->catalogue->itemOrdering());
 
                 foreach ($carRows as $carRow) {
-                    $cataloguePaths = $catalogue->getCataloguePaths($carRow['id']);
+                    $cataloguePaths = $this->catalogue->getCataloguePaths($carRow['id']);
 
                     foreach ($cataloguePaths as $cPath) {
                         $vehicles[] = [
                             'name' => $controller->car()->formatName($carRow, $language),
-                            'url'  => $controller->url()->fromRoute('catalogue', [
+                            'url'  => $this->httpRouter->assemble([
                                 'action'        => 'brand-item',
                                 'brand_catname' => $cPath['brand_catname'],
                                 'car_catname'   => $cPath['car_catname'],
                                 'path'          => $cPath['path']
+                            ], [
+                                'name' => 'catalogue'
                             ])
                         ];
                         break;
@@ -759,14 +785,16 @@ class Pic extends AbstractPlugin
             $hasSpecs = $this->specsService->hasSpecs($engineRow->id);
 
             if ($hasSpecs) {
-                $cataloguePaths = $catalogue->getCataloguePaths($engineRow['id']);
+                $cataloguePaths = $this->catalogue->getCataloguePaths($engineRow['id']);
 
                 foreach ($cataloguePaths as $path) {
-                    $specsUrl = $controller->url()->fromRoute('catalogue', [
+                    $specsUrl = $this->httpRouter->assemble([
                         'action'        => 'brand-item-specifications',
                         'brand_catname' => $path['brand_catname'],
                         'car_catname'   => $path['car_catname'],
                         'path'          => $path['path']
+                    ], [
+                        'name' => 'catalogue'
                     ]);
                     break;
                 }
@@ -774,9 +802,11 @@ class Pic extends AbstractPlugin
 
             $specsEditUrl = null;
             if ($controller->user()->isAllowed('specifications', 'edit')) {
-                $specsEditUrl = $controller->url()->fromRoute('cars/params', [
+                $specsEditUrl = $this->httpRouter->assemble([
                     'action'  => 'car-specifications-editor',
                     'item_id' => $engineRow->id
+                ], [
+                    'name' => 'cars/params'
                 ]);
             }
 
@@ -795,11 +825,10 @@ class Pic extends AbstractPlugin
     private function picPageFactoriesData($picture)
     {
         $controller = $this->getController();
-        $catalogue = $controller->catalogue();
 
         $language = $controller->language();
 
-        $itemTable = $catalogue->getItemTable();
+        $itemTable = $this->catalogue->getItemTable();
 
         $factories = $itemTable->fetchAll(
             $itemTable->select(true)
@@ -816,11 +845,11 @@ class Pic extends AbstractPlugin
 
             $carIds = $factory->getRelatedCarGroupId();
             if ($carIds) {
-                $itemTable = $catalogue->getItemTable();
+                $itemTable = $this->catalogue->getItemTable();
 
                 $carRows = $itemTable->fetchAll([
                     'id in (?)' => $carIds
-                ], $catalogue->itemOrdering());
+                ], $this->catalogue->itemOrdering());
 
                 $limit = 10;
 
@@ -834,7 +863,7 @@ class Pic extends AbstractPlugin
                 }
 
                 foreach ($carRows as $carRow) {
-                    $cataloguePaths = $catalogue->getCataloguePaths($carRow['id'], [
+                    $cataloguePaths = $this->catalogue->getCataloguePaths($carRow['id'], [
                         'breakOnFirst' => true,
                         'toBrand'      => null,
                         'stockFirst'   => true
@@ -845,29 +874,35 @@ class Pic extends AbstractPlugin
                             case 'brand-item':
                                 $factoryCars[] = [
                                     'name' => $controller->car()->formatName($carRow, $language),
-                                    'url'  => $controller->url()->fromRoute('catalogue', [
+                                    'url'  => $this->httpRouter->assemble([
                                         'action'        => 'brand-item',
                                         'brand_catname' => $cPath['brand_catname'],
                                         'car_catname'   => $cPath['car_catname'],
                                         'path'          => $cPath['path']
+                                    ], [
+                                        'name' => 'catalogue'
                                     ])
                                 ];
                                 break;
                             case 'brand':
                                 $factoryCars[] = [
                                     'name' => $controller->car()->formatName($carRow, $language),
-                                    'url'  => $controller->url()->fromRoute('catalogue', [
+                                    'url'  => $this->httpRouter->assemble([
                                         'action'        => 'brand',
                                         'brand_catname' => $cPath['brand_catname']
+                                    ], [
+                                        'name' => 'catalogue'
                                     ])
                                 ];
                                 break;
                             case 'category':
                                 $factoryCars[] = [
                                     'name' => $controller->car()->formatName($carRow, $language),
-                                    'url'  => $controller->url()->fromRoute('categories', [
+                                    'url'  => $this->httpRouter->assemble([
                                         'action'           => 'category',
                                         'category_catname' => $cPath['category_catname']
+                                    ], [
+                                        'name' => 'catalogue'
                                     ])
                                 ];
                                 break;
@@ -897,7 +932,6 @@ class Pic extends AbstractPlugin
         ], $options);
 
         $controller = $this->getController();
-        $catalogue = $controller->catalogue();
         $imageStorage = $controller->imageStorage();
 
         $isModer = $controller->user()->inheritsRole('moder');
@@ -1014,6 +1048,7 @@ class Pic extends AbstractPlugin
 
                 foreach ($pageNumbers as $page => &$val) {
                     $pic = $paginatorPictures[$page - 1];
+
                     $val = $controller->url()->fromRoute(
                         $options['paginator']['route'],
                         array_replace($options['paginator']['urlParams'], [
@@ -1049,18 +1084,20 @@ class Pic extends AbstractPlugin
             $url = null;
             $carRow = $itemTable->find($mRow->item_id)->current();
             if ($carRow) {
-                $paths = $catalogue->getCataloguePaths($carRow->id, [
+                $paths = $this->catalogue->getCataloguePaths($carRow->id, [
                     'breakOnFirst' => true
                 ]);
                 if (count($paths) > 0) {
                     $path = $paths[0];
 
-                    $url = $controller->url()->fromRoute('catalogue', [
+                    $url = $this->httpRouter->assemble([
                         'action'        => 'brand-item-pictures',
                         'brand_catname' => $path['brand_catname'],
                         'car_catname'   => $path['car_catname'],
                         'path'          => $path['path'],
                         'mod'           => $mRow->id
+                    ], [
+                        'name' => 'catalogue'
                     ]);
                 }
             }
@@ -1137,9 +1174,11 @@ class Pic extends AbstractPlugin
             'factories'         => $this->picPageFactoriesData($picture),
             'votes'             => $votes,
             'subscribed'        => $subscribed,
-            'subscribeUrl'      => $controller->url()->fromRoute('api/comment/subscribe', [
+            'subscribeUrl'      => $this->httpRouter->assemble([
                 'item_id' => $picture['id'],
                 'type_id' => \Application\Comments::PICTURES_TYPE_ID
+            ], [
+                'name' => 'api/comment/subscribe'
             ]),
             'galleryImage'      => $galleryImage,
             'twitterCreatorId'  => $twitterCreatorId
@@ -1166,9 +1205,11 @@ class Pic extends AbstractPlugin
             $brandModel = new BrandModel();
 
             foreach ($vehicleTable->find($carIds) as $car) {
-                $url = $controller->url()->fromRoute('moder/cars/params', [
+                $url = $this->httpRouter->assemble([
                     'action'  => 'car',
                     'item_id' => $car->id
+                ], [
+                    'name' => 'moder/cars/params'
                 ]);
                 $links[$url] = sprintf(
                     $this->translator->translate('moder/picture/edit-vehicle-%s'),
@@ -1184,9 +1225,11 @@ class Pic extends AbstractPlugin
                 });
 
                 foreach ($brands as $brand) {
-                    $url = $controller->url()->fromRoute('moder/cars/params', [
+                    $url = $this->httpRouter->assemble([
                         'action'  => 'car',
                         'item_id' => $brand['id']
+                    ], [
+                        'name' => 'moder/cars/params'
                     ]);
                     $links[$url] = sprintf(
                         $this->translator->translate('moder/picture/edit-brand-%s'),
@@ -1216,7 +1259,6 @@ class Pic extends AbstractPlugin
         $gallery = [];
 
         $controller = $this->getController();
-        $catalogue = $controller->catalogue();
         $imageStorage = $controller->imageStorage();
 
         $language = $controller->language();

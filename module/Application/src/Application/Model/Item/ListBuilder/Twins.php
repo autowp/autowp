@@ -2,7 +2,6 @@
 
 namespace Application\Model\Item\ListBuilder;
 
-use Application\Model\DbTable;
 use Application\Model\Item\ListBuilder;
 
 class Twins extends ListBuilder
@@ -16,7 +15,7 @@ class Twins extends ListBuilder
         return $this;
     }
 
-    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
+    public function getPictureUrl($item, array $picture)
     {
         return $this->router->assemble([
             'id'         => $this->group['id'],

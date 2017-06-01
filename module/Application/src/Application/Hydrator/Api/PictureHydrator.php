@@ -162,6 +162,10 @@ class PictureHydrator extends RestHydrator
 
     public function extract($object)
     {
+        if ($object === null) {
+            return null;
+        }
+
         $cropped = DbTable\Picture\Row::checkCropParameters($object);
 
         $nameDatas = $this->pictureTable->getNameData([$object], [

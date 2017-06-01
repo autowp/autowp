@@ -19,6 +19,22 @@ angular.module(Module)
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template,
+                params: { 
+                    status: { dynamic: true },
+                    car_type_id: { dynamic: true },
+                    perspective_id: { dynamic: true },
+                    item_id: { dynamic: true },
+                    comments: { dynamic: true },
+                    owner_id: { dynamic: true },
+                    replace: { dynamic: true },
+                    requests: { dynamic: true },
+                    special_name: { dynamic: true },
+                    lost: { dynamic: true },
+                    gps: { dynamic: true },
+                    similar: { dynamic: true },
+                    order: { dynamic: true },
+                    page: { dynamic: true }
+                },
                 resolve: {
                     access: [ACL_SERVICE_NAME, function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
@@ -226,12 +242,13 @@ angular.module(Module)
                 var deferred = $q.defer();
                 
                 var params = {
-                    limit: 10
+                    limit: 10,
+                    fields: 'name_text'
                 };
                 if (query.substring(0, 1) == '#') {
                     params.id = query.substring(1);
                 } else {
-                    params.search = query;
+                    params.name = '%' + query + '%';
                 }
                 
                 $http({

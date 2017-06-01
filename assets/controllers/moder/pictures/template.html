@@ -56,13 +56,13 @@
                 md-selected-item="selectedItem"
                 md-search-text="item_name"
                 md-items="item in queryItemName(item_name)"
-                md-item-text="item.name"
+                md-item-text="item.name_text"
                 md-floating-label="{{'moder/picture/filter/item'|translate}}"
                 ng-model-options="{debounce:300}"
                 md-require-match="true"
                 md-selected-item-change="load()">
                 <md-item-template>
-                    <span md-highlight-text="item_name">{{item.name}}</span>
+                    <span md-highlight-text="item_name">{{item.name_text}}</span>
                 </md-item-template>
             </md-autocomplete>
             <md-input-container>
@@ -167,7 +167,7 @@
 
         <h2>
             {{'page/73/name'|translate}}
-            <small ng-if="paginator.totalItemCount" translate="ng/%1$s-picures" translate-values="{count:paginator.totalItemCount}"></small>
+            <small ng-if="paginator.totalItemCount" translate="ng/%1$s-pictures" translate-values="{count: paginator.totalItemCount}"></small>
         </h2>
         
         <div layout="row" layout-sm="column" layout-align="space-around" ng-show="loading">

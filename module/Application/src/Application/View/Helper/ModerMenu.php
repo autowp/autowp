@@ -63,7 +63,7 @@ class ModerMenu extends AbstractHtmlElement
             }
 
             $items[] = [
-                'href'  => $this->view->url('moder/cars'),
+                'href'  => '/ng/moder/items',
                 'label' => $this->view->page(131)->name,
                 'icon'  => 'fa fa-car'
             ];

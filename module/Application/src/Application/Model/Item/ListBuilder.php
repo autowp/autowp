@@ -2,11 +2,12 @@
 
 namespace Application\Model\Item;
 
+use Zend\Router\Http\TreeRouteStack;
+
 use Application\Controller\Plugin\Pic;
 use Application\Model\Catalogue;
 use Application\Model\DbTable;
-
-use Zend\Router\Http\TreeRouteStack;
+use Application\Service\SpecificationsService;
 
 class ListBuilder
 {
@@ -24,6 +25,11 @@ class ListBuilder
      * @var Pic
      */
     protected $picHelper;
+
+    /**
+     * @var SpecificationsService
+     */
+    protected $specsService;
 
     /**
      * @var array
@@ -64,6 +70,13 @@ class ListBuilder
         return $this;
     }
 
+    public function setSpecsService(SpecificationsService $specsService)
+    {
+        $this->specsService = $specsService;
+
+        return $this;
+    }
+
     public function isTypeUrlEnabled()
     {
         return false;
@@ -79,7 +92,11 @@ class ListBuilder
         return $this->cataloguePaths[$id];
     }
 
-    public function getDetailsUrl(DbTable\Item\Row $item)
+    /**
+     * @param DbTable\Item\Row|array $item
+     * @return mixed|string|NULL
+     */
+    public function getDetailsUrl($item)
     {
         $cataloguePaths = $this->getCataloguePath($item);
 
@@ -98,13 +115,27 @@ class ListBuilder
         return null;
     }
 
-    public function getPicturesUrl(DbTable\Item\Row $item)
+    /**
+     * @param DbTable\Item\Row|array $item
+     * @return string|NULL
+     */
+    public function getPicturesUrl($item)
     {
         return null;
     }
 
-    public function getSpecificationsUrl(DbTable\Item\Row $item)
+    /**
+     * @param DbTable\Item\Row|array $item
+     * @return string|NULL
+     */
+    public function getSpecificationsUrl($item)
     {
+        $hasSpecs = $this->specsService->hasSpecs($item['id']);
+
+        if (! $hasSpecs) {
+            return false;
+        }
+
         $cataloguePaths = $this->getCataloguePath($item, [
             'toBrand' => true
         ]);
@@ -128,7 +159,7 @@ class ListBuilder
         return null;
     }
 
-    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
+    public function getPictureUrl($item, array $picture)
     {
         return $this->picHelper->href($picture);
     }

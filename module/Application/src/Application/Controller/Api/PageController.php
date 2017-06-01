@@ -5,7 +5,6 @@ namespace Application\Controller\Api;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\Feature\RowGatewayFeature;
-use Zend\Db\RowGateway\RowGateway;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;

@@ -44,7 +44,7 @@ class CatalogueItem extends Catalogue
         return $this;
     }
 
-    public function getPicturesUrl(DbTable\Item\Row $item)
+    public function getPicturesUrl($item)
     {
         return $this->router->assemble([
             'action'        => 'brand-item-pictures',
@@ -57,9 +57,9 @@ class CatalogueItem extends Catalogue
         ]);
     }
 
-    public function getSpecificationsUrl(DbTable\Item\Row $item)
+    public function getSpecificationsUrl($item)
     {
-        $hasSpecs = $this->specsService->hasSpecs($item->id);
+        $hasSpecs = $this->specsService->hasSpecs($item['id']);
 
         if (! $hasSpecs) {
             return false;
@@ -113,7 +113,7 @@ class CatalogueItem extends Catalogue
         ]);
     }
 
-    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
+    public function getPictureUrl($item, array $picture)
     {
         return $this->router->assemble([
             'action'        => 'brand-item-picture',

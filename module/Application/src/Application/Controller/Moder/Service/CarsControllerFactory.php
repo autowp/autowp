@@ -19,7 +19,6 @@ class CarsControllerFactory implements FactoryInterface
             clone $container->get('DescriptionForm'),
             clone $container->get('DescriptionForm'),
             $container->get('ModerCarParent'),
-            $container->get('ModerCarsFilter'),
             $container->get('BrandLogoForm'),
             $container->get(\Application\Model\BrandVehicle::class),
             $container->get(\Autowp\Message\MessageService::class),

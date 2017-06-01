@@ -9,10 +9,10 @@ return array_replace(include 'root.php', [
 
     /* Common words */
     'and' => '还有',
-    '%1$s picures'       => [
+    '%1$s pictures'       => [
         '%1$s 张图片',
     ],
-    'ng/%1$s-picures' => '{count, plural,
+    'ng/%1$s-pictures' => '{count, plural,
         other {{count} 张图片}
     }',
     '%1$s items'      => [

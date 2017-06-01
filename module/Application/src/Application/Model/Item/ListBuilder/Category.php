@@ -60,12 +60,12 @@ class Category extends ListBuilder
         return $this;
     }
 
-    public function getDetailsUrl(DbTable\Item\Row $item)
+    public function getDetailsUrl($item)
     {
-        if ($item->item_type_id == DbTable\Item\Type::CATEGORY) {
+        if ($item['item_type_id'] == DbTable\Item\Type::CATEGORY) {
             return $this->router->assemble([
                 'action'           => 'category',
-                'category_catname' => $item->catname
+                'category_catname' => $item['catname']
             ], [
                 'name' => 'categories'
             ]);
@@ -75,7 +75,7 @@ class Category extends ListBuilder
         $hasChilds = (bool)$itemParentAdapter->fetchOne(
             $itemParentAdapter->select()
                 ->from($this->itemParentTable->info('name'), new Zend_Db_Expr('1'))
-                ->where('parent_id = ?', $item->id)
+                ->where('parent_id = ?', $item['id'])
         );
 
         if (! $hasChilds) {
@@ -85,7 +85,7 @@ class Category extends ListBuilder
         // found parent row
         if ($this->currentItem) {
             $itemParentRow = $this->itemParentTable->fetchRow([
-                'item_id = ?'   => $item->id,
+                'item_id = ?'   => $item['id'],
                 'parent_id = ?' => $this->currentItem->id
             ]);
             if (! $itemParentRow) {
@@ -110,12 +110,12 @@ class Category extends ListBuilder
         ]);
     }
 
-    public function getPicturesUrl(DbTable\Item\Row $item)
+    public function getPicturesUrl($item)
     {
-        if ($item->item_type_id == DbTable\Item\Type::CATEGORY) {
+        if ($item['item_type_id'] == DbTable\Item\Type::CATEGORY) {
             return $this->router->assemble([
                 'action'           => 'category-pictures',
-                'category_catname' => $item->catname,
+                'category_catname' => $item['catname'],
                 'path'             => $this->path,
             ], [
                 'name' => 'categories'
@@ -125,7 +125,7 @@ class Category extends ListBuilder
         // found parent row
         if ($this->currentItem) {
             $itemParentRow = $this->itemParentTable->fetchRow([
-                'item_id = ?'   => $item->id,
+                'item_id = ?'   => $item['id'],
                 'parent_id = ?' => $this->currentItem->id
             ]);
             if (! $itemParentRow) {
@@ -150,17 +150,17 @@ class Category extends ListBuilder
         ]);
     }
 
-    public function getSpecificationsUrl(DbTable\Item\Row $item)
+    public function getSpecificationsUrl($item)
     {
         return null;
     }
 
-    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
+    public function getPictureUrl($item, array $picture)
     {
-        if ($item->item_type_id == DbTable\Item\Type::CATEGORY) {
+        if ($item['item_type_id'] == DbTable\Item\Type::CATEGORY) {
             return $this->router->assemble([
                 'action'           => 'category-picture',
-                'category_catname' => $item->catname,
+                'category_catname' => $item['catname'],
                 'picture_id'       => $picture['identity']
             ], [
                 'name' => 'categories'
@@ -170,7 +170,7 @@ class Category extends ListBuilder
         // found parent row
         if ($this->currentItem) {
             $itemParentRow = $this->itemParentTable->fetchRow([
-                'item_id = ?'   => $item->id,
+                'item_id = ?'   => $item['id'],
                 'parent_id = ?' => $this->currentItem->id
             ]);
             if (! $itemParentRow) {

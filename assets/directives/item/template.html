@@ -1,0 +1,97 @@
+<div class="car item-list-item"> <!--  data-module="car-list" -->
+
+    <h3 ng-if="!disableTitle">
+        <span ng-bind-html="item.name_html"></span>
+        <sup class="designBrand" ng-if="item.design">{{'ng/carlist/designed by'|translate}}<a ng-href="{{item.design.url}}" ng-bind="item.design.brand_name"></a></sup>
+        
+        <small ng-if="item.produced > 1">
+            <span ng-if="item.produced_exactly" translate="ng/carlist/produced/%1$s" translate-values="{count: item.produced}"></span>
+            <span ng-if="!item.produced_exactly" translate="ng/carlist/produced-about/%1$s" translate-values="{count: item.produced}"></span>
+        </small>
+        <small translate ng-if="item.produced == 1">carlist/produced/one</small>
+    </h3>
+
+    <h4 ng-bind="item.name_default" ng-if="item.name_default"></h4>
+
+    <div class="row thumbnails">
+        <div ng-class="ctrl.thumbnailClasses(picture)" ng-if="ctrl.havePhoto(item)" ng-repeat="picture in item.preview_pictures">
+            <a ng-href="{{picture.url}}" ng-if="picture.thumbnail" class="thumbnail">
+                <img ng-src="{{picture.thumbnail.src}}" alt="{{picture.picture.name}}" title="{{picture.picture.name}}" />
+            </a>
+            <span ng-if="!picture">&#xa0;</span>
+        </div>
+
+        <div class="col-md-3 col-sm-6" ng-if="!ctrl.havePhoto(item) && ctrl.canHavePhoto(item)">
+            <div class="thumbnail no-photo" ng-title="{{'carlist/no-photo'|translate}}">
+                <a ng-href="{{item.upload_url}}" title="{{'carlist/no-photo/add'|translate}}" class="fa fa-plus-circle text-success"></a>
+                <span class="fa fa-camera fa-lg fa-4x" aria-hidden="true"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="text" ng-if="item.description.length" btf-markdown="item.description"></div>
+    
+    <div ng-if="item.engine_vehicles.length">
+        <p translate>catalogue/engine/mounted-on:</p>
+        <ul>
+            <li ng-repeat="vehicle in item.engine_vehicles">
+                <a ng-href="{{vehicle.url}}" ng-bind-html="vehicle.name_html"></a>
+            </li>
+        </ul>
+    </div>
+
+    <ul class="list-inline">
+
+        <li ng-if="(item.has_text || item.childs_count) && item.url">
+            <i class="fa fa-align-left"></i>
+            <a ng-href="{{item.url}}">{{'carlist/details'|translate}}<span ng-if="item.childs_count > 1"> ({{item.childs_count}})</span></a>
+        </li>
+
+        <li ng-if="item.tuning">
+            <i class="fa fa-align-left"></i>
+            <a ng-href="{{item.tuning.url}}">{{'catalogue/related'|translate|lowercase}} ({{item.tuning.count}})</a>
+        </li>
+        
+        <li ng-if="item.sport">
+            <i class="fa fa-align-left"></i>
+            <a ng-href="{{item.sport.url}}">{{'catalogue/sport'|translate|lowercase}} ({{item.sport.count}})</a>
+        </li>
+        
+        <li ng-if="item.more_pictures_url">
+            <span class="fa fa-th"></span>
+            <a ng-href="{{item.more_pictures_url}}">{{'carlist/all pictures'|translate}} ({{item.total_pictures}})</a>
+        </li>
+
+        <!-- 
+        <li ng-if="item.specsLinks.length > 1">
+            <i class="fa fa-list-alt"></i>
+            {{'carlist/specifications'|translate}}
+            <a ng-href="{{specLink.url}}" ng-bind="specLink.name" ng-repeat="specLink in item.specsLinks"></a>
+        </li>
+         -->
+        <li ng-if="item.specs_url">
+            <i class="fa fa-list-alt"></i>
+            <a ng-href="{{item.specs_url}}" translate>carlist/specifications</a>
+        </li>
+
+        <li ng-repeat="twinsGroup in item.twins_groups">
+            <i class="fa fa-adjust"></i>
+            <a ng-href="{{twinsGroup.url}}" translate>carlist/twins</a>
+        </li>
+
+        <li ng-repeat="category in item.categories">
+            <i class="fa fa-tag"></i>
+            <a ng-href="{{category.url}}" ng-bind-html="category.name_html"></a>
+        </li>
+
+        <li ng-if="item.moder_url">
+            <i class="fa fa-cog"></i>
+            <a ng-href="{{item.moder_url}}" translate>moder/edit-object</a>
+        </li>
+
+        <li ng-if="item.spec_editor_url">
+            <i class="fa fa-pencil"></i>
+            <a ng-href="{{item.spec_editor_url}}" translate>carlist/edit-specs</a>
+        </li>
+    </ul>
+</div>

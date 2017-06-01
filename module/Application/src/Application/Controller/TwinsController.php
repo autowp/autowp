@@ -211,10 +211,11 @@ class TwinsController extends AbstractActionController
                 'disableTwins'         => true,
                 'disableSpecs'         => true,
                 'listBuilder' => new \Application\Model\Item\ListBuilder\Twins([
-                    'catalogue' => $this->catalogue(),
-                    'router'    => $this->getEvent()->getRouter(),
-                    'picHelper' => $this->getPluginManager()->get('pic'),
-                    'group'     => $group
+                    'catalogue'    => $this->catalogue(),
+                    'router'       => $this->getEvent()->getRouter(),
+                    'picHelper'    => $this->getPluginManager()->get('pic'),
+                    'group'        => $group,
+                    'specsService' => $this->specsService
                 ])
             ]),
             'picturesCount'      => $picturesCount,

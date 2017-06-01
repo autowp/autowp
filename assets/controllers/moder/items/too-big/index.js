@@ -42,7 +42,7 @@ angular.module(Module)
                 params: {
                     order: 'childs_count',
                     limit: 100,
-                    fields: 'childs_count,moder_url'
+                    fields: 'childs_count,moder_url,name_html'
                 }
             }).then(function(response) {
                 $scope.items = response.data.items;

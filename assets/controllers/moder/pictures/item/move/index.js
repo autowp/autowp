@@ -75,7 +75,7 @@ angular.module(Module)
                     url: '/api/item',
                     params: {
                         type_id: 7,
-                        fields: '',
+                        fields: 'name_html',
                         limit: 50,
                         page: $scope.page
                     }
@@ -91,7 +91,7 @@ angular.module(Module)
                     url: '/api/item',
                     params: {
                         type_id: 6,
-                        fields: '',
+                        fields: 'name_html',
                         limit: 50,
                         page: $scope.page
                     }
@@ -153,7 +153,7 @@ angular.module(Module)
                         url: '/api/item',
                         params: {
                             type_id: 5,
-                            fields: '',
+                            fields: 'name_html',
                             limit: 200,
                             page: $scope.page
                         }

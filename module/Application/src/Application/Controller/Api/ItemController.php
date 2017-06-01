@@ -50,6 +50,8 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        $user = $this->user()->get();
+
         $this->listInputFilter->setData($this->params()->fromQuery());
 
         if (! $this->listInputFilter->isValid()) {
@@ -61,6 +63,8 @@ class ItemController extends AbstractRestfulController
         $select = $this->table->getAdapter()->select()
             ->from('item');
 
+        $group = false;
+
         if ($data['last_item']) {
             $namespace = new \Zend\Session\Container('Moder_Car');
             if (isset($namespace->lastCarId)) {
@@ -71,11 +75,17 @@ class ItemController extends AbstractRestfulController
         }
 
         switch ($data['order']) {
+            case 'id_asc':
+                $select->order('item.id ASC');
+                break;
+            case 'id_desc':
+                $select->order('item.id DESC');
+                break;
             case 'childs_count':
+                $group = true;
                 $select
                     ->columns(['childs_count' => new Zend_Db_Expr('count(item_parent.item_id)')])
                     ->join('item_parent', 'item_parent.parent_id = item.id', null)
-                    ->group('item.id')
                     ->order('childs_count desc');
                 break;
             default:
@@ -89,10 +99,16 @@ class ItemController extends AbstractRestfulController
                 break;
         }
 
-        if ($data['search']) {
+        if ($data['name']) {
             $select
                 ->join('item_language', 'item.id = item_language.item_id', null)
-                ->where('item_language.name like ?', $data['search'] . '%');
+                ->where('item_language.name like ?', $data['name']);
+        }
+
+        if ($data['name_exclude']) {
+            $select
+                ->join('item_language', 'item.id = item_language.item_id', null)
+                ->where('item_language.name not like ?', $data['name_exclude']);
         }
 
         $id = (int)$this->params()->fromQuery('id');
@@ -101,19 +117,82 @@ class ItemController extends AbstractRestfulController
         }
 
         if ($data['descendant']) {
+            $group = true;
             $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', $data['descendant'])
-                ->group('item.id');
+                ->where('item_parent_cache.item_id = ?', $data['descendant']);
         }
 
         if ($data['type_id']) {
             $select->where('item.item_type_id = ?', $data['type_id']);
         }
 
+        if ($data['vehicle_type_id']) {
+            if ($data['vehicle_type_id'] == 'empty') {
+                $select
+                    ->joinLeft('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
+                    ->where('vehicle_vehicle_type.vehicle_id is null');
+            } else {
+                $select
+                    ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
+                    ->where('vehicle_vehicle_type.vehicle_type_id = ?', $data['vehicle_type_id']);
+            }
+        }
+
+        if ($data['vehicle_childs_type_id']) {
+            $group = true;
+            $select
+                ->join(
+                    ['cpc_childs' => 'item_parent_cache'],
+                    'item.id = cpc_childs.parent_id',
+                    null
+                )
+                ->join(
+                    ['vvt_child' => 'vehicle_vehicle_type'],
+                    'cpc_childs.item_id = vvt_child.vehicle_id',
+                    null
+                )
+                ->join('car_types_parents', 'vvt_child.vehicle_type_id = car_types_parents.id', null)
+                ->where('car_types_parents.parent_id = ?', $data['vehicle_childs_type_id']);
+        }
+
+        if ($data['spec']) {
+            $select->where('item.spec_id = ?', $data['spec']);
+        }
+
         if ($data['parent_id']) {
             $select
-                ->join('item_parent', 'item.id = item_parent.item_id', null)
-                ->where('item_parent.parent_id = ?', $data['parent_id']);
+                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $data['parent_id'])
+                ->where('item_parent_cache.item_id <> item_parent_cache.parent_id');
+        }
+
+        if ($data['from_year']) {
+            $select->where('item.begin_year = ?', $data['from_year']);
+        }
+
+        if ($data['to_year']) {
+            $select->where('item.end_year = ?', $data['to_year']);
+        }
+
+        if ($data['no_parent']) {
+            $select
+                ->joinLeft(
+                    ['np_ip' => 'item_parent'],
+                    'item.id = np_ip.item_id',
+                    null
+                )
+                ->where('np_ip.item_id IS NULL');
+        }
+
+        if ($data['text']) {
+            $select
+                ->join('item_language', 'item.id = item_language.item_id', null)
+                ->join('textstorage_text', 'item_language.text_id = textstorage_text.id', null)
+                ->where('textstorage_text.text like ?', '%' . $data['text'] . '%');
+        }
+
+        if ($group) {
+            $select->group('item.id');
         }
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -130,8 +209,8 @@ class ItemController extends AbstractRestfulController
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => $data['fields']
-            //'user_id'  => $user ? $user['id'] : null
+            'fields'   => $data['fields'],
+            'user_id'  => $user ? $user['id'] : null
         ]);
 
         $items = [];

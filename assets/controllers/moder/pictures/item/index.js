@@ -62,7 +62,12 @@ angular.module(Module)
                     method: 'GET',
                     url: '/api/picture/' + $state.params.id,
                     params: {
-                        fields: 'owner,thumbnail,add_date,iptc,exif,image,items.item.name_html,items.item.brands.name_html,special_name,copyrights,change_status_user,rights,moder_votes,moder_voted,is_last,accepted_count,similar.picture.thumbnail,replaceable,siblings,ip.rights,ip.blacklist'
+                        fields: ['owner', 'thumbnail', 'add_date', 'iptc', 'exif', 'image', 
+                            'items.item.name_html', 'items.item.moder_url', 'items.item.brands.name_html',
+                            'special_name', 'copyrights', 'change_status_user',
+                            'rights', 'moder_votes', 'moder_voted', 'is_last', 
+                            'accepted_count', 'similar.picture.thumbnail',
+                            'replaceable', 'siblings', 'ip.rights', 'ip.blacklist'].join(',')
                     }
                 }).then(function(response) {
                     $scope.picture = response.data;

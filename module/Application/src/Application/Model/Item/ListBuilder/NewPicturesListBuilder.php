@@ -30,7 +30,7 @@ class NewPicturesListBuilder extends \Application\Model\Item\ListBuilder
         return $this;
     }
 
-    public function getPicturesUrl(DbTable\Item\Row $item)
+    public function getPicturesUrl($item)
     {
         return $this->router->assemble([
             'action'        => 'index',

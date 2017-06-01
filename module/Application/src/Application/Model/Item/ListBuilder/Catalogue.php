@@ -4,7 +4,6 @@ namespace Application\Model\Item\ListBuilder;
 
 use Application\Model\DbTable;
 use Application\Model\Item\ListBuilder;
-use Application\Service\SpecificationsService;
 
 class Catalogue extends ListBuilder
 {
@@ -14,11 +13,6 @@ class Catalogue extends ListBuilder
     protected $brand;
 
     /**
-     * @var SpecificationsService
-     */
-    protected $specsService;
-
-    /**
      * @var array
      */
     private $pathsToBrand = [];
@@ -26,13 +20,6 @@ class Catalogue extends ListBuilder
     public function setBrand(array $brand)
     {
         $this->brand = $brand;
-
-        return $this;
-    }
-
-    public function setSpecsService(SpecificationsService $specsService)
-    {
-        $this->specsService = $specsService;
 
         return $this;
     }
@@ -55,9 +42,9 @@ class Catalogue extends ListBuilder
         return $this->pathsToBrand[$itemId][$brandId];
     }
 
-    public function getDetailsUrl(DbTable\Item\Row $item)
+    public function getDetailsUrl($item)
     {
-        $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
+        $paths = $this->getPathsToBrand($item['id'], $this->brand['id'], [
             'breakOnFirst' => true
         ]);
 
@@ -77,9 +64,9 @@ class Catalogue extends ListBuilder
         ]);
     }
 
-    public function getPicturesUrl(DbTable\Item\Row $item)
+    public function getPicturesUrl($item)
     {
-        $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
+        $paths = $this->getPathsToBrand($item['id'], $this->brand['id'], [
             'breakOnFirst' => true
         ]);
 
@@ -100,15 +87,15 @@ class Catalogue extends ListBuilder
         ]);
     }
 
-    public function getSpecificationsUrl(DbTable\Item\Row $item)
+    public function getSpecificationsUrl($item)
     {
-        $hasSpecs = $this->specsService->hasSpecs($item->id);
+        $hasSpecs = $this->specsService->hasSpecs($item['id']);
 
         if (! $hasSpecs) {
             return false;
         }
 
-        $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
+        $paths = $this->getPathsToBrand($item['id'], $this->brand['id'], [
             'breakOnFirst' => true
         ]);
 
@@ -128,9 +115,9 @@ class Catalogue extends ListBuilder
         ]);
     }
 
-    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
+    public function getPictureUrl($item, array $picture)
     {
-        $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
+        $paths = $this->getPathsToBrand($item['id'], $this->brand['id'], [
             'breakOnFirst' => true
         ]);
 

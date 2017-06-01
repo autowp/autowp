@@ -31,13 +31,13 @@
                 md-selected-item="selectedItem"
                 md-search-text="item_name"
                 md-items="item in queryItemName(item_name)"
-                md-item-text="item.name"
+                md-item-text="item.name_text"
                 md-floating-label="{{'moder/comments/filter/vehicle-id'|translate}}"
                 ng-model-options="{debounce:300}"
                 md-require-match="true"
                 md-selected-item-change="load()">
                 <md-item-template>
-                    <span md-highlight-text="item_name">{{item.name}}</span>
+                    <span md-highlight-text="item_name">{{item.name_text}}</span>
                 </md-item-template>
             </md-autocomplete>
         </div>

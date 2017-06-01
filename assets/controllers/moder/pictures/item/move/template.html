@@ -12,7 +12,7 @@
 
 <div ng-if="show_museums && !src_item">
     <md-content layout-padding>
-        <a href="#" ng-repeat-start="item in museums" ng-click="selectItem(item.id)" ng-bind="item.name"></a>
+        <a href="#" ng-repeat-start="item in museums" ng-click="selectItem(item.id)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </md-content>
     
@@ -22,7 +22,7 @@
 <div ng-if="show_factories && !src_item">
 
     <md-content layout-padding>
-        <a href="#" ng-repeat-start="item in factories" ng-click="selectItem(item.id)" ng-bind="item.name"></a>
+        <a href="#" ng-repeat-start="item in factories" ng-click="selectItem(item.id)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </md-content>
     
@@ -34,7 +34,7 @@
     
         <md-content layout-padding layout="row">
             <div layout="column" ng-repeat="chunk in brands" flex="20">
-                <a ng-repeat="item in chunk" ui-sref=".({page: null, brand_id: item.id})" ng-bind="item.name"></a>
+                <a ng-repeat="item in chunk" ui-sref=".({page: null, brand_id: item.id})" ng-bind-html="item.name_html"></a>
             </div>
         </md-content>
         

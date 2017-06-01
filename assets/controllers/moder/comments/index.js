@@ -15,6 +15,12 @@ angular.module(Module)
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template,
+                params: { 
+                    user: { dynamic: true },
+                    moderator_attention: { dynamic: true },
+                    item_id: { dynamic: true },
+                    page: { dynamic: true }
+                },
                 resolve: {
                     access: [ACL_SERVICE_NAME, function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
@@ -105,7 +111,8 @@ angular.module(Module)
                 var deferred = $q.defer();
                 
                 var params = {
-                    limit: 10
+                    limit: 10,
+                    fields: 'name_text'
                 };
                 if (query.substring(0, 1) == '#') {
                     params.id = query.substring(1);

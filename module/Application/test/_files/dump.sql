@@ -117,7 +117,7 @@ CREATE TABLE `acl_roles_parents` (
 --
 
 /*!40000 ALTER TABLE `acl_roles_parents` DISABLE KEYS */;
-INSERT INTO `acl_roles_parents` (`role_id`, `parent_role_id`) VALUES (14,6),(5,9),(5,10),(5,14),(10,14),(5,58);
+INSERT IGNORE INTO `acl_roles_parents` (`role_id`, `parent_role_id`) VALUES (14,6),(5,9),(5,10),(5,14),(10,14),(5,58),(5,13);
 /*!40000 ALTER TABLE `acl_roles_parents` ENABLE KEYS */;
 
 --

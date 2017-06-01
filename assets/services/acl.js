@@ -63,8 +63,10 @@ angular.module(Module)
                             reject(rejectError);
                         }
                     }, function() {
-                        cache[role] = false;
-                        reject(rejectError);
+                    	if (! isAllowedCache.hasOwnProperty(resource)) {
+                            isAllowedCache[resource] = {};
+                        }
+                        isAllowedCache[resource][privilege] = false;
                     });
                 } else {
                     if (isAllowedCache[resource][privilege]) {

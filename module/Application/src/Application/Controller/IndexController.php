@@ -248,9 +248,10 @@ class IndexController extends AbstractActionController
                 'onlyChilds'           => []
             ]),
             'listBuilder' => new \Application\Model\Item\ListBuilder([
-                'catalogue' => $this->catalogue(),
-                'router'    => $this->getEvent()->getRouter(),
-                'picHelper' => $this->getPluginManager()->get('pic')
+                'catalogue'    => $this->catalogue(),
+                'router'       => $this->getEvent()->getRouter(),
+                'picHelper'    => $this->getPluginManager()->get('pic'),
+                'specsService' => $this->specsService
             ]),
             'disableDescription'   => true,
             'callback'             => function (&$item) use ($userTable) {

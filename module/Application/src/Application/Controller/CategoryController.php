@@ -11,6 +11,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Categories;
 use Application\Model\DbTable;
+use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
 
@@ -35,11 +36,21 @@ class CategoryController extends AbstractActionController
      */
     private $categories;
 
-    public function __construct($cache, $textStorage, Categories $categories)
-    {
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(
+        $cache,
+        $textStorage,
+        Categories $categories,
+        SpecificationsService $specsService
+    ) {
         $this->cache = $cache;
         $this->textStorage = $textStorage;
         $this->categories = $categories;
+        $this->specsService = $specsService;
 
         $this->itemTable = new DbTable\Item();
         $this->itemLanguageTable = new DbTable\Item\Language();
@@ -424,7 +435,8 @@ class CategoryController extends AbstractActionController
                 'currentItem'     => $currentCar,
                 'category'        => $currentCategory,
                 'isOther'         => $isOther,
-                'path'            => $path
+                'path'            => $path,
+                'specsService'    => $this->specsService
             ]);
 
             if ($currentCar && $paginator->getTotalItemCount() <= 0) {

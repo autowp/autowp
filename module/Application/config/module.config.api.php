@@ -44,6 +44,7 @@ return [
             Controller\Api\PictureModerVoteController::class => Controller\Api\Service\PictureModerVoteControllerFactory::class,
             Controller\Api\PictureModerVoteTemplateController::class => Controller\Api\Service\PictureModerVoteTemplateControllerFactory::class,
             Controller\Api\PictureVoteController::class  => Controller\Api\Service\PictureVoteControllerFactory::class,
+            Controller\Api\SpecController::class         => InvokableFactory::class,
             Controller\Api\StatController::class         => InvokableFactory::class,
             Controller\Api\TrafficController::class      => Controller\Api\Service\TrafficControllerFactory::class,
             Controller\Api\UsersController::class        => InvokableFactory::class,
@@ -163,6 +164,27 @@ return [
                     ]
                 ]
             ],
+            'vehicle_type_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'vehicle_childs_type_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ]
+            ],
+            'spec' => [
+                'required'   => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ],
             'limit' => [
                 'required' => false,
                 'filters'  => [
@@ -200,7 +222,9 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['childs_count', 'name_html', 'brands']]
+                        'options' => ['fields' => ['childs_count', 'name_html', 'name_text', 'name_default',
+                            'description', 'has_text', 'brands', 'moder_url', 'upload_url', 'spec_editor_url', 'specs_url',
+                            'categories', 'twins_groups', 'url', 'more_pictures_url', 'preview_pictures', 'design', 'engine_vehicles']]
                     ]
                 ]
             ],
@@ -212,16 +236,54 @@ return [
                         'options' => [
                             'haystack' => [
                                 'name',
-                                'childs_count'
+                                'childs_count',
+                                'id_desc',
+                                'id_asc'
                             ]
                         ]
                     ]
                 ]
             ],
-            'search' => [
+            'name' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
+                ]
+            ],
+            'name_exclude' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'no_parent' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'text' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'from_year' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'to_year' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
                 ]
             ]
         ],
@@ -1608,6 +1670,27 @@ return [
                                 'type' => Segment::class,
                                 'options' => [
                                     'route' => '/:id'
+                                ]
+                            ]
+                        ]
+                    ],
+                    'spec' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/spec',
+                            'defaults' => [
+                                'controller' => Controller\Api\SpecController::class
+                            ]
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'get' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
                                 ]
                             ]
                         ]

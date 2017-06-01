@@ -11,6 +11,7 @@ use Application\ItemNameFormatter;
 use Application\Model\DbTable;
 use Application\Model\PictureItem;
 use Application\Service\DayPictures;
+use Application\Service\SpecificationsService;
 
 class NewController extends AbstractActionController
 {
@@ -23,10 +24,17 @@ class NewController extends AbstractActionController
      */
     private $itemNameFormatter;
 
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
     public function __construct(
-        ItemNameFormatter $itemNameFormatter
+        ItemNameFormatter $itemNameFormatter,
+        SpecificationsService $specsService
     ) {
-            $this->itemNameFormatter = $itemNameFormatter;
+        $this->itemNameFormatter = $itemNameFormatter;
+        $this->specsService = $specsService;
     }
 
     public function indexAction()
@@ -174,11 +182,12 @@ class NewController extends AbstractActionController
                         'pictureIds' => $ids
                     ]),
                     'listBuilder' => new \Application\Model\Item\ListBuilder\NewPicturesListBuilder([
-                        'date'       => $currentDateStr,
-                        'pictureIds' => $ids,
-                        'catalogue'  => $this->catalogue(),
-                        'router'     => $this->getEvent()->getRouter(),
-                        'picHelper'  => $this->getPluginManager()->get('pic')
+                        'date'         => $currentDateStr,
+                        'pictureIds'   => $ids,
+                        'catalogue'    => $this->catalogue(),
+                        'router'       => $this->getEvent()->getRouter(),
+                        'picHelper'    => $this->getPluginManager()->get('pic'),
+                        'specsService' => $this->specsService
                     ])
                 ]);
             } else {

@@ -9,11 +9,11 @@ return array_replace(include 'root.php', [
 
     /* Common words */
     'and' => 'et',
-    '%1$s picures'       => [
+    '%1$s pictures'       => [
         '%1$s image',
         '%1$s images',
     ],
-    'ng/%1$s-picures' => '{count, plural,
+    'ng/%1$s-pictures' => '{count, plural,
         one {{count} image}
         other {{count} images}
     }',

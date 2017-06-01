@@ -2,14 +2,14 @@
 
 namespace Application\Controller;
 
+use geoPHP;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\DbTable;
-
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 
-use geoPHP;
+use Application\Model\DbTable;
+use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
 
@@ -17,9 +17,17 @@ class FactoriesController extends AbstractActionController
 {
     private $textStorage;
 
-    public function __construct($textStorage)
-    {
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(
+        $textStorage,
+        SpecificationsService $specsService
+    ) {
         $this->textStorage = $textStorage;
+        $this->specsService = $specsService;
     }
 
     public function indexAction()
@@ -204,9 +212,10 @@ class FactoriesController extends AbstractActionController
                     'onlyChilds'           => $groups
                 ]),
                 'listBuilder' => new \Application\Model\Item\ListBuilder([
-                    'catalogue' => $this->catalogue(),
-                    'router'    => $this->getEvent()->getRouter(),
-                    'picHelper' => $this->getPluginManager()->get('pic')
+                    'catalogue'    => $this->catalogue(),
+                    'router'       => $this->getEvent()->getRouter(),
+                    'picHelper'    => $this->getPluginManager()->get('pic'),
+                    'specsService' => $this->specsService
                 ]),
             ]),
             'paginator' => $paginator

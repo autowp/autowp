@@ -45,13 +45,17 @@ class View extends Table
     }
 
     /**
-     * @param PictureRow $picture
+     * @param array|PictureRow $picture
      * @return int
      */
-    public function get(PictureRow $picture)
+    public function get($picture)
     {
+        if (!isset($picture['id'])) {
+            throw new \InvalidArgumentException("picture.id is not set");
+        }
+
         $view = $this->fetchRow([
-            'picture_id = ?' => $picture->id
+            'picture_id = ?' => $picture['id']
         ]);
 
         return $view ? (int)$view->views : 0;
