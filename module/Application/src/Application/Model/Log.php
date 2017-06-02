@@ -31,14 +31,10 @@ class Log
      */
     private $adapter;
 
-    private $router;
-
-    public function __construct(Adapter $adapter, $router)
+    public function __construct(Adapter $adapter)
     {
         $this->adapter = $adapter;
         $this->eventTable = new TableGateway('log_events', $adapter);
-
-        $this->router = $router;
     }
 
     public function addEvent($userId, $message, $objects)
