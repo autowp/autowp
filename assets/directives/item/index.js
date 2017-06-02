@@ -41,8 +41,8 @@ angular.module(Module)
                         var singleThumbPart = Math.round(12 / thumbColumns);
                         
                         var classes = {};
-                        var col = picture.largeFormat && $index === 0  ? 2*singleThumbPart : singleThumbPart;
-                        var colSm = picture.largeFormat && $index === 0  ? 12 : 6;
+                        var col = picture.large && $index === 0  ? 2*singleThumbPart : singleThumbPart;
+                        var colSm = picture.large && $index === 0  ? 12 : 6;
                         
                         classes['col-md-'+col] = true;
                         classes['col-sm-'+colSm] = true;

@@ -69,6 +69,7 @@ class PreviewPictureHydrator extends RestHydrator
         return [
             'picture'   => $this->extractValue('picture', $object['row']),
             'url'       => $object['url'],
+            'large'     => $object['format'] == 'picture-thumb-medium',
             'thumbnail' => $object['row'] ? $this->extractValue('thumbnail', [
                 'image'  => DbTable\Picture\Row::buildFormatRequest($object['row']),
                 'format' => $object['format']
