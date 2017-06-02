@@ -49,10 +49,7 @@
                     <?php } ?>
                 </p>
             <?php } ?>
-            <p><?=$this->htmlA($this->url('log/params', [
-                'action'  => 'index',
-                'item_id' => $this->car['id']
-            ]), $this->translate('moder/log-of-events')) ?></p>
+            <p><?=$this->htmlA('/ng/log?item_id='.$this->car['id'], $this->translate('moder/log-of-events')) ?></p>
         </div>
     </div>
     <div class="col-md-5">

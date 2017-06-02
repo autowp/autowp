@@ -161,49 +161,24 @@ class Log
 
         $events = [];
         foreach ($paginator->getCurrentItems() as $event) {
-            $vehicleRows = $itemTable->fetchAll(
+            $itemRows = $itemTable->fetchAll(
                 $itemTable->select(true)
                     ->join('log_events_item', 'item.id = log_events_item.item_id', null)
                     ->where('log_events_item.log_event_id = ?', $event['id'])
             );
-            $vehicles = [];
-            foreach ($vehicleRows as $vehicleRow) {
-                $vehicles[] = [
-                    'name' => $vehicleRow->getNameData($language),
-                    'url'  => $this->router->assemble([
-                        'action'  => 'car',
-                        'item_id' => $vehicleRow->id
-                    ], [
-                        'name' => 'moder/cars/params'
-                    ])
-                ];
-            }
 
-            $picturesRows = $picturesTable->fetchAll(
+            $pictureRows = $picturesTable->fetchAll(
                 $picturesTable->select(true)
                     ->join('log_events_pictures', 'pictures.id = log_events_pictures.picture_id', null)
                     ->where('log_events_pictures.log_event_id = ?', $event['id'])
             );
-            $pictures = [];
-
-            $names = $picturesTable->getNameData($picturesRows, [
-                'language' => $language
-            ]);
-
-            foreach ($picturesRows as $picturesRow) {
-                $id = $picturesRow->id;
-                $pictures[] = [
-                    'name' => isset($names[$id]) ? $names[$id] : null,
-                    'url'  => '/ng/moder/pictures/' . $picturesRow->id
-                ];
-            }
 
             $events[] = [
                 'user'     => $userTable->find($event['user_id'])->current(),
                 'date'     => Table\Row::getDateTimeByColumnType('timestamp', $event['add_datetime']),
                 'desc'     => $event['description'],
-                'vehicles' => $vehicles,
-                'pictures' => $pictures
+                'items'    => $itemRows->toArray(),
+                'pictures' => $pictureRows
             ];
         }
 

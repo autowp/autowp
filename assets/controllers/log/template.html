@@ -1,0 +1,19 @@
+<table class="table table-condensed table-striped">
+    <tr ng-repeat="event in ctrl.items">
+        <td>
+            <autowp-user user="event.user" ng-if="event.user"></autowp-user>
+            <div ng-if="event.date" ng-bind="event.date | date : 'fullDate'"></div>
+        </td>
+        <td ng-bind-html="event.desc"></td>
+        <td>
+            <div ng-repeat="item in event.items">
+                Item: <a ng-href="{{item.moder_url}}" ng-bind-html="item.name_html"></a>
+            </div>
+            <div ng-repeat="picture in event.pictures">
+                Picture: <a ui-sref="moder-pictures-item({id: picture.id})" ng-bind-html="picture.name_html"></a>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<autowp-paginator data="paginator" ng-if="paginator"></autowp-paginator>

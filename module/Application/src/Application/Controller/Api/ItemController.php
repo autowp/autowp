@@ -32,6 +32,11 @@ class ItemController extends AbstractRestfulController
      */
     private $itemNameFormatter;
 
+    /**
+     * @var InputFilter
+     */
+    private $listInputFilter;
+
     public function __construct(
         RestHydrator $hydrator,
         ItemNameFormatter $itemNameFormatter,

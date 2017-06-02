@@ -168,11 +168,6 @@ class PictureHydrator extends RestHydrator
 
         $cropped = DbTable\Picture\Row::checkCropParameters($object);
 
-        $nameDatas = $this->pictureTable->getNameData([$object], [
-            'language' => $this->language
-        ]);
-        $nameData = $nameDatas[$object['id']];
-
         $picture = [
             'id'             => (int)$object['id'],
             'url'            => $this->router->assemble([
@@ -180,9 +175,6 @@ class PictureHydrator extends RestHydrator
             ], [
                 'name' => 'picture/picture'
             ]),
-            'name'           => $this->pictureNameFormatter->format($nameData, $this->language),
-            'nameHtml'       => $this->pictureNameFormatter->formatHtml($nameData, $this->language),
-            'views'          => $this->pictureViewTable->get($object),
             'resolution'     => (int)$object['width'] . '×' . (int)$object['height'],
             'cropped'        => $cropped,
             'cropResolution' => $cropped ? $object['crop_width'] . '×' . $object['crop_height'] : null,
@@ -192,6 +184,29 @@ class PictureHydrator extends RestHydrator
             'height'         => (int)$object['height'],
             'filesize'       => $object['filesize']
         ];
+
+        if ($this->filterComposite->filter('views')) {
+            $picture['views'] = $this->pictureViewTable->get($object);
+        }
+
+        $showNameHtml = $this->filterComposite->filter('name_html');
+        $showNameText = $this->filterComposite->filter('name_text');
+
+        $nameData = null;
+        if ($showNameHtml || $showNameText) {
+            $nameDatas = $this->pictureTable->getNameData([$object], [
+                'language' => $this->language
+            ]);
+            $nameData = $nameDatas[$object['id']];
+        }
+
+        if ($showNameHtml) {
+            $picture['name_html'] = $this->pictureNameFormatter->formatHtml($nameData, $this->language);
+        }
+
+        if ($showNameText) {
+            $picture['name_text'] = $this->pictureNameFormatter->format($nameData, $this->language);
+        }
 
         if ($this->filterComposite->filter('crop')) {
             if ($cropped) {

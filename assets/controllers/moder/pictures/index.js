@@ -155,7 +155,7 @@ angular.module(Module)
                     location: 'replace'
                 });
                 
-                params.fields = 'owner,thumbnail,moder_vote,votes,similar,comments_count,perspective_item';
+                params.fields = 'owner,thumbnail,moder_vote,votes,similar,comments_count,perspective_item,name_html,name_text';
                 params.limit = 24;
                 
                 $http({

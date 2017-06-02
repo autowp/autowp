@@ -9,6 +9,7 @@ import './directives/user';
 import './controllers/root';
 import './controllers/error/403';
 import './controllers/error/404';
+import './controllers/log';
 import './controllers/moder';
 import './controllers/moder/items';
 import './controllers/moder/items/alpha';

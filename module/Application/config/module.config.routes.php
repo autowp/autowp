@@ -696,22 +696,6 @@ return [
                     ]
                 ]
             ],
-            'log' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route'    => '/log/index',
-                    'defaults' => [
-                        'controller' => Controller\LogController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'params' => [
-                        'type' => Router\Http\WildcardSafe::class
-                    ]
-                ]
-            ],
             'login' => [
                 'type' => Literal::class,
                 'options' => [
@@ -1264,7 +1248,7 @@ return [
                     ]
                 ]
             ],
-            
+
         ]
     ]
 ];

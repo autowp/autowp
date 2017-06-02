@@ -28,7 +28,6 @@ return [
             Controller\IndexController::class           => Controller\Frontend\Service\IndexControllerFactory::class,
             Controller\InboxController::class           => InvokableFactory::class,
             Controller\InfoController::class            => Controller\Frontend\Service\InfoControllerFactory::class,
-            Controller\LogController::class             => Controller\Frontend\Service\LogControllerFactory::class,
             Controller\LoginController::class           => Controller\Frontend\Service\LoginControllerFactory::class,
             Controller\MapController::class             => Controller\Frontend\Service\MapControllerFactory::class,
             Controller\MostsController::class           => Controller\Frontend\Service\MostsControllerFactory::class,

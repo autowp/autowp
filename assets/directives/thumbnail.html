@@ -1,10 +1,10 @@
 <div ng-class="{'picture-preview': true, 'vote-accept': picture.moder_vote.vote > 0, 'vote-remove': picture.moder_vote.vote < 0, 'vote-neutral': picture.moder_vote.count > 0 && picture.moder_vote.vote == 0}">
     <div class="thumbnail">
         <a href="{{picture.url}}" ng-if="picture.thumbnail">
-            <img ng-src="{{picture.thumbnail.src}}" alt="{{picture.name}}" title="{{picture.name}}">
+            <img ng-src="{{picture.thumbnail.src}}" alt="{{picture.name_text}}" title="{{picture.name_text}}">
         </a>
         <div class="name">
-            <p><a href="{{picture.url}}" ng-bind-html="picture.nameHtml"></a></p>
+            <p><a href="{{picture.url}}" ng-bind-html="picture.name_html"></a></p>
 
             <p class="picture-behaviour clearfix" ng-if="!disableBehaviour">
                 <span title="Status" ng-if="isModer">

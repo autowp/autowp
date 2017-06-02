@@ -17,6 +17,7 @@ return [
             Hydrator\Api\IpHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemParentHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\LogHydrator::class              => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectiveHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectiveGroupHydrator::class => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectivePageHydrator::class  => Hydrator\Api\RestHydratorFactory::class,
@@ -36,6 +37,7 @@ return [
             Controller\Api\IpController::class           => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class         => Controller\Api\Service\ItemControllerFactory::class,
             Controller\Api\ItemParentController::class   => Controller\Api\Service\ItemParentControllerFactory::class,
+            Controller\Api\LogController::class          => Controller\Api\Service\LogControllerFactory::class,
             Controller\Api\PageController::class         => Controller\Api\Service\PageControllerFactory::class,
             Controller\Api\PerspectiveController::class  => Controller\Api\Service\PerspectiveControllerFactory::class,
             Controller\Api\PerspectivePageController::class => Controller\Api\Service\PerspectivePageControllerFactory::class,
@@ -377,6 +379,69 @@ return [
                 ]
             ],
         ],
+        'api_log_list' => [
+            'article_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'item_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'picture_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'user_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'page' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['user', 'pictures', 'items']]
+                    ]
+                ]
+            ]
+        ],
         'api_page_post' => [
             'parent_id' => [
                 'required' => false
@@ -625,7 +690,8 @@ return [
                             'copyrights', 'change_status_user', 'rights',
                             'moder_votes', 'moder_voted', 'is_last',
                             'accepted_count', 'crop', 'replaceable',
-                            'perspective_item', 'siblings', 'ip'
+                            'perspective_item', 'siblings', 'ip',
+                            'name_html', 'name_text'
                         ]]
                     ]
                 ]
@@ -796,7 +862,8 @@ return [
                             'copyrights', 'change_status_user', 'rights',
                             'moder_votes', 'moder_voted', 'is_last',
                             'accepted_count', 'crop', 'replaceable',
-                            'perspective_item', 'siblings', 'ip'
+                            'perspective_item', 'siblings', 'ip',
+                            'name_html', 'name_text'
                         ]]
                     ]
                 ]
@@ -1247,6 +1314,27 @@ return [
                                 'type' => Method::class,
                                 'options' => [
                                     'verb'     => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'log' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/log',
+                            'defaults' => [
+                                'controller' => Controller\Api\LogController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'get' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
                                     'defaults' => [
                                         'action' => 'index'
                                     ]

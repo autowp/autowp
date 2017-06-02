@@ -42,7 +42,7 @@
                 {{'moder/picture/image:'|translate}}
                 <a ng-href="{{picture.image.src}}" ng-bind="picture.image.src"></a>
             </p>
-            <a ng-href="/log/index/picture_id/{{picture.id}}" translate>moder/log-of-events</a>
+            <a ui-sref="log({picture_id: picture.id})" translate>moder/log-of-events</a>
         </md-content>
     </div>
     <div class="col-md-5">
