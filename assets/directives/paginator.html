@@ -1,21 +1,21 @@
 <div ng-if="data.pageCount > 1">
     <p>
-        <a ui-sref="{page:data.previous}" ng-if="data.previous">←{{'previous'|translate}}</a>
+        <a ui-sref="{page:data.previous}" ui-sref-opts="{reload: true}" ng-if="data.previous">←{{'previous'|translate}}</a>
         <span ng-if="!data.previous">←{{'previous'|translate}}</span>
         
-        <a ui-sref="{page:data.next}" ng-if="data.next">{{'next'|translate}}→</a>
+        <a ui-sref="{page:data.next}" ui-sref-opts="{reload: true}" ng-if="data.next">{{'next'|translate}}→</a>
         <span ng-if="!data.next">{{'next'|translate}}→</span>
     </p>
     <p>
-        <a ui-sref="{page:data.first}" ng-if="data.first < data.firstPageInRange">{{padd(data.first)}}</a>
+        <a ui-sref="{page:data.first}" ui-sref-opts="{reload: true}" ng-if="data.first < data.firstPageInRange">{{padd(data.first)}}</a>
         <span ng-if="data.first < data.firstPageInRange-1">…</span>
         
         <span ng-repeat="page in data.pagesInRange">
-            <a ng-if="page != data.current" ui-sref="{page:page}" ng-bind="padd(page)"></a>
+            <a ng-if="page != data.current" ui-sref="{page:page}" ui-sref-opts="{reload: true}" ng-bind="padd(page)"></a>
             <strong ng-if="page == data.current" style="font-size:20px;margin:0 3px" ng-if="page == data.current" ng-bind="padd(page)"></strong>
         </span>
         
         <span ng-if="data.last > data.lastPageInRange+1">…</span>
-        <a ui-sref="{page:data.last}" ng-if="data.last > data.lastPageInRange">{{padd(data.last)}}</a>
+        <a ui-sref="{page:data.last}" ui-sref-opts="{reload: true}" ng-if="data.last > data.lastPageInRange">{{padd(data.last)}}</a>
     </p>
 </div>

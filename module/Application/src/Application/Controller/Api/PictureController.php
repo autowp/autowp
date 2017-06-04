@@ -378,7 +378,8 @@ class PictureController extends AbstractRestfulController
             }
             $select
                 ->join('item', 'picture_item.item_id = item.id', null)
-                ->join('car_types_parents', 'item.car_type_id=car_types_parents.id', null)
+                ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
+                ->join('car_types_parents', 'vehicle_vehicle_type.vehicle_type_id = car_types_parents.id', null)
                 ->where('car_types_parents.parent_id = ?', $data['car_type_id']);
         }
 
