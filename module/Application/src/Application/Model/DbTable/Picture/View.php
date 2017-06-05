@@ -50,7 +50,7 @@ class View extends Table
      */
     public function get($picture)
     {
-        if (!isset($picture['id'])) {
+        if (! isset($picture['id'])) {
             throw new \InvalidArgumentException("picture.id is not set");
         }
 

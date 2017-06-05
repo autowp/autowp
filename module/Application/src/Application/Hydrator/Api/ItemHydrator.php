@@ -241,7 +241,6 @@ class ItemHydrator extends RestHydrator
         $onlyExactlyPictures = false;
 
         if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
-
             $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
                 'type'                 => null,
                 'onlyExactlyPictures'  => $onlyExactlyPictures,
@@ -256,7 +255,6 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($showPreviewPictures) {
-
             $pictures = $cFetcher->fetch($object, [
                 'totalPictures' => $totalPictures
             ]);
@@ -396,7 +394,6 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('design')) {
-
             $db = $this->itemParentTable->getAdapter();
             $designRow = $db->fetchRow(
                 $db->select()

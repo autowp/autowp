@@ -172,7 +172,6 @@ class AclController extends AbstractRestfulController
         if ($data['recursive']) {
             $roles = $this->getRoles(null);
         } else {
-
             $roles = [];
             foreach ($this->roleTable->select([]) as $role) {
                 $roles[] = [
@@ -307,7 +306,7 @@ class AclController extends AbstractRestfulController
         }
 
         $avaliableRoles = [];
-        foreach ($this->roleTable->select()as $row) {
+        foreach ($this->roleTable->select() as $row) {
             $avaliableRoles[] = $row['name'];
         }
 
@@ -317,7 +316,7 @@ class AclController extends AbstractRestfulController
         $this->rulesPostFilter->get('role')->getValidatorChain()->attach($validator);
 
         $avaliableResources = [];
-        foreach ($this->resourceTable->select()as $row) {
+        foreach ($this->resourceTable->select() as $row) {
             $avaliableResources[] = $row['name'];
         }
 
