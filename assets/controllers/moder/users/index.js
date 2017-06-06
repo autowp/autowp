@@ -27,6 +27,10 @@ angular.module(Module)
         '$scope', '$http', '$state',
         function($scope, $http, $state) {
             
+            var ctrl = this;
+            
+            ctrl.loading = 0;
+            
             $scope.pageEnv({
                 layout: {
                     isAdminPage: true,
@@ -41,7 +45,7 @@ angular.module(Module)
             $scope.page = $state.params.page;
             
             $scope.load = function() {
-                $scope.loading = true;
+                ctrl.loading++;
                 $scope.users = [];
                 
                 var params = {
@@ -63,7 +67,9 @@ angular.module(Module)
                 }).then(function(response) {
                     $scope.users = response.data.items;
                     $scope.paginator = response.data.paginator;
-                    $scope.loading = false;
+                    ctrl.loading--;
+                }, function() {
+                    ctrl.loading--;
                 });
             };
             

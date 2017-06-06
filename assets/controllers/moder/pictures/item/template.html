@@ -32,7 +32,7 @@
         <img ng-src="{{picture.thumbnail.src}}" ng-if="picture.thumbnail" />
     </div>
     <div class="col-md-5">
-        <md-content layout-padding>
+        <div class="well">
             <p translate="ng/moder/database-id-n" translate-values="{id: picture.id}"></p>
             <p>
                 {{'moder/picture/public-url:'|translate}}
@@ -43,10 +43,10 @@
                 <a ng-href="{{picture.image.src}}" ng-bind="picture.image.src"></a>
             </p>
             <a ui-sref="log({picture_id: picture.id})" translate>moder/log-of-events</a>
-        </md-content>
+        </div>
     </div>
     <div class="col-md-5">
-        <md-content layout-padding>
+        <div class="well">
             <p>{{'moder/picture/resolution:'|translate}}
             <b>{{picture.width}}×{{picture.height}}</b></p>
             <p ng-if="picture.dpi_x || picture.dpi_y">
@@ -54,12 +54,12 @@
             </p>
             <p>{{'moder/picture/filesize:'|translate}} <b ng-bind="picture.filesize | filesize"></b></p>
             <p>{{'moder/picture/upload-date:'|translate}} <b ng-bind="picture.add_date | date : 'fullDate'"></b></p>
-        </md-content>
+        </div>
     </div>
 </div>
 
 <h3 translate>moder/picture/catalogue</h3>
-<md-content layout-padding>
+<div class="well">
     <table class="table" ng-if="picture.items.length">
         <thead>
             <tr>
@@ -141,13 +141,16 @@
         </div>
     </div>
     
-    <md-progress-linear md-mode="indeterminate" ng-show="pictureItemLoading"></md-progress-linear>
-</md-content>
+    <div class="progress" ng-show="pictureItemLoading">
+        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-md-6">
         <h3 translate>moder/picture/settings</h3>
-        <md-content layout-padding layout="column">
+        <div class="well">
             <div>
                 <p class="text-danger">Achtung! High Voltage! Ты сюда не ходи!</p>
                 <p class="text-danger">Поле использовать в ИСКЛЮЧИТЕЛЬНЫХ случаях. А лучше вообще никогда не использовать.</p>
@@ -164,18 +167,24 @@
                 </div>
             </div>
             
-            <md-progress-linear md-mode="indeterminate" ng-show="specialNameLoading"></md-progress-linear>
-        </md-content>
+            <div class="progress" ng-show="specialNameLoading">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                </div>
+            </div>
+        </div>
 
         <h3 translate>moder/picture/copyrights</h3>
-        <md-content layout-padding layout="column">
+        <div class="well">
             <autowp-markdown-edit save="saveCopyrights" text="picture.copyrights"></autowp-markdown-edit>
             <p ng-if="picture.copyrights_text_id">
                 <a ng-href="/info/text/id/{{picture.copyrights_text_id}}">History</a>
             </p>
             
-            <md-progress-linear md-mode="indeterminate" ng-show="copyrightsLoading"></md-progress-linear>
-        </md-content>
+            <div class="progress" ng-show="copyrightsLoading">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                </div>
+            </div>
+        </div>
 
         <h3 ng-if="picture.iptc">IPTC</h3>
         <div class="well small" style="overflow:auto" ng-if="picture.iptc" ng-bind-html="picture.iptc"></div>
@@ -188,7 +197,7 @@
     <div class="col-md-6">
 
         <h3 translate ng-if="picture.replaceable">moder/picture/replacement</h3>
-        <md-content layout-padding ng-if="picture.replaceable">
+        <div class="well">
             <div>
                 <p>
                     {{'moder/picture/replacement/photo-suggested-to-replace'|translate}}
@@ -203,12 +212,16 @@
                     {{'moder/picture/replacement/cancel'|translate}}
                 </md-button>
             </div>
-            <md-progress-linear md-mode="indeterminate" ng-show="replaceLoading"></md-progress-linear>
-        </md-content>
+
+            <div class="progress" ng-show="replaceLoading">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                </div>
+            </div>
+        </div>
 
 
         <h3 translate>moder/picture/acceptance</h3>
-        <md-content layout-padding layout="column">
+        <div class="well">
             <autowp-user user="picture.change_status_user" ng-if="picture.change_status_user"></autowp-user>
 
             <div ng-if="picture.status == 'inbox'">
@@ -251,11 +264,14 @@
                 <span class="label label-warning" translate="ng/moder/picture/acceptance/accepted-pictures-is-n" translate-values="{count: picture.accepted_count}"></span>
             </p>
             
-            <md-progress-linear md-mode="indeterminate" ng-show="statusLoading"></md-progress-linear>
-        </md-content>
+            <div class="progress" ng-show="statusLoading">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                </div>
+            </div>
+        </div>
 
         <h3 translate>moder/picture/edit-and-repair</h3>
-        <md-content layout-padding layout="column" ng-if="picture.rights.normalize || picture.rights.flop || picture.rights.crop">
+        <div class="well" ng-if="picture.rights.normalize || picture.rights.flop || picture.rights.crop">
             <div layout="row">
                 <md-button class="md-raised md-warn" ng-click="normalizePicture()" ng-if="picture.rights.normalize" ng-disabled="repairLoading">
                     <i class="fa fa-signal"></i>
@@ -282,11 +298,14 @@
                 </md-button>
             </div>
             
-            <md-progress-linear md-mode="indeterminate" ng-show="repairLoading"></md-progress-linear>
-        </md-content>
+            <div class="progress" ng-show="repairLoading">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                </div>
+            </div>
+        </div>
         
         <h3 ng-if="picture.similar">Similar picture</h3>
-        <md-content ng-if="picture.similar" layout-padding>
+        <div class="well" ng-if="picture.similar">
             <p class="alert alert-warning" role="alert">
                 <span class="fa fa-file-image-o"></span>
                 <a ui-sref="moder-pictures-item({id: picture.similar.picture_id})">
@@ -299,11 +318,15 @@
                 </a>
             </p>
             <md-button ng-click="cancelSimilar()">That is not similar</md-button>
-            <md-progress-linear md-mode="indeterminate" ng-show="repairLoading"></md-progress-linear>
-        </md-content>
+
+            <div class="progress" ng-show="similarLoading">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                </div>
+            </div>
+        </div>
 
         <h3 translate>moder/picture/uploader</h3>
-        <md-content layout-padding>
+        <div class="well">
             <autowp-user user="picture.owner" ng-if="picture.owner"></autowp-user>
             <span ng-if="!picture.owner" translate>moder/picture/uploader/unknown</span>
             <div ng-if="picture.ip.address">
@@ -347,6 +370,6 @@
                 <?php } ?>
  -->
             </div>
-        </md-content>
+        </div>
     </div>
 </div>

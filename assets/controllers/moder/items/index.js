@@ -58,6 +58,8 @@ angular.module(Module)
             
             var ctrl = this;
             
+            ctrl.loading = 0;
+            
             var DEFAULT_ORDER = 'id_desc';
             
             ctrl.filter = {
@@ -130,7 +132,7 @@ angular.module(Module)
             }
             
             ctrl.load = function() {
-                //ctrl.loading = true;
+                ctrl.loading++;
                 ctrl.pictures = [];
                 
                 var stateParams = getStateParams();
@@ -170,9 +172,9 @@ angular.module(Module)
                 }).then(function(response) {
                     ctrl.items = response.data.items;
                     ctrl.paginator = response.data.paginator;
-                    ctrl.loading = false;
+                    ctrl.loading--;
                 }, function() {
-                    ctrl.loading = false;
+                    ctrl.loading--;
                 });
             };
             

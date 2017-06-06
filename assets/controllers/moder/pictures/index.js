@@ -47,6 +47,9 @@ angular.module(Module)
         '$scope', '$http', '$state', '$q', PERSPECTIVE_SERVICE, MODER_VOTE_SERVICE, MODER_VOTE_TEMPLATE_SERVICE, VEHICLE_TYPE_SERVICE,
         function($scope, $http, $state, $q, PerspectiveService, ModerVoteService, ModerVoteTemplateService, VehicleTypeService) {
             
+            var ctrl = this;
+            ctrl.loading = 0;
+            
             $scope.pageEnv({
                 layout: {
                     isAdminPage: true,
@@ -127,7 +130,7 @@ angular.module(Module)
             });
             
             $scope.load = function() {
-                $scope.loading = true;
+                ctrl.loading++;
                 $scope.pictures = [];
                 
                 selected = [];
@@ -165,7 +168,9 @@ angular.module(Module)
                 }).then(function(response) {
                     $scope.pictures = response.data.pictures;
                     $scope.paginator = response.data.paginator;
-                    $scope.loading = false;
+                    ctrl.loading--;
+                }, function() {
+                    ctrl.loading--;
                 });
             };
             

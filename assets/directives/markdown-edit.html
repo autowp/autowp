@@ -6,9 +6,9 @@
         </md-input-container>
     </md-tab>
     <md-tab label="{{'moder/markdown/preview'|translate}}" ng-disabled="!text.length">
-        <md-content class="md-padding">
+        <div class="well">
             <div btf-markdown="text"></div>
-        </md-content>
+        </div>
     </md-tab>
 </md-tabs>
 <md-button class="md-raised md-primary" ng-click="save()">{{'submit'|translate}}</md-button>

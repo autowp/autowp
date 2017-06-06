@@ -11,20 +11,20 @@
 </ul>
 
 <div ng-if="show_museums && !src_item">
-    <md-content layout-padding>
+    <div class="well">
         <a href="#" ng-repeat-start="item in museums" ng-click="selectItem(item.id)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
-    </md-content>
+    </div>
     
     <autowp-paginator data="museums_paginator" ng-if="museums_paginator"></autowp-paginator>
 </div>
 
 <div ng-if="show_factories && !src_item">
 
-    <md-content layout-padding>
+    <div class="well">
         <a href="#" ng-repeat-start="item in factories" ng-click="selectItem(item.id)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
-    </md-content>
+    </div>
     
     <autowp-paginator data="factories_paginator" ng-if="factories_paginator"></autowp-paginator>
 </div>
@@ -32,11 +32,11 @@
 <div ng-if="!show_factories && !show_museums">
     <div ng-if="!brand_id">
     
-        <md-content layout-padding layout="row">
+        <div class="well" layout-padding layout="row">
             <div layout="column" ng-repeat="chunk in brands" flex="20">
                 <a ng-repeat="item in chunk" ui-sref=".({page: null, brand_id: item.id})" ng-bind-html="item.name_html"></a>
             </div>
-        </md-content>
+        </div>
         
         <autowp-paginator data="brands_paginator" ng-if="brands_paginator"></autowp-paginator>
     </div>

@@ -45,6 +45,8 @@
     </md-input-container>
     <div layout="row">
         <md-button type="submit" class="md-primary md-raised">{{'send'|translate}}</md-button>
-        <md-progress-circular ng-show="ctrl.loading > 0"></md-progress-circular>
+        <span ng-show="ctrl.loading > 0">
+            <i class="fa fa-spinner fa-spin fa-fw fa-3x"></i>
+        </span>
     </div>
 </form>

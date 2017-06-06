@@ -56,7 +56,7 @@ class ModerMenu extends AbstractHtmlElement
 
             if ($this->view->user()->inheritsRole('pages-moder')) {
                 $items[] = [
-                    'href'  => '/ng/moder/page',
+                    'href'  => '/ng/moder/pages',
                     'label' => $this->view->page(68)->name,
                     'icon'  => 'fa fa-book'
                 ];

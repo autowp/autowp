@@ -96,12 +96,11 @@
     <div class="col-lg-8 col-md-8">
         <h2>
             {{'page/131/name'|translate}}
+            <span ng-show="ctrl.loading > 0">
+                <i class="fa fa-spinner fa-spin fa-fw"></i>
+            </span>
             <small ng-if="ctrl.paginator.totalItemCount" translate="ng/%1$s-items" translate-values="{count: ctrl.paginator.totalItemCount}"></small>
         </h2>
-        
-        <div layout="row" layout-sm="column" layout-align="space-around" ng-show="ctrl.loading">
-            <md-progress-circular md-mode="indeterminate"></md-progress-circular>
-        </div>
         
         <div layout="column">
             <autowp-item item="item" ng-repeat="item in ctrl.items"></autowp-item>

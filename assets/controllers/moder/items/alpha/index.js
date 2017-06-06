@@ -15,6 +15,10 @@ angular.module(Module)
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template,
+                params: { 
+                    char: { dynamic: true },
+                    page: { dynamic: true }
+                },
                 resolve: {
                     access: [ACL_SERVICE_NAME, function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
@@ -26,6 +30,10 @@ angular.module(Module)
     .controller(CONTROLLER_NAME, [
         '$scope', '$http', '$state',
         function($scope, $http, $state) {
+            
+            var ctrl = this;
+            
+            ctrl.loading = 0;
             
             $scope.title = 'page/119/title';
             $scope.pageEnv({
@@ -47,7 +55,7 @@ angular.module(Module)
             function loadChar(char) {
                 $scope.paginator = null;
                 $scope.items = [];
-                $scope.loading = true;
+                ctrl.loading++;
                 $http.get('/api/item', {
                     params: {
                         name: char + '%',
@@ -58,7 +66,9 @@ angular.module(Module)
                 }).then(function(response) {
                     $scope.paginator = response.data.paginator;
                     $scope.items = response.data.items;
-                    $scope.loading = false;
+                    ctrl.loading--;
+                }, function() {
+                    ctrl.loading--;
                 });
             }
             

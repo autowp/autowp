@@ -167,12 +167,11 @@
 
         <h2>
             {{'page/73/name'|translate}}
+            <span ng-show="ctrl.loading > 0">
+                <i class="fa fa-spinner fa-spin fa-fw"></i>
+            </span>
             <small ng-if="paginator.totalItemCount" translate="ng/%1$s-pictures" translate-values="{count: paginator.totalItemCount}"></small>
         </h2>
-        
-        <div layout="row" layout-sm="column" layout-align="space-around" ng-show="loading">
-            <md-progress-circular md-mode="indeterminate"></md-progress-circular>
-        </div>
         
         <div layout="row" layout-wrap>
             <div flex="25" flex-xs="50" flex-sm="33" ng-repeat="picture in pictures">
