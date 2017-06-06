@@ -84,10 +84,10 @@
                     </md-select>
                 </td>
                 <td ng-if="picture.rights.crop">
-                    <md-button ui-sref="moder-pictures-item-area({id: picture.id, item_id: item.item_id})" arial-label="Area" style="margin:0">
+                    <a class="btn btn-default" ui-sref="moder-pictures-item-area({id: picture.id, item_id: item.item_id})" arial-label="Area" style="margin:0">
                         <i class="fa fa-crop"></i>
                         {{'moder/picture/catalogue/pick-item-area'|translate}}
-                    </md-button>
+                    </a>
                 </td>
                 <td ng-if="picture.rights.move">
                     <div class="btn-group" style="white-space:nowrap">
@@ -118,26 +118,26 @@
                     </div>
                 </td>
                 <td ng-if="picture.rights.move">
-                    <md-button class="md-warn" ng-click="deletePictureItem(item.item_id)" aria-label="Delete" style="margin:0">
+                    <button class="btn btn-danger" ng-click="deletePictureItem(item.item_id)" aria-label="Delete" style="margin:0">
                         <span class="fa fa-times"></span>
-                    </md-button>
+                    </button>
                 </td>
             </tr>
         </tbody>
     </table>
     <div ng-if="picture.rights.move">
         <div ng-if="last_item && !hasItem(last_item.id)">
-            <md-button ng-click="addItem(last_item.id)">
+            <button class="btn btn-default" ng-click="addItem(last_item.id)">
                 <i class="fa fa-plus"></i>
                 {{'moder/picture/catalogue/add-to'|translate}}
                 <span ng-bind-html="last_item.name_html"></span>
-            </md-button>
+            </button>
         </div>
         <div>
-            <md-button ui-sref="moder-pictures-item-move({id: picture.id})">
+            <a class="btn btn-success" ui-sref="moder-pictures-item-move({id: picture.id})">
                 <i class="fa fa-plus"></i>
                 {{'moder/picture/catalogue/add-to'|translate}} ...
-            </md-button>
+            </a>
         </div>
     </div>
     
@@ -163,7 +163,7 @@
                 </md-input-container>
                 
                 <div flex="20">
-                    <md-button class="md-raised md-primary" ng-click="saveSpecialName()">{{'submit'|translate}}</md-button>
+                    <button class="btn btn-primary" ng-click="saveSpecialName()">{{'submit'|translate}}</button>
                 </div>
             </div>
             
@@ -203,14 +203,14 @@
                     {{'moder/picture/replacement/photo-suggested-to-replace'|translate}}
                     <a ng-href="{{picture.replaceable.url}}">{{picture.replaceable.url}}</a>
                 </p>
-                <md-button class="md-raised md-primary" ng-if="picture.rights.accept" ng-click="acceptReplace()">
+                <button class="btn btn-success" ng-if="picture.rights.accept" ng-click="acceptReplace()">
                     <i class="fa fa-exchange"></i>
                     {{'moder/picture/replacement/accept-and-delete-double'|translate}}
-                </md-button>
-                <md-button class="md-raised md-warn" ng-if="picture.rights.accept" ng-click="cancelReplace()">
+                </button>
+                <button class="btn btn-warning" ng-if="picture.rights.accept" ng-click="cancelReplace()">
                     <i class="fa fa-times"></i>
                     {{'moder/picture/replacement/cancel'|translate}}
-                </md-button>
+                </button>
             </div>
 
             <div class="progress" ng-show="replaceLoading">
@@ -227,28 +227,28 @@
             <div ng-if="picture.status == 'inbox'">
                 <p><strong class="label label-warning" translate>moder/picture/acceptance/not-accepted</strong></p>
                 
-                <md-button class="md-raised md-primary md-primary" ng-click="acceptPicture()" ng-if="picture.rights.accept">
+                <button class="btn btn-success" ng-click="acceptPicture()" ng-if="picture.rights.accept">
                     {{'moder/picture/acceptance/accept'|translate}}
-                </md-button>
-                <md-button class="md-raised md-primary md-warn" ng-click="deletePicture()" ng-if="picture.rights.delete">
+                </button>
+                <button class="btn btn-danger" ng-click="deletePicture()" ng-if="picture.rights.delete">
                     {{'moder/picture/acceptance/delete'|translate}}
-                </md-button>
+                </button>
             </div>
 
             <div ng-show="picture.status == 'accepted'">
                 <p><strong class="label label-success" translate>moder/picture/acceptance/accepted</strong></p>
                 
-                <md-button class="md-raised md-primary md-warn" ng-click="unacceptPicture()" ng-if="picture.rights.unaccept">
+                <button class="btn btn-warning" ng-click="unacceptPicture()" ng-if="picture.rights.unaccept">
                     {{'moder/picture/acceptance/unaccept'|translate}}
-                </md-button>
+                </button>
             </div>
 
             <div ng-if="picture.status == 'removing'">
                 <p><strong class="label label-danger" translate>moder/picture/acceptance/in-delete-queue</strong></p>
 
-                <md-button class="md-raised md-primary md-warn" ng-click="restorePicture()" ng-if="picture.rights.restore">
+                <button class="btn btn-warning" ng-click="restorePicture()" ng-if="picture.rights.restore">
                     {{'moder/picture/acceptance/restore'|translate}}
-                </md-button>
+                </button>
             </div>
 
             <div ng-if="picture.status == 'removed'">
@@ -273,29 +273,29 @@
         <h3 translate>moder/picture/edit-and-repair</h3>
         <div class="well" ng-if="picture.rights.normalize || picture.rights.flop || picture.rights.crop">
             <div layout="row">
-                <md-button class="md-raised md-warn" ng-click="normalizePicture()" ng-if="picture.rights.normalize" ng-disabled="repairLoading">
+                <button class="btn btn-warning" ng-click="normalizePicture()" ng-if="picture.rights.normalize" ng-disabled="repairLoading">
                     <i class="fa fa-signal"></i>
                     {{'moder/picture/edit-and-repair/normalize'|translate}}
-                </md-button>
-                <md-button class="md-raised md-warn" ng-click="flopPicture()" ng-if="picture.rights.flop" ng-disabled="repairLoading">
+                </button>
+                <button class="btn btn-warning" ng-click="flopPicture()" ng-if="picture.rights.flop" ng-disabled="repairLoading">
                     <i class="fa fa-arrows-h"></i>
                     {{'moder/picture/edit-and-repair/flop'|translate}}
-                </md-button>
-                <md-button class="md-raised" ui-sref="moder-pictures-item-crop({id: picture.id})" ng-if="picture.rights.crop" ng-disabled="repairLoading">
+                </button>
+                <button class="btn btn-default" ui-sref="moder-pictures-item-crop({id: picture.id})" ng-if="picture.rights.crop" ng-disabled="repairLoading">
                     <i class="fa fa-crop"></i>
                     {{'moder/picture/edit-and-repair/crop'|translate}}
-                </md-button>
+                </button>
             </div>
 
             <div layout="row">
-                <md-button class="md-raised" ng-click="repairPicture()" ng-disabled="repairLoading">
+                <button class="btn btn-default" ng-click="repairPicture()" ng-disabled="repairLoading">
                     <i class="fa fa-wrench"></i>
                     {{'moder/picture/edit-and-repair/repair-all-files'|translate}}
-                </md-button>
-                <md-button class="md-raised" ng-click="correctFileNames()" ng-disabled="repairLoading">
+                </button>
+                <button class="btn btn-default" ng-click="correctFileNames()" ng-disabled="repairLoading">
                     <i class="fa fa-wrench"></i>
                     {{'moder/picture/edit-and-repair/rebuild-files-names'|translate}}
-                </md-button>
+                </button>
             </div>
             
             <div class="progress" ng-show="repairLoading">
@@ -317,7 +317,7 @@
                     <img ng-if="picture.similar.picture.thumbnail" ng-src="{{picture.similar.picture.thumbnail.src}}" />
                 </a>
             </p>
-            <md-button ng-click="cancelSimilar()">That is not similar</md-button>
+            <button ng-click="cancelSimilar()" class="btn btn-warning">That is not similar</button>
 
             <div class="progress" ng-show="similarLoading">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
@@ -340,9 +340,9 @@
                     <span ng-if="picture.ip.blacklist.reason" ng-bind="picture.ip.blacklist.reason"></span>
                 </p>
                 
-                <md-button ng-if="picture.ip.blacklist && picture.ip.rights.remove_from_blacklist" class="md-raised" ng-click="removeFromBlacklist(picture.ip.address)">
+                <button ng-if="picture.ip.blacklist && picture.ip.rights.remove_from_blacklist" class="btn btn-success" ng-click="removeFromBlacklist(picture.ip.address)">
                     {{'ban/unban'|translate}}
-                </md-button>
+                </button>
                
                 <div layout="row" ng-if="!picture.ip.blacklist && picture.ip.rights.add_to_blacklist">
                     <md-input-container>
@@ -357,9 +357,9 @@
                         <label translate>ban/reason</label>
                         <input md-maxlength="50" ng-model="ctrl.banReason" />
                     </md-input-container>
-                    <md-button class="md-raised md-warn" ng-click="addToBlacklist(picture.ip.address)">
+                    <button class="btn btn-danger" ng-click="addToBlacklist(picture.ip.address)">
                         {{'ban/ban'|translate}}
-                    </md-button>
+                    </button>
                 </div>
 
 <!-- 
