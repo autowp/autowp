@@ -2,7 +2,7 @@ var $ = require('jquery');
 var CarTypePicker = require('./car-type-picker');
 var Markdown = require('widget/markdown-edit-tabbar');
 var Picker = require("latlng-picker");
-require('typeahead');
+require('corejs-typeahead');
 
 module.exports = {
     init: function(options) {

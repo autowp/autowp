@@ -1,5 +1,5 @@
 var $ = require("jquery");
-require("typeahead");
+require("corejs-typeahead");
 require("bootstrap-tagsinput");
 require("bootstrap-tagsinput/src/bootstrap-tagsinput.css");
 

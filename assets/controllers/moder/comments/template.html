@@ -1,65 +1,44 @@
 <div class="row">
     <div class="col-md-4">
         <h2 translate>moder/comments/filter</h2>
-        <div class="well" layout="column">
-            <md-autocomplete 
-                md-input-name="owner_id"
-                md-input-minlength="1"
-                md-selected-item="selectedUser"
-                md-search-text="user_name"
-                md-items="item in queryUserName(user_name)"
-                md-item-text="item.name"
-                md-floating-label="{{'moder/comments/filter/user-id'|translate}}"
-                md-require-match="true"
-                md-selected-item-change="load()">
-                <md-item-template>
-                    <span md-highlight-text="owner_name">{{item.name}}</span>
-                </md-item-template>
-            </md-autocomplete>
-            <md-input-container>
+        <form class="well form-vertical">
+            <div class="form-group">
+                <label translate>moder/comments/filter/user-id</label>
+                <input type="text" name="user_id" class="form-control" />
+            </div>
+            <div class="form-group">
                 <label translate>moder/comments/filter/moderator_attention</label>
-                <md-select ng-model="moderator_attention" ng-change="load()">
-                    <md-option ng-value=""><em>{{'moder/comments/filter/moderator_attention/not-matters'|translate}}</em></md-option>
-                    <md-option ng-value="0">{{'moder/comments/filter/moderator_attention/not-required'|translate}}</md-option>
-                    <md-option ng-value="1">{{'moder/comments/filter/moderator_attention/required'|translate}}</md-option>
-                    <md-option ng-value="2">{{'moder/comments/filter/moderator_attention/resolved'|translate}}</md-option>
-                </md-select>
-            </md-input-container>
-            <md-autocomplete  
-                md-input-name="item_id"
-                md-input-minlength="1"
-                md-selected-item="selectedItem"
-                md-search-text="item_name"
-                md-items="item in queryItemName(item_name)"
-                md-item-text="item.name_text"
-                md-floating-label="{{'moder/comments/filter/vehicle-id'|translate}}"
-                ng-model-options="{debounce:300}"
-                md-require-match="true"
-                md-selected-item-change="load()">
-                <md-item-template>
-                    <span md-highlight-text="item_name">{{item.name_text}}</span>
-                </md-item-template>
-            </md-autocomplete>
-        </div>
+                <select name="moderator_attention" class="form-control" ng-model="ctrl.moderator_attention" ng-change="ctrl.load()">
+                    <option value="">{{'moder/comments/filter/moderator_attention/not-matters'|translate}}</option>
+                    <option value="0">{{'moder/comments/filter/moderator_attention/not-required'|translate}}</option>
+                    <option value="1">{{'moder/comments/filter/moderator_attention/required'|translate}}</option>
+                    <option value="2">{{'moder/comments/filter/moderator_attention/resolved'|translate}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label translate>moder/comments/filter/vehicle-id</label>
+                <input type="text" name="item_id" class="form-control">
+            </div>
+
+        </form>
     </div>
     <div class="col-md-8">
         <h2>
             {{'moder/comments/title'|translate}}
-            <small ng-if="paginator.totalItemCount" translate="ng/%1$s-comments" translate-values="{count:paginator.totalItemCount}"></small>
+            <span ng-show="ctrl.loading > 0">
+                <i class="fa fa-spinner fa-spin fa-fw"></i>
+            </span>
+            <small ng-if="ctrl.paginator.totalItemCount" translate="ng/%1$s-comments" translate-values="{count: ctrl.paginator.totalItemCount}"></small>
         </h2>
         
-        <div layout="row" layout-sm="column" layout-align="space-around" ng-show="loading">
-            <md-progress-circular md-mode="indeterminate"></md-progress-circular>
-        </div>
-        
         <ul class="comments">
-            <li ng-repeat="comment in comments">
+            <li ng-repeat="comment in ctrl.comments">
                 <span class="label label-warning" ng-if="comment.new" translate>moder/comments/not-readed</span>
                 <span class="label label-{{comment.status.class}}" ng-if="comment.status">{{comment.status.name|translate}}</span>
                 <a ng-href="{{comment.url}}" ng-bind="comment.preview"></a>
                 <autowp-user user="comment.user"></autowp-user>
             </li>
         </ul>
-        <autowp-paginator data="paginator" ng-if="paginator"></autowp-paginator>
+        <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
     </div>
 </div>

@@ -2,6 +2,8 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import ACL_SERVICE_NAME from 'services/acl';
+import "corejs-typeahead";
+import $ from 'jquery';
 
 const CONTROLLER_NAME = 'ModerCommentsController';
 const STATE_NAME = 'moder-comments';
@@ -30,8 +32,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$q',
-        function($scope, $http, $state, $q) {
+        '$scope', '$http', '$state', '$q', '$element',
+        function($scope, $http, $state, $q, $element) {
             
             $scope.title = 'page/119/title';
             $scope.pageEnv({
@@ -43,27 +45,25 @@ angular.module(Module)
                 pageId: 110
             });
             
-            $scope.comments = [];
-            $scope.paginator = null;
-            $scope.selectedUser = $state.params.user ? {
-                id: $state.params.user,
-                name: '#' + $state.params.user
-            } : null;
-            $scope.moderator_attention = $state.params.moderator_attention;
-            $scope.selectedItem = $state.params.item_id ? {
-                id: $state.params.item_id,
-                name: '#' + $state.params.item_id
-            } : null;
-            $scope.page = $state.params.page;
+            var ctrl = this;
             
-            $scope.load = function() {
-                $scope.loading = true;
+            ctrl.loading = 0;
+            
+            ctrl.comments = [];
+            ctrl.paginator = null;
+            ctrl.user = $state.params.user;
+            ctrl.moderator_attention = $state.params.moderator_attention;
+            ctrl.item_id = $state.params.item_id;
+            ctrl.page = $state.params.page;
+            
+            ctrl.load = function() {
+                ctrl.loading++;
                 
                 var params = {
-                    user: $scope.selectedUser ? $scope.selectedUser.id : null,
-                    moderator_attention: $scope.moderator_attention,
-                    item_id: $scope.selectedItem ? $scope.selectedItem.id : null,
-                    page: $scope.page
+                    user: ctrl.user,
+                    moderator_attention: ctrl.moderator_attention,
+                    item_id: ctrl.item_id,
+                    page: ctrl.page
                 };
                 
                 $state.go(STATE_NAME, params, {
@@ -77,62 +77,116 @@ angular.module(Module)
                     url: '/api/comment',
                     params: params
                 }).then(function(response) {
-                    $scope.comments = response.data.comments;
-                    $scope.paginator = response.data.paginator;
-                    $scope.loading = false;
-                });
-            };
-            
-            $scope.queryUserName = function(query) { 
-                var deferred = $q.defer();
-                
-                var params = {
-                    limit: 10
-                };
-                if (query.substring(0, 1) == '#') {
-                    params.id = query.substring(1);
-                } else {
-                    params.search = query;
-                }
-                
-                $http({
-                    method: 'GET',
-                    url: '/api/user',
-                    params: params
-                }).then(function(response) {
-                    deferred.resolve(response.data.items);
+                    ctrl.comments = response.data.comments;
+                    ctrl.paginator = response.data.paginator;
+                    ctrl.loading--;
                 }, function() {
-                    deferred.reject(null);
+                    ctrl.loading--;
                 });
-                return deferred.promise;
             };
             
-            $scope.queryItemName = function(query) {
-                var deferred = $q.defer();
-                
-                var params = {
-                    limit: 10,
-                    fields: 'name_text'
-                };
-                if (query.substring(0, 1) == '#') {
-                    params.id = query.substring(1);
-                } else {
-                    params.search = query;
-                }
-                
-                $http({
-                    method: 'GET',
-                    url: '/api/item',
-                    params: params
-                }).then(function(response) {
-                    deferred.resolve(response.data.items);
-                }, function() {
-                    deferred.reject(null);
+            var $userIdElement = $($element[0]).find(':input[name=user_id]');
+            $userIdElement.val(ctrl.user ? '#' + ctrl.user : '')
+            var userIdLastValue = $userIdElement.val();
+            $userIdElement
+                .typeahead({ }, {
+                    display: function(item) {
+                        return item.name;
+                    },
+                    templates: {
+                        suggestion: function(item) {
+                            return $('<div class="tt-suggestion tt-selectable"></div>')
+                                .text(item.name);
+                        }
+                    },
+                    source: function(query, syncResults, asyncResults) {
+                        var params = {
+                            limit: 10
+                        };
+                        if (query.substring(0, 1) == '#') {
+                            params.id = query.substring(1);
+                        } else {
+                            params.search = query;
+                        }
+                        
+                        $http({
+                            method: 'GET',
+                            url: '/api/user',
+                            params: params
+                        }).then(function(response) {
+                            asyncResults(response.data.items);
+                        });
+                        
+                    }
+                })
+                .on('typeahead:select', function(ev, item) {
+                    userIdLastValue = item.name;
+                    ctrl.user = item.id;
+                    ctrl.load();
+                })
+                .on('change blur', function(ev, item) {
+                    var curValue = $(this).val();
+                    if (userIdLastValue && !curValue) {
+                        ctrl.user = null;
+                        ctrl.load();
+                    }
+                    userIdLastValue = curValue;
                 });
-                return deferred.promise;
-            };
             
-            $scope.load();
+            var $itemIdElement = $($element[0]).find(':input[name=item_id]');
+            $itemIdElement.val(ctrl.item_id ? '#' + ctrl.item_id : '')
+            var itemIdLastValue = $itemIdElement.val();
+            $itemIdElement
+                .typeahead({ }, {
+                    display: function(item) {
+                        return item.name;
+                    },
+                    templates: {
+                        suggestion: function(item) {
+                            return $('<div class="tt-suggestion tt-selectable"></div>')
+                                .html(item.name_html);
+                        }
+                    },
+                    display: function(item) {
+                        return item.name_text;
+                    },
+                    source: function(query, syncResults, asyncResults) {
+                        var params = {
+                            limit: 10,
+                            fields: 'name_text,name_html'
+                        };
+                        if (query.substring(0, 1) == '#') {
+                            params.id = query.substring(1);
+                        } else {
+                            params.name = '%' + query + '%';
+                        }
+                        
+                        $http({
+                            method: 'GET',
+                            url: '/api/item',
+                            params: params
+                        }).then(function(response) {
+                            asyncResults(response.data.items);
+                        });
+                        
+                    }
+                })
+                .on('typeahead:select', function(ev, item) {
+                    itemIdLastValue = item.name_text;
+                    ctrl.item_id = item.id;
+                    ctrl.load();
+                })
+                .on('change blur', function(ev, item) {
+                    var curValue = $(this).val();
+                    if (itemIdLastValue && !curValue) {
+                        ctrl.item_id = null;
+                        ctrl.load();
+                    }
+                    itemIdLastValue = curValue;
+                });
+            
+            
+            ctrl.load();
         }
     ]);
 

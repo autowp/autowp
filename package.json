@@ -54,6 +54,7 @@
     }
   },
   "dependencies": {
+    "@uirouter/angularjs": "^1.0.3",
     "angular": "^1.6.3",
     "angular-animate": "^1.6.3",
     "angular-aria": "^1.6.3",
@@ -64,10 +65,10 @@
     "angular-sanitize": "^1.6.3",
     "angular-translate": "^2.15.1",
     "angular-translate-interpolation-messageformat": "^2.15.1",
-    "@uirouter/angularjs": "^1.0.3",
     "bootstrap": "^3.x",
     "bootstrap-tagsinput": "^0.x",
     "chart.js": "^2.x",
+    "corejs-typeahead": "^1.1.1",
     "diff": "^3.x",
     "favicons": "^4.x",
     "filesize": "^3.x",
@@ -84,7 +85,6 @@
     "showdown": "^1.6.4",
     "sprintf": "^0.1.5",
     "sprintf-js": "^1.x",
-    "typeahead.js": "^0.x",
     "webgl-heatmap-leaflet": "git+https://git@github.com/ursudio/leaflet-webgl-heatmap.git"
   },
   "scripts": {

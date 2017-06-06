@@ -21,7 +21,6 @@ module.exports = {
         alias: {
             requireLib: 'require',
             chart: require.resolve('chart.js'),
-            typeahead: require.resolve('typeahead.js'),
             markdown: require.resolve('markdown/lib/markdown.js')
         }
     },

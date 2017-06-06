@@ -1,5 +1,5 @@
 define(
-    ['jquery', './car-type-picker', 'typeahead'],
+    ['jquery', './car-type-picker', 'corejs-typeahead'],
     function($, CarTypePicker) {
         return {
             init: function(options) {
