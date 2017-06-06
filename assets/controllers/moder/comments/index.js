@@ -86,7 +86,7 @@ angular.module(Module)
             };
             
             var $userIdElement = $($element[0]).find(':input[name=user_id]');
-            $userIdElement.val(ctrl.user ? '#' + ctrl.user : '')
+            $userIdElement.val(ctrl.user ? '#' + ctrl.user : '');
             var userIdLastValue = $userIdElement.val();
             $userIdElement
                 .typeahead({ }, {
@@ -134,21 +134,18 @@ angular.module(Module)
                 });
             
             var $itemIdElement = $($element[0]).find(':input[name=item_id]');
-            $itemIdElement.val(ctrl.item_id ? '#' + ctrl.item_id : '')
+            $itemIdElement.val(ctrl.item_id ? '#' + ctrl.item_id : '');
             var itemIdLastValue = $itemIdElement.val();
             $itemIdElement
                 .typeahead({ }, {
                     display: function(item) {
-                        return item.name;
+                        return item.name_text;
                     },
                     templates: {
                         suggestion: function(item) {
                             return $('<div class="tt-suggestion tt-selectable"></div>')
                                 .html(item.name_html);
                         }
-                    },
-                    display: function(item) {
-                        return item.name_text;
                     },
                     source: function(query, syncResults, asyncResults) {
                         var params = {
