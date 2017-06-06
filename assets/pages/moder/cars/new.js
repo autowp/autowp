@@ -1,15 +1,17 @@
 var CarTypePicker = require('./car-type-picker');
 var $ = require('jquery');
 var Picker = require("latlng-picker");
-require('typeahead');
+require('corejs-typeahead');
 
 module.exports = {
     init: function(options) {
         CarTypePicker.init($('select[multiple]'));
         
-        new Picker({
-            lat: ':input[name=lat]',
-            lng: ':input[name=lng]'
-        });
+        if ($(':input[name=lat]').length) {
+            new Picker({
+                lat: ':input[name=lat]',
+                lng: ':input[name=lng]'
+            });
+        }
     }
 };
