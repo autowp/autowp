@@ -1,4 +1,4 @@
-<md-button class="md-raised md-warn" ng-click="ctrl.clearAll()" ng-if="ctrl.canManage">Clear all</md-button>
+<button class="btn btn-warning" ng-click="ctrl.clearAll()" ng-if="ctrl.canManage">Clear all</button>
 
 <table class="table table-border">
     <thead>
@@ -12,10 +12,10 @@
         <tr ng-repeat="host in ctrl.hosts">
             <td>
                 <div ng-bind="host.host"></div>
-                <md-button class="md-warn" ng-click="ctrl.clear(host.host)" ng-if="ctrl.canManage">Clear</md-button>
-                <md-button class="md-primary" ng-click="ctrl.addToWhitelist(host.host)" ng-if="ctrl.canManage && !host.whitelisted">Whitelist</md-button>
-                <md-button class="md-primary" ng-click="ctrl.addToWhitelistAndClear(host.host)" ng-if="ctrl.canManage && !host.whitelisted">Whitelist&amp;Clear</md-button>
-                <md-button class="md-warn" ng-click="ctrl.addToBlacklist(host.host)" ng-if="ctrl.canManage && !host.blacklisted">Blacklist</md-button>
+                <button class="btn btn-warning" ng-click="ctrl.clear(host.host)" ng-if="ctrl.canManage">Clear</button>
+                <button class="btn btn-success" ng-click="ctrl.addToWhitelist(host.host)" ng-if="ctrl.canManage && !host.whitelisted">Whitelist</button>
+                <button class="btn btn-success" ng-click="ctrl.addToWhitelistAndClear(host.host)" ng-if="ctrl.canManage && !host.whitelisted">Whitelist&amp;Clear</button>
+                <button class="btn btn-danger" ng-click="ctrl.addToBlacklist(host.host)" ng-if="ctrl.canManage && !host.blacklisted">Blacklist</button>
             </td>
             <td>
                 <div ng-repeat="link in host.links">

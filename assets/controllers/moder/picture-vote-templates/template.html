@@ -6,9 +6,9 @@
         </td>
         <td ng-bind="template.name"></td>
         <td>
-            <md-button class="md-icon-button md-warn" aria-label="Delete" ng-click="deleteTemplate(template)">
+            <button class="btn btn-danger btn-sm" aria-label="Delete" ng-click="deleteTemplate(template)">
                 <span class="fa fa-times"></span>
-            </md-button>
+            </button>
         </td>
     </tr>
 </table>
@@ -31,6 +31,6 @@
                 </md-option>
             </md-select>
         </md-input-container>
-        <md-button class="md-raised md-primary" ng-click="createTemplate()">{{'submit'|translate}}</md-button>
+        <button class="btn btn-primary" ng-click="createTemplate()">{{'submit'|translate}}</button>
     </div>
 </form>

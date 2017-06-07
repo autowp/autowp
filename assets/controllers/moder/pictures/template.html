@@ -128,34 +128,7 @@
         </form>
     </div>
     <div class="col-lg-8 col-md-8">
-        <div>
-            <md-button ng-disabled="!hasSelectedItem" class="md-raised md-primary" ng-click="acceptPictures()">
-                {{'moder/picture/acceptance/accept'|translate}}
-            </md-button>
-            <md-menu>
-                <md-button ng-disabled="!hasSelectedItem" class="md-raised md-primary" ng-click="$mdMenu.open($event);">
-                    {{'moder/picture/acceptance/want-accept'|translate}}
-                    <i class="fa fa-caret-down" aria-hidden="true"></i>
-                </md-button>
-                <md-menu-content>
-                    <md-menu-item ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote > 0">
-                        <md-button ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePictures(template.vote, template.name);"></md-button>
-                    </md-menu-item>
-                </md-menu-content>
-            </md-menu>
-            <md-menu>
-                <md-button ng-disabled="!hasSelectedItem" class="md-raised md-warn" ng-click="$mdMenu.open($event);">
-                    {{'moder/picture/acceptance/want-delete'|translate}}
-                    <i class="fa fa-caret-down" aria-hidden="true"></i>
-                </md-button>
-                <md-menu-content>
-                    <md-menu-item ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote < 0">
-                        <md-button ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePictures(template.vote, template.name);"></md-button>
-                    </md-menu-item>
-                </md-menu-content>
-            </md-menu>
-        </div>
-
+    
         <h2>
             {{'page/73/name'|translate}}
             <span ng-show="ctrl.loading > 0">
@@ -163,6 +136,38 @@
             </span>
             <small ng-if="paginator.totalItemCount" translate="ng/%1$s-pictures" translate-values="{count: paginator.totalItemCount}"></small>
         </h2>
+    
+        <div style="margin-bottom:20px">
+            <div class="btn-group">
+                <button ng-disabled="!hasSelectedItem" class="btn btn-success" ng-click="acceptPictures()">
+                    {{'moder/picture/acceptance/accept'|translate}}
+                </button>
+                <div class="btn-group">
+                    <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-disabled="!hasSelectedItem">
+                        {{'moder/picture/acceptance/want-accept'|translate}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote > 0">
+                            <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePictures(template.vote, template.name);"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-disabled="!hasSelectedItem">
+                        {{'moder/picture/acceptance/want-delete'|translate}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote < 0">
+                            <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePictures(template.vote, template.name);"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        
         
         <div layout="row" layout-wrap>
             <div flex="25" flex-xs="50" flex-sm="33" ng-repeat="picture in pictures">

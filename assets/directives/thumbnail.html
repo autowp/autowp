@@ -59,8 +59,8 @@
             <span class="fa fa-file-image-o"></span>
             <a ui-sref="moder-pictures-item({id: picture.similar.picture_id})">Similar picture: {{picture.similar.distance}}</a>
         </p>
-        <md-button ui-sref="moder-pictures-item({id: picture.id})" class="md-fab md-mini md-primary settings" aria-label="Settings">
+        <a ui-sref="moder-pictures-item({id: picture.id})" class="btn btn-default btn-sm settings" aria-label="Settings">
             <i class="fa fa-cog"></i>
-        </md-button>
+        </a>
     </div>
 </div>

@@ -29,9 +29,9 @@
             </span>
         </div>
         <div>
-            <md-button ng-if="item.ban" ng-click="removeFromBlacklist(item.ip)">{{'ban/unban'|translate}}</md-button>
-            <md-button class="md-warn" ng-if="!item.ban" ng-click="addToBlacklist(item.ip)">{{'ban/ban'|translate}}</md-button>
-            <md-button ng-if="!item.whitelist" ng-click="addToWhitelist(item.ip)">Whitelist</md-button>
+            <button ng-if="item.ban" class="btn btn-default" ng-click="removeFromBlacklist(item.ip)">{{'ban/unban'|translate}}</button>
+            <button class="btn btn-danger" ng-if="!item.ban" ng-click="addToBlacklist(item.ip)">{{'ban/ban'|translate}}</button>
+            <button ng-if="!item.whitelist" class="btn btn-success" ng-click="addToWhitelist(item.ip)">Whitelist</button>
         </div>
     </div>
 </div>

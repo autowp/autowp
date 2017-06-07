@@ -1,37 +1,39 @@
-<div layout="row">
-    <md-menu ng-if="!picture.moder_voted">
-        <md-button class="md-raised md-primary" ng-click="$mdMenu.open($event);">
+<div class="btn-group">
+    <div class="btn-group" ng-if="!picture.moder_voted">
+        <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             {{'moder/picture/acceptance/want-accept'|translate}}
-            <i class="fa fa-caret-down" aria-hidden="true"></i>
-        </md-button>
-        <md-menu-content>
-            <md-menu-item ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote > 0">
-                <md-button class="md-primary" ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePicture(template.vote, template.name)"></md-button>
-            </md-menu-item>
-            <md-menu-divider></md-menu-divider>
-            <md-menu-item>
-                <md-button ng-click="showCustomDialog($event, 1)">{{'moder/picture/acceptance/custom'|translate}}</md-button>
-            </md-menu-item>
-        </md-menu-content>
-    </md-menu>
-    <md-menu ng-if="!picture.moder_voted">
-        <md-button class="md-raised md-warn" ng-click="$mdMenu.open($event);">
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <li ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote > 0">
+                <a href="#" ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePicture(template.vote, template.name);"></a>
+            </li>
+            <li role="separator" class="divider"></li>
+            <li>
+                <a href="#" ng-click="showCustomDialog($event, 1)">{{'moder/picture/acceptance/custom'|translate}}</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="btn-group" ng-if="!picture.moder_voted">
+        <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             {{'moder/picture/acceptance/want-delete'|translate}}
-            <i class="fa fa-caret-down" aria-hidden="true"></i>
-        </md-button>
-        <md-menu-content>
-            <md-menu-item ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote < 0">
-                <md-button class="md-warn" ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePicture(template.vote, template.name)"></md-button>
-            </md-menu-item>
-            <md-menu-divider></md-menu-divider>
-            <md-menu-item>
-                <md-button ng-click="showCustomDialog($event, -1)">{{'moder/picture/acceptance/custom'|translate}}</md-button>
-            </md-menu-item>
-        </md-menu-content>
-    </md-menu>
-    <md-button class="md-raised" ng-if="picture.moder_voted" ng-click="cancelVotePicture()">
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <li ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote < 0">
+                <a href="#" ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePicture(template.vote, template.name);"></a>
+            </li>
+            <li role="separator" class="divider"></li>
+            <li>
+                <a href="#" ng-click="showCustomDialog($event, -1)">{{'moder/picture/acceptance/custom'|translate}}</a>
+            </li>
+        </ul>
+    </div>
+    
+    <button class="btn btn-default" ng-if="picture.moder_voted" ng-click="cancelVotePicture()">
         {{'moder/picture/acceptance/cancel-vote'|translate}}
-    </md-button>
+    </button>
 </div>
 
 <div ng-if="picture.moder_votes.length">
