@@ -6,6 +6,8 @@ import PERSPECTIVE_SERVICE from 'services/perspective';
 import MODER_VOTE_TEMPLATE_SERVICE from 'services/picture-moder-vote-template';
 import MODER_VOTE_SERVICE from 'services/picture-moder-vote';
 import ACL_SERVICE_NAME from 'services/acl';
+import "corejs-typeahead";
+import $ from 'jquery';
 
 const CONTROLLER_NAME = 'ModerPicturesController';
 const STATE_NAME = 'moder-pictures';
@@ -44,8 +46,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$q', PERSPECTIVE_SERVICE, MODER_VOTE_SERVICE, MODER_VOTE_TEMPLATE_SERVICE, VEHICLE_TYPE_SERVICE,
-        function($scope, $http, $state, $q, PerspectiveService, ModerVoteService, ModerVoteTemplateService, VehicleTypeService) {
+        '$scope', '$http', '$state', '$q', '$element', PERSPECTIVE_SERVICE, MODER_VOTE_SERVICE, MODER_VOTE_TEMPLATE_SERVICE, VEHICLE_TYPE_SERVICE,
+        function($scope, $http, $state, $q, $element, PerspectiveService, ModerVoteService, ModerVoteTemplateService, VehicleTypeService) {
             
             var ctrl = this;
             ctrl.loading = 0;
@@ -65,24 +67,16 @@ angular.module(Module)
             $scope.status = $state.params.status;
             $scope.car_type_id = $state.params.car_type_id;
             $scope.perspective_id = $state.params.perspective_id;
-            $scope.selectedItem = $state.params.item_id ? {
-                id: $state.params.item_id,
-                name: '#' + $state.params.item_id
-            } : null;
-            //$scope.item_id = $state.params.item_id;
+            $scope.item_id = $state.params.item_id;
             $scope.comments = $state.params.comments;
-            $scope.selectedOwner = $state.params.owner_id ? {
-                id: $state.params.owner_id,
-                name: '#' + $state.params.owner_id
-            } : null;
-            //$scope.owner_id = $state.params.owner_id;
+            $scope.owner_id = $state.params.owner_id;
             $scope.replace = $state.params.replace;
             $scope.requests = $state.params.requests;
-            $scope.special_name = $state.params.special_name ? 1 : null;
-            $scope.lost = $state.params.lost ? 1 : null;
-            $scope.gps = $state.params.gps ? 1 : null;
-            $scope.similar = $state.params.similar ? 1 : null;
-            $scope.order = $state.params.order || 1;
+            $scope.special_name = $state.params.special_name ? true : false;
+            $scope.lost = $state.params.lost ? true : false;
+            $scope.gps = $state.params.gps ? true : false;
+            $scope.similar = $state.params.similar ? true : false;
+            $scope.order = $state.params.order || '1';
             
             $scope.page = $state.params.page;
             
@@ -129,7 +123,7 @@ angular.module(Module)
                 $scope.moderVoteTemplateOptions = templates;
             });
             
-            $scope.load = function() {
+            ctrl.load = function() {
                 ctrl.loading++;
                 $scope.pictures = [];
                 
@@ -139,15 +133,15 @@ angular.module(Module)
                     status: $scope.status,
                     car_type_id: $scope.car_type_id,
                     perspective_id: $scope.perspective_id,
-                    item_id: $scope.selectedItem ? $scope.selectedItem.id : null,
+                    item_id: $scope.item_id,
                     comments: $scope.comments,
-                    owner_id: $scope.selectedOwner ? $scope.selectedOwner.id : null,
+                    owner_id: $scope.owner_id,
                     replace: $scope.replace,
                     requests: $scope.requests,
-                    special_name: $scope.special_name,
-                    lost: $scope.lost,
-                    gps: $scope.gps,
-                    similar: $scope.similar,
+                    special_name: $scope.special_name ? 1 : null,
+                    lost: $scope.lost ? 1 : null,
+                    gps: $scope.gps ? 1 : null,
+                    similar: $scope.similar ? 1 : null,
                     order: $scope.order,
                     page: $scope.page
                 };
@@ -194,7 +188,7 @@ angular.module(Module)
                     });
                     
                     $q.all(promises).then(function() { 
-                        $scope.load();
+                        ctrl.load();
                     });
                 });
                 selected = [];
@@ -212,63 +206,111 @@ angular.module(Module)
                     });
                     
                     $q.all(promises).then(function() { 
-                        $scope.load();
+                    	ctrl.load();
                     });
                 });
                 selected = [];
                 $scope.hasSelectedItem = false;
             };
             
-            $scope.queryUserName = function(query) { 
-                var deferred = $q.defer();
-                
-                var params = {
-                    limit: 10
-                };
-                if (query.substring(0, 1) == '#') {
-                    params.id = query.substring(1);
-                } else {
-                    params.search = query;
-                }
-                
-                $http({
-                    method: 'GET',
-                    url: '/api/user',
-                    params: params 
-                }).then(function(response) {
-                    deferred.resolve(response.data.items);
-                }, function() {
-                    deferred.reject(null);
+            var $userIdElement = $($element[0]).find(':input[name=owner_id]');
+            $userIdElement.val($scope.owner_id ? '#' + $scope.owner_id : '');
+            var userIdLastValue = $userIdElement.val();
+            $userIdElement
+                .typeahead({ }, {
+                    display: function(item) {
+                        return item.name;
+                    },
+                    templates: {
+                        suggestion: function(item) {
+                            return $('<div class="tt-suggestion tt-selectable"></div>')
+                                .text(item.name);
+                        }
+                    },
+                    source: function(query, syncResults, asyncResults) {
+                        var params = {
+                            limit: 10
+                        };
+                        if (query.substring(0, 1) == '#') {
+                            params.id = query.substring(1);
+                        } else {
+                            params.search = query;
+                        }
+                        
+                        $http({
+                            method: 'GET',
+                            url: '/api/user',
+                            params: params
+                        }).then(function(response) {
+                            asyncResults(response.data.items);
+                        });
+                        
+                    }
+                })
+                .on('typeahead:select', function(ev, item) {
+                    userIdLastValue = item.name;
+                    $scope.owner_id = item.id;
+                    ctrl.load();
+                })
+                .on('change blur', function(ev, item) {
+                    var curValue = $(this).val();
+                    if (userIdLastValue && !curValue) {
+                    	$scope.owner_id = null;
+                        ctrl.load();
+                    }
+                    userIdLastValue = curValue;
                 });
-                return deferred.promise;
-            };
             
-            $scope.queryItemName = function(query) {
-                var deferred = $q.defer();
-                
-                var params = {
-                    limit: 10,
-                    fields: 'name_text'
-                };
-                if (query.substring(0, 1) == '#') {
-                    params.id = query.substring(1);
-                } else {
-                    params.name = '%' + query + '%';
-                }
-                
-                $http({
-                    method: 'GET',
-                    url: '/api/item',
-                    params: params
-                }).then(function(response) {
-                    deferred.resolve(response.data.items);
-                }, function() {
-                    deferred.reject(null);
+            var $itemIdElement = $($element[0]).find(':input[name=item_id]');
+            $itemIdElement.val($scope.item_id ? '#' + $scope.item_id : '');
+            var itemIdLastValue = $itemIdElement.val();
+            $itemIdElement
+                .typeahead({ }, {
+                    display: function(item) {
+                        return item.name_text;
+                    },
+                    templates: {
+                        suggestion: function(item) {
+                            return $('<div class="tt-suggestion tt-selectable"></div>')
+                                .html(item.name_html);
+                        }
+                    },
+                    source: function(query, syncResults, asyncResults) {
+                        var params = {
+                            limit: 10,
+                            fields: 'name_text,name_html'
+                        };
+                        if (query.substring(0, 1) == '#') {
+                            params.id = query.substring(1);
+                        } else {
+                            params.name = '%' + query + '%';
+                        }
+                        
+                        $http({
+                            method: 'GET',
+                            url: '/api/item',
+                            params: params
+                        }).then(function(response) {
+                            asyncResults(response.data.items);
+                        });
+                        
+                    }
+                })
+                .on('typeahead:select', function(ev, item) {
+                    itemIdLastValue = item.name_text;
+                    $scope.item_id = item.id;
+                    ctrl.load();
+                })
+                .on('change blur', function(ev, item) {
+                    var curValue = $(this).val();
+                    if (itemIdLastValue && !curValue) {
+                    	$scope.item_id = null;
+                        ctrl.load();
+                    }
+                    itemIdLastValue = curValue;
                 });
-                return deferred.promise;
-            };
             
-            $scope.load();
+            ctrl.load();
         }
     ]);
 
