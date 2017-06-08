@@ -22,66 +22,60 @@
     </tbody>
 </table>
 
-<div class="well">
-    <form name="add-role-parent" layout="column" ng-submit="ctrl.addRoleParent()">
-        <h3 translate>moder/acl/add-parent</h3>
-        <md-input-container class="md-block">
-            <label translate>moder/acl/role</label>
-            <md-select name="role" ng-model="ctrl.addRoleParentForm.role" required>
-                <md-option ng-repeat="role in ctrl.roles" ng-value="role.name">{{role.name}}</md-option>
-            </md-select>
-        </md-input-container>
-        <md-input-container class="md-block">
-            <label translate>moder/acl/parent-role</label>
-            <md-select name="parent_role" ng-model="ctrl.addRoleParentForm.parentRole" required>
-                <md-option ng-repeat="role in ctrl.roles" ng-value="role.name">{{role.name}}</md-option>
-            </md-select>
-        </md-input-container>
-        <div>
-            <button type="submit" class="md-raised md-primary" translate>send</button>
-        </div>
-    </form>
-</div>
+<form name="add-role-parent" class="well form-vertical" ng-submit="ctrl.addRoleParent()">
+    <h3 translate>moder/acl/add-parent</h3>
+    <div class="form-group">
+        <label translate>moder/acl/role</label>
+        <select name="role" class="form-control" ng-model="ctrl.addRoleParentForm.role" required>
+            <option ng-repeat="role in ctrl.roles" value="{{role.name}}">{{role.name}}</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label translate>moder/acl/parent-role</label>
+        <select name="parent_role" class="form-control" ng-model="ctrl.addRoleParentForm.parentRole" required>
+            <option ng-repeat="role in ctrl.roles" value="{{role.name}}">{{role.name}}</option>
+        </select>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary" translate>send</button>
+    </div>
+</form>
 
-<div class="well">
-    <form name="add-rule" layout="column" ng-submit="ctrl.addRule()">
-        <h3 translate>moder/acl/add-rule</h3>
-        <md-input-container class="md-block">
-            <label translate>moder/acl/role</label>
-            <md-select name="role" ng-model="ctrl.addRuleForm.role" required>
-                <md-option ng-repeat="role in ctrl.roles" ng-value="role.name">{{role.name}}</md-option>
-            </md-select>
-        </md-input-container>
-        <md-input-container class="md-block">
-            <label translate>moder/acl/privilege</label>
-            <md-select name="privilege" ng-model="ctrl.addRuleForm.privilege" required>
-                <md-optgroup label="{{resource.name}}" ng-repeat="resource in ctrl.resources">
-                    <md-option ng-repeat="privilege in resource.privileges" ng-value="{privilege: privilege.name, resource: resource.name}">{{privilege.name}}</md-option>
-                </md-optgroup>
-            </md-select>
-        </md-input-container>
-        <md-input-container class="md-block">
-            <label translate>moder/acl/add-rule/action</label>
-            <md-select name="what" ng-model="ctrl.addRuleForm.allowed" required>
-                <md-option ng-value="0">{{'moder/acl/add-rule/action/deny'|translate}}</md-option>
-                <md-option ng-value="1">{{'moder/acl/add-rule/action/allow'|translate}}</md-option>
-            </md-select>
-        </md-input-container>
-        <div>
-            <button type="submit" class="md-raised md-primary" translate>send</button>
-        </div>
-    </form>
-</div>
+<form name="add-rule" class="well form-vertical" ng-submit="ctrl.addRule()">
+    <h3 translate>moder/acl/add-rule</h3>
+    <div class="form-group">
+        <label translate>moder/acl/role</label>
+        <select name="role" class="form-control" ng-model="ctrl.addRuleForm.role" required>
+            <option ng-repeat="role in ctrl.roles" value="{{role.name}}">{{role.name}}</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label translate>moder/acl/privilege</label>
+        <select name="privilege" class="form-control" ng-model="ctrl.addRuleForm.privilege" required>
+            <optgroup label="{{resource.name}}" ng-repeat="resource in ctrl.resources">
+                <option ng-repeat="privilege in resource.privileges" value="{{resource.name + '/' + privilege.name}}">{{privilege.name}}</option>
+            </optgroup>
+        </select>
+    </div>
+    <div class="form-group">
+        <label translate>moder/acl/add-rule/action</label>
+        <select name="what" class="form-control" ng-model="ctrl.addRuleForm.allowed" required>
+            <option value="0">{{'moder/acl/add-rule/action/deny'|translate}}</option>
+            <option value="1">{{'moder/acl/add-rule/action/allow'|translate}}</option>
+        </select>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary" translate>send</button>
+    </div>
+</form>
 
-<div class="well">
-    <form name="add-role" layout="column" ng-submit="ctrl.addRole()">
-        <h3 translate>moder/acl/add-role</h3>
-        <md-input-container class="md-block">
-            <label translate>moder/acl/role</label>
-            <input type="text" md-maxlength="255" name="name" ng-model="ctrl.addRoleForm.name" required />
-        </md-input-container>
-        <div>
-            <button type="submit" class="md-raised md-primary" translate>send</button>
-        </div>
-    </form>
-</div>
+<form name="add-role" class="well form-vertical" ng-submit="ctrl.addRole()">
+    <h3 translate>moder/acl/add-role</h3>
+    <div class="form-group">
+        <label translate>moder/acl/role</label>
+        <input type="text" class="form-control" maxlength="255" name="name" ng-model="ctrl.addRoleForm.name" required />
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary" translate>send</button>
+    </div>
+</form>

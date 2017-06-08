@@ -129,13 +129,14 @@ angular.module(Module)
             };
             
             ctrl.addRule = function() {
+                var privilege = ctrl.addRuleForm.privilege.split('/');
                 $http({
                     method: 'POST',
                     url: '/api/acl/rules',
                     data: {
                         role: ctrl.addRuleForm.role,
-                        resource: ctrl.addRuleForm.privilege.resource,
-                        privilege: ctrl.addRuleForm.privilege.privilege,
+                        resource: privilege[0],
+                        privilege: privilege[1],
                         allowed: ctrl.addRuleForm.allowed
                     }
                 }).then(function() {
