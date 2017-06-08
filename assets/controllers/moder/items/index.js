@@ -7,6 +7,8 @@ import PERSPECTIVE_SERVICE from 'services/perspective';
 import MODER_VOTE_TEMPLATE_SERVICE from 'services/picture-moder-vote-template';
 import MODER_VOTE_SERVICE from 'services/picture-moder-vote';
 import ACL_SERVICE_NAME from 'services/acl';
+import "corejs-typeahead";
+import $ from 'jquery';
 
 const CONTROLLER_NAME = 'ModerItemsController';
 const STATE_NAME = 'moder-items';
@@ -44,8 +46,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$q', PERSPECTIVE_SERVICE, MODER_VOTE_SERVICE, MODER_VOTE_TEMPLATE_SERVICE, VEHICLE_TYPE_SERVICE, SPEC_SERVICE,
-        function($scope, $http, $state, $q, PerspectiveService, ModerVoteService, ModerVoteTemplateService, VehicleTypeService, SpecService) {
+        '$scope', '$http', '$state', '$q', '$element', PERSPECTIVE_SERVICE, MODER_VOTE_SERVICE, MODER_VOTE_TEMPLATE_SERVICE, VEHICLE_TYPE_SERVICE, SPEC_SERVICE,
+        function($scope, $http, $state, $q, $element, PerspectiveService, ModerVoteService, ModerVoteTemplateService, VehicleTypeService, SpecService) {
             
             $scope.pageEnv({
                 layout: {
@@ -69,23 +71,14 @@ angular.module(Module)
                 vehicle_type_id: $state.params.vehicle_type_id || null,
                 vehicle_childs_type_id: parseInt($state.params.vehicle_childs_type_id) || null,
                 spec: $state.params.spec || null,
-                no_parent: $state.params.no_parent || false,
+                no_parent: $state.params.no_parent ? true : false,
                 text: $state.params.text || null,
                 from_year: $state.params.from_year || null,
                 to_year: $state.params.to_year || null,
                 order: $state.params.order || DEFAULT_ORDER,
-                parent: null,
+                parent_id: $state.params.parent_id || null,
             };
-            
-            ctrl.parent_search_text = '';
-            if ($state.params.parent_id) {
-                ctrl.filter.parent = {
-                    id: parseInt($state.params.parent_id),
-                    name: '#' + $state.params.parent_id
-                };
-                ctrl.parent_search_text = '#' + $state.params.parent_id;
-            }
-            
+
             ctrl.items = [];
             ctrl.paginator = null;
             ctrl.page = $state.params.page;
@@ -126,7 +119,7 @@ angular.module(Module)
                     text: ctrl.filter.text ? ctrl.filter.text : null,
                     from_year: ctrl.filter.from_year ? ctrl.filter.from_year : null,
                     to_year: ctrl.filter.to_year ? ctrl.filter.to_year : null,
-                    parent_id: ctrl.filter.parent ? ctrl.filter.parent.id : null,
+                    parent_id: ctrl.filter.parent_id ? ctrl.filter.parent_id : null,
                     page: ctrl.page,
                 };
             }
@@ -158,7 +151,7 @@ angular.module(Module)
                         text: ctrl.filter.text ? ctrl.filter.text : null,
                         from_year: ctrl.filter.from_year ? ctrl.filter.from_year : null,
                         to_year: ctrl.filter.to_year ? ctrl.filter.to_year : null,
-                        parent_id: ctrl.filter.parent ? ctrl.filter.parent.id : null,
+                        parent_id: ctrl.filter.parent_id ? ctrl.filter.parent_id : null,
                         page: ctrl.page,
                         fields: [
                             'name_html,name_default,description,has_text,produced',
@@ -180,30 +173,54 @@ angular.module(Module)
             
             ctrl.load();
             
-            ctrl.queryItemName = function(query) {
-                var deferred = $q.defer();
-                
-                var params = {
-                    limit: 10,
-                    fields: 'name_text'
-                };
-                if (query.substring(0, 1) == '#') {
-                    params.id = query.substring(1);
-                } else {
-                    params.name = '%' + query + '%';
-                }
-                
-                $http({
-                    method: 'GET',
-                    url: '/api/item',
-                    params: params
-                }).then(function(response) {
-                    deferred.resolve(response.data.items);
-                }, function() {
-                    deferred.reject(null);
+            var $itemIdElement = $($element[0]).find(':input[name=parent_id]');
+            $itemIdElement.val(ctrl.filter.parent_id ? '#' + ctrl.filter.parent_id : '');
+            var itemIdLastValue = $itemIdElement.val();
+            $itemIdElement
+                .typeahead({ }, {
+                    display: function(item) {
+                        return item.name_text;
+                    },
+                    templates: {
+                        suggestion: function(item) {
+                            return $('<div class="tt-suggestion tt-selectable"></div>')
+                                .html(item.name_html);
+                        }
+                    },
+                    source: function(query, syncResults, asyncResults) {
+                        var params = {
+                            limit: 10,
+                            fields: 'name_text,name_html'
+                        };
+                        if (query.substring(0, 1) == '#') {
+                            params.id = query.substring(1);
+                        } else {
+                            params.name = '%' + query + '%';
+                        }
+                        
+                        $http({
+                            method: 'GET',
+                            url: '/api/item',
+                            params: params
+                        }).then(function(response) {
+                            asyncResults(response.data.items);
+                        });
+                        
+                    }
+                })
+                .on('typeahead:select', function(ev, item) {
+                    itemIdLastValue = item.name_text;
+                    ctrl.filter.parent_id = item.id;
+                    ctrl.load();
+                })
+                .on('change blur', function(ev, item) {
+                    var curValue = $(this).val();
+                    if (itemIdLastValue && !curValue) {
+                    	ctrl.filter.parent_id = null;
+                        ctrl.load();
+                    }
+                    itemIdLastValue = curValue;
                 });
-                return deferred.promise;
-            };
         }
     ]);
 

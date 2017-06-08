@@ -9,89 +9,81 @@
 <div class="row">
     <div class="col-lg-4 col-md-4">
         <h2 translate>moder/items/filter</h2>
-        <div class="well" layout="column">
-            <md-input-container>
+        <form class="well form-vertical">
+            <div class="form-group">
                 <label translate>moder/items/filter/name</label>
-                <input type="text" name="name" ng-model="ctrl.filter.name" ng-model-options="{debounce:300}" ng-change="ctrl.load()" />
-            </md-input-container>
-            <md-input-container>
+                <input type="text" name="name" class="form-control" ng-model="ctrl.filter.name" ng-model-options="{debounce:300}" ng-change="ctrl.load()" />
+            </div>
+            <div class="form-group">
                 <label translate>moder/items/filter/name-exclude</label>
-                <input type="text" name="name_exclude" ng-model="ctrl.filter.name_exclude" ng-model-options="{debounce:300}" ng-change="ctrl.load()" />
-            </md-input-container>
-            <md-input-container>
+                <input type="text" name="name_exclude" class="form-control" ng-model="ctrl.filter.name_exclude" ng-model-options="{debounce:300}" ng-change="ctrl.load()" />
+            </div>
+            <div class="form-group">
                 <label translate>moder/items/filter/item-type</label>
-                <md-select name="item_type_id" ng-model="ctrl.filter.item_type_id" ng-change="ctrl.load()">
-                    <md-option ng-value=""><em translate>Any</em></md-option>
-                    <md-option ng-value="1">{{'item/type/1/name'|translate}}</md-option>
-                    <md-option ng-value="2">{{'item/type/2/name'|translate}}</md-option>
-                    <md-option ng-value="3">{{'item/type/3/name'|translate}}</md-option>
-                    <md-option ng-value="4">{{'item/type/4/name'|translate}}</md-option>
-                    <md-option ng-value="5">{{'item/type/5/name'|translate}}</md-option>
-                    <md-option ng-value="6">{{'item/type/6/name'|translate}}</md-option>
-                    <md-option ng-value="7">{{'item/type/7/name'|translate}}</md-option>
-                </md-select>
-            </md-input-container>
-            <md-input-container>
+                <select name="item_type_id" class="form-control" ng-model="ctrl.filter.item_type_id" ng-change="ctrl.load()">
+                    <option value="">Any</option>
+                    <option value="1" translate>item/type/1/name</option>
+                    <option value="2" translate>item/type/2/name</option>
+                    <option value="3" translate>item/type/3/name</option>
+                    <option value="4" translate>item/type/4/name</option>
+                    <option value="5" translate>item/type/5/name</option>
+                    <option value="6" translate>item/type/6/name</option>
+                    <option value="7" translate>item/type/7/name</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label translate>moder/items/filter/vehicle-type</label>
-                <md-select name="vehicle_type_id" ng-model="ctrl.filter.vehicle_type_id" ng-change="ctrl.load()">
-                    <md-option ng-value=""><em translate>Any</em></md-option>
-                    <md-option ng-value="'empty'" translate>moder/items/filter/vehicle-type/empty</md-option>
-                    <md-option ng-value="item.id" ng-repeat="item in ctrl.vehicleTypeOptions" style="padding-left:{{(item.deep+1)*16}}px">{{item.name|translate}}</md-option>
-                </md-select>
-            </md-input-container>
-            <md-input-container>
+                <select name="vehicle_type_id" class="form-control" ng-model="ctrl.filter.vehicle_type_id" ng-change="ctrl.load()">
+                    <option value="">Any</option>
+                    <option value="empty" translate>moder/items/filter/vehicle-type/empty</option>
+                    <option value="{{item.id}}" ng-repeat="item in ctrl.vehicleTypeOptions">{{'...'.repeat(item.deep)}}{{item.name|translate}}</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label>Have childs with type</label>
-                <md-select name="vehicle_childs_type_id" ng-model="ctrl.filter.vehicle_childs_type_id" ng-change="ctrl.load()">
-                    <md-option ng-value=""><em translate>Any</em></md-option>
-                    <md-option ng-value="item.id" ng-repeat="item in ctrl.vehicleTypeOptions" style="padding-left:{{(item.deep+1)*16}}px">{{item.name|translate}}</md-option>
-                </md-select>
-            </md-input-container>
-            <md-input-container>
+                <select name="vehicle_childs_type_id" class="form-control" ng-model="ctrl.filter.vehicle_childs_type_id" ng-change="ctrl.load()">
+                    <option value="">Any</option>
+                    <option value="{{item.id}}" ng-repeat="item in ctrl.vehicleTypeOptions">{{'...'.repeat(item.deep)}}{{item.name|translate}}</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label translate>moder/items/filter/spec</label>
-                <md-select name="spec" ng-model="ctrl.filter.spec" ng-change="ctrl.load()">
-                    <md-option ng-value=""><em translate>Any</em></md-option>
-                    <md-option ng-value="item.id" ng-repeat="item in ctrl.specOptions" style="padding-left:{{(item.deep+1)*16}}px">{{item.short_name}}</md-option>
-                </md-select>
-            </md-input-container>
-            <md-input-container>
+                <select name="spec" class="form-control" ng-model="ctrl.filter.spec" ng-change="ctrl.load()">
+                    <option value="">Any</option>
+                    <option value="{{item.id}}" ng-repeat="item in ctrl.specOptions">{{'...'.repeat(item.deep)}}{{item.short_name}}</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label translate>moder/items/filter/from-year</label>
-                <input type="text" name="from_year" ng-model="ctrl.filter.from_year" ng-model-options="{debounce:300}" ng-change="ctrl.load()" md-maxlength="4" />
-            </md-input-container>
-            <md-input-container>
+                <input type="text" name="from_year" class="form-control" ng-model="ctrl.filter.from_year" ng-model-options="{debounce:300}" ng-change="ctrl.load()" maxlength="4" />
+            </div>
+            <div class="form-group">
                 <label translate>moder/items/filter/to-year</label>
-                <input type="text" name="to_year" ng-model="ctrl.filter.to_year" ng-model-options="{debounce:300}" ng-change="ctrl.load()" md-maxlength="4" />
-            </md-input-container>
-            <md-autocomplete  
-                md-input-name="item_id"
-                md-input-minlength="1"
-                md-selected-item="ctrl.filter.parent"
-                md-search-text="ctrl.parent_search_text"
-                md-items="item in ctrl.queryItemName(ctrl.parent_search_text)"
-                md-item-text="item.name_text"
-                md-floating-label="{{'moder/items/filter/parent'|translate}}"
-                ng-model-options="{debounce:300}"
-                md-require-match="true"
-                md-selected-item-change="ctrl.load()">
-                <md-item-template>
-                    <span md-highlight-text="item_name">{{item.name_text}}</span>
-                </md-item-template>
-            </md-autocomplete>
-            <md-input-container>
+                <input type="text" name="to_year" class="form-control" ng-model="ctrl.filter.to_year" ng-model-options="{debounce:300}" ng-change="ctrl.load()" maxlength="4" />
+            </div>
+            <div class="form-group">
+                <label translate>moder/items/filter/parent</label>
+                <input type="text" name="parent_id" class="form-control" />
+            </div>
+            <div class="form-group">
                 <label translate>moder/items/filter/text</label>
-                <input type="text" name="text" ng-model="ctrl.filter.text" ng-change="ctrl.load()" ng-model-options="{debounce:300}" />
-            </md-input-container>
-            <md-switch ng-model="ctrl.filter.no_parent" ng-true-value="1" ng-false-value="null" ng-change="ctrl.load()" ng-model-options="{debounce:300}">
-                {{'moder/items/filter/no-parents'|translate}}
-            </md-switch>
-            <md-input-container>
+                <input type="text" name="text" class="form-control" ng-model="ctrl.filter.text" ng-change="ctrl.load()" ng-model-options="{debounce:300}" />
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="no_parent" value="1" ng-model="ctrl.filter.no_parent" ng-change="ctrl.load()" /> 
+                    {{'moder/items/filter/no-parents'|translate}}
+                </label>
+            </div>
+            <div class="form-group">
                 <label translate>moder/items/filter/order</label>
-                <md-select name="order" ng-model="ctrl.filter.order" ng-change="ctrl.load()">
-                    <md-option ng-value="'id_desc'">id desc</md-option>
-                    <md-option ng-value="'id_asc'">id asc</md-option>
-                    <md-option ng-value="'childs_count'">childs count</md-option>
-                </md-select>
-            </md-input-container>
-        </div>
+                <select name="order" class="form-control" ng-model="ctrl.filter.order" ng-change="ctrl.load()">
+                    <option value="id_desc">id desc</option>
+                    <option value="id_asc">id asc</option>
+                    <option value="childs_count">childs count</option>
+                </select>
+            </div>
+        </form>
     </div>
     <div class="col-lg-8 col-md-8">
         <h2>
