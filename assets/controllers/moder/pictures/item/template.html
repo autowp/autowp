@@ -1,28 +1,16 @@
-<div class="row">
+<div class="row" ng-init="ctrl.initArrows()">
     <div class="col-md-6 text-right">
         <p>
-            <a ui-sref="moder-pictures-item({id: picture.siblings.prev.id})" ng-if="picture.siblings.prev">
-                <md-tooltip md-direction="top">{{picture.siblings.prev.name}}</md-tooltip>
-                <span translate>moder/picture/previous</span>
-            </a>
+            <a ui-sref="moder-pictures-item({id: picture.siblings.prev.id})" title="{{picture.siblings.prev.name_text}}" ng-if="picture.siblings.prev" translate>moder/picture/previous</a>
             <br ng-if="picture.siblings.prev" />
-            <a ui-sref="moder-pictures-item({id: picture.siblings.prev_new.id})" ng-if="picture.siblings.prev_new">
-                <md-tooltip>{{picture.siblings.prev_new.name}}</md-tooltip>
-                <span translate>moder/picture/previous-new</span>
-            </a>
+            <a ui-sref="moder-pictures-item({id: picture.siblings.prev_new.id})" title="{{picture.siblings.prev_new.name_text}}" ng-if="picture.siblings.prev_new" translate>moder/picture/previous-new</a>
         </p>
     </div>
     <div class="col-md-6">
         <p>
-            <a ui-sref="moder-pictures-item({id: picture.siblings.next.id})" ng-if="picture.siblings.next">
-                <md-tooltip md-direction="top">{{picture.siblings.next.name}}</md-tooltip>
-                <span translate>moder/picture/next</span>
-            </a>
+            <a ui-sref="moder-pictures-item({id: picture.siblings.next.id})" title="{{picture.siblings.next.name_text}}" ng-if="picture.siblings.next" translate>moder/picture/next</a>
             <br ng-if="picture.siblings.next" />
-            <a ui-sref="moder-pictures-item({id: picture.siblings.next_new.id})" ng-if="picture.siblings.next_new">
-                <md-tooltip>{{picture.siblings.next_new.name}}</md-tooltip>
-                <span translate>moder/picture/next-new</span>
-            </a>
+            <a ui-sref="moder-pictures-item({id: picture.siblings.next_new.id})" title="{{picture.siblings.next_new.name_text}}" ng-if="picture.siblings.next_new" translate>moder/picture/next-new</a>
         </p>
     </div>
 </div>

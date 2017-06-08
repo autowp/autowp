@@ -2,7 +2,7 @@ import './directives/item';
 import './directives/markdown-edit';
 import './directives/paginator';
 import './directives/picture-moder-vote';
-import './directives/thumbnail';
+import './directives/thumbnail';  
 import './directives/user';
 
 

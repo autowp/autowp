@@ -30,8 +30,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$q', '$translate', PERSPECTIVE_SERVICE, PICTURE_ITEM_SERVICE,
-        function($scope, $http, $state, $q, $translate, PerspectiveService, PictureItemService) {
+        '$scope', '$http', '$state', '$q', '$translate', '$element', PERSPECTIVE_SERVICE, PICTURE_ITEM_SERVICE,
+        function($scope, $http, $state, $q, $translate, $element, PerspectiveService, PictureItemService) {
             
             var that = this;
             
@@ -67,7 +67,7 @@ angular.module(Module)
                             'special_name', 'copyrights', 'change_status_user',
                             'rights', 'moder_votes', 'moder_voted', 'is_last', 'views',
                             'accepted_count', 'similar.picture.thumbnail',
-                            'replaceable', 'siblings', 'ip.rights', 'ip.blacklist'].join(',')
+                            'replaceable', 'siblings.name_text', 'ip.rights', 'ip.blacklist'].join(',')
                     }
                 }).then(function(response) {
                     $scope.picture = response.data;

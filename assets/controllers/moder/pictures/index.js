@@ -206,7 +206,7 @@ angular.module(Module)
                     });
                     
                     $q.all(promises).then(function() { 
-                    	ctrl.load();
+                        ctrl.load();
                     });
                 });
                 selected = [];
@@ -255,7 +255,7 @@ angular.module(Module)
                 .on('change blur', function(ev, item) {
                     var curValue = $(this).val();
                     if (userIdLastValue && !curValue) {
-                    	$scope.owner_id = null;
+                        $scope.owner_id = null;
                         ctrl.load();
                     }
                     userIdLastValue = curValue;
@@ -304,7 +304,7 @@ angular.module(Module)
                 .on('change blur', function(ev, item) {
                     var curValue = $(this).val();
                     if (itemIdLastValue && !curValue) {
-                    	$scope.item_id = null;
+                        $scope.item_id = null;
                         ctrl.load();
                     }
                     itemIdLastValue = curValue;

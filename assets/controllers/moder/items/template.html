@@ -94,9 +94,7 @@
             <small ng-if="ctrl.paginator.totalItemCount" translate="ng/%1$s-items" translate-values="{count: ctrl.paginator.totalItemCount}"></small>
         </h2>
         
-        <div layout="column">
-            <autowp-item item="item" ng-repeat="item in ctrl.items"></autowp-item>
-        </div>
+        <autowp-item item="item" ng-repeat="item in ctrl.items"></autowp-item>
         
         <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
     </div>
