@@ -7,16 +7,16 @@
     </li>
 </ul>
 
-<div layout="row" ng-repeat="item in items" layout-wrap>
-    <div flex-xs="20" flex-gt-xs="10">
+<div class="row" ng-repeat="item in items">
+    <div class="col-sm-2">
         <h3 ng-bind="item.count"></h3>
     </div>
-    <div flex-xs="80" flex-gt-xs="40">
+    <div class="col-sm-4">
         <h3>{{item.ip}} <a ng-href="{{item.whois_url}}">whois</a></h3>
         <h4 ng-if="item.users"><autowp-user user="user" ng-repeat="user in item.users"></autowp-user></h4>
         <p>{{item.hostname ? item.hostname : item.ip}}</p>
     </div>
-    <div flex-xs="100" flex-gt-xs="50">
+    <div class="col-sm-6">
         <div ng-if="item.ban">
             {{'ban/until'|translate}}
             {{item.ban.up_to | date : 'fullDate'}}

@@ -1,6 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './markdown-edit.html';
+import autosize from 'autosize';
 
 angular.module(Module)
     .directive('autowpMarkdownEdit', function() {
@@ -11,7 +12,8 @@ angular.module(Module)
                 save: '='
             },
             template: template,
-            controller: ['$scope', function($scope) {
+            controller: ['$scope', '$element', function($scope, $element) {
+                autosize($element.find('textarea'));
             }]
         };
     });

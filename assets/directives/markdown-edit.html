@@ -1,14 +1,19 @@
 <div btf-markdown="'moder/markdown/description'|translate"></div>
-<md-tabs md-dynamic-height md-border-bottom>
-    <md-tab label="{{'moder/markdown/edit'|translate}}">
-        <md-input-container class="md-block">
-            <textarea ng-model="text" md-maxlength="65536" rows="1" aria-label="Text"></textarea>
-        </md-input-container>
-    </md-tab>
-    <md-tab label="{{'moder/markdown/preview'|translate}}" ng-disabled="!text.length">
-        <div class="well">
-            <div btf-markdown="text"></div>
-        </div>
-    </md-tab>
-</md-tabs>
-<button class="btn btn-primary" ng-click="save()">{{'submit'|translate}}</button>
+<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active">
+        <a href="#markdown-edit-text" role="tab" data-toggle="tab" translate>moder/markdown/edit</a>
+    </li>
+    <li role="presentation">
+        <a href="#markdown-edit-preview" role="tab" data-toggle="tab" translate ng-disabled="!text.length">moder/markdown/preview</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="markdown-edit-text">
+        <textarea ng-model="text" class="form-control" maxlength="65536" rows="1" aria-label="Text"></textarea>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="markdown-edit-preview">
+        <div btf-markdown="text"></div>
+    </div>
+</div>
+
+<button class="btn btn-primary" ng-click="save()" translate>submit</button>

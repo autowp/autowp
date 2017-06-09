@@ -3,10 +3,11 @@ import Module from 'app.module';
 import template from './template.html';
 import MODER_VOTE_TEMPLATE_SERVICE from 'services/picture-moder-vote-template';
 import MODER_VOTE_SERVICE from 'services/picture-moder-vote';
+import $ from 'jquery';
 
 angular.module(Module)
-    .directive('autowpPictureModerVote', ['$mdDialog', MODER_VOTE_SERVICE, MODER_VOTE_TEMPLATE_SERVICE,
-        function($mdDialog, ModerVoteService, ModerVoteTemplateService) {
+    .directive('autowpPictureModerVote', [MODER_VOTE_SERVICE, MODER_VOTE_TEMPLATE_SERVICE,
+        function(ModerVoteService, ModerVoteTemplateService) {
             return {
                 restirct: 'E',
                 scope: {
@@ -14,9 +15,12 @@ angular.module(Module)
                     change: '='
                 },
                 template: template,
-                controller: ['$scope', function($scope) {
+                controller: ['$scope', '$element', function($scope, $element) {
                     
                     $scope.moderVoteTemplateOptions = [];
+                    $scope.vote = null;
+                    $scope.reason = '';
+                    $scope.save = false;
                     
                     $scope.votePicture = function(vote, reason) {
                         ModerVoteService.vote($scope.picture.id, vote, reason).then(function() { 
@@ -38,46 +42,27 @@ angular.module(Module)
                         $scope.moderVoteTemplateOptions = templates;
                     });
                     
-                    $scope.showCustomDialog = function(ev, vote) {
-                        $mdDialog.show({
-                            controller: ['$scope', '$mdDialog', 'vote', DialogController],
-                            template: require('./dialog.html'),
-                            parent: angular.element(document.body),
-                            targetEvent: ev,
-                            clickOutsideToClose: true,
-                            locals: {
-                                vote: vote
-                            }
-                        })
-                        .then(function(reason) {
-                            $scope.votePicture(vote, reason);
-                        }, function() {
-                            
-                        });
+                    var $modal = $($element[0]).find('.modal');
+                    
+                    $scope.ok = function(answer) {
+                        if ($scope.save) {
+                            ModerVoteTemplateService.createTemplate({
+                                vote: $scope.vote,
+                                name: $scope.reason
+                            });
+                        }
+                        
+                        $modal.modal('hide');
+                        $scope.votePicture($scope.vote, $scope.reason);
                     };
                     
-                    function DialogController($scope, $mdDialog, vote) {
+                    $scope.showCustomDialog = function(ev, vote) {
                         $scope.vote = vote;
-                        $scope.reason = '';
-                        $scope.save = false;
                         
-                        $scope.cancel = function() {
-                            $mdDialog.cancel();
-                        };
-
-                        $scope.ok = function(answer) {
-                            if ($scope.save) {
-                                ModerVoteTemplateService.createTemplate({
-                                    vote: vote,
-                                    name: $scope.reason
-                                }).then(function() {
-                                    $mdDialog.hide($scope.reason);
-                                });
-                            } else {
-                                $mdDialog.hide($scope.reason);
-                            }
-                        };
-                    }
+                        $modal.modal({
+                            show: true
+                        });
+                    };
                 }]
             };
         }

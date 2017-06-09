@@ -1,36 +1,35 @@
 <table class="table">
-    <tr ng-repeat="template in templates">
+    <tr ng-repeat="template in ctrl.templates">
         <td>
             <i class="fa fa-thumbs-up text-success" ng-if="template.vote > 0"></i>
             <i class="fa fa-thumbs-down text-danger" ng-if="template.vote < 0"></i>
         </td>
         <td ng-bind="template.name"></td>
         <td>
-            <button class="btn btn-danger btn-sm" aria-label="Delete" ng-click="deleteTemplate(template)">
+            <button class="btn btn-danger btn-sm" aria-label="Delete" ng-click="ctrl.deleteTemplate(template)">
                 <span class="fa fa-times"></span>
             </button>
         </td>
     </tr>
 </table>
 
-<form name="add" layout="row">
-    <div flex="100" flex-gt-sm="50" flex-offset-gt-sm="25" layout="column">
-        <h2 translate>moder/picture/acceptance/add-reason</h2>
-        <md-input-container class="md-block">
-            <label translate>moder/picture/acceptance/reason</label>
-            <input md-maxlength="50" required name="name" ng-model="name">
-        </md-input-container>
-        <md-input-container>
-            <label translate>moder/picture/acceptance/vote</label>
-            <md-select ng-model="vote" required>
-                <md-option ng-value="-1">
-                    <i class="fa fa-thumbs-down text-danger"></i> Negative
-                </md-option>
-                <md-option ng-value="1">
-                    <i class="fa fa-thumbs-up text-success"></i> Positive
-                </md-option>
-            </md-select>
-        </md-input-container>
-        <button class="btn btn-primary" ng-click="createTemplate()">{{'submit'|translate}}</button>
+<form class="well form-vertical" name="add" ng-submit="ctrl.createTemplate()">
+    <h2 translate>moder/picture/acceptance/add-reason</h2>
+    
+    <div class="form-group">
+        <label translate>moder/picture/acceptance/reason</label>
+        <input type="text" name="name" class="form-control" ng-model="ctrl.name" required maxlength="50" />
     </div>
+    <div class="form-group">
+        <label translate>moder/picture/acceptance/vote</label>
+        <select name="vote" ng-model="ctrl.vote" required class="form-control">
+            <option value="-1" class="text-danger">
+                Negative
+            </option>
+            <option value="1" class="text-success">
+                Positive
+            </option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary" translate>submit</button>
 </form>

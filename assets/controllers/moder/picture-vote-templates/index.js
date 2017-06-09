@@ -36,33 +36,35 @@ angular.module(Module)
                 pageId: 212
             });
             
-            $scope.templates = [];
-            $scope.vote = -1;
-            $scope.name = '';
+            var ctrl = this;
+            
+            ctrl.templates = [];
+            ctrl.vote = -1;
+            ctrl.name = '';
                 
             VoteTemplateService.getTemplates().then(function(templates) {
-                $scope.templates = templates;
+            	ctrl.templates = templates;
             });
             
-            $scope.deleteTemplate = function(template) {
+            ctrl.deleteTemplate = function(template) {
                 VoteTemplateService.deleteTemplate(template.id).then(function() {
                     VoteTemplateService.getTemplates().then(function(templates) {
-                        $scope.templates = templates;
+                    	ctrl.templates = templates;
                     });
                 });
             };
             
-            $scope.createTemplate = function() {
+            ctrl.createTemplate = function() {
                 var template = {
-                    vote: $scope.vote,
-                    name: $scope.name
+                    vote: ctrl.vote,
+                    name: ctrl.name
                 };
                 VoteTemplateService.createTemplate(template).then(function(data) {
                     $scope.add.$setPristine();
                     $scope.add.$setUntouched();
-                    $scope.name = '';
+                    ctrl.name = '';
                     VoteTemplateService.getTemplates().then(function(templates) {
-                        $scope.templates = templates;
+                    	ctrl.templates = templates;
                     });
                 });
             };

@@ -158,7 +158,7 @@ angular.module(Module)
                             page: $scope.page
                         }
                     }).then(function(response) {
-                        $scope.brands = chunk(response.data.items, 5);
+                        $scope.brands = chunk(response.data.items, 6);
                         $scope.brands_paginator = response.data.paginator;
                     });
                 }

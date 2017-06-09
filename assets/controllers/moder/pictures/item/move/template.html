@@ -32,9 +32,12 @@
 <div ng-if="!show_factories && !show_museums">
     <div ng-if="!brand_id">
     
-        <div class="well" layout-padding layout="row">
-            <div layout="column" ng-repeat="chunk in brands" flex="20">
-                <a ng-repeat="item in chunk" ui-sref=".({page: null, brand_id: item.id})" ng-bind-html="item.name_html"></a>
+        <div class="well">
+            <div class="row">
+                <div ng-repeat="chunk in brands" class="col-xs-2">
+                    <a ng-repeat-start="item in chunk" ui-sref=".({page: null, brand_id: item.id})" ng-bind-html="item.name_html"></a>
+                    <br ng-repeat-end />
+                </div>
             </div>
         </div>
         

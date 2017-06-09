@@ -65,6 +65,7 @@
     "angular-sanitize": "^1.6.3",
     "angular-translate": "^2.15.1",
     "angular-translate-interpolation-messageformat": "^2.15.1",
+    "autosize": "^3.0.21",
     "bootstrap": "^3.x",
     "bootstrap-tagsinput": "^0.x",
     "chart.js": "^2.x",

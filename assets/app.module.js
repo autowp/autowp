@@ -1,6 +1,5 @@
 import angular from 'angular';
 import angularRouter from '@uirouter/angularjs';
-import angularMaterial from 'angular-material';
 import angularAnimate from 'angular-animate';
 import angularAria from 'angular-aria';
 import angularMessages from 'angular-messages';
@@ -8,14 +7,13 @@ import angularTranslate from 'angular-translate';
 import angularTranslateInterpolationMessageformat from 'angular-translate-interpolation-messageformat';
 import angularSanitize from 'angular-sanitize';
 import angularMarkdown from 'angular-markdown-directive';
-import materialCss from 'angular-material/angular-material.css';
 import 'angular-filesize-filter/angular-filesize-filter';
 
 const MODULE_NAME = 'App';
 
-angular.module(MODULE_NAME, [angularMaterial, angularAnimate, angularAria, angularRouter, angularTranslate, 'btford.markdown', angularSanitize, "ngFilesizeFilter"])
-    .config(['$urlRouterProvider', '$locationProvider', '$translateProvider', '$mdGestureProvider',
-        function config($urlRouterProvider, $locationProvider, $translateProvider, $mdGestureProvider) {
+angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angularTranslate, 'btford.markdown', angularSanitize, "ngFilesizeFilter"])
+    .config(['$urlRouterProvider', '$locationProvider', '$translateProvider',
+        function config($urlRouterProvider, $locationProvider, $translateProvider) {
             $locationProvider.html5Mode(true).hashPrefix('!');
     
             //$urlRouterProvider.when('', '/');
@@ -34,8 +32,6 @@ angular.module(MODULE_NAME, [angularMaterial, angularAnimate, angularAria, angul
             $translateProvider.fallbackLanguage('en');
             $translateProvider.preferredLanguage(lang);
             $translateProvider.use(lang);
-            
-            $mdGestureProvider.skipClickHijack();
         }
     ]);
 

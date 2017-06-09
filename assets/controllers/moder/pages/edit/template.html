@@ -1,50 +1,59 @@
-<form layout="column" ng-submit="ctrl.save()">
-    <md-input-container>
+<form class="well form-vertical" ng-submit="ctrl.save()">
+    <div class="form-group">
         <label translate>page/parent</label>
-        <md-select ng-model="ctrl.item.parent_id" name="parent_id">
-            <md-option ng-value="null"><em>None</em></md-option>
-            <md-option ng-repeat="page in ctrl.pages" ng-value="page.id" style="padding-left:{{16 + page.level*20}}px">
-                {{page.name}}
-            </md-option>
-        </md-select>
-    </md-input-container>
-    <md-input-container>
+        <select ng-model="ctrl.item.parent_id" name="parent_id" class="form-control">
+            <option value="">None</option>
+            <option ng-repeat="page in ctrl.pages" value="{{page.id}}">
+                {{'...'.repeat(page.level)}}{{page.name}}
+            </option>
+        </select>
+    </div>
+    <div class="form-group">
         <label translate>page/name</label>
-        <input ng-model="ctrl.item.name" name="name" md-maxlength="255" />
-    </md-input-container>
-    <md-input-container>
+        <input ng-model="ctrl.item.name" name="name" maxlength="255" class="form-control" />
+    </div>
+    <div class="form-group">
         <label>Title</label>
-        <input ng-model="ctrl.item.title" name="title" md-maxlength="255" />
-    </md-input-container>
-    <md-input-container>
+        <input ng-model="ctrl.item.title" name="title" maxlength="255" class="form-control" />
+    </div>
+    <div class="form-group">
         <label>Breadcrumbs</label>
-        <input ng-model="ctrl.item.breadcrumbs" name="breadcrumbs" md-maxlength="255" />
-    </md-input-container>
-    <md-input-container>
+        <input ng-model="ctrl.item.breadcrumbs" name="breadcrumbs" maxlength="255" class="form-control" />
+    </div>
+    <div class="form-group">
         <label>URL</label>
-        <input ng-model="ctrl.item.url" name="url" md-maxlength="255" />
-    </md-input-container>
-    <md-input-container class="md-block">
-        <md-checkbox name="is_group_node" ng-model="ctrl.item.is_group_node">
-            {{'page/is_group_node'|translate}}
-        </md-checkbox>
-    </md-input-container>
-    <md-input-container class="md-block">
-        <md-checkbox name="registered_only" ng-model="ctrl.item.registered_only">
-            {{'page/registered_only'|translate}}
-        </md-checkbox>
-    </md-input-container>
-    <md-input-container class="md-block">
-        <md-checkbox name="guest_only" ng-model="ctrl.item.guest_only">
-            {{'page/guests_only'|translate}}
-        </md-checkbox>
-    </md-input-container>
-    <md-input-container>
+        <input ng-model="ctrl.item.url" name="url" maxlength="255" class="form-control" />
+    </div>
+    <div class="form-group">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="is_group_node" ng-model="ctrl.item.is_group_node" /> 
+                {{'page/is_group_node'|translate}}
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="registered_only" ng-model="ctrl.item.registered_only" /> 
+                {{'page/registered_only'|translate}}
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="guest_only" ng-model="ctrl.item.guest_only" /> 
+                {{'page/guests_only'|translate}}
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
         <label translate>page/class</label>
-        <input ng-model="ctrl.item.class" name="class" md-maxlength="255" />
-    </md-input-container>
-    <div layout="row">
-        <button type="submit" class="btn btn-primary">{{'send'|translate}}</button>
+        <input ng-model="ctrl.item.class" name="class" maxlength="255" class="form-control" />
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary" translate>send</button>
         <span ng-show="ctrl.loading > 0">
             <i class="fa fa-spinner fa-spin fa-fw fa-3x"></i>
         </span>

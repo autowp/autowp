@@ -169,8 +169,8 @@
 
         
         
-        <div layout="row" layout-wrap>
-            <div flex="25" flex-xs="50" flex-sm="33" ng-repeat="picture in pictures">
+        <div class="row" ng-repeat="chunk in chunks">
+            <div class="col-sm-3" ng-repeat="picture in chunk">
                 <autowp-thumbnail picture="picture" onselect="onPictureSelect" is-moder="isModer"></autowp-thumbnail>
             </div>
         </div>

@@ -258,7 +258,7 @@
 
         <h3 translate>moder/picture/edit-and-repair</h3>
         <div class="well" ng-if="picture.rights.normalize || picture.rights.flop || picture.rights.crop">
-            <div layout="row">
+            <div>
                 <button class="btn btn-warning" ng-click="normalizePicture()" ng-if="picture.rights.normalize" ng-disabled="repairLoading">
                     <i class="fa fa-signal"></i>
                     {{'moder/picture/edit-and-repair/normalize'|translate}}
@@ -273,7 +273,7 @@
                 </button>
             </div>
 
-            <div layout="row">
+            <div>
                 <button class="btn btn-default" ng-click="repairPicture()" ng-disabled="repairLoading">
                     <i class="fa fa-wrench"></i>
                     {{'moder/picture/edit-and-repair/repair-all-files'|translate}}

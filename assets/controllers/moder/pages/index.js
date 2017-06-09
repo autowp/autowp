@@ -85,22 +85,14 @@ angular.module(Module)
             };
             
             ctrl.deletePage = function(ev, page) {
-                var confirm = $mdDialog.confirm()
-                    .title('Would you like to delete page?')
-                    .textContent('That can not be undone.')
-                    .ariaLabel('Lucky day')
-                    .targetEvent(ev)
-                    .ok('Yes')
-                    .cancel('Nope');
-
-                $mdDialog.show(confirm).then(function() {
+                if (window.confirm('Would you like to delete page?')) {
                     $http({
                         method: 'DELETE',
                         url: '/api/page/' + page.id
                     }).then(function(response) {
                         load();
                     });
-                });
+                }
             };
         }
     ]);
