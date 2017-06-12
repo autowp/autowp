@@ -2,6 +2,8 @@
 
 namespace Application\Hydrator\Api;
 
+use Exception;
+
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Permissions\Acl\Acl;
 
@@ -164,6 +166,10 @@ class PictureHydrator extends RestHydrator
     {
         if ($object === null) {
             return null;
+        }
+
+        if (! isset($object['id'], $object['status'], $object['filesize'])) {
+            throw new Exception("Unexpected object");
         }
 
         $cropped = DbTable\Picture\Row::checkCropParameters($object);
