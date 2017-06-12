@@ -1,5 +1,16 @@
-.settings
+.buildpath
+.codeclimate.yml
+.coveralls.yml
+.eslintignore
+.eslintrc
 .git
+.gitignore
+.jshintrc
 .project
+.settings
+.travis.yml
 Dockerfile
 docker-compose.yml
+phpcs.xml
+phpunit.xml
+README.md
