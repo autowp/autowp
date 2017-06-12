@@ -164,7 +164,7 @@ class PictureHydrator extends RestHydrator
 
     public function extract($object)
     {
-        if ($object === null) {
+        if ($object === null || $object === false) {
             return null;
         }
 
