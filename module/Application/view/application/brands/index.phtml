@@ -33,7 +33,7 @@
                 ?><div>
                     <?=$this->htmlA([
                         'href'  => $brand['url'],
-                        'class' => 'brandicon brandicon-' . $brand['catname']
+                        'class' => 'brandicon brandicon-' . str_replace('.', '_', $brand['catname'])
                     ], '') ?>
                     <h4>
                         <?=$this->htmlA($brand['url'], $brand['name'])?>
