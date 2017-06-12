@@ -6,7 +6,6 @@ use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
 
-use Application\Controller\Api\ContactsController;
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Moder\CarsController;
 use Application\Controller\Api\ItemController;
@@ -227,7 +226,5 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
 
         $this->assertNotEmpty($json);
-
-        var_dump($engineId);
     }
 }
