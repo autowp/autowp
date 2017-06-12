@@ -2,7 +2,6 @@
 
 namespace Application\Model\Item\ListBuilder;
 
-use Application\Model\DbTable;
 use Application\Model\Item\ListBuilder;
 
 class Catalogue extends ListBuilder

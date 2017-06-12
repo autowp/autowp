@@ -37,14 +37,21 @@ class ItemController extends AbstractRestfulController
      */
     private $listInputFilter;
 
+    /**
+     * @var InputFilter
+     */
+    private $itemInputFilter;
+
     public function __construct(
         RestHydrator $hydrator,
         ItemNameFormatter $itemNameFormatter,
-        InputFilter $listInputFilter
+        InputFilter $listInputFilter,
+        InputFilter $itemInputFilter
     ) {
         $this->hydrator = $hydrator;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->listInputFilter = $listInputFilter;
+        $this->itemInputFilter = $itemInputFilter;
 
         $this->table = new DbTable\Item();
     }
@@ -263,5 +270,36 @@ class ItemController extends AbstractRestfulController
         return new JsonModel([
             'groups' => $groups
         ]);
+    }
+
+    public function itemAction()
+    {
+        if (! $this->user()->inheritsRole('moder')) {
+            return $this->forbiddenAction();
+        }
+
+        $user = $this->user()->get();
+
+        $this->itemInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->itemInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->itemInputFilter);
+        }
+
+        $data = $this->itemInputFilter->getValues();
+
+        $select = $this->table->getAdapter()->select()
+            ->from('item')
+            ->where('id = ?', (int)$this->params('id'));
+
+        $row = $this->table->getAdapter()->fetchRow($select);
+
+        $this->hydrator->setOptions([
+            'language' => $this->language(),
+            'fields'   => $data['fields'],
+            'user_id'  => $user ? $user['id'] : null
+        ]);
+
+        return new JsonModel($this->hydrator->extract($row));
     }
 }

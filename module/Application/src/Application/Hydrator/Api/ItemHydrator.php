@@ -232,6 +232,10 @@ class ItemHydrator extends RestHydrator
             }
         }
 
+        if ($this->filterComposite->filter('catname')) {
+            $result['catname'] = $object['catname'];
+        }
+
         $totalPictures = null;
         $pictures = [];
         $cFetcher = null;
@@ -258,6 +262,7 @@ class ItemHydrator extends RestHydrator
             $pictures = $cFetcher->fetch($object, [
                 'totalPictures' => $totalPictures
             ]);
+
             $largeFormat = false;
             foreach ($pictures as &$picture) {
                 if ($picture) {

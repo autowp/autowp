@@ -224,9 +224,13 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['childs_count', 'name_html', 'name_text', 'name_default',
-                            'description', 'has_text', 'brands', 'moder_url', 'upload_url', 'spec_editor_url', 'specs_url',
-                            'categories', 'twins_groups', 'url', 'more_pictures_url', 'preview_pictures', 'design', 'engine_vehicles']]
+                        'options' => ['fields' => ['childs_count', 'name_html',
+                            'name_text', 'name_default', 'description',
+                            'has_text', 'brands', 'moder_url', 'upload_url',
+                            'spec_editor_url', 'specs_url', 'categories',
+                            'twins_groups', 'url', 'more_pictures_url',
+                            'preview_pictures', 'design', 'engine_vehicles',
+                            'catname']]
                     ]
                 ]
             ],
@@ -288,6 +292,23 @@ return [
                     ['name' => 'Digits']
                 ]
             ]
+        ],
+        'api_item_item' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['childs_count', 'name_html',
+                            'name_text', 'name_default', 'description',
+                            'has_text', 'brands', 'moder_url', 'upload_url',
+                            'spec_editor_url', 'specs_url', 'categories',
+                            'twins_groups', 'url', 'more_pictures_url',
+                            'preview_pictures', 'design', 'engine_vehicles',
+                            'catname']]
+                    ]
+                ]
+            ],
         ],
         'api_item_parent_list' => [
             'ancestor_id' => [
@@ -1296,6 +1317,24 @@ return [
                                     'defaults' => [
                                         'action' => 'alpha'
                                     ]
+                                ]
+                            ],
+                            'item' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/:id'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'item'
+                                            ]
+                                        ]
+                                    ],
                                 ]
                             ]
                         ]

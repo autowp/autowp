@@ -2,8 +2,6 @@
 
 namespace Application\Model\Item\ListBuilder;
 
-use Application\Model\DbTable;
-
 class NewPicturesListBuilder extends \Application\Model\Item\ListBuilder
 {
     /**
