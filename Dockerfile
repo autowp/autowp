@@ -43,7 +43,7 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ADD composer.json /app/composer.json
-RUN php ./composer.phar install --no-dev
+RUN php ./composer.phar install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader
 
 ADD package.json /app/package.json
 RUN cd /app && npm install --production
