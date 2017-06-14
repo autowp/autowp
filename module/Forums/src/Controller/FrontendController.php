@@ -2,7 +2,6 @@
 
 namespace Autowp\Forums\Controller;
 
-use Zend\Mail;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
