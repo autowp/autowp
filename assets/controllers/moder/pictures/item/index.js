@@ -379,7 +379,6 @@ angular.module(Module)
             };
             
             $scope.addToBlacklist = function(ip) {
-                console.log(that.banPeriod, that.banReason);
                 $http({
                     method: 'POST',
                     url: '/api/traffic/blacklist',

@@ -6,12 +6,18 @@ import angularMessages from 'angular-messages';
 import angularTranslate from 'angular-translate';
 import angularTranslateInterpolationMessageformat from 'angular-translate-interpolation-messageformat';
 import angularSanitize from 'angular-sanitize';
+import 'angular-simple-logger';
 import angularMarkdown from 'angular-markdown-directive';
 import 'angular-filesize-filter/angular-filesize-filter';
+import 'ng-tags-input';
+import 'ng-tags-input/build/ng-tags-input.css';
+import 'ng-tags-input/build/ng-tags-input.bootstrap.css';
+import 'ui-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const MODULE_NAME = 'App';
 
-angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angularTranslate, 'btford.markdown', angularSanitize, "ngFilesizeFilter"])
+angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angularTranslate, 'nemLogging', 'btford.markdown', angularSanitize, "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet'])
     .config(['$urlRouterProvider', '$locationProvider', '$translateProvider',
         function config($urlRouterProvider, $locationProvider, $translateProvider) {
             $locationProvider.html5Mode(true).hashPrefix('!');

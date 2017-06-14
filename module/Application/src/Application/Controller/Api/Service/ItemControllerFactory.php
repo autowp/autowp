@@ -17,7 +17,8 @@ class ItemControllerFactory implements FactoryInterface
             $hydrators->get(\Application\Hydrator\Api\ItemHydrator::class),
             $container->get(\Application\ItemNameFormatter::class),
             $filters->get('api_item_list'),
-            $filters->get('api_item_item')
+            $filters->get('api_item_item'),
+            $container->get(\Application\Service\SpecificationsService::class)
         );
     }
 }

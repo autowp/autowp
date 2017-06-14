@@ -1,9 +1,9 @@
-<?php 
+<?php
     $canHaveParents = !in_array($this->car['item_type_id'], [
         Application\Model\DbTable\Item\Type::TWINS,
         Application\Model\DbTable\Item\Type::FACTORY
     ]);
-    
+
     $organizeTypeId = $this->car['item_type_id'];
     switch ($organizeTypeId) {
         case Application\Model\DbTable\Item\Type::BRAND:
@@ -162,11 +162,7 @@
                         <td colspan="2">
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA(
-                                $this->url('moder/cars/params', [
-                                    'action'       => 'new',
-                                    'parent_id'    => $this->car->id,
-                                    'item_type_id' => Application\Model\DbTable\Item\Type::ENGINE
-                                ]),
+                                '/ng/moder/items/new?item_type_id='.Application\Model\DbTable\Item\Type::ENGINE.'&parent_id=' . $this->car->id,
                                 $this->translate('moder/vehicle/catalogue/add-engine')
                             )?>
                         </td>
@@ -179,11 +175,7 @@
                         <td colspan="2">
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA(
-                                $this->url('moder/cars/params', [
-                                    'action'       => 'new',
-                                    'parent_id'    => $this->car->id,
-                                    'item_type_id' => Application\Model\DbTable\Item\Type::VEHICLE
-                                ]),
+                                '/ng/moder/items/new?item_type_id='.Application\Model\DbTable\Item\Type::VEHICLE.'&parent_id=' . $this->car->id,
                                 $this->translate('moder/vehicle/catalogue/add-vehicle')
                             )?>
                         </td>
@@ -197,11 +189,7 @@
                         <td colspan="2">
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA(
-                                $this->url('moder/cars/params', [
-                                    'action'       => 'new',
-                                    'parent_id'    => $this->car->id,
-                                    'item_type_id' => Application\Model\DbTable\Item\Type::CATEGORY
-                                ]),
+                                '/ng/moder/items/new?item_type_id='.Application\Model\DbTable\Item\Type::CATEGORY.'&parent_id=' . $this->car->id,
                                 $this->translate('moder/vehicle/catalogue/add-category')
                             )?>
                         </td>
@@ -214,11 +202,7 @@
                         <td colspan="2">
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA(
-                                $this->url('moder/cars/params', [
-                                    'action'       => 'new',
-                                    'parent_id'    => $this->car->id,
-                                    'item_type_id' => Application\Model\DbTable\Item\Type::ENGINE
-                                ]),
+                                '/ng/moder/items/new?item_type_id='.Application\Model\DbTable\Item\Type::ENGINE.'&parent_id=' . $this->car->id,
                                 $this->translate('moder/vehicle/catalogue/add-engine')
                             )?>
                         </td>
@@ -231,11 +215,7 @@
                         <td colspan="2">
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA(
-                                $this->url('moder/cars/params', [
-                                    'action'       => 'new',
-                                    'parent_id'    => $this->car->id,
-                                    'item_type_id' => Application\Model\DbTable\Item\Type::VEHICLE
-                                ]),
+                                '/ng/moder/items/new?item_type_id='.Application\Model\DbTable\Item\Type::VEHICLE.'&parent_id=' . $this->car->id,
                                 $this->translate('moder/vehicle/catalogue/add-vehicle')
                             )?>
                         </td>
@@ -249,11 +229,7 @@
                         <td colspan="2">
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA(
-                                $this->url('moder/cars/params', [
-                                    'action'       => 'new',
-                                    'parent_id'    => $this->car->id,
-                                    'item_type_id' => $this->car['item_type_id'],
-                                ]),
+                                '/ng/moder/items/new?item_type_id='.$this->car['item_type_id'].'&parent_id=' . $this->car->id,
                                 $this->translate(
                                     $this->car['item_type_id'] == Application\Model\DbTable\Item\Type::ENGINE
                                         ? 'moder/vehicle/catalogue/add-engine'

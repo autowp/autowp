@@ -26,7 +26,10 @@ module.exports = {
     },
     module: {
         rules: [
-            {
+        	{ test: /ui-leaflet/, use: {
+                loader: 'imports-loader',
+                options: {'L': 'leaflet'}
+            }}, {
                 test: /\.js$/, // include .js files
                 exclude: /node_modules/, // exclude any and all files in the node_modules folder
                 use:[

@@ -199,6 +199,22 @@ class ItemHydrator extends RestHydrator
             'item_type_id' => (int)$object['item_type_id']
         ];
 
+        if ($this->filterComposite->filter('is_concept')) { // only for moders
+            $result['is_concept'] = (bool)$object['is_concept'];
+        }
+
+        if ($this->filterComposite->filter('spec_id')) { // only for moders
+            $result['spec_id'] = (bool)$object['spec_id'];
+        }
+
+        if ($this->filterComposite->filter('begin_year')) { // only for moders
+            $result['begin_year'] = $object['begin_year'];
+        }
+
+        if ($this->filterComposite->filter('end_year')) { // only for moders
+            $result['end_year'] = $object['end_year'];
+        }
+
         if ($this->filterComposite->filter('moder_url')) {
             $result['moder_url'] = $this->router->assemble([
                 'action'  => 'car',

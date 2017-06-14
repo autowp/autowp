@@ -9,6 +9,7 @@ import MODER_VOTE_SERVICE from 'services/picture-moder-vote';
 import ACL_SERVICE_NAME from 'services/acl';
 import "corejs-typeahead";
 import $ from 'jquery';
+import "./new";
 
 const CONTROLLER_NAME = 'ModerItemsController';
 const STATE_NAME = 'moder-items';

@@ -28,6 +28,28 @@ class VehicleType
         $this->vehicleVehicleTypeTable = new DbTable\Vehicle\VehicleType();
     }
 
+    public function removeVehicleType($vehicleId, $type)
+    {
+        $deleted = $this->vehicleVehicleTypeTable->delete([
+            'vehicle_id = ?'      => (int)$vehicleId,
+            'vehicle_type_id = ?' => (int)$type,
+            'not inherited'
+        ]);
+
+        if ($deleted > 0) {
+            $this->refreshInheritance($vehicleId);
+        }
+    }
+
+    public function addVehicleType($vehicleId, $type)
+    {
+        $changed = $this->setRow($vehicleId, $type, false);
+
+        if ($changed) {
+            $this->refreshInheritance($vehicleId);
+        }
+    }
+
     public function setVehicleTypes($vehicleId, array $types)
     {
         $vehicleId = (int)$vehicleId;

@@ -8,6 +8,8 @@ angular.module(Module)
         
         var types = null;
         
+        var service = this;
+        
         this.getSpecs = function() {
             return $q(function(resolve, reject) {
                 if (types === null) {
@@ -26,6 +28,33 @@ angular.module(Module)
             });
         };
         
+        this.getSpec = function(id) {
+            return $q(function(resolve, reject) {
+                service.getSpecs().then(function(types) {
+                    var spec = findSpec(types, id);
+                    if (spec) {
+                        resolve(spec);
+                    } else {
+                        reject(null);
+                    }
+                }, reject);
+            });
+        };
+        
+        function findSpec(specs, id) {
+        	var spec = null;
+        	for (var i=0; i<specs.length; i++) {
+        		if (specs[i].id == id) {
+                	spec = specs[i];
+                	break;
+                }
+        		spec = findSpec(specs[i].childs, id);
+        		if (spec) {
+        			break;
+        		}
+        	}
+            return spec;
+        }
     }]);
 
 export default SERVICE_NAME;

@@ -28,11 +28,10 @@
 
         <?php if ($this->user()->isAllowed('car', 'add')) { ?>
             <i class="fa fa-plus"></i>
-            <?=$this->htmlA($this->url('moder/cars/params', [
-                'action'       => 'new',
-                'parent_id'    => $this->currentItem['id'],
-                'item_type_id' => $this->currentItem['item_type_id'],
-            ]), $this->translate('item/type/'.$this->currentItem['item_type_id'].'/add-sub-item'))?>
+            <?=$this->htmlA(
+                '/ng/moder/items/new?item_type_id='.$this->currentItem['item_type_id'].'&parent_id=' . $this->currentItem['id'],
+                mb_strtolower($this->translate('item/type/'.$this->currentItem['item_type_id'].'/add-sub-item')
+            ))?>
         <?php } ?>
     </p>
 <?php } ?>

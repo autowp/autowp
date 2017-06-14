@@ -30,28 +30,29 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Api\AclController::class          => Controller\Api\Service\AclControllerFactory::class,
-            Controller\Api\CommentController::class      => Controller\Api\Service\CommentControllerFactory::class,
-            Controller\Api\ContactsController::class     => InvokableFactory::class,
-            Controller\Api\HotlinksController::class     => InvokableFactory::class,
-            Controller\Api\IpController::class           => Controller\Api\Service\IpControllerFactory::class,
-            Controller\Api\ItemController::class         => Controller\Api\Service\ItemControllerFactory::class,
-            Controller\Api\ItemParentController::class   => Controller\Api\Service\ItemParentControllerFactory::class,
-            Controller\Api\LogController::class          => Controller\Api\Service\LogControllerFactory::class,
-            Controller\Api\PageController::class         => Controller\Api\Service\PageControllerFactory::class,
-            Controller\Api\PerspectiveController::class  => Controller\Api\Service\PerspectiveControllerFactory::class,
+            Controller\Api\AclController::class             => Controller\Api\Service\AclControllerFactory::class,
+            Controller\Api\CommentController::class         => Controller\Api\Service\CommentControllerFactory::class,
+            Controller\Api\ContactsController::class        => InvokableFactory::class,
+            Controller\Api\HotlinksController::class        => InvokableFactory::class,
+            Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,
+            Controller\Api\ItemController::class            => Controller\Api\Service\ItemControllerFactory::class,
+            Controller\Api\ItemParentController::class      => Controller\Api\Service\ItemParentControllerFactory::class,
+            Controller\Api\ItemVehicleTypeController::class => Controller\Api\Service\ItemVehicleTypeControllerFactory::class,
+            Controller\Api\LogController::class             => Controller\Api\Service\LogControllerFactory::class,
+            Controller\Api\PageController::class            => Controller\Api\Service\PageControllerFactory::class,
+            Controller\Api\PerspectiveController::class     => Controller\Api\Service\PerspectiveControllerFactory::class,
             Controller\Api\PerspectivePageController::class => Controller\Api\Service\PerspectivePageControllerFactory::class,
-            Controller\Api\PictureController::class      => Controller\Api\Service\PictureControllerFactory::class,
-            Controller\Api\PictureItemController::class  => Controller\Api\Service\PictureItemControllerFactory::class,
+            Controller\Api\PictureController::class         => Controller\Api\Service\PictureControllerFactory::class,
+            Controller\Api\PictureItemController::class     => Controller\Api\Service\PictureItemControllerFactory::class,
             Controller\Api\PictureModerVoteController::class => Controller\Api\Service\PictureModerVoteControllerFactory::class,
             Controller\Api\PictureModerVoteTemplateController::class => Controller\Api\Service\PictureModerVoteTemplateControllerFactory::class,
-            Controller\Api\PictureVoteController::class  => Controller\Api\Service\PictureVoteControllerFactory::class,
-            Controller\Api\SpecController::class         => InvokableFactory::class,
-            Controller\Api\StatController::class         => InvokableFactory::class,
-            Controller\Api\TrafficController::class      => Controller\Api\Service\TrafficControllerFactory::class,
-            Controller\Api\UsersController::class        => InvokableFactory::class,
-            Controller\Api\UserController::class         => Controller\Api\Service\UserControllerFactory::class,
-            Controller\Api\VehicleTypesController::class => InvokableFactory::class,
+            Controller\Api\PictureVoteController::class     => Controller\Api\Service\PictureVoteControllerFactory::class,
+            Controller\Api\SpecController::class            => InvokableFactory::class,
+            Controller\Api\StatController::class            => InvokableFactory::class,
+            Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
+            Controller\Api\UsersController::class           => InvokableFactory::class,
+            Controller\Api\UserController::class            => Controller\Api\Service\UserControllerFactory::class,
+            Controller\Api\VehicleTypesController::class    => InvokableFactory::class,
         ]
     ],
     'input_filter_specs' => [
@@ -230,7 +231,7 @@ return [
                             'spec_editor_url', 'specs_url', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
                             'preview_pictures', 'design', 'engine_vehicles',
-                            'catname']]
+                            'catname', 'is_concept', 'spec_id', 'begin_year', 'end_year']]
                     ]
                 ]
             ],
@@ -305,7 +306,7 @@ return [
                             'spec_editor_url', 'specs_url', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
                             'preview_pictures', 'design', 'engine_vehicles',
-                            'catname']]
+                            'catname', 'is_concept', 'spec_id', 'begin_year', 'end_year']]
                     ]
                 ]
             ],
@@ -397,6 +398,37 @@ return [
                             ]
                         ]
                     ]
+                ]
+            ],
+        ],
+        'api_item_parent_item' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['item']]
+                    ]
+                ]
+            ]
+        ],
+        'api_item_parent_post' => [
+            'item_id' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'parent_id' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
                 ]
             ],
         ],
@@ -1310,6 +1342,15 @@ return [
                                     ]
                                 ]
                             ],
+                            'post' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'post',
+                                    'defaults' => [
+                                        'action' => 'post'
+                                    ]
+                                ]
+                            ],
                             'alpha' => [
                                 'type' => Literal::class,
                                 'options' => [
@@ -1322,7 +1363,10 @@ return [
                             'item' => [
                                 'type' => Segment::class,
                                 'options' => [
-                                    'route' => '/:id'
+                                    'route' => '/:id',
+                                    'constraints' => [
+                                        'id' => '[0-9]+'
+                                    ],
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
@@ -1357,7 +1401,73 @@ return [
                                         'action' => 'index'
                                     ]
                                 ]
+                            ],
+                            'item' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/:item_id/:parent_id',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'get',
+                                            'defaults' => [
+                                                'action' => 'item'
+                                            ]
+                                        ]
+                                    ],
+                                    'post' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'post',
+                                            'defaults' => [
+                                                'action' => 'post'
+                                            ]
+                                        ]
+                                    ],
+                                ]
                             ]
+                        ]
+                    ],
+                    'item-vehicle-type' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/item-vehicle-type/:item_id/:vehicle_type_id',
+                            'defaults' => [
+                                'controller' => Controller\Api\ItemVehicleTypeController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'item' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb'     => 'get',
+                                    'defaults' => [
+                                        'action' => 'item'
+                                    ]
+                                ]
+                            ],
+                            'create' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb'     => 'post',
+                                    'defaults' => [
+                                        'action' => 'create'
+                                    ]
+                                ]
+                            ],
+                            'delete' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb'     => 'delete',
+                                    'defaults' => [
+                                        'action' => 'delete'
+                                    ]
+                                ]
+                            ],
                         ]
                     ],
                     'log' => [
