@@ -79,22 +79,6 @@ return [
                                 'type' => Router\Http\WildcardSafe::class
                             ]
                         ]
-                    ],
-                    'picture-item' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/picture-item[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\PictureItemController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
                     ]
                 ]
             ],
@@ -106,7 +90,6 @@ return [
             Controller\Moder\ItemParentController::class   => Controller\Moder\Service\ItemParentControllerFactory::class,
             Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
-            Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
         ]
     ],
     'forms' => [
