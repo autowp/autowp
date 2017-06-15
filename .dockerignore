@@ -14,3 +14,8 @@ docker-compose.yml
 phpcs.xml
 phpunit.xml
 README.md
+module/Application/test
+module/Comments/test
+module/Message/test
+module/Traffic/test
+module/User/test
