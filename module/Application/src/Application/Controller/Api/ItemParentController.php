@@ -201,16 +201,29 @@ class ItemParentController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $values;
+        $request = $this->getRequest();
+        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
+            $data = $this->jsonDecode($request->getContent());
+        } else {
+            $data = $request->getPost()->toArray();
+        }
+
+        $this->postInputFilter->setData($data);
+
+        if (! $this->postInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->postInputFilter);
+        }
+
+        $data = $this->postInputFilter->getValues();
 
         $itemTable = $this->catalogue()->getItemTable();
 
-        $item = $itemTable->find($this->params('item_id'))->current();
+        $item = $itemTable->find($data['item_id'])->current();
         if (! $item) {
             return $this->notFoundAction();
         }
 
-        $parentItem = $itemTable->find($this->params('parent_id'))->current();
+        $parentItem = $itemTable->find($data['parent_id'])->current();
         if (! $parentItem) {
             return $this->notFoundAction();
         }

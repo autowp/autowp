@@ -1417,18 +1417,18 @@ return [
                                                 'action' => 'item'
                                             ]
                                         ]
-                                    ],
-                                    'post' => [
-                                        'type' => Method::class,
-                                        'options' => [
-                                            'verb'     => 'post',
-                                            'defaults' => [
-                                                'action' => 'post'
-                                            ]
-                                        ]
-                                    ],
+                                    ]
                                 ]
-                            ]
+                            ],
+                            'post' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb'     => 'post',
+                                    'defaults' => [
+                                        'action' => 'post'
+                                    ]
+                                ]
+                            ],
                         ]
                     ],
                     'item-vehicle-type' => [

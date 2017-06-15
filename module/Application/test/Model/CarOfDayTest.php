@@ -20,7 +20,8 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
         $result = $model->getCarOfDayCadidate();
 
         if ($result) {
-            $this->assertInstanceOf(Row::class, $result);
+            $this->assertArrayHasKey('id', $result);
+            $this->assertNotEmpty($result['id']);
         } else {
             $this->assertFalse($result);
         }

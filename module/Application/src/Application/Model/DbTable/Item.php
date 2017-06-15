@@ -68,7 +68,7 @@ class Item extends Table
             $oldIsConcept = (bool)$car->is_concept;
 
             if ($oldIsConcept !== $isConcept) {
-                $car->is_concept = $isConcept;
+                $car->is_concept = $isConcept ? 1 : 0;
                 $somethingChanged = true;
             }
         }

@@ -17,9 +17,12 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
         $brandId = 204;
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/1', Request::METHOD_POST, [
-            'name' => 'Car for testNewcars'
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
+            'name' => 'Car for testNewcars',
+            'item_type_id' => 1
         ]);
+
+        $this->assertResponseStatusCode(201);
 
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();
@@ -29,9 +32,11 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
         // add to brand
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/add-parent/parent_id/'.$brandId.'/item_id/' . $carId, Request::METHOD_POST, [
-            'name' => 'Test car'
+        $this->dispatch('https://www.autowp.ru/api/item-parent', Request::METHOD_POST, [
+            'parent_id' => $brandId,
+            'item_id'   => $carId
         ]);
+        $this->assertResponseStatusCode(201);
 
         // page
         $this->reset();

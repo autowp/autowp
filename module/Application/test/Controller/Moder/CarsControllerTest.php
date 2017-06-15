@@ -7,8 +7,10 @@ use Zend\Http\Headers;
 use Zend\Http\Request;
 use Zend\Json\Json;
 
+use Application\Controller\Api\ItemParentController;
 use Application\Controller\Moder\CarsController;
 use Application\Test\AbstractHttpControllerTestCase;
+use Application\Controller\Api\ItemController;
 
 class CarsControllerTest extends AbstractHttpControllerTestCase
 {
@@ -35,15 +37,16 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testCreateCarAndAddToBrand()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/1', Request::METHOD_POST, [
-            'name' => 'Test car'
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
+            'item_type_id' => 1,
+            'name'         => 'Test car'
         ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('new');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/post');
+        $this->assertActionName('post');
 
         /**
          * @var Headers $headers
@@ -59,15 +62,20 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         // add to brand
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/add-parent/parent_id/205/item_id/' . $carId, Request::METHOD_POST, [
-            'name' => 'Test car'
-        ]);
+        $this->dispatch(
+            'https://www.autowp.ru/api/item-parent',
+            Request::METHOD_POST,
+            [
+                'item_id'   => $carId,
+                'parent_id' => 205
+            ]
+        );
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('add-parent');
+        $this->assertControllerName(ItemParentController::class);
+        $this->assertMatchedRouteName('api/item-parent/post');
+        $this->assertActionName('post');
     }
 
     public function testSelectBrand()
@@ -179,27 +187,26 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $catname = 'test-brand-' . (10000 * microtime(true));
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/5', Request::METHOD_POST, [
-            'name'      => 'Test brand',
-            'full_name' => 'Test brand full name',
-            'catname'   => $catname,
-            'begin'     => [
-                'year' => 1950
-            ]
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
+            'item_type_id' => 5,
+            'name'         => 'Test brand',
+            'full_name'    => 'Test brand full name',
+            'catname'      => $catname,
+            'begin_year'   => 1950
         ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('new');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/post');
+        $this->assertActionName('post');
 
         $this->assertHasResponseHeader('Location');
 
         $header = $this->getResponse()->getHeaders()->get('Location');
         $path = $header->uri()->getPath();
 
-        $this->assertStringStartsWith('/moder/cars/car/item_id/', $path);
+        $this->assertStringStartsWith('/api/item/', $path);
 
         $path = explode('/', $path);
         $brandId = (int)array_pop($path);

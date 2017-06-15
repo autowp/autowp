@@ -29,20 +29,17 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     public function testCars()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/1', Request::METHOD_POST, [
-            'name'       => 'Test car',
-            'is_concept' => 0,
-            'begin' => [
-                'year' => 1999,
-            ],
-            'end'   => [
-                'year' => 2001,
-            ],
-            'is_group'   => 0
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
+            'name'         => 'Test car',
+            'item_type_id' => 1,
+            'is_concept'   => 0,
+            'begin_year'   => 1999,
+            'end_year'     => 2001,
+            'is_group'     => 0
         ]);
 
-        $this->assertResponseStatusCode(302);
-        $this->assertMatchedRouteName('moder/cars/params');
+        $this->assertResponseStatusCode(201);
+        $this->assertMatchedRouteName('api/item/post');
 
         $uri = $this->getResponse()->getHeaders()->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
@@ -53,12 +50,15 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         // add to brand
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/add-parent/parent_id/204/item_id/' . $carId, Request::METHOD_POST);
+        $this->dispatch('https://www.autowp.ru/api/item-parent', Request::METHOD_POST, [
+            'parent_id' => 204,
+            'item_id'   => $carId
+        ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('add-parent');
+        $this->assertMatchedRouteName('api/item-parent/post');
+        $this->assertActionName('post');
 
         // request
         $this->reset();
@@ -89,13 +89,14 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     public function testConcepts()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/1', Request::METHOD_POST, [
-            'name'       => 'Test concept car',
-            'is_concept' => 1
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
+            'item_type_id' => 1,
+            'name'         => 'Test concept car',
+            'is_concept'   => 1
         ]);
 
-        $this->assertResponseStatusCode(302);
-        $this->assertMatchedRouteName('moder/cars/params');
+        $this->assertResponseStatusCode(201);
+        $this->assertMatchedRouteName('api/item/post');
 
         $uri = $this->getResponse()->getHeaders()->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
@@ -106,12 +107,19 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         // add to brand
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/add-parent/parent_id/204/item_id/' . $carId, Request::METHOD_POST);
+        $this->dispatch(
+            'https://www.autowp.ru/api/item-parent',
+            Request::METHOD_POST,
+            [
+                'item_id'   => $carId,
+                'parent_id' => 204
+            ]
+        );
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('add-parent');
+        $this->assertMatchedRouteName('api/item-parent/post');
+        $this->assertActionName('post');
 
         // request concept
         $this->reset();
@@ -277,9 +285,16 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     {
         // add to brand
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/add-parent/parent_id/204/item_id/3', Request::METHOD_POST);
+        $this->dispatch(
+            'https://www.autowp.ru/api/item-parent',
+            Request::METHOD_POST,
+            [
+                'item_id'   => 3,
+                'parent_id' => 204
+            ]
+        );
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
 
         $this->reset();
         $this->dispatch('https://www.autowp.ru/bmw/mosts', Request::METHOD_GET);

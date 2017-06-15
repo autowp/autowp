@@ -6,6 +6,9 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\ApiProblemResponse;
+
 use geoPHP;
 use Point;
 
@@ -561,7 +564,16 @@ class ItemController extends AbstractRestfulController
 
         $user = $this->user()->get();
 
-        $data = $this->processBodyContent($this->getRequest());
+        $request = $this->getRequest();
+        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
+            $data = $this->jsonDecode($request->getContent());
+        } else {
+            $data = $request->getPost()->toArray();
+        }
+
+        if (! isset($data['item_type_id'])) {
+            return new ApiProblemResponse(new ApiProblem(400, 'Invalid item_type_id'));
+        }
 
         $itemTypeId = (int)$data['item_type_id'];
 
@@ -595,7 +607,8 @@ class ItemController extends AbstractRestfulController
             'body'               => '',
             'produced_exactly'   => 0,
             'is_concept_inherit' => 1,
-            'spec_inherit'       => 1
+            'spec_inherit'       => 1,
+            'is_concept'         => 0
         ]);
 
         if (array_key_exists('name', $values)) {

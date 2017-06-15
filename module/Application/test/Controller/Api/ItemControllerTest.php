@@ -12,23 +12,24 @@ use Application\Controller\Api\ItemController;
 use Application\Controller\UploadController;
 use Application\Controller\Api\PictureItemController;
 use Application\Controller\Api\PictureController;
+use Application\Controller\Api\ItemParentController;
 
 class ItemControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
 
-    private function createItem($typeId, $params)
+    private function createItem($params)
     {
         $this->reset();
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/' . $typeId, Request::METHOD_POST, $params);
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, $params);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('new');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/post');
+        $this->assertActionName('post');
 
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();
@@ -40,15 +41,17 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     private function createVehicle()
     {
-        return $this->createItem(1, [
-            'name' => 'Some vehicle'
+        return $this->createItem([
+            'item_type_id' => 1,
+            'name'         => 'Some vehicle'
         ]);
     }
 
     private function createEngine()
     {
-        return $this->createItem(2, [
-            'name' => 'Some engine'
+        return $this->createItem([
+            'item_type_id' => 2,
+            'name'         => 'Some engine'
         ]);
     }
 
@@ -100,17 +103,19 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch(
-            'https://www.autowp.ru/moder/cars/add-parent' .
-            '/item_id/' . $itemId.
-            '/parent_id/' . $parentId,
-            Request::METHOD_POST
+            'https://www.autowp.ru/api/item-parent',
+            Request::METHOD_POST,
+            [
+                'item_id'   => $itemId,
+                'parent_id' => $parentId
+            ]
         );
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('add-parent');
+        $this->assertControllerName(ItemParentController::class);
+        $this->assertMatchedRouteName('api/item-parent/post');
+        $this->assertActionName('post');
     }
 
     private function addPictureToItem($vehicleId)

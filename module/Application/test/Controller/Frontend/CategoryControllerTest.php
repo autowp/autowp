@@ -30,29 +30,26 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $catname = 'catname-' . (10000 * microtime(true));
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/3', Request::METHOD_POST, [
-            'name'    => 'Test category',
-            'catname' => $catname,
-            'begin'   => [
-                'year' => 2000
-            ],
-            'end'    => [
-                'year' => 2000
-            ]
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
+            'item_type_id' => 3,
+            'name'         => 'Test category',
+            'catname'      => $catname,
+            'begin_year'   => 2000,
+            'end_year'     => 2000
         ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\Moder\CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('new');
+        $this->assertControllerName(\Application\Controller\Api\ItemController::class);
+        $this->assertMatchedRouteName('api/item/post');
+        $this->assertActionName('post');
 
         $this->assertHasResponseHeader('Location');
 
         $header = $this->getResponse()->getHeaders()->get('Location');
         $path = $header->uri()->getPath();
 
-        $this->assertStringStartsWith('/moder/cars/car/item_id/', $path);
+        $this->assertStringStartsWith('/api/item/', $path);
 
         $path = explode('/', $path);
         $categoryId = (int)array_pop($path);
@@ -63,13 +60,20 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/add-parent/item_id/1/parent_id/' . $categoryId, Request::METHOD_POST);
+        $this->dispatch(
+            'https://www.autowp.ru/api/item-parent',
+            Request::METHOD_POST,
+            [
+                'item_id'   => 1,
+                'parent_id' => $categoryId
+            ]
+        );
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\Moder\CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('add-parent');
+        $this->assertControllerName(\Application\Controller\Api\ItemParentController::class);
+        $this->assertMatchedRouteName('api/item-parent/post');
+        $this->assertActionName('post');
 
         // request category page
         $this->reset();
