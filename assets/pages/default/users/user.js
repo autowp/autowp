@@ -22,6 +22,45 @@ define(
                         }
                     });
                 });
+                
+                $('.btn-delete-user').on('click', function() {
+                    
+                    if (! window.confirm("Are you sure?")) {
+                        return;
+                    }
+                    
+                    var $btn = $(this);
+                    var id = $btn.data('id');
+                    
+                    $.ajax({
+                        url: '/api/user/'+id,
+                        method: 'PUT',
+                        data: {
+                            deleted: true
+                        },
+                        success: function() {
+                            window.location = window.location;
+                        }
+                    });
+                });
+                
+                $('.btn-delete-photo').on('click', function() {
+                    
+                    if (! window.confirm("Are you sure?")) {
+                        return;
+                    }
+                    
+                    var $btn = $(this);
+                    var id = $btn.data('id');
+                    
+                    $.ajax({
+                        url: '/api/user/'+id+'/photo',
+                        method: 'DELETE',
+                        success: function() {
+                            window.location = window.location;
+                        }
+                    });
+                });
             }
         };
     }

@@ -161,25 +161,19 @@
             <h2><?=$this->escapeHtml($this->translate('users/for-moderators'))?></h2>
             <div class="well">
                 <?php if ($this->canRemovePhoto && $this->currentUser->img) { ?>
-                    <form action="<?=$this->escapeHtmlAttr($this->url('moder/users/params', [
-                        'action' => 'remove-user-photo',
-                        'id'     => $this->currentUser->id
-                    ]))?>" method="post">
-                        <button type="submit" class="btn btn-warning btn-block">
+                    <div>
+                        <button class="btn btn-warning btn-block btn-delete-photo" data-id="<?=$this->currentUser->id?>">
                             <?=$this->escapeHtml($this->translate('users/for-moderators/remove-photo'))?>
                         </button>
-                    </form>
+                    </div>
                 <?php } ?>
 
                 <?php if ($this->canDeleteUser) { ?>
-                    <form action="<?=$this->escapeHtmlAttr($this->url('moder/users/params', [
-                        'action' => 'delete-user',
-                        'id'     => $this->currentUser->id
-                    ]))?>" method="post">
-                        <button type="submit" class="btn btn-danger btn-block">
+                    <div>
+                        <button class="btn btn-danger btn-block btn-delete-user" data-id="<?=$this->currentUser->id?>">
                             <?=$this->escapeHtml($this->translate('users/for-moderators/remove-user'))?>
                         </button>
-                    </form>
+                    </div>
                 <?php } ?>
 
                 <p>

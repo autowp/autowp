@@ -50,7 +50,6 @@ return [
             Controller\Api\SpecController::class            => InvokableFactory::class,
             Controller\Api\StatController::class            => InvokableFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
-            Controller\Api\UsersController::class           => InvokableFactory::class,
             Controller\Api\UserController::class            => Controller\Api\Service\UserControllerFactory::class,
             Controller\Api\VehicleTypesController::class    => InvokableFactory::class,
         ]
@@ -1021,6 +1020,14 @@ return [
                 ]
             ]
         ],
+        'api_user_put' => [
+            'deleted' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ]
+        ]
     ],
     'router' => [
         'routes' => [
@@ -1890,23 +1897,50 @@ return [
                                         'action' => 'index'
                                     ]
                                 ]
-                            ]
-                        ]
-                    ],
-                    'users' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/users',
-                            'defaults' => [
-                                'controller' => Controller\Api\UsersController::class
-                            ]
-                        ],
-                        'may_terminate' => true,
-                        'child_routes' => [
+                            ],
                             'user' => [
                                 'type' => Segment::class,
                                 'options' => [
                                     'route' => '/:id'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'item' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'item'
+                                            ]
+                                        ]
+                                    ],
+                                    'put' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'put',
+                                            'defaults' => [
+                                                'action' => 'put'
+                                            ]
+                                        ]
+                                    ],
+                                    'photo' => [
+                                        'type' => Literal::class,
+                                        'options' => [
+                                            'route'    => '/photo',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'delete' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'delete',
+                                                    'defaults' => [
+                                                        'action' => 'delete-photo'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]

@@ -15,7 +15,9 @@ class UserControllerFactory implements FactoryInterface
         $filters = $container->get('InputFilterManager');
         return new Controller(
             $hydrators->get(\Application\Hydrator\Api\UserHydrator::class),
-            $filters->get('api_user_list')
+            $filters->get('api_user_list'),
+            $filters->get('api_user_put'),
+            $container->get(\Application\Service\UsersService::class)
         );
     }
 }

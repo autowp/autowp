@@ -95,23 +95,7 @@ return [
                                 'type' => Router\Http\WildcardSafe::class
                             ]
                         ]
-                    ],
-                    'users' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/users[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\UsersController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
+                    ]
                 ]
             ],
         ]
@@ -123,7 +107,6 @@ return [
             Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
             Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
-            Controller\Moder\UsersController::class        => Controller\Moder\Service\UsersControllerFactory::class,
         ]
     ],
     'forms' => [

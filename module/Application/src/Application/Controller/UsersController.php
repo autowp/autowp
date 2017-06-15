@@ -142,6 +142,7 @@ class UsersController extends AbstractActionController
                 $canBan = $this->user()->isAllowed('user', 'ban');
                 $canDeleteUser = $this->user()->isAllowed('user', 'delete');
             }
+            $canRemovePhoto = $this->user()->isAllowed('user', 'ban');
             $canViewIp = $this->user()->isAllowed('user', 'ip');
         }
 
@@ -171,7 +172,7 @@ class UsersController extends AbstractActionController
             'currentUser'     => $user,
             'ban'             => $ban,
             'canBan'          => $canBan,
-            'canRemovePhoto'  => $canBan,
+            'canRemovePhoto'  => $canRemovePhoto,
             'canViewIp'       => $canViewIp,
             'canDeleteUser'   => $canDeleteUser,
             'accounts'        => $uaRows,
