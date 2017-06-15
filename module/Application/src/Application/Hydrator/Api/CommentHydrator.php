@@ -129,8 +129,6 @@ class CommentHydrator extends RestHydrator
             }
         }
 
-        //var_dump($this->userId); exit;
-
         return [
             'url'     => $this->comments->getMessageRowUrl($object),
             'preview' => $this->comments->getMessagePreview($object['message']),

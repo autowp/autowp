@@ -92,7 +92,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
             'item_type_id' => 1,
             'name'         => 'Test concept car',
-            'is_concept'   => 1
+            'is_concept'   => 1,
+            'is_concept_inherited' => 0
         ]);
 
         $this->assertResponseStatusCode(201);
@@ -103,6 +104,20 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $carId = $parts[count($parts) - 1];
 
         $this->assertNotEmpty($carId);
+
+        // check is_concept
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item/' . $carId, Request::METHOD_GET, [
+            'fields' => 'is_concept'
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertMatchedRouteName('api/item/item/get');
+        $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
+
+        $data = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+        $this->assertTrue($data['is_concept']);
 
         // add to brand
         $this->reset();

@@ -595,9 +595,6 @@ class PictureController extends AbstractRestfulController
                     return $this->notFoundAction();
                 }
 
-                var_dump(123);
-                exit;
-
                 if (! $this->user()->isAllowed('picture', 'move')) {
                     return $this->forbiddenAction();
                 }
