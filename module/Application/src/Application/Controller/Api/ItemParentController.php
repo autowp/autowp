@@ -285,4 +285,41 @@ class ItemParentController extends AbstractRestfulController
 
         return $this->getResponse()->setStatusCode(201);
     }
+
+    /**
+     * @param \Autowp\User\Model\DbTable\User\Row $user
+     * @param bool $full
+     * @param \Zend\Uri\Uri $uri
+     * @return string
+     */
+    private function userModerUrl(\Autowp\User\Model\DbTable\User\Row $user, $full = false, $uri = null)
+    {
+        return $this->url()->fromRoute('users/user', [
+            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+        ], [
+            'force_canonical' => $full,
+            'uri'             => $uri
+        ]);
+    }
+
+    /**
+     * @param DbTable\Item\Row $car
+     * @return string
+     */
+    private function carModerUrl(DbTable\Item\Row $car, $full = false, $tab = null, $uri = null)
+    {
+        $params = [
+            'action'  => 'car',
+            'item_id' => $car->id,
+        ];
+
+        if ($tab) {
+            $params['tab'] = $tab;
+        }
+
+        return $this->url()->fromRoute('moder/cars/params', $params, [
+            'force_canonical' => $full,
+            'uri'             => $uri
+        ]);
+    }
 }
