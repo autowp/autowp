@@ -175,7 +175,13 @@ angular.module(Module)
             setIsConceptOptions();
             
             ctrl.loadVehicleTypes = function(query) {
-                return VehicleTypeService.getTypes();
+                return $q(function(resolve, reject) {
+                    VehicleTypeService.getTypes().then(function(data) {
+                        resolve(toPlain(data, 0));
+                    }, function() {
+                        reject();
+                    });
+                });
             };
 
             $translate('item/type/'+$state.params.item_type_id+'/new-item').then(function(translation) {
@@ -246,7 +252,10 @@ angular.module(Module)
                         });
                         
                         if (ctrl.parent) {
-                            promises.push($http.post('/api/item-parent/' + response.data.id + '/' + ctrl.parent.id));
+                            promises.push($http.post('/api/item-parent', {
+                                parent_id: ctrl.parent.id,
+                                item_id: response.data.id
+                            }));
                         }
                         
                         ctrl.loading++;

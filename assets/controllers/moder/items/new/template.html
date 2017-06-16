@@ -56,15 +56,23 @@
                 add-from-autocomplete-only="true"
                 key-property="id"
                 display-property="name"
-                min-length="0">
+                min-length="0"
+                template="vehicle-type-tag-template">
                 <auto-complete source="ctrl.loadVehicleTypes($query)" 
                      min-length="0"
                      load-on-empty="true"
                      load-on-focus="true"
                      debounce-delay="0"
-                     max-results-to-show="30"></auto-complete>
+                     max-results-to-show="30"
+                     template="vehicle-type-list-template"></auto-complete>
             </tags-input>
         </div>
+        <script type="text/ng-template" id="vehicle-type-tag-template">
+            <div>{{data.name|translate}}</div>
+        </script>
+        <script type="text/ng-template" id="vehicle-type-list-template">
+            <div>{{'...'.repeat(data.deep)}}{{data.name|translate}}</div>
+        </script>
     </div>
     <div class="form-group" ng-class="{'has-error':ctrl.invalidParams.begin_model_year || ctrl.invalidParams.end_model_year}" ng-if="ctrl.item_type_id == 1 || ctrl.item_type_id == 2">
         <label class="col-md-2 control-label" translate>moder/vehicle/model-years</label>
