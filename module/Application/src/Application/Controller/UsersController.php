@@ -136,7 +136,7 @@ class UsersController extends AbstractActionController
                 ->order('date DESC')
         );
 
-        $ban = $canBan = $canViewIp = $canDeleteUser = false;
+        $canRemovePhoto = $ban = $canBan = $canViewIp = $canDeleteUser = false;
         if ($this->user()->logedIn()) {
             if ($this->user()->get()->id != $user->id) {
                 $canBan = $this->user()->isAllowed('user', 'ban');
