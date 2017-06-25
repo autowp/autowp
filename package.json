@@ -79,7 +79,6 @@
     "requirejs": "^2.x",
     "scriptjs": "^2.x",
     "showdown": "^1.6.4",
-    "sprintf": "^0.1.5",
     "sprintf-js": "^1.x",
     "style-loader": "^0.x",
     "svg-inline-loader": "^0.x",
