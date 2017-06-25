@@ -20,8 +20,7 @@ class ItemParentController extends AbstractActionController
 
     public function __construct(
         BrandVehicle $model,
-        array $languages,
-        HostManager $hostManager
+        array $languages
     ) {
         $this->model = $model;
         $this->languages = $languages;
