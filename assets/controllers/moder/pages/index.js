@@ -26,8 +26,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$mdDialog', ACL_SERVICE_NAME,
-        function($scope, $http, $mdDialog, Acl) {
+        '$scope', '$http', ACL_SERVICE_NAME,
+        function($scope, $http, Acl) {
             $scope.pageEnv({
                 layout: {
                     isAdminPage: true,
