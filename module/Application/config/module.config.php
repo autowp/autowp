@@ -50,8 +50,9 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
-            'forbiddenAction' => Controller\Plugin\ForbiddenAction::class,
-            'inputFilterResponse' => Controller\Api\Plugin\InputFilterResponse::class
+            'forbiddenAction'     => Controller\Plugin\ForbiddenAction::class,
+            'inputFilterResponse' => Controller\Api\Plugin\InputFilterResponse::class,
+            'inputResponse'       => Controller\Api\Plugin\InputResponse::class
         ],
         'factories' => [
             'car'         => Controller\Plugin\Service\CarFactory::class,
@@ -97,6 +98,7 @@ return [
         'factories' => [
             Acl::class                           => Permissions\AclFactory::class,
             Comments::class                      => Service\CommentsFactory::class,
+            Db\TableManager::class               => Db\TableManagerFactory::class,
             DuplicateFinder::class               => Service\DuplicateFinderFactory::class,
             ExternalLoginServiceFactory::class   => Service\ExternalLoginServiceFactory::class,
             FileSize::class                      => InvokableFactory::class,

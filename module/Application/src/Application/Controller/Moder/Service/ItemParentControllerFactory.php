@@ -14,8 +14,7 @@ class ItemParentControllerFactory implements FactoryInterface
         $config = $container->get('Config');
         return new Controller(
             $container->get(\Application\Model\BrandVehicle::class),
-            $config['content_languages'],
-            $container->get(\Application\HostManager::class)
+            $config['content_languages']
         );
     }
 }

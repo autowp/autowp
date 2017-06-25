@@ -44,12 +44,19 @@ angular.module(Module)
             
             var ctrl = this;
             
+            ctrl.item = {
+                produced_exactly: '0',
+                is_concept: 'inherited',
+                spec_id: 'inherited',
+                item_type_id: parseInt($state.params.item_type_id)
+            };
+            
             ctrl.loading = 0;
-            ctrl.item_type_id = parseInt($state.params.item_type_id);
+            
             ctrl.parent = null;
             ctrl.parentSpec = null;
             
-            if ([1, 2, 3, 4, 5, 6, 7].indexOf(ctrl.item_type_id) == -1) {
+            if ([1, 2, 3, 4, 5, 6, 7].indexOf(ctrl.item.item_type_id) == -1) {
                 $state.go('error-404');
                 return;
             }
@@ -64,7 +71,6 @@ angular.module(Module)
                     }
                 }).then(function(response) {
                     ctrl.parent = response.data;
-                    setIsConceptOptions();
                     
                     if (ctrl.parent.spec_id) {
                         SpecService.getSpec(ctrl.parent.spec_id).then(function(spec) {
@@ -76,113 +82,6 @@ angular.module(Module)
                     ctrl.loading--;
                 });
             }
-            
-            ctrl.center = {
-                lat: 55.7423627,
-                lng: 37.6786422,
-                zoom: 8
-            };
-            ctrl.markers = {
-                point: {
-                    lat: 0,
-                    lng: 0,
-                    focus: true
-                }
-            };
-            
-            ctrl.tiles = {
-                url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                options: {
-                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }
-            };
-            
-            ctrl.coordsChanged = function() {
-                var lat = parseFloat(ctrl.item.lat);
-                var lng = parseFloat(ctrl.item.lng);
-                ctrl.markers.point.lat = isNaN(lat) ? 0 : lat;
-                ctrl.markers.point.lng = isNaN(lng) ? 0 : lng;
-                ctrl.center.lat = isNaN(lat) ? 0 : lat;
-                ctrl.center.lng = isNaN(lng) ? 0 : lng;
-            };
-
-
-            $scope.$on('leafletDirectiveMap.click', function(event, e) {
-                var latLng = e.leafletEvent.latlng;
-                ctrl.markers.point = {
-                    lat: latLng.lat,
-                    lng: latLng.lng,
-                    focus: true
-                };
-                ctrl.item.lat = latLng.lat;
-                ctrl.item.lng = latLng.lng;
-            });
-            
-            ctrl.invalidParams = {};
-            
-            ctrl.item = {
-                produced_exactly: '0',
-                is_concept: 'inherited',
-                spec_id: 'inherited'
-            };
-            
-            ctrl.name_maxlength = 100; // DbTable\Item::MAX_NAME
-            ctrl.full_name_maxlength = 255; // BrandModel::MAX_FULLNAME
-            ctrl.body_maxlength = 20;
-            ctrl.model_year_max = parseInt(new Date().getFullYear()) + 10;
-            ctrl.year_max = parseInt(new Date().getFullYear()) + 10;
-            
-            ctrl.specOptions = [];
-            ctrl.monthOptions = [];
-            
-            var date = new Date("01/01/2000");
-            for (var i=0; i<12; i++) {
-                date.setMonth(i);
-                
-                var month = date.toLocaleString({}, { month: "long" });
-                ctrl.monthOptions.push({
-                    value: i+1,
-                    name: sprintf("%02d - %s", i+1, month)
-                });
-            }
-            
-            function setIsConceptOptions() {
-                ctrl.isConceptOptions = [
-                    {
-                        value: 0,
-                        name: 'moder/vehicle/is-concept/no',
-                    },
-                    {
-                        value: 1,
-                        name: 'moder/vehicle/is-concept/yes',
-                    }
-                ];
-                if (ctrl.parent) {
-                    ctrl.isConceptOptions = [{
-                        value: 'inherited',
-                        name: ctrl.parent.is_concept ? 
-                            'moder/vehicle/is-concept/inherited-yes': 
-                            'moder/vehicle/is-concept/inherited-no'
-                    }].concat(ctrl.isConceptOptions);
-                } else {
-                    ctrl.isConceptOptions = [{
-                        value: 'inherited',
-                        name: 'moder/vehicle/is-concept/inherited'
-                    }].concat(ctrl.isConceptOptions);
-                }
-            }
-            
-            setIsConceptOptions();
-            
-            ctrl.loadVehicleTypes = function(query) {
-                return $q(function(resolve, reject) {
-                    VehicleTypeService.getTypes().then(function(data) {
-                        resolve(toPlain(data, 0));
-                    }, function() {
-                        reject();
-                    });
-                });
-            };
 
             $translate('item/type/'+$state.params.item_type_id+'/new-item').then(function(translation) {
                 $scope.pageEnv({
@@ -198,12 +97,6 @@ angular.module(Module)
                 });
             });
             
-            ctrl.loading++;
-            SpecService.getSpecs().then(function(types) {
-                ctrl.loading--;
-                ctrl.specOptions = toPlain(types, 0);
-            });
-            
             ctrl.submit = function() {
                 ctrl.loading++;
                 
@@ -213,8 +106,7 @@ angular.module(Module)
                     full_name: ctrl.item.full_name,
                     catname: ctrl.item.catname,
                     body: ctrl.item.body,
-                    spec_id: ctrl.item.spec_id == 'inherited' ? null : ctrl.item.spec_id,
-                    spec_inherited: ctrl.item.spec_id == 'inherited' ? 1 : 0,
+                    spec_id: ctrl.item.spec_id,
                     begin_model_year: ctrl.item.begin_model_year,
                     end_model_year: ctrl.item.end_model_year,
                     begin_year: ctrl.item.begin_year,
@@ -222,10 +114,9 @@ angular.module(Module)
                     end_year: ctrl.item.end_year,
                     end_month: ctrl.item.end_month,
                     today: ctrl.item.today,
-                    produced_count: ctrl.item.produced_count,
+                    produced: ctrl.item.produced,
                     produced_exactly: ctrl.item.produced_exactly,
-                    is_concept: ctrl.item.is_concept == 'inherited' ? null : ctrl.item.is_concept,
-                    is_concept_inherited: ctrl.item.is_concept == 'inherited' ? 1 : 0,
+                    is_concept: ctrl.item.is_concept,
                     is_group: ctrl.item.is_group,
                     lat: ctrl.item.lat,
                     lng: ctrl.item.lng
@@ -247,7 +138,7 @@ angular.module(Module)
                         
                         var promises = [];
                         
-                        angular.forEach(ctrl.item_vehicle_type, function(vehicle_type) {
+                        angular.forEach(ctrl.item.vehicle_type, function(vehicle_type) {
                             promises.push($http.post('/api/item-vehicle-type/' + response.data.id + '/' + vehicle_type.id));
                         });
                         
@@ -260,7 +151,9 @@ angular.module(Module)
                         
                         ctrl.loading++;
                         $q.all(promises).then(function(results) {
-                            window.location = '/moder/cars/car/item_id/' + response.data.id;
+                            $state.go('moder-items-item', {
+                                id: response.data.id
+                            });
                             ctrl.loading--;
                         });
                         

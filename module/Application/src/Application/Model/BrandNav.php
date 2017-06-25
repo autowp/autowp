@@ -325,8 +325,8 @@ class BrandNav
 
     private function carSectionGroups($language, array $brand, array $section, $conceptsSeparatly, $carId)
     {
-        $itemParentLangaugeTable = new DbTable\Item\ParentLanguage();
-        $db = $itemParentLangaugeTable->getAdapter();
+        $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
+        $db = $itemParentLanguageTable->getAdapter();
 
         $rows = [];
         if ($section['car_type_id']) {
@@ -378,7 +378,7 @@ class BrandNav
                 'car_catname'   => $brandItemRow['brand_item_catname']
             ]);
 
-            $bvlRow = $itemParentLangaugeTable->fetchRow([
+            $bvlRow = $itemParentLanguageTable->fetchRow([
                 'item_id = ?'   => $brandItemRow['item_id'],
                 'parent_id = ?' => $brandItemRow['brand_id'],
                 'length(name) > 0'

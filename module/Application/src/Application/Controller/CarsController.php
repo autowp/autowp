@@ -52,15 +52,14 @@ class CarsController extends AbstractActionController
         $this->message = $message;
     }
 
-    private function carModerUrl(DbTable\Item\Row $car, $uri = null)
+    private function carModerUrl(DbTable\Item\Row $item, $uri = null)
     {
-        return $this->url()->fromRoute('moder/cars/params', [
-            'action'  => 'car',
-            'item_id' => $car->id,
-        ], [
+        $url = 'moder/items/item/' . $item['id'];
+
+        return $this->url()->fromRoute('ng', ['path' => ''], [
             'force_canonical' => true,
             'uri'             => $uri
-        ]);
+        ]) . $url;
     }
 
     private function editorUrl($car, $tab = null)
@@ -156,10 +155,7 @@ class CarsController extends AbstractActionController
             foreach ($carRows as $carRow) {
                 $engineInheritedFrom[] = [
                     'name' => $this->car()->formatName($carRow, $this->language()),
-                    'url'  => $this->url()->fromRoute('moder/cars/params', [
-                        'action'  => 'car',
-                        'item_id' => $carRow->id
-                    ])
+                    'url'  => '/ng/moder/items/item/' . $carRow->id
                 ];
             }
         }
@@ -472,10 +468,7 @@ class CarsController extends AbstractActionController
                 ]);
 
                 if ($isModerator) {
-                    $moderUrl = $this->url()->fromRoute('moder/cars/params', [
-                        'action'  => 'car',
-                        'item_id' => $car->id
-                    ]);
+                    $moderUrl = '/ng/moder/items/item/' . $car->id;
                 }
             }
 

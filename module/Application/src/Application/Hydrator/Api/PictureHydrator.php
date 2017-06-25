@@ -12,10 +12,6 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Comments;
 use Application\DuplicateFinder;
-use Application\Hydrator\Api\Strategy\Image as HydratorImageStrategy;
-use Application\Hydrator\Api\Strategy\PictureItems as HydratorPictureItemsStrategy;
-use Application\Hydrator\Api\Strategy\Similar as HydratorSimilarStrategy;
-use Application\Hydrator\Api\Strategy\User as HydratorUserStrategy;
 use Application\Model\DbTable;
 use Application\Model\PictureItem;
 use Application\Model\PictureVote;
@@ -101,10 +97,10 @@ class PictureHydrator extends RestHydrator
         $this->imageStorage = $serviceManager->get(Image\Storage::class);
         $this->textStorage = $serviceManager->get(\Autowp\TextStorage\Service::class);
 
-        $strategy = new HydratorImageStrategy($serviceManager);
+        $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('picture-thumb', $strategy);
 
-        $strategy = new HydratorUserStrategy($serviceManager);
+        $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('owner', $strategy);
         $this->addStrategy('change_status_user', $strategy);
         $this->addStrategy('moder_vote_user', $strategy);
@@ -112,10 +108,10 @@ class PictureHydrator extends RestHydrator
         $strategy = new DateTimeFormatterStrategy();
         $this->addStrategy('add_date', $strategy);
 
-        $strategy = new HydratorPictureItemsStrategy($serviceManager);
+        $strategy = new Strategy\PictureItems($serviceManager);
         $this->addStrategy('items', $strategy);
 
-        $strategy = new HydratorSimilarStrategy($serviceManager);
+        $strategy = new Strategy\Similar($serviceManager);
         $this->addStrategy('similar', $strategy);
 
         $strategy = new Strategy\Picture($serviceManager);

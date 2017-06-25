@@ -426,10 +426,7 @@ class Car extends AbstractPlugin
             }
 
             if ($isCarModer) {
-                $item['moderUrl'] = $controller->url()->fromRoute('moder/cars/params', [
-                    'action'  => 'car',
-                    'item_id' => $car->id
-                ]);
+                $item['moderUrl'] = '/ng/moder/items/item/' . $car['id'];
             }
 
             if ($listBuilder->isTypeUrlEnabled()) {

@@ -6,6 +6,7 @@ use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 use Application\Controller\Api\ItemController as Controller;
+use Application\Hydrator\Api\Strategy\Image;
 
 class ItemControllerFactory implements FactoryInterface
 {
@@ -15,10 +16,14 @@ class ItemControllerFactory implements FactoryInterface
         $filters = $container->get('InputFilterManager');
         return new Controller(
             $hydrators->get(\Application\Hydrator\Api\ItemHydrator::class),
+            new Image($container),
             $container->get(\Application\ItemNameFormatter::class),
             $filters->get('api_item_list'),
             $filters->get('api_item_item'),
-            $container->get(\Application\Service\SpecificationsService::class)
+            $container->get(\Application\Service\SpecificationsService::class),
+            $container->get(\Application\Model\BrandVehicle::class),
+            $container->get(\Application\HostManager::class),
+            $container->get(\Autowp\Message\MessageService::class)
         );
     }
 }

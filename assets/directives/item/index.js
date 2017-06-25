@@ -2,6 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import './styles.less';
+import ACL_SERVICE_NAME from 'services/acl';
 
 angular.module(Module)
     .directive('autowpItem', function() {
@@ -16,8 +17,8 @@ angular.module(Module)
             template: template,
             transclude: true,
             controllerAs: 'ctrl',
-            controller: [
-                function() {
+            controller: [ACL_SERVICE_NAME, 
+                function(Acl) {
                     var ctrl = this;
                     
                     ctrl.havePhoto = function(item) {
@@ -49,6 +50,13 @@ angular.module(Module)
                         
                         return classes;
                     };
+                    
+                    ctrl.is_moder = false;
+                    Acl.inheritsRole('moder').then(function() {
+                        ctrl.is_moder = true;
+                    }, function() {
+                        ctrl.is_moder = false;
+                    });
                 }
             ]
         };

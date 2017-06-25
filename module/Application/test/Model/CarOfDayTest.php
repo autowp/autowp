@@ -6,7 +6,6 @@ use Zend\Form\Form;
 use Application\Test\AbstractHttpControllerTestCase;
 
 use Application\Model\CarOfDay;
-use Application\Model\DbTable\Item\Row;
 
 class CarOfDayTest extends AbstractHttpControllerTestCase
 {

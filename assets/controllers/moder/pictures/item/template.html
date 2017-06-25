@@ -61,7 +61,7 @@
         <tbody>
             <tr ng-repeat="item in picture.items">
                 <td>
-                    <a ng-href="{{item.item.moder_url}}" ng-bind-html="item.item.name_html"></a>
+                    <a ui-sref="moder-items-item({id: item.item_id})" ng-bind-html="item.item.name_html"></a>
                 </td>
                 <td>
                     <select class="form-control" ng-model="item.perspective_id" ng-change="savePerspective(item)" style="max-width:10em">
@@ -161,9 +161,11 @@
 
         <h3 translate>moder/picture/copyrights</h3>
         <div class="well">
-            <autowp-markdown-edit save="saveCopyrights" text="picture.copyrights"></autowp-markdown-edit>
+            <div btf-markdown="'moder/markdown/description'|translate"></div>
+            <autowp-markdown-edit text="picture.copyrights"></autowp-markdown-edit>
+            <button class="btn btn-primary" ng-click="saveCopyrights()" translate>submit</button>
             <p ng-if="picture.copyrights_text_id">
-                <a ng-href="/info/text/id/{{picture.copyrights_text_id}}">History</a>
+                <a ng-href="/info/text/id/{{picture.copyrights_text_id}}" translate>moder/markdown/history</a>
             </p>
             
             <div class="progress" ng-show="copyrightsLoading">
@@ -256,7 +258,7 @@
             </div>
         </div>
 
-        <h3 translate>moder/picture/edit-and-repair</h3>
+        <h3 translate ng-if="picture.rights.normalize || picture.rights.flop || picture.rights.crop">moder/picture/edit-and-repair</h3>
         <div class="well" ng-if="picture.rights.normalize || picture.rights.flop || picture.rights.crop">
             <div>
                 <button class="btn btn-warning" ng-click="normalizePicture()" ng-if="picture.rights.normalize" ng-disabled="repairLoading">

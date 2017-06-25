@@ -352,10 +352,7 @@ class TwinsController extends AbstractActionController
                 'picturesUrl'   => $this->url()->fromRoute('twins/group/pictures', [
                     'id' => $group->id,
                 ]),
-                'moderUrl'      => $this->url()->fromRoute('moder/cars/params', [
-                    'action'  => 'car',
-                    'item_id' => $group->id
-                ])
+                'moderUrl'      => '/ng/moder/items/item/' . $group->id
             ];
         }
 

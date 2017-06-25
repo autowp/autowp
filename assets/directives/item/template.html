@@ -84,9 +84,9 @@
             <a ng-href="{{category.url}}" ng-bind-html="category.name_html"></a>
         </li>
 
-        <li ng-if="item.moder_url">
+        <li ng-if="ctrl.is_moder">
             <i class="fa fa-cog"></i>
-            <a ng-href="{{item.moder_url}}" translate>moder/edit-object</a>
+            <a ui-sref="moder-items-item({id: item.id})" translate>moder/edit-object</a>
         </li>
 
         <li ng-if="item.spec_editor_url">

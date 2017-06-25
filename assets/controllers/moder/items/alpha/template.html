@@ -14,7 +14,7 @@
             <i class="fa fa-spinner fa-spin fa-fw"></i>
         </span>
         <div ng-repeat="item in items">
-            <a ng-href="{{item.moder_url}}" ng-bind-html="item.name_html"></a>
+            <a ui-sref="moder-items-item({item.id})" ng-bind-html="item.name_html"></a>
         </div>
         <autowp-paginator data="paginator" ng-if="paginator"></autowp-paginator>
     </div>

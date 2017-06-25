@@ -61,7 +61,7 @@ angular.module(Module)
                         name: char + '%',
                         page: $scope.page,
                         limit: 500,
-                        fields: 'moder_url,name_html'
+                        fields: 'name_html'
                     }
                 }).then(function(response) {
                     $scope.paginator = response.data.paginator;

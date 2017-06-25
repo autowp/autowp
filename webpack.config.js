@@ -18,6 +18,7 @@ module.exports = {
             'assets',
             'node_modules'
         ],
+        extensions: ['.ts', '.tsx', '.js'],
         alias: {
             requireLib: 'require',
             chart: require.resolve('chart.js'),
@@ -26,7 +27,11 @@ module.exports = {
     },
     module: {
         rules: [
-        	{ test: /ui-leaflet/, use: {
+            {
+                test: /\.tsx?$/,
+                loader: 'awesome-typescript-loader'
+            },
+            { test: /ui-leaflet/, use: {
                 loader: 'imports-loader',
                 options: {'L': 'leaflet'}
             }}, {

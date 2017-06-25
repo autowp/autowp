@@ -16,6 +16,9 @@ return [
             Hydrator\Api\CommentHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\IpHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemLanguageHydrator::class     => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemLinkHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemParentHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\LogHydrator::class              => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectiveHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
@@ -33,9 +36,12 @@ return [
             Controller\Api\AclController::class             => Controller\Api\Service\AclControllerFactory::class,
             Controller\Api\CommentController::class         => Controller\Api\Service\CommentControllerFactory::class,
             Controller\Api\ContactsController::class        => InvokableFactory::class,
+            Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
             Controller\Api\HotlinksController::class        => InvokableFactory::class,
             Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class            => Controller\Api\Service\ItemControllerFactory::class,
+            Controller\Api\ItemLanguageController::class    => Controller\Api\ItemLanguageControllerFactory::class,
+            Controller\Api\ItemLinkController::class        => Controller\Api\ItemLinkControllerFactory::class,
             Controller\Api\ItemParentController::class      => Controller\Api\Service\ItemParentControllerFactory::class,
             Controller\Api\ItemVehicleTypeController::class => Controller\Api\Service\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LogController::class             => Controller\Api\Service\LogControllerFactory::class,
@@ -226,11 +232,12 @@ return [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => ['childs_count', 'name_html',
                             'name_text', 'name_default', 'description',
-                            'has_text', 'brands', 'moder_url', 'upload_url',
+                            'has_text', 'brands', 'upload_url',
                             'spec_editor_url', 'specs_url', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
                             'preview_pictures', 'design', 'engine_vehicles',
-                            'catname', 'is_concept', 'spec_id', 'begin_year', 'end_year']]
+                            'catname', 'is_concept', 'spec_id', 'begin_year',
+                            'end_year', 'body']]
                     ]
                 ]
             ],
@@ -291,7 +298,25 @@ return [
                 'validators' => [
                     ['name' => 'Digits']
                 ]
-            ]
+            ],
+            'suggestions_to' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'engine_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
         ],
         'api_item_item' => [
             'fields' => [
@@ -301,11 +326,124 @@ return [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => ['childs_count', 'name_html',
                             'name_text', 'name_default', 'description',
-                            'has_text', 'brands', 'moder_url', 'upload_url',
+                            'has_text', 'brands', 'upload_url',
                             'spec_editor_url', 'specs_url', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
                             'preview_pictures', 'design', 'engine_vehicles',
-                            'catname', 'is_concept', 'spec_id', 'begin_year', 'end_year']]
+                            'catname', 'is_concept', 'spec_id', 'begin_year',
+                            'end_year', 'body']]
+                    ]
+                ]
+            ],
+        ],
+        'api_item_link_index' => [
+            'item_id' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+        ],
+        'api_item_link_post' => [
+            'item_id' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'name' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => 255
+                        ]
+                    ]
+                ]
+            ],
+            'url' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => 255
+                        ]
+                    ]
+                ]
+            ],
+            'type_id' => [
+                'required'   => true,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'default',
+                                'official',
+                                'club'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+        ],
+        'api_item_link_put' => [
+            'name' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => 255
+                        ]
+                    ]
+                ]
+            ],
+            'url' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => 255
+                        ]
+                    ]
+                ]
+            ],
+            'type_id' => [
+                'required'   => false,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'default',
+                                'official',
+                                'club'
+                            ]
+                        ]
                     ]
                 ]
             ],
@@ -327,6 +465,15 @@ return [
                 ],
             ],
             'item_type_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'item_id' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
@@ -428,6 +575,51 @@ return [
                 ],
                 'validators' => [
                     ['name' => 'Digits']
+                ]
+            ],
+        ],
+        'api_item_language_put' => [
+            'name' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => 255
+                        ]
+                    ]
+                ]
+            ],
+            'text' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => 4096
+                        ]
+                    ]
+                ]
+            ],
+            'full_text' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => 65536
+                        ]
+                    ]
                 ]
             ],
         ],
@@ -1213,6 +1405,27 @@ return [
                             ],
                         ],
                     ],
+                    'content-language' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/content-language',
+                            'defaults' => [
+                                'controller' => Controller\Api\ContentLanguageController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'index' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
+                            ],
+                        ]
+                    ],
                     'hotlinks' => [
                         'type' => Literal::class,
                         'options' => [
@@ -1386,6 +1599,180 @@ return [
                                             ]
                                         ]
                                     ],
+                                    'put' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'put',
+                                            'defaults' => [
+                                                'action' => 'put'
+                                            ]
+                                        ]
+                                    ],
+                                    'logo' => [
+                                        'type' => Literal::class,
+                                        'options' => [
+                                            'route' => '/logo',
+                                            'defaults' => [
+                                                'action' => 'logo'
+                                            ]
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'get' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'get-logo'
+                                                    ]
+                                                ]
+                                            ],
+                                            'put' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'put',
+                                                    'defaults' => [
+                                                        'action' => 'put-logo'
+                                                    ]
+                                                ]
+                                            ],
+                                        ]
+                                    ],
+                                    'language' => [
+                                        'type' => Literal::class,
+                                        'options' => [
+                                            'route' => '/language',
+                                            'defaults' => [
+                                                'controller' => Controller\Api\ItemLanguageController::class
+                                            ]
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'index' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'index'
+                                                    ]
+                                                ]
+                                            ],
+                                            'item' => [
+                                                'type' => Segment::class,
+                                                'options' => [
+                                                    'route' => '/:language'
+                                                ],
+                                                'may_terminate' => false,
+                                                'child_routes' => [
+                                                    'get' => [
+                                                        'type' => Method::class,
+                                                        'options' => [
+                                                            'verb' => 'get',
+                                                            'defaults' => [
+                                                                'action' => 'get'
+                                                            ]
+                                                        ]
+                                                    ],
+                                                    'put' => [
+                                                        'type' => Method::class,
+                                                        'options' => [
+                                                            'verb' => 'put',
+                                                            'defaults' => [
+                                                                'action' => 'put'
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ],
+                                    'tree' => [
+                                        'type' => Literal::class,
+                                        'options' => [
+                                            'route' => '/tree',
+                                            'defaults' => [
+                                                'action' => 'tree'
+                                            ]
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'get' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'tree'
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ]
+                        ]
+                    ],
+                    'item-link' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/item-link',
+                            'defaults' => [
+                                'controller' => Controller\Api\ItemLinkController::class
+                            ]
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'index' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
+                            ],
+                            'post' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'post',
+                                    'defaults' => [
+                                        'action' => 'post'
+                                    ]
+                                ]
+                            ],
+                            'item' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/:id'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'get'
+                                            ]
+                                        ]
+                                    ],
+                                    'put' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'put',
+                                            'defaults' => [
+                                                'action' => 'put'
+                                            ]
+                                        ]
+                                    ],
+                                    'delete' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'delete',
+                                            'defaults' => [
+                                                'action' => 'delete'
+                                            ]
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]
@@ -1424,6 +1811,15 @@ return [
                                                 'action' => 'item'
                                             ]
                                         ]
+                                    ],
+                                    'delete' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'delete',
+                                            'defaults' => [
+                                                'action' => 'delete'
+                                            ]
+                                        ]
                                     ]
                                 ]
                             ],
@@ -1439,42 +1835,63 @@ return [
                         ]
                     ],
                     'item-vehicle-type' => [
-                        'type' => Segment::class,
+                        'type' => Literal::class,
                         'options' => [
-                            'route' => '/item-vehicle-type/:item_id/:vehicle_type_id',
+                            'route' => '/item-vehicle-type',
                             'defaults' => [
                                 'controller' => Controller\Api\ItemVehicleTypeController::class,
                             ],
                         ],
                         'may_terminate' => false,
                         'child_routes' => [
-                            'item' => [
+                            'index' => [
                                 'type' => Method::class,
                                 'options' => [
                                     'verb'     => 'get',
                                     'defaults' => [
-                                        'action' => 'item'
+                                        'action' => 'index'
                                     ]
                                 ]
                             ],
-                            'create' => [
-                                'type' => Method::class,
+                            'item' => [
+                                'type' => Segment::class,
                                 'options' => [
-                                    'verb'     => 'post',
+                                    'route' => '/:item_id/:vehicle_type_id',
                                     'defaults' => [
-                                        'action' => 'create'
-                                    ]
+                                        'controller' => Controller\Api\ItemVehicleTypeController::class,
+                                    ],
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'get',
+                                            'defaults' => [
+                                                'action' => 'item'
+                                            ]
+                                        ]
+                                    ],
+                                    'post' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'post',
+                                            'defaults' => [
+                                                'action' => 'create'
+                                            ]
+                                        ]
+                                    ],
+                                    'delete' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'delete',
+                                            'defaults' => [
+                                                'action' => 'delete'
+                                            ]
+                                        ]
+                                    ],
                                 ]
-                            ],
-                            'delete' => [
-                                'type' => Method::class,
-                                'options' => [
-                                    'verb'     => 'delete',
-                                    'defaults' => [
-                                        'action' => 'delete'
-                                    ]
-                                ]
-                            ],
+                            ]
                         ]
                     ],
                     'log' => [

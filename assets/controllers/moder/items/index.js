@@ -10,6 +10,7 @@ import ACL_SERVICE_NAME from 'services/acl';
 import "corejs-typeahead";
 import $ from 'jquery';
 import "./new";
+import "./item";
 
 const CONTROLLER_NAME = 'ModerItemsController';
 const STATE_NAME = 'moder-items';
@@ -157,7 +158,7 @@ angular.module(Module)
                         fields: [
                             'name_html,name_default,description,has_text,produced',
                             'design,engine_vehicles',
-                            'url,moder_url,spec_editor_url,specs_url,upload_url,more_pictures_url',
+                            'url,spec_editor_url,specs_url,upload_url,more_pictures_url',
                             'categories.url,categories.name_html,twins_groups.url',
                             'preview_pictures,childs_count,total_pictures'
                         ].join(','),

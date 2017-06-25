@@ -1346,7 +1346,7 @@ class SpecificationsService
 
         $carTypeTable = new DbTable\Vehicle\Type();
         $attributeTable = $this->getAttributeTable();
-        $itemParentLangaugeTable = new DbTable\Item\ParentLanguage();
+        $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
 
         $ids = [];
         foreach ($cars as $car) {
@@ -1423,13 +1423,13 @@ class SpecificationsService
 
             $itemParentName = null;
             if ($contextCarId) {
-                $db = $itemParentLangaugeTable->getAdapter();
+                $db = $itemParentLanguageTable->getAdapter();
 
                 $langSortExpr = new Zend_Db_Expr(
                     $db->quoteInto('language = ? desc', $language)
                 );
 
-                $itemParentLangRow = $itemParentLangaugeTable->fetchRow([
+                $itemParentLangRow = $itemParentLanguageTable->fetchRow([
                     'item_id = ?'   => $car->id,
                     'parent_id = ?' => $contextCarId,
                     'length(name) > 0'

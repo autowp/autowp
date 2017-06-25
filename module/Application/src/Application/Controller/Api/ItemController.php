@@ -3,6 +3,7 @@
 namespace Application\Controller\Api;
 
 use Zend\InputFilter\InputFilter;
+use Zend\Hydrator\Strategy\StrategyInterface;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
@@ -13,22 +14,27 @@ use geoPHP;
 use Point;
 
 use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
+use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
+use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
+use Application\Hydrator\Api\Strategy\Image;
 use Application\ItemNameFormatter;
 use Application\Model\Brand as BrandModel;
+use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
 
+
 class ItemController extends AbstractRestfulController
 {
     /**
-     * @var User
+     * @var DbTable\Item
      */
     private $table;
 
@@ -36,6 +42,11 @@ class ItemController extends AbstractRestfulController
      * @var RestHydrator
      */
     private $hydrator;
+
+    /**
+     * @var StrategyInterface
+     */
+    private $logoHydrator;
 
     /**
      * @var ItemNameFormatter
@@ -57,20 +68,44 @@ class ItemController extends AbstractRestfulController
      */
     private $specificationsService;
 
+    /**
+     * @var DbTable\Item\ParentTable
+     */
+    private $itemParentTable;
+
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
+
+    /**
+     * @var MessageService
+     */
+    private $message;
+
     public function __construct(
         RestHydrator $hydrator,
+        Image $logoHydrator,
         ItemNameFormatter $itemNameFormatter,
         InputFilter $listInputFilter,
         InputFilter $itemInputFilter,
-        SpecificationsService $specificationsService
+        SpecificationsService $specificationsService,
+        BrandVehicle $brandVehicle,
+        HostManager $hostManager,
+        MessageService $message
     ) {
         $this->hydrator = $hydrator;
+        $this->logoHydrator = $logoHydrator;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->listInputFilter = $listInputFilter;
         $this->itemInputFilter = $itemInputFilter;
         $this->specificationsService = $specificationsService;
+        $this->brandVehicle = $brandVehicle;
+        $this->hostManager = $hostManager;
+        $this->message = $message;
 
         $this->table = new DbTable\Item();
+        $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     public function indexAction()
@@ -220,6 +255,30 @@ class ItemController extends AbstractRestfulController
                 ->where('textstorage_text.text like ?', '%' . $data['text'] . '%');
         }
 
+        if ($data['suggestions_to']) {
+            $db = $this->table->getAdapter();
+
+            $select
+                ->join(['ils' => 'item_language'], 'item.id = ils.item_id', [])
+                ->join(['ils2' => 'item_language'], 'INSTR(ils.name, ils2.name)', [])
+                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->where('ils2.item_id = ?', $data['suggestions_to'])
+                ->where(
+                    'item.id NOT IN (?)',
+                    $db->select()
+                        ->from('item', ['id'])
+                        ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                        ->where('item_parent_cache.item_id = ?', $data['suggestions_to'])
+                );
+
+            $group = true;
+        }
+
+        if ($data['engine_id']) {
+            $select->where('item.engine_item_id = ?', (int)$data['engine_id']);
+        }
+
         if ($group) {
             $select->group('item.id');
         }
@@ -326,9 +385,10 @@ class ItemController extends AbstractRestfulController
 
     /**
      * @param int $itemTypeId
+     * @param bool $post
      * @return \Zend\InputFilter\InputFilterInterface
      */
-    private function getPostInputFilter($itemTypeId)
+    private function getInputFilter($itemTypeId, $post, $itemId)
     {
         $specTable = new DbTable\Spec();
         $db = $specTable->getAdapter();
@@ -336,10 +396,11 @@ class ItemController extends AbstractRestfulController
             $db->select()
                 ->from($specTable->info('name'), 'id')
         );
+        $specOptions[] = 'inherited';
 
         $spec = [
             'name' => [
-                'required' => true,
+                'required' => $post,
                 'filters' => [
                     ['name' => 'StringTrim'],
                     ['name' => SingleSpaces::class]
@@ -370,7 +431,7 @@ class ItemController extends AbstractRestfulController
                 ]
             ],
             'catname' => [
-                'required' => true,
+                'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
                     ['name' => SingleSpaces::class],
@@ -387,7 +448,7 @@ class ItemController extends AbstractRestfulController
                     [
                         'name'    => \Application\Validator\Item\CatnameNotExists::class,
                         'options' => [
-                            'exclude' => null
+                            'exclude' => $itemId
                         ]
                     ]
                 ]
@@ -418,9 +479,6 @@ class ItemController extends AbstractRestfulController
                         ]
                     ]
                 ]
-            ],
-            'spec_inherited' => [
-                'required' => false
             ],
             'begin_model_year' => [
                 'required' => false,
@@ -477,30 +535,17 @@ class ItemController extends AbstractRestfulController
                 ]
             ],
             'today' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => ['', '0', '1']
-                        ]
-                    ]
-                ]
+                'required'    => false,
+                'allow_empty' => true
             ],
             'is_concept' => [
-                'required' => false
-            ],
-            'is_concept_inherited' => [
-                'required' => false
+                'required'    => false,
+                'allow_empty' => true
             ],
             'is_group' => [
-                'required' => false
+                'required'    => false,
+                'allow_empty' => true
             ],
-
             'lat' => [
                 'required' => false,
                 'filters' => [
@@ -513,7 +558,7 @@ class ItemController extends AbstractRestfulController
                     ['name' => 'StringTrim']
                 ]
             ],
-            'produced_count' => [
+            'produced' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
@@ -523,7 +568,12 @@ class ItemController extends AbstractRestfulController
                 ]
             ],
             'produced_exactly' => [
-                'required' => false
+                'required'    => false,
+                'allow_empty' => true
+            ],
+            'subscription' => [
+                'required'    => false,
+                'allow_empty' => true
             ],
         ];
 
@@ -546,7 +596,7 @@ class ItemController extends AbstractRestfulController
         if (! in_array($itemTypeId, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
             unset($spec['is_group']);
             unset($spec['is_concept']);
-            unset($spec['produced_count'], $spec['produced_exactly']);
+            unset($spec['produced'], $spec['produced_exactly']);
             unset($spec['begin_model_year'], $spec['end_model_year']);
             unset($spec['spec_id']);
             unset($spec['body']);
@@ -577,7 +627,7 @@ class ItemController extends AbstractRestfulController
 
         $itemTypeId = (int)$data['item_type_id'];
 
-        $inputFilter = $this->getPostInputFilter($itemTypeId);
+        $inputFilter = $this->getInputFilter($itemTypeId, true, null);
 
         $fields = ['name'];
         switch ($itemTypeId) {
@@ -663,24 +713,26 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('is_concept', $values)) {
-            $item['is_concept'] = $values['is_concept'] ? 1 : 0;
-        }
-
-        if (array_key_exists('is_concept_inherited', $values)) {
-            $item['is_concept_inherit'] = $values['is_concept_inherited'] ? 1 : 0;
+            $item['is_concept_inherit'] = $values['is_concept'] == 'inherited' ? 1 : 0;
+            if (! $item['is_concept_inherit']) {
+                $item['is_concept'] = $values['is_concept'] ? 1 : 0;
+            }
         }
 
         if (array_key_exists('catname', $values)) {
-            if (! $values['catname']) {
+            if (! $values['catname'] || $values['catname'] == '_') {
                 $filter = new \Autowp\ZFComponents\Filter\FilenameSafe();
                 $values['catname'] = $filter->filter($values['name']);
             }
 
             $item['catname'] = $values['catname'];
+        } else {
+            $filter = new \Autowp\ZFComponents\Filter\FilenameSafe();
+            $values['catname'] = $filter->filter($values['name']);
         }
 
-        if (array_key_exists('produced_count', $values)) {
-            $item['produced'] = strlen($values['produced_count']) ? (int)$values['produced_count'] : null;
+        if (array_key_exists('produced', $values)) {
+            $item['produced'] = strlen($values['produced']) ? (int)$values['produced'] : null;
         }
 
         if (array_key_exists('produced_exactly', $values)) {
@@ -705,12 +757,13 @@ class ItemController extends AbstractRestfulController
                 return $this->notFoundAction();
         }
 
-        if (array_key_exists('spec_inherited', $values)) {
-            $item['spec_inherit'] = $values['spec_inherited'] ? 1 : 0;
-        }
-
         if (array_key_exists('spec_id', $values)) {
-            $item['spec_id'] = $values['spec_id'] ? $values['spec_id'] : null;
+            if ($values['spec_id'] === 'inherited') {
+                $item['spec_inherit'] = 1;
+            } else {
+                $item['spec_inherit'] = 0;
+                $item['spec_id'] = $values['spec_id'] ? (int)$values['spec_id'] : null;
+            }
         }
 
         $item->save();
@@ -762,6 +815,358 @@ class ItemController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    public function putAction()
+    {
+        if (! $this->user()->isAllowed('car', 'edit_meta')) {
+            return $this->forbiddenAction();
+        }
+
+        $itemTable = $this->catalogue()->getItemTable();
+
+        $item = $itemTable->find($this->params('id'))->current();
+        if (! $item) {
+            return $this->notFoundAction();
+        }
+
+        $user = $this->user()->get();
+
+        $request = $this->getRequest();
+        $data = (array)$this->processBodyContent($request);
+
+        $inputFilter = $this->getInputFilter($item['item_type_id'], false, $item['id']);
+
+        $fields = [];
+        foreach (array_keys($data) as $key) {
+            if ($inputFilter->has($key)) {
+                $fields[] = $key;
+            }
+        }
+
+        if (! $fields) {
+            return new ApiProblemResponse(new ApiProblem(400, 'Not params'));
+        }
+
+        $inputFilter->setValidationGroup($fields);
+
+        $inputFilter->setData($data);
+        if (! $inputFilter->isValid()) {
+            return $this->inputFilterResponse($inputFilter);
+        }
+
+        $oldData = $item->toArray();
+
+        $values = $inputFilter->getValues();
+
+        if (array_key_exists('subscription', $values)) {
+            $ucsTable = new DbTable\User\ItemSubscribe();
+            if ($values['subscription']) {
+                $ucsTable->subscribe($user, $item);
+            } else {
+                $ucsTable->unsubscribe($user, $item);
+            }
+        }
+
+        if (array_key_exists('name', $values)) {
+            $item['name'] = $values['name'];
+            $this->setLanguageName($item['id'], 'xx', $values['name']);
+        }
+
+        if (array_key_exists('full_name', $values)) {
+            $item['full_name'] = $values['full_name'] ? $values['full_name'] : null;
+        }
+
+        if (array_key_exists('body', $values)) {
+            $item['body'] = (string)$values['body'];
+        }
+
+        if (array_key_exists('begin_year', $values)) {
+            $item['begin_year'] = $values['begin_year'] ? $values['begin_year'] : null;
+        }
+
+        if (array_key_exists('begin_month', $values)) {
+            $item['begin_month'] = $values['begin_month'] ? $values['begin_month'] : null;
+        }
+
+        if (array_key_exists('end_year', $values)) {
+            $endYear = $values['end_year'] ? $values['end_year'] : null;
+            $item['end_year'] = $endYear;
+
+            if ($endYear) {
+                if ($endYear < date('Y')) {
+                    $values['today'] = false;
+                }
+            }
+        }
+
+        if (array_key_exists('end_month', $values)) {
+            $item['end_month'] = $values['end_month'] ? $values['end_month'] : null;
+        }
+
+        if (array_key_exists('today', $values)) {
+            if (is_string($values['today'])) {
+                $values['today'] = strlen($values['today']) ? (bool)strlen($values['today']) : null;
+            }
+            if ($values['today'] !== null) {
+                $item['today'] = $values['today'] ? 1 : 0;
+            } else {
+                $item['today'] = null;
+            }
+        }
+
+        if (array_key_exists('begin_model_year', $values)) {
+            $item['begin_model_year'] = $values['begin_model_year'] ? $values['begin_model_year'] : null;
+        }
+
+        if (array_key_exists('end_model_year', $values)) {
+            $item['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
+        }
+
+        if (array_key_exists('is_concept', $values)) {
+            $item['is_concept_inherit'] = $values['is_concept'] === 'inherited' ? 1 : 0;
+            if (! $item['is_concept_inherit']) {
+                $item['is_concept'] = $values['is_concept'] ? 1 : 0;
+            }
+        }
+
+        if (array_key_exists('catname', $values)) {
+            if (! $values['catname']) {
+                $filter = new \Autowp\ZFComponents\Filter\FilenameSafe();
+                $values['catname'] = $filter->filter($values['name']);
+            }
+
+            $item['catname'] = $values['catname'];
+        }
+
+        if (array_key_exists('produced', $values)) {
+            $item['produced'] = strlen($values['produced']) ? (int)$values['produced'] : null;
+        }
+
+        if (array_key_exists('produced_exactly', $values)) {
+            $item['produced_exactly'] = $values['produced_exactly'] ? 1 : 0;
+        }
+
+        switch ($item['item_type_id']) {
+            case DbTable\Item\Type::VEHICLE:
+            case DbTable\Item\Type::ENGINE:
+                if (array_key_exists('is_group', $values)) {
+
+                    $haveChilds = (bool)$this->itemParentTable->fetchRow([
+                        'parent_id = ?' => $item['id']
+                    ]);
+
+                    if ($haveChilds) {
+                        $item['is_group'] = 1;
+                    } else {
+                        $item['is_group'] = $values['is_group'] ? 1 : 0;
+                    }
+                }
+                break;
+            case DbTable\Item\Type::CATEGORY:
+            case DbTable\Item\Type::TWINS:
+            case DbTable\Item\Type::BRAND:
+            case DbTable\Item\Type::FACTORY:
+            case DbTable\Item\Type::MUSEUM:
+                $item['is_group'] = 1;
+                break;
+        }
+
+        if (array_key_exists('spec_id', $values)) {
+            if ($values['spec_id'] === 'inherited') {
+                $item['spec_inherit'] = 1;
+            } else {
+                $item['spec_inherit'] = 0;
+                $item['spec_id'] = $values['spec_id'] ? (int)$values['spec_id'] : null;
+            }
+        }
+
+        $item->save();
+
+        if (isset($values['lat'], $values['lng'])) {
+            $point = null;
+            if (strlen($values['lat']) && strlen($values['lng'])) {
+                geoPHP::version(); // for autoload classes
+                $point = new Point($values['lng'], $values['lat']);
+            }
+            $this->setItemPoint($item, $point);
+        }
+
+        $itemTable->updateInteritance($item);
+        $item->updateOrderCache();
+
+        $this->brandVehicle->refreshAutoByVehicle($item->id);
+
+        $ucsTable = new DbTable\User\ItemSubscribe();
+        $ucsTable->subscribe($user, $item);
+
+        $newData = $item->toArray();
+        $htmlChanges = [];
+        foreach ($this->buildChangesMessage($oldData, $newData, 'en') as $line) {
+            $htmlChanges[] = htmlspecialchars($line);
+        }
+
+        $message = sprintf(
+            'Редактирование мета-информации автомобиля %s',
+            htmlspecialchars($this->car()->formatName($item, 'en')).
+            ( count($htmlChanges) ? '<p>'.implode('<br />', $htmlChanges).'</p>' : '')
+        );
+        $this->log($message, $item);
+
+        $user = $this->user()->get();
+        foreach ($ucsTable->getItemSubscribers($item) as $subscriber) {
+            if ($subscriber && ($subscriber->id != $user->id)) {
+                $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+
+                $changes = $this->buildChangesMessage($oldData, $newData, $subscriber->language);
+
+                $message = sprintf(
+                    $this->translate(
+                        'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s',
+                        'default',
+                        $subscriber->language
+                    ),
+                    $this->userModerUrl($user, true, $uri),
+                    $this->car()->formatName($car, $subscriber->language),
+                    $this->itemModerUrl($car, true, null, $uri),
+                    ( count($changes) ? implode("\n", $changes) : '')
+                );
+
+                $this->message->send(null, $subscriber->id, $message);
+            }
+        }
+
+        return $this->getResponse()->setStatusCode(200);
+    }
+
+    /**
+     * @param \Autowp\User\Model\DbTable\User\Row $user
+     * @param bool $full
+     * @param \Zend\Uri\Uri $uri
+     * @return string
+     */
+    private function userModerUrl(\Autowp\User\Model\DbTable\User\Row $user, $full = false, $uri = null)
+    {
+        return $this->url()->fromRoute('users/user', [
+            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+        ], [
+            'force_canonical' => $full,
+            'uri'             => $uri
+        ]);
+    }
+
+    /**
+     * @param DbTable\Item\Row $car
+     * @return string
+     */
+    private function itemModerUrl(DbTable\Item\Row $item, $full = false, $tab = null, $uri = null)
+    {
+        $url = 'moder/items/item/' . $item['id'];
+
+        if ($tab) {
+            $url .= '?' . http_build_query([
+                'tab' => $tab
+            ]);
+        }
+
+        return $this->url()->fromRoute('ng', ['path' => ''], [
+            'force_canonical' => $full,
+            'uri'             => $uri
+        ]) . $url;
+    }
+
+    private function buildChangesMessage($oldData, $newData, $language)
+    {
+        $fields = [
+            'name'             => ['str', 'moder/vehicle/changes/name-%s-%s'],
+            'body'             => ['str', 'moder/vehicle/changes/body-%s-%s'],
+            'begin_year'       => ['int', 'moder/vehicle/changes/from/year-%s-%s'],
+            'begin_month'      => ['int', 'moder/vehicle/changes/from/month-%s-%s'],
+            'end_year'         => ['int', 'moder/vehicle/changes/to/year-%s-%s'],
+            'end_month'        => ['int', 'moder/vehicle/changes/to/month-%s-%s'],
+            'today'            => ['bool', 'moder/vehicle/changes/to/today-%s-%s'],
+            'produced'         => ['int', 'moder/vehicle/changes/produced/count-%s-%s'],
+            'produced_exactly' => ['bool', 'moder/vehicle/changes/produced/exactly-%s-%s'],
+            'is_concept'       => ['bool', 'moder/vehicle/changes/is-concept-%s-%s'],
+            'is_group'         => ['bool', 'moder/vehicle/changes/is-group-%s-%s'],
+            'begin_model_year' => ['int', 'moder/vehicle/changes/model-years/from-%s-%s'],
+            'end_model_year'   => ['int', 'moder/vehicle/changes/model-years/to-%s-%s'],
+            'spec_id'          => ['spec_id', 'moder/vehicle/changes/spec-%s-%s'],
+            //'vehicle_type_id'  => ['vehicle_type_id', 'moder/vehicle/changes/car-type-%s-%s']
+        ];
+
+        $changes = [];
+        foreach ($fields as $field => $info) {
+            $message = $this->translate($info[1], 'default', $language);
+            switch ($info[0]) {
+                case 'int':
+                    $old = is_null($oldData[$field]) ? null : (int)$oldData[$field];
+                    $new = is_null($newData[$field]) ? null : (int)$newData[$field];
+                    if ($old !== $new) {
+                        $changes[] = sprintf($message, $old, $new);
+                    }
+                    break;
+                case 'str':
+                    $old = is_null($oldData[$field]) ? null : (string)$oldData[$field];
+                    $new = is_null($newData[$field]) ? null : (string)$newData[$field];
+                    if ($old !== $new) {
+                        $changes[] = sprintf($message, $old, $new);
+                    }
+                    break;
+                case 'bool':
+                    $old = is_null($oldData[$field])
+                        ? null
+                        : $this->translate($oldData[$field]
+                            ? 'moder/vehicle/changes/boolean/true'
+                            : 'moder/vehicle/changes/boolean/false');
+                    $new = is_null($newData[$field])
+                        ? null
+                        : $this->translate($newData[$field]
+                            ? 'moder/vehicle/changes/boolean/true'
+                            : 'moder/vehicle/changes/boolean/false');
+                    if ($old !== $new) {
+                        $changes[] = sprintf($message, $old, $new);
+                    }
+                    break;
+
+                case 'spec_id':
+                    $specTable = new DbTable\Spec();
+                    $old = $oldData[$field];
+                    $new = $newData[$field];
+                    if ($old !== $new) {
+                        $old = $specTable->find($old)->current();
+                        $new = $specTable->find($new)->current();
+                        $changes[] = sprintf($message, $old ? $old->short_name : '-', $new ? $new->short_name : '-');
+                    }
+                    break;
+
+                /*case 'vehicle_type_id':
+                    $vehicleTypeTable = new DbTable\Vehicle\Type();
+                    $old = $oldData[$field];
+                    $new = $newData[$field];
+                    $old = $old ? (array)$old : [];
+                    $new = $new ? (array)$new : [];
+                    if (array_diff($old, $new) !== array_diff($new, $old)) {
+                        $oldNames = [];
+                        foreach ($vehicleTypeTable->find($old) as $row) {
+                            $oldNames[] = $this->translate($row->name);
+                        }
+                        $newNames = [];
+                        foreach ($vehicleTypeTable->find($new) as $row) {
+                            $newNames[] = $this->translate($row->name);
+                        }
+                        $changes[] = sprintf(
+                            $message,
+                            $oldNames ? implode(', ', $oldNames) : '-',
+                            $newNames ? implode(', ', $newNames) : '-'
+                            );
+                    }
+                    break;*/
+            }
+        }
+
+        return $changes;
+    }
+
+
     private function setItemPoint(DbTable\Item\Row $item, $point)
     {
         $itemPointTable = new DbTable\Item\Point();
@@ -803,5 +1208,149 @@ class ItemController extends AbstractRestfulController
         }
         $carLangRow['name'] = $name;
         $carLangRow->save();
+    }
+
+    public function getLogoAction()
+    {
+        if (! $this->user()->inheritsRole('moder')) {
+            return $this->forbiddenAction();
+        }
+
+        $itemTable = $this->catalogue()->getItemTable();
+
+        $item = $itemTable->find($this->params('id'))->current();
+        if (! $item) {
+            return $this->notFoundAction();
+        }
+
+        if (! $item['logo_id']) {
+            return $this->notFoundAction();
+        }
+
+        return new JsonModel($this->logoHydrator->extract([
+            'image' => $item['logo_id']
+        ]));
+    }
+
+    public function putLogoAction()
+    {
+        if (! $this->user()->isAllowed('brand', 'logo')) {
+            return $this->forbiddenAction();
+        }
+
+        $itemTable = $this->catalogue()->getItemTable();
+
+        $item = $itemTable->find($this->params('id'))->current();
+        if (! $item) {
+            return $this->notFoundAction();
+        }
+
+        $user = $this->user()->get();
+
+        $filePath = tempnam(sys_get_temp_dir(), 'logo');
+        file_put_contents($filePath, $this->getRequest()->getContent());
+
+        $factory = new \Zend\InputFilter\Factory();
+        $input = $factory->createInput([
+            'required'   => true,
+            'validators' => [
+                ['name' => 'FileIsImage'],
+                [
+                    'name' => 'FileSize',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'max' => 10*1024*1024
+                    ]
+                ],
+                [
+                    'name' => 'FileIsImage',
+                    'break_chain_on_failure' => true,
+                ],
+                [
+                    'name' => 'FileMimeType',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'mimeType' => 'image/png'
+                    ]
+                ],
+                [
+                    'name' => 'FileImageSize',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'minWidth'  => 50,
+                        'minHeight' => 50
+                    ]
+                ],
+            ]
+        ]);
+
+        $input->setValue($filePath);
+
+        if (! $input->isValid()) {
+            return $this->inputResponse($input);
+        }
+
+        $oldImageId = $item->logo_id;
+
+        $imageId = $this->imageStorage()->addImageFromFile($filePath, 'brand');
+
+        $item->logo_id = $imageId;
+        $item->save();
+
+        if ($oldImageId) {
+            $imageStorage->removeImage($oldImageId);
+        }
+
+        $this->log(sprintf(
+            'Закачен логотип %s',
+            htmlspecialchars($item->name)
+        ), $item);
+
+        return $this->getResponse()->setStatusCode(200);
+    }
+
+    private function carTreeWalk(DbTable\Item\Row $car, $itemParentRow = null)
+    {
+        $data = [
+            'id'     => (int)$car['id'],
+            'name'   => $this->car()->formatName($car, $this->language()),
+            'childs' => [],
+            'type'   => $itemParentRow ? (int)$itemParentRow->type : null
+        ];
+
+        $itemParentRows = $this->itemParentTable->fetchAll(
+            $this->itemParentTable->select(true)
+                ->join('item', 'item_parent.item_id = item.id', null)
+                ->where('item_parent.parent_id = ?', $car['id'])
+                ->order(array_merge(['item_parent.type'], $this->catalogue()->itemOrdering()))
+        );
+
+        $itemTable = $this->catalogue()->getItemTable();
+        foreach ($itemParentRows as $itemParentRow) {
+            $carRow = $itemTable->find($itemParentRow->item_id)->current();
+            if ($carRow) {
+                $data['childs'][] = $this->carTreeWalk($carRow, $itemParentRow);
+            }
+        }
+
+        return $data;
+    }
+
+    public function treeAction()
+    {
+        if (! $this->user()->inheritsRole('moder')) {
+            return $this->forbiddenAction();
+        }
+
+        $itemTable = $this->catalogue()->getItemTable();
+
+        $item = $itemTable->find($this->params('id'))->current();
+        if (! $item) {
+            return $this->notFoundAction();
+        }
+
+        return new JsonModel([
+            'item' => $this->carTreeWalk($item)
+        ]);
     }
 }

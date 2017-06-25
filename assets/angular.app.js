@@ -1,4 +1,6 @@
+import 'es6-shim';
 import './directives/item';
+import './directives/item-meta-form';
 import './directives/markdown-edit';
 import './directives/paginator';
 import './directives/picture-moder-vote';

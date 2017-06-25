@@ -1164,6 +1164,7 @@
     "moder/vehicle/catalogue/turbo-group-creator/vehicles": "Vehicles",
     "moder/vehicle/catalogue/add-brand": "品牌 ...",
     "moder/vehicle/catalogue/add-brand-%s": "品牌 %s",
+    "ng/moder/vehicle/catalogue/add-brand-{brand}": "品牌 {brand}",
     "moder/vehicle/twins/select-or-create": "选择或创建公司 ...",
     "moder/vehicle/twins/group-not-selected": "未选择公司",
     "moder/vehicle/twins/remove": "取消",

@@ -20,7 +20,7 @@ use Application\Service\SpecificationsService;
 class ItemParentController extends AbstractRestfulController
 {
     /**
-     * @var User
+     * @var DbTable\Item\ParentTable
      */
     private $table;
 
@@ -64,6 +64,11 @@ class ItemParentController extends AbstractRestfulController
      */
     private $postInputFilter;
 
+    /**
+     * @var DbTable\Item
+     */
+    private $itemTable;
+
     public function __construct(
         RestHydrator $hydrator,
         InputFilter $listInputFilter,
@@ -80,6 +85,7 @@ class ItemParentController extends AbstractRestfulController
         $this->postInputFilter = $postInputFilter;
 
         $this->table = new DbTable\Item\ParentTable();
+        $this->itemTable = new DbTable\Item();
 
         $this->brandVehicle = $brandVehicle;
         $this->specificationsService = $specificationsService;
@@ -130,6 +136,10 @@ class ItemParentController extends AbstractRestfulController
 
         if ($data['parent_id']) {
             $select->where('item_parent.parent_id = ?', $data['parent_id']);
+        }
+
+        if ($data['item_id']) {
+            $select->where('item_parent.item_id = ?', $data['item_id']);
         }
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -238,7 +248,7 @@ class ItemParentController extends AbstractRestfulController
         $this->specificationsService->updateActualValues($item->id);
 
         $message = sprintf(
-            '%s выбран как родительский автомобиль для %s',
+            '%s выбран как родительский для %s',
             htmlspecialchars($this->car()->formatName($parentItem, 'en')),
             htmlspecialchars($this->car()->formatName($item, 'en'))
         );
@@ -268,9 +278,9 @@ class ItemParentController extends AbstractRestfulController
                     ),
                     $this->userModerUrl($user, true, $uri),
                     $this->car()->formatName($item, $subscriber->language),
-                    $this->carModerUrl($item, true, null, $uri),
+                    $this->itemModerUrl($item, true, null, $uri),
                     $this->car()->formatName($parentItem, $subscriber->language),
-                    $this->carModerUrl($parentItem, true, null, $uri)
+                    $this->itemModerUrl($parentItem, true, null, $uri)
                 );
 
                 $this->message->send(null, $subscriber->id, $message);
@@ -306,20 +316,106 @@ class ItemParentController extends AbstractRestfulController
      * @param DbTable\Item\Row $car
      * @return string
      */
-    private function carModerUrl(DbTable\Item\Row $car, $full = false, $tab = null, $uri = null)
+    private function itemModerUrl(DbTable\Item\Row $item, $full = false, $tab = null, $uri = null)
     {
-        $params = [
-            'action'  => 'car',
-            'item_id' => $car->id,
-        ];
+        $url = 'moder/items/item/' . $item['id'];
 
         if ($tab) {
-            $params['tab'] = $tab;
+            $url .= '?' . http_build_query([
+                'tab' => $tab
+            ]);
         }
 
-        return $this->url()->fromRoute('moder/cars/params', $params, [
+        return $this->url()->fromRoute('ng', ['path' => ''], [
             'force_canonical' => $full,
             'uri'             => $uri
-        ]);
+        ]) . $url;
+    }
+
+    public function deleteAction()
+    {
+        if (! $this->user()->isAllowed('car', 'move')) {
+            return $this->forbiddenAction();
+        }
+
+        $this->itemInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->itemInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->itemInputFilter);
+        }
+
+        $data = $this->itemInputFilter->getValues();
+
+        $select = $this->table->getAdapter()->select()
+            ->from($this->table->info('name'))
+            ->where('item_id = ?', (int)$this->params('item_id'))
+            ->where('parent_id = ?', (int)$this->params('parent_id'));
+
+        $row = $this->table->getAdapter()->fetchRow($select);
+        if (! $row) {
+            return $this->notFoundAction();
+        }
+
+        $item = $this->itemTable->find($row['item_id'])->current();
+        if (! $item) {
+            return $this->notFoundAction();
+        }
+
+        $parentItem = $this->itemTable->find($row['parent_id'])->current();
+        if (! $parentItem) {
+            return $this->notFoundAction();
+        }
+
+        $this->brandVehicle->remove($parentItem->id, $item->id);
+
+        $itemTable->updateInteritance($item);
+
+        $vehicleType = new VehicleType();
+        $vehicleType->refreshInheritanceFromParents($item->id);
+
+        $this->specificationsService->updateActualValues($item->id);
+
+        $message = sprintf(
+            '%s перестал быть родительским автомобилем для %s',
+            htmlspecialchars($this->car()->formatName($parentItem, 'en')),
+            htmlspecialchars($this->car()->formatName($item, 'en'))
+        );
+        $this->log($message, [$item, $parentItem]);
+
+
+        $ucsTable = new DbTable\User\ItemSubscribe();
+        $user = $this->user()->get();
+
+        $subscribers = [];
+        foreach ($ucsTable->getItemSubscribers($item) as $subscriber) {
+            $subscribers[$subscriber->id] = $subscriber;
+        }
+
+        foreach ($ucsTable->getItemSubscribers($parentItem) as $subscriber) {
+            $subscribers[$subscriber->id] = $subscriber;
+        }
+
+        foreach ($subscribers as $subscriber) {
+            if ($subscriber->id != $user->id) {
+                $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+
+                $message = sprintf(
+                    $this->translate(
+                        'pm/user-%s-removed-item-%s-%s-from-item-%s-%s',
+                        'default',
+                        $subscriber->language
+                    ),
+                    $this->userModerUrl($user, true, $uri),
+                    $this->car()->formatName($item, $subscriber->language),
+                    $this->itemModerUrl($item, true, null, $uri),
+                    $this->car()->formatName($parentItem, $subscriber->language),
+                    $this->itemModerUrl($parentItem, true, null, $uri)
+                );
+
+                $this->message->send(null, $subscriber->id, $message);
+            }
+        }
+
+        return $this->getResponse()->setStatusCode(204);
     }
 }

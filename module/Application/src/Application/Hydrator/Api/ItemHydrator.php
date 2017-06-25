@@ -1,6 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\Hydrator\Api;
+
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+
+use geoPHP;
 
 use Autowp\User\Model\DbTable\User;
 
@@ -9,8 +16,6 @@ use Application\Model\Catalogue;
 use Application\Model\DbTable;
 use Application\Model\Item as ItemModel;
 use Application\Service\SpecificationsService;
-
-use Zend_Db_Expr;
 
 class ItemHydrator extends RestHydrator
 {
@@ -56,7 +61,7 @@ class ItemHydrator extends RestHydrator
     private $itemModel;
 
     /**
-     * @var DbTable\Item\Language
+     * @var TableGateway
      */
     private $itemLanguageTable;
 
@@ -66,9 +71,34 @@ class ItemHydrator extends RestHydrator
     private $textStorage;
 
     /**
+     * @var TableGateway
+     */
+    private $pictureTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $itemParentTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $linkTable;
+
+    /**
+     * @var SpecificationsService
+     */
+    private $specificationsService;
+
+    /**
+     * @var TableGateway
+     */
+    private $itemTableGateway;
+
+    /**
      * @return DbTable\Spec
      */
-    private function getSpecTable()
+    private function getSpecTable(): DbTable\Spec
     {
         return $this->specTable
             ? $this->specTable
@@ -80,11 +110,18 @@ class ItemHydrator extends RestHydrator
     ) {
         parent::__construct();
 
+        $tables = $serviceManager->get(\Application\Db\TableManager::class);
+        $this->pictureTable = $tables->get('pictures');
+        $this->linkTable = $tables->get('links');
+        $this->itemParentTable = $tables->get('item_parent');
+        $this->itemLanguageTable = $tables->get('item_language');
+        $this->itemTableGateway = $tables->get('item');
+
+        $this->specificationsService = $serviceManager->get(SpecificationsService::class);
+
         $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
         $this->router = $serviceManager->get('HttpRouter');
 
-        $this->itemLanguageTable = new DbTable\Item\Language();
-        $this->itemParentTable = new DbTable\Item\ParentTable();
         $this->itemTable = new DbTable\Item();
         $this->itemModel = new \Application\Model\Item();
 
@@ -108,6 +145,9 @@ class ItemHydrator extends RestHydrator
 
         $strategy = new Strategy\PreviewPictures($serviceManager);
         $this->addStrategy('preview_pictures', $strategy);
+
+        $strategy = new Strategy\Image($serviceManager);
+        $this->addStrategy('logo', $strategy);
     }
 
     /**
@@ -148,7 +188,7 @@ class ItemHydrator extends RestHydrator
         return $this;
     }
 
-    private function getNameData(array $object, $language = 'en')
+    private function getNameData(array $object, string $language = 'en'): array
     {
         if (! is_string($language)) {
             throw new \Exception('`language` is not string');
@@ -166,7 +206,7 @@ class ItemHydrator extends RestHydrator
             }
         }
 
-        $result = [
+        return [
             'begin_model_year' => $object['begin_model_year'],
             'end_model_year'   => $object['end_model_year'],
             'spec'             => $spec,
@@ -179,8 +219,13 @@ class ItemHydrator extends RestHydrator
             'begin_month'      => $object['begin_month'],
             'end_month'        => $object['end_month']
         ];
+    }
 
-        return $result;
+    private function getCountBySelect(Sql\Select $select, TableGateway $table): int
+    {
+        $select->columns(['count' => new Sql\Expression('count(1)')]);
+        $row = $table->selectWith($select)->current();
+        return $row ? (int)$row['count'] : 0;
     }
 
     public function extract($object)
@@ -199,29 +244,75 @@ class ItemHydrator extends RestHydrator
             'item_type_id' => (int)$object['item_type_id']
         ];
 
+        if ($this->filterComposite->filter('body')) { // only for moders
+            $result['body'] = (string)$object['body'];
+        }
+
         if ($this->filterComposite->filter('is_concept')) { // only for moders
-            $result['is_concept'] = (bool)$object['is_concept'];
+            if ($object['is_concept_inherit']) {
+                $result['is_concept'] = 'inherited';
+            } else {
+                $result['is_concept'] = (bool)$object['is_concept'];
+            }
         }
 
         if ($this->filterComposite->filter('spec_id')) { // only for moders
-            $result['spec_id'] = (bool)$object['spec_id'];
+
+            if ($object['spec_inherit']) {
+                $result['spec_id'] = 'inherited';
+            } else {
+                $value = (int)$object['spec_id'];
+                $result['spec_id'] = $value > 0 ? $value : null;
+            }
+
+        }
+
+        if ($this->filterComposite->filter('is_group')) { // only for moders
+            $result['is_group'] = (bool)$object['is_group'];
+        }
+
+        if ($this->filterComposite->filter('begin_model_year')) { // only for moders
+            $value = (int)$object['begin_model_year'];
+            $result['begin_model_year'] = $value > 0 ? $value : null;
+        }
+
+        if ($this->filterComposite->filter('end_model_year')) { // only for moders
+            $value = (int)$object['end_model_year'];
+            $result['end_model_year'] = $value > 0 ? $value : null;
         }
 
         if ($this->filterComposite->filter('begin_year')) { // only for moders
-            $result['begin_year'] = $object['begin_year'];
+            $value = (int)$object['begin_year'];
+            $result['begin_year'] = $value > 0 ? $value : null;
+        }
+
+        if ($this->filterComposite->filter('begin_month')) { // only for moders
+            $value = (int)$object['begin_month'];
+            $result['begin_month'] = $value > 0 ? $value : null;
         }
 
         if ($this->filterComposite->filter('end_year')) { // only for moders
-            $result['end_year'] = $object['end_year'];
+            $value = (int)$object['end_year'];
+            $result['end_year'] = $value > 0 ? $value : null;
         }
 
-        if ($this->filterComposite->filter('moder_url')) {
-            $result['moder_url'] = $this->router->assemble([
-                'action'  => 'car',
-                'item_id' => $object['id']
-            ], [
-                'name' => 'moder/cars/params'
+        if ($this->filterComposite->filter('end_month')) { // only for moders
+            $value = (int)$object['end_month'];
+            $result['end_month'] = $value > 0 ? $value : null;
+        }
+
+        if ($this->filterComposite->filter('today')) { // only for moders
+            $result['today'] = $object['today'] === null ? null : (bool)$object['today'];
+        }
+
+        if ($this->filterComposite->filter('subscription') && $this->userId) { // only for moders
+            $ucsTable = new DbTable\User\ItemSubscribe();
+
+            $ucsRow = $ucsTable->fetchRow([
+                'user_id = ?' => $this->userId,
+                'item_id = ?' => $object['id']
             ]);
+            $result['subscription'] = (bool)$ucsRow;
         }
 
         if ($this->filterComposite->filter('upload_url')) {
@@ -248,8 +339,28 @@ class ItemHydrator extends RestHydrator
             }
         }
 
+        if ($this->filterComposite->filter('full_name')) {
+            $result['full_name'] = $object['full_name'];
+        }
+
         if ($this->filterComposite->filter('catname')) {
             $result['catname'] = $object['catname'];
+        }
+
+        $showLat = $this->filterComposite->filter('lat');
+        $showLng = $this->filterComposite->filter('lng');
+
+        if ($showLat || $showLng) {
+
+            $point = $this->getItemPoint((int)$object['id']);
+
+            if ($showLat) {
+                $result['lat'] = $point ? $point->y() : null;
+            }
+
+            if ($showLat) {
+                $result['lng'] = $point ? $point->x() : null;
+            }
         }
 
         $totalPictures = null;
@@ -310,17 +421,57 @@ class ItemHydrator extends RestHydrator
             }
         }
 
+        if ($this->filterComposite->filter('pictures_count')) {
+            $select = new Sql\Select($this->pictureTable->getTable());
+            $select->join('picture_item', 'pictures.id = picture_item.picture_id', [])
+                ->where(['picture_item.item_id' => $object['id']]);
+            $result['pictures_count'] = $this->getCountBySelect($select, $this->pictureTable);
+        }
+
+        if ($this->filterComposite->filter('specifications_count')) {
+            $result['specifications_count'] = $this->specificationsService->getSpecsCount($object['id']);
+        }
+
+        if ($this->filterComposite->filter('links_count')) {
+            $select = new Sql\Select($this->linkTable->getTable());
+            $select->where(['item_id' => $object['id']]);
+            $result['links_count'] = $this->getCountBySelect($select, $this->linkTable);
+        }
+
         if ($this->filterComposite->filter('childs_count')) {
             if (isset($object['childs_count'])) {
                 $result['childs_count'] = (int)$object['childs_count'];
             } else {
-                $db = $this->itemParentTable->getAdapter();
-                $result['childs_count'] = (int)$db->fetchOne(
-                    $db->select()
-                        ->from('item_parent', [new Zend_Db_Expr('count(1)')])
-                        ->where('parent_id = ?', $object['id'])
-                );
+                $select = new Sql\Select($this->itemParentTable->getTable());
+                $select->where(['parent_id' => $object['id']]);
+                $result['childs_count'] = $this->getCountBySelect($select, $this->itemParentTable);
             }
+        }
+
+        if ($this->filterComposite->filter('parents_count')) {
+            $select = new Sql\Select($this->itemParentTable->getTable());
+            $select->where(['item_id' => $object['id']]);
+            $result['parents_count'] = $this->getCountBySelect($select, $this->itemParentTable);
+        }
+
+        if ($this->filterComposite->filter('item_language_count')) {
+            $select = new Sql\Select($this->itemLanguageTable->getTable());
+            $select->where([
+                'item_id'       => $object['id'],
+                'language <> ?' => 'xx'
+            ]);
+            $result['item_language_count'] = $this->getCountBySelect($select, $this->itemLanguageTable);
+        }
+
+        if ($this->filterComposite->filter('engine_vehicles_count')) {
+            $select = new Sql\Select($this->itemTableGateway->getTable());
+            $select->where(['engine_item_id' => $object['id']]);
+            $result['engine_vehicles_count'] = $this->getCountBySelect($select, $this->itemTableGateway);
+        }
+
+        if ($this->filterComposite->filter('name')) {
+            $name = $this->itemModel->getName($object['id'], 'xx');
+            $result['name'] = $nameData['name'];
         }
 
         if ($this->filterComposite->filter('name_default')) {
@@ -410,12 +561,13 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('produced')) {
-            $result['produced'] = (int)$object['produced'];
+            $value = (int)$object['produced'];
+            $result['produced'] = $value > 0 ? $value : null;
             $result['produced_exactly'] = (bool)$object['produced_exactly'];
         }
 
         if ($this->filterComposite->filter('design')) {
-            $db = $this->itemParentTable->getAdapter();
+            $db = $this->itemTable->getAdapter();
             $designRow = $db->fetchRow(
                 $db->select()
                     ->from('item', [
@@ -452,6 +604,16 @@ class ItemHydrator extends RestHydrator
             }
         }
 
+        if ($this->filterComposite->filter('public_urls')) {
+            $result['public_urls'] = $this->getItemPublicUrls($object);
+        }
+
+        if ($this->filterComposite->filter('logo')) {
+            $result['logo'] = $this->extractValue('logo', [
+                'image' => $object['logo_id']
+            ]);
+        }
+
         $showDescription = $this->filterComposite->filter('description');
         $showHasText = $this->filterComposite->filter('has_text');
 
@@ -459,18 +621,20 @@ class ItemHydrator extends RestHydrator
         $fullTextIds = [];
 
         if ($showDescription || $showHasText) {
-            $db = $this->itemLanguageTable->getAdapter();
-            $orderExpr = $db->quoteInto('language = ? desc', $this->language);
-            $itemLanguageRows = $this->itemLanguageTable->fetchAll([
-                'item_id = ?' => $object['id']
-            ], new \Zend_Db_Expr($orderExpr));
+
+            $select = new Sql\Select($this->itemLanguageTable->getTable());
+            $select->columns(['text_id', 'full_text_id'])
+                ->where(['item_id' => $object['id']])
+                ->order([new Sql\Expression('language = ? desc', $this->language)]);
+
+            $itemLanguageRows = $this->itemLanguageTable->selectWith($select);
 
             foreach ($itemLanguageRows as $itemLanguageRow) {
-                if ($itemLanguageRow->text_id) {
-                    $textIds[] = $itemLanguageRow->text_id;
+                if ($itemLanguageRow['text_id']) {
+                    $textIds[] = $itemLanguageRow['text_id'];
                 }
-                if ($itemLanguageRow->full_text_id) {
-                    $fullTextIds[] = $itemLanguageRow->full_text_id;
+                if ($itemLanguageRow['full_text_id']) {
+                    $fullTextIds[] = $itemLanguageRow['full_text_id'];
                 }
             }
         }
@@ -501,6 +665,23 @@ class ItemHydrator extends RestHydrator
         throw new \Exception("Not supported");
     }
 
+    private function getItemPoint(int $itemId)
+    {
+        $point = null;
+        $itemPointTable = new DbTable\Item\Point();
+        $itemPointRow = $itemPointTable->fetchRow([
+            'item_id = ?' => $itemId
+        ]);
+        if ($itemPointRow) {
+            if ($itemPointRow->point) {
+                geoPHP::version(); // for autoload classes
+                $point = geoPHP::load(substr($itemPointRow->point, 4), 'wkb');
+            }
+        }
+
+        return $point;
+    }
+
     private function getUserRole()
     {
         if (! $this->userId) {
@@ -520,7 +701,7 @@ class ItemHydrator extends RestHydrator
         return $this->userRole;
     }
 
-    private function isAllowed($resource, $privilege)
+    private function isAllowed(string $resource, string $privilege): bool
     {
         $role = $this->getUserRole();
         if (! $role) {
@@ -564,5 +745,86 @@ class ItemHydrator extends RestHydrator
         }
 
         return $result;
+    }
+
+    private function getItemPublicUrls($item)
+    {
+        if ($item['item_type_id'] == DbTable\Item\Type::FACTORY) {
+            return [
+                $this->router->assemble([
+                    'action' => 'factory',
+                    'id'     => $item['id'],
+                ], [
+                    'name' => 'factories/factory'
+                ])
+            ];
+        }
+
+        if ($item['item_type_id'] == DbTable\Item\Type::CATEGORY) {
+            return [
+                $this->router->assemble([
+                    'action'           => 'category',
+                    'category_catname' => $item['catname'],
+                ], [
+                    'name' => 'categories'
+                ])
+            ];
+        }
+
+        if ($item['item_type_id'] == DbTable\Item\Type::TWINS) {
+            return [
+                $this->router->assemble([
+                    'id' => $item['id'],
+                ], [
+                    'name' => 'twins/group'
+                ])
+            ];
+        }
+
+        if ($item['item_type_id'] == DbTable\Item\Type::BRAND) {
+            return [
+                $this->router->assemble([
+                    'brand_catname' => $item['catname'],
+                ], [
+                    'name' => 'catalogue'
+                ])
+            ];
+        }
+
+        return $this->walkUpUntilBrand((int)$item['id'], []);
+    }
+
+    private function walkUpUntilBrand(int $id, array $path)
+    {
+        $urls = [];
+
+        $parentRows = $this->itemParentTable->select([
+            'item_id = ?' => $id
+        ]);
+
+        foreach ($parentRows as $parentRow) {
+            $brand = $this->itemTable->fetchRow([
+                'item_type_id = ?' => DbTable\Item\Type::BRAND,
+                'id = ?'           => $parentRow['parent_id']
+            ]);
+
+            if ($brand) {
+                $urls[] = $this->router->assemble([
+                    'action'        => 'brand-item',
+                    'brand_catname' => $brand->catname,
+                    'car_catname'   => $parentRow['catname'],
+                    'path'          => $path
+                ], [
+                    'name' => 'catalogue'
+                ]);
+            }
+
+            $urls = array_merge(
+                $urls,
+                $this->walkUpUntilBrand((int)$parentRow['parent_id'], array_merge([$parentRow['catname']], $path))
+            );
+        }
+
+        return $urls;
     }
 }

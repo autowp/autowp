@@ -1205,17 +1205,11 @@ class Pic extends AbstractPlugin
             $brandModel = new BrandModel();
 
             foreach ($vehicleTable->find($carIds) as $car) {
-                $url = $this->httpRouter->assemble([
-                    'action'  => 'car',
-                    'item_id' => $car->id
-                ], [
-                    'name' => 'moder/cars/params'
-                ]);
+                $url = '/ng/moder/items/item/' . $car['id'];
                 $links[$url] = sprintf(
                     $this->translator->translate('moder/picture/edit-vehicle-%s'),
                     $controller->car()->formatName($car, $language)
                 );
-
 
                 $brands = $brandModel->getList(['language' => $language], function ($select) use ($car) {
                     $select
@@ -1225,12 +1219,7 @@ class Pic extends AbstractPlugin
                 });
 
                 foreach ($brands as $brand) {
-                    $url = $this->httpRouter->assemble([
-                        'action'  => 'car',
-                        'item_id' => $brand['id']
-                    ], [
-                        'name' => 'moder/cars/params'
-                    ]);
+                    $url = '/ng/moder/items/item/' . $brand['id'];
                     $links[$url] = sprintf(
                         $this->translator->translate('moder/picture/edit-brand-%s'),
                         $brand['name']

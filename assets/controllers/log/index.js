@@ -47,7 +47,7 @@ angular.module(Module)
                     picture_id: $state.params.picture_id,
                     page: $state.params.page,
                     user_id: $state.params.user_id,
-                    fields: 'pictures.name_html,items.name_html,items.moder_url,user'
+                    fields: 'pictures.name_html,items.name_html,user'
                 }
             }).then(function(response) {
                 ctrl.items = response.data.items;

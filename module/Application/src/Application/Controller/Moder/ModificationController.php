@@ -16,15 +16,17 @@ class ModificationController extends AbstractActionController
      */
     private function carModerUrl($carId, $full = false, $tab = null)
     {
-        return $this->view->serverUrl(
-            $this->_helper->url->url([
-                'module'     => 'moder',
-                'controller' => 'cars',
-                'action'     => 'car',
-                'item_id'    => $carId,
-                'tab'        => $tab
-            ], 'default', true)
-        );
+        $url = 'moder/items/item/' . $carId;
+
+        if ($tab) {
+            $url .= '?' . http_build_query([
+                'tab' => $tab
+            ]);
+        }
+
+        return $this->url()->fromRoute('ng', ['path' => ''], [
+            'force_canonical' => $full
+        ]) . $url;
     }
 
     /**

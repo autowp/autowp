@@ -92,8 +92,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_POST, [
             'item_type_id' => 1,
             'name'         => 'Test concept car',
-            'is_concept'   => 1,
-            'is_concept_inherited' => 0
+            'is_concept'   => 1
         ]);
 
         $this->assertResponseStatusCode(201);

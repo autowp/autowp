@@ -7,7 +7,7 @@
         <td ng-bind-html="event.desc"></td>
         <td>
             <div ng-repeat="item in event.items">
-                Item: <a ng-href="{{item.moder_url}}" ng-bind-html="item.name_html"></a>
+                Item: <a ui-sref="moder-items-item({id: item.id})" ng-bind-html="item.name_html"></a>
             </div>
             <div ng-repeat="picture in event.pictures">
                 Picture: <a ui-sref="moder-pictures-item({id: picture.id})" ng-bind-html="picture.name_html"></a>

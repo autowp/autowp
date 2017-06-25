@@ -1,6 +1,6 @@
 import angular from 'angular';
 import Module from 'app.module';
-import template from './markdown-edit.html';
+import template from './template.html';
 import autosize from 'autosize';
 
 angular.module(Module)

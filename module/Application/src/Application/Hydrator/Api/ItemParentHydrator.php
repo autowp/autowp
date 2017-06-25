@@ -2,8 +2,9 @@
 
 namespace Application\Hydrator\Api;
 
-use Application\Hydrator\Api\Strategy\Item as HydratorItemStrategy;
 use Application\Model\DbTable;
+
+use Zend_Db_Expr;
 
 class ItemParentHydrator extends RestHydrator
 {
@@ -14,6 +15,16 @@ class ItemParentHydrator extends RestHydrator
 
     private $router;
 
+    /**
+     * @var DbTable\Item
+     */
+    private $itemTable;
+
+    /**
+     * @var DbTable\Item\ParentLanguage
+     */
+    private $itemParentLanguageTable;
+
     public function __construct(
         $serviceManager
     ) {
@@ -22,9 +33,19 @@ class ItemParentHydrator extends RestHydrator
         $this->router = $serviceManager->get('HttpRouter');
 
         $this->itemTable = new DbTable\Item();
+        $this->itemParentLanguageTable = new DbTable\Item\ParentLanguage();
 
-        $strategy = new HydratorItemStrategy($serviceManager);
+        $strategy = new Strategy\Item($serviceManager);
         $this->addStrategy('item', $strategy);
+
+        $strategy = new Strategy\Item($serviceManager);
+        $this->addStrategy('parent', $strategy);
+
+        $strategy = new Strategy\Item($serviceManager);
+        $this->addStrategy('duplicate_parent', $strategy);
+
+        $strategy = new Strategy\Item($serviceManager);
+        $this->addStrategy('duplicate_child', $strategy);
     }
 
     /**
@@ -59,8 +80,8 @@ class ItemParentHydrator extends RestHydrator
     {
         $this->userId = $userId;
 
-        //$this->getStrategy('content')->setUser($user);
-        //$this->getStrategy('replies')->setUser($user);
+        $this->getStrategy('content')->setUser($user);
+        $this->getStrategy('replies')->setUser($user);
 
         return $this;
     }
@@ -76,6 +97,55 @@ class ItemParentHydrator extends RestHydrator
         if ($this->filterComposite->filter('item')) {
             $item = $this->itemTable->find($object['item_id'])->current();
             $result['item'] = $item ? $this->extractValue('item', $item->toArray()) : null;
+        }
+
+        if ($this->filterComposite->filter('parent')) {
+            $item = $this->itemTable->find($object['parent_id'])->current();
+            $result['parent'] = $item ? $this->extractValue('parent', $item->toArray()) : null;
+        }
+
+        if ($this->filterComposite->filter('name')) {
+            $db = $this->itemParentLanguageTable->getAdapter();
+            $langSortExpr = new Zend_Db_Expr(
+                $db->quoteInto('language = ? desc', $this->language)
+            );
+            $itemParentLanguageRow = $this->itemParentLanguageTable->fetchRow([
+                'item_id = ?'   => $object['item_id'],
+                'parent_id = ?' => $object['parent_id'],
+                'length(name) > 0'
+            ], $langSortExpr);
+
+            $result['name'] = $itemParentLanguageRow ? $itemParentLanguageRow->name : null;
+        }
+
+        if ($this->filterComposite->filter('duplicate_parent')) {
+            $select = $this->itemTable->select(true)
+                ->join('item_parent', 'item.id = item_parent.parent_id', null)
+                ->where('item_parent.item_id = ?', $object['item_id'])
+                ->where('item_parent.parent_id <> ?', $object['parent_id'])
+                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $object['parent_id'])
+                ->where('not item_parent_cache.tuning')
+                ->where('not item_parent_cache.sport')
+                ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DEFAULT);
+
+            $duplicateRow = $this->itemTable->fetchRow($select);
+
+            $result['duplicate_parent'] = $duplicateRow ? $this->extractValue('duplicate_parent', $duplicateRow->toArray()) : null;
+        }
+
+        if ($this->filterComposite->filter('duplicate_child')) {
+            $select = $this->itemTable->select(true)
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
+                ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', null)
+                ->where('item_parent_cache.item_id = ?', $object['item_id'])
+                ->where('item_parent.parent_id = ?', $object['parent_id'])
+                ->where('item_parent.item_id <> ?', $object['item_id'])
+                ->where('item_parent.type = ?', $object['type']);
+
+            $duplicateRow = $this->itemTable->fetchRow($select);
+
+            $result['duplicate_child'] = $duplicateRow ? $this->extractValue('duplicate_child', $duplicateRow->toArray()) : null;
         }
 
         return $result;

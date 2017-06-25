@@ -16,10 +16,7 @@
 <ul class="nav nav-pills" style="margin-bottom: 20px">
     <?php if ($this->user()->inheritsRole('cars-moder')) { ?>
         <li>
-            <a href="<?=$this->escapeHtmlAttr($this->url('moder/cars/params', [
-                'action'  => 'car',
-                'item_id' => $this->car->id
-            ]))?>">
+            <a href="/ng/moder/items/item/<?=$this->car->id?>">
                 <i class="fa fa-cog"></i>
                 <?=$this->escapeHtml($this->translate('moder/edit-object'))?>
                 <?=$this->car()->htmlTitle($this->car->getNameData($this->language()))?>
@@ -72,10 +69,7 @@
 
             <?php if ($this->user()->isAllowed('specifications', 'edit-engine')) { ?>
                 <?php if ($this->engine) { ?>
-                    <p><?=$this->htmlA($this->url('moder/cars/params', [
-                        'action'  => 'car',
-                        'item_id' => $this->engine->id
-                    ]), $this->car()->textTitle($this->engine->getNameData($this->language())))?></p>
+                    <p><?=$this->htmlA('/ng/moder/items/item/' . $this->engine->id, $this->car()->textTitle($this->engine->getNameData($this->language())))?></p>
                     <?php if ($this->engineInherited) { ?>
                         <?php foreach ($this->engineInheritedFrom as $car) { ?>
                             <h6><em>

@@ -50,6 +50,7 @@
     "corejs-typeahead": "^1.1.1",
     "css-loader": "^0.x",
     "diff": "^3.x",
+    "es6-shim": "^0.35.3",
     "exports-loader": "^0.x",
     "extract-text-webpack-plugin": "^2.x",
     "favicons": "^4.x",
@@ -82,11 +83,12 @@
     "sprintf-js": "^1.x",
     "style-loader": "^0.x",
     "svg-inline-loader": "^0.x",
+    "ts-loader": "^2.1.0",
+    "ui-leaflet": "git+https://github.com/autowp/ui-leaflet.git#leaflet-1.X",
     "url-loader": "^0.x",
     "webgl-heatmap-leaflet": "git+https://git@github.com/ursudio/leaflet-webgl-heatmap.git",
     "webpack": "^2.x",
-    "webpack-manifest-plugin": "^1.x",
-    "ui-leaflet": "git+https://github.com/autowp/ui-leaflet.git#leaflet-1.X"
+    "webpack-manifest-plugin": "^1.x"
   },
   "scripts": {
     "start": "node_modules/.bin/webpack --progress --colors -p --config webpack.config.js",

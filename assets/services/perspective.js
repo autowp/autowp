@@ -7,9 +7,13 @@ angular.module(Module)
     .service(SERVICE_NAME, ['$q', '$http', function($q, $http) {
         
         var perspectives = null;
+        var promise = null;
         
         this.getPerspectives = function() {
-            return $q(function(resolve, reject) {
+            if (promise) {
+                return promise;
+            }
+            promise = $q(function(resolve, reject) {
                 if (perspectives === null) {
                     $http({
                         method: 'GET',
@@ -17,13 +21,17 @@ angular.module(Module)
                     }).then(function(response) {
                         perspectives = response.data.items;
                         resolve(perspectives);
+                        promise = null;
                     }, function() {
                         reject(null);
+                        promise = null;
                     });
                 } else {
                     resolve(perspectives);
                 }
             });
+            
+            return promise;
         };
         
     }]);

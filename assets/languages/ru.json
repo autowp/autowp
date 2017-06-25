@@ -1192,6 +1192,7 @@
     "moder/vehicle/catalogue/turbo-group-creator/vehicles": "Автомобили",
     "moder/vehicle/catalogue/add-brand": "Бренд ...",
     "moder/vehicle/catalogue/add-brand-%s": "Бренд %s",
+    "ng/moder/vehicle/catalogue/add-brand-{brand}": "Бренд {brand}",
     "moder/vehicle/twins/select-or-create": "Выбрать или создать группу ...",
     "moder/vehicle/twins/group-not-selected": "Группа не задана",
     "moder/vehicle/twins/remove": "Удалить",

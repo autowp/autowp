@@ -9,6 +9,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
 use Application\Model\VehicleType;
+use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 
 class ItemVehicleTypeController extends AbstractRestfulController
 {
@@ -21,6 +22,47 @@ class ItemVehicleTypeController extends AbstractRestfulController
         VehicleType $vehicleType
     ) {
         $this->vehicleType = $vehicleType;
+    }
+
+    public function indexAction()
+    {
+        if (! $this->user()->inheritsRole('moder')) {
+            return $this->forbiddenAction();
+        }
+
+        $itemVehicleTypeTable = new DbTable\Vehicle\VehicleType();
+
+        $select = $itemVehicleTypeTable->select(true);
+
+        $itemId = (int)$this->params()->fromQuery('item_id');
+        if ($itemId) {
+            $select->where('vehicle_id = ?', $itemId);
+        }
+
+        $vehicleTypeId = (int)$this->params()->fromQuery('vehicle_type_id');
+        if ($vehicleTypeId) {
+            $select->where('vehicle_type_id = ?', $vehicleTypeId);
+        }
+
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbSelect($select)
+        );
+
+        $paginator
+            ->setItemCountPerPage(50)
+            ->setCurrentPageNumber($this->params()->fromQuery('page'));
+
+        $items = [];
+        foreach ($paginator->getCurrentItems() as $row) {
+            $items[] = [
+                'item_id'         => (int)$row['vehicle_id'],
+                'vehicle_type_id' => (int)$row['vehicle_type_id'],
+            ];
+        }
+
+        return new JsonModel([
+            'items' => $items
+        ]);
     }
 
     public function itemAction()
@@ -78,7 +120,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
 
         $this->vehicleType->addVehicleType($itemId, $vehicleTypeId);
 
-        $url = $this->url()->fromRoute('api/item-vehicle-type/create', [
+        $url = $this->url()->fromRoute('api/item-vehicle-type/item/get', [
             'vehicle_type_id' => $vehicleTypeId,
             'item_id'         => $itemId
         ]);

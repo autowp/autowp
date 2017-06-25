@@ -23,10 +23,7 @@
 <?php if ($this->user()->inheritsRole('museum-moder')) { ?>
     <p>
         <i class="fa fa-cog"></i>
-        <?=$this->htmlA($this->url('moder/cars/params', [
-            'action'  => 'car',
-            'item_id' => $this->museum['id']
-        ]), $this->translate('moder/edit-object'))?>
+        <?=$this->htmlA('/ng/moder/items/item/' . $this->museum['id'], $this->translate('moder/edit-object'))?>
     </p>
 <?php } ?>
 

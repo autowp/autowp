@@ -11,20 +11,14 @@ class CarsControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $container->get('Config');
         return new Controller(
             $container->get(\Application\HostManager::class),
-            $container->get(\Autowp\TextStorage\Service::class),
             $container->get('MvcTranslator'),
-            clone $container->get('DescriptionForm'),
-            clone $container->get('DescriptionForm'),
             $container->get('ModerCarParent'),
-            $container->get('BrandLogoForm'),
             $container->get(\Application\Model\BrandVehicle::class),
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Application\Model\PictureItem::class),
-            $config['content_languages']
+            $container->get(\Application\Model\PictureItem::class)
         );
     }
 }
