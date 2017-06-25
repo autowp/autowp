@@ -540,7 +540,8 @@ return [
                         'options' => [
                             'haystack' => [
                                 'name',
-                                'childs_count'
+                                'childs_count',
+                                'moder_auto'
                             ]
                         ]
                     ]

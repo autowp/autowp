@@ -388,7 +388,8 @@ angular.module(Module)
                     params: {
                         parent_id: ctrl.item.id,
                         limit: 500,
-                        fields: 'name,duplicate_child.name_html,item.name_html,item.name,item.public_urls'
+                        fields: 'name,duplicate_child.name_html,item.name_html,item.name,item.public_urls',
+                        order: 'moder_auto'
                     }
                 }).then(function(response) {
                     ctrl.childs = response.data.items;

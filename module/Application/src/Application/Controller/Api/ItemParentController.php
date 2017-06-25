@@ -109,15 +109,7 @@ class ItemParentController extends AbstractRestfulController
 
         $select = $this->table->getAdapter()->select()
             ->from($this->table->info('name'))
-            ->join('item', 'item_parent.item_id = item.id', [])
-            ->order([
-                'item_parent.type',
-                'item.name',
-                'item.body',
-                'item.spec_id',
-                'item.begin_order_cache',
-                'item.end_order_cache'
-            ]);
+            ->join('item', 'item_parent.item_id = item.id', []);
 
         if ($data['ancestor_id']) {
             $select
@@ -140,6 +132,29 @@ class ItemParentController extends AbstractRestfulController
 
         if ($data['item_id']) {
             $select->where('item_parent.item_id = ?', $data['item_id']);
+        }
+
+        switch ($data['order']) {
+            case 'moder_auto':
+                $select->order([
+                    'item_parent.type',
+                    'item.begin_order_cache',
+                    'item.end_order_cache',
+                    'item.name',
+                    'item.body',
+                    'item.spec_id',
+                ]);
+                break;
+            default:
+                $select->order([
+                    'item_parent.type',
+                    'item.name',
+                    'item.body',
+                    'item.spec_id',
+                    'item.begin_order_cache',
+                    'item.end_order_cache'
+                ]);
+                break;
         }
 
         $paginator = new \Zend\Paginator\Paginator(
