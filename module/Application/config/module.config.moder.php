@@ -93,24 +93,6 @@ return [
         ]
     ],
     'forms' => [
-        'ModerCarForm' => [
-            'type' => Form\Moder\Car::class,
-            'attributes'  => [
-                'method' => 'post',
-            ],
-        ],
-        'ModerCarOrganizeForm' => [
-            'type' => Form\Moder\CarOrganize::class,
-            'attributes'  => [
-                'method' => 'post',
-            ],
-        ],
-        'ModerCarOrganizePicturesForm' => [
-            'type' => Form\Moder\CarOrganizePictures::class,
-            'attributes'  => [
-                'method' => 'post',
-            ],
-        ],
         'ModerCommentsFilterForm' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
