@@ -383,6 +383,7 @@ class ItemParentController extends AbstractRestfulController
 
         $this->brandVehicle->remove($parentItem->id, $item->id);
 
+        $itemTable = $this->catalogue()->getItemTable();
         $itemTable->updateInteritance($item);
 
         $vehicleType = new VehicleType();
