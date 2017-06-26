@@ -4,7 +4,6 @@ namespace Application;
 
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
-use Zend\ServiceManager\Factory\InvokableFactory;
 
 return [
     'router' => [
@@ -48,22 +47,6 @@ return [
                             ]
                         ]
                     ],
-                    'item-parent' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/item-parent[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\ItemParentController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'modification' => [
                         'type' => Segment::class,
                         'options' => [
@@ -86,10 +69,8 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Moder\AttrsController::class        => Controller\Moder\Service\AttrsControllerFactory::class,
-            Controller\Moder\ItemParentController::class   => Controller\Moder\Service\ItemParentControllerFactory::class,
-            Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
-            Controller\Moder\HotlinkController::class      => InvokableFactory::class,
+            Controller\Moder\AttrsController::class => Controller\Moder\Service\AttrsControllerFactory::class,
+            Controller\Moder\CarsController::class  => Controller\Moder\Service\CarsControllerFactory::class,
         ]
     ],
     'forms' => [
@@ -213,74 +194,6 @@ return [
                     'required' => false
                 ]
             ]
-        ],
-        'ModerCarParent' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type'    => 'Text',
-                        'name'    => 'name',
-                        'options' => [
-                            'label' => 'Name',
-                        ],
-                        'attributes' => [
-                            'maxlength' => 50
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type'    => 'Text',
-                        'name'    => 'catname',
-                        'options' => [
-                            'label' => 'Catname',
-                        ],
-                        'attributes' => [
-                            'maxlength' => 50
-                        ]
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'name' => [
-                    'required'   => false,
-                    'filters'    => [
-                        ['name' => 'StringTrim'],
-                        ['name' => 'SingleSpaces'],
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'min' => 1,
-                                'max' => 50
-                            ]
-                        ]
-                    ]
-                ],
-                'catname' => [
-                    'required' => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim'],
-                        ['name' => 'SingleSpaces'],
-                        ['name' => 'StringToLower'],
-                        ['name' => 'FilenameSafe']
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'min' => 1,
-                                'max' => 50
-                            ]
-                        ]
-                    ]
-                ]
-            ],
         ]
     ]
 ];

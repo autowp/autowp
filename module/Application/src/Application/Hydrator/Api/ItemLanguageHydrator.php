@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace Application\Hydrator\Api;
 
-use Application\Hydrator\Api\Strategy\Item as HydratorItemStrategy;
-
 class ItemLanguageHydrator extends RestHydrator
 {
     /**
      * @var int|null
      */
     private $userId = null;
-
-    private $router;
 
     /**
      * @var TextStorage
@@ -25,11 +21,7 @@ class ItemLanguageHydrator extends RestHydrator
     ) {
         parent::__construct();
 
-        $this->router = $serviceManager->get('HttpRouter');
         $this->textStorage = $serviceManager->get(\Autowp\TextStorage\Service::class);
-
-        $strategy = new HydratorItemStrategy($serviceManager);
-        $this->addStrategy('item', $strategy);
     }
 
     public function extract($object)

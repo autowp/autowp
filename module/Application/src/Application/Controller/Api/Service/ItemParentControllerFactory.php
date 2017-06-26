@@ -18,6 +18,7 @@ class ItemParentControllerFactory implements FactoryInterface
             $filters->get('api_item_parent_list'),
             $filters->get('api_item_parent_item'),
             $filters->get('api_item_parent_post'),
+            $filters->get('api_item_parent_put'),
             $container->get(\Application\Model\BrandVehicle::class),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\HostManager::class),

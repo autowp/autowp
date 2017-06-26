@@ -20,6 +20,7 @@ return [
             Hydrator\Api\ItemLanguageHydrator::class     => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemLinkHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemParentHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemParentLanguageHydrator::class => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\LogHydrator::class              => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectiveHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectiveGroupHydrator::class => Hydrator\Api\RestHydratorFactory::class,
@@ -43,6 +44,7 @@ return [
             Controller\Api\ItemLanguageController::class    => Controller\Api\ItemLanguageControllerFactory::class,
             Controller\Api\ItemLinkController::class        => Controller\Api\ItemLinkControllerFactory::class,
             Controller\Api\ItemParentController::class      => Controller\Api\Service\ItemParentControllerFactory::class,
+            Controller\Api\ItemParentLanguageController::class => Controller\Api\ItemParentLanguageControllerFactory::class,
             Controller\Api\ItemVehicleTypeController::class => Controller\Api\Service\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LogController::class             => Controller\Api\Service\LogControllerFactory::class,
             Controller\Api\PageController::class            => Controller\Api\Service\PageControllerFactory::class,
@@ -336,6 +338,51 @@ return [
                 ]
             ],
         ],
+        'api_item_language_put' => [
+            'name' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => 255
+                        ]
+                    ]
+                ]
+            ],
+            'text' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => 4096
+                        ]
+                    ]
+                ]
+            ],
+            'full_text' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => 65536
+                        ]
+                    ]
+                ]
+            ],
+        ],
         'api_item_link_index' => [
             'item_id' => [
                 'required' => true,
@@ -447,6 +494,23 @@ return [
                     ]
                 ]
             ],
+        ],
+        'api_item_parent_language_put' => [
+            'name' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => DbTable\Item\ParentLanguage::MAX_NAME
+                        ]
+                    ]
+                ]
+            ]
         ],
         'api_item_parent_list' => [
             'ancestor_id' => [
@@ -579,50 +643,44 @@ return [
                 ]
             ],
         ],
-        'api_item_language_put' => [
-            'name' => [
-                'required' => false,
+        'api_item_parent_put' => [
+            'type_id' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                Model\DbTable\Item\ParentTable::TYPE_DEFAULT,
+                                Model\DbTable\Item\ParentTable::TYPE_TUNING,
+                                Model\DbTable\Item\ParentTable::TYPE_SPORT,
+                                Model\DbTable\Item\ParentTable::TYPE_DESIGN
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'catname' => [
+                'required' => true,
                 'filters'  => [
                     ['name' => 'StringTrim'],
-                    ['name' => SingleSpaces::class]
+                    ['name' => 'SingleSpaces'],
+                    ['name' => 'StringToLower'],
+                    ['name' => 'FilenameSafe']
                 ],
                 'validators' => [
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => 255
+                            'min' => 1,
+                            'max' => 50
                         ]
                     ]
                 ]
-            ],
-            'text' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'max' => 4096
-                        ]
-                    ]
-                ]
-            ],
-            'full_text' => [
-                'required' => false,
-                'filters'  => [
-                    ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    [
-                        'name' => 'StringLength',
-                        'options' => [
-                            'max' => 65536
-                        ]
-                    ]
-                ]
-            ],
+            ]
         ],
         'api_log_list' => [
             'article_id' => [
@@ -1813,6 +1871,15 @@ return [
                                             ]
                                         ]
                                     ],
+                                    'put' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'put',
+                                            'defaults' => [
+                                                'action' => 'put'
+                                            ]
+                                        ]
+                                    ],
                                     'delete' => [
                                         'type' => Method::class,
                                         'options' => [
@@ -1821,7 +1888,55 @@ return [
                                                 'action' => 'delete'
                                             ]
                                         ]
-                                    ]
+                                    ],
+                                    'language' => [
+                                        'type' => Literal::class,
+                                        'options' => [
+                                            'route' => '/language',
+                                            'defaults' => [
+                                                'controller' => Controller\Api\ItemParentLanguageController::class
+                                            ]
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'index' => [
+                                                'type' => Method::class,
+                                                'options' => [
+                                                    'verb' => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'index'
+                                                    ]
+                                                ]
+                                            ],
+                                            'item' => [
+                                                'type' => Segment::class,
+                                                'options' => [
+                                                    'route' => '/:language'
+                                                ],
+                                                'may_terminate' => false,
+                                                'child_routes' => [
+                                                    'get' => [
+                                                        'type' => Method::class,
+                                                        'options' => [
+                                                            'verb' => 'get',
+                                                            'defaults' => [
+                                                                'action' => 'get'
+                                                            ]
+                                                        ]
+                                                    ],
+                                                    'put' => [
+                                                        'type' => Method::class,
+                                                        'options' => [
+                                                            'verb' => 'put',
+                                                            'defaults' => [
+                                                                'action' => 'put'
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ],
                                 ]
                             ],
                             'post' => [

@@ -91,7 +91,8 @@ class ItemParentHydrator extends RestHydrator
         $result = [
             'item_id'   => (int)$object['item_id'],
             'parent_id' => (int)$object['parent_id'],
-            'type'      => (int)$object['type'],
+            'type_id'   => (int)$object['type'],
+            'catname'   => $object['catname'],
         ];
 
         if ($this->filterComposite->filter('item')) {

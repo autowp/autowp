@@ -74,6 +74,7 @@ class ItemParentController extends AbstractRestfulController
         InputFilter $listInputFilter,
         InputFilter $itemInputFilter,
         InputFilter $postInputFilter,
+        InputFilter $putInputFilter,
         BrandVehicle $brandVehicle,
         SpecificationsService $specificationsService,
         HostManager $hostManager,
@@ -83,6 +84,7 @@ class ItemParentController extends AbstractRestfulController
         $this->listInputFilter = $listInputFilter;
         $this->itemInputFilter = $itemInputFilter;
         $this->postInputFilter = $postInputFilter;
+        $this->putInputFilter = $putInputFilter;
 
         $this->table = new DbTable\Item\ParentTable();
         $this->itemTable = new DbTable\Item();
@@ -309,6 +311,63 @@ class ItemParentController extends AbstractRestfulController
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
         return $this->getResponse()->setStatusCode(201);
+    }
+
+    public function putAction()
+    {
+        $canMove = $this->user()->isAllowed('car', 'move');
+        if (! $canMove) {
+            return $this->forbiddenAction();
+        }
+
+        $data = $this->processBodyContent($this->getRequest());
+
+        $fields = [];
+        foreach (array_keys($data) as $key) {
+            if ($this->putInputFilter->has($key)) {
+                $fields[] = $key;
+            }
+        }
+
+        $this->putInputFilter->setValidationGroup($fields);
+
+        if (! $fields) {
+            return new ApiProblemResponse(new ApiProblem(400, 'Invalid request'));
+        }
+
+        $this->putInputFilter->setData($data);
+
+        if (! $this->putInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->putInputFilter);
+        }
+
+        $data = $this->putInputFilter->getValues();
+
+        $itemTable = $this->catalogue()->getItemTable();
+
+        $select = $this->table->getAdapter()->select()
+            ->from($this->table->info('name'))
+            ->where('item_id = ?', (int)$this->params('item_id'))
+            ->where('parent_id = ?', (int)$this->params('parent_id'));
+
+        $row = $this->table->getAdapter()->fetchRow($select);
+        if (! $row) {
+            return $this->notFoundAction();
+        }
+
+        $values = [];
+
+        if (array_key_exists('catname', $data)) {
+            $values['catname'] = $data['catname'];
+        }
+
+        if (array_key_exists('type_id', $data)) {
+            $values['type'] = $data['type_id'];
+        }
+
+        $this->brandVehicle->setItemParent($row['parent_id'], $row['item_id'], $values, false);
+
+        return $this->getResponse()->setStatusCode(200);
     }
 
     /**

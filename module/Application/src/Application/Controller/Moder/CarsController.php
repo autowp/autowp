@@ -32,11 +32,6 @@ class CarsController extends AbstractActionController
     private $translator;
 
     /**
-     * @var Form
-     */
-    private $itemParentForm;
-
-    /**
      * @var HostManager
      */
     private $hostManager;
@@ -64,7 +59,6 @@ class CarsController extends AbstractActionController
     public function __construct(
         HostManager $hostManager,
         $translator,
-        Form $itemParentForm,
         BrandVehicle $brandVehicle,
         MessageService $message,
         SpecificationsService $specificationsService,
@@ -72,7 +66,6 @@ class CarsController extends AbstractActionController
     ) {
         $this->hostManager = $hostManager;
         $this->translator = $translator;
-        $this->itemParentForm = $itemParentForm;
         $this->brandVehicle = $brandVehicle;
         $this->message = $message;
         $this->specificationsService = $specificationsService;
@@ -498,111 +491,6 @@ class CarsController extends AbstractActionController
 
         return new JsonModel([
             'ok' => true
-        ]);
-    }
-
-    public function carParentSetCatnameAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $car = $itemTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $parent = $itemTable->find($this->params('parent_id'))->current();
-        if (! $parent) {
-            return $this->notFoundAction();
-        }
-
-        $itemParentTable = $this->getCarParentTable();
-
-        $itemParentRow = $itemParentTable->fetchRow([
-            'item_id = ?'   => $car->id,
-            'parent_id = ?' => $parent->id
-        ]);
-
-        if (! $itemParentRow) {
-            return $this->notFoundAction();
-        }
-
-        $ok = false;
-        $messages = [];
-
-        $data = $this->params()->fromPost();
-        $takeCatnameFromName = ! isset($data['catname'])
-                            || ! strlen($data['catname'])
-                            || (! $itemParentRow->manual_catname && ($data['catname'] == $itemParentRow->item_id));
-        if ($takeCatnameFromName && isset($data['name'])) {
-            $data['catname'] = $data['name'];
-        }
-
-        $this->itemParentForm->setData($data);
-        if ($this->itemParentForm->isValid()) {
-            $values = $this->itemParentForm->getData();
-
-            $row = $itemParentTable->fetchRow([
-                'parent_id = ?' => $itemParentRow->parent_id,
-                'catname = ?'   => $values['catname'],
-                'item_id <> ?'  => $itemParentRow->item_id
-            ]);
-
-            if (! $row) {
-                $nameIsEmpty = strlen($values['name']) == 0;
-
-                if (! $nameIsEmpty) {
-                    $itemParentRow->name = $values['name'];
-                } else {
-                    $itemParentRow->name = null;
-                }
-
-                $catnameIsEmpty = strlen($values['catname']) == 0 || $values['catname'] == '_';
-                if (! $catnameIsEmpty) {
-                    $itemParentRow->catname = $values['catname'];
-                    $itemParentRow->manual_catname = 1;
-                } else {
-                    $itemParentRow->catname = $itemParentRow->item_id;
-                    $itemParentRow->manual_catname = 0;
-                }
-
-                $itemParentRow->save();
-
-                $ok = true;
-            }
-        } else {
-            $messages = array_values($this->itemParentForm->catname->getMessages());
-        }
-
-        $urls = [
-            (int)$car->id => $this->carPublicUrls($car)
-        ];
-
-        $itemParentTable = $this->getCarParentTable();
-
-        $itemParentRows = $itemParentTable->fetchAll([
-            'parent_id = ?' => $car->id
-        ]);
-        foreach ($itemParentRows as $cpRow) {
-            $carRow = $itemTable->fetchRow([
-                'id = ?' => $cpRow->item_id
-            ]);
-            if (! $carRow) {
-                throw new Exception("Broken car parent link");
-            }
-
-            $urls[(int)$carRow->id] = $this->carPublicUrls($carRow);
-        }
-
-        return new JsonModel([
-            'ok'         => $ok,
-            'name'       => $itemParentRow->name,
-            'catname'    => $itemParentRow->catname,
-            'messages'   => $messages,
-            'urls'       => $urls
         ]);
     }
 

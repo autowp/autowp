@@ -4,7 +4,7 @@ import template from './template.html';
 import ACL_SERVICE_NAME from 'services/acl';
 import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
 import SPEC_SERVICE from 'services/spec';
-var sprintf = require("sprintf-js").sprintf;
+import CONTENT_LANGUAGE_SERVICE from 'services/content-language';
 var $ = require('jquery');
 require('corejs-typeahead');
 import './tree';
@@ -54,8 +54,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$rootScope', '$http', '$state', '$translate', '$q', '$element', SPEC_SERVICE, VEHICLE_TYPE_SERVICE, ACL_SERVICE_NAME,
-        function($scope, $rootScope, $http, $state, $translate, $q, $element, SpecService, VehicleTypeService, Acl) {
+        '$scope', '$rootScope', '$http', '$state', '$translate', '$q', '$element', SPEC_SERVICE, VEHICLE_TYPE_SERVICE, ACL_SERVICE_NAME, CONTENT_LANGUAGE_SERVICE,
+        function($scope, $rootScope, $http, $state, $translate, $q, $element, SpecService, VehicleTypeService, Acl, ContentLanguage) {
             
             var ctrl = this;
             
@@ -344,11 +344,7 @@ angular.module(Module)
             function initItemLanguageTab() {
                 // TODO: move to service
                 ctrl.languagesLoading++;
-                $http({
-                    method: 'GET',
-                    url: '/api/content-language'
-                }).then(function(response) {
-                    var contentLanguages = response.data.items;
+                ContentLanguage.getList().then(function(contentLanguages) {
                     ctrl.currentLanguage = contentLanguages[0];
                     
                     angular.forEach(contentLanguages, function(language) {

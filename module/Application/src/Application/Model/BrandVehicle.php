@@ -365,7 +365,7 @@ class BrandVehicle
         $cpcTable->rebuildCache($itemRow);
     }
 
-    private function setItemParentLanguage($parentId, $itemId, $language, array $values, $forceIsAuto)
+    public function setItemParentLanguage($parentId, $itemId, $language, array $values, $forceIsAuto)
     {
         $parentId = (int)$parentId;
         $itemId = (int)$itemId;
@@ -440,32 +440,38 @@ class BrandVehicle
             return false;
         }
 
-        $newCatname = $values['catname'];
+        if (array_key_exists('type', $values)) {
+            $itemParentRow['type'] = $values['type'];
+        }
 
-        if ($forceIsAuto) {
-            $isAuto = true;
-        } else {
-            $isAuto = ! $itemParentRow->manual_catname;
-            if ($itemParentRow->catname != $newCatname) {
-                $isAuto = false;
+        if (array_key_exists('catname', $values)) {
+            $newCatname = $values['catname'];
+
+            if ($forceIsAuto) {
+                $isAuto = true;
+            } else {
+                $isAuto = ! $itemParentRow->manual_catname;
+                if ($itemParentRow->catname != $newCatname) {
+                    $isAuto = false;
+                }
             }
+
+            if (! $newCatname || $newCatname == '_') {
+                $parentRow = $this->itemTable->find($parentId)->current();
+                $itemRow = $this->itemTable->find($itemId)->current();
+                $newCatname = $this->extractCatname($parentRow, $itemRow);
+                $isAuto = true;
+            }
+
+            $itemParentRow->setFromArray([
+                'catname'        => $newCatname,
+                'manual_catname' => $isAuto ? 0 : 1,
+            ]);
         }
 
-        if (! $newCatname || $newCatname == '_') {
-            $parentRow = $this->itemTable->find($parentId)->current();
-            $itemRow = $this->itemTable->find($itemId)->current();
-            $newCatname = $this->extractCatname($parentRow, $itemRow);
-            $isAuto = true;
-        }
-
-        $itemParentRow->setFromArray([
-            'catname'        => $newCatname,
-            'type'           => $values['type'],
-            'manual_catname' => $isAuto ? 0 : 1,
-        ]);
         $itemParentRow->save();
 
-        return $this->setItemParentLanguages($parentId, $itemId, $values, false);
+        return true;
     }
 
     public function refreshAuto($parentId, $itemId)

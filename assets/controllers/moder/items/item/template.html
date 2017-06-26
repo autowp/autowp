@@ -211,7 +211,7 @@
                         </small></div>
                     </td>
                     <td>
-                        <a ng-href="/moder/item-parent/item/item_id/{{item.item_id}}/parent_id/{{item.parent_id}}">
+                        <a ui-sref="moder-item-parent({item_id: item.item_id, parent_id: item.parent_id})">
                             {{item.name}}
                             <span class="fa fa-pencil"></span>
                         </a>
@@ -241,9 +241,9 @@
                 <tr data-id="{{item.id}}" ng-repeat="item in ctrl.childs">
                     <td>
                         <i class="fa fa-arrow-down"></i>
-                        <span ng-if="item.type == 1" translate>moder/vehicle/link-type-prefix/related</span>
-                        <span ng-if="item.type == 3" translate>moder/vehicle/link-type-prefix/design</span>
-                        <span ng-if="item.type == 2" translate>moder/vehicle/link-type-prefix/sport</span>
+                        <span ng-if="item.type_id == 1" translate>moder/vehicle/link-type-prefix/related</span>
+                        <span ng-if="item.type_id == 3" translate>moder/vehicle/link-type-prefix/design</span>
+                        <span ng-if="item.type_id == 2" translate>moder/vehicle/link-type-prefix/sport</span>
                         <a ui-sref="moder-items-item({id: item.item_id})" ng-href="{{item.url}}" ng-bind-html="item.item.name_html"></a>
                         <div ng-if="item.duplicate_child" class="text-warning"><small>
                             {{'moder/vehicle/catalogue/possible-duplicate-child'|translate}}
@@ -251,7 +251,7 @@
                         </small></div>
                     </td>
                     <td>
-                        <a ng-href="/moder/item-parent/item/item_id/{{item.item_id}}/parent_id/{{item.parent_id}}">
+                        <a ui-sref="moder-item-parent({item_id: item.item_id, parent_id: item.parent_id})">
                             {{item.name}}
                             <span class="fa fa-pencil"></span>
                         </a>
