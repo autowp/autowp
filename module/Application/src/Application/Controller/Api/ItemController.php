@@ -1025,8 +1025,8 @@ class ItemController extends AbstractRestfulController
                         $subscriber->language
                     ),
                     $this->userModerUrl($user, true, $uri),
-                    $this->car()->formatName($car, $subscriber->language),
-                    $this->itemModerUrl($car, true, null, $uri),
+                    $this->car()->formatName($item, $subscriber->language),
+                    $this->itemModerUrl($item, true, null, $uri),
                     ( count($changes) ? implode("\n", $changes) : '')
                 );
 
