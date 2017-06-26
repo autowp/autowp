@@ -167,6 +167,8 @@ class ItemController extends AbstractRestfulController
             $select
                 ->join('item_language', 'item.id = item_language.item_id', null)
                 ->where('item_language.name like ?', $data['name']);
+
+            $group = true;
         }
 
         if ($data['name_exclude']) {
