@@ -2,8 +2,6 @@
 
 namespace Application\Controller\Moder;
 
-use Exception;
-
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -381,79 +379,6 @@ class CarsController extends AbstractActionController
         return $this->itemParentTable
             ? $this->itemParentTable
             : $this->itemParentTable = new DbTable\Item\ParentTable();
-    }
-
-    private function walkUpUntilBrand($id, array $path)
-    {
-        $urls = [];
-
-        $parentRows = $this->getCarParentTable()->fetchAll([
-            'item_id = ?' => $id
-        ]);
-
-        $itemTable = $this->catalogue()->getItemTable();
-
-        foreach ($parentRows as $parentRow) {
-            $brand = $itemTable->fetchRow([
-                'item_type_id = ?' => DbTable\Item\Type::BRAND,
-                'id = ?'           => $parentRow->parent_id
-            ]);
-
-            if ($brand) {
-                $urls[] = $this->url()->fromRoute('catalogue', [
-                    'action'        => 'brand-item',
-                    'brand_catname' => $brand->catname,
-                    'car_catname'   => $parentRow->catname,
-                    'path'          => $path
-                ]);
-            }
-
-            $urls = array_merge(
-                $urls,
-                $this->walkUpUntilBrand($parentRow->parent_id, array_merge([$parentRow->catname], $path))
-            );
-        }
-
-        return $urls;
-    }
-
-    private function carPublicUrls(DbTable\Item\Row $car)
-    {
-        if ($car['item_type_id'] == DbTable\Item\Type::FACTORY) {
-            return [
-                $this->url()->fromRoute('factories/factory', [
-                    'action' => 'factory',
-                    'id'     => $car['id'],
-                ])
-            ];
-        }
-
-        if ($car['item_type_id'] == DbTable\Item\Type::CATEGORY) {
-            return [
-                $this->url()->fromRoute('categories', [
-                    'action'           => 'category',
-                    'category_catname' => $car['catname'],
-                ])
-            ];
-        }
-
-        if ($car['item_type_id'] == DbTable\Item\Type::TWINS) {
-            return [
-                $this->url()->fromRoute('twins/group', [
-                    'id' => $car['id'],
-                ])
-            ];
-        }
-
-        if ($car['item_type_id'] == DbTable\Item\Type::BRAND) {
-            return [
-                $this->url()->fromRoute('catalogue', [
-                    'brand_catname' => $car['catname'],
-                ])
-            ];
-        }
-
-        return $this->walkUpUntilBrand($car->id, []);
     }
 
     public function carParentSetTypeAction()

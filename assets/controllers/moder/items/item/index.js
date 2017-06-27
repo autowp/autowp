@@ -330,7 +330,7 @@ angular.module(Module)
                     params: {
                         item_id: ctrl.item.id,
                         limit: 500,
-                        fields: 'owner,thumbnail,moder_vote,votes,similar,comments_count,perspective_item,name_html,name_text'
+                        fields: 'owner,thumbnail,moder_vote,votes,similar,comments_count,perspective_item,name_html,name_text,views'
                     }
                 }).then(function(response) {
                     ctrl.pictures = response.data.pictures;
