@@ -7,7 +7,7 @@
             <p><a href="{{picture.url}}" ng-bind-html="picture.name_html"></a></p>
 
             <p class="picture-behaviour clearfix" ng-if="!disableBehaviour">
-                <span title="Status" ng-if="isModer">
+                <span title="Status" ng-if="picture.status">
                     <i class="fa fa-check text-success" ng-if="picture.status=='accepted'"></i>
                     <i class="fa fa-hourglass text-warning" ng-if="picture.status=='inbox'"></i>
                     <i class="fa fa-trash text-danger" ng-if="picture.status=='removed'"></i>
