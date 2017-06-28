@@ -4,6 +4,7 @@ import template from './template.html';
 import './styles.less';
 import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
 import SPEC_SERVICE from 'services/spec';
+import LANGUAGE_SERVICE_NAME from 'services/language';
 var sprintf = require("sprintf-js").sprintf;
 
 function toPlain(options, deep) {
@@ -31,8 +32,8 @@ angular.module(Module)
             template: template,
             transclude: true,
             controllerAs: 'ctrl',
-            controller: ['$scope', '$q', SPEC_SERVICE, VEHICLE_TYPE_SERVICE, 'leafletData',
-                function($scope, $q, SpecService, VehicleTypeService, leafletData) {
+            controller: ['$scope', '$q', SPEC_SERVICE, VEHICLE_TYPE_SERVICE, LANGUAGE_SERVICE_NAME, 'leafletData',
+                function($scope, $q, SpecService, VehicleTypeService, LanguageService, leafletData) {
                     var ctrl = this;
                     
                     ctrl.center = {
@@ -116,11 +117,11 @@ angular.module(Module)
                         }
                     ];
                     
-                    var date = new Date("01/01/2000");
+                    var date = new Date(Date.UTC(2000, 1, 1, 0, 0, 0, 0));
                     for (var i=0; i<12; i++) {
                         date.setMonth(i);
                         
-                        var month = date.toLocaleString({}, { month: "long" });
+                        var month = date.toLocaleString(LanguageService.getLanguage(), { month: "long" });
                         ctrl.monthOptions.push({
                             value: i+1,
                             name: sprintf("%02d - %s", i+1, month)
