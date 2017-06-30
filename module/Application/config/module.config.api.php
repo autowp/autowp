@@ -262,7 +262,8 @@ return [
                                 'name',
                                 'childs_count',
                                 'id_desc',
-                                'id_asc'
+                                'id_asc',
+                                'age'
                             ]
                         ]
                     ]

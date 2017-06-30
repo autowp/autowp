@@ -151,6 +151,9 @@ class ItemController extends AbstractRestfulController
                     ->join('item_parent', 'item_parent.parent_id = item.id', null)
                     ->order('childs_count desc');
                 break;
+            case 'age':
+                $select->order($this->catalogue()->itemOrdering());
+                break;
             default:
                 $select->order([
                     'item.name',

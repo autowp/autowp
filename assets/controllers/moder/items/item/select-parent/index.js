@@ -254,7 +254,8 @@ angular.module(Module)
                         limit: 100,
                         fields: 'name_html,childs_count',
                         parent_id: parent.id,
-                        is_group: true
+                        is_group: true,
+                        order: 'age'
                     }
                 }).then(function(response) {
                     parent.childs = response.data.items;
