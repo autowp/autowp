@@ -15,7 +15,7 @@ angular.module(Module)
         function config($stateProvider) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/items/item/{id}/select-parent?tab&brand_id',
+                url: '/moder/items/item/{id}/select-parent?tab&brand_id&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template,
@@ -40,6 +40,8 @@ angular.module(Module)
             ctrl.showFactoriesTab = false;
             
             ctrl.brand_id = null;
+            ctrl.paginator = null;
+            ctrl.page = $state.params.page;
             
             $http({
                 method: 'GET',
@@ -78,10 +80,12 @@ angular.module(Module)
                                 fields: 'name_html,childs_count',
                                 parent_id: ctrl.brand_id,
                                 is_group: true,
-                                type_id: ctrl.item.item_type_id
+                                type_id: ctrl.item.item_type_id,
+                                page: ctrl.page
                             }
                         }).then(function(response) {
                             ctrl.items = response.data.items;
+                            ctrl.paginator = response.data.paginator;
                         });
                     } else {
                         $http({
@@ -89,12 +93,14 @@ angular.module(Module)
                             url: '/api/item',
                             params: {
                                 type_id: 5,
-                                limit: 100,
+                                limit: 500,
                                 fields: 'name_html',
-                                have_childs_of_type: ctrl.item.item_type_id
+                                have_childs_of_type: ctrl.item.item_type_id,
+                                page: ctrl.page
                             }
                         }).then(function(response) {
                             ctrl.brands = ctrl.chunk(response.data.items, 6);
+                            ctrl.paginator = response.data.paginator;
                         });
                     }
                 }
@@ -105,11 +111,13 @@ angular.module(Module)
                         url: '/api/item',
                         params: {
                             type_id: 5,
-                            limit: 100,
-                            fields: 'name_html'
+                            limit: 500,
+                            fields: 'name_html',
+                            page: ctrl.page
                         }
                     }).then(function(response) {
                         ctrl.brands = ctrl.chunk(response.data.items, 6);
+                        ctrl.paginator = response.data.paginator;
                     });
                 }
                 
@@ -121,10 +129,12 @@ angular.module(Module)
                             type_id: 3,
                             limit: 100,
                             no_parent: true,
-                            fields: 'name_html,childs_count'
+                            fields: 'name_html,childs_count',
+                            page: ctrl.page
                         }
                     }).then(function(response) {
                         ctrl.categories = response.data.items;
+                        ctrl.paginator = response.data.paginator;
                     });
                 }
                 
@@ -136,12 +146,14 @@ angular.module(Module)
                             url: '/api/item',
                             params: {
                                 type_id: 4,
-                                limit: 100,
+                                limit: 500,
                                 fields: 'name_html',
-                                have_common_childs_with: ctrl.brand_id
+                                have_common_childs_with: ctrl.brand_id,
+                                page: ctrl.page
                             }
                         }).then(function(response) {
                             ctrl.items = response.data.items;
+                            ctrl.paginator = response.data.paginator;
                         });
                     } else {
                         $http({
@@ -151,10 +163,12 @@ angular.module(Module)
                                 type_id: 5,
                                 limit: 100,
                                 fields: 'name_html',
-                                have_childs_of_type: 4
+                                have_childs_of_type: 4,
+                                page: ctrl.page
                             }
                         }).then(function(response) {
                             ctrl.brands = ctrl.chunk(response.data.items, 6);
+                            ctrl.paginator = response.data.paginator;
                         });
                     }
                 }
@@ -166,10 +180,12 @@ angular.module(Module)
                         params: {
                             type_id: 6,
                             limit: 100,
-                            fields: 'name_html'
+                            fields: 'name_html',
+                            page: ctrl.page
                         }
                     }).then(function(response) {
                         ctrl.factories = response.data.items;
+                        ctrl.paginator = response.data.paginator;
                     });
                 }
                 
