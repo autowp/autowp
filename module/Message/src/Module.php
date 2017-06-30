@@ -14,11 +14,11 @@ class Module implements
     {
         $application = $e->getApplication();
         $serviceManager = $application->getServiceManager();
-        
+
         $maintenance = new Maintenance();
         $maintenance->attach($serviceManager->get('CronEventManager')); // TODO: move CronEventManager to zf-components
     }
-    
+
     /**
      * @return array
      */

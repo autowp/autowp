@@ -13,6 +13,7 @@ use Application\Hydrator\Api\RestHydrator;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
 use Application\HostManager;
+use Autowp\Message\MessageService;
 
 class ItemLanguageController extends AbstractRestfulController
 {
@@ -52,7 +53,8 @@ class ItemLanguageController extends AbstractRestfulController
         RestHydrator $hydrator,
         BrandVehicle $brandVehicle,
         HostManager $hostManager,
-        InputFilter $putInputFilter
+        InputFilter $putInputFilter,
+        MessageService $message
     ) {
         $this->table = $table;
         $this->textStorage = $textStorage;
@@ -60,6 +62,7 @@ class ItemLanguageController extends AbstractRestfulController
         $this->brandVehicle = $brandVehicle;
         $this->hostManager = $hostManager;
         $this->putInputFilter = $putInputFilter;
+        $this->message = $message;
     }
 
     public function indexAction()
@@ -197,7 +200,6 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         if ($set) {
-
             $primaryKey = [
                 'item_id'  => $item['id'],
                 'language' => $language

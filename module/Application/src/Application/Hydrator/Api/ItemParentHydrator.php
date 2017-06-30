@@ -132,7 +132,8 @@ class ItemParentHydrator extends RestHydrator
 
             $duplicateRow = $this->itemTable->fetchRow($select);
 
-            $result['duplicate_parent'] = $duplicateRow ? $this->extractValue('duplicate_parent', $duplicateRow->toArray()) : null;
+            $result['duplicate_parent'] = $duplicateRow
+                ? $this->extractValue('duplicate_parent', $duplicateRow->toArray()) : null;
         }
 
         if ($this->filterComposite->filter('duplicate_child')) {
@@ -146,7 +147,8 @@ class ItemParentHydrator extends RestHydrator
 
             $duplicateRow = $this->itemTable->fetchRow($select);
 
-            $result['duplicate_child'] = $duplicateRow ? $this->extractValue('duplicate_child', $duplicateRow->toArray()) : null;
+            $result['duplicate_child'] = $duplicateRow
+                ? $this->extractValue('duplicate_child', $duplicateRow->toArray()) : null;
         }
 
         return $result;

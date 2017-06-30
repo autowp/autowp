@@ -111,7 +111,8 @@ class Car extends AbstractPlugin
         $disableSpecs         = isset($options['disableSpecs']) && $options['disableSpecs'];
         $disableCategories    = isset($options['disableCategories']) && $options['disableCategories'];
         $callback             = isset($options['callback']) && $options['callback'] ? $options['callback'] : null;
-        $thumbColumns         = isset($options['thumbColumns']) && $options['thumbColumns'] ? $options['thumbColumns'] : 4;
+        $thumbColumns         = isset($options['thumbColumns']) && $options['thumbColumns']
+                                    ? $options['thumbColumns'] : 4;
 
         $controller = $this->getController();
         $pluginManager = $controller->getPluginManager();

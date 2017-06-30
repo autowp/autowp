@@ -678,7 +678,11 @@ class CommentsService
                         new Sql\Predicate\PredicateSet([
                             new Sql\Predicate\Expression('comment_topic.type_id = comment_topic_view.type_id'),
                             new Sql\Predicate\Expression('comment_topic.item_id = comment_topic_view.item_id'),
-                            new Sql\Predicate\Operator('comment_topic_view.user_id', Sql\Predicate\Operator::OP_EQ, $userId)
+                            new Sql\Predicate\Operator(
+                                'comment_topic_view.user_id',
+                                Sql\Predicate\Operator::OP_EQ,
+                                $userId
+                            )
                         ]),
                         ['timestamp'],
                         $select::JOIN_LEFT

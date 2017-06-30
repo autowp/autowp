@@ -107,7 +107,8 @@ class CategoryController extends AbstractActionController
                         'category_catname' => $row->catname,
                     ]),
                     'name'           => $langRow ? $langRow->name : $row->name,
-                    'short_name'     => $langRow ? $langRow->name : $row->name,//$langRow ? $langRow->short_name : $row->short_name,
+                    'short_name'     => $langRow ? $langRow->name : $row->name,
+                                        //$langRow ? $langRow->short_name : $row->short_name,
                     'cars_count'     => $carsCount,
                     'new_cars_count' => $carsCount //$row->getWeekCarsCount(),
                 ];

@@ -264,7 +264,6 @@ class ItemHydrator extends RestHydrator
                 $value = (int)$object['spec_id'];
                 $result['spec_id'] = $value > 0 ? $value : null;
             }
-
         }
 
         if ($this->filterComposite->filter('is_group')) { // only for moders
@@ -351,7 +350,6 @@ class ItemHydrator extends RestHydrator
         $showLng = $this->filterComposite->filter('lng');
 
         if ($showLat || $showLng) {
-
             $point = $this->getItemPoint((int)$object['id']);
 
             if ($showLat) {
@@ -621,7 +619,6 @@ class ItemHydrator extends RestHydrator
         $fullTextIds = [];
 
         if ($showDescription || $showHasText) {
-
             $select = new Sql\Select($this->itemLanguageTable->getTable());
             $select->columns(['text_id', 'full_text_id'])
                 ->where(['item_id' => $object['id']])

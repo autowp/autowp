@@ -167,10 +167,16 @@ class MessageService
     private function getDialogSelect($userId, $withUserId)
     {
         $predicate1 = new Sql\Predicate\Predicate();
-        $predicate1->expression('from_user_id = ? and to_user_id = ? and NOT deleted_by_from', [(int)$userId, (int)$withUserId]);
+        $predicate1->expression(
+            'from_user_id = ? and to_user_id = ? and NOT deleted_by_from',
+            [(int)$userId, (int)$withUserId]
+        );
 
         $predicate2 = new Sql\Predicate\Predicate();
-        $predicate2->expression('from_user_id = ? and to_user_id = ? and NOT deleted_by_to', [(int)$withUserId, (int)$userId]);
+        $predicate2->expression(
+            'from_user_id = ? and to_user_id = ? and NOT deleted_by_to',
+            [(int)$withUserId, (int)$userId]
+        );
 
         $predicate = new Sql\Predicate\PredicateSet([
             $predicate1,

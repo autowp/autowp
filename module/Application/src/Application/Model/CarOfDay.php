@@ -147,7 +147,7 @@ class CarOfDay
         return $pictureTable->fetchRow($select);
     }
 
-    private static function mb_ucfirst($str)
+    private static function ucfirst($str)
     {
         $fc = mb_strtoupper(mb_substr($str, 0, 1));
         return $fc.mb_substr($str, 1);
@@ -206,7 +206,7 @@ class CarOfDay
         }
 
         $text = sprintf(
-            self::mb_ucfirst($title) . ': %s %s',
+            self::ucfirst($title) . ': %s %s',
             $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
             $url
         );
@@ -285,7 +285,7 @@ class CarOfDay
         }
 
         $text = sprintf(
-            self::mb_ucfirst($title) . ': %s %s',
+            self::ucfirst($title) . ': %s %s',
             $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
             $url
         );
@@ -298,7 +298,8 @@ class CarOfDay
 
         $linkData = [
             'link'    => $url,
-            'message' => self::mb_ucfirst($title) . ': ' . $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
+            'message' => self::ucfirst($title) . ': ' .
+                $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
         ];
 
         try {
@@ -375,7 +376,7 @@ class CarOfDay
         }
 
         $text = sprintf(
-            self::mb_ucfirst($title) . ': %s',
+            self::ucfirst($title) . ': %s',
             $this->itemNameFormatter->format($car->getNameData($language), $language)
         );
 

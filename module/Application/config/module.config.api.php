@@ -143,6 +143,15 @@ return [
                     ['name' => 'Digits']
                 ]
             ],
+            'ancestor_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
             'parent_id' => [
                 'required' => false,
                 'filters'  => [
@@ -277,6 +286,12 @@ return [
                     ['name' => 'StringTrim']
                 ]
             ],
+            'is_group' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
             'text' => [
                 'required' => false,
                 'filters'  => [
@@ -311,6 +326,24 @@ return [
                 ]
             ],
             'engine_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'have_childs_of_type' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'have_common_childs_with' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']

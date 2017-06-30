@@ -19,7 +19,8 @@ class ItemLanguageControllerFactory implements FactoryInterface
             $hydrators->get(\Application\Hydrator\Api\ItemLanguageHydrator::class),
             $container->get(\Application\Model\BrandVehicle::class),
             $container->get(\Application\HostManager::class),
-            $filters->get('api_item_language_put')
+            $filters->get('api_item_language_put'),
+            $container->get(\Autowp\Message\MessageService::class)
         );
     }
 }

@@ -1,0 +1,74 @@
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <li ng-class="{active: ctrl.tab == 'catalogue'}" ng-if="ctrl.showCatalogueTab">
+        <a ui-sref="moder-items-item-select-parent({id: ctrl.item.id, tab: 'catalogue'})" ui-sref-opts="{inherit:false}"><i class="fa fa-list"></i> Catalogue</a>
+    </li>
+    <li ng-class="{active: ctrl.tab == 'brands'}" ng-if="ctrl.showBrandsTab">
+        <a ui-sref="moder-items-item-select-parent({id: ctrl.item.id, tab: 'brands'})" ui-sref-opts="{inherit:false}"><i class="fa fa-list"></i> Brands</a>
+    </li>
+    <li ng-class="{active: ctrl.tab == 'categories'}">
+        <a ui-sref="moder-items-item-select-parent({id: ctrl.item.id, tab: 'categories'})" ui-sref-opts="{inherit:false}"><i class="fa fa-tag"></i> Categories</a>
+    </li>
+    <li ng-class="{active: ctrl.tab == 'twins'}" ng-if="ctrl.showTwinsTab">
+        <a ui-sref="moder-items-item-select-parent({id: ctrl.item.id, tab: 'twins'})" ui-sref-opts="{inherit:false}"><i class="fa fa-adjust"></i> Twins</a>
+    </li>
+    <li ng-class="{active: ctrl.tab == 'factories'}" ng-if="ctrl.showFactoriesTab">
+        <a ui-sref="moder-items-item-select-parent({id: ctrl.item.id, tab: 'factories'})" ui-sref-opts="{inherit:false}"><i class="fa fa-cogs"></i> {{'moder/vehicle/tabs/factories'|translate}}</a>
+    </li>
+</ul>
+
+<div class="well" ng-if="ctrl.tab == 'catalogue'">
+    <table class="table" ng-if="!ctrl.brand_id"><tbody><tr>
+        <td style="width:{{100/6}}%" ng-repeat="chunk in ctrl.brands">
+            <a ui-sref=".({brand_id: item.id})" ng-repeat-start="item in chunk" ng-bind-html="item.name_html"></a>
+            <br ng-repeat-end />
+        </td>
+    </tr></tbody></table>
+    <ul ng-if="ctrl.brand_id">
+        <li class="car-node" ng-repeat="item in ctrl.items">
+            <autowp-moder-items-item-select-parent-tree item="item" select="ctrl.select" disable-item-id="ctrl.item.id" load-childs="ctrl.loadChildCatalogues">
+            </autowp-moder-items-item-select-parent-tree>
+        </li>
+    </ul>
+</div>
+
+<div class="well" ng-if="ctrl.tab == 'brands'">
+    <table class="table"><tbody><tr>
+        <td style="width:{{100/6}}%" ng-repeat="chunk in ctrl.brands">
+            <a href="" ng-click="ctrl.select(item)" ng-repeat-start="item in chunk" ng-bind-html="item.name_html"></a>
+            <br ng-repeat-end />
+        </td>
+    </tr></tbody></table>
+</div>
+
+<div class="well" ng-if="ctrl.tab == 'categories'">
+    <ul>
+        <li class="car-node" ng-repeat="item in ctrl.categories">
+            <autowp-moder-items-item-select-parent-tree item="item" select="ctrl.select" load-childs="ctrl.loadChildCategories" disable-item-id="ctrl.item.id">
+            </autowp-moder-items-item-select-parent-tree>
+        </li>
+    </ul>
+</div>
+
+<div class="well" ng-if="ctrl.tab == 'twins'">
+    <table class="table" ng-if="!ctrl.brand_id"><tbody><tr>
+        <td style="width:{{100/6}}%" ng-repeat="chunk in ctrl.brands">
+            <a ui-sref=".({brand_id: item.id})" ng-repeat-start="item in chunk" ng-bind-html="item.name_html"></a>
+            <br ng-repeat-end />
+        </td>
+    </tr></tbody></table>
+    <ul ng-if="ctrl.brand_id">
+        <li class="car-node" ng-repeat="item in ctrl.items">
+            <autowp-moder-items-item-select-parent-tree item="item" select="ctrl.select" disable-item-id="ctrl.item.id">
+            </autowp-moder-items-item-select-parent-tree>
+        </li>
+    </ul>
+</div>
+
+<div class="well" ng-if="ctrl.tab == 'factories'">
+    <ul>
+        <li class="car-node" ng-repeat="item in ctrl.factories">
+            <autowp-moder-items-item-select-parent-tree item="item" select="ctrl.select" disable-item-id="ctrl.item.id">
+            </autowp-moder-items-item-select-parent-tree>
+        </li>
+    </ul>
+</div>

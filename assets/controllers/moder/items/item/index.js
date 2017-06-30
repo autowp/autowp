@@ -8,6 +8,7 @@ import CONTENT_LANGUAGE_SERVICE from 'services/content-language';
 var $ = require('jquery');
 require('corejs-typeahead');
 import './tree';
+import './select-parent';
 
 const STATE_NAME = 'moder-items-item';
 const CONTROLLER_NAME = 'ModerItemsItemController';

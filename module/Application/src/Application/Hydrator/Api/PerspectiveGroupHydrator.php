@@ -32,7 +32,11 @@ class PerspectiveGroupHydrator extends RestHydrator
         if ($this->filterComposite->filter('perspectives')) {
             $rows = $this->perspectiveTable->fetchAll(
                 $this->perspectiveTable->select(true)
-                    ->join('perspectives_groups_perspectives', 'perspectives.id = perspectives_groups_perspectives.perspective_id', null)
+                    ->join(
+                        'perspectives_groups_perspectives',
+                        'perspectives.id = perspectives_groups_perspectives.perspective_id',
+                        []
+                    )
                     ->where('perspectives_groups_perspectives.group_id = ?', $object['id'])
                     ->order('perspectives_groups_perspectives.position')
             );

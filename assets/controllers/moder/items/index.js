@@ -20,7 +20,7 @@ angular.module(Module)
         function config($stateProvider) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/items?name&name_exclude&item_type_id&vehicle_type_id&vehicle_childs_type_id&spec&from_year&to_year&parent_id&text&no_parent&order&page',
+                url: '/moder/items?name&name_exclude&item_type_id&vehicle_type_id&vehicle_childs_type_id&spec&from_year&to_year&ancestor_id&text&no_parent&order&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template,
@@ -33,7 +33,7 @@ angular.module(Module)
                     spec: { dynamic: true },
                     from_year: { dynamic: true },
                     to_year: { dynamic: true },
-                    parent_id: { dynamic: true },
+                    ancestor_id: { dynamic: true },
                     text: { dynamic: true },
                     no_parent: { dynamic: true },
                     order: { dynamic: true },
@@ -78,7 +78,7 @@ angular.module(Module)
                 from_year: $state.params.from_year || null,
                 to_year: $state.params.to_year || null,
                 order: $state.params.order || DEFAULT_ORDER,
-                parent_id: $state.params.parent_id || null,
+                ancestor_id: $state.params.ancestor_id || null,
             };
 
             ctrl.items = [];
@@ -121,7 +121,7 @@ angular.module(Module)
                     text: ctrl.filter.text ? ctrl.filter.text : null,
                     from_year: ctrl.filter.from_year ? ctrl.filter.from_year : null,
                     to_year: ctrl.filter.to_year ? ctrl.filter.to_year : null,
-                    parent_id: ctrl.filter.parent_id ? ctrl.filter.parent_id : null,
+                    ancestor_id: ctrl.filter.ancestor_id ? ctrl.filter.ancestor_id : null,
                     page: ctrl.page,
                 };
             }
@@ -153,7 +153,7 @@ angular.module(Module)
                         text: ctrl.filter.text ? ctrl.filter.text : null,
                         from_year: ctrl.filter.from_year ? ctrl.filter.from_year : null,
                         to_year: ctrl.filter.to_year ? ctrl.filter.to_year : null,
-                        parent_id: ctrl.filter.parent_id ? ctrl.filter.parent_id : null,
+                        ancestor_id: ctrl.filter.ancestor_id ? ctrl.filter.ancestor_id : null,
                         page: ctrl.page,
                         fields: [
                             'name_html,name_default,description,has_text,produced',
@@ -175,8 +175,8 @@ angular.module(Module)
             
             ctrl.load();
             
-            var $itemIdElement = $($element[0]).find(':input[name=parent_id]');
-            $itemIdElement.val(ctrl.filter.parent_id ? '#' + ctrl.filter.parent_id : '');
+            var $itemIdElement = $($element[0]).find(':input[name=ancestor_id]');
+            $itemIdElement.val(ctrl.filter.ancestor_id ? '#' + ctrl.filter.ancestor_id : '');
             var itemIdLastValue = $itemIdElement.val();
             $itemIdElement
                 .typeahead({ }, {
@@ -212,13 +212,13 @@ angular.module(Module)
                 })
                 .on('typeahead:select', function(ev, item) {
                     itemIdLastValue = item.name_text;
-                    ctrl.filter.parent_id = item.id;
+                    ctrl.filter.ancestor_id = item.id;
                     ctrl.load();
                 })
                 .on('change blur', function(ev, item) {
                     var curValue = $(this).val();
                     if (itemIdLastValue && !curValue) {
-                    	ctrl.filter.parent_id = null;
+                    	ctrl.filter.ancestor_id = null;
                         ctrl.load();
                     }
                     itemIdLastValue = curValue;

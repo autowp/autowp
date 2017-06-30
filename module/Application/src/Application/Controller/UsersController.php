@@ -491,7 +491,11 @@ class UsersController extends AbstractActionController
         $rows = $db->fetchAll(
             $db->select()
                 ->from('pictures', ['owner_id'])
-                ->join('picture_vote', 'pictures.id = picture_vote.picture_id', ['volume' => new Zend_Db_Expr('sum(value)')])
+                ->join(
+                    'picture_vote',
+                    'pictures.id = picture_vote.picture_id',
+                    ['volume' => new Zend_Db_Expr('sum(value)')]
+                )
                 ->where('pictures.owner_id <> picture_vote.user_id')
                 ->group('pictures.owner_id')
                 ->order('volume DESC')

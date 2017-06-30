@@ -43,7 +43,7 @@
 </ul>
 
 <div class="tab-content well">
-    <div class="tab-pane" ng-class="{active: ctrl.tabs.meta.active}" id="meta">
+    <div class="tab-pane" ng-class="{active: ctrl.tabs.meta.active}">
         <div class="progress" ng-show="ctrl.metaLoading > 0">
             <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
             </div>
@@ -176,14 +176,14 @@
                                 <input type="text" name="parent" class="form-control item-autocomplete" placeholder="{{'moder/vehicle/catalogue/select-placeholder'|translate}}" />
                                 
                                 <div class="input-group-btn" style="white-space:nowrap">
-                                    <a class="btn btn-default" ng-href="/moder/cars/car-select-parent/item_id/{{ctrl.item.id}}" translate>moder/vehicle/catalogue/select</a>
+                                    <a class="btn btn-default" ui-sref="moder-items-item-select-parent({id: ctrl.item.id})" translate>moder/vehicle/catalogue/select</a>
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <span class="caret"></span>
                                         <span class="sr-only">Toggle Dropdown</span>
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li ng-if="ctrl.canHaveParentBrand">
-                                            <a ng-href="/moder/cars/car-select-brand/item_id/{{ctrl.item.id}}/tab/catalogue">
+                                            <a ui-sref="moder-items-item-select-parent({id: ctrl.item.id, tab: 'brands'})">
                                                 <i class="fa fa-plus"></i>
                                                 {{'moder/vehicle/catalogue/add-brand'|translate}}
                                             </a>
@@ -307,7 +307,7 @@
                     <td class="urls"></td>
                     <td></td>
                 </tr>
-                <tr ng-if="ctrl.canMove && (![4, 6].includes(ctrl.item.item_type_id))">
+                <tr ng-if="ctrl.canMove && (![4, 6, 3].includes(ctrl.item.item_type_id))">
                     <td colspan="2">
                         <i class="fa fa-plus"></i>
                         <a ui-sref="moder-items-new({item_type_id: ctrl.item.item_type_id, parent_id: ctrl.item.id})">

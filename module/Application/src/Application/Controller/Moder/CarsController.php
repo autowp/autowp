@@ -30,11 +30,6 @@ class CarsController extends AbstractActionController
     private $translator;
 
     /**
-     * @var HostManager
-     */
-    private $hostManager;
-
-    /**
      * @var BrandVehicle
      */
     private $brandVehicle;
@@ -55,14 +50,12 @@ class CarsController extends AbstractActionController
     private $pictureItem;
 
     public function __construct(
-        HostManager $hostManager,
         $translator,
         BrandVehicle $brandVehicle,
         MessageService $message,
         SpecificationsService $specificationsService,
         PictureItem $pictureItem
     ) {
-        $this->hostManager = $hostManager;
         $this->translator = $translator;
         $this->brandVehicle = $brandVehicle;
         $this->message = $message;
@@ -152,36 +145,6 @@ class CarsController extends AbstractActionController
                 'count'   => $car->produced,
                 'exactly' => $car->produced_exactly
             ],
-        ];
-    }
-
-    public function carSelectBrandAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $itemTable = $this->catalogue()->getItemTable();
-        $car = $itemTable->fetchRow([
-            'id = ?' => (int)$this->params('item_id'),
-            'item_type_id IN (?)' => [DbTable\Item\Type::ENGINE, DbTable\Item\Type::VEHICLE]
-        ]);
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canMove = $this->canMove($car);
-        if (! $canMove) {
-            return $this->forbiddenAction();
-        }
-
-        return [
-            'brands' => $itemTable->fetchAll(
-                $itemTable->select(true)
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
-                    ->order(['item.position', 'item.name'])
-            ),
-            'car' => $car
         ];
     }
 
@@ -379,231 +342,6 @@ class CarsController extends AbstractActionController
         return $this->itemParentTable
             ? $this->itemParentTable
             : $this->itemParentTable = new DbTable\Item\ParentTable();
-    }
-
-    public function carParentSetTypeAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $car = $itemTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $parent = $itemTable->find($this->params('parent_id'))->current();
-        if (! $parent) {
-            return $this->notFoundAction();
-        }
-
-        $itemParentRow = $this->getCarParentTable()->fetchRow([
-            'item_id = ?'   => $car->id,
-            'parent_id = ?' => $parent->id
-        ]);
-
-        if (! $itemParentRow) {
-            return $this->notFoundAction();
-        }
-
-        $itemParentRow->type = $this->params()->fromPost('type');
-        $itemParentRow->save();
-
-        $cpcTable = new DbTable\Item\ParentCache();
-        $cpcTable->rebuildCache($car);
-
-        return new JsonModel([
-            'ok' => true
-        ]);
-    }
-
-    private function carSelectParentWalk(DbTable\Item\Row $car, $itemTypeId)
-    {
-        $data = [
-            'name'   => $car->getNameData($this->language()),
-            'url'    => $this->url()->fromRoute('moder/cars/params', [
-                'parent_id' => $car['id']
-            ], [], true),
-            'childs' => []
-        ];
-
-        $itemTable = $this->catalogue()->getItemTable();
-        $childRows = $itemTable->fetchAll(
-            $itemTable->select(true)
-                ->join('item_parent', 'item.id = item_parent.item_id', null)
-                ->where('item_parent.parent_id = ?', $car['id'])
-                ->where('item.is_group')
-                ->where('item.item_type_id IN (?)', $itemTypeId)
-                ->order(array_merge(['item_parent.type'], $this->catalogue()->itemOrdering()))
-        );
-        foreach ($childRows as $childRow) {
-            $data['childs'][] = $this->carSelectParentWalk($childRow, $itemTypeId);
-        }
-
-        return $data;
-    }
-
-    public function carSelectParentAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $itemTable = $this->catalogue()->getItemTable();
-        $car = $itemTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canMove = $this->canMove($car);
-        if (! $canMove) {
-            return $this->forbiddenAction();
-        }
-
-        $parent = $itemTable->find($this->params('parent_id'))->current();
-
-        if ($parent) {
-            return $this->forward()->dispatch(self::class, [
-                'action'    => 'add-parent',
-                'item_id'   => $car->id,
-                'parent_id' => $parent->id
-            ]);
-        }
-
-        $tab = $this->params('tab', 'brands');
-
-        $showBrandsTab = $car->item_type_id != DbTable\Item\Type::CATEGORY;
-
-        if (! $showBrandsTab) {
-            $tab = 'categories';
-        }
-
-        $showTwinsTab = $car->item_type_id == DbTable\Item\Type::VEHICLE;
-
-        $showFactoriesTab = in_array($car->item_type_id, [
-            DbTable\Item\Type::VEHICLE,
-            DbTable\Item\Type::ENGINE
-        ]);
-
-        $brand = null;
-        $brands = [];
-        $cars = [];
-
-        if ($tab == 'brands') {
-            $brand = $itemTable->fetchRow([
-                'item_type_id = ?' => DbTable\Item\Type::BRAND,
-                'id = ?'           => (int)$this->params('brand_id')
-            ]);
-
-            if ($brand) {
-                $rows = $itemTable->fetchAll(
-                    $itemTable->select(true)
-                        ->where('item.is_group')
-                        ->where('item.item_type_id = ?', $car->item_type_id)
-                        ->join('item_parent', 'item.id = item_parent.item_id', null)
-                        ->where('item_parent.parent_id = ?', $brand->id)
-                        ->order(['item.name', 'item.body', 'item.begin_year', 'item.begin_model_year'])
-                );
-
-                foreach ($rows as $row) {
-                    $cars[] = $this->carSelectParentWalk($row, $car->item_type_id);
-                }
-            } else {
-                $brandModel = new \Application\Model\Brand();
-
-                $brands = $brandModel->getList([
-                    'language' => $this->language()
-                ], null);
-            }
-        } elseif ($tab == 'categories') {
-            $rows = $itemTable->fetchAll(
-                $itemTable->select(true)
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft('item_parent', 'item.id = item_parent.item_id', null)
-                    ->where('item_parent.item_id IS NULL')
-                    ->order(['item.name', 'item.body', 'item.begin_year', 'item.begin_model_year'])
-            );
-
-
-            if ($car->item_type_id == DbTable\Item\Type::CATEGORY) {
-                $itemTypes = [DbTable\Item\Type::CATEGORY];
-            } else {
-                $itemTypes = [DbTable\Item\Type::CATEGORY]; // , DbTable\Item\Type::VEHICLE
-            }
-
-            foreach ($rows as $row) {
-                $cars[] = $this->carSelectParentWalk($row, $itemTypes);
-            }
-        } elseif ($tab == 'twins') {
-            $brand = $itemTable->fetchRow([
-                'item_type_id = ?' => DbTable\Item\Type::BRAND,
-                'id = ?'           => (int)$this->params('brand_id')
-            ]);
-
-            if ($brand) {
-                $rows = $itemTable->fetchAll(
-                    $itemTable->select(true)
-                        ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
-                        ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', null)
-                        ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
-                        ->where('ipc2.parent_id = ?', $brand->id)
-                        ->group('item.id')
-                        ->order($this->catalogue()->itemOrdering())
-                );
-
-                foreach ($rows as $row) {
-                    $cars[] = [
-                        'name'   => $row->getNameData($this->language()),
-                        'url'    => $this->url()->fromRoute('moder/cars/params', [
-                            'parent_id' => $row['id']
-                        ], [], true),
-                        'childs' => []
-                    ];
-                }
-            } else {
-                $brandModel = new \Application\Model\Brand();
-
-                $brands = $brandModel->getList([
-                    'language' => $this->language()
-                ], function ($select) {
-                    $select
-                        ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', null)
-                        ->join('item_parent', 'ipc1.item_id = item_parent.item_id', null)
-                        ->join(['twins' => 'item'], 'item_parent.parent_id = twins.id', null)
-                        ->where('twins.item_type_id = ?', DbTable\Item\Type::TWINS)
-                        ->group('item.id');
-                });
-            }
-        } elseif ($tab == 'factories') {
-            $rows = $itemTable->fetchAll(
-                $itemTable->select(true)
-                    ->where('item_type_id = ?', DbTable\Item\Type::FACTORY)
-                    ->order($this->catalogue()->itemOrdering())
-            );
-
-            foreach ($rows as $row) {
-                $cars[] = [
-                    'name'   => $row->getNameData($this->language()),
-                    'url'    => $this->url()->fromRoute('moder/cars/params', [
-                        'parent_id' => $row['id']
-                    ], [], true),
-                    'childs' => []
-                ];
-            }
-        }
-
-        return [
-            'tab'              => $tab,
-            'car'              => $car,
-            'brand'            => $brand,
-            'brands'           => $brands,
-            'cars'             => $cars,
-            'showBrandsTab'    => $showBrandsTab,
-            'showTwinsTab'     => $showTwinsTab,
-            'showFactoriesTab' => $showFactoriesTab
-        ];
     }
 
     private function loadSpecs($table, $parentId, $deep = 0)
@@ -1329,93 +1067,5 @@ class CarsController extends AbstractActionController
             'pictures' => $pictures,
             'groups'   => $groups
         ];
-    }
-
-    public function addParentAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        /*if (!$this->getRequest()->isPost()) {
-         return $this->notFoundAction();
-         }*/
-
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $car = $itemTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canEditMeta = $this->canEditMeta($car);
-
-        if (! $canEditMeta) {
-            return $this->notFoundAction();
-        }
-
-        $parentCar = $itemTable->find($this->params('parent_id'))->current();
-        if (! $parentCar) {
-            return $this->notFoundAction();
-        }
-
-        $this->brandVehicle->create($parentCar->id, $car->id);
-
-        $itemTable->updateInteritance($car);
-
-        $vehicleType = new VehicleType();
-        $vehicleType->refreshInheritanceFromParents($car->id);
-
-        $this->specificationsService->updateActualValues($car->id);
-
-        $message = sprintf(
-            '%s выбран как родительский автомобиль для %s',
-            htmlspecialchars($this->car()->formatName($parentCar, 'en')),
-            htmlspecialchars($this->car()->formatName($car, 'en'))
-        );
-        $this->log($message, [$car, $parentCar]);
-
-        $ucsTable = new DbTable\User\ItemSubscribe();
-        $user = $this->user()->get();
-
-        $subscribers = [];
-        foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
-            $subscribers[$subscriber->id] = $subscriber;
-        }
-
-        foreach ($ucsTable->getItemSubscribers($parentCar) as $subscriber) {
-            $subscribers[$subscriber->id] = $subscriber;
-        }
-
-        foreach ($subscribers as $subscriber) {
-            if ($subscriber->id != $user->id) {
-                $uri = $this->hostManager->getUriByLanguage($subscriber->language);
-
-                $message = sprintf(
-                    $this->translate(
-                        'pm/user-%s-adds-item-%s-%s-to-item-%s-%s',
-                        'default',
-                        $subscriber->language
-                    ),
-                    $this->userModerUrl($user, true, $uri),
-                    $this->car()->formatName($car, $subscriber->language),
-                    $this->carModerUrl($car, true, null, $uri),
-                    $this->car()->formatName($parentCar, $subscriber->language),
-                    $this->carModerUrl($parentCar, true, null, $uri)
-                );
-
-                $this->message->send(null, $subscriber->id, $message);
-            }
-        }
-
-        $url = $this->carModerUrl($car, false, 'catalogue');
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            return new JsonModel([
-                'ok'  => true,
-                'url' => $url
-            ]);
-        } else {
-            return $this->redirect()->toUrl($url);
-        }
     }
 }

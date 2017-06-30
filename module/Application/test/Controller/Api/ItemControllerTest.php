@@ -295,37 +295,13 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
                 'item_id'   => $carId,
                 'parent_id' => 205
             ]
-            );
+        );
 
         $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
         $this->assertControllerName(ItemParentController::class);
         $this->assertMatchedRouteName('api/item-parent/post');
         $this->assertActionName('post');
-    }
-
-    public function testSelectBrand()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-brand/item_id/1', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('car-select-brand');
-    }
-
-    public function testSelectParent()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-parent/item_id/1', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('car-select-parent');
     }
 
     public function testOrganize()

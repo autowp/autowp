@@ -30,7 +30,6 @@ use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
 
-
 class ItemController extends AbstractRestfulController
 {
     /**
@@ -225,7 +224,7 @@ class ItemController extends AbstractRestfulController
             $select->where('item.spec_id = ?', $data['spec']);
         }
 
-        if ($data['parent_id']) {
+        if ($data['ancestor_id']) {
             $select
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $data['parent_id'])
@@ -238,6 +237,12 @@ class ItemController extends AbstractRestfulController
 
         if ($data['to_year']) {
             $select->where('item.end_year = ?', $data['to_year']);
+        }
+
+        if ($data['parent_id']) {
+            $select
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
+                ->where('item_parent.parent_id = ?', $data['parent_id']);
         }
 
         if ($data['no_parent']) {
@@ -277,13 +282,37 @@ class ItemController extends AbstractRestfulController
             $group = true;
         }
 
+        if ($data['have_childs_of_type']) {
+            $select
+                ->join(['ipc3' => 'item_parent_cache'], 'item.id = ipc3.parent_id', [])
+                ->join(['child' => 'item'], 'ipc3.item_id = child.id', [])
+                ->where('child.item_type_id = ?', (int)$data['have_childs_of_type']);
+
+            $group = true;
+        }
+
+        if ($data['have_common_childs_with']) {
+            $select
+                ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', null)
+                ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
+                ->where('ipc2.parent_id = ?', (int)$data['have_common_childs_with']);
+
+            $group = true;
+        }
+
         if ($data['engine_id']) {
             $select->where('item.engine_item_id = ?', (int)$data['engine_id']);
+        }
+
+        if ($data['is_group']) {
+            $select->where('item.is_group');
         }
 
         if ($group) {
             $select->group('item.id');
         }
+
+        //print $select->assemble(); exit;
 
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbSelect($select)
@@ -951,7 +980,6 @@ class ItemController extends AbstractRestfulController
             case DbTable\Item\Type::VEHICLE:
             case DbTable\Item\Type::ENGINE:
                 if (array_key_exists('is_group', $values)) {
-
                     $haveChilds = (bool)$this->itemParentTable->fetchRow([
                         'parent_id = ?' => $item['id']
                     ]);
@@ -1261,7 +1289,7 @@ class ItemController extends AbstractRestfulController
                     'name' => 'FileSize',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'max' => 10*1024*1024
+                        'max' => 10 * 1024 * 1024
                     ]
                 ],
                 [

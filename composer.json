@@ -90,8 +90,8 @@
 			"@cs-check",
 			"@test"
 		],
-		"cs-check" : "phpcs",
-		"cs-fix" : "phpcbf",
+		"cs-check" : "phpcs --encoding=utf-8",
+		"cs-fix" : "phpcbf --encoding=utf-8",
 		"test" : "phpunit --colors=always"
 	},
 	"homepage" : "http://wheelsage.org/",

@@ -119,7 +119,8 @@ class Categories
                     'name' => 'categories'
                 ]),
                 'name'           => $langRow && $langRow['name'] ? $langRow['name'] : $item['name'],
-                'short_name'     => $langRow && $langRow['name'] ? $langRow['name'] : $item['name'],//$langRow ? $langRow->short_name : $row->short_name,
+                'short_name'     => $langRow && $langRow['name'] ? $langRow['name'] : $item['name'],
+                                    //$langRow ? $langRow->short_name : $row->short_name,
                 'cars_count'     => $item['cars_count'],
                 'new_cars_count' => $item['new_cars_count'],
             ];

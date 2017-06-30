@@ -1125,7 +1125,11 @@ class Pic extends AbstractPlugin
 
         $subscribed = false;
         if ($user) {
-            $subscribed = $this->comments->userSubscribed(\Application\Comments::PICTURES_TYPE_ID, $picture['id'], $user['id']);
+            $subscribed = $this->comments->userSubscribed(
+                \Application\Comments::PICTURES_TYPE_ID,
+                $picture['id'],
+                $user['id']
+            );
         }
 
         $twitterCreatorId = null;
@@ -1197,7 +1201,10 @@ class Pic extends AbstractPlugin
         $language = $controller->language();
 
         $links = [];
-        $links['/ng/moder/pictures/' . $picture->id] = sprintf($this->translator->translate('moder/picture/edit-picture-%s'), $picture->id);
+        $links['/ng/moder/pictures/' . $picture->id] = sprintf(
+            $this->translator->translate('moder/picture/edit-picture-%s'),
+            $picture->id
+        );
 
         $carIds = $this->pictureItem->getPictureItems($picture['id']);
         if ($carIds) {
