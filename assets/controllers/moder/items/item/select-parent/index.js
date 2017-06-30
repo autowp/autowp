@@ -146,7 +146,7 @@ angular.module(Module)
                             url: '/api/item',
                             params: {
                                 type_id: 4,
-                                limit: 500,
+                                limit: 100,
                                 fields: 'name_html',
                                 have_common_childs_with: ctrl.brand_id,
                                 page: ctrl.page
@@ -161,7 +161,7 @@ angular.module(Module)
                             url: '/api/item',
                             params: {
                                 type_id: 5,
-                                limit: 100,
+                                limit: 500,
                                 fields: 'name_html',
                                 have_childs_with_parent_of_type: 4,
                                 page: ctrl.page
