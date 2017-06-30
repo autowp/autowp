@@ -11,7 +11,6 @@ use Autowp\Message\MessageService;
 
 use Application\Form\Moder\CarOrganize as CarOrganizeForm;
 use Application\Form\Moder\CarOrganizePictures as CarOrganizePicturesForm;
-use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;

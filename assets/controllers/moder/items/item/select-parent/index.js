@@ -163,7 +163,7 @@ angular.module(Module)
                                 type_id: 5,
                                 limit: 100,
                                 fields: 'name_html',
-                                have_childs_of_type: 4,
+                                have_childs_with_parent_of_type: 4,
                                 page: ctrl.page
                             }
                         }).then(function(response) {

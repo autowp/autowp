@@ -300,6 +300,16 @@ class ItemController extends AbstractRestfulController
             $group = true;
         }
 
+        if ($data['have_childs_with_parent_of_type']) {
+            $select
+                ->join(['ipc4' => 'item_parent_cache'], 'item.id = ipc4.parent_id', [])
+                ->join(['ip5' => 'item_parent'], 'ipc4.item_id = ip5.item_id', [])
+                ->join(['child2' => 'item'], 'ip5.parent_id = child2.id', [])
+                ->where('child2.item_type_id = ?', (int)$data['have_childs_with_parent_of_type']);
+
+            $group = true;
+        }
+
         if ($data['engine_id']) {
             $select->where('item.engine_item_id = ?', (int)$data['engine_id']);
         }
@@ -311,8 +321,6 @@ class ItemController extends AbstractRestfulController
         if ($group) {
             $select->group('item.id');
         }
-
-        //print $select->assemble(); exit;
 
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbSelect($select)

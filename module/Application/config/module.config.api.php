@@ -352,6 +352,15 @@ return [
                     ['name' => 'Digits']
                 ]
             ],
+            'have_childs_with_parent_of_type' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ]
         ],
         'api_item_item' => [
             'fields' => [
