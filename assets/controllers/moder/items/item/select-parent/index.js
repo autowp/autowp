@@ -6,6 +6,7 @@ import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
 import SPEC_SERVICE from 'services/spec';
 import CONTENT_LANGUAGE_SERVICE from 'services/content-language';
 import './tree';
+import './tree-item';
 import 'directives/auto-focus';
 
 const STATE_NAME = 'moder-items-item-select-parent';
@@ -94,10 +95,10 @@ angular.module(Module)
                     if (ctrl.brand_id) {
                         $http({
                             method: 'GET',
-                            url: '/api/item',
+                            url: '/api/item-parent',
                             params: {
-                                limit: 100,
-                                fields: 'name_html,childs_count',
+                                limit: 100, 
+                                fields: 'item.name_html,item.childs_count',
                                 parent_id: ctrl.brand_id,
                                 is_group: true,
                                 type_id: ctrl.item.item_type_id,
@@ -151,7 +152,6 @@ angular.module(Module)
                         params: {
                             type_id: 3,
                             limit: 100,
-                            no_parent: true,
                             fields: 'name_html,childs_count',
                             page: ctrl.page
                         }
@@ -257,12 +257,13 @@ angular.module(Module)
             ctrl.loadChildCategories = function(parent) {
                 $http({
                     method: 'GET',
-                    url: '/api/item',
+                    url: '/api/item-parent',
                     params: {
                         limit: 100,
-                        fields: 'name_html,childs_count',
+                        fields: 'item.name_html,item.childs_count',
                         parent_id: parent.id,
-                        is_group: true
+                        is_group: true,
+                        order: 'moder_auto'
                     }
                 }).then(function(response) {
                     parent.childs = response.data.items;
@@ -272,13 +273,13 @@ angular.module(Module)
             ctrl.loadChildCatalogues = function(parent) {
                 $http({
                     method: 'GET',
-                    url: '/api/item',
+                    url: '/api/item-parent',
                     params: {
                         limit: 100,
-                        fields: 'name_html,childs_count',
+                        fields: 'item.name_html,item.childs_count',
                         parent_id: parent.id,
                         is_group: true,
-                        order: 'age'
+                        order: 'moder_auto'
                     }
                 }).then(function(response) {
                     parent.childs = response.data.items;

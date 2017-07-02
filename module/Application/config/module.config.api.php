@@ -639,6 +639,12 @@ return [
                     ]
                 ]
             ],
+            'is_group' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
             'order' => [
                 'required'   => false,
                 'validators' => [

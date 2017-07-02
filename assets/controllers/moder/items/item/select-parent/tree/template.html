@@ -1,16 +1,2 @@
-<div ng-if="item.childs_count > 0">
-    <a href="#" class="toggle" ng-click="item.open = !item.open; loadChilds(item)">
-        <i class="fa fa-folder-o" ng-show="!item.open"></i>
-        <i class="fa fa-folder-open-o" ng-show="item.open"></i>
-        <span ng-bind-html="item.name_html"></span>
-    </a>
-    <ul ng-show="item.open">
-        <li><a href="" ng-click="select(item)" translate>moder/vehicle/move/here</a></li>
-        <li class="car-node" ng-repeat="child in item.childs">
-            <autowp-moder-items-item-select-parent-tree item="child" select="select" load-childs="loadChilds" disable-item-id="disableItemId">
-            </autowp-moder-items-item-select-parent-tree>
-        </li>
-    </ul>
-</div>
-<a href="" ng-click="select(item)" ng-bind-html="item.name_html" ng-if="(!item.childs_count || item.childs_count <= 0) && !ctrl.isDisabled(item)"></a>
-<span class="text-muted" ng-if="ctrl.isDisabled(item)" ng-bind-html="item.name_html"></span>
+<autowp-moder-items-item-select-parent-tree-item item="item.item" type_id="item.type_id" select="select" load-childs="loadChilds" disable-item-id="disableItemId">
+</autowp-moder-items-item-select-parent-tree-item>

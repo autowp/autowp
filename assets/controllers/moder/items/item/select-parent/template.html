@@ -47,8 +47,8 @@
 <div class="well" ng-if="ctrl.tab == 'categories'">
     <ul>
         <li class="car-node" ng-repeat="item in ctrl.categories">
-            <autowp-moder-items-item-select-parent-tree item="item" select="ctrl.select" load-childs="ctrl.loadChildCategories" disable-item-id="ctrl.item.id">
-            </autowp-moder-items-item-select-parent-tree>
+            <autowp-moder-items-item-select-parent-tree-item item="item" select="ctrl.select" load-childs="ctrl.loadChildCategories" disable-item-id="ctrl.item.id">
+            </autowp-moder-items-item-select-parent-tree-item>
         </li>
     </ul>
     <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
@@ -63,8 +63,8 @@
     </tr></tbody></table>
     <ul ng-if="ctrl.brand_id">
         <li class="car-node" ng-repeat="item in ctrl.items">
-            <autowp-moder-items-item-select-parent-tree item="item" select="ctrl.select" disable-item-id="ctrl.item.id">
-            </autowp-moder-items-item-select-parent-tree>
+            <autowp-moder-items-item-select-parent-tree-item item="item" select="ctrl.select" disable-item-id="ctrl.item.id">
+            </autowp-moder-items-item-select-parent-tree-item>
         </li>
     </ul>
     <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
@@ -73,8 +73,8 @@
 <div class="well" ng-if="ctrl.tab == 'factories'">
     <ul>
         <li class="car-node" ng-repeat="item in ctrl.factories">
-            <autowp-moder-items-item-select-parent-tree item="item" select="ctrl.select" disable-item-id="ctrl.item.id">
-            </autowp-moder-items-item-select-parent-tree>
+            <autowp-moder-items-item-select-parent-tree-item item="item" select="ctrl.select" disable-item-id="ctrl.item.id">
+            </autowp-moder-items-item-select-parent-tree-item>
         </li>
     </ul>
     <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>

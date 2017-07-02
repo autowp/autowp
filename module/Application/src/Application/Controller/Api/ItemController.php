@@ -263,6 +263,8 @@ class ItemController extends AbstractRestfulController
                 ->join('item_language', 'item.id = item_language.item_id', null)
                 ->join('textstorage_text', 'item_language.text_id = textstorage_text.id', null)
                 ->where('textstorage_text.text like ?', '%' . $data['text'] . '%');
+
+            $group = true;
         }
 
         if ($data['suggestions_to']) {

@@ -136,6 +136,10 @@ class ItemParentController extends AbstractRestfulController
             $select->where('item_parent.item_id = ?', $data['item_id']);
         }
 
+        if ($data['is_group']) {
+            $select->where('item.is_group');
+        }
+
         switch ($data['order']) {
             case 'moder_auto':
                 $select->order([
