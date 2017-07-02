@@ -1339,7 +1339,7 @@ class ItemController extends AbstractRestfulController
         $item->save();
 
         if ($oldImageId) {
-            $imageStorage->removeImage($oldImageId);
+            $this->imageStorage()->removeImage($oldImageId);
         }
 
         $this->log(sprintf(
