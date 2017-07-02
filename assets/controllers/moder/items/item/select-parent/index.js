@@ -6,6 +6,7 @@ import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
 import SPEC_SERVICE from 'services/spec';
 import CONTENT_LANGUAGE_SERVICE from 'services/content-language';
 import './tree';
+import 'directives/auto-focus';
 
 const STATE_NAME = 'moder-items-item-select-parent';
 const CONTROLLER_NAME = 'ModerItemsItemSelectParentController';
@@ -42,6 +43,7 @@ angular.module(Module)
             ctrl.brand_id = null;
             ctrl.paginator = null;
             ctrl.page = $state.params.page;
+            ctrl.search = '';
             
             $http({
                 method: 'GET',
@@ -69,6 +71,24 @@ angular.module(Module)
                 ctrl.showTwinsTab = ctrl.item.item_type_id == 1;
                 ctrl.showFactoriesTab = [1, 2].includes(ctrl.item.item_type_id);
                 
+                function loadCatalogueBrands() {
+                    $http({
+                        method: 'GET',
+                        url: '/api/item',
+                        params: {
+                            type_id: 5,
+                            limit: 500,
+                            fields: 'name_html',
+                            have_childs_of_type: ctrl.item.item_type_id,
+                            name: ctrl.search ? '%' + ctrl.search + '%' : null,
+                            page: ctrl.page
+                        }
+                    }).then(function(response) {
+                        ctrl.brands = ctrl.chunk(response.data.items, 6);
+                        ctrl.paginator = response.data.paginator;
+                    });
+                }
+                
                 if (ctrl.tab == 'catalogue') {
                     ctrl.brand_id = $state.params.brand_id;
                     if (ctrl.brand_id) {
@@ -88,24 +108,16 @@ angular.module(Module)
                             ctrl.paginator = response.data.paginator;
                         });
                     } else {
-                        $http({
-                            method: 'GET',
-                            url: '/api/item',
-                            params: {
-                                type_id: 5,
-                                limit: 500,
-                                fields: 'name_html',
-                                have_childs_of_type: ctrl.item.item_type_id,
-                                page: ctrl.page
-                            }
-                        }).then(function(response) {
-                            ctrl.brands = ctrl.chunk(response.data.items, 6);
-                            ctrl.paginator = response.data.paginator;
-                        });
+                        
+                        ctrl.doSearch = function() {
+                            loadCatalogueBrands();
+                        };
+                        
+                        loadCatalogueBrands();
                     }
                 }
                 
-                if (ctrl.tab == 'brands') {
+                function loadBrands() {
                     $http({
                         method: 'GET',
                         url: '/api/item',
@@ -113,6 +125,7 @@ angular.module(Module)
                             type_id: 5,
                             limit: 500,
                             fields: 'name_html',
+                            name: ctrl.search ? '%' + ctrl.search + '%' : null,
                             page: ctrl.page
                         }
                     }).then(function(response) {
@@ -121,7 +134,17 @@ angular.module(Module)
                     });
                 }
                 
+                if (ctrl.tab == 'brands') {
+                    
+                    ctrl.doSearch = function() {
+                        loadBrands();
+                    };
+                    
+                    loadBrands();
+                }
+                
                 if (ctrl.tab == 'categories') {
+                    
                     $http({
                         method: 'GET',
                         url: '/api/item',
