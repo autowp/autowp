@@ -295,6 +295,10 @@ class BrandVehicle
             }
         }
 
+        if (array_key_exists('type', $options) && $options['type'] === null) {
+            unset($options['type']);
+        }
+
         $defaults = [
             'type'           => DbTable\Item\ParentTable::TYPE_DEFAULT,
             'catname'        => null,
