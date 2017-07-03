@@ -225,6 +225,23 @@ class BrandVehicle
         return $name;
     }
 
+    private function isAllowedCatname(int $itemId, int $parentId, string $catname)
+    {
+        if (mb_strlen($catname) <= 0) {
+            return false;
+        }
+
+        if (in_array($catname, $this->catnameBlacklist)) {
+            return false;
+        }
+
+        return ! $this->itemParentTable->fetchRow([
+            'parent_id = ?' => $parentId,
+            'catname = ?'   => $catname,
+            'item_id <> ?'  => $itemId
+        ]);
+    }
+
     private function extractCatname(DbTable\Item\Row $brandRow, DbTable\Item\Row $vehicleRow)
     {
         $itemParentLangRow = $this->itemParentLanguageTable->fetchRow([
@@ -243,21 +260,9 @@ class BrandVehicle
 
         $i = 0;
         do {
-            $allowed = true;
-
             $catname = $catnameTemplate . ($i ? '_' . $i : '');
 
-            if (in_array($catname, $this->catnameBlacklist)) {
-                $allowed = false;
-            }
-
-            if ($allowed) {
-                $allowed = ! $this->itemParentTable->fetchRow([
-                    'parent_id = ?' => $brandRow->id,
-                    'catname = ?'   => $catname,
-                    'item_id <> ?'  => $vehicleRow->id
-                ]);
-            }
+            $allowed = $this->isAllowedCatname($vehicleRow->id, $brandRow->id, $catname);
 
             $i++;
         } while (! $allowed);
@@ -290,7 +295,8 @@ class BrandVehicle
         $parentId = (int)$parentRow->id;
 
         if (isset($options['catname'])) {
-            if (in_array($options['catname'], $this->catnameBlacklist)) {
+            $allowed = $this->isAllowedCatname($itemId, $parentId, $options['catname']);
+            if (! $allowed) {
                 unset($options['catname']);
             }
         }
