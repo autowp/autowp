@@ -691,6 +691,43 @@ return [
                     ['name' => 'Digits']
                 ]
             ],
+            'type_id' => [
+                'required'   => false,
+                'filters'    => [
+                    ['name' => 'StringTrim'],
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                Model\DbTable\Item\ParentTable::TYPE_DEFAULT,
+                                Model\DbTable\Item\ParentTable::TYPE_TUNING,
+                                Model\DbTable\Item\ParentTable::TYPE_SPORT,
+                                Model\DbTable\Item\ParentTable::TYPE_DESIGN
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'catname' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => 'SingleSpaces'],
+                    ['name' => 'StringToLower'],
+                    ['name' => 'FilenameSafe']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 50
+                        ]
+                    ]
+                ]
+            ]
         ],
         'api_item_parent_put' => [
             'type_id' => [

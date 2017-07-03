@@ -42,12 +42,12 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
-    private function createVehicle()
+    private function createVehicle(array $params = [])
     {
-        return $this->createItem([
+        return $this->createItem(array_replace([
             'item_type_id' => 1,
             'name'         => 'Some vehicle'
-        ]);
+        ], $params));
     }
 
     private function createEngine()
@@ -100,7 +100,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return $json['items'][0];
     }
 
-    private function addItemParent($itemId, $parentId)
+    private function addItemParent($itemId, $parentId, array $params = [])
     {
         $this->reset();
 
@@ -108,10 +108,10 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch(
             'https://www.autowp.ru/api/item-parent',
             Request::METHOD_POST,
-            [
+            array_replace([
                 'item_id'   => $itemId,
                 'parent_id' => $parentId
-            ]
+            ], $params)
         );
 
         $this->assertResponseStatusCode(201);
@@ -206,6 +206,25 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(PictureController::class);
         $this->assertMatchedRouteName('api/picture/picture/update');
         $this->assertActionName('update');
+    }
+
+    private function getItemParent($itemId, $parentId)
+    {
+        $this->reset();
+
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch(
+            'https://www.autowp.ru/api/item-parent/'.$itemId.'/'.$parentId,
+            Request::METHOD_GET
+        );
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemParentController::class);
+        $this->assertMatchedRouteName('api/item-parent/item/get');
+        $this->assertActionName('item');
+
+        return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
     }
 
     public function testEngineUnderTheHoodPreviews()
@@ -447,5 +466,43 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(ItemLinkController::class);
         $this->assertMatchedRouteName('api/item-link/post');
         $this->assertActionName('post');
+    }
+
+    public function testBlacklistedCatnameNotAllowedManually()
+    {
+        $parentVehicleId = $this->createVehicle([
+            'is_group' => true
+        ]);
+        $childVehicleId = $this->createVehicle();
+        $this->addItemParent($childVehicleId, $parentVehicleId, [
+            'type_id' => 1, // tuning
+            'catname' => 'sport'
+        ]);
+
+        $json = $this->getItemParent($childVehicleId, $parentVehicleId);
+
+        $this->assertNotEquals('sport', $json['catname']);
+
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch(
+            'https://www.autowp.ru/api/item-parent/'.$childVehicleId.'/'.$parentVehicleId,
+            Request::METHOD_PUT,
+            [
+                'catname' => 'sport'
+            ]
+        );
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemParentController::class);
+        $this->assertMatchedRouteName('api/item-parent/item/put');
+        $this->assertActionName('put');
+
+
+        $json = $this->getItemParent($childVehicleId, $parentVehicleId);
+
+        $this->assertNotEquals('sport', $json['catname']);
     }
 }

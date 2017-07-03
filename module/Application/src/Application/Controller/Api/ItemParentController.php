@@ -259,7 +259,15 @@ class ItemParentController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $this->brandVehicle->create($parentItem->id, $item->id);
+        $params = [];
+        if (array_key_exists('catname', $data)) {
+            $params['catname'] = $data['catname'];
+        }
+        if (array_key_exists('type_id', $data)) {
+            $params['type'] = $data['type_id'];
+        }
+
+        $this->brandVehicle->create((int)$parentItem->id, (int)$item->id, $params);
 
         $itemTable->updateInteritance($item);
 

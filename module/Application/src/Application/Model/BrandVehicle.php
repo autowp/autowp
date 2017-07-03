@@ -60,6 +60,8 @@ class BrandVehicle
         ]
     ];
 
+    private $catnameBlacklist = ['sport', 'tuning', 'related', 'pictures', 'specifications'];
+
     public function __construct(array $languages)
     {
         $this->languages = $languages;
@@ -241,16 +243,24 @@ class BrandVehicle
 
         $i = 0;
         do {
+            $allowed = true;
+
             $catname = $catnameTemplate . ($i ? '_' . $i : '');
 
-            $exists = (bool)$this->itemParentTable->fetchRow([
-                'parent_id = ?' => $brandRow->id,
-                'catname = ?'   => $catname,
-                'item_id <> ?'  => $vehicleRow->id
-            ]);
+            if (in_array($catname, $this->catnameBlacklist)) {
+                $allowed = false;
+            }
+
+            if ($allowed) {
+                $allowed = ! $this->itemParentTable->fetchRow([
+                    'parent_id = ?' => $brandRow->id,
+                    'catname = ?'   => $catname,
+                    'item_id <> ?'  => $vehicleRow->id
+                ]);
+            }
 
             $i++;
-        } while ($exists);
+        } while (! $allowed);
 
         return $catname;
     }
@@ -260,7 +270,7 @@ class BrandVehicle
         return isset($this->allowedCombinations[$parentItemTypeId][$itemTypeId]);
     }
 
-    public function create($parentId, $itemId, array $options = [])
+    public function create(int $parentId, int $itemId, array $options = [])
     {
         $parentRow = $this->itemTable->find($parentId)->current();
         $itemRow = $this->itemTable->find($itemId)->current();
@@ -279,17 +289,27 @@ class BrandVehicle
         $itemId = (int)$itemRow->id;
         $parentId = (int)$parentRow->id;
 
-        $catname = $this->extractCatname($parentRow, $itemRow);
-        if (! $catname) {
-            throw new Exception('Failed to create catname');
+        if (isset($options['catname'])) {
+            if (in_array($options['catname'], $this->catnameBlacklist)) {
+                unset($options['catname']);
+            }
         }
 
         $defaults = [
             'type'           => DbTable\Item\ParentTable::TYPE_DEFAULT,
-            'catname'        => $catname,
+            'catname'        => null,
             'manual_catname' => isset($options['catname'])
         ];
         $options = array_replace($defaults, $options);
+
+        if (! isset($options['catname']) || ! $options['catname']) {
+            $catname = $this->extractCatname($parentRow, $itemRow);
+            if (! $catname) {
+                throw new Exception('Failed to create catname');
+            }
+
+            $options['catname'] = $catname;
+        }
 
         if (! isset($options['type'])) {
             throw new Exception("Type cannot be null");
@@ -456,7 +476,7 @@ class BrandVehicle
                 }
             }
 
-            if (! $newCatname || $newCatname == '_') {
+            if (! $newCatname || $newCatname == '_' || in_array($newCatname, $this->catnameBlacklist)) {
                 $parentRow = $this->itemTable->find($parentId)->current();
                 $itemRow = $this->itemTable->find($itemId)->current();
                 $newCatname = $this->extractCatname($parentRow, $itemRow);
