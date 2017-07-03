@@ -153,7 +153,8 @@ angular.module(Module)
                             type_id: 3,
                             limit: 100,
                             fields: 'name_html,childs_count',
-                            page: ctrl.page
+                            page: ctrl.page,
+                            no_parent: true
                         }
                     }).then(function(response) {
                         ctrl.categories = response.data.items;
