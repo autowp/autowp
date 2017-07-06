@@ -27,7 +27,7 @@ class UserItemSubscribe
 
         $row = $this->table->select($primaryKey)->current();
         if (! $row) {
-            $this->insert($primaryKey);
+            $this->table->insert($primaryKey);
         }
     }
 
