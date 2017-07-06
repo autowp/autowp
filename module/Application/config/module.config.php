@@ -112,6 +112,7 @@ return [
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\Catalogue::class               => Model\Service\CatalogueFactory::class,
             Model\Categories::class              => Model\Service\CategoriesFactory::class,
+            Model\Contact::class                 => Model\ContactFactory::class,
             Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
             Model\Log::class                     => Model\Service\LogFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,

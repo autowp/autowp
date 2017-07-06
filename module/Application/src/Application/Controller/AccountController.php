@@ -16,7 +16,6 @@ use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Rename as UserRename;
 
 use Application\Controller\LoginController;
-use Application\Model\Contact;
 use Application\Model\DbTable;
 use Application\Service\SpecificationsService;
 use Application\Service\UsersService;

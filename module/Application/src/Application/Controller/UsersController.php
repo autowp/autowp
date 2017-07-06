@@ -36,14 +36,21 @@ class UsersController extends AbstractActionController
      */
     private $comments;
 
+    /**
+     * @var Contact
+     */
+    private $contact;
+
     public function __construct(
         $cache,
         TrafficControl $trafficControl,
-        Comments $comments
+        Comments $comments,
+        Contact $contact
     ) {
         $this->cache = $cache;
         $this->trafficControl = $trafficControl;
         $this->comments = $comments;
+        $this->contact = $contact;
     }
 
     private function getUser()
@@ -161,11 +168,9 @@ class UsersController extends AbstractActionController
             'user_id = ?' => $user->id
         ]);
 
-        $contact = new Contact();
-
         $currentUser = $this->user()->get();
         $isMe = $currentUser && ($currentUser->id == $user->id);
-        $inContacts = $currentUser && ! $isMe && $contact->exists($currentUser->id, $user->id);
+        $inContacts = $currentUser && ! $isMe && $this->contact->exists($currentUser->id, $user->id);
         $canBeInContacts = $currentUser && ! $currentUser->deleted && ! $isMe ;
 
         return [

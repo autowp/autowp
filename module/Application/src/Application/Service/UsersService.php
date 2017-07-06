@@ -68,6 +68,11 @@ class UsersService
     private $userItemSubscribe;
 
     /**
+     * @var Contact
+     */
+    private $contact;
+
+    /**
      * @return Comments\CommentsService
      */
     private function getTable()
@@ -85,7 +90,8 @@ class UsersService
         SpecificationsService $specsService,
         Image\Storage $imageStorage,
         Comments\CommentsService $comments,
-        UserItemSubscribe $userItemSubscribe
+        UserItemSubscribe $userItemSubscribe,
+        Contact $contact
     ) {
 
         $this->salt = $options['salt'];
@@ -100,6 +106,7 @@ class UsersService
         $this->comments = $comments;
 
         $this->userItemSubscribe = $userItemSubscribe;
+        $this->contact = $contact;
     }
 
     /**
@@ -540,8 +547,7 @@ class UsersService
         $row->save();
 
         // delete from contacts
-        $contactModel = new Contact();
-        $contactModel->deleteUserEverywhere($row['id']);
+        $this->contact->deleteUserEverywhere($row['id']);
 
         // unsubscribe from telegram
         $telegramChatTable = new DbTable\Telegram\Chat();

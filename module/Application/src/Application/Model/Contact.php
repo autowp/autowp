@@ -2,69 +2,61 @@
 
 namespace Application\Model;
 
-use Autowp\Commons\Db\Table;
-
-use Zend_Db_Expr;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 
 class Contact
 {
     /**
-     * @var Table
+     * @var TableGateway
      */
     private $table;
 
-    public function __construct()
+    public function __construct(TableGateway $table)
     {
-        $this->table = new Table([
-            'name'    => 'contact',
-            'primary' => ['user_id', 'contact_user_id']
-        ]);
+        $this->table = $table;
     }
 
-    public function create($userId, $contactUserId)
+    public function create(int $userId, int $contactUserId)
     {
-        $row = $this->table->fetchRow([
-            'user_id = ?'         => (int)$userId,
-            'contact_user_id = ?' => (int)$contactUserId
-        ]);
+        $primaryKey = [
+            'user_id'         => $userId,
+            'contact_user_id' => $contactUserId
+        ];
+
+        $row = $this->table->select($primaryKey)->current();
         if (! $row) {
-            $row = $this->table->createRow([
-                'user_id'         => (int)$userId,
-                'contact_user_id' => (int)$contactUserId,
-                'timestamp'       => new Zend_Db_Expr('now()')
-            ]);
-            $row->save();
+            $row = $this->table->insert(array_merge([
+                'timestamp' => new Sql\Expression('now()')
+            ], $primaryKey));
         }
     }
 
-    public function delete($userId, $contactUserId)
+    public function delete(int $userId, int $contactUserId)
     {
-        $row = $this->table->fetchRow([
-            'user_id = ?'         => (int)$userId,
-            'contact_user_id = ?' => (int)$contactUserId
+        $this->table->delete([
+            'user_id'         => $userId,
+            'contact_user_id' => $contactUserId
         ]);
-        if ($row) {
-            $row->delete();
-        }
     }
 
-    public function exists($userId, $contactUserId)
+    public function exists(int $userId, int $contactUserId)
     {
-        $row = $this->table->fetchRow([
-            'user_id = ?'         => (int)$userId,
-            'contact_user_id = ?' => (int)$contactUserId
-        ]);
+        $row = $this->table->select([
+            'user_id'         => $userId,
+            'contact_user_id' => $contactUserId
+        ])->current();
         return (bool)$row;
     }
 
-    public function deleteUserEverywhere($userId)
+    public function deleteUserEverywhere(int $userId)
     {
         $this->table->delete([
-            'user_id = ?' => (int)$userId
+            'user_id' => $userId
         ]);
 
         $this->table->delete([
-            'contact_user_id = ?' => (int)$userId
+            'contact_user_id' => $userId
         ]);
     }
 }

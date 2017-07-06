@@ -36,7 +36,7 @@ return [
         'factories' => [
             Controller\Api\AclController::class             => Controller\Api\Service\AclControllerFactory::class,
             Controller\Api\CommentController::class         => Controller\Api\Service\CommentControllerFactory::class,
-            Controller\Api\ContactsController::class        => InvokableFactory::class,
+            Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
             Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
             Controller\Api\HotlinksController::class        => InvokableFactory::class,
             Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,

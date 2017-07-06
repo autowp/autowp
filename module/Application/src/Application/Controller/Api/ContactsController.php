@@ -12,6 +12,16 @@ use Application\Model\Contact;
 class ContactsController extends AbstractRestfulController
 {
     /**
+     * @var Contact
+     */
+    private $contact;
+
+    public function __construct(Contact $contact)
+    {
+        $this->contact = $contact;
+    }
+
+    /**
      * Update an existing resource
      *
      * @param  mixed $id
@@ -29,8 +39,6 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $contact = new Contact();
-
         $userTable = new User();
         $user = $userTable->fetchRow([
             'id = ?' => (int)$id,
@@ -41,7 +49,7 @@ class ContactsController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $contact->create($currentUser->id, $user->id);
+        $this->contact->create($currentUser->id, $user->id);
 
         $this->getResponse()->setStatusCode(200);
 
@@ -67,8 +75,6 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $contact = new Contact();
-
         $userTable = new User();
         $user = $userTable->fetchRow([
             'id = ?' => (int)$id
@@ -78,7 +84,7 @@ class ContactsController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $contact->delete($currentUser->id, $user->id);
+        $this->contact->delete($currentUser->id, $user->id);
 
         $this->getResponse()->setStatusCode(204);
 

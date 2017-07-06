@@ -14,6 +14,7 @@ class TableManager implements ServiceLocatorInterface
      * @var array
      */
     private $specs = [
+        'contact',
         'item' => [],
         'item_language' => [],
         'item_parent' => [],
