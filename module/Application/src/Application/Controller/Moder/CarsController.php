@@ -18,6 +18,7 @@ use Application\Model\Modification;
 use Application\Model\PictureItem;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
+use Application\Model\UserItemSubscribe;
 
 class CarsController extends AbstractActionController
 {
@@ -48,18 +49,25 @@ class CarsController extends AbstractActionController
      */
     private $pictureItem;
 
+    /**
+     * @var UserItemSubscribe
+     */
+    private $userItemSubscribe;
+
     public function __construct(
         $translator,
         BrandVehicle $brandVehicle,
         MessageService $message,
         SpecificationsService $specificationsService,
-        PictureItem $pictureItem
+        PictureItem $pictureItem,
+        UserItemSubscribe $userItemSubscribe
     ) {
         $this->translator = $translator;
         $this->brandVehicle = $brandVehicle;
         $this->message = $message;
         $this->specificationsService = $specificationsService;
         $this->pictureItem = $pictureItem;
+        $this->userItemSubscribe = $userItemSubscribe;
     }
 
     private function canMove(DbTable\Item\Row $car)
@@ -508,8 +516,7 @@ class CarsController extends AbstractActionController
                 $this->specificationsService->updateActualValues($newCar->id);
 
                 $user = $this->user()->get();
-                $ucsTable = new DbTable\User\ItemSubscribe();
-                $ucsTable->subscribe($user, $newCar);
+                $this->userItemSubscribe->subscribe($user['id'], $newCar['id']);
 
                 return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
             }
@@ -782,8 +789,7 @@ class CarsController extends AbstractActionController
                 $this->specificationsService->updateActualValues($newCar->id);
 
                 $user = $this->user()->get();
-                $ucsTable = new DbTable\User\ItemSubscribe();
-                $ucsTable->subscribe($user, $newCar);
+                $this->userItemSubscribe->subscribe($user['id'], $newCar['id']);
 
                 return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
             }

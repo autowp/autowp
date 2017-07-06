@@ -26,6 +26,7 @@ use Application\ItemNameFormatter;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
+use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
@@ -82,6 +83,11 @@ class ItemController extends AbstractRestfulController
      */
     private $message;
 
+    /**
+     * @var UserItemSubscribe
+     */
+    private $userItemSubscribe;
+
     public function __construct(
         RestHydrator $hydrator,
         Image $logoHydrator,
@@ -91,7 +97,8 @@ class ItemController extends AbstractRestfulController
         SpecificationsService $specificationsService,
         BrandVehicle $brandVehicle,
         HostManager $hostManager,
-        MessageService $message
+        MessageService $message,
+        UserItemSubscribe $userItemSubscribe
     ) {
         $this->hydrator = $hydrator;
         $this->logoHydrator = $logoHydrator;
@@ -102,6 +109,7 @@ class ItemController extends AbstractRestfulController
         $this->brandVehicle = $brandVehicle;
         $this->hostManager = $hostManager;
         $this->message = $message;
+        $this->userItemSubscribe = $userItemSubscribe;
 
         $this->table = new DbTable\Item();
         $this->itemParentTable = new DbTable\Item\ParentTable();
@@ -844,8 +852,7 @@ class ItemController extends AbstractRestfulController
             htmlspecialchars($this->car()->formatName($item, 'en'))
         ), $item);
 
-        $ucsTable = new DbTable\User\ItemSubscribe();
-        $ucsTable->subscribe($user, $item);
+        $this->userItemSubscribe->subscribe($user['id'], $item['id']);
 
         $itemTable->updateInteritance($item);
 
@@ -902,11 +909,10 @@ class ItemController extends AbstractRestfulController
         $values = $inputFilter->getValues();
 
         if (array_key_exists('subscription', $values)) {
-            $ucsTable = new DbTable\User\ItemSubscribe();
             if ($values['subscription']) {
-                $ucsTable->subscribe($user, $item);
+                $this->userItemSubscribe->subscribe($user['id'], $item['id']);
             } else {
-                $ucsTable->unsubscribe($user, $item);
+                $this->userItemSubscribe->unsubscribe($user['id'], $item['id']);
             }
         }
 
@@ -1038,8 +1044,7 @@ class ItemController extends AbstractRestfulController
 
         $this->brandVehicle->refreshAutoByVehicle($item->id);
 
-        $ucsTable = new DbTable\User\ItemSubscribe();
-        $ucsTable->subscribe($user, $item);
+        $this->userItemSubscribe->subscribe($user['id'], $item['id']);
 
         $newData = $item->toArray();
         $htmlChanges = [];
@@ -1055,7 +1060,7 @@ class ItemController extends AbstractRestfulController
         $this->log($message, $item);
 
         $user = $this->user()->get();
-        foreach ($ucsTable->getItemSubscribers($item) as $subscriber) {
+        foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
             if ($subscriber && ($subscriber->id != $user->id)) {
                 $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 

@@ -16,6 +16,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
 use Application\Service\SpecificationsService;
+use Application\Model\UserItemSubscribe;
 
 class CarsController extends AbstractActionController
 {
@@ -39,17 +40,24 @@ class CarsController extends AbstractActionController
      */
     private $message;
 
+    /**
+     * @var UserItemSubscribe
+     */
+    private $userItemSubscribe;
+
     public function __construct(
         HostManager $hostManager,
         Form $filterForm,
         SpecificationsService $specsService,
-        MessageService $message
+        MessageService $message,
+        UserItemSubscribe $userItemSubscribe
     ) {
 
         $this->hostManager = $hostManager;
         $this->filterForm = $filterForm;
         $this->specsService = $specsService;
         $this->message = $message;
+        $this->userItemSubscribe = $userItemSubscribe;
     }
 
     private function carModerUrl(DbTable\Item\Row $item, $uri = null)
@@ -553,9 +561,8 @@ class CarsController extends AbstractActionController
             $this->log($message, $car);
 
             $user = $this->user()->get();
-            $ucsTable = new DbTable\User\ItemSubscribe();
 
-            foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
+            foreach ($this->userItemSubscribe->getItemSubscribers($car['id']) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
                     $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
@@ -608,9 +615,8 @@ class CarsController extends AbstractActionController
             $this->log($message, $car);
 
             $user = $this->user()->get();
-            $ucsTable = new DbTable\User\ItemSubscribe();
 
-            foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
+            foreach ($this->userItemSubscribe->getItemSubscribers($car['id']) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
                     $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
@@ -729,7 +735,6 @@ class CarsController extends AbstractActionController
         $this->specsService->updateActualValues($car->id);
 
         $user = $this->user()->get();
-        $ucsTable = new DbTable\User\ItemSubscribe();
 
         $message = sprintf(
             'Автомобилю %s назначен двигатель %s',
@@ -738,7 +743,7 @@ class CarsController extends AbstractActionController
         );
         $this->log($message, $car);
 
-        foreach ($ucsTable->getItemSubscribers($car) as $subscriber) {
+        foreach ($this->userItemSubscribe->getItemSubscribers($car['id']) as $subscriber) {
             if ($subscriber && ($subscriber->id != $user->id)) {
                 $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 

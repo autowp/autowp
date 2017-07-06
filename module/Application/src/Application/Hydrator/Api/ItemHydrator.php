@@ -16,6 +16,7 @@ use Application\Model\Catalogue;
 use Application\Model\DbTable;
 use Application\Model\Item as ItemModel;
 use Application\Service\SpecificationsService;
+use Application\Model\UserItemSubscribe;
 
 class ItemHydrator extends RestHydrator
 {
@@ -96,6 +97,11 @@ class ItemHydrator extends RestHydrator
     private $itemTableGateway;
 
     /**
+     * @var UserItemSubscribe
+     */
+    private $userItemSubscribe;
+
+    /**
      * @return DbTable\Spec
      */
     private function getSpecTable(): DbTable\Spec
@@ -116,6 +122,8 @@ class ItemHydrator extends RestHydrator
         $this->itemParentTable = $tables->get('item_parent');
         $this->itemLanguageTable = $tables->get('item_language');
         $this->itemTableGateway = $tables->get('item');
+
+        $this->userItemSubscribe = $serviceManager->get(UserItemSubscribe::class);
 
         $this->specificationsService = $serviceManager->get(SpecificationsService::class);
 
@@ -305,13 +313,7 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('subscription') && $this->userId) { // only for moders
-            $ucsTable = new DbTable\User\ItemSubscribe();
-
-            $ucsRow = $ucsTable->fetchRow([
-                'user_id = ?' => $this->userId,
-                'item_id = ?' => $object['id']
-            ]);
-            $result['subscription'] = (bool)$ucsRow;
+            $result['subscription'] = $this->userItemSubscribe->isSubscribed($this->userId, $object['id']);
         }
 
         if ($this->filterComposite->filter('upload_url')) {

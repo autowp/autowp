@@ -16,6 +16,7 @@ use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
+use Application\Model\UserItemSubscribe;
 
 class ItemParentController extends AbstractRestfulController
 {
@@ -69,6 +70,11 @@ class ItemParentController extends AbstractRestfulController
      */
     private $itemTable;
 
+    /**
+     * @var UserItemSubscribe
+     */
+    private $userItemSubscribe;
+
     public function __construct(
         RestHydrator $hydrator,
         InputFilter $listInputFilter,
@@ -78,7 +84,8 @@ class ItemParentController extends AbstractRestfulController
         BrandVehicle $brandVehicle,
         SpecificationsService $specificationsService,
         HostManager $hostManager,
-        MessageService $message
+        MessageService $message,
+        UserItemSubscribe $userItemSubscribe
     ) {
         $this->hydrator = $hydrator;
         $this->listInputFilter = $listInputFilter;
@@ -93,6 +100,7 @@ class ItemParentController extends AbstractRestfulController
         $this->specificationsService = $specificationsService;
         $this->hostManager = $hostManager;
         $this->message = $message;
+        $this->userItemSubscribe = $userItemSubscribe;
     }
 
     public function indexAction()
@@ -283,15 +291,14 @@ class ItemParentController extends AbstractRestfulController
         );
         $this->log($message, [$item, $parentItem]);
 
-        $ucsTable = new DbTable\User\ItemSubscribe();
         $user = $this->user()->get();
 
         $subscribers = [];
-        foreach ($ucsTable->getItemSubscribers($item) as $subscriber) {
+        foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
             $subscribers[$subscriber->id] = $subscriber;
         }
 
-        foreach ($ucsTable->getItemSubscribers($parentItem) as $subscriber) {
+        foreach ($this->userItemSubscribe->getItemSubscribers($parentItem['id']) as $subscriber) {
             $subscribers[$subscriber->id] = $subscriber;
         }
 
@@ -470,15 +477,14 @@ class ItemParentController extends AbstractRestfulController
         $this->log($message, [$item, $parentItem]);
 
 
-        $ucsTable = new DbTable\User\ItemSubscribe();
         $user = $this->user()->get();
 
         $subscribers = [];
-        foreach ($ucsTable->getItemSubscribers($item) as $subscriber) {
+        foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
             $subscribers[$subscriber->id] = $subscriber;
         }
 
-        foreach ($ucsTable->getItemSubscribers($parentItem) as $subscriber) {
+        foreach ($this->userItemSubscribe->getItemSubscribers($parentItem['id']) as $subscriber) {
             $subscribers[$subscriber->id] = $subscriber;
         }
 

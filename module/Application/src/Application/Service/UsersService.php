@@ -22,6 +22,7 @@ use Exception;
 use Zend_Db_Expr;
 
 use Autowp\Image;
+use Application\Model\UserItemSubscribe;
 
 class UsersService
 {
@@ -62,6 +63,11 @@ class UsersService
     private $comments;
 
     /**
+     * @var UserItemSubscribe
+     */
+    private $userItemSubscribe;
+
+    /**
      * @return Comments\CommentsService
      */
     private function getTable()
@@ -78,7 +84,8 @@ class UsersService
         $transport,
         SpecificationsService $specsService,
         Image\Storage $imageStorage,
-        Comments\CommentsService $comments
+        Comments\CommentsService $comments,
+        UserItemSubscribe $userItemSubscribe
     ) {
 
         $this->salt = $options['salt'];
@@ -91,6 +98,8 @@ class UsersService
         $this->imageStorage = $imageStorage;
 
         $this->comments = $comments;
+
+        $this->userItemSubscribe = $userItemSubscribe;
     }
 
     /**
@@ -547,8 +556,7 @@ class UsersService
         ]);
 
         // unsubscribe from items
-        $ucsTable = new DbTable\User\ItemSubscribe();
-        $ucsTable->unsubscribeAll($row['id']);
+        $this->userItemSubscribe->unsubscribeAll($row['id']);
 
         return true;
     }

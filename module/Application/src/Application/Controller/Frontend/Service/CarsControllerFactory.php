@@ -15,7 +15,8 @@ class CarsControllerFactory implements FactoryInterface
             $container->get(\Application\HostManager::class),
             $container->get('AttrsLogFilterForm'),
             $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Autowp\Message\MessageService::class)
+            $container->get(\Autowp\Message\MessageService::class),
+            $container->get(\Application\Model\UserItemSubscribe::class)
         );
     }
 }

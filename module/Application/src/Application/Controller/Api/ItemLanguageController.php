@@ -14,6 +14,7 @@ use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
 use Application\HostManager;
 use Autowp\Message\MessageService;
+use Application\Model\UserItemSubscribe;
 
 class ItemLanguageController extends AbstractRestfulController
 {
@@ -47,6 +48,11 @@ class ItemLanguageController extends AbstractRestfulController
      */
     private $putInputFilter;
 
+    /**
+     * @var UserItemSubscribe
+     */
+    private $userItemSubscribe;
+
     public function __construct(
         TableGateway $table,
         TextStorage $textStorage,
@@ -54,7 +60,8 @@ class ItemLanguageController extends AbstractRestfulController
         BrandVehicle $brandVehicle,
         HostManager $hostManager,
         InputFilter $putInputFilter,
-        MessageService $message
+        MessageService $message,
+        UserItemSubscribe $userItemSubscribe
     ) {
         $this->table = $table;
         $this->textStorage = $textStorage;
@@ -63,6 +70,7 @@ class ItemLanguageController extends AbstractRestfulController
         $this->hostManager = $hostManager;
         $this->putInputFilter = $putInputFilter;
         $this->message = $message;
+        $this->userItemSubscribe = $userItemSubscribe;
     }
 
     public function indexAction()
@@ -215,12 +223,11 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         if ($changes) {
-            $ucsTable = new DbTable\User\ItemSubscribe();
-            $ucsTable->subscribe($user, $item);
+            $this->userItemSubscribe->subscribe($user['id'], $item['id']);
 
             $language = $this->language();
 
-            foreach ($ucsTable->getItemSubscribers($item) as $subscriber) {
+            foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
                     $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
