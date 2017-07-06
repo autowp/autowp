@@ -36,11 +36,16 @@ class RegistrationController extends AbstractActionController
             if ($this->form->isValid()) {
                 $values = $this->form->getData();
 
+                $ip = $request->getServer('REMOTE_ADDR');
+                if (! $ip) {
+                    $ip = '127.0.0.1';
+                }
+
                 $this->service->addUser([
                     'email'    => $values['email'],
                     'password' => $values['password'],
                     'name'     => $values['name'],
-                    'ip'       => $request->getServer('REMOTE_ADDR')
+                    'ip'       => $ip
                 ], $this->language());
 
                 return $this->redirect()->toUrl(

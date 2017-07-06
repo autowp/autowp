@@ -112,15 +112,17 @@ return [
             'elements' => [
                 'captcha' => [
                     'spec' => [
-                        'options' => [
-                            'captcha' => [
-                                'imgDir' => sys_get_temp_dir()
-                            ]
-                        ],
+                        'type' => 'Text',
+                        'name' => 'captcha'
                     ],
                 ]
+            ],
+            'input_filter' => [
+                'captcha' => [
+                    'required' => false
+                ]
             ]
-        ]
+        ],
     ],
     'mosts_min_vehicles_count' => 1,
 

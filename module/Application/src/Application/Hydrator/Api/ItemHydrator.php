@@ -313,7 +313,7 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('subscription') && $this->userId) { // only for moders
-            $result['subscription'] = $this->userItemSubscribe->isSubscribed($this->userId, $object['id']);
+            $result['subscription'] = $this->userItemSubscribe->isSubscribed((int)$this->userId, (int)$object['id']);
         }
 
         if ($this->filterComposite->filter('upload_url')) {

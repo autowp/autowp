@@ -59,7 +59,7 @@ class UserItemSubscribe
 
     public function isSubscribed(int $userId, int $itemId): bool
     {
-        return (bool) $this->userItemSubscribe->select([
+        return (bool) $this->table->select([
             'user_id' => $userId,
             'item_id' => $itemId
         ])->current();

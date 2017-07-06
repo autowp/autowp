@@ -86,7 +86,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
             'type_id' => 5,
             'order'   => 'id_desc',
-            'fields'  => 'catname'
+            'fields'  => 'catname,subscription'
         ]);
 
         $this->assertResponseStatusCode(200);
@@ -504,5 +504,42 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $json = $this->getItemParent($childVehicleId, $parentVehicleId);
 
         $this->assertNotEquals('sport', $json['catname']);
+    }
+
+    public function subscriptionTest()
+    {
+        $brand = $this->getRandomBrand();
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch(
+            'https://www.autowp.ru/api/item/' . $brand['id'],
+            Request::METHOD_PUT,
+            [
+                'subscription' => 1
+            ]
+        );
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/item/put');
+        $this->assertActionName('put');
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch(
+            'https://www.autowp.ru/api/item/' . $brand['id'],
+            Request::METHOD_PUT,
+            [
+                'subscription' => 0
+            ]
+        );
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/item/put');
+        $this->assertActionName('put');
     }
 }
