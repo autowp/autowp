@@ -57,7 +57,7 @@ ADD composer.json /app/composer.json
 RUN php ./composer.phar install --no-progress --no-interaction --no-suggest --optimize-autoloader
 
 ADD package.json /app/package.json
-RUN cd /app && npm install -y --silent --production
+RUN npm install -y --silent --production
 
 ADD . /app
 
