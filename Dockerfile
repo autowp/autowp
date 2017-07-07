@@ -44,7 +44,10 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install --no-install-re
     mkdir -p /var/log/supervisor && \
     rm /etc/nginx/sites-enabled/default && \
     mkdir -p /var/run/php/ && \
-    rm /etc/php/7.0/fpm/pool.d/www.conf
+    rm /etc/php/7.0/fpm/pool.d/www.conf && \
+    \
+    curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh > wait-for-it.sh && \
+    chmod +x wait-for-it.sh
 
 COPY ./etc/ /etc/
 
@@ -60,4 +63,4 @@ RUN ./node_modules/.bin/webpack -p
 
 EXPOSE 80
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["./start.sh"]
