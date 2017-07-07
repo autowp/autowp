@@ -6,33 +6,35 @@ WORKDIR /app
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
-RUN apt-get update && apt-get dist-upgrade -y && apt-get install --no-install-recommends --no-install-suggests  -y \
-    anacron \
-    apt-utils \
-    bash \
-    build-essential \
-    ca-certificates \
-    cron \
-    curl \
-    dh-autoreconf \
-    git \
-    imagemagick \
-    nginx \
-    php7.0-cli \
-    php7.0-curl \
-    php7.0-fpm \
-    php7.0-intl \
-    php7.0-json \
-    php7.0-gd \
-    php7.0-mbstring \
-    php7.0-mysql \
-    php7.0-xml \
-    php7.0-zip \
-    php-imagick \
-    php-memcache \
-    php-memcached \
-    supervisor \
-    tzdata && \
+RUN apt-get update && \
+    apt-get dist-upgrade --no-install-recommends --no-install-suggests -y && \
+    apt-get install --no-install-recommends --no-install-suggests -y \
+        anacron \
+        apt-utils \
+        bash \
+        build-essential \
+        ca-certificates \
+        cron \
+        curl \
+        dh-autoreconf \
+        git \
+        imagemagick \
+        nginx \
+        php7.0-cli \
+        php7.0-curl \
+        php7.0-fpm \
+        php7.0-intl \
+        php7.0-json \
+        php7.0-gd \
+        php7.0-mbstring \
+        php7.0-mysql \
+        php7.0-xml \
+        php7.0-zip \
+        php-imagick \
+        php-memcache \
+        php-memcached \
+        supervisor \
+        tzdata && \
     \
     curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
     apt-get install --no-install-recommends --no-install-suggests -y nodejs && \
@@ -58,6 +60,9 @@ ADD package.json /app/package.json
 RUN cd /app && npm install --production
 
 ADD . /app
+
+RUN chmod +x zf && \
+    chmod +x start.sh
 
 RUN ./node_modules/.bin/webpack -p
 
