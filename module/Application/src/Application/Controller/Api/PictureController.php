@@ -308,6 +308,7 @@ class PictureController extends AbstractRestfulController
             11 => ['sql' => ['pictures.removing_date DESC', 'pictures.id']],
             12 => ['sql' => 'picture_vote_summary.positive DESC'],
             13 => ['sql' => 'picture_vote_summary.negative DESC'],
+            14 => ['sql' => 'pictures.status']
         ];
 
         $select = $this->table->select(true)
