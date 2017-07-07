@@ -14,11 +14,9 @@ before_install:
   
 script: docker exec -it autowp_test_web vendor/bin/phpunit
 
-after_script:
-- docker exec -it autowp_test_web bash -c "./vendor/bin/coveralls -v"
-- docker exec -it autowp_test_web bash -c "./vendor/bin/test-reporter -v --coverage-report=./logs/clover.xml"
-
 after_success:
+  - docker exec -it autowp_test_web bash -c "./vendor/bin/coveralls -v"
+  - docker exec -it autowp_test_web bash -c "./vendor/bin/test-reporter -v --coverage-report=./logs/clover.xml"
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
     docker push $DOCKER_REPO;
