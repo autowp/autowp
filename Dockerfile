@@ -33,6 +33,7 @@ RUN apt-get update -qq && \
         php-imagick \
         php-memcache \
         php-memcached \
+        php-xdebug \
         supervisor \
         tzdata && \
     \
@@ -46,7 +47,9 @@ RUN apt-get update -qq && \
     mkdir -p /var/log/supervisor && \
     rm /etc/nginx/sites-enabled/default && \
     mkdir -p /var/run/php/ && \
-    rm /etc/php/7.0/fpm/pool.d/www.conf
+    rm /etc/php/7.0/fpm/pool.d/www.conf && \
+    rm /etc/php/7.0/cli/conf.d/20-xdebug.ini && \
+    rm /etc/php/7.0/fpm/conf.d/20-xdebug.ini
 
 COPY ./etc/ /etc/
 
