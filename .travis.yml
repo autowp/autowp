@@ -1,31 +1,8 @@
 sudo: required
-dist: trusty
 language: php
-php:
-  - 7.0.13
-  - 7.1
-git:
-  submodules: false
 services:
-  - mysql
-addons:
-  apt:
-    packages:
-    - mysql-server-5.6
-    - mysql-client-core-5.6
-    - mysql-client-5.6
-install:
-  - printf "\n" | pecl install imagick
-before_script: 
-  - phpenv config-add module/Application/test/_files/travis.php.ini
-  - composer install --ignore-platform-reqs --no-progress --no-interaction --no-suggest --optimize-autoloader
-  - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
-  - mysql -u root -e 'create database autowp_test;'
-  - mysql -u root < module/Application/test/_files/dump.sql
-  - mysql -u root -e 'GRANT ALL PRIVILEGES ON autowp_test.* TO autowp_test@localhost IDENTIFIED BY "test";'
-  - mkdir logs && chmod 0777 logs
-script: ./vendor/bin/phpunit --coverage-clover ./logs/clover.xml
-
-after_script:
-- ./vendor/bin/coveralls -v
-- ./vendor/bin/test-reporter -v --coverage-report=./logs/clover.xml
+  - docker
+before_install:
+  - docker pull autowp/autowp
+  
+script: docker build -t autowp/autowp .
