@@ -3,9 +3,9 @@ language: generic
 services:
   - docker
 before_install:
-  - docker pull autowp/autowp
-  - docker build -t autowp/autowp .
-  - docker-compose up -d module/Application/test/_files/docker-compose.yml
+  - docker pull $DOCKER_REPO
+  - docker build -t $DOCKER_REPO .
+  - docker-compose -f module/Application/test/_files/docker-compose.yml up -d
   - docker exec autowp_test_mysql "mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql"
   - docker exec autowp_test_mysql "mysql -u root -p password -e 'create database autowp_test;'"
   - docker exec autowp_test_mysql "mysql -u root -p password < module/Application/test/_files/dump.sql"
@@ -16,3 +16,9 @@ script: docker exec autowp_test_web vendor/bin/phpunit
 after_script:
 - docker exec autowp_test_web "./vendor/bin/coveralls -v"
 - docker exec autowp_test_web "./vendor/bin/test-reporter -v --coverage-report=./logs/clover.xml"
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push $DOCKER_REPO;
+    fi
