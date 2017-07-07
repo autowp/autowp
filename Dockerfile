@@ -51,7 +51,7 @@ RUN apt-get update && \
 COPY ./etc/ /etc/
 
 ADD composer.json /app/composer.json
-RUN php ./composer.phar install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader
+RUN php ./composer.phar install --no-progress --no-interaction --no-suggest --optimize-autoloader
 
 ADD package.json /app/package.json
 RUN cd /app && npm install --production
