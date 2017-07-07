@@ -46,10 +46,7 @@ RUN apt-get update && \
     mkdir -p /var/log/supervisor && \
     rm /etc/nginx/sites-enabled/default && \
     mkdir -p /var/run/php/ && \
-    rm /etc/php/7.0/fpm/pool.d/www.conf && \
-    \
-    curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh > wait-for-it.sh && \
-    chmod +x wait-for-it.sh
+    rm /etc/php/7.0/fpm/pool.d/www.conf
 
 COPY ./etc/ /etc/
 
@@ -62,7 +59,8 @@ RUN cd /app && npm install --production
 ADD . /app
 
 RUN chmod +x zf && \
-    chmod +x start.sh
+    chmod +x start.sh && \
+    chmod +x wait-for-it.sh
 
 RUN ./node_modules/.bin/webpack -p
 
