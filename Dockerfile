@@ -33,6 +33,7 @@ RUN apt-get update -qq && \
         php-imagick \
         php-memcache \
         php-memcached \
+        sh \
         supervisor \
         tzdata && \
     \
