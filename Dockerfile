@@ -6,9 +6,9 @@ WORKDIR /app
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
-RUN apt-get update && \
-    apt-get dist-upgrade --no-install-recommends --no-install-suggests -y && \
-    apt-get install --no-install-recommends --no-install-suggests -y \
+RUN apt-get update -qq && \
+    apt-get dist-upgrade -qq --no-install-recommends --no-install-suggests -y && \
+    apt-get install -qq --no-install-recommends --no-install-suggests -y \
         anacron \
         apt-utils \
         bash \
@@ -54,7 +54,7 @@ ADD composer.json /app/composer.json
 RUN php ./composer.phar install --no-progress --no-interaction --no-suggest --optimize-autoloader
 
 ADD package.json /app/package.json
-RUN cd /app && npm install --production
+RUN cd /app && npm install -y --silent --production
 
 ADD . /app
 
