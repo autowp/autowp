@@ -31,7 +31,8 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install --no-install-re
     php-imagick \
     php-memcache \
     php-memcached \
-    supervisor && \
+    supervisor \
+    tzdata && \
     \
     curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
     apt-get install --no-install-recommends --no-install-suggests -y nodejs && \
