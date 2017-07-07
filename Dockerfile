@@ -60,7 +60,9 @@ ADD . /app
 
 RUN chmod +x zf && \
     chmod +x start.sh && \
-    chmod +x wait-for-it.sh
+    chmod +x wait-for-it.sh && \
+    mkdir logs && \
+    chmod 0777 logs
 
 RUN ./node_modules/.bin/webpack -p
 
