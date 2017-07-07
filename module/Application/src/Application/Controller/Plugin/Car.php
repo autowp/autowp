@@ -244,42 +244,38 @@ class Car extends AbstractPlugin
             }
         }
 
-        // design projects
-        $carsDesignProject = [];
-        $designCarsRows = $itemParentAdapter->fetchAll(
-            $itemParentAdapter->select()
-                ->from('item', [
-                    'brand_name'    => 'name',
-                    'brand_catname' => 'catname'
-                ])
-                ->join('item_parent', 'item.id = item_parent.parent_id', [
-                    'brand_item_catname' => 'catname'
-                ])
-                ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DESIGN)
-                ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
-                ->where('item_parent_cache.item_id IN (?)', $carIds ? $carIds : 0)
-                ->group('item_parent_cache.item_id')
-        );
-        foreach ($designCarsRows as $designCarsRow) {
-            $carsDesignProject[$designCarsRow['item_id']] = [
-                'brandName' => $designCarsRow['brand_name'],
-                'url'       => $controller->url()->fromRoute('catalogue', [
-                    'action'        => 'brand-item',
-                    'brand_catname' => $designCarsRow['brand_catname'] ? $designCarsRow['brand_catname'] : 'test',
-                    'car_catname'   => $designCarsRow['brand_item_catname']
-                ])
-            ];
-        }
-
         // total pictures
         $carsTotalPictures = $pictureFetcher->getTotalPictures($carIds, $onlyExactlyPictures);
         $items = [];
         foreach ($cars as $car) {
             $totalPictures = isset($carsTotalPictures[$car->id]) ? $carsTotalPictures[$car->id] : null;
 
+            // design projects
+            $carsDesignProject = [];
+            $designCarsRow = $itemParentAdapter->fetchRow(
+                $itemParentAdapter->select()
+                    ->from('item', [
+                        'brand_name'    => 'name',
+                        'brand_catname' => 'catname'
+                    ])
+                    ->join('item_parent', 'item.id = item_parent.parent_id', [
+                        'brand_item_catname' => 'catname'
+                    ])
+                    ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DESIGN)
+                    ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
+                    ->where('item_parent_cache.item_id = ?', $car->id)
+                    ->limit(1)
+            );
             $designProjectData = false;
-            if (isset($carsDesignProject[$car->id])) {
-                $designProjectData = $carsDesignProject[$car->id];
+            if ($designCarsRow) {
+                $designProjectData = [
+                    'brandName' => $designCarsRow['brand_name'],
+                    'url'       => $controller->url()->fromRoute('catalogue', [
+                        'action'        => 'brand-item',
+                        'brand_catname' => $designCarsRow['brand_catname'] ? $designCarsRow['brand_catname'] : 'test',
+                        'car_catname'   => $designCarsRow['brand_item_catname']
+                    ])
+                ];
             }
 
             $categories = [];

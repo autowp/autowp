@@ -1,0 +1,25 @@
+web:
+  image: autowp/autowp
+  container_name: autowp_test_web
+  volumes:
+  - ./local.php:/app/config/autoload/local.php:ro
+  ports:
+  - "127.0.0.1:8089:80"
+  restart: always
+  links:
+  - memcached
+  - mysql
+  
+memcached:
+  image: memcached
+  container_name: autowp_test_memcached
+  expose:
+  - "11211"
+  
+mysql:
+  image: mysql
+  container_name: autowp_test_mysql
+  environment:
+  - "MYSQL_ROOT_PASSWORD=password"
+  expose:
+  - "3306"

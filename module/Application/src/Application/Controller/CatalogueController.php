@@ -20,6 +20,7 @@ use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Select;
+use Application\Model\DbTable\Picture;
 
 class CatalogueController extends AbstractActionController
 {
@@ -370,30 +371,45 @@ class CatalogueController extends AbstractActionController
                     [
                         'factory_id'   => 'id',
                         'factory_name' => 'name',
-                        'cars_count'   => 'count(ipc2.item_id)',
-                        'pictures.id', 'pictures.identity',
-                        'pictures.width', 'pictures.height',
-                        'pictures.crop_left', 'pictures.crop_top',
-                        'pictures.crop_width', 'pictures.crop_height',
-                        'pictures.status', 'pictures.image_id'
+                        'cars_count'   => 'count(ipc2.item_id)'
                     ]
                 )
                 ->where('item.item_type_id = ?', DbTable\Item\Type::FACTORY)
-                ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', null)
-                ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
+                ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', [])
+                ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', [])
                 ->where('ipc2.parent_id = ?', $brandId)
                 ->group('item.id')
-                ->join('picture_item', 'item.id = picture_item.item_id', null)
-                ->join('pictures', 'picture_item.picture_id = pictures.id', null)
+                ->join('picture_item', 'item.id = picture_item.item_id', [])
+                ->join('pictures', 'picture_item.picture_id = pictures.id', [])
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->order('cars_count desc')
                 ->limit(4)
         );
 
+        $pictureTable = new Picture();
+
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = DbTable\Picture\Row::buildFormatRequest($picture);
+
+            $pictureRow = $pictureTable->fetchRow(
+                $pictureTable->select(true)
+                    ->columns([
+                        'pictures.id', 'pictures.identity',
+                        'pictures.width', 'pictures.height',
+                        'pictures.crop_left', 'pictures.crop_top',
+                        'pictures.crop_width', 'pictures.crop_height',
+                        'pictures.status', 'pictures.image_id'
+                    ])
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                    ->join('pictures', 'picture_item.picture_id = pictures.id', [])
+                    ->where('picture_item.item_id = ?', $row['factory_id'])
+                    ->limit(1)
+            );
+
+            if ($pictureRow) {
+                $requests[$idx] = DbTable\Picture\Row::buildFormatRequest($pictureRow->toArray());
+            }
         }
 
         $imagesInfo = $this->imageStorage()->getFormatedImages($requests, 'picture-thumb');
