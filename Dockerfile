@@ -37,7 +37,7 @@ RUN apt-get update -qq && \
         tzdata && \
     \
     curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
-    apt-get install --no-install-recommends --no-install-suggests -y nodejs && \
+    apt-get install -qq --no-install-recommends --no-install-suggests -y nodejs && \
     \
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php --quiet && \
