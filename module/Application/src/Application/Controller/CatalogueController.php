@@ -402,7 +402,7 @@ class CatalogueController extends AbstractActionController
                         'pictures.status', 'pictures.image_id'
                     ])
                     ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
-                    ->join('pictures', 'picture_item.picture_id = pictures.id', [])
+                    ->join('picture_item', 'picture_item.picture_id = pictures.id', [])
                     ->where('picture_item.item_id = ?', $picture['factory_id'])
                     ->limit(1)
             );
