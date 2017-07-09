@@ -3,8 +3,10 @@ web:
   container_name: autowp_test_web
   environment:
     CODECLIMATE_REPO_TOKEN: ${CODECLIMATE_REPO_TOKEN}
+    COVERALLS_RUN_LOCALLY: 1
+    COVERALLS_REPO_TOKEN: ${COVERALLS_REPO_TOKEN}
   volumes:
-  - ./local.php:/app/config/autoload/local.php:ro
+  - ../../../../config/autoload/local.php:/app/config/autoload/local.php:ro
   links:
   - memcached
   - mysql
