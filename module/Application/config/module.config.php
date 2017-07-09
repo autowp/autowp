@@ -125,7 +125,8 @@ return [
             Service\TelegramService::class       => Service\TelegramServiceFactory::class,
             Service\UsersService::class          => Service\UsersServiceFactory::class,
             ItemNameFormatter::class             => Service\ItemNameFormatterFactory::class,
-            'translator'                         => \Zend\Mvc\I18n\TranslatorFactory::class
+            'translator'                         => \Zend\Mvc\I18n\TranslatorFactory::class,
+            Provider\UserId\OAuth2UserIdProvider::class => Provider\UserId\OAuth2UserIdProviderFactory::class,
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
@@ -133,7 +134,7 @@ return [
         'abstract_factories' => [
             'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
             //'Zend\Form\FormAbstractServiceFactory',
-        ],
+        ]
     ],
 
     'telegram' => [

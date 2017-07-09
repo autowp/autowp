@@ -7,7 +7,7 @@ use Application\Test\AbstractConsoleControllerTestCase;
 
 class ConsoleControllerTest extends AbstractConsoleControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../_files/application.config.php';
+    protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
     public function testRefreshRepliesCount()
     {

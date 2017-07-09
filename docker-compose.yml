@@ -1,10 +1,15 @@
 web:
   image: autowp/autowp
   container_name: autowp_test_web
-  environment:
-    CODECLIMATE_REPO_TOKEN: ${CODECLIMATE_REPO_TOKEN}
   volumes:
-  - ./local.php:/app/config/autoload/local.php:ro
+  - ./config:/app/config
+  - ./data:/app/data
+  - ./cache:/app/cache
+  - ./module:/app/module
+  - ./public_html:/app/public_html
+  ports:
+  - "80:80"
+  restart: always
   links:
   - memcached
   - mysql
@@ -20,5 +25,8 @@ mysql:
   container_name: autowp_test_mysql
   environment:
   - "MYSQL_ROOT_PASSWORD=password"
+  volumes:
+  - "./mysql:/var/lib/mysql"
+  - "./mysql.conf.d:/etc/mysql/conf.d"
   expose:
   - "3306"

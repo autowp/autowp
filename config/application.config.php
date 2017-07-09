@@ -1,12 +1,6 @@
 <?php
-/**
- * If you need an environment-specific system or application configuration,
- * there is an example in the documentation
- * @see http://framework.zend.com/manual/current/en/tutorials/config.advanced.html#environment-specific-system-configuration
- * @see http://framework.zend.com/manual/current/en/tutorials/config.advanced.html#environment-specific-application-configuration
- */
+
 return [
-    // This should be an array of module namespaces used in the application.
     'modules' => [
         'Zend\\Db',
         'Zend\\Form',
@@ -52,7 +46,7 @@ return [
         // modules are loaded. These effectively override configuration
         // provided by modules themselves. Paths may use GLOB_BRACE notation.
         'config_glob_paths' => [
-            'config/autoload/{{,*.}global,{,*.}local}.php',
+            'config/autoload/local.php',
         ],
 
         // Whether or not to enable a configuration cache.
@@ -78,19 +72,5 @@ return [
         // Enabled by default, prevents usage of modules that depend on other modules
         // that weren't loaded.
         // 'check_dependencies' => true,
-    ],
-
-    // Used to create an own service manager. May contain one or more child arrays.
-    //'service_listener_options' => array(
-    //     array(
-    //         'service_manager' => $stringServiceManagerName,
-    //         'config_key'      => $stringConfigKey,
-    //         'interface'       => $stringOptionalInterface,
-    //         'method'          => $stringRequiredMethodName,
-    //     ),
-    // ),
-
-   // Initial configuration with which to seed the ServiceManager.
-   // Should be compatible with Zend\ServiceManager\Config.
-   // 'service_manager' => array(),
+    ]
 ];
