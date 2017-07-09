@@ -506,7 +506,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEquals('sport', $json['catname']);
     }
 
-    public function subscriptionTest()
+    public function testSubscription()
     {
         $brand = $this->getRandomBrand();
 
