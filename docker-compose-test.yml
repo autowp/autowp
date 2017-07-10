@@ -6,7 +6,7 @@ web:
     COVERALLS_RUN_LOCALLY: 1
     COVERALLS_REPO_TOKEN: ${COVERALLS_REPO_TOKEN}
   volumes:
-  - config/autoload/local.php:/app/config/autoload/local.php:ro
+  - ./config/autoload/local.php:/app/config/autoload/local.php:ro
   links:
   - memcached
   - mysql
