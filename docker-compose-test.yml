@@ -7,6 +7,8 @@ web:
     COVERALLS_REPO_TOKEN: ${COVERALLS_REPO_TOKEN}
   volumes:
   - ./config/autoload/local.php:/app/config/autoload/local.php:ro
+  - ./module/Application/test/_files/image:/app/public_html/image
+  - ./module/Application/test/_files/pictures:/app/public_html/pictures
   links:
   - memcached
   - mysql
