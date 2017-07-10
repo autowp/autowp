@@ -323,18 +323,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
-    public function testOrganize()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/organize/item_id/1', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('organize');
-    }
-
     public function testOrganizePicturesForm()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -352,8 +340,8 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         // upload picture
         $request = $this->getRequest();
         $request->getHeaders()
-        ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
-        ->addHeaderLine('Content-Type', 'multipart/form-data');
+            ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
+            ->addHeaderLine('Content-Type', 'multipart/form-data');
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
