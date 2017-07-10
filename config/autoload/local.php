@@ -2,8 +2,6 @@
 
 namespace Application;
 
-$imageDir = __DIR__ . DIRECTORY_SEPARATOR . 'image' . DIRECTORY_SEPARATOR;
-
 return [
     'zf1db' => [
         'params' => [
@@ -73,25 +71,6 @@ return [
                 'name'     => 'blackHole',
                 'lifetime' => 600
             ],
-        ],
-    ],
-    'imageStorage' => [
-        'dirs' => [
-            'format' => [
-                'path' => $imageDir . "format",
-            ],
-            'museum' => [
-                'path' => $imageDir . "museum",
-            ],
-            'user' => [
-                'path' => $imageDir . "user",
-            ],
-            'brand' => [
-                'path' => $imageDir . "brand",
-            ],
-            'picture' => [
-                'path' => __DIR__ . '/pictures/',
-            ]
         ],
     ],
     'forms' => [
