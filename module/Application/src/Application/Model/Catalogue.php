@@ -206,7 +206,6 @@ class Catalogue
         }
 
         if ($toBrand === false) {
-            //print '123';
             $select = new Sql\Select($this->itemTable2->getTable());
             $select
                 ->columns(['catname'])

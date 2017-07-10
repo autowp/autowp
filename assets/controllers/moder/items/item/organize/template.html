@@ -1,0 +1,23 @@
+<div btf-markdown="'moder/vehicle/catalogue/turbo-group-creator/text'|translate"></div>
+
+<autowp-item-meta-form ng-show="ctrl.loading <= 0" disable-is-group="true" hide-submit="true" item="ctrl.newItem" submit="ctrl.saveMeta" invalid-params="ctrl.invalidParams" control="ctrl.control"></autowp-item-meta-form>
+
+<div class="form-group row" ng-show="ctrl.loading <= 0">
+    <label class="col-md-2 control-label text-right" translate>moder/vehicle/catalogue/turbo-group-creator/vehicles</label>
+    <div class="col-md-10">
+        <div class="checkbox" ng-repeat="child in ctrl.childs">
+            <label>
+                <input type="checkbox" ng-model="child.selected" ng-change="ctrl.childSelected()" />
+                <span ng-bind-html="child.item.name_html"></span>
+            </label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <div class="col-md-10 col-md-offset-2">
+        <button type="submit" name="submit" class="btn btn-primary" translate ng-click="ctrl.submit()" ng-disabled="!ctrl.hasSelectedChild || ctrl.loading > 0">submit</button>
+        <span ng-show="ctrl.loading > 0">
+            <i class="fa fa-spinner fa-spin fa-fw"></i>
+        </span>
+    </div>
+</div>

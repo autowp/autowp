@@ -5,10 +5,12 @@ import ACL_SERVICE_NAME from 'services/acl';
 import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
 import SPEC_SERVICE from 'services/spec';
 import CONTENT_LANGUAGE_SERVICE from 'services/content-language';
+import ITEM_SERVICE from 'services/item';
 var $ = require('jquery');
 require('corejs-typeahead');
 import './tree';
 import './select-parent';
+import './organize';
 
 const STATE_NAME = 'moder-items-item';
 const CONTROLLER_NAME = 'ModerItemsItemController';
@@ -55,8 +57,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$rootScope', '$http', '$state', '$translate', '$q', '$element', SPEC_SERVICE, VEHICLE_TYPE_SERVICE, ACL_SERVICE_NAME, CONTENT_LANGUAGE_SERVICE,
-        function($scope, $rootScope, $http, $state, $translate, $q, $element, SpecService, VehicleTypeService, Acl, ContentLanguage) {
+        '$scope', '$rootScope', '$http', '$state', '$translate', '$q', '$element', SPEC_SERVICE, VEHICLE_TYPE_SERVICE, ACL_SERVICE_NAME, CONTENT_LANGUAGE_SERVICE, ITEM_SERVICE,
+        function($scope, $rootScope, $http, $state, $translate, $q, $element, SpecService, VehicleTypeService, Acl, ContentLanguage, ItemService) {
             
             var ctrl = this;
             
@@ -539,9 +541,11 @@ angular.module(Module)
                     
                     var promises = [];
                     
+                    var ids = [];
                     angular.forEach(ctrl.item.vehicle_type, function(vehicle_type) {
-                        promises.push($http.post('/api/item-vehicle-type/' + ctrl.item.id + '/' + vehicle_type.id));
+                        ids.push(vehicle_type.id);
                     });
+                    promises.push(ItemService.setItemVehicleTypes(ctrl.item.id, ids));
                     
                     ctrl.loading++;
                     $q.all(promises).then(function(results) {

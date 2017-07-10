@@ -9,7 +9,6 @@ use Zend\View\Model\ViewModel;
 
 use Autowp\Message\MessageService;
 
-use Application\Form\Moder\CarOrganize as CarOrganizeForm;
 use Application\Form\Moder\CarOrganizePictures as CarOrganizePicturesForm;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
@@ -93,22 +92,6 @@ class CarsController extends AbstractActionController
             'force_canonical' => $full,
             'uri'             => $uri
         ]) . $url;
-    }
-
-    /**
-     * @param \Autowp\User\Model\DbTable\User\Row $user
-     * @param bool $full
-     * @param \Zend\Uri\Uri $uri
-     * @return string
-     */
-    private function userModerUrl(\Autowp\User\Model\DbTable\User\Row $user, $full = false, $uri = null)
-    {
-        return $this->url()->fromRoute('users/user', [
-            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
-        ], [
-            'force_canonical' => $full,
-            'uri'             => $uri
-        ]);
     }
 
     /**
@@ -366,167 +349,6 @@ class CarsController extends AbstractActionController
         }
 
         return $result;
-    }
-
-    public function organizeAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $car = $itemTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canMove = $this->canMove($car);
-        if (! $canMove) {
-            return $this->forbiddenAction();
-        }
-
-        $itemParentTable = $this->getCarParentTable();
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $order = array_merge(['item_parent.type'], $this->catalogue()->itemOrdering());
-
-        $itemParentRows = $itemParentTable->fetchAll(
-            $itemParentTable->select(true)
-                ->join('item', 'item_parent.item_id = item.id', null)
-                ->where('item_parent.parent_id = ?', $car->id)
-                ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DEFAULT)
-                ->order($order)
-        );
-
-        $childs = [];
-        foreach ($itemParentRows as $childRow) {
-            $carRow = $itemTable->find($childRow->item_id)->current();
-            $childs[$carRow->id] = $this->car()->formatName($carRow, $this->language());
-        }
-
-        $specTable = new DbTable\Spec();
-        $specOptions = $this->loadSpecs($specTable, null, 0);
-
-        $db = $itemTable->getAdapter();
-        $avgSpecId = $db->fetchOne(
-            $db->select()
-                ->from($itemTable->info('name'), 'AVG(spec_id)')
-                ->join('item_parent', 'item.id = item_parent.parent_id', null)
-                ->where('item_parent.item_id = ?', $car->id)
-        );
-        $inheritedSpec = null;
-        if ($avgSpecId) {
-            $avgSpec = $specTable->find($avgSpecId)->current();
-            if ($avgSpec) {
-                $inheritedSpec = $avgSpec->short_name;
-            }
-        }
-
-        $organizeItemTypeId = $car['item_type_id'];
-        switch ($organizeItemTypeId) {
-            case DbTable\Item\Type::BRAND:
-                $organizeItemTypeId = DbTable\Item\Type::VEHICLE;
-                break;
-        }
-
-        $form = new CarOrganizeForm(null, [
-            'itemType'           => $organizeItemTypeId,
-            'language'           => $this->language(),
-            'childOptions'       => $childs,
-            'inheritedIsConcept' => $car->is_concept,
-            'specOptions'        => array_replace(['' => '-'], $specOptions),
-            'inheritedSpec'      => $inheritedSpec,
-            'translator'         => $this->translator
-        ]);
-
-        $form->setAttribute('action', $this->url()->fromRoute('moder/cars/params', [], [], true));
-
-        $data = $this->carToForm($car);
-        $data['is_group'] = true;
-
-        $vehicleType = new VehicleType();
-        $data['vehicle_type_id'] = $vehicleType->getVehicleTypes($car->id);
-
-        $form->populateValues($data);
-
-        if ($this->getRequest()->isPost()) {
-            $form->setData($this->params()->fromPost());
-            if ($form->isValid()) {
-                $values = $form->getData();
-
-                $values['is_group'] = true;
-
-                $newCar = $itemTable->createRow(
-                    $this->prepareCarMetaToSave($values)
-                );
-                $newCar->item_type_id = $organizeItemTypeId;
-                $newCar->save();
-
-                $this->setLanguageName($newCar['id'], 'xx', $values['name']);
-
-                $vehicleType->setVehicleTypes($newCar->id, (array)$values['vehicle_type_id']);
-
-                $newCar->updateOrderCache();
-
-                $cpcTable = new DbTable\Item\ParentCache();
-                $cpcTable->rebuildCache($newCar);
-
-                $this->log(sprintf(
-                    'Создан новый автомобиль %s',
-                    htmlspecialchars($this->car()->formatName($newCar, 'en'))
-                ), $newCar);
-
-                $this->brandVehicle->create($car->id, $newCar->id);
-
-                $message = sprintf(
-                    '%s выбран как родительский автомобиль для %s',
-                    htmlspecialchars($this->car()->formatName($car, 'en')),
-                    htmlspecialchars($this->car()->formatName($newCar, 'en'))
-                );
-                $this->log($message, [$car, $newCar]);
-
-                $itemTable->updateInteritance($newCar);
-
-
-                $childCarRows = $itemTable->find($values['childs']);
-
-                foreach ($childCarRows as $childCarRow) {
-                    $this->brandVehicle->create($newCar->id, $childCarRow->id);
-
-                    $message = sprintf(
-                        '%s выбран как родительский автомобиль для %s',
-                        htmlspecialchars($this->car()->formatName($newCar, 'en')),
-                        htmlspecialchars($this->car()->formatName($childCarRow, 'en'))
-                    );
-                    $this->log($message, [$newCar, $childCarRow]);
-
-                    $this->brandVehicle->remove($car->id, $childCarRow->id);
-
-                    $message = sprintf(
-                        '%s перестал быть родительским автомобилем для %s',
-                        htmlspecialchars($this->car()->formatName($car, 'en')),
-                        htmlspecialchars($this->car()->formatName($childCarRow, 'en'))
-                    );
-                    $this->log($message, [$car, $childCarRow]);
-
-                    $itemTable->updateInteritance($childCarRow);
-                }
-
-                $this->specificationsService->updateActualValues($newCar->id);
-
-                $user = $this->user()->get();
-                $this->userItemSubscribe->subscribe($user['id'], $newCar['id']);
-
-                return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
-            }
-        }
-
-        return [
-            'car'    => $car,
-            //'childs' => $childs,
-            'form'   => $form
-        ];
     }
 
     private function prepareCarMetaToSave(array $values)

@@ -4,6 +4,7 @@ import template from './template.html';
 import ACL_SERVICE_NAME from 'services/acl';
 import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
 import SPEC_SERVICE from 'services/spec';
+import ITEM_SERVICE from 'services/item';
 var sprintf = require("sprintf-js").sprintf;
 
 const STATE_NAME = 'moder-items-new';
@@ -39,8 +40,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$translate', '$q', SPEC_SERVICE, VEHICLE_TYPE_SERVICE,
-        function($scope, $http, $state, $translate, $q, SpecService, VehicleTypeService) {
+        '$scope', '$http', '$state', '$translate', '$q', SPEC_SERVICE, VEHICLE_TYPE_SERVICE, ITEM_SERVICE,
+        function($scope, $http, $state, $translate, $q, SpecService, VehicleTypeService, ItemService) {
             
             var ctrl = this;
             
@@ -138,9 +139,11 @@ angular.module(Module)
                         
                         var promises = [];
                         
+                        var ids = [];
                         angular.forEach(ctrl.item.vehicle_type, function(vehicle_type) {
-                            promises.push($http.post('/api/item-vehicle-type/' + response.data.id + '/' + vehicle_type.id));
+                            ids.push(vehicle_type.id);
                         });
+                        promises.push(ItemService.setItemVehicleTypes(response.data.id, ids));
                         
                         if (ctrl.parent) {
                             promises.push($http.post('/api/item-parent', {

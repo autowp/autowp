@@ -155,8 +155,8 @@
         <span ng-show="ctrl.catalogueLoading > 0">
             <i class="fa fa-spinner fa-spin fa-fw"></i>
         </span>
-        <a ng-if="ctrl.item.is_group && ctrl.canMove"
-            ng-href="/moder/cars/organize/item_id/{{ctrl.item.id}}/item_type_id/{{ctrl.organizeTypeId}}" 
+        <a ng-if="ctrl.item.is_group && ctrl.canMove && ctrl.item.childs_count > 0"
+            ui-sref="moder-items-item-organize({id: ctrl.item.id, item_type_id: ctrl.organizeTypeId})"
             class="btn btn-default" 
             translate>moder/vehicle/catalogue/turbo-group-creator</a>
         <table class="table">

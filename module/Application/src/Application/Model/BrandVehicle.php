@@ -364,6 +364,72 @@ class BrandVehicle
         return true;
     }
 
+    public function move(int $itemId, int $fromParentId, int $toParentId)
+    {
+        $oldParentRow = $this->itemTable->find($fromParentId)->current();
+        $newParentRow = $this->itemTable->find($toParentId)->current();
+        $itemRow = $this->itemTable->find($itemId)->current();
+        if (! $oldParentRow || ! $newParentRow || ! $itemRow) {
+            return false;
+        }
+
+        if ($oldParentRow->id == $newParentRow->id) {
+            return false;
+        }
+
+        if (! $oldParentRow->is_group) {
+            throw new Exception("Only groups can have childs");
+        }
+
+        if (! $newParentRow->is_group) {
+            throw new Exception("Only groups can have childs");
+        }
+
+        if (! $this->isAllowedCombination($itemRow->item_type_id, $newParentRow->item_type_id)) {
+            throw new Exception("That type of parent is not allowed for this type");
+        }
+
+        $itemId = (int)$itemRow->id;
+        $parentId = (int)$newParentRow->id;
+
+        $parentIds = $this->itemParentTable->collectParentIds($newParentRow->id);
+        if (in_array($itemId, $parentIds)) {
+            throw new Exception('Cycle detected');
+        }
+
+        $itemParentRow = $this->itemParentTable->fetchRow([
+            'parent_id = ?' => $fromParentId,
+            'item_id = ?'   => $itemId
+        ]);
+
+        if (! $itemParentRow) {
+            return false;
+        }
+
+        $itemParentRow->setFromArray([
+            'parent_id' => $toParentId
+        ]);
+        $itemParentRow->save();
+
+        $bvlRows = $this->itemParentLanguageTable->fetchAll([
+            'item_id = ?'   => $itemId,
+            'parent_id = ?' => $fromParentId
+        ]);
+        foreach ($bvlRows as $bvlRow) {
+            $bvlRow->setFromArray([
+                'parent_id' => $toParentId
+            ]);
+            $itemParentRow->save();
+        }
+
+        $cpcTable = new DbTable\Item\ParentCache();
+        $cpcTable->rebuildCache($itemRow);
+
+        $this->refreshAuto($toParentId, $itemId);
+
+        return true;
+    }
+
     public function remove($parentId, $itemId)
     {
         $parentRow = $this->itemTable->find($parentId)->current();

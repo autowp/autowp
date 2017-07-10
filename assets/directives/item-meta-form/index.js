@@ -27,7 +27,9 @@ angular.module(Module)
                 item: '=',
                 submit: '<',
                 parent: '<',
-                invalidParams: '<'
+                invalidParams: '<',
+                hideSubmit: '<',
+                disableIsGroup: '<'
             },
             template: template,
             transclude: true,
@@ -44,8 +46,8 @@ angular.module(Module)
                     
                     ctrl.markers = {
                         point: {
-                            lat: $scope.item.lat,
-                            lng: $scope.item.lng,
+                            lat: $scope.item ? $scope.item.lat : null,
+                            lng: $scope.item ? $scope.item.lng : null,
                             focus: true
                         }
                     };

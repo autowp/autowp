@@ -43,7 +43,7 @@ return [
             Controller\Api\ItemController::class            => Controller\Api\Service\ItemControllerFactory::class,
             Controller\Api\ItemLanguageController::class    => Controller\Api\ItemLanguageControllerFactory::class,
             Controller\Api\ItemLinkController::class        => Controller\Api\ItemLinkControllerFactory::class,
-            Controller\Api\ItemParentController::class      => Controller\Api\Service\ItemParentControllerFactory::class,
+            Controller\Api\ItemParentController::class      => Controller\Api\ItemParentControllerFactory::class,
             Controller\Api\ItemParentLanguageController::class => Controller\Api\ItemParentLanguageControllerFactory::class,
             Controller\Api\ItemVehicleTypeController::class => Controller\Api\Service\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LogController::class             => Controller\Api\Service\LogControllerFactory::class,
@@ -766,7 +766,16 @@ return [
                         ]
                     ]
                 ]
-            ]
+            ],
+            'parent_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
         ],
         'api_log_list' => [
             'article_id' => [

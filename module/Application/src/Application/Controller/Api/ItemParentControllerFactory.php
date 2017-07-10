@@ -1,11 +1,9 @@
 <?php
 
-namespace Application\Controller\Api\Service;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
-use Application\Controller\Api\ItemParentController as Controller;
 
 class ItemParentControllerFactory implements FactoryInterface
 {
@@ -13,7 +11,7 @@ class ItemParentControllerFactory implements FactoryInterface
     {
         $hydrators = $container->get('HydratorManager');
         $filters = $container->get('InputFilterManager');
-        return new Controller(
+        return new ItemParentController(
             $hydrators->get(\Application\Hydrator\Api\ItemParentHydrator::class),
             $filters->get('api_item_parent_list'),
             $filters->get('api_item_parent_item'),
