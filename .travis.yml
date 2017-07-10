@@ -5,7 +5,7 @@ services:
 before_install:
   - docker pull $DOCKER_REPO
   - docker build --cache-from $DOCKER_REPO -t $DOCKER_REPO .
-  - docker-compose -f module/Application/test/_files/docker-compose.yml up -d
+  - docker-compose -f docker-compose-test.yml up -d
   - docker exec -it autowp_test_web bash -c "./wait-for-it.sh autowp_test_mysql:3306"
   - docker exec -it autowp_test_mysql bash -c "mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -uroot -ppassword mysql"
   - docker exec -it autowp_test_mysql bash -c "mysql -uroot -ppassword -e 'create database autowp_test;'"

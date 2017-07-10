@@ -4,5 +4,7 @@
 .project
 .settings
 .travis.yml
+docker-compose.yml
+docker-compose-test.yml
 Dockerfile
 README.md
