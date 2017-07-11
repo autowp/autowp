@@ -38,6 +38,10 @@ angular.module(Module)
         '$scope', '$http', '$state', PICTURE_ITEM_SERVICE,
         function($scope, $http, $state, PictureItemService) {
             
+            var ctrl = this;
+            
+            ctrl.search = '';
+            
             $scope.pageEnv({
                 layout: {
                     isAdminPage: true,
@@ -101,6 +105,23 @@ angular.module(Module)
                 });
             }
             
+            function loadBrands() {
+                $http({
+                    method: 'GET',
+                    url: '/api/item',
+                    params: {
+                        type_id: 5,
+                        fields: 'name_html',
+                        limit: 200,
+                        name: ctrl.search ? '%' + ctrl.search + '%' : null,
+                        page: $scope.page
+                    }
+                }).then(function(response) {
+                    $scope.brands = chunk(response.data.items, 6);
+                    $scope.brands_paginator = response.data.paginator;
+                });
+            }
+            
             if (! $scope.show_museums && ! $scope.show_factories) {
                 if ($scope.brand_id) {
                     $http({
@@ -148,19 +169,12 @@ angular.module(Module)
                     });
                     
                 } else {
-                    $http({
-                        method: 'GET',
-                        url: '/api/item',
-                        params: {
-                            type_id: 5,
-                            fields: 'name_html',
-                            limit: 200,
-                            page: $scope.page
-                        }
-                    }).then(function(response) {
-                        $scope.brands = chunk(response.data.items, 6);
-                        $scope.brands_paginator = response.data.paginator;
-                    });
+                    
+                    ctrl.doSearch = function() {
+                        loadBrands();
+                    };
+                    
+                    loadBrands();
                 }
             }
             
