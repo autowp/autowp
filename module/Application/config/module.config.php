@@ -9,6 +9,27 @@ use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
 use Zend_Db_Adapter_Abstract;
 
+$host = getenv('AUTOWP_HOST');
+$hostCookie = ($host == 'localhost' ? '' : '.' . $host);
+
+$mailTypes = [
+    'in-memory' => [
+        'type' => 'in-memory'
+    ],
+    'smtp' => [
+        'type'    => 'smtp',
+        'options' => [
+            'host'              => getenv('AUTOWP_MAIL_SMTP_HOST'),
+            'connection_class'  => 'login',
+            'connection_config' => [
+                'username' => getenv('AUTOWP_MAIL_SMTP_USERNAME'),
+                'password' => getenv('AUTOWP_MAIL_SMTP_PASSWORD'),
+                'ssl'      => 'tls'
+            ],
+        ],
+    ]
+];
+
 return [
     'controllers' => [
         'factories' => [
@@ -138,73 +159,73 @@ return [
     ],
 
     'telegram' => [
-        'accessToken' => '',
-        'token'       => '',
-        'webhook'     => ''
+        'accessToken' => getenv('AUTOWP_TELEGRAM_ACCESS_TOKEN'),
+        'token'       => getenv('AUTOWP_TELEGRAM_TOKEN'),
+        'webhook'     => 'https://www.autowp.ru/telegram/webhook/token/' . getenv('AUTOWP_TELEGRAM_TOKEN')
     ],
 
     'twitter' => [
-        'username' => '',
+        'username' => getenv('AUTOWP_TWITTER_USERNAME'),
         'oauthOptions' => [
-            'consumerKey'    => '',
-            'consumerSecret' => ''
+            'consumerKey'    => getenv('AUTOWP_TWITTER_OAUTH_KEY'),
+            'consumerSecret' => getenv('AUTOWP_TWITTER_OAUTH_SECRET')
         ],
         'token' => [
-            'oauth_token'        => '',
-            'oauth_token_secret' => ''
+            'oauth_token'        => getenv('AUTOWP_TWITTER_TOKEN_OAUTH'),
+            'oauth_token_secret' => getenv('AUTOWP_TWITTER_TOKEN_OAUTH_SECRET')
         ]
     ],
 
     'facebook' => [
-        'app_id' => '',
-        'app_secret' => '',
-        'page_access_token' => ''
+        'app_id' => getenv('AUTOWP_FACEBOOK_APP_ID'),
+        'app_secret' => getenv('AUTOWP_FACEBOOK_APP_SECRET'),
+        'page_access_token' => getenv('AUTOWP_FACEBOOK_PAGE_ACCESS_TOKEN'),
     ],
 
     'hosts' => [
         'ru' => [
-            'hostname' => 'www.autowp.ru',
+            'hostname' => getenv('AUTOWP_HOST_RU'),
             'timezone' => 'Europe/Moscow',
             'name'     => 'Русский',
             'flag'     => 'flag-icon flag-icon-ru',
-            'cookie'   => '.autowp.ru',
+            'cookie'   => getenv('AUTOWP_HOST_COOKIE_RU'),
             'aliases'  => [
                 'ru.autowp.ru'
             ]
         ],
         'en' => [
-            'hostname' => 'en.wheelsage.org',
+            'hostname' => 'en.' . $host,
             'timezone' => 'Europe/London',
             'name'     => 'English (beta)',
             'flag'     => 'flag-icon flag-icon-gb',
-            'cookie'   => '.wheelsage.org',
+            'cookie'   => $hostCookie,
             'aliases'  => [
                 'en.autowp.ru',
-                'wheelsage.org',
-                'www.wheelsage.org'
+                $host,
+                'www' . $host
             ]
         ],
         'fr' => [
-            'hostname' => 'fr.wheelsage.org',
+            'hostname' => 'fr.' . $host,
             'timezone' => 'Europe/Paris',
             'name'     => 'Français (beta)',
             'flag'     => 'flag-icon flag-icon-fr',
-            'cookie'   => '.wheelsage.org',
+            'cookie'   => $hostCookie,
             'aliases'  => []
         ],
         'zh' => [
-            'hostname' => 'zh.wheelsage.org',
+            'hostname' => 'zh.' . $host,
             'timezone' => 'Asia/Shanghai',
             'name'     => '中文 (beta)',
             'flag'     => 'flag-icon flag-icon-cn',
-            'cookie'   => '.wheelsage.org',
+            'cookie'   => $hostCookie,
             'aliases'  => []
         ]
     ],
 
     'hostname_whitelist' => ['www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
-        'i.wheelsage.org', 'en.wheelsage.org', 'fr.wheelsage.org',
-        'zh.wheelsage.org', 'www.wheelsage.org', 'wheelsage.org'],
+        'i.' . $host, 'en.' . $host, 'fr.' . $host,
+        'zh.' . $host, 'www.' . $host, $host],
 
     'pictures_hostname' => 'i.wheelsage.org',
 
@@ -240,29 +261,29 @@ return [
 
     'externalloginservice' => [
         'vk' => [
-            'clientId'     => '',
-            'clientSecret' => ''
+            'clientId'     => getenv('AUTOWP_ELS_VK_CLIENTID'),
+            'clientSecret' => getenv('AUTOWP_ELS_VK_SECRET'),
         ],
         'google-plus' => [
-            'clientId'     => '',
-            'clientSecret' => ''
+            'clientId'     => getenv('AUTOWP_ELS_GOOGLEPLUS_CLIENTID'),
+            'clientSecret' => getenv('AUTOWP_ELS_GOOGLEPLUS_SECRET'),
         ],
         'twitter' => [
-            'consumerKey'    => '',
-            'consumerSecret' => ''
+            'consumerKey'    => getenv('AUTOWP_ELS_TWITTER_CLIENTID'),
+            'consumerSecret' => getenv('AUTOWP_ELS_TWITTER_SECRET'),
         ],
         'facebook' => [
-            'clientId'     => '',
-            'clientSecret' => '',
+            'clientId'     => getenv('AUTOWP_ELS_FACEBOOK_CLIENTID'),
+            'clientSecret' => getenv('AUTOWP_ELS_FACEBOOK_SECRET'),
             'scope'        => ['public_profile', 'user_friends']
         ],
         'github' => [
-            'clientId'     => '',
-            'clientSecret' => ''
+            'clientId'     => getenv('AUTOWP_ELS_GITHUB_CLIENTID'),
+            'clientSecret' => getenv('AUTOWP_ELS_GITHUB_SECRET'),
         ],
         'linkedin' => [
-            'clientId'     => '',
-            'clientSecret' => ''
+            'clientId'     => getenv('AUTOWP_ELS_LINKEDIN_CLIENTID'),
+            'clientSecret' => getenv('AUTOWP_ELS_LINKEDIN_SECRET'),
         ]
     ],
 
@@ -271,21 +292,30 @@ return [
         'prefix'   => '/dist/'
     ],
 
-    'mosts_min_vehicles_count' => 200,
+    'mosts_min_vehicles_count' => (int)getenv('AUTOWP_MOSTS_MIN_VEHICLES_COUNT'),
 
     'yandex' => [
-        'secret' => '',
-        'price'  => 0
+        'secret' => getenv('AUTOWP_YANDEX_SECRET'),
+        'price'  => (int)getenv('AUTOWP_YANDEX_PRICE')
     ],
 
     'vk' => [
-        'token'    => '',
-        'owner_id' => ''
+        'token'    => getenv('AUTOWP_VK_TOKEN'),
+        'owner_id' => getenv('AUTOWP_VK_OWNER_ID')
     ],
 
     'input_filters' => [
         'abstract_factories' => [
             \Zend\InputFilter\InputFilterAbstractServiceFactory::class
         ]
+    ],
+
+    'users' => [
+        'salt'      => getenv('AUTOWP_USERS_SALT'),
+        'emailSalt' => getenv('AUTOWP_EMAIL_SALT')
+    ],
+
+    'mail' => [
+        'transport' => $mailTypes[getenv('AUTOWP_MAIL_TYPE')]
     ],
 ];

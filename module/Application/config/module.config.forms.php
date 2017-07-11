@@ -303,7 +303,7 @@ return [
                 ],
                 'captcha' => [
                     'spec' => [
-                        'type' => 'Captcha',
+                        'type' => getenv('AUTOWP_CAPTCHA') ? 'Captcha' : 'Text',
                         'name' => 'captcha',
                         'options' => [
                             'label' => 'login/captcha',
@@ -356,6 +356,9 @@ return [
                             ],
                         ]
                     ]
+                ],
+                'captcha' => [
+                    'required' => (bool)getenv('AUTOWP_CAPTCHA')
                 ]
             ]
         ],

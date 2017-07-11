@@ -10,11 +10,14 @@ return [
     'zf1db' => [
         'adapter' => 'PDO_MYSQL',
         'params' => [
-            'host'     => '',
-            'username' => '',
-            'password' => '',
-            'dbname'   => '',
-            'charset'  => 'utf8'
+            'host'     => getenv('AUTOWP_DB_HOST'),
+            'username' => getenv('AUTOWP_DB_USERNAME'),
+            'password' => getenv('AUTOWP_DB_PASSWORD'),
+            'dbname'   => getenv('AUTOWP_DB_DBNAME'),
+            'charset'  => 'utf8',
+            'driver_options' => [
+                \PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'"
+            ]
         ],
         'isDefaultTableAdapter' => true,
         'defaultMetadataCache'  => 'fast'
@@ -22,11 +25,14 @@ return [
     'db' => [
         'driver'         => 'Pdo',
         'pdodriver'      => 'mysql',
-        'host'           => '',
+        'host'           => getenv('AUTOWP_DB_HOST'),
         'charset'        => 'utf8',
-        'dbname'         => '',
-        'username'       => '',
-        'password'       => ''
+        'dbname'         => getenv('AUTOWP_DB_DBNAME'),
+        'username'       => getenv('AUTOWP_DB_USERNAME'),
+        'password'       => getenv('AUTOWP_DB_PASSWORD'),
+        'driver_options' => [
+            \PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'"
+        ],
     ],
     'service_manager' => [
         'factories' => [

@@ -4,6 +4,8 @@ namespace Application;
 
 use Zend_Cache_Manager;
 
+$host = getenv('AUTOWP_MEMCACHED_HOST');
+
 return [
     'cachemanager' => [
         'fast' => [
@@ -16,33 +18,98 @@ return [
                 ]
             ],
             'backend' => [
-                'name' => 'black-hole'
+                'name' => 'Memcached',
+                'options' => [
+                    'servers' => [
+                        'host' => $host,
+                        'port' => 11211
+                    ]
+                ]
             ]
         ]
     ],
     'caches' => [
         'fastCache' => [
             'adapter' => [
-                'name'     =>'blackHole',
-                'lifetime' => 180,
+                'name'     =>'memcached',
+                'options'  => [
+                    'ttl' => 180,
+                    'servers'   => [
+                        'main' => [
+                            'host' => $host,
+                            'port' => 11211
+                        ]
+                    ],
+                    'namespace'  => 'FAST',
+                    'liboptions' => [
+                        'COMPRESSION'     => false,
+                        'binary_protocol' => true,
+                        'no_block'        => true,
+                        'connect_timeout' => 100
+                    ]
+                ]
             ],
         ],
         'longCache' => [
             'adapter' => [
-                'name'     =>'blackHole',
-                'lifetime' => 600
+                'name'     =>'memcached',
+                'options'  => [
+                    'ttl' => 600,
+                    'servers'   => [
+                        'main' => [
+                            'host' => $host,
+                            'port' => 11211
+                        ]
+                    ],
+                    'namespace'  => 'LONG',
+                    'liboptions' => [
+                        'COMPRESSION'     => false,
+                        'binary_protocol' => true,
+                        'no_block'        => true,
+                        'connect_timeout' => 100
+                    ]
+                ]
             ],
         ],
         'localeCache' => [
             'adapter' => [
-                'name'     =>'blackHole',
-                'lifetime' => 600
+                'name'     =>'memcached',
+                'options'  => [
+                    'servers'   => [
+                        'main' => [
+                            'host' => $host,
+                            'port' => 11211
+                        ]
+                    ],
+                    'namespace'  => 'LOCALE',
+                    'liboptions' => [
+                        'COMPRESSION'     => false,
+                        'binary_protocol' => true,
+                        'no_block'        => true,
+                        'connect_timeout' => 100
+                    ]
+                ]
             ],
         ],
         'sessionCache' => [
             'adapter' => [
-                'name'     =>'blackHole',
-                'lifetime' => 864000
+                'name'     =>'memcached',
+                'options'  => [
+                    'ttl' => 864000,
+                    'servers'   => [
+                        'main' => [
+                            'host' => $host,
+                            'port' => 11211
+                        ]
+                    ],
+                    'namespace'  => 'LONG',
+                    'liboptions' => [
+                        'COMPRESSION'     => false,
+                        'binary_protocol' => true,
+                        'no_block'        => true,
+                        'connect_timeout' => 100
+                    ]
+                ]
             ],
         ],
     ],
