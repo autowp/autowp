@@ -42,7 +42,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
-        $filename = 'test2.jpg';
+        $filename = 'test1.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
         $request->getFiles()->fromArray([
@@ -198,6 +198,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testRecent()
     {
+        $pictureId = $this->addPictureToItem(204);
+        $this->acceptPicture($pictureId);
+
+        $this->reset();
         $this->dispatch('https://www.autowp.ru/bmw/recent', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
