@@ -26,7 +26,7 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
-        $filename = 'test.jpg';
+        $filename = 'test1.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
         $request->getFiles()->fromArray([
