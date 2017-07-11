@@ -331,7 +331,7 @@ angular.module(Module)
                     method: 'GET',
                     url: '/api/picture',
                     params: {
-                        item_id: ctrl.item.id,
+                        exact_item_id: ctrl.item.id,
                         limit: 500,
                         fields: 'owner,thumbnail,moder_vote,votes,similar,comments_count,perspective_item,name_html,name_text,views',
                         order: 14

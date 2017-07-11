@@ -1103,6 +1103,15 @@ return [
             'perspective_id' => [
                 'required' => false
             ],
+            'exact_item_id' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
             'item_id' => [
                 'required' => false,
                 'filters' => [

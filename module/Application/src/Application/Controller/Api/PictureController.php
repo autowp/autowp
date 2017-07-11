@@ -336,6 +336,14 @@ class PictureController extends AbstractRestfulController
             }
         }
 
+        if ($data['exact_item_id']) {
+            if (! $pictureItemJoined) {
+                $pictureItemJoined = true;
+                $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
+            }
+            $select->where('picture_item.item_id = ?', $data['exact_item_id']);
+        }
+
         if ($data['item_id']) {
             if (! $pictureItemJoined) {
                 $pictureItemJoined = true;
