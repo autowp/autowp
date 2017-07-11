@@ -115,7 +115,11 @@ class CarOfDay
 
             $now = new DateTime();
             $this->setItemOfDay($now, $row['id'], null);
+
+            return true;
         }
+
+        return false;
     }
 
     public function getCurrent()

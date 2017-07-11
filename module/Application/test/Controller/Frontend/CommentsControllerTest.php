@@ -8,11 +8,61 @@ use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
 use Application\Controller\CommentsController;
+use Application\Controller\UploadController;
 use Application\Test\AbstractHttpControllerTestCase;
 
 class CommentsControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
+
+    private function addPictureToItem($itemId)
+    {
+        $this->reset();
+
+        $request = $this->getRequest();
+        $request->getHeaders()
+            ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
+            ->addHeaderLine('Content-Type', 'multipart/form-data');
+        $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
+
+        $file = tempnam(sys_get_temp_dir(), 'upl');
+        $filename = 'test.jpg';
+        copy(__DIR__ . '/../../_files/' . $filename, $file);
+
+        $request->getFiles()->fromArray([
+            'picture' => [
+                [
+                    'tmp_name' => $file,
+                    'name'     => $filename,
+                    'error'    => UPLOAD_ERR_OK,
+                    'type'     => 'image/jpeg'
+                ]
+            ]
+        ]);
+        $this->dispatch('https://www.autowp.ru/upload/send/type/1/item_id/' . $itemId, Request::METHOD_POST, [], true);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(UploadController::class);
+        $this->assertMatchedRouteName('upload/params');
+        $this->assertActionName('send');
+
+        $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertInternalType('array', $json);
+        $this->assertNotEmpty($json);
+
+        foreach ($json as $item) {
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('html', $item);
+            $this->assertArrayHasKey('width', $item);
+            $this->assertArrayHasKey('height', $item);
+        }
+
+        return $json[0]['id'];
+    }
 
     private function fetchLastComment()
     {
@@ -26,9 +76,12 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
 
     public function testCreateCommentAndSubcomment()
     {
+        $pictureId = $this->addPictureToItem(1);
+
         // create comment
+        $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/1', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/' . $pictureId, Request::METHOD_POST, [
             'moderator_attention' => 0,
             'parent_id'           => null,
             'message'             => 'Test comment'
@@ -61,9 +114,12 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
 
     public function testCreateCommentAndVote()
     {
+        $pictureId = $this->addPictureToItem(1);
+
         // create comment
+        $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/1', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/' . $pictureId, Request::METHOD_POST, [
             'moderator_attention' => 0,
             'parent_id'           => null,
             'message'             => 'Test comment'
@@ -129,9 +185,12 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
 
     public function testCreateCommentAndDeleteAndRestore()
     {
+        $pictureId = $this->addPictureToItem(1);
+
         // create comment
+        $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/1', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/' . $pictureId, Request::METHOD_POST, [
             'moderator_attention' => 0,
             'parent_id'           => null,
             'message'             => 'Test comment'
@@ -182,9 +241,12 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
 
     public function testCreateCommentAndResolve()
     {
+        $pictureId = $this->addPictureToItem(1);
+
         // create comment
+        $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/1', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/' . $pictureId, Request::METHOD_POST, [
             'moderator_attention' => 0,
             'parent_id'           => null,
             'message'             => 'Test comment',

@@ -30,6 +30,15 @@ $mailTypes = [
     ]
 ];
 
+$mailType = getenv('AUTOWP_MAIL_TYPE');
+if (! $mailType) {
+    throw new \Exception("Mail type not provided");
+}
+if (! isset($mailTypes[$mailType])) {
+    throw new \Exception("Mail type `$mailType` not found");
+}
+$mailTransport = $mailTypes[$mailType];
+
 return [
     'controllers' => [
         'factories' => [
@@ -316,6 +325,6 @@ return [
     ],
 
     'mail' => [
-        'transport' => $mailTypes[getenv('AUTOWP_MAIL_TYPE')]
+        'transport' => $mailTransport
     ],
 ];

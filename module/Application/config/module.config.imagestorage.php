@@ -4,6 +4,8 @@ namespace Application;
 
 $imageDir = __DIR__ . '/../../../public_html/image/';
 
+$host = getenv('AUTOWP_HOST');
+
 return [
     'imageStorage' => [
         'imageTableName' => 'image',
@@ -14,14 +16,14 @@ return [
         'dirs' => [
             'format' => [
                 'path' => $imageDir . "format",
-                'url'  => 'http://i.wheelsage.org/image/format/',
+                'url'  => 'http://i.' . $host . '/image/format/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'
                 ]
             ],
             'museum' => [
                 'path' => $imageDir . "museum",
-                'url'  => 'http://i.wheelsage.org/image/museum/',
+                'url'  => 'http://i.' . $host . '/image/museum/',
                 'namingStrategy' => [
                     'strategy' => 'serial',
                     'options'  => [
@@ -31,7 +33,7 @@ return [
             ],
             'user' => [
                 'path' => $imageDir . "user",
-                'url'  => 'http://i.wheelsage.org/image/user/',
+                'url'  => 'http://i.' . $host . '/image/user/',
                 'namingStrategy' => [
                     'strategy' => 'serial',
                     'options'  => [
@@ -41,14 +43,14 @@ return [
             ],
             'brand' => [
                 'path' => $imageDir . "brand",
-                'url'  => 'http://i.wheelsage.org/image/brand/',
+                'url'  => 'http://i.' . $host . '/image/brand/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'
                 ]
             ],
             'picture' => [
                 'path' => __DIR__ . '/../../../public_html/pictures/',
-                'url'  => 'http://i.wheelsage.org/pictures/',
+                'url'  => 'http://i.' . $host . '/pictures/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'
                 ]

@@ -391,7 +391,6 @@ class CatalogueController extends AbstractActionController
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-
             $pictureRow = $pictureTable->fetchRow(
                 $pictureTable->select(true)
                     ->columns([

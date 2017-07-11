@@ -11,7 +11,6 @@ use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\RegistrationController;
 use Application\Controller\Api\UserController;
 
-
 class UserControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
@@ -61,6 +60,4 @@ class UserControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/user/user/put');
         $this->assertActionName('put');
     }
-
-
 }

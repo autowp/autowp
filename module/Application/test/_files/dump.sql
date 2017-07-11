@@ -1250,14 +1250,6 @@ CREATE TABLE `image` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `image`
---
-
-/*!40000 ALTER TABLE `image` DISABLE KEYS */;
-INSERT INTO `image` (`id`, `filepath`, `filesize`, `width`, `height`, `date_add`, `dir`) VALUES (1,'1.jpg',242405,1200,800,'2016-11-25 18:31:48','picture'),(33,'2.jpg',242405,1200,800,'2016-11-25 18:31:48','picture'),(35,'3.jpg',242405,1200,800,'2016-11-25 18:31:48','picture'),(37,'4.jpg',242405,1200,800,'2016-11-25 18:31:48','picture'),(38,'5.jpg',242405,1200,800,'2016-11-25 18:31:48','picture');
-/*!40000 ALTER TABLE `image` ENABLE KEYS */;
-
---
 -- Table structure for table `image_dir`
 --
 
@@ -2053,7 +2045,17 @@ CREATE TABLE `perspectives` (
 --
 
 /*!40000 ALTER TABLE `perspectives` DISABLE KEYS */;
-INSERT INTO `perspectives` (`id`, `name`, `position`) VALUES (1,'perspective/front',1),(2,'perspective/back',9),(3,'perspective/left',5),(4,'perspective/right',7),(5,'perspective/interior',14),(6,'perspective/front-panel',11),(7,'perspective/3/4-left',3),(8,'perspective/3/4-right',4),(9,'perspective/cutaway',21),(10,'perspective/front-strict',2),(11,'perspective/left-strict',6),(12,'perspective/right-strict',8),(13,'perspective/back-strict',10),(14,'perspective/n/a',50),(15,'perspective/label',17),(16,'perspective/upper',19),(17,'perspective/under-the-hood',16),(18,'perspective/upper-strict',20),(19,'perspective/bottom',18),(20,'perspective/dashboard',12),(21,'perspective/boot',15),(22,'perspective/logo',22),(23,'perspective/mascot',25),(24,'perspective/sketch',26);
+INSERT INTO `perspectives` (`id`, `name`, `position`) VALUES 
+(1,'perspective/front',1),(2,'perspective/back',9),(3,'perspective/left',5),
+(4,'perspective/right',7),(5,'perspective/interior',14),(6,'perspective/front-panel',11),
+(7,'perspective/3/4-left',3),(8,'perspective/3/4-right',4),(9,'perspective/cutaway',21),
+(10,'perspective/front-strict',2),(11,'perspective/left-strict',6),(12,'perspective/right-strict',8),
+(13,'perspective/back-strict',10),(14,'perspective/n/a',50),(15,'perspective/label',17),
+(16,'perspective/upper',19),(17,'perspective/under-the-hood',16),(18,'perspective/upper-strict',20),
+(19,'perspective/bottom',18),(20,'perspective/dashboard',12),(21,'perspective/boot',15),
+(22,'perspective/logo',22),(23,'perspective/mascot',25),
+(24,'perspective/sketch',26),
+(25, 'perspective/mixed', 27);
 /*!40000 ALTER TABLE `perspectives` ENABLE KEYS */;
 
 --
@@ -2157,14 +2159,6 @@ CREATE TABLE `picture_item` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `picture_item`
---
-
-/*!40000 ALTER TABLE `picture_item` DISABLE KEYS */;
-INSERT INTO `picture_item` (`picture_id`, `item_id`, `perspective_id`, `crop_left`, `crop_top`, `crop_width`, `crop_height`, `timestamp`) VALUES (1,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:36:48'),(2,204,NULL,NULL,NULL,NULL,NULL,'2017-01-14 19:46:14'),(3,204,25,NULL,NULL,NULL,NULL,'2017-01-14 19:46:14'),(4,204,22,NULL,NULL,NULL,NULL,'2017-01-14 19:46:14');
-/*!40000 ALTER TABLE `picture_item` ENABLE KEYS */;
-
---
 -- Table structure for table `picture_view`
 --
 
@@ -2178,13 +2172,6 @@ CREATE TABLE `picture_view` (
   CONSTRAINT `picture_view_ibfk_1` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `picture_view`
---
-
-/*!40000 ALTER TABLE `picture_view` DISABLE KEYS */;
-/*!40000 ALTER TABLE `picture_view` ENABLE KEYS */;
 
 --
 -- Table structure for table `pictures`
@@ -2244,10 +2231,6 @@ CREATE TABLE `pictures` (
 --
 -- Dumping data for table `pictures`
 --
-
-/*!40000 ALTER TABLE `pictures` DISABLE KEYS */;
-INSERT INTO `pictures` (`id`, `width`, `height`, `filesize`, `owner_id`, `add_date`, `note`, `crc`, `status`, `_type`, `removing_date`, `_brand_id`, `change_status_user_id`, `crop_left`, `crop_top`, `crop_width`, `crop_height`, `accept_datetime`, `name`, `source_id`, `copyrights`, `identity`, `replace_picture_id`, `image_id`, `_factory_id`, `ip`, `copyrights_text_id`, `point`) VALUES (1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity1',NULL,1,NULL,0x7F000001,NULL,NULL),(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity2',NULL,33,NULL,0x7F000001,NULL,NULL),(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity3',NULL,35,NULL,0x7F000001,NULL,NULL),(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity4',NULL,37,NULL,0x7F000001,NULL,NULL),(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity5',NULL,38,NULL,0x7F000001,NULL,NULL);
-/*!40000 ALTER TABLE `pictures` ENABLE KEYS */;
 
 alter table `pictures` add `dpi_x` int(11) DEFAULT NULL,
  add `dpi_y` int(11) DEFAULT NULL;
@@ -2780,7 +2763,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `login`, `password`, `e_mail`, `name`, `reg_date`, `last_online`, `icq`, `url`, `own_car`, `dream_car`, `forums_topics`, `forums_messages`, `pictures_added`, `e_mail_checked`, `hide_e_mail`, `authority`, `pictures_ratio`, `email_to_check`, `email_check_code`, `role`, `avatar`, `photo`, `messaging_interval`, `last_message_time`, `deleted`, `identity`, `img`, `votes_per_day`, `votes_left`, `timezone`, `specs_volume`, `specs_volume_valid`, `specs_positives`, `specs_negatives`, `specs_weight`, `last_ip`, `language`) 
 VALUES (1,'test','26cc2d23a03a8f07ed1e3d000a244636','test@example.com','tester',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,NULL,NULL,1,1000000,'Europe/Moscow',0,0,NULL,NULL,0,0x7F000001,'ru'),
 (2,NULL,'',NULL,'tester2',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,'identity',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru'),
-(3,NULL,'',NULL,'admin','2004-11-25 18:31:52','2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'admin',NULL,NULL,0,NULL,0,'admin',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru');
+(3,'admin','72a4a00d16ecf16d8bef792ef553c2d7',NULL,'admin','2004-11-25 18:31:52','2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'admin',NULL,NULL,0,NULL,0,'admin',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
 --

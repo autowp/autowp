@@ -389,10 +389,9 @@ class ItemParentController extends AbstractRestfulController
         if (array_key_exists('parent_id', $data) && $data['parent_id']) {
             $success = $this->brandVehicle->move($row['item_id'], $row['parent_id'], $data['parent_id']);
             if ($success) {
-
                 $item = $this->itemTable->find($row['item_id'])->current();
-                $oldParent= $this->itemTable->find($row['parent_id'])->current();
-                $newParent= $this->itemTable->find($data['parent_id'])->current();
+                $oldParent = $this->itemTable->find($row['parent_id'])->current();
+                $newParent = $this->itemTable->find($data['parent_id'])->current();
 
                 $message = sprintf(
                     '%s перемещен из %s в %s',
@@ -405,7 +404,6 @@ class ItemParentController extends AbstractRestfulController
                 $itemTable->updateInteritance($item);
 
                 $this->specificationsService->updateActualValues($row['item_id']);
-
             }
         }
 
