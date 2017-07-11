@@ -66,6 +66,7 @@ RUN chmod +x zf && \
     chmod +x wait-for-it.sh && \
     mkdir logs && chmod 0777 logs && \
     mkdir public_html/img && \
+    mkdir public_html/img/captcha && \
     crontab ./crontab
 
 RUN ./node_modules/.bin/webpack -p
