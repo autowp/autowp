@@ -8,7 +8,7 @@ use Application\Controller\DonateController;
 
 class DonateControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
+    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     public function testIndex()
     {

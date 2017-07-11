@@ -14,7 +14,7 @@ use Application\Controller\Api\UserController;
 
 class UserControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
+    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     public function testDelete()
     {

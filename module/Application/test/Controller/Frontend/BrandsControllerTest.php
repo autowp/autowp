@@ -10,7 +10,7 @@ use Application\Controller\BrandsController;
 
 class BrandsControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
+    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     public function testNewcars()
     {

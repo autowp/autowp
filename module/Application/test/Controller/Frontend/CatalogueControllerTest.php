@@ -11,7 +11,7 @@ use Zend\Http\Header\Cookie;
 
 class CatalogueControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
+    protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
     public function testBrand()
     {
