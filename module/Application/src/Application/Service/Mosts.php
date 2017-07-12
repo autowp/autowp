@@ -728,7 +728,7 @@ class Mosts
             ];
         }
 
-        $carTypes = $this->getCarTypes($brandId);
+        $carTypes = $this->getCarTypes((int)$brandId);
 
         $sidebarCarTypes = [];
         foreach ($carTypes as $carType) {
