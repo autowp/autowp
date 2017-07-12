@@ -4,6 +4,12 @@ namespace Application\Test;
 
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase as ZendTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.NumberOfChildren)
+ *
+ * @author dmitry
+ *
+ */
 abstract class AbstractHttpControllerTestCase extends ZendTestCase
 {
     protected $applicationConfigPath;

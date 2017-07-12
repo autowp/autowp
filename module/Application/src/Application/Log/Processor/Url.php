@@ -16,9 +16,9 @@ class Url implements ProcessorInterface
             $event['extra'] = [];
         }
 
-        if (isset($_SERVER['REQUEST_URI'])) {
+        /*if (isset($_SERVER['REQUEST_URI'])) {
             $event['extra']['url'] = $_SERVER['REQUEST_URI'];
-        }
+        }*/
 
         return $event;
     }

@@ -34,7 +34,7 @@ class ConsoleController extends AbstractActionController
 
     public function gcAction()
     {
-        $count = $this->service->gc();
+        $count = $this->service->garbageCollect();
 
         $this->getResponse()->setContent(
             sprintf("%d ip monitoring and banned ip rows was deleted\ndone\n", $count)

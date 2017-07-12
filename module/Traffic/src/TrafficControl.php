@@ -440,7 +440,7 @@ class TrafficControl
         }
     }
 
-    public function gc()
+    public function garbageCollect()
     {
         $count = $this->getMonitoringTable()->delete([
             'day_date < CURDATE()'

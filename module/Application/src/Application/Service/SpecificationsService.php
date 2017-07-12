@@ -33,9 +33,6 @@ class SpecificationsService
           WEIGHT_SECOND_ACTUAL = 0.1,
           WEIGHT_WRONG         = -1;
 
-
-    private $zones = null;
-
     /**
      * @var Attr\Attribute
      */
@@ -87,11 +84,6 @@ class SpecificationsService
      * @var array
      */
     private $carChildsCache = [];
-
-    /**
-     * @var array
-     */
-    private $engineChildsCache = [];
 
     /**
      * @var Attr\Value

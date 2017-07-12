@@ -12,6 +12,11 @@ use Exception;
 use Traversable;
 use Application\Hydrator\Api\Strategy\HydratorStrategy;
 
+/**
+ * @SuppressWarnings(PHPMD.NumberOfChildren)
+ * @author dmitry
+ *
+ */
 abstract class RestHydrator extends AbstractHydrator implements HydratorOptionsInterface
 {
     protected $language;
