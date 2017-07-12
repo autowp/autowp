@@ -44,7 +44,14 @@ class TableManager implements ServiceLocatorInterface
      */
     public function build($name, array $options = null)
     {
-        $spec = $this->specs[$id];
+        if (! isset($this->specs[$name])) {
+            throw new ServiceNotFoundException(sprintf(
+                'Unable to create service "%s"',
+                $name
+            ));
+        }
+
+        $spec = $this->specs[$name];
 
         $platform = $this->adapter->getPlatform();
         $platformName = $platform->getName();
@@ -64,13 +71,6 @@ class TableManager implements ServiceLocatorInterface
     public function get($id)
     {
         if (! isset($this->tables[$id])) {
-            if (! isset($this->specs[$id])) {
-                throw new ServiceNotFoundException(sprintf(
-                    'Unable to create service "%s"',
-                    $id
-                ));
-            }
-
             $this->tables[$id] = $this->build($id);
         }
 
