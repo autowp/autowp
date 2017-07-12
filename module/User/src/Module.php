@@ -18,6 +18,7 @@ class Module implements
         $provider = new ConfigProvider();
         return [
             'controller_plugins' => $provider->getControllerPluginConfig(),
+            'service_manager'    => $provider->getDependencyConfig(),
             'view_helpers'       => $provider->getViewHelperConfig(),
         ];
     }

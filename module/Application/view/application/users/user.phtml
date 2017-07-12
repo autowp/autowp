@@ -38,9 +38,9 @@
             <strong>«<?=$this->escapeHtml($this->currentUser->getCompoundName()) ?>»</strong>
         </p>
         <?php foreach ($this->renames as $rename) { ?>
-            <div style="color:#666666;margin-left:40px;cursor:help" title="<?=$this->escapeHtmlAttr($this->user()->humanTime($rename->getDateTime('date')))?>">
+            <div style="color:#666666;margin-left:40px;cursor:help" title="<?=$this->escapeHtmlAttr($this->user()->humanTime($rename['date']))?>">
                 <?=$this->escapeHtml($this->translate('users/user/before-known-as:'))?>
-                <strong style="color:#666666">«<?=$this->escapeHtml($rename->old_name) ?>»</strong>
+                <strong style="color:#666666">«<?=$this->escapeHtml($rename['old_name']) ?>»</strong>
             </div>
         <?php } ?>
 

@@ -9,7 +9,7 @@ use Zend\View\Model\ViewModel;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
-use Autowp\User\Model\DbTable\User\Rename as UserRename;
+use Autowp\User\Model\UserRename;
 
 use Application\Comments;
 use Application\Model\Brand as BrandModel;
@@ -41,16 +41,23 @@ class UsersController extends AbstractActionController
      */
     private $contact;
 
+    /**
+     * @var UserRename
+     */
+    private $userRename;
+
     public function __construct(
         $cache,
         TrafficControl $trafficControl,
         Comments $comments,
-        Contact $contact
+        Contact $contact,
+        UserRename $userRename
     ) {
         $this->cache = $cache;
         $this->trafficControl = $trafficControl;
         $this->comments = $comments;
         $this->contact = $contact;
+        $this->userRename = $userRename;
     }
 
     private function getUser()
@@ -136,12 +143,7 @@ class UsersController extends AbstractActionController
             ];
         }
 
-        $userRenames = new UserRename();
-        $renames = $userRenames->fetchAll(
-            $userRenames->select(true)
-                ->where('user_id = ?', $user->id)
-                ->order('date DESC')
-        );
+        $renames = $this->userRename->getRenames($user->id);
 
         $canRemovePhoto = $ban = $canBan = $canViewIp = $canDeleteUser = false;
         if ($this->user()->logedIn()) {

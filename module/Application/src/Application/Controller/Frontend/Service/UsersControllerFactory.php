@@ -18,7 +18,8 @@ class UsersControllerFactory implements FactoryInterface
             $container->get('longCache'),
             $container->get(\Autowp\Traffic\TrafficControl::class),
             $container->get(\Application\Comments::class),
-            $container->get(\Application\Model\Contact::class)
+            $container->get(\Application\Model\Contact::class),
+            $container->get(\Autowp\User\Model\UserRename::class)
         );
     }
 }

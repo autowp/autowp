@@ -11,6 +11,7 @@ class ConfigProvider
     {
         return [
             'controller_plugins' => $this->getControllerPluginConfig(),
+            'dependencies'       => $this->getDependencyConfig(),
             'view_helpers'       => $this->getViewHelperConfig(),
         ];
     }
@@ -28,6 +29,20 @@ class ConfigProvider
             'factories' => [
                 Controller\Plugin\User::class => Controller\Plugin\Service\UserFactory::class,
             ],
+        ];
+    }
+
+    /**
+     * Return application-level dependency configuration.
+     *
+     * @return array
+     */
+    public function getDependencyConfig()
+    {
+        return [
+            'factories' => [
+                Model\UserRename::class => Model\UserRenameFactory::class
+            ]
         ];
     }
 

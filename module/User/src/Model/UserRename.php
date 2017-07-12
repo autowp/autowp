@@ -1,0 +1,54 @@
+<?php
+
+namespace Autowp\User\Model;
+
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+
+class UserRename
+{
+    /**
+     * @var TableGateway
+     */
+    private $table;
+
+    public function __construct(TableGateway $table)
+    {
+        $this->table = $table;
+    }
+
+    public function garbageCollect()
+    {
+        return (int)$this->table->delete([
+            'date < DATE_SUB(NOW(), INTERVAL 3 MONTH)'
+        ]);
+    }
+
+    public function add(int $userId, string $oldName, string $newName)
+    {
+        $this->table->insert([
+            'user_id'  => $userId,
+            'old_name' => $oldName,
+            'new_name' => $newName,
+            'date'     => new Sql\Expression('NOW()')
+        ]);
+    }
+
+    public function getRenames(int $userId)
+    {
+        $select = new Sql\Select($this->table->getTable());
+        $select->where(['user_id' => $userId])
+            ->order('date DESC');
+
+        $result = [];
+        foreach ($this->table->selectWith($select) as $row) {
+            $result[] = [
+                'old_name' => $row['old_name'],
+                'new_name' => $row['new_name'],
+                'date'     => \Autowp\Commons\Db\Table\Row::getDateTimeByColumnType('timestamp', $row['date'])
+            ];
+        }
+
+        return $result;
+    }
+}

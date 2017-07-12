@@ -26,7 +26,8 @@ class AccountControllerFactory implements FactoryInterface
             $container->get(\Autowp\ExternalLoginService\Factory::class),
             $config['hosts'],
             $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Autowp\Message\MessageService::class)
+            $container->get(\Autowp\Message\MessageService::class),
+            $container->get(\Autowp\User\Model\UserRename::class)
         );
     }
 }

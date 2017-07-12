@@ -13,7 +13,6 @@ use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
-use Autowp\User\Model\DbTable\User\Rename as UserRename;
 
 use Application\Controller\LoginController;
 use Application\Model\DbTable;
@@ -27,6 +26,7 @@ use DateTimeZone;
 use Exception;
 use Imagick;
 use Locale;
+use Autowp\User\Model\UserRename;
 
 class AccountController extends AbstractActionController
 {
@@ -85,6 +85,11 @@ class AccountController extends AbstractActionController
      */
     private $message;
 
+    /**
+     * @var UserRename
+     */
+    private $userRename;
+
     public function __construct(
         UsersService $service,
         Form $emailForm,
@@ -96,7 +101,8 @@ class AccountController extends AbstractActionController
         ExternalLoginServiceFactory $externalLoginFactory,
         array $hosts,
         SpecificationsService $specsService,
-        MessageService $message
+        MessageService $message,
+        UserRename $userRename
     ) {
 
         $this->service = $service;
@@ -110,6 +116,7 @@ class AccountController extends AbstractActionController
         $this->hosts = $hosts;
         $this->specsService = $specsService;
         $this->message = $message;
+        $this->userRename = $userRename;
     }
 
     private function forwardToLogin()
@@ -381,13 +388,7 @@ class AccountController extends AbstractActionController
                 $newName = $user->getCompoundName();
 
                 if ($oldName != $newName) {
-                    $userRenames = new UserRename();
-                    $userRenames->insert([
-                        'user_id'  => $user->id,
-                        'old_name' => $oldName,
-                        'new_name' => $newName,
-                        'date'     => new Zend_Db_Expr('NOW()')
-                    ]);
+                    $this->userRename->add($user->id, $oldName, $newName);
                 }
 
                 $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/saved'));
