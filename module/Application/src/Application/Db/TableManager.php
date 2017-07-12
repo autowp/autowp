@@ -65,7 +65,7 @@ class TableManager implements ServiceLocatorInterface
             }
         }
 
-        return new TableGateway($id, $this->adapter, $features);
+        return new TableGateway($name, $this->adapter, $features);
     }
 
     public function get($id)
