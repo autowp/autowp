@@ -267,7 +267,7 @@
                     </td>
                 </tr>
     
-                <tr ng-if="ctrl.canMove && ctrl.item.item_type_id == 5">
+                <tr ng-if="ctrl.item.is_group && ctrl.canMove && ctrl.item.item_type_id == 5">
                     <td colspan="2">
                         <i class="fa fa-plus"></i>
                         <a ui-sref="moder-items-new({item_type_id: 2, parent_id: ctrl.item.id})" translate>moder/vehicle/catalogue/add-engine</a>
@@ -275,7 +275,7 @@
                     <td class="urls"></td>
                     <td></td>
                 </tr>
-                <tr ng-if="ctrl.canMove && ctrl.item.item_type_id == 5">
+                <tr ng-if="ctrl.item.is_group && ctrl.canMove && ctrl.item.item_type_id == 5">
                     <td colspan="2">
                         <i class="fa fa-plus"></i>
                         <a ui-sref="moder-items-new({item_type_id: 1, parent_id: ctrl.item.id})" translate>moder/vehicle/catalogue/add-vehicle</a>
@@ -283,7 +283,7 @@
                     <td class="urls"></td>
                     <td></td>
                 </tr>
-                <tr ng-if="ctrl.canMove && ctrl.item.item_type_id == 3">
+                <tr ng-if="ctrl.item.is_group && ctrl.canMove && ctrl.item.item_type_id == 3">
                     <td colspan="2">
                         <i class="fa fa-plus"></i>
                         <a ui-sref="moder-items-new({item_type_id: 3, parent_id: ctrl.item.id})" translate>moder/vehicle/catalogue/add-category</a>
@@ -291,7 +291,7 @@
                     <td class="urls"></td>
                     <td></td>
                 </tr>
-                <tr ng-if="ctrl.canMove && ctrl.item.item_type_id == 3">
+                <tr ng-if="ctrl.item.is_group && ctrl.canMove && ctrl.item.item_type_id == 3">
                     <td colspan="2">
                         <i class="fa fa-plus"></i>
                         <a ui-sref="moder-items-new({item_type_id: 2, parent_id: ctrl.item.id})" translate>moder/vehicle/catalogue/add-engine</a>
@@ -299,7 +299,7 @@
                     <td class="urls"></td>
                     <td></td>
                 </tr>
-                <tr ng-if="ctrl.canMove && ctrl.item.item_type_id == 3">
+                <tr ng-if="ctrl.item.is_group && ctrl.canMove && ctrl.item.item_type_id == 3">
                     <td colspan="2">
                         <i class="fa fa-plus"></i>
                         <a ui-sref="moder-items-new({item_type_id: 1, parent_id: ctrl.item.id})" translate>moder/vehicle/catalogue/add-vehicle</a>
@@ -307,7 +307,7 @@
                     <td class="urls"></td>
                     <td></td>
                 </tr>
-                <tr ng-if="ctrl.canMove && (![4, 6, 3].includes(ctrl.item.item_type_id))">
+                <tr ng-if="ctrl.item.is_group && ctrl.canMove && (![4, 6, 3].includes(ctrl.item.item_type_id))">
                     <td colspan="2">
                         <i class="fa fa-plus"></i>
                         <a ui-sref="moder-items-new({item_type_id: ctrl.item.item_type_id, parent_id: ctrl.item.id})">
