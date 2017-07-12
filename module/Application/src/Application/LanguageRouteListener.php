@@ -29,6 +29,8 @@ class LanguageRouteListener extends AbstractListenerAggregate
     private $defaultLanguage = 'en';
 
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param EventManagerInterface $events
      * @param int                   $priority
      */

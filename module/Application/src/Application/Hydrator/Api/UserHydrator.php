@@ -152,6 +152,9 @@ class UserHydrator extends RestHydrator
         return $this->acl->inheritsRole($role, 'moder');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

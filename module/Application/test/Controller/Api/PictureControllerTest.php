@@ -64,25 +64,6 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         return $json[0]['id'];
     }
 
-    private function getRandomItem()
-    {
-        $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
-            'fields' => 'total_pictures'
-        ]);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/list');
-        $this->assertActionName('index');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        return $json['items'][0];
-    }
-
     private function createItem($params)
     {
         $this->reset();

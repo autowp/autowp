@@ -9,6 +9,9 @@ use Application\Controller\LoginController as Controller;
 
 class LoginControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(

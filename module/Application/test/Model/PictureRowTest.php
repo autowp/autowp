@@ -13,8 +13,6 @@ class PictureRowTest extends AbstractHttpControllerTestCase
 
     public function testPattern()
     {
-        $serviceManager = $this->getApplicationServiceLocator();
-
         $table = new Picture();
         $row = $table->fetchRow([]);
 

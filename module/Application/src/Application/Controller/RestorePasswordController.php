@@ -57,8 +57,6 @@ class RestorePasswordController extends AbstractActionController
         $message = '';
         $success = false;
 
-        $request = $this->getRequest();
-
         if ($this->getRequest()->isPost()) {
             $this->restorePasswordForm->setData($this->params()->fromPost());
 

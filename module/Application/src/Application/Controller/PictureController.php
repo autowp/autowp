@@ -118,7 +118,6 @@ class PictureController extends AbstractActionController
         $picSelect = $this->getPicturesSelect($picture);
 
         $brands = [];
-        $car = null;
 
         $language = $this->language();
         $brandList = $brandModel->getList($language, function ($select) use ($picture) {

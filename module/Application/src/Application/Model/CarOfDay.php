@@ -288,12 +288,6 @@ class CarOfDay
             $title = $this->translator->translate('theme-of-day', 'default', 'en');
         }
 
-        $text = sprintf(
-            self::ucfirst($title) . ': %s %s',
-            $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
-            $url
-        );
-
         $fb = new Facebook\Facebook([
             'app_id'                => $fbOptions['app_id'],
             'app_secret'            => $fbOptions['app_secret'],
@@ -308,7 +302,7 @@ class CarOfDay
 
         try {
             // Returns a `Facebook\FacebookResponse` object
-            $response = $fb->post('/296027603807350/feed', $linkData, $fbOptions['page_access_token']);
+            $fb->post('/296027603807350/feed', $linkData, $fbOptions['page_access_token']);
         } catch (Facebook\Exceptions\FacebookResponseException $e) {
             echo 'Graph returned an error: ' . $e->getMessage();
             return;
@@ -475,8 +469,8 @@ class CarOfDay
             'toBrand'      => false
         ]);
 
-        $categoryPaths = [];
-        /*if (! $paths) {
+        /*$categoryPaths = [];
+        if (! $paths) {
             $categoryPaths = $this->getCategoryPaths($carOfDay->id, [
                 'breakOnFirst' => true
             ]);

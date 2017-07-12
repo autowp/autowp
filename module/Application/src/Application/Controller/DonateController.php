@@ -114,7 +114,7 @@ class DonateController extends AbstractActionController
 
         $brand = $brandModel->getBrandById($this->params('brand_id'), $language);
         if (! $brand) {
-            $rows = $brandModel->getList($language, function ($select) {
+            $rows = $brandModel->getList($language, function () {
             });
 
             return [

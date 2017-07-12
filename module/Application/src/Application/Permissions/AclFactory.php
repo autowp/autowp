@@ -16,6 +16,9 @@ use Exception;
 
 class AclFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $services = $container->get('ServiceManager');
@@ -57,7 +60,6 @@ class AclFactory implements FactoryInterface
     {
         $roleTable = new TableGateway('acl_roles', $adapter);
         $resourceTable = new TableGateway('acl_resources', $adapter);
-        $privilegeTable = new TableGateway('acl_resources_privileges', $adapter);
         $privilegeAllowedTable = new TableGateway('acl_roles_privileges_allowed', $adapter);
         $privilegeDeniedTable = new TableGateway('acl_roles_privileges_denied', $adapter);
 

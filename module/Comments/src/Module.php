@@ -37,11 +37,17 @@ class Module implements
         ];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getConsoleBanner(Console $console)
     {
         return __NAMESPACE__ . ' Module';
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getConsoleUsage(Console $console)
     {
         return [

@@ -9,6 +9,8 @@ use Zend\Mvc\MvcEvent;
 class UrlCorrectionRouteListener extends AbstractListenerAggregate
 {
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param EventManagerInterface $events
      * @param int                   $priority
      */

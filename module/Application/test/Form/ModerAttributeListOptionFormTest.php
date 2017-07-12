@@ -11,8 +11,6 @@ class ModerAttributeListOptionFormTest extends AbstractHttpControllerTestCase
 
     public function testForm()
     {
-        $serviceManager = $this->getApplicationServiceLocator();
-
         $form = new \Application\Form\Moder\AttributeListOption(null);
 
         $form->setData([]);

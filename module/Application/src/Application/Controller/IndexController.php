@@ -180,7 +180,7 @@ class IndexController extends AbstractActionController
         $cacheKey = 'INDEX_CATEGORY13_' . $language;
         $categories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $categories = $this->categories->getCategoriesList(null, $language, 15, 'count');
+            $categories = $this->categories->getCategoriesList(null, $language, 15, 'name');
 
             foreach ($categories as &$category) {
                 $category['new_cars_url'] = $this->url()->fromRoute('category-newcars', [

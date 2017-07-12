@@ -13,7 +13,6 @@
     <file>module/Comments/src</file>
     <file>module/Comments/test</file>
     <file>module/Message/src</file>
-    <file>module/Message/test</file>
     <file>module/Forums/src</file>
     <file>module/Votings/src</file>
 </ruleset>

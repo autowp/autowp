@@ -146,22 +146,6 @@ class Row extends \Autowp\Commons\Db\Table\Row
         return $this->getFileNamePattern() . '_%d.' . $ext;
     }
 
-    public function getImageOptions($col)
-    {
-        $options = [];
-
-        if ($this->cropParametersExists()) {
-            $options['crop'] = [
-                'left'   => $this->crop_left,
-                'top'    => $this->crop_top,
-                'width'  => $this->crop_width,
-                'height' => $this->crop_height
-            ];
-        }
-
-        return $options;
-    }
-
     /**
      * @return Request
      */

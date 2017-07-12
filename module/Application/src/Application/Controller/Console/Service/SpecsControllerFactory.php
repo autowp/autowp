@@ -9,6 +9,9 @@ use Application\Controller\Console\SpecsController as Controller;
 
 class SpecsControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(

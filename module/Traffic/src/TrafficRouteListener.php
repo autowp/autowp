@@ -10,6 +10,8 @@ use Zend\Mvc\MvcEvent;
 class TrafficRouteListener extends AbstractListenerAggregate
 {
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param EventManagerInterface $events
      * @param int                   $priority
      */

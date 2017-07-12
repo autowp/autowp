@@ -7,11 +7,6 @@ use Application\Model\DbTable;
 
 class SimilarHydrator extends RestHydrator
 {
-    /**
-     * @var DbTable\Perspective
-     */
-    private $perspectiveTable;
-
     public function __construct($serviceManager)
     {
         parent::__construct();
@@ -41,6 +36,9 @@ class SimilarHydrator extends RestHydrator
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

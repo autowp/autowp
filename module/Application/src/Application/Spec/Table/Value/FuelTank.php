@@ -15,6 +15,9 @@ class FuelTank
         $this->secondary = $options['secondary'];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {
         $primary = isset($values[$this->primary]) ? $values[$this->primary] : null;

@@ -460,7 +460,7 @@ class AccountController extends AbstractActionController
         sort($list, SORT_STRING);
         $list = array_combine($list, $list);
 
-        foreach ($this->hosts as $language => $options) {
+        foreach (array_keys($this->hosts) as $language) {
             $languages[$language] = Locale::getDisplayLanguage($language, $language);
         }
 

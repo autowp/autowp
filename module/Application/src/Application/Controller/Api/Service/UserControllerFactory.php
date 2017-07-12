@@ -9,6 +9,9 @@ use Application\Controller\Api\UserController as Controller;
 
 class UserControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $hydrators = $container->get('HydratorManager');

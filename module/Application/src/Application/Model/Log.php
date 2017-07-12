@@ -2,6 +2,8 @@
 
 namespace Application\Model;
 
+use Exception;
+
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -11,11 +13,8 @@ use Autowp\Commons\Db\Table;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
-use Application\Model\Brand as BrandModel;
 
 use Zend_Db_Table_Row_Abstract;
-
-use Exception;
 
 class Log
 {
@@ -112,7 +111,6 @@ class Log
         $options = array_replace($defaults, $options);
 
         $itemTable = new DbTable\Item();
-        $brandModel = new BrandModel();
         $picturesTable = new DbTable\Picture();
         $userTable = new User();
 
@@ -152,8 +150,6 @@ class Log
         $paginator
             ->setItemCountPerPage(self::EVENTS_PER_PAGE)
             ->setCurrentPageNumber($options['page']);
-
-        $language = $options['language'];
 
         $events = [];
         foreach ($paginator->getCurrentItems() as $event) {

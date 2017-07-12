@@ -9,6 +9,9 @@ use Application\Controller\Plugin\PictureVote as Plugin;
 
 class PictureVoteFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Plugin(

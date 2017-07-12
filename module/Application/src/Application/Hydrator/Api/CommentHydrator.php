@@ -138,6 +138,9 @@ class CommentHydrator extends RestHydrator
         ];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

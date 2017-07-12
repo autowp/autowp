@@ -7,6 +7,9 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 
 class LogControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $hydrators = $container->get('HydratorManager');

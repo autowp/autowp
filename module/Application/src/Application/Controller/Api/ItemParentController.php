@@ -458,8 +458,6 @@ class ItemParentController extends AbstractRestfulController
             return $this->inputFilterResponse($this->itemInputFilter);
         }
 
-        $data = $this->itemInputFilter->getValues();
-
         $select = $this->table->getAdapter()->select()
             ->from($this->table->info('name'))
             ->where('item_id = ?', (int)$this->params('item_id'))

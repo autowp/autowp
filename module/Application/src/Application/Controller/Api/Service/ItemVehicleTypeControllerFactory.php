@@ -9,6 +9,9 @@ use Application\Controller\Api\ItemVehicleTypeController as Controller;
 
 class ItemVehicleTypeControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(

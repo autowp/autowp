@@ -382,8 +382,6 @@ class Pic extends AbstractPlugin
             }
         }
 
-        $itemParentTable = new DbTable\Item\ParentTable();
-
         $items = [];
         foreach ($rows as $idx => $row) {
             $id = (int)$row['id'];
@@ -733,7 +731,7 @@ class Pic extends AbstractPlugin
         return $items;
     }
 
-    private function picPageEnginesData($picture, $itemIds)
+    private function picPageEnginesData($itemIds)
     {
         $controller = $this->getController();
 
@@ -937,8 +935,6 @@ class Pic extends AbstractPlugin
         $isModer = $controller->user()->inheritsRole('moder');
 
         $db = $this->pictureTable->getAdapter();
-
-        $items = [];
 
         $language = $controller->language();
 
@@ -1174,7 +1170,7 @@ class Pic extends AbstractPlugin
             ]),
             //'picturePerspectives' => $picturePerspectives,
             'items'             => $this->picPageItemsData($picture, $itemIds),
-            'engines'           => $this->picPageEnginesData($picture, $itemIds),
+            'engines'           => $this->picPageEnginesData($itemIds),
             'factories'         => $this->picPageFactoriesData($picture),
             'votes'             => $votes,
             'subscribed'        => $subscribed,
@@ -1249,8 +1245,6 @@ class Pic extends AbstractPlugin
         $options = array_replace($defaults, $options);
 
         $itemsPerPage = 10;
-
-        $galleryStatuses = [DbTable\Picture::STATUS_ACCEPTED];
 
         $gallery = [];
 

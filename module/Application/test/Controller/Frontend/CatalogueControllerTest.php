@@ -80,25 +80,6 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         return $json[0]['id'];
     }
 
-    private function getItemById($itemId)
-    {
-        $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/api/item/' . $itemId, Request::METHOD_GET, [
-            'fields' => 'total_pictures,begin_year,end_year'
-        ]);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/item/get');
-        $this->assertActionName('item');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        return $json;
-    }
-
     private function getPicture($itemId)
     {
         $this->reset();

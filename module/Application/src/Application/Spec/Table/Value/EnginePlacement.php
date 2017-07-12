@@ -15,6 +15,9 @@ class EnginePlacement
         $this->orientation = $options['orientation'];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {
         $placement = isset($values[$this->placement]) ? $values[$this->placement] : null;

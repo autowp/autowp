@@ -7,6 +7,9 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 
 class ContactFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $tables = $container->get(\Application\Db\TableManager::class);

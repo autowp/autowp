@@ -7,11 +7,6 @@ namespace Application\Hydrator\Api;
 class ItemLanguageHydrator extends RestHydrator
 {
     /**
-     * @var int|null
-     */
-    private $userId = null;
-
-    /**
      * @var TextStorage
      */
     private $textStorage;
@@ -48,6 +43,9 @@ class ItemLanguageHydrator extends RestHydrator
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

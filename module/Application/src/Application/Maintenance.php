@@ -19,6 +19,8 @@ use Zend_ProgressBar_Adapter_Console;
 class Maintenance extends AbstractListenerAggregate
 {
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param EventManagerInterface $events
      * @param int                   $priority
      */

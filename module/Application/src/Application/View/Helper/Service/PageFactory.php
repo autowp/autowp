@@ -9,6 +9,9 @@ use Application\View\Helper\Page as Helper;
 
 class PageFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Helper(

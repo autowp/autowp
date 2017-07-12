@@ -1001,7 +1001,7 @@ class CatalogueController extends AbstractActionController
                 'is_concepts' => $currentCar['is_concept']
             ]);
 
-            $result = $callback($brand, $currentCar, $currentCar['brand_item_catname'], $path, $breadcrumbs);
+            $result = $callback($currentCar, $breadcrumbs, $brand, $currentCar['brand_item_catname'], $path);
 
             if (is_array($result)) {
                 $result = array_replace([
@@ -1039,7 +1039,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandItemAction()
     {
-        return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
+        return $this->doBrandItemAction(function (array $currentCar, $breadcrumbs, $brand, $brandItemCatname, $path) {
 
             $modification = null;
             $modId = (int)$this->params('mod');
@@ -1080,7 +1080,6 @@ class CatalogueController extends AbstractActionController
                     $currentCar,
                     $brandItemCatname,
                     $path,
-                    $modgroupId,
                     $modId,
                     $breadcrumbs
                 );
@@ -1100,7 +1099,6 @@ class CatalogueController extends AbstractActionController
             }
 
             $itemTable = $this->catalogue()->getItemTable();
-            $itemParentTable = new DbTable\Item\ParentTable();
 
             $currentCarId = $currentCar['id'];
 
@@ -1180,7 +1178,7 @@ class CatalogueController extends AbstractActionController
         });
     }
 
-    private function brandItemGroupModifications($carId, $groupId, $modificationId)
+    private function brandItemGroupModifications(int $carId, int $groupId, int $modificationId)
     {
         $mTable = new DbTable\Modification();
         $db = $mTable->getAdapter();
@@ -1220,7 +1218,7 @@ class CatalogueController extends AbstractActionController
         return $modifications;
     }
 
-    private function brandItemModifications($carId, $modificationId)
+    private function brandItemModifications(int $carId, int $modificationId)
     {
         // modifications
         $mgTable = new DbTable\Modification\Group();
@@ -1262,7 +1260,7 @@ class CatalogueController extends AbstractActionController
         return $modificationGroups;
     }
 
-    private function getModgroupPicturesSelect($carId, $modId)
+    private function getModgroupPicturesSelect(int $carId, int $modId)
     {
         $pictureTable = $this->catalogue()->getPictureTable();
         $db = $pictureTable->getAdapter();
@@ -1284,7 +1282,7 @@ class CatalogueController extends AbstractActionController
             ->limit(1);
     }
 
-    private function getModgroupPictureList($carId, $modId, array $perspectiveGroupIds)
+    private function getModgroupPictureList(int $carId, int $modId, array $perspectiveGroupIds)
     {
         $pictures = [];
         $usedIds = [];
@@ -1385,7 +1383,7 @@ class CatalogueController extends AbstractActionController
         return $result;
     }
 
-    private function getPerspectiveGroupIds($pageId)
+    private function getPerspectiveGroupIds(int $pageId)
     {
         $perspectivesGroups = new DbTable\Perspective\Group();
         $db = $perspectivesGroups->getAdapter();
@@ -1402,8 +1400,8 @@ class CatalogueController extends AbstractActionController
         array $currentCar,
         $brandItemCatname,
         $path,
-        $modgroupId,
-        $modId,
+        int $modgroupId,
+        int $modId,
         $breadcrumbs
     ) {
         $currentCarId = $currentCar['id'];
@@ -1514,7 +1512,7 @@ class CatalogueController extends AbstractActionController
         ];
     }
 
-    private function getItemTexts($itemId)
+    private function getItemTexts(int $itemId)
     {
         $itemLanguageTable = new DbTable\Item\Language();
 
@@ -1556,8 +1554,7 @@ class CatalogueController extends AbstractActionController
         array $currentCar,
         $brandItemCatname,
         $path,
-        $modgroupId,
-        $modId,
+        int $modId,
         $breadcrumbs
     ) {
         $currentCarId = $currentCar['id'];
@@ -1751,7 +1748,7 @@ class CatalogueController extends AbstractActionController
         ]);
     }
 
-    private function getCarInboxCount($carId)
+    private function getCarInboxCount(int $carId)
     {
         $pictureTable = $this->catalogue()->getPictureTable();
         $select = $pictureTable->select(true)
@@ -1772,7 +1769,7 @@ class CatalogueController extends AbstractActionController
      * @param bool $exact
      * @return Zend_Db_Table_Select
      */
-    private function getBrandItemPicturesSelect($carId, $exact, $onlyAccepted = true)
+    private function getBrandItemPicturesSelect(int $carId, bool $exact, bool $onlyAccepted = true)
     {
         $select = $this->selectFromPictures($onlyAccepted)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
@@ -1796,7 +1793,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandItemPicturesAction()
     {
-        return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
+        return $this->doBrandItemAction(function (array $currentCar, $breadcrumbs, $brand, $brandItemCatname, $path) {
 
             $exact = (bool)$this->params('exact');
 
@@ -1904,7 +1901,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandItemPictureAction()
     {
-        return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
+        return $this->doBrandItemAction(function (array $currentCar, $breadcrumbs) {
             $exact = (bool)$this->params('exact');
 
             $select = $this->getBrandItemPicturesSelect($currentCar['id'], $exact, false);
@@ -1928,7 +1925,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandItemGalleryAction()
     {
-        return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
+        return $this->doBrandItemAction(function (array $currentCar) {
 
             $exact = (bool)$this->params('exact');
             $select = $this->getBrandItemPicturesSelect($currentCar['id'], $exact, false);
@@ -1958,7 +1955,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandItemSpecificationsAction()
     {
-        return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
+        return $this->doBrandItemAction(function (array $currentCar, $breadcrumbs) {
 
             $currentCarId = $currentCar['id'];
 
@@ -2041,7 +2038,7 @@ class CatalogueController extends AbstractActionController
         });
     }
 
-    private function mostsActive($brandId)
+    private function mostsActive(int $brandId)
     {
         $itemTable = new DbTable\Item();
         $db = $itemTable->getAdapter();
@@ -2049,7 +2046,7 @@ class CatalogueController extends AbstractActionController
             $db->select()
                 ->from($itemTable->info('name'), 'count(1)')
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', (int)$brandId)
+                ->where('item_parent_cache.parent_id = ?', $brandId)
         );
 
         return $carsCount >= $this->mostsMinCarsCount;

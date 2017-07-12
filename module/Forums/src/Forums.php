@@ -213,8 +213,6 @@ class Forums
             return false;
         }
 
-        $db = $this->topicTable->getAdapter();
-
         $select = new Sql\Select($this->topicTable->getTable());
         $select
             ->columns(['count' => new Sql\Expression('count(1)')])
@@ -392,8 +390,6 @@ class Forums
         if (! $theme || $theme['disable_topics']) {
             return false;
         }
-
-        $db = $this->topicTable->getAdapter();
 
         if (! $values['ip']) {
             $values['ip'] = '127.0.0.1';

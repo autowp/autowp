@@ -17,6 +17,9 @@ class EngineConfiguration
         $this->valvesCount = $options['valvesCount'];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {
         $cylinders = isset($values[$this->cylindersCount]) ? $values[$this->cylindersCount] : null;

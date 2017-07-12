@@ -7,6 +7,9 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 
 class ItemParentLanguageControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $tables = $container->get(\Application\Db\TableManager::class);

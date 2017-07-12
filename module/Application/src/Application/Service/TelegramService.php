@@ -75,7 +75,7 @@ class TelegramService
 
     public function registerWebhook()
     {
-        $message = $this->getApi()->setWebhook([
+        $this->getApi()->setWebhook([
             'url'         => $this->webhook,
             //'certificate' => ''
         ]);

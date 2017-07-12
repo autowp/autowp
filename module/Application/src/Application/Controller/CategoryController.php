@@ -7,7 +7,6 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
-use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Categories;
 use Application\Model\DbTable;
@@ -174,8 +173,6 @@ class CategoryController extends AbstractActionController
         $otherCategoriesName = $this->translate('categories/other');
 
         if ($maxDeep > 0) {
-            $db = $this->itemTable->getAdapter();
-
             $categories = $this->categories->getCategoriesList($parent['id'], $language, null, 'name');
 
             foreach ($categories as &$category) {
@@ -357,8 +354,14 @@ class CategoryController extends AbstractActionController
         ];
 
 
-        $result = $callback($language, $topCategory, $currentCategory,
-            $categoryLang, $isOther, $path, $currentCar, $breadcrumbs);
+        $result = $callback(
+            $currentCategory,
+            $currentCar,
+            $isOther,
+            $path,
+            $breadcrumbs,
+            $categoryLang ? $categoryLang->name : $currentCategory->name
+        );
 
         if (is_array($result)) {
             return array_replace($data, $result);
@@ -370,15 +373,15 @@ class CategoryController extends AbstractActionController
     public function categoryAction()
     {
         return $this->doCategoryAction(function (
-            $language,
-            $topCategory,
             $currentCategory,
-            $categoryLang,
+            $currentCar,
             $isOther,
             $path,
-            $currentCar,
-            $breadcrumbs
+            $breadcrumbs,
+            $currentCategoryName
         ) {
+
+            $language = $this->language();
 
             $haveSubcategories = (bool)$this->itemTable->fetchRow(
                 $this->itemTable->select(true)
@@ -408,7 +411,6 @@ class CategoryController extends AbstractActionController
                 ->setItemCountPerPage($this->catalogue()->getCarsPerPage())
                 ->setCurrentPageNumber($this->params('page'));
 
-            $users = new User();
             $contributors = [];
             /*$contributors = $users->fetchAll(
                 $users->select(true)
@@ -423,7 +425,7 @@ class CategoryController extends AbstractActionController
             if ($currentCar) {
                 $title = $this->car()->formatName($currentCar, $language);
             } else {
-                $title = $categoryLang ? $categoryLang->name : $currentCategory->name;
+                $title = $currentCategoryName;
             }
 
             $itemParentTable = new DbTable\Item\ParentTable();
@@ -573,13 +575,10 @@ class CategoryController extends AbstractActionController
     public function categoryPicturesAction()
     {
         return $this->doCategoryAction(function (
-            $language,
-            $topCategory,
             $currentCategory,
-            $categoryLang,
+            $currentCar,
             $isOther,
             $path,
-            $currentCar,
             $breadcrumbs
         ) {
 
@@ -627,13 +626,10 @@ class CategoryController extends AbstractActionController
     public function categoryPictureAction()
     {
         return $this->doCategoryAction(function (
-            $language,
-            $topCategory,
             $currentCategory,
-            $categoryLang,
+            $currentCar,
             $isOther,
             $path,
-            $currentCar,
             $breadcrumbs
         ) {
 
@@ -678,16 +674,8 @@ class CategoryController extends AbstractActionController
 
     public function categoryPictureGalleryAction()
     {
-        return $this->doCategoryAction(function (
-            $language,
-            $topCategory,
-            $currentCategory,
-            $categoryLang,
-            $isOther,
-            $path,
-            $currentCar,
-            $breadcrumbs
-        ) {
+
+        return $this->doCategoryAction(function ($currentCategory, $currentCar) {
 
             $pictureTable = $this->catalogue()->getPictureTable();
 
@@ -735,12 +723,6 @@ class CategoryController extends AbstractActionController
         }
 
         $language = $this->language();
-        $itemLangTable = new DbTable\Item\Language();
-        $itemLang = $itemLangTable->fetchRow([
-            'item_id = ?'  => $category->id,
-            'language = ?' => $language
-        ]);
-
 
         $rows = $itemTable->fetchAll(
             $itemTable->select(true)

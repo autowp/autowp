@@ -6,17 +6,6 @@ namespace Application\Hydrator\Api;
 
 class ItemParentLanguageHydrator extends RestHydrator
 {
-    /**
-     * @var int|null
-     */
-    private $userId = null;
-
-    public function __construct(
-        $serviceManager
-    ) {
-        parent::__construct();
-    }
-
     public function extract($object)
     {
         $result = [
@@ -27,6 +16,9 @@ class ItemParentLanguageHydrator extends RestHydrator
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

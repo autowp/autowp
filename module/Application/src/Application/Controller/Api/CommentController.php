@@ -12,7 +12,6 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Comments;
 use Application\Hydrator\Api\RestHydrator;
-use Application\Model\DbTable;
 
 class CommentController extends AbstractRestfulController
 {
@@ -78,7 +77,6 @@ class CommentController extends AbstractRestfulController
 
         $user = $this->user()->get();
 
-        $itemTable = new DbTable\Item();
         $userTable = new User();
 
         $options = [

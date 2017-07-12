@@ -19,6 +19,9 @@ class Wheel
         $this->rimwidth = $options['rimwidth'];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {
         $tyreWidth = isset($values[$this->tyrewidth]) ? $values[$this->tyrewidth] : null;

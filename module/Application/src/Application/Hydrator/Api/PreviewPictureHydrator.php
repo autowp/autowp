@@ -2,8 +2,6 @@
 
 namespace Application\Hydrator\Api;
 
-use Autowp\User\Model\DbTable\User;
-
 use Application\Model\DbTable;
 
 class PreviewPictureHydrator extends RestHydrator
@@ -77,27 +75,11 @@ class PreviewPictureHydrator extends RestHydrator
         ];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");
-    }
-
-    private function getUserRole()
-    {
-        if (! $this->userId) {
-            return null;
-        }
-
-        if (! $this->userRole) {
-            $table = new User();
-            $db = $table->getAdapter();
-            $this->userRole = $db->fetchOne(
-                $db->select()
-                    ->from($table->info('name'), ['role'])
-                    ->where('id = ?', $this->userId)
-            );
-        }
-
-        return $this->userRole;
     }
 }

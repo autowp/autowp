@@ -27,6 +27,8 @@ class OAuth2UserIdProvider implements UserIdProviderInterface
     }
 
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param  RequestInterface $request
      * @return mixed
      */

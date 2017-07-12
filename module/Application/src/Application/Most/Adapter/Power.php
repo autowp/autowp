@@ -81,7 +81,6 @@ class Power extends AbstractAdapter
             $html .= ' <span class="unit">л.с.</span>';
 
 
-            $engText = '';
             if (strlen($cyl) || $turbo || $volume) {
                 $a = [];
 
@@ -112,7 +111,7 @@ class Power extends AbstractAdapter
         ];
     }
 
-    protected function cylinders($layout, $cylinders, $valve_per_cylinder = null)
+    protected function cylinders($layout, $cylinders, $valvePerCylinder = null)
     {
         if ($layout) {
             if ($cylinders) {
@@ -128,8 +127,8 @@ class Power extends AbstractAdapter
             }
         }
 
-        if ($valve_per_cylinder) {
-            $result .= '/' . $valve_per_cylinder;
+        if ($valvePerCylinder) {
+            $result .= '/' . $valvePerCylinder;
         }
 
         return $result;

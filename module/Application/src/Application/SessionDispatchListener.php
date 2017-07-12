@@ -65,7 +65,7 @@ class SessionDispatchListener extends AbstractListenerAggregate
     {
         $hostname = $request->getUri()->getHost();
 
-        foreach ($hosts as $hostLanguage => $host) {
+        foreach ($hosts as $host) {
             if ($host['hostname'] == $hostname) {
                 return $host['cookie'];
             }

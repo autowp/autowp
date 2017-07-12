@@ -135,6 +135,8 @@ class PictureModerVoteController extends AbstractRestfulController
     /**
      * Return single resource
      *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param  mixed $id
      * @return mixed
      */
@@ -167,7 +169,7 @@ class PictureModerVoteController extends AbstractRestfulController
         }
 
         $pictureTable = new DbTable\Picture();
-        $picture = $pictureTable->find($this->params('id'))->current();
+        $picture = $pictureTable->find($id)->current();
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -250,7 +252,7 @@ class PictureModerVoteController extends AbstractRestfulController
     public function delete($id)
     {
         $pictureTable = new DbTable\Picture();
-        $picture = $pictureTable->find($this->params('id'))->current();
+        $picture = $pictureTable->find($id)->current();
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -272,9 +274,7 @@ class PictureModerVoteController extends AbstractRestfulController
         ]);
 
         $message = sprintf(
-            $vote
-                ? 'Отменена заявка на принятие картинки %s'
-                : 'Отменена заявка на удаление картинки %s',
+            'Отменена заявка на принятие/удаление картинки %s',
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         );
         $this->log($message, $picture);

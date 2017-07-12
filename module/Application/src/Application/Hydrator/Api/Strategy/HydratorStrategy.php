@@ -49,6 +49,9 @@ abstract class HydratorStrategy implements StrategyInterface
         return $hydrator->extract($value);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate($value)
     {
         return null;

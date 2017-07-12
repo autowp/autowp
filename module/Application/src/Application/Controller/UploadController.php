@@ -308,7 +308,7 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $rows = $brandModel->getList($language, function ($select) {
+        $rows = $brandModel->getList($language, function () {
         });
 
         return [

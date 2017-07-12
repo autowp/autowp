@@ -4,11 +4,6 @@ namespace Application\Hydrator\Api;
 
 class PerspectiveHydrator extends RestHydrator
 {
-    public function __construct($serviceManager)
-    {
-        parent::__construct();
-    }
-
     public function extract($object)
     {
         $result = [
@@ -19,6 +14,9 @@ class PerspectiveHydrator extends RestHydrator
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

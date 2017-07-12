@@ -78,6 +78,9 @@ class WildcardSafe extends Wildcard
     }
 
     /**
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * assemble(): Defined by RouteInterface interface.
      *
      * @see    \Zend\Router\RouteInterface::assemble()

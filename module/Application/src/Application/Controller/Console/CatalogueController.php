@@ -85,12 +85,12 @@ class CatalogueController extends AbstractActionController
 
         if (! $result->isValid()) {
             var_dump('fail 1');
-            exit;
+            return;
         }
 
         if (! $auth->hasIdentity()) {
             var_dump('fail 2');
-            exit;
+            return;
         }
 
         foreach ($rows as $picture) {

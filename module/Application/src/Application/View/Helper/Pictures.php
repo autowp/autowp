@@ -143,11 +143,9 @@ class Pictures extends AbstractHelper
 
         if ($row['count'] > 0) {
             return (int)$row['vote'];
-        } else {
-            return null;
         }
 
-        return $moderVote;
+        return null;
     }
 
 
@@ -196,49 +194,5 @@ class Pictures extends AbstractHelper
                         $this->userBehaviour($picture, $isModer) .
                     '</div>' .
                 '</div>';
-    }
-
-
-    private function splitByScheme(array $items, $scheme)
-    {
-        switch ($scheme) {
-            case self::SCHEME_422:
-                return $this->splitBy3Level($items, 4, 2);
-                break;
-
-            case self::SCHEME_631:
-                return $this->splitBy3Level($items, 6, 3);
-                break;
-
-            default:
-                throw new Exception("Unknown scheme '$scheme'");
-        }
-    }
-
-
-    private function splitBy3Level(array $items, $perLine, $perSuperCol)
-    {
-        $html = [];
-
-        $itemsCount = count($items);
-        $lineCount = ceil($itemsCount / $perLine);
-        $superColCount = $perLine / $perSuperCol;
-        for ($line = 0; $line < $lineCount; $line++) {
-            $html[] = '<div class="row">';
-            for ($superCol = 0; $superCol < $superColCount; $superCol++) {
-                $html[] = '<div class="col-lg-6 col-md-6 col-sm-12 col-12">';
-                $html[] = '<div class="row">';
-                for ($col = 0; $col < $perSuperCol; $col++) {
-                    $index = $line * $perLine + $superCol * $perSuperCol + $col;
-                    if ($index < $itemsCount) {
-                        $html[] = $items[$index];
-                    }
-                }
-                $html[] = '</div>';
-                $html[] = '</div>';
-            }
-            $html[] = '</div>';
-        }
-        return implode($html);
     }
 }

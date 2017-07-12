@@ -17,6 +17,9 @@ class Gearbox
         $this->name = $options['name'];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {
         $type = isset($values[$this->type]) ? $values[$this->type] : null;

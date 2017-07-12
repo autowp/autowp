@@ -9,6 +9,9 @@ use Application\View\Helper\Language as Helper;
 
 class LanguageFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Helper(

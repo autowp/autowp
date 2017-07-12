@@ -7,6 +7,9 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 
 class FrontendControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new FrontendController(

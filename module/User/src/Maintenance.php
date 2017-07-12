@@ -17,6 +17,7 @@ use Application\CronEvent;
 class Maintenance extends AbstractListenerAggregate
 {
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param EventManagerInterface $events
      * @param int                   $priority
      */
@@ -25,6 +26,9 @@ class Maintenance extends AbstractListenerAggregate
         $this->listeners[] = $events->attach(Cron\CronEvent::EVENT_DAILY_MAINTENANCE, [$this, 'dailyMaintenance']);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function dailyMaintenance(Cron\CronEvent $event)
     {
         $this->clearUserRemember();

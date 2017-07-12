@@ -266,6 +266,9 @@ class Category implements RouteInterface
         return false;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function assemble(array $params = [], array $options = [])
     {
         $data = $params;

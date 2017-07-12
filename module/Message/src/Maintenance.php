@@ -10,6 +10,8 @@ use Zend\EventManager\EventManagerInterface;
 class Maintenance extends AbstractListenerAggregate
 {
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param EventManagerInterface $events
      * @param int                   $priority
      */
@@ -18,12 +20,15 @@ class Maintenance extends AbstractListenerAggregate
         $this->listeners[] = $events->attach(Cron\CronEvent::EVENT_DAILY_MAINTENANCE, [$this, 'dailyMaintenance']);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function dailyMaintenance(Cron\CronEvent $event)
     {
-        $application = $event->getApplication();
+        /*$application = $event->getApplication();
         $serviceManager = $application->getServiceManager();
 
-        $service = $serviceManager->get(MessageService::class);
+        $service = $serviceManager->get(MessageService::class);*/
 
         /*$count = $service->recycleSystem();
         print sprintf("%d messages was deleted\n", $count);*/

@@ -23,9 +23,6 @@ class Row extends Zend_Db_Table_Row
 
     public static function getDateTimeByColumnType($type, $value)
     {
-        $str = $value;
-
-        $result = null;
         switch ($type) {
             case 'date':
                 $format = 'Y-m-d H:i:s';

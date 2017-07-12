@@ -24,10 +24,8 @@ class FormPictureMultiCheckbox extends FormMultiCheckbox
         array $selectedOptions,
         array $attributes
     ) {
-        $escapeHtmlHelper = $this->getEscapeHtmlHelper();
         $labelHelper      = $this->getLabelHelper();
         $labelClose       = $labelHelper->closeTag();
-        $labelPosition    = $this->getLabelPosition();
         $globalLabelAttributes = [];
         $closingBracket   = $this->getInlineClosingBracket();
 

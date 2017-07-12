@@ -103,10 +103,8 @@ class MainMenu
      * @param string $language
      * @return array
      */
-    private function getMenuData($id, $logedIn, $language)
+    private function getMenuData($id, $logedIn)
     {
-        $db = $this->pageTable->getAdapter();
-
         $select = new Sql\Select($this->pageTable->getTable());
         $select
             ->columns(['id', 'url', 'class'])
@@ -169,7 +167,7 @@ class MainMenu
 
         $secondMenu = $this->cache->getItem($key, $success);
         if (! $success) {
-            $secondMenu = $this->getMenuData(87, $logedIn, $language);
+            $secondMenu = $this->getMenuData(87, $logedIn);
 
             foreach ($secondMenu as &$item) {
                 if (isset($this->icons[$item['id']])) {
@@ -196,7 +194,7 @@ class MainMenu
 
         $pages = $this->cache->getItem($key, $success);
         if (! $success) {
-            $pages = $this->getMenuData(2, $logedIn, $language);
+            $pages = $this->getMenuData(2, $logedIn);
 
             $this->cache->setItem($key, $pages);
         }

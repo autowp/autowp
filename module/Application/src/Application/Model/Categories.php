@@ -94,7 +94,7 @@ class Categories
 
     public function getCategoriesList($parentId, $language, $limit, $order)
     {
-        $select = $this->getCategoriesSelect($parentId, 'name');
+        $select = $this->getCategoriesSelect($parentId, $order);
 
         if ($limit) {
             $select->limit($limit);

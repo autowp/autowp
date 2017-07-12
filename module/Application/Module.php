@@ -143,11 +143,17 @@ class Module implements
         $transport->send($mail);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getConsoleBanner(Console $console)
     {
         return 'WheelsAge Module';
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getConsoleUsage(Console $console)
     {
         //description command

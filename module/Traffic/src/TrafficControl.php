@@ -307,7 +307,7 @@ class TrafficControl
      */
     public function addToWhitelist($ip, $description)
     {
-        $banRow = $this->unban($ip);
+        $this->unban($ip);
 
         $table = $this->getWhitelistTable();
 
@@ -357,15 +357,13 @@ class TrafficControl
     public function pushHit($ip)
     {
         if ($ip) {
-            $table = $this->getBannedTable();
-
             $sql = '
                 INSERT INTO ip_monitoring4 (ip, day_date, hour, tenminute, minute, count)
                 VALUES (INET6_ATON(?), CURDATE(), HOUR(NOW()), FLOOR(MINUTE(NOW())/10), MINUTE(NOW()), 1)
                 ON DUPLICATE KEY UPDATE count=count+1
             ';
             $stmt = $this->adapter->query($sql);
-            $result = $stmt->execute([$ip]);
+            $stmt->execute([$ip]);
         }
     }
 

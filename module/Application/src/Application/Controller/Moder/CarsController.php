@@ -10,7 +10,6 @@ use Zend\View\Model\ViewModel;
 use Autowp\Message\MessageService;
 
 use Application\Form\Moder\CarOrganizePictures as CarOrganizePicturesForm;
-use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
 use Application\Model\Modification;
@@ -21,11 +20,6 @@ use Application\Model\UserItemSubscribe;
 
 class CarsController extends AbstractActionController
 {
-    /**
-     * @var DbTable\Item\ParentTable
-     */
-    private $itemParentTable;
-
     private $translator;
 
     /**
@@ -69,11 +63,6 @@ class CarsController extends AbstractActionController
         $this->userItemSubscribe = $userItemSubscribe;
     }
 
-    private function canMove(DbTable\Item\Row $car)
-    {
-        return $this->user()->isAllowed('car', 'move');
-    }
-
     /**
      * @param DbTable\Item\Row $car
      * @return string
@@ -101,11 +90,6 @@ class CarsController extends AbstractActionController
     private function redirectToCar(DbTable\Item\Row $car, $tab = null)
     {
         return $this->redirect()->toUrl($this->carModerUrl($car, true, $tab));
-    }
-
-    private function canEditMeta(DbTable\Item\Row $car)
-    {
-        return $this->user()->isAllowed('car', 'edit_meta');
     }
 
     private function carToForm(DbTable\Item\Row $car)
@@ -151,7 +135,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $canEditMeta = $this->canEditMeta($car);
+        $canEditMeta = $this->user()->isAllowed('car', 'edit_meta');
 
         if (! $canEditMeta) {
             return $this->notFoundAction();
@@ -324,16 +308,6 @@ class CarsController extends AbstractActionController
         return new JsonModel($result);
     }
 
-    /**
-     * @return DbTable\Item\ParentTable
-     */
-    private function getCarParentTable()
-    {
-        return $this->itemParentTable
-            ? $this->itemParentTable
-            : $this->itemParentTable = new DbTable\Item\ParentTable();
-    }
-
     private function loadSpecs($table, $parentId, $deep = 0)
     {
         if ($parentId) {
@@ -484,12 +458,11 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $canMove = $this->canMove($car);
+        $canMove = $this->user()->isAllowed('car', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
         }
 
-        $itemParentTable = $this->getCarParentTable();
         $itemTable = $this->catalogue()->getItemTable();
         $imageStorage = $this->imageStorage();
 
@@ -605,8 +578,6 @@ class CarsController extends AbstractActionController
                         htmlspecialchars($this->car()->formatName($car, 'en'))
                     ), [$car, $pictureRow]);
                 }
-
-                $brandModel = new BrandModel();
 
                 $this->specificationsService->updateActualValues($newCar->id);
 

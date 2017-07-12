@@ -9,6 +9,9 @@ use Application\Controller\FactoriesController as Controller;
 
 class FactoriesControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(

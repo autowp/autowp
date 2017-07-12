@@ -7,6 +7,9 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 
 class ZF1CacheManagerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('Config');

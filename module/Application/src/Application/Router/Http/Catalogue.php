@@ -732,6 +732,8 @@ class Catalogue implements RouteInterface
     }
 
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * Assemble the route.
      *
      * @param  array $params

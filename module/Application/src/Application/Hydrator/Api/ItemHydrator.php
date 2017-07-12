@@ -598,7 +598,6 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('engine_vehicles')) {
-            $vehiclesOnEngine = [];
             if ($object['item_type_id'] == DbTable\Item\Type::ENGINE) {
                 $result['engine_vehicles'] = $this->getVehiclesOnEngine($object);
             }
@@ -659,6 +658,9 @@ class ItemHydrator extends RestHydrator
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

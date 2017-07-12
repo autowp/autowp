@@ -15,6 +15,8 @@ use Zend_Db_Expr;
 class UserLastOnlineDispatchListener extends AbstractListenerAggregate
 {
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param EventManagerInterface $events
      * @param int                   $priority
      */

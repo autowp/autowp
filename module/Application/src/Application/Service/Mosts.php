@@ -448,7 +448,7 @@ class Mosts
         return $this->perspectiveGroups;
     }
 
-    public function getCarTypes($language, $brandId)
+    private function getCarTypes(int $brandId)
     {
         $carTypesTable = new DbTable\Vehicle\Type();
         $carTypes = [];
@@ -501,7 +501,7 @@ class Mosts
         return $carTypes;
     }
 
-    public function getCarTypeData($carType, $language)
+    private function getCarTypeData($carType)
     {
         return [
             'id'      => $carType->id,
@@ -511,13 +511,13 @@ class Mosts
         ];
     }
 
-    private function getOrientedPictureList($carId, array $perspective_group_ids)
+    private function getOrientedPictureList($carId, array $perspectiveGroupIds)
     {
         $pictureTable = new DbTable\Picture();
         $pictures = [];
         $db = $pictureTable->getAdapter();
 
-        foreach ($perspective_group_ids as $groupId) {
+        foreach ($perspectiveGroupIds as $groupId) {
             $picture = $pictureTable->fetchRow(
                 $pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
@@ -708,7 +708,7 @@ class Mosts
 
         $carTypeData = false;
         if ($carType) {
-            $carTypeData = $this->getCarTypeData($carType, $language);
+            $carTypeData = $this->getCarTypeData($carType);
         }
 
         $data = $this->getCarsData($cMost, $carType, $cYear, $brandId, $language);
@@ -728,7 +728,7 @@ class Mosts
             ];
         }
 
-        $carTypes = $this->getCarTypes($language, $brandId);
+        $carTypes = $this->getCarTypes($brandId);
 
         $sidebarCarTypes = [];
         foreach ($carTypes as $carType) {

@@ -15,6 +15,9 @@ class BootVolume
         $this->max = $options['max'];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {
         $min = isset($values[$this->min]) ? $values[$this->min] : null;

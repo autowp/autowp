@@ -145,7 +145,7 @@ class UserText extends AbstractHtmlElement
         foreach ($map as $pattern) {
             $match = true;
             foreach ($pattern as $key => $value) {
-                if (! isset($params[$key]) || $params[$key] != $pattern[$key]) {
+                if (! isset($params[$key]) || $params[$key] != $value) {
                     $match = false;
                     break;
                 }
@@ -208,7 +208,7 @@ class UserText extends AbstractHtmlElement
         foreach ($map as $pattern) {
             $match = true;
             foreach ($pattern as $key => $value) {
-                if (! isset($params[$key]) || $params[$key] != $pattern[$key]) {
+                if (! isset($params[$key]) || $params[$key] != $value) {
                     $match = false;
                     break;
                 }

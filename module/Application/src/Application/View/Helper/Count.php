@@ -6,7 +6,7 @@ use Zend\View\Helper\AbstractHelper;
 
 class Count extends AbstractHelper
 {
-    public function __invoke($count, $new = null, array $options = [])
+    public function __invoke(int $count, $new = null)
     {
         if ($count == 0) {
             $result = $this->view->translate('count 0');

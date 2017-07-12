@@ -12,8 +12,6 @@ use Application\ItemNameFormatter;
 
 use Autowp\TextStorage\Service as TextStorage;
 
-use Spec;
-
 use Zend_Db_Expr;
 
 class Car extends AbstractPlugin
@@ -27,11 +25,6 @@ class Car extends AbstractPlugin
      * @var Twins
      */
     private $twins;
-
-    /**
-     * @var Spec
-     */
-    private $specTable;
 
     /**
      * @var TextStorage
@@ -120,7 +113,6 @@ class Car extends AbstractPlugin
         $userHelper = $controller->user();
         $imageStorage = $controller->imageStorage();
 
-        $user = $userHelper->get();
         $specEditor = $userHelper->isAllowed('specifications', 'edit');
         $isCarModer = $userHelper->inheritsRole('cars-moder');
         $language = $controller->language();
@@ -251,7 +243,6 @@ class Car extends AbstractPlugin
             $totalPictures = isset($carsTotalPictures[$car->id]) ? $carsTotalPictures[$car->id] : null;
 
             // design projects
-            $carsDesignProject = [];
             $designCarsRow = $itemParentAdapter->fetchRow(
                 $itemParentAdapter->select()
                     ->from('item', [

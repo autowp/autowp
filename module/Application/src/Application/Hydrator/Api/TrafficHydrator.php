@@ -91,16 +91,9 @@ class TrafficHydrator extends RestHydrator
         return $object;
     }
 
-    private function isModer()
-    {
-        $role = $this->getUserRole();
-        if (! $role) {
-            return false;
-        }
-
-        return $this->acl->inheritsRole($role, 'moder');
-    }
-
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");
@@ -114,24 +107,5 @@ class TrafficHydrator extends RestHydrator
         }
 
         return $this;
-    }
-
-    private function getUserRole()
-    {
-        if (! $this->userId) {
-            return null;
-        }
-
-        if (! $this->userRole) {
-            $table = new User();
-            $db = $table->getAdapter();
-            $this->userRole = $db->fetchOne(
-                $db->select()
-                    ->from($table->info('name'), ['role'])
-                    ->where('id = ?', $this->userId)
-            );
-        }
-
-        return $this->userRole;
     }
 }

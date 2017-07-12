@@ -336,8 +336,6 @@ class CarsController extends AbstractActionController
 
     public function specsAdminAction()
     {
-        $itemTable = new DbTable\Item();
-
         if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
         }
@@ -441,8 +439,8 @@ class CarsController extends AbstractActionController
         if ($this->filterForm->isValid()) {
             $values = $this->filterForm->getData();
 
-            if ($user_id = $values['user_id']) {
-                $select->where('user_id = ?', $user_id);
+            if ($userId = $values['user_id']) {
+                $select->where('user_id = ?', $userId);
             }
         }
 

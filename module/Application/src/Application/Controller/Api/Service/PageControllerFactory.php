@@ -9,6 +9,9 @@ use Application\Controller\Api\PageController as Controller;
 
 class PageControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $filters = $container->get('InputFilterManager');

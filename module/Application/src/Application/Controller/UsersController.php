@@ -458,7 +458,6 @@ class UsersController extends AbstractActionController
     private function likesRating()
     {
         $userTable = new User();
-        $itemTable = new DbTable\Item();
 
         $db = $userTable->getAdapter();
 
@@ -489,7 +488,6 @@ class UsersController extends AbstractActionController
     private function pictureLikesRating()
     {
         $userTable = new User();
-        $itemTable = new DbTable\Item();
 
         $db = $userTable->getAdapter();
 
@@ -601,7 +599,7 @@ class UsersController extends AbstractActionController
         ];
 
         $currentOrder = 'new';
-        foreach ($orders as $key => $name) {
+        foreach (array_keys($orders) as $key) {
             if ($key == $order) {
                 $currentOrder = $key;
                 break;

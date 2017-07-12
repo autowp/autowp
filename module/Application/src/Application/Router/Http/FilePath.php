@@ -56,6 +56,9 @@ class FilePath implements RouteInterface
         return new RouteMatch(array_replace($this->defaults, $variables), $length);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function assemble(array $params = [], array $options = [])
     {
         $data = array_merge($this->defaults, $params);

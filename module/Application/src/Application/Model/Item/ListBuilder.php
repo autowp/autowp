@@ -100,7 +100,6 @@ class ListBuilder
     {
         $cataloguePaths = $this->getCataloguePath($item);
 
-        $url = null;
         foreach ($cataloguePaths as $cPath) {
             return $this->router->assemble([
                 'action'        => 'brand-item',
@@ -116,6 +115,8 @@ class ListBuilder
     }
 
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param DbTable\Item\Row|array $item
      * @return string|NULL
      */
@@ -154,11 +155,17 @@ class ListBuilder
         return null;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getTypeUrl(DbTable\Item\Row $item, $type)
     {
         return null;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getPictureUrl($item, array $picture)
     {
         return $this->picHelper->href($picture);

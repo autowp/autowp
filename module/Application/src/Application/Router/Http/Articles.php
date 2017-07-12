@@ -73,6 +73,9 @@ class Articles implements RouteInterface
         return new RouteMatch($data, $length);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function assemble(array $params = [], array $options = [])
     {
         $data = $params;

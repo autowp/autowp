@@ -85,8 +85,6 @@ class PictureItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $user = $this->user()->get();
-
         $this->itemInputFilter->setData($this->params()->fromQuery());
 
         if (! $this->itemInputFilter->isValid()) {
@@ -114,8 +112,6 @@ class PictureItemController extends AbstractRestfulController
         if (! $canMove) {
             return $this->forbiddenAction();
         }
-
-        $userId = $this->user()->get()->id;
 
         $pictureTable = new DbTable\Picture();
         $picture = $pictureTable->find($this->params('picture_id'))->current();

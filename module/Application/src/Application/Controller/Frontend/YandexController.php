@@ -51,8 +51,6 @@ class YandexController extends AbstractActionController
         $request = $this->getRequest();
 
         if (! $request->isPost()) {
-            print '1';
-            exit;
             return $this->forbiddenAction();
         }
 
@@ -72,43 +70,31 @@ class YandexController extends AbstractActionController
         $sha1Hash = (string)$this->params()->fromPost('sha1_hash');
 
         if (sha1($str) !== $sha1Hash) {
-            print '2';
-            exit;
             return $this->forbiddenAction();
         }
 
         $currency = $this->params()->fromPost('currency');
         if ($currency != 643) {
-            print '3';
-            exit;
             return $this->forbiddenAction();
         }
 
         $withdrawAmount = (float)$this->params()->fromPost('withdraw_amount');
         if ($withdrawAmount < $this->price) {
-            print '4';
-            exit;
             return $this->forbiddenAction();
         }
 
         $label = (string)$this->params()->fromPost('label');
         if (! preg_match('|^vod/([0-9]{4}-[0-9]{2}-[0-9]{2})/([0-9]+)/([0-9]+)$|isu', $label, $matches)) {
-            print '5';
-            exit;
             return $this->forbiddenAction();
         }
 
         $timezone = new DateTimeZone('UTC');
         $dateTime = DateTime::createFromFormat(self::DATE_FORMAT, $matches[1], $timezone);
         if (! $dateTime) {
-            print '6';
-            exit;
             return $this->forbiddenAction();
         }
 
         if (! $this->isAvailableDate($dateTime)) {
-            print '7';
-            exit;
             return $this->forbiddenAction();
         }
 
@@ -116,22 +102,16 @@ class YandexController extends AbstractActionController
         $userId = (int)$matches[3];
 
         if (! $itemId) {
-            print '8';
-            exit;
             return $this->forbiddenAction();
         }
 
         $unaccepted = $this->params()->fromPost('unaccepted') === 'true';
         if ($unaccepted) {
-            print '9';
-            exit;
             return $this->forbiddenAction();
         }
 
         $success = $this->itemOfDay->setItemOfDay($dateTime, $itemId, $userId);
         if (! $success) {
-            print '10';
-            exit;
             return $this->forbiddenAction();
         }
 

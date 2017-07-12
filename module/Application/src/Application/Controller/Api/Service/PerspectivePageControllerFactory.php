@@ -9,6 +9,9 @@ use Application\Controller\Api\PerspectivePageController as Controller;
 
 class PerspectivePageControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $hydrators = $container->get('HydratorManager');

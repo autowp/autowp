@@ -9,6 +9,9 @@ use Application\View\Helper\Pic as Helper;
 
 class PicFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Helper(

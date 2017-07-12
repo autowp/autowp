@@ -191,7 +191,7 @@ class NewController extends AbstractActionController
                     ])
                 ]);
             } else {
-                $item['picture'] = $listData = $this->pic()->listData($item['pictures'], [
+                $item['picture'] = $this->pic()->listData($item['pictures'], [
                     'width' => 6
                 ]);
             }

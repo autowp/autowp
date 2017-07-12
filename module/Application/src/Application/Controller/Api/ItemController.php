@@ -1293,8 +1293,6 @@ class ItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $user = $this->user()->get();
-
         $filePath = tempnam(sys_get_temp_dir(), 'logo');
         file_put_contents($filePath, $this->getRequest()->getContent());
 

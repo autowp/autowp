@@ -15,8 +15,6 @@ class ItemLanguages extends Form implements InputFilterProviderInterface
 
         $this->setWrapElements(true);
 
-        $elements = [];
-
         foreach ($this->languages as $language) {
             $this->add([
                 'name'    => $language,

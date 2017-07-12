@@ -60,7 +60,7 @@ class TrafficController extends AbstractRestfulController
 
         $data = $this->service->getWhitelistData();
 
-        $users = new User();
+        //$users = new User();
 
         foreach ($data as &$row) {
             //$row['users'] = [];

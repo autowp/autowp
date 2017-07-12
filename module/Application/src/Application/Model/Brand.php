@@ -456,7 +456,6 @@ class Brand
         if ($width <= 0) {
             $width = 1;
         }
-        $height = ceil($count / $width);
 
         $cmd = sprintf(
             'montage ' . implode(' ', $images) . ' -background %s -geometry +1+1 -tile %dx %s',

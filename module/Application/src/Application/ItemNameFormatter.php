@@ -68,17 +68,12 @@ class ItemNameFormatter
         $bm = (int)$item['begin_month'];
         $ey = (int)$item['end_year'];
         $em = (int)$item['end_month'];
-        $cy = (int)date('Y');
-        $cm = (int)date('m');
 
         $bmy = (int)$item['begin_model_year'];
         $emy = (int)$item['end_model_year'];
 
         $bs = (int)($by / 100);
         $es = (int)($ey / 100);
-
-        $bms = (int)($bmy / 100);
-        $ems = (int)($emy / 100);
 
         $useModelYear = $bmy || $emy;
 
@@ -164,7 +159,6 @@ class ItemNameFormatter
         $bm = (int)$item['begin_month'];
         $ey = (int)$item['end_year'];
         $em = (int)$item['end_month'];
-        $cy = (int)date('Y');
 
         $bmy = (int)$item['begin_model_year'];
         $emy = (int)$item['end_model_year'];
@@ -270,8 +264,6 @@ class ItemNameFormatter
                    '–'.
                    ($em ? sprintf($this->textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey % 100));
         }
-
-        $cy = (int)date('Y');
 
         return  (($bm ? sprintf($this->textMonthFormat, $bm) : '').($by ? $by : '????')).
                 (

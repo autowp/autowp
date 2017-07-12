@@ -9,6 +9,9 @@ use Application\Controller\FeedbackController as Controller;
 
 class FeedbackControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(

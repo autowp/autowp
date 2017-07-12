@@ -9,6 +9,9 @@ use Application\Controller\Console\CatalogueController as Controller;
 
 class CatalogueControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(

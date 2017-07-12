@@ -14,6 +14,9 @@ use Application\Controller\Api\Plugin\Oauth2 as OAuth2Plugin;
 
 class OAuth2PluginFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $services = $container->get('ServiceManager');

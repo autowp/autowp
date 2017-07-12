@@ -22,6 +22,8 @@ class ContactsController extends AbstractRestfulController
     }
 
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * Update an existing resource
      *
      * @param  mixed $id

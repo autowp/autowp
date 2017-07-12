@@ -27,14 +27,14 @@ class TypeParent extends Table
             $select->where('parent_id = ?', $id[0]);
         }
 
-        foreach ($table->getAdapter()->fetchCol($select) as $cat_id) {
+        foreach ($table->getAdapter()->fetchCol($select) as $catId) {
             $this->insert([
-                'id'        => intval($cat_id),
-                'parent_id' => intval($cat_id),
+                'id'        => intval($catId),
+                'parent_id' => intval($catId),
                 'level'     => $level
             ]);
 
-            $this->rebuildStep($table, array_merge([$cat_id], $id), $level + 1);
+            $this->rebuildStep($table, array_merge([$catId], $id), $level + 1);
         }
 
         --$level;

@@ -177,7 +177,6 @@ class CommentsController extends AbstractRestfulController
             if (! $messageId) {
                 throw new Exception("Message add fails");
             }
-            $db = $user->getTable()->getAdapter();
 
             $user->last_message_time = new Zend_Db_Expr('NOW()');
             $user->save();

@@ -390,7 +390,6 @@ class BrandVehicle
         }
 
         $itemId = (int)$itemRow->id;
-        $parentId = (int)$newParentRow->id;
 
         $parentIds = $this->itemParentTable->collectParentIds($newParentRow->id);
         if (in_array($itemId, $parentIds)) {

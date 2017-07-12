@@ -3,9 +3,7 @@
 namespace Application\Controller\Api;
 
 use Zend\InputFilter\InputFilter;
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
-use Zend\Form\Form;
 use Zend\Http\Request;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
@@ -16,7 +14,6 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Comments;
 use Application\DuplicateFinder;
-use Application\Form\Moder\Inbox as InboxForm;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\CarOfDay;
@@ -34,11 +31,6 @@ class PictureController extends AbstractRestfulController
      * @var CarOfDay
      */
     private $carOfDay;
-
-    /**
-     * @var Form
-     */
-    private $form;
 
     /**
      * @var RestHydrator
@@ -101,7 +93,6 @@ class PictureController extends AbstractRestfulController
         RestHydrator $hydrator,
         PictureItem $pictureItem,
         DuplicateFinder $duplicateFinder,
-        Adapter $adapter,
         UserPicture $userPicture,
         Log $log,
         HostManager $hostManager,
@@ -248,34 +239,6 @@ class PictureController extends AbstractRestfulController
         }
 
         return new JsonModel($result);
-    }
-
-    private function getFilterForm()
-    {
-        $db = $this->table->getAdapter();
-
-        $brandMultioptions = [];
-
-        $form = new InboxForm(null, [
-            'perspectiveOptions' => [
-                ''     => 'moder/pictures/filter/perspective/any',
-                'null' => 'moder/pictures/filter/perspective/empty'
-            ] + $db->fetchPairs(
-                $db
-                ->select()
-                ->from('perspectives', ['id', 'name'])
-                ->order('position')
-            ),
-            'brandOptions'       => [
-                '' => 'moder/pictures/filter/brand/any'
-            ] + $brandMultioptions,
-        ]);
-
-        $form->setAttribute('action', $this->url()->fromRoute(null, [
-            'action' => 'index'
-        ]));
-
-        return $form;
     }
 
     public function indexAction()

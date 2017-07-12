@@ -4,7 +4,6 @@ namespace Application\Hydrator\Api;
 
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 
-use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
 
 class LogHydrator extends RestHydrator
@@ -13,11 +12,6 @@ class LogHydrator extends RestHydrator
      * @var int|null
      */
     private $userId = null;
-
-    /**
-     * @var TrafficControl
-     */
-    private $trafficControl;
 
     public function __construct(
         $serviceManager
@@ -98,6 +92,9 @@ class LogHydrator extends RestHydrator
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");

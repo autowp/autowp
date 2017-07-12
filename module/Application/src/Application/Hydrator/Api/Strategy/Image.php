@@ -63,6 +63,9 @@ class Image implements StrategyInterface
         return $photo;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function hydrate($value)
     {
         return null;

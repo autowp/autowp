@@ -6,6 +6,9 @@ use Zend\View\Renderer\PhpRenderer;
 
 class DefaultValue
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {
         if ($value === null) {

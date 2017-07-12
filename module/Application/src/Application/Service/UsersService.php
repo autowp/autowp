@@ -391,7 +391,6 @@ class UsersService
 
     public function setPassword(UserRow $user, $password)
     {
-        $uTable = $this->getTable();
         $passwordExpr = $this->passwordHashExpr($password);
 
         $user->password = new Zend_Db_Expr($passwordExpr);
@@ -449,7 +448,6 @@ class UsersService
     public function deleteUnused()
     {
         $table = $this->getTable();
-        $db = $table->getAdapter();
 
         $rows = $table->fetchAll(
             $table->select(true)

@@ -10,6 +10,8 @@ use Zend\Mvc\MvcEvent;
 class RememberDispatchListener extends AbstractListenerAggregate
 {
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param EventManagerInterface $events
      * @param int                   $priority
      */
@@ -33,7 +35,7 @@ class RememberDispatchListener extends AbstractListenerAggregate
                 if ($cookies && isset($cookies['remember'])) {
                     $adapter = new Adapter\Remember();
                     $adapter->setCredential($cookies['remember']);
-                    $result = $auth->authenticate($adapter);
+                    $auth->authenticate($adapter);
                 }
             }
         }

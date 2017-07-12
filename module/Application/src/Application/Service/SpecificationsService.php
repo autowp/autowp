@@ -222,23 +222,6 @@ class SpecificationsService
             : $this->userValueTable = new Attr\UserValue();
     }
 
-    private function getZone($id)
-    {
-        if ($this->zones === null) {
-            $zoneTable = new Attr\Zone();
-            $this->zones = [];
-            foreach ($zoneTable->fetchAll() as $zone) {
-                $this->zones[$zone->id] = $zone;
-            }
-        }
-
-        if (! isset($this->zones[$id])) {
-            throw new Exception("Zone `$id` not found");
-        }
-
-        return $this->zones[$id];
-    }
-
     private function loadUnits()
     {
         if ($this->units === null) {
@@ -315,14 +298,6 @@ class SpecificationsService
         }
 
         return $result;
-    }
-
-    private function walkTree($zoneId, callable $callback)
-    {
-        $this->loadAttributes();
-        $this->loadZone($zoneId);
-
-        return $this->walkTreeStep($zoneId, 0, $callback);
     }
 
     private function walkTreeStep($zoneId, $parent, callable $callback)
@@ -421,8 +396,6 @@ class SpecificationsService
 
     public function getFormData($itemId, $zoneId, UserRow $user, $language)
     {
-        $zone = $this->getZone($zoneId);
-
         $userValueTable = $this->getUserValueTable();
         $zoneUserValues = $this->getZoneUsersValues($zoneId, $itemId);
 
@@ -617,11 +590,10 @@ class SpecificationsService
             }
         }
 
-        return $result = [
+        return [
             'elements'     => $elements,
             'input_filter' => $inputFilters
         ];
-        ;
     }
 
     /**
@@ -634,8 +606,6 @@ class SpecificationsService
     private function getForm($itemId, $zoneId, $user, array $options)
     {
         $multioptions = $this->getListsOptions($this->loadZone($zoneId));
-
-        $zone = $this->getZone($zoneId);
 
         $options = array_replace($options, [
             'multioptions' => $multioptions,
@@ -964,7 +934,6 @@ class SpecificationsService
         $vehicleTypeIds = $vtTable->getVehicleTypes($car->id);
 
         $zoneId = $this->zoneIdByCarTypeId($car->item_type_id, $vehicleTypeIds);
-        $zone = $this->getZone($zoneId);
 
         $attributes = $this->getAttributes([
             'zone'   => $zoneId,
@@ -1344,8 +1313,6 @@ class SpecificationsService
         $topPerspectives = [10, 1, 7, 8, 11, 12, 2, 4, 13, 5];
         $bottomPerspectives = [13, 2, 9, 6, 5];
 
-        $carTypeTable = new DbTable\Vehicle\Type();
-        $attributeTable = $this->getAttributeTable();
         $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
 
         $ids = [];
@@ -2214,8 +2181,6 @@ class SpecificationsService
             throw new Exception("Item_id not set");
         }
 
-        $zone = $this->getZone($zoneId);
-
         $this->loadZone($zoneId);
 
         $attributes = $this->getAttributes([
@@ -2283,8 +2248,6 @@ class SpecificationsService
         if (! $itemId) {
             throw new Exception("Item_id not set");
         }
-
-        $zone = $this->getZone($zoneId);
 
         $this->loadZone($zoneId);
 
@@ -2515,8 +2478,6 @@ class SpecificationsService
             return [];
         }
 
-        $zone = $this->getZone($zoneId);
-
         $this->loadZone($zoneId);
 
         $attributes = $this->getAttributes([
@@ -2587,8 +2548,6 @@ class SpecificationsService
         if (! $itemId) {
             throw new Exception("Item_id not set");
         }
-
-        $zone = $this->getZone($zoneId);
 
         $this->loadZone($zoneId);
 

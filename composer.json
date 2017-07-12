@@ -70,7 +70,8 @@
 		"zendframework/zend-test" : "^3.1",
 		"satooshi/php-coveralls" : "^1.0",
 		"codeclimate/php-test-reporter" : "dev-master",
-		"zendframework/zend-coding-standard" : "~1.0.0"
+		"zendframework/zend-coding-standard" : "~1.0.0",
+		"phpmd/phpmd" : "^2.6"
 	},
 	"autoload-dev" : {
 		"psr-4" : {
@@ -92,7 +93,8 @@
 		],
 		"cs-check" : "phpcs --encoding=utf-8",
 		"cs-fix" : "phpcbf --encoding=utf-8",
-		"test" : "phpunit --colors=always"
+		"test" : "phpunit --colors=always",
+		"phpmd" : "phpmd config,module,public_html text ruleset.xml --suffixes php,phtml"
 	},
 	"homepage" : "http://wheelsage.org/",
 	"support" : {

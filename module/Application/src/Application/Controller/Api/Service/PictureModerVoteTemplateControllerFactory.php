@@ -9,6 +9,9 @@ use Application\Controller\Api\PictureModerVoteTemplateController as Controller;
 
 class PictureModerVoteTemplateControllerFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $filters = $container->get('InputFilterManager');

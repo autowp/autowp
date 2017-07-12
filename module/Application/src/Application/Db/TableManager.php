@@ -39,8 +39,26 @@ class TableManager implements ServiceLocatorInterface
         $this->adapter = $adapter;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function build($name, array $options = null)
     {
+        $spec = $this->specs[$id];
+
+        $platform = $this->adapter->getPlatform();
+        $platformName = $platform->getName();
+
+        $features = [];
+        if ($platformName == 'PostgreSQL') {
+            if (isset($spec['sequences'])) {
+                foreach ($spec['sequences'] as $field => $sequence) {
+                    $features[] = new SequenceFeature($field, $sequence);
+                }
+            }
+        }
+
+        return new TableGateway($id, $this->adapter, $features);
     }
 
     public function get($id)
@@ -53,21 +71,7 @@ class TableManager implements ServiceLocatorInterface
                 ));
             }
 
-            $spec = $this->specs[$id];
-
-            $platform = $this->adapter->getPlatform();
-            $platformName = $platform->getName();
-
-            $features = [];
-            if ($platformName == 'PostgreSQL') {
-                if (isset($spec['sequences'])) {
-                    foreach ($spec['sequences'] as $field => $sequence) {
-                        $features[] = new SequenceFeature($field, $sequence);
-                    }
-                }
-            }
-
-            $this->tables[$id] = new TableGateway($id, $this->adapter, $features);
+            $this->tables[$id] = $this->build($id);
         }
 
         return $this->tables[$id];

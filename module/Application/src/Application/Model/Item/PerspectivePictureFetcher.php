@@ -148,8 +148,6 @@ class PerspectivePictureFetcher extends PictureFetcher
         $emptyPictures = 0;
         foreach ($pictures as $idx => $picture) {
             if ($picture) {
-                $pictureId = $picture['id'];
-
                 $format = $useLargeFormat && $idx == 0 ? 'picture-thumb-medium' : 'picture-thumb';
 
                 $result[] = [

@@ -323,7 +323,7 @@ class BrandNav
         return $select;
     }
 
-    private function carSectionGroups($language, array $brand, array $section, $conceptsSeparatly, $carId)
+    private function carSectionGroups($language, array $brand, array $section, $conceptsSeparatly)
     {
         $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
         $db = $itemParentLanguageTable->getAdapter();
@@ -479,8 +479,7 @@ class BrandNav
                     $language,
                     $brand,
                     $sectionsPreset,
-                    $conceptsSeparatly,
-                    $carId
+                    $conceptsSeparatly
                 );
 
                 usort($sectionGroups, function ($a, $b) {
