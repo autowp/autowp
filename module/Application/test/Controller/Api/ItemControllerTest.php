@@ -530,4 +530,19 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/item/item/put');
         $this->assertActionName('put');
     }
+
+    public function testItemParentAutoCatnameIsNotEmpty()
+    {
+        $parentId = $this->createVehicle([
+            'name'     => 'Toyota Corolla',
+            'is_group' => true
+        ]);
+        $childId = $this->createVehicle(['name' => 'Toyota Corolla Sedan']);
+
+        $this->addItemParent($childId, $parentId);
+
+        $itemParent = $this->getItemParent($childId, $parentId);
+
+        $this->assertEquals('sedan', $itemParent['catname']);
+    }
 }

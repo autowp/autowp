@@ -312,7 +312,7 @@ class BrandVehicle
         ];
         $options = array_replace($defaults, $options);
 
-        if (! isset($options['catname']) || ! $options['catname']) {
+        if (! isset($options['catname']) || ! $options['catname'] || $options['catname'] == '_') {
             $catname = $this->extractCatname($parentRow, $itemRow);
             if (! $catname) {
                 throw new Exception('Failed to create catname');
