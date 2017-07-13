@@ -2,6 +2,12 @@
 
 namespace Application\Model;
 
+use DateInterval;
+use DateTime;
+
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+
 use Autowp\Commons\Db\Table;
 use Autowp\Image;
 
@@ -16,9 +22,6 @@ use Facebook;
 use Zend_Db_Expr;
 use Zend_Oauth_Token_Access;
 use Zend_Service_Twitter;
-
-use DateInterval;
-use DateTime;
 
 class CarOfDay
 {
@@ -56,13 +59,19 @@ class CarOfDay
      */
     private $itemParentTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $perspectiveGroupTable;
+
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
         Image\Storage $imageStorage,
         Catalogue $catalogue,
         $router,
         $translator,
-        SpecificationsService $specsService
+        SpecificationsService $specsService,
+        TableGateway $perspectiveGroupTable
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->imageStorage = $imageStorage;
@@ -70,6 +79,7 @@ class CarOfDay
         $this->router = $router;
         $this->translator = $translator;
         $this->specsService = $specsService;
+        $this->perspectiveGroupTable = $perspectiveGroupTable;
 
         $this->table = new Table([
             'name'    => 'of_day',
@@ -542,20 +552,19 @@ class CarOfDay
 
     private function getOrientedPictureList($car)
     {
-        $perspectivesGroups = new DbTable\Perspective\Group();
+        $select = new Sql\Select($this->perspectiveGroupTable->getTable());
+        $select->columns(['id'])
+            ->where(['page_id' => 6])
+            ->order('position');
 
-        $db = $perspectivesGroups->getAdapter();
-        $perspectivesGroupIds = $db->fetchCol(
-            $db->select()
-                ->from($perspectivesGroups->info('name'), 'id')
-                ->where('page_id = ?', 6)
-                ->order('position')
-        );
+        $perspectivesGroupIds = [];
+        foreach ($this->perspectiveGroupTable->selectWith($select) as $row) {
+            $perspectivesGroupIds[] = (int)$row['id'];
+        }
 
         $pTable = $this->catalogue->getPictureTable();
         $pictures = [];
 
-        $db = $pTable->getAdapter();
         $usedIds = [];
 
         foreach ($perspectivesGroupIds as $groupId) {

@@ -2,6 +2,8 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
@@ -9,12 +11,11 @@ use Zend\View\Model\JsonModel;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Hydrator\Api\RestHydrator;
-use Application\Model\DbTable;
 
 class PerspectivePageController extends AbstractRestfulController
 {
     /**
-     * @var DbTable\Perspective
+     * @var TableGateway
      */
     private $table;
 
@@ -28,9 +29,9 @@ class PerspectivePageController extends AbstractRestfulController
      */
     private $listInputFilter;
 
-    public function __construct(RestHydrator $hydrator, InputFilter $listInputFilter)
+    public function __construct(RestHydrator $hydrator, InputFilter $listInputFilter, TableGateway $table)
     {
-        $this->table = new DbTable\Perspective\Page();
+        $this->table = $table;
         $this->hydrator = $hydrator;
         $this->listInputFilter = $listInputFilter;
     }
@@ -54,9 +55,11 @@ class PerspectivePageController extends AbstractRestfulController
             'fields'   => $data['fields']
         ]);
 
-        $rows = $this->table->fetchAll([], 'id');
+        $select = new Sql\Select($this->table->getTable());
+        $select->order('id');
+
         $items = [];
-        foreach ($rows as $row) {
+        foreach ($this->table->selectWith($select) as $row) {
             $items[] = $this->hydrator->extract($row);
         }
 

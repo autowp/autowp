@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -40,16 +41,23 @@ class CategoryController extends AbstractActionController
      */
     private $specsService = null;
 
+    /**
+     * @var TableGateway
+     */
+    private $perspectiveGroupTable;
+
     public function __construct(
         $cache,
         $textStorage,
         Categories $categories,
-        SpecificationsService $specsService
+        SpecificationsService $specsService,
+        TableGateway $perspectiveGroupTable
     ) {
         $this->cache = $cache;
         $this->textStorage = $textStorage;
         $this->categories = $categories;
         $this->specsService = $specsService;
+        $this->perspectiveGroupTable = $perspectiveGroupTable;
 
         $this->itemTable = new DbTable\Item();
         $this->itemLanguageTable = new DbTable\Item\Language();
@@ -468,7 +476,9 @@ class CategoryController extends AbstractActionController
             }
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [
-                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([]),
+                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                ]),
                 'useFrontPictures' => $haveSubcategories,
                 'disableLargePictures' => true,
                 'picturesDateSort' => true,

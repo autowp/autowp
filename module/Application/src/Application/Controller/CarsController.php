@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -45,12 +46,18 @@ class CarsController extends AbstractActionController
      */
     private $userItemSubscribe;
 
+    /**
+     * @var TableGateway
+     */
+    private $perspectiveGroupTable;
+
     public function __construct(
         HostManager $hostManager,
         Form $filterForm,
         SpecificationsService $specsService,
         MessageService $message,
-        UserItemSubscribe $userItemSubscribe
+        UserItemSubscribe $userItemSubscribe,
+        TableGateway $perspectiveGroupTable
     ) {
 
         $this->hostManager = $hostManager;
@@ -58,6 +65,7 @@ class CarsController extends AbstractActionController
         $this->specsService = $specsService;
         $this->message = $message;
         $this->userItemSubscribe = $userItemSubscribe;
+        $this->perspectiveGroupTable = $perspectiveGroupTable;
     }
 
     private function carModerUrl(DbTable\Item\Row $item, $uri = null)
@@ -840,12 +848,13 @@ class CarsController extends AbstractActionController
             'paginator'     => $paginator,
             'childListData' => $this->car()->listData($listCars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'type'                 => null,
-                    'onlyExactlyPictures'  => false,
-                    'dateSort'             => false,
-                    'disableLargePictures' => false,
-                    'perspectivePageId'    => null,
-                    'onlyChilds'           => []
+                    'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                    'type'                  => null,
+                    'onlyExactlyPictures'   => false,
+                    'dateSort'              => false,
+                    'disableLargePictures'  => false,
+                    'perspectivePageId'     => null,
+                    'onlyChilds'            => []
                 ]),
                 'listBuilder' => new \Application\Model\Item\ListBuilder([
                     'catalogue'    => $this->catalogue(),

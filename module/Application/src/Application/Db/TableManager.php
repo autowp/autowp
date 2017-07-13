@@ -20,6 +20,8 @@ class TableManager implements ServiceLocatorInterface
         'item_parent' => [],
         'item_parent_language' => [],
         'links' => [],
+        'perspectives_groups' => [],
+        'perspectives_pages' => [],
         'pictures' => [],
         'user_item_subscribe' => [],
         'user_renames' => []

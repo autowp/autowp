@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -39,17 +40,24 @@ class TwinsController extends AbstractActionController
      */
     private $comments;
 
+    /**
+     * @var TableGateway
+     */
+    private $perspectiveGroupTable;
+
     public function __construct(
         TextStorage\Service $textStorage,
         $cache,
         SpecificationsService $specsService,
-        Comments\CommentsService $comments
+        Comments\CommentsService $comments,
+        TableGateway $perspectiveGroupTable
     ) {
 
         $this->textStorage = $textStorage;
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->comments = $comments;
+        $this->perspectiveGroupTable = $perspectiveGroupTable;
     }
 
     /**
@@ -201,12 +209,13 @@ class TwinsController extends AbstractActionController
             'description'        => $description,
             'cars'               => $this->car()->listData($carList, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'type'                 => null,
-                    'onlyExactlyPictures'  => false,
-                    'dateSort'             => false,
-                    'disableLargePictures' => true,
-                    'perspectivePageId'    => null,
-                    'onlyChilds'           => []
+                    'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                    'type'                  => null,
+                    'onlyExactlyPictures'   => false,
+                    'dateSort'              => false,
+                    'disableLargePictures'  => true,
+                    'perspectivePageId'     => null,
+                    'onlyChilds'            => []
                 ]),
                 'disableTwins'         => true,
                 'disableSpecs'         => true,

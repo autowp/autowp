@@ -3,6 +3,7 @@
 namespace Application\Controller;
 
 use geoPHP;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -22,12 +23,19 @@ class FactoriesController extends AbstractActionController
      */
     private $specsService = null;
 
+    /**
+     * @var TableGateway
+     */
+    private $perspectiveGroupTable;
+
     public function __construct(
         $textStorage,
-        SpecificationsService $specsService
+        SpecificationsService $specsService,
+        TableGateway $perspectiveGroupTable
     ) {
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
+        $this->perspectiveGroupTable = $perspectiveGroupTable;
     }
 
     public function indexAction()
@@ -204,12 +212,13 @@ class FactoriesController extends AbstractActionController
             'factory'  => $factory,
             'carsData' => $this->car()->listData($cars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'type'                 => null,
-                    'onlyExactlyPictures'  => false,
-                    'dateSort'             => false,
-                    'disableLargePictures' => true,
-                    'perspectivePageId'    => null,
-                    'onlyChilds'           => $groups
+                    'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                    'type'                  => null,
+                    'onlyExactlyPictures'   => false,
+                    'dateSort'              => false,
+                    'disableLargePictures'  => true,
+                    'perspectivePageId'     => null,
+                    'onlyChilds'            => $groups
                 ]),
                 'listBuilder' => new \Application\Model\Item\ListBuilder([
                     'catalogue'    => $this->catalogue(),

@@ -102,6 +102,11 @@ class ItemHydrator extends RestHydrator
     private $userItemSubscribe;
 
     /**
+     * @var TableGateway
+     */
+    private $perspectiveGroupTable;
+
+    /**
      * @return DbTable\Spec
      */
     private function getSpecTable(): DbTable\Spec
@@ -122,6 +127,7 @@ class ItemHydrator extends RestHydrator
         $this->itemParentTable = $tables->get('item_parent');
         $this->itemLanguageTable = $tables->get('item_language');
         $this->itemTableGateway = $tables->get('item');
+        $this->perspectiveGroupTable = $tables->get('perspectives_groups');
 
         $this->userItemSubscribe = $serviceManager->get(UserItemSubscribe::class);
 
@@ -373,12 +379,13 @@ class ItemHydrator extends RestHydrator
 
         if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
             $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
-                'type'                 => null,
-                'onlyExactlyPictures'  => $onlyExactlyPictures,
-                'dateSort'             => false,
-                'disableLargePictures' => false,
-                'perspectivePageId'    => null,
-                'onlyChilds'           => []
+                'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                'type'                  => null,
+                'onlyExactlyPictures'   => $onlyExactlyPictures,
+                'dateSort'              => false,
+                'disableLargePictures'  => false,
+                'perspectivePageId'     => null,
+                'onlyChilds'            => []
             ]);
 
             $carsTotalPictures = $cFetcher->getTotalPictures([$object['id']], $onlyExactlyPictures);

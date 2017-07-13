@@ -14,11 +14,13 @@ class CategoryControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get('longCache'),
             $container->get(\Autowp\TextStorage\Service::class),
             $container->get(\Application\Model\Categories::class),
-            $container->get(\Application\Service\SpecificationsService::class)
+            $container->get(\Application\Service\SpecificationsService::class),
+            $tables->get('perspectives_groups')
         );
     }
 }

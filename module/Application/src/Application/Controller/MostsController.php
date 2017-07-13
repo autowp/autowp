@@ -2,14 +2,15 @@
 
 namespace Application\Controller;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+
+use Autowp\TextStorage;
 
 use Application\Model\DbTable;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
-
-use Autowp\TextStorage;
 
 class MostsController extends AbstractActionController
 {
@@ -20,19 +21,27 @@ class MostsController extends AbstractActionController
      */
     private $specsService = null;
 
+    /**
+     * @var TableGateway
+     */
+    private $perspectiveGroupTable;
+
     public function __construct(
         TextStorage\Service $textStorage,
-        SpecificationsService $specsService
+        SpecificationsService $specsService,
+        TableGateway $perspectiveGroupTable
     ) {
 
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
+        $this->perspectiveGroupTable = $perspectiveGroupTable;
     }
 
     public function indexAction()
     {
         $service = new Mosts([
-            'specs' => $this->specsService
+            'specs'                 => $this->specsService,
+            'perspectiveGroupTable' => $this->perspectiveGroupTable
         ]);
 
         $language = $this->language();

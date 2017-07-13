@@ -35,17 +35,24 @@ class IndexController extends AbstractActionController
      */
     private $itemTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $perspectiveGroupTable;
+
     public function __construct(
         $cache,
         SpecificationsService $specsService,
         CarOfDay $carOfDay,
         Categories $categories,
-        Adapter $adapter
+        Adapter $adapter,
+        TableGateway $perspectiveGroupTable
     ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->carOfDay = $carOfDay;
         $this->categories = $categories;
+        $this->perspectiveGroupTable = $perspectiveGroupTable;
 
         $this->itemTable = new TableGateway('item', $adapter);
     }
@@ -240,12 +247,13 @@ class IndexController extends AbstractActionController
 
         $specsCars = $this->car()->listData($cars, [
             'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                'type'                 => null,
-                'onlyExactlyPictures'  => false,
-                'dateSort'             => false,
-                'disableLargePictures' => true,
-                'perspectivePageId'    => 1,
-                'onlyChilds'           => []
+                'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                'type'                  => null,
+                'onlyExactlyPictures'   => false,
+                'dateSort'              => false,
+                'disableLargePictures'  => true,
+                'perspectivePageId'     => 1,
+                'onlyChilds'            => []
             ]),
             'listBuilder' => new \Application\Model\Item\ListBuilder([
                 'catalogue'    => $this->catalogue(),

@@ -2,11 +2,14 @@
 
 namespace Application\Service;
 
+use Exception;
+
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+
 use Application\Model\DbTable;
 use Application\Most;
 use Application\Service\SpecificationsService;
-
-use Exception;
 
 use Zend_Db_Expr;
 
@@ -335,9 +338,15 @@ class Mosts
      */
     private $specs = null;
 
+    /**
+     * @var TableGateway
+     */
+    private $perspectiveGroupTable;
+
     public function __construct(array $options = [])
     {
         $this->specs = $options['specs'];
+        $this->perspectiveGroupTable = $options['perspectiveGroupTable'];
     }
 
     private function betweenYearsExpr($from, $to)
@@ -431,18 +440,17 @@ class Mosts
     public function getPrespectiveGroups()
     {
         if ($this->perspectiveGroups === null) {
-            $pgTable = new DbTable\Perspective\Group();
-            $groups = $pgTable->fetchAll(
-                $pgTable->select(true)
-                    ->where('page_id = ?', 1)
-                    ->order('position')
-            );
-            $g = [];
-            foreach ($groups as $group) {
-                $g[] = $group->id;
+            $select = new Sql\Select($this->perspectiveGroupTable->getTable());
+            $select->columns(['id'])
+                ->where(['page_id' => 1])
+                ->order('position');
+
+            $ids = [];
+            foreach ($this->perspectiveGroupTable->selectWith($select) as $group) {
+                $ids[] = (int)$group['id'];
             }
 
-            $this->perspectiveGroups = $g;
+            $this->perspectiveGroups = $ids;
         }
 
         return $this->perspectiveGroups;

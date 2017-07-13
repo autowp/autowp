@@ -2,13 +2,15 @@
 
 namespace Application\Hydrator\Api;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+
 use Application\Hydrator\Api\Strategy\PerspectiveGroups as HydratorPerspectiveGroupsStrategy;
-use Application\Model\DbTable;
 
 class PerspectivePageHydrator extends RestHydrator
 {
     /**
-     * @var DbTable\Perspective\Group
+     * @var TableGateway
      */
     private $groupTable;
 
@@ -16,7 +18,9 @@ class PerspectivePageHydrator extends RestHydrator
     {
         parent::__construct();
 
-        $this->groupTable = new DbTable\Perspective\Group();
+        $tables = $serviceManager->get(\Application\Db\TableManager::class);
+
+        $this->groupTable = $tables->get('perspectives_groups');
 
         $strategy = new HydratorPerspectiveGroupsStrategy($serviceManager);
         $this->addStrategy('groups', $strategy);
@@ -30,9 +34,12 @@ class PerspectivePageHydrator extends RestHydrator
         ];
 
         if ($this->filterComposite->filter('groups')) {
-            $rows = $this->groupTable->fetchAll([
-                'page_id = ?' => $object['id']
-            ], 'position');
+            $select = new Sql\Select($this->groupTable->getTable());
+
+            $select->where(['page_id' => $object['id']])
+                ->order('position');
+
+            $rows = $this->groupTable->selectWith($select);
 
             $result['groups'] = $this->extractValue('groups', $rows);
         }

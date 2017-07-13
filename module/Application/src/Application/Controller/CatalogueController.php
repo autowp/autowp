@@ -2,6 +2,8 @@
 
 namespace Application\Controller;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -20,7 +22,6 @@ use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Select;
-use Application\Model\DbTable\Picture;
 
 class CatalogueController extends AbstractActionController
 {
@@ -50,6 +51,11 @@ class CatalogueController extends AbstractActionController
      */
     private $comments;
 
+    /**
+     * @var TableGateway
+     */
+    private $perspectiveGroupTable;
+
     public function __construct(
         $textStorage,
         $cache,
@@ -57,7 +63,8 @@ class CatalogueController extends AbstractActionController
         BrandVehicle $brandVehicle,
         ItemNameFormatter $itemNameFormatter,
         $mostsMinCarsCount,
-        Comments\CommentsService $comments
+        Comments\CommentsService $comments,
+        TableGateway $perspectiveGroupTable
     ) {
 
         $this->textStorage = $textStorage;
@@ -67,6 +74,7 @@ class CatalogueController extends AbstractActionController
         $this->itemNameFormatter = $itemNameFormatter;
         $this->mostsMinCarsCount = $mostsMinCarsCount;
         $this->comments = $comments;
+        $this->perspectiveGroupTable = $perspectiveGroupTable;
     }
 
     private function doBrandAction(callable $callback)
@@ -250,12 +258,13 @@ class CatalogueController extends AbstractActionController
                         'specsService'    => $this->specsService
                     ]),
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                        'type'                 => null,
-                        'onlyExactlyPictures'  => false,
-                        'dateSort'             => false,
-                        'disableLargePictures' => false,
-                        'perspectivePageId'    => null,
-                        'onlyChilds'           => []
+                        'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                        'type'                  => null,
+                        'onlyExactlyPictures'   => false,
+                        'dateSort'              => false,
+                        'disableLargePictures'  => false,
+                        'perspectivePageId'     => null,
+                        'onlyChilds'            => []
                     ])
                 ])
             ];
@@ -341,12 +350,13 @@ class CatalogueController extends AbstractActionController
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                        'type'                 => null,
-                        'onlyExactlyPictures'  => false,
-                        'dateSort'             => false,
-                        'disableLargePictures' => false,
-                        'perspectivePageId'    => null,
-                        'onlyChilds'           => []
+                        'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                        'type'                  => null,
+                        'onlyExactlyPictures'   => false,
+                        'dateSort'              => false,
+                        'disableLargePictures'  => false,
+                        'perspectivePageId'     => null,
+                        'onlyChilds'            => []
                     ]),
                     'listBuilder' => new \Application\Model\Item\ListBuilder\Catalogue([
                         'catalogue'       => $this->catalogue(),
@@ -386,7 +396,7 @@ class CatalogueController extends AbstractActionController
                 ->limit(4)
         );
 
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
 
         // prefetch
         $requests = [];
@@ -1149,12 +1159,13 @@ class CatalogueController extends AbstractActionController
                 ], [], true),
                 'childListData' => $this->car()->listData($listCars, [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                        'type'                 => $type == DbTable\Item\ParentTable::TYPE_DEFAULT ? $type : null,
-                        'onlyExactlyPictures'  => true,
-                        'dateSort'             => false,
-                        'disableLargePictures' => false,
-                        'perspectivePageId'    => null,
-                        'onlyChilds'           => []
+                        'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                        'type'                  => $type == DbTable\Item\ParentTable::TYPE_DEFAULT ? $type : null,
+                        'onlyExactlyPictures'   => true,
+                        'dateSort'              => false,
+                        'disableLargePictures'  => false,
+                        'perspectivePageId'     => null,
+                        'onlyChilds'            => []
                     ]),
                     'listBuilder' => new \Application\Model\Item\ListBuilder\CatalogueItem([
                         'catalogue'        => $this->catalogue(),
@@ -1385,14 +1396,18 @@ class CatalogueController extends AbstractActionController
 
     private function getPerspectiveGroupIds(int $pageId)
     {
-        $perspectivesGroups = new DbTable\Perspective\Group();
-        $db = $perspectivesGroups->getAdapter();
-        return $db->fetchCol(
-            $db->select()
-                ->from($perspectivesGroups->info('name'), 'id')
-                ->where('page_id = ?', $pageId)
-                ->order('position')
-        );
+        $select = new Sql\Select($this->perspectiveGroupTable->getTable());
+
+        $select->columns(['id'])
+            ->where(['page_id' => $pageId])
+            ->order('position');
+
+        $result = [];
+        foreach ($this->perspectiveGroupTable->selectWith($select) as $row) {
+            $result[] = (int)$row['id'];
+        }
+
+        return $result;
     }
 
     private function brandItemModgroup(
@@ -1704,12 +1719,13 @@ class CatalogueController extends AbstractActionController
             ], [], true),
             'childListData' => $this->car()->listData($listCars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'type'                 => $type == DbTable\Item\ParentTable::TYPE_DEFAULT ? $type : null,
-                    'onlyExactlyPictures'  => false,
-                    'dateSort'             => false,
-                    'disableLargePictures' => false,
-                    'perspectivePageId'    => null,
-                    'onlyChilds'           => []
+                    'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                    'type'                  => $type == DbTable\Item\ParentTable::TYPE_DEFAULT ? $type : null,
+                    'onlyExactlyPictures'   => false,
+                    'dateSort'              => false,
+                    'disableLargePictures'  => false,
+                    'perspectivePageId'     => null,
+                    'onlyChilds'            => []
                 ]),
                 'listBuilder' => new \Application\Model\Item\ListBuilder\CatalogueGroupItem([
                     'catalogue'        => $this->catalogue(),
@@ -2061,7 +2077,8 @@ class CatalogueController extends AbstractActionController
             }
 
             $service = new Mosts([
-                'specs' => $this->specsService
+                'specs' => $this->specsService,
+                'perspectiveGroupTable' => $this->perspectiveGroupTable
             ]);
 
             $language = $this->language();
@@ -2213,12 +2230,13 @@ class CatalogueController extends AbstractActionController
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                        'type'                 => null,
-                        'onlyExactlyPictures'  => false,
-                        'dateSort'             => false,
-                        'disableLargePictures' => false,
-                        'perspectivePageId'    => null,
-                        'onlyChilds'           => []
+                        'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                        'type'                  => null,
+                        'onlyExactlyPictures'   => false,
+                        'dateSort'              => false,
+                        'disableLargePictures'  => false,
+                        'perspectivePageId'     => null,
+                        'onlyChilds'            => []
                     ]),
                     'listBuilder' => new \Application\Model\Item\ListBuilder\Catalogue([
                         'catalogue'       => $this->catalogue(),

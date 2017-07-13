@@ -15,6 +15,7 @@ class CatalogueControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('Config');
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get(\Autowp\TextStorage\Service::class),
             $container->get('longCache'),
@@ -22,7 +23,8 @@ class CatalogueControllerFactory implements FactoryInterface
             $container->get(\Application\Model\BrandVehicle::class),
             $container->get(\Application\ItemNameFormatter::class),
             $config['mosts_min_vehicles_count'],
-            $container->get(\Autowp\Comments\CommentsService::class)
+            $container->get(\Autowp\Comments\CommentsService::class),
+            $tables->get('perspectives_groups')
         );
     }
 }
