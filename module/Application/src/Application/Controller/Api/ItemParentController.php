@@ -18,6 +18,8 @@ use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
 use Application\Model\UserItemSubscribe;
 
+use Zend_Db_Expr;
+
 class ItemParentController extends AbstractRestfulController
 {
     /**
