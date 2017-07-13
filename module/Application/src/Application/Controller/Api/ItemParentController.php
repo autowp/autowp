@@ -149,6 +149,17 @@ class ItemParentController extends AbstractRestfulController
         }
 
         switch ($data['order']) {
+            case 'categories_first':
+                $select->order([
+                    'item_parent.type',
+                    new Zend_Db_Expr('item.item_type_id = ' . DbTable\Item\Type::CATEGORY . ' DESC'),
+                    'item.begin_order_cache',
+                    'item.end_order_cache',
+                    'item.name',
+                    'item.body',
+                    'item.spec_id',
+                ]);
+                break;
             case 'moder_auto':
                 $select->order([
                     'item_parent.type',

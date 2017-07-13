@@ -654,7 +654,8 @@ return [
                             'haystack' => [
                                 'name',
                                 'childs_count',
-                                'moder_auto'
+                                'moder_auto',
+                                'categories_first'
                             ]
                         ]
                     ]

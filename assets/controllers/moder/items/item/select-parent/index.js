@@ -264,7 +264,7 @@ angular.module(Module)
                         fields: 'item.name_html,item.childs_count',
                         parent_id: parent.id,
                         is_group: true,
-                        order: 'moder_auto'
+                        order: 'categories_first'
                     }
                 }).then(function(response) {
                     parent.childs = response.data.items;
