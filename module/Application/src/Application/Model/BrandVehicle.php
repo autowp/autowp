@@ -429,7 +429,7 @@ class BrandVehicle
         return true;
     }
 
-    public function remove($parentId, $itemId)
+    public function remove(int $parentId, int $itemId)
     {
         $parentRow = $this->itemTable->find($parentId)->current();
         $itemRow = $this->itemTable->find($itemId)->current();
@@ -460,11 +460,8 @@ class BrandVehicle
         $cpcTable->rebuildCache($itemRow);
     }
 
-    public function setItemParentLanguage($parentId, $itemId, $language, array $values, $forceIsAuto)
+    public function setItemParentLanguage(int $parentId, int $itemId, string $language, array $values, $forceIsAuto)
     {
-        $parentId = (int)$parentId;
-        $itemId = (int)$itemId;
-
         $bvlRow = $this->itemParentLanguageTable->fetchRow([
             'item_id = ?'   => $itemId,
             'parent_id = ?' => $parentId,
@@ -503,7 +500,7 @@ class BrandVehicle
         $bvlRow->save();
     }
 
-    private function setItemParentLanguages($parentId, $itemId, array $values, $forceIsAuto)
+    private function setItemParentLanguages(int $parentId, int $itemId, array $values, $forceIsAuto)
     {
         $success = true;
         foreach ($this->languages as $language) {
@@ -521,11 +518,8 @@ class BrandVehicle
         return $success;
     }
 
-    public function setItemParent($parentId, $itemId, array $values, $forceIsAuto)
+    public function setItemParent(int $parentId, int $itemId, array $values, $forceIsAuto)
     {
-        $parentId = (int)$parentId;
-        $itemId = (int)$itemId;
-
         $itemParentRow = $this->itemParentTable->fetchRow([
             'parent_id = ?' => $parentId,
             'item_id = ?'   => $itemId
@@ -569,11 +563,8 @@ class BrandVehicle
         return true;
     }
 
-    public function refreshAuto($parentId, $itemId)
+    public function refreshAuto(int $parentId, int $itemId)
     {
-        $itemId = (int)$itemId;
-        $parentId = (int)$parentId;
-
         $bvlRows = $this->itemParentLanguageTable->fetchAll([
             'item_id = ?'   => $itemId,
             'parent_id = ?' => $parentId
@@ -614,10 +605,10 @@ class BrandVehicle
         return true;
     }
 
-    public function refreshAutoByVehicle($itemId)
+    public function refreshAutoByVehicle(int $itemId)
     {
         $brandVehicleRows = $this->itemParentTable->fetchAll([
-            'item_id = ?' => (int)$itemId
+            'item_id = ?' => $itemId
         ]);
 
         foreach ($brandVehicleRows as $brandVehicleRow) {
@@ -640,12 +631,12 @@ class BrandVehicle
         return true;
     }
 
-    public function getName($parentId, $itemId, $language)
+    public function getName(int $parentId, int $itemId, string $language)
     {
         $bvlRow = $this->itemParentLanguageTable->fetchRow([
-            'parent_id = ?' => (int)$parentId,
-            'item_id = ?'   => (int)$itemId,
-            'language = ?'  => (string)$language
+            'parent_id = ?' => $parentId,
+            'item_id = ?'   => $itemId,
+            'language = ?'  => $language
         ]);
 
         if (! $bvlRow) {

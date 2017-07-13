@@ -118,18 +118,11 @@ class ItemParentLanguageController extends AbstractRestfulController
 
         $language = (string)$this->params('language');
 
-        $row = $this->table->select([
-            'item_id'   => (int)$this->params('item_id'),
-            'parent_id' => (int)$this->params('parent_id'),
-            'language'  => $language
-        ])->current();
-
-        if (! $row) {
-            return $this->notFoundAction();
-        }
+        $itemId = (int)$this->params('item_id');
+        $parentId = (int)$this->params('parent_id');
 
         if (array_key_exists('name', $data)) {
-            $this->brandVehicle->setItemParentLanguage($row['parent_id'], $row['item_id'], $language, [
+            $this->brandVehicle->setItemParentLanguage($parentId, $itemId, $language, [
                 'name' => $data['name']
             ], false);
         }
