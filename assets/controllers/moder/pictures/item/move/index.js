@@ -185,11 +185,17 @@ angular.module(Module)
             $scope.selectItem = function(itemId, perspectiveId) {
                 if ($scope.src_item_id) {
                     PictureItemService.changeItem($state.params.id, $scope.src_item_id, itemId).then(function() {
-                        $state.go('moder-pictures-item', {
-                            id: $state.params.id
-                        });
-                    }, function() {
-                        
+                        if (Number.isInteger(perspectiveId)) {
+                            PictureItemService.setPerspective($state.params.id, itemId, perspectiveId).then(function() {
+                                $state.go('moder-pictures-item', {
+                                    id: $state.params.id
+                                });
+                            });
+                        } else {
+                            $state.go('moder-pictures-item', {
+                                id: $state.params.id
+                            });
+                        }
                     });
                 } else {
                     var data = {
@@ -200,8 +206,6 @@ angular.module(Module)
                         $state.go('moder-pictures-item', {
                             id: $state.params.id
                         });
-                    }, function() {
-                        
                     });
                 }
             };
