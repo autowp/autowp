@@ -1249,7 +1249,7 @@ class CatalogueController extends AbstractActionController
             }
         }
 
-        $modifications = $this->brandItemGroupModifications($carId, null, $modificationId);
+        $modifications = $this->brandItemGroupModifications($carId, 0, $modificationId);
         if ($modifications) {
             $modificationGroups[] = [
                 'name'          => null,
