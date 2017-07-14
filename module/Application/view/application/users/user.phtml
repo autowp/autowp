@@ -6,7 +6,7 @@
         ],
         'pageId' => 62,
         'args'   => [
-            'USER_NAME'     => $this->currentUser->getCompoundName(),
+            'USER_NAME'     => $this->currentUser->name,
             'USER_IDENTITY' => $this->currentUser->identity ? $this->currentUser->identity : 'user' . $this->currentUser->id,
         ]
     ]);
@@ -23,7 +23,7 @@
             <?php if ($this->currentUser->img) { ?>
                 <?=$this->img($this->currentUser->img, [
                     'format' => 'photo',
-                    'alt'    => $this->currentUser->getCompoundName(),
+                    'alt'    => $this->currentUser->name,
                 ])?>
             <?php } elseif ($this->currentUser->e_mail) { ?>
                 <?=$this->gravatar($this->currentUser->e_mail, [
@@ -35,7 +35,7 @@
 
         <p>
             <?=$this->escapeHtml($this->translate('users/user/known-as:'))?>
-            <strong>«<?=$this->escapeHtml($this->currentUser->getCompoundName()) ?>»</strong>
+            <strong>«<?=$this->escapeHtml($this->currentUser->name) ?>»</strong>
         </p>
         <?php foreach ($this->renames as $rename) { ?>
             <div style="color:#666666;margin-left:40px;cursor:help" title="<?=$this->escapeHtmlAttr($this->user()->humanTime($rename['date']))?>">

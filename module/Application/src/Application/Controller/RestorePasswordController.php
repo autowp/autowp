@@ -91,7 +91,7 @@ class RestorePasswordController extends AbstractActionController
                         ->setEncoding('utf-8')
                         ->setBody($message)
                         ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
-                        ->addTo($user->e_mail, $user->getCompoundName())
+                        ->addTo($user->e_mail, $user->name)
                         ->setSubject($this->translate(
                             'restore-password/new-password/mail/subject',
                             'default',

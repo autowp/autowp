@@ -10,7 +10,6 @@ use Zend\View\Model\ViewModel;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
-use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
@@ -125,12 +124,12 @@ class CarsController extends AbstractActionController
             if ($carForm->isValid()) {
                 $this->specsService->saveCarAttributes($car, $carForm->getData(), $user);
 
-                $user->invalidateSpecsVolume();
+                $userTable = new User();
+                $userTable->invalidateSpecsVolume($user->id);
 
                 $contribPairs = $this->specsService->getContributors([$car->id]);
                 $contributors = [];
                 if ($contribPairs) {
-                    $userTable = new User();
                     $contributors = $userTable->fetchAll(
                         $userTable->select(true)
                             ->where('id IN (?)', array_keys($contribPairs))
@@ -526,7 +525,7 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    private function userUrl(UserRow $user, $uri = null)
+    private function userUrl(\Autowp\Commons\Db\Table\Row $user, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user->identity ? $user->identity : 'user' . $user->id

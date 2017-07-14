@@ -9,7 +9,6 @@ use Zend\Paginator\Paginator;
 
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
-use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\ItemNameFormatter;
@@ -386,7 +385,7 @@ class SpecificationsService
         return $this->translator->translate($this->listOptions[$attributeId][$id], 'default');
     }
 
-    public function getFormData($itemId, $zoneId, UserRow $user, $language)
+    public function getFormData($itemId, $zoneId, \Autowp\Commons\Db\Table\Row $user, $language)
     {
         $userValueTable = $this->getUserValueTable();
         $zoneUserValues = $this->getZoneUsersValues($zoneId, $itemId);
@@ -591,7 +590,7 @@ class SpecificationsService
     /**
      * @param int $itemId
      * @param int $zoneId
-     * @param UserRow $user
+     * @param \Autowp\Commons\Db\Table\Row $user
      * @param array $options
      * @return AttrsZoneAttributesForm
      */
@@ -649,11 +648,11 @@ class SpecificationsService
 
     /**
      * @param DbTable\Item\Row $car
-     * @param UserRow $user
+     * @param \Autowp\Commons\Db\Table\Row $user
      * @param array $options
      * @return array
      */
-    public function getCarForm(DbTable\Item\Row $car, UserRow $user, array $options, $language)
+    public function getCarForm(DbTable\Item\Row $car, \Autowp\Commons\Db\Table\Row $user, array $options, $language)
     {
         $vtTable = new \Application\Model\VehicleType();
         $vehicleTypeIds = $vtTable->getVehicleTypes($car->id);
@@ -918,9 +917,9 @@ class SpecificationsService
     /**
      * @param DbTable\Item\Row $car
      * @param array $values
-     * @param UserRow $user
+     * @param \Autowp\Commons\Db\Table\Row $user
      */
-    public function saveCarAttributes(DbTable\Item\Row $car, array $values, UserRow $user)
+    public function saveCarAttributes(DbTable\Item\Row $car, array $values, \Autowp\Commons\Db\Table\Row $user)
     {
         $vtTable = new \Application\Model\VehicleType();
         $vehicleTypeIds = $vtTable->getVehicleTypes($car->id);

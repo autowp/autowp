@@ -2,8 +2,6 @@
 
 namespace ApplicationTest\Other;
 
-use Autowp\User\Model\DbTable\User\Row as UserRow;
-
 use Application\Test\AbstractHttpControllerTestCase;
 
 class RegistrationTest extends AbstractHttpControllerTestCase
@@ -22,6 +20,6 @@ class RegistrationTest extends AbstractHttpControllerTestCase
             'ip'       => '127.0.0.1'
         ], 'en');
 
-        $this->assertInstanceOf(UserRow::class, $user);
+        $this->assertInstanceOf(\Autowp\Commons\Db\Table\Row::class, $user);
     }
 }

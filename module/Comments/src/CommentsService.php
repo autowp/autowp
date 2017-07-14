@@ -156,7 +156,7 @@ class CommentsService
      */
     private function getRecursive($type, $item, $parentId, $userId, $perPage = 0, $page = 0)
     {
-        if ($userId instanceof User\Row) {
+        if ($userId instanceof \Autowp\Commons\Db\Table\Row) {
             $userId = $userId->id;
         }
 

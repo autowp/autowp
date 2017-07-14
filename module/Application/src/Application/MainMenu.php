@@ -9,7 +9,6 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\Message\MessageService;
-use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Application\Language;
 use Application\Model\Categories;
@@ -203,10 +202,10 @@ class MainMenu
     }
 
     /**
-     * @param UserRow $user
+     * @param \Autowp\Commons\Db\Table\Row $user
      * @return array
      */
-    public function getMenu(UserRow $user = null)
+    public function getMenu(\Autowp\Commons\Db\Table\Row $user = null)
     {
         $newMessages = 0;
         if ($user) {

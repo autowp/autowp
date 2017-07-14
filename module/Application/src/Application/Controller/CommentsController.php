@@ -56,7 +56,13 @@ class CommentsController extends AbstractRestfulController
 
     private function nextMessageTime()
     {
-        return $this->user()->get()->nextMessageTime();
+        $user = $this->user()->get();
+        if (! $user) {
+            return null;
+        }
+
+        $userTable = new User();
+        return $userTable->getNextMessageTime($user['id']);
     }
 
     private function needWait()

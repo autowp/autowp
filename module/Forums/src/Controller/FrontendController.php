@@ -306,7 +306,9 @@ class FrontendController extends AbstractActionController
     {
         $user = $this->user()->get();
         if ($user) {
-            if ($nextMessageTime = $user->nextMessageTime()) {
+            $userTable = new User();
+            $nextMessageTime = $userTable->getNextMessageTime($user['id']);
+            if ($nextMessageTime) {
                 return $nextMessageTime > new DateTime();
             }
         }

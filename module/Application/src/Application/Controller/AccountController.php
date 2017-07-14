@@ -379,13 +379,13 @@ class AccountController extends AbstractActionController
             if ($this->profileForm->isValid()) {
                 $values = $this->profileForm->getData();
 
-                $oldName = $user->getCompoundName();
+                $oldName = $user->name;
 
                 $user->setFromArray([
                     'name' => $values['name']
                 ])->save();
 
-                $newName = $user->getCompoundName();
+                $newName = $user->name;
 
                 if ($oldName != $newName) {
                     $this->userRename->add($user->id, $oldName, $newName);

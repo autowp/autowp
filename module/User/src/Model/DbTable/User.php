@@ -2,12 +2,14 @@
 
 namespace Autowp\User\Model\DbTable;
 
+use DateInterval;
+use DateTime;
+
 use Autowp\Commons\Db\Table;
 
 class User extends Table
 {
     protected $_name = 'users';
-    protected $_rowClass = User\Row::class;
 
     const MIN_NAME = 2;
     const MAX_NAME = 50;
@@ -33,5 +35,52 @@ class User extends Table
                 'id = ?' => $userId
             ]);
         }
+    }
+
+    public function invalidateSpecsVolume(int $userId)
+    {
+        $this->update([
+            'specs_volume_valid' => 0
+        ], [
+            'id = ?' => $userId
+        ]);
+    }
+
+    private function getMessagingInterval($row)
+    {
+        $date = Table\Row::getDateTimeByColumnType('timestamp', $row['reg_date']);
+
+        $defaultInterval = 300;
+
+        if (! $date) {
+            return $defaultInterval;
+        }
+
+        $tenDaysBefore = (new DateTime())->sub(new DateInterval('P10D'));
+        if ($tenDaysBefore > $date) {
+            return $row['messaging_interval'];
+        }
+
+        return max($row['messaging_interval'], $defaultInterval);
+    }
+
+    public function getNextMessageTime(int $userId)
+    {
+        $row = $this->find($userId)->current();
+        if (! $row) {
+            return false;
+        }
+
+        $lastMessageTime = Table\Row::getDateTimeByColumnType('timestamp', $row['last_message_time']);
+
+        if ($lastMessageTime) {
+            $messagingInterval = $this->getMessagingInterval($row);
+            if ($messagingInterval) {
+                $interval = new DateInterval('PT'.$messagingInterval.'S');
+                return $lastMessageTime->add($interval);
+            }
+        }
+
+        return false;
     }
 }

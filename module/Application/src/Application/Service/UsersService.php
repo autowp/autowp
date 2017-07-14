@@ -8,7 +8,6 @@ use Autowp\Comments;
 use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
-use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Application\Model\Contact;
 use Application\Model\DbTable;
@@ -188,11 +187,11 @@ class UsersService
     }
 
     /**
-     * @param UserRow $user
+     * @param \Autowp\Commons\Db\Table\Row $user
      * @param string $email
      * @param string $language
      */
-    public function changeEmailStart(UserRow $user, $email, $language)
+    public function changeEmailStart(\Autowp\Commons\Db\Table\Row $user, $email, $language)
     {
         $host = $this->getHostOptions($language);
 
@@ -207,7 +206,7 @@ class UsersService
 
     /**
      * @param string $code
-     * @return boolean|UserRow
+     * @return boolean|\Autowp\Commons\Db\Table\Row
      */
     public function emailChangeFinish($code)
     {
@@ -235,10 +234,10 @@ class UsersService
     }
 
     /**
-     * @param UserRow $user
+     * @param \Autowp\Commons\Db\Table\Row $user
      * @param string $hostname
      */
-    public function sendRegistrationConfirmEmail(UserRow $user, $hostname)
+    public function sendRegistrationConfirmEmail(\Autowp\Commons\Db\Table\Row $user, $hostname)
     {
         if ($user->email_to_check && $user->email_check_code) {
             $values = [
@@ -272,10 +271,10 @@ class UsersService
     }
 
     /**
-     * @param UserRow $user
+     * @param \Autowp\Commons\Db\Table\Row $user
      * @param string $hostname
      */
-    public function sendChangeConfirmEmail(UserRow $user, $hostname)
+    public function sendChangeConfirmEmail(\Autowp\Commons\Db\Table\Row $user, $hostname)
     {
         if ($user->email_to_check && $user->email_check_code) {
             $values = [
@@ -388,7 +387,7 @@ class UsersService
         ]);
     }
 
-    public function setPassword(UserRow $user, $password)
+    public function setPassword(\Autowp\Commons\Db\Table\Row $user, $password)
     {
         $passwordExpr = $this->passwordHashExpr($password);
 

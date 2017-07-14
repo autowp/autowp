@@ -7,8 +7,6 @@ use Zend\View\Helper\AbstractHelper;
 use Zend\View\Exception\InvalidArgumentException;
 use Zend\Permissions\Acl\Acl;
 
-use Autowp\User\Model\DbTable\User\Row as UserRow;
-
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -55,7 +53,7 @@ class User extends AbstractHelper
             $user = $this->getLogedInUser();
         }
 
-        if (! $user instanceof UserRow) {
+        if (! $user instanceof \Autowp\Commons\Db\Table\Row) {
             $user = $this->user($user);
         }
 
@@ -65,7 +63,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return UserRow|bool
+     * @return \Autowp\Commons\Db\Table\Row|bool
      */
     private function getLogedInUser()
     {
@@ -87,7 +85,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return UserRow
+     * @return \Autowp\Commons\Db\Table\Row
      */
     public function get()
     {
@@ -133,7 +131,7 @@ class User extends AbstractHelper
             $result =
                 '<span class="'.implode(' ', $classes).'">' .
                     '<i class="fa fa-user"></i>&#xa0;' .
-                    $this->view->htmlA($url, $user->getCompoundName()) .
+                    $this->view->htmlA($url, $user['name']) .
                 '</span>';
         } catch (Exception $e) {
             $result = $e->getMessage();

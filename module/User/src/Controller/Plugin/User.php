@@ -7,7 +7,6 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Permissions\Acl\Acl;
 
 use Autowp\User\Model\DbTable\User as UserTable;
-use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 class User extends AbstractPlugin
 {
@@ -27,7 +26,7 @@ class User extends AbstractPlugin
     private $users = [];
 
     /**
-     * @var UserRow
+     * @var \Autowp\Commons\Db\Table\Row
      */
     private $user = null;
 
@@ -48,7 +47,7 @@ class User extends AbstractPlugin
 
     /**
      * @param int $id
-     * @return UserRow
+     * @return \Autowp\Commons\Db\Table\Row
      */
     private function user($id)
     {
@@ -73,7 +72,7 @@ class User extends AbstractPlugin
             $user = $this->getLogedInUser();
         }
 
-        if (! $user instanceof UserRow) {
+        if (! $user instanceof \Autowp\Commons\Db\Table\Row) {
             $user = $this->user($user);
         }
 
@@ -83,7 +82,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return UserRow
+     * @return \Autowp\Commons\Db\Table\Row
      */
     private function getLogedInUser()
     {
@@ -105,7 +104,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return UserRow
+     * @return \Autowp\Commons\Db\Table\Row
      */
     public function get()
     {
