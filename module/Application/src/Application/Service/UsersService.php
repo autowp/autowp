@@ -2,25 +2,23 @@
 
 namespace Application\Service;
 
+use DateTime;
+use Exception;
+
 use Zend\Mail;
 
 use Autowp\Comments;
+use Autowp\Image;
 use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
 use Autowp\User\Model\DbTable\User;
-use Autowp\User\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
 
 use Application\Model\Contact;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
+use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
 
-use DateTime;
-use Exception;
-
 use Zend_Db_Expr;
-
-use Autowp\Image;
-use Application\Model\UserItemSubscribe;
 
 class UsersService
 {
@@ -393,24 +391,6 @@ class UsersService
 
         $user->password = new Zend_Db_Expr($passwordExpr);
         $user->save();
-    }
-
-    public function createRestorePasswordToken($userId)
-    {
-        $uprTable = new UserPasswordRemind();
-
-        do {
-            $code = md5($this->salt . uniqid());
-            $exists = (bool)$uprTable->find($code)->current();
-        } while ($exists);
-
-        $uprTable->insert([
-            'user_id' => $userId,
-            'hash'    => $code,
-            'created' => new Zend_Db_Expr('NOW()')
-        ]);
-
-        return $code;
     }
 
     public function checkPassword($userId, $password)

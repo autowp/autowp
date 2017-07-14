@@ -19,7 +19,8 @@ class RestorePasswordControllerFactory implements FactoryInterface
             $container->get('RestorePasswordForm'),
             $container->get('NewPasswordForm'),
             $container->get(\Zend\Mail\Transport\TransportInterface::class),
-            $container->get(\Application\HostManager::class)
+            $container->get(\Application\HostManager::class),
+            $container->get(\Autowp\User\Model\UserPasswordRemind::class)
         );
     }
 }

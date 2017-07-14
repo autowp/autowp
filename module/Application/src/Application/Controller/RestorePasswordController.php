@@ -9,7 +9,7 @@ use Zend\Form\Form;
 
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
-use Autowp\User\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
+use Autowp\User\Model\UserPasswordRemind;
 
 use Application\HostManager;
 use Application\Service\UsersService;
@@ -38,18 +38,25 @@ class RestorePasswordController extends AbstractActionController
      */
     private $hostManager;
 
+    /**
+     * @var UserPasswordRemind
+     */
+    private $userPasswordRemind;
+
     public function __construct(
         UsersService $service,
         Form $restorePasswordForm,
         Form $newPasswordForm,
         $transport,
-        HostManager $hostManager
+        HostManager $hostManager,
+        UserPasswordRemind $userPasswordRemind
     ) {
         $this->service = $service;
         $this->restorePasswordForm = $restorePasswordForm;
         $this->newPasswordForm = $newPasswordForm;
         $this->transport = $transport;
         $this->hostManager = $hostManager;
+        $this->userPasswordRemind = $userPasswordRemind;
     }
 
     public function indexAction()
@@ -70,7 +77,7 @@ class RestorePasswordController extends AbstractActionController
                 ]);
 
                 if ($user) {
-                    $code = $this->service->createRestorePasswordToken($user->id);
+                    $code = $this->userPasswordRemind->createToken($user->id);
 
                     $uri = $this->hostManager->getUriByLanguage($user->language);
 
@@ -119,18 +126,14 @@ class RestorePasswordController extends AbstractActionController
     {
         $code = (string)$this->params('code');
 
-        $uprTable = new UserPasswordRemind();
+        $userId = $this->userPasswordRemind->getUserId($code);
 
-        $uprRow = $uprTable->fetchRow([
-            'hash = ?' => $code,
-            'created > DATE_SUB(NOW(), INTERVAL 10 DAY)'
-        ]);
-
-        if (! $uprRow) {
+        if (! $userId) {
             return $this->notFoundAction();
         }
 
-        $user = $uprRow->findParentRow(User::class);
+        $userTable = new User();
+        $user = $userTable->find($userId)->current();
 
         if (! $user) {
             return $this->notFoundAction();
@@ -144,7 +147,7 @@ class RestorePasswordController extends AbstractActionController
 
                 $this->service->setPassword($user, $values['password']);
 
-                $uprRow->delete();
+                $this->userPasswordRemind->deleteToken($code);
 
                 $adapter = new IdAuthAdapter();
                 $adapter->setIdentity($user->id);

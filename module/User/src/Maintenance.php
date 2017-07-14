@@ -6,8 +6,6 @@ use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
 
 use Autowp\Cron;
-use Autowp\User\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
-use Autowp\User\Model\DbTable\UserRemember;
 
 use Application\CronEvent;
 
@@ -37,20 +35,12 @@ class Maintenance extends AbstractListenerAggregate
         $count = $userRemember->garbageCollect();
         print sprintf("%d user remember rows was deleted\ndone\n", $count);
 
-        $this->clearUserPasswordRemind();
+        $userPasswordRemind = $serviceManager->get(\Autowp\User\Model\UserPasswordRemind::class);
+        $count = $userPasswordRemind->garbageCollect();
+        print sprintf("%d password remind rows was deleted\ndone\n", $count);
 
         $userRename = $serviceManager->get(\Autowp\User\Model\UserRename::class);
         $count = $userRename->garbageCollect();
         print sprintf("%d user rename rows was deleted\ndone\n", $count);
-    }
-
-    private function clearUserPasswordRemind()
-    {
-        $uprTable = new UserPasswordRemind();
-        $count = $uprTable->delete([
-            'created < DATE_SUB(NOW(), INTERVAL 10 DAY)'
-        ]);
-
-        print sprintf("%d password remind rows was deleted\ndone\n", $count);
     }
 }
