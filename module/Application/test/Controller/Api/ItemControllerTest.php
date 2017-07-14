@@ -323,62 +323,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
-    public function testOrganizePicturesForm()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/organize-pictures/item_id/1', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('organize-pictures');
-    }
-
-    public function testOrganizePicturesAction()
-    {
-        // upload picture
-        $request = $this->getRequest();
-        $request->getHeaders()
-            ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
-            ->addHeaderLine('Content-Type', 'multipart/form-data');
-        $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
-
-        $file = tempnam(sys_get_temp_dir(), 'upl');
-        $filename = 'test.jpg';
-        copy(__DIR__ . '/../../_files/' . $filename, $file);
-
-        $request->getFiles()->fromArray([
-            'picture' => [
-                [
-                    'tmp_name' => $file,
-                    'name'     => $filename,
-                    'error'    => UPLOAD_ERR_OK,
-                    'type'     => 'image/jpeg'
-                ]
-            ]
-        ]);
-        $this->dispatch('https://www.autowp.ru/upload/send/type/1/item_id/1', Request::METHOD_POST, [], true);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $pictureId = $json[0]['id'];
-
-        // do organize
-        $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/organize-pictures/item_id/1', Request::METHOD_POST, [
-            'name'   => 'Pictures organize test item',
-            'childs' => [$pictureId]
-        ]);
-
-        $this->assertResponseStatusCode(302);
-        $this->assertHasResponseHeader('Location');
-    }
-
     public function testTree()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
