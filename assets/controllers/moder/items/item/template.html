@@ -333,7 +333,9 @@
     </div>
     <div ng-if="ctrl.tabs.pictures" class="tab-pane" ng-class="{active: ctrl.tabs.pictures.active}" id="pictures">
         <p class="btn-group" ng-if="ctrl.canUseTurboGroupCreator">
-            <a ng-href="/moder/cars/organize-pictures/item_id/{{ctrl.item.id}}" class="btn btn-default" translate>moder/vehicle/pictures/turbo-group-creator</a>
+            <a ui-sref="moder-items-item-organize-pictures({id: ctrl.item.id})"
+                class="btn btn-default" 
+                translate>moder/vehicle/pictures/turbo-group-creator</a>
         </p>
         <div class="row" ng-repeat="chunk in ctrl.picturesChunks">
             <div class="col-sm-2" ng-repeat="picture in chunk">

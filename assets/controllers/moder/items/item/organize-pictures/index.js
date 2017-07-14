@@ -6,16 +6,17 @@ import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
 import SPEC_SERVICE from 'services/spec';
 import CONTENT_LANGUAGE_SERVICE from 'services/content-language';
 import ITEM_SERVICE from 'services/item';
+import './styles.less';
 
-const STATE_NAME = 'moder-items-item-organize';
-const CONTROLLER_NAME = 'ModerItemsItemOrganizeController';
+const STATE_NAME = 'moder-items-item-organize-pictures';
+const CONTROLLER_NAME = 'ModerItemsItemOrganizePicturesController';
 
 angular.module(Module)
     .config(['$stateProvider',
         function config($stateProvider) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/items/item/{id}/organize?item_type_id',
+                url: '/moder/items/item/{id}/organize-pictures?item_type_id',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template,
@@ -35,7 +36,7 @@ angular.module(Module)
             
             ctrl.item = null;
             ctrl.newItem = null;
-            ctrl.hasSelectedChild = false;
+            ctrl.hasSelectedPicture = false;
             ctrl.loading = 0;
             
             $http({
@@ -52,6 +53,7 @@ angular.module(Module)
             }).then(function(response) {
                 ctrl.item = response.data;
                 ctrl.newItem = angular.copy(ctrl.item);
+                ctrl.newItem.is_group = false;
                 $translate('item/type/'+ctrl.item.item_type_id+'/name').then(function(translation) {
                     $scope.pageEnv({
                         layout: {
@@ -73,28 +75,29 @@ angular.module(Module)
             
             $http({
                 method: 'GET',
-                url: '/api/item-parent',
+                url: '/api/picture',
                 params: {
-                    parent_id: $state.params.id,
+                    exact_item_id: $state.params.id,
                     limit: 500,
-                    fields: 'item.name_html',
-                    order: 'moder_auto'
+                    fields: 'thumbnail,name_text',
+                    order: 14
                 }
             }).then(function(response) {
-                ctrl.childs = response.data.items;
+                ctrl.pictures = response.data.pictures;
             }, function() {
                 
             });
             
-            ctrl.childSelected = function() {
+            ctrl.pictureSelected = function(picture) {
+                picture.selected = !picture.selected;
                 var result = false;
-                angular.forEach(ctrl.childs, function(child) {
-                    if (child.selected) {
+                angular.forEach(ctrl.pictures, function(picture) {
+                    if (picture.selected) {
                         result = true;
                     }
                 });
                 
-                ctrl.hasSelectedChild = result;
+                ctrl.hasSelectedPicture = result;
             };
             
             ctrl.submit = function() {
@@ -102,7 +105,7 @@ angular.module(Module)
                 ctrl.loading++;
                 
                 var data = {
-                    item_type_id: $state.params.item_type_id,
+                    item_type_id: ctrl.newItem.item_type_id,
                     name: ctrl.newItem.name,
                     full_name: ctrl.newItem.full_name,
                     catname: ctrl.newItem.catname,
@@ -150,14 +153,14 @@ angular.module(Module)
                             item_id: response.data.id
                         }));
                         
-                        angular.forEach(ctrl.childs, function(child) {
-                            if (child.selected) {
+                        angular.forEach(ctrl.pictures, function(picture) {
+                            if (picture.selected) {
                                 promises.push(
                                     $http({
                                         method: 'PUT',
-                                        url: '/api/item-parent/' + child.item_id + '/' + child.parent_id,
+                                        url: '/api/picture-item/' + picture.id + '/' + ctrl.item.id,
                                         data: {
-                                            parent_id: response.data.id
+                                            item_id: response.data.id
                                         }
                                     })
                                 );
@@ -169,7 +172,7 @@ angular.module(Module)
                         $q.all(promises).then(function(results) {
                             $state.go('moder-items-item', {
                                 id: response.data.id,
-                                tab: 'catalogue'
+                                tab: 'pictures'
                             });
                             ctrl.loading--;
                         });

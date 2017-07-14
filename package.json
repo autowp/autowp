@@ -44,7 +44,6 @@
     "angular-translate-interpolation-messageformat": "^2.15.1",
     "autosize": "^4.0",
     "bootstrap": "^3.x",
-    "bootstrap-tagsinput": "^0.x",
     "chart.js": "^2.x",
     "compression-webpack-plugin": "^0.4.0",
     "corejs-typeahead": "^1.1.1",

@@ -11,6 +11,7 @@ require('corejs-typeahead');
 import './tree';
 import './select-parent';
 import './organize';
+import './organize-pictures';
 
 const STATE_NAME = 'moder-items-item';
 const CONTROLLER_NAME = 'ModerItemsItemController';
