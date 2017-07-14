@@ -80,7 +80,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         $newPassword = 'password2';
         $name = 'User, who restore password';
 
-        $userId = $this->createUser($email, $password, $name);
+        $this->createUser($email, $password, $name);
         $this->activateUser();
 
         // request email message
