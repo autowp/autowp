@@ -2,11 +2,12 @@
 
 namespace Application\Controller;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Application\Model\DbTable\Attr;
-use Application\Model\DbTable\Spec;
 use Application\Model\DbTable\Item;
 use Application\Service\SpecificationsService;
 
@@ -25,9 +26,15 @@ class ChartController extends AbstractRestfulController
      */
     private $specsService = null;
 
-    public function __construct(SpecificationsService $specsService)
+    /**
+     * @var TableGateway
+     */
+    private $specTable;
+
+    public function __construct(SpecificationsService $specsService, TableGateway $specTable)
     {
         $this->specsService = $specsService;
+        $this->specTable = $specTable;
     }
 
     public function yearsAction()
@@ -47,16 +54,20 @@ class ChartController extends AbstractRestfulController
         ];
     }
 
-    private function specIds($db, $id)
+    private function specIds(int $id)
     {
-        $ids = $db->fetchCol(
-            $db->select()
-                ->from('spec', 'id')
-                ->where('parent_id = ?', $id)
-        );
+        $select = new Sql\Select($this->specTable->getTable());
+        $select->columns(['id'])
+            ->where(['parent_id' => $id]);
+
+        $ids = [];
+        foreach ($this->specTable->selectWith($select) as $row) {
+            $ids[] = (int)$row['id'];
+        }
+
         $result = [$id];
         foreach ($ids as $pid) {
-            $result = array_merge($result, $this->specIds($db, $pid));
+            $result = array_merge($result, $this->specIds($pid));
         }
 
         return array_merge($ids, $result);
@@ -82,12 +93,11 @@ class ChartController extends AbstractRestfulController
 
         $itemTable = new Item();
         $db = $itemTable->getAdapter();
-        $specTable = new Spec();
 
         $datasets = [];
         foreach ($this->specs as $specId) {
-            $specRow = $specTable->find($specId)->current();
-            $specIds = $this->specIds($specTable->getAdapter(), $specId);
+            $specRow = $this->specTable->select(['id' => $specId])->current();
+            $specIds = $this->specIds($specId);
 
             $pairs = $db->fetchPairs(
                 $db->select()

@@ -55,7 +55,7 @@ return [
             Controller\Api\PictureModerVoteController::class => Controller\Api\Service\PictureModerVoteControllerFactory::class,
             Controller\Api\PictureModerVoteTemplateController::class => Controller\Api\Service\PictureModerVoteTemplateControllerFactory::class,
             Controller\Api\PictureVoteController::class     => Controller\Api\Service\PictureVoteControllerFactory::class,
-            Controller\Api\SpecController::class            => InvokableFactory::class,
+            Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
             Controller\Api\StatController::class            => InvokableFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
             Controller\Api\UserController::class            => Controller\Api\Service\UserControllerFactory::class,

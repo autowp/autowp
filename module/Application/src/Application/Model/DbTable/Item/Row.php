@@ -2,73 +2,14 @@
 
 namespace Application\Model\DbTable\Item;
 
-use Application\Model\DbTable;
-use Application\Model\Item as ItemModel;
-
 use DateTime;
-use Exception;
+
+use Application\Model\DbTable;
 
 use Zend_Db_Expr;
 
 class Row extends \Autowp\Commons\Db\Table\Row
 {
-    /**
-     * @var DbTable\Spec
-     */
-    private $specTable;
-
-    /**
-     * @return DbTable\Spec
-     */
-    private function getSpecTable()
-    {
-        return $this->specTable
-            ? $this->specTable
-            : $this->specTable = new DbTable\Spec();
-    }
-
-    public function getNameData($language = 'en')
-    {
-        if (! is_string($language)) {
-            throw new Exception('`language` is not string');
-        }
-
-        /*$carLangTable = new DbTable\Item\Language();
-        $carLangRow = $carLangTable->fetchRow([
-            'item_id = ?'  => $this->id,
-            'language = ?' => (string)$language
-        ]);
-
-        $name = $carLangRow && $carLangRow->name ? $carLangRow->name : $this->name;*/
-
-        $itemModel = new ItemModel();
-        $name = $itemModel->getName($this['id'], $language);
-
-        $spec = null;
-        $specFull = null;
-        if ($this->spec_id) {
-            $specRow = $this->getSpecTable()->find($this->spec_id)->current();
-            if ($specRow) {
-                $spec = $specRow->short_name;
-                $specFull = $specRow->name;
-            }
-        }
-
-        return [
-            'begin_model_year' => $this->begin_model_year,
-            'end_model_year'   => $this->end_model_year,
-            'spec'             => $spec,
-            'spec_full'        => $specFull,
-            'body'             => $this->body,
-            'name'             => $name,
-            'begin_year'       => $this->begin_year,
-            'end_year'         => $this->end_year,
-            'today'            => $this->today,
-            'begin_month'      => $this->begin_month,
-            'end_month'        => $this->end_month,
-        ];
-    }
-
     public function getOrientedPictureList(array $perspectiveGroupIds)
     {
         $pictureTable = new DbTable\Picture();

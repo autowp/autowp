@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 $this->pageEnv([
     'layout' => [
@@ -45,7 +45,7 @@ $dateFormatter = new IntlDateFormatter($this->language(), IntlDateFormatter::LON
     <?php if ($this->selectedItem) { ?>
         <p>
             <?=$this->escapeHtml($this->translate('donate/vod/select-item/selection:'))?>
-            <strong><?=$this->car()->htmlTitle($this->selectedItem->getNameData($this->language()), $this->language()) ?></strong>
+            <strong><?=$this->car()->htmlTitle($this->selectedItemNameData, $this->language()) ?></strong>
         </p>
     <?php } ?>
     <?=$this->htmlA([
@@ -90,9 +90,9 @@ $dateFormatter = new IntlDateFormatter($this->language(), IntlDateFormatter::LON
 <div class="well">
     <form method="post" action="https://money.yandex.ru/quickpay/confirm.xml">
         <?php if ($this->selectedDate && $this->selectedItem) { ?>
-            <?php 
+            <?php
                 $label = 'vod/'.$this->selectedDate.'/'.$this->selectedItem['id'].'/' . ($this->anonymous ? 0 : (int)$this->userId);
-            
+
                 $params = [
                     'receiver'      => '41001161017513',
                     'sum'           => $this->sum,
@@ -114,7 +114,7 @@ $dateFormatter = new IntlDateFormatter($this->language(), IntlDateFormatter::LON
                 <input type="hidden" name="<?=$this->escapeHtmlAttr($key)?>" value="<?=$this->escapeHtmlAttr($value)?>" />
             <?php } ?>
             <div class="form-group">
-                <textarea name="comment" placeholder="<?=$this->escapeHtmlAttr($this->translate('donate/vod/message'))?>" class="form-control" value="" maxlength="200"></textarea>
+                <textarea name="comment" placeholder="<?=$this->escapeHtmlAttr($this->translate('donate/vod/message'))?>" class="form-control" maxlength="200"></textarea>
             </div>
         <?php } ?>
         <p>
@@ -124,7 +124,7 @@ $dateFormatter = new IntlDateFormatter($this->language(), IntlDateFormatter::LON
         </p>
         <?php if ($this->selectedDate && $this->selectedItem) { ?>
             <div class="form-group">
-                <div class="btn-group" data-toggle="buttons"> 
+                <div class="btn-group" data-toggle="buttons">
                     <label class="btn btn-default active">
                         <input type="radio" name="paymentType" value="AC" autocomplete="off" checked>
                         <span class="fa fa-credit-card"></span>

@@ -18,7 +18,8 @@ class FactoriesControllerFactory implements FactoryInterface
         return new Controller(
             $container->get(\Autowp\TextStorage\Service::class),
             $container->get(\Application\Service\SpecificationsService::class),
-            $tables->get('perspectives_groups')
+            $tables->get('perspectives_groups'),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

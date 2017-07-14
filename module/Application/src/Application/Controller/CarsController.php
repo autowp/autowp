@@ -17,6 +17,7 @@ use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
 use Application\Service\SpecificationsService;
 use Application\Model\UserItemSubscribe;
+use Application\Model\Item;
 
 class CarsController extends AbstractActionController
 {
@@ -50,13 +51,19 @@ class CarsController extends AbstractActionController
      */
     private $perspectiveGroupTable;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         HostManager $hostManager,
         Form $filterForm,
         SpecificationsService $specsService,
         MessageService $message,
         UserItemSubscribe $userItemSubscribe,
-        TableGateway $perspectiveGroupTable
+        TableGateway $perspectiveGroupTable,
+        Item $itemModel
     ) {
 
         $this->hostManager = $hostManager;
@@ -65,6 +72,7 @@ class CarsController extends AbstractActionController
         $this->message = $message;
         $this->userItemSubscribe = $userItemSubscribe;
         $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->itemModel = $itemModel;
     }
 
     private function carModerUrl(DbTable\Item\Row $item, $uri = null)
@@ -175,6 +183,11 @@ class CarsController extends AbstractActionController
             }
         }
 
+        $engineNameData = null;
+        if ($engine) {
+            $engineNameData = $this->itemModel->getNameData($engine, $this->language());
+        }
+
         $tabs = [
             'info' => [
                 'icon'  => 'fa fa-info',
@@ -223,9 +236,11 @@ class CarsController extends AbstractActionController
 
         return [
             'car'                 => $car,
+            'nameData'            => $this->itemModel->getNameData($car, $this->language()),
             'engine'              => $engine,
             'engineInherited'     => $engineInherited,
             'engineInheritedFrom' => $engineInheritedFrom,
+            'engineNameData'      => $engineNameData,
             'form'                => $carForm,
             'formData'            => $carFormData,
             'tabs'                => $tabs,
@@ -667,7 +682,7 @@ class CarsController extends AbstractActionController
         foreach ($rows as $row) {
             $engines[] = [
                 'id'     => $row->id,
-                'name'   => $row->getNameData($this->language()),
+                'name'   => $this->itemModel->getNameData($row, $this->language()),
                 'childs' => $this->enginesWalkTree($row->id, null)
             ];
         }
@@ -711,10 +726,11 @@ class CarsController extends AbstractActionController
             });
 
             return [
-                'car'     => $car,
-                'brand'   => false,
-                'brands'  => $brands,
-                'engines' => []
+                'car'      => $car,
+                'nameData' => $this->itemModel->getNameData($car, $language),
+                'brand'    => false,
+                'brands'   => $brands,
+                'engines'  => []
             ];
         }
 
@@ -724,10 +740,11 @@ class CarsController extends AbstractActionController
         ]);
         if (! $engine) {
             return [
-                'car'     => $car,
-                'brand'   => $brand,
-                'brands'  => [],
-                'engines' => $this->enginesWalkTree(null, $brand['id'])
+                'car'      => $car,
+                'nameData' => $this->itemModel->getNameData($car, $language),
+                'brand'    => $brand,
+                'brands'   => [],
+                'engines'  => $this->enginesWalkTree(null, $brand['id'])
             ];
         }
 

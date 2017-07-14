@@ -2,43 +2,44 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
-use Autowp\User\Model\DbTable\User;
-
-use Application\Model\DbTable;
 
 class SpecController extends AbstractRestfulController
 {
     /**
-     * @var DbTable\Spec
+     * @var TableGateway
      */
     private $table;
 
-    public function __construct()
+    public function __construct(TableGateway $table)
     {
-        $this->table = new DbTable\Spec();
+        $this->table = $table;
     }
 
-    private function getSpecOptions($parentId = null)
+    private function getSpecOptions(int $parentId = 0): array
     {
+        $select = new Sql\Select($this->table->getTable());
+        $select->order('name');
+
         if ($parentId) {
-            $filter = [
-                'parent_id = ?' => $parentId
-            ];
+            $select->where([
+                'parent_id' => $parentId
+            ]);
         } else {
-            $filter = 'parent_id is null';
+            $select->where(['parent_id is null']);
         }
 
-        $rows = $this->table->fetchAll($filter, 'name');
+        $rows = $this->table->selectWith($select);
         $result = [];
         foreach ($rows as $row) {
             $result[] = [
-                'id'         => (int)$row->id,
-                'name'       => $row->name,
-                'short_name' => $row->short_name,
-                'childs'     => $this->getSpecOptions($row->id)
+                'id'         => (int)$row['id'],
+                'name'       => $row['name'],
+                'short_name' => $row['short_name'],
+                'childs'     => $this->getSpecOptions($row['id'])
             ];
         }
 
@@ -52,7 +53,7 @@ class SpecController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $this->getSpecOptions(null),
+            'items' => $this->getSpecOptions(0),
         ]);
     }
 }

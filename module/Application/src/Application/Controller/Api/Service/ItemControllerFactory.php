@@ -17,6 +17,7 @@ class ItemControllerFactory implements FactoryInterface
     {
         $hydrators = $container->get('HydratorManager');
         $filters = $container->get('InputFilterManager');
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $hydrators->get(\Application\Hydrator\Api\ItemHydrator::class),
             new Image($container),
@@ -27,7 +28,8 @@ class ItemControllerFactory implements FactoryInterface
             $container->get(\Application\Model\BrandVehicle::class),
             $container->get(\Application\HostManager::class),
             $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Application\Model\UserItemSubscribe::class)
+            $container->get(\Application\Model\UserItemSubscribe::class),
+            $tables->get('spec')
         );
     }
 }

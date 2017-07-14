@@ -10,6 +10,7 @@ use Zend\View\Model\ViewModel;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
@@ -28,14 +29,21 @@ class FactoriesController extends AbstractActionController
      */
     private $perspectiveGroupTable;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         $textStorage,
         SpecificationsService $specsService,
-        TableGateway $perspectiveGroupTable
+        TableGateway $perspectiveGroupTable,
+        Item $itemModel
     ) {
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
         $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->itemModel = $itemModel;
     }
 
     public function indexAction()
@@ -172,7 +180,7 @@ class FactoriesController extends AbstractActionController
             'carPictures' => $carPictures,
             'point'       => $point,
             'canEdit'     => $this->user()->isAllowed('factory', 'edit'),
-            'factoryName' => $factory->getNameData($language)
+            'factoryName' => $this->itemModel->getNameData($factory, $language)
         ];
     }
 
@@ -261,7 +269,7 @@ class FactoriesController extends AbstractActionController
 
         $items = [];
         foreach ($rows as $row) {
-            $items[] = $row->getNameData($language);
+            $items[] = $this->itemModel->getNameData($row, $language);
         }
 
         $viewModel = new ViewModel([

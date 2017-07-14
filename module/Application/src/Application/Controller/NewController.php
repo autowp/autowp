@@ -9,6 +9,7 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 
 use Application\ItemNameFormatter;
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\PictureItem;
 use Application\Service\DayPictures;
 use Application\Service\SpecificationsService;
@@ -29,12 +30,19 @@ class NewController extends AbstractActionController
      */
     private $specsService = null;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
-        SpecificationsService $specsService
+        SpecificationsService $specsService,
+        Item $itemModel
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->specsService = $specsService;
+        $this->itemModel = $itemModel;
     }
 
     public function indexAction()
@@ -238,9 +246,9 @@ class NewController extends AbstractActionController
         $pictureTable = new DbTable\Picture();
 
         $select = $pictureTable->select(true)
-        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-        ->where('picture_item.item_id = ?', $item['id'])
-        ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->where('picture_item.item_id = ?', $item['id'])
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
 
         $service = new DayPictures([
             'timezone'     => $this->user()->timezone(),
@@ -251,15 +259,15 @@ class NewController extends AbstractActionController
         ]);
 
         $paginator = $service->getPaginator()
-        ->setItemCountPerPage(30)
-        ->setCurrentPageNumber($this->params('page'));
+            ->setItemCountPerPage(30)
+            ->setCurrentPageNumber($this->params('page'));
 
         if ($paginator->getTotalItemCount() <= 0) {
             return $this->notFoundAction();
         }
 
         $select = $service->getCurrentDateSelect()
-        ->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
+            ->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
         $picturesData = $this->pic()->listData($select, [
             'width' => 6
@@ -268,7 +276,7 @@ class NewController extends AbstractActionController
         $language = $this->language();
 
         $carFullName = $this->itemNameFormatter->format(
-            $item->getNameData($language),
+            $this->itemModel->getNameData($item, $language),
             $language
         );
 

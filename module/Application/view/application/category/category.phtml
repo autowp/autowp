@@ -4,7 +4,7 @@
             'blankPage' => false,
             'needRight' => false
         ],
-        'pageTitle' => $this->car()->textTitle($this->currentItem->getNameData($this->language())),
+        'pageTitle' => $this->car()->textTitle($this->currentItemNameData),
         'pageId' => 23,
         'args'   => [
             'CATEGORY_SHORT_NAME' => $this->category->name, //$this->categoryLang ? $this->categoryLang->short_name : $this->category->short_name,

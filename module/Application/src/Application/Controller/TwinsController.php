@@ -7,13 +7,14 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\DbTable;
-use Application\Model\Twins;
-use Application\Service\SpecificationsService;
-
 use Autowp\Comments;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\TextStorage;
+
+use Application\Model\DbTable;
+use Application\Model\Item;
+use Application\Model\Twins;
+use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
 
@@ -45,12 +46,18 @@ class TwinsController extends AbstractActionController
      */
     private $perspectiveGroupTable;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         TextStorage\Service $textStorage,
         $cache,
         SpecificationsService $specsService,
         Comments\CommentsService $comments,
-        TableGateway $perspectiveGroupTable
+        TableGateway $perspectiveGroupTable,
+        Item $itemModel
     ) {
 
         $this->textStorage = $textStorage;
@@ -58,6 +65,7 @@ class TwinsController extends AbstractActionController
         $this->specsService = $specsService;
         $this->comments = $comments;
         $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->itemModel = $itemModel;
     }
 
     /**
@@ -204,7 +212,7 @@ class TwinsController extends AbstractActionController
         $this->getBrands($this->getTwins()->getGroupBrandIds($group['id']));
 
         return [
-            //'name'               => $group->getNameData($this->language()),
+            //'name'               => $this->itemModel->getNameData($group, $this->language()),
             'group'              => $group,
             'description'        => $description,
             'cars'               => $this->car()->listData($carList, [
@@ -346,7 +354,7 @@ class TwinsController extends AbstractActionController
             $picturesCount = isset($picturesCounts[$group->id]) ? $picturesCounts[$group->id] : null;
 
             $groups[] = [
-                'name'          => $group->getNameData($language),
+                'name'          => $this->itemModel->getNameData($group, $language),
                 'cars'          => $cars,
                 'picturesShown' => $picturesShown,
                 'picturesCount' => $picturesCount,

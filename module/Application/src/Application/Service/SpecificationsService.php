@@ -2,6 +2,9 @@
 
 namespace Application\Service;
 
+use Exception;
+use NumberFormatter;
+
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -14,10 +17,8 @@ use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\ItemNameFormatter;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
+use Application\Model\Item;
 use Application\Spec\Table\Car as CarSpecTable;
-
-use Exception;
-use NumberFormatter;
 
 use Zend_Db_Expr;
 
@@ -123,13 +124,20 @@ class SpecificationsService
      */
     private $itemNameFormatter;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         $translator,
         ItemNameFormatter $itemNameFormatter,
-        Adapter $adapter
+        Adapter $adapter,
+        Item $itemModel
     ) {
         $this->translator = $translator;
         $this->itemNameFormatter = $itemNameFormatter;
+        $this->itemModel = $itemModel;
 
         $this->unitTable = new TableGateway('attrs_units', $adapter);
         $this->listOptionsTable = new TableGateway('attrs_list_options', $adapter);
@@ -1400,7 +1408,7 @@ class SpecificationsService
 
             $name = $itemParentName;
             if (! $name) {
-                $name = $this->itemNameFormatter->format($car->getNameData($language), $language);
+                $name = $this->itemNameFormatter->format($this->itemModel->getNameData($car, $language), $language);
             }
 
             $result[] = [

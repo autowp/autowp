@@ -7,14 +7,21 @@ use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
+use Application\Model\Item;
 
 class BrandsController extends AbstractActionController
 {
     private $cache;
 
-    public function __construct($cache)
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
+    public function __construct($cache, Item $itemModel)
     {
         $this->cache = $cache;
+        $this->itemModel = $itemModel;
     }
 
     public function indexAction()
@@ -103,7 +110,7 @@ class BrandsController extends AbstractActionController
 
         $cars = [];
         foreach ($carList as $car) {
-            $cars[] = $car->getNameData($language);
+            $cars[] = $this->itemModel->getNameData($car, $language);
         }
 
         $viewModel = new ViewModel([

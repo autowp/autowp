@@ -25,6 +25,7 @@ use Exception;
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;
+use Application\Model\Item;
 
 class Pic extends AbstractPlugin
 {
@@ -79,6 +80,11 @@ class Pic extends AbstractPlugin
      */
     private $catalogue;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -90,7 +96,8 @@ class Pic extends AbstractPlugin
         Comments\CommentsService $comments,
         PictureVote $pictureVote,
         Catalogue $catalogue,
-        PictureView $pictureView
+        PictureView $pictureView,
+        Item $itemModel
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -103,6 +110,7 @@ class Pic extends AbstractPlugin
         $this->pictureVote = $pictureVote;
         $this->catalogue = $catalogue;
         $this->pictureView = $pictureView;
+        $this->itemModel = $itemModel;
 
         $this->pictureTable = new DbTable\Picture();
     }
@@ -682,7 +690,7 @@ class Pic extends AbstractPlugin
                         'name' => 'api/picture-item/update'
                     ]),
                     'value'   => $this->pictureItem->getPerspective($picture->id, $item->id),
-                    'name'    => $item->getNameData($language)
+                    'name'    => $this->itemModel->getNameData($item, $language)
                 ];
             }
 
@@ -702,7 +710,7 @@ class Pic extends AbstractPlugin
 
             $items[] = [
                 'id'            => $item['id'],
-                'name'          => $item->getNameData($language),
+                'name'          => $this->itemModel->getNameData($item, $language),
                 'specsUrl'      => $specsUrl,
                 //'row'           => $item,
                 'hasSpecs'      => $hasSpecs,
@@ -731,7 +739,6 @@ class Pic extends AbstractPlugin
         $language = $controller->language();
 
         $itemTable = $this->catalogue->getItemTable();
-        $itemModel = new \Application\Model\Item();
 
         $engineRows = [];
         if ($itemIds) {
@@ -745,7 +752,7 @@ class Pic extends AbstractPlugin
         foreach ($engineRows as $engineRow) {
             $vehicles = [];
 
-            $vehicleIds = $itemModel->getEngineVehiclesGroups($engineRow->id);
+            $vehicleIds = $this->itemModel->getEngineVehiclesGroups($engineRow->id);
 
             if ($vehicleIds) {
                 $carRows = $itemTable->fetchAll([
@@ -1411,7 +1418,7 @@ class Pic extends AbstractPlugin
                         'width'  => $pictureItem['area'][2] / $image->getWidth(),
                         'height' => $pictureItem['area'][3] / $image->getHeight(),
                     ],
-                    'name' => $this->itemNameFormatter->formatHtml($item->getNameData($language), $language)
+                    'name' => $this->itemNameFormatter->formatHtml($this->itemModel->getNameData($item, $language), $language)
                 ];
             }
 

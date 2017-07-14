@@ -20,7 +20,8 @@ class TwinsControllerFactory implements FactoryInterface
             $container->get('longCache'),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Autowp\Comments\CommentsService::class),
-            $tables->get('perspectives_groups')
+            $tables->get('perspectives_groups'),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

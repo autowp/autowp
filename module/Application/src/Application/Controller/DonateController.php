@@ -8,6 +8,7 @@ use Zend\View\Model\ViewModel;
 use Application\Model\Brand as BrandModel;
 use Application\Model\CarOfDay;
 use Application\Model\DbTable;
+use Application\Model\Item;
 
 use Zend_Db_Expr;
 
@@ -25,10 +26,16 @@ class DonateController extends AbstractActionController
      */
     private $yandexConfig;
 
-    public function __construct(CarOfDay $carOfDay, array $yandexConfig)
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
+    public function __construct(CarOfDay $carOfDay, array $yandexConfig, Item $itemModel)
     {
         $this->carOfDay = $carOfDay;
         $this->yandexConfig = $yandexConfig;
+        $this->itemModel = $itemModel;
     }
 
     private function getItemParentTable()
@@ -87,18 +94,21 @@ class DonateController extends AbstractActionController
         $anonymous = (bool)$this->params('anonymous');
 
         $itemOfDay = null;
+        $itemNameData = null;
         if ($item) {
             $itemOfDay = $this->carOfDay->getItemOfDay($item['id'], $anonymous ? null : $userId, $this->language());
+            $itemNameData = $this->itemModel->getNameData($item, $this->language());
         }
 
         return [
-            'dates'        => $dates,
-            'selectedDate' => $selectedDate,
-            'selectedItem' => $item,
-            'sum'          => $this->yandexConfig['price'],
-            'userId'       => $userId,
-            'anonymous'    => $userId ? $anonymous : true,
-            'itemOfDay'    => $itemOfDay
+            'dates'                => $dates,
+            'selectedDate'         => $selectedDate,
+            'selectedItem'         => $item,
+            'selectedItemNameData' => $itemNameData,
+            'sum'                  => $this->yandexConfig['price'],
+            'userId'               => $userId,
+            'anonymous'            => $userId ? $anonymous : true,
+            'itemOfDay'            => $itemOfDay,
         ];
     }
 

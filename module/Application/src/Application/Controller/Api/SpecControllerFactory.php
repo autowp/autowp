@@ -1,19 +1,20 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class LogControllerFactory implements FactoryInterface
+class SpecControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new \Application\Controller\LogController(
-            $container->get(\Application\Model\Log::class)
+        $tables = $container->get(\Application\Db\TableManager::class);
+        return new SpecController(
+            $tables->get('spec')
         );
     }
 }

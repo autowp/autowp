@@ -9,6 +9,7 @@ use Zend\View\Model\ViewModel;
 use Autowp\TextStorage;
 
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
 
@@ -29,12 +30,14 @@ class MostsController extends AbstractActionController
     public function __construct(
         TextStorage\Service $textStorage,
         SpecificationsService $specsService,
-        TableGateway $perspectiveGroupTable
+        TableGateway $perspectiveGroupTable,
+        Item $itemModel
     ) {
 
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
         $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->itemModel = $itemModel;
     }
 
     public function indexAction()
@@ -149,7 +152,7 @@ class MostsController extends AbstractActionController
                 }
             }
 
-            $car['name'] = $car['car']->getNameData($language);
+            $car['name'] = $this->itemModel->getNameData($car['car'], $language);
             $car['pictures'] = $pictures;
         }
         unset($car);

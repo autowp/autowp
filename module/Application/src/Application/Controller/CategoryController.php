@@ -11,6 +11,7 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 
 use Application\Model\Categories;
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
@@ -46,18 +47,25 @@ class CategoryController extends AbstractActionController
      */
     private $perspectiveGroupTable;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         $cache,
         $textStorage,
         Categories $categories,
         SpecificationsService $specsService,
-        TableGateway $perspectiveGroupTable
+        TableGateway $perspectiveGroupTable,
+        Item $itemModel
     ) {
         $this->cache = $cache;
         $this->textStorage = $textStorage;
         $this->categories = $categories;
         $this->specsService = $specsService;
         $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->itemModel = $itemModel;
 
         $this->itemTable = new DbTable\Item();
         $this->itemLanguageTable = new DbTable\Item\Language();
@@ -354,11 +362,15 @@ class CategoryController extends AbstractActionController
         $sideBarModel->setTemplate('application/category/menu');
         $this->layout()->addChild($sideBarModel, 'sidebar');
 
+        $currentItem = $currentCar ? $currentCar : $currentCategory;
+        $currentItemNameData = $this->itemModel->getNameData($currentItem, $language);
+
         $data = [
-            'category'     => $currentCategory,
-            'categoryLang' => $categoryLang,
-            'isOther'      => $isOther,
-            'currentItem'  => $currentCar ? $currentCar : $currentCategory
+            'category'            => $currentCategory,
+            'categoryLang'        => $categoryLang,
+            'isOther'             => $isOther,
+            'currentItem'         => $currentItem,
+            'currentItemNameData' => $currentItemNameData
         ];
 
 
@@ -753,7 +765,7 @@ class CategoryController extends AbstractActionController
 
         $items = [];
         foreach ($rows as $row) {
-            $items[] = $row->getNameData($language);
+            $items[] = $this->itemModel->getNameData($row, $language);
         }
 
         $viewModel = new ViewModel([

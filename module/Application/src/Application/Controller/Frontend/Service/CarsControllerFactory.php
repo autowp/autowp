@@ -22,7 +22,8 @@ class CarsControllerFactory implements FactoryInterface
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Application\Model\UserItemSubscribe::class),
-            $tables->get('perspectives_groups')
+            $tables->get('perspectives_groups'),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

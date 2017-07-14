@@ -17,6 +17,7 @@ use Application\ItemNameFormatter;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
 
@@ -56,6 +57,11 @@ class CatalogueController extends AbstractActionController
      */
     private $perspectiveGroupTable;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         $textStorage,
         $cache,
@@ -64,7 +70,8 @@ class CatalogueController extends AbstractActionController
         ItemNameFormatter $itemNameFormatter,
         $mostsMinCarsCount,
         Comments\CommentsService $comments,
-        TableGateway $perspectiveGroupTable
+        TableGateway $perspectiveGroupTable,
+        Item $itemModel
     ) {
 
         $this->textStorage = $textStorage;
@@ -75,6 +82,7 @@ class CatalogueController extends AbstractActionController
         $this->mostsMinCarsCount = $mostsMinCarsCount;
         $this->comments = $comments;
         $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->itemModel = $itemModel;
     }
 
     private function doBrandAction(callable $callback)
@@ -2194,7 +2202,7 @@ class CatalogueController extends AbstractActionController
                     }
                 }
 
-                $car['name'] = $car['car']->getNameData($language);
+                $car['name'] = $this->itemModel->getNameData($car['car'], $language);
                 $car['pictures'] = $pictures;
             }
             unset($car);

@@ -2,6 +2,8 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
 use Zend\Hydrator\Strategy\StrategyInterface;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -88,6 +90,11 @@ class ItemController extends AbstractRestfulController
      */
     private $userItemSubscribe;
 
+    /**
+     * @var TableGateway
+     */
+    private $specTable;
+
     public function __construct(
         RestHydrator $hydrator,
         Image $logoHydrator,
@@ -98,7 +105,8 @@ class ItemController extends AbstractRestfulController
         BrandVehicle $brandVehicle,
         HostManager $hostManager,
         MessageService $message,
-        UserItemSubscribe $userItemSubscribe
+        UserItemSubscribe $userItemSubscribe,
+        TableGateway $specTable
     ) {
         $this->hydrator = $hydrator;
         $this->logoHydrator = $logoHydrator;
@@ -110,6 +118,7 @@ class ItemController extends AbstractRestfulController
         $this->hostManager = $hostManager;
         $this->message = $message;
         $this->userItemSubscribe = $userItemSubscribe;
+        $this->specTable = $specTable;
 
         $this->table = new DbTable\Item();
         $this->itemParentTable = new DbTable\Item\ParentTable();
@@ -398,10 +407,9 @@ class ItemController extends AbstractRestfulController
                 }
             }
 
-            $specTable = new DbTable\Spec();
-            $specRow = $specTable->fetchRow([
-                'INSTR(?, short_name)' => $query
-            ]);
+            $specRow = $this->specTable->select([
+                new Sql\Expression('INSTR(?, short_name)', [$query])
+            ])->current();
 
             $specId = null;
             if ($specRow) {
@@ -596,12 +604,12 @@ class ItemController extends AbstractRestfulController
      */
     private function getInputFilter($itemTypeId, $post, $itemId)
     {
-        $specTable = new DbTable\Spec();
-        $db = $specTable->getAdapter();
-        $specOptions = $db->fetchCol(
-            $db->select()
-                ->from($specTable->info('name'), 'id')
-        );
+        $select = new Sql\Select($this->specTable->getTable());
+        $select->columns(['id']);
+        $specOptions = [];
+        foreach ($this->specTable->selectWith($select) as $row) {
+            $specOptions[] = (int)$row['id'];
+        }
         $specOptions[] = 'inherited';
 
         $spec = [
@@ -1330,13 +1338,12 @@ class ItemController extends AbstractRestfulController
                     break;
 
                 case 'spec_id':
-                    $specTable = new DbTable\Spec();
                     $old = $oldData[$field];
                     $new = $newData[$field];
                     if ($old !== $new) {
-                        $old = $specTable->find($old)->current();
-                        $new = $specTable->find($new)->current();
-                        $changes[] = sprintf($message, $old ? $old->short_name : '-', $new ? $new->short_name : '-');
+                        $old = $this->specTable->select(['id' => $old])->current();
+                        $new = $this->specTable->select(['id' => $new])->current();
+                        $changes[] = sprintf($message, $old ? $old['short_name'] : '-', $new ? $new['short_name'] : '-');
                     }
                     break;
 

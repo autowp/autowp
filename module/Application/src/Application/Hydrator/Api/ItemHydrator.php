@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Application\Hydrator\Api;
 
 use Zend\Db\Sql;
@@ -14,7 +12,6 @@ use Autowp\User\Model\DbTable\User;
 use Application\ItemNameFormatter;
 use Application\Model\Catalogue;
 use Application\Model\DbTable;
-use Application\Model\Item as ItemModel;
 use Application\Service\SpecificationsService;
 use Application\Model\UserItemSubscribe;
 
@@ -35,7 +32,7 @@ class ItemHydrator extends RestHydrator
     private $router;
 
     /**
-     * @var DbTable\Spec
+     * @var TableGateway
      */
     private $specTable;
 
@@ -106,16 +103,6 @@ class ItemHydrator extends RestHydrator
      */
     private $perspectiveGroupTable;
 
-    /**
-     * @return DbTable\Spec
-     */
-    private function getSpecTable(): DbTable\Spec
-    {
-        return $this->specTable
-            ? $this->specTable
-            : $this->specTable = new DbTable\Spec();
-    }
-
     public function __construct(
         $serviceManager
     ) {
@@ -128,6 +115,7 @@ class ItemHydrator extends RestHydrator
         $this->itemLanguageTable = $tables->get('item_language');
         $this->itemTableGateway = $tables->get('item');
         $this->perspectiveGroupTable = $tables->get('perspectives_groups');
+        $this->specTable = $tables->get('spec');
 
         $this->userItemSubscribe = $serviceManager->get(UserItemSubscribe::class);
 
@@ -137,7 +125,7 @@ class ItemHydrator extends RestHydrator
         $this->router = $serviceManager->get('HttpRouter');
 
         $this->itemTable = new DbTable\Item();
-        $this->itemModel = new \Application\Model\Item();
+        $this->itemModel = $serviceManager->get(\Application\Model\Item::class);
 
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
         $this->textStorage = $serviceManager->get(\Autowp\TextStorage\Service::class);
@@ -216,10 +204,10 @@ class ItemHydrator extends RestHydrator
         $spec = null;
         $specFull = null;
         if ($object['spec_id']) {
-            $specRow = $this->getSpecTable()->find($object['spec_id'])->current();
+            $specRow = $this->specTable->select(['id' => (int)$object['spec_id']])->current();
             if ($specRow) {
-                $spec = $specRow->short_name;
-                $specFull = $specRow->name;
+                $spec = $specRow['short_name'];
+                $specFull = $specRow['name'];
             }
         }
 
@@ -745,7 +733,7 @@ class ItemHydrator extends RestHydrator
                 foreach ($cataloguePaths as $cPath) {
                     $result[] = [
                         'name_html' => $this->itemNameFormatter->formatHtml(
-                            $row->getNameData($this->language),
+                            $this->itemModel->getNameData($row, $this->language),
                             $this->language
                         ),
                         'url'  => $this->router->assemble([

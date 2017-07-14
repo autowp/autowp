@@ -20,7 +20,8 @@ class CategoryControllerFactory implements FactoryInterface
             $container->get(\Autowp\TextStorage\Service::class),
             $container->get(\Application\Model\Categories::class),
             $container->get(\Application\Service\SpecificationsService::class),
-            $tables->get('perspectives_groups')
+            $tables->get('perspectives_groups'),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

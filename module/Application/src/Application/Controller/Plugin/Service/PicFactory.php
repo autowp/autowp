@@ -25,7 +25,8 @@ class PicFactory implements FactoryInterface
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get(\Application\Model\PictureVote::class),
             $container->get(\Application\Model\Catalogue::class),
-            $container->get(\Application\Model\PictureView::class)
+            $container->get(\Application\Model\PictureView::class),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

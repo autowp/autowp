@@ -4,13 +4,14 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+use Autowp\TextStorage\Service as TextStorage;
+
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\Item\PictureFetcher;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Application\ItemNameFormatter;
-
-use Autowp\TextStorage\Service as TextStorage;
 
 use Zend_Db_Expr;
 
@@ -43,15 +44,22 @@ class Car extends AbstractPlugin
 
     private $categoryPictureFetcher;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         TextStorage $textStorage,
         SpecificationsService $specsService,
-        ItemNameFormatter $itemNameFormatter
+        ItemNameFormatter $itemNameFormatter,
+        Item $itemModel
     ) {
 
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
         $this->itemNameFormatter = $itemNameFormatter;
+        $this->itemModel = $itemModel;
     }
 
     private function getCarLanguageTable()
@@ -363,7 +371,7 @@ class Car extends AbstractPlugin
                 'id'               => $car->id,
                 'itemTypeId'       => $car['item_type_id'],
                 'name'             => $car->name,
-                'nameData'         => $car->getNameData($language),
+                'nameData'         => $this->itemModel->getNameData($car, $language),
                 'langName'         => isset($carsLangName[$car->id]) ? $carsLangName[$car->id] : null,
                 'produced'         => $car->produced,
                 'produced_exactly' => $car->produced_exactly,
@@ -503,9 +511,7 @@ class Car extends AbstractPlugin
     {
         $result = [];
 
-        $itemModel = new \Application\Model\Item();
-
-        $ids = $itemModel->getEngineVehiclesGroups($engine->id, [
+        $ids = $this->itemModel->getEngineVehiclesGroups($engine->id, [
             'groupJoinLimit' => 3
         ]);
 
@@ -522,7 +528,7 @@ class Car extends AbstractPlugin
                 $cataloguePaths = $catalogue->getCataloguePaths($row['id']);
                 foreach ($cataloguePaths as $cPath) {
                     $result[] = [
-                        'name' => $row->getNameData($language),
+                        'name' => $this->itemModel->getNameData($row, $language),
                         'url'  => $controller->url()->fromRoute('catalogue', [
                             'action'        => 'brand-item',
                             'brand_catname' => $cPath['brand_catname'],
@@ -546,7 +552,7 @@ class Car extends AbstractPlugin
     public function formatName(DbTable\Item\Row $vehicle, $language)
     {
         return $this->itemNameFormatter->format(
-            $vehicle->getNameData($language),
+            $this->itemModel->getNameData($vehicle, $language),
             $language
         );
     }

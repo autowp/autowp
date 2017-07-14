@@ -14,7 +14,6 @@ use Autowp\Image;
 use Application\ItemNameFormatter;
 use Application\Model\Catalogue;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Item;
 use Application\Service\SpecificationsService;
 
 use Facebook;
@@ -64,6 +63,11 @@ class CarOfDay
      */
     private $perspectiveGroupTable;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
         Image\Storage $imageStorage,
@@ -71,7 +75,8 @@ class CarOfDay
         $router,
         $translator,
         SpecificationsService $specsService,
-        TableGateway $perspectiveGroupTable
+        TableGateway $perspectiveGroupTable,
+        Item $itemModel
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->imageStorage = $imageStorage;
@@ -80,6 +85,7 @@ class CarOfDay
         $this->translator = $translator;
         $this->specsService = $specsService;
         $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->itemModel = $itemModel;
 
         $this->table = new Table([
             'name'    => 'of_day',
@@ -179,7 +185,7 @@ class CarOfDay
             return;
         }
 
-        $itemTable = new Item();
+        $itemTable = new DbTable\Item();
 
         $car = $itemTable->fetchRow([
             'id = ?' => (int)$dayRow->item_id
@@ -213,7 +219,7 @@ class CarOfDay
 
         $url = 'http://wheelsage.org/picture/' . $picture->identity;
 
-        if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
+        if ($car['item_type_id'] == DbTable\Item\Type::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'en');
@@ -221,7 +227,7 @@ class CarOfDay
 
         $text = sprintf(
             self::ucfirst($title) . ': %s %s',
-            $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
+            $this->itemNameFormatter->format($this->itemModel->getNameData($car, 'en'), 'en'),
             $url
         );
 
@@ -258,7 +264,7 @@ class CarOfDay
             return;
         }
 
-        $itemTable = new Item();
+        $itemTable = new DbTable\Item();
 
         $car = $itemTable->fetchRow([
             'id = ?' => (int)$dayRow->item_id
@@ -292,7 +298,7 @@ class CarOfDay
 
         $url = 'http://wheelsage.org/picture/' . $picture->identity;
 
-        if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
+        if ($car['item_type_id'] == DbTable\Item\Type::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'en');
@@ -307,7 +313,7 @@ class CarOfDay
         $linkData = [
             'link'    => $url,
             'message' => self::ucfirst($title) . ': ' .
-                $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
+                $this->itemNameFormatter->format($this->itemModel->getNameData($car, 'en'), 'en'),
         ];
 
         try {
@@ -341,7 +347,7 @@ class CarOfDay
             return;
         }
 
-        $itemTable = new Item();
+        $itemTable = new DbTable\Item();
 
         $car = $itemTable->fetchRow([
             'id = ?' => (int)$dayRow->item_id
@@ -377,7 +383,7 @@ class CarOfDay
 
         $url = 'http://autowp.ru/picture/' . $picture->identity;
 
-        if ($car['item_type_id'] == \Application\Model\DbTable\Item\Type::VEHICLE) {
+        if ($car['item_type_id'] == DbTable\Item\Type::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'ru');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'ru');
@@ -385,7 +391,7 @@ class CarOfDay
 
         $text = sprintf(
             self::ucfirst($title) . ': %s',
-            $this->itemNameFormatter->format($car->getNameData($language), $language)
+            $this->itemNameFormatter->format($this->itemModel->getNameData($car, $language), $language)
         );
 
         $client = new \Zend\Http\Client('https://api.vk.com/method/wall.post');
@@ -543,7 +549,7 @@ class CarOfDay
 
         return [
             'itemTypeId' => $carOfDay['item_type_id'],
-            'name'       => $carOfDay->getNameData($language),
+            'name'       => $this->itemModel->getNameData($carOfDay, $language),
             'pictures'   => $carOfDayPicturesData,
             'links'      => $this->carLinks($carOfDay, $language),
             'userId'     => $userId

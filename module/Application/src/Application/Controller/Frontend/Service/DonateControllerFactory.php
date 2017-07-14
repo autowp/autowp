@@ -17,7 +17,8 @@ class DonateControllerFactory implements FactoryInterface
         $config = $container->get('Config');
         return new Controller(
             $container->get(\Application\Model\CarOfDay::class),
-            $config['yandex']
+            $config['yandex'],
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

@@ -2,11 +2,13 @@
 
 namespace Application\Model;
 
-use Application\Model\DbTable;
+use Exception;
+
+use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
-use Exception;
+use Application\Model\DbTable;
 
 use Zend_Db_Expr;
 
@@ -62,9 +64,15 @@ class BrandVehicle
 
     private $catnameBlacklist = ['sport', 'tuning', 'related', 'pictures', 'specifications'];
 
-    public function __construct(array $languages)
+    /**
+     * @var TableGateway
+     */
+    private $specTable;
+
+    public function __construct(array $languages, TableGateway $specTable)
     {
         $this->languages = $languages;
+        $this->specTable = $specTable;
 
         $this->itemTable = new DbTable\Item();
         $this->itemLangTable = new DbTable\Item\Language();
@@ -209,8 +217,7 @@ class BrandVehicle
         if (! $name && $vehicleRow->spec_id) {
             $specsDifferent = $vehicleRow->spec_id != $parentRow->spec_id;
             if ($specsDifferent) {
-                $specTable = new DbTable\Spec();
-                $specRow = $specTable->find($vehicleRow->spec_id)->current();
+                $specRow = $this->specTable->select(['id' => (int)$vehicleRow->spec_id])->current();
 
                 if ($specRow) {
                     $name = $specRow->short_name;

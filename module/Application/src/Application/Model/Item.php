@@ -2,13 +2,25 @@
 
 namespace Application\Model;
 
+use Zend\Db\TableGateway\TableGateway;
+
 use Application\Model\DbTable;
 
 use Zend_Db_Expr;
 
 class Item
 {
-    public function getEngineVehiclesGroups($engineId, array $options = [])
+    /**
+     * @var TableGateway
+     */
+    private $specTable;
+
+    public function __construct(TableGateway $specTable)
+    {
+        $this->specTable = $specTable;
+    }
+
+    public function getEngineVehiclesGroups(int $engineId, array $options = [])
     {
         $defaults = [
             'groupJoinLimit' => null
@@ -102,5 +114,42 @@ class Item
             ->limit(1);
 
         return $db->fetchOne($select);
+    }
+
+    public function getNameData(DbTable\Item\Row $row, string $language = 'en')
+    {
+        /*$carLangTable = new DbTable\Item\Language();
+         $carLangRow = $carLangTable->fetchRow([
+         'item_id = ?'  => $this->id,
+         'language = ?' => (string)$language
+         ]);
+
+         $name = $carLangRow && $carLangRow->name ? $carLangRow->name : $this->name;*/
+
+        $name = $this->getName($row['id'], $language);
+
+        $spec = null;
+        $specFull = null;
+        if ($row['spec_id']) {
+            $specRow = $this->specTable->select(['id' => (int)$row['spec_id']])->current();
+            if ($specRow) {
+                $spec = $specRow['short_name'];
+                $specFull = $specRow['name'];
+            }
+        }
+
+        return [
+            'begin_model_year' => $row['begin_model_year'],
+            'end_model_year'   => $row['end_model_year'],
+            'spec'             => $spec,
+            'spec_full'        => $specFull,
+            'body'             => $row['body'],
+            'name'             => $name,
+            'begin_year'       => $row['begin_year'],
+            'end_year'         => $row['end_year'],
+            'today'            => $row['today'],
+            'begin_month'      => $row['begin_month'],
+            'end_month'        => $row['end_month'],
+        ];
     }
 }

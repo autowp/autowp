@@ -24,7 +24,8 @@ class CatalogueControllerFactory implements FactoryInterface
             $container->get(\Application\ItemNameFormatter::class),
             $config['mosts_min_vehicles_count'],
             $container->get(\Autowp\Comments\CommentsService::class),
-            $tables->get('perspectives_groups')
+            $tables->get('perspectives_groups'),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }
