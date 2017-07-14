@@ -42,7 +42,7 @@
     "angular-sanitize": "^1.6.3",
     "angular-translate": "^2.15.1",
     "angular-translate-interpolation-messageformat": "^2.15.1",
-    "autosize": "^3.0.21",
+    "autosize": "^4.0",
     "bootstrap": "^3.x",
     "bootstrap-tagsinput": "^0.x",
     "chart.js": "^2.x",
@@ -52,7 +52,7 @@
     "diff": "^3.x",
     "es6-shim": "^0.35.3",
     "exports-loader": "^0.x",
-    "extract-text-webpack-plugin": "^2.x",
+    "extract-text-webpack-plugin": "^3.x",
     "favicons": "^4.x",
     "favicons-webpack-plugin": "git+https://github.com/LoicMahieu/favicons-webpack-plugin.git#feature/peer-dependency",
     "file-loader": "^0.x",
@@ -86,7 +86,7 @@
     "ui-leaflet": "git+https://github.com/autowp/ui-leaflet.git#leaflet-1.X",
     "url-loader": "^0.x",
     "webgl-heatmap-leaflet": "git+https://git@github.com/ursudio/leaflet-webgl-heatmap.git",
-    "webpack": "^2.x",
+    "webpack": "^3.x",
     "webpack-manifest-plugin": "^1.x"
   },
   "scripts": {
