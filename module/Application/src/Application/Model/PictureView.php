@@ -32,7 +32,7 @@ class PictureView
 
     public function get(int $pictureId): int
     {
-        $row = $this->table->selectRow([
+        $row = $this->table->select([
             'picture_id' => $pictureId
         ])->current();
 
