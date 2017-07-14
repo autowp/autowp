@@ -41,7 +41,8 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                Model\UserRename::class => Model\UserRenameFactory::class
+                Model\UserRename::class   => Model\UserRenameFactory::class,
+                Model\UserRemember::class => Model\UserRememberFactory::class
             ]
         ];
     }

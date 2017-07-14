@@ -2,6 +2,9 @@
 
 namespace Application\Controller;
 
+use Exception;
+use Imagick;
+
 use Zend\Authentication\AuthenticationService;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -11,15 +14,13 @@ use Zend\View\Model\ViewModel;
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\UserRemember;
 
 use Application\Model\DbTable\LoginState;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Service\UsersService;
 
 use Zend_Db_Expr;
-
-use Exception;
-use Imagick;
 
 class LoginController extends AbstractActionController
 {
@@ -43,17 +44,24 @@ class LoginController extends AbstractActionController
      */
     private $hosts = [];
 
+    /**
+     * @var UserRemember
+     */
+    private $userRemember;
+
     public function __construct(
         UsersService $service,
         Form $form,
         ExternalLoginServiceFactory $externalLoginFactory,
-        array $hosts
+        array $hosts,
+        UserRemember $userRemember
     ) {
 
         $this->service = $service;
         $this->form = $form;
         $this->externalLoginFactory = $externalLoginFactory;
         $this->hosts = $hosts;
+        $this->userRemember = $userRemember;
     }
 
     public function indexAction()
@@ -81,7 +89,7 @@ class LoginController extends AbstractActionController
 
                 if ($result->isValid()) {
                     if ($values['remember']) {
-                        $token = $this->service->createRememberToken($this->user()->get()->id);
+                        $token = $this->userRemember->createToken($this->user()->get()->id);
 
                         $this->service->setRememberCookie($token, $this->language());
                     } else {

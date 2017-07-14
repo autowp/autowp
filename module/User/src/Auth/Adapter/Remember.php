@@ -30,7 +30,7 @@ class Remember implements AdapterInterface
 
         $userRow = $userTable->fetchRow(
             $userTable->select(true)
-                ->join('user_remember', 'users.id=user_remember.user_id', null)
+                ->join('user_remember', 'users.id = user_remember.user_id', [])
                 ->where('user_remember.token = ?', (string)$this->credential)
                 ->where('not users.deleted')
         );

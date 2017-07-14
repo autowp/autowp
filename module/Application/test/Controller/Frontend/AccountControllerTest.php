@@ -247,13 +247,8 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertQuery('.alert-success');
 
-        $userRememberTable = new Remember();
-        $userRememberRow = $userRememberTable->fetchRow(
-            $userRememberTable->select(true)
-                ->where('user_id = ?', $userId)
-        );
-
-        $token = $userRememberRow['token'];
+        $token = $this->getApplicationServiceLocator()->get(\Autowp\User\Model\UserRemember::class)
+            ->getUserToken($userId);
 
         $this->assertNotEmpty($token);
 

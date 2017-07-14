@@ -18,7 +18,8 @@ class LoginControllerFactory implements FactoryInterface
             $container->get(\Application\Service\UsersService::class),
             $container->get('LoginForm'),
             $container->get(\Autowp\ExternalLoginService\Factory::class),
-            $container->get('Config')['hosts']
+            $container->get('Config')['hosts'],
+            $container->get(\Autowp\User\Model\UserRemember::class)
         );
     }
 }

@@ -8,7 +8,6 @@ use Autowp\Comments;
 use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
-use Autowp\User\Model\DbTable\User\Remember as UserRemember;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Application\Model\Contact;
@@ -395,26 +394,6 @@ class UsersService
 
         $user->password = new Zend_Db_Expr($passwordExpr);
         $user->save();
-    }
-
-    public function createRememberToken($userId)
-    {
-        $table = new UserRemember();
-
-        do {
-            $token = md5($this->salt . microtime());
-            $row = $table->fetchRow([
-                'token = ?' => $token
-            ]);
-        } while ($row);
-
-        $table->insert([
-            'user_id' => $userId,
-            'token'   => $token,
-            'date'    => new Zend_Db_Expr('NOW()')
-        ]);
-
-        return $token;
     }
 
     public function createRestorePasswordToken($userId)
