@@ -162,6 +162,9 @@ class ItemHydrator extends RestHydrator
 
         $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('logo', $strategy);
+
+        $strategy = new Strategy\Image($serviceManager);
+        $this->addStrategy('brandicon', $strategy);
     }
 
     /**
@@ -617,6 +620,13 @@ class ItemHydrator extends RestHydrator
         if ($this->filterComposite->filter('logo')) {
             $result['logo'] = $this->extractValue('logo', [
                 'image' => $object['logo_id']
+            ]);
+        }
+
+        if ($this->filterComposite->filter('brandicon')) {
+            $result['brandicon'] = $this->extractValue('brandicon', [
+                'image'  => $object['logo_id'],
+                'format' => 'brandicon2'
             ]);
         }
 

@@ -361,6 +361,30 @@ return [
                 'validators' => [
                     ['name' => 'Digits']
                 ]
+            ],
+            'autocomplete' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'exclude_self_and_childs' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'parent_types_of' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
             ]
         ],
         'api_item_item' => [

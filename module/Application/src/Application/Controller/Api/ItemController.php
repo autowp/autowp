@@ -135,6 +135,7 @@ class ItemController extends AbstractRestfulController
             ->from('item');
 
         $group = false;
+        $itemLanguageJoined = false;
 
         if ($data['last_item']) {
             $namespace = new \Zend\Session\Container('Moder_Car');
@@ -162,6 +163,14 @@ class ItemController extends AbstractRestfulController
             case 'age':
                 $select->order($this->catalogue()->itemOrdering());
                 break;
+            case 'name_length_desc':
+                if (! $itemLanguageJoined) {
+                    $itemLanguageJoined = true;
+                    $select->join('item_language', 'item.id = item_language.item_id', []);
+                }
+                $select->order(['length(item_language.name)', 'item_language.name']);
+                $group = true;
+                break;
             default:
                 $select->order([
                     'item.name',
@@ -174,17 +183,19 @@ class ItemController extends AbstractRestfulController
         }
 
         if ($data['name']) {
-            $select
-                ->join('item_language', 'item.id = item_language.item_id', null)
-                ->where('item_language.name like ?', $data['name']);
+            if (! $itemLanguageJoined) {
+                $itemLanguageJoined = true;
+                $select->join('item_language', 'item.id = item_language.item_id', []);
+            }
+            $select->where('item_language.name like ?', $data['name']);
 
             $group = true;
         }
 
         if ($data['name_exclude']) {
             $select
-                ->join('item_language', 'item.id = item_language.item_id', null)
-                ->where('item_language.name not like ?', $data['name_exclude']);
+                ->join(['ile' => 'item_language'], 'item.id = ile.item_id', null)
+                ->where('ile.name not like ?', $data['name_exclude']);
         }
 
         $id = (int)$this->params()->fromQuery('id');
@@ -267,8 +278,11 @@ class ItemController extends AbstractRestfulController
         }
 
         if ($data['text']) {
+            if (! $itemLanguageJoined) {
+                $itemLanguageJoined = true;
+                $select->join('item_language', 'item.id = item_language.item_id', []);
+            }
             $select
-                ->join('item_language', 'item.id = item_language.item_id', null)
                 ->join('textstorage_text', 'item_language.text_id = textstorage_text.id', null)
                 ->where('textstorage_text.text like ?', '%' . $data['text'] . '%');
 
@@ -331,6 +345,144 @@ class ItemController extends AbstractRestfulController
             $select->where('item.is_group');
         }
 
+        if ($data['autocomplete']) {
+            $query = $data['autocomplete'];
+
+            $beginYear = false;
+            $endYear = false;
+            $today = false;
+            $body = false;
+
+            $pattern = "|^" .
+                "(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?" .
+                "$|isu";
+
+            if (preg_match($pattern, $query, $match)) {
+                $query = trim($match[5]);
+                $body = isset($match[7]) ? trim($match[7]) : null;
+                $beginYear = isset($match[9]) ? (int)$match[9] : null;
+                $endYear = isset($match[11]) ? $match[11] : null;
+                $beginModelYear = isset($match[2]) ? (int)$match[2] : null;
+                $endModelYear = isset($match[4]) ? $match[4] : null;
+
+                if ($endYear == 'н.в.') {
+                    $today = true;
+                    $endYear = false;
+                } else {
+                    $eyLength = strlen($endYear);
+                    if ($eyLength) {
+                        if ($eyLength == 2) {
+                            $endYear = $beginYear - $beginYear % 100 + $endYear;
+                        } else {
+                            $endYear = (int)$endYear;
+                        }
+                    } else {
+                        $endYear = false;
+                    }
+                }
+
+                if ($endModelYear == 'н.в.') {
+                    $today = true;
+                    $endModelYear = false;
+                } else {
+                    $eyLength = strlen($endModelYear);
+                    if ($eyLength) {
+                        if ($eyLength == 2) {
+                            $endModelYear = $beginModelYear - $beginModelYear % 100 + $endModelYear;
+                        } else {
+                            $endModelYear = (int)$endModelYear;
+                        }
+                    } else {
+                        $endModelYear = false;
+                    }
+                }
+            }
+
+            $specTable = new DbTable\Spec();
+            $specRow = $specTable->fetchRow([
+                'INSTR(?, short_name)' => $query
+            ]);
+
+            $specId = null;
+            if ($specRow) {
+                $specId = $specRow->id;
+                $query = trim(str_replace($specRow->short_name, '', $query));
+            }
+
+            if (! $itemLanguageJoined) {
+                $itemLanguageJoined = true;
+                $select->join('item_language', 'item.id = item_language.item_id', []);
+            }
+
+            $select->where('item_language.name like ?', $query . '%');
+
+            if ($specId) {
+                $select->where('spec_id = ?', $specId);
+            }
+
+            if ($beginYear) {
+                $select->where('item.begin_year = ?', $beginYear);
+            }
+            if ($today) {
+                $select->where('item.today');
+            } elseif ($endYear) {
+                $select->where('item.end_year = ?', $endYear);
+            }
+            if ($body) {
+                $select->where('item.body like ?', $body . '%');
+            }
+
+            if ($beginModelYear) {
+                $select->where('item.begin_model_year = ?', $beginModelYear);
+            }
+
+            if ($endModelYear) {
+                $select->where('item.end_model_year = ?', $endModelYear);
+            }
+
+            $group = true;
+        }
+
+        if ($data['exclude_self_and_childs']) {
+            $expr = $this->table->getAdapter()->quoteInto(
+                'item.id = esac.item_id and esac.parent_id = ?',
+                $data['exclude_self_and_childs']
+            );
+            $select
+                ->joinLeft(['esac' => 'item_parent_cache'], $expr, [])
+                ->where('esac.item_id is null');
+        }
+
+        if ($data['parent_types_of']) {
+            $typeId = $data['parent_types_of'];
+
+            $allowedItemTypes = [0];
+            switch ($typeId) {
+                case DbTable\Item\Type::VEHICLE:
+                case DbTable\Item\Type::ENGINE:
+                    $allowedItemTypes = [
+                        DbTable\Item\Type::CATEGORY,
+                        DbTable\Item\Type::TWINS,
+                        DbTable\Item\Type::BRAND,
+                        DbTable\Item\Type::FACTORY
+                    ];
+                    break;
+                case DbTable\Item\Type::BRAND:
+                    $allowedItemTypes = [
+                        DbTable\Item\Type::CATEGORY,
+                        DbTable\Item\Type::BRAND
+                    ];
+                    break;
+                case DbTable\Item\Type::CATEGORY:
+                    $allowedItemTypes = [
+                        DbTable\Item\Type::CATEGORY
+                    ];
+                    break;
+            }
+
+            $select->where('item.item_type_id IN (?)', $allowedItemTypes);
+        }
+
         if ($group) {
             $select->group('item.id');
         }
@@ -346,6 +498,8 @@ class ItemController extends AbstractRestfulController
             ->setCurrentPageNumber($data['page']);
 
         $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
+
+        //print $select->assemble(); exit;
 
         $this->hydrator->setOptions([
             'language' => $this->language(),

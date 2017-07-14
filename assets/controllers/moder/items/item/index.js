@@ -272,14 +272,12 @@ angular.module(Module)
                         },
                         templates: {
                             suggestion: function(item) {
-                                var $div = $('<div class="tt-suggestion tt-selectable"></div>')
-                                    .text(item.name);
+                                var $div = $('<div class="tt-suggestion tt-selectable car"></div>')
+                                    .html(item.name_html);
                                 
-                                $div.addClass(item.type);
-                                
-                                if (item.image) {
+                                if (item.brandicon) {
                                     $div.prepend($('<img />', {
-                                        src: item.image
+                                        src: item.brandicon.src
                                     }));
                                 }
                                 
@@ -289,12 +287,17 @@ angular.module(Module)
                         source: function(query, syncResults, asyncResults) {
                             $http({
                                 method: 'GET',
-                                url: '/moder/cars/car-autocomplete/item_id/' + ctrl.item.id,
+                                url: '/api/item',
                                 params: {
-                                    q: query
+                                    autocomplete: query,
+                                    exclude_self_and_childs: ctrl.item.id,
+                                    is_group: true,
+                                    parent_types_of: ctrl.item.item_type_id,
+                                    fields: 'name_html,brandicon',
+                                    limit: 15
                                 }
                             }).then(function(response) {
-                                asyncResults(response.data);
+                                asyncResults(response.data.items);
                             });
                         }
                     })
@@ -689,9 +692,7 @@ angular.module(Module)
                     ctrl.logoLoading++;
                     $http({
                         url: '/api/item/' + ctrl.item.id + '/logo',
-                        method: 'PUT',
-                        data: element[0].files[0],
-                        headers: {'Content-Type': undefined}
+                        method: 'GET'
                     }).then(function (response) {
                         ctrl.item.logo = response.data;
                         ctrl.logoLoading--;
