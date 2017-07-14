@@ -146,6 +146,7 @@ return [
             Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
             Model\Log::class                     => Model\Service\LogFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,
+            Model\PictureView::class             => Model\PictureViewFactory::class,
             Model\PictureVote::class             => Model\Service\PictureVoteFactory::class,
             Model\UserPicture::class             => Model\Service\UserPictureFactory::class,
             Model\UserItemSubscribe::class       => Model\UserItemSubscribeFactory::class,

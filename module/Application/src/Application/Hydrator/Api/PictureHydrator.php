@@ -18,6 +18,7 @@ use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
 
 use Zend_Db_Expr;
+use Application\Model\PictureView;
 
 class PictureHydrator extends RestHydrator
 {
@@ -77,15 +78,21 @@ class PictureHydrator extends RestHydrator
 
     private $textStorage;
 
+    /**
+     * @var PictureView
+     */
+    private $pictureView;
+
     public function __construct(
         $serviceManager
     ) {
         parent::__construct();
 
-        $this->pictureViewTable = new DbTable\Picture\View();
         $this->pictureTable = new DbTable\Picture();
         $this->userTable = new User();
         $this->moderVoteTable = new DbTable\Picture\ModerVote();
+
+        $this->pictureView = $serviceManager->get(PictureView::class);
 
         $this->router = $serviceManager->get('HttpRouter');
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
@@ -189,7 +196,7 @@ class PictureHydrator extends RestHydrator
         ];
 
         if ($this->filterComposite->filter('views')) {
-            $picture['views'] = $this->pictureViewTable->get($object);
+            $picture['views'] = $this->pictureView->get($object['id']);
         }
 
         $showNameHtml = $this->filterComposite->filter('name_html');

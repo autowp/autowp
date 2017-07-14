@@ -15,7 +15,8 @@ class PicturesFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Helper(
-            $container->get(\Autowp\Comments\CommentsService::class)
+            $container->get(\Autowp\Comments\CommentsService::class),
+            $container->get(\Application\Model\PictureView::class)
         );
     }
 }

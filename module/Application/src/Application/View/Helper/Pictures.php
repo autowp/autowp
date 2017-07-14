@@ -8,7 +8,7 @@ use Autowp\Comments;
 
 use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 use Application\Model\DbTable\Picture\Row as PictureRow;
-use Application\Model\DbTable\Picture\View as PictureView;
+use Application\Model\PictureView;
 
 use Zend_Db_Expr;
 
@@ -21,7 +21,7 @@ class Pictures extends AbstractHelper
     /**
      * @var PictureView
      */
-    private $pictureViewTable = null;
+    private $pictureView;
 
     /**
      * @var PictureModerVote
@@ -33,9 +33,10 @@ class Pictures extends AbstractHelper
      */
     private $comments;
 
-    public function __construct(Comments\CommentsService $comments)
+    public function __construct(Comments\CommentsService $comments, PictureView $pictureView)
     {
         $this->comments = $comments;
+        $this->pictureView = $pictureView;
     }
 
     /**
@@ -46,16 +47,6 @@ class Pictures extends AbstractHelper
         return $this->moderVoteTable
             ? $this->moderVoteTable
             : $this->moderVoteTable = new PictureModerVote();
-    }
-
-    /**
-     * @return PictureView
-     */
-    private function getPictureViewTable()
-    {
-        return $this->pictureViewTable
-            ? $this->pictureViewTable
-            : $this->pictureViewTable = new PictureView();
     }
 
     private function isPictureModer()
@@ -119,7 +110,7 @@ class Pictures extends AbstractHelper
             'crop_height' => $picture->crop_height,
             'msgCount'    => $msgCount,
             'newMsgCount' => $newMsgCount,
-            'views'       => $this->getPictureViewTable()->get($picture),
+            'views'       => $this->pictureView->get($picture['id']),
             'status'      => $picture->status,
         ];
 

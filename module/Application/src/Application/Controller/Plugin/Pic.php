@@ -14,6 +14,7 @@ use Application\Model\Catalogue;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
 use Application\Model\PictureItem;
+use Application\Model\PictureView;
 use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
@@ -28,9 +29,9 @@ use Zend_Db_Table_Select;
 class Pic extends AbstractPlugin
 {
     /**
-     * @var DbTable\Picture\View
+     * @var PictureView
      */
-    private $pictureViewTable = null;
+    private $pictureView = null;
 
     private $moderVoteTable = null;
 
@@ -88,7 +89,8 @@ class Pic extends AbstractPlugin
         $httpRouter,
         Comments\CommentsService $comments,
         PictureVote $pictureVote,
-        Catalogue $catalogue
+        Catalogue $catalogue,
+        PictureView $pictureView
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -100,6 +102,7 @@ class Pic extends AbstractPlugin
         $this->comments = $comments;
         $this->pictureVote = $pictureVote;
         $this->catalogue = $catalogue;
+        $this->pictureView = $pictureView;
 
         $this->pictureTable = new DbTable\Picture();
     }
@@ -112,16 +115,6 @@ class Pic extends AbstractPlugin
         return $this->moderVoteTable
             ? $this->moderVoteTable
             : $this->moderVoteTable = new DbTable\Picture\ModerVote();
-    }
-
-    /**
-     * @return DbTable\Picture\View
-     */
-    private function getPictureViewTable()
-    {
-        return $this->pictureViewTable
-            ? $this->pictureViewTable
-            : $this->pictureViewTable = new DbTable\Picture\View();
     }
 
     public function href($row, array $options = [])
@@ -272,7 +265,7 @@ class Pic extends AbstractPlugin
             // views
             $views = [];
             if (! $options['disableBehaviour']) {
-                $views = $this->getPictureViewTable()->getValues($ids);
+                $views = $this->pictureView->getValues($ids);
             }
 
             // messages
@@ -1184,9 +1177,7 @@ class Pic extends AbstractPlugin
             'twitterCreatorId'  => $twitterCreatorId
         ];
 
-        // refresh views count
-        $views = new DbTable\Picture\View();
-        $views->inc($picture);
+        $this->pictureView->inc($picture['id']);
 
         return $data;
     }
