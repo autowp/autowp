@@ -27,6 +27,7 @@ use Exception;
 use Imagick;
 use Locale;
 use Autowp\User\Model\UserRename;
+use Application\Model\UserAccount;
 
 class AccountController extends AbstractActionController
 {
@@ -90,6 +91,11 @@ class AccountController extends AbstractActionController
      */
     private $userRename;
 
+    /**
+     * @var UserAccount
+     */
+    private $userAccount;
+
     public function __construct(
         UsersService $service,
         Form $emailForm,
@@ -102,7 +108,8 @@ class AccountController extends AbstractActionController
         array $hosts,
         SpecificationsService $specsService,
         MessageService $message,
-        UserRename $userRename
+        UserRename $userRename,
+        UserAccount $userAccount
     ) {
 
         $this->service = $service;
@@ -117,6 +124,7 @@ class AccountController extends AbstractActionController
         $this->specsService = $specsService;
         $this->message = $message;
         $this->userRename = $userRename;
+        $this->userAccount = $userAccount;
     }
 
     private function forwardToLogin()
@@ -242,23 +250,14 @@ class AccountController extends AbstractActionController
             return $this->forwardToLogin();
         }
 
-        $uaTable = new DbTable\User\Account();
-
-        $uaRows = $uaTable->fetchAll([
-            'user_id = ?' => $user->id
-        ]);
-
         $accounts = [];
-        foreach ($uaRows as $uaRow) {
-            $accounts[] = [
-                'name'      => $uaRow->name,
-                'link'      => $uaRow->link,
-                'icon'      => 'fa fa-' . $uaRow->service_id,
-                'canRemove' => $this->canRemoveAccount($uaRow->service_id),
+        foreach ($this->userAccount->getAccounts($user->id) as $row) {
+            $accounts[] = array_replace($row, [
+                'canRemove' => $this->canRemoveAccount($row['service_id']),
                 'removeUrl' => $this->url()->fromRoute('account/remove-account', [
-                    'service' => $uaRow->service_id
+                    'service' => $row['service_id']
                 ])
-            ];
+            ]);
         }
 
         $request = $this->getRequest();
@@ -298,7 +297,7 @@ class AccountController extends AbstractActionController
         ];
     }
 
-    private function canRemoveAccount($serviceId)
+    private function canRemoveAccount(string $serviceId): bool
     {
         if (! $this->user()->logedIn()) {
             return false;
@@ -308,13 +307,11 @@ class AccountController extends AbstractActionController
             return true;
         }
 
-        $uaTable = new DbTable\User\Account();
-        $uaRow = $uaTable->fetchRow([
-            'user_id = ?'     => $this->user()->get()->id,
-            'service_id <> ?' => $serviceId
-        ]);
-
-        if ($uaRow) {
+        $haveAccounts = $this->userAccount->haveAccountsForOtherServices(
+            $this->user()->get()->id,
+            $serviceId
+        );
+        if ($haveAccounts) {
             return true;
         }
 
@@ -328,25 +325,15 @@ class AccountController extends AbstractActionController
             return $this->forwardToLogin();
         }
 
-        $serviceId = (string)$this->params('service');
+        $service = (string)$this->params('service');
 
-        $uaTable = new DbTable\User\Account();
-        $uaRow = $uaTable->fetchRow([
-            'user_id = ?'    => $user->id,
-            'service_id = ?' => $serviceId
-        ]);
-
-        if (! $uaRow) {
-            return $this->notFoundAction();
-        }
-
-        if (! $this->canRemoveAccount($serviceId)) {
+        if (! $this->canRemoveAccount($service)) {
             return $this->forward()->dispatch(self::class, [
                 'action' => 'remove-account-failed'
             ]);
         }
 
-        $uaRow->delete();
+        $this->userAccount->removeAccount($user['id'], $service);
 
         $this->flashMessenger()->addSuccessMessage($this->translate('account/accounts/removed'));
 

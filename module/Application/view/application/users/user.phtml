@@ -77,11 +77,11 @@
         <?php if (count($this->accounts)) { ?>
             <?php foreach ($this->accounts as $account) { ?>
                 <p>
-                    <i class="fa fa-fw fa-<?=$this->escapeHtmlAttr(str_replace('googleplus', 'google-plus', $account->service_id))?>"></i>
-                    <?php if ($account->link) { ?>
-                        <?=$this->htmlA($account->link, $account->name)?>
+                    <i class="<?=$this->escapeHtmlAttr($account['icon'] . ' fa-fw')?>"></i>
+                    <?php if ($account['link']) { ?>
+                        <?=$this->htmlA($account['link'], $account['name'])?>
                     <?php } else { ?>
-                        <?=$this->escapeHtml($account->name)?>
+                        <?=$this->escapeHtml($account['name'])?>
                     <?php } ?>
                 </p>
             <?php } ?>

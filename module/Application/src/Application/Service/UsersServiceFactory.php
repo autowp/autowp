@@ -24,7 +24,8 @@ class UsersServiceFactory implements FactoryInterface
             $container->get(\Autowp\Image\Storage::class),
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get(\Application\Model\UserItemSubscribe::class),
-            $container->get(\Application\Model\Contact::class)
+            $container->get(\Application\Model\Contact::class),
+            $container->get(\Application\Model\UserAccount::class)
         );
     }
 }

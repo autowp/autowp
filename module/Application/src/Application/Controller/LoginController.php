@@ -17,7 +17,7 @@ use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\UserRemember;
 
 use Application\Model\DbTable\LoginState;
-use Application\Model\DbTable\User\Account as UserAccount;
+use Application\Model\UserAccount;
 use Application\Service\UsersService;
 
 use Zend_Db_Expr;
@@ -49,12 +49,18 @@ class LoginController extends AbstractActionController
      */
     private $userRemember;
 
+    /**
+     * @var UserAccount
+     */
+    private $userAccount;
+
     public function __construct(
         UsersService $service,
         Form $form,
         ExternalLoginServiceFactory $externalLoginFactory,
         array $hosts,
-        UserRemember $userRemember
+        UserRemember $userRemember,
+        UserAccount $userAccount
     ) {
 
         $this->service = $service;
@@ -62,6 +68,7 @@ class LoginController extends AbstractActionController
         $this->externalLoginFactory = $externalLoginFactory;
         $this->hosts = $hosts;
         $this->userRemember = $userRemember;
+        $this->userAccount = $userAccount;
     }
 
     public function indexAction()
@@ -259,16 +266,11 @@ class LoginController extends AbstractActionController
             throw new Exception('name not found');
         }
 
-        $uaTable = new UserAccount();
+        $uTable = new User();
 
-        $uaRow = $uaTable->fetchRow([
-            'service_id = ?'  => $stateRow->service,
-            'external_id = ?' => $data->getExternalId(),
-        ]);
+        $userId = $this->userAccount->getUserId($stateRow->service, $data->getExternalId());
 
-        if (! $uaRow) {
-            $uTable = new User();
-
+        if (! $userId) {
             if ($stateRow->user_id) {
                 $uRow = $uTable->find($stateRow->user_id)->current();
                 if (! $uRow) {
@@ -287,12 +289,11 @@ class LoginController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $uaRow = $uaTable->fetchNew();
-            $uaRow->setFromArray([
-                'service_id'   => $stateRow->service,
-                'external_id'  => $data->getExternalId(),
+            $this->userAccount->create($stateRow->service, $data->getExternalId(), [
                 'user_id'      => $uRow->id,
-                'used_for_reg' => $stateRow->user_id ? 0 : 1
+                'used_for_reg' => $stateRow->user_id ? 0 : 1,
+                'name'         => $data->getName(),
+                'link'         => $data->getProfileUrl(),
             ]);
 
             if (! $stateRow->user_id) { // first login
@@ -323,17 +324,20 @@ class LoginController extends AbstractActionController
                 }
             }
         } else {
-            $uRow = $uaRow->findParentRow(User::class);
+            $uRow = $uTable->find($userId)->current();
             if (! $uRow) {
                 throw new Exception('Not linked account row');
             }
-        }
 
-        $uaRow->setFromArray([
-            'name' => $data->getName(),
-            'link' => $data->getProfileUrl(),
-        ]);
-        $uaRow->save();
+            $this->userAccount->setAccountData(
+                $stateRow->service,
+                $data->getExternalId(),
+                [
+                    'name' => $data->getName(),
+                    'link' => $data->getProfileUrl(),
+                ]
+            );
+        }
 
         $url = $stateRow->url;
 

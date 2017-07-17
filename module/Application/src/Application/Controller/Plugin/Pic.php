@@ -9,24 +9,25 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User as UserTable;
 
+use Application\ItemNameFormatter;
 use Application\Model\Brand as BrandModel;
 use Application\Model\Catalogue;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
+use Application\Model\Item;
+use Application\Model\Perspective;
 use Application\Model\PictureItem;
 use Application\Model\PictureView;
 use Application\Model\PictureVote;
+use Application\Model\UserAccount;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
-use Application\ItemNameFormatter;
 
 use Exception;
 
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;
-use Application\Model\Item;
-use Application\Model\Perspective;
 
 class Pic extends AbstractPlugin
 {
@@ -91,6 +92,11 @@ class Pic extends AbstractPlugin
      */
     private $perspective;
 
+    /**
+     * @var UserAccount
+     */
+    private $userAccount;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -104,7 +110,8 @@ class Pic extends AbstractPlugin
         Catalogue $catalogue,
         PictureView $pictureView,
         Item $itemModel,
-        Perspective $perspective
+        Perspective $perspective,
+        UserAccount $userAccount
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -119,6 +126,7 @@ class Pic extends AbstractPlugin
         $this->pictureView = $pictureView;
         $this->itemModel = $itemModel;
         $this->perspective = $perspective;
+        $this->userAccount = $userAccount;
 
         $this->pictureTable = new DbTable\Picture();
     }
@@ -1130,14 +1138,7 @@ class Pic extends AbstractPlugin
 
         $twitterCreatorId = null;
         if ($picture['owner_id']) {
-            $userAccountTable = new DbTable\User\Account();
-            $twitterAccountRow = $userAccountTable->fetchRow([
-                'user_id = ?'    => $picture['owner_id'],
-                'service_id = ?' => 'twitter'
-            ]);
-            if ($twitterAccountRow) {
-                $twitterCreatorId = $twitterAccountRow->external_id;
-            }
+            $twitterCreatorId = $this->userAccount->getServiceExternalId($picture['owner_id'], 'twitter');
         }
 
         $data = [

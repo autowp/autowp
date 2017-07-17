@@ -15,6 +15,7 @@ use Autowp\User\Model\DbTable\User;
 use Application\Model\Contact;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
+use Application\Model\UserAccount;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
 
@@ -69,6 +70,11 @@ class UsersService
     private $contact;
 
     /**
+     * @var UserAccount
+     */
+    private $userAccount;
+
+    /**
      * @return Comments\CommentsService
      */
     private function getTable()
@@ -87,7 +93,8 @@ class UsersService
         Image\Storage $imageStorage,
         Comments\CommentsService $comments,
         UserItemSubscribe $userItemSubscribe,
-        Contact $contact
+        Contact $contact,
+        UserAccount $userAccount
     ) {
 
         $this->salt = $options['salt'];
@@ -103,6 +110,7 @@ class UsersService
 
         $this->userItemSubscribe = $userItemSubscribe;
         $this->contact = $contact;
+        $this->userAccount = $userAccount;
     }
 
     /**
@@ -512,10 +520,8 @@ class UsersService
         ]);
 
         // delete linked profiles
-        $uaTable = new DbTable\User\Account();
-        $uaTable->delete([
-            'user_id = ?' => $row['id']
-        ]);
+        $this->userAccount->removeUserAccounts($row['id']);
+
 
         // unsubscribe from items
         $this->userItemSubscribe->unsubscribeAll($row['id']);

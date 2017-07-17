@@ -20,7 +20,8 @@ class UsersControllerFactory implements FactoryInterface
             $container->get(\Application\Comments::class),
             $container->get(\Application\Model\Contact::class),
             $container->get(\Autowp\User\Model\UserRename::class),
-            $container->get(\Application\Model\Perspective::class)
+            $container->get(\Application\Model\Perspective::class),
+            $container->get(\Application\Model\UserAccount::class)
         );
     }
 }

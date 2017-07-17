@@ -2,6 +2,10 @@
 
 namespace Application\Controller;
 
+use DateInterval;
+use DateTime;
+use DateTimeZone;
+
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
@@ -16,12 +20,9 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\Contact;
 use Application\Model\Perspective;
+use Application\Model\UserAccount;
 
 use Zend_Db_Expr;
-
-use DateInterval;
-use DateTime;
-use DateTimeZone;
 
 class UsersController extends AbstractActionController
 {
@@ -52,13 +53,19 @@ class UsersController extends AbstractActionController
      */
     private $perspective;
 
+    /**
+     * @var UserAccount
+     */
+    private $userAccount;
+
     public function __construct(
         $cache,
         TrafficControl $trafficControl,
         Comments $comments,
         Contact $contact,
         UserRename $userRename,
-        Perspective $perspective
+        Perspective $perspective,
+        UserAccount $userAccount
     ) {
         $this->cache = $cache;
         $this->trafficControl = $trafficControl;
@@ -66,6 +73,7 @@ class UsersController extends AbstractActionController
         $this->contact = $contact;
         $this->userRename = $userRename;
         $this->perspective = $perspective;
+        $this->userAccount = $userAccount;
     }
 
     private function getUser()
@@ -172,12 +180,6 @@ class UsersController extends AbstractActionController
             }
         }
 
-        $uaTable = new DbTable\User\Account();
-
-        $uaRows = $uaTable->fetchAll([
-            'user_id = ?' => $user->id
-        ]);
-
         $currentUser = $this->user()->get();
         $isMe = $currentUser && ($currentUser->id == $user->id);
         $inContacts = $currentUser && ! $isMe && $this->contact->exists($currentUser->id, $user->id);
@@ -190,7 +192,7 @@ class UsersController extends AbstractActionController
             'canRemovePhoto'  => $canRemovePhoto,
             'canViewIp'       => $canViewIp,
             'canDeleteUser'   => $canDeleteUser,
-            'accounts'        => $uaRows,
+            'accounts'        => $this->userAccount->getAccounts($user['id']),
             'inContacts'      => $inContacts,
             'canBeInContacts' => $canBeInContacts,
             'contactApiUrl'   => sprintf('/api/contacts/%d', $user->id),

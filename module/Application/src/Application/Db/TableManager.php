@@ -26,6 +26,7 @@ class TableManager implements ServiceLocatorInterface
         'picture_view' => [],
         'pictures' => [],
         'spec' => [],
+        'user_account' => [],
         'user_item_subscribe' => [],
         'user_password_remind' => [],
         'user_remember' => [],

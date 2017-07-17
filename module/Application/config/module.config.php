@@ -151,6 +151,7 @@ return [
             Model\PictureView::class             => Model\PictureViewFactory::class,
             Model\PictureVote::class             => Model\Service\PictureVoteFactory::class,
             Model\UserPicture::class             => Model\Service\UserPictureFactory::class,
+            Model\UserAccount::class             => Model\UserAccountFactory::class,
             Model\UserItemSubscribe::class       => Model\UserItemSubscribeFactory::class,
             Model\VehicleType::class             => InvokableFactory::class,
             PictureNameFormatter::class          => Service\PictureNameFormatterFactory::class,
