@@ -2,10 +2,8 @@
 
 namespace Application\Model\Item;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
-
 use Application\Model\DbTable;
+use Application\Model\Perspective;
 
 class PerspectivePictureFetcher extends PictureFetcher
 {
@@ -22,34 +20,26 @@ class PerspectivePictureFetcher extends PictureFetcher
     private $disableLargePictures = false;
 
     /**
-     * @var TableGateway
+     * @var Perspective
      */
-    private $perspectiveGroupTable;
+    private $perspective;
 
-    private function getPerspectiveGroupIds($pageId)
+    private function getPerspectiveGroupIds(int $pageId): array
     {
         if (isset($this->perspectiveCache[$pageId])) {
             return $this->perspectiveCache[$pageId];
         }
 
-        $select = new Sql\Select($this->perspectiveGroupTable->getTable());
-        $select->columns(['id'])
-            ->where(['page_id' => $pageId])
-            ->order('position');
-
-        $ids = [];
-        foreach ($this->perspectiveGroupTable->selectWith($select) as $row) {
-            $ids[] = (int)$row['id'];
-        }
+        $ids = $this->perspective->getPageGroupIds($pageId);
 
         $this->perspectiveCache[$pageId] = $ids;
 
         return $ids;
     }
 
-    public function setPerspectiveGroupTable(TableGateway $table)
+    public function setPerspective(Perspective $model)
     {
-        $this->perspectiveGroupTable = $table;
+        $this->perspective = $model;
 
         return $this;
     }

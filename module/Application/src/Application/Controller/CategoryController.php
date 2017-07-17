@@ -2,7 +2,6 @@
 
 namespace Application\Controller;
 
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -12,6 +11,7 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Model\Categories;
 use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Perspective;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
@@ -43,9 +43,9 @@ class CategoryController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var TableGateway
+     * @var Perspective
      */
-    private $perspectiveGroupTable;
+    private $perspective;
 
     /**
      * @var Item
@@ -57,14 +57,14 @@ class CategoryController extends AbstractActionController
         $textStorage,
         Categories $categories,
         SpecificationsService $specsService,
-        TableGateway $perspectiveGroupTable,
+        Perspective $perspective,
         Item $itemModel
     ) {
         $this->cache = $cache;
         $this->textStorage = $textStorage;
         $this->categories = $categories;
         $this->specsService = $specsService;
-        $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->perspective = $perspective;
         $this->itemModel = $itemModel;
 
         $this->itemTable = new DbTable\Item();
@@ -489,7 +489,7 @@ class CategoryController extends AbstractActionController
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'perspectiveGroupTable' => $this->perspectiveGroupTable,
+                    'perspective' => $this->perspective
                 ]),
                 'useFrontPictures' => $haveSubcategories,
                 'disableLargePictures' => true,

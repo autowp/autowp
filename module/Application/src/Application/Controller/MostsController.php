@@ -2,7 +2,6 @@
 
 namespace Application\Controller;
 
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -10,6 +9,7 @@ use Autowp\TextStorage;
 
 use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Perspective;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
 
@@ -23,28 +23,28 @@ class MostsController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var TableGateway
+     * @var Perspective
      */
-    private $perspectiveGroupTable;
+    private $perspective;
 
     public function __construct(
         TextStorage\Service $textStorage,
         SpecificationsService $specsService,
-        TableGateway $perspectiveGroupTable,
-        Item $itemModel
+        Item $itemModel,
+        Perspective $perspective
     ) {
 
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
-        $this->perspectiveGroupTable = $perspectiveGroupTable;
         $this->itemModel = $itemModel;
+        $this->perspective = $perspective;
     }
 
     public function indexAction()
     {
         $service = new Mosts([
-            'specs'                 => $this->specsService,
-            'perspectiveGroupTable' => $this->perspectiveGroupTable
+            'specs'       => $this->specsService,
+            'perspective' => $this->perspective
         ]);
 
         $language = $this->language();
@@ -92,7 +92,7 @@ class MostsController extends AbstractActionController
         $pictureTable = new DbTable\Picture();
         $names = $pictureTable->getNameData($allPictures, [
             'language' => $language
-        ]);
+        ], $this->perspective);
 
         $itemLanguageTable = new DbTable\Item\Language();
 

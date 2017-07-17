@@ -15,6 +15,7 @@ use Application\Comments;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\Contact;
+use Application\Model\Perspective;
 
 use Zend_Db_Expr;
 
@@ -46,18 +47,25 @@ class UsersController extends AbstractActionController
      */
     private $userRename;
 
+    /**
+     * @var Perspective
+     */
+    private $perspective;
+
     public function __construct(
         $cache,
         TrafficControl $trafficControl,
         Comments $comments,
         Contact $contact,
-        UserRename $userRename
+        UserRename $userRename,
+        Perspective $perspective
     ) {
         $this->cache = $cache;
         $this->trafficControl = $trafficControl;
         $this->comments = $comments;
         $this->contact = $contact;
         $this->userRename = $userRename;
+        $this->perspective = $perspective;
     }
 
     private function getUser()
@@ -133,7 +141,7 @@ class UsersController extends AbstractActionController
         $names = $pictureTable->getNameData($lastPictureRows, [
             'language' => $this->language(),
             'large'    => true
-        ]);
+        ], $this->perspective);
 
         $lastPictures = [];
         foreach ($lastPictureRows as $lastPictureRow) {

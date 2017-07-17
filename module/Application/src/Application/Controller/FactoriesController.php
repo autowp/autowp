@@ -3,7 +3,6 @@
 namespace Application\Controller;
 
 use geoPHP;
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -11,6 +10,7 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 
 use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Perspective;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
@@ -25,9 +25,9 @@ class FactoriesController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var TableGateway
+     * @var Perspective
      */
-    private $perspectiveGroupTable;
+    private $perspective;
 
     /**
      * @var Item
@@ -37,12 +37,12 @@ class FactoriesController extends AbstractActionController
     public function __construct(
         $textStorage,
         SpecificationsService $specsService,
-        TableGateway $perspectiveGroupTable,
+        Perspective $perspective,
         Item $itemModel
     ) {
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
-        $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->perspective = $perspective;
         $this->itemModel = $itemModel;
     }
 
@@ -220,13 +220,13 @@ class FactoriesController extends AbstractActionController
             'factory'  => $factory,
             'carsData' => $this->car()->listData($cars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'perspectiveGroupTable' => $this->perspectiveGroupTable,
-                    'type'                  => null,
-                    'onlyExactlyPictures'   => false,
-                    'dateSort'              => false,
-                    'disableLargePictures'  => true,
-                    'perspectivePageId'     => null,
-                    'onlyChilds'            => $groups
+                    'perspective'          => $this->perspective,
+                    'type'                 => null,
+                    'onlyExactlyPictures'  => false,
+                    'dateSort'             => false,
+                    'disableLargePictures' => true,
+                    'perspectivePageId'    => null,
+                    'onlyChilds'           => $groups
                 ]),
                 'listBuilder' => new \Application\Model\Item\ListBuilder([
                     'catalogue'    => $this->catalogue(),

@@ -1,22 +1,21 @@
 <?php
 
-namespace Application\View\Helper\Service;
+namespace Application\Model;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\View\Helper\Pic as Helper;
-
-class PicFactory implements FactoryInterface
+class PerspectiveFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Helper(
-            $container->get(\Application\PictureNameFormatter::class),
-            $container->get(\Application\Model\Perspective::class)
+        $tables = $container->get(\Application\Db\TableManager::class);
+        return new Perspective(
+            $tables->get('perspectives'),
+            $tables->get('perspectives_groups')
         );
     }
 }

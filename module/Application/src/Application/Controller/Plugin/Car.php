@@ -9,6 +9,7 @@ use Autowp\TextStorage\Service as TextStorage;
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Item\PictureFetcher;
+use Application\Model\Perspective;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Application\ItemNameFormatter;
@@ -49,17 +50,24 @@ class Car extends AbstractPlugin
      */
     private $itemModel;
 
+    /**
+     * @var Perspective
+     */
+    private $perspective;
+
     public function __construct(
         TextStorage $textStorage,
         SpecificationsService $specsService,
         ItemNameFormatter $itemNameFormatter,
-        Item $itemModel
+        Item $itemModel,
+        Perspective $perspective
     ) {
 
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->itemModel = $itemModel;
+        $this->perspective = $perspective;
     }
 
     private function getCarLanguageTable()
@@ -473,7 +481,7 @@ class Car extends AbstractPlugin
         // prefetch names
         $pictureNames = $pictureTable->getNameData($allPictures, [
             'language' => $language
-        ]);
+        ], $this->perspective);
 
         // prefetch images
         $imagesInfo = [];

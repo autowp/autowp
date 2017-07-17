@@ -12,7 +12,6 @@ class CarOfDayFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
         return new \Application\Model\CarOfDay(
             $container->get(\Application\ItemNameFormatter::class),
             $container->get(\Autowp\Image\Storage::class),
@@ -20,8 +19,8 @@ class CarOfDayFactory implements FactoryInterface
             $container->get('HttpRouter'),
             $container->get('MvcTranslator'),
             $container->get(\Application\Service\SpecificationsService::class),
-            $tables->get('perspectives_groups'),
-            $container->get(\Application\Model\Item::class)
+            $container->get(\Application\Model\Item::class),
+            $container->get(\Application\Model\Perspective::class)
         );
     }
 }

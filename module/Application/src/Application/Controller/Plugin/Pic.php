@@ -26,6 +26,7 @@ use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;
 use Application\Model\Item;
+use Application\Model\Perspective;
 
 class Pic extends AbstractPlugin
 {
@@ -85,6 +86,11 @@ class Pic extends AbstractPlugin
      */
     private $itemModel;
 
+    /**
+     * @var Perspective
+     */
+    private $perspective;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -97,7 +103,8 @@ class Pic extends AbstractPlugin
         PictureVote $pictureVote,
         Catalogue $catalogue,
         PictureView $pictureView,
-        Item $itemModel
+        Item $itemModel,
+        Perspective $perspective
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -111,6 +118,7 @@ class Pic extends AbstractPlugin
         $this->catalogue = $catalogue;
         $this->pictureView = $pictureView;
         $this->itemModel = $itemModel;
+        $this->perspective = $perspective;
 
         $this->pictureTable = new DbTable\Picture();
     }
@@ -370,7 +378,7 @@ class Pic extends AbstractPlugin
         // names
         $names = $this->pictureTable->getNameData($rows, [
             'language' => $language
-        ]);
+        ], $this->perspective);
 
         // comments
         if (! $options['disableBehaviour']) {
@@ -456,17 +464,9 @@ class Pic extends AbstractPlugin
         $db = $this->pictureTable->getAdapter();
 
         if ($isModer) {
-            $perspectives = new DbTable\Perspective();
-
-            $multioptions = $perspectives->getAdapter()->fetchPairs(
-                $perspectives->getAdapter()->select()
-                    ->from($perspectives->info('name'), ['id', 'name'])
-                    ->order('position')
-            );
-
             $multioptions = array_replace([
                 '' => '--'
-            ], $multioptions);
+            ], $this->perspective->getPairs());
         }
 
         $itemRows = [];
@@ -1063,7 +1063,7 @@ class Pic extends AbstractPlugin
         $names = $this->pictureTable->getNameData([$picture->toArray()], [
             'language' => $language,
             'large'    => true
-        ]);
+        ], $this->perspective);
         $name = $names[$picture->id];
 
         $mTable = new DbTable\Modification();
@@ -1336,7 +1336,7 @@ class Pic extends AbstractPlugin
         // names
         $names = $this->pictureTable->getNameData($rows, [
             'language' => $language
-        ]);
+        ], $this->perspective);
 
         // comments
         $userId = null;
@@ -1449,7 +1449,7 @@ class Pic extends AbstractPlugin
         $names = $this->pictureTable->getNameData([$pictureRow->toArray()], [
             'language' => $language,
             'large'    => true
-        ]);
+        ], $this->perspective);
         $name = $names[$pictureRow->id];
 
         return $this->pictureNameFormatter->format($name, $language);

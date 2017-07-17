@@ -23,6 +23,7 @@ use Point;
 use Zend_Db_Expr;
 
 use Exception;
+use Application\Model\Perspective;
 
 class UploadController extends AbstractActionController
 {
@@ -58,13 +59,19 @@ class UploadController extends AbstractActionController
      */
     private $userPicture;
 
+    /**
+     * @var Perspective
+     */
+    private $perspective;
+
     public function __construct(
         $partial,
         TelegramService $telegram,
         PictureItem $pictureItem,
         DuplicateFinder $duplicateFinder,
         Comments\CommentsService $comments,
-        UserPicture $userPicture
+        UserPicture $userPicture,
+        Perspective $perspective
     ) {
         $this->partial = $partial;
         $this->telegram = $telegram;
@@ -72,6 +79,7 @@ class UploadController extends AbstractActionController
         $this->duplicateFinder = $duplicateFinder;
         $this->comments = $comments;
         $this->userPicture = $userPicture;
+        $this->perspective = $perspective;
     }
 
     private function getCarParentTable()
@@ -137,21 +145,11 @@ class UploadController extends AbstractActionController
             ], [], true));
         }
 
-        $perspectiveTable = new DbTable\Perspective();
-
-        $perspectives = [];
-        foreach ($perspectiveTable->fetchAll(null, 'position') as $row) {
-            $perspectives[] = [
-                'id'   => $row['id'],
-                'name' => $this->translate($row['name'])
-            ];
-        }
-
         return [
             'form'         => $form,
             'selected'     => $selected,
             'selectedName' => $selectedName,
-            'perspectives' => $perspectives
+            'perspectives' => $this->perspective->getArray()
         ];
     }
 

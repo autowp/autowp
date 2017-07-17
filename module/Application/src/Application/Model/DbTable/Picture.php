@@ -2,9 +2,10 @@
 
 namespace Application\Model\DbTable;
 
+use Autowp\Commons\Db\Table;
 use Autowp\Image;
 
-use Autowp\Commons\Db\Table;
+use Application\Model\Perspective;
 
 use Zend_Db_Expr;
 
@@ -91,7 +92,7 @@ class Picture extends Table
         return $result;
     }
 
-    public function getNameData($rows, array $options = [])
+    public function getNameData($rows, array $options = [], Perspective $perspective)
     {
         $result = [];
 
@@ -162,15 +163,7 @@ class Picture extends Table
             }
         }
 
-        $perspectives = [];
-        if (count($perspectiveIds)) {
-            $perspectiveTable = new Perspective();
-            $pRows = $perspectiveTable->find(array_keys($perspectiveIds));
-
-            foreach ($pRows as $row) {
-                $perspectives[$row->id] = $row->name;
-            }
-        }
+        $perspectives = $perspective->getOnlyPairs($perspectiveIds);
 
         foreach ($rows as $index => $row) {
             if ($row['name']) {

@@ -3,20 +3,20 @@
 namespace Application\Hydrator\Api;
 
 use Application\Hydrator\Api\Strategy\Perspectives as HydratorPerspectivesStrategy;
-use Application\Model\DbTable;
+use Application\Model\Perspective;
 
 class PerspectiveGroupHydrator extends RestHydrator
 {
     /**
-     * @var DbTable\Perspective
+     * @var Perspective
      */
-    private $perspectiveTable;
+    private $perspective;
 
     public function __construct($serviceManager)
     {
         parent::__construct();
 
-        $this->perspectiveTable = new DbTable\Perspective();
+        $this->perspective = $serviceManager->get(Perspective::class);
 
         $strategy = new HydratorPerspectivesStrategy($serviceManager);
         $this->addStrategy('perspectives', $strategy);
@@ -30,18 +30,10 @@ class PerspectiveGroupHydrator extends RestHydrator
         ];
 
         if ($this->filterComposite->filter('perspectives')) {
-            $rows = $this->perspectiveTable->fetchAll(
-                $this->perspectiveTable->select(true)
-                    ->join(
-                        'perspectives_groups_perspectives',
-                        'perspectives.id = perspectives_groups_perspectives.perspective_id',
-                        []
-                    )
-                    ->where('perspectives_groups_perspectives.group_id = ?', $object['id'])
-                    ->order('perspectives_groups_perspectives.position')
+            $result['perspectives'] = $this->extractValue(
+                'perspectives',
+                $this->perspective->getGroupPerspectives($object['id'])
             );
-
-            $result['perspectives'] = $this->extractValue('perspectives', $rows);
         }
 
         return $result;

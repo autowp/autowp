@@ -14,11 +14,10 @@ class FactoriesControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get(\Autowp\TextStorage\Service::class),
             $container->get(\Application\Service\SpecificationsService::class),
-            $tables->get('perspectives_groups'),
+            $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\Item::class)
         );
     }

@@ -14,15 +14,13 @@ class CarsControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
-
         return new Controller(
             $container->get(\Application\HostManager::class),
             $container->get('AttrsLogFilterForm'),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Application\Model\UserItemSubscribe::class),
-            $tables->get('perspectives_groups'),
+            $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\Item::class)
         );
     }

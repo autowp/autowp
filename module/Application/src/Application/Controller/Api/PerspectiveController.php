@@ -2,16 +2,17 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Application\Hydrator\Api\RestHydrator;
-use Application\Model\DbTable;
 
 class PerspectiveController extends AbstractRestfulController
 {
     /**
-     * @var DbTable\Perspective
+     * @var TableGateway
      */
     private $table;
 
@@ -20,10 +21,10 @@ class PerspectiveController extends AbstractRestfulController
      */
     private $hydrator;
 
-    public function __construct(RestHydrator $hydrator)
+    public function __construct(RestHydrator $hydrator, TableGateway $table)
     {
         $this->hydrator = $hydrator;
-        $this->table = new DbTable\Perspective();
+        $this->table = $table;
     }
 
     public function indexAction()
@@ -37,7 +38,10 @@ class PerspectiveController extends AbstractRestfulController
             'fields'   => []
         ]);
 
-        $rows = $this->table->fetchAll([], 'position');
+        $select = new Sql\Select($this->table->getTable());
+        $select->order('position');
+
+        $rows = $this->table->selectWith($select);
         $items = [];
         foreach ($rows as $row) {
             $items[] = $this->hydrator->extract($row);

@@ -4,8 +4,8 @@ namespace Application;
 
 use Zend\View\Renderer\PhpRenderer;
 
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Picture\Row as PictureRow;
+use Application\Model\DbTable;
+use Application\Model\Perspective;
 
 class PictureNameFormatter
 {
@@ -29,12 +29,14 @@ class PictureNameFormatter
     public function __construct(
         $translator,
         PhpRenderer $renderer,
-        ItemNameFormatter $itemNameFormatter
+        ItemNameFormatter $itemNameFormatter,
+        Perspective $perspective
     ) {
 
         $this->translator = $translator;
         $this->renderer = $renderer;
         $this->itemNameFormatter = $itemNameFormatter;
+        $this->perspective = $perspective;
     }
 
     private function translate($string, $language)
@@ -44,12 +46,12 @@ class PictureNameFormatter
 
     public function format($picture, $language)
     {
-        if ($picture instanceof PictureRow) {
-            $pictureTable = new Picture();
+        if ($picture instanceof DbTable\Picture\Row) {
+            $pictureTable = new DbTable\Picture();
             $names = $pictureTable->getNameData([$picture->toArray()], [
                 'language' => $language,
                 'large'    => true
-            ]);
+            ], $this->perspective);
             $picture = $names[$picture->id];
         }
 

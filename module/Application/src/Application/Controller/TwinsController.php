@@ -2,7 +2,6 @@
 
 namespace Application\Controller;
 
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -13,6 +12,7 @@ use Autowp\TextStorage;
 
 use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Perspective;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
@@ -42,9 +42,9 @@ class TwinsController extends AbstractActionController
     private $comments;
 
     /**
-     * @var TableGateway
+     * @var Perspective
      */
-    private $perspectiveGroupTable;
+    private $perspective;
 
     /**
      * @var Item
@@ -56,7 +56,7 @@ class TwinsController extends AbstractActionController
         $cache,
         SpecificationsService $specsService,
         Comments\CommentsService $comments,
-        TableGateway $perspectiveGroupTable,
+        Perspective $perspective,
         Item $itemModel
     ) {
 
@@ -64,7 +64,7 @@ class TwinsController extends AbstractActionController
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->comments = $comments;
-        $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->perspective = $perspective;
         $this->itemModel = $itemModel;
     }
 
@@ -217,13 +217,13 @@ class TwinsController extends AbstractActionController
             'description'        => $description,
             'cars'               => $this->car()->listData($carList, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'perspectiveGroupTable' => $this->perspectiveGroupTable,
-                    'type'                  => null,
-                    'onlyExactlyPictures'   => false,
-                    'dateSort'              => false,
-                    'disableLargePictures'  => true,
-                    'perspectivePageId'     => null,
-                    'onlyChilds'            => []
+                    'perspective'          => $this->perspective,
+                    'type'                 => null,
+                    'onlyExactlyPictures'  => false,
+                    'dateSort'             => false,
+                    'disableLargePictures' => true,
+                    'perspectivePageId'    => null,
+                    'onlyChilds'           => []
                 ]),
                 'disableTwins'         => true,
                 'disableSpecs'         => true,

@@ -12,8 +12,9 @@ use Autowp\User\Model\DbTable\User;
 use Application\ItemNameFormatter;
 use Application\Model\Catalogue;
 use Application\Model\DbTable;
-use Application\Service\SpecificationsService;
+use Application\Model\Perspective;
 use Application\Model\UserItemSubscribe;
+use Application\Service\SpecificationsService;
 
 class ItemHydrator extends RestHydrator
 {
@@ -99,9 +100,9 @@ class ItemHydrator extends RestHydrator
     private $userItemSubscribe;
 
     /**
-     * @var TableGateway
+     * @var Perspective
      */
-    private $perspectiveGroupTable;
+    private $perspective;
 
     public function __construct(
         $serviceManager
@@ -114,9 +115,9 @@ class ItemHydrator extends RestHydrator
         $this->itemParentTable = $tables->get('item_parent');
         $this->itemLanguageTable = $tables->get('item_language');
         $this->itemTableGateway = $tables->get('item');
-        $this->perspectiveGroupTable = $tables->get('perspectives_groups');
         $this->specTable = $tables->get('spec');
 
+        $this->perspective = $serviceManager->get(Perspective::class);
         $this->userItemSubscribe = $serviceManager->get(UserItemSubscribe::class);
 
         $this->specificationsService = $serviceManager->get(SpecificationsService::class);
@@ -370,13 +371,13 @@ class ItemHydrator extends RestHydrator
 
         if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
             $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
-                'perspectiveGroupTable' => $this->perspectiveGroupTable,
-                'type'                  => null,
-                'onlyExactlyPictures'   => $onlyExactlyPictures,
-                'dateSort'              => false,
-                'disableLargePictures'  => false,
-                'perspectivePageId'     => null,
-                'onlyChilds'            => []
+                'perspective'          => $this->perspective,
+                'type'                 => null,
+                'onlyExactlyPictures'  => $onlyExactlyPictures,
+                'dateSort'             => false,
+                'disableLargePictures' => false,
+                'perspectivePageId'    => null,
+                'onlyChilds'           => []
             ]);
 
             $carsTotalPictures = $cFetcher->getTotalPictures([$object['id']], $onlyExactlyPictures);

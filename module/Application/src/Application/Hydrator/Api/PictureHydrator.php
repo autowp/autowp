@@ -13,12 +13,13 @@ use Autowp\User\Model\DbTable\User;
 use Application\Comments;
 use Application\DuplicateFinder;
 use Application\Model\DbTable;
+use Application\Model\Perspective;
 use Application\Model\PictureItem;
+use Application\Model\PictureView;
 use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
 
 use Zend_Db_Expr;
-use Application\Model\PictureView;
 
 class PictureHydrator extends RestHydrator
 {
@@ -83,6 +84,11 @@ class PictureHydrator extends RestHydrator
      */
     private $pictureView;
 
+    /**
+     * @var Perspective
+     */
+    private $perspective;
+
     public function __construct(
         $serviceManager
     ) {
@@ -103,6 +109,7 @@ class PictureHydrator extends RestHydrator
         $this->pictureItem = $serviceManager->get(PictureItem::class);
         $this->imageStorage = $serviceManager->get(Image\Storage::class);
         $this->textStorage = $serviceManager->get(\Autowp\TextStorage\Service::class);
+        $this->perspective = $serviceManager->get(\Application\Model\Perspective::class);
 
         $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('picture-thumb', $strategy);
@@ -206,7 +213,7 @@ class PictureHydrator extends RestHydrator
         if ($showNameHtml || $showNameText) {
             $nameDatas = $this->pictureTable->getNameData([$object], [
                 'language' => $this->language
-            ]);
+            ], $this->perspective);
             $nameData = $nameDatas[$object['id']];
         }
 

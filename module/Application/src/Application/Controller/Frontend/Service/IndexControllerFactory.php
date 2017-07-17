@@ -14,14 +14,13 @@ class IndexControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get('fastCache'),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\Model\CarOfDay::class),
             $container->get(\Application\Model\Categories::class),
             $container->get(\Zend\Db\Adapter\AdapterInterface::class),
-            $tables->get('perspectives_groups')
+            $container->get(\Application\Model\Perspective::class)
         );
     }
 }

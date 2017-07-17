@@ -6,7 +6,6 @@ use DateInterval;
 use DateTime;
 
 use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\Commons\Db\Table;
 use Autowp\Image;
@@ -59,14 +58,14 @@ class CarOfDay
     private $itemParentTable;
 
     /**
-     * @var TableGateway
-     */
-    private $perspectiveGroupTable;
-
-    /**
      * @var Item
      */
     private $itemModel;
+
+    /**
+     * @var Perspective
+     */
+    private $perspective;
 
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
@@ -75,8 +74,8 @@ class CarOfDay
         $router,
         $translator,
         SpecificationsService $specsService,
-        TableGateway $perspectiveGroupTable,
-        Item $itemModel
+        Item $itemModel,
+        Perspective $perspective
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->imageStorage = $imageStorage;
@@ -84,8 +83,8 @@ class CarOfDay
         $this->router = $router;
         $this->translator = $translator;
         $this->specsService = $specsService;
-        $this->perspectiveGroupTable = $perspectiveGroupTable;
         $this->itemModel = $itemModel;
+        $this->perspective = $perspective;
 
         $this->table = new Table([
             'name'    => 'of_day',
@@ -478,7 +477,7 @@ class CarOfDay
         $pictureTable = $this->catalogue->getPictureTable();
         $names = $pictureTable->getNameData($notEmptyPics, [
             'language' => $language
-        ]);
+        ], $this->perspective);
 
         $paths = $this->catalogue->getCataloguePaths($carOfDay->id, [
             'breakOnFirst' => true,
@@ -558,15 +557,7 @@ class CarOfDay
 
     private function getOrientedPictureList($car)
     {
-        $select = new Sql\Select($this->perspectiveGroupTable->getTable());
-        $select->columns(['id'])
-            ->where(['page_id' => 6])
-            ->order('position');
-
-        $perspectivesGroupIds = [];
-        foreach ($this->perspectiveGroupTable->selectWith($select) as $row) {
-            $perspectivesGroupIds[] = (int)$row['id'];
-        }
+        $perspectivesGroupIds = $this->perspective->getPageGroupIds(6);
 
         $pTable = $this->catalogue->getPictureTable();
         $pictures = [];

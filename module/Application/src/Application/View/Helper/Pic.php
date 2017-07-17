@@ -4,14 +4,14 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
 
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Picture\Row as PictureRow;
+use Application\Model\DbTable;
+use Application\Model\Perspective;
 use Application\PictureNameFormatter;
 
 class Pic extends AbstractHtmlElement
 {
     /**
-     * @var PictureRow
+     * @var DbTable\Picture\Row
      */
     private $picture = null;
 
@@ -20,12 +20,20 @@ class Pic extends AbstractHtmlElement
      */
     private $pictureNameFormatter;
 
-    public function __construct(PictureNameFormatter $pictureNameFormatter)
-    {
+    /**
+     * @var Perspective
+     */
+    private $perspective;
+
+    public function __construct(
+        PictureNameFormatter $pictureNameFormatter,
+        Perspective $perspective
+    ) {
         $this->pictureNameFormatter = $pictureNameFormatter;
+        $this->perspective = $perspective;
     }
 
-    public function __invoke(PictureRow $picture = null)
+    public function __invoke(DbTable\Picture\Row $picture = null)
     {
         $this->picture = $picture;
 
@@ -54,11 +62,11 @@ class Pic extends AbstractHtmlElement
 
     public function name($pictureRow, $language)
     {
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
         $names = $pictureTable->getNameData([$pictureRow->toArray()], [
             'language' => $language,
             'large'    => true
-        ]);
+        ], $this->perspective);
         $name = $names[$pictureRow->id];
 
         return $this->pictureNameFormatter->format($name, $language);

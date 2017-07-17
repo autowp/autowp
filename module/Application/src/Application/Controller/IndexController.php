@@ -13,6 +13,7 @@ use Application\Model\CarOfDay;
 use Application\Model\Categories;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
+use Application\Model\Perspective;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
@@ -36,9 +37,9 @@ class IndexController extends AbstractActionController
     private $itemTable;
 
     /**
-     * @var TableGateway
+     * @var Perspective
      */
-    private $perspectiveGroupTable;
+    private $perspective;
 
     public function __construct(
         $cache,
@@ -46,13 +47,13 @@ class IndexController extends AbstractActionController
         CarOfDay $carOfDay,
         Categories $categories,
         Adapter $adapter,
-        TableGateway $perspectiveGroupTable
+        Perspective $perspective
     ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->carOfDay = $carOfDay;
         $this->categories = $categories;
-        $this->perspectiveGroupTable = $perspectiveGroupTable;
+        $this->perspective = $perspective;
 
         $this->itemTable = new TableGateway('item', $adapter);
     }
@@ -247,13 +248,13 @@ class IndexController extends AbstractActionController
 
         $specsCars = $this->car()->listData($cars, [
             'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                'perspectiveGroupTable' => $this->perspectiveGroupTable,
-                'type'                  => null,
-                'onlyExactlyPictures'   => false,
-                'dateSort'              => false,
-                'disableLargePictures'  => true,
-                'perspectivePageId'     => 1,
-                'onlyChilds'            => []
+                'perspective'          => $this->perspective,
+                'type'                 => null,
+                'onlyExactlyPictures'  => false,
+                'dateSort'             => false,
+                'disableLargePictures' => true,
+                'perspectivePageId'    => 1,
+                'onlyChilds'           => []
             ]),
             'listBuilder' => new \Application\Model\Item\ListBuilder([
                 'catalogue'    => $this->catalogue(),
