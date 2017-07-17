@@ -748,7 +748,7 @@ return [
                         'name' => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => 50
+                            'max' => Model\DbTable\Item\ParentTable::MAX_CATNAME
                         ]
                     ]
                 ]
@@ -787,7 +787,7 @@ return [
                         'name' => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => 50
+                            'max' => Model\DbTable\Item\ParentTable::MAX_CATNAME
                         ]
                     ]
                 ]
