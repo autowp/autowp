@@ -159,6 +159,7 @@ angular.module(Module)
                 ];
                 
                 angular.forEach(ctrl.languages, function(language) {
+                    language.invalidParams = null;
                     promises.push(
                         $http({
                             method: 'PUT',
@@ -166,11 +167,13 @@ angular.module(Module)
                             data: {
                                 name: language.name
                             }
+                        }).then(function() {}, function(response) {
+                            language.invalidParams = response.data.invalid_params;
                         })
                     );
                 });
                 
-                $q.all(promises).then(reloadItemParent, reloadItemParent);
+                $q.all(promises).then(reloadItemParent);
             };
         }
     ]);

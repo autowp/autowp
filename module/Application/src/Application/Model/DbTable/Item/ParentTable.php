@@ -29,7 +29,7 @@ class ParentTable extends Table
         TYPE_SPORT = 2,
         TYPE_DESIGN = 3;
 
-    const MAX_CATNAME = 70;
+    const MAX_CATNAME = 150;
 
     public function collectChildIds($id)
     {

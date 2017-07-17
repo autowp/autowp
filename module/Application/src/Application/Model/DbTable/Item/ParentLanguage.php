@@ -9,5 +9,5 @@ class ParentLanguage extends Table
     protected $_name = 'item_parent_language';
     protected $_primary = ['item_id', 'parent_id', 'language'];
 
-    const MAX_NAME = 70;
+    const MAX_NAME = 255;
 }

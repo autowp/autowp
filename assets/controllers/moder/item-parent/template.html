@@ -8,7 +8,7 @@
     <div class="form-group">
         <label class="col-md-2 control-label">Catname</label>
         <div class="col-md-10">
-            <input type="text" name="catname" ng-model="ctrl.itemParent.catname" class="form-control" />
+            <input type="text" name="catname" maxlength="150" ng-model="ctrl.itemParent.catname" class="form-control" />
         </div>
     </div>
     <div class="form-group">
@@ -18,10 +18,11 @@
             </select>
         </div>
     </div>
-    <div class="form-group" ng-repeat="language in ctrl.languages">
+    <div class="form-group" ng-repeat="language in ctrl.languages" ng-class="{'has-error':language.invalidParams}">
         <label class="col-md-2 control-label">{{language.language.toUpperCase()}} Name</label>
         <div class="col-md-10">
-            <input type="text" name="name" maxlength="70" class="form-control" ng-model="language.name" />
+            <input type="text" name="name" maxlength="255" class="form-control" ng-model="language.name" />
+            <p ng-repeat="message in language.invalidParams.name" ng-bind="message" class="help-block"></p>
         </div>
     </div>
     <div class="row">

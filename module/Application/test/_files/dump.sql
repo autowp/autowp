@@ -1429,7 +1429,7 @@ CREATE TABLE `item_parent` (
   `item_id` int(10) unsigned NOT NULL,
   `parent_id` int(10) unsigned NOT NULL,
   `is_primary` tinyint(1) NOT NULL DEFAULT '0',
-  `catname` varchar(50) NOT NULL,
+  `catname` varchar(150) NOT NULL,
   `type` tinyint(4) NOT NULL DEFAULT '0',
   `timestamp` timestamp NULL DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
