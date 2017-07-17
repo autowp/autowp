@@ -26,7 +26,7 @@ use Application\Hydrator\Api\RestHydrator;
 use Application\Hydrator\Api\Strategy\Image;
 use Application\ItemNameFormatter;
 use Application\Model\Brand as BrandModel;
-use Application\Model\BrandVehicle;
+use Application\Model\ItemParent;
 use Application\Model\DbTable;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
@@ -95,6 +95,11 @@ class ItemController extends AbstractRestfulController
      */
     private $specTable;
 
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
     public function __construct(
         RestHydrator $hydrator,
         Image $logoHydrator,
@@ -102,7 +107,7 @@ class ItemController extends AbstractRestfulController
         InputFilter $listInputFilter,
         InputFilter $itemInputFilter,
         SpecificationsService $specificationsService,
-        BrandVehicle $brandVehicle,
+        ItemParent $itemParent,
         HostManager $hostManager,
         MessageService $message,
         UserItemSubscribe $userItemSubscribe,
@@ -114,7 +119,7 @@ class ItemController extends AbstractRestfulController
         $this->listInputFilter = $listInputFilter;
         $this->itemInputFilter = $itemInputFilter;
         $this->specificationsService = $specificationsService;
-        $this->brandVehicle = $brandVehicle;
+        $this->itemParent = $itemParent;
         $this->hostManager = $hostManager;
         $this->message = $message;
         $this->userItemSubscribe = $userItemSubscribe;
@@ -407,14 +412,16 @@ class ItemController extends AbstractRestfulController
                 }
             }
 
-            $specRow = $this->specTable->select([
-                new Sql\Expression('INSTR(?, short_name)', [$query])
-            ])->current();
-
             $specId = null;
-            if ($specRow) {
-                $specId = $specRow->id;
-                $query = trim(str_replace($specRow->short_name, '', $query));
+            if ($query) {
+                $specRow = $this->specTable->select([
+                    new Sql\Expression('INSTR(?, short_name)', [$query])
+                ])->current();
+
+                if ($specRow) {
+                    $specId = $specRow->id;
+                    $query = trim(str_replace($specRow->short_name, '', $query));
+                }
             }
 
             if (! $itemLanguageJoined) {
@@ -1204,7 +1211,7 @@ class ItemController extends AbstractRestfulController
         $itemTable->updateInteritance($item);
         $item->updateOrderCache();
 
-        $this->brandVehicle->refreshAutoByVehicle($item->id);
+        $this->itemParent->refreshAutoByVehicle($item->id);
 
         $this->userItemSubscribe->subscribe($user['id'], $item['id']);
 

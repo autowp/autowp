@@ -573,7 +573,7 @@ return [
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => DbTable\Item\ParentLanguage::MAX_NAME
+                            'max' => Model\ItemParent::MAX_LANGUAGE_NAME
                         ]
                     ]
                 ]

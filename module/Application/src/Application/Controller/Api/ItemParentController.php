@@ -12,7 +12,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
-use Application\Model\BrandVehicle;
+use Application\Model\ItemParent;
 use Application\Model\DbTable;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
@@ -33,9 +33,9 @@ class ItemParentController extends AbstractRestfulController
     private $hydrator;
 
     /**
-     * @var BrandVehicle
+     * @var ItemParent
      */
-    private $brandVehicle;
+    private $itemParent;
 
     /**
      * @var SpecificationsService
@@ -83,7 +83,7 @@ class ItemParentController extends AbstractRestfulController
         InputFilter $itemInputFilter,
         InputFilter $postInputFilter,
         InputFilter $putInputFilter,
-        BrandVehicle $brandVehicle,
+        ItemParent $itemParent,
         SpecificationsService $specificationsService,
         HostManager $hostManager,
         MessageService $message,
@@ -98,7 +98,7 @@ class ItemParentController extends AbstractRestfulController
         $this->table = new DbTable\Item\ParentTable();
         $this->itemTable = new DbTable\Item();
 
-        $this->brandVehicle = $brandVehicle;
+        $this->itemParent = $itemParent;
         $this->specificationsService = $specificationsService;
         $this->hostManager = $hostManager;
         $this->message = $message;
@@ -288,7 +288,7 @@ class ItemParentController extends AbstractRestfulController
             $params['type'] = $data['type_id'];
         }
 
-        $this->brandVehicle->create((int)$parentItem->id, (int)$item->id, $params);
+        $this->itemParent->create((int)$parentItem->id, (int)$item->id, $params);
 
         $itemTable->updateInteritance($item);
 
@@ -397,10 +397,10 @@ class ItemParentController extends AbstractRestfulController
             $values['type'] = $data['type_id'];
         }
 
-        $this->brandVehicle->setItemParent($row['parent_id'], $row['item_id'], $values, false);
+        $this->itemParent->setItemParent($row['parent_id'], $row['item_id'], $values, false);
 
         if (array_key_exists('parent_id', $data) && $data['parent_id']) {
-            $success = $this->brandVehicle->move($row['item_id'], $row['parent_id'], $data['parent_id']);
+            $success = $this->itemParent->move($row['item_id'], $row['parent_id'], $data['parent_id']);
             if ($success) {
                 $item = $this->itemTable->find($row['item_id'])->current();
                 $oldParent = $this->itemTable->find($row['parent_id'])->current();
@@ -491,7 +491,7 @@ class ItemParentController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $this->brandVehicle->remove($parentItem->id, $item->id);
+        $this->itemParent->remove($parentItem->id, $item->id);
 
         $itemTable = $this->catalogue()->getItemTable();
         $itemTable->updateInteritance($item);

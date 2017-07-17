@@ -1,13 +1,11 @@
 <?php
 
-namespace Application\Model\Service;
+namespace Application\Model;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\Model\BrandVehicle as Model;
-
-class BrandVehicleFactory implements FactoryInterface
+class ItemParentFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -16,7 +14,7 @@ class BrandVehicleFactory implements FactoryInterface
     {
         $config = $container->get('Config');
         $tables = $container->get(\Application\Db\TableManager::class);
-        return new Model(
+        return new ItemParent(
             $config['content_languages'],
             $tables->get('spec')
         );

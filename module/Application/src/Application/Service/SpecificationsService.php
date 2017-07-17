@@ -18,6 +18,7 @@ use Application\ItemNameFormatter;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
 use Application\Model\Item;
+use Application\Model\ItemParent;
 use Application\Spec\Table\Car as CarSpecTable;
 
 use Zend_Db_Expr;
@@ -129,15 +130,22 @@ class SpecificationsService
      */
     private $itemModel;
 
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
     public function __construct(
         $translator,
         ItemNameFormatter $itemNameFormatter,
         Adapter $adapter,
-        Item $itemModel
+        Item $itemModel,
+        ItemParent $itemParent
     ) {
         $this->translator = $translator;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->itemModel = $itemModel;
+        $this->itemParent = $itemParent;
 
         $this->unitTable = new TableGateway('attrs_units', $adapter);
         $this->listOptionsTable = new TableGateway('attrs_list_options', $adapter);
@@ -1312,8 +1320,6 @@ class SpecificationsService
         $topPerspectives = [10, 1, 7, 8, 11, 12, 2, 4, 13, 5];
         $bottomPerspectives = [13, 2, 9, 6, 5];
 
-        $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
-
         $ids = [];
         foreach ($cars as $car) {
             $ids[] = $car->id;
@@ -1387,26 +1393,10 @@ class SpecificationsService
                 }
             }
 
-            $itemParentName = null;
+            $name = null;
             if ($contextCarId) {
-                $db = $itemParentLanguageTable->getAdapter();
-
-                $langSortExpr = new Zend_Db_Expr(
-                    $db->quoteInto('language = ? desc', $language)
-                );
-
-                $itemParentLangRow = $itemParentLanguageTable->fetchRow([
-                    'item_id = ?'   => $car->id,
-                    'parent_id = ?' => $contextCarId,
-                    'length(name) > 0'
-                ], $langSortExpr);
-
-                if ($itemParentLangRow) {
-                    $itemParentName = $itemParentLangRow->name;
-                }
+                $name = $this->itemParent->getNamePreferLanguage($contextCarId, $car->id, $language);
             }
-
-            $name = $itemParentName;
             if (! $name) {
                 $name = $this->itemNameFormatter->format($this->itemModel->getNameData($car, $language), $language);
             }

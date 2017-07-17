@@ -25,7 +25,7 @@ class ItemControllerFactory implements FactoryInterface
             $filters->get('api_item_list'),
             $filters->get('api_item_item'),
             $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Application\Model\BrandVehicle::class),
+            $container->get(\Application\Model\ItemParent::class),
             $container->get(\Application\HostManager::class),
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Application\Model\UserItemSubscribe::class),

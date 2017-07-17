@@ -18,7 +18,8 @@ class SpecificationsServiceFactory implements FactoryInterface
             $container->get('MvcTranslator'),
             $container->get(\Application\ItemNameFormatter::class),
             $container->get(\Zend\Db\Adapter\AdapterInterface::class),
-            $container->get(\Application\Model\Item::class)
+            $container->get(\Application\Model\Item::class),
+            $container->get(\Application\Model\ItemParent::class)
         );
     }
 }

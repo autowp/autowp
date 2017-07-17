@@ -17,7 +17,8 @@ class BrandNavFactory implements FactoryInterface
         return new Model(
             $container->get('fastCache'),
             $container->get('MvcTranslator'),
-            $container->get('HttpRouter')
+            $container->get('HttpRouter'),
+            $container->get(\Application\Model\ItemParent::class)
         );
     }
 }

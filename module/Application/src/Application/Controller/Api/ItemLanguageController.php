@@ -10,7 +10,7 @@ use Zend\View\Model\JsonModel;
 use Autowp\TextStorage\Service as TextStorage;
 
 use Application\Hydrator\Api\RestHydrator;
-use Application\Model\BrandVehicle;
+use Application\Model\ItemParent;
 use Application\Model\DbTable;
 use Application\HostManager;
 use Autowp\Message\MessageService;
@@ -34,9 +34,9 @@ class ItemLanguageController extends AbstractRestfulController
     private $hydrator;
 
     /**
-     * @var BrandVehicle
+     * @var ItemParent
      */
-    private $brandVehicle;
+    private $itemParent;
 
     /**
      * @var HostManager
@@ -57,7 +57,7 @@ class ItemLanguageController extends AbstractRestfulController
         TableGateway $table,
         TextStorage $textStorage,
         RestHydrator $hydrator,
-        BrandVehicle $brandVehicle,
+        ItemParent $itemParent,
         HostManager $hostManager,
         InputFilter $putInputFilter,
         MessageService $message,
@@ -66,7 +66,7 @@ class ItemLanguageController extends AbstractRestfulController
         $this->table = $table;
         $this->textStorage = $textStorage;
         $this->hydrator = $hydrator;
-        $this->brandVehicle = $brandVehicle;
+        $this->itemParent = $itemParent;
         $this->hostManager = $hostManager;
         $this->putInputFilter = $putInputFilter;
         $this->message = $message;
@@ -219,7 +219,7 @@ class ItemLanguageController extends AbstractRestfulController
                 $this->table->insert(array_merge($set, $primaryKey));
             }
 
-            $this->brandVehicle->refreshAutoByVehicle($item->id);
+            $this->itemParent->refreshAutoByVehicle($item->id);
         }
 
         if ($changes) {

@@ -8,7 +8,7 @@ use Zend\Router\Http\TreeRouteStack;
 
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Picture;
+use Application\Model\ItemParent;
 
 use Zend_Db_Expr;
 
@@ -29,15 +29,22 @@ class BrandNav
      */
     private $router;
 
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
     public function __construct(
         StorageInterface $cache,
         TranslatorInterface $translator,
-        TreeRouteStack $router
+        TreeRouteStack $router,
+        ItemParent $itemParent
     ) {
 
         $this->cache = $cache;
         $this->translator = $translator;
         $this->router = $router;
+        $this->itemParent = $itemParent;
     }
 
     public function getMenu(array $params)
@@ -146,7 +153,7 @@ class BrandNav
             $logoPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->where('picture_item.perspective_id = ?', 22)
                     ->where('picture_item.item_id = ?', $brand['id'])
@@ -166,7 +173,7 @@ class BrandNav
             $mixedPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->where('picture_item.perspective_id = ?', 25)
                     ->where('picture_item.item_id = ?', $brand['id'])
@@ -186,7 +193,7 @@ class BrandNav
             $unsortedPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->where('picture_item.perspective_id NOT IN (?) OR picture_item.perspective_id IS NULL', [22, 25])
                     ->where('picture_item.item_id = ?', $brand['id'])
@@ -325,8 +332,8 @@ class BrandNav
 
     private function carSectionGroups($language, array $brand, array $section, $conceptsSeparatly)
     {
-        $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
-        $db = $itemParentLanguageTable->getAdapter();
+        $carLanguageTable = new DbTable\Item\Language();
+        $db = $carLanguageTable->getAdapter();
 
         $rows = [];
         if ($section['car_type_id']) {
@@ -364,12 +371,6 @@ class BrandNav
 
         $aliases = $this->getBrandAliases($brand);
 
-        $carLanguageTable = new DbTable\Item\Language();
-
-        $langSortExpr = new Zend_Db_Expr(
-            $db->quoteInto('language = ? desc', $language)
-        );
-
         $groups = [];
         foreach ($rows as $brandItemRow) {
             $url = $this->url('catalogue', [
@@ -378,15 +379,13 @@ class BrandNav
                 'car_catname'   => $brandItemRow['brand_item_catname']
             ]);
 
-            $bvlRow = $itemParentLanguageTable->fetchRow([
-                'item_id = ?'   => $brandItemRow['item_id'],
-                'parent_id = ?' => $brandItemRow['brand_id'],
-                'length(name) > 0'
-            ], $langSortExpr);
+            $name = $this->itemParent->getNamePreferLanguage(
+                $brandItemRow['brand_id'],
+                $brandItemRow['item_id'],
+                $language
+            );
 
-            if ($bvlRow) {
-                $name = $bvlRow->name;
-            } else {
+            if (! $name) {
                 $carLangRow = $carLanguageTable->fetchRow([
                     'item_id = ?'  => (int)$brandItemRow['item_id'],
                     'language = ?' => (string)$language,

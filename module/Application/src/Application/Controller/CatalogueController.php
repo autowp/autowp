@@ -14,7 +14,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\ItemNameFormatter;
 use Application\Model\Brand as BrandModel;
-use Application\Model\BrandVehicle;
+use Application\Model\ItemParent;
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
@@ -38,9 +38,9 @@ class CatalogueController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var BrandVehicle
+     * @var ItemParent
      */
-    private $brandVehicle;
+    private $itemParent;
 
     /**
      * @var ItemNameFormatter
@@ -66,7 +66,7 @@ class CatalogueController extends AbstractActionController
         $textStorage,
         $cache,
         SpecificationsService $specsService,
-        BrandVehicle $brandVehicle,
+        ItemParent $itemParent,
         ItemNameFormatter $itemNameFormatter,
         $mostsMinCarsCount,
         Comments\CommentsService $comments,
@@ -77,7 +77,7 @@ class CatalogueController extends AbstractActionController
         $this->textStorage = $textStorage;
         $this->cache = $cache;
         $this->specsService = $specsService;
-        $this->brandVehicle = $brandVehicle;
+        $this->itemParent = $itemParent;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->mostsMinCarsCount = $mostsMinCarsCount;
         $this->comments = $comments;
@@ -943,7 +943,7 @@ class CatalogueController extends AbstractActionController
             }
 
             $bvName = false;
-            $bvName = $this->brandVehicle->getName($brand['id'], $currentCar['top_item_id'], $language);
+            $bvName = $this->itemParent->getName($brand['id'], $currentCar['top_item_id'], $language);
             if (! $bvName) {
                 $bvName = $this->stripName($brand, $topCarName);
             }

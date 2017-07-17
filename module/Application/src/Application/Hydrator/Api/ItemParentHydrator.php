@@ -3,8 +3,7 @@
 namespace Application\Hydrator\Api;
 
 use Application\Model\DbTable;
-
-use Zend_Db_Expr;
+use Application\Model\ItemParent;
 
 class ItemParentHydrator extends RestHydrator
 {
@@ -21,9 +20,9 @@ class ItemParentHydrator extends RestHydrator
     private $itemTable;
 
     /**
-     * @var DbTable\Item\ParentLanguage
+     * @var ItemParent
      */
-    private $itemParentLanguageTable;
+    private $itemParent;
 
     public function __construct(
         $serviceManager
@@ -31,9 +30,9 @@ class ItemParentHydrator extends RestHydrator
         parent::__construct();
 
         $this->router = $serviceManager->get('HttpRouter');
+        $this->itemParent = $serviceManager->get(ItemParent::class);
 
         $this->itemTable = new DbTable\Item();
-        $this->itemParentLanguageTable = new DbTable\Item\ParentLanguage();
 
         $strategy = new Strategy\Item($serviceManager);
         $this->addStrategy('item', $strategy);
@@ -106,17 +105,11 @@ class ItemParentHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('name')) {
-            $db = $this->itemParentLanguageTable->getAdapter();
-            $langSortExpr = new Zend_Db_Expr(
-                $db->quoteInto('language = ? desc', $this->language)
+            $result['name'] = $this->itemParent->getNamePreferLanguage(
+                $object['parent_id'],
+                $object['item_id'],
+                $this->language
             );
-            $itemParentLanguageRow = $this->itemParentLanguageTable->fetchRow([
-                'item_id = ?'   => $object['item_id'],
-                'parent_id = ?' => $object['parent_id'],
-                'length(name) > 0'
-            ], $langSortExpr);
-
-            $result['name'] = $itemParentLanguageRow ? $itemParentLanguageRow->name : null;
         }
 
         if ($this->filterComposite->filter('duplicate_parent')) {

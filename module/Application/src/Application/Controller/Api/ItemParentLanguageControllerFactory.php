@@ -19,7 +19,7 @@ class ItemParentLanguageControllerFactory implements FactoryInterface
         return new ItemParentLanguageController(
             $tables->get('item_parent_language'),
             $hydrators->get(\Application\Hydrator\Api\ItemParentLanguageHydrator::class),
-            $container->get(\Application\Model\BrandVehicle::class),
+            $container->get(\Application\Model\ItemParent::class),
             $filters->get('api_item_parent_language_put')
         );
     }

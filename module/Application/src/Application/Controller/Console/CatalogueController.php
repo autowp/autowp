@@ -6,7 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\DuplicateFinder;
 use Application\HostManager;
-use Application\Model\BrandVehicle;
+use Application\Model\ItemParent;
 use Application\Model\DbTable;
 use Application\Model\PictureItem;
 use Application\Service\SpecificationsService;
@@ -22,9 +22,9 @@ use Zend\Authentication\AuthenticationService;
 class CatalogueController extends AbstractActionController
 {
     /**
-     * @var BrandVehicle
+     * @var ItemParent
      */
-    private $brandVehicle;
+    private $itemParent;
 
     /**
      * @var PictureItem
@@ -39,7 +39,7 @@ class CatalogueController extends AbstractActionController
     private $message;
 
     public function __construct(
-        BrandVehicle $brandVehicle,
+        ItemParent $itemParent,
         PictureItem $pictureItem,
         SpecificationsService $specService,
         HostManager $hostManager,
@@ -48,7 +48,7 @@ class CatalogueController extends AbstractActionController
         $textStorage,
         DuplicateFinder $duplicateFinder
     ) {
-        $this->brandVehicle = $brandVehicle;
+        $this->itemParent = $itemParent;
         $this->pictureItem = $pictureItem;
         $this->specService = $specService;
         $this->hostManager = $hostManager;
@@ -60,7 +60,7 @@ class CatalogueController extends AbstractActionController
 
     public function refreshBrandVehicleAction()
     {
-        $this->brandVehicle->refreshAllAuto();
+        $this->itemParent->refreshAllAuto();
 
         return "done\n";
     }

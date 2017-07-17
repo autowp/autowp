@@ -5,8 +5,6 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-use Application\Model\DbTable;
-
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class ItemParentLanguage extends Form implements InputFilterProviderInterface
@@ -41,7 +39,7 @@ class ItemParentLanguage extends Form implements InputFilterProviderInterface
                     'label' => 'Name'
                 ],
                 'attributes' => [
-                    'maxlength' => DbTable\Item\ParentLanguage::MAX_NAME
+                    'maxlength' => \Application\Model\ItemParent::MAX_LANGUAGE_NAME
                 ]
             ]
         ];
@@ -71,7 +69,7 @@ class ItemParentLanguage extends Form implements InputFilterProviderInterface
                         'name' => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => DbTable\Item\ParentLanguage::MAX_NAME
+                            'max' => \Application\Model\ItemParent::MAX_LANGUAGE_NAME
                         ]
                     ]
                 ]

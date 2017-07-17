@@ -11,9 +11,12 @@ use Autowp\ZFComponents\Filter\FilenameSafe;
 use Application\Model\DbTable;
 
 use Zend_Db_Expr;
+use Zend_Db_Table;
 
-class BrandVehicle
+class ItemParent
 {
+    const MAX_LANGUAGE_NAME = 255;
+
     /**
      * @var DbTable\Item
      */
@@ -30,7 +33,7 @@ class BrandVehicle
     private $itemParentTable;
 
     /**
-     * @var DbTable\Item\ParentLanguage
+     * @var Zend_Db_Table
      */
     private $itemParentLanguageTable;
 
@@ -77,7 +80,10 @@ class BrandVehicle
         $this->itemTable = new DbTable\Item();
         $this->itemLangTable = new DbTable\Item\Language();
         $this->itemParentTable = new DbTable\Item\ParentTable();
-        $this->itemParentLanguageTable = new DbTable\Item\ParentLanguage();
+        $this->itemParentLanguageTable = new Zend_Db_Table([
+            'name'    => 'item_parent_language',
+            'primary' => ['item_id', 'parent_id', 'language']
+        ]);
     }
 
     public function delete($parentId, $itemId)
@@ -251,14 +257,8 @@ class BrandVehicle
 
     private function extractCatname(DbTable\Item\Row $brandRow, DbTable\Item\Row $vehicleRow)
     {
-        $itemParentLangRow = $this->itemParentLanguageTable->fetchRow([
-            'parent_id = ?' => $brandRow['id'],
-            'item_id = ?'   => $vehicleRow['id'],
-            'length(name) > 0'
-        ], new \Zend_Db_Expr('language = "en" desc'));
-        if ($itemParentLangRow) {
-            $diffName = $itemParentLangRow->name;
-        } else {
+        $diffName = $this->getNamePreferLanguage($brandRow['id'], $vehicleRow['id'], 'en');
+        if (! $diffName) {
             $diffName = $this->extractName($brandRow, $vehicleRow, 'en');
         }
 
@@ -269,7 +269,7 @@ class BrandVehicle
         do {
             $catname = $catnameTemplate . ($i ? '_' . $i : '');
 
-            $allowed = $this->isAllowedCatname($vehicleRow->id, $brandRow->id, $catname);
+            $allowed = $this->isAllowedCatname($vehicleRow['id'], $brandRow['id'], $catname);
 
             $i++;
         } while (! $allowed);
@@ -501,7 +501,7 @@ class BrandVehicle
         }
 
         $bvlRow->setFromArray([
-            'name'    => mb_substr($values['name'], 0, DbTable\Item\ParentLanguage::MAX_NAME),
+            'name'    => mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME),
             'is_auto' => $isAuto ? 1 : 0
         ]);
         $bvlRow->save();
@@ -614,12 +614,12 @@ class BrandVehicle
 
     public function refreshAutoByVehicle(int $itemId)
     {
-        $brandVehicleRows = $this->itemParentTable->fetchAll([
+        $itemParentRows = $this->itemParentTable->fetchAll([
             'item_id = ?' => $itemId
         ]);
 
-        foreach ($brandVehicleRows as $brandVehicleRow) {
-            $this->refreshAuto($brandVehicleRow->parent_id, $itemId);
+        foreach ($itemParentRows as $itemParentRow) {
+            $this->refreshAuto($itemParentRow->parent_id, $itemId);
         }
 
         return true;
@@ -627,12 +627,12 @@ class BrandVehicle
 
     public function refreshAllAuto()
     {
-        $brandVehicleRows = $this->itemParentTable->fetchAll([
+        $itemParentRows = $this->itemParentTable->fetchAll([
             'not manual_catname',
         ], ['parent_id', 'item_id']);
 
-        foreach ($brandVehicleRows as $brandVehicleRow) {
-            $this->refreshAuto($brandVehicleRow->parent_id, $brandVehicleRow->item_id);
+        foreach ($itemParentRows as $itemParentRow) {
+            $this->refreshAuto($itemParentRow->parent_id, $itemParentRow->item_id);
         }
 
         return true;
@@ -651,5 +651,20 @@ class BrandVehicle
         }
 
         return $bvlRow->name;
+    }
+
+    public function getNamePreferLanguage(int $parentId, int $itemId, string $language): string
+    {
+        $db = $this->itemParentLanguageTable->getAdapter();
+        $langSortExpr = new Zend_Db_Expr(
+            $db->quoteInto('language = ? desc', $language)
+        );
+        $row = $this->itemParentLanguageTable->fetchRow([
+            'item_id = ?'   => $itemId,
+            'parent_id = ?' => $parentId,
+            'length(name) > 0'
+        ], $langSortExpr);
+
+        return $row ? $row['name'] : '';
     }
 }

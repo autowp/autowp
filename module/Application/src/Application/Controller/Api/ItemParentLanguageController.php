@@ -11,7 +11,7 @@ use ZF\ApiProblem\ApiProblemResponse;
 use ZF\ApiProblem\ApiProblem;
 
 use Application\Hydrator\Api\RestHydrator;
-use Application\Model\BrandVehicle;
+use Application\Model\ItemParent;
 
 class ItemParentLanguageController extends AbstractRestfulController
 {
@@ -26,9 +26,9 @@ class ItemParentLanguageController extends AbstractRestfulController
     private $hydrator;
 
     /**
-     * @var BrandVehicle
+     * @var ItemParent
      */
-    private $brandVehicle;
+    private $itemParent;
 
     /**
      * @var InputFilter
@@ -38,12 +38,12 @@ class ItemParentLanguageController extends AbstractRestfulController
     public function __construct(
         TableGateway $table,
         RestHydrator $hydrator,
-        BrandVehicle $brandVehicle,
+        ItemParent $itemParent,
         InputFilter $putInputFilter
     ) {
         $this->table = $table;
         $this->hydrator = $hydrator;
-        $this->brandVehicle = $brandVehicle;
+        $this->itemParent = $itemParent;
         $this->putInputFilter = $putInputFilter;
     }
 
@@ -122,7 +122,7 @@ class ItemParentLanguageController extends AbstractRestfulController
         $parentId = (int)$this->params('parent_id');
 
         if (array_key_exists('name', $data)) {
-            $this->brandVehicle->setItemParentLanguage($parentId, $itemId, $language, [
+            $this->itemParent->setItemParentLanguage($parentId, $itemId, $language, [
                 'name' => $data['name']
             ], false);
         }
