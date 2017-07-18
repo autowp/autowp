@@ -1016,8 +1016,7 @@ class ItemController extends AbstractRestfulController
 
         $item->updateOrderCache();
 
-        $cpcTable = new DbTable\Item\ParentCache();
-        $cpcTable->rebuildCache($item);
+        $this->itemParent->rebuildCache($item['id']);
 
         /*$vehicleType = new VehicleType();
         $vehicleType->refreshInheritanceFromParents($item->id);*/

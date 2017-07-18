@@ -72,6 +72,11 @@ class ItemParent
      */
     private $specTable;
 
+    /**
+     * @var Zend_Db_Table
+     */
+    private $itemParentCacheTable;
+
     public function __construct(array $languages, TableGateway $specTable)
     {
         $this->languages = $languages;
@@ -83,6 +88,10 @@ class ItemParent
         $this->itemParentLanguageTable = new Zend_Db_Table([
             'name'    => 'item_parent_language',
             'primary' => ['item_id', 'parent_id', 'language']
+        ]);
+        $this->itemParentCacheTable = new Zend_Db_Table([
+            'name'    => 'item_parent_cache',
+            'primary' => ['item_id', 'parent_id']
         ]);
     }
 
@@ -365,8 +374,7 @@ class ItemParent
 
         $this->setItemParentLanguages($parentId, $itemId, $values, true);
 
-        $cpcTable = new DbTable\Item\ParentCache();
-        $cpcTable->rebuildCache($itemRow);
+        $this->rebuildCache($itemRow['id']);
 
         return true;
     }
@@ -428,8 +436,7 @@ class ItemParent
             $itemParentRow->save();
         }
 
-        $cpcTable = new DbTable\Item\ParentCache();
-        $cpcTable->rebuildCache($itemRow);
+        $this->rebuildCache($itemRow['id']);
 
         $this->refreshAuto($toParentId, $itemId);
 
@@ -463,8 +470,7 @@ class ItemParent
             $bvlRow->delete();
         }
 
-        $cpcTable = new DbTable\Item\ParentCache();
-        $cpcTable->rebuildCache($itemRow);
+        $this->rebuildCache($itemRow['id']);
     }
 
     public function setItemParentLanguage(int $parentId, int $itemId, string $language, array $values, $forceIsAuto)
@@ -666,5 +672,119 @@ class ItemParent
         ], $langSortExpr);
 
         return $row ? $row['name'] : '';
+    }
+
+    private function collectParentInfo(int $id, int $diff = 1): array
+    {
+        $cpTableName = $this->itemParentTable->info('name');
+        $adapter = $this->itemParentTable->getAdapter();
+
+        $rows = $adapter->fetchAll(
+            $adapter->select()
+                ->from($cpTableName, ['parent_id', 'type'])
+                ->where('item_id = ?', $id)
+        );
+
+        $result = [];
+        foreach ($rows as $row) {
+            $parentId = $row['parent_id'];
+            $isTuning = $row['type'] == DbTable\Item\ParentTable::TYPE_TUNING;
+            $isSport  = $row['type'] == DbTable\Item\ParentTable::TYPE_SPORT;
+            $isDesign = $row['type'] == DbTable\Item\ParentTable::TYPE_DESIGN;
+            $result[$parentId] = [
+                'diff'   => $diff,
+                'tuning' => $isTuning,
+                'sport'  => $isSport,
+                'design' => $isDesign
+            ];
+
+            foreach ($this->collectParentInfo($parentId, $diff + 1) as $pid => $info) {
+                if (! isset($result[$pid]) || $info['diff'] < $result[$pid]['diff']) {
+                    $result[$pid] = $info;
+                    $result[$pid]['tuning'] = $result[$pid]['tuning'] || $isTuning;
+                    $result[$pid]['sport']  = $result[$pid]['sport']  || $isSport;
+                    $result[$pid]['design'] = $result[$pid]['design'] || $isDesign;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public function rebuildCache(int $itemId)
+    {
+        $parentInfo = $this->collectParentInfo($itemId);
+        $parentInfo[$itemId] = [
+            'diff'   => 0,
+            'tuning' => false,
+            'sport'  => false,
+            'design' => false
+        ];
+
+        $updates = 0;
+
+        foreach ($parentInfo as $parentId => $info) {
+            $row = $this->itemParentCacheTable->fetchRow([
+                'item_id = ?'   => $itemId,
+                'parent_id = ?' => $parentId
+            ]);
+            if (! $row) {
+                $row = $this->itemParentCacheTable->createRow([
+                    'item_id'   => $itemId,
+                    'parent_id' => $parentId,
+                    'diff'      => $info['diff'],
+                    'tuning'    => $info['tuning'] ? 1 : 0,
+                    'sport'     => $info['sport'] ? 1 : 0,
+                    'design'    => $info['design'] ? 1 : 0
+                ]);
+                $updates++;
+                $row->save();
+            }
+            $changes = false;
+            if ($row->diff != $info['diff']) {
+                $row->diff = $info['diff'];
+                $changes = true;
+            }
+
+            if ($row->tuning xor $info['tuning']) {
+                $row->tuning = $info['tuning'] ? 1 : 0;
+                $changes = true;
+            }
+
+            if ($row->sport xor $info['sport']) {
+                $row->sport = $info['sport'] ? 1 : 0;
+                $changes = true;
+            }
+
+            if ($row->design xor $info['design']) {
+                $row->design = $info['design'] ? 1 : 0;
+                $changes = true;
+            }
+
+            if ($changes) {
+                $updates++;
+                $row->save();
+            }
+        }
+
+        $filter = [
+            'item_id = ?' => $itemId
+        ];
+        if ($parentInfo) {
+            $filter['parent_id not in (?)'] = array_keys($parentInfo);
+        }
+
+        $this->itemParentCacheTable->delete($filter);
+
+        $childs = $this->itemParentTable->fetchAll(
+            $this->itemParentTable->select(true)
+                ->where('parent_id = ?', $itemId)
+        );
+
+        foreach ($childs as $child) {
+            $this->rebuildCache($child['item_id']);
+        }
+
+        return $updates;
     }
 }
