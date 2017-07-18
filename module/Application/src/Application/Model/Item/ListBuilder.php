@@ -6,7 +6,6 @@ use Zend\Router\Http\TreeRouteStack;
 
 use Application\Controller\Plugin\Pic;
 use Application\Model\Catalogue;
-use Application\Model\DbTable;
 use Application\Service\SpecificationsService;
 
 class ListBuilder
@@ -93,7 +92,7 @@ class ListBuilder
     }
 
     /**
-     * @param DbTable\Item\Row|array $item
+     * @param \Autowp\Commons\Db\Table\Row|array $item
      * @return mixed|string|NULL
      */
     public function getDetailsUrl($item)
@@ -117,7 +116,7 @@ class ListBuilder
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      *
-     * @param DbTable\Item\Row|array $item
+     * @param \Autowp\Commons\Db\Table\Row|array $item
      * @return string|NULL
      */
     public function getPicturesUrl($item)
@@ -126,7 +125,7 @@ class ListBuilder
     }
 
     /**
-     * @param DbTable\Item\Row|array $item
+     * @param \Autowp\Commons\Db\Table\Row|array $item
      * @return string|NULL
      */
     public function getSpecificationsUrl($item)
@@ -158,7 +157,7 @@ class ListBuilder
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getTypeUrl(DbTable\Item\Row $item, $type)
+    public function getTypeUrl(\Autowp\Commons\Db\Table\Row $item, $type)
     {
         return null;
     }

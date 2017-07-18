@@ -24,7 +24,8 @@ class ItemParentControllerFactory implements FactoryInterface
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\HostManager::class),
             $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Application\Model\UserItemSubscribe::class)
+            $container->get(\Application\Model\UserItemSubscribe::class),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

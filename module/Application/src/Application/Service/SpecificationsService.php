@@ -648,12 +648,12 @@ class SpecificationsService
     }
 
     /**
-     * @param DbTable\Item\Row $car
+     * @param \Autowp\Commons\Db\Table\Row $car
      * @param \Autowp\Commons\Db\Table\Row $user
      * @param array $options
      * @return array
      */
-    public function getCarForm(DbTable\Item\Row $car, \Autowp\Commons\Db\Table\Row $user, array $options, $language)
+    public function getCarForm(\Autowp\Commons\Db\Table\Row $car, \Autowp\Commons\Db\Table\Row $user, array $options, $language)
     {
         $vtTable = new \Application\Model\VehicleType();
         $vehicleTypeIds = $vtTable->getVehicleTypes($car->id);
@@ -916,11 +916,11 @@ class SpecificationsService
     }
 
     /**
-     * @param DbTable\Item\Row $car
+     * @param \Autowp\Commons\Db\Table\Row $car
      * @param array $values
      * @param \Autowp\Commons\Db\Table\Row $user
      */
-    public function saveCarAttributes(DbTable\Item\Row $car, array $values, \Autowp\Commons\Db\Table\Row $user)
+    public function saveCarAttributes(\Autowp\Commons\Db\Table\Row $car, array $values, \Autowp\Commons\Db\Table\Row $user)
     {
         $vtTable = new \Application\Model\VehicleType();
         $vehicleTypeIds = $vtTable->getVehicleTypes($car->id);

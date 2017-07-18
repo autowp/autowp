@@ -145,7 +145,7 @@ class ItemParent
         return true;
     }
 
-    private function getVehicleName(DbTable\Item\Row $itemRow, $language)
+    private function getVehicleName(\Autowp\Commons\Db\Table\Row $itemRow, $language)
     {
         $languageRow = $this->itemLangTable->fetchRow([
             'item_id = ?'  => $itemRow->id,
@@ -179,7 +179,7 @@ class ItemParent
         return $begin . '–xx';
     }
 
-    private function extractName(DbTable\Item\Row $parentRow, DbTable\Item\Row $vehicleRow, $language)
+    private function extractName(\Autowp\Commons\Db\Table\Row $parentRow, \Autowp\Commons\Db\Table\Row $vehicleRow, $language)
     {
         $vehicleName = $this->getVehicleName($vehicleRow, $language);
         $aliases = $this->itemAlias->getAliases($parentRow['id'], $parentRow['name']);
@@ -255,7 +255,7 @@ class ItemParent
         ])->current();
     }
 
-    private function extractCatname(DbTable\Item\Row $brandRow, DbTable\Item\Row $vehicleRow)
+    private function extractCatname(\Autowp\Commons\Db\Table\Row $brandRow, \Autowp\Commons\Db\Table\Row $vehicleRow)
     {
         $diffName = $this->getNamePreferLanguage($brandRow['id'], $vehicleRow['id'], 'en');
         if (! $diffName) {

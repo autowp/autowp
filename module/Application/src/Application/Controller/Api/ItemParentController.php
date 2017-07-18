@@ -5,19 +5,20 @@ namespace Application\Controller\Api;
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
 use Zend\Paginator;
+use Zend\View\Model\JsonModel;
 
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
-use Application\Model\ItemParent;
 use Application\Model\DbTable;
+use Application\Model\Item;
+use Application\Model\ItemParent;
+use Application\Model\UserItemSubscribe;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
-use Application\Model\UserItemSubscribe;
 
 class ItemParentController extends AbstractRestfulController
 {
@@ -71,6 +72,11 @@ class ItemParentController extends AbstractRestfulController
      */
     private $userItemSubscribe;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         RestHydrator $hydrator,
         InputFilter $listInputFilter,
@@ -81,7 +87,8 @@ class ItemParentController extends AbstractRestfulController
         SpecificationsService $specificationsService,
         HostManager $hostManager,
         MessageService $message,
-        UserItemSubscribe $userItemSubscribe
+        UserItemSubscribe $userItemSubscribe,
+        Item $itemModel
     ) {
         $this->hydrator = $hydrator;
         $this->listInputFilter = $listInputFilter;
@@ -96,6 +103,7 @@ class ItemParentController extends AbstractRestfulController
         $this->hostManager = $hostManager;
         $this->message = $message;
         $this->userItemSubscribe = $userItemSubscribe;
+        $this->itemModel = $itemModel;
     }
 
     public function indexAction()
@@ -278,7 +286,7 @@ class ItemParentController extends AbstractRestfulController
 
         $this->itemParent->create((int)$parentItem->id, (int)$item->id, $params);
 
-        $itemTable->updateInteritance($item);
+        $this->itemModel->updateInteritance($item);
 
         $vehicleType = new VehicleType();
         $vehicleType->refreshInheritanceFromParents($item->id);
@@ -363,8 +371,6 @@ class ItemParentController extends AbstractRestfulController
 
         $data = $this->putInputFilter->getValues();
 
-        $itemTable = $this->catalogue()->getItemTable();
-
         $row = $this->itemParent->getRow(
             $this->params('parent_id'),
             $this->params('item_id')
@@ -400,7 +406,7 @@ class ItemParentController extends AbstractRestfulController
                 );
                 $this->log($message, [$item, $newParent, $oldParent]);
 
-                $itemTable->updateInteritance($item);
+                $this->itemModel->updateInteritance($item);
 
                 $this->specificationsService->updateActualValues($row['item_id']);
             }
@@ -426,10 +432,10 @@ class ItemParentController extends AbstractRestfulController
     }
 
     /**
-     * @param DbTable\Item\Row $car
+     * @param \Autowp\Commons\Db\Table\Row $car
      * @return string
      */
-    private function itemModerUrl(DbTable\Item\Row $item, $full = false, $tab = null, $uri = null)
+    private function itemModerUrl(\Autowp\Commons\Db\Table\Row $item, $full = false, $tab = null, $uri = null)
     {
         $url = 'moder/items/item/' . $item['id'];
 
@@ -477,8 +483,7 @@ class ItemParentController extends AbstractRestfulController
 
         $this->itemParent->remove($parentItem->id, $item->id);
 
-        $itemTable = $this->catalogue()->getItemTable();
-        $itemTable->updateInteritance($item);
+        $this->itemModel->updateInteritance($item);
 
         $vehicleType = new VehicleType();
         $vehicleType->refreshInheritanceFromParents($item->id);

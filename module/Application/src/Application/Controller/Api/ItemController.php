@@ -32,6 +32,7 @@ use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
+use Application\Model\Item;
 
 class ItemController extends AbstractRestfulController
 {
@@ -95,6 +96,11 @@ class ItemController extends AbstractRestfulController
      */
     private $itemParent;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         RestHydrator $hydrator,
         Image $logoHydrator,
@@ -106,7 +112,8 @@ class ItemController extends AbstractRestfulController
         HostManager $hostManager,
         MessageService $message,
         UserItemSubscribe $userItemSubscribe,
-        TableGateway $specTable
+        TableGateway $specTable,
+        Item $itemModel
     ) {
         $this->hydrator = $hydrator;
         $this->logoHydrator = $logoHydrator;
@@ -119,6 +126,7 @@ class ItemController extends AbstractRestfulController
         $this->message = $message;
         $this->userItemSubscribe = $userItemSubscribe;
         $this->specTable = $specTable;
+        $this->itemModel = $itemModel;
 
         $this->table = new DbTable\Item();
     }
@@ -1008,7 +1016,7 @@ class ItemController extends AbstractRestfulController
         /*$vehicleType = new VehicleType();
         $vehicleType->setVehicleTypes($item->id, (array)$values['vehicle_type_id']);*/
 
-        $item->updateOrderCache();
+        $this->itemModel->updateOrderCache($item['id']);
 
         $this->itemParent->rebuildCache($item['id']);
 
@@ -1025,7 +1033,7 @@ class ItemController extends AbstractRestfulController
 
         $this->userItemSubscribe->subscribe($user['id'], $item['id']);
 
-        $itemTable->updateInteritance($item);
+        $this->itemModel->updateInteritance($item);
 
         $this->specificationsService->updateInheritedValues($item->id);
 
@@ -1208,8 +1216,8 @@ class ItemController extends AbstractRestfulController
             $this->setItemPoint($item, $point);
         }
 
-        $itemTable->updateInteritance($item);
-        $item->updateOrderCache();
+        $this->itemModel->updateInteritance($item);
+        $this->itemModel->updateOrderCache($item['id']);
 
         $this->itemParent->refreshAutoByVehicle($item->id);
 
@@ -1271,10 +1279,10 @@ class ItemController extends AbstractRestfulController
     }
 
     /**
-     * @param DbTable\Item\Row $car
+     * @param \Autowp\Commons\Db\Table\Row $car
      * @return string
      */
-    private function itemModerUrl(DbTable\Item\Row $item, $full = false, $tab = null, $uri = null)
+    private function itemModerUrl(\Autowp\Commons\Db\Table\Row $item, $full = false, $tab = null, $uri = null)
     {
         $url = 'moder/items/item/' . $item['id'];
 
@@ -1383,7 +1391,7 @@ class ItemController extends AbstractRestfulController
     }
 
 
-    private function setItemPoint(DbTable\Item\Row $item, $point)
+    private function setItemPoint(\Autowp\Commons\Db\Table\Row $item, $point)
     {
         $itemPointTable = new DbTable\Item\Point();
         $itemPointRow = $itemPointTable->fetchRow([
@@ -1523,7 +1531,7 @@ class ItemController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
-    private function carTreeWalk(DbTable\Item\Row $car, int $parentType = 0)
+    private function carTreeWalk(\Autowp\Commons\Db\Table\Row $car, int $parentType = 0)
     {
         $data = [
             'id'     => (int)$car['id'],

@@ -543,7 +543,7 @@ class Car extends AbstractPlugin
         return $this->getController()->catalogue()->getPictureTable();
     }
 
-    public function formatName(DbTable\Item\Row $vehicle, $language)
+    public function formatName(\Autowp\Commons\Db\Table\Row $vehicle, $language)
     {
         return $this->itemNameFormatter->format(
             $this->itemModel->getNameData($vehicle, $language),

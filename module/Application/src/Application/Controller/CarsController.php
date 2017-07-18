@@ -75,7 +75,7 @@ class CarsController extends AbstractActionController
         $this->itemModel = $itemModel;
     }
 
-    private function carModerUrl(DbTable\Item\Row $item, $uri = null)
+    private function carModerUrl(\Autowp\Commons\Db\Table\Row $item, $uri = null)
     {
         $url = 'moder/items/item/' . $item['id'];
 
@@ -568,7 +568,7 @@ class CarsController extends AbstractActionController
         $car->engine_item_id = null;
         $car->save();
 
-        $itemTable->updateInteritance($car);
+        $this->itemModel->updateInteritance($car);
 
         $this->specsService->updateActualValues($car->id);
 
@@ -624,7 +624,7 @@ class CarsController extends AbstractActionController
             $car->engine_inherit = 1;
             $car->save();
 
-            $itemTable->updateInteritance($car);
+            $this->itemModel->updateInteritance($car);
 
             $this->specsService->updateActualValues($car->id);
 
@@ -752,7 +752,7 @@ class CarsController extends AbstractActionController
         $car->engine_item_id = $engine->id;
         $car->save();
 
-        $itemTable->updateInteritance($car);
+        $this->itemModel->updateInteritance($car);
 
         $this->specsService->updateActualValues($car->id);
 
@@ -797,7 +797,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $itemTable->updateInteritance($car);
+        $this->itemModel->updateInteritance($car);
 
         $this->specsService->updateActualValues($car->id);
 

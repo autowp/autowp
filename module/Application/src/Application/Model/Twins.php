@@ -191,7 +191,7 @@ class Twins
 
     /**
      * @param int $groupId
-     * @return DbTable\Item\Row[]
+     * @return \Autowp\Commons\Db\Table\Row[]
      */
     public function getGroupCars($groupId)
     {

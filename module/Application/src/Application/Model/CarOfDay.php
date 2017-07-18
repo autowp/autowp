@@ -625,7 +625,7 @@ class CarOfDay
         return $pictures;
     }
 
-    private function carLinks(DbTable\Item\Row $car, $language)
+    private function carLinks(\Autowp\Commons\Db\Table\Row $car, $language)
     {
         $items = [];
 

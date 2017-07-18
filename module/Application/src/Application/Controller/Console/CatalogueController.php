@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\DuplicateFinder;
 use Application\HostManager;
+use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\DbTable;
 use Application\Model\PictureItem;
@@ -38,6 +39,11 @@ class CatalogueController extends AbstractActionController
      */
     private $message;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         ItemParent $itemParent,
         PictureItem $pictureItem,
@@ -46,7 +52,8 @@ class CatalogueController extends AbstractActionController
         TelegramService $telegram,
         MessageService $message,
         $textStorage,
-        DuplicateFinder $duplicateFinder
+        DuplicateFinder $duplicateFinder,
+        Item $itemModel
     ) {
         $this->itemParent = $itemParent;
         $this->pictureItem = $pictureItem;
@@ -56,6 +63,7 @@ class CatalogueController extends AbstractActionController
         $this->message = $message;
         $this->textStorage = $textStorage;
         $this->duplicateFinder = $duplicateFinder;
+        $this->itemModel = $itemModel;
     }
 
     public function refreshBrandVehicleAction()
@@ -156,9 +164,9 @@ class CatalogueController extends AbstractActionController
         $pagesCount = $paginator->count();
         for ($i = 1; $i <= $pagesCount; $i++) {
             $paginator->setCurrentPageNumber($i);
-            foreach ($paginator->getCurrentItems() as $carRow) {
-                print $carRow->id . "\n";
-                $carRow->updateOrderCache();
+            foreach ($paginator->getCurrentItems() as $item) {
+                print $item['id'] . "\n";
+                $this->itemModel->updateOrderCache($item['id']);
             }
         }
 

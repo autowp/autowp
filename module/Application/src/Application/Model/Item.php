@@ -2,6 +2,8 @@
 
 namespace Application\Model;
 
+use DateTime;
+
 use Zend\Db\TableGateway\TableGateway;
 
 use Application\Model\DbTable;
@@ -15,9 +17,16 @@ class Item
      */
     private $specTable;
 
+    /**
+     * @var DbTable\Item
+     */
+    private $itemTable;
+
     public function __construct(TableGateway $specTable)
     {
         $this->specTable = $specTable;
+
+        $this->itemTable = new DbTable\Item();
     }
 
     public function getEngineVehiclesGroups(int $engineId, array $options = [])
@@ -27,9 +36,7 @@ class Item
         ];
         $options = array_replace($defaults, $options);
 
-        $itemTable = new DbTable\Item();
-
-        $db = $itemTable->getAdapter();
+        $db = $this->itemTable->getAdapter();
 
         $vehicleIds = $db->fetchCol(
             $db->select()
@@ -116,7 +123,7 @@ class Item
         return $db->fetchOne($select);
     }
 
-    public function getNameData(DbTable\Item\Row $row, string $language = 'en')
+    public function getNameData(\Autowp\Commons\Db\Table\Row $row, string $language = 'en')
     {
         /*$carLangTable = new DbTable\Item\Language();
          $carLangRow = $carLangTable->fetchRow([
@@ -151,5 +158,383 @@ class Item
             'begin_month'      => $row['begin_month'],
             'end_month'        => $row['end_month'],
         ];
+    }
+
+    public function getRelatedCarGroups(int $itemId): array
+    {
+        $db = $this->itemTable->getAdapter();
+
+        $carIds = $db->fetchCol(
+            $db->select()
+                ->from('item_parent', 'item_id')
+                ->where('item_parent.parent_id = ?', $itemId)
+        );
+
+        $vectors = [];
+        foreach ($carIds as $carId) {
+            $parentIds = $db->fetchCol(
+                $db->select()
+                    ->from('item_parent_cache', 'parent_id')
+                    ->join('item', 'item_parent_cache.parent_id = item.id', null)
+                    ->where('item.item_type_id IN (?)', [
+                        Type::VEHICLE,
+                        Type::ENGINE
+                    ])
+                    ->where('item_parent_cache.item_id = ?', $carId)
+                    ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
+                    ->order('item_parent_cache.diff desc')
+            );
+
+            // remove parents
+            foreach ($parentIds as $parentId) {
+                $index = array_search($parentId, $carIds);
+                if ($index !== false) {
+                    unset($carIds[$index]);
+                }
+            }
+
+            $vector = $parentIds;
+            $vector[] = $carId;
+
+            $vectors[] = [
+                'parents' => $vector,
+                'childs'  => [$carId]
+            ];
+        }
+
+        do {
+            // look for same root
+
+            $matched = false;
+            for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
+                for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
+                    if ($vectors[$i]['parents'][0] == $vectors[$j]['parents'][0]) {
+                        $matched = true;
+                        // matched root
+                        $newVector = [];
+                        $length = min(count($vectors[$i]['parents']), count($vectors[$j]['parents']));
+                        for ($k = 0; $k < $length && $vectors[$i]['parents'][$k] == $vectors[$j]['parents'][$k]; $k++) {
+                            $newVector[] = $vectors[$i]['parents'][$k];
+                        }
+                        $vectors[$i] = [
+                            'parents' => $newVector,
+                            'childs'  => array_merge($vectors[$i]['childs'], $vectors[$j]['childs'])
+                        ];
+                        array_splice($vectors, $j, 1);
+                    }
+                }
+            }
+        } while ($matched);
+
+        $result = [];
+        foreach ($vectors as $vector) {
+            $carId = $vector['parents'][count($vector['parents']) - 1];
+            $result[$carId] = $vector['childs'];
+        }
+
+        return $result;
+    }
+
+    public function getRelatedCarGroupId(int $itemId): array
+    {
+        $db = $this->itemTable->getAdapter();
+
+        $carIds = $db->fetchCol(
+            $db->select()
+                ->from('item_parent', 'item_id')
+                ->where('item_parent.parent_id = ?', $itemId)
+        );
+
+        $vectors = [];
+        foreach ($carIds as $carId) {
+            $parentIds = $db->fetchCol(
+                $db->select()
+                    ->from('item_parent_cache', 'parent_id')
+                    ->join('item', 'item_parent_cache.parent_id = item.id', null)
+                    ->where('item.item_type_id IN (?)', [
+                        Type::VEHICLE,
+                        Type::ENGINE
+                    ])
+                    ->where('item_id = ?', $carId)
+                    ->where('item_id <> parent_id')
+                    ->order('diff desc')
+            );
+
+            // remove parents
+            foreach ($parentIds as $parentId) {
+                $index = array_search($parentId, $carIds);
+                if ($index !== false) {
+                    unset($carIds[$index]);
+                }
+            }
+
+            $vector = $parentIds;
+            $vector[] = $carId;
+
+            $vectors[] = $vector;
+        }
+
+        do {
+            // look for same root
+
+            $matched = false;
+            for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
+                for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
+                    if ($vectors[$i][0] == $vectors[$j][0]) {
+                        $matched = true;
+                        // matched root
+                        $newVector = [];
+                        $length = min(count($vectors[$i]), count($vectors[$j]));
+                        for ($k = 0; $k < $length && $vectors[$i][$k] == $vectors[$j][$k]; $k++) {
+                            $newVector[] = $vectors[$i][$k];
+                        }
+                        $vectors[$i] = $newVector;
+                        array_splice($vectors, $j, 1);
+                    }
+                }
+            }
+        } while ($matched);
+
+        $resultIds = [];
+        foreach ($vectors as $vector) {
+            $resultIds[] = $vector[count($vector) - 1];
+        }
+
+        return $resultIds;
+    }
+
+    public function updateOrderCache(int $itemId): bool
+    {
+        $row = $this->itemTable->find($itemId)->current();
+        if (! $row) {
+            return false;
+        }
+
+        $begin = null;
+        if ($row['begin_year']) {
+            $begin = new DateTime();
+            $begin->setDate(
+                $row['begin_year'],
+                $row['begin_month'] ? $row['begin_month'] : 1,
+                1
+            );
+        } elseif ($row['begin_model_year']) {
+            $begin = new DateTime();
+            $begin->setDate( // approximation
+                $row['begin_model_year'] - 1,
+                10,
+                1
+            );
+        } else {
+            $begin = new DateTime();
+            $begin->setDate(
+                2100,
+                1,
+                1
+            );
+        }
+
+        $end = null;
+        if ($row['end_year']) {
+            $end = new DateTime();
+            $end->setDate(
+                $row['end_year'],
+                $row['end_month'] ? $row['end_month'] : 12,
+                1
+            );
+        } elseif ($row['end_model_year']) {
+            $end = new DateTime();
+            $end->setDate( // approximation
+                $row['end_model_year'],
+                9,
+                30
+            );
+        } else {
+            $end = $begin;
+        }
+
+        $row->setFromArray([
+            'begin_order_cache' => $begin ? $begin->format(MYSQL_DATETIME_FORMAT) : null,
+            'end_order_cache'   => $end ? $end->format(MYSQL_DATETIME_FORMAT) : null,
+        ]);
+        $row->save();
+
+        return true;
+    }
+
+    public function updateInteritance(\Autowp\Commons\Db\Table\Row $car)
+    {
+        $parents = $this->itemTable->fetchAll(
+            $this->itemTable->select(true)
+                ->join('item_parent', 'item.id = item_parent.parent_id', null)
+                ->where('item_parent.item_id = ?', $car->id)
+        );
+
+        $somethingChanged = false;
+
+        if ($car->is_concept_inherit) {
+            $isConcept = false;
+            foreach ($parents as $parent) {
+                if ($parent->is_concept) {
+                    $isConcept = true;
+                }
+            }
+
+            $oldIsConcept = (bool)$car->is_concept;
+
+            if ($oldIsConcept !== $isConcept) {
+                $car->is_concept = $isConcept ? 1 : 0;
+                $somethingChanged = true;
+            }
+        }
+
+        if ($car->engine_inherit) {
+            $map = [];
+            foreach ($parents as $parent) {
+                $engineId = $parent->engine_item_id;
+                if ($engineId) {
+                    if (isset($map[$engineId])) {
+                        $map[$engineId]++;
+                    } else {
+                        $map[$engineId] = 1;
+                    }
+                }
+            }
+
+            // select top
+            $maxCount = null;
+            $selectedId = null;
+            foreach ($map as $id => $count) {
+                if (is_null($maxCount) || ($count > $maxCount)) {
+                    $maxCount = $count;
+                    $selectedId = (int)$id;
+                }
+            }
+
+            $oldEngineId = isset($car->engine_item_id) ? (int)$car->engine_item_id : null;
+
+            if ($oldEngineId !== $selectedId) {
+                $car->engine_item_id = $selectedId;
+                $somethingChanged = true;
+            }
+        }
+
+        if ($car->car_type_inherit) {
+            $map = [];
+            foreach ($parents as $parent) {
+                $typeId = $parent->car_type_id;
+                if ($typeId) {
+                    if (isset($map[$typeId])) {
+                        $map[$typeId]++;
+                    } else {
+                        $map[$typeId] = 1;
+                    }
+                }
+            }
+
+            $carTypeParentTable = new Vehicle\TypeParent();
+            $carTypeParentTableName = $carTypeParentTable->info('name');
+            $db = $carTypeParentTable->getAdapter();
+            foreach ($map as $id => $count) {
+                $otherIds = array_diff(array_keys($map), [$id]);
+
+                if (count($otherIds)) {
+                    $isParentOf = $db->fetchCol(
+                        $db->select()
+                        ->from($carTypeParentTableName, 'id')
+                        ->where('id in (?)', $otherIds)
+                        ->where('parent_id = ?', $id)
+                        ->where('id <> parent_id')
+                    );
+
+                    if (count($isParentOf)) {
+                        foreach ($isParentOf as $childId) {
+                            $map[$childId] += $count;
+                        }
+
+                        unset($map[$id]);
+                    }
+                }
+            }
+
+            // select top
+            $maxCount = null;
+            $selectedId = null;
+            foreach ($map as $id => $count) {
+                if (is_null($maxCount) || ($count > $maxCount)) {
+                    $maxCount = $count;
+                    $selectedId = (int)$id;
+                }
+            }
+
+            $oldCarTypeId = isset($car->car_type_id) ? (int)$car->car_type_id : null;
+
+            if ($oldCarTypeId !== $selectedId) {
+                $car->car_type_id = $selectedId;
+                $somethingChanged = true;
+            }
+        }
+
+        if ($car->spec_inherit) {
+            $map = [];
+            foreach ($parents as $parent) {
+                $specId = $parent->spec_id;
+                if ($specId) {
+                    if (isset($map[$specId])) {
+                        $map[$specId]++;
+                    } else {
+                        $map[$specId] = 1;
+                    }
+                }
+            }
+
+            // select top
+            $maxCount = null;
+            $selectedId = null;
+            foreach ($map as $id => $count) {
+                if (is_null($maxCount) || ($count > $maxCount)) {
+                    $maxCount = $count;
+                    $selectedId = (int)$id;
+                }
+            }
+
+            $oldSpecId = isset($car->spec_id) ? (int)$car->spec_id : null;
+
+            if ($oldSpecId !== $selectedId) {
+                $car->spec_id = $selectedId;
+                $somethingChanged = true;
+            }
+        }
+
+        if ($somethingChanged || ! $car->car_type_inherit) {
+            $car->save();
+
+            $childs = $this->itemTable->fetchAll(
+                $this->itemTable->select(true)
+                    ->join('item_parent', 'item.id = item_parent.item_id', null)
+                    ->where('item_parent.parent_id = ?', $car->id)
+            );
+
+            foreach ($childs as $child) {
+                $this->updateInteritance($child);
+            }
+        }
+    }
+
+    public function getVehiclesAndEnginesCount(int $parentId): int
+    {
+        $db = $this->itemTable->getAdapter();
+
+        $select = $db->select()
+            ->from('item', new Zend_Db_Expr('COUNT(1)'))
+            ->where('item.item_type_id IN (?)', [
+                DbTable\Item\Type::ENGINE,
+                DbTable\Item\Type::VEHICLE
+            ])
+            ->where('not item.is_group')
+            ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
+            ->where('item_parent_cache.parent_id = ?', $parentId);
+
+        return (int)$db->fetchOne($select);
     }
 }

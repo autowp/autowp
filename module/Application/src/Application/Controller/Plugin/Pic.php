@@ -858,7 +858,7 @@ class Pic extends AbstractPlugin
             $factoryCars = [];
             $factoryCarsMore = false;
 
-            $carIds = $factory->getRelatedCarGroupId();
+            $carIds = $this->itemModel->getRelatedCarGroupId($factory['id']);
             if ($carIds) {
                 $itemTable = $this->catalogue->getItemTable();
 

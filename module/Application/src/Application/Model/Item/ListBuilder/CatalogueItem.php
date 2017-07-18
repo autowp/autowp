@@ -4,7 +4,6 @@ namespace Application\Model\Item\ListBuilder;
 
 use Exception;
 
-use Application\Model\DbTable;
 use Application\Model\ItemParent;
 
 class CatalogueItem extends Catalogue
@@ -88,7 +87,7 @@ class CatalogueItem extends Catalogue
         ]);
     }
 
-    public function getTypeUrl(DbTable\Item\Row $item, $type)
+    public function getTypeUrl(\Autowp\Commons\Db\Table\Row $item, $type)
     {
         switch ($type) {
             case ItemParent::TYPE_TUNING:

@@ -11,10 +11,10 @@ use Application\Model\Modification;
 class CarsController extends AbstractActionController
 {
     /**
-     * @param DbTable\Item\Row $car
+     * @param \Autowp\Commons\Db\Table\Row $car
      * @return string
      */
-    private function carModerUrl(DbTable\Item\Row $item, $full = false, $tab = null, $uri = null)
+    private function carModerUrl(\Autowp\Commons\Db\Table\Row $item, $full = false, $tab = null, $uri = null)
     {
         $url = 'moder/items/item/' . $item['id'];
 
@@ -31,15 +31,15 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param DbTable\Item\Row $car
+     * @param \Autowp\Commons\Db\Table\Row $car
      * @return void
      */
-    private function redirectToCar(DbTable\Item\Row $car, $tab = null)
+    private function redirectToCar(\Autowp\Commons\Db\Table\Row $car, $tab = null)
     {
         return $this->redirect()->toUrl($this->carModerUrl($car, true, $tab));
     }
 
-    private function carMofificationsGroupModifications(DbTable\Item\Row $car, $groupId)
+    private function carMofificationsGroupModifications(\Autowp\Commons\Db\Table\Row $car, $groupId)
     {
         $modModel = new Modification();
         $mTable = new DbTable\Modification();

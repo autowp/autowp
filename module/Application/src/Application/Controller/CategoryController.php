@@ -120,8 +120,7 @@ class CategoryController extends AbstractActionController
                     'language = ?' => $language,
                     'item_id = ?'  => $row->id
                 ]);
-
-                $carsCount = $this->itemTable->getVehiclesAndEnginesCount($row->id);
+                $carsCount = $this->itemModel->getVehiclesAndEnginesCount($row->id);
 
                 $categories[] = [
                     'id'             => $row->id,

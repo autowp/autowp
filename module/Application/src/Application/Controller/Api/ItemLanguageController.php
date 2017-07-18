@@ -7,13 +7,12 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service as TextStorage;
 
+use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\ItemParent;
-use Application\Model\DbTable;
-use Application\HostManager;
-use Autowp\Message\MessageService;
 use Application\Model\UserItemSubscribe;
 
 class ItemLanguageController extends AbstractRestfulController
@@ -282,10 +281,10 @@ class ItemLanguageController extends AbstractRestfulController
     }
 
     /**
-     * @param DbTable\Item\Row $car
+     * @param \Autowp\Commons\Db\Table\Row $car
      * @return string
      */
-    private function itemModerUrl(DbTable\Item\Row $item, $full = false, $tab = null, $uri = null)
+    private function itemModerUrl(\Autowp\Commons\Db\Table\Row $item, $full = false, $tab = null, $uri = null)
     {
         $url = 'moder/items/item/' . $item['id'];
 

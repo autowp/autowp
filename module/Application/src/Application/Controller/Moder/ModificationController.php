@@ -10,10 +10,6 @@ use Application\Model\Modification;
 
 class ModificationController extends AbstractActionController
 {
-    /**
-     * @param DbTable\Item\Row $car
-     * @return string
-     */
     private function carModerUrl($carId, $full = false, $tab = null)
     {
         $url = 'moder/items/item/' . $carId;
@@ -29,10 +25,6 @@ class ModificationController extends AbstractActionController
         ]) . $url;
     }
 
-    /**
-     * @param DbTable\Item\Row $car
-     * @return void
-     */
     private function redirectToCar($carId, $tab = null)
     {
         return $this->redirect($this->carModerUrl($carId, true, $tab));

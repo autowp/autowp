@@ -78,7 +78,7 @@ class FactoriesController extends AbstractActionController
         $imageStorage = $this->imageStorage();
 
         $carPictures = [];
-        $groups = $factory->getRelatedCarGroups();
+        $groups = $this->itemModel->getRelatedCarGroups($factory['id']);
         if (count($groups) > 0) {
             $cars = $itemTable->fetchAll([
                 'id in (?)' => array_keys($groups)
@@ -199,7 +199,7 @@ class FactoriesController extends AbstractActionController
         $paginator = null;
 
         $cars = [];
-        $groups = $factory->getRelatedCarGroups();
+        $groups = $this->itemModel->getRelatedCarGroups($factory['id']);
         if (count($groups) > 0) {
             $select = $itemTable->select(true)
                 ->where('id IN (?)', array_keys($groups))
