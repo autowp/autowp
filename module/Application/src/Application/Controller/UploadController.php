@@ -145,11 +145,18 @@ class UploadController extends AbstractActionController
             ], [], true));
         }
 
+        $perspectives = $this->perspective->getArray();
+
+        foreach ($perspectives as &$perspective) {
+            $perspective['name'] = $this->translate($perspective['name']);
+        }
+        unset($perspective);
+
         return [
             'form'         => $form,
             'selected'     => $selected,
             'selectedName' => $selectedName,
-            'perspectives' => $this->perspective->getArray()
+            'perspectives' => $perspectives
         ];
     }
 
