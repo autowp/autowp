@@ -419,8 +419,8 @@ class ItemController extends AbstractRestfulController
                 ])->current();
 
                 if ($specRow) {
-                    $specId = $specRow->id;
-                    $query = trim(str_replace($specRow->short_name, '', $query));
+                    $specId = $specRow['id'];
+                    $query = trim(str_replace($specRow['short_name'], '', $query));
                 }
             }
 
@@ -474,8 +474,17 @@ class ItemController extends AbstractRestfulController
             $allowedItemTypes = [0];
             switch ($typeId) {
                 case DbTable\Item\Type::VEHICLE:
+                    $allowedItemTypes = [
+                        DbTable\Item\Type::VEHICLE,
+                        DbTable\Item\Type::CATEGORY,
+                        DbTable\Item\Type::TWINS,
+                        DbTable\Item\Type::BRAND,
+                        DbTable\Item\Type::FACTORY
+                    ];
+                    break;
                 case DbTable\Item\Type::ENGINE:
                     $allowedItemTypes = [
+                        DbTable\Item\Type::ENGINE,
                         DbTable\Item\Type::CATEGORY,
                         DbTable\Item\Type::TWINS,
                         DbTable\Item\Type::BRAND,
