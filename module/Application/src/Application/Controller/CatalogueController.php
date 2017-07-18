@@ -998,7 +998,7 @@ class CatalogueController extends AbstractActionController
                     ->join('item_parent', 'item.id = item_parent.parent_id', [
                         'brand_item_catname' => 'catname'
                     ])
-                    ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DESIGN)
+                    ->where('item_parent.type = ?', ItemParent::TYPE_DESIGN)
                     ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id = ?', $currentCar['id'])
             );
@@ -1046,12 +1046,12 @@ class CatalogueController extends AbstractActionController
         $pairs = $db->fetchPairs($select);
 
         return [
-            'stock'  => isset($pairs[DbTable\Item\ParentTable::TYPE_DEFAULT])
-                ? $pairs[DbTable\Item\ParentTable::TYPE_DEFAULT] : 0,
-            'tuning' => isset($pairs[DbTable\Item\ParentTable::TYPE_TUNING])
-                ? $pairs[DbTable\Item\ParentTable::TYPE_TUNING] : 0,
-            'sport'  => isset($pairs[DbTable\Item\ParentTable::TYPE_SPORT])
-                ? $pairs[DbTable\Item\ParentTable::TYPE_SPORT] : 0
+            'stock'  => isset($pairs[ItemParent::TYPE_DEFAULT])
+                ? $pairs[ItemParent::TYPE_DEFAULT] : 0,
+            'tuning' => isset($pairs[ItemParent::TYPE_TUNING])
+                ? $pairs[ItemParent::TYPE_TUNING] : 0,
+            'sport'  => isset($pairs[ItemParent::TYPE_SPORT])
+                ? $pairs[ItemParent::TYPE_SPORT] : 0
         ];
     }
 
@@ -1106,13 +1106,13 @@ class CatalogueController extends AbstractActionController
             $type = $this->params('type');
             switch ($type) {
                 case 'tuning':
-                    $type = DbTable\Item\ParentTable::TYPE_TUNING;
+                    $type = ItemParent::TYPE_TUNING;
                     break;
                 case 'sport':
-                    $type = DbTable\Item\ParentTable::TYPE_SPORT;
+                    $type = ItemParent::TYPE_SPORT;
                     break;
                 default:
-                    $type = DbTable\Item\ParentTable::TYPE_DEFAULT;
+                    $type = ItemParent::TYPE_DEFAULT;
                     break;
             }
 
@@ -1168,7 +1168,7 @@ class CatalogueController extends AbstractActionController
                 'childListData' => $this->car()->listData($listCars, [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
                         'perspective'          => $this->perspective,
-                        'type'                 => $type == DbTable\Item\ParentTable::TYPE_DEFAULT ? $type : null,
+                        'type'                 => $type == ItemParent::TYPE_DEFAULT ? $type : null,
                         'onlyExactlyPictures'  => true,
                         'dateSort'             => false,
                         'disableLargePictures' => false,
@@ -1328,12 +1328,12 @@ class CatalogueController extends AbstractActionController
             /*
             if (isset($options['type'])) {
                 switch ($options['type']) {
-                    case DbTable\Item\ParentTable::TYPE_DEFAULT:
+                    case ItemParent::TYPE_DEFAULT:
                         break;
-                    case DbTable\Item\ParentTable::TYPE_TUNING:
+                    case ItemParent::TYPE_TUNING:
                         $select->where('item_parent_cache.tuning');
                         break;
-                    case DbTable\Item\ParentTable::TYPE_SPORT:
+                    case ItemParent::TYPE_SPORT:
                         $select->where('item_parent_cache.sport');
                         break;
                 }
@@ -1569,13 +1569,13 @@ class CatalogueController extends AbstractActionController
         $type = $this->params('type');
         switch ($type) {
             case 'tuning':
-                $type = DbTable\Item\ParentTable::TYPE_TUNING;
+                $type = ItemParent::TYPE_TUNING;
                 break;
             case 'sport':
-                $type = DbTable\Item\ParentTable::TYPE_SPORT;
+                $type = ItemParent::TYPE_SPORT;
                 break;
             default:
-                $type = DbTable\Item\ParentTable::TYPE_DEFAULT;
+                $type = ItemParent::TYPE_DEFAULT;
                 break;
         }
 
@@ -1605,7 +1605,7 @@ class CatalogueController extends AbstractActionController
 
         $currentPictures = [];
         $currentPicturesCount = 0;
-        if ($isLastPage && $type == DbTable\Item\ParentTable::TYPE_DEFAULT) {
+        if ($isLastPage && $type == ItemParent::TYPE_DEFAULT) {
             $select = $this->selectOrderFromPictures()
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('picture_item.item_id = ?', $currentCarId);
@@ -1712,7 +1712,7 @@ class CatalogueController extends AbstractActionController
             'childListData' => $this->car()->listData($listCars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
                     'perspective'          => $this->perspective,
-                    'type'                 => $type == DbTable\Item\ParentTable::TYPE_DEFAULT ? $type : null,
+                    'type'                 => $type == ItemParent::TYPE_DEFAULT ? $type : null,
                     'onlyExactlyPictures'  => false,
                     'dateSort'             => false,
                     'disableLargePictures' => false,
@@ -1970,13 +1970,13 @@ class CatalogueController extends AbstractActionController
             $type = $this->params('type');
             switch ($type) {
                 case 'tuning':
-                    $type = DbTable\Item\ParentTable::TYPE_TUNING;
+                    $type = ItemParent::TYPE_TUNING;
                     break;
                 case 'sport':
-                    $type = DbTable\Item\ParentTable::TYPE_SPORT;
+                    $type = ItemParent::TYPE_SPORT;
                     break;
                 default:
-                    $type = DbTable\Item\ParentTable::TYPE_DEFAULT;
+                    $type = ItemParent::TYPE_DEFAULT;
                     break;
             }
 

@@ -8,6 +8,7 @@ use Autowp\TextStorage\Service as TextStorage;
 
 use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\ItemParent;
 use Application\Model\Item\PictureFetcher;
 use Application\Model\Perspective;
 use Application\Model\Twins;
@@ -223,8 +224,8 @@ class Car extends AbstractPlugin
                     ->from($itemParentTable->info('name'), ['parent_id', 'type', 'count' => 'count(1)'])
                     ->where('parent_id IN (?)', $carIds)
                     ->where('type IN (?)', [
-                        DbTable\Item\ParentTable::TYPE_TUNING,
-                        DbTable\Item\ParentTable::TYPE_SPORT
+                        ItemParent::TYPE_TUNING,
+                        ItemParent::TYPE_SPORT
                     ])
                     ->group(['parent_id', 'type'])
             );
@@ -268,7 +269,7 @@ class Car extends AbstractPlugin
                     ->join('item_parent', 'item.id = item_parent.parent_id', [
                         'brand_item_catname' => 'catname'
                     ])
-                    ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DESIGN)
+                    ->where('item_parent.type = ?', ItemParent::TYPE_DESIGN)
                     ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id = ?', $car->id)
                     ->limit(1)
@@ -434,22 +435,22 @@ class Car extends AbstractPlugin
             }
 
             if ($listBuilder->isTypeUrlEnabled()) {
-                $tuningCount = isset($carsTypeCounts[$car->id][DbTable\Item\ParentTable::TYPE_TUNING])
-                    ? $carsTypeCounts[$car->id][DbTable\Item\ParentTable::TYPE_TUNING]
+                $tuningCount = isset($carsTypeCounts[$car->id][ItemParent::TYPE_TUNING])
+                    ? $carsTypeCounts[$car->id][ItemParent::TYPE_TUNING]
                     : 0;
                 if ($tuningCount) {
-                    $url = $listBuilder->getTypeUrl($car, DbTable\Item\ParentTable::TYPE_TUNING);
+                    $url = $listBuilder->getTypeUrl($car, ItemParent::TYPE_TUNING);
                     $item['tuning'] = [
                         'count' => $tuningCount,
                         'url'   => $url
                     ];
                 }
 
-                $sportCount = isset($carsTypeCounts[$car->id][DbTable\Item\ParentTable::TYPE_SPORT])
-                    ? $carsTypeCounts[$car->id][DbTable\Item\ParentTable::TYPE_SPORT]
+                $sportCount = isset($carsTypeCounts[$car->id][ItemParent::TYPE_SPORT])
+                    ? $carsTypeCounts[$car->id][ItemParent::TYPE_SPORT]
                     : 0;
                 if ($sportCount) {
-                    $url = $listBuilder->getTypeUrl($car, DbTable\Item\ParentTable::TYPE_SPORT);
+                    $url = $listBuilder->getTypeUrl($car, ItemParent::TYPE_SPORT);
                     $item['sport'] = [
                         'count' => $sportCount,
                         'url'   => $url

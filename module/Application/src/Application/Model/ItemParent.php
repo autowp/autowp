@@ -15,7 +15,14 @@ use Zend_Db_Table;
 
 class ItemParent
 {
+    const MAX_CATNAME = 150;
     const MAX_LANGUAGE_NAME = 255;
+
+    const
+        TYPE_DEFAULT = 0,
+        TYPE_TUNING = 1,
+        TYPE_SPORT = 2,
+        TYPE_DESIGN = 3;
 
     /**
      * @var DbTable\Item
@@ -322,7 +329,7 @@ class ItemParent
         }
 
         $defaults = [
-            'type'           => DbTable\Item\ParentTable::TYPE_DEFAULT,
+            'type'           => self::TYPE_DEFAULT,
             'catname'        => null,
             'manual_catname' => isset($options['catname'])
         ];
@@ -341,7 +348,7 @@ class ItemParent
             throw new Exception("Type cannot be null");
         }
 
-        $parentIds = $this->itemParentTable->collectParentIds($parentId);
+        $parentIds = $this->collectParentIds($parentId);
         if (in_array($itemId, $parentIds)) {
             throw new Exception('Cycle detected');
         }
@@ -406,7 +413,7 @@ class ItemParent
 
         $itemId = (int)$itemRow->id;
 
-        $parentIds = $this->itemParentTable->collectParentIds($newParentRow->id);
+        $parentIds = $this->collectParentIds($newParentRow->id);
         if (in_array($itemId, $parentIds)) {
             throw new Exception('Cycle detected');
         }
@@ -674,6 +681,27 @@ class ItemParent
         return $row ? $row['name'] : '';
     }
 
+    private function collectParentIds(int $id): array
+    {
+        $cpTableName = $this->itemParentTable->info('name');
+        $adapter = $this->itemParentTable->getAdapter();
+
+        $toCheck = [$id];
+        $ids = [];
+
+        while (count($toCheck) > 0) {
+            $ids = array_merge($ids, $toCheck);
+
+            $toCheck = $adapter->fetchCol(
+                $adapter->select()
+                    ->from($cpTableName, 'parent_id')
+                    ->where('item_id in (?)', $toCheck)
+            );
+        }
+
+        return array_unique($ids);
+    }
+
     private function collectParentInfo(int $id, int $diff = 1): array
     {
         $cpTableName = $this->itemParentTable->info('name');
@@ -688,9 +716,9 @@ class ItemParent
         $result = [];
         foreach ($rows as $row) {
             $parentId = $row['parent_id'];
-            $isTuning = $row['type'] == DbTable\Item\ParentTable::TYPE_TUNING;
-            $isSport  = $row['type'] == DbTable\Item\ParentTable::TYPE_SPORT;
-            $isDesign = $row['type'] == DbTable\Item\ParentTable::TYPE_DESIGN;
+            $isTuning = $row['type'] == self::TYPE_TUNING;
+            $isSport  = $row['type'] == self::TYPE_SPORT;
+            $isDesign = $row['type'] == self::TYPE_DESIGN;
             $result[$parentId] = [
                 'diff'   => $diff,
                 'tuning' => $isTuning,

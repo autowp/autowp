@@ -88,15 +88,15 @@
         'title' => $this->carFullName,
         'stock' => [
             'count'  => $this->stockCount,
-            'active' => $this->type == Application\Model\DbTable\Item\ParentTable::TYPE_DEFAULT
+            'active' => $this->type == Application\Model\ItemParent::TYPE_DEFAULT
         ],
         'tuning' => [
             'count'  => $this->tuningCount,
-            'active' => $this->type == Application\Model\DbTable\Item\ParentTable::TYPE_TUNING
+            'active' => $this->type == Application\Model\ItemParent::TYPE_TUNING
         ],
         'sport' => [
             'count'  => $this->sportCount,
-            'active' => $this->type == Application\Model\DbTable\Item\ParentTable::TYPE_SPORT
+            'active' => $this->type == Application\Model\ItemParent::TYPE_SPORT
         ],
         'pictures' => [
             'count'  => $this->picturesCount,

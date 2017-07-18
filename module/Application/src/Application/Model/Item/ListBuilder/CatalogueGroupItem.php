@@ -2,9 +2,10 @@
 
 namespace Application\Model\Item\ListBuilder;
 
-use Application\Model\DbTable;
-
 use Exception;
+
+use Application\Model\DbTable;
+use Application\Model\ItemParent;
 
 use Zend_Db_Expr;
 
@@ -184,11 +185,11 @@ class CatalogueGroupItem extends CatalogueItem
         }
 
         switch ($this->type) {
-            case DbTable\Item\ParentTable::TYPE_TUNING:
+            case ItemParent::TYPE_TUNING:
                 $typeStr = 'tuning';
                 break;
 
-            case DbTable\Item\ParentTable::TYPE_SPORT:
+            case ItemParent::TYPE_SPORT:
                 $typeStr = 'sport';
                 break;
 
@@ -211,10 +212,10 @@ class CatalogueGroupItem extends CatalogueItem
     public function getTypeUrl(DbTable\Item\Row $item, $type)
     {
         switch ($type) {
-            case DbTable\Item\ParentTable::TYPE_TUNING:
+            case ItemParent::TYPE_TUNING:
                 $catname = 'tuning';
                 break;
-            case DbTable\Item\ParentTable::TYPE_SPORT:
+            case ItemParent::TYPE_SPORT:
                 $catname = 'sport';
                 break;
             default:

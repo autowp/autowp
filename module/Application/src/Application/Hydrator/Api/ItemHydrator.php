@@ -15,6 +15,7 @@ use Application\Model\DbTable;
 use Application\Model\Perspective;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
+use Application\Model\ItemParent;
 
 class ItemHydrator extends RestHydrator
 {
@@ -576,7 +577,7 @@ class ItemHydrator extends RestHydrator
                     ->join('item_parent', 'item.id = item_parent.parent_id', [
                         'brand_item_catname' => 'catname'
                     ])
-                    ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DESIGN)
+                    ->where('item_parent.type = ?', ItemParent::TYPE_DESIGN)
                     ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id = ?', $object['id'])
             );

@@ -2,6 +2,8 @@
 
 namespace Application\Controller\Plugin;
 
+use Exception;
+
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Autowp\Comments;
@@ -13,8 +15,8 @@ use Application\ItemNameFormatter;
 use Application\Model\Brand as BrandModel;
 use Application\Model\Catalogue;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Picture;
 use Application\Model\Item;
+use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Model\PictureItem;
 use Application\Model\PictureView;
@@ -22,8 +24,6 @@ use Application\Model\PictureVote;
 use Application\Model\UserAccount;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
-
-use Exception;
 
 use Zend_Db_Expr;
 use Zend_Db_Select;
@@ -523,7 +523,7 @@ class Pic extends AbstractPlugin
                         ->join('item_parent', 'item.id = item_parent.parent_id', [
                             'brand_item_catname' => 'catname'
                         ])
-                        ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DESIGN)
+                        ->where('item_parent.type = ?', ItemParent::TYPE_DESIGN)
                         ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                         ->where('item_parent_cache.item_id = ?', $item->id)
                 );

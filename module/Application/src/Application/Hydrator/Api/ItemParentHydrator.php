@@ -121,7 +121,7 @@ class ItemParentHydrator extends RestHydrator
                 ->where('item_parent_cache.parent_id = ?', $object['parent_id'])
                 ->where('not item_parent_cache.tuning')
                 ->where('not item_parent_cache.sport')
-                ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DEFAULT);
+                ->where('item_parent.type = ?', ItemParent::TYPE_DEFAULT);
 
             $duplicateRow = $this->itemTable->fetchRow($select);
 

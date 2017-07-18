@@ -2,6 +2,8 @@
 
 namespace Application\Model;
 
+use InvalidArgumentException;
+
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -9,8 +11,6 @@ use Zend\Db\TableGateway\TableGateway;
 use Autowp\Image\Storage\Request;
 
 use Application\Model\DbTable;
-
-use InvalidArgumentException;
 
 class Catalogue
 {
@@ -235,7 +235,7 @@ class Catalogue
 
         if ($stockFirst) {
             $select->order([
-                new Sql\Expression('type = ? desc', [DbTable\Item\ParentTable::TYPE_DEFAULT])
+                new Sql\Expression('type = ? desc', [ItemParent::TYPE_DEFAULT])
             ]);
         }
 
@@ -251,7 +251,7 @@ class Catalogue
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $parentRow['catname'],
                             'path'          => [],
-                            'stock'         => $parentRow['type'] == DbTable\Item\ParentTable::TYPE_DEFAULT
+                            'stock'         => $parentRow['type'] == ItemParent::TYPE_DEFAULT
                         ];
                         break;
                     case 'brand-item':
@@ -260,7 +260,7 @@ class Catalogue
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => array_merge($path['path'], [$parentRow['catname']]),
-                            'stock'         => $path['stock'] && ($parentRow['type'] == DbTable\Item\ParentTable::TYPE_DEFAULT)
+                            'stock'         => $path['stock'] && ($parentRow['type'] == ItemParent::TYPE_DEFAULT)
                         ];
                         break;
                 }

@@ -3,6 +3,7 @@
 namespace Application\Model\Item;
 
 use Application\Model\DbTable;
+use Application\Model\ItemParent;
 
 use Zend_Db_Expr;
 
@@ -106,12 +107,12 @@ abstract class PictureFetcher
 
             if (isset($options['type'])) {
                 switch ($options['type']) {
-                    case DbTable\Item\ParentTable::TYPE_DEFAULT:
+                    case ItemParent::TYPE_DEFAULT:
                         break;
-                    case DbTable\Item\ParentTable::TYPE_TUNING:
+                    case ItemParent::TYPE_TUNING:
                         $select->where('item_parent_cache.tuning');
                         break;
-                    case DbTable\Item\ParentTable::TYPE_SPORT:
+                    case ItemParent::TYPE_SPORT:
                         $select->where('item_parent_cache.sport');
                         break;
                 }

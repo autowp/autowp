@@ -5,8 +5,6 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-use Application\Model\DbTable;
-
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class ItemParent extends Form implements InputFilterProviderInterface
@@ -29,7 +27,7 @@ class ItemParent extends Form implements InputFilterProviderInterface
                 'type'    => 'Text',
                 'options' => [
                     'label'     => 'Catname',
-                    'maxlength' => DbTable\Item\ParentTable::MAX_CATNAME,
+                    'maxlength' => \Application\Model\ItemParent::MAX_CATNAME
                 ]
             ],
             [
@@ -38,10 +36,10 @@ class ItemParent extends Form implements InputFilterProviderInterface
                 'options' => [
                     'label'   => 'Type',
                     'options' => [
-                        DbTable\Item\ParentTable::TYPE_DEFAULT => 'catalogue/stock-model',
-                        DbTable\Item\ParentTable::TYPE_TUNING  => 'catalogue/related',
-                        DbTable\Item\ParentTable::TYPE_SPORT   => 'catalogue/sport',
-                        DbTable\Item\ParentTable::TYPE_DESIGN  => 'catalogue/design',
+                        \Application\Model\ItemParent::TYPE_DEFAULT => 'catalogue/stock-model',
+                        \Application\Model\ItemParent::TYPE_TUNING  => 'catalogue/related',
+                        \Application\Model\ItemParent::TYPE_SPORT   => 'catalogue/sport',
+                        \Application\Model\ItemParent::TYPE_DESIGN  => 'catalogue/design',
                     ],
                 ]
             ]
@@ -130,7 +128,7 @@ class ItemParent extends Form implements InputFilterProviderInterface
                         'name' => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => DbTable\Item\ParentTable::MAX_CATNAME
+                            'max' => \Application\Model\ItemParent::MAX_CATNAME
                         ]
                     ],
                     [

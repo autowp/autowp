@@ -2,9 +2,10 @@
 
 namespace Application\Model\Item\ListBuilder;
 
-use Application\Model\DbTable;
-
 use Exception;
+
+use Application\Model\DbTable;
+use Application\Model\ItemParent;
 
 class CatalogueItem extends Catalogue
 {
@@ -78,10 +79,10 @@ class CatalogueItem extends Catalogue
     public function getTypeUrl(DbTable\Item\Row $item, $type)
     {
         switch ($type) {
-            case DbTable\Item\ParentTable::TYPE_TUNING:
+            case ItemParent::TYPE_TUNING:
                 $catname = 'tuning';
                 break;
-            case DbTable\Item\ParentTable::TYPE_SPORT:
+            case ItemParent::TYPE_SPORT:
                 $catname = 'sport';
                 break;
             default:

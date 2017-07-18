@@ -726,10 +726,10 @@ return [
                         'name' => 'InArray',
                         'options' => [
                             'haystack' => [
-                                Model\DbTable\Item\ParentTable::TYPE_DEFAULT,
-                                Model\DbTable\Item\ParentTable::TYPE_TUNING,
-                                Model\DbTable\Item\ParentTable::TYPE_SPORT,
-                                Model\DbTable\Item\ParentTable::TYPE_DESIGN
+                                Model\ItemParent::TYPE_DEFAULT,
+                                Model\ItemParent::TYPE_TUNING,
+                                Model\ItemParent::TYPE_SPORT,
+                                Model\ItemParent::TYPE_DESIGN
                             ]
                         ]
                     ]
@@ -748,7 +748,7 @@ return [
                         'name' => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => Model\DbTable\Item\ParentTable::MAX_CATNAME
+                            'max' => Model\ItemParent::MAX_CATNAME
                         ]
                     ]
                 ]
@@ -765,10 +765,10 @@ return [
                         'name' => 'InArray',
                         'options' => [
                             'haystack' => [
-                                Model\DbTable\Item\ParentTable::TYPE_DEFAULT,
-                                Model\DbTable\Item\ParentTable::TYPE_TUNING,
-                                Model\DbTable\Item\ParentTable::TYPE_SPORT,
-                                Model\DbTable\Item\ParentTable::TYPE_DESIGN
+                                Model\ItemParent::TYPE_DEFAULT,
+                                Model\ItemParent::TYPE_TUNING,
+                                Model\ItemParent::TYPE_SPORT,
+                                Model\ItemParent::TYPE_DESIGN
                             ]
                         ]
                     ]
@@ -787,7 +787,7 @@ return [
                         'name' => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => Model\DbTable\Item\ParentTable::MAX_CATNAME
+                            'max' => Model\ItemParent::MAX_CATNAME
                         ]
                     ]
                 ]
