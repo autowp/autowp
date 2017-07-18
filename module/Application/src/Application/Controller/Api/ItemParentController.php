@@ -2,11 +2,12 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use Zend\Paginator;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 
@@ -18,15 +19,8 @@ use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
 use Application\Model\UserItemSubscribe;
 
-use Zend_Db_Expr;
-
 class ItemParentController extends AbstractRestfulController
 {
-    /**
-     * @var DbTable\Item\ParentTable
-     */
-    private $table;
-
     /**
      * @var RestHydrator
      */
@@ -95,7 +89,6 @@ class ItemParentController extends AbstractRestfulController
         $this->postInputFilter = $postInputFilter;
         $this->putInputFilter = $putInputFilter;
 
-        $this->table = new DbTable\Item\ParentTable();
         $this->itemTable = new DbTable\Item();
 
         $this->itemParent = $itemParent;
@@ -119,42 +112,41 @@ class ItemParentController extends AbstractRestfulController
 
         $data = $this->listInputFilter->getValues();
 
-        $select = $this->table->getAdapter()->select()
-            ->from($this->table->info('name'))
-            ->join('item', 'item_parent.item_id = item.id', []);
+        $select = new Sql\Select($this->itemParent->getTable()->getTable());
+        $select->join('item', 'item_parent.item_id = item.id', []);
 
         if ($data['ancestor_id']) {
             $select
                 ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.item_id', [])
-                ->where('item_parent_cache.parent_id = ?', $data['ancestor_id'])
+                ->where(['item_parent_cache.parent_id' => $data['ancestor_id']])
                 ->group(['item_parent.item_id']);
         }
 
         if ($data['item_type_id']) {
-            $select->where('item.item_type_id = ?', $data['item_type_id']);
+            $select->where(['item.item_type_id' => $data['item_type_id']]);
         }
 
         if ($data['concept']) {
-            $select->where('item.is_concept');
+            $select->where(['item.is_concept']);
         }
 
         if ($data['parent_id']) {
-            $select->where('item_parent.parent_id = ?', $data['parent_id']);
+            $select->where(['item_parent.parent_id' => $data['parent_id']]);
         }
 
         if ($data['item_id']) {
-            $select->where('item_parent.item_id = ?', $data['item_id']);
+            $select->where(['item_parent.item_id' => $data['item_id']]);
         }
 
         if ($data['is_group']) {
-            $select->where('item.is_group');
+            $select->where(['item.is_group']);
         }
 
         switch ($data['order']) {
             case 'categories_first':
                 $select->order([
                     'item_parent.type',
-                    new Zend_Db_Expr('item.item_type_id = ' . DbTable\Item\Type::CATEGORY . ' DESC'),
+                    new Sql\Expression('item.item_type_id = ? DESC', [DbTable\Item\Type::CATEGORY]),
                     'item.begin_order_cache',
                     'item.end_order_cache',
                     'item.name',
@@ -184,8 +176,8 @@ class ItemParentController extends AbstractRestfulController
                 break;
         }
 
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->itemParent->getTable()->getAdapter())
         );
 
         $limit = $data['limit'] ? $data['limit'] : 1;
@@ -194,8 +186,6 @@ class ItemParentController extends AbstractRestfulController
             ->setItemCountPerPage($limit)
             ->setCurrentPageNumber($data['page']);
 
-        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields']
@@ -203,7 +193,7 @@ class ItemParentController extends AbstractRestfulController
         ]);
 
         $items = [];
-        foreach ($this->table->getAdapter()->fetchAll($select) as $row) {
+        foreach ($paginator->getCurrentItems() as $row) {
             $items[] = $this->hydrator->extract($row);
         }
 
@@ -227,12 +217,10 @@ class ItemParentController extends AbstractRestfulController
 
         $data = $this->itemInputFilter->getValues();
 
-        $select = $this->table->getAdapter()->select()
-            ->from($this->table->info('name'))
-            ->where('item_id = ?', (int)$this->params('item_id'))
-            ->where('parent_id = ?', (int)$this->params('parent_id'));
-
-        $row = $this->table->getAdapter()->fetchRow($select);
+        $row = $this->itemParent->getRow(
+            $this->params('parent_id'),
+            $this->params('item_id')
+        );
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -377,12 +365,10 @@ class ItemParentController extends AbstractRestfulController
 
         $itemTable = $this->catalogue()->getItemTable();
 
-        $select = $this->table->getAdapter()->select()
-            ->from($this->table->info('name'))
-            ->where('item_id = ?', (int)$this->params('item_id'))
-            ->where('parent_id = ?', (int)$this->params('parent_id'));
-
-        $row = $this->table->getAdapter()->fetchRow($select);
+        $row = $this->itemParent->getRow(
+            $this->params('parent_id'),
+            $this->params('item_id')
+        );
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -471,12 +457,10 @@ class ItemParentController extends AbstractRestfulController
             return $this->inputFilterResponse($this->itemInputFilter);
         }
 
-        $select = $this->table->getAdapter()->select()
-            ->from($this->table->info('name'))
-            ->where('item_id = ?', (int)$this->params('item_id'))
-            ->where('parent_id = ?', (int)$this->params('parent_id'));
-
-        $row = $this->table->getAdapter()->fetchRow($select);
+        $row = $this->itemParent->getRow(
+            (int)$this->params('parent_id'),
+            (int)$this->params('item_id')
+        );
         if (! $row) {
             return $this->notFoundAction();
         }

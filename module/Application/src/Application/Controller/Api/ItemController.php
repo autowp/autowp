@@ -71,11 +71,6 @@ class ItemController extends AbstractRestfulController
     private $specificationsService;
 
     /**
-     * @var DbTable\Item\ParentTable
-     */
-    private $itemParentTable;
-
-    /**
      * @var HostManager
      */
     private $hostManager;
@@ -126,7 +121,6 @@ class ItemController extends AbstractRestfulController
         $this->specTable = $specTable;
 
         $this->table = new DbTable\Item();
-        $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     public function indexAction()
@@ -1176,11 +1170,9 @@ class ItemController extends AbstractRestfulController
             case DbTable\Item\Type::VEHICLE:
             case DbTable\Item\Type::ENGINE:
                 if (array_key_exists('is_group', $values)) {
-                    $haveChilds = (bool)$this->itemParentTable->fetchRow([
-                        'parent_id = ?' => $item['id']
-                    ]);
+                    $hasChildItems = $this->itemParent->hasChildItems($item['id']);
 
-                    if ($haveChilds) {
+                    if ($hasChildItems) {
                         $item['is_group'] = 1;
                     } else {
                         $item['is_group'] = $values['is_group'] ? 1 : 0;
@@ -1531,27 +1523,29 @@ class ItemController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
-    private function carTreeWalk(DbTable\Item\Row $car, $itemParentRow = null)
+    private function carTreeWalk(DbTable\Item\Row $car, int $parentType = 0)
     {
         $data = [
             'id'     => (int)$car['id'],
             'name'   => $this->car()->formatName($car, $this->language()),
             'childs' => [],
-            'type'   => $itemParentRow ? (int)$itemParentRow->type : null
+            'type'   => $parentType ? $parentType : null
         ];
 
-        $itemParentRows = $this->itemParentTable->fetchAll(
-            $this->itemParentTable->select(true)
-                ->join('item', 'item_parent.item_id = item.id', null)
-                ->where('item_parent.parent_id = ?', $car['id'])
-                ->order(array_merge(['item_parent.type'], $this->catalogue()->itemOrdering()))
-        );
+        $table = $this->itemParent->getTable();
+
+        $select = new Sql\Select($table->getTable());
+        $select
+            ->columns(['item_id', 'type'])
+            ->join('item', 'item_parent.item_id = item.id', [])
+            ->where(['item_parent.parent_id' => $car['id']])
+            ->order(array_merge(['item_parent.type'], $this->catalogue()->itemOrdering()));
 
         $itemTable = $this->catalogue()->getItemTable();
-        foreach ($itemParentRows as $itemParentRow) {
-            $carRow = $itemTable->find($itemParentRow->item_id)->current();
+        foreach ($table->selectWith($select) as $itemParentRow) {
+            $carRow = $itemTable->find($itemParentRow['item_id'])->current();
             if ($carRow) {
-                $data['childs'][] = $this->carTreeWalk($carRow, $itemParentRow);
+                $data['childs'][] = $this->carTreeWalk($carRow, (int)$itemParentRow['type']);
             }
         }
 

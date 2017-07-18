@@ -21,7 +21,8 @@ class UploadControllerFactory implements FactoryInterface
             $container->get(\Application\DuplicateFinder::class),
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get(\Application\Model\UserPicture::class),
-            $container->get(\Application\Model\Perspective::class)
+            $container->get(\Application\Model\Perspective::class),
+            $container->get(\Application\Model\ItemParent::class)
         );
     }
 }

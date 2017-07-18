@@ -1,20 +1,19 @@
 <?php
 
-namespace Application\Model\Service;
+namespace Application\Validator\ItemParent;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class CatalogueFactory implements FactoryInterface
+class CatnameNotExistsFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new \Application\Model\Catalogue(
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class),
-            $container->get(\Application\Model\ItemParent::class)
-        );
+        return new CatnameNotExists(array_merge($options, [
+            'antibruteforce' => $container->get(\Application\Model\Antibruteforce::class)
+        ]));
     }
 }

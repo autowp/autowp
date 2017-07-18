@@ -24,11 +24,6 @@ class Catalogue
     private $itemTable;
 
     /**
-     * @var DbTable\Item\ParentTable
-     */
-    private $itemParentTable;
-
-    /**
      * @var DbTable\Vehicle\Type
      */
     private $carTypeTable;
@@ -49,15 +44,15 @@ class Catalogue
     private $itemTable2;
 
     /**
-     * @var TableGateway
+     * @var ItemParent
      */
-    private $itemParentTable2;
+    private $itemParent;
 
-    public function __construct(Adapter $adapter)
+    public function __construct(Adapter $adapter, ItemParent $itemParent)
     {
         $this->adapter = $adapter;
         $this->itemTable2 = new TableGateway('item', $adapter);
-        $this->itemParentTable2 = new TableGateway('item_parent', $adapter);
+        $this->itemParent = $itemParent;
     }
 
     /**
@@ -116,16 +111,6 @@ class Catalogue
         return $this->itemTable
             ? $this->itemTable
             : $this->itemTable = new DbTable\Item();
-    }
-
-    /**
-     * @return DbTable\Item\ParentTable
-     */
-    public function getCarParentTable()
-    {
-        return $this->itemParentTable
-            ? $this->itemParentTable
-            : $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     /**
@@ -228,18 +213,7 @@ class Catalogue
             }
         }
 
-        $select = new Sql\Select($this->itemParentTable2->getTable());
-        $select
-            ->columns(['parent_id', 'catname', 'type'])
-            ->where(['item_id' => $id]);
-
-        if ($stockFirst) {
-            $select->order([
-                new Sql\Expression('type = ? desc', [ItemParent::TYPE_DEFAULT])
-            ]);
-        }
-
-        $parentRows = $this->itemParentTable2->selectWith($select);
+        $parentRows = $this->itemParent->getParentRows($id, $stockFirst);
 
         foreach ($parentRows as $parentRow) {
             $paths = $this->getCataloguePaths($parentRow['parent_id'], $options);

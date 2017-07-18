@@ -78,11 +78,6 @@ class ItemHydrator extends RestHydrator
     /**
      * @var TableGateway
      */
-    private $itemParentTable;
-
-    /**
-     * @var TableGateway
-     */
     private $linkTable;
 
     /**
@@ -105,6 +100,11 @@ class ItemHydrator extends RestHydrator
      */
     private $perspective;
 
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
     public function __construct(
         $serviceManager
     ) {
@@ -113,7 +113,6 @@ class ItemHydrator extends RestHydrator
         $tables = $serviceManager->get(\Application\Db\TableManager::class);
         $this->pictureTable = $tables->get('pictures');
         $this->linkTable = $tables->get('links');
-        $this->itemParentTable = $tables->get('item_parent');
         $this->itemLanguageTable = $tables->get('item_language');
         $this->itemTableGateway = $tables->get('item');
         $this->specTable = $tables->get('spec');
@@ -128,6 +127,7 @@ class ItemHydrator extends RestHydrator
 
         $this->itemTable = new DbTable\Item();
         $this->itemModel = $serviceManager->get(\Application\Model\Item::class);
+        $this->itemParent = $serviceManager->get(ItemParent::class);
 
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
         $this->textStorage = $serviceManager->get(\Autowp\TextStorage\Service::class);
@@ -442,16 +442,12 @@ class ItemHydrator extends RestHydrator
             if (isset($object['childs_count'])) {
                 $result['childs_count'] = (int)$object['childs_count'];
             } else {
-                $select = new Sql\Select($this->itemParentTable->getTable());
-                $select->where(['parent_id' => $object['id']]);
-                $result['childs_count'] = $this->getCountBySelect($select, $this->itemParentTable);
+                $result['childs_count'] = $this->itemParent->getChildItemsCount($object['id']);
             }
         }
 
         if ($this->filterComposite->filter('parents_count')) {
-            $select = new Sql\Select($this->itemParentTable->getTable());
-            $select->where(['item_id' => $object['id']]);
-            $result['parents_count'] = $this->getCountBySelect($select, $this->itemParentTable);
+            $result['parents_count'] = $this->itemParent->getParentItemsCount($object['id']);
         }
 
         if ($this->filterComposite->filter('item_language_count')) {
@@ -806,9 +802,7 @@ class ItemHydrator extends RestHydrator
     {
         $urls = [];
 
-        $parentRows = $this->itemParentTable->select([
-            'item_id = ?' => $id
-        ]);
+        $parentRows = $this->itemParent->getParentRows($id);
 
         foreach ($parentRows as $parentRow) {
             $brand = $this->itemTable->fetchRow([

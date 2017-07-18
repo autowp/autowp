@@ -9,17 +9,11 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\CarOfDay;
 use Application\Model\DbTable;
 use Application\Model\Item;
-
-use Zend_Db_Expr;
+use Application\Model\ItemParent;
 
 class DonateController extends AbstractActionController
 {
     private $carOfDay;
-
-    /**
-     * @var DbTable\Item\ParentTable
-     */
-    private $itemParentTable;
 
     /**
      * @var array
@@ -31,18 +25,21 @@ class DonateController extends AbstractActionController
      */
     private $itemModel;
 
-    public function __construct(CarOfDay $carOfDay, array $yandexConfig, Item $itemModel)
-    {
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
+    public function __construct(
+        CarOfDay $carOfDay,
+        array $yandexConfig,
+        Item $itemModel,
+        ItemParent $itemParent
+    ) {
         $this->carOfDay = $carOfDay;
         $this->yandexConfig = $yandexConfig;
         $this->itemModel = $itemModel;
-    }
-
-    private function getItemParentTable()
-    {
-        return $this->itemParentTable
-            ? $this->itemParentTable
-            : $this->itemParentTable = new DbTable\Item\ParentTable();
+        $this->itemParent = $itemParent;
     }
 
     public function indexAction()
@@ -216,16 +213,10 @@ class DonateController extends AbstractActionController
 
     private function prepareVehicles($rows)
     {
-        $itemParentTable = $this->getItemParentTable();
-        $itemParentAdapter = $itemParentTable->getAdapter();
-
         $items = [];
         foreach ($rows as $row) {
-            $haveChilds = (bool)$itemParentAdapter->fetchOne(
-                $itemParentAdapter->select()
-                    ->from($itemParentTable->info('name'), new Zend_Db_Expr('1'))
-                    ->where('parent_id = ?', $row['id'])
-            );
+            $hasChildItems = $this->itemParent->hasChildItems($row['id']);
+
             $items[] = [
                 'begin_model_year' => $row['begin_model_year'],
                 'end_model_year'   => $row['end_model_year'],
@@ -239,7 +230,7 @@ class DonateController extends AbstractActionController
                 'url'  => $this->url()->fromRoute('donate/vod/params', [
                     'item_id' => $row['id']
                 ], [], true),
-                'haveChilds' => $haveChilds,
+                'haveChilds' => $hasChildItems,
                 'isGroup'    => $row['is_group'],
                 'type'       => null,
                 'loadUrl'    => $this->url()->fromRoute('donate/vod/vehicle-childs/params', [
@@ -294,16 +285,8 @@ class DonateController extends AbstractActionController
 
     private function prepareItemParentRows($rows)
     {
-        $itemParentTable = $this->getItemParentTable();
-        $itemParentAdapter = $itemParentTable->getAdapter();
-
         $items = [];
         foreach ($rows as $row) {
-            $haveChilds = (bool)$itemParentAdapter->fetchOne(
-                $itemParentAdapter->select()
-                    ->from($itemParentTable->info('name'), new Zend_Db_Expr('1'))
-                    ->where('parent_id = ?', $row['id'])
-            );
             $items[] = [
                 'begin_model_year' => $row['begin_model_year'],
                 'end_model_year'   => $row['end_model_year'],
@@ -317,7 +300,7 @@ class DonateController extends AbstractActionController
                 'url'  => $this->url()->fromRoute('donate/vod/params', [
                     'item_id' => $row['id']
                 ], [], true),
-                'haveChilds' => $haveChilds,
+                'haveChilds' => $this->itemParent->hasChildItems($row['id']),
                 'isGroup'    => $row['is_group'],
                 'type'       => $row['type'],
                 'loadUrl'    => $this->url()->fromRoute('donate/vod/vehicle-childs/params', [

@@ -19,7 +19,8 @@ class CarFactory implements FactoryInterface
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\ItemNameFormatter::class),
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\Perspective::class)
+            $container->get(\Application\Model\Perspective::class),
+            $container->get(\Application\Model\ItemParent::class)
         );
     }
 }

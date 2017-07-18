@@ -465,13 +465,11 @@ class CatalogueController extends AbstractActionController
                     ->group('pictures.id')
                     ->limit(12);
 
-                $itemParentTable = new DbTable\Item\ParentTable();
+                $db = $select->getAdapter();
 
                 $topPictures = $this->pic()->listData($select, [
                     'width' => 4,
-                    'url'   => function ($picture) use ($itemParentTable, $brand) {
-
-                        $db = $itemParentTable->getAdapter();
+                    'url'   => function ($picture) use ($db, $brand) {
 
                         $carId = $db->fetchOne(
                             $db->select()
@@ -1181,10 +1179,10 @@ class CatalogueController extends AbstractActionController
                         'picHelper'        => $this->getPluginManager()->get('pic'),
                         'brand'            => $brand,
                         'specsService'     => $this->specsService,
-                        //'itemParentTable'  => $itemParentTable,
                         'brandItemCatname' => $brandItemCatname,
                         'itemId'           => $currentCarId,
-                        'path'             => $path
+                        'path'             => $path,
+                        'itemParent'       => $this->itemParent
                     ]),
                     'onlyExactlyPictures'  => true,
                     'disableDescription' => true,
@@ -1580,7 +1578,6 @@ class CatalogueController extends AbstractActionController
         }
 
         $itemTable = $this->catalogue()->getItemTable();
-        $itemParentTable = new DbTable\Item\ParentTable();
 
         $listCars = [];
 
@@ -1725,7 +1722,7 @@ class CatalogueController extends AbstractActionController
                     'picHelper'        => $this->getPluginManager()->get('pic'),
                     'brand'            => $brand,
                     'specsService'     => $this->specsService,
-                    'itemParentTable'  => $itemParentTable,
+                    'itemParent'       => $this->itemParent,
                     'brandItemCatname' => $brandItemCatname,
                     'itemId'           => $currentCarId,
                     'path'             => $path,

@@ -53,11 +53,6 @@ class CarOfDay
     private $specsService = null;
 
     /**
-     * @var DbTable\Item\ParentTable
-     */
-    private $itemParentTable;
-
-    /**
      * @var Item
      */
     private $itemModel;
@@ -67,6 +62,11 @@ class CarOfDay
      */
     private $perspective;
 
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
         Image\Storage $imageStorage,
@@ -75,7 +75,8 @@ class CarOfDay
         $translator,
         SpecificationsService $specsService,
         Item $itemModel,
-        Perspective $perspective
+        Perspective $perspective,
+        ItemParent $itemParent
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->imageStorage = $imageStorage;
@@ -85,21 +86,12 @@ class CarOfDay
         $this->specsService = $specsService;
         $this->itemModel = $itemModel;
         $this->perspective = $perspective;
+        $this->itemParent = $itemParent;
 
         $this->table = new Table([
             'name'    => 'of_day',
             'primary' => 'day_date'
         ]);
-    }
-
-    /**
-     * @return DbTable\Item\ParentTable
-     */
-    private function getItemParentTable()
-    {
-        return $this->itemParentTable
-            ? $this->itemParentTable
-            : $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     public function getCarOfDayCadidate()
@@ -484,13 +476,6 @@ class CarOfDay
             'toBrand'      => false
         ]);
 
-        /*$categoryPaths = [];
-        if (! $paths) {
-            $categoryPaths = $this->getCategoryPaths($carOfDay->id, [
-                'breakOnFirst' => true
-            ]);
-        }*/
-
         $carOfDayPicturesData = [];
         foreach ($carOfDayPictures as $idx => $row) {
             if ($row) {
@@ -777,65 +762,6 @@ class CarOfDay
         }
 
         return $items;
-    }
-
-    private function getCategoryPaths($carId, array $options = [])
-    {
-        $carId = (int)$carId;
-        if (! $carId) {
-            throw new Exception("carId not provided");
-        }
-
-        $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
-
-        $result = [];
-
-        $db = $this->getItemParentTable()->getAdapter();
-
-        $select = $db->select()
-            ->from('item_parent', 'item_id')
-            ->join('item', 'item_parent.parent_id = item.id', 'catname')
-            ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-            ->where('item_parent.item_id = ?', $carId);
-
-        if ($breakOnFirst) {
-            $select->limit(1);
-        }
-
-        $categoryVehicleRows = $db->fetchAll($select);
-        foreach ($categoryVehicleRows as $categoryVehicleRow) {
-            $result[] = [
-                'category_catname' => $categoryVehicleRow['catname'],
-                'item_id'          => $categoryVehicleRow['item_id'],
-                'path'             => []
-            ];
-        }
-
-        if ($breakOnFirst && count($result)) {
-            return $result;
-        }
-
-        $parents = $this->getItemParentTable()->fetchAll([
-            'item_id = ?' => $carId
-        ]);
-
-        foreach ($parents as $parent) {
-            $paths = $this->getCategoryPaths($parent->parent_id, $options);
-
-            foreach ($paths as $path) {
-                $result[] = [
-                    'category_catname' => $path['category_catname'],
-                    'item_id'          => $path['item_id'],
-                    'path'             => array_merge($path['path'], [$parent->catname])
-                ];
-            }
-
-            if ($breakOnFirst && count($result)) {
-                return $result;
-            }
-        }
-
-        return $result;
     }
 
     public function isComplies($itemId)

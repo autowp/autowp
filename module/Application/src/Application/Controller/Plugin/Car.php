@@ -56,12 +56,18 @@ class Car extends AbstractPlugin
      */
     private $perspective;
 
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
     public function __construct(
         TextStorage $textStorage,
         SpecificationsService $specsService,
         ItemNameFormatter $itemNameFormatter,
         Item $itemModel,
-        Perspective $perspective
+        Perspective $perspective,
+        ItemParent $itemParent
     ) {
 
         $this->textStorage = $textStorage;
@@ -69,6 +75,7 @@ class Car extends AbstractPlugin
         $this->itemNameFormatter = $itemNameFormatter;
         $this->itemModel = $itemModel;
         $this->perspective = $perspective;
+        $this->itemParent = $itemParent;
     }
 
     private function getCarLanguageTable()
@@ -136,8 +143,6 @@ class Car extends AbstractPlugin
         $catalogue = $controller->catalogue();
 
         $pictureTable = $this->getPictureTable();
-        $itemParentTable = new DbTable\Item\ParentTable();
-        $itemParentAdapter = $itemParentTable->getAdapter();
         $itemTable = new DbTable\Item();
         $itemLanguageTable = new DbTable\Item\Language();
 
@@ -147,12 +152,7 @@ class Car extends AbstractPlugin
         }
 
         if ($carIds) {
-            $childsCounts = $itemParentAdapter->fetchPairs(
-                $itemParentAdapter->select()
-                    ->from($itemParentTable->info('name'), ['parent_id', new Zend_Db_Expr('count(1)')])
-                    ->where('parent_id IN (?)', $carIds)
-                    ->group('parent_id')
-            );
+            $childsCounts = $this->itemParent->getChildItemsCountArray($carIds);
         } else {
             $childsCounts = [];
         }
@@ -219,25 +219,10 @@ class Car extends AbstractPlugin
         // typecount
         $carsTypeCounts = [];
         if ($carIds && $listBuilder->isTypeUrlEnabled()) {
-            $rows = $itemParentAdapter->fetchAll(
-                $itemParentAdapter->select()
-                    ->from($itemParentTable->info('name'), ['parent_id', 'type', 'count' => 'count(1)'])
-                    ->where('parent_id IN (?)', $carIds)
-                    ->where('type IN (?)', [
-                        ItemParent::TYPE_TUNING,
-                        ItemParent::TYPE_SPORT
-                    ])
-                    ->group(['parent_id', 'type'])
-            );
-
-            foreach ($rows as $row) {
-                $carId = (int)$row['parent_id'];
-                $typeId = (int)$row['type'];
-                if (! isset($carsTypeCounts[$carId])) {
-                    $carsTypeCounts[$carId] = [];
-                }
-                $carsTypeCounts[$carId][$typeId] = (int)$row['count'];
-            }
+            $carsTypeCounts = $this->itemParent->getChildItemsCountArrayByTypes($carIds, [
+                ItemParent::TYPE_TUNING,
+                ItemParent::TYPE_SPORT
+            ]);
         }
 
         // lang names
@@ -260,8 +245,8 @@ class Car extends AbstractPlugin
             $totalPictures = isset($carsTotalPictures[$car->id]) ? $carsTotalPictures[$car->id] : null;
 
             // design projects
-            $designCarsRow = $itemParentAdapter->fetchRow(
-                $itemParentAdapter->select()
+            $designCarsRow = $itemTable->getAdapter()->fetchRow(
+                $itemTable->getAdapter()->select()
                     ->from('item', [
                         'brand_name'    => 'name',
                         'brand_catname' => 'catname'

@@ -271,11 +271,11 @@ class BrandNav
 
     private function carSectionGroupsSelect($brandId, $itemTypeId, $carTypeId, $nullType, $conceptsSeparatly)
     {
-        $itemParentTable = new DbTable\Item\ParentTable();
-        $db = $itemParentTable->getAdapter();
+        $itemTable = new DbTable\Item();
+        $db = $itemTable->getAdapter();
 
         $select = $db->select()
-            ->from($itemParentTable->info('name'), [
+            ->from('item_parent', [
                 'brand_item_catname' => 'catname',
                 'brand_id' => 'parent_id'
             ])

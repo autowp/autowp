@@ -4,7 +4,7 @@ namespace Application\Validator\ItemParent;
 
 use Zend\Validator\AbstractValidator;
 
-use Application\Model\DbTable;
+use Application\Model\ItemParent;
 
 class CatnameNotExists extends AbstractValidator
 {
@@ -17,6 +17,18 @@ class CatnameNotExists extends AbstractValidator
     private $parentId;
 
     private $ignoreItemId;
+
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
+    public function setItemParent(ItemParent $itemParent)
+    {
+        $this->itemParent = $itemParent;
+
+        return $this;
+    }
 
     public function setParentId($parentId)
     {
@@ -36,16 +48,12 @@ class CatnameNotExists extends AbstractValidator
     {
         $this->setValue($value);
 
-        $filter = [
-            'parent_id = ?' => (int)$this->parentId,
-            'catname = ?'   => (string)$value
-        ];
-        if ($this->ignoreItemId) {
-            $filter['item_id <> ?'] = $this->ignoreItemId;
+        $row = $this->itemParent->getRowByCatname($this->parentId, $value);
+
+        if ($this->ignoreItemId && $row['item_id'] == $this->ignoreItemId) {
+            $row = null;
         }
 
-        $table = new DbTable\Item\ParentTable();
-        $row = $table->fetchRow($filter);
         if ($row) {
             $this->error(self::EXISTS);
             return false;

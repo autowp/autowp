@@ -77,11 +77,6 @@ class SpecificationsService
     private $itemTable = null;
 
     /**
-     * @var DbTable\Item\ParentTable
-     */
-    private $itemParentTable = null;
-
-    /**
      * @var array
      */
     private $carChildsCache = [];
@@ -193,16 +188,6 @@ class SpecificationsService
         return $this->valueTable
             ? $this->valueTable
             : $this->valueTable = new Attr\Value();
-    }
-
-    /**
-     * @return DbTable\Item\ParentTable
-     */
-    private function getCarParentTable()
-    {
-        return $this->itemParentTable
-            ? $this->itemParentTable
-            : $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     /**
@@ -999,19 +984,10 @@ class SpecificationsService
         }
     }
 
-    /**
-     * @param int $parentId
-     */
-    private function getChildCarIds($parentId)
+    private function getChildCarIds(int $parentId)
     {
         if (! isset($this->carChildsCache[$parentId])) {
-            $itemParentTable = $this->getCarParentTable();
-            $db = $itemParentTable->getAdapter();
-            $this->carChildsCache[$parentId] = $db->fetchCol(
-                $db->select()
-                    ->from($itemParentTable->info('name'), 'item_id')
-                    ->where('parent_id = ?', $parentId)
-            );
+            $this->carChildsCache[$parentId] = $this->itemParent->getChildItemsIds($parentId);
         }
 
         return $this->carChildsCache[$parentId];

@@ -11,6 +11,7 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Model\Categories;
 use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Service\SpecificationsService;
 
@@ -52,13 +53,19 @@ class CategoryController extends AbstractActionController
      */
     private $itemModel;
 
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
     public function __construct(
         $cache,
         $textStorage,
         Categories $categories,
         SpecificationsService $specsService,
         Perspective $perspective,
-        Item $itemModel
+        Item $itemModel,
+        ItemParent $itemParent
     ) {
         $this->cache = $cache;
         $this->textStorage = $textStorage;
@@ -66,6 +73,7 @@ class CategoryController extends AbstractActionController
         $this->specsService = $specsService;
         $this->perspective = $perspective;
         $this->itemModel = $itemModel;
+        $this->itemParent = $itemParent;
 
         $this->itemTable = new DbTable\Item();
         $this->itemLanguageTable = new DbTable\Item\Language();
@@ -448,18 +456,16 @@ class CategoryController extends AbstractActionController
                 $title = $currentCategoryName;
             }
 
-            $itemParentTable = new DbTable\Item\ParentTable();
-
             $listBuilder = new \Application\Model\Item\ListBuilder\Category([
-                'catalogue'       => $this->catalogue(),
-                'router'          => $this->getEvent()->getRouter(),
-                'picHelper'       => $this->getPluginManager()->get('pic'),
-                'itemParentTable' => $itemParentTable,
-                'currentItem'     => $currentCar,
-                'category'        => $currentCategory,
-                'isOther'         => $isOther,
-                'path'            => $path,
-                'specsService'    => $this->specsService
+                'catalogue'    => $this->catalogue(),
+                'router'       => $this->getEvent()->getRouter(),
+                'picHelper'    => $this->getPluginManager()->get('pic'),
+                'itemParent'   => $this->itemParent,
+                'currentItem'  => $currentCar,
+                'category'     => $currentCategory,
+                'isOther'      => $isOther,
+                'path'         => $path,
+                'specsService' => $this->specsService
             ]);
 
             if ($currentCar && $paginator->getTotalItemCount() <= 0) {

@@ -32,18 +32,11 @@ class CatalogueGroupItem extends CatalogueItem
 
     private $itemParentRows = [];
 
-    private $itemParentTable;
-
     public function __construct(array $options)
     {
         parent::__construct($options);
 
         $this->itemLanguageTable = new DbTable\Item\Language();
-    }
-
-    public function setItemParentTable($table)
-    {
-        $this->itemParentTable = $table;
     }
 
     public function setLanguage($language)
@@ -96,13 +89,12 @@ class CatalogueGroupItem extends CatalogueItem
         return (bool)$this->textStorage->getFirstText($fullTextIds);
     }
 
-    private function getItemParentRow($itemId, $parentId)
+    private function getItemParentRow(int $itemId, int $parentId)
     {
         if (! isset($this->itemParentRows[$itemId][$parentId])) {
-            $this->itemParentRows[$itemId][$parentId] = $this->itemParentTable->fetchRow([
-                'item_id = ?'   => $itemId,
-                'parent_id = ?' => $parentId
-            ]);
+            $row = $this->itemParent->getRow($parentId, $itemId);
+
+            $this->itemParentRows[$itemId][$parentId] = $row;
         }
 
         return $this->itemParentRows[$itemId][$parentId];
@@ -110,12 +102,7 @@ class CatalogueGroupItem extends CatalogueItem
 
     public function getDetailsUrl($item)
     {
-        $itemParentAdapter = $this->itemParentTable->getAdapter();
-        $hasChilds = (bool)$itemParentAdapter->fetchOne(
-            $itemParentAdapter->select()
-                ->from($this->itemParentTable->info('name'), new Zend_Db_Expr('1'))
-                ->where('parent_id = ?', $item['id'])
-        );
+        $hasChilds = $this->itemParent->hasChildItems($item['id']);
 
         $hasHtml = $this->isItemHasFullText($item['id']);
 
@@ -134,7 +121,7 @@ class CatalogueGroupItem extends CatalogueItem
             'brand_catname' => $this->brand['catname'],
             'car_catname'   => $this->brandItemCatname,
             'path'          => array_merge($this->path, [
-                $itemParentRow->catname
+                $itemParentRow['catname']
             ])
         ], [
             'name' => 'catalogue'
@@ -154,7 +141,7 @@ class CatalogueGroupItem extends CatalogueItem
             'brand_catname' => $this->brand['catname'],
             'car_catname'   => $this->brandItemCatname,
             'path'          => array_merge($this->path, [
-                $itemParentRow->catname
+                $itemParentRow['catname']
             ]),
             'exact'         => false
         ], [
@@ -172,7 +159,7 @@ class CatalogueGroupItem extends CatalogueItem
                     'brand_catname' => $this->brand['catname'],
                     'car_catname'   => $this->brandItemCatname,
                     'path'          => array_merge($this->path, [
-                        $itemParentRow->catname
+                        $itemParentRow['catname']
                     ]),
                 ], [
                     'name' => 'catalogue'
@@ -226,7 +213,7 @@ class CatalogueGroupItem extends CatalogueItem
         $itemParentRow = $this->getItemParentRow($item->id, $this->itemId);
         if ($itemParentRow) {
             $currentPath = array_merge($this->path, [
-                $itemParentRow->catname
+                $itemParentRow['catname']
             ]);
         } else {
             $currentPath = $this->path;
@@ -257,7 +244,7 @@ class CatalogueGroupItem extends CatalogueItem
             'brand_catname' => $this->brand['catname'],
             'car_catname'   => $this->brandItemCatname,
             'path'          => array_merge($this->path, [
-                $itemParentRow->catname
+                $itemParentRow['catname']
             ]),
             'picture_id'    => $picture['identity']
         ], [

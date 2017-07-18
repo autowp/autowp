@@ -20,7 +20,8 @@ class CarOfDayFactory implements FactoryInterface
             $container->get('MvcTranslator'),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\Perspective::class)
+            $container->get(\Application\Model\Perspective::class),
+            $container->get(\Application\Model\ItemParent::class)
         );
     }
 }

@@ -24,9 +24,21 @@ class CatalogueItem extends Catalogue
      */
     protected $itemId;
 
+    /**
+     * @var ItemParent
+     */
+    protected $itemParent;
+
     public function setBrandItemCatname($brandItemCatname)
     {
         $this->brandItemCatname = $brandItemCatname;
+
+        return $this;
+    }
+
+    public function setItemParent(ItemParent $model)
+    {
+        $this->itemParent = $model;
 
         return $this;
     }
@@ -90,13 +102,11 @@ class CatalogueItem extends Catalogue
                 break;
         }
 
-        $itemParentRow = $this->itemParentTable->fetchRow([
-            'item_id = ?'   => $item->id,
-            'parent_id = ?' => $this->itemId
-        ]);
+        $itemParentRow = $this->itemParent->getRow($this->itemId, $item->id);
+
         if ($itemParentRow) {
             $currentPath = array_merge($this->path, [
-                $itemParentRow->catname
+                $itemParentRow['catname']
             ]);
         } else {
             $currentPath = $this->path;

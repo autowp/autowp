@@ -2,6 +2,11 @@
 
 namespace Application\Controller;
 
+use Exception;
+
+use geoPHP;
+use Point;
+
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -13,25 +18,16 @@ use Application\ExifGPSExtractor;
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
+use Application\Model\ItemParent;
+use Application\Model\Perspective;
 use Application\Model\PictureItem;
 use Application\Model\UserPicture;
 use Application\Service\TelegramService;
 
-use geoPHP;
-use Point;
-
 use Zend_Db_Expr;
-
-use Exception;
-use Application\Model\Perspective;
 
 class UploadController extends AbstractActionController
 {
-    /**
-     * @var DbTable\Item\ParentTable
-     */
-    private $itemParentTable;
-
     private $partial;
 
     /**
@@ -64,6 +60,11 @@ class UploadController extends AbstractActionController
      */
     private $perspective;
 
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
     public function __construct(
         $partial,
         TelegramService $telegram,
@@ -71,7 +72,8 @@ class UploadController extends AbstractActionController
         DuplicateFinder $duplicateFinder,
         Comments\CommentsService $comments,
         UserPicture $userPicture,
-        Perspective $perspective
+        Perspective $perspective,
+        ItemParent $itemParent
     ) {
         $this->partial = $partial;
         $this->telegram = $telegram;
@@ -80,13 +82,7 @@ class UploadController extends AbstractActionController
         $this->comments = $comments;
         $this->userPicture = $userPicture;
         $this->perspective = $perspective;
-    }
-
-    private function getCarParentTable()
-    {
-        return $this->itemParentTable
-            ? $this->itemParentTable
-            : $this->itemParentTable = new DbTable\Item\ParentTable();
+        $this->itemParent = $itemParent;
     }
 
     public function onlyRegisteredAction()
@@ -420,16 +416,8 @@ class UploadController extends AbstractActionController
 
     private function prepareCars($rows)
     {
-        $itemParentTable = $this->getCarParentTable();
-        $itemParentAdapter = $itemParentTable->getAdapter();
-
         $items = [];
         foreach ($rows as $row) {
-            $haveChilds = (bool)$itemParentAdapter->fetchOne(
-                $itemParentAdapter->select()
-                    ->from($itemParentTable->info('name'), new Zend_Db_Expr('1'))
-                    ->where('parent_id = ?', $row['id'])
-            );
             $items[] = [
                 'begin_model_year' => $row['begin_model_year'],
                 'end_model_year'   => $row['end_model_year'],
@@ -444,7 +432,7 @@ class UploadController extends AbstractActionController
                     'action'  => 'index',
                     'item_id' => $row['id']
                 ], [], true),
-                'haveChilds' => $haveChilds,
+                'haveChilds' => $this->itemParent->hasChildItems($row['id']),
                 'isGroup'    => $row['is_group'],
                 'type'       => null,
                 'loadUrl'    => $this->url()->fromRoute('upload/params', [
@@ -459,16 +447,8 @@ class UploadController extends AbstractActionController
 
     private function prepareCarParentRows($rows)
     {
-        $itemParentTable = $this->getCarParentTable();
-        $itemParentAdapter = $itemParentTable->getAdapter();
-
         $items = [];
         foreach ($rows as $row) {
-            $haveChilds = (bool)$itemParentAdapter->fetchOne(
-                $itemParentAdapter->select()
-                    ->from($itemParentTable->info('name'), new Zend_Db_Expr('1'))
-                    ->where('parent_id = ?', $row['id'])
-            );
             $items[] = [
                 'begin_model_year' => $row['begin_model_year'],
                 'end_model_year'   => $row['end_model_year'],
@@ -483,7 +463,7 @@ class UploadController extends AbstractActionController
                     'action'  => 'index',
                     'item_id' => $row['id']
                 ], [], true),
-                'haveChilds' => $haveChilds,
+                'haveChilds' => $this->itemParent->hasChildItems($row['id']),
                 'isGroup'    => $row['is_group'],
                 'type'       => $row['type'],
                 'loadUrl'    => $this->url()->fromRoute('upload/params', [

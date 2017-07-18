@@ -4,6 +4,7 @@ namespace Application\Model;
 
 use Exception;
 
+use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\ZFComponents\Filter\FilenameSafe;
@@ -35,7 +36,7 @@ class ItemParent
     private $itemLangTable;
 
     /**
-     * @var DbTable\Item\ParentTable
+     * @var TableGateway
      */
     private $itemParentTable;
 
@@ -84,19 +85,29 @@ class ItemParent
      */
     private $itemParentCacheTable;
 
-    public function __construct(array $languages, TableGateway $specTable)
-    {
+    public function __construct(
+        array $languages,
+        TableGateway $specTable,
+        TableGateway $itemParentTable,
+        \Zend_Db_Adapter_Abstract $zf1db
+    ) {
         $this->languages = $languages;
         $this->specTable = $specTable;
 
-        $this->itemTable = new DbTable\Item();
-        $this->itemLangTable = new DbTable\Item\Language();
-        $this->itemParentTable = new DbTable\Item\ParentTable();
+        $this->itemTable = new DbTable\Item([
+            'db' => $zf1db
+        ]);
+        $this->itemLangTable = new DbTable\Item\Language([
+            'db' => $zf1db
+        ]);
+        $this->itemParentTable = $itemParentTable;
         $this->itemParentLanguageTable = new Zend_Db_Table([
+            'db'      => $zf1db,
             'name'    => 'item_parent_language',
             'primary' => ['item_id', 'parent_id', 'language']
         ]);
         $this->itemParentCacheTable = new Zend_Db_Table([
+            'db'      => $zf1db,
             'name'    => 'item_parent_cache',
             'primary' => ['item_id', 'parent_id']
         ]);
@@ -254,7 +265,7 @@ class ItemParent
         return $name;
     }
 
-    private function isAllowedCatname(int $itemId, int $parentId, string $catname)
+    private function isAllowedCatname(int $itemId, int $parentId, string $catname): bool
     {
         if (mb_strlen($catname) <= 0) {
             return false;
@@ -264,11 +275,11 @@ class ItemParent
             return false;
         }
 
-        return ! $this->itemParentTable->fetchRow([
-            'parent_id = ?' => $parentId,
-            'catname = ?'   => $catname,
-            'item_id <> ?'  => $itemId
-        ]);
+        return ! $this->itemParentTable->select([
+            'parent_id'    => $parentId,
+            'catname'      => $catname,
+            'item_id != ?' => $itemId
+        ])->current();
     }
 
     private function extractCatname(DbTable\Item\Row $brandRow, DbTable\Item\Row $vehicleRow)
@@ -348,29 +359,28 @@ class ItemParent
             throw new Exception("Type cannot be null");
         }
 
-        $parentIds = $this->collectParentIds($parentId);
+        $parentIds = $this->collectAncestorsIds($parentId);
         if (in_array($itemId, $parentIds)) {
             throw new Exception('Cycle detected');
         }
 
-        $itemParentRow = $this->itemParentTable->fetchRow([
-            'parent_id = ?' => $parentId,
-            'item_id = ?'   => $itemId
-        ]);
+        $itemParentRow = $this->itemParentTable->select([
+            'parent_id' => $parentId,
+            'item_id'   => $itemId
+        ])->current();
 
         if ($itemParentRow) {
             return false;
         }
 
-        $itemParentRow = $this->itemParentTable->createRow([
+        $this->itemParentTable->insert([
             'parent_id'      => $parentId,
             'item_id'        => $itemId,
             'type'           => $options['type'],
             'catname'        => $options['catname'],
             'manual_catname' => $options['manual_catname'] ? 1 : 0,
-            'timestamp'      => new Zend_Db_Expr('now()'),
+            'timestamp'      => new Sql\Expression('now()'),
         ]);
-        $itemParentRow->save();
 
         $values = [];
         foreach ($this->languages as $language) {
@@ -381,7 +391,7 @@ class ItemParent
 
         $this->setItemParentLanguages($parentId, $itemId, $values, true);
 
-        $this->rebuildCache($itemRow['id']);
+        $this->rebuildCache($itemId);
 
         return true;
     }
@@ -413,24 +423,26 @@ class ItemParent
 
         $itemId = (int)$itemRow->id;
 
-        $parentIds = $this->collectParentIds($newParentRow->id);
+        $parentIds = $this->collectAncestorsIds($newParentRow->id);
         if (in_array($itemId, $parentIds)) {
             throw new Exception('Cycle detected');
         }
 
-        $itemParentRow = $this->itemParentTable->fetchRow([
-            'parent_id = ?' => $fromParentId,
-            'item_id = ?'   => $itemId
-        ]);
+        $itemParentRow = $this->itemParentTable->select([
+            'parent_id' => $fromParentId,
+            'item_id'   => $itemId
+        ])->current();
 
         if (! $itemParentRow) {
             return false;
         }
 
-        $itemParentRow->setFromArray([
+        $this->itemParentTable->update([
             'parent_id' => $toParentId
+        ], [
+            'parent_id = ?' => $fromParentId,
+            'item_id = ?'   => $itemId
         ]);
-        $itemParentRow->save();
 
         $bvlRows = $this->itemParentLanguageTable->fetchAll([
             'item_id = ?'   => $itemId,
@@ -440,7 +452,7 @@ class ItemParent
             $bvlRow->setFromArray([
                 'parent_id' => $toParentId
             ]);
-            $itemParentRow->save();
+            $bvlRow->save();
         }
 
         $this->rebuildCache($itemRow['id']);
@@ -461,13 +473,10 @@ class ItemParent
         $itemId = (int)$itemRow->id;
         $parentId = (int)$parentRow->id;
 
-        $row = $this->itemParentTable->fetchRow([
+        $this->itemParentTable->delete([
             'item_id = ?'   => $itemId,
             'parent_id = ?' => $parentId
         ]);
-        if ($row) {
-            $row->delete();
-        }
 
         $bvlRows = $this->itemParentLanguageTable->fetchAll([
             'item_id = ?'   => $itemId,
@@ -540,17 +549,19 @@ class ItemParent
 
     public function setItemParent(int $parentId, int $itemId, array $values, $forceIsAuto)
     {
-        $itemParentRow = $this->itemParentTable->fetchRow([
-            'parent_id = ?' => $parentId,
-            'item_id = ?'   => $itemId
-        ]);
+        $itemParentRow = $this->itemParentTable->select([
+            'parent_id' => $parentId,
+            'item_id'   => $itemId
+        ])->current();
 
         if (! $itemParentRow) {
             return false;
         }
 
+        $set = [];
+
         if (array_key_exists('type', $values)) {
-            $itemParentRow['type'] = $values['type'];
+            $set['type'] = $values['type'];
         }
 
         if (array_key_exists('catname', $values)) {
@@ -559,8 +570,8 @@ class ItemParent
             if ($forceIsAuto) {
                 $isAuto = true;
             } else {
-                $isAuto = ! $itemParentRow->manual_catname;
-                if ($itemParentRow->catname != $newCatname) {
+                $isAuto = ! $itemParentRow['manual_catname'];
+                if ($itemParentRow['catname'] != $newCatname) {
                     $isAuto = false;
                 }
             }
@@ -572,13 +583,18 @@ class ItemParent
                 $isAuto = true;
             }
 
-            $itemParentRow->setFromArray([
+            $set = array_replace($set, [
                 'catname'        => $newCatname,
                 'manual_catname' => $isAuto ? 0 : 1,
             ]);
         }
 
-        $itemParentRow->save();
+        if ($set) {
+            $this->itemParentTable->update($set, [
+                'parent_id = ?' => $parentId,
+                'item_id = ?'   => $itemId
+            ]);
+        }
 
         return true;
     }
@@ -599,15 +615,15 @@ class ItemParent
 
         $this->setItemParentLanguages($parentId, $itemId, $values, false);
 
-        $bvRow = $this->itemParentTable->fetchRow([
+        $bvRow = $this->itemParentTable->select([
             'item_id = ?'   => $itemId,
             'parent_id = ?' => $parentId
-        ]);
+        ])->current();
 
         if (! $bvRow) {
             return false;
         }
-        if (! $bvRow->manual_catname) {
+        if (! $bvRow['manual_catname']) {
             $brandRow = $this->itemTable->fetchRow([
                 'id = ?' => (int)$parentId
             ]);
@@ -618,8 +634,12 @@ class ItemParent
                 return false;
             }
 
-            $bvRow->catname = $catname;
-            $bvRow->save();
+            $this->itemParentTable->update([
+                'catname' => $catname
+            ], [
+                'item_id = ?'   => $itemId,
+                'parent_id = ?' => $parentId
+            ]);
         }
 
         return true;
@@ -627,12 +647,8 @@ class ItemParent
 
     public function refreshAutoByVehicle(int $itemId)
     {
-        $itemParentRows = $this->itemParentTable->fetchAll([
-            'item_id = ?' => $itemId
-        ]);
-
-        foreach ($itemParentRows as $itemParentRow) {
-            $this->refreshAuto($itemParentRow->parent_id, $itemId);
+        foreach ($this->getParentRows($itemId) as $itemParentRow) {
+            $this->refreshAuto($itemParentRow['parent_id'], $itemId);
         }
 
         return true;
@@ -649,6 +665,43 @@ class ItemParent
         }
 
         return true;
+    }
+
+    public function getParentRows(int $itemId, bool $stockFirst = false): array
+    {
+        $select = new Sql\Select($this->itemParentTable->getTable());
+        $select->where(['item_id' => $itemId]);
+
+        if ($stockFirst) {
+            $select->order([
+                new Sql\Expression('type = ? desc', [self::TYPE_DEFAULT])
+            ]);
+        }
+
+        $rows = $this->itemParentTable->selectWith($select);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = $row;
+        }
+
+        return $result;
+    }
+
+    public function getRow(int $parentId, int $itemId)
+    {
+        return $this->itemParentTable->select([
+            'parent_id = ?' => $parentId,
+            'item_id = ?'   => $itemId
+        ])->current();
+    }
+
+    public function getRowByCatname(int $parentId, string $catname)
+    {
+        return $this->itemParentTable->select([
+            'parent_id' => $parentId,
+            'catname'   => $catname
+        ])->current();
     }
 
     public function getName(int $parentId, int $itemId, string $language)
@@ -681,10 +734,23 @@ class ItemParent
         return $row ? $row['name'] : '';
     }
 
-    private function collectParentIds(int $id): array
+    public function getChildItemsIds(int $parentId): array
     {
-        $cpTableName = $this->itemParentTable->info('name');
-        $adapter = $this->itemParentTable->getAdapter();
+        $select = new Sql\Select($this->itemParentTable->getTable());
+        $select->columns(['item_id'])
+            ->where(['parent_id' => $parentId]);
+
+        $result = [];
+        foreach ($this->itemParentTable->selectWith($select) as $row) {
+            $result[] = (int)$row['item_id'];
+        }
+
+        return $result;
+    }
+
+    private function collectAncestorsIds(int $id): array
+    {
+        $cpTableName = $this->itemParentTable->getTable();
 
         $toCheck = [$id];
         $ids = [];
@@ -692,11 +758,14 @@ class ItemParent
         while (count($toCheck) > 0) {
             $ids = array_merge($ids, $toCheck);
 
-            $toCheck = $adapter->fetchCol(
-                $adapter->select()
-                    ->from($cpTableName, 'parent_id')
-                    ->where('item_id in (?)', $toCheck)
-            );
+            $select = new Sql\Select($cpTableName);
+            $select->columns(['parent_id'])
+                ->where([new Sql\Predicate\In('item_id', $toCheck)]);
+
+            $toCheck = [];
+            foreach ($this->itemParentTable->selectWith($select) as $row) {
+                $toCheck [] = (int)$row['parent_id'];
+            }
         }
 
         return array_unique($ids);
@@ -704,14 +773,11 @@ class ItemParent
 
     private function collectParentInfo(int $id, int $diff = 1): array
     {
-        $cpTableName = $this->itemParentTable->info('name');
-        $adapter = $this->itemParentTable->getAdapter();
+        $select = new Sql\Select($this->itemParentTable->getTable());
+        $select->columns(['parent_id', 'type'])
+            ->where(['item_id' => $id]);
 
-        $rows = $adapter->fetchAll(
-            $adapter->select()
-                ->from($cpTableName, ['parent_id', 'type'])
-                ->where('item_id = ?', $id)
-        );
+        $rows = $this->itemParentTable->selectWith($select);
 
         $result = [];
         foreach ($rows as $row) {
@@ -804,15 +870,102 @@ class ItemParent
 
         $this->itemParentCacheTable->delete($filter);
 
-        $childs = $this->itemParentTable->fetchAll(
-            $this->itemParentTable->select(true)
-                ->where('parent_id = ?', $itemId)
-        );
+        $childs = $this->getChildItemsIds($itemId);
 
         foreach ($childs as $child) {
-            $this->rebuildCache($child['item_id']);
+            $this->rebuildCache($child);
         }
 
         return $updates;
+    }
+
+    public function hasChildItems(int $parentId): bool
+    {
+        $select = new Sql\Select($this->itemParentTable->getTable());
+        $select->columns(['item_id'])
+            ->where(['parent_id' => $parentId])
+            ->limit(1);
+
+        return (bool)$this->itemParentTable->selectWith($select)->current();
+    }
+
+    public function getChildItemsCount(int $parentId): int
+    {
+        $select = new Sql\Select($this->itemParentTable->getTable());
+        $select->columns(['count' => new Sql\Expression('count(1)')])
+            ->where(['parent_id' => $parentId]);
+
+        $row = $this->itemParentTable->selectWith($select);
+        return $row ? (int)$row['count'] : 0;
+    }
+
+    public function getParentItemsCount(int $itemId): int
+    {
+        $select = new Sql\Select($this->itemParentTable->getTable());
+        $select->columns(['count' => new Sql\Expression('count(1)')])
+            ->where(['item_id' => $itemId]);
+
+        $row = $this->itemParentTable->selectWith($select);
+        return $row ? (int)$row['count'] : 0;
+    }
+
+    public function getChildItemsCountArray(array $parentIds): array
+    {
+        if (count($parentIds) <= 0) {
+            return [];
+        }
+
+        $select = new Sql\Select($this->itemParentTable->getTable());
+        $select->columns(['parent_id', 'count' => new Sql\Expression('count(1)')])
+            ->where([new Sql\Predicate\In('parent_id', $parentIds)])
+            ->group('parent_id');
+
+        $result = [];
+        foreach ($this->itemParentTable->selectWith($select) as $row) {
+            $result[(int)$row['parent_id']] = (int)$row['count'];
+        }
+
+        return $result;
+    }
+
+    public function getChildItemsCountArrayByTypes(array $parentIds, array $typeIds): array
+    {
+        if (count($parentIds) <= 0) {
+            return [];
+        }
+
+        if (count($typeIds) <= 0) {
+            return [];
+        }
+
+        $select = new Sql\Select($this->itemParentTable->getTable());
+        $select->columns(['parent_id', 'type', 'count' => new Sql\Expression('count(1)')])
+            ->where([
+                new Sql\Predicate\In('parent_id', $parentIds),
+                new Sql\Predicate\In('type', $typeIds)
+            ])
+            ->group(['parent_id', 'type']);
+
+        $rows = $this->itemParentTable->selectWith($select);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $itemId = (int)$row['parent_id'];
+            $typeId = (int)$row['type'];
+            if (! isset($result[$itemId])) {
+                $result[$itemId] = [];
+            }
+            $result[$itemId][$typeId] = (int)$row['count'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return TableGateway
+     */
+    public function getTable()
+    {
+        return $this->itemParentTable;
     }
 }

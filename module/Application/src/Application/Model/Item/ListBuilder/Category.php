@@ -4,16 +4,10 @@ namespace Application\Model\Item\ListBuilder;
 
 use Application\Model\DbTable;
 use Application\Model\Item\ListBuilder;
-
-use Zend_Db_Expr;
+use Application\Model\ItemParent;
 
 class Category extends ListBuilder
 {
-    /**
-     * @var DbTable\Item\ParentTable
-     */
-    protected $itemParentTable;
-
     protected $currentItem;
 
     protected $category;
@@ -25,9 +19,14 @@ class Category extends ListBuilder
 
     protected $path;
 
-    public function setItemParentTable(DbTable\Item\ParentTable $itemParentTable)
+    /**
+     * @var ItemParent
+     */
+    private $itemParent;
+
+    public function setItemParent(ItemParent $model)
     {
-        $this->itemParentTable = $itemParentTable;
+        $this->itemParent = $model;
 
         return $this;
     }
@@ -71,12 +70,7 @@ class Category extends ListBuilder
             ]);
         }
 
-        $itemParentAdapter = $this->itemParentTable->getAdapter();
-        $hasChilds = (bool)$itemParentAdapter->fetchOne(
-            $itemParentAdapter->select()
-                ->from($this->itemParentTable->info('name'), new Zend_Db_Expr('1'))
-                ->where('parent_id = ?', $item['id'])
-        );
+        $hasChilds = $this->itemParent->hasChildItems($item['id']);
 
         if (! $hasChilds) {
             return null;
@@ -84,16 +78,13 @@ class Category extends ListBuilder
 
         // found parent row
         if ($this->currentItem) {
-            $itemParentRow = $this->itemParentTable->fetchRow([
-                'item_id = ?'   => $item['id'],
-                'parent_id = ?' => $this->currentItem->id
-            ]);
+            $itemParentRow = $this->itemParent->getRow($this->currentItem->id, $item['id']);
             if (! $itemParentRow) {
                 return null;
             }
 
             $currentPath = array_merge($this->path, [
-                $itemParentRow->catname
+                $itemParentRow['catname']
             ]);
         } else {
             $currentPath = [];
@@ -124,16 +115,13 @@ class Category extends ListBuilder
 
         // found parent row
         if ($this->currentItem) {
-            $itemParentRow = $this->itemParentTable->fetchRow([
-                'item_id = ?'   => $item['id'],
-                'parent_id = ?' => $this->currentItem->id
-            ]);
+            $itemParentRow = $this->itemParent->getRow($this->currentItem->id, $item['id']);
             if (! $itemParentRow) {
                 return null;
             }
 
             $currentPath = array_merge($this->path, [
-                $itemParentRow->catname
+                $itemParentRow['catname']
             ]);
         } else {
             $currentPath = [];
@@ -169,16 +157,13 @@ class Category extends ListBuilder
 
         // found parent row
         if ($this->currentItem) {
-            $itemParentRow = $this->itemParentTable->fetchRow([
-                'item_id = ?'   => $item['id'],
-                'parent_id = ?' => $this->currentItem->id
-            ]);
+            $itemParentRow = $this->itemParent->getRow($this->currentItem->id, $item['id']);
             if (! $itemParentRow) {
                 return null;
             }
 
             $currentPath = array_merge($this->path, [
-                $itemParentRow->catname
+                $itemParentRow['catname']
             ]);
         } else {
             $currentPath = [];

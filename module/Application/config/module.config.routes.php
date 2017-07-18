@@ -8,6 +8,11 @@ use Zend\Router\Http\Regex;
 use Zend\Router\Http\Segment;
 
 return [
+    'route_manager' => [
+        'factories' => [
+            Router\Http\Catalogue::class => Router\Http\CatalogueFactory::class
+        ]
+    ],
     'router' => [
         'routes' => [
            'ng' => [

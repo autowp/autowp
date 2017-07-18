@@ -20,7 +20,8 @@ class CategoryControllerFactory implements FactoryInterface
             $container->get(\Application\Model\Categories::class),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\Model\Perspective::class),
-            $container->get(\Application\Model\Item::class)
+            $container->get(\Application\Model\Item::class),
+            $container->get(\Application\Model\ItemParent::class)
         );
     }
 }
