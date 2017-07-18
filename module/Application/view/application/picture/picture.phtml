@@ -10,18 +10,18 @@
             'force_canonical' => true
         ], true))
         ->appendProperty('og:description', $this->pic()->textTitle($this->name));
-        
+
     if ($this->twitterCreatorId) {
         $this->headMeta()->appendName('twitter:creator:id', $this->twitterCreatorId);
     }
-        
+
     if ($this->galleryImage) {
         $this->headMeta()
             ->appendProperty('og:image', $this->galleryImage->getSrc())
             ->appendProperty('og:image:width',  $this->galleryImage->getWidth())
             ->appendProperty('og:image:height', $this->galleryImage->getHeight())
             ->appendName('twitter:image', $this->galleryImage->getSrc());
-        
+
         $this->headLink(['rel' => 'image_src', 'href' => $this->galleryImage->getSrc()]);
     }
 
@@ -81,7 +81,7 @@
                 <?php } ?>
             <?php } ?>
         </div>
-        
+
         <div class="row">
             <div class="col-xs-6">
                 <div class="picture-vote" data-id="<?=(int)$this->picture['id']?>">
@@ -115,7 +115,7 @@
                 <a href="#" class="fa fa-2x fa-share-alt btn-share-dialog" title="Share ..."></a>
             </div>
         </div>
-        
+
         <div class="share-dialog">
             <?=$this->partial('application/share', [
                 'url'     => $this->canonicalUrl,
@@ -123,7 +123,7 @@
                 'picture' => $this->preview
             ])?>
         </div>
-        
+
         <?php if ($this->copyrights) { ?>
             <div>
                 <?=$this->markdown($this->copyrights) ?>
@@ -215,7 +215,7 @@
             $list = [];
 
             foreach ($this->ofLinks as $link) {
-                $list[] = $this->htmlA($link->url, '<i class="fa fa-globe"></i> ' . $this->escapeHtml($link->name), false);
+                $list[] = $this->htmlA($link['url'], '<i class="fa fa-globe"></i> ' . $this->escapeHtml($link['name']), false);
             }
 
             foreach ($this->items as $item) {

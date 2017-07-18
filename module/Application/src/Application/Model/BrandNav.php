@@ -34,17 +34,24 @@ class BrandNav
      */
     private $itemParent;
 
+    /**
+     * @var ItemAlias
+     */
+    private $itemAlias;
+
     public function __construct(
         StorageInterface $cache,
         TranslatorInterface $translator,
         TreeRouteStack $router,
-        ItemParent $itemParent
+        ItemParent $itemParent,
+        ItemAlias $itemAlias
     ) {
 
         $this->cache = $cache;
         $this->translator = $translator;
         $this->router = $router;
         $this->itemParent = $itemParent;
+        $this->itemAlias = $itemAlias;
     }
 
     public function getMenu(array $params)
@@ -232,43 +239,6 @@ class BrandNav
         return array_values($groups);
     }
 
-    private function getBrandAliases(array $brand)
-    {
-        $aliases = [$brand['name']];
-
-        $brandAliasTable = new DbTable\Item\Alias();
-        $brandAliasRows = $brandAliasTable->fetchAll([
-            'item_id = ?' => $brand['id']
-        ]);
-        foreach ($brandAliasRows as $brandAliasRow) {
-            if ($brandAliasRow->name) {
-                $aliases[] = $brandAliasRow->name;
-            }
-        }
-
-        $brandLangTable = new DbTable\Item\Language();
-        $brandLangRows = $brandLangTable->fetchAll([
-            'item_id = ?' => $brand['id']
-        ]);
-        foreach ($brandLangRows as $brandLangRow) {
-            if ($brandLangRow->name) {
-                $aliases[] = $brandLangRow->name;
-            }
-        }
-
-        usort($aliases, function ($a, $b) {
-            $la = mb_strlen($a);
-            $lb = mb_strlen($b);
-
-            if ($la == $lb) {
-                return 0;
-            }
-            return ($la > $lb) ? -1 : 1;
-        });
-
-        return $aliases;
-    }
-
     private function carSectionGroupsSelect($brandId, $itemTypeId, $carTypeId, $nullType, $conceptsSeparatly)
     {
         $itemTable = new DbTable\Item();
@@ -369,7 +339,7 @@ class BrandNav
             }
         }
 
-        $aliases = $this->getBrandAliases($brand);
+        $aliases = $this->itemAlias->getAliases($brand['id'], $brand['name']);
 
         $groups = [];
         foreach ($rows as $brandItemRow) {

@@ -4,6 +4,8 @@ namespace Application\Controller\Plugin;
 
 use Exception;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Autowp\Comments;
@@ -97,6 +99,11 @@ class Pic extends AbstractPlugin
      */
     private $userAccount;
 
+    /**
+     * @var TableGateway
+     */
+    private $itemLinkTable;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -111,7 +118,8 @@ class Pic extends AbstractPlugin
         PictureView $pictureView,
         Item $itemModel,
         Perspective $perspective,
-        UserAccount $userAccount
+        UserAccount $userAccount,
+        TableGateway $itemLinkTable
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -127,6 +135,7 @@ class Pic extends AbstractPlugin
         $this->itemModel = $itemModel;
         $this->perspective = $perspective;
         $this->userAccount = $userAccount;
+        $this->itemLinkTable = $itemLinkTable;
 
         $this->pictureTable = new DbTable\Picture();
     }
@@ -957,15 +966,13 @@ class Pic extends AbstractPlugin
 
         // links
         $ofLinks = [];
-        $linksTable = new DbTable\Item\Link();
         if (count($brandIds)) {
-            $links = $linksTable->fetchAll(
-                $linksTable->select(true)
-                    ->where('item_id in (?)', $brandIds)
-                    ->where('type = ?', 'official')
-            );
+            $links = $this->itemLinkTable->select([
+                new Sql\Predicate\In('item_id', $brandIds),
+                'type' => 'official'
+            ]);
             foreach ($links as $link) {
-                $ofLinks[$link->id] = $link;
+                $ofLinks[$link['id']] = $link;
             }
         }
 

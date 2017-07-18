@@ -7,14 +7,21 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\Model\DbTable;
 
 use geoPHP;
+use Zend\Db\TableGateway\TableGateway;
 
 class MuseumsController extends AbstractActionController
 {
     private $textStorage;
 
-    public function __construct($textStorage)
+    /**
+     * @var TableGateway
+     */
+    private $itemLinkTable;
+
+    public function __construct($textStorage, TableGateway $itemLinkTable)
     {
         $this->textStorage = $textStorage;
+        $this->itemLinkTable = $itemLinkTable;
     }
 
     public function indexAction()
@@ -44,11 +51,9 @@ class MuseumsController extends AbstractActionController
             $point = geoPHP::load(substr($itemPointRow->point, 4), 'wkb');
         }
 
-        $linkTable = new DbTable\Item\Link();
-        $links = $linkTable->fetchAll(
-            $linkTable->select()
-                ->where('item_id = ?', $museum['id'])
-        );
+        $links = $this->itemLinkTable->select([
+            'item_id' => $museum['id']
+        ]);
 
         $itemLanguageTable = new DbTable\Item\Language();
         $db = $itemLanguageTable->getAdapter();

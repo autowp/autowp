@@ -14,8 +14,10 @@ class MuseumsControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
-            $container->get(\Autowp\TextStorage\Service::class)
+            $container->get(\Autowp\TextStorage\Service::class),
+            $tables->get('links')
         );
     }
 }

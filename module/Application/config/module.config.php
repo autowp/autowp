@@ -143,6 +143,7 @@ return [
             Model\Categories::class              => Model\Service\CategoriesFactory::class,
             Model\Contact::class                 => Model\ContactFactory::class,
             Model\Item::class                    => Model\ItemFactory::class,
+            Model\ItemAlias::class               => Model\ItemAliasFactory::class,
             Model\ItemParent::class              => Model\ItemParentFactory::class,
             Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
             Model\Log::class                     => Model\Service\LogFactory::class,

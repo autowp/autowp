@@ -3,6 +3,7 @@
 namespace Application\Controller;
 
 use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -62,6 +63,11 @@ class CatalogueController extends AbstractActionController
      */
     private $perspective;
 
+    /**
+     * @var TableGateway
+     */
+    private $itemLinkTable;
+
     public function __construct(
         $textStorage,
         $cache,
@@ -71,7 +77,8 @@ class CatalogueController extends AbstractActionController
         $mostsMinCarsCount,
         Comments\CommentsService $comments,
         Item $itemModel,
-        Perspective $perspective
+        Perspective $perspective,
+        TableGateway $itemLinkTable
     ) {
 
         $this->textStorage = $textStorage;
@@ -83,6 +90,7 @@ class CatalogueController extends AbstractActionController
         $this->comments = $comments;
         $this->itemModel = $itemModel;
         $this->perspective = $perspective;
+        $this->itemLinkTable = $itemLinkTable;
     }
 
     private function doBrandAction(callable $callback)
@@ -514,13 +522,11 @@ class CatalogueController extends AbstractActionController
                 'default'  => []
             ];
 
-            $links = new DbTable\Item\Link();
             foreach ($types as $key => &$type) {
-                $type['links'] = $links->fetchAll(
-                    $links->select()
-                        ->where('item_id = ?', $brand['id'])
-                        ->where('type = ?', $key)
-                );
+                $type['links'] = $this->itemLinkTable->select([
+                    'item_id' => $brand['id'],
+                    'type'    => $key
+                ]);
             }
             foreach ($types as $key => &$type) {
                 if (count($type['links']) <= 0) {

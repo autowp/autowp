@@ -85,11 +85,17 @@ class ItemParent
      */
     private $itemParentCacheTable;
 
+    /**
+     * @var ItemAlias
+     */
+    private $itemAlias;
+
     public function __construct(
         array $languages,
         TableGateway $specTable,
         TableGateway $itemParentTable,
-        \Zend_Db_Adapter_Abstract $zf1db
+        \Zend_Db_Adapter_Abstract $zf1db,
+        ItemAlias $itemAlias
     ) {
         $this->languages = $languages;
         $this->specTable = $specTable;
@@ -111,6 +117,7 @@ class ItemParent
             'name'    => 'item_parent_cache',
             'primary' => ['item_id', 'parent_id']
         ]);
+        $this->itemAlias = $itemAlias;
     }
 
     public function delete($parentId, $itemId)
@@ -136,40 +143,6 @@ class ItemParent
         ]);
 
         return true;
-    }
-
-    private function getBrandAliases(DbTable\Item\Row $parentRow)
-    {
-        $aliases = [$parentRow['name']];
-
-        $brandAliasTable = new DbTable\Item\Alias();
-        $brandAliasRows = $brandAliasTable->fetchAll([
-            'item_id = ?' => $parentRow['id'],
-            'length(name) > 0'
-        ]);
-        foreach ($brandAliasRows as $brandAliasRow) {
-            $aliases[] = $brandAliasRow->name;
-        }
-
-        $itemLangRows = $this->itemLangTable->fetchAll([
-            'item_id = ?' => $parentRow['id'],
-            'length(name) > 0'
-        ]);
-        foreach ($itemLangRows as $itemLangRow) {
-            $aliases[] = $itemLangRow->name;
-        }
-
-        usort($aliases, function ($a, $b) {
-            $la = mb_strlen($a);
-            $lb = mb_strlen($b);
-
-            if ($la == $lb) {
-                return 0;
-            }
-            return ($la > $lb) ? -1 : 1;
-        });
-
-        return $aliases;
     }
 
     private function getVehicleName(DbTable\Item\Row $itemRow, $language)
@@ -209,7 +182,7 @@ class ItemParent
     private function extractName(DbTable\Item\Row $parentRow, DbTable\Item\Row $vehicleRow, $language)
     {
         $vehicleName = $this->getVehicleName($vehicleRow, $language);
-        $aliases = $this->getBrandAliases($parentRow);
+        $aliases = $this->itemAlias->getAliases($parentRow['id'], $parentRow['name']);
 
         $name = $vehicleName;
         foreach ($aliases as $alias) {

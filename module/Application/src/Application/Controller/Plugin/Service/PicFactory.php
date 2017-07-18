@@ -14,6 +14,7 @@ class PicFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Plugin(
             $container->get(\Autowp\TextStorage\Service::class),
             $container->get('MvcTranslator'),
@@ -28,7 +29,8 @@ class PicFactory implements FactoryInterface
             $container->get(\Application\Model\PictureView::class),
             $container->get(\Application\Model\Item::class),
             $container->get(\Application\Model\Perspective::class),
-            $container->get(\Application\Model\UserAccount::class)
+            $container->get(\Application\Model\UserAccount::class),
+            $tables->get('links')
         );
     }
 }
