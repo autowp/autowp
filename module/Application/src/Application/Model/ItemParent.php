@@ -895,7 +895,7 @@ class ItemParent
         $select->columns(['count' => new Sql\Expression('count(1)')])
             ->where(['parent_id' => $parentId]);
 
-        $row = $this->itemParentTable->selectWith($select);
+        $row = $this->itemParentTable->selectWith($select)->current();
         return $row ? (int)$row['count'] : 0;
     }
 
@@ -905,7 +905,7 @@ class ItemParent
         $select->columns(['count' => new Sql\Expression('count(1)')])
             ->where(['item_id' => $itemId]);
 
-        $row = $this->itemParentTable->selectWith($select);
+        $row = $this->itemParentTable->selectWith($select)->current();
         return $row ? (int)$row['count'] : 0;
     }
 
