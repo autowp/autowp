@@ -415,7 +415,7 @@ class ItemController extends AbstractRestfulController
             $specId = null;
             if ($query) {
                 $specRow = $this->specTable->select([
-                    new Sql\Expression('INSTR(?, short_name)', [$query])
+                    new Sql\Predicate\Expression('INSTR(?, short_name)', $query)
                 ])->current();
 
                 if ($specRow) {
