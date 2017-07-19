@@ -27,7 +27,7 @@ class InfoController extends AbstractActionController
     private function loadSpecs(int $parentId): array
     {
         if ($parentId) {
-            $filter = ['parent_id?' => $parentId];
+            $filter = ['parent_id' => $parentId];
         } else {
             $filter = ['parent_id is null'];
         }
