@@ -5,8 +5,6 @@ namespace Application\Hydrator\Api;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
-use geoPHP;
-
 use Autowp\User\Model\DbTable\User;
 
 use Application\ItemNameFormatter;
@@ -351,7 +349,7 @@ class ItemHydrator extends RestHydrator
         $showLng = $this->filterComposite->filter('lng');
 
         if ($showLat || $showLng) {
-            $point = $this->getItemPoint((int)$object['id']);
+            $point = $this->itemModel->getPoint($object['id']);
 
             if ($showLat) {
                 $result['lat'] = $point ? $point->y() : null;
@@ -667,23 +665,6 @@ class ItemHydrator extends RestHydrator
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");
-    }
-
-    private function getItemPoint(int $itemId)
-    {
-        $point = null;
-        $itemPointTable = new DbTable\Item\Point();
-        $itemPointRow = $itemPointTable->fetchRow([
-            'item_id = ?' => $itemId
-        ]);
-        if ($itemPointRow) {
-            if ($itemPointRow->point) {
-                geoPHP::version(); // for autoload classes
-                $point = geoPHP::load(substr($itemPointRow->point, 4), 'wkb');
-            }
-        }
-
-        return $point;
     }
 
     private function getUserRole()

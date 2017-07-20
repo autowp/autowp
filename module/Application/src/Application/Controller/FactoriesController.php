@@ -2,7 +2,6 @@
 
 namespace Application\Controller;
 
-use geoPHP;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -144,15 +143,7 @@ class FactoriesController extends AbstractActionController
             }
         }
 
-        $itemPointTable = new DbTable\Item\Point();
-        $itemPointRow = $itemPointTable->fetchRow([
-            'item_id = ?' => $factory->id
-        ]);
-
-        $point = null;
-        if ($itemPointRow && $itemPointRow->point) {
-            $point = geoPHP::load(substr($itemPointRow->point, 4), 'wkb');
-        }
+        $point = $this->itemModel->getPoint($factory->id);
 
         $itemLanguageTable = new DbTable\Item\Language();
         $db = $itemLanguageTable->getAdapter();

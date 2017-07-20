@@ -1006,7 +1006,7 @@ class ItemController extends AbstractRestfulController
                 geoPHP::version(); // for autoload classes
                 $point = new Point($values['lng'], $values['lat']);
             }
-            $this->setItemPoint($item, $point);
+            $this->itemModel->setPoint($item['id'], $point);
         }
 
         if (array_key_exists('name', $values)) {
@@ -1213,7 +1213,7 @@ class ItemController extends AbstractRestfulController
                 geoPHP::version(); // for autoload classes
                 $point = new Point($values['lng'], $values['lat']);
             }
-            $this->setItemPoint($item, $point);
+            $this->itemModel->setPoint($item['id'], $point);
         }
 
         $this->itemModel->updateInteritance($item);
@@ -1388,31 +1388,6 @@ class ItemController extends AbstractRestfulController
         }
 
         return $changes;
-    }
-
-
-    private function setItemPoint(\Autowp\Commons\Db\Table\Row $item, $point)
-    {
-        $itemPointTable = new DbTable\Item\Point();
-        $itemPointRow = $itemPointTable->fetchRow([
-            'item_id = ?' => $item['id']
-        ]);
-
-        if ($point) {
-            if (! $itemPointRow) {
-                $itemPointRow = $itemPointTable->createRow([
-                    'item_id' => $item['id']
-                ]);
-            }
-
-            $db = $itemPointTable->getAdapter();
-            $itemPointRow->point = new Zend_Db_Expr($db->quoteInto('GeomFromText(?)', $point->out('wkt')));
-            $itemPointRow->save();
-        } else {
-            if ($itemPointRow) {
-                $itemPointRow->delete();
-            }
-        }
     }
 
     private function setLanguageName($carId, $language, $name)

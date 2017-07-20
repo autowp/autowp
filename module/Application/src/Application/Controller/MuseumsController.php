@@ -2,12 +2,11 @@
 
 namespace Application\Controller;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable;
-
-use geoPHP;
-use Zend\Db\TableGateway\TableGateway;
+use Application\Model\Item;
 
 class MuseumsController extends AbstractActionController
 {
@@ -18,10 +17,16 @@ class MuseumsController extends AbstractActionController
      */
     private $itemLinkTable;
 
-    public function __construct($textStorage, TableGateway $itemLinkTable)
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
+    public function __construct($textStorage, TableGateway $itemLinkTable, Item $itemModel)
     {
         $this->textStorage = $textStorage;
         $this->itemLinkTable = $itemLinkTable;
+        $this->itemModel = $itemModel;
     }
 
     public function indexAction()
@@ -41,15 +46,7 @@ class MuseumsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $itemPointTable = new DbTable\Item\Point();
-        $itemPointRow = $itemPointTable->fetchRow([
-            'item_id = ?' => $museum->id
-        ]);
-
-        $point = null;
-        if ($itemPointRow && $itemPointRow->point) {
-            $point = geoPHP::load(substr($itemPointRow->point, 4), 'wkb');
-        }
+        $point = $this->itemModel->getPoint($museum->id);
 
         $links = $this->itemLinkTable->select([
             'item_id' => $museum['id']

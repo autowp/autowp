@@ -4,6 +4,8 @@ namespace Application\Model;
 
 use DateTime;
 
+use geoPHP;
+use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 use Application\Model\DbTable;
@@ -22,11 +24,17 @@ class Item
      */
     private $itemTable;
 
-    public function __construct(TableGateway $specTable)
+    /**
+     * @var TableGateway
+     */
+    private $itemPointTable;
+
+    public function __construct(TableGateway $specTable, TableGateway $itemPointTable)
     {
         $this->specTable = $specTable;
 
         $this->itemTable = new DbTable\Item();
+        $this->itemPointTable = $itemPointTable;
     }
 
     public function getEngineVehiclesGroups(int $engineId, array $options = [])
@@ -536,5 +544,39 @@ class Item
             ->where('item_parent_cache.parent_id = ?', $parentId);
 
         return (int)$db->fetchOne($select);
+    }
+
+    public function setPoint(int $itemId, $point)
+    {
+        $primaryKey = ['item_id' => $itemId];
+
+        if (! $point) {
+            $this->itemPointTable->delete($primaryKey);
+            return;
+        }
+
+        $set = [
+            'point' => new Sql\Expression('GeomFromText(?)', [$point->out('wkt')])
+        ];
+
+        $row = $this->itemPointTable->select($primaryKey)->current();
+        if ($row) {
+            $this->itemPointTable->update($set, $primaryKey);
+            return;
+        }
+
+        $this->itemPointTable->insert(array_replace($set, $primaryKey));
+    }
+
+    public function getPoint(int $itemId)
+    {
+        $point = null;
+        $row = $this->itemPointTable->select(['item_id' => $itemId])->current();
+        if ($row && $row['point']) {
+            geoPHP::version(); // for autoload classes
+            $point = geoPHP::load(substr($row['point'], 4), 'wkb');
+        }
+
+        return $point;
     }
 }

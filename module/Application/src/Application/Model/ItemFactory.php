@@ -14,7 +14,8 @@ class ItemFactory implements FactoryInterface
     {
         $tables = $container->get(\Application\Db\TableManager::class);
         return new Item(
-            $tables->get('spec')
+            $tables->get('spec'),
+            $tables->get('item_point')
         );
     }
 }
