@@ -12,3 +12,21 @@
 <http://autowp.ru/>
 
 ======
+
+## Requirements
+
+The following versions of PHP are supported.
+
+* PHP 7.0
+* PHP 7.1
+
+
+## Credits
+
+- [Dmitry P.](https://github.com/autowp)
+- [Contributors](https://github.com/autowp/autowp/contributors)
+
+
+## License
+
+The MIT License (MIT). Please see [License File](https://github.com/thephpleague/oauth2-facebook/blob/master/LICENSE) for more information.
