@@ -21,6 +21,7 @@ use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Model\PictureItem;
+use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
 use Application\Model\PictureVote;
 use Application\Model\UserAccount;
@@ -37,8 +38,6 @@ class Pic extends AbstractPlugin
      * @var PictureView
      */
     private $pictureView = null;
-
-    private $moderVoteTable = null;
 
     private $textStorage;
 
@@ -104,6 +103,11 @@ class Pic extends AbstractPlugin
      */
     private $itemLinkTable;
 
+    /**
+     * @var PictureModerVote
+     */
+    private $pictureModerVote;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -119,7 +123,8 @@ class Pic extends AbstractPlugin
         Item $itemModel,
         Perspective $perspective,
         UserAccount $userAccount,
-        TableGateway $itemLinkTable
+        TableGateway $itemLinkTable,
+        PictureModerVote $pictureModerVote
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -136,18 +141,9 @@ class Pic extends AbstractPlugin
         $this->perspective = $perspective;
         $this->userAccount = $userAccount;
         $this->itemLinkTable = $itemLinkTable;
+        $this->pictureModerVote = $pictureModerVote;
 
         $this->pictureTable = new DbTable\Picture();
-    }
-
-    /**
-     * @return DbTable\Picture\ModerVote
-     */
-    private function getModerVoteTable()
-    {
-        return $this->moderVoteTable
-            ? $this->moderVoteTable
-            : $this->moderVoteTable = new DbTable\Picture\ModerVote();
     }
 
     public function href($row, array $options = [])
@@ -271,29 +267,7 @@ class Pic extends AbstractPlugin
             }
 
             // moder votes
-            $moderVotes = [];
-            if (count($ids)) {
-                $moderVoteTable = $this->getModerVoteTable();
-                $db = $moderVoteTable->getAdapter();
-
-                $voteRows = $db->fetchAll(
-                    $db->select()
-                        ->from($moderVoteTable->info('name'), [
-                            'picture_id',
-                            'vote'  => new Zend_Db_Expr('sum(if(vote, 1, -1))'),
-                            'count' => 'count(1)'
-                        ])
-                        ->where('picture_id in (?)', $ids)
-                        ->group('picture_id')
-                );
-
-                foreach ($voteRows as $row) {
-                    $moderVotes[$row['picture_id']] = [
-                        'moder_votes'       => (int)$row['vote'],
-                        'moder_votes_count' => (int)$row['count']
-                    ];
-                }
-            }
+            $moderVotes = $this->pictureModerVote->getVoteCountArray($ids);
 
             // views
             $views = [];
@@ -997,11 +971,11 @@ class Pic extends AbstractPlugin
         $userTable = new UserTable();
 
         $moderVotes = [];
-        foreach ($picture->findDependentRowset(DbTable\Picture\ModerVote::class) as $moderVote) {
+        foreach ($this->pictureModerVote->getVotes($picture['id']) as $moderVote) {
             $moderVotes[] = [
-                'vote'   => $moderVote->vote,
-                'reason' => $moderVote->reason,
-                'user'   => $userTable->find($moderVote->user_id)->current()
+                'vote'   => $moderVote['vote'],
+                'reason' => $moderVote['reason'],
+                'user'   => $userTable->find($moderVote['user_id'])->current()
             ];
         }
 

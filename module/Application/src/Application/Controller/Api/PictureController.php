@@ -24,6 +24,7 @@ use Application\Model\UserPicture;
 use Application\Service\TelegramService;
 
 use Zend_Db_Expr;
+use Application\Model\PictureModerVote;
 
 class PictureController extends AbstractRestfulController
 {
@@ -89,6 +90,11 @@ class PictureController extends AbstractRestfulController
      */
     private $comments;
 
+    /**
+     * @var PictureModerVote
+     */
+    private $pictureModerVote;
+
     public function __construct(
         RestHydrator $hydrator,
         PictureItem $pictureItem,
@@ -103,7 +109,9 @@ class PictureController extends AbstractRestfulController
         InputFilter $listInputFilter,
         InputFilter $editInputFilter,
         $textStorage,
-        \Autowp\Comments\CommentsService $comments
+        \Autowp\Comments\CommentsService $comments,
+        PictureModerVote $pictureModerVote,
+        DbTable\Picture $pictureTable
     ) {
         $this->carOfDay = $carOfDay;
 
@@ -120,8 +128,9 @@ class PictureController extends AbstractRestfulController
         $this->editInputFilter = $editInputFilter;
         $this->textStorage = $textStorage;
         $this->comments = $comments;
+        $this->pictureModerVote = $pictureModerVote;
 
-        $this->table = new DbTable\Picture();
+        $this->table = $pictureTable;
     }
 
     public function randomPictureAction()
@@ -510,7 +519,8 @@ class PictureController extends AbstractRestfulController
 
     private function canAccept(DbTable\Picture\Row $picture)
     {
-        return $picture->canAccept() && $this->user()->isAllowed('picture', 'accept');
+        return $this->table->canAccept($picture)
+            && $this->user()->isAllowed('picture', 'accept');
     }
 
     /**
@@ -548,6 +558,8 @@ class PictureController extends AbstractRestfulController
         if (! $picture) {
             return $this->notFoundAction();
         }
+
+        $userTable = new User();
 
         $data = (array)$this->processBodyContent($this->getRequest());
         $validationGroup = array_keys($data); // TODO: intersect with real keys
@@ -656,7 +668,6 @@ class PictureController extends AbstractRestfulController
             if ($picture->copyrights_text_id) {
                 $userIds = $this->textStorage->getTextUserIds($picture->copyrights_text_id);
 
-                $userTable = new User();
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {
                         foreach ($userTable->find($userId) as $userRow) {
@@ -717,7 +728,6 @@ class PictureController extends AbstractRestfulController
 
 
                 if ($previousStatusUserId != $user->id) {
-                    $userTable = new User();
                     foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                         $message = sprintf(
                             'Принята картинка %s',
@@ -774,7 +784,6 @@ class PictureController extends AbstractRestfulController
 
                     $pictureUrl = $this->pic()->url($picture->identity, true);
                     if ($previousStatusUserId != $user->id) {
-                        $userTable = new User();
                         foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                             $message = sprintf(
                                 'С картинки %s снят статус "принято"',
@@ -804,19 +813,13 @@ class PictureController extends AbstractRestfulController
                     if ($owner->id != $user->id) {
                         $uri = $this->hostManager->getUriByLanguage($owner->language);
 
-                        $requests = new DbTable\Picture\ModerVote();
-                        $deleteRequests = $requests->fetchAll(
-                            $requests->select()
-                                ->where('picture_id = ?', $picture->id)
-                                ->where('vote = 0')
-                        );
+                        $deleteRequests = $this->pictureModerVote->getNegativeVotes($picture['id']);
 
                         $reasons = [];
-                        if (count($deleteRequests)) {
-                            foreach ($deleteRequests as $request) {
-                                if ($user = $request->findParentRow(User::class)) {
-                                    $reasons[] = $this->userModerUrl($user, true, $uri) . ' : ' . $request->reason;
-                                }
+                        foreach ($deleteRequests as $request) {
+                            $user = $userTable->find($request['user_id'])->current();
+                            if ($user) {
+                                $reasons[] = $this->userModerUrl($user, true, $uri) . ' : ' . $request['reason'];
                             }
                         }
 
@@ -872,47 +875,26 @@ class PictureController extends AbstractRestfulController
 
     private function pictureCanDelete($picture)
     {
-        $canDelete = false;
-        if ($picture->canDelete()) {
-            $user = $this->user()->get();
-            if ($this->user()->isAllowed('picture', 'remove')) {
-                if ($this->pictureVoteExists($picture, $user)) {
-                    $canDelete = true;
-                }
-            } elseif ($this->user()->isAllowed('picture', 'remove_by_vote')) {
-                if ($this->pictureVoteExists($picture, $user)) {
-                    $db = $this->table->getAdapter();
-                    $acceptVotes = (int)$db->fetchOne(
-                        $db->select()
-                            ->from('pictures_moder_votes', [new Zend_Db_Expr('COUNT(1)')])
-                            ->where('picture_id = ?', $picture->id)
-                            ->where('vote > 0')
-                    );
-                    $deleteVotes = (int)$db->fetchOne(
-                        $db->select()
-                            ->from('pictures_moder_votes', [new Zend_Db_Expr('COUNT(1)')])
-                            ->where('picture_id = ?', $picture->id)
-                            ->where('vote = 0')
-                    );
+        if (! $this->table->canDelete($picture)) {
+            return false;
+        }
 
-                    $canDelete = ($deleteVotes > $acceptVotes);
-                }
+        $canDelete = false;
+        $user = $this->user()->get();
+        if ($this->user()->isAllowed('picture', 'remove')) {
+            if ($this->pictureModerVote->hasVote($picture->id, $user->id)) {
+                $canDelete = true;
+            }
+        } elseif ($this->user()->isAllowed('picture', 'remove_by_vote')) {
+            if ($this->pictureModerVote->hasVote($picture->id, $user->id)) {
+                $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture->id);
+                $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture->id);
+
+                $canDelete = ($deleteVotes > $acceptVotes);
             }
         }
 
         return $canDelete;
-    }
-
-    private function pictureVoteExists($picture, $user)
-    {
-        $pictureTable = new DbTable\Picture();
-        $db = $pictureTable->getAdapter();
-        return $db->fetchOne(
-            $db->select()
-                ->from('pictures_moder_votes', new Zend_Db_Expr('COUNT(1)'))
-                ->where('picture_id = ?', $picture->id)
-                ->where('user_id = ?', $user->id)
-        );
     }
 
     public function normalizeAction()

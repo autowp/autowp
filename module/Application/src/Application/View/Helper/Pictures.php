@@ -6,47 +6,35 @@ use Zend\View\Helper\AbstractHelper;
 
 use Autowp\Comments;
 
-use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
-use Application\Model\DbTable\Picture\Row as PictureRow;
+use Application\Model\DbTable;
+use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
-
-use Zend_Db_Expr;
 
 class Pictures extends AbstractHelper
 {
-    const
-        SCHEME_631 = '631',
-        SCHEME_422 = '422';
-
     /**
      * @var PictureView
      */
     private $pictureView;
 
     /**
-     * @var PictureModerVote
-     */
-    private $moderVoteTable = null;
-
-    /**
      * @var Comments\CommentsService
      */
     private $comments;
 
-    public function __construct(Comments\CommentsService $comments, PictureView $pictureView)
-    {
+    /**
+     * @var PictureModerVote
+     */
+    private $pictureModerVote;
+
+    public function __construct(
+        Comments\CommentsService $comments,
+        PictureView $pictureView,
+        PictureModerVote $pictureModerVote
+    ) {
         $this->comments = $comments;
         $this->pictureView = $pictureView;
-    }
-
-    /**
-     * @return PictureModerVote
-     */
-    private function getModerVoteTable()
-    {
-        return $this->moderVoteTable
-            ? $this->moderVoteTable
-            : $this->moderVoteTable = new PictureModerVote();
+        $this->pictureModerVote = $pictureModerVote;
     }
 
     private function isPictureModer()
@@ -55,7 +43,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function behaviour(PictureRow $picture)
+    public function behaviour(DbTable\Picture\Row $picture)
     {
         return $this->userBehaviour($picture, $this->isPictureModer());
     }
@@ -82,7 +70,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    private function userBehaviour(PictureRow $picture, $isModer)
+    private function userBehaviour(DbTable\Picture\Row $picture, $isModer)
     {
         if ($this->view->user()->logedIn()) {
             $commentsStat = $this->comments->getTopicStatForUser(
@@ -118,19 +106,9 @@ class Pictures extends AbstractHelper
     }
 
 
-    private function getModerVote(PictureRow $picture)
+    private function getModerVote(int $pictureId)
     {
-        $moderVoteTable = $this->getModerVoteTable();
-        $db = $moderVoteTable->getAdapter();
-
-        $row = $db->fetchRow(
-            $db->select()
-                ->from($moderVoteTable->info('name'), [
-                    'vote'  => new Zend_Db_Expr('sum(if(vote, 1, -1))'),
-                    'count' => 'count(1)'
-                ])
-                ->where('picture_id = ?', $picture->id)
-        );
+        $row = $this->pictureModerVote->getVoteCount($pictureId);
 
         if ($row['count'] > 0) {
             return (int)$row['vote'];
@@ -140,7 +118,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function picture(PictureRow $picture)
+    public function picture(DbTable\Picture\Row $picture)
     {
         $view = $this->view;
 
@@ -165,7 +143,7 @@ class Pictures extends AbstractHelper
                           '</span>';
         }
 
-        $moderVote = $this->getModerVote($picture);
+        $moderVote = $this->getModerVote($picture['id']);
 
         $classes = ['picture-preview'];
         if ($moderVote !== null) {

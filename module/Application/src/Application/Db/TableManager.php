@@ -25,6 +25,7 @@ class TableManager implements ServiceLocatorInterface
         'perspectives' => [],
         'perspectives_groups' => [],
         'perspectives_pages' => [],
+        'pictures_moder_votes' => [],
         'picture_view' => [],
         'pictures' => [],
         'spec' => [],

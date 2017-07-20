@@ -7,7 +7,10 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\DbTable;
+use Application\Model\PictureModerVote;
 
 use Zend_Db_Expr;
 
@@ -23,10 +26,19 @@ class PictureVote extends AbstractPlugin
      */
     private $voteTemplateTable;
 
-    public function __construct(Adapter $adapter)
-    {
-        $this->table = new DbTable\Picture();
+    /**
+     * @var PictureModerVote
+     */
+    private $pictureModerVote;
+
+    public function __construct(
+        Adapter $adapter,
+        PictureModerVote $pictureModerVote,
+        DbTable\Picture $pictureTable
+    ) {
+        $this->table = $pictureTable;
         $this->voteTemplateTable = new TableGateway('picture_moder_vote_template', $adapter);
+        $this->pictureModerVote = $pictureModerVote;
     }
 
     private function isLastPicture($picture)
@@ -115,7 +127,20 @@ class PictureVote extends AbstractPlugin
         }
 
         $user = $controller->user()->get();
-        $voteExists = $this->pictureVoteExists($picture, $user);
+        $voteExists = $this->pictureModerVote->hasVote($picture['id'], $user['id']);
+
+        $moderVotes = null;
+        if (! $options['hideVote']) {
+            $moderVotes = [];
+            $userTable = new User();
+            foreach ($this->pictureModerVote->getVotes($picture['id']) as $vote) {
+                $moderVotes[] = [
+                    'vote'   => $vote['vote'],
+                    'reason' => $vote['reason'],
+                    'user'   => $userTable->find($vote['user_id'])->current()
+                ];
+            }
+        }
 
         return [
             'isLastPicture'     => $this->isLastPicture($picture),
@@ -126,9 +151,7 @@ class PictureVote extends AbstractPlugin
             ]),
             'canVote'           => ! $voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
             'voteExists'        => $voteExists,
-            'moderVotes'        => $options['hideVote']
-                ? null
-                : $picture->findDependentRowset(DbTable\Picture\ModerVote::class),
+            'moderVotes'        => $moderVotes,
             'voteOptions' => $this->getVoteOptions2(),
             'voteUrl' => $controller->url()->fromRoute('api/picture-moder-vote', [
                 'id' => $picture->id
@@ -138,45 +161,25 @@ class PictureVote extends AbstractPlugin
 
     private function pictureCanDelete($picture)
     {
-        $canDelete = false;
-        if ($picture->canDelete()) {
-            $user = $this->getController()->user()->get();
-            if ($this->getController()->user()->isAllowed('picture', 'remove')) {
-                if ($this->pictureVoteExists($picture, $user)) {
-                    $canDelete = true;
-                }
-            } elseif ($this->getController()->user()->isAllowed('picture', 'remove_by_vote')) {
-                if ($this->pictureVoteExists($picture, $user)) {
-                    $db = $this->table->getAdapter();
-                    $acceptVotes = (int)$db->fetchOne(
-                        $db->select()
-                            ->from('pictures_moder_votes', [new Zend_Db_Expr('COUNT(1)')])
-                            ->where('picture_id = ?', $picture->id)
-                            ->where('vote > 0')
-                    );
-                    $deleteVotes = (int)$db->fetchOne(
-                        $db->select()
-                            ->from('pictures_moder_votes', [new Zend_Db_Expr('COUNT(1)')])
-                            ->where('picture_id = ?', $picture->id)
-                            ->where('vote = 0')
-                    );
+        if (! $this->table->canDelete($picture)) {
+            return false;
+        }
 
-                    $canDelete = ($deleteVotes > $acceptVotes);
-                }
+        $canDelete = false;
+        $user = $this->getController()->user()->get();
+        if ($this->getController()->user()->isAllowed('picture', 'remove')) {
+            if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
+                $canDelete = true;
+            }
+        } elseif ($this->getController()->user()->isAllowed('picture', 'remove_by_vote')) {
+            if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
+                $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);
+                $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);
+
+                $canDelete = ($deleteVotes > $acceptVotes);
             }
         }
 
         return $canDelete;
-    }
-
-    private function pictureVoteExists($picture, $user)
-    {
-        $db = $this->table->getAdapter();
-        return $db->fetchOne(
-            $db->select()
-                ->from('pictures_moder_votes', new Zend_Db_Expr('COUNT(1)'))
-                ->where('picture_id = ?', $picture->id)
-                ->where('user_id = ?', $user->id)
-        );
     }
 }

@@ -1,11 +1,9 @@
 <?php
 
-namespace Application\Controller\Api\Service;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
-use Application\Controller\Api\PictureController as Controller;
 
 class PictureControllerFactory implements FactoryInterface
 {
@@ -16,7 +14,7 @@ class PictureControllerFactory implements FactoryInterface
     {
         $hydrators = $container->get('HydratorManager');
         $filters = $container->get('InputFilterManager');
-        return new Controller(
+        return new PictureController(
             $hydrators->get(\Application\Hydrator\Api\PictureHydrator::class),
             $container->get(\Application\Model\PictureItem::class),
             $container->get(\Application\DuplicateFinder::class),
@@ -30,7 +28,9 @@ class PictureControllerFactory implements FactoryInterface
             $filters->get('api_picture_list'),
             $filters->get('api_picture_edit'),
             $container->get(\Autowp\TextStorage\Service::class),
-            $container->get(\Autowp\Comments\CommentsService::class)
+            $container->get(\Autowp\Comments\CommentsService::class),
+            $container->get(\Application\Model\PictureModerVote::class),
+            $container->get(\Application\Model\DbTable\Picture::class)
         );
     }
 }

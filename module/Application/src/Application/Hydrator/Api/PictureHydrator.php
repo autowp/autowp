@@ -15,6 +15,7 @@ use Application\DuplicateFinder;
 use Application\Model\DbTable;
 use Application\Model\Perspective;
 use Application\Model\PictureItem;
+use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
 use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
@@ -58,11 +59,6 @@ class PictureHydrator extends RestHydrator
     private $userTable;
 
     /**
-     * @var DbTable\Picture\ModerVote
-     */
-    private $moderVoteTable;
-
-    /**
      * @var DuplicateFinder
      */
     private $duplicateFinder;
@@ -89,16 +85,21 @@ class PictureHydrator extends RestHydrator
      */
     private $perspective;
 
+    /**
+     * @var PictureModerVote
+     */
+    private $pictureModerVote;
+
     public function __construct(
         $serviceManager
     ) {
         parent::__construct();
 
-        $this->pictureTable = new DbTable\Picture();
+        $this->pictureTable = $serviceManager->get(DbTable\Picture::class);
         $this->userTable = new User();
-        $this->moderVoteTable = new DbTable\Picture\ModerVote();
 
         $this->pictureView = $serviceManager->get(PictureView::class);
+        $this->pictureModerVote = $serviceManager->get(PictureModerVote::class);
 
         $this->router = $serviceManager->get('HttpRouter');
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
@@ -296,26 +297,12 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('moder_vote')) {
-            $moderVotes = null;
-            $db = $this->moderVoteTable->getAdapter();
-
-            $moderVotes = $db->fetchRow(
-                $db->select()
-                    ->from($this->moderVoteTable->info('name'), [
-                        'vote'  => new Zend_Db_Expr('sum(if(vote, 1, -1))'),
-                        'count' => 'count(1)'
-                    ])
-                    ->where('picture_id = ?', $object['id'])
-            );
-            $picture['moder_vote'] = $moderVotes;
+            $picture['moder_vote'] = $this->pictureModerVote->getVoteCount($object['id']);
         }
 
         if ($this->filterComposite->filter('moder_votes')) {
-            $rows = $this->moderVoteTable->fetchAll([
-                'picture_id = ?' => $object['id']
-            ]);
             $moderVotes = [];
-            foreach ($rows as $row) {
+            foreach ($this->pictureModerVote->getVotes($object['id']) as $row) {
                 $user = $this->userTable->find($row['user_id'])->current();
                 $moderVotes[] = [
                     'reason' => $row['reason'],
@@ -327,11 +314,7 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('moder_voted')) {
-            $row = $this->moderVoteTable->fetchRow([
-                'picture_id = ?' => $object['id'],
-                'user_id = ?'    => $this->userId
-            ]);
-            $picture['moder_voted'] = (bool)$row;
+            $picture['moder_voted'] = $this->pictureModerVote->hasVote($object['id'], $this->userId);
         }
 
         if ($this->filterComposite->filter('image')) {
@@ -438,7 +421,8 @@ class PictureHydrator extends RestHydrator
                     'move'      => $this->acl->isAllowed($role, 'picture', 'move'),
                     'unaccept'  => ($object['status'] == DbTable\Picture::STATUS_ACCEPTED)
                                 && $this->acl->isAllowed($role, 'picture', 'unaccept'),
-                    'accept'    => $object->canAccept() && $this->acl->isAllowed($role, 'picture', 'accept'),
+                    'accept'    => $this->pictureTable->canAccept($object)
+                                && $this->acl->isAllowed($role, 'picture', 'accept'),
                     'restore'   => ($object['status'] == DbTable\Picture::STATUS_REMOVING)
                                 && $this->acl->isAllowed($role, 'picture', 'restore'),
                     'normalize' => ($object['status'] == DbTable\Picture::STATUS_INBOX)
@@ -587,7 +571,7 @@ class PictureHydrator extends RestHydrator
 
     private function canDelete($picture)
     {
-        if (! $picture->canDelete()) {
+        if (! $this->pictureTable->canDelete($picture)) {
             return false;
         }
 
@@ -597,7 +581,7 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->acl->isAllowed($role, 'picture', 'remove')) {
-            if ($this->pictureVoteExists($picture)) {
+            if ($this->pictureModerVote->hasVote($picture['id'], $this->userId)) {
                 return true;
             }
         }
@@ -606,36 +590,13 @@ class PictureHydrator extends RestHydrator
             return false;
         }
 
-        if (! $this->pictureVoteExists($picture)) {
+        if (! $this->pictureModerVote->hasVote($picture['id'], $this->userId)) {
             return false;
         }
 
-        $db = $this->pictureTable->getAdapter();
-        $acceptVotes = (int)$db->fetchOne(
-            $db->select()
-                ->from('pictures_moder_votes', [new Zend_Db_Expr('COUNT(1)')])
-                ->where('picture_id = ?', $picture->id)
-                ->where('vote > 0')
-        );
-        $deleteVotes = (int)$db->fetchOne(
-            $db->select()
-                ->from('pictures_moder_votes', [new Zend_Db_Expr('COUNT(1)')])
-                ->where('picture_id = ?', $picture->id)
-                ->where('vote = 0')
-        );
+        $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture->id);
+        $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture->id);
 
         return $deleteVotes > $acceptVotes;
-    }
-
-    private function pictureVoteExists($picture)
-    {
-        $pictureTable = new DbTable\Picture();
-        $db = $pictureTable->getAdapter();
-        return $db->fetchOne(
-            $db->select()
-                ->from('pictures_moder_votes', new Zend_Db_Expr('COUNT(1)'))
-                ->where('picture_id = ?', $picture->id)
-                ->where('user_id = ?', (int)$this->userId)
-        );
     }
 }

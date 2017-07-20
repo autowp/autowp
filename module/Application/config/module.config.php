@@ -146,6 +146,7 @@ return [
             Model\Log::class                     => Model\Service\LogFactory::class,
             Model\Perspective::class             => Model\PerspectiveFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,
+            Model\PictureModerVote::class        => Model\PictureModerVoteFactory::class,
             Model\PictureView::class             => Model\PictureViewFactory::class,
             Model\PictureVote::class             => Model\Service\PictureVoteFactory::class,
             Model\UserPicture::class             => Model\Service\UserPictureFactory::class,
@@ -279,7 +280,7 @@ return [
         \Autowp\ExternalLoginService\GooglePlus::class => [
             'clientId'     => getenv('AUTOWP_ELS_GOOGLEPLUS_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GOOGLEPLUS_SECRET'),
-            'redirectUri'  => 'http://en.wheelsage.org/login/callback'
+            'redirectUri'  => 'http://en.'.$host.'/login/callback'
         ],
         \Autowp\ExternalLoginService\Twitter::class => [
             'consumerKey'    => getenv('AUTOWP_ELS_TWITTER_CLIENTID'),

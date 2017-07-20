@@ -183,40 +183,4 @@ class Row extends \Autowp\Commons\Db\Table\Row
 
         return new Request($request);
     }
-
-    public function canAccept()
-    {
-        if (! in_array($this->status, [DbTable\Picture::STATUS_INBOX])) {
-            return false;
-        }
-
-        $moderVoteTable = new DbTable\Picture\ModerVote();
-        $deleteVote = $moderVoteTable->fetchRow([
-            'picture_id = ?' => $this->id,
-            'vote = 0'
-        ]);
-        if ($deleteVote) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function canDelete()
-    {
-        if (! in_array($this->status, [DbTable\Picture::STATUS_INBOX])) {
-            return false;
-        }
-
-        $moderVoteTable = new DbTable\Picture\ModerVote();
-        $acceptVote = $moderVoteTable->fetchRow([
-            'picture_id = ?' => $this->id,
-            'vote > 0'
-        ]);
-        if ($acceptVote) {
-            return false;
-        }
-
-        return true;
-    }
 }

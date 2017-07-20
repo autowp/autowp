@@ -13,9 +13,8 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
 use Application\Model\DbTable;
+use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
-
-use Zend_Db_Expr;
 
 class PictureModerVoteController extends AbstractRestfulController
 {
@@ -39,18 +38,25 @@ class PictureModerVoteController extends AbstractRestfulController
      */
     private $userPicture;
 
+    /**
+     * @var PictureModerVote
+     */
+    private $pictureModerVote;
+
     public function __construct(
         Adapter $adapter,
         HostManager $hostManager,
         MessageService $message,
         Form $voteForm,
-        UserPicture $userPicture
+        UserPicture $userPicture,
+        PictureModerVote $pictureModerVote
     ) {
         $this->hostManager = $hostManager;
         $this->message = $message;
         $this->voteForm = $voteForm;
         $this->templateTable = new TableGateway('picture_moder_vote_template', $adapter);
         $this->userPicture = $userPicture;
+        $this->pictureModerVote = $pictureModerVote;
     }
 
     private function pictureUrl(DbTable\Picture\Row $picture, $forceCanonical = false, $uri = null)
@@ -59,18 +65,6 @@ class PictureModerVoteController extends AbstractRestfulController
             'force_canonical' => $forceCanonical,
             'uri'             => $uri
         ]) . 'ng/moder/pictures/' . $picture->id;
-    }
-
-    private function pictureVoteExists($picture, $user)
-    {
-        $pictureTable = new DbTable\Picture();
-        $db = $pictureTable->getAdapter();
-        return $db->fetchOne(
-            $db->select()
-                ->from('pictures_moder_votes', new Zend_Db_Expr('COUNT(1)'))
-                ->where('picture_id = ?', $picture->id)
-                ->where('user_id = ?', $user->id)
-        );
     }
 
     private function notifyVote($picture, $vote, $reason)
@@ -175,7 +169,7 @@ class PictureModerVoteController extends AbstractRestfulController
         }
 
         $user = $this->user()->get();
-        $voteExists = $this->pictureVoteExists($picture, $user);
+        $voteExists = $this->pictureModerVote->hasVote($picture['id'], $user['id']);
 
         if ($voteExists) {
             return $this->getResponse()->setStatusCode(400);
@@ -194,14 +188,7 @@ class PictureModerVoteController extends AbstractRestfulController
 
         $vote = $values['vote'] > 0;
 
-        $moderVotes = new DbTable\Picture\ModerVote();
-        $moderVotes->insert([
-            'user_id'    => $user->id,
-            'picture_id' => $picture->id,
-            'day_date'   => new Zend_Db_Expr('NOW()'),
-            'reason'     => $values['reason'],
-            'vote'       => $vote ? 1 : 0
-        ]);
+        $this->pictureModerVote->add($picture['id'], $user['id'], $vote ? 1 : 0, $values['reason']);
 
         if ($vote && $picture->status == DbTable\Picture::STATUS_REMOVING) {
             $picture->status = DbTable\Picture::STATUS_INBOX;
@@ -262,16 +249,12 @@ class PictureModerVoteController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $voteExists = $this->pictureVoteExists($picture, $user);
+        $voteExists = $this->pictureModerVote->hasVote($picture['id'], $user['id']);
         if (! $voteExists) {
             return $this->notFoundAction();
         }
 
-        $moderVotes = new DbTable\Picture\ModerVote();
-        $moderVotes->delete([
-            'user_id = ?'    => $user->id,
-            'picture_id = ?' => $picture->id
-        ]);
+        $this->pictureModerVote->delete($picture->id, $user->id);
 
         $message = sprintf(
             'Отменена заявка на принятие/удаление картинки %s',

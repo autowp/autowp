@@ -5,7 +5,9 @@ namespace Application\Model\DbTable;
 use Autowp\Commons\Db\Table;
 use Autowp\Image;
 
+use Application\Model\DbTable;
 use Application\Model\Perspective;
+use Application\Model\PictureModerVote;
 
 use Zend_Db_Expr;
 
@@ -44,6 +46,11 @@ class Picture extends Table
     private $imageStorage;
 
     /**
+     * @var PictureModerVote
+     */
+    private $pictureModerVote;
+
+    /**
      * setOptions()
      *
      * @param array $options
@@ -54,6 +61,11 @@ class Picture extends Table
         if (isset($options['imageStorage'])) {
             $this->imageStorage = $options['imageStorage'];
             unset($options['imageStorage']);
+        }
+
+        if (isset($options['pictureModerVote'])) {
+            $this->pictureModerVote = $options['pictureModerVote'];
+            unset($options['pictureModerVote']);
         }
     }
 
@@ -223,5 +235,27 @@ class Picture extends Table
         $picture->save();
 
         return true;
+    }
+
+    public function canAccept(DbTable\Picture\Row $row): bool
+    {
+        if (! in_array($row['status'], [self::STATUS_INBOX])) {
+            return false;
+        }
+
+        $votes = $this->pictureModerVote->getNegativeVotesCount($row['id']);
+
+        return $votes <= 0;
+    }
+
+    public function canDelete(DbTable\Picture\Row $row): bool
+    {
+        if (! in_array($row['status'], [DbTable\Picture::STATUS_INBOX])) {
+            return false;
+        }
+
+        $votes = $this->pictureModerVote->getPositiveVotesCount($row['id']);
+
+        return $votes <= 0;
     }
 }

@@ -79,9 +79,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
             ->setConstructorArgs([$serviceManager])
             ->getMock();
 
-        $mock->method('get')->willReturnCallback(function () use ($serviceMock) {
-            return $serviceMock;
-        });
+        $mock->method('get')->willReturn($serviceMock);
 
         $serviceManager->setService('ExternalLoginServiceManager', $mock);
     }

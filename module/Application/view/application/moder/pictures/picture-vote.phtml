@@ -20,7 +20,7 @@
                 ], $this->translate('moder/picture/acceptance/custom'))?></li>
             </ul>
         </div>
-    
+
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-delete'))?>
@@ -57,10 +57,10 @@
     <?php $idx = 0 ?>
     <?php foreach ($this->moderVotes as $vote) { ?>
         <?php if ($idx++ > 0) { ?>, <?php } ?>
-        <?php if ($user = $vote->findParentRow(Autowp\User\Model\DbTable\User::class)) { ?>
-            <?=$this->user($user) ?>
+        <?php if ($vote['user']) { ?>
+            <?=$this->user($vote['user']) ?>
         <?php } ?>
-        <span style="color:<?=$vote->vote ? 'green' : 'red' ?>">&#xa0;(<?=$this->escapeHtml($vote->reason) ?>)</span>
+        <span style="color:<?=$vote['vote'] ? 'green' : 'red' ?>">&#xa0;(<?=$this->escapeHtml($vote['reason']) ?>)</span>
     <?php } ?>
 <?php } ?>
 
