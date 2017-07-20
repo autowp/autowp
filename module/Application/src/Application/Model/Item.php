@@ -177,8 +177,8 @@ class Item
                     ->from('item_parent_cache', 'parent_id')
                     ->join('item', 'item_parent_cache.parent_id = item.id', null)
                     ->where('item.item_type_id IN (?)', [
-                        Type::VEHICLE,
-                        Type::ENGINE
+                        DbTable\Item\Type::VEHICLE,
+                        DbTable\Item\Type::ENGINE
                     ])
                     ->where('item_parent_cache.item_id = ?', $carId)
                     ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
@@ -252,8 +252,8 @@ class Item
                     ->from('item_parent_cache', 'parent_id')
                     ->join('item', 'item_parent_cache.parent_id = item.id', null)
                     ->where('item.item_type_id IN (?)', [
-                        Type::VEHICLE,
-                        Type::ENGINE
+                        DbTable\Item\Type::VEHICLE,
+                        DbTable\Item\Type::ENGINE
                     ])
                     ->where('item_id = ?', $carId)
                     ->where('item_id <> parent_id')
