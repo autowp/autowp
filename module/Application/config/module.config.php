@@ -5,8 +5,6 @@ namespace Application;
 use Zend\Permissions\Acl\Acl;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
-use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
-
 use Zend_Db_Adapter_Abstract;
 
 $host = getenv('AUTOWP_HOST');
@@ -130,7 +128,6 @@ return [
             Comments::class                      => Service\CommentsFactory::class,
             Db\TableManager::class               => Db\TableManagerFactory::class,
             DuplicateFinder::class               => Service\DuplicateFinderFactory::class,
-            ExternalLoginServiceFactory::class   => Service\ExternalLoginServiceFactory::class,
             FileSize::class                      => InvokableFactory::class,
             HostManager::class                   => Service\HostManagerFactory::class,
             HostnameCheckRouteListener::class    => HostnameCheckRouteListenerFactory::class,
@@ -273,31 +270,38 @@ return [
         ],
     ],
 
-    'externalloginservice' => [
-        'vk' => [
+    'external_login_services' => [
+        \Autowp\ExternalLoginService\Vk::class => [
             'clientId'     => getenv('AUTOWP_ELS_VK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_VK_SECRET'),
+            'redirectUri'  => 'http://en.'.$host.'/login/callback'
         ],
-        'google-plus' => [
+        \Autowp\ExternalLoginService\GooglePlus::class => [
             'clientId'     => getenv('AUTOWP_ELS_GOOGLEPLUS_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GOOGLEPLUS_SECRET'),
+            'redirectUri'  => 'http://en.wheelsage.org/login/callback'
         ],
-        'twitter' => [
+        \Autowp\ExternalLoginService\Twitter::class => [
             'consumerKey'    => getenv('AUTOWP_ELS_TWITTER_CLIENTID'),
             'consumerSecret' => getenv('AUTOWP_ELS_TWITTER_SECRET'),
+            'redirectUri'  => 'http://en.'.$host.'/login/callback'
         ],
-        'facebook' => [
+        \Autowp\ExternalLoginService\Facebook::class => [
             'clientId'     => getenv('AUTOWP_ELS_FACEBOOK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_FACEBOOK_SECRET'),
-            'scope'        => ['public_profile', 'user_friends']
+            'scope'        => ['public_profile', 'user_friends'],
+            'graphApiVersion' => 'v2.10',
+            'redirectUri'  => 'http://en.'.$host.'/login/callback'
         ],
-        'github' => [
+        \Autowp\ExternalLoginService\Github::class => [
             'clientId'     => getenv('AUTOWP_ELS_GITHUB_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GITHUB_SECRET'),
+            'redirectUri'  => 'http://en.'.$host.'/login/callback'
         ],
-        'linkedin' => [
+        \Autowp\ExternalLoginService\Linkedin::class => [
             'clientId'     => getenv('AUTOWP_ELS_LINKEDIN_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_LINKEDIN_SECRET'),
+            'redirectUri'  => 'http://en.'.$host.'/login/callback'
         ]
     ],
 

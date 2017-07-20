@@ -21,7 +21,7 @@
 		"irazasyed/telegram-bot-sdk" : "dev-master",
 		"phayes/geophp" : "^1.2",
 		"michelf/php-markdown" : "^1.6",
-		"autowp/external-login-service" : ">=1.1.8",
+		"autowp/external-login-service" : ">=1.2.0",
 		"autowp/textstorage" : "^2.0.2",
 		"autowp/zf-components" : "^1.0.7",
 		"zendframework/zend-authentication" : "^2.5",
@@ -50,8 +50,8 @@
 		"facebook/graph-sdk" : "^5.4",
 		"zendframework/zend-hydrator" : "^2.2.1",
 		"autowp/cron" : "^0.1.1",
-		"zendframework/zend-filter": ">=2.7.2",
-		"zendframework/zend-inputfilter": ">=2.7.4"
+		"zendframework/zend-filter" : ">=2.7.2",
+		"zendframework/zend-inputfilter" : ">=2.7.4"
 	},
 	"autoload" : {
 		"psr-4" : {
@@ -81,6 +81,9 @@
 	"repositories" : [{
 			"type" : "git",
 			"url" : "https://github.com/irazasyed/telegram-bot-sdk"
+		}, {
+			"type" : "git",
+			"url" : "https://github.com/autowp/oauth2-vkontakte"
 		}
 	],
 	"suggest" : {

@@ -36,7 +36,6 @@ class ServicesTest extends AbstractHttpControllerTestCase
             [\Application\Language::class],
             [\Autowp\TextStorage\Service::class],
             [\Zend\Permissions\Acl\Acl::class],
-            [\Autowp\ExternalLoginService\Factory::class],
             [\Application\FileSize::class],
             [\Application\Service\SpecificationsService::class],
             [\Zend_Cache_Manager::class],

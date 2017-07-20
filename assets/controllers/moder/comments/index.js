@@ -4,6 +4,7 @@ import template from './template.html';
 import ACL_SERVICE_NAME from 'services/acl';
 import "corejs-typeahead";
 import $ from 'jquery';
+import notify from 'notify';
 
 const CONTROLLER_NAME = 'ModerCommentsController';
 const STATE_NAME = 'moder-comments';
@@ -80,7 +81,8 @@ angular.module(Module)
                     ctrl.comments = response.data.comments;
                     ctrl.paginator = response.data.paginator;
                     ctrl.loading--;
-                }, function() {
+                }, function(response) {
+                    notify.response(response);
                     ctrl.loading--;
                 });
             };

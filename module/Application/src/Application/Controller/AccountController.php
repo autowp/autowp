@@ -2,6 +2,11 @@
 
 namespace Application\Controller;
 
+use DateTimeZone;
+use Exception;
+use Imagick;
+use Locale;
+
 use Zend\Authentication\AuthenticationService;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -9,25 +14,20 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
+use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
+use Application\Model\UserAccount;
+use Autowp\User\Model\UserRename;
 
 use Application\Controller\LoginController;
 use Application\Model\DbTable;
 use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
-use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
 use Zend_Db_Expr;
-
-use DateTimeZone;
-use Exception;
-use Imagick;
-use Locale;
-use Autowp\User\Model\UserRename;
-use Application\Model\UserAccount;
 
 class AccountController extends AbstractActionController
 {
@@ -67,9 +67,9 @@ class AccountController extends AbstractActionController
     private $deleteUserForm;
 
     /**
-     * @var ExternalLoginServiceFactory
+     * @var ExternalLoginServices
      */
-    private $externalLoginFactory;
+    private $externalLoginServices;
 
     /**
      * @var array
@@ -104,7 +104,7 @@ class AccountController extends AbstractActionController
         Form $photoForm,
         Form $changePasswordForm,
         Form $deleteUserForm,
-        ExternalLoginServiceFactory $externalLoginFactory,
+        ExternalLoginServices $externalLoginServices,
         array $hosts,
         SpecificationsService $specsService,
         MessageService $message,
@@ -119,7 +119,7 @@ class AccountController extends AbstractActionController
         $this->photoForm = $photoForm;
         $this->changePasswordForm = $changePasswordForm;
         $this->deleteUserForm = $deleteUserForm;
-        $this->externalLoginFactory = $externalLoginFactory;
+        $this->externalLoginServices = $externalLoginServices;
         $this->hosts = $hosts;
         $this->specsService = $specsService;
         $this->message = $message;
@@ -228,13 +228,11 @@ class AccountController extends AbstractActionController
 
     /**
      * @param string $serviceId
-     * @return Autowp_ExternalLoginService_Abstract
+     * @return \Autowp\ExternalLoginService\AbstractService
      */
     private function getExternalLoginService($serviceId)
     {
-        $service = $this->externalLoginFactory->getService($serviceId, $serviceId, [
-            'redirect_uri' => 'http://en.wheelsage.org/login/callback'
-        ]);
+        $service = $this->externalLoginServices->get($serviceId);
 
         if (! $service) {
             throw new Exception("Service `$serviceId` not found");

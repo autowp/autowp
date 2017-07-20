@@ -2,6 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import ACL_SERVICE_NAME from 'services/acl';
+import notify from 'notify';
 
 const CONTROLLER_NAME = 'ModerHotlinksController';
 const STATE_NAME = 'moder-hotlinks';
@@ -50,6 +51,8 @@ angular.module(Module)
                     url: '/api/hotlinks/hosts'
                 }).then(function(response) {
                     ctrl.hosts = response.data.items;
+                }, function(response) {
+                    notify.response(response);
                 });
             };
             

@@ -17,7 +17,7 @@ class LoginControllerFactory implements FactoryInterface
         return new Controller(
             $container->get(\Application\Service\UsersService::class),
             $container->get('LoginForm'),
-            $container->get(\Autowp\ExternalLoginService\Factory::class),
+            $container->get('ExternalLoginServiceManager'),
             $container->get('Config')['hosts'],
             $container->get(\Autowp\User\Model\UserRemember::class),
             $container->get(\Application\Model\UserAccount::class)

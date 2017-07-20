@@ -2,6 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import ACL_SERVICE_NAME from 'services/acl';
+import notify from 'notify';
 
 const CONTROLLER_NAME = 'ModerIndexStatController';
 
@@ -38,6 +39,8 @@ angular.module(Module)
             
             $http.get('/api/stat/global-summary').then(function(response) {
                 $scope.items = response.data.items;
+            }, function(response) {
+                notify.response(response);
             });
         }
     ]);

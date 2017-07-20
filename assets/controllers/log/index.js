@@ -2,6 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import ACL_SERVICE_NAME from 'services/acl';
+import notify from 'notify';
 
 const CONTROLLER_NAME = 'ModerLogController';
 const STATE_NAME = 'log';
@@ -52,6 +53,8 @@ angular.module(Module)
             }).then(function(response) {
                 ctrl.items = response.data.items;
                 $scope.paginator = response.data.paginator;
+            }, function(response) {
+                notify.response(response);
             });
         }
     ]);

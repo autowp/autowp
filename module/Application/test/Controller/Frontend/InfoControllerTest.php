@@ -19,5 +19,4 @@ class InfoControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerClass('InfoController');
         $this->assertMatchedRouteName('info/spec');
     }
-
 }

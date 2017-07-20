@@ -11,7 +11,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Uri\Http as HttpUri;
 use Zend\View\Model\ViewModel;
 
-use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
+use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\UserRemember;
@@ -35,9 +35,9 @@ class LoginController extends AbstractActionController
     private $form;
 
     /**
-     * @var ExternalLoginServiceFactory
+     * @var ExternalLoginServices
      */
-    private $externalLoginFactory;
+    private $externalLoginServices;
 
     /**
      * @var array
@@ -57,7 +57,7 @@ class LoginController extends AbstractActionController
     public function __construct(
         UsersService $service,
         Form $form,
-        ExternalLoginServiceFactory $externalLoginFactory,
+        ExternalLoginServices $externalLoginServices,
         array $hosts,
         UserRemember $userRemember,
         UserAccount $userAccount
@@ -65,7 +65,7 @@ class LoginController extends AbstractActionController
 
         $this->service = $service;
         $this->form = $form;
-        $this->externalLoginFactory = $externalLoginFactory;
+        $this->externalLoginServices = $externalLoginServices;
         $this->hosts = $hosts;
         $this->userRemember = $userRemember;
         $this->userAccount = $userAccount;
@@ -170,15 +170,11 @@ class LoginController extends AbstractActionController
 
     /**
      * @param string $serviceId
-     * @return Autowp_ExternalLoginService_Abstract
+     * @return \Autowp\ExternalLoginService\AbstractService
      */
     private function getExternalLoginService($serviceId)
     {
-        $serviceOptionsKey = $serviceId;
-
-        $service = $this->externalLoginFactory->getService($serviceId, $serviceOptionsKey, [
-            'redirect_uri' => 'http://en.wheelsage.org/login/callback'
-        ]);
+        $service = $this->externalLoginServices->get($serviceId);
 
         if (! $service) {
             throw new Exception("Service `$serviceId` not found");
@@ -277,11 +273,16 @@ class LoginController extends AbstractActionController
                     throw new Exception("Account `{$stateRow->user_id}` not found");
                 }
             } else {
+                $ip = $this->getRequest()->getServer('REMOTE_ADDR');
+                if (! $ip) {
+                    $ip = '127.0.0.1';
+                }
+
                 $uRow = $this->service->addUser([
                     'email'    => null,
                     'password' => uniqid(),
                     'name'     => $data->getName(),
-                    'ip'       => $this->getRequest()->getServer('REMOTE_ADDR')
+                    'ip'       => $ip
                 ], $this->language());
             }
 

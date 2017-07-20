@@ -42,4 +42,96 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertQuery('.alert-success');
     }
+
+    private function mockExternalLoginFactory($photoUrl)
+    {
+        $serviceManager = $this->getApplicationServiceLocator();
+
+        $config = $serviceManager->get('config');
+
+        $serviceMock = $this->getMockBuilder(\Autowp\ExternalLoginService\Facebook::class)
+            ->setMethods(['getData', 'callback'])
+            ->setConstructorArgs([
+                $config['external_login_services'][\Autowp\ExternalLoginService\Facebook::class]
+            ])
+            ->getMock();
+
+        $serviceMock->method('getData')->willReturnCallback(function () use ($serviceMock, $photoUrl) {
+            return new \Autowp\ExternalLoginService\Result([
+                'externalId' => 'test-external-id',
+                'name'       => 'test-name',
+                'profileUrl' => 'http://example.com/',
+                'photoUrl'   => $photoUrl, //'http://example.com/photo.jpg',
+                'birthday'   => new \DateTime(),
+                'email'      => 'test@example.com',
+                'gender'     => 1,
+                'location'   => 'London',
+                'language'   => 'en'
+            ]);
+        });
+
+        $serviceMock->method('callback')->willReturnCallback(function () {
+            return true;
+        });
+
+        $mock = $this->getMockBuilder(\Autowp\ExternalLoginService\PluginManager::class)
+            ->setMethods(['get'])
+            ->setConstructorArgs([$serviceManager])
+            ->getMock();
+
+        $mock->method('get')->willReturnCallback(function () use ($serviceMock) {
+            return $serviceMock;
+        });
+
+        $serviceManager->setService('ExternalLoginServiceManager', $mock);
+    }
+
+    public function testAuthorizeBySerevice()
+    {
+        $this->mockExternalLoginFactory(null);
+
+        $this->dispatch('https://www.autowp.ru/login/start/facebook', Request::METHOD_GET);
+
+        $this->assertModuleName('application');
+        $this->assertControllerName(LoginController::class);
+        $this->assertActionName('start');
+        $this->assertMatchedRouteName('login/start');
+        $this->assertResponseStatusCode(302);
+        $this->assertHasResponseHeader('Location');
+
+        $headers = $this->getResponse()->getHeaders();
+        $uri = $headers->get('Location')->uri();
+
+        $this->assertRegExp(
+            '|^https://www\.facebook\.com/v2\.10/dialog/oauth'.
+                '\?scope=public_profile%2Cuser_friends&state=[0-9a-z]+' .
+                '&response_type=code&approval_prompt=auto' .
+                '&redirect_uri=http%3A%2F%2Fen\.localhost%2Flogin%2Fcallback' .
+                '&client_id=facebook_test_clientid$|iu',
+            $uri->toString()
+        );
+
+        $query = $uri->getQueryAsArray();
+        $state = $query['state'];
+
+        $this->assertNotEmpty($state);
+
+        /*$this->assertEquals('Bearer', $params['token_type']);
+
+        $token = $params['access_token'];
+
+        $this->assertNotEmpty($token);*/
+
+        // check token valid
+        $this->reset();
+
+        $this->mockExternalLoginFactory(null);
+
+        $this->dispatch('https://www.autowp.ru/login/callback', Request::METHOD_GET, [
+            'state' => $state,
+            'code'  => 'zzzz'
+        ]);
+
+        $this->assertResponseStatusCode(302);
+    }
 }

@@ -23,7 +23,7 @@ class AccountControllerFactory implements FactoryInterface
             $container->get('AccountPhotoForm'),
             $container->get('ChangePasswordForm'),
             $container->get('DeleteUserForm'),
-            $container->get(\Autowp\ExternalLoginService\Factory::class),
+            $container->get('ExternalLoginServiceManager'),
             $config['hosts'],
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Autowp\Message\MessageService::class),
