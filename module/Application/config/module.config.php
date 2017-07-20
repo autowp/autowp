@@ -290,7 +290,7 @@ return [
             'clientId'     => getenv('AUTOWP_ELS_FACEBOOK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_FACEBOOK_SECRET'),
             'scope'        => ['public_profile', 'user_friends'],
-            'graphApiVersion' => 'v2.10',
+            'graphApiVersion' => 'v2.9',
             'redirectUri'  => 'http://en.'.$host.'/login/callback'
         ],
         \Autowp\ExternalLoginService\Github::class => [
