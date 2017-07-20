@@ -44,13 +44,15 @@ angular.module(Module)
                         zoom: 8
                     };
                     
-                    ctrl.markers = {
-                        point: {
+                    ctrl.markers = {};
+                    
+                    if ($scope.item && $scope.item.lat && $scope.item.lng) {
+                        ctrl.markers.point = {
                             lat: $scope.item ? $scope.item.lat : null,
                             lng: $scope.item ? $scope.item.lng : null,
                             focus: true
-                        }
-                    };
+                        };
+                    }
                     
                     ctrl.tiles = {
                         url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -62,8 +64,16 @@ angular.module(Module)
                     ctrl.coordsChanged = function() {
                         var lat = parseFloat($scope.item.lat);
                         var lng = parseFloat($scope.item.lng);
-                        ctrl.markers.point.lat = isNaN(lat) ? 0 : lat;
-                        ctrl.markers.point.lng = isNaN(lng) ? 0 : lng;
+                        if (ctrl.markers.point) {
+                            ctrl.markers.point.lat = isNaN(lat) ? 0 : lat;
+                            ctrl.markers.point.lng = isNaN(lng) ? 0 : lng;
+                        } else {
+                            ctrl.markers.point = {
+                                lat: isNaN(lat) ? 0 : lat,
+                                lng: isNaN(lng) ? 0 : lng,
+                                focus: true
+                            };
+                        }
                         ctrl.center.lat = isNaN(lat) ? 0 : lat;
                         ctrl.center.lng = isNaN(lng) ? 0 : lng;
                     };

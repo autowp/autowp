@@ -86,7 +86,7 @@
     "ts-loader": "^2.1.0",
     "ui-leaflet": "git+https://github.com/autowp/ui-leaflet.git#leaflet-1.X",
     "url-loader": "^0.x",
-    "webgl-heatmap-leaflet": "git+https://git@github.com/ursudio/leaflet-webgl-heatmap.git",
+    "leaflet-webgl-heatmap": "^0.2.7",
     "webpack": "^3.x",
     "webpack-manifest-plugin": "^1.x"
   },

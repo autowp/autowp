@@ -3,6 +3,7 @@ var leaflet = require("leaflet-bundle");
 var popupMarkup = require('./popup.html'); 
 require("./index.less");
 
+require('leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap');
 require('leaflet-webgl-heatmap/dist/leaflet-webgl-heatmap.min');
 
 module.exports = {
@@ -36,7 +37,7 @@ module.exports = {
             self.map.on('zoomend', function() {
                 self.zoomStarted = false;
                 self.queueLoadData(self.map.getZoom());
-                self.heatmap.setSize(self.zoomToSize(self.map.getZoom()));
+                //self.heatmap.setSize(self.zoomToSize(self.map.getZoom()));
             });
             
             self.map.on('moveend', function() {
