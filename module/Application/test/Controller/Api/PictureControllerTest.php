@@ -165,7 +165,6 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $itemId = $row ? $row['item_id'] : null;
 
         if (! $itemId) {
-            print 'CREATE';
             $itemId = $this->createItem([
                 'item_type_id' => 1,
                 'name'         => 'Peugeot 407 Coupe "Car of the day"',
