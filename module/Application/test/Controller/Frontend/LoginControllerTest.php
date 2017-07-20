@@ -103,7 +103,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $uri = $headers->get('Location')->uri();
 
         $this->assertRegExp(
-            '|^https://www\.facebook\.com/v2\.10/dialog/oauth'.
+            '|^https://www\.facebook\.com/v[0-9.]+/dialog/oauth'.
                 '\?scope=public_profile%2Cuser_friends&state=[0-9a-z]+' .
                 '&response_type=code&approval_prompt=auto' .
                 '&redirect_uri=http%3A%2F%2Fen\.localhost%2Flogin%2Fcallback' .
