@@ -489,4 +489,31 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertEquals('sedan', $itemParent['catname']);
     }
+
+    public function testItemPoint()
+    {
+        $itemId = $this->createItem([
+            'item_type_id' => 7,
+            'name'         => 'Museum of something',
+            'lat'          => 20.5,
+            'lng'          => -15
+        ]);
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item/' . $itemId, Request::METHOD_GET, [
+            'fields' => 'lat,lng'
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/item/get');
+        $this->assertActionName('item');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertSame(20.5, $json['lat']);
+        $this->assertSame(-15, $json['lng']);
+    }
 }

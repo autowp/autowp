@@ -564,7 +564,6 @@ class Item
             $this->itemPointTable->update($set, $primaryKey);
             return;
         }
-
         $this->itemPointTable->insert(array_replace($set, $primaryKey));
     }
 
