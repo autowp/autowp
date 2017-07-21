@@ -440,7 +440,7 @@ class Item
                 }
             }
 
-            $carTypeParentTable = new Vehicle\TypeParent();
+            $carTypeParentTable = new DbTable\Vehicle\TypeParent();
             $carTypeParentTableName = $carTypeParentTable->info('name');
             $db = $carTypeParentTable->getAdapter();
             foreach ($map as $id => $count) {
