@@ -2,12 +2,13 @@
 
 namespace Application\Model\DbTable\Picture;
 
+use Exception;
+
 use Autowp\Image\Storage\Request;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 use Application\Model\DbTable;
-
-use Exception;
+use Application\Model\Item;
 
 class Row extends \Autowp\Commons\Db\Table\Row
 {
@@ -52,7 +53,7 @@ class Row extends \Autowp\Commons\Db\Table\Row
         if (count($cars) > 1) {
             $brands = $itemTable->fetchAll(
                 $itemTable->select(true)
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                    ->where('item.item_type_id = ?', Item::BRAND)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                     ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                     ->where('picture_item.picture_id = ?', $this->id)
@@ -76,7 +77,7 @@ class Row extends \Autowp\Commons\Db\Table\Row
 
             $brands = $itemTable->fetchAll(
                 $itemTable->select(true)
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->where('item.item_type_id = ?', Item::BRAND)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                     ->where('item_parent_cache.item_id = ?', $car->id)
             );

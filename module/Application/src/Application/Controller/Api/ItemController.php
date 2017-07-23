@@ -26,13 +26,13 @@ use Application\Hydrator\Api\RestHydrator;
 use Application\Hydrator\Api\Strategy\Image;
 use Application\ItemNameFormatter;
 use Application\Model\Brand as BrandModel;
+use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\DbTable;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
-use Application\Model\Item;
 
 class ItemController extends AbstractRestfulController
 {
@@ -311,13 +311,13 @@ class ItemController extends AbstractRestfulController
             $select
                 ->join(['ils' => 'item_language'], 'item.id = ils.item_id', [])
                 ->join(['ils2' => 'item_language'], 'INSTR(ils.name, ils2.name)', [])
-                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->where('item.item_type_id = ?', Item::BRAND)
                 ->where('ils2.item_id = ?', $data['suggestions_to'])
                 ->where(
                     'item.id NOT IN (?)',
                     $db->select()
                         ->from('item', ['id'])
-                        ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                        ->where('item.item_type_id = ?', Item::BRAND)
                         ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
                         ->where('item_parent_cache.item_id = ?', $data['suggestions_to'])
                 );
@@ -475,33 +475,33 @@ class ItemController extends AbstractRestfulController
 
             $allowedItemTypes = [0];
             switch ($typeId) {
-                case DbTable\Item\Type::VEHICLE:
+                case Item::VEHICLE:
                     $allowedItemTypes = [
-                        DbTable\Item\Type::VEHICLE,
-                        DbTable\Item\Type::CATEGORY,
-                        DbTable\Item\Type::TWINS,
-                        DbTable\Item\Type::BRAND,
-                        DbTable\Item\Type::FACTORY
+                        Item::VEHICLE,
+                        Item::CATEGORY,
+                        Item::TWINS,
+                        Item::BRAND,
+                        Item::FACTORY
                     ];
                     break;
-                case DbTable\Item\Type::ENGINE:
+                case Item::ENGINE:
                     $allowedItemTypes = [
-                        DbTable\Item\Type::ENGINE,
-                        DbTable\Item\Type::CATEGORY,
-                        DbTable\Item\Type::TWINS,
-                        DbTable\Item\Type::BRAND,
-                        DbTable\Item\Type::FACTORY
+                        Item::ENGINE,
+                        Item::CATEGORY,
+                        Item::TWINS,
+                        Item::BRAND,
+                        Item::FACTORY
                     ];
                     break;
-                case DbTable\Item\Type::BRAND:
+                case Item::BRAND:
                     $allowedItemTypes = [
-                        DbTable\Item\Type::CATEGORY,
-                        DbTable\Item\Type::BRAND
+                        Item::CATEGORY,
+                        Item::BRAND
                     ];
                     break;
-                case DbTable\Item\Type::CATEGORY:
+                case Item::CATEGORY:
                     $allowedItemTypes = [
-                        DbTable\Item\Type::CATEGORY
+                        Item::CATEGORY
                     ];
                     break;
             }
@@ -810,22 +810,22 @@ class ItemController extends AbstractRestfulController
         ];
 
         $pointFields = in_array($itemTypeId, [
-            DbTable\Item\Type::FACTORY,
-            DbTable\Item\Type::MUSEUM
+            Item::FACTORY,
+            Item::MUSEUM
         ]);
         if (! $pointFields) {
             unset($spec['lat'], $spec['lng']);
         }
 
-        if ($itemTypeId != DbTable\Item\Type::BRAND) {
+        if ($itemTypeId != Item::BRAND) {
             unset($spec['full_name']);
         }
 
-        if (! in_array($itemTypeId, [DbTable\Item\Type::CATEGORY, DbTable\Item\Type::BRAND])) {
+        if (! in_array($itemTypeId, [Item::CATEGORY, Item::BRAND])) {
             unset($spec['catname']);
         }
 
-        if (! in_array($itemTypeId, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
+        if (! in_array($itemTypeId, [Item::VEHICLE, Item::ENGINE])) {
             unset($spec['is_group']);
             unset($spec['is_concept']);
             unset($spec['produced'], $spec['produced_exactly']);
@@ -863,8 +863,8 @@ class ItemController extends AbstractRestfulController
 
         $fields = ['name'];
         switch ($itemTypeId) {
-            case DbTable\Item\Type::CATEGORY:
-            case DbTable\Item\Type::BRAND:
+            case Item::CATEGORY:
+            case Item::BRAND:
                 $fields[] = 'catname';
                 break;
         }
@@ -972,17 +972,17 @@ class ItemController extends AbstractRestfulController
         }
 
         switch ($itemTypeId) {
-            case DbTable\Item\Type::VEHICLE:
-            case DbTable\Item\Type::ENGINE:
+            case Item::VEHICLE:
+            case Item::ENGINE:
                 if (array_key_exists('is_group', $values)) {
                     $item['is_group'] = $values['is_group'] ? 1 : 0;
                 }
                 break;
-            case DbTable\Item\Type::CATEGORY:
-            case DbTable\Item\Type::TWINS:
-            case DbTable\Item\Type::BRAND:
-            case DbTable\Item\Type::FACTORY:
-            case DbTable\Item\Type::MUSEUM:
+            case Item::CATEGORY:
+            case Item::TWINS:
+            case Item::BRAND:
+            case Item::FACTORY:
+            case Item::MUSEUM:
                 $item['is_group'] = 1;
                 break;
             default:
@@ -1175,8 +1175,8 @@ class ItemController extends AbstractRestfulController
         }
 
         switch ($item['item_type_id']) {
-            case DbTable\Item\Type::VEHICLE:
-            case DbTable\Item\Type::ENGINE:
+            case Item::VEHICLE:
+            case Item::ENGINE:
                 if (array_key_exists('is_group', $values)) {
                     $hasChildItems = $this->itemParent->hasChildItems($item['id']);
 
@@ -1187,11 +1187,11 @@ class ItemController extends AbstractRestfulController
                     }
                 }
                 break;
-            case DbTable\Item\Type::CATEGORY:
-            case DbTable\Item\Type::TWINS:
-            case DbTable\Item\Type::BRAND:
-            case DbTable\Item\Type::FACTORY:
-            case DbTable\Item\Type::MUSEUM:
+            case Item::CATEGORY:
+            case Item::TWINS:
+            case Item::BRAND:
+            case Item::FACTORY:
+            case Item::MUSEUM:
                 $item['is_group'] = 1;
                 break;
         }

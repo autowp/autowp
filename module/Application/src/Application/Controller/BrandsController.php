@@ -82,7 +82,7 @@ class BrandsController extends AbstractActionController
         $itemTable = new DbTable\Item();
 
         $brand = $itemTable->fetchRow([
-            'item_type_id = ?' => DbTable\Item\Type::BRAND,
+            'item_type_id = ?' => Item::BRAND,
             'id = ?'           => (int)$this->params('brand_id')
         ]);
         if (! $brand) {

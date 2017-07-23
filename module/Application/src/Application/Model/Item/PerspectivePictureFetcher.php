@@ -3,6 +3,7 @@
 namespace Application\Model\Item;
 
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\Perspective;
 
 class PerspectivePictureFetcher extends PictureFetcher
@@ -165,7 +166,7 @@ class PerspectivePictureFetcher extends PictureFetcher
             }
         }
 
-        if ($emptyPictures > 0 && ($item['item_type_id'] == DbTable\Item\Type::ENGINE)) {
+        if ($emptyPictures > 0 && ($item['item_type_id'] == Item::ENGINE)) {
             $pictureRows = $db->fetchAll(
                 $db->select()
                     ->from('pictures', [

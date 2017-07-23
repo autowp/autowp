@@ -14,6 +14,7 @@ use Application\Model\Perspective;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
 use Application\Model\ItemParent;
+use Application\Model\Item;
 
 class ItemHydrator extends RestHydrator
 {
@@ -500,7 +501,7 @@ class ItemHydrator extends RestHydrator
                 $this->itemTable->select(true)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                     ->where('item_parent_cache.item_id = ?', $object['id'])
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                    ->where('item.item_type_id = ?', Item::BRAND)
                     ->group('item.id')
             );
 
@@ -510,10 +511,10 @@ class ItemHydrator extends RestHydrator
         if ($this->filterComposite->filter('categories')) {
             $rows = $this->itemTable->fetchAll(
                 $this->itemTable->select(true)
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->where('item.item_type_id = ?', Item::CATEGORY)
                     ->join('item_parent', 'item.id = item_parent.parent_id', null)
                     ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
-                    ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
+                    ->where('top_item.item_type_id IN (?)', [Item::VEHICLE, Item::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', null)
                     ->where('item_parent_cache.item_id = ?', $object['id'])
                     ->group(['item.id'])
@@ -525,7 +526,7 @@ class ItemHydrator extends RestHydrator
         if ($this->filterComposite->filter('twins_groups')) {
             $rows = $this->itemTable->fetchAll(
                 $this->itemTable->select(true)
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
+                    ->where('item.item_type_id = ?', Item::TWINS)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                     ->where('item_parent_cache.item_id = ?', $object['id'])
                     ->group('item.id')
@@ -537,7 +538,7 @@ class ItemHydrator extends RestHydrator
         if ($this->filterComposite->filter('url')) {
             $url = null;
             switch ($object['item_type_id']) {
-                case DbTable\Item\Type::CATEGORY:
+                case Item::CATEGORY:
                     $url = $this->router->assemble([
                         'action'           => 'category',
                         'category_catname' => $object['catname'],
@@ -545,7 +546,7 @@ class ItemHydrator extends RestHydrator
                         'name' => 'categories'
                     ]);
                     break;
-                case DbTable\Item\Type::TWINS:
+                case Item::TWINS:
                     $url = $this->router->assemble([
                         'id' => $object['id'],
                     ], [
@@ -553,8 +554,8 @@ class ItemHydrator extends RestHydrator
                     ]);
                     break;
 
-                case DbTable\Item\Type::ENGINE:
-                case DbTable\Item\Type::VEHICLE:
+                case Item::ENGINE:
+                case Item::VEHICLE:
                     $url = $listBuilder->getDetailsUrl($object);
                     break;
             }
@@ -600,7 +601,7 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('engine_vehicles')) {
-            if ($object['item_type_id'] == DbTable\Item\Type::ENGINE) {
+            if ($object['item_type_id'] == Item::ENGINE) {
                 $result['engine_vehicles'] = $this->getVehiclesOnEngine($object);
             }
         }
@@ -742,7 +743,7 @@ class ItemHydrator extends RestHydrator
 
     private function getItemPublicUrls($item)
     {
-        if ($item['item_type_id'] == DbTable\Item\Type::FACTORY) {
+        if ($item['item_type_id'] == Item::FACTORY) {
             return [
                 $this->router->assemble([
                     'action' => 'factory',
@@ -753,7 +754,7 @@ class ItemHydrator extends RestHydrator
             ];
         }
 
-        if ($item['item_type_id'] == DbTable\Item\Type::CATEGORY) {
+        if ($item['item_type_id'] == Item::CATEGORY) {
             return [
                 $this->router->assemble([
                     'action'           => 'category',
@@ -764,7 +765,7 @@ class ItemHydrator extends RestHydrator
             ];
         }
 
-        if ($item['item_type_id'] == DbTable\Item\Type::TWINS) {
+        if ($item['item_type_id'] == Item::TWINS) {
             return [
                 $this->router->assemble([
                     'id' => $item['id'],
@@ -774,7 +775,7 @@ class ItemHydrator extends RestHydrator
             ];
         }
 
-        if ($item['item_type_id'] == DbTable\Item\Type::BRAND) {
+        if ($item['item_type_id'] == Item::BRAND) {
             return [
                 $this->router->assemble([
                     'brand_catname' => $item['catname'],
@@ -795,7 +796,7 @@ class ItemHydrator extends RestHydrator
 
         foreach ($parentRows as $parentRow) {
             $brand = $this->itemTable->fetchRow([
-                'item_type_id = ?' => DbTable\Item\Type::BRAND,
+                'item_type_id = ?' => Item::BRAND,
                 'id = ?'           => $parentRow['parent_id']
             ]);
 

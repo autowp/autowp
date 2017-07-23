@@ -394,7 +394,7 @@ class TwinsController extends AbstractActionController
     public function brandAction()
     {
         $brand = $this->catalogue()->getItemTable()->fetchRow([
-            'item_type_id = ?' => DbTable\Item\Type::BRAND,
+            'item_type_id = ?' => Item::BRAND,
             'catname = ?'      => (string)$this->params('brand_catname')
         ]);
 

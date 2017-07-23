@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
 use Application\Model\DbTable;
+use Application\Model\Item;
 
 class StatController extends AbstractActionController
 {
@@ -25,11 +26,11 @@ class StatController extends AbstractActionController
 
         $totalBrands = $db->fetchOne('
             select count(1) from item where item_type_id = ?
-        ', [DbTable\Item\Type::BRAND]);
+        ', [Item::BRAND]);
 
         $totalCars = $db->fetchOne('
             select count(1) from item where item_type_id = ?
-        ', [DbTable\Item\Type::VEHICLE]);
+        ', [Item::VEHICLE]);
 
         $totalCarAttrs = $db->fetchOne('
             select count(1)
@@ -77,7 +78,7 @@ class StatController extends AbstractActionController
                     select count(1)
                     from item
                     where logo_id is not null and item_type_id = ?
-                ', [DbTable\Item\Type::BRAND])
+                ', [Item::BRAND])
             ],
             [
                 'name'    => 'moder/statistics/from-years',

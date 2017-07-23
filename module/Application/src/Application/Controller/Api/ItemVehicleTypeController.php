@@ -9,6 +9,7 @@ use Zend\View\Model\JsonModel;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\VehicleType;
 
 class ItemVehicleTypeController extends AbstractRestfulController
@@ -105,7 +106,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
         $itemTable = new DbTable\Item();
         $itemRow = $itemTable->find($itemId)->current();
 
-        if (! in_array($itemRow['item_type_id'], [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::TWINS])) {
+        if (! in_array($itemRow['item_type_id'], [Item::VEHICLE, Item::TWINS])) {
             return $this->notFoundAction();
         }
 

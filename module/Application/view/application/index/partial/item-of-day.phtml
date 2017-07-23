@@ -2,7 +2,7 @@
     <h2>
         <?=$this->car()->htmlTitle($this->itemOfDay['name'])?>
         <small>
-            <?php if ($this->itemOfDay['itemTypeId'] == Application\Model\DbTable\Item\Type::VEHICLE) { ?>
+            <?php if ($this->itemOfDay['itemTypeId'] == Application\Model\Item::VEHICLE) { ?>
                 <?=$this->escapeHtml($this->translate('car-of-day')) ?>
             <?php } else { ?>
                 <?=$this->escapeHtml($this->translate('theme-of-day')) ?>
@@ -76,7 +76,7 @@
                 <span class="fa fa-<?=$item['icon']?>"></span>
                 <?=$this->htmlA($item['url'], $item['text'] . (isset($item['count']) ? ' ('.$item['count'].')' : ''))?>
             <?php } ?>
-            
+
             <?php if ($this->itemOfDay['links']) { ?> &#xa0; <?php } ?>
             <span class="fa fa-trophy"></span>
             <?=$this->htmlA([

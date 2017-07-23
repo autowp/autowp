@@ -2,7 +2,7 @@
 
 namespace Application\Model\Item;
 
-use Application\Model\DbTable;
+use Application\Model\Item;
 
 class DistinctItemPictureFetcher extends PictureFetcher
 {
@@ -16,7 +16,7 @@ class DistinctItemPictureFetcher extends PictureFetcher
         $ids = $db->fetchCol(
             $db->select()
                 ->from('item', 'id')
-                ->where('item.item_type_id <> ?', DbTable\Item\Type::CATEGORY)
+                ->where('item.item_type_id <> ?', Item::CATEGORY)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $item['id'])
                 ->limit(self::COUNT)

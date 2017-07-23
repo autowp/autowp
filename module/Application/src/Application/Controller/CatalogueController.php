@@ -396,7 +396,7 @@ class CatalogueController extends AbstractActionController
                         'cars_count'   => 'count(ipc2.item_id)'
                     ]
                 )
-                ->where('item.item_type_id = ?', DbTable\Item\Type::FACTORY)
+                ->where('item.item_type_id = ?', Item::FACTORY)
                 ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', [])
                 ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', [])
                 ->where('ipc2.parent_id = ?', $brandId)
@@ -533,7 +533,7 @@ class CatalogueController extends AbstractActionController
             $haveTwins = $cars->getAdapter()->fetchOne(
                 $cars->getAdapter()->select()
                     ->from($cars->info('name'), 'id')
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
+                    ->where('item.item_type_id = ?', Item::TWINS)
                     ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', null)
                     ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
                     ->where('ipc2.parent_id = ?', $brand['id'])
@@ -991,7 +991,7 @@ class CatalogueController extends AbstractActionController
                         'brand_name'    => 'name',
                         'brand_catname' => 'catname'
                     ])
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                    ->where('item.item_type_id = ?', Item::BRAND)
                     ->join('item_parent', 'item.id = item_parent.parent_id', [
                         'brand_item_catname' => 'catname'
                     ])
@@ -2192,7 +2192,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandAction(function ($brand) {
             $select = $this->catalogue()->getItemTable()->select(true)
-                ->where('item.item_type_id = ?', DbTable\Item\Type::ENGINE)
+                ->where('item.item_type_id = ?', Item::ENGINE)
                 ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $brand['id'])
                 ->order($this->carsOrder());

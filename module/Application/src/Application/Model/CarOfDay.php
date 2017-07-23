@@ -222,7 +222,7 @@ class CarOfDay
 
         $url = 'http://wheelsage.org/picture/' . $picture->identity;
 
-        if ($car['item_type_id'] == DbTable\Item\Type::VEHICLE) {
+        if ($car['item_type_id'] == Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'en');
@@ -299,7 +299,7 @@ class CarOfDay
 
         $url = 'http://wheelsage.org/picture/' . $picture->identity;
 
-        if ($car['item_type_id'] == DbTable\Item\Type::VEHICLE) {
+        if ($car['item_type_id'] == Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'en');
@@ -382,7 +382,7 @@ class CarOfDay
 
         $url = 'http://autowp.ru/picture/' . $picture->identity;
 
-        if ($car['item_type_id'] == DbTable\Item\Type::VEHICLE) {
+        if ($car['item_type_id'] == Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'ru');
         } else {
             $title = $this->translator->translate('theme-of-day', 'default', 'ru');
@@ -647,7 +647,7 @@ class CarOfDay
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
         );
 
-        if ($car->item_type_id == DbTable\Item\Type::CATEGORY) {
+        if ($car->item_type_id == Item::CATEGORY) {
             $items[] = [
                 'icon'  => 'align-left',
                 'url'   => $this->router->assemble([
@@ -731,7 +731,7 @@ class CarOfDay
                         'catname', 'begin_year', 'end_year',
                         'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,item.name)')
                     ])
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->where('item.item_type_id = ?', Item::CATEGORY)
                     ->joinLeft(
                         'item_language',
                         'item.id = item_language.item_id and item_language.language = :language',
@@ -739,7 +739,7 @@ class CarOfDay
                     )
                     ->join('item_parent', 'item.id = item_parent.parent_id', null)
                     ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
-                    ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
+                    ->where('top_item.item_type_id IN (?)', [Item::VEHICLE, Item::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id = :item_id')
                     ->group(['item_parent_cache.item_id', 'item.id'])

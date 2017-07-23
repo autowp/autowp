@@ -133,7 +133,7 @@ class Catalogue
                 ->columns(['catname'])
                 ->where([
                     'id'           => $id,
-                    'item_type_id' => DbTable\Item\Type::BRAND
+                    'item_type_id' => Item::BRAND
                 ]);
 
             $brand = $this->itemTable2->selectWith($select)->current();
@@ -159,7 +159,7 @@ class Catalogue
                 ->columns(['catname'])
                 ->where([
                     'id'           => $id,
-                    'item_type_id' => DbTable\Item\Type::CATEGORY
+                    'item_type_id' => Item::CATEGORY
                 ]);
 
             $category = $this->itemTable2->selectWith($select)->current();

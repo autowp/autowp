@@ -2,6 +2,9 @@
 
 namespace Application;
 
+use Exception;
+use InvalidArgumentException;
+
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
@@ -12,10 +15,8 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\StringUtils;
-
-use Exception;
-use InvalidArgumentException;
 
 class Comments
 {
@@ -115,7 +116,7 @@ class Comments
                     throw new Exception("Item `{$message['item_id']}` not found");
                 }
                 switch ($item['item_type_id']) {
-                    case DbTable\Item\Type::TWINS:
+                    case Item::TWINS:
                         $url = $this->router->assemble([
                             'id' => $item['id']
                         ], [
@@ -124,7 +125,7 @@ class Comments
                             'uri'             => $uri
                         ]);
                         break;
-                    case DbTable\Item\Type::MUSEUM:
+                    case Item::MUSEUM:
                         $url = $this->router->assemble([
                             'id' => $item['id']
                         ], [

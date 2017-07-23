@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\Service\DayPictures;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
+use Application\Model\Item;
 
 class InboxController extends AbstractActionController
 {
@@ -34,7 +35,7 @@ class InboxController extends AbstractActionController
                 'item.id IN (?)',
                 $db->select()
                     ->from('item', 'id')
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                    ->where('item.item_type_id = ?', Item::BRAND)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                     ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                     ->join('pictures', 'picture_item.picture_id = pictures.id', null)

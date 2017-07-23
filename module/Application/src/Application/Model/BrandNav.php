@@ -265,8 +265,8 @@ class BrandNav
             $select->where('NOT item.is_concept');
         }
 
-        if ($itemTypeId == DbTable\Item\Type::VEHICLE) {
-            $select->where('item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::BRAND]);
+        if ($itemTypeId == Item::VEHICLE) {
+            $select->where('item.item_type_id IN (?)', [Item::VEHICLE, Item::BRAND]);
             if ($carTypeId) {
                 $select
                     ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
@@ -413,32 +413,32 @@ class BrandNav
                 'other' => [
                     'name'         => null,
                     'car_type_id'  => null,
-                    'item_type_id' => DbTable\Item\Type::VEHICLE
+                    'item_type_id' => Item::VEHICLE
                 ],
                 'moto' => [
                     'name'        => 'catalogue/section/moto',
                     'car_type_id' => 43,
-                    'item_type_id' => DbTable\Item\Type::VEHICLE
+                    'item_type_id' => Item::VEHICLE
                 ],
                 'bus' => [
                     'name' => 'catalogue/section/buses',
                     'car_type_id' => 19,
-                    'item_type_id' => DbTable\Item\Type::VEHICLE
+                    'item_type_id' => Item::VEHICLE
                 ],
                 'truck' => [
                     'name' => 'catalogue/section/trucks',
                     'car_type_id' => 17,
-                    'item_type_id' => DbTable\Item\Type::VEHICLE
+                    'item_type_id' => Item::VEHICLE
                 ],
                 'tractor' => [
                     'name'        => 'catalogue/section/tractors',
                     'car_type_id' => 44,
-                    'item_type_id' => DbTable\Item\Type::VEHICLE
+                    'item_type_id' => Item::VEHICLE
                 ],
                 'engine' => [
                     'name'        => 'catalogue/section/engines',
                     'car_type_id' => null,
-                    'item_type_id' => DbTable\Item\Type::ENGINE,
+                    'item_type_id' => Item::ENGINE,
                     'url'          => $this->router->assemble([
                         'brand_catname' => $brand['catname'],
                         'action'        => 'engines'

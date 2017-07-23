@@ -113,7 +113,7 @@ class CarsController extends AbstractActionController
 
         $car = $itemTable->fetchRow([
             'id = ?' => (int)$this->params('item_id'),
-            'item_type_id IN (?)' => [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE]
+            'item_type_id IN (?)' => [Item::VEHICLE, Item::ENGINE]
         ]);
         if (! $car) {
             return $this->notFoundAction();
@@ -231,7 +231,7 @@ class CarsController extends AbstractActionController
             $tab['active'] = $id == $currentTab;
         }
 
-        if ($car->item_type_id != DbTable\Item\Type::VEHICLE) {
+        if ($car->item_type_id != Item::VEHICLE) {
             unset($tabs['engine']);
         }
 
@@ -670,7 +670,7 @@ class CarsController extends AbstractActionController
     {
         $itemTable = new DbTable\Item();
         $select = $itemTable->select(true)
-            ->where('item.item_type_id = ?', DbTable\Item\Type::ENGINE)
+            ->where('item.item_type_id = ?', Item::ENGINE)
             ->order('item.name');
         if ($brandId) {
             $select
@@ -711,7 +711,7 @@ class CarsController extends AbstractActionController
 
         $car = $itemTable->fetchRow([
             'id = ?'           => (int)$this->params('item_id'),
-            'item_type_id = ?' => DbTable\Item\Type::VEHICLE
+            'item_type_id = ?' => Item::VEHICLE
         ]);
         if (! $car) {
             return $this->notFoundAction();
@@ -728,7 +728,7 @@ class CarsController extends AbstractActionController
                 $select
                     ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                     ->join(['engine' => 'item'], 'item_parent_cache.item_id = engine.id', null)
-                    ->where('engine.item_type_id = ?', DbTable\Item\Type::ENGINE)
+                    ->where('engine.item_type_id = ?', Item::ENGINE)
                     ->group('item.id');
             });
 
@@ -743,7 +743,7 @@ class CarsController extends AbstractActionController
 
         $engine = $itemTable->fetchRow([
             'id = ?'           => (int)$this->params()->fromPost('engine'),
-            'item_type_id = ?' => DbTable\Item\Type::ENGINE
+            'item_type_id = ?' => Item::ENGINE
         ]);
         if (! $engine) {
             return [

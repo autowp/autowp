@@ -23,6 +23,7 @@ use Application\Model\Perspective;
 use Application\Model\UserAccount;
 
 use Zend_Db_Expr;
+use Application\Model\Item;
 
 class UsersController extends AbstractActionController
 {
@@ -358,7 +359,7 @@ class UsersController extends AbstractActionController
                 if (! $success) {
                     $carSelect = $db->select()
                         ->from('item', ['id', 'count(1)'])
-                        ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                        ->where('item.item_type_id = ?', Item::BRAND)
                         ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                         ->join('attrs_user_values', 'item_parent_cache.item_id = attrs_user_values.item_id', null)
                         ->where('attrs_user_values.user_id = ?', $user->id)
@@ -382,7 +383,7 @@ class UsersController extends AbstractActionController
                     foreach ($data as $brandId => $value) {
                         $row = $itemTable->fetchRow([
                             'id = ?'           => $brandId,
-                            'item_type_id = ?' => DbTable\Item\Type::BRAND
+                            'item_type_id = ?' => Item::BRAND
                         ]);
                         $brands[] = [
                             'name' => $row->name,
@@ -434,7 +435,7 @@ class UsersController extends AbstractActionController
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (! $success) {
                     $select = $itemTable->select(true)
-                        ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                        ->where('item.item_type_id = ?', Item::BRAND)
                         ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                         ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                         ->join('pictures', 'picture_item.picture_id = pictures.id', null)

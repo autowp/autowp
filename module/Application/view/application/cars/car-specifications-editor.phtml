@@ -63,7 +63,7 @@
     <div class="tab-pane<?=$this->tabs['info']['active'] ? ' active' : ''?>" id="info">
         <?=$this->markdown($this->translate('specifications-editor/description'))?>
     </div>
-    <?php if ($this->car->item_type_id == Application\Model\DbTable\Item\Type::VEHICLE) { ?>
+    <?php if ($this->car->item_type_id == Application\Model\Item::VEHICLE) { ?>
         <div class="tab-pane<?=$this->tabs['engine']['active'] ? ' active' : ''?>" id="engine">
             <h2><?=$this->escapeHtml($this->translate('specifications-editor/engine'))?></h2>
 

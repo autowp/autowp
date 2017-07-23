@@ -14,6 +14,14 @@ use Zend_Db_Expr;
 
 class Item
 {
+    const VEHICLE  = 1,
+          ENGINE   = 2,
+          CATEGORY = 3,
+          TWINS    = 4,
+          BRAND    = 5,
+          FACTORY  = 6,
+          MUSEUM   = 7;
+
     /**
      * @var TableGateway
      */
@@ -68,7 +76,7 @@ class Item
                 $db->select()
                     ->from('item_parent_cache', 'parent_id')
                     ->join('item', 'item_parent_cache.parent_id = item.id', null)
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::VEHICLE)
+                    ->where('item.item_type_id = ?', self::VEHICLE)
                     ->where('item_parent_cache.item_id = ?', $vehicleId)
                     ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
                     ->order('item_parent_cache.diff desc')
@@ -194,8 +202,8 @@ class Item
                     ->from('item_parent_cache', 'parent_id')
                     ->join('item', 'item_parent_cache.parent_id = item.id', null)
                     ->where('item.item_type_id IN (?)', [
-                        DbTable\Item\Type::VEHICLE,
-                        DbTable\Item\Type::ENGINE
+                        self::VEHICLE,
+                        self::ENGINE
                     ])
                     ->where('item_parent_cache.item_id = ?', $carId)
                     ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
@@ -269,8 +277,8 @@ class Item
                     ->from('item_parent_cache', 'parent_id')
                     ->join('item', 'item_parent_cache.parent_id = item.id', null)
                     ->where('item.item_type_id IN (?)', [
-                        DbTable\Item\Type::VEHICLE,
-                        DbTable\Item\Type::ENGINE
+                        self::VEHICLE,
+                        self::ENGINE
                     ])
                     ->where('item_id = ?', $carId)
                     ->where('item_id <> parent_id')
@@ -556,8 +564,8 @@ class Item
         $select = $db->select()
             ->from('item', new Zend_Db_Expr('COUNT(1)'))
             ->where('item.item_type_id IN (?)', [
-                DbTable\Item\Type::ENGINE,
-                DbTable\Item\Type::VEHICLE
+                self::ENGINE,
+                self::VEHICLE
             ])
             ->where('not item.is_group')
             ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)

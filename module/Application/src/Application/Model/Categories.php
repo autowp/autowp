@@ -6,8 +6,6 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
 
-use Application\Model\DbTable;
-
 class Categories
 {
     const NEW_DAYS = 7;
@@ -52,16 +50,16 @@ class Categories
                     self::NEW_DAYS
                 )
             ])
-            ->where(['item.item_type_id = ?' => DbTable\Item\Type::CATEGORY])
+            ->where(['item.item_type_id = ?' => Item::CATEGORY])
             ->group('item.id')
             ->join(['ipc_cat2cat' => 'item_parent_cache'], 'item.id = ipc_cat2cat.parent_id', [])
             ->join(['low_cat' => 'item'], 'ipc_cat2cat.item_id = low_cat.id', [])
-            ->where(['low_cat.item_type_id = ?' => DbTable\Item\Type::CATEGORY])
+            ->where(['low_cat.item_type_id = ?' => Item::CATEGORY])
             ->join(['ip_cat2car' => 'item_parent'], 'ipc_cat2cat.item_id = ip_cat2car.parent_id', [])
             ->join(['top_car' => 'item'], 'ip_cat2car.item_id = top_car.id', [])
             ->where(new Sql\Predicate\In('top_car.item_type_id', [
-                DbTable\Item\Type::VEHICLE,
-                DbTable\Item\Type::ENGINE
+                Item::VEHICLE,
+                Item::ENGINE
             ]));
 
         if ($parentId) {

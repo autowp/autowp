@@ -10,6 +10,7 @@ use Application\Model\DbTable;
 use Application\Model\ItemParent;
 
 use Exception;
+use Application\Model\Item;
 
 class Catalogue implements RouteInterface
 {
@@ -81,7 +82,7 @@ class Catalogue implements RouteInterface
         $itemTable = new DbTable\Item();
         $brand = $itemTable->fetchRow([
             'catname = ?'      => $path[0],
-            'item_type_id = ?' => DbTable\Item\Type::BRAND
+            'item_type_id = ?' => Item::BRAND
         ]);
 
         if (! $brand) {

@@ -2,19 +2,19 @@
 
 namespace Application\Service;
 
+use Telegram\Bot\Api;
+use Zend\Router\Http\TreeRouteStack;
+
 use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Telegram\Command\InboxCommand;
 use Application\Telegram\Command\MeCommand;
 use Application\Telegram\Command\NewCommand;
 use Application\Telegram\Command\StartCommand;
 use Application\Telegram\Command\MessagesCommand;
-
-use Telegram\Bot\Api;
-
-use Zend\Router\Http\TreeRouteStack;
 
 class TelegramService
 {
@@ -219,7 +219,7 @@ class TelegramService
         $brandIds = $db->fetchCol(
             $db->select()
                 ->from('item', 'id')
-                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->where('item.item_type_id = ?', Item::BRAND)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->where('picture_item.picture_id = ?', $picture->id)

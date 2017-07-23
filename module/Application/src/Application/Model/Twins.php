@@ -66,7 +66,7 @@ class Twins
                 ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', null)
                 ->join('item_parent', 'ipc1.item_id = item_parent.item_id', null)
                 ->join(['twins' => 'item'], 'item_parent.parent_id = twins.id', null)
-                ->where('twins.item_type_id = ?', DbTable\Item\Type::TWINS)
+                ->where('twins.item_type_id = ?', Item::TWINS)
                 ->group('item.id');
 
             if ($limit > 0) {
@@ -124,11 +124,11 @@ class Twins
         return $brandAdapter->fetchCol(
             $brandAdapter->select()
                 ->from($itemTable->info('name'), 'id')
-                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->where('item.item_type_id = ?', Item::BRAND)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->where('item_parent_cache.item_id = ?', $groupId)
                 ->join(['vehicle' => 'item'], 'item_parent_cache.item_id = vehicle.id', null)
-                ->where('vehicle.item_type_id = ?', DbTable\Item\Type::TWINS)
+                ->where('vehicle.item_type_id = ?', Item::TWINS)
         );
     }
 
@@ -143,10 +143,10 @@ class Twins
         return (int)$db->fetchOne(
             $db->select(true)
                 ->from('item', 'count(distinct item.id)')
-                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->where('item.item_type_id = ?', Item::BRAND)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->join(['vehicle' => 'item'], 'item_parent_cache.item_id = vehicle.id', null)
-                ->where('vehicle.item_type_id = ?', DbTable\Item\Type::TWINS)
+                ->where('vehicle.item_type_id = ?', Item::TWINS)
         );
     }
 
@@ -164,7 +164,7 @@ class Twins
         $brandId = (int)$options['brandId'];
 
         $select = $this->getItemTable()->select(true)
-            ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
+            ->where('item.item_type_id = ?', Item::TWINS)
             ->order('item.add_datetime desc');
 
         if ($options['brandId']) {
@@ -172,7 +172,7 @@ class Twins
                 ->join('item_parent', 'item.id = item_parent.parent_id', null)
                 ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.item_id', null)
                 ->join(['brand' => 'item'], 'item_parent_cache.parent_id = brand.id', null)
-                ->where('brand.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->where('brand.item_type_id = ?', Item::BRAND)
                 ->where('item_parent_cache.parent_id = ?', $brandId)
                 ->group('item.id');
         }
@@ -232,7 +232,7 @@ class Twins
     {
         $row = $this->getItemTable()->fetchRow([
             'id = ?' => $groupId,
-            'item_type_id = ?' => DbTable\Item\Type::TWINS
+            'item_type_id = ?' => Item::TWINS
         ]);
         if (! $row) {
             return null;
@@ -256,7 +256,7 @@ class Twins
 
         $rows = $groupTable->fetchAll(
             $groupTable->select(true)
-                ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
+                ->where('item.item_type_id = ?', Item::TWINS)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->where('item_parent_cache.item_id = ?', (int)$itemId)
                 ->group('item.id')
@@ -286,7 +286,7 @@ class Twins
         $rows = $db->fetchAll(
             $db->select()
                 ->from($groupTable->info('name'), ['id', 'name'])
-                ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
+                ->where('item.item_type_id = ?', Item::TWINS)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', 'item_id')
                 ->where('item_parent_cache.item_id IN (?)', $itemIds)
                 ->group(['item_parent_cache.item_id', 'item.id'])

@@ -21,6 +21,7 @@ use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
 
 use Zend_Db_Expr;
+use Application\Model\Item;
 
 class PictureHydrator extends RestHydrator
 {
@@ -363,8 +364,8 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('perspective_item')) {
             $itemIds = $this->pictureItem->getPictureItemsByType($object['id'], [
-                DbTable\Item\Type::VEHICLE,
-                DbTable\Item\Type::BRAND
+                Item::VEHICLE,
+                Item::BRAND
             ]);
 
             $picture['perspective_item'] = null;

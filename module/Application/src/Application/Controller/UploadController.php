@@ -25,6 +25,7 @@ use Application\Model\UserPicture;
 use Application\Service\TelegramService;
 
 use Zend_Db_Expr;
+use Application\Model\Item;
 
 class UploadController extends AbstractActionController
 {
@@ -362,7 +363,7 @@ class UploadController extends AbstractActionController
                 ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $brand['id'])
                 ->where('NOT item.is_concept')
-                ->where('item.item_type_id = ?', DbTable\Item\Type::VEHICLE)
+                ->where('item.item_type_id = ?', Item::VEHICLE)
                 ->order([
                     'item.name',
                     'item.begin_year',
@@ -392,7 +393,7 @@ class UploadController extends AbstractActionController
                 ->joinLeft('spec', 'item.spec_id = spec.id', null)
                 ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $brand['id'])
-                ->where('item.item_type_id = ?', DbTable\Item\Type::ENGINE)
+                ->where('item.item_type_id = ?', Item::ENGINE)
                 ->order([
                     'item.name',
                     'item.begin_year',
@@ -537,7 +538,7 @@ class UploadController extends AbstractActionController
 
         $itemTable = new DbTable\Item();
         $brand = $itemTable->fetchRow([
-            'item_type_id = ?' => DbTable\Item\Type::BRAND,
+            'item_type_id = ?' => Item::BRAND,
             'id = ?'           => (int)$this->params('brand_id')
         ]);
         if (! $brand) {

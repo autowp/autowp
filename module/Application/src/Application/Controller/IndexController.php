@@ -12,6 +12,7 @@ use Application\Model\CarOfDay;
 use Application\Model\Categories;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
@@ -144,10 +145,10 @@ class IndexController extends AbstractActionController
                     )
                 ])
                 ->where([
-                    'item.item_type_id = ?' => DbTable\Item\Type::FACTORY,
+                    'item.item_type_id = ?' => Item::FACTORY,
                     new Sql\Predicate\In('product.item_type_id', [
-                        DbTable\Item\Type::VEHICLE,
-                        DbTable\Item\Type::ENGINE
+                        Item::VEHICLE,
+                        Item::ENGINE
                     ])
                 ])
                 ->join('item_parent', 'item.id = item_parent.parent_id', [])

@@ -9,6 +9,7 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Application\Model\DbTable;
 use Autowp\ZFComponents\Filter\SingleSpaces;
+use Application\Model\Item;
 
 return [
     'hydrators' => [
@@ -171,13 +172,13 @@ return [
                         'name' => 'InArray',
                         'options' => [
                             'haystack' => [
-                                DbTable\Item\Type::VEHICLE,
-                                DbTable\Item\Type::ENGINE,
-                                DbTable\Item\Type::CATEGORY,
-                                DbTable\Item\Type::TWINS,
-                                DbTable\Item\Type::BRAND,
-                                DbTable\Item\Type::FACTORY,
-                                DbTable\Item\Type::MUSEUM,
+                                Model\Item::VEHICLE,
+                                Model\Item::ENGINE,
+                                Model\Item::CATEGORY,
+                                Model\Item::TWINS,
+                                Model\Item::BRAND,
+                                Model\Item::FACTORY,
+                                Model\Item::MUSEUM,
                             ]
                         ]
                     ]

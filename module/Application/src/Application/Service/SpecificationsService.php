@@ -264,7 +264,7 @@ class SpecificationsService
 
     private function zoneIdByCarTypeId($itemTypeId, array $vehicleTypeIds)
     {
-        if ($itemTypeId == DbTable\Item\Type::ENGINE) {
+        if ($itemTypeId == Item::ENGINE) {
             return self::ENGINE_ZONE_ID;
         }
 

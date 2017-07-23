@@ -162,11 +162,11 @@ class Car extends AbstractPlugin
                         'catname', 'begin_year', 'end_year',
                         'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,item.name)')
                     ])
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->where('item.item_type_id = ?', Item::CATEGORY)
                     ->joinLeft('item_language', $langExpr, ['lang_name' => 'name'])
                     ->join('item_parent', 'item.id = item_parent.parent_id', null)
                     ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
-                    ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
+                    ->where('top_item.item_type_id IN (?)', [Item::VEHICLE, Item::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id IN (?)', $carIds)
                     ->group(['item_parent_cache.item_id', 'item.id'])
@@ -268,7 +268,7 @@ class Car extends AbstractPlugin
             }
 
             $cFetcher = $pictureFetcher;
-            if ($car['item_type_id'] == DbTable\Item\Type::CATEGORY) {
+            if ($car['item_type_id'] == Item::CATEGORY) {
                 $cFetcher = $this->getCategoryPictureFetcher();
             }
 
@@ -348,7 +348,7 @@ class Car extends AbstractPlugin
             $childsCount = isset($childsCounts[$car->id]) ? $childsCounts[$car->id] : 0;
 
             $vehiclesOnEngine = [];
-            if ($car->item_type_id == DbTable\Item\Type::ENGINE) {
+            if ($car->item_type_id == Item::ENGINE) {
                 $vehiclesOnEngine = $this->getVehiclesOnEngine($car);
             }
 

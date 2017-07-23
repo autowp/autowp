@@ -2,9 +2,9 @@
 
 namespace Application\Model\Item\ListBuilder;
 
-use Application\Model\DbTable;
-use Application\Model\Item\ListBuilder;
+use Application\Model\Item;
 use Application\Model\ItemParent;
+use Application\Model\Item\ListBuilder;
 
 class Category extends ListBuilder
 {
@@ -61,7 +61,7 @@ class Category extends ListBuilder
 
     public function getDetailsUrl($item)
     {
-        if ($item['item_type_id'] == DbTable\Item\Type::CATEGORY) {
+        if ($item['item_type_id'] == Item::CATEGORY) {
             return $this->router->assemble([
                 'action'           => 'category',
                 'category_catname' => $item['catname']
@@ -103,7 +103,7 @@ class Category extends ListBuilder
 
     public function getPicturesUrl($item)
     {
-        if ($item['item_type_id'] == DbTable\Item\Type::CATEGORY) {
+        if ($item['item_type_id'] == Item::CATEGORY) {
             return $this->router->assemble([
                 'action'           => 'category-pictures',
                 'category_catname' => $item['catname'],
@@ -145,7 +145,7 @@ class Category extends ListBuilder
 
     public function getPictureUrl($item, array $picture)
     {
-        if ($item['item_type_id'] == DbTable\Item\Type::CATEGORY) {
+        if ($item['item_type_id'] == Item::CATEGORY) {
             return $this->router->assemble([
                 'action'           => 'category-picture',
                 'category_catname' => $item['catname'],

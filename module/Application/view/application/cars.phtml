@@ -1,4 +1,4 @@
-<?php 
+<?php
 $numberFormatter = NumberFormatter::create($this->language(), NumberFormatter::DECIMAL);
 if (isset($this->thumbColumns) && $this->thumbColumns) {
     $thumbColumns = $this->thumbColumns;
@@ -44,11 +44,11 @@ $singleThumbPart = round(12 / $thumbColumns);
         <div class="row thumbnails">
             <?php
                 $canHavePhoto = in_array($item['itemTypeId'], [
-                    Application\Model\DbTable\Item\Type::VEHICLE,
-                    Application\Model\DbTable\Item\Type::ENGINE,
-                    Application\Model\DbTable\Item\Type::BRAND,
-                    Application\Model\DbTable\Item\Type::FACTORY,
-                    Application\Model\DbTable\Item\Type::MUSEUM
+                    Application\Model\Item::VEHICLE,
+                    Application\Model\Item::ENGINE,
+                    Application\Model\Item::BRAND,
+                    Application\Model\Item::FACTORY,
+                    Application\Model\Item::MUSEUM
                 ]);
                 $havePhoto = false;
                 foreach ($item['pictures'] as $picture) {
@@ -58,7 +58,7 @@ $singleThumbPart = round(12 / $thumbColumns);
                     }
                 }
             ?>
-        
+
             <?php if ($havePhoto) { ?>
                 <?php foreach ($item['pictures'] as $idx => $picture) { ?>
                     <?php
@@ -102,7 +102,7 @@ $singleThumbPart = round(12 / $thumbColumns);
         <?php if (!$this->disableDescription && strlen($item['description'])) { ?>
             <div class="text"><?=$this->markdown($item['description'])?></div>
         <?php } ?>
-        
+
         <?php if (count($item['vehiclesOnEngine'])) { ?>
             <p><?=$this->escapeHtml($this->translate('catalogue/engine/mounted-on:'))?></p>
             <ul>

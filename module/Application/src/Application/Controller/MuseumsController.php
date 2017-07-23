@@ -50,7 +50,7 @@ class MuseumsController extends AbstractActionController
 
         $museum = $table->fetchRow([
             'id = ?'           => (int)$this->params()->fromRoute('id'),
-            'item_type_id = ?' => DbTable\Item\Type::MUSEUM
+            'item_type_id = ?' => Item::MUSEUM
         ]);
         if (! $museum) {
             return $this->notFoundAction();

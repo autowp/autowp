@@ -161,7 +161,7 @@ class ItemParentController extends AbstractRestfulController
             case 'categories_first':
                 $select->order([
                     'item_parent.type',
-                    new Sql\Expression('item.item_type_id = ? DESC', [DbTable\Item\Type::CATEGORY]),
+                    new Sql\Expression('item.item_type_id = ? DESC', [Item::CATEGORY]),
                     'item.begin_order_cache',
                     'item.end_order_cache',
                     'item.name',

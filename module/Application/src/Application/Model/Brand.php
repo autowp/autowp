@@ -38,7 +38,7 @@ class Brand
     public function getTotalCount()
     {
         $sql = 'SELECT COUNT(1) FROM item WHERE item_type_id = ?';
-        return $this->table->getAdapter()->fetchOne($sql, [DbTable\Item\Type::BRAND]);
+        return $this->table->getAdapter()->fetchOne($sql, [Item::BRAND]);
     }
 
     private function countExpr()
@@ -107,7 +107,7 @@ class Brand
                 'item.id = item_language.item_id and item_language.language = :language',
                 null
             )
-            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+            ->where('item.item_type_id = ?', Item::BRAND)
             ->where('item.position = 0') // exclude "other"
             ->group('item.id')
             ->order('cars_count DESC')
@@ -301,7 +301,7 @@ class Brand
                 'item.id = item_language.item_id and item_language.language = :language',
                 null
             )
-            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+            ->where('item.item_type_id = ?', Item::BRAND)
             ->bind([
                 'language' => (string)$language
             ]);
@@ -392,7 +392,7 @@ class Brand
 
         $select = $db->select()
             ->from('item', $columns)
-            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+            ->where('item.item_type_id = ?', Item::BRAND)
             ->joinLeft(
                 'item_language',
                 'item.id = item_language.item_id and item_language.language = :language',

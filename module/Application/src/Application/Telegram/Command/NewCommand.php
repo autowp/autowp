@@ -5,6 +5,7 @@ namespace Application\Telegram\Command;
 use Telegram\Bot\Commands\Command;
 
 use Application\Model\DbTable;
+use Application\Model\Item;
 
 class NewCommand extends Command
 {
@@ -28,7 +29,7 @@ class NewCommand extends Command
 
             $brandRow = $itemTable->fetchRow([
                 'name = ?'         => (string)$arguments,
-                'item_type_id = ?' => DbTable\Item\Type::BRAND
+                'item_type_id = ?' => Item::BRAND
             ]);
 
             if ($brandRow) {

@@ -63,7 +63,7 @@ class FactoriesController extends AbstractActionController
 
         $factory = $itemTable->fetchRow([
             'id = ?'           => (int)$this->params()->fromRoute('id'),
-            'item_type_id = ?' => DbTable\Item\Type::FACTORY
+            'item_type_id = ?' => Item::FACTORY
         ]);
         if (! $factory) {
             return $this->notFoundAction();
@@ -186,7 +186,7 @@ class FactoriesController extends AbstractActionController
 
         $factory = $itemTable->fetchRow([
             'id = ?'           => (int)$this->params()->fromRoute('id'),
-            'item_type_id = ?' => DbTable\Item\Type::FACTORY
+            'item_type_id = ?' => Item::FACTORY
         ]);
         if (! $factory) {
             return $this->notFoundAction();
@@ -241,7 +241,7 @@ class FactoriesController extends AbstractActionController
         $itemTable = new DbTable\Item();
 
         $factory = $itemTable->fetchRow([
-            'item_type_id = ?' => DbTable\Item\Type::FACTORY,
+            'item_type_id = ?' => Item::FACTORY,
             'id = ?'           => (int)$this->params('item_id')
         ]);
         if (! $factory) {
@@ -253,8 +253,8 @@ class FactoriesController extends AbstractActionController
         $rows = $itemTable->fetchAll(
             $itemTable->select(true)
                 ->where('item.item_type_id IN (?)', [
-                    DbTable\Item\Type::VEHICLE,
-                    DbTable\Item\Type::ENGINE
+                    Item::VEHICLE,
+                    Item::ENGINE
                 ])
                 ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $factory->id)

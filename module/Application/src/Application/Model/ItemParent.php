@@ -48,28 +48,28 @@ class ItemParent
     private $languages = ['en'];
 
     private $allowedCombinations = [
-        DbTable\Item\Type::VEHICLE => [
-            DbTable\Item\Type::VEHICLE => true
+        Item::VEHICLE => [
+            Item::VEHICLE => true
         ],
-        DbTable\Item\Type::ENGINE => [
-            DbTable\Item\Type::ENGINE => true
+        Item::ENGINE => [
+            Item::ENGINE => true
         ],
-        DbTable\Item\Type::CATEGORY => [
-            DbTable\Item\Type::VEHICLE  => true,
-            DbTable\Item\Type::CATEGORY => true,
-            DbTable\Item\Type::BRAND    => true
+        Item::CATEGORY => [
+            Item::VEHICLE  => true,
+            Item::CATEGORY => true,
+            Item::BRAND    => true
         ],
-        DbTable\Item\Type::TWINS => [
-            DbTable\Item\Type::VEHICLE => true
+        Item::TWINS => [
+            Item::VEHICLE => true
         ],
-        DbTable\Item\Type::BRAND => [
-            DbTable\Item\Type::BRAND   => true,
-            DbTable\Item\Type::VEHICLE => true,
-            DbTable\Item\Type::ENGINE  => true,
+        Item::BRAND => [
+            Item::BRAND   => true,
+            Item::VEHICLE => true,
+            Item::ENGINE  => true,
         ],
-        DbTable\Item\Type::FACTORY => [
-            DbTable\Item\Type::VEHICLE => true,
-            DbTable\Item\Type::ENGINE  => true,
+        Item::FACTORY => [
+            Item::VEHICLE => true,
+            Item::ENGINE  => true,
         ]
     ];
 

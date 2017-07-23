@@ -11,6 +11,7 @@ use Zend\View\Model\JsonModel;
 
 use Application\ItemNameFormatter;
 use Application\Model\DbTable;
+use Application\Model\Item;
 
 class MapController extends AbstractActionController
 {
@@ -99,13 +100,13 @@ class MapController extends AbstractActionController
             if (! $pointsOnly) {
                 $url = null;
                 switch ($item['item_type_id']) {
-                    case DbTable\Item\Type::FACTORY:
+                    case Item::FACTORY:
                         $url = $this->url()->fromRoute('factories/factory', [
                             'id' => $item['id']
                         ]);
                         break;
 
-                    case DbTable\Item\Type::MUSEUM:
+                    case Item::MUSEUM:
                         $url = $this->url()->fromRoute('museums/museum', [
                             'id' => $item['id']
                         ]);
