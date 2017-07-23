@@ -14,8 +14,32 @@ class TableManager implements ServiceLocatorInterface
      * @var array
      */
     private $specs = [
+        'acl_roles' => [], //TODO: rename to acl_role
+        'acl_roles_parents' => [], //TODO: rename to acl_role_parent
+        'acl_resources' => [], //TODO: rename to acl_resources
+        'acl_resources_privileges' => [], //TODO: rename to acl_resource_privilege
+        'acl_roles_privileges_allowed' => [], //TODO: rename to acl_role_privilege_allowed
+        'acl_roles_privileges_denied' => [], //TODO: rename to acl_role_privilege_denied
+        'articles' => [],
+        'attrs_list_options' => [],
+        'attrs_units' => [],
+        'banned_ip' => [],
         'brand_alias' => [], //TODO: rename to item_alias
+        'car_types'   => [], //TODO: rename to vehicle_type
+        'car_types_parents' => [], //TODO: rename to vehicle_type_parent
+        'comment_message' => [],
+        'comment_vote' => [],
+        'comment_topic' => [],
+        'comment_topic_subscribe' => [],
+        'comment_topic_view' => [],
         'contact' => [],
+        'df_distance' => [],
+        'df_hash' => [],
+        'forums_themes' => [],
+        'forums_topics' => [],
+        'htmls' => [],
+        'ip_monitoring4' => [],
+        'ip_whitelist' => [],
         'item' => [],
         'item_language' => [],
         'item_parent' => [],
@@ -23,18 +47,33 @@ class TableManager implements ServiceLocatorInterface
         'item_parent_language' => [],
         'item_point' => [],
         'links' => [],
+        'log_events' => [],
+        'log_events_articles' => [],
+        'log_events_item' => [],
+        'log_events_pictures' => [],
+        'log_events_user' => [],
+        'pages' => [], //TODO: rename to page
+        'personal_messages' => [],
         'perspectives' => [],
         'perspectives_groups' => [],
         'perspectives_pages' => [],
+        'pictures' => [], //TODO: rename to picture
         'pictures_moder_votes' => [],
+        'picture_moder_vote_template' => [],
         'picture_view' => [],
-        'pictures' => [],
+        'picture_vote' => [],
+        'picture_vote_summary' => [],
         'spec' => [],
         'user_account' => [],
         'user_item_subscribe' => [],
         'user_password_remind' => [],
         'user_remember' => [],
-        'user_renames' => []
+        'user_renames' => [],
+        'users' => [], //TODO: rename to users
+        'vehicle_vehicle_type' => [], //TODO: rename to item_vehicle_type
+        'voting' => [],
+        'voting_variant' => [],
+        'voting_variant_vote' => [],
     ];
 
     /**

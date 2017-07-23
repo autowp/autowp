@@ -22,10 +22,19 @@ class AboutController extends AbstractActionController
      */
     private $comments;
 
-    public function __construct(Acl $acl, Comments\CommentsService $comments)
-    {
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    public function __construct(
+        Acl $acl,
+        Comments\CommentsService $comments,
+        DbTable\Picture $pictureTable
+    ) {
         $this->acl = $acl;
         $this->comments = $comments;
+        $this->pictureTable = $pictureTable;
     }
 
     public function indexAction()
@@ -70,9 +79,8 @@ class AboutController extends AbstractActionController
 
         ksort($contributors, SORT_NUMERIC);
 
-        $pictureTable = new DbTable\Picture();
-        $pictureTableAdapter = $pictureTable->getAdapter();
-        $pictureTableName = $pictureTable->info('name');
+        $pictureTableAdapter = $this->pictureTable->getAdapter();
+        $pictureTableName = $this->pictureTable->info('name');
 
         $totalPictures = $pictureTableAdapter->fetchOne(
             $pictureTableAdapter->select()

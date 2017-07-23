@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Moder;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
@@ -21,21 +20,15 @@ class AttrsController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var Adapter
-     */
-    private $adapter;
-
-    /**
      * @var TableGateway
      */
     private $listOptionTable;
 
-    public function __construct(SpecificationsService $specsService, Adapter $adapter)
+    public function __construct(SpecificationsService $specsService, TableGateway $listOptionTable)
     {
         $this->specsService = $specsService;
-        $this->adapter = $adapter;
 
-        $this->listOptionTable = new TableGateway('attrs_list_options', $this->adapter);
+        $this->listOptionTable = $listOptionTable;
     }
 
     public function indexAction()

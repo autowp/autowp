@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Plugin;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
@@ -32,12 +31,12 @@ class PictureVote extends AbstractPlugin
     private $pictureModerVote;
 
     public function __construct(
-        Adapter $adapter,
         PictureModerVote $pictureModerVote,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        TableGateway $voteTemplateTeable
     ) {
         $this->table = $pictureTable;
-        $this->voteTemplateTable = new TableGateway('picture_moder_vote_template', $adapter);
+        $this->voteTemplateTable = $voteTemplateTeable;
         $this->pictureModerVote = $pictureModerVote;
     }
 

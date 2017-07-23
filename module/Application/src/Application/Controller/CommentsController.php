@@ -37,16 +37,23 @@ class CommentsController extends AbstractRestfulController
      */
     private $message;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         HostManager $hostManager,
         $form,
         MessageService $message,
-        Comments $comments
+        Comments $comments,
+        DbTable\Picture $pictureTable
     ) {
         $this->hostManager = $hostManager;
         $this->form = $form;
         $this->comments = $comments;
         $this->message = $message;
+        $this->pictureTable = $pictureTable;
     }
 
     private function canAddComments()
@@ -131,8 +138,7 @@ class CommentsController extends AbstractRestfulController
             $object = null;
             switch ($typeId) {
                 case \Application\Comments::PICTURES_TYPE_ID:
-                    $pictures = $this->catalogue()->getPictureTable();
-                    $object = $pictures->find($itemId)->current();
+                    $object = $this->pictureTable->find($itemId)->current();
                     break;
 
                 case \Application\Comments::ITEM_TYPE_ID:

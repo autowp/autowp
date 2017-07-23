@@ -21,7 +21,8 @@ class PictureItemControllerFactory implements FactoryInterface
             $container->get(\Application\Model\PictureItem::class),
             $container->get(\Application\Model\Log::class),
             $hydrators->get(\Application\Hydrator\Api\PictureItemHydrator::class),
-            $filters->get('api_picture_item_item')
+            $filters->get('api_picture_item_item'),
+            $container->get(\Application\Model\DbTable\Picture::class)
         );
     }
 }

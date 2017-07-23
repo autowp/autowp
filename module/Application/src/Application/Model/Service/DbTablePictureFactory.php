@@ -14,7 +14,8 @@ class DbTablePictureFactory implements FactoryInterface
     {
         return new \Application\Model\DbTable\Picture([
             'imageStorage'     => $container->get(\Autowp\Image\Storage::class),
-            'pictureModerVote' => $container->get(\Application\Model\PictureModerVote::class)
+            'pictureModerVote' => $container->get(\Application\Model\PictureModerVote::class),
+            'perspective'      => $container->get(\Application\Model\Perspective::class)
         ]);
     }
 }

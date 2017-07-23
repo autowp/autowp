@@ -12,8 +12,14 @@ class LogFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new \Application\Model\Log(
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+            $container->get(\Application\Model\DbTable\Picture::class),
+            $tables->get('log_events'),
+            $tables->get('log_events_articles'),
+            $tables->get('log_events_item'),
+            $tables->get('log_events_pictures'),
+            $tables->get('log_events_user')
         );
     }
 }

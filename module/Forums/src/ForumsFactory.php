@@ -12,9 +12,11 @@ class ForumsFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Forums(
             $container->get(\Autowp\Comments\CommentsService::class),
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+            $tables->get('forums_themes'),
+            $tables->get('forums_topics')
         );
     }
 }

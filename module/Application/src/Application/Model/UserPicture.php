@@ -2,7 +2,6 @@
 
 namespace Application\Model;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -10,10 +9,10 @@ use Application\Model\DbTable;
 
 class UserPicture
 {
-    public function __construct(Adapter $adapter)
+    public function __construct(TableGateway $pictureTable, TableGateway $userTable)
     {
-        $this->pictureTable = new TableGateway('pictures', $adapter);
-        $this->userTable = new TableGateway('users', $adapter);
+        $this->pictureTable = $pictureTable;
+        $this->userTable = $userTable;
     }
 
     public function refreshAllPicturesCount()

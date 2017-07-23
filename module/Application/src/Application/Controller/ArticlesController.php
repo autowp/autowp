@@ -18,10 +18,10 @@ class ArticlesController extends AbstractActionController
     const ARTICLES_PER_PAGE = 10;
     const PREVIEW_CAT_PATH = '/img/articles/preview/';
 
-    public function __construct(Adapter $adapter)
+    public function __construct(TableGateway $table, TableGateway $htmlTable)
     {
-        $this->table = new TableGateway('articles', $adapter);
-        $this->htmlTable = new TableGateway('htmls', $adapter);
+        $this->table = $table;
+        $this->htmlTable = $htmlTable;
     }
 
     public function indexAction()

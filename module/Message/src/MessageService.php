@@ -2,7 +2,6 @@
 
 namespace Autowp\Message;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
@@ -18,11 +17,6 @@ use Application\Service\TelegramService;
 class MessageService
 {
     /**
-     * @var Adapter
-     */
-    private $adapter;
-
-    /**
      * @var TableGateway
      */
     private $table;
@@ -34,10 +28,9 @@ class MessageService
      */
     private $telegram;
 
-    public function __construct(Adapter $adapter, TelegramService $telegram)
+    public function __construct(TelegramService $telegram, TableGateway $table)
     {
-        $this->adapter = $adapter;
-        $this->table = new TableGateway('personal_messages', $this->adapter);
+        $this->table = $table;
 
         $this->telegram = $telegram;
     }
@@ -193,7 +186,7 @@ class MessageService
         $select = $this->getSystemSelect($userId);
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         return $paginator->getTotalItemCount();
@@ -205,7 +198,7 @@ class MessageService
             ->where('NOT readen');
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         return $paginator->getTotalItemCount();
@@ -216,7 +209,7 @@ class MessageService
         $select = $this->getInboxSelect($userId);
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         return $paginator->getTotalItemCount();
@@ -228,7 +221,7 @@ class MessageService
             ->where('NOT readen');
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         return $paginator->getTotalItemCount();
@@ -239,7 +232,7 @@ class MessageService
         $select = $this->getDialogSelect($userId, $withUserId);
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         return $paginator->getTotalItemCount();
@@ -250,7 +243,7 @@ class MessageService
         $select = $this->getSentSelect($userId);
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         return $paginator->getTotalItemCount();
@@ -284,7 +277,7 @@ class MessageService
         $select = $this->getInboxSelect($userId);
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         $paginator
@@ -306,7 +299,7 @@ class MessageService
         $select = $this->getSentSelect($userId);
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         $paginator
@@ -326,7 +319,7 @@ class MessageService
         $select = $this->getSystemSelect($userId);
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         $paginator
@@ -348,7 +341,7 @@ class MessageService
         $select = $this->getDialogSelect($userId, $withUserId);
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         $paginator

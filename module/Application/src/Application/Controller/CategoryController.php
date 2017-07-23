@@ -58,6 +58,11 @@ class CategoryController extends AbstractActionController
      */
     private $itemParent;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         $cache,
         $textStorage,
@@ -65,7 +70,8 @@ class CategoryController extends AbstractActionController
         SpecificationsService $specsService,
         Perspective $perspective,
         Item $itemModel,
-        ItemParent $itemParent
+        ItemParent $itemParent,
+        DbTable\Picture $pictureTable
     ) {
         $this->cache = $cache;
         $this->textStorage = $textStorage;
@@ -74,6 +80,7 @@ class CategoryController extends AbstractActionController
         $this->perspective = $perspective;
         $this->itemModel = $itemModel;
         $this->itemParent = $itemParent;
+        $this->pictureTable = $pictureTable;
 
         $this->itemTable = new DbTable\Item();
         $this->itemLanguageTable = new DbTable\Item\Language();
@@ -139,10 +146,9 @@ class CategoryController extends AbstractActionController
             $this->cache->setItem($key, $categories);
         }
 
-        $pictureTable = $this->catalogue()->getPictureTable();
         foreach ($categories as &$category) {
-            $picture = $pictureTable->fetchRow(
-                $pictureTable->select(true)
+            $picture = $this->pictureTable->fetchRow(
+                $this->pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
@@ -494,7 +500,8 @@ class CategoryController extends AbstractActionController
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'perspective' => $this->perspective
+                    'pictureTable' => $this->pictureTable,
+                    'perspective'  => $this->perspective
                 ]),
                 'useFrontPictures' => $haveSubcategories,
                 'disableLargePictures' => true,
@@ -546,9 +553,8 @@ class CategoryController extends AbstractActionController
 
                 $otherItemsCount = $otherPaginator->getTotalItemCount();
 
-                $pictureTable = new DbTable\Picture();
-                $pictureRows = $pictureTable->fetchAll(
-                    $pictureTable->select(true)
+                $pictureRows = $this->pictureTable->fetchAll(
+                    $this->pictureTable->select(true)
                         ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item', 'picture_item.item_id = item.id', null)
@@ -609,9 +615,7 @@ class CategoryController extends AbstractActionController
             $breadcrumbs
         ) {
 
-            $pictureTable = $this->catalogue()->getPictureTable();
-
-            $select = $pictureTable->select(true)
+            $select = $this->pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->order($this->catalogue()->picturesOrdering())
@@ -660,9 +664,7 @@ class CategoryController extends AbstractActionController
             $breadcrumbs
         ) {
 
-            $pictureTable = $this->catalogue()->getPictureTable();
-
-            $select = $pictureTable->select(true)
+            $select = $this->pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->order($this->catalogue()->picturesOrdering())
@@ -704,9 +706,7 @@ class CategoryController extends AbstractActionController
 
         return $this->doCategoryAction(function ($currentCategory, $currentCar) {
 
-            $pictureTable = $this->catalogue()->getPictureTable();
-
-            $select = $pictureTable->select(true)
+            $select = $this->pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->order($this->catalogue()->picturesOrdering())

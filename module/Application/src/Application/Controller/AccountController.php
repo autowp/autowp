@@ -96,6 +96,11 @@ class AccountController extends AbstractActionController
      */
     private $userAccount;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         UsersService $service,
         Form $emailForm,
@@ -109,7 +114,8 @@ class AccountController extends AbstractActionController
         SpecificationsService $specsService,
         MessageService $message,
         UserRename $userRename,
-        UserAccount $userAccount
+        UserAccount $userAccount,
+        DbTable\Picture $pictureTable
     ) {
 
         $this->service = $service;
@@ -125,6 +131,7 @@ class AccountController extends AbstractActionController
         $this->message = $message;
         $this->userRename = $userRename;
         $this->userAccount = $userAccount;
+        $this->pictureTable = $pictureTable;
     }
 
     private function forwardToLogin()
@@ -138,9 +145,7 @@ class AccountController extends AbstractActionController
     {
         $user = $this->user()->get();
 
-        $pictures = $this->catalogue()->getPictureTable();
-
-        $db = $pictures->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
         $picsCount = $db->fetchOne(
             $db->select()
@@ -157,9 +162,9 @@ class AccountController extends AbstractActionController
                  ->where('forums_topics.status IN (?)', [Forums::STATUS_CLOSED, Forums::STATUS_NORMAL])
         );
 
-        $notTakenPicturesCount = $pictures->getAdapter()->fetchOne(
-            $pictures->select()
-                ->from($pictures, new Zend_Db_Expr('COUNT(1)'))
+        $notTakenPicturesCount = $this->pictureTable->getAdapter()->fetchOne(
+            $this->pictureTable->select()
+                ->from($this->pictureTable, new Zend_Db_Expr('COUNT(1)'))
                 ->where('owner_id = ?', $user->id)
                 ->where('status = ?', DbTable\Picture::STATUS_INBOX)
         );
@@ -643,9 +648,7 @@ class AccountController extends AbstractActionController
             return $this->forwardToLogin();
         }
 
-        $pictures = $this->catalogue()->getPictureTable();
-
-        $select = $pictures->select(true)
+        $select = $this->pictureTable->select(true)
             ->where('owner_id = ?', $this->user()->get()->id)
             ->where('status = ?', DbTable\Picture::STATUS_INBOX)
             ->order(['add_date DESC']);

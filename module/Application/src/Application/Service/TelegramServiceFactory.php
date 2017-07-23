@@ -19,7 +19,8 @@ class TelegramServiceFactory implements FactoryInterface
             $config['telegram'],
             $container->get('HttpRouter'),
             $container->get(\Application\HostManager::class),
-            $container
+            $container,
+            $container->get(\Application\Model\DbTable\Picture::class)
         );
     }
 }

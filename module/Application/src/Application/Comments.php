@@ -2,7 +2,6 @@
 
 namespace Application;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
@@ -39,11 +38,6 @@ class Comments
     private $router;
 
     /**
-     * @var Adapter
-     */
-    private $adapter;
-
-    /**
      * @var HostManager
      */
     private $hostManager;
@@ -55,20 +49,32 @@ class Comments
 
     private $translator;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $articleTable;
+
     public function __construct(
         CommentsService $service,
         TreeRouteStack $router,
-        Adapter $adapter,
         HostManager $hostManager,
         MessageService $message,
-        $translator
+        $translator,
+        DbTable\Picture $pictureTable,
+        TableGateway $articleTable
     ) {
         $this->service = $service;
         $this->router = $router;
-        $this->adapter = $adapter;
         $this->hostManager = $hostManager;
         $this->message = $message;
         $this->translator = $translator;
+        $this->pictureTable = $pictureTable;
+        $this->articleTable = $articleTable;
     }
 
     public function getMessageUrl($messageId, $canonical = false, $uri = null)
@@ -88,8 +94,7 @@ class Comments
 
         switch ($message['type_id']) {
             case self::PICTURES_TYPE_ID:
-                $pictureTable = new DbTable\Picture();
-                $picture = $pictureTable->find($message['item_id'])->current();
+                $picture = $this->pictureTable->find($message['item_id'])->current();
                 if (! $picture) {
                     throw new Exception("Picture `{$message['item_id']}` not found");
                 }
@@ -148,8 +153,7 @@ class Comments
                 break;
 
             case self::ARTICLES_TYPE_ID:
-                $articleTable = new TableGateway('articles', $this->adapter);
-                $article = $articleTable->select([
+                $article = $this->articleTable->select([
                     'id = ?' => $message['item_id']
                 ])->current();
                 if (! $article) {

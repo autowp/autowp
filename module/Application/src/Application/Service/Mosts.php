@@ -6,6 +6,7 @@ use Exception;
 
 use Application\Model\DbTable;
 use Application\Model\Perspective;
+use Application\Model\VehicleType;
 use Application\Most;
 use Application\Service\SpecificationsService;
 
@@ -341,10 +342,26 @@ class Mosts
      */
     private $perspective;
 
-    public function __construct(array $options = [])
-    {
-        $this->specs = $options['specs'];
-        $this->perspective = $options['perspective'];
+    /**
+     * @var VehicleType
+     */
+    private $vehicleType;
+
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    public function __construct(
+        SpecificationsService $specs,
+        Perspective $perspective,
+        VehicleType $vehicleType,
+        DbTable\Picture $pictureTable
+    ) {
+        $this->specs = $specs;
+        $this->perspective = $perspective;
+        $this->vehicleType = $vehicleType;
+        $this->pictureTable = $pictureTable;
     }
 
     private function betweenYearsExpr($from, $to)
@@ -448,50 +465,22 @@ class Mosts
 
     private function getCarTypes(int $brandId)
     {
-        $carTypesTable = new DbTable\Vehicle\Type();
         $carTypes = [];
-        $select = $carTypesTable->select(true)
-            ->where('car_types.parent_id IS NULL')
-            ->order('car_types.position');
-
-        if ($brandId) {
-            $select
-                ->join('car_types_parents', 'car_types.id = car_types_parents.parent_id', null)
-                ->join('vehicle_vehicle_type', 'car_types_parents.id = vehicle_vehicle_type.vehicle_type_id', null)
-                ->join('item_parent_cache', 'vehicle_vehicle_type.vehicle_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $brandId)
-                ->group('car_types.id');
-        }
-
-
-        foreach ($carTypesTable->fetchAll($select) as $row) {
+        foreach ($this->vehicleType->getRows(0, $brandId) as $row) {
             $childs = [];
 
-            $select = $select = $carTypesTable->select(true)
-                ->where('car_types.parent_id = ?', $row->id)
-                ->order('car_types.position');
-
-            if ($brandId) {
-                $select
-                    ->join('car_types_parents', 'car_types.id = car_types_parents.parent_id', null)
-                    ->join('vehicle_vehicle_type', 'car_types_parents.id = vehicle_vehicle_type.vehicle_type_id', null)
-                    ->join('item_parent_cache', 'vehicle_vehicle_type.vehicle_id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $brandId)
-                    ->group('car_types.id');
-            }
-
-            foreach ($carTypesTable->fetchAll($select) as $srow) {
+            foreach ($this->vehicleType->getRows($row['id'], $brandId) as $srow) {
                 $childs[] = [
-                    'id'      => $srow->id,
-                    'catname' => $srow->catname,
-                    'name'    => $srow->name_rp
+                    'id'      => (int)$srow['id'],
+                    'catname' => $srow['catname'],
+                    'name'    => $srow['name_rp']
                 ];
             }
 
             $carTypes[] = [
-                'id'      => $row->id,
-                'catname' => $row->catname,
-                'name'    => $row->name_rp,
+                'id'      => (int)$row['id'],
+                'catname' => $row['catname'],
+                'name'    => $row['name_rp'],
                 'childs'  => $childs
             ];
         }
@@ -502,22 +491,21 @@ class Mosts
     private function getCarTypeData($carType)
     {
         return [
-            'id'      => $carType->id,
-            'catname' => $carType->catname,
-            'name'    => $carType->name,
-            'name_rp' => $carType->name_rp,
+            'id'      => (int)$carType['id'],
+            'catname' => $carType['catname'],
+            'name'    => $carType['name'],
+            'name_rp' => $carType['name_rp'],
         ];
     }
 
     private function getOrientedPictureList($carId, array $perspectiveGroupIds)
     {
-        $pictureTable = new DbTable\Picture();
         $pictures = [];
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
         foreach ($perspectiveGroupIds as $groupId) {
-            $picture = $pictureTable->fetchRow(
-                $pictureTable->select(true)
+            $picture = $this->pictureTable->fetchRow(
+                $this->pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->join(
@@ -553,7 +541,7 @@ class Mosts
 
         foreach ($pictures as $key => $picture) {
             if (! $picture) {
-                $select = $pictureTable->select(true)
+                $select = $this->pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id = ?', $carId)
@@ -565,7 +553,7 @@ class Mosts
                     $select->where('id NOT IN (?)', $ids);
                 }
 
-                $pic = $pictureTable->fetchAll($select)->current();
+                $pic = $this->pictureTable->fetchAll($select)->current();
 
                 if ($pic) {
                     $pictures[$key] = $pic;
@@ -586,7 +574,7 @@ class Mosts
         $select = $itemTable->select(true);
 
         if ($carType) {
-            $ids = $this->getCarTypesIds($carType);
+            $ids = $this->vehicleType->getDescendantsAndSelfIds($carType['id']);
 
             $select->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null);
 
@@ -626,16 +614,6 @@ class Mosts
         return $data;
     }
 
-    private function getCarTypesIds($carType)
-    {
-        $result = [$carType->id];
-        foreach ($carType->findDependentRowset(DbTable\Vehicle\Type::class) as $child) {
-            $result[] = $child->id;
-            $result = array_merge($result, $this->getCarTypesIds($child));
-        }
-        return $result;
-    }
-
     public function getData($options)
     {
         $defaults = [
@@ -668,10 +646,10 @@ class Mosts
             }
         }
 
-        $carTypesTable = new DbTable\Vehicle\Type();
-        $carType = $carTypesTable->fetchRow([
-            'catname = ?' => (string)$carTypeCatname
-        ]);
+        $carType = null;
+        if ($carTypeCatname) {
+            $carType = $this->vehicleType->getRowByCatname($carTypeCatname);
+        }
 
         $years = $this->getYears();
 

@@ -12,8 +12,11 @@ class VotingsFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Votings(
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+            $tables->get('voting'),
+            $tables->get('voting_variant'),
+            $tables->get('voting_variant_vote')
         );
     }
 }

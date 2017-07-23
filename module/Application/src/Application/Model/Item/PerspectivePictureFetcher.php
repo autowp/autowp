@@ -84,8 +84,7 @@ class PerspectivePictureFetcher extends PictureFetcher
         $pictures = [];
         $usedIds = [];
 
-        $pictureTable = $this->getPictureTable();
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
         $totalPictures = isset($options['totalPictures']) ? (int)$options['totalPictures'] : null;
         $itemOnlyChilds = isset($this->onlyChilds[$item['id']]) ? $this->onlyChilds[$item['id']] : null;

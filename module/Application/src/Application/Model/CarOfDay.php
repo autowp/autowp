@@ -67,6 +67,16 @@ class CarOfDay
      */
     private $itemParent;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    /**
+     * @var Twins
+     */
+    private $twins;
+
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
         Image\Storage $imageStorage,
@@ -76,7 +86,9 @@ class CarOfDay
         SpecificationsService $specsService,
         Item $itemModel,
         Perspective $perspective,
-        ItemParent $itemParent
+        ItemParent $itemParent,
+        DbTable\Picture $pictureTable,
+        Twins $twins
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->imageStorage = $imageStorage;
@@ -87,6 +99,8 @@ class CarOfDay
         $this->itemModel = $itemModel;
         $this->perspective = $perspective;
         $this->itemParent = $itemParent;
+        $this->pictureTable = $pictureTable;
+        $this->twins = $twins;
 
         $this->table = new Table([
             'name'    => 'of_day',
@@ -141,9 +155,9 @@ class CarOfDay
         ] : null;
     }
 
-    private function pictureByPerspective($pictureTable, $car, $perspective)
+    private function pictureByPerspective($car, $perspective)
     {
-        $select = $pictureTable->select(true)
+        $select = $this->pictureTable->select(true)
             ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
@@ -155,7 +169,7 @@ class CarOfDay
         if ($perspective) {
             $select->where('picture_item.perspective_id = ?', $perspective);
         }
-        return $pictureTable->fetchRow($select);
+        return $this->pictureTable->fetchRow($select);
     }
 
     private static function ucfirst($str)
@@ -187,20 +201,18 @@ class CarOfDay
             return;
         }
 
-        $pictureTable = new Picture();
-
         /* Hardcoded perspective priority list */
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
         foreach ($perspectives as $perspective) {
-            $picture = $this->pictureByPerspective($pictureTable, $car, $perspective);
+            $picture = $this->pictureByPerspective($car, $perspective);
             if ($picture) {
                 break;
             }
         }
 
         if (! $picture) {
-            $picture = $this->pictureByPerspective($pictureTable, $car, false);
+            $picture = $this->pictureByPerspective($car, false);
         }
 
         if (! $picture) {
@@ -266,20 +278,18 @@ class CarOfDay
             return;
         }
 
-        $pictureTable = new Picture();
-
         /* Hardcoded perspective priority list */
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
         foreach ($perspectives as $perspective) {
-            $picture = $this->pictureByPerspective($pictureTable, $car, $perspective);
+            $picture = $this->pictureByPerspective($car, $perspective);
             if ($picture) {
                 break;
             }
         }
 
         if (! $picture) {
-            $picture = $this->pictureByPerspective($pictureTable, $car, false);
+            $picture = $this->pictureByPerspective($car, false);
         }
 
         if (! $picture) {
@@ -349,20 +359,18 @@ class CarOfDay
             return;
         }
 
-        $pictureTable = new Picture();
-
         /* Hardcoded perspective priority list */
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
         foreach ($perspectives as $perspective) {
-            $picture = $this->pictureByPerspective($pictureTable, $car, $perspective);
+            $picture = $this->pictureByPerspective($car, $perspective);
             if ($picture) {
                 break;
             }
         }
 
         if (! $picture) {
-            $picture = $this->pictureByPerspective($pictureTable, $car, false);
+            $picture = $this->pictureByPerspective($car, false);
         }
 
         if (! $picture) {
@@ -466,10 +474,9 @@ class CarOfDay
                 $notEmptyPics[] = $picture;
             }
         }
-        $pictureTable = $this->catalogue->getPictureTable();
-        $names = $pictureTable->getNameData($notEmptyPics, [
+        $names = $this->pictureTable->getNameData($notEmptyPics, [
             'language' => $language
-        ], $this->perspective);
+        ]);
 
         $paths = $this->catalogue->getCataloguePaths($carOfDay->id, [
             'breakOnFirst' => true,
@@ -544,7 +551,6 @@ class CarOfDay
     {
         $perspectivesGroupIds = $this->perspective->getPageGroupIds(6);
 
-        $pTable = $this->catalogue->getPictureTable();
         $pictures = [];
 
         $usedIds = [];
@@ -552,7 +558,7 @@ class CarOfDay
         foreach ($perspectivesGroupIds as $groupId) {
             $picture = null;
 
-            $select = $pTable->select(true)
+            $select = $this->pictureTable->select(true)
                 ->where('mp.group_id = ?', $groupId)
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
@@ -573,7 +579,7 @@ class CarOfDay
             if ($usedIds) {
                 $select->where('pictures.id not in (?)', $usedIds);
             }
-            $picture = $pTable->fetchRow($select);
+            $picture = $this->pictureTable->fetchRow($select);
 
             if ($picture) {
                 $pictures[] = $picture;
@@ -604,7 +610,7 @@ class CarOfDay
         }
 
         if (count($left) > 0) {
-            $select = $pTable->select(true)
+            $select = $this->pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
@@ -616,7 +622,7 @@ class CarOfDay
                 $select->where('pictures.id NOT IN (?)', $usedIds);
             }
 
-            foreach ($pTable->fetchAll($select) as $pic) {
+            foreach ($this->pictureTable->fetchAll($select) as $pic) {
                 $key = array_shift($left);
                 $pictures[$key] = $pic;
             }
@@ -707,8 +713,7 @@ class CarOfDay
                 }
             }
 
-            $twins = new Twins();
-            foreach ($twins->getCarGroups($car->id) as $twinsGroup) {
+            foreach ($this->twins->getCarGroups($car->id) as $twinsGroup) {
                 $items[] = [
                     'icon'  => 'adjust',
                     'url'   => $this->router->assemble([

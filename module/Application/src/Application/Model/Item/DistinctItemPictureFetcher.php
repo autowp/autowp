@@ -11,8 +11,7 @@ class DistinctItemPictureFetcher extends PictureFetcher
 
     public function fetch(array $item, array $options = [])
     {
-        $pictureTable = $this->getPictureTable();
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
         $ids = $db->fetchCol(
             $db->select()

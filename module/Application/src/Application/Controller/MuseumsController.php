@@ -22,11 +22,21 @@ class MuseumsController extends AbstractActionController
      */
     private $itemModel;
 
-    public function __construct($textStorage, TableGateway $itemLinkTable, Item $itemModel)
-    {
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    public function __construct(
+        $textStorage,
+        TableGateway $itemLinkTable,
+        Item $itemModel,
+        DbTable\Picture $pictureTable
+    ) {
         $this->textStorage = $textStorage;
         $this->itemLinkTable = $itemLinkTable;
         $this->itemModel = $itemModel;
+        $this->pictureTable = $pictureTable;
     }
 
     public function indexAction()
@@ -71,9 +81,7 @@ class MuseumsController extends AbstractActionController
             $description = $this->textStorage->getFirstText($textIds);
         }
 
-        $pictureTable = new DbTable\Picture();
-
-        $select = $pictureTable->select(true)
+        $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->where('picture_item.item_id = ?', $museum->id)
             ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);

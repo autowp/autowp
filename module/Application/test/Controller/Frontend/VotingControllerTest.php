@@ -3,7 +3,6 @@
 namespace ApplicationTest\Frontend\Controller;
 
 use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
@@ -26,9 +25,9 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
 
     public function testVoteAndGetVotes()
     {
-        $adapter = $this->getApplication()->getServiceManager()->get(\Zend\Db\Adapter\AdapterInterface::class);
+        $tables = $this->getApplication()->getServiceManager()->get(\Application\Db\TableManager::class);
 
-        $table = new TableGateway('voting', $adapter);
+        $table = $tables->get('voting');
         $table->insert([
             'name'         => 'Test vote',
             'multivariant' => 0,
@@ -39,7 +38,7 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
         ]);
         $id = $table->getLastInsertValue();
 
-        $table = new TableGateway('voting_variant', $adapter);
+        $table = $tables->get('voting_variant');
         $table->insert([
             'voting_id'    => $id,
             'name'         => 'First variant',

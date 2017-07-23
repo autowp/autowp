@@ -12,13 +12,15 @@ class CommentsFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new \Application\Comments(
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get('HttpRouter'),
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class),
             $container->get(\Application\HostManager::class),
             $container->get(\Autowp\Message\MessageService::class),
-            $container->get('MvcTranslator')
+            $container->get('MvcTranslator'),
+            $container->get(\Application\Model\DbTable\Picture::class),
+            $tables->get('articles')
         );
     }
 }

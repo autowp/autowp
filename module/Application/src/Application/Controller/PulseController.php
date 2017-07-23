@@ -2,7 +2,6 @@
 
 namespace Application\Controller;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -36,9 +35,9 @@ class PulseController extends AbstractActionController
         '#008888',
     ];
 
-    public function __construct(Adapter $adapter)
+    public function __construct(TableGateway $logTable)
     {
-        $this->logTable = new TableGateway('log_events', $adapter);
+        $this->logTable = $logTable;
     }
 
     private function randomColor()

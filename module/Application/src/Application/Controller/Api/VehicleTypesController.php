@@ -7,41 +7,18 @@ use Zend\View\Model\JsonModel;
 
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable;
+use Application\Model\VehicleType;
 
 class VehicleTypesController extends AbstractRestfulController
 {
     /**
-     * @var DbTable\Vehicle\Type
+     * @var VehicleType
      */
-    private $table;
+    private $vehicleType;
 
-    public function __construct()
+    public function __construct(VehicleType $vehicleType)
     {
-        $this->table = new DbTable\Vehicle\Type();
-    }
-
-    private function getCarTypeOptions($parentId = null)
-    {
-        if ($parentId) {
-            $filter = [
-                'parent_id = ?' => $parentId
-            ];
-        } else {
-            $filter = 'parent_id is null';
-        }
-
-        $rows = $this->table->fetchAll($filter, 'position');
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = [
-                'id'     => (int)$row->id,
-                'name'   => $row->name,
-                'childs' => $this->getCarTypeOptions($row->id)
-            ];
-        }
-
-        return $result;
+        $this->vehicleType = $vehicleType;
     }
 
     public function indexAction()
@@ -51,7 +28,7 @@ class VehicleTypesController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'items' => $this->getCarTypeOptions(null),
+            'items' => $this->vehicleType->getTree(),
         ]);
     }
 }

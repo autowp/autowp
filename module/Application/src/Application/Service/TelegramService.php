@@ -34,11 +34,17 @@ class TelegramService
      */
     private $hostManager;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         array $options,
         TreeRouteStack $router,
         HostManager $hostManager,
-        $serviceManager
+        $serviceManager,
+        DbTable\Picture $pictureTable
     ) {
 
         $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
@@ -48,6 +54,7 @@ class TelegramService
         $this->router = $router;
         $this->hostManager = $hostManager;
         $this->serviceManager = $serviceManager;
+        $this->pictureTable = $pictureTable;
     }
 
     /**
@@ -128,9 +135,7 @@ class TelegramService
 
     public function notifyInbox($pictureId)
     {
-        $pictureTable = new DbTable\Picture();
-
-        $picture = $pictureTable->find($pictureId)->current();
+        $picture = $this->pictureTable->find($pictureId)->current();
         if (! $picture) {
             return;
         }
@@ -166,9 +171,7 @@ class TelegramService
 
     public function notifyPicture($pictureId)
     {
-        $pictureTable = new DbTable\Picture();
-
-        $picture = $pictureTable->find($pictureId)->current();
+        $picture = $this->pictureTable->find($pictureId)->current();
         if (! $picture) {
             return;
         }

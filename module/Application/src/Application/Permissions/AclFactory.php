@@ -2,7 +2,8 @@
 
 namespace Application\Permissions;
 
-use Zend\Db\Adapter\Adapter;
+use Exception;
+
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\ServiceManager\FactoryInterface;
@@ -11,8 +12,6 @@ use Zend\Permissions\Acl\Acl;
 use Zend\Permissions\Acl\Role\GenericRole;
 use Zend\Permissions\Acl\Resource\GenericResource;
 use Interop\Container\ContainerInterface;
-
-use Exception;
 
 class AclFactory implements FactoryInterface
 {
@@ -34,7 +33,7 @@ class AclFactory implements FactoryInterface
 
             $this->load(
                 $acl,
-                $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+                $container
             );
 
             $cache->setItem($key, $acl);
@@ -56,12 +55,14 @@ class AclFactory implements FactoryInterface
         return $this($controllers, AclFactory::class);
     }
 
-    private function load(Acl $acl, Adapter $adapter)
+    private function load(Acl $acl, ContainerInterface $container)
     {
-        $roleTable = new TableGateway('acl_roles', $adapter);
-        $resourceTable = new TableGateway('acl_resources', $adapter);
-        $privilegeAllowedTable = new TableGateway('acl_roles_privileges_allowed', $adapter);
-        $privilegeDeniedTable = new TableGateway('acl_roles_privileges_denied', $adapter);
+        $tables = $container->get(\Application\Db\TableManager::class);
+
+        $roleTable = $tables->get('acl_roles');
+        $resourceTable = $tables->get('acl_resources');
+        $privilegeAllowedTable = $tables->get('acl_roles_privileges_allowed');
+        $privilegeDeniedTable = $tables->get('acl_roles_privileges_denied');
 
         $loaded = [];
         foreach ($roleTable->select([]) as $role) {

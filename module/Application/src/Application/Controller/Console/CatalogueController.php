@@ -44,6 +44,11 @@ class CatalogueController extends AbstractActionController
      */
     private $itemModel;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         ItemParent $itemParent,
         PictureItem $pictureItem,
@@ -53,7 +58,8 @@ class CatalogueController extends AbstractActionController
         MessageService $message,
         $textStorage,
         DuplicateFinder $duplicateFinder,
-        Item $itemModel
+        Item $itemModel,
+        DbTable\Picture $pictureTable
     ) {
         $this->itemParent = $itemParent;
         $this->pictureItem = $pictureItem;
@@ -64,6 +70,7 @@ class CatalogueController extends AbstractActionController
         $this->textStorage = $textStorage;
         $this->duplicateFinder = $duplicateFinder;
         $this->itemModel = $itemModel;
+        $this->pictureTable = $pictureTable;
     }
 
     public function refreshBrandVehicleAction()
@@ -75,11 +82,9 @@ class CatalogueController extends AbstractActionController
 
     public function acceptOldUnsortedAction()
     {
-        $pictureTable = new DbTable\Picture();
-
-        $rows = $pictureTable->fetchAll([
-            'type = ?'     => DbTable\Picture::UNSORTED_TYPE_ID,
-            'status = ?'   => DbTable\Picture::STATUS_INBOX,
+        $rows = $this->pictureTable->fetchAll([
+            'type = ?'   => DbTable\Picture::UNSORTED_TYPE_ID,
+            'status = ?' => DbTable\Picture::STATUS_INBOX,
             'add_date < DATE_SUB(NOW(), INTERVAL 2 YEAR)'
         ], 'id');
 
@@ -106,7 +111,7 @@ class CatalogueController extends AbstractActionController
 
             $previousStatusUserId = $picture->change_status_user_id;
 
-            $success = $pictureTable->accept($picture->id, $userId, $isFirstTimeAccepted);
+            $success = $this->pictureTable->accept($picture->id, $userId, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
                 $owner = $picture->findParentRow(User::class, 'Owner');
                 if ($owner && ($owner->id != $userId)) {

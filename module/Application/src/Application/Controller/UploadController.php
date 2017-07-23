@@ -65,6 +65,11 @@ class UploadController extends AbstractActionController
      */
     private $itemParent;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         $partial,
         TelegramService $telegram,
@@ -73,7 +78,8 @@ class UploadController extends AbstractActionController
         Comments\CommentsService $comments,
         UserPicture $userPicture,
         Perspective $perspective,
-        ItemParent $itemParent
+        ItemParent $itemParent,
+        DbTable\Picture $pictureTable
     ) {
         $this->partial = $partial;
         $this->telegram = $telegram;
@@ -83,6 +89,7 @@ class UploadController extends AbstractActionController
         $this->userPicture = $userPicture;
         $this->perspective = $perspective;
         $this->itemParent = $itemParent;
+        $this->pictureTable = $pictureTable;
     }
 
     public function onlyRegisteredAction()
@@ -99,12 +106,10 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $pictureTable = $this->catalogue()->getPictureTable();
-
         $replace = $this->params('replace');
         $replacePicture = false;
         if ($replace) {
-            $replacePicture = $pictureTable->fetchRow([
+            $replacePicture = $this->pictureTable->fetchRow([
                 'identity = ?' => $replace
             ]);
         }
@@ -162,8 +167,6 @@ class UploadController extends AbstractActionController
 
         $values = $form->getData();
 
-        $pictureTable = $this->catalogue()->getPictureTable();
-
         $tempFilePaths = [];
         $data = $form->get('picture')->getValue();
 
@@ -210,7 +213,7 @@ class UploadController extends AbstractActionController
             $resolution = $this->imageStorage()->getImageResolution($imageId);
 
             // add record to db
-            $picture = $pictureTable->createRow([
+            $picture = $this->pictureTable->createRow([
                 'image_id'      => $imageId,
                 'width'         => $width,
                 'height'        => $height,
@@ -222,7 +225,7 @@ class UploadController extends AbstractActionController
                 'status'        => DbTable\Picture::STATUS_INBOX,
                 'removing_date' => null,
                 'ip'            => inet_pton($this->getRequest()->getServer('REMOTE_ADDR')),
-                'identity'      => $pictureTable->generateIdentity(),
+                'identity'      => $this->pictureTable->generateIdentity(),
                 'replace_picture_id' => $replacePicture ? $replacePicture->id : null,
             ]);
             $picture->save();
@@ -272,7 +275,7 @@ class UploadController extends AbstractActionController
             if ($gps !== false) {
                 geoPHP::version();
                 $point = new Point($gps['lng'], $gps['lat']);
-                $db = $pictureTable->getAdapter();
+                $db = $this->pictureTable->getAdapter();
                 $pointExpr = new Zend_Db_Expr($db->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
 
                 $picture->point = $pointExpr;
@@ -578,9 +581,7 @@ class UploadController extends AbstractActionController
 
     public function cropSaveAction()
     {
-        $pictureTable = $this->catalogue()->getPictureTable();
-
-        $picture = $pictureTable->find($this->params()->fromPost('id'))->current();
+        $picture = $this->pictureTable->find($this->params()->fromPost('id'))->current();
         if (! $picture) {
             return $this->notfoundAction();
         }
@@ -663,12 +664,10 @@ class UploadController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $pictureTable = $this->catalogue()->getPictureTable();
-
         $replace = $this->params('replace');
         $replacePicture = false;
         if ($replace) {
-            $replacePicture = $pictureTable->fetchRow([
+            $replacePicture = $this->pictureTable->fetchRow([
                 'identity = ?' => $replace
             ]);
         }

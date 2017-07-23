@@ -51,13 +51,20 @@ class TwinsController extends AbstractActionController
      */
     private $itemModel;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         TextStorage\Service $textStorage,
         $cache,
         SpecificationsService $specsService,
         Comments\CommentsService $comments,
         Perspective $perspective,
-        Item $itemModel
+        Item $itemModel,
+        DbTable\Picture $pictureTable,
+        Twins $twins
     ) {
 
         $this->textStorage = $textStorage;
@@ -66,16 +73,8 @@ class TwinsController extends AbstractActionController
         $this->comments = $comments;
         $this->perspective = $perspective;
         $this->itemModel = $itemModel;
-    }
-
-    /**
-     * @return Twins
-     */
-    private function getTwins()
-    {
-        return $this->twins
-            ? $this->twins
-            : $this->twins = new Twins();
+        $this->pictureTable = $pictureTable;
+        $this->twins = $twins;
     }
 
     private function getBrands(array $selectedIds)
@@ -86,7 +85,7 @@ class TwinsController extends AbstractActionController
 
         $arr = $this->cache->getItem($key, $success);
         if (! $success) {
-            $arr = $this->getTwins()->getBrands([
+            $arr = $this->twins->getBrands([
                 'language' => $language
             ]);
 
@@ -113,12 +112,12 @@ class TwinsController extends AbstractActionController
 
     public function specificationsAction()
     {
-        $group = $this->getTwins()->getGroup($this->params('id'));
+        $group = $this->twins->getGroup($this->params('id'));
         if (! $group) {
             return $this->notFoundAction();
         }
 
-        $specs = $this->specsService->specifications($this->getTwins()->getGroupCars($group['id']), [
+        $specs = $this->specsService->specifications($this->twins->getGroupCars($group['id']), [
             'language' => $this->language()
         ]);
 
@@ -130,7 +129,7 @@ class TwinsController extends AbstractActionController
 
     public function picturesAction()
     {
-        $twins = $this->getTwins();
+        $twins = $this->twins;
 
         $group = $twins->getGroup($this->params('id'));
         if (! $group) {
@@ -172,7 +171,7 @@ class TwinsController extends AbstractActionController
 
     public function groupAction()
     {
-        $twins = $this->getTwins();
+        $twins = $this->twins;
 
         $group = $twins->getGroup($this->params('id'));
         if (! $group) {
@@ -209,7 +208,7 @@ class TwinsController extends AbstractActionController
             $description = $this->textStorage->getFirstText($textIds);
         }
 
-        $this->getBrands($this->getTwins()->getGroupBrandIds($group['id']));
+        $this->getBrands($this->twins->getGroupBrandIds($group['id']));
 
         return [
             //'name'               => $this->itemModel->getNameData($group, $this->language()),
@@ -217,6 +216,7 @@ class TwinsController extends AbstractActionController
             'description'        => $description,
             'cars'               => $this->car()->listData($carList, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'pictureTable'         => $this->pictureTable,
                     'perspective'          => $this->perspective,
                     'type'                 => null,
                     'onlyExactlyPictures'  => false,
@@ -248,8 +248,6 @@ class TwinsController extends AbstractActionController
 
     private function prepareList($list)
     {
-        $pictureTable = new DbTable\Picture();
-
         $imageStorage = $this->imageStorage();
 
         $language = $this->language();
@@ -259,7 +257,7 @@ class TwinsController extends AbstractActionController
             $ids[] = $group->id;
         }
 
-        $picturesCounts = $this->getTwins()->getGroupPicturesCount($ids);
+        $picturesCounts = $this->twins->getGroupPicturesCount($ids);
 
         //TODO: topic stat for authenticated user
         $commentsStats = $this->comments->getTopicStat(
@@ -308,8 +306,8 @@ class TwinsController extends AbstractActionController
             $cars = [];
 
             foreach ($carList as $car) {
-                $pictureRow = $pictureTable->fetchRow(
-                    $pictureTable->select(true)
+                $pictureRow = $this->pictureTable->fetchRow(
+                    $this->pictureTable->select(true)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                         ->where('item_parent_cache.parent_id = ?', (int)$car['id'])
@@ -406,7 +404,7 @@ class TwinsController extends AbstractActionController
 
         $canEdit = $this->user()->isAllowed('twins', 'edit');
 
-        $paginator = $this->getTwins()->getGroupsPaginator([
+        $paginator = $this->twins->getGroupsPaginator([
             'brandId' => $brand->id
         ])
             ->setItemCountPerPage(self::GROUPS_PER_PAGE)
@@ -428,7 +426,7 @@ class TwinsController extends AbstractActionController
     {
         $canEdit = $this->user()->isAllowed('twins', 'edit');
 
-        $paginator = $this->getTwins()->getGroupsPaginator()
+        $paginator = $this->twins->getGroupsPaginator()
             ->setItemCountPerPage(self::GROUPS_PER_PAGE)
             ->setCurrentPageNumber($this->params('page'));
 
@@ -445,7 +443,7 @@ class TwinsController extends AbstractActionController
 
     private function doPictureAction($callback)
     {
-        $twins = $this->getTwins();
+        $twins = $this->twins;
 
         $group = $twins->getGroup($this->params('id'));
         if (! $group) {
@@ -470,7 +468,7 @@ class TwinsController extends AbstractActionController
     {
         return $this->doPictureAction(function ($group, $picture) {
 
-            $twins = $this->getTwins();
+            $twins = $this->twins;
 
             $select = $twins->getGroupPicturesSelect($group['id'], [
                 'ordering' => $this->catalogue()->picturesOrdering()
@@ -501,7 +499,7 @@ class TwinsController extends AbstractActionController
     {
         return $this->doPictureAction(function ($group, $picture) {
 
-            $select = $this->getTwins()->getGroupPicturesSelect($group['id'], [
+            $select = $this->twins->getGroupPicturesSelect($group['id'], [
                 'ordering' => $this->catalogue()->picturesOrdering()
             ]);
 

@@ -39,7 +39,7 @@ class CommentHydrator extends RestHydrator
         $this->comments = $serviceManager->get(\Application\Comments::class);
         $this->router = $serviceManager->get('HttpRouter');
 
-        $this->pictureTable = new DbTable\Picture();
+        $this->pictureTable = $serviceManager->get(DbTable\Picture::class);
         $this->userTable = new User();
 
         $this->userId = null;

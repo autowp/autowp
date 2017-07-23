@@ -19,9 +19,7 @@ class NewPictureFetcher extends PictureFetcher
 
     public function fetch(array $item, array $options = [])
     {
-        $pictureTable = $this->getPictureTable();
-
-        $select = $pictureTable->select();
+        $select = $this->pictureTable->select();
 
         $select = $this->getPictureSelect($item['id'], [
             'ids'   => $this->pictureIds,
@@ -29,7 +27,7 @@ class NewPictureFetcher extends PictureFetcher
             'acceptedSort' => true
         ]);
 
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
         $db->fetchRow($select);
 
         $result = [];
@@ -50,11 +48,10 @@ class NewPictureFetcher extends PictureFetcher
             $result[$itemId] = null;
         }
         if (count($itemIds)) {
-            $pictureTable = $this->getPictureTable();
-            $pictureTableAdapter = $pictureTable->getAdapter();
+            $pictureTableAdapter = $this->pictureTable->getAdapter();
 
             $select = $pictureTableAdapter->select()
-                ->from($pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
+                ->from($this->pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
                 ->where('pictures.id IN (?)', $this->pictureIds)
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)

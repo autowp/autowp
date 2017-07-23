@@ -11,48 +11,49 @@ use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Service\Mosts;
-use Application\Service\SpecificationsService;
 
 class MostsController extends AbstractActionController
 {
     private $textStorage;
 
     /**
-     * @var SpecificationsService
-     */
-    private $specsService = null;
-
-    /**
      * @var Perspective
      */
     private $perspective;
 
+    /**
+     * @var Mosts
+     */
+    private $mosts;
+
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         TextStorage\Service $textStorage,
-        SpecificationsService $specsService,
         Item $itemModel,
-        Perspective $perspective
+        Perspective $perspective,
+        Mosts $mosts,
+        DbTable\Picture $pictureTable
     ) {
 
         $this->textStorage = $textStorage;
-        $this->specsService = $specsService;
         $this->itemModel = $itemModel;
         $this->perspective = $perspective;
+        $this->mosts = $mosts;
+        $this->pictureTable = $pictureTable;
     }
 
     public function indexAction()
     {
-        $service = new Mosts([
-            'specs'       => $this->specsService,
-            'perspective' => $this->perspective
-        ]);
-
         $language = $this->language();
         $yearsCatname = $this->params('years_catname');
         $carTypeCatname = $this->params('shape_catname');
         $mostCatname = $this->params('most_catname');
 
-        $data = $service->getData([
+        $data = $this->mosts->getData([
             'language' => $language,
             'most'     => $mostCatname,
             'years'    => $yearsCatname,
@@ -89,10 +90,9 @@ class MostsController extends AbstractActionController
         $imageStorage = $this->imageStorage();
         $imagesInfo = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb');
 
-        $pictureTable = new DbTable\Picture();
-        $names = $pictureTable->getNameData($allPictures, [
+        $names = $this->pictureTable->getNameData($allPictures, [
             'language' => $language
-        ], $this->perspective);
+        ]);
 
         $itemLanguageTable = new DbTable\Item\Language();
 

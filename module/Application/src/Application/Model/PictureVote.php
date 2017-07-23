@@ -2,7 +2,6 @@
 
 namespace Application\Model;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -18,10 +17,10 @@ class PictureVote
      */
     private $summaryTable;
 
-    public function __construct(Adapter $adapter)
+    public function __construct(TableGateway $voteTable, TableGateway $summaryTable)
     {
-        $this->voteTable = new TableGateway('picture_vote', $adapter);
-        $this->summaryTable = new TableGateway('picture_vote_summary', $adapter);
+        $this->voteTable = $voteTable;
+        $this->summaryTable = $summaryTable;
     }
 
     public function vote($pictureId, $userId, $value)
@@ -68,10 +67,10 @@ class PictureVote
         $pictureId = (int)$pictureId;
 
         $sql = '
-            insert into picture_vote_summary (picture_id, positive, negative) 
+            insert into picture_vote_summary (picture_id, positive, negative)
             values (
-                ?, 
-                (select count(1) from picture_vote where picture_id = ? and value > 0), 
+                ?,
+                (select count(1) from picture_vote where picture_id = ? and value > 0),
                 (select count(1) from picture_vote where picture_id = ? and value < 0)
             )
             on duplicate key update

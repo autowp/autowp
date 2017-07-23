@@ -15,7 +15,8 @@ class UserTextFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Helper(
-            $container->get('Router')
+            $container->get('Router'),
+            $container->get(\Application\Model\DbTable\Picture::class)
         );
     }
 }

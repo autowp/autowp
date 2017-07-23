@@ -19,6 +19,7 @@ use Application\Model\ItemParent;
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
+use Application\Model\VehicleType;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
 
@@ -68,6 +69,21 @@ class CatalogueController extends AbstractActionController
      */
     private $itemLinkTable;
 
+    /**
+     * @var Mosts
+     */
+    private $mosts;
+
+    /**
+     * @var VehicleType
+     */
+    private $vehicleType;
+
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         $textStorage,
         $cache,
@@ -78,7 +94,10 @@ class CatalogueController extends AbstractActionController
         Comments\CommentsService $comments,
         Item $itemModel,
         Perspective $perspective,
-        TableGateway $itemLinkTable
+        TableGateway $itemLinkTable,
+        Mosts $mosts,
+        VehicleType $vehicleType,
+        DbTable\Picture $pictureTable
     ) {
 
         $this->textStorage = $textStorage;
@@ -91,6 +110,9 @@ class CatalogueController extends AbstractActionController
         $this->itemModel = $itemModel;
         $this->perspective = $perspective;
         $this->itemLinkTable = $itemLinkTable;
+        $this->mosts = $mosts;
+        $this->vehicleType = $vehicleType;
+        $this->pictureTable = $pictureTable;
     }
 
     private function doBrandAction(callable $callback)
@@ -145,7 +167,7 @@ class CatalogueController extends AbstractActionController
      */
     private function selectFromPictures($onlyAccepted = true)
     {
-        $select = $this->catalogue()->getPictureTable()->select(true);
+        $select = $this->pictureTable->select(true);
 
         if ($onlyAccepted) {
             $select->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
@@ -274,6 +296,7 @@ class CatalogueController extends AbstractActionController
                         'specsService'    => $this->specsService
                     ]),
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                        'pictureTable'         => $this->pictureTable,
                         'perspective'          => $this->perspective,
                         'type'                 => null,
                         'onlyExactlyPictures'  => false,
@@ -291,51 +314,23 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandAction(function ($brand) {
 
-            $carTypeTable = new DbTable\Vehicle\Type();
-
             $cartype = false;
-            if ($this->params('cartype_catname')) {
-                $cartype = $carTypeTable->fetchRow(
-                    $carTypeTable->select()
-                        ->from($carTypeTable, ['id', 'name', 'catname'])
-                        ->where('catname = ?', $this->params('cartype_catname'))
-                );
-
+            $catname = $this->params('cartype_catname');
+            if ($catname) {
+                $cartype = $this->vehicleType->getRowByCatname($catname);
                 if (! $cartype) {
                     return $this->notFoundAction();
                 }
             }
 
-            $carTypeAdapter = $carTypeTable->getAdapter();
-            $select = $carTypeAdapter->select()
-                ->from($carTypeTable->info('name'), [
-                    'id',
-                    'cars_count' => new Zend_Db_Expr('COUNT(1)')
-                ])
-                ->join('vehicle_vehicle_type', 'car_types.id = vehicle_vehicle_type.vehicle_type_id', null)
-                ->join('item', 'vehicle_vehicle_type.vehicle_id = item.id', null)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $brand['id'])
-                ->where('item.begin_year or item.begin_model_year')
-                ->where('not item.is_group')
-                ->group('car_types.id')
-                ->order('car_types.position');
-
-            $list = [];
-            foreach ($carTypeAdapter->fetchAll($select) as $row) {
-                $carType = $carTypeTable->find($row['id'])->current();
-                if ($carType) {
-                    $list[] = [
-                        'id'        => $carType->id,
-                        'name'      => $carType->name,
-                        'carsCount' => $row['cars_count'],
-                        'url'       => $this->url()->fromRoute('catalogue', [
-                            'cartype_catname' => $carType->catname,
-                            'page'            => 1
-                        ], [], true)
-                    ];
-                }
+            $list = $this->vehicleType->getBrandVehicleTypes($brand['id']);
+            foreach ($list as &$listItem) {
+                $listItem['url'] = $this->url()->fromRoute('catalogue', [
+                    'cartype_catname' => $listItem['catname'],
+                    'page'            => 1
+                ], [], true);
             }
+            unset($listItem);
 
             $select = $this->catalogue()->getItemTable()->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
@@ -347,7 +342,7 @@ class CatalogueController extends AbstractActionController
             if ($cartype) {
                 $select
                     ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
-                    ->where('vehicle_vehicle_type.vehicle_type_id = ?', $cartype->id);
+                    ->where('vehicle_vehicle_type.vehicle_type_id = ?', $cartype['id']);
             }
 
             $paginator = $this->carsPaginator($select, $this->params('page'));
@@ -366,6 +361,7 @@ class CatalogueController extends AbstractActionController
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                        'pictureTable'         => $this->pictureTable,
                         'perspective'          => $this->perspective,
                         'type'                 => null,
                         'onlyExactlyPictures'  => false,
@@ -412,13 +408,11 @@ class CatalogueController extends AbstractActionController
                 ->limit(4)
         );
 
-        $pictureTable = new DbTable\Picture();
-
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $pictureRow = $pictureTable->fetchRow(
-                $pictureTable->select(true)
+            $pictureRow = $this->pictureTable->fetchRow(
+                $this->pictureTable->select(true)
                     ->columns([
                         'pictures.id', 'pictures.identity',
                         'pictures.width', 'pictures.height',
@@ -572,8 +566,7 @@ class CatalogueController extends AbstractActionController
             $inboxPictures = null;
 
             if ($this->user()->isAllowed('picture', 'move')) {
-                $pictureTable = new DbTable\Picture();
-                $db = $pictureTable->getAdapter();
+                $db = $this->pictureTable->getAdapter();
 
                 $inboxPictures = $db->fetchOne(
                     $db->select()
@@ -1171,6 +1164,7 @@ class CatalogueController extends AbstractActionController
                 ], [], true),
                 'childListData' => $this->car()->listData($listCars, [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                        'pictureTable'         => $this->pictureTable,
                         'perspective'          => $this->perspective,
                         'type'                 => $type == ItemParent::TYPE_DEFAULT ? $type : null,
                         'onlyExactlyPictures'  => true,
@@ -1285,12 +1279,11 @@ class CatalogueController extends AbstractActionController
 
     private function getModgroupPicturesSelect(int $carId, int $modId)
     {
-        $pictureTable = $this->catalogue()->getPictureTable();
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
         return $db->select()
             ->from(
-                $pictureTable->info('name'),
+                $this->pictureTable->info('name'),
                 [
                     'id', 'name', 'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
@@ -1310,8 +1303,7 @@ class CatalogueController extends AbstractActionController
         $pictures = [];
         $usedIds = [];
 
-        $pictureTable = $this->catalogue()->getPictureTable();
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
         foreach ($perspectiveGroupIds as $groupId) {
             $select = $this->getModgroupPicturesSelect($carId, $modId)
@@ -1714,6 +1706,7 @@ class CatalogueController extends AbstractActionController
             ], [], true),
             'childListData' => $this->car()->listData($listCars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'pictureTable'         => $this->pictureTable,
                     'perspective'          => $this->perspective,
                     'type'                 => $type == ItemParent::TYPE_DEFAULT ? $type : null,
                     'onlyExactlyPictures'  => false,
@@ -1761,8 +1754,7 @@ class CatalogueController extends AbstractActionController
 
     private function getCarInboxCount(int $carId)
     {
-        $pictureTable = $this->catalogue()->getPictureTable();
-        $select = $pictureTable->select(true)
+        $select = $this->pictureTable->select(true)
             ->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
@@ -2071,17 +2063,12 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $service = new Mosts([
-                'specs'       => $this->specsService,
-                'perspective' => $this->perspective
-            ]);
-
             $language = $this->language();
             $yearsCatname = $this->params('years_catname');
             $carTypeCatname = $this->params('shape_catname');
             $mostCatname = $this->params('most_catname');
 
-            $data = $service->getData([
+            $data = $this->mosts->getData([
                 'language' => $language,
                 'most'     => $mostCatname,
                 'years'    => $yearsCatname,
@@ -2150,10 +2137,9 @@ class CatalogueController extends AbstractActionController
             $imageStorage = $this->imageStorage();
             $imagesInfo = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb');
 
-            $pictureTable = new DbTable\Picture();
-            $names = $pictureTable->getNameData($allPictures, [
+            $names = $this->pictureTable->getNameData($allPictures, [
                 'language' => $language
-            ], $this->perspective);
+            ]);
 
             $idx = 0;
             foreach ($data['carList']['cars'] as &$car) {
@@ -2225,6 +2211,7 @@ class CatalogueController extends AbstractActionController
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                        'pictureTable'         => $this->pictureTable,
                         'perspective'          => $this->perspective,
                         'type'                 => null,
                         'onlyExactlyPictures'  => false,

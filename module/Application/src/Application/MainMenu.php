@@ -3,7 +3,6 @@
 namespace Application;
 
 use Zend\Cache\Storage\StorageInterface;
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
@@ -79,8 +78,8 @@ class MainMenu
         $translator,
         LanguagePicker $languagePicker,
         MessageService $message,
-        Adapter $adapter,
-        Categories $categories
+        Categories $categories,
+        TableGateway $pageTable
     ) {
 
         $this->router = $router;
@@ -88,7 +87,7 @@ class MainMenu
         $this->hosts = $hosts;
         $this->cache = $cache;
 
-        $this->pageTable = new TableGateway('pages', $adapter);
+        $this->pageTable = $pageTable;
 
         $this->translator = $translator;
         $this->languagePicker = $languagePicker;

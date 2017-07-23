@@ -14,7 +14,6 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Contact;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Picture;
 use Application\Model\UserAccount;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
@@ -75,6 +74,11 @@ class UsersService
     private $userAccount;
 
     /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    /**
      * @return Comments\CommentsService
      */
     private function getTable()
@@ -94,7 +98,8 @@ class UsersService
         Comments\CommentsService $comments,
         UserItemSubscribe $userItemSubscribe,
         Contact $contact,
-        UserAccount $userAccount
+        UserAccount $userAccount,
+        DbTable\Picture $pictureTable
     ) {
 
         $this->salt = $options['salt'];
@@ -111,6 +116,7 @@ class UsersService
         $this->userItemSubscribe = $userItemSubscribe;
         $this->contact = $contact;
         $this->userAccount = $userAccount;
+        $this->pictureTable = $pictureTable;
     }
 
     /**
@@ -365,13 +371,12 @@ class UsersService
             $age = ((($diff / 60) / 60) / 24) / 365;
         }
 
-        $pictureTable = new Picture();
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
         $picturesExists = $db->fetchOne(
             $db->select()
-                ->from($pictureTable->info('name'), [new Zend_Db_Expr('COUNT(1)')])
+                ->from($this->pictureTable->info('name'), [new Zend_Db_Expr('COUNT(1)')])
                 ->where('owner_id = ?', $userRow->id)
-                ->where('status = ?', Picture::STATUS_ACCEPTED)
+                ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
         );
 
         $value = round($default + $avgVote + $age + $picturesExists / 100);

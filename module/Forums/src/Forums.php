@@ -39,12 +39,13 @@ class Forums
 
     public function __construct(
         Comments\CommentsService $comments,
-        Adapter $adapter
+        TableGateway $themeTable,
+        TableGateway $topicTable
     ) {
         $this->comments = $comments;
 
-        $this->themeTable = new TableGateway('forums_themes', $adapter);
-        $this->topicTable = new TableGateway('forums_topics', $adapter);
+        $this->themeTable = $themeTable;
+        $this->topicTable = $topicTable;
     }
 
     public function getThemeList($themeId, $isModerator)

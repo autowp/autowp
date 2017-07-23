@@ -51,6 +51,11 @@ class Picture extends Table
     private $pictureModerVote;
 
     /**
+     * @var Perspective
+     */
+    private $perspective;
+
+    /**
      * setOptions()
      *
      * @param array $options
@@ -66,6 +71,11 @@ class Picture extends Table
         if (isset($options['pictureModerVote'])) {
             $this->pictureModerVote = $options['pictureModerVote'];
             unset($options['pictureModerVote']);
+        }
+
+        if (isset($options['perspective'])) {
+            $this->perspective = $options['perspective'];
+            unset($options['perspective']);
         }
     }
 
@@ -104,7 +114,7 @@ class Picture extends Table
         return $result;
     }
 
-    public function getNameData($rows, array $options = [], Perspective $perspective)
+    public function getNameData($rows, array $options = [])
     {
         $result = [];
 
@@ -175,7 +185,7 @@ class Picture extends Table
             }
         }
 
-        $perspectives = $perspective->getOnlyPairs($perspectiveIds);
+        $perspectives = $this->perspective->getOnlyPairs($perspectiveIds);
 
         foreach ($rows as $index => $row) {
             if ($row['name']) {

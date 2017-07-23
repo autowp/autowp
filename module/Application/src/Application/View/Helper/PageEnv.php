@@ -4,7 +4,6 @@ namespace Application\View\Helper;
 
 use Application\Language as AppLanguage;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\View\Helper\AbstractHelper;
 
@@ -25,9 +24,9 @@ class PageEnv extends AbstractHelper
      */
     private $language = 'en';
 
-    public function __construct(AppLanguage $language, Adapter $adapter)
+    public function __construct(AppLanguage $language, TableGateway $pageTable)
     {
-        $this->pageTable = new TableGateway('pages', $adapter);
+        $this->pageTable = $pageTable;
 
         $this->language = $language->getLanguage();
     }

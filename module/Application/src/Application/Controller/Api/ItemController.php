@@ -1361,29 +1361,6 @@ class ItemController extends AbstractRestfulController
                         $changes[] = sprintf($message, $old ? $old['short_name'] : '-', $new ? $new['short_name'] : '-');
                     }
                     break;
-
-                /*case 'vehicle_type_id':
-                    $vehicleTypeTable = new DbTable\Vehicle\Type();
-                    $old = $oldData[$field];
-                    $new = $newData[$field];
-                    $old = $old ? (array)$old : [];
-                    $new = $new ? (array)$new : [];
-                    if (array_diff($old, $new) !== array_diff($new, $old)) {
-                        $oldNames = [];
-                        foreach ($vehicleTypeTable->find($old) as $row) {
-                            $oldNames[] = $this->translate($row->name);
-                        }
-                        $newNames = [];
-                        foreach ($vehicleTypeTable->find($new) as $row) {
-                            $newNames[] = $this->translate($row->name);
-                        }
-                        $changes[] = sprintf(
-                            $message,
-                            $oldNames ? implode(', ', $oldNames) : '-',
-                            $newNames ? implode(', ', $newNames) : '-'
-                            );
-                    }
-                    break;*/
             }
         }
 

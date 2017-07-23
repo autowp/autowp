@@ -2,7 +2,6 @@
 
 namespace Application\Controller;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -41,21 +40,35 @@ class IndexController extends AbstractActionController
      */
     private $perspective;
 
+    /**
+     * @var Twins
+     */
+    private $twins;
+
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         $cache,
         SpecificationsService $specsService,
         CarOfDay $carOfDay,
         Categories $categories,
-        Adapter $adapter,
-        Perspective $perspective
+        Perspective $perspective,
+        Twins $twins,
+        DbTable\Picture $pictureTable,
+        TableGateway $itemTable
     ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->carOfDay = $carOfDay;
         $this->categories = $categories;
         $this->perspective = $perspective;
+        $this->twins = $twins;
+        $this->pictureTable = $pictureTable;
 
-        $this->itemTable = new TableGateway('item', $adapter);
+        $this->itemTable = $itemTable;
     }
 
     private function brands()
@@ -169,12 +182,11 @@ class IndexController extends AbstractActionController
 
     public function indexAction()
     {
-        $pictures = $this->catalogue()->getPictureTable();
         $itemTable = $this->catalogue()->getItemTable();
 
         $language = $this->language();
 
-        $select = $pictures->select(true)
+        $select = $this->pictureTable->select(true)
             ->where('pictures.accept_datetime > DATE_SUB(CURDATE(), INTERVAL 3 DAY)')
             ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
             ->order(['pictures.accept_datetime DESC', 'pictures.id DESC'])
@@ -204,9 +216,7 @@ class IndexController extends AbstractActionController
         $cacheKey = 'INDEX_INTERESTS_TWINS_BLOCK_27_' . $language;
         $twinsBlock = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $twins = new Twins();
-
-            $twinsBrands = $twins->getBrands([
+            $twinsBrands = $this->twins->getBrands([
                 'language' => $language,
                 'limit'    => 20
             ]);
@@ -220,7 +230,7 @@ class IndexController extends AbstractActionController
 
             $twinsBlock = [
                 'brands'     => $twinsBrands,
-                'more_count' => $twins->getTotalBrandsCount()
+                'more_count' => $this->twins->getTotalBrandsCount()
             ];
 
             $this->cache->setItem($cacheKey, $twinsBlock);
@@ -248,6 +258,7 @@ class IndexController extends AbstractActionController
 
         $specsCars = $this->car()->listData($cars, [
             'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                'pictureTable'         => $this->pictureTable,
                 'perspective'          => $this->perspective,
                 'type'                 => null,
                 'onlyExactlyPictures'  => false,

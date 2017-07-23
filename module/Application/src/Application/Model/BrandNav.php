@@ -39,12 +39,18 @@ class BrandNav
      */
     private $itemAlias;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         StorageInterface $cache,
         TranslatorInterface $translator,
         TreeRouteStack $router,
         ItemParent $itemParent,
-        ItemAlias $itemAlias
+        ItemAlias $itemAlias,
+        DbTable\Picture $pictureTable
     ) {
 
         $this->cache = $cache;
@@ -52,6 +58,7 @@ class BrandNav
         $this->router = $router;
         $this->itemParent = $itemParent;
         $this->itemAlias = $itemAlias;
+        $this->pictureTable = $pictureTable;
     }
 
     public function getMenu(array $params)
@@ -127,8 +134,7 @@ class BrandNav
             '9'
         ]);
 
-        $picturesTable = new DbTable\Picture;
-        $picturesAdapter = $picturesTable->getAdapter();
+        $picturesAdapter = $this->pictureTable->getAdapter();
 
         $groups = $this->cache->getItem($cacheKey, $success);
         if (! $success) {

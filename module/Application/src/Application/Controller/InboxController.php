@@ -13,6 +13,16 @@ class InboxController extends AbstractActionController
     const PER_PAGE = 18;
     const BRAND_ALL = 'all';
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    public function __construct(DbTable\Picture $pictureTable)
+    {
+        $this->pictureTable = $pictureTable;
+    }
+
     private function getBrandControl($brand = null)
     {
         $brandModel = new BrandModel();
@@ -71,9 +81,7 @@ class InboxController extends AbstractActionController
 
         $brand = $brandModel->getBrandByCatname($this->params('brand'), $language);
 
-        $pictureTable = new DbTable\Picture();
-
-        $select = $pictureTable->select(true)
+        $select = $this->pictureTable->select(true)
             ->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX);
         if ($brand) {
             $select

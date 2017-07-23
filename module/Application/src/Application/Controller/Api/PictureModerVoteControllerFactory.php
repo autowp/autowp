@@ -12,13 +12,15 @@ class PictureModerVoteControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new PictureModerVoteController(
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class),
             $container->get(\Application\HostManager::class),
             $container->get(\Autowp\Message\MessageService::class),
             $container->get('ModerPictureVoteForm2'),
             $container->get(\Application\Model\UserPicture::class),
-            $container->get(\Application\Model\PictureModerVote::class)
+            $container->get(\Application\Model\PictureModerVote::class),
+            $container->get(\Application\Model\DbTable\Picture::class),
+            $tables->get('picture_moder_vote_template')
         );
     }
 }

@@ -10,7 +10,6 @@ use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Item\PictureFetcher;
-use Application\Model\Perspective;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Application\ItemNameFormatter;
@@ -52,30 +51,32 @@ class Car extends AbstractPlugin
     private $itemModel;
 
     /**
-     * @var Perspective
-     */
-    private $perspective;
-
-    /**
      * @var ItemParent
      */
     private $itemParent;
+
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
 
     public function __construct(
         TextStorage $textStorage,
         SpecificationsService $specsService,
         ItemNameFormatter $itemNameFormatter,
         Item $itemModel,
-        Perspective $perspective,
-        ItemParent $itemParent
+        ItemParent $itemParent,
+        DbTable\Picture $pictureTable,
+        Twins $twins
     ) {
 
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->itemModel = $itemModel;
-        $this->perspective = $perspective;
         $this->itemParent = $itemParent;
+        $this->pictureTable = $pictureTable;
+        $this->twins = $twins;
     }
 
     private function getCarLanguageTable()
@@ -83,16 +84,6 @@ class Car extends AbstractPlugin
         return $this->carLangTable
             ? $this->carLangTable
             : $this->carLangTable = new DbTable\Item\Language();
-    }
-
-    /**
-     * @return Twins
-     */
-    private function getTwins()
-    {
-        return $this->twins
-            ? $this->twins
-            : $this->twins = new Twins();
     }
 
     /**
@@ -108,6 +99,7 @@ class Car extends AbstractPlugin
         return $this->categoryPictureFetcher
             ? $this->categoryPictureFetcher
             : $this->categoryPictureFetcher = new \Application\Model\Item\DistinctItemPictureFetcher([
+                'pictureTable' => $this->pictureTable,
                 'dateSort' => false
             ]);
     }
@@ -142,7 +134,6 @@ class Car extends AbstractPlugin
         $language = $controller->language();
         $catalogue = $controller->catalogue();
 
-        $pictureTable = $this->getPictureTable();
         $itemTable = new DbTable\Item();
         $itemLanguageTable = new DbTable\Item\Language();
 
@@ -204,7 +195,7 @@ class Car extends AbstractPlugin
         if ($carIds && ! $disableTwins) {
             $carsTwinsGroups = [];
 
-            foreach ($this->getTwins()->getCarsGroups($carIds) as $carId => $twinsGroups) {
+            foreach ($this->twins->getCarsGroups($carIds) as $carId => $twinsGroups) {
                 $carsTwinsGroups[$carId] = [];
                 foreach ($twinsGroups as $twinsGroup) {
                     $carsTwinsGroups[$carId][] = [
@@ -465,9 +456,9 @@ class Car extends AbstractPlugin
 
 
         // prefetch names
-        $pictureNames = $pictureTable->getNameData($allPictures, [
+        $pictureNames = $this->pictureTable->getNameData($allPictures, [
             'language' => $language
-        ], $this->perspective);
+        ]);
 
         // prefetch images
         $imagesInfo = [];
@@ -536,11 +527,6 @@ class Car extends AbstractPlugin
         }
 
         return $result;
-    }
-
-    private function getPictureTable()
-    {
-        return $this->getController()->catalogue()->getPictureTable();
     }
 
     public function formatName(\Autowp\Commons\Db\Table\Row $vehicle, $language)

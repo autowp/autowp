@@ -12,11 +12,6 @@ class Item extends Table
 
     protected $_name = 'item';
     protected $_referenceMap = [
-        'Type' => [
-            'columns'       => ['car_type_id'],
-            'refTableClass' => Vehicle\Type::class,
-            'refColumns'    => ['id']
-        ],
         'Meta_Last_Editor' => [
             'columns'       => ['meta_last_editor_id'],
             'refTableClass' => User::class,

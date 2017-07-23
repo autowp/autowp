@@ -77,6 +77,11 @@ class ItemParentController extends AbstractRestfulController
      */
     private $itemModel;
 
+    /**
+     * @var VehicleType
+     */
+    private $vehicleType;
+
     public function __construct(
         RestHydrator $hydrator,
         InputFilter $listInputFilter,
@@ -88,7 +93,8 @@ class ItemParentController extends AbstractRestfulController
         HostManager $hostManager,
         MessageService $message,
         UserItemSubscribe $userItemSubscribe,
-        Item $itemModel
+        Item $itemModel,
+        VehicleType $vehicleType
     ) {
         $this->hydrator = $hydrator;
         $this->listInputFilter = $listInputFilter;
@@ -104,6 +110,7 @@ class ItemParentController extends AbstractRestfulController
         $this->message = $message;
         $this->userItemSubscribe = $userItemSubscribe;
         $this->itemModel = $itemModel;
+        $this->vehicleType = $vehicleType;
     }
 
     public function indexAction()
@@ -288,8 +295,7 @@ class ItemParentController extends AbstractRestfulController
 
         $this->itemModel->updateInteritance($item);
 
-        $vehicleType = new VehicleType();
-        $vehicleType->refreshInheritanceFromParents($item->id);
+        $this->vehicleType->refreshInheritanceFromParents($item->id);
 
         $this->specificationsService->updateActualValues($item->id);
 
@@ -485,8 +491,7 @@ class ItemParentController extends AbstractRestfulController
 
         $this->itemModel->updateInteritance($item);
 
-        $vehicleType = new VehicleType();
-        $vehicleType->refreshInheritanceFromParents($item->id);
+        $this->vehicleType->refreshInheritanceFromParents($item->id);
 
         $this->specificationsService->updateActualValues($item->id);
 

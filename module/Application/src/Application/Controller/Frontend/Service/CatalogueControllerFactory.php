@@ -26,7 +26,10 @@ class CatalogueControllerFactory implements FactoryInterface
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get(\Application\Model\Item::class),
             $container->get(\Application\Model\Perspective::class),
-            $tables->get('links')
+            $tables->get('links'),
+            $container->get(\Application\Service\Mosts::class),
+            $container->get(\Application\Model\VehicleType::class),
+            $container->get(\Application\Model\DbTable\Picture::class)
         );
     }
 }

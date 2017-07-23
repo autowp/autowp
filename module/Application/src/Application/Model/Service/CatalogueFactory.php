@@ -12,9 +12,10 @@ class CatalogueFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new \Application\Model\Catalogue(
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class),
-            $container->get(\Application\Model\ItemParent::class)
+            $container->get(\Application\Model\ItemParent::class),
+            $tables->get('item')
         );
     }
 }

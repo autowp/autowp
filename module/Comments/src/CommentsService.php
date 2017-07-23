@@ -5,7 +5,6 @@ namespace Autowp\Comments;
 use Autowp\Commons\Db\Table;
 use Autowp\User\Model\DbTable\User;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator\Paginator;
@@ -13,11 +12,6 @@ use Zend\Paginator\Paginator;
 class CommentsService
 {
     const DELETE_TTL_DAYS = 300;
-
-    /**
-     * @var Adapter
-     */
-    private $adapter;
 
     /**
      * @var TableGateway
@@ -49,15 +43,18 @@ class CommentsService
      */
     private $topicSubscribeTable;
 
-    public function __construct(Adapter $adapter)
-    {
-        $this->adapter = $adapter;
-
-        $this->voteTable = new TableGateway('comment_vote', $this->adapter);
-        $this->topicTable = new TableGateway('comment_topic', $this->adapter);
-        $this->messageTable = new TableGateway('comment_message', $this->adapter);
-        $this->topicViewTable = new TableGateway('comment_topic_view', $this->adapter);
-        $this->topicSubscribeTable = new TableGateway('comment_topic_subscribe', $this->adapter);
+    public function __construct(
+        TableGateway $voteTable,
+        TableGateway $topicTable,
+        TableGateway $messageTable,
+        TableGateway $topicViewTable,
+        TableGateway $topicSubscribeTable
+    ) {
+        $this->voteTable = $voteTable;
+        $this->topicTable = $topicTable;
+        $this->messageTable = $messageTable;
+        $this->topicViewTable = $topicViewTable;
+        $this->topicSubscribeTable = $topicSubscribeTable;
     }
 
     /**

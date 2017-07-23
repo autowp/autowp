@@ -14,8 +14,10 @@ class ArticlesControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+            $tables->get('articles'),
+            $tables->get('htmls')
         );
     }
 }

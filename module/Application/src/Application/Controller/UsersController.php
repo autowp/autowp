@@ -58,6 +58,11 @@ class UsersController extends AbstractActionController
      */
     private $userAccount;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         $cache,
         TrafficControl $trafficControl,
@@ -65,7 +70,8 @@ class UsersController extends AbstractActionController
         Contact $contact,
         UserRename $userRename,
         Perspective $perspective,
-        UserAccount $userAccount
+        UserAccount $userAccount,
+        DbTable\Picture $pictureTable
     ) {
         $this->cache = $cache;
         $this->trafficControl = $trafficControl;
@@ -74,6 +80,7 @@ class UsersController extends AbstractActionController
         $this->userRename = $userRename;
         $this->perspective = $perspective;
         $this->userAccount = $userAccount;
+        $this->pictureTable = $pictureTable;
     }
 
     private function getUser()
@@ -128,8 +135,7 @@ class UsersController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $pictureTable = $this->catalogue()->getPictureTable();
-        $pictureAdapter = $pictureTable->getAdapter();
+        $pictureAdapter = $this->pictureTable->getAdapter();
         $picturesExists = $pictureAdapter->fetchOne(
             $pictureAdapter->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
@@ -137,19 +143,18 @@ class UsersController extends AbstractActionController
                 ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
         );
 
-        $pictureTable = $this->catalogue()->getPictureTable();
-        $lastPictureRows = $pictureTable->fetchAll(
-            $pictureTable->select()
+        $lastPictureRows = $this->pictureTable->fetchAll(
+            $this->pictureTable->select()
                 ->from('pictures')
                 ->where('owner_id = ?', $user->id)
                 ->order('id DESC')
                 ->limit(12)
         );
 
-        $names = $pictureTable->getNameData($lastPictureRows, [
+        $names = $this->pictureTable->getNameData($lastPictureRows, [
             'language' => $this->language(),
             'large'    => true
-        ], $this->perspective);
+        ]);
 
         $lastPictures = [];
         foreach ($lastPictureRows as $lastPictureRow) {
@@ -270,8 +275,7 @@ class UsersController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $pictures = $this->catalogue()->getPictureTable();
-        $select = $pictures->select(true)
+        $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
             ->where('pictures.owner_id = ?', $user->id)

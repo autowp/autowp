@@ -2,14 +2,13 @@
 
 namespace Autowp\Votings;
 
-use Zend\Db\Adapter\Adapter;
+use DateTime;
+
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\Commons\Db\Table;
 use Autowp\User\Model\DbTable\User;
-
-use DateTime;
 
 class Votings
 {
@@ -28,11 +27,14 @@ class Votings
      */
     private $voteTable;
 
-    public function __construct(Adapter $adapter)
-    {
-        $this->votingTable = new TableGateway('voting', $adapter);
-        $this->variantTable = new TableGateway('voting_variant', $adapter);
-        $this->voteTable = new TableGateway('voting_variant_vote', $adapter);
+    public function __construct(
+        TableGateway $votingTable,
+        TableGateway $variantTable,
+        TableGateway $voteTable
+    ) {
+        $this->votingTable = $votingTable;
+        $this->variantTable = $variantTable;
+        $this->voteTable = $voteTable;
     }
 
     private function canVote($voting, $userId)

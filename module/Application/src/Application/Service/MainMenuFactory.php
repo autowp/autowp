@@ -14,6 +14,7 @@ class MainMenuFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new MainMenu(
             $container->get('HttpRouter'),
             $container->get(\Application\Language::class),
@@ -22,8 +23,8 @@ class MainMenuFactory implements FactoryInterface
             $container->get('MvcTranslator'),
             $container->get(\Application\LanguagePicker::class),
             $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class),
-            $container->get(\Application\Model\Categories::class)
+            $container->get(\Application\Model\Categories::class),
+            $tables->get('pages')
         );
     }
 }

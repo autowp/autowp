@@ -29,12 +29,21 @@ class Item
      */
     private $itemPointTable;
 
-    public function __construct(TableGateway $specTable, TableGateway $itemPointTable)
-    {
+    /**
+     * @var TableGateway
+     */
+    private $vehicleTypeParentTable;
+
+    public function __construct(
+        TableGateway $specTable,
+        TableGateway $itemPointTable,
+        TableGateway $vehicleTypeParentTable
+    ) {
         $this->specTable = $specTable;
 
         $this->itemTable = new DbTable\Item();
         $this->itemPointTable = $itemPointTable;
+        $this->vehicleTypeParentTable = $vehicleTypeParentTable;
     }
 
     public function getEngineVehiclesGroups(int $engineId, array $options = [])
@@ -370,6 +379,28 @@ class Item
         return true;
     }
 
+    private function getChildVehicleTypesByWhitelist($parentId, array $whitelist): array
+    {
+        if (count($whitelist) <= 0) {
+            return [];
+        }
+
+        $select = new Sql\Select($this->vehicleTypeParentTable->getTable());
+        $select->columns(['id'])
+            ->where([
+                new Sql\Predicate\In('id', $whitelist),
+                'parent_id' => $parentId,
+                'id <> parent_id'
+            ]);
+
+        $result = [];
+        foreach ($this->vehicleTypeParentTable->selectWith($select) as $row) {
+            $result[] = (int)$row['id'];
+        }
+
+        return $result;
+    }
+
     public function updateInteritance(\Autowp\Commons\Db\Table\Row $car)
     {
         $parents = $this->itemTable->fetchAll(
@@ -440,28 +471,17 @@ class Item
                 }
             }
 
-            $carTypeParentTable = new DbTable\Vehicle\TypeParent();
-            $carTypeParentTableName = $carTypeParentTable->info('name');
-            $db = $carTypeParentTable->getAdapter();
             foreach ($map as $id => $count) {
                 $otherIds = array_diff(array_keys($map), [$id]);
 
-                if (count($otherIds)) {
-                    $isParentOf = $db->fetchCol(
-                        $db->select()
-                        ->from($carTypeParentTableName, 'id')
-                        ->where('id in (?)', $otherIds)
-                        ->where('parent_id = ?', $id)
-                        ->where('id <> parent_id')
-                    );
+                $isParentOf = $this->getChildVehicleTypesByWhitelist($id, $otherIds);
 
-                    if (count($isParentOf)) {
-                        foreach ($isParentOf as $childId) {
-                            $map[$childId] += $count;
-                        }
-
-                        unset($map[$id]);
+                if (count($isParentOf)) {
+                    foreach ($isParentOf as $childId) {
+                        $map[$childId] += $count;
                     }
+
+                    unset($map[$id]);
                 }
             }
 

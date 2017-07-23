@@ -10,14 +10,14 @@ use Zend_Db_Expr;
 abstract class PictureFetcher
 {
     /**
-     * @var DbTable\Picture
-     */
-    private $pictureTable;
-
-    /**
      * @var boolean
      */
     protected $dateSort;
+
+    /**
+     * @var DbTable\Picture
+     */
+    protected $pictureTable;
 
     abstract public function fetch(array $item, array $options = []);
 
@@ -45,14 +45,11 @@ abstract class PictureFetcher
         return $this;
     }
 
-    /**
-     * @return DbTable\Picture
-     */
-    protected function getPictureTable()
+    public function setPictureTable(DbTable\Picture $table) //
     {
-        return $this->pictureTable
-            ? $this->pictureTable
-            : $this->pictureTable = new DbTable\Picture();
+        $this->pictureTable = $table;
+
+        return $this;
     }
 
     protected function getPictureSelect($itemId, array $options)
@@ -71,11 +68,10 @@ abstract class PictureFetcher
         ];
         $options = array_merge($defaults, $options);
 
-        $pictureTable = $this->getPictureTable();
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
         $select = $db->select()
             ->from(
-                $pictureTable->info('name'),
+                $this->pictureTable->info('name'),
                 [
                     'id', 'name',
                     'image_id', 'crop_left', 'crop_top',
@@ -180,21 +176,20 @@ abstract class PictureFetcher
             $result[$itemId] = null;
         }
         if (count($itemIds)) {
-            $pictureTable = $this->getPictureTable();
-            $pictureTableAdapter = $pictureTable->getAdapter();
+            $pictureTableAdapter = $this->pictureTable->getAdapter();
 
             $select = $pictureTableAdapter->select()
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
 
             if ($onlyExactly) {
                 $select
-                    ->from($pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
+                    ->from($this->pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->where('picture_item.item_id IN (?)', $itemIds)
                     ->group('picture_item.item_id');
             } else {
                 $select
-                    ->from($pictureTable->info('name'), ['item_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
+                    ->from($this->pictureTable->info('name'), ['item_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id IN (?)', $itemIds)

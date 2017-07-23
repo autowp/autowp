@@ -2,18 +2,15 @@
 
 namespace Application\Controller;
 
+use geoPHP;
+use LineString;
+use Point;
+use Polygon;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
 use Application\ItemNameFormatter;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Museum;
-use Application\Model\DbTable\Picture;
-
-use geoPHP;
-use LineString;
-use Point;
-use Polygon;
 
 class MapController extends AbstractActionController
 {
@@ -63,7 +60,7 @@ class MapController extends AbstractActionController
 
         $pointsOnly = (bool)$this->params()->fromQuery('points-only', 14);
 
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
 
         $language = $this->language();
 

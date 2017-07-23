@@ -35,24 +35,29 @@ class NewController extends AbstractActionController
      */
     private $itemModel;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
         SpecificationsService $specsService,
-        Item $itemModel
+        Item $itemModel,
+        DbTable\Picture $pictureTable
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->specsService = $specsService;
         $this->itemModel = $itemModel;
+        $this->pictureTable = $pictureTable;
     }
 
     public function indexAction()
     {
-        $pictureTable = new DbTable\Picture();
-
         $service = new DayPictures([
             'timezone'     => $this->user()->timezone(),
             'dbTimezone'   => MYSQL_TIMEZONE,
-            'select'       => $pictureTable->select(true)
+            'select'       => $this->pictureTable->select(true)
             ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED),
             'orderColumn'  => 'accept_datetime',
             'currentDate'  => $this->params('date'),
@@ -187,7 +192,8 @@ class NewController extends AbstractActionController
                     'disableDetailsLink' => true,
                     'disableSpecs'       => true,
                     'pictureFetcher' => new \Application\Model\Item\NewPictureFetcher([
-                        'pictureIds' => $ids
+                        'pictureTable' => $this->pictureTable,
+                        'pictureIds'   => $ids
                     ]),
                     'listBuilder' => new \Application\Model\Item\ListBuilder\NewPicturesListBuilder([
                         'date'         => $currentDateStr,
@@ -243,9 +249,7 @@ class NewController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $pictureTable = new DbTable\Picture();
-
-        $select = $pictureTable->select(true)
+        $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->where('picture_item.item_id = ?', $item['id'])
             ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);

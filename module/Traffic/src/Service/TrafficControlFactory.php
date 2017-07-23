@@ -12,8 +12,11 @@ class TrafficControlFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new \Autowp\Traffic\TrafficControl(
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+            $tables->get('banned_ip'),
+            $tables->get('ip_whitelist'),
+            $tables->get('ip_monitoring4')
         );
     }
 }

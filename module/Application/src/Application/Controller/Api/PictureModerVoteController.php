@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -43,20 +42,27 @@ class PictureModerVoteController extends AbstractRestfulController
      */
     private $pictureModerVote;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
-        Adapter $adapter,
         HostManager $hostManager,
         MessageService $message,
         Form $voteForm,
         UserPicture $userPicture,
-        PictureModerVote $pictureModerVote
+        PictureModerVote $pictureModerVote,
+        DbTable\Picture $pictureTable,
+        TableGateway $templateTable
     ) {
         $this->hostManager = $hostManager;
         $this->message = $message;
         $this->voteForm = $voteForm;
-        $this->templateTable = new TableGateway('picture_moder_vote_template', $adapter);
+        $this->templateTable = $templateTable;
         $this->userPicture = $userPicture;
         $this->pictureModerVote = $pictureModerVote;
+        $this->pictureTable = $pictureTable;
     }
 
     private function pictureUrl(DbTable\Picture\Row $picture, $forceCanonical = false, $uri = null)
@@ -162,8 +168,7 @@ class PictureModerVoteController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $pictureTable = new DbTable\Picture();
-        $picture = $pictureTable->find($id)->current();
+        $picture = $this->pictureTable->find($id)->current();
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -238,8 +243,7 @@ class PictureModerVoteController extends AbstractRestfulController
      */
     public function delete($id)
     {
-        $pictureTable = new DbTable\Picture();
-        $picture = $pictureTable->find($id)->current();
+        $picture = $this->pictureTable->find($id)->current();
         if (! $picture) {
             return $this->notFoundAction();
         }

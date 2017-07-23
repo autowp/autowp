@@ -59,7 +59,7 @@ return [
             Controller\Api\StatController::class            => InvokableFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
             Controller\Api\UserController::class            => Controller\Api\Service\UserControllerFactory::class,
-            Controller\Api\VehicleTypesController::class    => InvokableFactory::class,
+            Controller\Api\VehicleTypesController::class    => Controller\Api\VehicleTypesControllerFactory::class
         ]
     ],
     'input_filter_specs' => [

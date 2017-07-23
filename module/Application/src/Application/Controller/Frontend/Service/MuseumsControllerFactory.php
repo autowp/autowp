@@ -18,7 +18,8 @@ class MuseumsControllerFactory implements FactoryInterface
         return new Controller(
             $container->get(\Autowp\TextStorage\Service::class),
             $tables->get('links'),
-            $container->get(\Application\Model\Item::class)
+            $container->get(\Application\Model\Item::class),
+            $container->get(\Application\Model\DbTable\Picture::class)
         );
     }
 }

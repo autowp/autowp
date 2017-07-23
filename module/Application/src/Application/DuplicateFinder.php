@@ -2,7 +2,6 @@
 
 namespace Application;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\Exception\InvalidQueryException;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
@@ -26,11 +25,10 @@ class DuplicateFinder
      */
     private $distanceTable;
 
-    public function __construct(Adapter $adapter)
+    public function __construct(TableGateway $hashTable, TableGateway $distanceTable)
     {
-        $this->adapter = $adapter;
-        $this->hashTable = new TableGateway('df_hash', $this->adapter);
-        $this->distanceTable = new TableGateway('df_distance', $this->adapter);
+        $this->hashTable = $hashTable;
+        $this->distanceTable = $distanceTable;
     }
 
     public function indexImage($id, $filepath)

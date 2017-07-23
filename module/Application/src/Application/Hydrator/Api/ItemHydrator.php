@@ -74,6 +74,11 @@ class ItemHydrator extends RestHydrator
     private $pictureTable;
 
     /**
+     * @var DbTable\Picture
+     */
+    private $pictureTableZf1;
+
+    /**
      * @var TableGateway
      */
     private $linkTable;
@@ -114,6 +119,8 @@ class ItemHydrator extends RestHydrator
         $this->itemLanguageTable = $tables->get('item_language');
         $this->itemTableGateway = $tables->get('item');
         $this->specTable = $tables->get('spec');
+
+        $this->pictureTableZf1 = $serviceManager->get(DbTable\Picture::class);
 
         $this->perspective = $serviceManager->get(Perspective::class);
         $this->userItemSubscribe = $serviceManager->get(UserItemSubscribe::class);
@@ -370,6 +377,7 @@ class ItemHydrator extends RestHydrator
 
         if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
             $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
+                'pictureTable'         => $this->pictureTableZf1,
                 'perspective'          => $this->perspective,
                 'type'                 => null,
                 'onlyExactlyPictures'  => $onlyExactlyPictures,

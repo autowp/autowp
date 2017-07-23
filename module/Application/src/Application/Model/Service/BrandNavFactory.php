@@ -19,7 +19,8 @@ class BrandNavFactory implements FactoryInterface
             $container->get('MvcTranslator'),
             $container->get('HttpRouter'),
             $container->get(\Application\Model\ItemParent::class),
-            $container->get(\Application\Model\ItemAlias::class)
+            $container->get(\Application\Model\ItemAlias::class),
+            $container->get(\Application\Model\DbTable\Picture::class)
         );
     }
 }

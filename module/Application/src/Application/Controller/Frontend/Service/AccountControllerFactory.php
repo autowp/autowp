@@ -28,7 +28,8 @@ class AccountControllerFactory implements FactoryInterface
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Autowp\User\Model\UserRename::class),
-            $container->get(\Application\Model\UserAccount::class)
+            $container->get(\Application\Model\UserAccount::class),
+            $container->get(\Application\Model\DbTable\Picture::class)
         );
     }
 }

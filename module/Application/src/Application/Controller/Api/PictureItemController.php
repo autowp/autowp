@@ -39,12 +39,14 @@ class PictureItemController extends AbstractRestfulController
         PictureItem $pictureItem,
         Log $log,
         RestHydrator $hydrator,
-        InputFilter $itemInputFilter
+        InputFilter $itemInputFilter,
+        DbTable\Picture $pictureTable
     ) {
         $this->pictureItem = $pictureItem;
         $this->log = $log;
         $this->hydrator = $hydrator;
         $this->itemInputFilter = $itemInputFilter;
+        $this->pictureTable = $pictureTable;
     }
 
     private function canChangePerspective($picture)
@@ -73,8 +75,7 @@ class PictureItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $pictureTable = new DbTable\Picture();
-        $picture = $pictureTable->find($this->params('picture_id'))->current();
+        $picture = $this->pictureTable->find($this->params('picture_id'))->current();
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -113,8 +114,7 @@ class PictureItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $pictureTable = new DbTable\Picture();
-        $picture = $pictureTable->find($this->params('picture_id'))->current();
+        $picture = $this->pictureTable->find($this->params('picture_id'))->current();
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -156,9 +156,7 @@ class PictureItemController extends AbstractRestfulController
         $pictureId = (int)$this->params('picture_id');
         $itemId    = (int)$this->params('item_id');
 
-        $pictureTable = new DbTable\Picture();
-
-        $picture = $pictureTable->find($pictureId)->current();
+        $picture = $this->pictureTable->find($pictureId)->current();
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -202,9 +200,7 @@ class PictureItemController extends AbstractRestfulController
         $pictureId = (int)$this->params('picture_id');
         $itemId    = (int)$this->params('item_id');
 
-        $pictureTable = new DbTable\Picture();
-
-        $picture = $pictureTable->find($pictureId)->current();
+        $picture = $this->pictureTable->find($pictureId)->current();
         if (! $picture) {
             return $this->notFoundAction();
         }

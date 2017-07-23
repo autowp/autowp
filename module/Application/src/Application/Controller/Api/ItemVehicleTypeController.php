@@ -3,13 +3,13 @@
 namespace Application\Controller\Api;
 
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Paginator;
 use Zend\View\Model\JsonModel;
 
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
 use Application\Model\VehicleType;
-use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 
 class ItemVehicleTypeController extends AbstractRestfulController
 {
@@ -30,22 +30,16 @@ class ItemVehicleTypeController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $itemVehicleTypeTable = new DbTable\Vehicle\VehicleType();
+        $select = $this->vehicleType->getItemSelect(
+            $this->params()->fromQuery('item_id'),
+            $this->params()->fromQuery('vehicle_type_id')
+        );
 
-        $select = $itemVehicleTypeTable->select(true);
-
-        $itemId = (int)$this->params()->fromQuery('item_id');
-        if ($itemId) {
-            $select->where('vehicle_id = ?', $itemId);
-        }
-
-        $vehicleTypeId = (int)$this->params()->fromQuery('vehicle_type_id');
-        if ($vehicleTypeId) {
-            $select->where('vehicle_type_id = ?', $vehicleTypeId);
-        }
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect(
+                $select,
+                $this->vehicleType->getItemTable()->getAdapter()
+            )
         );
 
         $paginator
@@ -71,19 +65,16 @@ class ItemVehicleTypeController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $itemVehicleTypeTable = new DbTable\Vehicle\VehicleType();
-        $row = $itemVehicleTypeTable->fetchRow([
-            'vehicle_id = ?'      => (int)$this->params('item_id'),
-            'vehicle_type_id = ?' => (int)$this->params('vehicle_type_id')
-        ]);
+        $row = $this->vehicleType->getItemRow(
+            $this->params('item_id'),
+            $this->params('vehicle_type_id')
+        );
+
         if (! $row) {
             return $this->notFoundAction();
         }
 
-        return new JsonModel([
-            'item_id'         => (int)$row['vehicle_id'],
-            'vehicle_type_id' => (int)$row['vehicle_type_id'],
-        ]);
+        return new JsonModel($row);
     }
 
     public function deleteAction()
@@ -93,10 +84,10 @@ class ItemVehicleTypeController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $vehicleTypeId = (int)$this->params('vehicle_type_id');
-        $itemId        = (int)$this->params('item_id');
-
-        $this->vehicleType->removeVehicleType($itemId, $vehicleTypeId);
+        $this->vehicleType->removeVehicleType(
+            $this->params('item_id'),
+            $this->params('vehicle_type_id')
+        );
 
         return $this->getResponse()->setStatusCode(204);
     }

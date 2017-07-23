@@ -124,7 +124,8 @@ class Pic extends AbstractPlugin
         Perspective $perspective,
         UserAccount $userAccount,
         TableGateway $itemLinkTable,
-        PictureModerVote $pictureModerVote
+        PictureModerVote $pictureModerVote,
+        DbTable\Picture $pictureTable
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -142,8 +143,7 @@ class Pic extends AbstractPlugin
         $this->userAccount = $userAccount;
         $this->itemLinkTable = $itemLinkTable;
         $this->pictureModerVote = $pictureModerVote;
-
-        $this->pictureTable = new DbTable\Picture();
+        $this->pictureTable = $pictureTable;
     }
 
     public function href($row, array $options = [])
@@ -369,7 +369,7 @@ class Pic extends AbstractPlugin
         // names
         $names = $this->pictureTable->getNameData($rows, [
             'language' => $language
-        ], $this->perspective);
+        ]);
 
         // comments
         if (! $options['disableBehaviour']) {
@@ -1052,7 +1052,7 @@ class Pic extends AbstractPlugin
         $names = $this->pictureTable->getNameData([$picture->toArray()], [
             'language' => $language,
             'large'    => true
-        ], $this->perspective);
+        ]);
         $name = $names[$picture->id];
 
         $mTable = new DbTable\Modification();
@@ -1318,7 +1318,7 @@ class Pic extends AbstractPlugin
         // names
         $names = $this->pictureTable->getNameData($rows, [
             'language' => $language
-        ], $this->perspective);
+        ]);
 
         // comments
         $userId = null;
@@ -1431,7 +1431,7 @@ class Pic extends AbstractPlugin
         $names = $this->pictureTable->getNameData([$pictureRow->toArray()], [
             'language' => $language,
             'large'    => true
-        ], $this->perspective);
+        ]);
         $name = $names[$pictureRow->id];
 
         return $this->pictureNameFormatter->format($name, $language);

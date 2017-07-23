@@ -14,6 +14,8 @@ class PicturesControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Controller();
+        return new Controller(
+            $container->get(\Application\Model\DbTable\Picture::class)
+        );
     }
 }

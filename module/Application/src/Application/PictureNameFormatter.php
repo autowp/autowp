@@ -5,7 +5,6 @@ namespace Application;
 use Zend\View\Renderer\PhpRenderer;
 
 use Application\Model\DbTable;
-use Application\Model\Perspective;
 
 class PictureNameFormatter
 {
@@ -21,22 +20,27 @@ class PictureNameFormatter
      */
     private $renderer;
 
-    private static function mbUcfirst($str)
-    {
-        return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
-    }
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
 
     public function __construct(
         $translator,
         PhpRenderer $renderer,
         ItemNameFormatter $itemNameFormatter,
-        Perspective $perspective
+        DbTable\Picture $pictureTable
     ) {
 
         $this->translator = $translator;
         $this->renderer = $renderer;
         $this->itemNameFormatter = $itemNameFormatter;
-        $this->perspective = $perspective;
+        $this->pictureTable = $pictureTable;
+    }
+
+    private static function mbUcfirst($str)
+    {
+        return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
     }
 
     private function translate($string, $language)
@@ -47,11 +51,10 @@ class PictureNameFormatter
     public function format($picture, $language)
     {
         if ($picture instanceof DbTable\Picture\Row) {
-            $pictureTable = new DbTable\Picture();
-            $names = $pictureTable->getNameData([$picture->toArray()], [
+            $names = $this->pictureTable->getNameData([$picture->toArray()], [
                 'language' => $language,
                 'large'    => true
-            ], $this->perspective);
+            ]);
             $picture = $names[$picture->id];
         }
 

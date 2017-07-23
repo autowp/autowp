@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
@@ -23,9 +22,9 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
      */
     private $createInputFilter;
 
-    public function __construct(Adapter $adapter, InputFilter $createInputFilter)
+    public function __construct(InputFilter $createInputFilter, TableGateway $table)
     {
-        $this->table = new TableGateway('picture_moder_vote_template', $adapter);
+        $this->table = $table;
         $this->createInputFilter = $createInputFilter;
     }
 

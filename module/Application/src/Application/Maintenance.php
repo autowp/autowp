@@ -9,7 +9,7 @@ use Zend\Session\SessionManager;
 use Autowp\Cron;
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable\Picture;
+use Application\Model\DbTable;
 
 use Exception;
 
@@ -36,6 +36,7 @@ class Maintenance extends AbstractListenerAggregate
 
         $application = $event->getApplication();
         $serviceManager = $application->getServiceManager();
+        $pictureTable = $serviceManager->get(DbTable\Picture::class);
 
         $comments = $serviceManager->get(Comments::class);
         /* $comments->cleanBrokenMessages();
@@ -43,7 +44,7 @@ class Maintenance extends AbstractListenerAggregate
         $comments->service()->cleanTopics();*/
 
         $imageStorage = $serviceManager->get(\Autowp\Image\Storage::class);
-        $this->clearPicturesQueue($comments->service(), $imageStorage);
+        $this->clearPicturesQueue($pictureTable, $comments->service(), $imageStorage);
 
         $sessionManager = $serviceManager->get(\Zend\Session\SessionManager::class);
         $this->clearSessions($sessionManager);
@@ -99,12 +100,14 @@ class Maintenance extends AbstractListenerAggregate
         return "Garabage collected\n";
     }
 
-    private function clearPicturesQueue(\Autowp\Comments\CommentsService $comments, \Autowp\Image\Storage $imageStorage)
-    {
-        $table = new Picture();
-        $pictures = $table->fetchAll(
-            $table->select(true)
-                ->where('status = ?', Picture::STATUS_REMOVING)
+    private function clearPicturesQueue(
+        DbTable\Picture $pictureTable,
+        \Autowp\Comments\CommentsService $comments,
+        \Autowp\Image\Storage $imageStorage
+    ) {
+        $pictures = $pictureTable->fetchAll(
+            $pictureTable->select(true)
+                ->where('status = ?', DbTable\Picture::STATUS_REMOVING)
                 ->where('removing_date is null OR (removing_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY) )')
                 ->limit(1000)
         );

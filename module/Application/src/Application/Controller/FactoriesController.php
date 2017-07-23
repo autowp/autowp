@@ -33,16 +33,23 @@ class FactoriesController extends AbstractActionController
      */
     private $itemModel;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         $textStorage,
         SpecificationsService $specsService,
         Perspective $perspective,
-        Item $itemModel
+        Item $itemModel,
+        DbTable\Picture $pictureTable
     ) {
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
         $this->perspective = $perspective;
         $this->itemModel = $itemModel;
+        $this->pictureTable = $pictureTable;
     }
 
     public function indexAction()
@@ -62,9 +69,7 @@ class FactoriesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $pictureTable = new DbTable\Picture();
-
-        $select = $pictureTable->select(true)
+        $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->where('picture_item.item_id = ?', $factory->id)
             ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
@@ -86,7 +91,7 @@ class FactoriesController extends AbstractActionController
             $catalogue = $this->catalogue();
 
             foreach ($cars as $car) {
-                $select = $pictureTable->select(true)
+                $select = $this->pictureTable->select(true)
                     ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item', 'picture_item.item_id = item.id', null)
@@ -112,7 +117,7 @@ class FactoriesController extends AbstractActionController
                         ->where('cpc_oc.parent_id IN (?)', $groups[$car->id]);
                 }
 
-                $pictureRow = $pictureTable->fetchRow($select);
+                $pictureRow = $this->pictureTable->fetchRow($select);
                 $src = null;
                 if ($pictureRow) {
                     $request = $catalogue->getPictureFormatRequest($pictureRow->toArray());
@@ -211,6 +216,7 @@ class FactoriesController extends AbstractActionController
             'factory'  => $factory,
             'carsData' => $this->car()->listData($cars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'pictureTable'         => $this->pictureTable,
                     'perspective'          => $this->perspective,
                     'type'                 => null,
                     'onlyExactlyPictures'  => false,

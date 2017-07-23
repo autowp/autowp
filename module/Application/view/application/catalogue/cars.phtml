@@ -9,8 +9,8 @@
             'args'   => [
                 'BRAND_CATNAME'    => $this->brand['catname'],
                 'BRAND_NAME'       => $this->brand['name'],
-                'CAR_TYPE_NAME'    => $this->translate($this->cartype->name),
-                'CAR_TYPE_CATNAME' => $this->cartype->catname
+                'CAR_TYPE_NAME'    => $this->translate($this->cartype['name']),
+                'CAR_TYPE_CATNAME' => $this->cartype['catname']
             ]
         ]);
     } else {
@@ -30,7 +30,7 @@
 
 <ul class="nav nav-pills">
     <?php foreach ($this->cartypes as $cartype) { ?>
-        <li<?=$this->cartype && $this->cartype->id == $cartype['id'] ? ' class="active"' : '' ?>>
+        <li<?=$this->cartype && $this->cartype['id'] == $cartype['id'] ? ' class="active"' : '' ?>>
             <?=$this->htmlA(
                 $cartype['url'],
                 $this->escapeHtml($this->translate($cartype['name'])) . ' <small>('.$cartype['carsCount'].')</small>',

@@ -6,7 +6,7 @@ use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\ExifGPSExtractor;
-use Application\Model\DbTable\Picture;
+use Application\Model\DbTable;
 
 use Zend_Db_Expr;
 
@@ -15,8 +15,14 @@ use Point;
 
 class PicturesController extends AbstractActionController
 {
-    public function __construct()
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    public function __construct(DbTable\Picture $pictureTable)
     {
+        $this->pictureTable = $pictureTable;
     }
 
     public function fillPointAction()
@@ -24,9 +30,7 @@ class PicturesController extends AbstractActionController
         $console = Console::getInstance();
         $imageStorage = $this->imageStorage();
 
-        $table = new Picture();
-
-        $rows = $table->fetchAll([
+        $rows = $this->pictureTable->fetchAll([
             'point is null'
         ], 'id');
 
@@ -42,7 +46,7 @@ class PicturesController extends AbstractActionController
                 $console->writeLine("Picture " . $row->id);
 
                 $point = new Point($gps['lng'], $gps['lat']);
-                $pointExpr = new Zend_Db_Expr($table->getAdapter()->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
+                $pointExpr = new Zend_Db_Expr($$this->pictureTable->getAdapter()->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
 
                 $row->point = $pointExpr;
                 $row->save();

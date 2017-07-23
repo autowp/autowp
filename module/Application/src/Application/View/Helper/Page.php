@@ -2,7 +2,6 @@
 
 namespace Application\View\Helper;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\View\Helper\AbstractHelper;
 
@@ -13,9 +12,6 @@ class Page extends AbstractHelper
      */
     private $pageTable;
 
-    /**
-     * @var Page_Row
-     */
     private $doc;
 
     /**
@@ -28,9 +24,9 @@ class Page extends AbstractHelper
      */
     private $pages = [];
 
-    public function __construct(Adapter $adapter)
+    public function __construct(TableGateway $pageTable)
     {
-        $this->pageTable = new TableGateway('pages', $adapter);
+        $this->pageTable = $pageTable;
     }
 
     public function __invoke($value)

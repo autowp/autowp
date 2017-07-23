@@ -5,7 +5,6 @@ namespace Application\Service;
 use Exception;
 use NumberFormatter;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator\Paginator;
@@ -22,6 +21,7 @@ use Application\Model\ItemParent;
 use Application\Spec\Table\Car as CarSpecTable;
 
 use Zend_Db_Expr;
+use Application\Model\VehicleType;
 
 class SpecificationsService
 {
@@ -130,20 +130,35 @@ class SpecificationsService
      */
     private $itemParent;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    /**
+     * @var VehicleType
+     */
+    private $vehicleType;
+
     public function __construct(
         $translator,
         ItemNameFormatter $itemNameFormatter,
-        Adapter $adapter,
         Item $itemModel,
-        ItemParent $itemParent
+        ItemParent $itemParent,
+        DbTable\Picture $pictureTable,
+        VehicleType $vehicleType,
+        TableGateway $unitTable,
+        TableGateway $listOptionsTable
     ) {
         $this->translator = $translator;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->itemModel = $itemModel;
         $this->itemParent = $itemParent;
+        $this->pictureTable = $pictureTable;
+        $this->vehicleType = $vehicleType;
 
-        $this->unitTable = new TableGateway('attrs_units', $adapter);
-        $this->listOptionsTable = new TableGateway('attrs_list_options', $adapter);
+        $this->unitTable = $unitTable;
+        $this->listOptionsTable = $listOptionsTable;
     }
 
     /**
@@ -655,8 +670,7 @@ class SpecificationsService
      */
     public function getCarForm(\Autowp\Commons\Db\Table\Row $car, \Autowp\Commons\Db\Table\Row $user, array $options, $language)
     {
-        $vtTable = new \Application\Model\VehicleType();
-        $vehicleTypeIds = $vtTable->getVehicleTypes($car->id);
+        $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car->id);
 
         $zoneId = $this->zoneIdByCarTypeId($car->item_type_id, $vehicleTypeIds);
 
@@ -922,8 +936,7 @@ class SpecificationsService
      */
     public function saveCarAttributes(\Autowp\Commons\Db\Table\Row $car, array $values, \Autowp\Commons\Db\Table\Row $user)
     {
-        $vtTable = new \Application\Model\VehicleType();
-        $vehicleTypeIds = $vtTable->getVehicleTypes($car->id);
+        $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car->id);
 
         $zoneId = $this->zoneIdByCarTypeId($car->item_type_id, $vehicleTypeIds);
 
@@ -1022,8 +1035,7 @@ class SpecificationsService
 
     private function specPicture($car, $perspectives)
     {
-        $pictureTable = new DbTable\Picture();
-        $pictureTableAdapter = $pictureTable->getAdapter();
+        $pictureTableAdapter = $this->pictureTable->getAdapter();
 
         $order = [];
         if ($perspectives) {
@@ -1035,8 +1047,8 @@ class SpecificationsService
         } else {
             $order[] = 'pictures.id desc';
         }
-        return $pictureTable->fetchRow(
-            $pictureTable->select(true)
+        return $this->pictureTable->fetchRow(
+            $this->pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
@@ -1304,10 +1316,9 @@ class SpecificationsService
         $result = [];
         $attributes = [];
 
-        $vtTable = new \Application\Model\VehicleType();
         $zoneIds = [];
         foreach ($cars as $car) {
-            $vehicleTypeIds = $vtTable->getVehicleTypes($car->id);
+            $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car->id);
             $zoneId = $this->zoneIdByCarTypeId($car->item_type_id, $vehicleTypeIds);
 
             $zoneIds[$zoneId] = true;

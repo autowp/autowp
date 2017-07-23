@@ -7,10 +7,19 @@ use Zend\View\Model\JsonModel;
 
 class WidgetController extends AbstractActionController
 {
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    public function __construct(DbTable\Picture $pictureTable)
+    {
+        $this->pictureTable = $pictureTable;
+    }
+
     public function picturePreviewAction()
     {
-        $pictures = $this->catalogue()->getPictureTable();
-        $picture = $pictures->find($this->params('picture_id'))->current();
+        $picture = $this->pictureTable->find($this->params('picture_id'))->current();
 
         if (! $picture) {
             return $this->notFoundAction();

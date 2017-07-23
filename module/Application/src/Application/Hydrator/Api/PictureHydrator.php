@@ -214,7 +214,7 @@ class PictureHydrator extends RestHydrator
         if ($showNameHtml || $showNameText) {
             $nameDatas = $this->pictureTable->getNameData([$object], [
                 'language' => $this->language
-            ], $this->perspective);
+            ]);
             $nameData = $nameDatas[$object['id']];
         }
 

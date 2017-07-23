@@ -11,13 +11,21 @@ use Application\Model\DbTable;
 
 class PictureController extends AbstractActionController
 {
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    public function __construct(DbTable\Picture $pictureTable)
+    {
+        $this->pictureTable = $pictureTable;
+    }
+
     private function picture()
     {
         $identity = (string)$this->params('picture_id');
 
-        $pTable = $this->catalogue()->getPictureTable();
-
-        return $pTable->fetchRow([
+        return $this->pictureTable->fetchRow([
             'identity = ?' => $identity
         ]);
     }
@@ -41,14 +49,12 @@ class PictureController extends AbstractActionController
 
     private function getPicturesSelect(DbTable\Picture\Row $picture)
     {
-        $pictureTable = $this->catalogue()->getPictureTable();
-
         $galleryStatuses = [
             DbTable\Picture::STATUS_ACCEPTED
         ];
 
         if (in_array($picture->status, $galleryStatuses)) {
-            $picSelect = $pictureTable->select(true)
+            $picSelect = $this->pictureTable->select(true)
                 ->where('pictures.status IN (?)', $galleryStatuses)
                 ->order($this->catalogue()->picturesOrdering());
 
@@ -61,7 +67,7 @@ class PictureController extends AbstractActionController
                 )
                 ->where('pi2.picture_id = ?', $picture->id);
         } else {
-            $picSelect = $pictureTable->select(true)
+            $picSelect = $this->pictureTable->select(true)
                 ->where('pictures.id = ?', $picture->id);
         }
 

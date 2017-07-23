@@ -16,7 +16,8 @@ class AboutControllerFactory implements FactoryInterface
     {
         return new Controller(
             $container->get(\Zend\Permissions\Acl\Acl::class),
-            $container->get(\Autowp\Comments\CommentsService::class)
+            $container->get(\Autowp\Comments\CommentsService::class),
+            $container->get(\Application\Model\DbTable\Picture::class)
         );
     }
 }

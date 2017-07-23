@@ -9,7 +9,7 @@ use Zend\View\Helper\AbstractHtmlElement;
 
 use Autowp\User\Model\DbTable\User as UserTable;
 
-use Application\Model\DbTable\Picture;
+use Application\Model\DbTable;
 
 use Exception;
 
@@ -34,9 +34,15 @@ class UserText extends AbstractHtmlElement
      */
     private $router;
 
-    public function __construct($router)
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    public function __construct($router, DbTable\Picture $pictureTable)
     {
         $this->router = $router;
+        $this->pictureTable = $pictureTable;
     }
 
     public function __invoke($text)
@@ -220,9 +226,7 @@ class UserText extends AbstractHtmlElement
         }
 
         if ($pictureId) {
-            $pictureTable = new Picture();
-
-            $picture = $pictureTable->fetchRow([
+            $picture = $this->pictureTable->fetchRow([
                 'identity = ?' => $pictureId
             ]);
 

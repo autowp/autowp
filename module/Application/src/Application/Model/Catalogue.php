@@ -4,7 +4,6 @@ namespace Application\Model;
 
 use InvalidArgumentException;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -24,21 +23,6 @@ class Catalogue
     private $itemTable;
 
     /**
-     * @var DbTable\Vehicle\Type
-     */
-    private $carTypeTable;
-
-    /**
-     * @var DbTable\Picture
-     */
-    private $pictureTable;
-
-    /**
-     * @var Adapter
-     */
-    private $adapter;
-
-    /**
      * @var TableGateway
      */
     private $itemTable2;
@@ -48,10 +32,9 @@ class Catalogue
      */
     private $itemParent;
 
-    public function __construct(Adapter $adapter, ItemParent $itemParent)
+    public function __construct(ItemParent $itemParent, TableGateway $itemTable)
     {
-        $this->adapter = $adapter;
-        $this->itemTable2 = new TableGateway('item', $adapter);
+        $this->itemTable2 = $itemTable;
         $this->itemParent = $itemParent;
     }
 
@@ -111,26 +94,6 @@ class Catalogue
         return $this->itemTable
             ? $this->itemTable
             : $this->itemTable = new DbTable\Item();
-    }
-
-    /**
-     * @return DbTable\Vehicle\Type
-     */
-    public function getCarTypeTable()
-    {
-        return $this->carTypeTable
-            ? $this->carTypeTable
-            : $this->carTypeTable = new DbTable\Vehicle\Type();
-    }
-
-    /**
-     * @return DbTable\Picture
-     */
-    public function getPictureTable()
-    {
-        return $this->pictureTable
-            ? $this->pictureTable
-            : $this->pictureTable = new DbTable\Picture();
     }
 
     /**

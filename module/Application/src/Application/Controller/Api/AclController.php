@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
@@ -73,23 +72,28 @@ class AclController extends AbstractRestfulController
     private $rulesPostFilter;
 
     public function __construct(
-        Adapter $adapter,
         $cache,
         InputFilter $rolesInputFilter,
         InputFilter $rolesPostFilter,
         InputFilter $roleParentsPostFilter,
-        InputFilter $rulesPostFilter
+        InputFilter $rulesPostFilter,
+        TableGateway $roleTable,
+        TableGateway $roleParentTable,
+        TableGateway $resourceTable,
+        TableGateway $privilegeTable,
+        TableGateway $privilegeAllowedTable,
+        TableGateway $privilegeDeniedTable
     ) {
         $this->cache = $cache;
 
-        $this->roleTable = new TableGateway('acl_roles', $adapter);
-        $this->roleParentTable = new TableGateway('acl_roles_parents', $adapter);
+        $this->roleTable = $roleTable;
+        $this->roleParentTable = $roleParentTable;
 
-        $this->resourceTable = new TableGateway('acl_resources', $adapter);
-        $this->privilegeTable = new TableGateway('acl_resources_privileges', $adapter);
+        $this->resourceTable = $resourceTable;
+        $this->privilegeTable = $privilegeTable;
 
-        $this->privilegeAllowedTable = new TableGateway('acl_roles_privileges_allowed', $adapter);
-        $this->privilegeDeniedTable = new TableGateway('acl_roles_privileges_denied', $adapter);
+        $this->privilegeAllowedTable = $privilegeAllowedTable;
+        $this->privilegeDeniedTable = $privilegeDeniedTable;
 
         $this->roleParentsPostFilter = $roleParentsPostFilter;
         $this->rolesInputFilter = $rolesInputFilter;

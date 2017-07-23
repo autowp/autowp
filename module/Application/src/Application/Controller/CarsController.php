@@ -56,6 +56,11 @@ class CarsController extends AbstractActionController
      */
     private $itemModel;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         HostManager $hostManager,
         Form $filterForm,
@@ -63,7 +68,8 @@ class CarsController extends AbstractActionController
         MessageService $message,
         UserItemSubscribe $userItemSubscribe,
         Perspective $perspective,
-        Item $itemModel
+        Item $itemModel,
+        DbTable\Picture $pictureTable
     ) {
 
         $this->hostManager = $hostManager;
@@ -73,6 +79,7 @@ class CarsController extends AbstractActionController
         $this->userItemSubscribe = $userItemSubscribe;
         $this->perspective = $perspective;
         $this->itemModel = $itemModel;
+        $this->pictureTable = $pictureTable;
     }
 
     private function carModerUrl(\Autowp\Commons\Db\Table\Row $item, $uri = null)
@@ -864,6 +871,7 @@ class CarsController extends AbstractActionController
             'paginator'     => $paginator,
             'childListData' => $this->car()->listData($listCars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'pictureTable'         => $this->pictureTable,
                     'perspective'          => $this->perspective,
                     'type'                 => null,
                     'onlyExactlyPictures'  => false,

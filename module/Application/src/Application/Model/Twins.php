@@ -22,14 +22,9 @@ class Twins
      */
     private $itemTable;
 
-    /**
-     * @return DbTable\Picture
-     */
-    private function getPictureTable()
+    public function __construct(DbTable\Picture $pictureTable)
     {
-        return $this->pictureTable
-            ? $this->pictureTable
-            : $this->pictureTable = new DbTable\Picture();
+        $this->pictureTable = $pictureTable;
     }
 
     /**
@@ -88,12 +83,10 @@ class Twins
      */
     public function getGroupPicturesCount($groupId)
     {
-        $pictureTable = $this->getPictureTable();
-
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
         $select = $db->select()
-            ->from($pictureTable->info('name'), null)
+            ->from($this->pictureTable->info('name'), null)
             ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null);
@@ -218,7 +211,7 @@ class Twins
 
         $ordering = $options['ordering'];
 
-        $select = $this->getPictureTable()->select(true)
+        $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
             ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)

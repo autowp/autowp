@@ -26,14 +26,44 @@ class Log
     private $eventTable;
 
     /**
-     * @var Adapter
+     * @var DbTable\Picture
      */
-    private $adapter;
+    private $pictureTable;
 
-    public function __construct(Adapter $adapter)
-    {
-        $this->adapter = $adapter;
-        $this->eventTable = new TableGateway('log_events', $adapter);
+    /**
+     * @var TableGateway
+     */
+    private $eventArticleTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $eventItemTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $eventPictureTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $eventUserTable;
+
+    public function __construct(
+        DbTable\Picture $pictureTable,
+        TableGateway $logTable,
+        TableGateway $eventArticleTable,
+        TableGateway $eventItemTable,
+        TableGateway $eventPictureTable,
+        TableGateway $eventUserTable
+    ) {
+        $this->eventTable = $logTable;
+        $this->pictureTable = $pictureTable;
+        $this->eventArticleTable = $eventArticleTable;
+        $this->eventItemTable = $eventItemTable;
+        $this->eventPictureTable = $eventPictureTable;
+        $this->eventUserTable = $eventUserTable;
     }
 
     public function addEvent($userId, $message, $objects)
@@ -59,32 +89,31 @@ class Log
 
             $table = $item->getTable();
 
-            $col = $tableName = null;
+            $col = $linkTable = null;
             switch (true) {
                 case $table instanceof DbTable\Picture:
                     $col = 'picture_id';
-                    $tableName = 'log_events_pictures';
+                    $linkTable = $this->eventPictureTable;
                     break;
                 case $table instanceof DbTable\Item:
                     $col = 'item_id';
-                    $tableName = 'log_events_item';
+                    $linkTable = $this->eventItemTable;
                     break;
                 case $table instanceof DbTable\Article:
                     $col = 'article_id';
-                    $tableName = 'log_events_articles';
+                    $linkTable = $this->eventArticleTable;
                     break;
                 case $table instanceof User:
                     $col = 'user_id';
-                    $tableName = 'log_events_user';
+                    $linkTable = $this->eventUserTable;
                     break;
                 default:
                     throw new Exception('Unknown data type');
             }
 
-            if ($col && $tableName) {
-                $table = new TableGateway($tableName, $this->adapter);
+            if ($col && $linkTable) {
                 try {
-                    $table->insert([
+                    $linkTable->insert([
                         'log_event_id' => $id,
                         $col           => $item['id']
                     ]);
@@ -111,7 +140,6 @@ class Log
         $options = array_replace($defaults, $options);
 
         $itemTable = new DbTable\Item();
-        $picturesTable = new DbTable\Picture();
         $userTable = new User();
 
         $select = new Sql\Select($this->eventTable->getTable());
@@ -144,7 +172,7 @@ class Log
         }
 
         $paginator = new Paginator\Paginator(
-            new Paginator\Adapter\DbSelect($select, $this->adapter)
+            new Paginator\Adapter\DbSelect($select, $this->eventTable->getAdapter())
         );
 
         $paginator
@@ -159,8 +187,8 @@ class Log
                     ->where('log_events_item.log_event_id = ?', $event['id'])
             );
 
-            $pictureRows = $picturesTable->fetchAll(
-                $picturesTable->select(true)
+            $pictureRows = $this->pictureTable->fetchAll(
+                $this->pictureTable->select(true)
                     ->join('log_events_pictures', 'pictures.id = log_events_pictures.picture_id', null)
                     ->where('log_events_pictures.log_event_id = ?', $event['id'])
             );

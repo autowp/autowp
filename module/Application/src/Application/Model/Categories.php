@@ -2,7 +2,6 @@
 
 namespace Application\Model;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
@@ -28,12 +27,15 @@ class Categories
      */
     private $itemLangTable;
 
-    public function __construct(TreeRouteStack $router, Adapter $adapter)
-    {
+    public function __construct(
+        TreeRouteStack $router,
+        TableGateway $itemTable,
+        TableGateway $itemLanguageTable
+    ) {
         $this->router = $router;
 
-        $this->itemTable = new TableGateway('item', $adapter);
-        $this->itemLangTable = new TableGateway('item_language', $adapter);
+        $this->itemTable = $itemTable;
+        $this->itemLangTable = $itemLanguageTable;
     }
 
     private function getCategoriesSelect($parentId, $order)

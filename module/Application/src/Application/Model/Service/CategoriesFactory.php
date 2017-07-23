@@ -12,9 +12,11 @@ class CategoriesFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new \Application\Model\Categories(
             $container->get('HttpRouter'),
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+            $tables->get('item'),
+            $tables->get('item_language')
         );
     }
 }

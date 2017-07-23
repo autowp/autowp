@@ -7,11 +7,16 @@ use Application\Model\DbTable;
 
 class SimilarHydrator extends RestHydrator
 {
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct($serviceManager)
     {
         parent::__construct();
 
-        $this->pictureTable = new DbTable\Picture();
+        $this->pictureTable = $serviceManager->get(DbTable\Picture::class);
 
         $strategy = new HydratorPictureStrategy($serviceManager);
         $this->addStrategy('picture', $strategy);

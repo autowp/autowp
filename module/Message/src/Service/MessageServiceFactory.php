@@ -17,9 +17,10 @@ class MessageServiceFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new MessageService(
-            $container->get(\Zend\Db\Adapter\AdapterInterface::class),
-            $container->get(\Application\Service\TelegramService::class)
+            $container->get(\Application\Service\TelegramService::class),
+            $tables->get('personal_messages')
         );
     }
 }
