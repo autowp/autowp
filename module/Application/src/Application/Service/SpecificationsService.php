@@ -662,14 +662,12 @@ class SpecificationsService
         return $form;
     }
 
-    /**
-     * @param \Autowp\Commons\Db\Table\Row $car
-     * @param \Autowp\Commons\Db\Table\Row $user
-     * @param array $options
-     * @return array
-     */
-    public function getCarForm(\Autowp\Commons\Db\Table\Row $car, \Autowp\Commons\Db\Table\Row $user, array $options, $language)
-    {
+    public function getCarForm(
+        \Autowp\Commons\Db\Table\Row $car,
+        \Autowp\Commons\Db\Table\Row $user,
+        array $options,
+        string $language
+    ) {
         $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car->id);
 
         $zoneId = $this->zoneIdByCarTypeId($car->item_type_id, $vehicleTypeIds);
@@ -929,13 +927,11 @@ class SpecificationsService
         }
     }
 
-    /**
-     * @param \Autowp\Commons\Db\Table\Row $car
-     * @param array $values
-     * @param \Autowp\Commons\Db\Table\Row $user
-     */
-    public function saveCarAttributes(\Autowp\Commons\Db\Table\Row $car, array $values, \Autowp\Commons\Db\Table\Row $user)
-    {
+    public function saveCarAttributes(
+        \Autowp\Commons\Db\Table\Row $car,
+        array $values,
+        \Autowp\Commons\Db\Table\Row $user
+    ) {
         $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car->id);
 
         $zoneId = $this->zoneIdByCarTypeId($car->item_type_id, $vehicleTypeIds);
