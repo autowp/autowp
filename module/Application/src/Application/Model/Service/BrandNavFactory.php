@@ -20,7 +20,8 @@ class BrandNavFactory implements FactoryInterface
             $container->get('HttpRouter'),
             $container->get(\Application\Model\ItemParent::class),
             $container->get(\Application\Model\ItemAlias::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

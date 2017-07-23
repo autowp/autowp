@@ -145,7 +145,7 @@ class ItemParent
         return true;
     }
 
-    private function getVehicleName(\Autowp\Commons\Db\Table\Row $itemRow, $language)
+    private function getItemName(\Autowp\Commons\Db\Table\Row $itemRow, string $language)
     {
         $languageRow = $this->itemLangTable->fetchRow([
             'item_id = ?'  => $itemRow->id,
@@ -181,7 +181,7 @@ class ItemParent
 
     private function extractName(\Autowp\Commons\Db\Table\Row $parentRow, \Autowp\Commons\Db\Table\Row $vehicleRow, $language)
     {
-        $vehicleName = $this->getVehicleName($vehicleRow, $language);
+        $vehicleName = $this->getItemName($vehicleRow, $language);
         $aliases = $this->itemAlias->getAliases($parentRow['id'], $parentRow['name']);
 
         $name = $vehicleName;

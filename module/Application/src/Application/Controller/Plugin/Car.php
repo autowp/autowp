@@ -4,8 +4,6 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
-use Autowp\TextStorage\Service as TextStorage;
-
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\ItemParent;
@@ -19,19 +17,9 @@ use Zend_Db_Expr;
 class Car extends AbstractPlugin
 {
     /**
-     * @var DbTable\Item\Language
-     */
-    private $carLangTable;
-
-    /**
      * @var Twins
      */
     private $twins;
-
-    /**
-     * @var TextStorage
-     */
-    private $textStorage;
 
     /**
      * @var SpecificationsService
@@ -61,7 +49,6 @@ class Car extends AbstractPlugin
     private $pictureTable;
 
     public function __construct(
-        TextStorage $textStorage,
         SpecificationsService $specsService,
         ItemNameFormatter $itemNameFormatter,
         Item $itemModel,
@@ -69,21 +56,12 @@ class Car extends AbstractPlugin
         DbTable\Picture $pictureTable,
         Twins $twins
     ) {
-
-        $this->textStorage = $textStorage;
         $this->specsService = $specsService;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->itemModel = $itemModel;
         $this->itemParent = $itemParent;
         $this->pictureTable = $pictureTable;
         $this->twins = $twins;
-    }
-
-    private function getCarLanguageTable()
-    {
-        return $this->carLangTable
-            ? $this->carLangTable
-            : $this->carLangTable = new DbTable\Item\Language();
     }
 
     /**
@@ -135,7 +113,6 @@ class Car extends AbstractPlugin
         $catalogue = $controller->catalogue();
 
         $itemTable = new DbTable\Item();
-        $itemLanguageTable = new DbTable\Item\Language();
 
         $carIds = [];
         foreach ($cars as $car) {
@@ -217,17 +194,7 @@ class Car extends AbstractPlugin
         }
 
         // lang names
-        $carsLangName = [];
-        if ($carIds) {
-            $carLangRows = $this->getCarLanguageTable()->fetchAll([
-                'item_id IN (?)' => $carIds,
-                'language = ?'  => $language,
-                'length(name) > 0'
-            ]);
-            foreach ($carLangRows as $carLangRow) {
-                $carsLangName[$carLangRow->item_id] = $carLangRow->name;
-            }
-        }
+        $carsLangName = $this->itemModel->getLanguageNamesOfItems($carIds, $language);
 
         // total pictures
         $carsTotalPictures = $pictureFetcher->getTotalPictures($carIds, $onlyExactlyPictures);
@@ -305,32 +272,10 @@ class Car extends AbstractPlugin
                 }
             }
 
-            $db = $itemLanguageTable->getAdapter();
-            $orderExpr = $db->quoteInto('language = ? desc', $language);
-            $itemLanguageRows = $itemLanguageTable->fetchAll([
-                'item_id = ?' => $car['id']
-            ], new \Zend_Db_Expr($orderExpr));
+            $texts = $this->itemModel->getTextsOfItem($car['id'], $language);
 
-            $textIds = [];
-            $fullTextIds = [];
-            foreach ($itemLanguageRows as $itemLanguageRow) {
-                if ($itemLanguageRow->text_id) {
-                    $textIds[] = $itemLanguageRow->text_id;
-                }
-                if ($itemLanguageRow->full_text_id) {
-                    $fullTextIds[] = $itemLanguageRow->full_text_id;
-                }
-            }
-
-            $description = null;
-            if ($textIds) {
-                $description = $this->textStorage->getFirstText($textIds);
-            }
-
-            $text = null;
-            if ($fullTextIds) {
-                $text = $this->textStorage->getFirstText($fullTextIds);
-            }
+            $description = $texts['description'];
+            $text = $texts['text'];
 
             $hasHtml = (bool)$text;
 

@@ -1010,7 +1010,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('name', $values)) {
-            $this->setLanguageName($item['id'], 'xx', $values['name']);
+            $this->itemModel->setLanguageName($item['id'], 'xx', $values['name']);
         }
 
         /*$vehicleType = new VehicleType();
@@ -1097,7 +1097,7 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('name', $values)) {
             $item['name'] = $values['name'];
-            $this->setLanguageName($item['id'], 'xx', $values['name']);
+            $this->itemModel->setLanguageName($item['id'], 'xx', $values['name']);
         }
 
         if (array_key_exists('full_name', $values)) {
@@ -1365,25 +1365,6 @@ class ItemController extends AbstractRestfulController
         }
 
         return $changes;
-    }
-
-    private function setLanguageName($carId, $language, $name)
-    {
-        $carLangTable = new DbTable\Item\Language();
-
-        $carLangRow = $carLangTable->fetchRow([
-            'item_id = ?'  => $carId,
-            'language = ?' => $language
-        ]);
-
-        if (! $carLangRow) {
-            $carLangRow = $carLangTable->createRow([
-                'item_id'  => $carId,
-                'language' => $language
-            ]);
-        }
-        $carLangRow['name'] = $name;
-        $carLangRow->save();
     }
 
     public function getLogoAction()

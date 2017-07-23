@@ -523,32 +523,10 @@ class Pic extends AbstractPlugin
                     ];
                 }
 
-                $db = $itemLanguageTable->getAdapter();
-                $orderExpr = $db->quoteInto('language = ? desc', $language);
-                $itemLanguageRows = $itemLanguageTable->fetchAll([
-                    'item_id = ?' => $item['id']
-                ], new \Zend_Db_Expr($orderExpr));
+                $texts = $this->itemModel->getTextsOfItem($item['id'], $language);
 
-                $textIds = [];
-                $fullTextIds = [];
-                foreach ($itemLanguageRows as $itemLanguageRow) {
-                    if ($itemLanguageRow->text_id) {
-                        $textIds[] = $itemLanguageRow->text_id;
-                    }
-                    if ($itemLanguageRow->full_text_id) {
-                        $fullTextIds[] = $itemLanguageRow->full_text_id;
-                    }
-                }
-
-                $text = null;
-                if ($textIds) {
-                    $text = $this->textStorage->getFirstText($textIds);
-                }
-
-                $fullText = null;
-                if ($fullTextIds) {
-                    $fullText = $this->textStorage->getFirstText($fullTextIds);
-                }
+                $fullText = $texts['text'];
+                $text = $texts['description'];
 
                 if ((bool)$fullText) {
                     foreach ($this->catalogue->getCataloguePaths($item['id']) as $path) {

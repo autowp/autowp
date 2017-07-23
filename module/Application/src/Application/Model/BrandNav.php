@@ -44,13 +44,19 @@ class BrandNav
      */
     private $pictureTable;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         StorageInterface $cache,
         TranslatorInterface $translator,
         TreeRouteStack $router,
         ItemParent $itemParent,
         ItemAlias $itemAlias,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        Item $itemModel
     ) {
 
         $this->cache = $cache;
@@ -59,6 +65,7 @@ class BrandNav
         $this->itemParent = $itemParent;
         $this->itemAlias = $itemAlias;
         $this->pictureTable = $pictureTable;
+        $this->itemModel = $itemModel;
     }
 
     public function getMenu(array $params)
@@ -362,13 +369,9 @@ class BrandNav
             );
 
             if (! $name) {
-                $carLangRow = $carLanguageTable->fetchRow([
-                    'item_id = ?'  => (int)$brandItemRow['item_id'],
-                    'language = ?' => (string)$language,
-                    'length(name) > 0'
-                ]);
+                $langName = $this->itemModel->getName($brandItemRow['item_id'], $language);
 
-                $name = $carLangRow ? $carLangRow->name : $brandItemRow['car_name'];
+                $name = $langName ? $langName : $brandItemRow['car_name'];
                 foreach ($aliases as $alias) {
                     $name = str_ireplace('by The ' . $alias . ' Company', '', $name);
                     $name = str_ireplace('by '.$alias, '', $name);
@@ -383,7 +386,7 @@ class BrandNav
                 $name = trim(preg_replace("|[[:space:]]+|", ' ', $name));
                 $name = ltrim($name, '/');
                 if (! $name) {
-                    $name = $carLangRow ? $carLangRow->name : $brandItemRow['car_name'];
+                    $name = $langName ? $langName : $brandItemRow['car_name'];
                 }
             }
 

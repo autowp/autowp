@@ -90,12 +90,8 @@ class BrandsController extends AbstractActionController
         }
 
         $language = $this->language();
-        $brandLangTable = new DbTable\Item\Language();
-        $brandLang = $brandLangTable->fetchRow([
-            'item_id = ?' => $brand->id,
-            'language = ?' => $language
-        ]);
 
+        $langName = $this->itemModel->getName($brand->id, $language);
 
         $carList = $itemTable->fetchAll(
             $itemTable->select(true)
@@ -115,8 +111,8 @@ class BrandsController extends AbstractActionController
 
         $viewModel = new ViewModel([
             'brand'     => $brand,
-            'brandLang' => $brandLang,
-            'carList'   => $cars
+            'carList'   => $cars,
+            'name'      => $langName ? $langName : $brand->name
         ]);
         $viewModel->setTerminal(true);
 

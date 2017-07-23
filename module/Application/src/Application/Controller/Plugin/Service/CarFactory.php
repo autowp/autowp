@@ -15,7 +15,6 @@ class CarFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Plugin(
-            $container->get(\Autowp\TextStorage\Service::class),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\ItemNameFormatter::class),
             $container->get(\Application\Model\Item::class),

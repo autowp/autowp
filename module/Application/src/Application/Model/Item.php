@@ -8,6 +8,8 @@ use geoPHP;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
+use Autowp\TextStorage\Service as TextStorage;
+
 use Application\Model\DbTable;
 
 use Zend_Db_Expr;
@@ -42,16 +44,30 @@ class Item
      */
     private $vehicleTypeParentTable;
 
+    /**
+     * @var DbTable\Item\Language
+     */
+    private $itemLanguageTable;
+
+    /**
+     * @var TextStorage
+     */
+    private $textStorage;
+
     public function __construct(
         TableGateway $specTable,
         TableGateway $itemPointTable,
-        TableGateway $vehicleTypeParentTable
+        TableGateway $vehicleTypeParentTable,
+        TextStorage $textStorage
     ) {
         $this->specTable = $specTable;
 
         $this->itemTable = new DbTable\Item();
         $this->itemPointTable = $itemPointTable;
         $this->vehicleTypeParentTable = $vehicleTypeParentTable;
+        $this->textStorage = $textStorage;
+
+        $this->itemLanguageTable = new DbTable\Item\Language();
     }
 
     public function getEngineVehiclesGroups(int $engineId, array $options = [])
@@ -130,17 +146,86 @@ class Item
         return $resultIds;
     }
 
-    public function getName($itemId, $language)
+    public function setLanguageName(int $id, string $language, string $name)
     {
-        $carLangTable = new DbTable\Item\Language();
+        $carLangRow = $this->itemLanguageTable->fetchRow([
+            'item_id = ?'  => $id,
+            'language = ?' => $language
+        ]);
 
-        $db = $carLangTable->getAdapter();
+        if (! $carLangRow) {
+            $carLangRow = $this->itemLanguageTable->createRow([
+                'item_id'  => $id,
+                'language' => $language
+            ]);
+        }
+        $carLangRow['name'] = $name;
+        $carLangRow->save();
+    }
+
+    public function getLanguageNamesOfItems(array $ids, string $language): array
+    {
+        if (! $ids) {
+            return [];
+        }
+
+        $rows = $this->itemLanguageTable->fetchAll([
+            'item_id IN (?)' => $ids,
+            'language = ?'   => $language,
+            'length(name) > 0'
+        ]);
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row->item_id] = $row->name;
+        }
+
+        return $result;
+    }
+
+    public function getTextsOfItem(int $id, string $language): array
+    {
+        $db = $this->itemLanguageTable->getAdapter();
+        $orderExpr = $db->quoteInto('language = ? desc', $language);
+        $rows = $this->itemLanguageTable->fetchAll([
+            'item_id = ?' => $id
+        ], new Zend_Db_Expr($orderExpr));
+
+        $textIds = [];
+        $fullTextIds = [];
+        foreach ($rows as $row) {
+            if ($row->text_id) {
+                $textIds[] = $row->text_id;
+            }
+            if ($row->full_text_id) {
+                $fullTextIds[] = $row->full_text_id;
+            }
+        }
+
+        $description = null;
+        if ($textIds) {
+            $description = $this->textStorage->getFirstText($textIds);
+        }
+
+        $text = null;
+        if ($fullTextIds) {
+            $text = $this->textStorage->getFirstText($fullTextIds);
+        }
+
+        return [
+            'text'        => $text,
+            'description' => $description
+        ];
+    }
+
+    public function getName(int $itemId, string $language)
+    {
+        $db = $this->itemLanguageTable->getAdapter();
 
         $languages = array_merge([$language], ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'zh', 'xx']);
 
         $select = $db->select()
             ->from('item_language', ['name'])
-            ->where('item_id = ?', (int)$itemId)
+            ->where('item_id = ?', $itemId)
             ->where('length(name) > 0')
             ->order(new Zend_Db_Expr($db->quoteInto('FIELD(language, ?)', $languages)))
             ->limit(1);
@@ -152,8 +237,8 @@ class Item
     {
         /*$carLangTable = new DbTable\Item\Language();
          $carLangRow = $carLangTable->fetchRow([
-         'item_id = ?'  => $this->id,
-         'language = ?' => (string)$language
+             'item_id = ?'  => $this->id,
+             'language = ?' => (string)$language
          ]);
 
          $name = $carLangRow && $carLangRow->name ? $carLangRow->name : $this->name;*/

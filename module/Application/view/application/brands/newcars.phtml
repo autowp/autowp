@@ -5,7 +5,7 @@
             'brand_catname' => $this->brand->catname
         ]), $this->img($this->brand->logo_id, [
             'alt'    => '',
-            'title'  => ($this->brandLang ? $this->brandLang->name : $this->brand->name),
+            'title'  => $this->name,
             'style'  => "float:right;margin:0 0 5px 5px",
             'format' => 'brandicon2'
         ]), false)?>
