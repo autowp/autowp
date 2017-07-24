@@ -749,30 +749,6 @@ CREATE TABLE `brand_alias` (
 /*!40000 ALTER TABLE `brand_alias` ENABLE KEYS */;
 
 --
--- Table structure for table `car_type_language`
---
-
-DROP TABLE IF EXISTS `car_type_language`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `car_type_language` (
-  `car_type_id` int(10) unsigned NOT NULL,
-  `language` varchar(5) NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `name_rp` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`car_type_id`,`language`),
-  CONSTRAINT `FK_car_type_language_car_types_id` FOREIGN KEY (`car_type_id`) REFERENCES `car_types` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `car_type_language`
---
-
-/*!40000 ALTER TABLE `car_type_language` DISABLE KEYS */;
-/*!40000 ALTER TABLE `car_type_language` ENABLE KEYS */;
-
---
 -- Table structure for table `car_types`
 --
 
@@ -799,6 +775,7 @@ CREATE TABLE `car_types` (
 --
 
 /*!40000 ALTER TABLE `car_types` DISABLE KEYS */;
+INSERT INTO `car_types` VALUES (1,29,'roadster','car-type/roadster',1,'car-type-rp/roadster'),(2,29,'spyder','car-type/spyder',2,'car-type-rp/spyder'),(3,NULL,'cabriolet','car-type/cabriolet',3,'car-type-rp/cabriolet'),(4,29,'cabrio-coupe','car-type/cabrio-coupe',4,'car-type-rp/cabrio-coupe'),(5,29,'targa','car-type/targa',5,'car-type-rp/targa'),(6,29,'coupe','car-type/coupe',8,'car-type-rp/coupe'),(7,29,'sedan','car-type/sedan',9,'car-type-rp/sedan'),(8,29,'hatchback','car-type/hatchback',13,'car-type-rp/hatchback'),(9,NULL,'crossover','car-type/crossover',16,'car-type-rp/crossover'),(10,NULL,'universal','car-type/universal',14,'car-type-rp/universal'),(11,NULL,'limousine','car-type/limousine',21,'car-type-rp/limousine'),(12,NULL,'pickup','car-type/pickup',20,'car-type-rp/pickup'),(13,29,'caravan','car-type/caravan',15,'car-type-rp/caravan'),(14,NULL,'offroad','car-type/offroad',17,'car-type-rp/offroad'),(15,NULL,'minivan','car-type/minivan',22,'car-type-rp/minivan'),(16,NULL,'van','car-type/van',23,'car-type-rp/van'),(17,NULL,'truck','car-type/truck',24,'car-type-rp/truck'),(19,NULL,'bus','car-type/bus',25,'car-type-rp/bus'),(20,29,'phaeton','car-type/phaeton',7,'car-type-rp/phaeton'),(21,7,'4door-hardtop','car-type/4door-hardtop',10,'car-type-rp/4door-hardtop'),(22,29,'landau','car-type/landau',6,'car-type-rp/landau'),(25,6,'liftback-coupe','car-type/liftback-coupe',26,'car-type-rp/liftback-coupe'),(26,7,'liftback-sedan','car-type/liftback-sedan',27,'car-type-rp/liftback-sedan'),(27,6,'2door-hardtop','car-type/2door-hardtop',11,'car-type-rp/2door-hardtop'),(28,19,'minibus','car-type/minibus',0,'car-type-rp/minibus'),(29,NULL,'car','car-type/car',1,'car-type-rp/car'),(32,19,'multiplex-bus','car-type/multiplex-bus',5,'car-type-rp/multiplex-bus'),(33,14,'offroad-short','car-type/offroad-short',77,'car-type-rp/offroad-short'),(34,29,'brougham','car-type/brougham',22,'car-type-rp/brougham'),(36,7,'fastback-sedan','car-type/fastback-sedan',50,'car-type-rp/fastback-sedan'),(37,6,'fastback-coupe','car-type/fastback-coupe',49,'car-type-rp/fastback-coupe'),(38,29,'tonneau','car-type/tonneau',43,'car-type-rp/tonneau'),(39,19,'2-floor-bus','car-type/2-floor-bus',6,'car-type-rp/2-floor-bus'),(40,29,'town-car','car-type/town-car',70,'car-type-rp/town-car'),(41,29,'barchetta','car-type/barchetta',99,'car-type-rp/barchetta'),(43,NULL,'moto','car-type/moto',100,'car-type-rp/moto'),(44,NULL,'tractor','car-type/tractor',101,'car-type-rp/tractor'),(45,NULL,'tracked','car-type/tracked',102,'car-type-rp/tracked');
 /*!40000 ALTER TABLE `car_types` ENABLE KEYS */;
 
 --
@@ -824,6 +801,15 @@ CREATE TABLE `car_types_parents` (
 --
 
 /*!40000 ALTER TABLE `car_types_parents` DISABLE KEYS */;
+INSERT INTO `car_types_parents` 
+VALUES (1,1,1),(1,29,0),(2,2,1),(2,29,0),(3,3,0),(4,4,1),(4,29,0),(5,5,1),(5,29,0),
+(6,6,1),(6,29,0),(7,7,1),(7,29,0),(8,8,1),(8,29,0),(9,9,0),(10,10,0),(11,11,0),
+(12,12,0),(13,13,1),(13,29,0),(14,14,0),(15,15,0),(16,16,0),(17,17,0),(19,19,0),
+(20,20,1),(20,29,0),(21,7,1),(21,21,2),(21,29,0),(22,22,1),(22,29,0),(25,6,1),
+(25,25,2),(25,29,0),(26,7,1),(26,26,2),(26,29,0),(27,6,1),(27,27,2),(27,29,0),
+(28,19,0),(28,28,1),(29,29,0),(32,19,0),(32,32,1),(33,14,0),(33,33,1),(36,7,1),
+(37,6,1),(38,29,0),(39,19,0),(39,39,1),(40,29,0),(40,40,1),(41,29,0),(41,41,1),
+(43,43,0),(44,44,0),(45,45,0),(38,38,1),(38,29,0);
 /*!40000 ALTER TABLE `car_types_parents` ENABLE KEYS */;
 
 --

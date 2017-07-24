@@ -21,4 +21,15 @@ class MostsControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('mosts');
         $this->assertActionName('index');
     }
+
+    public function testVehicleType()
+    {
+        $this->dispatch('https://www.autowp.ru/mosts/fastest/car', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(MostsController::class);
+        $this->assertMatchedRouteName('mosts');
+        $this->assertActionName('index');
+    }
 }
