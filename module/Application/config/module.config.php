@@ -61,7 +61,7 @@ return [
             Controller\MostsController::class           => Controller\Frontend\Service\MostsControllerFactory::class,
             Controller\MuseumsController::class         => Controller\Frontend\Service\MuseumsControllerFactory::class,
             Controller\NewController::class             => Controller\Frontend\Service\NewControllerFactory::class,
-            Controller\PerspectiveController::class     => InvokableFactory::class,
+            Controller\PerspectiveController::class     => Controller\Frontend\PerspectiveControllerFactory::class,
             Controller\PictureController::class         => Controller\Frontend\PictureControllerFactory::class,
             Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
             Controller\PulseController::class           => Controller\Frontend\Service\PulseControllerFactory::class,

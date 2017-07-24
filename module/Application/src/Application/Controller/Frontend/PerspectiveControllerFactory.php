@@ -7,7 +7,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 
 use Application\Controller\PerspctiveController as Controller;
 
-class PerspctiveControllerFactory implements FactoryInterface
+class PerspectiveControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
