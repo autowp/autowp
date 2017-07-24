@@ -33,7 +33,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
 
         $select = $this->vehicleType->getItemSelect(
             $this->params()->fromQuery('item_id'),
-            (Int) $this->params()->fromQuery('vehicle_type_id')
+            (int) $this->params()->fromQuery('vehicle_type_id')
         );
 
         $paginator = new Paginator\Paginator(
