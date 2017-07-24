@@ -289,7 +289,7 @@ class VehicleType
         $select->order('car_types.position');
 
         if ($parentId) {
-            $select->where(['parent_id' => $parentId]);
+            $select->where(['car_types.parent_id' => $parentId]);
         } else {
             $select->where(['car_types.parent_id IS NULL']);
         }
