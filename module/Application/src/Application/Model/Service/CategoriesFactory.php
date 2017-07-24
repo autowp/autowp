@@ -16,7 +16,7 @@ class CategoriesFactory implements FactoryInterface
         return new \Application\Model\Categories(
             $container->get('HttpRouter'),
             $tables->get('item'),
-            $tables->get('item_language')
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

@@ -540,24 +540,7 @@ class CatalogueController extends AbstractActionController
                     ->limit(1)
             );
 
-            $itemLanguageTable = new DbTable\Item\Language();
-            $db = $itemLanguageTable->getAdapter();
-            $orderExpr = $db->quoteInto('language = ? desc', $this->language());
-            $itemLanguageRows = $itemLanguageTable->fetchAll([
-                'item_id = ?' => $brand['id']
-            ], new \Zend_Db_Expr($orderExpr));
-
-            $textIds = [];
-            foreach ($itemLanguageRows as $itemLanguageRow) {
-                if ($itemLanguageRow->text_id) {
-                    $textIds[] = $itemLanguageRow->text_id;
-                }
-            }
-
-            $description = null;
-            if ($textIds) {
-                $description = $this->textStorage->getFirstText($textIds);
-            }
+            $description = $this->itemModel->getTextOfItem($brand['id'], $this->language());
 
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
@@ -1137,10 +1120,10 @@ class CatalogueController extends AbstractActionController
 
             $counts = $this->childsTypeCount($currentCarId);
 
-            $texts = $this->getItemTexts($currentCar['id']);
+            $texts = $this->itemModel->getTextsOfItem($currentCar['id'], $this->language());
 
-            $currentCar['description'] = $texts['description'];
-            $currentCar['text'] = $texts['text'];
+            $currentCar['description'] = $texts['text'];
+            $currentCar['text'] = $texts['full_text'];
             $hasHtml = (bool)$currentCar['text'];
 
             return [
@@ -1495,7 +1478,7 @@ class CatalogueController extends AbstractActionController
             $requireAttention = $this->getItemModerAttentionCount($currentCarId);
         }
 
-        $texts = $this->getItemTexts($currentCar['id']);
+        $texts = $this->itemModel->getTextsOfItem($currentCar['id'], $this->language());
 
         $currentCar['description'] = $texts['description'];
         $currentCar['text'] = $texts['text'];
@@ -1512,43 +1495,6 @@ class CatalogueController extends AbstractActionController
             'requireAttention' => $requireAttention,
             'hasHtml'          => $hasHtml,
             'isCarModer'       => $this->user()->inheritsRole('cars-moder')
-        ];
-    }
-
-    private function getItemTexts(int $itemId)
-    {
-        $itemLanguageTable = new DbTable\Item\Language();
-
-        $db = $itemLanguageTable->getAdapter();
-        $orderExpr = $db->quoteInto('language = ? desc', $this->language());
-        $itemLanguageRows = $itemLanguageTable->fetchAll([
-            'item_id = ?' => $itemId
-        ], new \Zend_Db_Expr($orderExpr));
-
-        $textIds = [];
-        $fullTextIds = [];
-        foreach ($itemLanguageRows as $itemLanguageRow) {
-            if ($itemLanguageRow->text_id) {
-                $textIds[] = $itemLanguageRow->text_id;
-            }
-            if ($itemLanguageRow->full_text_id) {
-                $fullTextIds[] = $itemLanguageRow->full_text_id;
-            }
-        }
-
-        $description = null;
-        if ($textIds) {
-            $description = $this->textStorage->getFirstText($textIds);
-        }
-
-        $text = null;
-        if ($fullTextIds) {
-            $text = $this->textStorage->getFirstText($fullTextIds);
-        }
-
-        return [
-            'description' => $description,
-            'text'        => $text
         ];
     }
 
@@ -1664,20 +1610,15 @@ class CatalogueController extends AbstractActionController
 
         $texts = $this->getItemTexts($currentCar['id']);
 
-        $currentCar['description'] = $texts['description'];
-        $currentCar['text'] = $texts['text'];
+        $currentCar['description'] = $texts['text'];
+        $currentCar['text'] = $texts['full_text'];
         $hasHtml = (bool)$currentCar['text'];
 
-        $carLangTable = new DbTable\Item\Language();
-        $carLangRows = $carLangTable->fetchAll([
-            'item_id = ?' => $currentCar['id'],
-            'length(name) > 0'
-        ]);
         $otherNames = [];
-        foreach ($carLangRows as $carLangRow) {
-            if ($currentCar['name'] != $carLangRow->name) {
-                if (! in_array($carLangRow->name, $otherNames)) {
-                    $otherNames[] = $carLangRow->name;
+        foreach ($this->itemModel->getNames($currentCar['id']) as $name) {
+            if ($currentCar['name'] != $name) {
+                if (! in_array($name, $otherNames)) {
+                    $otherNames[] = $name;
                 }
             }
         }
@@ -1716,6 +1657,7 @@ class CatalogueController extends AbstractActionController
                     'onlyChilds'           => []
                 ]),
                 'listBuilder' => new \Application\Model\Item\ListBuilder\CatalogueGroupItem([
+                    'itemModel'        => $this->itemModel,
                     'catalogue'        => $this->catalogue(),
                     'router'           => $this->getEvent()->getRouter(),
                     'picHelper'        => $this->getPluginManager()->get('pic'),

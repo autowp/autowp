@@ -60,11 +60,6 @@ class ItemHydrator extends RestHydrator
     private $itemModel;
 
     /**
-     * @var TableGateway
-     */
-    private $itemLanguageTable;
-
-    /**
      * @var \Autowp\TextStorage\Service
      */
     private $textStorage;
@@ -117,7 +112,6 @@ class ItemHydrator extends RestHydrator
         $tables = $serviceManager->get(\Application\Db\TableManager::class);
         $this->pictureTable = $tables->get('pictures');
         $this->linkTable = $tables->get('links');
-        $this->itemLanguageTable = $tables->get('item_language');
         $this->itemTableGateway = $tables->get('item');
         $this->specTable = $tables->get('spec');
 
@@ -458,12 +452,7 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('item_language_count')) {
-            $select = new Sql\Select($this->itemLanguageTable->getTable());
-            $select->where([
-                'item_id'       => $object['id'],
-                'language <> ?' => 'xx'
-            ]);
-            $result['item_language_count'] = $this->getCountBySelect($select, $this->itemLanguageTable);
+            $result['item_language_count'] = $this->itemModel->getUsedLanguagesCount($object['id']);
         }
 
         if ($this->filterComposite->filter('engine_vehicles_count')) {
@@ -623,46 +612,12 @@ class ItemHydrator extends RestHydrator
             ]);
         }
 
-        $showDescription = $this->filterComposite->filter('description');
-        $showHasText = $this->filterComposite->filter('has_text');
-
-        $textIds = [];
-        $fullTextIds = [];
-
-        if ($showDescription || $showHasText) {
-            $select = new Sql\Select($this->itemLanguageTable->getTable());
-            $select->columns(['text_id', 'full_text_id'])
-                ->where(['item_id' => $object['id']])
-                ->order([new Sql\Expression('language = ? desc', $this->language)]);
-
-            $itemLanguageRows = $this->itemLanguageTable->selectWith($select);
-
-            foreach ($itemLanguageRows as $itemLanguageRow) {
-                if ($itemLanguageRow['text_id']) {
-                    $textIds[] = $itemLanguageRow['text_id'];
-                }
-                if ($itemLanguageRow['full_text_id']) {
-                    $fullTextIds[] = $itemLanguageRow['full_text_id'];
-                }
-            }
+        if ($this->filterComposite->filter('has_text')) {
+            $result['has_text'] = $this->itemModel->hasFullText($object['id']);
         }
 
-        if ($showHasText) {
-            $text = null;
-            if ($fullTextIds) {
-                $text = $this->textStorage->getFirstText($fullTextIds);
-            }
-
-            $result['has_text'] = (bool)$text;
-        }
-
-        if ($showDescription) {
-            $description = null;
-            if ($textIds) {
-                $description = $this->textStorage->getFirstText($textIds);
-            }
-
-            $result['description'] = $description;
+        if ($this->filterComposite->filter('description')) {
+            $result['description'] = $this->itemModel->getTextOfItem($object['id'], $this->language);
         }
 
         return $result;

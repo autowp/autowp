@@ -17,6 +17,7 @@ class ItemFactory implements FactoryInterface
             $tables->get('spec'),
             $tables->get('item_point'),
             $tables->get('car_types_parents'),
+            $tables->get('item_language'),
             $container->get(\Autowp\TextStorage\Service::class)
         );
     }

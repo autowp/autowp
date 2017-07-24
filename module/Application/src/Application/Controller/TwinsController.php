@@ -189,24 +189,7 @@ class TwinsController extends AbstractActionController
         $picturesCount = $twins->getGroupPicturesCount($group['id']);
 
 
-        $itemLanguageTable = new DbTable\Item\Language();
-        $db = $itemLanguageTable->getAdapter();
-        $orderExpr = $db->quoteInto('language = ? desc', $this->language());
-        $itemLanguageRows = $itemLanguageTable->fetchAll([
-            'item_id = ?' => $group['id']
-        ], new \Zend_Db_Expr($orderExpr));
-
-        $textIds = [];
-        foreach ($itemLanguageRows as $itemLanguageRow) {
-            if ($itemLanguageRow->text_id) {
-                $textIds[] = $itemLanguageRow->text_id;
-            }
-        }
-
-        $description = null;
-        if ($textIds) {
-            $description = $this->textStorage->getFirstText($textIds);
-        }
+        $description = $this->itemModel->getTextOfItem($group['id'], $this->language());
 
         $this->getBrands($this->twins->getGroupBrandIds($group['id']));
 

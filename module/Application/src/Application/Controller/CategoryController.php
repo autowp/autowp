@@ -29,11 +29,6 @@ class CategoryController extends AbstractActionController
     private $itemTable;
 
     /**
-     * @var DbTable\Item\Language
-     */
-    private $itemLanguageTable;
-
-    /**
      * @var Categories
      */
     private $categories;
@@ -83,7 +78,6 @@ class CategoryController extends AbstractActionController
         $this->pictureTable = $pictureTable;
 
         $this->itemTable = new DbTable\Item();
-        $this->itemLanguageTable = new DbTable\Item\Language();
     }
 
     private function getOwnVehiclesAndEnginesCount($categoryId)
@@ -123,10 +117,7 @@ class CategoryController extends AbstractActionController
             );
 
             foreach ($rows as $row) {
-                $langRow = $this->itemLanguageTable->fetchRow([
-                    'language = ?' => $language,
-                    'item_id = ?'  => $row->id
-                ]);
+                $langName = $this->itemModel->getName($row->id, $language);
                 $carsCount = $this->itemModel->getVehiclesAndEnginesCount($row->id);
 
                 $categories[] = [
@@ -135,9 +126,8 @@ class CategoryController extends AbstractActionController
                         'action'           => 'category',
                         'category_catname' => $row->catname,
                     ]),
-                    'name'           => $langRow ? $langRow->name : $row->name,
-                    'short_name'     => $langRow ? $langRow->name : $row->name,
-                                        //$langRow ? $langRow->short_name : $row->short_name,
+                    'name'           => $langName ? $langName : $row->name,
+                    'short_name'     => $langName ? $langName : $row->name,
                     'cars_count'     => $carsCount,
                     'new_cars_count' => $carsCount //$row->getWeekCarsCount(),
                 ];
@@ -257,13 +247,10 @@ class CategoryController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $categoryLang = $this->itemLanguageTable->fetchRow([
-            'language = ?' => $language,
-            'item_id = ?'   => $currentCategory->id
-        ]);
+        $langName = $this->itemModel->getName($currentCategory->id, $language);
 
         $breadcrumbs = [[
-            'name' => $categoryLang && $categoryLang->name ? $categoryLang->name : $currentCategory->name,
+            'name' => $langName ? $langName : $currentCategory->name,
             'url'  => $this->url()->fromRoute('categories', [
                 'action'           => 'category',
                 'category_catname' => $currentCategory->catname,
@@ -287,17 +274,10 @@ class CategoryController extends AbstractActionController
 
             $topCategory = $parentCategory;
 
-            $categoryLang = $this->itemLanguageTable->fetchRow([
-                'language = ?' => $language,
-                'item_id = ?'  => $parentCategory->id
-            ]);
-
-            $name = $categoryLang && $categoryLang->name // short_name
-                ? $categoryLang->name // short_name
-                : $parentCategory->name; // short_name
+            $cLangName = $this->itemModel->getName($parentCategory->id, $language);
 
             array_unshift($breadcrumbs, [
-                'name' => $name,
+                'name' => $cLangName ? $cLangName : $parentCategory->name,
                 'url'  => $this->url()->fromRoute('categories', [
                     'action'           => 'category',
                     'category_catname' => $parentCategory->catname,
@@ -307,11 +287,6 @@ class CategoryController extends AbstractActionController
                 ])
             ]);
         }
-
-        $categoryLang = $this->itemLanguageTable->fetchRow([
-            'language = ?' => $language,
-            'item_id = ?'  => $currentCategory->id
-        ]);
 
         $path = $this->params('path');
         $path = $path ? (array)$path : [];
@@ -380,7 +355,7 @@ class CategoryController extends AbstractActionController
 
         $data = [
             'category'            => $currentCategory,
-            'categoryLang'        => $categoryLang,
+            'categoryName'        => $langName ? $langName : $currentCategory->name,
             'isOther'             => $isOther,
             'currentItem'         => $currentItem,
             'currentItemNameData' => $currentItemNameData
@@ -393,7 +368,7 @@ class CategoryController extends AbstractActionController
             $isOther,
             $path,
             $breadcrumbs,
-            $categoryLang ? $categoryLang->name : $currentCategory->name
+            $langName ? $langName : $currentCategory->name
         );
 
         if (is_array($result)) {
@@ -509,29 +484,7 @@ class CategoryController extends AbstractActionController
                 'listBuilder' => $listBuilder
             ]);
 
-            /*$description = null;
-            if ($categoryLang['text_id']) {
-                $description = $this->textStorage->getText($categoryLang['text_id']);
-            }*/
-
-            $itemLanguageTable = new DbTable\Item\Language();
-            $db = $itemLanguageTable->getAdapter();
-            $orderExpr = $db->quoteInto('language = ? desc', $this->language());
-            $itemLanguageRows = $itemLanguageTable->fetchAll([
-                'item_id = ?' => $currentCategory['id']
-            ], new \Zend_Db_Expr($orderExpr));
-
-            $textIds = [];
-            foreach ($itemLanguageRows as $itemLanguageRow) {
-                if ($itemLanguageRow->text_id) {
-                    $textIds[] = $itemLanguageRow->text_id;
-                }
-            }
-
-            $description = null;
-            if ($textIds) {
-                $description = $this->textStorage->getFirstText($textIds);
-            }
+            $description = $this->itemModel->getTextOfItem($currentCategory['id'], $this->language());
 
             $otherPictures = [];
             $otherItemsCount = 0;

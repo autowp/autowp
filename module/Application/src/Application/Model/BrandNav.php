@@ -49,6 +49,11 @@ class BrandNav
      */
     private $itemModel;
 
+    /**
+     * @var DbTable\Item
+     */
+    private $itemTable;
+
     public function __construct(
         StorageInterface $cache,
         TranslatorInterface $translator,
@@ -66,6 +71,8 @@ class BrandNav
         $this->itemAlias = $itemAlias;
         $this->pictureTable = $pictureTable;
         $this->itemModel = $itemModel;
+
+        $this->itemTable = new DbTable\Item();
     }
 
     public function getMenu(array $params)
@@ -149,9 +156,7 @@ class BrandNav
 
             if ($conceptsSeparatly) {
                 // concepts
-                $itemTable = new DbTable\Item();
-
-                $db = $itemTable->getAdapter();
+                $db = $this->itemTable->getAdapter();
                 $select = $db->select()
                     ->from('item', new Zend_Db_Expr('1'))
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
@@ -254,8 +259,7 @@ class BrandNav
 
     private function carSectionGroupsSelect($brandId, $itemTypeId, $carTypeId, $nullType, $conceptsSeparatly)
     {
-        $itemTable = new DbTable\Item();
-        $db = $itemTable->getAdapter();
+        $db = $this->itemTable->getAdapter();
 
         $select = $db->select()
             ->from('item_parent', [
@@ -315,8 +319,7 @@ class BrandNav
 
     private function carSectionGroups($language, array $brand, array $section, $conceptsSeparatly)
     {
-        $carLanguageTable = new DbTable\Item\Language();
-        $db = $carLanguageTable->getAdapter();
+        $db = $this->itemTable->getAdapter();
 
         $rows = [];
         if ($section['car_type_id']) {
@@ -474,11 +477,9 @@ class BrandNav
             $this->cache->setItem($cacheKey, $sections);
         }
 
-        $itemTable = new DbTable\Item();
-
         $selectedIds = [];
         if ($carId) {
-            $db = $itemTable->getAdapter();
+            $db = $this->itemTable->getAdapter();
             $selectedIds = $db->fetchCol(
                 $db->select()
                     ->distinct()

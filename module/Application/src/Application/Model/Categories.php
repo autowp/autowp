@@ -21,19 +21,20 @@ class Categories
     private $itemTable;
 
     /**
-     * @var TableGateway
+     * @var Item
      */
-    private $itemLangTable;
+    private $itemModel;
 
     public function __construct(
         TreeRouteStack $router,
         TableGateway $itemTable,
-        TableGateway $itemLanguageTable
+        Item $itemModel
     ) {
         $this->router = $router;
 
         $this->itemTable = $itemTable;
-        $this->itemLangTable = $itemLanguageTable;
+
+        $this->itemModel = $itemModel;
     }
 
     private function getCategoriesSelect($parentId, $order)
@@ -104,10 +105,7 @@ class Categories
 
         $categories = [];
         foreach ($items as $item) {
-            $langRow = $this->itemLangTable->select([
-                'language = ?' => $language,
-                'item_id = ?'  => $item['id']
-            ])->current();
+            $langName = $this->itemModel->getName($item['id'], $language);
 
             $category = [
                 'id'             => $item['id'],
@@ -118,9 +116,8 @@ class Categories
                 ], [
                     'name' => 'categories'
                 ]),
-                'name'           => $langRow && $langRow['name'] ? $langRow['name'] : $item['name'],
-                'short_name'     => $langRow && $langRow['name'] ? $langRow['name'] : $item['name'],
-                                    //$langRow ? $langRow->short_name : $row->short_name,
+                'name'           => $langName ? $langName : $item['name'],
+                'short_name'     => $langName ? $langName : $item['name'],
                 'cars_count'     => $item['cars_count'],
                 'new_cars_count' => $item['new_cars_count'],
             ];

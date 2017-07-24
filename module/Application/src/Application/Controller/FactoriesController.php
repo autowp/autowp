@@ -150,24 +150,7 @@ class FactoriesController extends AbstractActionController
 
         $point = $this->itemModel->getPoint($factory->id);
 
-        $itemLanguageTable = new DbTable\Item\Language();
-        $db = $itemLanguageTable->getAdapter();
-        $orderExpr = $db->quoteInto('language = ? desc', $this->language());
-        $itemLanguageRows = $itemLanguageTable->fetchAll([
-            'item_id = ?' => $factory['id']
-        ], new \Zend_Db_Expr($orderExpr));
-
-        $textIds = [];
-        foreach ($itemLanguageRows as $itemLanguageRow) {
-            if ($itemLanguageRow->text_id) {
-                $textIds[] = $itemLanguageRow->text_id;
-            }
-        }
-
-        $description = null;
-        if ($textIds) {
-            $description = $this->textStorage->getFirstText($textIds);
-        }
+        $description = $this->itemModel->getTextOfItem($factory['id'], $this->language());
 
         return [
             'factory'     => $factory,

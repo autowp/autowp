@@ -11,10 +11,15 @@ class ItemAlias
      */
     private $table;
 
-    public function __construct(TableGateway $table, TableGateway $itemLanguageTable)
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
+    public function __construct(TableGateway $table, Item $itemModel)
     {
         $this->table = $table;
-        $this->itemLanguageTable = $itemLanguageTable;
+        $this->itemModel = $itemModel;
     }
 
     public function getAliases(int $itemId, string $name): array
@@ -30,13 +35,9 @@ class ItemAlias
             }
         }
 
-        $langRows = $this->itemLanguageTable->select([
-            'item_id' => $itemId
-        ]);
-        foreach ($langRows as $langRow) {
-            if ($langRow['name']) {
-                $aliases[] = $langRow['name'];
-            }
+        $langNames = $this->itemModel->getNames($itemId);
+        foreach ($langNames as $langName) {
+            $aliases[] = $langName;
         }
 
         usort($aliases, function ($a, $b) {

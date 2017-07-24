@@ -274,8 +274,8 @@ class Car extends AbstractPlugin
 
             $texts = $this->itemModel->getTextsOfItem($car['id'], $language);
 
-            $description = $texts['description'];
-            $text = $texts['text'];
+            $description = $texts['text'];
+            $text = $texts['full_text'];
 
             $hasHtml = (bool)$text;
 

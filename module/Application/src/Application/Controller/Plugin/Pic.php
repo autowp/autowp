@@ -450,7 +450,6 @@ class Pic extends AbstractPlugin
         $isModer = $controller->user()->inheritsRole('moder');
 
         $itemTable = $this->catalogue->getItemTable();
-        $itemLanguageTable = new DbTable\Item\Language();
 
         $db = $this->pictureTable->getAdapter();
 
@@ -525,8 +524,8 @@ class Pic extends AbstractPlugin
 
                 $texts = $this->itemModel->getTextsOfItem($item['id'], $language);
 
-                $fullText = $texts['text'];
-                $text = $texts['description'];
+                $fullText = $texts['full_text'];
+                $text = $texts['text'];
 
                 if ((bool)$fullText) {
                     foreach ($this->catalogue->getCataloguePaths($item['id']) as $path) {
@@ -584,20 +583,17 @@ class Pic extends AbstractPlugin
             $altNames = [];
             $altNames2 = [];
 
-            $carLangRows = $itemLanguageTable->fetchAll([
-                'item_id = ?'   => $item->id,
-                'language <> ?' => 'xx'
-            ]);
+            $langNames = $this->itemModel->getNames($item->id);
 
             $currentLangName = null;
-            foreach ($carLangRows as $carLangRow) {
-                $name = $carLangRow->name;
+            foreach ($langNames as $lang => $langName) {
+                $name = $langName;
                 if (! isset($altNames[$name])) {
-                    $altNames[$carLangRow->name] = [];
+                    $altNames[$langName] = [];
                 }
-                $altNames[$name][] = $carLangRow->language;
+                $altNames[$name][] = $lang;
 
-                if ($language == $carLangRow->language) {
+                if ($language == $lang) {
                     $currentLangName = $name;
                 }
             }

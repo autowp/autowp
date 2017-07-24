@@ -31,11 +31,6 @@ class ItemParent
     private $itemTable;
 
     /**
-     * @var DbTable\Item\Language
-     */
-    private $itemLangTable;
-
-    /**
      * @var TableGateway
      */
     private $itemParentTable;
@@ -90,20 +85,24 @@ class ItemParent
      */
     private $itemAlias;
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
     public function __construct(
         array $languages,
         TableGateway $specTable,
         TableGateway $itemParentTable,
         \Zend_Db_Adapter_Abstract $zf1db,
-        ItemAlias $itemAlias
+        ItemAlias $itemAlias,
+        Item $itemModel
     ) {
         $this->languages = $languages;
         $this->specTable = $specTable;
+        $this->itemModel = $itemModel;
 
         $this->itemTable = new DbTable\Item([
-            'db' => $zf1db
-        ]);
-        $this->itemLangTable = new DbTable\Item\Language([
             'db' => $zf1db
         ]);
         $this->itemParentTable = $itemParentTable;
@@ -145,16 +144,6 @@ class ItemParent
         return true;
     }
 
-    private function getItemName(\Autowp\Commons\Db\Table\Row $itemRow, string $language)
-    {
-        $languageRow = $this->itemLangTable->fetchRow([
-            'item_id = ?'  => $itemRow->id,
-            'language = ?' => $language
-        ]);
-
-        return $languageRow && $languageRow->name ? $languageRow->name : $itemRow->name;
-    }
-
     private function getYearsPrefix($begin, $end)
     {
         $bms = (int)($begin / 100);
@@ -181,7 +170,10 @@ class ItemParent
 
     private function extractName(\Autowp\Commons\Db\Table\Row $parentRow, \Autowp\Commons\Db\Table\Row $vehicleRow, $language)
     {
-        $vehicleName = $this->getItemName($vehicleRow, $language);
+        $langName = $this->itemModel->getName($vehicleRow->id, $language);
+
+        $vehicleName = $langName ? $langName : $vehicleRow->name;
+
         $aliases = $this->itemAlias->getAliases($parentRow['id'], $parentRow['name']);
 
         $name = $vehicleName;

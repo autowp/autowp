@@ -4,18 +4,11 @@ namespace Application\Model\Item\ListBuilder;
 
 use Exception;
 
-use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\ItemParent;
-
-use Zend_Db_Expr;
 
 class CatalogueGroupItem extends CatalogueItem
 {
-    /**
-     * @var DbTable\Item\Language
-     */
-    private $itemLanguageTable;
-
     /**
      * @var string
      */
@@ -32,11 +25,14 @@ class CatalogueGroupItem extends CatalogueItem
 
     private $itemParentRows = [];
 
-    public function __construct(array $options)
-    {
-        parent::__construct($options);
+    /**
+     * @var Item
+     */
+    private $itemModel;
 
-        $this->itemLanguageTable = new DbTable\Item\Language();
+    public function setItemModel(Item $model)
+    {
+        $this->itemModel = $model;
     }
 
     public function setLanguage($language)
@@ -67,28 +63,6 @@ class CatalogueGroupItem extends CatalogueItem
         return $this;
     }
 
-    private function isItemHasFullText($itemId)
-    {
-        $db = $this->itemLanguageTable->getAdapter();
-        $orderExpr = $db->quoteInto('language = ? desc', $this->language);
-        $itemLanguageRows = $this->itemLanguageTable->fetchAll([
-            'item_id = ?' => $itemId
-        ], new Zend_Db_Expr($orderExpr));
-
-        $fullTextIds = [];
-        foreach ($itemLanguageRows as $itemLanguageRow) {
-            if ($itemLanguageRow->full_text_id) {
-                $fullTextIds[] = $itemLanguageRow->full_text_id;
-            }
-        }
-
-        if (! $fullTextIds) {
-            return false;
-        }
-
-        return (bool)$this->textStorage->getFirstText($fullTextIds);
-    }
-
     private function getItemParentRow(int $itemId, int $parentId)
     {
         if (! isset($this->itemParentRows[$itemId][$parentId])) {
@@ -104,7 +78,7 @@ class CatalogueGroupItem extends CatalogueItem
     {
         $hasChilds = $this->itemParent->hasChildItems($item['id']);
 
-        $hasHtml = $this->isItemHasFullText($item['id']);
+        $hasHtml = $this->itemModel->hasFullText($item['id']);
 
         if (! $hasChilds && ! $hasHtml) {
             return null;

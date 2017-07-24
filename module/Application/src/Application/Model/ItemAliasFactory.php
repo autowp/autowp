@@ -15,7 +15,7 @@ class ItemAliasFactory implements FactoryInterface
         $tables = $container->get(\Application\Db\TableManager::class);
         return new ItemAlias(
             $tables->get('brand_alias'),
-            $tables->get('item_language')
+            $container->get(Item::class)
         );
     }
 }

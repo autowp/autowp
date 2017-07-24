@@ -45,7 +45,7 @@ class Item
     private $vehicleTypeParentTable;
 
     /**
-     * @var DbTable\Item\Language
+     * @var TableGateway
      */
     private $itemLanguageTable;
 
@@ -58,6 +58,7 @@ class Item
         TableGateway $specTable,
         TableGateway $itemPointTable,
         TableGateway $vehicleTypeParentTable,
+        TableGateway $itemLanguageTable,
         TextStorage $textStorage
     ) {
         $this->specTable = $specTable;
@@ -65,9 +66,8 @@ class Item
         $this->itemTable = new DbTable\Item();
         $this->itemPointTable = $itemPointTable;
         $this->vehicleTypeParentTable = $vehicleTypeParentTable;
+        $this->itemLanguageTable = $itemLanguageTable;
         $this->textStorage = $textStorage;
-
-        $this->itemLanguageTable = new DbTable\Item\Language();
     }
 
     public function getEngineVehiclesGroups(int $engineId, array $options = [])
@@ -148,19 +148,35 @@ class Item
 
     public function setLanguageName(int $id, string $language, string $name)
     {
-        $carLangRow = $this->itemLanguageTable->fetchRow([
-            'item_id = ?'  => $id,
-            'language = ?' => $language
-        ]);
+        $primaryKey = [
+            'item_id'  => $id,
+            'language' => $language
+        ];
+        $set = [
+            'name' => $name
+        ];
 
-        if (! $carLangRow) {
-            $carLangRow = $this->itemLanguageTable->createRow([
-                'item_id'  => $id,
-                'language' => $language
-            ]);
+        $row = $this->itemLanguageTable->select($primaryKey)->current();
+
+        if (! $row) {
+            $this->itemLanguageTable->insert(array_replace($set, $primaryKey));
+            return;
         }
-        $carLangRow['name'] = $name;
-        $carLangRow->save();
+
+        $this->itemLanguageTable->update($set, $primaryKey);
+    }
+
+    public function getUsedLanguagesCount(int $id): int
+    {
+        $select = new Sql\Select($this->itemLanguageTable->getTable());
+        $select->columns(['count' => new Sql\Expression('count(1)')])
+            ->where([
+                'item_id'       => $id,
+                'language != ?' => 'xx'
+            ]);
+
+        $row = $this->itemLanguageTable->selectWith($select)->current();
+        return $row ? (int)$row['count'] : 0;
     }
 
     public function getLanguageNamesOfItems(array $ids, string $language): array
@@ -169,14 +185,14 @@ class Item
             return [];
         }
 
-        $rows = $this->itemLanguageTable->fetchAll([
-            'item_id IN (?)' => $ids,
+        $rows = $this->itemLanguageTable->select([
+            new Sql\Predicate\In('item_id', $ids),
             'language = ?'   => $language,
-            'length(name) > 0'
+            new Sql\Predicate\Expression('length(name) > 0')
         ]);
         $result = [];
         foreach ($rows as $row) {
-            $result[$row->item_id] = $row->name;
+            $result[(int)$row['item_id']] = $row['name'];
         }
 
         return $result;
@@ -184,20 +200,22 @@ class Item
 
     public function getTextsOfItem(int $id, string $language): array
     {
-        $db = $this->itemLanguageTable->getAdapter();
-        $orderExpr = $db->quoteInto('language = ? desc', $language);
-        $rows = $this->itemLanguageTable->fetchAll([
-            'item_id = ?' => $id
-        ], new Zend_Db_Expr($orderExpr));
+        $select = new Sql\Select($this->itemLanguageTable->getTable());
+
+        $select
+            ->where(['item_id' => $id])
+            ->order([new Sql\Expression('language = ? desc', [$language])]);
+
+        $rows = $this->itemLanguageTable->selectWith($select);
 
         $textIds = [];
         $fullTextIds = [];
         foreach ($rows as $row) {
             if ($row->text_id) {
-                $textIds[] = $row->text_id;
+                $textIds[] = $row['text_id'];
             }
             if ($row->full_text_id) {
-                $fullTextIds[] = $row->full_text_id;
+                $fullTextIds[] = $row['full_text_id'];
             }
         }
 
@@ -212,37 +230,91 @@ class Item
         }
 
         return [
-            'text'        => $text,
-            'description' => $description
+            'full_text' => $text,
+            'text'      => $description
         ];
+    }
+
+    public function getTextOfItem(int $id, string $language): string
+    {
+        $select = new Sql\Select($this->itemLanguageTable->getTable());
+
+        $select
+            ->columns(['text_id'])
+            ->where([
+                'item_id' => $id,
+                new Sql\Predicate\IsNotNull('text_id')
+            ])
+            ->order([new Sql\Expression('language = ? desc', [$language])]);
+
+        $rows = $this->itemLanguageTable->selectWith($select);
+
+        $textIds = [];
+        foreach ($rows as $row) {
+            $textIds[] = $row['text_id'];
+        }
+
+        $text = null;
+        if ($textIds) {
+            $text = $this->textStorage->getFirstText($textIds);
+        }
+
+        return $text ? $text : '';
+    }
+
+    public function hasFullText(int $id): bool
+    {
+        $rows = $this->itemLanguageTable->select([
+            'item_id' => $id,
+            new Sql\Predicate\IsNotNull('full_text_id')
+        ]);
+
+        $ids = [];
+        foreach ($rows as $row) {
+            $ids[] = $row['full_text_id'];
+        }
+
+        if (! $ids) {
+            return false;
+        }
+
+        return (bool)$this->textStorage->getFirstText($ids);
+    }
+
+    public function getNames(int $itemId): array
+    {
+        $rows = $this->itemLanguageTable->select([
+            'item_id' => $itemId,
+            new Sql\Predicate\Expression('length(name) > 0')
+        ]);
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['language']] = $row['name'];
+        }
+
+        return $result;
     }
 
     public function getName(int $itemId, string $language)
     {
-        $db = $this->itemLanguageTable->getAdapter();
-
         $languages = array_merge([$language], ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'zh', 'xx']);
 
-        $select = $db->select()
-            ->from('item_language', ['name'])
-            ->where('item_id = ?', $itemId)
-            ->where('length(name) > 0')
-            ->order(new Zend_Db_Expr($db->quoteInto('FIELD(language, ?)', $languages)))
+        $select = new Sql\Select($this->itemLanguageTable->getTable());
+        $select->columns(['name'])
+            ->where([
+                'item_id' => $itemId,
+                new Sql\Predicate\Expression('length(name) > 0')
+            ])
+            ->order([new Sql\Expression('FIELD(language' . str_repeat(', ?', count($languages)) . ')', $languages)])
             ->limit(1);
 
-        return $db->fetchOne($select);
+        $row = $this->itemLanguageTable->selectWith($select)->current();
+
+        return $row ? $row['name'] : '';
     }
 
     public function getNameData(\Autowp\Commons\Db\Table\Row $row, string $language = 'en')
     {
-        /*$carLangTable = new DbTable\Item\Language();
-         $carLangRow = $carLangTable->fetchRow([
-             'item_id = ?'  => $this->id,
-             'language = ?' => (string)$language
-         ]);
-
-         $name = $carLangRow && $carLangRow->name ? $carLangRow->name : $this->name;*/
-
         $name = $this->getName($row['id'], $language);
 
         $spec = null;
