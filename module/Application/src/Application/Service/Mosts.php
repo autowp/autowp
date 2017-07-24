@@ -576,6 +576,10 @@ class Mosts
         if ($carType) {
             $ids = $this->vehicleType->getDescendantsAndSelfIds($carType['id']);
 
+            if (! $ids) {
+                throw new Exception("Failed fetch vehicle_type ids");
+            }
+
             $select->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null);
 
             if (count($ids) == 1) {
