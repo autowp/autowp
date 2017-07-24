@@ -1608,7 +1608,7 @@ class CatalogueController extends AbstractActionController
         $counts = $this->childsTypeCount($currentCarId);
 
 
-        $texts = $this->itemModel->getItemTexts($currentCar['id']);
+        $texts = $this->itemModel->getTextsOfItem($currentCar['id']);
 
         $currentCar['description'] = $texts['text'];
         $currentCar['text'] = $texts['full_text'];
