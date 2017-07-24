@@ -5,7 +5,7 @@ namespace Application\Controller\Frontend;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\Controller\PerspctiveController as Controller;
+use Application\Controller\PerspectiveController as Controller;
 
 class PerspectiveControllerFactory implements FactoryInterface
 {
