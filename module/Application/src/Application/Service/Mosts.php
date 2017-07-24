@@ -567,20 +567,20 @@ class Mosts
         return $pictures;
     }
 
-    public function getCarsData($cMost, $carType, $cYear, $brandId, $language)
+    private function getCarsData(array $cMost, int $carTypeId, $cYear, int $brandId, string $language)
     {
         $itemTable = new DbTable\Item();
 
         $select = $itemTable->select(true);
 
-        if ($carType) {
-            $ids = $this->vehicleType->getDescendantsAndSelfIds($carType['id']);
+        if ($carTypeId) {
+            $ids = $this->vehicleType->getDescendantsAndSelfIds($carTypeId);
 
             if (! $ids) {
                 throw new Exception("Failed fetch vehicle_type ids");
             }
 
-            $select->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null);
+            $select->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', []);
 
             if (count($ids) == 1) {
                 $select->where('vehicle_vehicle_type.vehicle_type_id = ?', $ids[0]);
@@ -638,7 +638,7 @@ class Mosts
         $mostCatname = $options['most'];
         $yearsCatname = $options['years'];
         $carTypeCatname = $options['carType'];
-        $brandId = $options['brandId'];
+        $brandId = (int)$options['brandId'];
 
         $ratings = $this->getRatings();
 
@@ -691,7 +691,7 @@ class Mosts
             $carTypeData = $this->getCarTypeData($carType);
         }
 
-        $data = $this->getCarsData($cMost, $carType, $cYear, $brandId, $language);
+        $data = $this->getCarsData($cMost, $carType ? $carType['id'] : 0, $cYear, $brandId, $language);
 
         // sidebar
         $carTypeCatname = $carTypeData ? $carTypeData['catname'] : null;
@@ -708,7 +708,7 @@ class Mosts
             ];
         }
 
-        $carTypes = $this->getCarTypes((int)$brandId);
+        $carTypes = $this->getCarTypes($brandId);
 
         $sidebarCarTypes = [];
         foreach ($carTypes as $carType) {
