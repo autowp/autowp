@@ -25,7 +25,7 @@ class AttrsController extends AbstractActionController
     private $listOptionTable;
 
     /**
-     * @var Attr\ZoneAttribute
+     * @var TableGateway
      */
     private $zoneAttributeTable;
 
@@ -48,13 +48,14 @@ class AttrsController extends AbstractActionController
         SpecificationsService $specsService,
         TableGateway $listOptionTable,
         TableGateway $zoneTable,
-        TableGateway $typeTable
+        TableGateway $typeTable,
+        TableGateway $zoneAttributeTable
     ) {
         $this->specsService = $specsService;
 
         $this->listOptionTable = $listOptionTable;
         $this->attributeTable = new Attr\Attribute();
-        $this->zoneAttributeTable = new Attr\ZoneAttribute();
+        $this->zoneAttributeTable = $zoneAttributeTable;
         $this->zoneTable = $zoneTable;
         $this->typeTable = $typeTable;
     }
@@ -286,11 +287,11 @@ class AttrsController extends AbstractActionController
         return $result;
     }
 
-    private function zoneUrl($zone)
+    private function getZoneUrl(int $zoneId)
     {
         return $this->url()->fromRoute('moder/attrs/params', [
             'action'  => 'zone',
-            'zone_id' => $zone['id']
+            'zone_id' => $zoneId
         ]);
     }
 
@@ -309,41 +310,42 @@ class AttrsController extends AbstractActionController
         if ($request->isPost()) {
             switch ($this->params('form')) {
                 case 'attributes':
-                    $zoneAttributes = new Attr\ZoneAttribute();
                     $ids = (array)$request->getPost('attribute_id');
                     if (count($ids)) {
                         $select = $this->attributeTable->select()
                             ->where('id IN (?)', $ids);
                         foreach ($this->attributeTable->fetchAll($select) as $attribute) {
-                            $exists = (bool)$zoneAttributes->fetchRow(
-                                $zoneAttributes->select()
-                                    ->where('zone_id = ?', $zone['id'])
-                                    ->where('attribute_id = ?', $attribute->id)
-                            );
+                            $exists = (bool)$this->zoneAttributeTable->select([
+                                'zone_id'      => $zone['id'],
+                                'attribute_id' => $attribute->id
+                            ])->current();
                             if (! $exists) {
-                                $zoneAttributes->insert([
+                                $select = new Sql\Select($this->zoneAttributeTable->getTable());
+                                $select->columns(['max' => new Sql\Expression('MAX(position)')])
+                                    ->where(['zone_id' => $zone['id']]);
+
+                                $row = $this->zoneAttributeTable->selectWith($select)->current();
+                                $maxPosition = $row ? $row['max'] : 0;
+
+                                $this->zoneAttributeTable->insert([
                                     'zone_id'       => $zone['id'],
                                     'attribute_id'  => $attribute->id,
-                                    'position'      => 1 + $zoneAttributes->getAdapter()->fetchOne(
-                                        $zoneAttributes->select()
-                                            ->from($zoneAttributes, ['MAX(position)'])
-                                            ->where('zone_id = ?', $zone['id'])
-                                    )
+                                    'position'      => $maxPosition + 1
                                 ]);
                             }
                         }
-                        $zoneAttributes->delete([
-                            'zone_id = ?'             => $zone['id'],
-                            'attribute_id NOT IN (?)' => $ids
+                        $this->zoneAttributeTable->delete([
+                            'zone_id = ?' => $zone['id'],
+                            new Sql\Predicate\NotIn('attribute_id', $ids)
                         ]);
                     } else {
-                        $zoneAttributes->delete([
+                        $this->zoneAttributeTable->delete([
                             'zone_id = ?' => $zone['id']
                         ]);
                     }
                     break;
             }
-            return $this->redirect()->toUrl($this->zoneUrl($zone));
+            return $this->redirect()->toUrl($this->getZoneUrl($zone['id']));
         }
 
         return [
@@ -357,12 +359,10 @@ class AttrsController extends AbstractActionController
 
     private function isZoneHasAttribute(int $zoneId, int $attributeId): bool
     {
-        return (bool)$this->zoneAttributeTable->getAdapter()->fetchOne(
-            $this->zoneAttributeTable->select(true)
-                ->from($this->zoneAttributeTable->info('name'), 'COUNT(*)')
-                ->where('zone_id = ?', $zoneId)
-                ->where('attribute_id = ?', $attributeId)
-        );
+        return (bool)$this->zoneAttributeTable->select([
+            'zone_id'      => $zoneId,
+            'attribute_id' => $attributeId
+        ])->current();
     }
 
     private function getZoneAttributesRecursive(int $zoneId, int $parentId): array
@@ -520,45 +520,52 @@ class AttrsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $zoneAttributes = new Attr\ZoneAttribute();
-        $zoneAttribute = $zoneAttributes->fetchRow(
-            $zoneAttributes->select()
-                ->where('zone_id = ?', $zone['id'])
-                ->where('attribute_id = ?', $attribute->id)
-        );
+        $zoneAttribute = $this->zoneAttributeTable->select([
+            'zone_id'      => $zone['id'],
+            'attribute_id' => $attribute->id
+        ])->current();
 
         if (! $zoneAttribute) {
             return $this->notFoundAction();
         }
 
-        $select = $zoneAttributes->select(true)
-            ->join('attrs_attributes', 'attrs_zone_attributes.attribute_id=attrs_attributes.id', null)
-            ->where('attrs_zone_attributes.zone_id = ?', $zone['id'])
-            ->where('attrs_zone_attributes.position < ?', $zoneAttribute->position)
+        $select = new Sql\Select($this->zoneAttributeTable->getTable());
+
+        $select
+            ->join('attrs_attributes', 'attrs_zone_attributes.attribute_id = attrs_attributes.id', [])
+            ->where([
+                'attrs_zone_attributes.zone_id'      => $zone['id'],
+                'attrs_zone_attributes.position < ?' => $zoneAttribute['position']
+            ])
             ->order('attrs_zone_attributes.position DESC')
             ->limit(1);
         if ($attribute->parent_id) {
-            $select->where('attrs_attributes.parent_id = ?', $attribute->parent_id);
+            $select->where(['attrs_attributes.parent_id' => $attribute->parent_id]);
         } else {
-            $select->where('attrs_attributes.parent_id IS NULL');
+            $select->where(['attrs_attributes.parent_id IS NULL']);
         }
-        $prev = $zoneAttributes->fetchRow($select);
+        $prev = $this->zoneAttributeTable->selectWith($select)->current();
 
         if ($prev) {
-            $prevPos = $prev->position;
+            $prevPos = $prev['position'];
+            $pagePos = $zoneAttribute['position'];
 
-            $prev->position = 10000;
-            $prev->save();
-
-            $pagePos = $zoneAttribute->position;
-            $zoneAttribute->position = $prevPos;
-            $zoneAttribute->save();
-
-            $prev->position = $pagePos;
-            $prev->save();
+            $this->setZoneAttributePosition($prev['zone_id'], $prev['attribute_id'], 10000);
+            $this->setZoneAttributePosition($zoneAttribute['zone_id'], $zoneAttribute['attribute_id'], $prevPos);
+            $this->setZoneAttributePosition($prev['zone_id'], $prev['attribute_id'], $pagePos);
         }
 
-        return $this->redirect()->toUrl($this->zoneUrl($zone));
+        return $this->redirect()->toUrl($this->getZoneUrl($zone['id']));
+    }
+
+    private function setZoneAttributePosition(int $zoneId, int $attriuteId, int $position)
+    {
+        $this->zoneAttributeTable->update([
+            'position' => $position
+        ], [
+            'zone_id'      => $zoneId,
+            'attribute_id' => $attriuteId
+        ]);
     }
 
     public function moveDownAttributeAction()
@@ -577,44 +584,41 @@ class AttrsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $zoneAttributes = new Attr\ZoneAttribute();
-        $zoneAttribute = $zoneAttributes->fetchRow(
-            $zoneAttributes->select()
-                ->where('zone_id = ?', $zone['id'])
-                ->where('attribute_id = ?', $attribute->id)
-        );
+        $zoneAttribute = $this->zoneAttributeTable->select([
+            'zone_id'      => $zone['id'],
+            'attribute_id' => $attribute->id
+        ])->current();
 
         if (! $zoneAttribute) {
             return $this->notFoundAction();
         }
 
-        $select = $zoneAttributes->select(true)
-            ->join('attrs_attributes', 'attrs_zone_attributes.attribute_id=attrs_attributes.id', null)
-            ->where('attrs_zone_attributes.zone_id = ?', $zone['id'])
-            ->where('attrs_zone_attributes.position > ?', $zoneAttribute->position)
+        $select = new Sql\Select($this->zoneAttributeTable->getTable());
+
+        $select
+            ->join('attrs_attributes', 'attrs_zone_attributes.attribute_id = attrs_attributes.id', [])
+            ->where([
+                'attrs_zone_attributes.zone_id' => $zone['id'],
+                'attrs_zone_attributes.position > ?' => $zoneAttribute['position']
+            ])
             ->order('attrs_zone_attributes.position ASC')
             ->limit(1);
         if ($attribute->parent_id) {
-            $select->where('attrs_attributes.parent_id = ?', $attribute->parent_id);
+            $select->where(['attrs_attributes.parent_id' => $attribute->parent_id]);
         } else {
-            $select->where('attrs_attributes.parent_id IS NULL');
+            $select->where(['attrs_attributes.parent_id IS NULL']);
         }
-        $next = $zoneAttributes->fetchRow($select);
+        $next = $this->zoneAttributeTable->select($select)->current();
 
         if ($next) {
             $nextPos = $next->position;
-
-            $next->position = 10000;
-            $next->save();
-
             $pagePos = $zoneAttribute->position;
-            $zoneAttribute->position = $nextPos;
-            $zoneAttribute->save();
 
-            $next->position = $pagePos;
-            $next->save();
+            $this->setZoneAttributePosition($next['zone_id'], $next['attribute_id'], 10000);
+            $this->setZoneAttributePosition($zoneAttribute['zone_id'], $zoneAttribute['attribute_id'], $nextPos);
+            $this->setZoneAttributePosition($next['zone_id'], $next['attribute_id'], $pagePos);
         }
 
-        return $this->redirect()->toUrl($this->zoneUrl($zone));
+        return $this->redirect()->toUrl($this->getZoneUrl($zone['id']));
     }
 }
