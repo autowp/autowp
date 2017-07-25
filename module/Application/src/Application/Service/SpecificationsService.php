@@ -18,10 +18,10 @@ use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
 use Application\Model\Item;
 use Application\Model\ItemParent;
+use Application\Model\VehicleType;
 use Application\Spec\Table\Car as CarSpecTable;
 
 use Zend_Db_Expr;
-use Application\Model\VehicleType;
 
 class SpecificationsService
 {
@@ -92,7 +92,7 @@ class SpecificationsService
     private $engineAttributes = null;
 
     /**
-     * @var Attr\Type
+     * @var TableGateway
      */
     private $typeTable;
 
@@ -148,7 +148,8 @@ class SpecificationsService
         DbTable\Picture $pictureTable,
         VehicleType $vehicleType,
         TableGateway $unitTable,
-        TableGateway $listOptionsTable
+        TableGateway $listOptionsTable,
+        TableGateway $typeTable
     ) {
         $this->translator = $translator;
         $this->itemNameFormatter = $itemNameFormatter;
@@ -159,6 +160,7 @@ class SpecificationsService
 
         $this->unitTable = $unitTable;
         $this->listOptionsTable = $listOptionsTable;
+        $this->typeTable = $typeTable;
     }
 
     /**
@@ -183,16 +185,6 @@ class SpecificationsService
         }
 
         return $this->users[$userId];
-    }
-
-    /**
-     * @return Attr\Type
-     */
-    private function getTypeTable()
-    {
-        return $this->typeTable
-            ? $this->typeTable
-            : $this->typeTable = new Attr\Type();
     }
 
     /**
@@ -2583,13 +2575,13 @@ class SpecificationsService
     {
         if ($this->types === null) {
             $this->types = [];
-            foreach ($this->getTypeTable()->fetchAll() as $row) {
-                $this->types[(int)$row->id] = [
-                    'id'        => (int)$row->id,
-                    'name'      => $row->name,
-                    'element'   => $row->element,
-                    'maxlength' => $row->maxlength,
-                    'size'      => $row->size
+            foreach ($this->typeTable->select() as $row) {
+                $this->types[(int)$row['id']] = [
+                    'id'        => (int)$row['id'],
+                    'name'      => $row['name'],
+                    'element'   => $row['element'],
+                    'maxlength' => $row['maxlength'],
+                    'size'      => $row['size']
                 ];
             }
         }

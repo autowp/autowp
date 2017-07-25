@@ -13,11 +13,6 @@ class Attribute extends Table
             'columns'       => ['parent_id'],
             'refTableClass' => self::class,
             'refColumns'    => ['id']
-        ],
-        'Type' => [
-            'columns'       => ['type_id'],
-            'refTableClass' => Type::class,
-            'refColumns'    => ['id']
         ]
     ];
 }

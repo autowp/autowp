@@ -15,13 +15,6 @@ class Attribute extends Form implements InputFilterProviderInterface
     {
         parent::__construct($name, $options);
 
-        $typesTable = new Attr\Type();
-        $db = $typesTable->getAdapter();
-        $typeOptions = $db->fetchPairs(
-            $db->select()
-                ->from($typesTable->info('name'), ['id', 'name'])
-        );
-
         $elements = [
             [
                 'name'    => 'name',
@@ -35,7 +28,7 @@ class Attribute extends Form implements InputFilterProviderInterface
                 'type'    => 'Select',
                 'options' => [
                     'label'   => 'attrs/attribute/type',
-                    'options' => array_replace(['' => '--'], $typeOptions)
+                    'options' => ['' => '--']
                 ]
             ],
             [

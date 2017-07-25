@@ -18,7 +18,8 @@ class AttrsControllerFactory implements FactoryInterface
         return new Controller(
             $container->get(\Application\Service\SpecificationsService::class),
             $tables->get('attrs_list_options'),
-            $tables->get('attrs_zones')
+            $tables->get('attrs_zones'),
+            $tables->get('attrs_types')
         );
     }
 }

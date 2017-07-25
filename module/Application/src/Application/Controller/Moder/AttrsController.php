@@ -39,10 +39,16 @@ class AttrsController extends AbstractActionController
      */
     private $zoneTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $typeTable;
+
     public function __construct(
         SpecificationsService $specsService,
         TableGateway $listOptionTable,
-        TableGateway $zoneTable
+        TableGateway $zoneTable,
+        TableGateway $typeTable
     ) {
         $this->specsService = $specsService;
 
@@ -50,6 +56,7 @@ class AttrsController extends AbstractActionController
         $this->attributeTable = new Attr\Attribute();
         $this->zoneAttributeTable = new Attr\ZoneAttribute();
         $this->zoneTable = $zoneTable;
+        $this->typeTable = $typeTable;
     }
 
     public function indexAction()
@@ -93,8 +100,14 @@ class AttrsController extends AbstractActionController
             $unitOptions[$unit['id']] = $unit['name'];
         }
 
+        $typeOptions = ['' => '--'];
+        foreach ($this->typeTable->select([]) as $type) {
+            $typeOptions[$type['id']] = $type['name'];
+        }
+
         $formAttributeEdit = new AttributeForm();
         $formAttributeEdit->get('unit_id')->setValueOptions($unitOptions);
+        $formAttributeEdit->get('type_id')->setValueOptions($typeOptions);
         $formAttributeEdit->setAttribute('action', $this->url()->fromRoute(null, [
             'form' => 'edit'
         ], [], true));
@@ -102,6 +115,7 @@ class AttrsController extends AbstractActionController
 
         $formAttributeNew = new AttributeForm();
         $formAttributeNew->get('unit_id')->setValueOptions($unitOptions);
+        $formAttributeEdit->get('type_id')->setValueOptions($typeOptions);
         $formAttributeNew->setAttribute('action', $this->url()->fromRoute(null, [
             'form' => 'new'
         ], [], true));
@@ -189,8 +203,6 @@ class AttrsController extends AbstractActionController
             }
         }
 
-
-
         return [
             'attribute'         => $attribute,
             'formAttributeEdit' => $formAttributeEdit,
@@ -261,10 +273,11 @@ class AttrsController extends AbstractActionController
 
         $result = [];
         foreach ($rows as $row) {
+            $type = $this->typeTable->select(['id' => $row['type_id']])->current();
             $result[] = [
                 'id'     => $row['id'],
                 'name'   => $row['name'],
-                'type'   => $row->findParentRow(\Application\Model\DbTable\Attr\Type::class),
+                'type'   => $type,
                 'unit'   => $this->specsService->getUnit($row['unit_id']),
                 'childs' => $this->getAttributes($row['id'])
             ];
