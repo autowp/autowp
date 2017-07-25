@@ -360,9 +360,9 @@ class VehicleType
         $result = [];
         foreach ($this->vehicleTypeTable->selectWith($select) as $row) {
             $result[] = [
-                'id'        => (int)$carType['id'],
-                'name'      => $carType['name'],
-                'catname'   => $carType['catname'],
+                'id'        => (int)$row['id'],
+                'name'      => $row['name'],
+                'catname'   => $row['catname'],
                 'carsCount' => (int)$row['cars_count']
             ];
         }
