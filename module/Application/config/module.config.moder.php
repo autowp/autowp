@@ -31,22 +31,6 @@ return [
                             ]
                         ]
                     ],
-                    'cars' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/cars[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\CarsController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'modification' => [
                         'type' => Segment::class,
                         'options' => [
@@ -70,7 +54,6 @@ return [
     'controllers' => [
         'factories' => [
             Controller\Moder\AttrsController::class => Controller\Moder\Service\AttrsControllerFactory::class,
-            Controller\Moder\CarsController::class  => Controller\Moder\Service\CarsControllerFactory::class,
         ]
     ],
     'forms' => [
