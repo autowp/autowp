@@ -23,6 +23,7 @@ class TableManager implements ServiceLocatorInterface
         'articles' => [],
         'attrs_list_options' => [],
         'attrs_units' => [],
+        'attrs_zones' => [],
         'banned_ip' => [],
         'brand_alias' => [], //TODO: rename to item_alias
         'car_types'   => [], //TODO: rename to vehicle_type

@@ -7,8 +7,8 @@
         ],
         'pageId' => 142,
         'args'   => [
-            'ZONE_NAME' => $this->zone->name,
-            'ZONE_ID'   => $this->zone->id,
+            'ZONE_NAME' => $this->zone['name'],
+            'ZONE_ID'   => $this->zone['id'],
         ]
     ]);
 ?>
@@ -20,8 +20,7 @@
                 'form'  =>  'attributes'
             ], [], true))?>" method="post">
                 <?=$this->partial('application/moder/attrs/zone/attributes-list-partial', [
-                    'attributes' => $this->attributes,
-                    'zone'       => $this->zone
+                    'attributes' => $this->allAttributes
                 ]) ?>
                 <div>
                     <input type="submit" value="<?=$this->escapeHtmlAttr('submit')?>" />
@@ -34,8 +33,7 @@
         <div class="well">
             <table>
                 <?=$this->partial('application/moder/attrs/zone/attributes-rows-partial', [
-                    'attributes' => $this->zone->findAttributes(),
-                    'zone'       => $this->zone,
+                    'attributes' => $this->attributes,
                     'deep'       => 0
                 ]) ?>
             </table>

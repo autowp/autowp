@@ -16,8 +16,8 @@
                 <?php foreach ($this->zones as $zone) { ?>
                     <li><?=$this->htmlA($this->url('moder/attrs/params', [
                         'action'  => 'zone',
-                        'zone_id' => $zone->id
-                    ], [], true), $zone->name) ?></li>
+                        'zone_id' => $zone['id']
+                    ], [], true), $zone['name']) ?></li>
                 <?php } ?>
             </ul>
         </div>
