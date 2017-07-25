@@ -332,7 +332,7 @@ class CarsController extends AbstractActionController
                     'item_id = ?'      => $toItemId,
                     'user_id = ?'      => $eDataRow->user_id
                 ];
-                if ($attrRow->isMultiple()) {
+                if ($attrRow->multiple) {
                     $filter['ordering = ?'] = $eDataRow->ordering;
                 }
                 $cDataRow = $dataTable->fetchRow($filter);

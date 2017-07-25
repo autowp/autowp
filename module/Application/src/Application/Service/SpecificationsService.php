@@ -726,7 +726,7 @@ class SpecificationsService
                     'description' => $row->description,
                     'typeId'      => (int)$row->type_id,
                     'unitId'      => (int)$row->unit_id,
-                    'isMultiple'  => $row->isMultiple(),
+                    'isMultiple'  => $row->multiple,
                     'precision'   => $row->precision,
                     'parentId'    => $pid ? $pid : null
                 ];
@@ -1181,7 +1181,7 @@ class SpecificationsService
             throw new Exception("Item_id not set");
         }
 
-        if ($attribute instanceof Attr\AttributeRow) {
+        if ($attribute instanceof \Autowp\Commons\Db\Table\Row) {
             $attribute = $this->getAttribute($attribute->id);
         } elseif (is_numeric($attribute)) {
             $attribute = $this->getAttribute($attribute);
