@@ -54,10 +54,12 @@ RUN apt-get update -qq && \
 COPY ./etc/ /etc/
 
 ADD composer.json /app/composer.json
-RUN php ./composer.phar install --no-progress --no-interaction --no-suggest --optimize-autoloader
+RUN php ./composer.phar install --no-progress --no-interaction --no-suggest --optimize-autoloader && \
+    php ./composer.phar clearcache
 
 ADD package.json /app/package.json
-RUN npm install -y --silent --production
+RUN npm install -y --silent --production && \
+    npm cache clean
 
 ADD . /app
 
