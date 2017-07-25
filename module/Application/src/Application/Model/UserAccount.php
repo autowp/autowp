@@ -61,7 +61,7 @@ class UserAccount
         return $result;
     }
 
-    public function haveAccountsForOtherServices(int $userId, strint $service): bool
+    public function haveAccountsForOtherServices(int $userId, string $service): bool
     {
         return (bool)$this->table->select([
             'user_id'         => $userId,
