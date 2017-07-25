@@ -2,10 +2,13 @@
 
 namespace Application\Most\Adapter;
 
+use Exception;
+
+use Zend\Db\TableGateway\TableGateway;
+
 use Application\Most;
 
 use Zend_Db_Table_Select;
-use Exception;
 
 abstract class AbstractAdapter
 {
@@ -14,9 +17,19 @@ abstract class AbstractAdapter
      */
     protected $most;
 
+    /**
+     * @var TableGateway
+     */
+    protected $attributeTable;
+
     public function __construct(array $options)
     {
         $this->setOptions($options);
+    }
+
+    public function setAttributeTable(TableGateway $table)
+    {
+        $this->attributeTable = $table;
     }
 
     public function setMost(Most $most)

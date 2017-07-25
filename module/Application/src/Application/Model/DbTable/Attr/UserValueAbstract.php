@@ -7,11 +7,6 @@ use Autowp\Commons\Db\Table;
 class UserValueAbstract extends Table
 {
     protected $_referenceMap = [
-        'Attribute' => [
-            'columns'       => ['attribut_id'],
-            'refTableClass' => Attribute::class,
-            'refColumns'    => ['id']
-        ],
         'User' => [
             'columns'       => ['user_id'],
             'refTableClass' => \Autowp\User\Model\DbTable\User::class,

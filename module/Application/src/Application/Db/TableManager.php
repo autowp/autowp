@@ -21,6 +21,7 @@ class TableManager implements ServiceLocatorInterface
         'acl_roles_privileges_allowed' => [], //TODO: rename to acl_role_privilege_allowed
         'acl_roles_privileges_denied' => [], //TODO: rename to acl_role_privilege_denied
         'articles' => [],
+        'attrs_attributes' => [],
         'attrs_list_options' => [],
         'attrs_types' => [],
         'attrs_units' => [],

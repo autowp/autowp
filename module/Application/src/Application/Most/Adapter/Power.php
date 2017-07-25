@@ -2,8 +2,6 @@
 
 namespace Application\Most\Adapter;
 
-use Application\Model\DbTable\Attr\Attribute;
-
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 
@@ -27,18 +25,16 @@ class Power extends AbstractAdapter
     {
         $itemTable = $select->getTable();
 
-        $attributes = new Attribute();
-
-        $powerAttr = $attributes->find($this->attributes['power'])->current();
+        $powerAttr = $this->attributeTable->select(['id' => (int)$this->attributes['power']])->current();
 
         $specService = $this->most->getSpecs();
 
-        $valuesTable = $specService->getValueDataTable($powerAttr->type_id);
+        $valuesTable = $specService->getValueDataTable($powerAttr['type_id']);
         $valuesTableName = $valuesTable->info(Zend_Db_Table_Abstract::NAME);
 
         $select
             ->join($valuesTableName, 'item.id = '.$valuesTableName.'.item_id', null)
-            ->where($valuesTableName.'.attribute_id = ?', $powerAttr->id)
+            ->where($valuesTableName.'.attribute_id = ?', $powerAttr['id'])
             ->where($valuesTableName.'.value > 0')
             ->group('item.id')
             ->order($valuesTableName.'.value ' . $this->order)
@@ -49,7 +45,7 @@ class Power extends AbstractAdapter
         $result = [];
         foreach ($cars as $car) {
             $html = '';
-            $value = $specService->getActualValue($powerAttr->id, $car->id);
+            $value = $specService->getActualValue($powerAttr['id'], $car->id);
             $turbo = $specService->getActualValueText($this->attributes['turbo'], $car->id, $language);
             switch ($turbo) {
                 case 'нет':

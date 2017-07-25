@@ -4,6 +4,8 @@ namespace Application\Service;
 
 use Exception;
 
+use Zend\Db\TableGateway\TableGateway;
+
 use Application\Model\DbTable;
 use Application\Model\Perspective;
 use Application\Model\VehicleType;
@@ -352,16 +354,23 @@ class Mosts
      */
     private $pictureTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $attributeTable;
+
     public function __construct(
         SpecificationsService $specs,
         Perspective $perspective,
         VehicleType $vehicleType,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        TableGateway $attributeTable
     ) {
         $this->specs = $specs;
         $this->perspective = $perspective;
         $this->vehicleType = $vehicleType;
         $this->pictureTable = $pictureTable;
+        $this->attributeTable = $attributeTable;
     }
 
     private function betweenYearsExpr($from, $to)
@@ -602,10 +611,11 @@ class Mosts
         }
 
         $most = new Most([
-            'specs'      => $this->specs,
-            'carsSelect' => $select,
-            'adapter'    => $cMost['adapter'],
-            'carsCount'  => 7,
+            'attributeTable' => $this->attributeTable,
+            'specs'          => $this->specs,
+            'carsSelect'     => $select,
+            'adapter'        => $cMost['adapter'],
+            'carsCount'      => 7
         ]);
 
         $g = $this->getPrespectiveGroups();

@@ -35,7 +35,7 @@ class SpecificationsService
           WEIGHT_WRONG         = -1;
 
     /**
-     * @var Attr\Attribute
+     * @var TableGateway
      */
     private $attributeTable = null;
 
@@ -140,6 +140,11 @@ class SpecificationsService
      */
     private $vehicleType;
 
+    /**
+     * @var TableGateway
+     */
+    private $zoneAttributeTable;
+
     public function __construct(
         $translator,
         ItemNameFormatter $itemNameFormatter,
@@ -149,7 +154,9 @@ class SpecificationsService
         VehicleType $vehicleType,
         TableGateway $unitTable,
         TableGateway $listOptionsTable,
-        TableGateway $typeTable
+        TableGateway $typeTable,
+        TableGateway $attributeTable,
+        TableGateway $zoneAttributeTable
     ) {
         $this->translator = $translator;
         $this->itemNameFormatter = $itemNameFormatter;
@@ -161,6 +168,8 @@ class SpecificationsService
         $this->unitTable = $unitTable;
         $this->listOptionsTable = $listOptionsTable;
         $this->typeTable = $typeTable;
+        $this->attributeTable = $attributeTable;
+        $this->zoneAttributeTable = $zoneAttributeTable;
     }
 
     /**
@@ -205,13 +214,6 @@ class SpecificationsService
         return $this->itemTable
             ? $this->itemTable
             : $this->itemTable = new DbTable\Item();
-    }
-
-    private function getAttributeTable()
-    {
-        return $this->attributeTable
-            ? $this->attributeTable
-            : $this->attributeTable = new Attr\Attribute();
     }
 
     private function getUserValueTable()
@@ -693,20 +695,25 @@ class SpecificationsService
         return $result;
     }
 
-    private function loadZone($id)
+    private function loadZone(int $id)
     {
-        $id = (int)$id;
-        if (! isset($this->zoneAttrs[$id])) {
-            $db = $this->getAttributeTable()->getAdapter();
-            $this->zoneAttrs[$id] = $db->fetchCol(
-                $db->select()
-                    ->from('attrs_zone_attributes', 'attribute_id')
-                    ->where('zone_id = ?', $id)
-                    ->order('position')
-            );
+        if (isset($this->zoneAttrs[$id])) {
+            return $this->zoneAttrs[$id];
         }
 
-        return $this->zoneAttrs[$id];
+        $select = new Sql\Select($this->zoneAttributeTable->getTable());
+        $select->columns(['attribute_id'])
+            ->where(['zone_id' => $id])
+            ->order('position');
+
+        $result = [];
+        foreach ($this->zoneAttributeTable->selectWith($select) as $row) {
+            $result[] = (int)$row['attribute_id'];
+        }
+
+        $this->zoneAttrs[$id] = $result;
+
+        return $result;
     }
 
     /**
@@ -717,17 +724,21 @@ class SpecificationsService
         if ($this->attributes === null) {
             $array = [];
             $childs = [];
-            foreach ($this->getAttributeTable()->fetchAll(null, 'position') as $row) {
-                $id = (int)$row->id;
-                $pid = (int)$row->parent_id;
+
+            $select = new Sql\Select($this->attributeTable->getTable());
+            $select->order('position');
+
+            foreach ($this->attributeTable->selectWith($select) as $row) {
+                $id = (int)$row['id'];
+                $pid = (int)$row['parent_id'];
                 $array[$id] = [
                     'id'          => $id,
-                    'name'        => $row->name,
-                    'description' => $row->description,
-                    'typeId'      => (int)$row->type_id,
-                    'unitId'      => (int)$row->unit_id,
-                    'isMultiple'  => $row->multiple,
-                    'precision'   => $row->precision,
+                    'name'        => $row['name'],
+                    'description' => $row['description'],
+                    'typeId'      => (int)$row['type_id'],
+                    'unitId'      => (int)$row['unit_id'],
+                    'isMultiple'  => $row['multiple'],
+                    'precision'   => $row['precision'],
                     'parentId'    => $pid ? $pid : null
                 ];
                 if (! isset($childs[$pid])) {
@@ -945,21 +956,25 @@ class SpecificationsService
         }
     }
 
-    private function getEngineAttributeIds()
+    private function getEngineAttributeIds(): array
     {
-        if (! $this->engineAttributes) {
-            $table = $this->getAttributeTable();
-            $db = $table->getAdapter();
-
-            $this->engineAttributes = $db->fetchCol(
-                $db->select()
-                    ->from($table->info('name'), 'id')
-                    ->join('attrs_zone_attributes', 'attrs_attributes.id = attrs_zone_attributes.attribute_id', null)
-                    ->where('attrs_zone_attributes.zone_id = ?', self::ENGINE_ZONE_ID)
-            );
+        if ($this->engineAttributes) {
+            return $this->engineAttributes;
         }
 
-        return $this->engineAttributes;
+        $select = new Sql\Select($this->attributeTable->getTable());
+        $select->columns(['id'])
+            ->join('attrs_zone_attributes', 'attrs_attributes.id = attrs_zone_attributes.attribute_id', [])
+            ->where(['attrs_zone_attributes.zone_id' => self::ENGINE_ZONE_ID]);
+
+        $result = [];
+        foreach ($this->attributeTable->selectWith($select) as $row) {
+            $result[] = (int)$row['id'];
+        }
+
+        $this->engineAttributes = $result;
+
+        return $result;
     }
 
     /**

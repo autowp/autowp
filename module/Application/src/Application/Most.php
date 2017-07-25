@@ -2,13 +2,14 @@
 
 namespace Application;
 
+use Exception;
+
+use Zend\Db\TableGateway\TableGateway;
+
+use Application\Most\Adapter\AbstractAdapter;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Table_Select;
-
-use Application\Most\Adapter\AbstractAdapter;
-
-use Exception;
 
 class Most
 {
@@ -29,6 +30,11 @@ class Most
      */
     protected $specs;
 
+    /**
+     * @var TableGateway
+     */
+    protected $attributeTable;
+
     public function __construct(array $options)
     {
         $this->setOptions($options);
@@ -46,6 +52,11 @@ class Most
                 throw new Exception("Option '$key' not found");
             }
         }
+    }
+
+    public function setAttributeTable(TableGateway $table)
+    {
+        $this->attributeTable = $table;
     }
 
     public function setCarsCount($value)
@@ -96,11 +107,16 @@ class Most
         $adapterName = $adapterNamespace . '\\';
         $adapterName .= str_replace(' ', '_', ucwords(str_replace('_', ' ', strtolower($adapter))));
 
+        if (! $this->attributeTable) {
+            throw new Exception("attributeTable not provided");
+        }
+
         /*
          * Create an instance of the adapter class.
          * Pass the config to the adapter class constructor.
          */
         $options['most'] = $this;
+        $options['attributeTable'] = $this->attributeTable;
         $mostAdapter = new $adapterName($options);
 
         /*

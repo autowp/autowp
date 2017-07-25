@@ -5,8 +5,6 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-use Application\Model\DbTable\Attr;
-
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class Attribute extends Form implements InputFilterProviderInterface

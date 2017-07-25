@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -61,6 +62,11 @@ class CarsController extends AbstractActionController
      */
     private $pictureTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $attributeTable;
+
     public function __construct(
         HostManager $hostManager,
         Form $filterForm,
@@ -69,7 +75,8 @@ class CarsController extends AbstractActionController
         UserItemSubscribe $userItemSubscribe,
         Perspective $perspective,
         Item $itemModel,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        TableGateway $attributeTable
     ) {
 
         $this->hostManager = $hostManager;
@@ -80,6 +87,7 @@ class CarsController extends AbstractActionController
         $this->perspective = $perspective;
         $this->itemModel = $itemModel;
         $this->pictureTable = $pictureTable;
+        $this->attributeTable = $attributeTable;
     }
 
     private function carModerUrl(\Autowp\Commons\Db\Table\Row $item, $uri = null)
@@ -292,7 +300,6 @@ class CarsController extends AbstractActionController
         $toItemId = (int)$this->params('to_item_id');
 
         $userValueTable = new Attr\UserValue();
-        $attrTable = new Attr\Attribute();
 
         $eUserValueRows = $userValueTable->fetchAll([
             'item_id = ?' => $itemId
@@ -311,13 +318,13 @@ class CarsController extends AbstractActionController
                 throw new Exception("Value row already exists");
             }
 
-            $attrRow = $attrTable->find($eUserValueRow->attribute_id)->current();
+            $attrRow = $this->attributeTable->select(['id' => $eUserValueRow['attribute_id']])->current();
 
             if (! $attrRow) {
                 throw new Exception("Attr not found");
             }
 
-            $dataTable = $this->specsService->getUserValueDataTable($attrRow->type_id);
+            $dataTable = $this->specsService->getUserValueDataTable($attrRow['type_id']);
 
             $eDataRows = $dataTable->fetchAll([
                 'attribute_id = ?' => $eUserValueRow->attribute_id,
@@ -332,7 +339,7 @@ class CarsController extends AbstractActionController
                     'item_id = ?'      => $toItemId,
                     'user_id = ?'      => $eDataRow->user_id
                 ];
-                if ($attrRow->multiple) {
+                if ($attrRow['multiple']) {
                     $filter['ordering = ?'] = $eDataRow->ordering;
                 }
                 $cDataRow = $dataTable->fetchRow($filter);
@@ -381,7 +388,7 @@ class CarsController extends AbstractActionController
 
         $values = [];
         foreach ($rows as $row) {
-            $attribute = $row->findParentRow(Attr\Attribute::class);
+            $attribute = $this->attributeTable->select(['id' => $row['attribute_id']])->current();
             $user = $row->findParentRow(User::class);
             $unit = $this->specsService->getUnit($attribute['unit_id']);
             $values[] = [
@@ -389,12 +396,12 @@ class CarsController extends AbstractActionController
                 'unit'      => $unit,
                 'user'      => $user,
                 'value'     => $this->specsService->getActualValueText(
-                    $attribute->id,
+                    $attribute['id'],
                     $row->item_id,
                     $language
                 ),
                 'userValue' => $this->specsService->getUserValueText(
-                    $attribute->id,
+                    $attribute['id'],
                     $row->item_id,
                     $user->id,
                     $language
@@ -410,8 +417,8 @@ class CarsController extends AbstractActionController
         }
 
         return [
-            'values'     => $values,
-            'itemId'     => $itemId,
+            'values' => $values,
+            'itemId' => $itemId,
         ];
     }
 
@@ -507,13 +514,14 @@ class CarsController extends AbstractActionController
                 }
             }
 
-            $attribute = $row->findParentRow(Attr\Attribute::class);
+            $attribute = $this->attributeTable->select(['id' => $row['attribute_id']])->current();
             if ($attribute) {
                 $parents = [];
                 $parent = $attribute;
                 do {
-                    $parents[] = $parent->name;
-                } while ($parent = $parent->findParentRow(Attr\Attribute::class));
+                    $parents[] = $parent['name'];
+                    $parent = $this->attributeTable->select(['id' => $parent['parent_id']])->current();
+                } while ($parent);
 
                 $path = array_reverse($parents);
             }

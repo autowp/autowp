@@ -19,7 +19,7 @@
                 </td>
                 <td>
                     <?php if ($value['attribute']) {
-                        echo $this->escapeHtml($value['attribute']->name);
+                        echo $this->escapeHtml($value['attribute']['name']);
                         if ($value['unit']) {
                             echo ', ' . $this->escapeHtml($value['unit']['name']);
                         }

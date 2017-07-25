@@ -7,7 +7,6 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
-use Application\Model\DbTable\Attr;
 use Application\Model\DbTable\Item;
 use Application\Service\SpecificationsService;
 
@@ -31,21 +30,30 @@ class ChartController extends AbstractRestfulController
      */
     private $specTable;
 
-    public function __construct(SpecificationsService $specsService, TableGateway $specTable)
-    {
+    /**
+     * @var TableGateway
+     */
+    private $attributeTable;
+
+    public function __construct(
+        SpecificationsService $specsService,
+        TableGateway $specTable,
+        TableGateway $attributeTable
+    ) {
         $this->specsService = $specsService;
         $this->specTable = $specTable;
+        $this->attributeTable = $attributeTable;
     }
 
     public function yearsAction()
     {
-        $attrTable = new Attr\Attribute();
+        $rows = $this->attributeTable->select([new Sql\Predicate\In('id', $this->parameters)]);
 
         $params = [];
-        foreach ($attrTable->find($this->parameters) as $row) {
+        foreach ($rows as $row) {
             $params[] = [
-                'name' => $this->translate($row->name),
-                'id'   => $row->id
+                'name' => $this->translate($row['name']),
+                'id'   => (int)$row['id']
             ];
         }
 
@@ -75,19 +83,18 @@ class ChartController extends AbstractRestfulController
 
     public function yearsDataAction()
     {
-        $id = $this->params()->fromQuery('id');
+        $id = (int)$this->params()->fromQuery('id');
 
         if (! in_array($id, $this->parameters)) {
             return $this->notFoundAction();
         }
 
-        $attrTable = new Attr\Attribute();
-        $attrRow = $attrTable->find($id)->current();
+        $attrRow = $this->attributeTable->select(['id' => $id])->current();
         if (! $attrRow) {
             return $this->notFoundAction();
         }
 
-        $dataTable = $this->specsService->getValueDataTable($attrRow->type_id);
+        $dataTable = $this->specsService->getValueDataTable($attrRow['type_id']);
 
         $dataTableName = $dataTable->info('name');
 
@@ -102,7 +109,7 @@ class ChartController extends AbstractRestfulController
             $pairs = $db->fetchPairs(
                 $db->select()
                     ->from($dataTableName, ['year' => 'year(item.begin_order_cache)', 'round(avg(value))'])
-                    ->where($dataTableName . '.attribute_id = ?', $attrRow->id)
+                    ->where($dataTableName . '.attribute_id = ?', $attrRow['id'])
                     ->join('item', $dataTableName . '.item_id = item.id', null)
                     ->join('car_types_parents', 'item.car_type_id = car_types_parents.id', null)
                     ->where('car_types_parents.parent_id = ?', 29)

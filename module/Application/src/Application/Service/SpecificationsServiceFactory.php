@@ -24,7 +24,9 @@ class SpecificationsServiceFactory implements FactoryInterface
             $container->get(\Application\Model\VehicleType::class),
             $tables->get('attrs_units'),
             $tables->get('attrs_list_options'),
-            $tables->get('attrs_types')
+            $tables->get('attrs_types'),
+            $tables->get('attrs_attributes'),
+            $tables->get('attrs_zone_attributes')
         );
     }
 }

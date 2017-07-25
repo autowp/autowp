@@ -9,7 +9,6 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Moder\Attribute as AttributeForm;
 use Application\Form\Moder\AttributeListOption as AttributeListOptionForm;
-use Application\Model\DbTable\Attr;
 use Application\Service\SpecificationsService;
 
 class AttrsController extends AbstractActionController
@@ -30,7 +29,7 @@ class AttrsController extends AbstractActionController
     private $zoneAttributeTable;
 
     /**
-     * @var Attr\Attribute
+     * @var TableGateway
      */
     private $attributeTable;
 
@@ -49,12 +48,13 @@ class AttrsController extends AbstractActionController
         TableGateway $listOptionTable,
         TableGateway $zoneTable,
         TableGateway $typeTable,
-        TableGateway $zoneAttributeTable
+        TableGateway $zoneAttributeTable,
+        TableGateway $attributeTable
     ) {
         $this->specsService = $specsService;
 
         $this->listOptionTable = $listOptionTable;
-        $this->attributeTable = new Attr\Attribute();
+        $this->attributeTable = $attributeTable;
         $this->zoneAttributeTable = $zoneAttributeTable;
         $this->zoneTable = $zoneTable;
         $this->typeTable = $typeTable;
@@ -72,16 +72,47 @@ class AttrsController extends AbstractActionController
         }
 
         return [
-            'attributes' => $this->attributeTable->fetchAll('parent_id IS NULL', 'position'),
+            'attributes' => $this->getAttributesIndexRecursive(0),
             'zones'      => $zones
         ];
+    }
+
+    private function getAttributesIndexRecursive(int $parentId): array
+    {
+        $select = new Sql\Select($this->attributeTable->getTable());
+        $select->order('position');
+
+        if ($parentId) {
+            $select->where(['parent_id' => $parentId]);
+        } else {
+            $select->where(['parent_id IS NULL']);
+        }
+
+        $result = [];
+        foreach ($this->attributeTable->selectWith($select) as $row) {
+            $result[] = [
+                'id'              => (int)$row['id'],
+                'name'            => $row['name'],
+                'childAttributes' => $this->getAttributesIndexRecursive($row['id']),
+                'moveDownUrl'     => $this->url()->fromRoute('moder/attrs/params', [
+                    'action'       => 'attribute-down',
+                    'attribute_id' => $row['id']
+                ]),
+                'moveUpUrl'     => $this->url()->fromRoute('moder/attrs/params', [
+                    'action'       => 'attribute-up',
+                    'attribute_id' => $row['id']
+                ])
+            ];
+        }
+
+        return $result;
     }
 
     private function attributeUrl($attribute)
     {
         return $this->url()->fromRoute('moder/attrs/params', [
             'action'       => 'attribute',
-            'attribute_id' => $attribute->id
+            'attribute_id' => $attribute['id']
         ]);
     }
 
@@ -91,7 +122,7 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $attribute = $this->attributeTable->find($this->params('attribute_id'))->current();
+        $attribute = $this->attributeTable->select(['id' => (int)$this->params('attribute_id')])->current();
         if (! $attribute) {
             return $this->notFoundAction();
         }
@@ -112,7 +143,7 @@ class AttrsController extends AbstractActionController
         $formAttributeEdit->setAttribute('action', $this->url()->fromRoute(null, [
             'form' => 'edit'
         ], [], true));
-        $formAttributeEdit->populateValues($attribute->toArray());
+        $formAttributeEdit->populateValues((array)$attribute);
 
         $formAttributeNew = new AttributeForm();
         $formAttributeNew->get('unit_id')->setValueOptions($unitOptions);
@@ -121,9 +152,7 @@ class AttrsController extends AbstractActionController
             'form' => 'new'
         ], [], true));
 
-        $formListOption = new AttributeListOptionForm(null, [
-            'attribute' => $attribute
-        ]);
+        $formListOption = new AttributeListOptionForm();
         $formListOption->get('parent_id')->setValueOptions(
             array_merge(
                 ['' => '--'],
@@ -142,22 +171,23 @@ class AttrsController extends AbstractActionController
                     if ($formAttributeNew->isValid()) {
                         $values = $formAttributeNew->getData();
 
-                        $position = $this->attributeTable->getAdapter()->fetchOne(
-                            $this->attributeTable->getAdapter()->select()
-                                ->from($this->attributeTable->info('name'), 'max(position)')
-                                ->where('parent_id = ?', $attribute->id)
-                        ) + 1;
+                        $select = new Sql\Select($this->attributeTable->getTable());
+                        $select->columns(['max' => new Sql\Expression('max(position)')])
+                            ->where(['parent_id' => $attribute['id']]);
 
-                        $new = $this->attributeTable->createRow([
+                        $row = $this->attributeTable->selectWith($select)->current();
+
+                        $max = $row ? (int)$row['max'] : 0;
+
+                        $this->attributeTable->insert([
                             'name'        => $values['name'],
                             'description' => $values['description'],
                             'type_id'     => $values['type_id'] ? $values['type_id'] : null,
                             'unit_id'     => $values['unit_id'] ? $values['unit_id'] : null,
-                            'parent_id'   => $attribute->id,
+                            'parent_id'   => $attribute['id'],
                             'precision'   => $values['precision'] ? $values['precision'] : null,
-                            'position'    => $position
+                            'position'    => $max + 1
                         ]);
-                        $new->save();
 
                         return $this->redirect()->toUrl($this->attributeUrl($attribute));
                     }
@@ -168,14 +198,15 @@ class AttrsController extends AbstractActionController
                     if ($formAttributeEdit->isValid()) {
                         $values = $formAttributeEdit->getData();
 
-                        $attribute->setFromArray([
+                        $this->attributeTable->update([
                             'name'          => $values['name'],
                             'description'   => $values['description'],
                             'type_id'       => $values['type_id'] ? $values['type_id'] : null,
                             'unit_id'       => $values['unit_id'] ? $values['unit_id'] : null,
                             'precision'     => $values['precision'] ? $values['precision'] : null
+                        ], [
+                            'id' => $attribute['id']
                         ]);
-                        $attribute->save();
 
                         return $this->redirect()->toUrl($this->attributeUrl($attribute));
                     }
@@ -186,17 +217,19 @@ class AttrsController extends AbstractActionController
                     if ($formListOption->isValid()) {
                         $values = $formListOption->getData();
 
-                        $new = $options->createRow([
+                        $select = new Sql\Select($this->listOptionTable->getTable());
+                        $select->columns(['max' => new Sql\Expression('MAX(position)')])
+                            ->where(['attribute_id' => $attribute['id']]);
+
+                        $row = $this->listOptionTable->selectWith($select)->current();
+                        $max = $row ? (int)$row['max'] : 0;
+
+                        $this->listOptionTable->insert([
                             'name'          => $values['name'],
-                            'attribute_id'  => $attribute->id,
+                            'attribute_id'  => $attribute['id'],
                             'parent_id'     => $values['parent_id'] ? $values['parent_id'] : null,
-                            'position'      => 1 + (int)$options->getAdapter()->fetchOne(
-                                $options->select()
-                                    ->from($options, ['MAX(position)'])
-                                    ->where('attribute_id = ?', $attribute->id)
-                            )
+                            'position'      => 1 + $max
                         ]);
-                        $new->save();
 
                         return $this->redirect()->toUrl($this->attributeUrl($attribute));
                     }
@@ -268,12 +301,12 @@ class AttrsController extends AbstractActionController
 
     private function getAttributes($parentId)
     {
-        $rows = $this->attributeTable->fetchAll([
-            'parent_id = ?' => $parentId
-        ], 'position');
+        $select = new Sql\Select($this->attributeTable->getTable());
+        $select->where(['parent_id' => $parentId])
+            ->order('position');
 
         $result = [];
-        foreach ($rows as $row) {
+        foreach ($this->attributeTable->selectWith($select) as $row) {
             $type = $this->typeTable->select(['id' => $row['type_id']])->current();
             $result[] = [
                 'id'     => $row['id'],
@@ -312,12 +345,13 @@ class AttrsController extends AbstractActionController
                 case 'attributes':
                     $ids = (array)$request->getPost('attribute_id');
                     if (count($ids)) {
-                        $select = $this->attributeTable->select()
-                            ->where('id IN (?)', $ids);
-                        foreach ($this->attributeTable->fetchAll($select) as $attribute) {
+                        $attributes = $this->attributeTable->select([
+                            new Sql\Predicate\In('id', $ids)
+                        ]);
+                        foreach ($attributes as $attribute) {
                             $exists = (bool)$this->zoneAttributeTable->select([
                                 'zone_id'      => $zone['id'],
-                                'attribute_id' => $attribute->id
+                                'attribute_id' => $attribute['id']
                             ])->current();
                             if (! $exists) {
                                 $select = new Sql\Select($this->zoneAttributeTable->getTable());
@@ -329,7 +363,7 @@ class AttrsController extends AbstractActionController
 
                                 $this->zoneAttributeTable->insert([
                                     'zone_id'       => $zone['id'],
-                                    'attribute_id'  => $attribute->id,
+                                    'attribute_id'  => $attribute['id'],
                                     'position'      => $maxPosition + 1
                                 ]);
                             }
@@ -367,19 +401,20 @@ class AttrsController extends AbstractActionController
 
     private function getZoneAttributesRecursive(int $zoneId, int $parentId): array
     {
-        $select = $this->attributeTable->select(true)
-            ->join('attrs_zone_attributes', 'attrs_zone_attributes.attribute_id = attrs_attributes.id', [])
-            ->where('attrs_zone_attributes.zone_id = ?', $zoneId)
+        $select = new Sql\Select($this->attributeTable->getTable());
+
+        $select->join('attrs_zone_attributes', 'attrs_zone_attributes.attribute_id = attrs_attributes.id', [])
+            ->where(['attrs_zone_attributes.zone_id' => $zoneId])
             ->order('attrs_zone_attributes.position');
 
         if ($parentId) {
-            $select->where('attrs_attributes.parent_id = ?', $parentId);
+            $select->where(['attrs_attributes.parent_id' => $parentId]);
         } else {
-            $select->where('attrs_attributes.parent_id IS NULL');
+            $select->where(['attrs_attributes.parent_id IS NULL']);
         }
 
         $result = [];
-        foreach ($this->attributeTable->fetchAll($select) as $row) {
+        foreach ($this->attributeTable->selectWith($select) as $row) {
             $result[] = [
                 'id'              => (int)$row,
                 'name'            => $row['name'],
@@ -402,15 +437,14 @@ class AttrsController extends AbstractActionController
 
     private function getAllZoneAttributesRecursive(int $zoneId, int $parentId): array
     {
-        $select = $this->attributeTable->select(true);
         if ($parentId) {
-            $select->where('parent_id = ?', $parentId);
+            $filter = ['parent_id' => $parentId];
         } else {
-            $select->where('parent_id IS NULL');
+            $filter = ['parent_id IS NULL'];
         }
 
         $result = [];
-        foreach ($this->attributeTable->fetchAll($select) as $row) {
+        foreach ($this->attributeTable->select($filter) as $row) {
             $result[] = [
                 'id'              => (int)$row['id'],
                 'name'            => $row['name'],
@@ -428,39 +462,43 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $attribute = $this->attributeTable->find($this->params('attribute_id'))->current();
+        $attribute = $this->attributeTable->select(['id' => (int)$this->params('attribute_id')])->current();
         if (! $attribute) {
             return $this->notFoundAction();
         }
 
-        $select = $this->attributeTable->select(true)
-            ->where('attrs_attributes.position < ?', $attribute->position)
+        $select = new Sql\Select($this->attributeTable->getTable());
+        $select->where(['attrs_attributes.position < ?' => $attribute['position']])
             ->order('attrs_attributes.position DESC')
             ->limit(1);
-        if ($attribute->parent_id) {
-            $select->where('attrs_attributes.parent_id = ?', $attribute->parent_id);
+        if ($attribute['parent_id']) {
+            $select->where(['attrs_attributes.parent_id' => $attribute['parent_id']]);
         } else {
-            $select->where('attrs_attributes.parent_id IS NULL');
+            $select->where(['attrs_attributes.parent_id IS NULL']);
         }
-        $prev = $this->attributeTable->fetchRow($select);
+        $prev = $this->attributeTable->selectWith($select)->current();
 
         if ($prev) {
-            $prevPos = $prev->position;
+            $prevPos = $prev['position'];
+            $pagePos = $attribute['position'];
 
-            $prev->position = 10000;
-            $prev->save();
-
-            $pagePos = $attribute->position;
-            $attribute->position = $prevPos;
-            $attribute->save();
-
-            $prev->position = $pagePos;
-            $prev->save();
+            $this->setAttributePosition($prev['id'], 10000);
+            $this->setAttributePosition($attribute['id'], $prevPos);
+            $this->setAttributePosition($prev['id'], $pagePos);
         }
 
         return $this->redirect()->toRoute(null, [
             'action' => 'index'
         ], [], true);
+    }
+
+    private function setAttributePosition(int $attributeId, int $position)
+    {
+        $this->attributeTable->update([
+            'position' => $position
+        ], [
+            'id' => $attributeId
+        ]);
     }
 
     public function attributeDownAction()
@@ -469,34 +507,29 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $attribute = $this->attributeTable->find($this->params('attribute_id'))->current();
+        $attribute = $this->attributeTable->select(['id' => (int)$this->params('attribute_id')])->current();
         if (! $attribute) {
             return $this->notFoundAction();
         }
 
-        $select = $this->attributeTable->select(true)
-            ->where('attrs_attributes.position > ?', $attribute->position)
+        $select = new Sql\Select($this->attributeTable->getTable());
+        $select->where(['attrs_attributes.position > ?' => $attribute['position']])
             ->order('attrs_attributes.position ASC')
             ->limit(1);
-        if ($attribute->parent_id) {
-            $select->where('attrs_attributes.parent_id = ?', $attribute->parent_id);
+        if ($attribute['parent_id']) {
+            $select->where(['attrs_attributes.parent_id' => $attribute['parent_id']]);
         } else {
-            $select->where('attrs_attributes.parent_id IS NULL');
+            $select->where(['attrs_attributes.parent_id IS NULL']);
         }
-        $next = $this->attributeTable->fetchRow($select);
+        $next = $this->attributeTable->selectWith($select)->current();
 
         if ($next) {
-            $nextPos = $next->position;
+            $nextPos = $next['position'];
+            $pagePos = $attribute['position'];
 
-            $next->position = 10000;
-            $next->save();
-
-            $pagePos = $attribute->position;
-            $attribute->position = $nextPos;
-            $attribute->save();
-
-            $next->position = $pagePos;
-            $next->save();
+            $this->setAttributePosition($next['id'], 10000);
+            $this->setAttributePosition($attribute['id'], $nextPos);
+            $this->setAttributePosition($next['id'], $pagePos);
         }
 
         return $this->redirect()->toRoute(null, [
@@ -510,7 +543,7 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $attribute = $this->attributeTable->find($this->params('attribute_id'))->current();
+        $attribute = $this->attributeTable->select(['id' => (int)$this->params('attribute_id')])->current();
         if (! $attribute) {
             return $this->notFoundAction();
         }
@@ -522,7 +555,7 @@ class AttrsController extends AbstractActionController
 
         $zoneAttribute = $this->zoneAttributeTable->select([
             'zone_id'      => $zone['id'],
-            'attribute_id' => $attribute->id
+            'attribute_id' => $attribute['id']
         ])->current();
 
         if (! $zoneAttribute) {
@@ -539,8 +572,8 @@ class AttrsController extends AbstractActionController
             ])
             ->order('attrs_zone_attributes.position DESC')
             ->limit(1);
-        if ($attribute->parent_id) {
-            $select->where(['attrs_attributes.parent_id' => $attribute->parent_id]);
+        if ($attribute['parent_id']) {
+            $select->where(['attrs_attributes.parent_id' => $attribute['parent_id']]);
         } else {
             $select->where(['attrs_attributes.parent_id IS NULL']);
         }
@@ -574,7 +607,7 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $attribute = $this->attributeTable->find($this->params('attribute_id'))->current();
+        $attribute = $this->attributeTable->select(['id' => (int)$this->params('attribute_id')])->current();
         if (! $attribute) {
             return $this->notFoundAction();
         }
@@ -586,7 +619,7 @@ class AttrsController extends AbstractActionController
 
         $zoneAttribute = $this->zoneAttributeTable->select([
             'zone_id'      => $zone['id'],
-            'attribute_id' => $attribute->id
+            'attribute_id' => $attribute['id']
         ])->current();
 
         if (! $zoneAttribute) {
@@ -603,8 +636,8 @@ class AttrsController extends AbstractActionController
             ])
             ->order('attrs_zone_attributes.position ASC')
             ->limit(1);
-        if ($attribute->parent_id) {
-            $select->where(['attrs_attributes.parent_id' => $attribute->parent_id]);
+        if ($attribute['parent_id']) {
+            $select->where(['attrs_attributes.parent_id' => $attribute['parent_id']]);
         } else {
             $select->where(['attrs_attributes.parent_id IS NULL']);
         }

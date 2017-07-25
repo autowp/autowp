@@ -16,23 +16,14 @@ class Acceleration extends AbstractAdapter
 
     protected $order;
 
-    protected $attributesTable;
-
     const MPH60_TO_KMH100 = 0.98964381346271110050637609692728;
-
-    public function __construct(array $options)
-    {
-        $this->attributesTable = new Attr\Attribute();
-
-        parent::__construct($options);
-    }
 
     public function setAttributes(array $value)
     {
         $this->attributes = $value;
 
-        $this->kmhAttribute = $this->attributesTable->find($this->attributes['to100kmh'])->current();
-        $this->mphAttribute = $this->attributesTable->find($this->attributes['to60mph'])->current();
+        $this->kmhAttribute = $this->attributeTable->select(['id' => $this->attributes['to100kmh']])->current();
+        $this->mphAttribute = $this->attributeTable->select(['id' => $this->attributes['to60mph']])->current();
     }
 
     public function setOrder($value)
@@ -79,14 +70,14 @@ class Acceleration extends AbstractAdapter
 
             $attr = $axis['attr'];
 
-            $attrValuesTable = $specService->getValueDataTable($attr->type_id)->info(Zend_Db_Table_Abstract::NAME);
+            $attrValuesTable = $specService->getValueDataTable($attr['type_id'])->info(Zend_Db_Table_Abstract::NAME);
 
             $valueColumn = $axis['q'] != 1 ? new Zend_Db_Expr('axis.value / ' . $axis['q']) : 'axis.value';
 
             $axisSelect
                 ->columns(['item_id' => 'item.id', 'size_value' => $valueColumn])
                 ->join(['axis' => $attrValuesTable], 'item.id = axis.item_id', null)
-                ->where('axis.attribute_id = ?', $attr->id)
+                ->where('axis.attribute_id = ?', $attr['id'])
                 ->where('axis.value > 0')
                 ->order('size_value ' . $this->order)
                 ->limit($limit);

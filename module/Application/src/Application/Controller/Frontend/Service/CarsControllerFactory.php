@@ -14,6 +14,7 @@ class CarsControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get(\Application\HostManager::class),
             $container->get('AttrsLogFilterForm'),
@@ -22,7 +23,8 @@ class CarsControllerFactory implements FactoryInterface
             $container->get(\Application\Model\UserItemSubscribe::class),
             $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\DbTable\Picture::class),
+            $tables->get('attrs_attributes')
         );
     }
 }

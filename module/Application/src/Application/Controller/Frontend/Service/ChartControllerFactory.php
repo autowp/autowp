@@ -17,7 +17,8 @@ class ChartControllerFactory implements FactoryInterface
         $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get(\Application\Service\SpecificationsService::class),
-            $tables->get('spec')
+            $tables->get('spec'),
+            $tables->get('attrs_attributes')
         );
     }
 }

@@ -2,29 +2,17 @@
 
 namespace Application\Most\Adapter;
 
-use Zend_Db_Table_Select;
-
-use Application\Model\DbTable\Attr\Attribute;
-
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table;
 use Zend_Db_Table_Abstract;
+use Zend_Db_Table_Select;
 
 class Brakes extends AbstractAdapter
 {
     protected $attributes;
 
     protected $order;
-
-    protected $attributesTable;
-
-    public function __construct(array $options)
-    {
-        parent::__construct($options);
-
-        $this->attributesTable = new Attribute();
-    }
 
     public function setAttributes(array $value)
     {
@@ -69,21 +57,21 @@ class Brakes extends AbstractAdapter
             }
             $axisSelect->reset(Zend_Db_Table::COLUMNS);
 
-            $diameter  = $this->attributesTable->find($axis['diameter'])->current();
-            $diameterValuesTable = $specService->getValueDataTable($diameter->type_id)
+            $diameter  = $this->attributeTable->select(['id' => $axis['diameter']])->current();
+            $diameterValuesTable = $specService->getValueDataTable($diameter['type_id'])
                 ->info(Zend_Db_Table_Abstract::NAME);
 
-            $thickness = $this->attributesTable->find($axis['thickness'])->current();
-            $thicknessValuesTable = $specService->getValueDataTable($thickness->type_id)
+            $thickness = $this->attributesTable->select(['id' => $axis['thickness']])->current();
+            $thicknessValuesTable = $specService->getValueDataTable($thickness['type_id'])
                 ->info(Zend_Db_Table_Abstract::NAME);
 
             $axisSelect
                 ->columns(['item_id' => 'item.id', 'size_value' => new Zend_Db_Expr('diameter.value*thickness.value')])
                 ->join(['diameter' => $diameterValuesTable], 'item.id = diameter.item_id', null)
-                ->where('diameter.attribute_id = ?', $diameter->id)
+                ->where('diameter.attribute_id = ?', $diameter['id'])
                 ->where('diameter.value > 0')
                 ->join(['thickness' => $thicknessValuesTable], 'item.id = thickness.item_id', null)
-                ->where('thickness.attribute_id = ?', $thickness->id)
+                ->where('thickness.attribute_id = ?', $thickness['id'])
                 ->where('thickness.value > 0')
                 ->group('item.id')
                 ->order('size_value ' . $this->order)
