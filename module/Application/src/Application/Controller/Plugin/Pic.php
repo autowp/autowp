@@ -587,6 +587,9 @@ class Pic extends AbstractPlugin
 
             $currentLangName = null;
             foreach ($langNames as $lang => $langName) {
+                if ($lang == 'xx') {
+                    continue;
+                }
                 $name = $langName;
                 if (! isset($altNames[$name])) {
                     $altNames[$langName] = [];
