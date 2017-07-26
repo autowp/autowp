@@ -295,6 +295,20 @@ class Item
         return $result;
     }
 
+    public function getLanguageName(int $itemId, string $language): string
+    {
+        $select = new Sql\Select($this->itemLanguageTable->getTable());
+        $select->columns(['name'])
+            ->where([
+                'item_id'  => $itemId,
+                'language' => $language
+            ]);
+
+        $row = $this->itemLanguageTable->selectWith($select)->current();
+
+        return $row ? $row['name'] : '';
+    }
+
     public function getName(int $itemId, string $language)
     {
         $languages = array_merge([$language], ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'zh', 'xx']);
