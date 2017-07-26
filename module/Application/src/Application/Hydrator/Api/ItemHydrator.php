@@ -462,8 +462,7 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('name')) {
-            $name = $this->itemModel->getName($object['id'], 'xx');
-            $result['name'] = $nameData['name'];
+            $result['name'] = $this->itemModel->getLanguageName($object['id'], 'xx');
         }
 
         if ($this->filterComposite->filter('name_default')) {
