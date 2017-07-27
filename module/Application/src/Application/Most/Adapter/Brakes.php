@@ -5,7 +5,6 @@ namespace Application\Most\Adapter;
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table;
-use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 
 class Brakes extends AbstractAdapter
@@ -58,12 +57,10 @@ class Brakes extends AbstractAdapter
             $axisSelect->reset(Zend_Db_Table::COLUMNS);
 
             $diameter  = $this->attributeTable->select(['id' => $axis['diameter']])->current();
-            $diameterValuesTable = $specService->getValueDataTable($diameter['type_id'])
-                ->info(Zend_Db_Table_Abstract::NAME);
+            $diameterValuesTable = $specService->getValueDataTable($diameter['type_id'])->getTable();
 
             $thickness = $this->attributesTable->select(['id' => $axis['thickness']])->current();
-            $thicknessValuesTable = $specService->getValueDataTable($thickness['type_id'])
-                ->info(Zend_Db_Table_Abstract::NAME);
+            $thicknessValuesTable = $specService->getValueDataTable($thickness['type_id'])->getTable();
 
             $axisSelect
                 ->columns(['item_id' => 'item.id', 'size_value' => new Zend_Db_Expr('diameter.value*thickness.value')])

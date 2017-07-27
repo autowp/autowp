@@ -5,7 +5,6 @@ namespace Application\Most\Adapter;
 use Application\WheelSize as WheelsizeObject;
 
 use Zend_Db_Expr;
-use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 
 class Wheelsize extends AbstractAdapter
@@ -37,16 +36,13 @@ class Wheelsize extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         $tyrewidth  = $this->attributeTable->select(['id' => $wheel['tyrewidth']])->current();
-        $tyrewidthValuesTable = $specService->getValueDataTable($tyrewidth['type_id'])
-            ->info(Zend_Db_Table_Abstract::NAME);
+        $tyrewidthValuesTable = $specService->getValueDataTable($tyrewidth['type_id'])->getTable();
 
         $tyreseries = $this->attributeTable->select(['id' => $wheel['tyreseries']])->current();
-        $tyreseriesValuesTable = $specService->getValueDataTable($tyreseries['type_id'])
-            ->info(Zend_Db_Table_Abstract::NAME);
+        $tyreseriesValuesTable = $specService->getValueDataTable($tyreseries['type_id'])->getTable();
 
         $radius     = $this->attributeTable->select(['id' => $wheel['radius']])->current();
-        $radiusValuesTable = $specService->getValueDataTable($radius['type_id'])
-            ->info(Zend_Db_Table_Abstract::NAME);
+        $radiusValuesTable = $specService->getValueDataTable($radius['type_id'])->getTable();
 
         $select
             ->join(['tyrewidth' => $tyrewidthValuesTable], 'item.id = tyrewidth.item_id', null)

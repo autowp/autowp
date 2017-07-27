@@ -31,7 +31,12 @@ class SpecificationsServiceFactory implements FactoryInterface
             $tables->get('attrs_user_values_float'),
             $tables->get('attrs_user_values_int'),
             $tables->get('attrs_user_values_list'),
-            $tables->get('attrs_user_values_string')
+            $tables->get('attrs_user_values_string'),
+            $tables->get('attrs_values'),
+            $tables->get('attrs_values_float'),
+            $tables->get('attrs_values_int'),
+            $tables->get('attrs_values_list'),
+            $tables->get('attrs_values_string')
         );
     }
 }

@@ -653,6 +653,22 @@ class ItemParent
         return $result;
     }
 
+    public function getParentIds(int $itemId): array
+    {
+        $select = new Sql\Select($this->itemParentTable->getTable());
+        $select->columns(['parent_id'])
+            ->where(['item_id' => $itemId]);
+
+        $rows = $this->itemParentTable->selectWith($select);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = (int)$row['parent_id'];
+        }
+
+        return $result;
+    }
+
     public function getRow(int $parentId, int $itemId)
     {
         return $this->itemParentTable->select([

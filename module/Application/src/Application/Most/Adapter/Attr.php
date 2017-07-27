@@ -4,7 +4,6 @@ namespace Application\Most\Adapter;
 
 use Exception;
 
-use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 
 class Attr extends AbstractAdapter
@@ -33,7 +32,7 @@ class Attr extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         $valuesTable = $specService->getValueDataTable($attribute['type_id']);
-        $tableName = $valuesTable->info(Zend_Db_Table_Abstract::NAME);
+        $tableName = $valuesTable->getTable();
 
         $select
             ->where($tableName.'.attribute_id = ?', $attribute['id'])

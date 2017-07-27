@@ -2,7 +2,6 @@
 
 namespace Application\Most\Adapter;
 
-use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 
 class Power extends AbstractAdapter
@@ -30,7 +29,7 @@ class Power extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         $valuesTable = $specService->getValueDataTable($powerAttr['type_id']);
-        $valuesTableName = $valuesTable->info(Zend_Db_Table_Abstract::NAME);
+        $valuesTableName = $valuesTable->getTable();
 
         $select
             ->join($valuesTableName, 'item.id = '.$valuesTableName.'.item_id', null)

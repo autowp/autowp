@@ -96,7 +96,7 @@ class ChartController extends AbstractRestfulController
 
         $dataTable = $this->specsService->getValueDataTable($attrRow['type_id']);
 
-        $dataTableName = $dataTable->info('name');
+        $dataTableName = $dataTable->getTable();
 
         $itemTable = new Item();
         $db = $itemTable->getAdapter();

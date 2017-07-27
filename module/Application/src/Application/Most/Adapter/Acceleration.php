@@ -7,7 +7,6 @@ use Application\Model\DbTable\Attr;
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table;
-use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 
 class Acceleration extends AbstractAdapter
@@ -70,7 +69,7 @@ class Acceleration extends AbstractAdapter
 
             $attr = $axis['attr'];
 
-            $attrValuesTable = $specService->getValueDataTable($attr['type_id'])->info(Zend_Db_Table_Abstract::NAME);
+            $attrValuesTable = $specService->getValueDataTable($attr['type_id'])->getTable();
 
             $valueColumn = $axis['q'] != 1 ? new Zend_Db_Expr('axis.value / ' . $axis['q']) : 'axis.value';
 
