@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -19,6 +20,7 @@ use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
+use Autowp\Commons\Db\Table\Row;
 
 class CarsController extends AbstractActionController
 {
@@ -67,6 +69,11 @@ class CarsController extends AbstractActionController
      */
     private $attributeTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $userValueTable;
+
     public function __construct(
         HostManager $hostManager,
         Form $filterForm,
@@ -76,7 +83,8 @@ class CarsController extends AbstractActionController
         Perspective $perspective,
         Item $itemModel,
         DbTable\Picture $pictureTable,
-        TableGateway $attributeTable
+        TableGateway $attributeTable,
+        TableGateway $userValueTable
     ) {
 
         $this->hostManager = $hostManager;
@@ -88,6 +96,7 @@ class CarsController extends AbstractActionController
         $this->itemModel = $itemModel;
         $this->pictureTable = $pictureTable;
         $this->attributeTable = $attributeTable;
+        $this->userValueTable = $userValueTable;
     }
 
     private function carModerUrl(\Autowp\Commons\Db\Table\Row $item, $uri = null)
@@ -299,20 +308,28 @@ class CarsController extends AbstractActionController
 
         $toItemId = (int)$this->params('to_item_id');
 
-        $userValueTable = new Attr\UserValue();
-
-        $eUserValueRows = $userValueTable->fetchAll([
-            'item_id = ?' => $itemId
+        $eUserValueRows = $this->userValueTable->select([
+            'item_id' => $itemId
         ]);
 
         foreach ($eUserValueRows as $eUserValueRow) {
             // check for value in dest
 
-            $cUserValueRow = $userValueTable->fetchRow([
-                'item_id = ?'      => $toItemId,
-                'attribute_id = ?' => $eUserValueRow->attribute_id,
-                'user_id = ?'      => $eUserValueRow->user_id
-            ]);
+            $srcPrimaryKey = [
+                'item_id'      => $eUserValueRow['item_id'],
+                'attribute_id' => $eUserValueRow['attribute_id'],
+                'user_id'      => $eUserValueRow['user_id']
+            ];
+            $dstPrimaryKey = [
+                'item_id'      => $toItemId,
+                'attribute_id' => $eUserValueRow['attribute_id'],
+                'user_id'      => $eUserValueRow['user_id']
+            ];
+            $set = [
+                'item_id' => $toItemId
+            ];
+
+            $cUserValueRow = $this->userValueTable->select($dstPrimaryKey)->current();
 
             if ($cUserValueRow) {
                 throw new Exception("Value row already exists");
@@ -326,39 +343,33 @@ class CarsController extends AbstractActionController
 
             $dataTable = $this->specsService->getUserValueDataTable($attrRow['type_id']);
 
-            $eDataRows = $dataTable->fetchAll([
-                'attribute_id = ?' => $eUserValueRow->attribute_id,
-                'item_id = ?'      => $eUserValueRow->item_id,
-                'user_id = ?'      => $eUserValueRow->user_id
-            ]);
+            $eDataRows = [];
+            foreach ($dataTable->select($srcPrimaryKey) as $row) {
+                $eDataRows[] = $row;
+            }
 
             foreach ($eDataRows as $eDataRow) {
                 // check for data row existance
-                $filter = [
-                    'attribute_id = ?' => $eDataRow->attribute_id,
-                    'item_id = ?'      => $toItemId,
-                    'user_id = ?'      => $eDataRow->user_id
-                ];
+                $filter = $dstPrimaryKey;
                 if ($attrRow['multiple']) {
-                    $filter['ordering = ?'] = $eDataRow->ordering;
+                    $filter['ordering'] = $eDataRow['ordering'];
                 }
-                $cDataRow = $dataTable->fetchRow($filter);
+                $cDataRow = $dataTable->select($filter)->current();
 
                 if ($cDataRow) {
                     throw new Exception("Data row already exists");
                 }
             }
 
-            $eUserValueRow->setFromArray([
-                'item_id'      => $toItemId
-            ]);
-            $eUserValueRow->save();
+            $this->userValueTable->update($set, $srcPrimaryKey);
 
             foreach ($eDataRows as $eDataRow) {
-                $eDataRow->setFromArray([
-                    'item_id'      => $toItemId
-                ]);
-                $eDataRow->save();
+                $filter = $srcPrimaryKey;
+                if ($attrRow['multiple']) {
+                    $filter['ordering'] = $eDataRow['ordering'];
+                }
+
+                $dataTable->update($set, $filter);
             }
 
             $this->specsService->updateActualValues($toItemId);
@@ -378,40 +389,43 @@ class CarsController extends AbstractActionController
 
         $itemId = (int)$this->params('item_id');
 
-        $auvTable = new Attr\UserValue();
+        $userTable = new User();
 
-        $rows = $auvTable->fetchAll([
-            'item_id = ?' => $itemId
-        ], 'update_date');
+        $select = new Sql\Select($this->userValueTable->getTable());
+        $select->where(['item_id' => $itemId])
+            ->order('update_date');
+
+        $rows = $this->userValueTable->selectWith($select);
 
         $language = $this->language();
 
         $values = [];
         foreach ($rows as $row) {
             $attribute = $this->attributeTable->select(['id' => $row['attribute_id']])->current();
-            $user = $row->findParentRow(User::class);
+            $user = $userTable->find($row['user_id'])->current();
             $unit = $this->specsService->getUnit($attribute['unit_id']);
+            $date = Row::getDateTimeByColumnType('timestamp', $row['update_date']);
             $values[] = [
                 'attribute' => $attribute,
                 'unit'      => $unit,
                 'user'      => $user,
                 'value'     => $this->specsService->getActualValueText(
                     $attribute['id'],
-                    $row->item_id,
+                    $row['item_id'],
                     $language
                 ),
                 'userValue' => $this->specsService->getUserValueText(
                     $attribute['id'],
-                    $row->item_id,
+                    $row['item_id'],
                     $user->id,
                     $language
                 ),
-                'date'      => $row->getDateTime('update_date'),
+                'date'      => $date,
                 'deleteUrl' => $this->url()->fromRoute('cars/params', [
                     'action'       => 'delete-value',
-                    'attribute_id' => $row->attribute_id,
-                    'item_id'      => $row->item_id,
-                    'user_id'      => $row->user_id
+                    'attribute_id' => $row['attribute_id'],
+                    'item_id'      => $row['item_id'],
+                    'user_id'      => $row['user_id']
                 ], [], true)
             ];
         }
@@ -465,10 +479,9 @@ class CarsController extends AbstractActionController
 
         $language = $this->language();
 
-        $userValues = new Attr\UserValue();
+        $select = new Sql\Select($this->userValueTable->getTable());
 
-        $select = $userValues->select()
-            ->order('update_date DESC');
+        $select->order('update_date DESC');
 
         $this->filterForm->setData($this->params()->fromRoute());
 
@@ -476,12 +489,12 @@ class CarsController extends AbstractActionController
             $values = $this->filterForm->getData();
 
             if ($userId = $values['user_id']) {
-                $select->where('user_id = ?', $userId);
+                $select->where(['user_id' => $userId]);
             }
         }
 
         $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
+            new \Zend\Paginator\Adapter\DbSelect($select, $this->userValueTable->getAdapter())
         );
 
         $paginator
@@ -492,6 +505,7 @@ class CarsController extends AbstractActionController
         $items = [];
 
         $cars = new DbTable\Item();
+        $userTable = new User();
 
         $isModerator = $this->user()->inheritsRole('moder');
 
@@ -501,7 +515,7 @@ class CarsController extends AbstractActionController
             $moderUrl = null;
             $path = [];
 
-            $car = $cars->find($row->item_id)->current();
+            $car = $cars->find($row['item_id'])->current();
             if ($car) {
                 $objectName = $this->car()->formatName($car, $this->language());
                 $editorUrl = $this->url()->fromRoute('cars/params', [
@@ -526,10 +540,10 @@ class CarsController extends AbstractActionController
                 $path = array_reverse($parents);
             }
 
-            $user = $row->findParentRow(User::class);
+            $user = $userTable->find($row['user_id'])->current();
 
             $items[] = [
-                'date'     => $row->getDateTime('update_date'),
+                'date'     => Row::getDateTimeByColumnType('timestamp', $row['update_date']),
                 'user'     => $user,
                 'object'   => [
                     'name'      => $objectName,
@@ -539,7 +553,7 @@ class CarsController extends AbstractActionController
                 'path'     => $path,
                 'value'    => $this->specsService->getUserValueText(
                     $attribute->id,
-                    $row->item_id,
+                    $row['item_id'],
                     $user->id,
                     $language
                 ),

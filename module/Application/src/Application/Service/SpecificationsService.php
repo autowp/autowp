@@ -22,6 +22,7 @@ use Application\Model\VehicleType;
 use Application\Spec\Table\Car as CarSpecTable;
 
 use Zend_Db_Expr;
+use Autowp\Commons\Db\Table\Row;
 
 class SpecificationsService
 {
@@ -56,12 +57,10 @@ class SpecificationsService
      */
     private $unitTable = null;
 
-    private $userValueDataTables = [];
-
     private $units = null;
 
     /**
-     * @var Attr\UserValue
+     * @var TableGateway
      */
     private $userValueTable = null;
 
@@ -145,6 +144,26 @@ class SpecificationsService
      */
     private $zoneAttributeTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $userValueFloatTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $userValueIntTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $userValueListTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $userValueStringTable;
+
     public function __construct(
         $translator,
         ItemNameFormatter $itemNameFormatter,
@@ -156,7 +175,12 @@ class SpecificationsService
         TableGateway $listOptionsTable,
         TableGateway $typeTable,
         TableGateway $attributeTable,
-        TableGateway $zoneAttributeTable
+        TableGateway $zoneAttributeTable,
+        TableGateway $userValueTable,
+        TableGateway $userValueFloatTable,
+        TableGateway $userValueIntTable,
+        TableGateway $userValueListTable,
+        TableGateway $userValueStringTable
     ) {
         $this->translator = $translator;
         $this->itemNameFormatter = $itemNameFormatter;
@@ -170,6 +194,11 @@ class SpecificationsService
         $this->typeTable = $typeTable;
         $this->attributeTable = $attributeTable;
         $this->zoneAttributeTable = $zoneAttributeTable;
+        $this->userValueTable = $userValueTable;
+        $this->userValueFloatTable = $userValueFloatTable;
+        $this->userValueIntTable = $userValueIntTable;
+        $this->userValueListTable = $userValueListTable;
+        $this->userValueStringTable = $userValueStringTable;
     }
 
     /**
@@ -214,13 +243,6 @@ class SpecificationsService
         return $this->itemTable
             ? $this->itemTable
             : $this->itemTable = new DbTable\Item();
-    }
-
-    private function getUserValueTable()
-    {
-        return $this->userValueTable
-            ? $this->userValueTable
-            : $this->userValueTable = new Attr\UserValue();
     }
 
     private function loadUnits()
@@ -397,18 +419,18 @@ class SpecificationsService
 
     public function getFormData($itemId, $zoneId, \Autowp\Commons\Db\Table\Row $user, $language)
     {
-        $userValueTable = $this->getUserValueTable();
         $zoneUserValues = $this->getZoneUsersValues($zoneId, $itemId);
 
         // fetch values dates
         $dates = [];
         if (count($zoneUserValues)) {
-            $valueDescRows = $userValueTable->fetchAll([
-                'attribute_id IN (?)' => array_keys($zoneUserValues),
-                'item_id = ?'         => $itemId,
+            $valueDescRows = $this->userValueTable->select([
+                new Sql\Predicate\In('attribute_id', array_keys($zoneUserValues)),
+                'item_id' => $itemId,
             ]);
             foreach ($valueDescRows as $valueDescRow) {
-                $dates[$valueDescRow->attribute_id][$valueDescRow->user_id] = $valueDescRow->getDateTime('update_date');
+                $date = Row::getDateTimeByColumnType('timestamp', $valueDescRow['update_date']);
+                $dates[$valueDescRow['attribute_id']][$valueDescRow['user_id']] = $date;
             }
         }
 
@@ -767,33 +789,29 @@ class SpecificationsService
         return isset($this->attributes[$id]) ? $this->attributes[$id] : null;
     }
 
-    public function setUserValue($uid, $attributeId, $itemId, $value)
+    public function setUserValue(int $uid, int $attributeId, int $itemId, $value)
     {
         $attribute = $this->getAttribute($attributeId);
         $somethingChanged = false;
 
-        $userValueTable = $this->getUserValueTable();
         $userValueDataTable = $this->getUserValueDataTable($attribute['typeId']);
+
+        $userValuePrimaryKey = [
+            'attribute_id' => $attribute['id'],
+            'item_id'      => $itemId,
+            'user_id'      => $uid
+        ];
 
         if ($attribute['isMultiple']) {
             // remove value descriptiors
-            $userValues = $userValueTable->fetchAll([
+            $this->userValueTable->delete([
                 'attribute_id = ?' => $attribute['id'],
                 'item_id = ?'      => $itemId,
                 'user_id = ?'      => $uid,
             ]);
-            foreach ($userValues as $userValue) {
-                $userValue->delete();
-            }
+
             // remove values
-            $userValueDataRows = $userValueDataTable->fetchAll([
-                'attribute_id = ?' => $attribute['id'],
-                'item_id = ?'      => $itemId,
-                'user_id = ?'      => $uid
-            ]);
-            foreach ($userValueDataRows as $userValueDataRow) {
-                $userValueDataRow->delete();
-            }
+            $userValueDataTable->delete($userValuePrimaryKey);
 
             if ($value) {
                 $empty = true;
@@ -810,13 +828,10 @@ class SpecificationsService
 
                 if (! $empty) {
                     // insert new descriptiors and values
-                    $userValueTable->insert([
-                        'attribute_id' => $attribute['id'],
-                        'item_id'      => $itemId,
-                        'user_id'      => $uid,
-                        'add_date'     => new Zend_Db_Expr('NOW()'),
-                        'update_date'  => new Zend_Db_Expr('NOW()'),
-                    ]);
+                    $this->userValueTable->insert(array_replace([
+                        'add_date'     => new Sql\Expression('NOW()'),
+                        'update_date'  => new Sql\Expression('NOW()'),
+                    ], $userValuePrimaryKey));
                     $ordering = 1;
 
                     if ($valueNot) {
@@ -824,13 +839,10 @@ class SpecificationsService
                     }
 
                     foreach ($value as $oneValue) {
-                        $userValueDataTable->insert([
-                            'attribute_id' => $attribute['id'],
-                            'item_id'      => $itemId,
-                            'user_id'      => $uid,
+                        $userValueDataTable->insert(array_replace([
                             'ordering'     => $ordering,
                             'value'        => $oneValue
-                        ]);
+                        ], $userValuePrimaryKey));
 
                         $ordering++;
                     }
@@ -841,81 +853,50 @@ class SpecificationsService
         } else {
             if (strlen($value) > 0) {
                 // insert/update value decsriptor
-                $userValue = $userValueTable->fetchRow([
-                    'attribute_id = ?' => $attribute['id'],
-                    'item_id = ?'      => $itemId,
-                    'user_id = ?'      => $uid
-                ]);
+                $userValue = $this->userValueTable->select($userValuePrimaryKey)->current();
 
                 // insert update value
-                $userValueData = $userValueDataTable->fetchRow([
-                    'attribute_id = ?' => $attribute['id'],
-                    'item_id = ?'      => $itemId,
-                    'user_id = ?'      => $uid
-                ]);
+                $userValueData = $userValueDataTable->select($userValuePrimaryKey)->current();
 
                 if ($value == self::NULL_VALUE_STR) {
                     $value = null;
                 }
 
                 if ($userValueData) {
-                    $valueChanged = $value === null ? $userValueData->value !== null : $userValueData->value != $value;
+                    $valueChanged = $value === null ? $userValueData['value'] !== null : $userValueData['value'] != $value;
                 } else {
                     $valueChanged = true;
                 }
 
                 if (! $userValue || $valueChanged) {
                     if (! $userValue) {
-                        $userValue = $userValueTable->createRow([
-                            'attribute_id' => $attribute['id'],
-                            'item_id'      => $itemId,
-                            'user_id'      => $uid,
-                            'add_date'     => new Zend_Db_Expr('NOW()')
-                        ]);
+                        $this->userValueTable->insert(array_replace([
+                            'add_date'    => new Sql\Expression('NOW()'),
+                            'update_date' => new Sql\Expression('NOW()')
+                        ], $userValuePrimaryKey));
+                    } else {
+                        $this->userValueTable->update([
+                            'update_date' => new Zend_Db_Expr('NOW()')
+                        ], $userValuePrimaryKey);
                     }
 
-                    $userValue->setFromArray([
-                        'update_date' => new Zend_Db_Expr('NOW()')
-                    ]);
-                    $userValue->save();
+                    $set = ['value' => $value];
 
-                    if (! $userValueData) {
-                        $userValueData = $userValueDataTable->fetchNew();
-                        $userValueData->setFromArray([
-                            'attribute_id' => $attribute['id'],
-                            'item_id'      => $itemId,
-                            'user_id'      => $uid
-                        ]);
+                    if ($userValueData) {
+                        $userValueDataTable->update($set, $userValuePrimaryKey);
+                    } else {
+                        $userValueDataTable->insert(array_merge($set, $userValuePrimaryKey));
                     }
-
-                    $userValueData->value = $value;
-                    $userValueData->save();
 
                     $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
                 }
             } else {
-                $needUpdate = false;
                 // delete value descriptor
-                $userValue = $userValueTable->fetchRow([
-                    'attribute_id = ?' => $attribute['id'],
-                    'item_id = ?'      => $itemId,
-                    'user_id = ?'      => $uid,
-                ]);
-                if ($userValue) {
-                    $userValue->delete();
-                    $needUpdate = true;
-                }
+                $affected = $this->userValueTable->delete($userValuePrimaryKey);
                 // remove value
-                $userValueData = $userValueDataTable->fetchRow([
-                    'attribute_id = ?' => $attribute['id'],
-                    'item_id = ?'      => $itemId,
-                    'user_id = ?'      => $uid,
-                ]);
-                if ($userValueData) {
-                    $userValueData->delete();
-                    $needUpdate = true;
-                }
-                if ($needUpdate) {
+                $affected += $userValueDataTable->delete($userValuePrimaryKey);
+
+                if ($affected > 0) {
                     $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
                 }
             }
@@ -1009,12 +990,12 @@ class SpecificationsService
         return $this->carChildsCache[$parentId];
     }
 
-    private function haveOwnAttributeValue($attributeId, $itemId)
+    private function haveOwnAttributeValue(int $attributeId, int $itemId): bool
     {
-        return (bool)$this->getUserValueTable()->fetchRow([
-            'attribute_id = ?' => (int)$attributeId,
-            'item_id = ?'      => (int)$itemId
-        ]);
+        return (bool)$this->userValueTable->select([
+            'attribute_id' => $attributeId,
+            'item_id'      => $itemId
+        ])->current();
     }
 
     private function propagateInheritance($attribute, $itemId)
@@ -1241,7 +1222,7 @@ class SpecificationsService
      * @param int $userId
      * @throws Exception
      */
-    public function deleteUserValue($attributeId, $itemId, $userId)
+    public function deleteUserValue(int $attributeId, int $itemId, int $userId)
     {
         if (! $itemId) {
             throw new Exception("Item_id not set");
@@ -1252,29 +1233,19 @@ class SpecificationsService
             throw new Exception("attribute not found");
         }
 
-        $valueTable = $this->getUserValueTable();
-        $row = $valueTable->fetchRow([
-            'attribute_id = ?' => (int)$attribute['id'],
-            'item_id = ?'      => (int)$itemId,
-            'user_id = ?'      => (int)$userId
-        ]);
-
         $valueDataTable = $this->getUserValueDataTable($attribute['typeId']);
-        if (! $valueDataTable) {
-            throw new Exception("Failed to allocate data table");
-        }
 
-        $dataRows = $valueDataTable->fetchAll([
+        $valueDataTable->delete([
             'attribute_id = ?' => (int)$attribute['id'],
-            'item_id = ?'      => (int)$itemId,
-            'user_id = ?'      => (int)$userId
+            'item_id = ?'      => $itemId,
+            'user_id = ?'      => $userId
         ]);
 
-        foreach ($dataRows as $dataRow) {
-            $dataRow->delete();
-        }
-
-        $row->delete();
+        $this->userValueTable->delete([
+            'attribute_id = ?' => (int)$attribute['id'],
+            'item_id = ?'      => $itemId,
+            'user_id = ?'      => $userId
+        ]);
 
         $this->updateActualValue($attribute['id'], $itemId);
     }
@@ -1487,45 +1458,24 @@ class SpecificationsService
         return null;
     }
 
-
-    public function getUserValueDataTable($type)
-    {
-        if (! isset($this->userValueDataTables[$type])) {
-            $this->userValueDataTables[$type] = $this->createUserValueDataTable($type);
-        }
-
-        return $this->userValueDataTables[$type];
-    }
-
-    private function createUserValueDataTable($type)
+    public function getUserValueDataTable(int $type): TableGateway
     {
         switch ($type) {
             case 1: // string
-                return new Attr\UserValueString();
+                return $this->userValueStringTable;
 
             case 2: // int
-                return new Attr\UserValueInt();
+            case 5: // checkbox
+                return $this->userValueIntTable;
 
             case 3: // float
-                return new Attr\UserValueFloat();
-
-            case 4: // textarea
-                throw new Exception("Unexpected type 4");
-                //return new Attrs_User_Values_Text();
-
-            case 5: // checkbox
-                return new Attr\UserValueInt();
+                return $this->userValueFloatTable;
 
             case 6: // select
-                return new Attr\UserValueList();
-
             case 7: // select
-                return new Attr\UserValueList();
-
-            default:
-                throw new Exception("Unexpected type `$type`");
+                return $this->userValueListTable;
         }
-        return null;
+        throw new Exception("Unexpected type `$type`");
     }
 
     private function valueToText($attribute, $value, $language)
@@ -1580,102 +1530,104 @@ class SpecificationsService
         return null;
     }
 
-    private function calcAvgUserValue($attribute, $itemId)
+    private function calcAvgUserValue($attribute, int $itemId)
     {
-        $userValuesTable = $this->getUserValueTable();
         $userValuesDataTable = $this->getUserValueDataTable($attribute['typeId']);
 
-        $userValueDataRows = $userValuesDataTable->fetchAll([
-            'attribute_id = ?' => $attribute['id'],
-            'item_id = ?'      => $itemId,
+        $userValueDataRows = $userValuesDataTable->select([
+            'attribute_id' => $attribute['id'],
+            'item_id'      => $itemId
         ]);
-        if (count($userValueDataRows)) {
-            // group by users
-            $data = [];
-            foreach ($userValueDataRows as $userValueDataRow) {
-                $uid = $userValueDataRow->user_id;
-                if (! isset($data[$uid])) {
-                    $data[$uid] = [];
+
+        // group by users
+        $data = [];
+        foreach ($userValueDataRows as $userValueDataRow) {
+            $uid = $userValueDataRow['user_id'];
+            if (! isset($data[$uid])) {
+                $data[$uid] = [];
+            }
+            $data[$uid][] = $userValueDataRow;
+        }
+
+        if (count($data) <= 0) {
+            return [
+                'value' => null,
+                'empty' => true
+            ];
+        }
+
+        $idx = 0;
+        $registry = $freshness = $ratios = [];
+        foreach ($data as $uid => $valueRows) {
+            /*$user = $uTable->find($uid)->current();
+            if (!$user) {
+                throw new Exception('User not found');
+            }*/
+
+            if ($attribute['isMultiple']) {
+                $value = [];
+                foreach ($valueRows as $valueRow) {
+                    $value[$valueRow['ordering']] = $valueRow['value'];
                 }
-                $data[$uid][] = $userValueDataRow;
+            } else {
+                foreach ($valueRows as $valueRow) {
+                    $value = $valueRow['value'];
+                }
             }
 
-            $idx = 0;
-            $registry = $freshness = $ratios = [];
-            foreach ($data as $uid => $valueRows) {
-                /*$user = $uTable->find($uid)->current();
-                if (!$user) {
-                    throw new Exception('User not found');
-                }*/
-
-                if ($attribute['isMultiple']) {
-                    $value = [];
-                    foreach ($valueRows as $valueRow) {
-                        $value[$valueRow->ordering] = $valueRow->value;
-                    }
-                } else {
-                    foreach ($valueRows as $valueRow) {
-                        $value = $valueRow->value;
-                    }
-                }
-
-                $row = $userValuesTable->fetchRow([
-                    'attribute_id = ?' => $attribute['id'],
-                    'item_id = ?'      => $itemId,
-                    'user_id = ?'      => $uid
-                ]);
-                if (! $row) {
-                    throw new Exception('Row(rows) without descriptors');
-                }
-
-                // look for same value
-                $matchRegIdx = null;
-                foreach ($registry as $regIdx => $regVal) {
-                    if ($regVal === $value) {
-                        $matchRegIdx = $regIdx;
-                    }
-                }
-
-                if ($matchRegIdx === null) {
-                    $registry[$idx] = $value;
-                    $matchRegIdx = $idx;
-                    $idx++;
-                }
-
-                if (! isset($ratios[$matchRegIdx])) {
-                    $ratios[$matchRegIdx] = 0;
-                    $freshness[$matchRegIdx] = null;
-                }
-                $ratios[$matchRegIdx] += $this->getUserValueWeight($uid);
-                if ($freshness[$matchRegIdx] < $row->update_date) {
-                    $freshness[$matchRegIdx] = $row->update_date;
-                }
-                //$idx++;
+            $row = $this->userValueTable->select([
+                'attribute_id' => $attribute['id'],
+                'item_id'      => $itemId,
+                'user_id'      => $uid
+            ])->current();
+            if (! $row) {
+                throw new Exception('Row(rows) without descriptors');
             }
 
-            // select max
-            $maxValueRatio = 0;
-            $maxValueIdx = null;
-            foreach ($ratios as $idx => $ratio) {
-                if (is_null($maxValueIdx)) {
+            // look for same value
+            $matchRegIdx = null;
+            foreach ($registry as $regIdx => $regVal) {
+                if ($regVal === $value) {
+                    $matchRegIdx = $regIdx;
+                }
+            }
+
+            if ($matchRegIdx === null) {
+                $registry[$idx] = $value;
+                $matchRegIdx = $idx;
+                $idx++;
+            }
+
+            if (! isset($ratios[$matchRegIdx])) {
+                $ratios[$matchRegIdx] = 0;
+                $freshness[$matchRegIdx] = null;
+            }
+            $ratios[$matchRegIdx] += $this->getUserValueWeight($uid);
+            if ($freshness[$matchRegIdx] < $row['update_date']) {
+                $freshness[$matchRegIdx] = $row['update_date'];
+            }
+            //$idx++;
+        }
+
+        // select max
+        $maxValueRatio = 0;
+        $maxValueIdx = null;
+        foreach ($ratios as $idx => $ratio) {
+            if (is_null($maxValueIdx)) {
+                $maxValueIdx = $idx;
+                $maxValueRatio = $ratio;
+            } elseif ($maxValueRatio <= $ratio) {
+                if ($freshness[$idx] > $freshness[$maxValueIdx]) {
                     $maxValueIdx = $idx;
                     $maxValueRatio = $ratio;
-                } elseif ($maxValueRatio <= $ratio) {
-                    if ($freshness[$idx] > $freshness[$maxValueIdx]) {
-                        $maxValueIdx = $idx;
-                        $maxValueRatio = $ratio;
-                    } else {
-                        $maxValueIdx = $idx;
-                        $maxValueRatio = $ratio;
-                    }
+                } else {
+                    $maxValueIdx = $idx;
+                    $maxValueRatio = $ratio;
                 }
             }
-            $actualValue = $registry[$maxValueIdx];
-            $empty = false;
-        } else {
-            $actualValue = null;
-            $empty = true;
         }
+        $actualValue = $registry[$maxValueIdx];
+        $empty = false;
 
         return [
             'value' => $actualValue,
@@ -2101,24 +2053,24 @@ class SpecificationsService
         }
     }
 
-    public function getContributors($itemId)
+    public function getContributors($itemId): array
     {
         if (! $itemId) {
             return [];
         }
 
-        $uvTable = $this->getUserValueTable();
-        $db = $uvTable->getAdapter();
+        $select = new Sql\Select($this->userValueTable->getTable());
+        $select->columns(['user_id', 'c' => new Sql\Expression('COUNT(1)')])
+            ->where([new Sql\Predicate\In('item_id', (array)$itemId)])
+            ->group('user_id')
+            ->order('c desc');
 
-        $pairs = $db->fetchPairs(
-            $db->select(true)
-                ->from($uvTable->info('name'), ['user_id', 'c' => new Zend_Db_Expr('COUNT(1)')])
-                ->where('attrs_user_values.item_id IN (?)', (array)$itemId)
-                ->group('attrs_user_values.user_id')
-                ->order('c desc')
-        );
+        $result = [];
+        foreach ($this->userValueTable->selectWith($select) as $row) {
+            $result[(int)$row['user_id']] = (int)$row['c'];
+        }
 
-        return $pairs;
+        return $result;
     }
 
     private function prepareValue($typeId, $value)
@@ -2148,13 +2100,9 @@ class SpecificationsService
     }
 
     /**
-     * @param int $zoneId
-     * @param int $itemId
-     * @param int $userId
      * @throws Exception
-     * @return array
      */
-    private function getZoneUserValues($zoneId, $itemId, $userId)
+    private function getZoneUserValues(int $zoneId, int $itemId, int $userId): array
     {
         if (! $itemId) {
             throw new Exception("Item_id not set");
@@ -2184,22 +2132,23 @@ class SpecificationsService
         foreach ($requests as $typeId => $multiples) {
             foreach ($multiples as $isMultiple => $ids) {
                 $valuesTable = $this->getUserValueDataTable($typeId);
-                if (! $valuesTable) {
-                    throw new Exception("ValueTable not found");
-                }
 
-                $select = $valuesTable->select()
-                    ->where('attribute_id in (?)', $ids)
-                    ->where('item_id = ?', (int)$itemId)
-                    ->where('user_id = ?', (int)$userId);
+                $select = new Sql\Select($valuesTable->getTable());
+
+                $select->columns(['attribute_id', 'value'])
+                    ->where([
+                        new Sql\Predicate\In('attribute_id', $ids),
+                        'item_id' => $itemId,
+                        'user_id' => $userId
+                    ]);
 
                 if ($isMultiple) {
                     $select->order('ordering');
                 }
 
-                foreach ($valuesTable->fetchAll($select) as $row) {
-                    $aid = (int)$row->attribute_id;
-                    $value = $this->prepareValue($typeId, $row->value);
+                foreach ($valuesTable->selectWith($select) as $row) {
+                    $aid = (int)$row['attribute_id'];
+                    $value = $this->prepareValue($typeId, $row['value']);
                     if ($isMultiple) {
                         if (! isset($values[$aid])) {
                             $values[$aid] = [];
@@ -2222,7 +2171,7 @@ class SpecificationsService
      * @throws Exception
      * @return array
      */
-    private function getZoneUsersValues($zoneId, $itemId)
+    private function getZoneUsersValues(int $zoneId, int $itemId)
     {
         if (! $itemId) {
             throw new Exception("Item_id not set");
@@ -2252,22 +2201,22 @@ class SpecificationsService
         foreach ($requests as $typeId => $multiples) {
             foreach ($multiples as $isMultiple => $ids) {
                 $valuesTable = $this->getUserValueDataTable($typeId);
-                if (! $valuesTable) {
-                    throw new Exception("ValueTable not found");
-                }
 
-                $select = $valuesTable->select()
-                    ->where('attribute_id in (?)', $ids)
-                    ->where('item_id = ?', (int)$itemId);
+                $select = new Sql\Select($valuesTable->getTable());
+                $select->columns(['attribute_id', 'user_id', 'value'])
+                    ->where([
+                        new Sql\Predicate\In('attribute_id', $ids),
+                        'item_id' => $itemId
+                    ]);
 
                 if ($isMultiple) {
                     $select->order('ordering');
                 }
 
-                foreach ($valuesTable->fetchAll($select) as $row) {
-                    $aid = (int)$row->attribute_id;
-                    $uid = (int)$row->user_id;
-                    $value = $this->prepareValue($typeId, $row->value);
+                foreach ($valuesTable->selectWith($select) as $row) {
+                    $aid = (int)$row['attribute_id'];
+                    $uid = (int)$row['user_id'];
+                    $value = $this->prepareValue($typeId, $row['value']);
                     if (! isset($values[$aid])) {
                         $values[$aid] = [];
                     }
@@ -2286,7 +2235,7 @@ class SpecificationsService
         return $values;
     }
 
-    public function getUserValue($attributeId, $itemId, $userId)
+    public function getUserValue(int $attributeId, int $itemId, int $userId)
     {
         if (! $itemId) {
             throw new Exception("Item_id not set");
@@ -2298,22 +2247,22 @@ class SpecificationsService
         }
 
         $valuesTable = $this->getUserValueDataTable($attribute['typeId']);
-        if (! $valuesTable) {
-            return null;
-        }
 
-        $select = $valuesTable->select()
-            ->where('attribute_id = ?', (int)$attribute['id'])
-            ->where('item_id = ?', (int)$itemId)
-            ->where('user_id = ?', (int)$userId);
+        $select = new Sql\Select($valuesTable->getTable());
+        $select->columns(['value'])
+            ->where([
+                'attribute_id' => (int)$attribute['id'],
+                'item_id'      => $itemId,
+                'user_id'      => $userId
+            ]);
 
         if ($attribute['isMultiple']) {
             $select->order('ordering');
         }
 
         $values = [];
-        foreach ($valuesTable->fetchAll($select) as $row) {
-            $values[] = $this->prepareValue($attribute['typeId'], $row->value);
+        foreach ($valuesTable->selectWith($select) as $row) {
+            $values[] = $this->prepareValue($attribute['typeId'], $row['value']);
         }
 
         if (count($values) <= 0) {
@@ -2323,7 +2272,7 @@ class SpecificationsService
         return $attribute['isMultiple'] ? $values : $values[0];
     }
 
-    public function getUserValueText($attributeId, $itemId, $userId, $language)
+    public function getUserValueText(int $attributeId, int $itemId, int $userId, string $language)
     {
         if (! $itemId) {
             throw new Exception("Item_id not set");
@@ -2335,22 +2284,23 @@ class SpecificationsService
         }
 
         $valuesTable = $this->getUserValueDataTable($attribute['typeId']);
-        if (! $valuesTable) {
-            return null;
-        }
 
-        $select = $valuesTable->select()
-            ->where('attribute_id = ?', (int)$attribute['id'])
-            ->where('item_id = ?', (int)$itemId)
-            ->where('user_id = ?', (int)$userId);
+        $select = new Sql\Select($valuesTable->getTable());
+
+        $select->columns(['value'])
+            ->where([
+                'attribute_id' => (int)$attribute['id'],
+                'item_id'      => $itemId,
+                'user_id'      => $userId
+            ]);
 
         if ($attribute['isMultiple']) {
             $select->order('ordering');
         }
 
         $values = [];
-        foreach ($valuesTable->fetchAll($select) as $row) {
-            $values[] = $this->valueToText($attribute, $row->value, $language);
+        foreach ($valuesTable->selectWith($select) as $row) {
+            $values[] = $this->valueToText($attribute, $row['value'], $language);
         }
 
         if (count($values) > 1) {
@@ -2608,7 +2558,7 @@ class SpecificationsService
         return $this->types[$typeId];
     }
 
-    public function refreshConflictFlag($attributeId, $itemId)
+    public function refreshConflictFlag(int $attributeId, int $itemId)
     {
         if (! $attributeId) {
             throw new Exception("attributeId not provided");
@@ -2623,8 +2573,7 @@ class SpecificationsService
             throw new Exception("Attribute not found");
         }
 
-        $userValueTable = $this->getUserValueTable();
-        $userValueRows = $userValueTable->fetchAll([
+        $userValueRows = $this->userValueTable->select([
             'attribute_id = ?' => $attribute['id'],
             'item_id = ?'      => $itemId,
         ]);
@@ -2688,7 +2637,7 @@ class SpecificationsService
                     $weight = self::WEIGHT_NONE;
                 }
 
-                $affectedRows = $userValueTable->update([
+                $affectedRows = $this->userValueTable->update([
                     'conflict' => $conflict,
                     'weight'   => $weight
                 ], [
@@ -2702,7 +2651,7 @@ class SpecificationsService
                 }
             }
         } else {
-            $affectedRows = $userValueTable->update([
+            $affectedRows = $this->userValueTable->update([
                 'conflict' => 0,
                 'weight'   => self::WEIGHT_NONE
             ], [
@@ -2723,28 +2672,15 @@ class SpecificationsService
         $userId = (array)$userId;
 
         if (count($userId)) {
-            $userValueTable = $this->getUserValueTable();
-            $db = $userValueTable->getAdapter();
+            $pSelect = 'SELECT sum(weight) FROM attrs_user_values WHERE user_id = users.id AND weight > 0';
 
-            $pSelect = $db->select()
-                ->from($userValueTable->info('name'), 'sum(weight)')
-                ->where('user_id = users.id')
-                ->where('weight > 0')
-                ->assemble();
-
-            $nSelect = $db->select()
-                ->from($userValueTable->info('name'), 'abs(sum(weight))')
-                ->where('user_id = users.id')
-                ->where('weight < 0')
-                ->assemble();
+            $nSelect = 'SELECT abs(sum(weight)) FROM attrs_user_values WHERE user_id = users.id AND weight < 0';
 
             $expr = new Zend_Db_Expr(
                 '1.5 * ((1 + IFNULL((' . $pSelect . '), 0)) / (1 + IFNULL((' . $nSelect . '), 0)))'
             );
 
-            //print $expr . PHP_EOL;
-
-            $db->update('users', [
+            $this->getUserTable()->update([
                 'specs_weight' => $expr,
             ], [
                 'id IN (?)' => $userId
@@ -2771,19 +2707,14 @@ class SpecificationsService
         }
     }
 
-    public function refreshItemConflictFlags($itemId)
+    public function refreshItemConflictFlags(int $itemId)
     {
-        $valueTable = $this->getUserValueTable();
-        $select = $valueTable->select(true)
-            ->where('attrs_user_values.item_id = ?', (int)$itemId);
-
-        foreach ($valueTable->fetchAll($select) as $valueRow) {
-            //print $valueRow['attribute_id'] . '#' . $valueRow['item_id'] . PHP_EOL;
+        foreach ($this->userValueTable->select(['item_id' => $itemId]) as $valueRow) {
             $this->refreshConflictFlag($valueRow['attribute_id'], $valueRow['item_id']);
         }
     }
 
-    public function getConflicts($userId, $filter, $page, $perPage, $language)
+    public function getConflicts(int $userId, $filter, int $page, int $perPage, string $language)
     {
         $userId = (int)$userId;
 
@@ -2808,8 +2739,6 @@ class SpecificationsService
             $select->where('attrs_user_values.conflict < 0');
         }
 
-        $userValueTable = $this->getUserValueTable();
-
         $paginator = new Paginator(
             new Zend1DbTableSelect($select)
         );
@@ -2821,11 +2750,11 @@ class SpecificationsService
         $conflicts = [];
         foreach ($paginator->getCurrentItems() as $valueRow) {
             // other users values
-            $userValueRows = $userValueTable->fetchAll([
-                'attribute_id = ?' => $valueRow['attribute_id'],
-                'item_id = ?'      => $valueRow['item_id'],
-                'user_id <> ?'     => $userId
-            ]);
+            $userValueRows = $this->userValueTable->select([
+                'attribute_id' => $valueRow['attribute_id'],
+                'item_id'      => $valueRow['item_id'],
+                'user_id != ?' => $userId
+            ])->current();
 
             $values = [];
             foreach ($userValueRows as $userValueRow) {
@@ -2841,10 +2770,10 @@ class SpecificationsService
             }
 
             // my value
-            $userValueRow = $userValueTable->fetchRow([
-                'attribute_id = ?' => $valueRow['attribute_id'],
-                'item_id = ?'      => $valueRow['item_id'],
-                'user_id = ?'      => $userId
+            $userValueRow = $this->userValueTable->fetchRow([
+                'attribute_id' => $valueRow['attribute_id'],
+                'item_id'      => $valueRow['item_id'],
+                'user_id'      => $userId
             ]);
             $value = null;
             if ($userValueRow) {
@@ -2887,42 +2816,30 @@ class SpecificationsService
 
     public function refreshUserConflictsStat()
     {
-        $userValueTable = $this->getUserValueTable();
-        $db = $userValueTable->getAdapter();
+        $select = new Sql\Select($this->userValueTable->getTable());
+        $select->columns(['user_id']);
 
-        $userIds = $db->fetchCol(
-            $db->select()
-                ->distinct()
-                ->from($userValueTable->info('name'), ['user_id'])
-        );
+        $userIds = [];
+        foreach ($this->userValueTable->selectWith($select) as $row) {
+            $userIds[] = (int)$row['user_id'];
+        }
 
         $this->refreshUserConflicts($userIds);
     }
 
     public function refreshUsersConflictsStat()
     {
-        $userValueTable = $this->getUserValueTable();
-        $db = $userValueTable->getAdapter();
+        $pSelect = 'SELECT sum(weight) FROM attrs_user_values WHERE user_id = users.id AND weight > 0';
 
-        $pSelect = $db->select()
-            ->from($userValueTable->info('name'), 'sum(weight)')
-            ->where('user_id = users.id')
-            ->where('weight > 0')
-            ->assemble();
-
-        $nSelect = $db->select()
-            ->from($userValueTable->info('name'), 'abs(sum(weight))')
-            ->where('user_id = users.id')
-            ->where('weight < 0')
-            ->assemble();
+        $nSelect = 'SELECT abs(sum(weight)) FROM attrs_user_values WHERE user_id = users.id AND weight < 0';
 
         $expr = new Zend_Db_Expr(
             '1.5 * ((1 + IFNULL((' . $pSelect . '), 0)) / (1 + IFNULL((' . $nSelect . '), 0)))'
         );
 
-        $db->update('users', [
-            'specs_weight' => $expr,
-        ]);
+        $this->getUserTable()->update([
+            'specs_weight' => $expr
+        ], []);
     }
 
     private function getUserValueWeight($userId)
