@@ -275,7 +275,6 @@ class ModificationController extends AbstractActionController
         $map = [];
 
         foreach ($mgRows as $mgRow) {
-
             $select = new Sql\Select($this->modificationTable->getTable());
             $select->columns(['id'])
                 ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
