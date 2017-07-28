@@ -5,7 +5,6 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\Referer;
-use Application\Model\Referer\Blacklist;
 
 class PictureFileController extends AbstractActionController
 {
@@ -14,9 +13,15 @@ class PictureFileController extends AbstractActionController
      */
     private $picturesHostname = null;
 
-    public function __construct($picturesHostname)
+    /**
+     * @var Referer
+     */
+    private $referer;
+
+    public function __construct($picturesHostname, Referer $referer)
     {
         $this->picturesHostname = $picturesHostname;
+        $this->referer = $referer;
     }
 
     public function indexAction()
@@ -63,9 +68,9 @@ class PictureFileController extends AbstractActionController
         $referer = (string)$request->getServer('HTTP_REFERER');
 
         if ($referer) {
-            $blacklist = new Blacklist();
-            $blacklistRow = $blacklist->fetchRowByUrl($referer);
-            if ($blacklistRow && $blacklistRow->hard) {
+            $blacklisted = $this->referer->isUrlBlacklisted($referer);
+
+            /*if ($blacklistRow && $blacklistRow->hard) {
                 return $this->getResponse()
                     ->setStatusCode(429)
                     ->getHeaders()
@@ -73,16 +78,15 @@ class PictureFileController extends AbstractActionController
                         'Content-Type'     => 'image/gif',
                         'X-Accel-Redirect' => '/hotlinking.gif'
                     ]);
-            }
+            }*/
 
             $accept = (string)$request->getServer('HTTP_ACCEPT');
 
-            $refererTable = new Referer();
-            if ($accept && $refererTable->isImageRequest($accept) && $blacklistRow) {
+            if ($accept && $blacklisted && $this->referer->isImageRequest($accept)) {
                 return $this->getResponse()->setStatusCode(429);
             }
 
-            $refererTable->addUrl($referer, $accept);
+            $this->referer->addUrl($referer, $accept);
         }
 
         $expiresTime = 86400 * 60;

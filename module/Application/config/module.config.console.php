@@ -10,7 +10,7 @@ return [
             Controller\Console\BuildController::class     => InvokableFactory::class,
             Controller\Console\CatalogueController::class => Controller\Console\Service\CatalogueControllerFactory::class,
             Controller\Console\PicturesController::class  => Controller\Console\Service\PicturesControllerFactory::class,
-            Controller\Console\RefererController::class   => InvokableFactory::class,
+            Controller\Console\RefererController::class   => Controller\Console\RefererControllerFactory::class,
             Controller\Console\SpecsController::class     => Controller\Console\Service\SpecsControllerFactory::class,
             Controller\Console\TelegramController::class  => Controller\Console\Service\TelegramControllerFactory::class
         ]

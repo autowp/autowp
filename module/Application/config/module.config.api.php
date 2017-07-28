@@ -7,9 +7,7 @@ use Zend\Router\Http\Method;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
-use Application\Model\DbTable;
 use Autowp\ZFComponents\Filter\SingleSpaces;
-use Application\Model\Item;
 
 return [
     'hydrators' => [
