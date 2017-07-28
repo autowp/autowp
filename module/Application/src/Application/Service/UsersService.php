@@ -5,6 +5,7 @@ namespace Application\Service;
 use DateTime;
 use Exception;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mail;
 
 use Autowp\Comments;
@@ -79,6 +80,11 @@ class UsersService
     private $pictureTable;
 
     /**
+     * @var TableGateway
+     */
+    private $telegramChatTable;
+
+    /**
      * @return Comments\CommentsService
      */
     private function getTable()
@@ -99,7 +105,8 @@ class UsersService
         UserItemSubscribe $userItemSubscribe,
         Contact $contact,
         UserAccount $userAccount,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        TableGateway $telegramChatTable
     ) {
 
         $this->salt = $options['salt'];
@@ -117,6 +124,7 @@ class UsersService
         $this->contact = $contact;
         $this->userAccount = $userAccount;
         $this->pictureTable = $pictureTable;
+        $this->telegramChatTable = $telegramChatTable;
     }
 
     /**
@@ -519,8 +527,7 @@ class UsersService
         $this->contact->deleteUserEverywhere($row['id']);
 
         // unsubscribe from telegram
-        $telegramChatTable = new DbTable\Telegram\Chat();
-        $telegramChatTable->delete([
+        $this->telegramChatTable->delete([
             'user_id = ?' => $row['id']
         ]);
 

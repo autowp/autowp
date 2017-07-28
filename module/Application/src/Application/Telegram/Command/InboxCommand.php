@@ -3,6 +3,8 @@
 namespace Application\Telegram\Command;
 
 use Telegram\Bot\Commands\Command;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 
 use Application\Model\DbTable;
 use Application\Model\Item;
@@ -20,20 +22,37 @@ class InboxCommand extends Command
     protected $description = "Subscribe to inbox pictures";
 
     /**
+     * @var TableGateway
+     */
+    private $telegramItemTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $telegramChatTable;
+
+    public function __construct(TableGateway $telegramItemTable, TableGateway $telegramChatTable)
+    {
+        $this->telegramItemTable = $telegramItemTable;
+        $this->telegramChatTable = $telegramChatTable;
+    }
+
+    /**
      * @inheritdoc
      */
     public function handle($arguments)
     {
         $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
 
-        $chatTable = new DbTable\Telegram\Chat();
+        $select = new Sql\Select($this->telegramChatTable->getTable());
+        $select->join('users', 'telegram_chat.user_id = users.id', [])
+            ->where([
+                'chat_id' => $chatId,
+                'not users.deleted'
+            ])
+            ->limit(1);
 
-        $chatRow = $chatTable->fetchRow(
-            $chatTable->select(true)
-                ->where('chat_id = ?', $chatId)
-                ->join('users', 'telegram_chat.user_id = users.id', null)
-                ->where('not users.deleted')
-        );
+        $chatRow = $this->telegramChatTable->selectWith($select)->current();
 
         if (! $chatRow) {
             $this->replyWithMessage([
@@ -51,27 +70,25 @@ class InboxCommand extends Command
             ]);
 
             if ($brandRow) {
-                $telegramBrandTable = new DbTable\Telegram\Brand();
-                $telegramBrandRow = $telegramBrandTable->fetchRow([
-                    'item_id = ?' => $brandRow->id,
-                    'chat_id = ?' => $chatId
-                ]);
+                $primaryKey = [
+                    'item_id' => $brandRow->id,
+                    'chat_id' => $chatId
+                ];
+                $telegramBrandRow = $this->telegramItemTable->select($primaryKey)->current();
 
-                if ($telegramBrandRow && $telegramBrandRow->inbox) {
-                    $telegramBrandRow->inbox = 0;
-                    $telegramBrandRow->save();
+                if ($telegramBrandRow && $telegramBrandRow['inbox']) {
+                    $this->telegramItemTable->update(['inbox' => 0], $primaryKey);
                     $this->replyWithMessage([
                         'text' => 'Successful unsubscribed from ' . $brandRow->name
                     ]);
                 } else {
-                    if (! $telegramBrandRow) {
-                        $telegramBrandRow = $telegramBrandTable->createRow([
-                            'item_id' => $brandRow->id,
-                            'chat_id' => $chatId
-                        ]);
+                    $set = ['inbox' => 1];
+                    if ($telegramBrandRow) {
+                        $this->telegramItemTable->update($set, $primaryKey);
+                    } else {
+                        $this->telegramItemTable->insert(array_replace($set, $primaryKey));
                     }
-                    $telegramBrandRow->inbox = 1;
-                    $telegramBrandRow->save();
+
                     $this->replyWithMessage([
                         'text' => 'Successful subscribed to ' . $brandRow->name
                     ]);

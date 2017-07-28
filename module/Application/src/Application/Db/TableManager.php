@@ -83,6 +83,8 @@ class TableManager implements ServiceLocatorInterface
         'picture_vote' => [],
         'picture_vote_summary' => [],
         'spec' => [],
+        'telegram_brand' => [],
+        'telegram_chat' => [],
         'user_account' => [],
         'user_item_subscribe' => [],
         'user_password_remind' => [],

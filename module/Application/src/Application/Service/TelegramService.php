@@ -3,6 +3,8 @@
 namespace Application\Service;
 
 use Telegram\Bot\Api;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\User\Model\DbTable\User;
@@ -39,12 +41,24 @@ class TelegramService
      */
     private $pictureTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $telegramItemTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $telegramChatTable;
+
     public function __construct(
         array $options,
         TreeRouteStack $router,
         HostManager $hostManager,
         $serviceManager,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        TableGateway $telegramItemTable,
+        TableGateway $telegramChatTable
     ) {
 
         $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
@@ -55,6 +69,8 @@ class TelegramService
         $this->hostManager = $hostManager;
         $this->serviceManager = $serviceManager;
         $this->pictureTable = $pictureTable;
+        $this->telegramItemTable = $telegramItemTable;
+        $this->telegramChatTable = $telegramChatTable;
     }
 
     /**
@@ -66,10 +82,10 @@ class TelegramService
 
         $api->addCommands([
             StartCommand::class,
-            new MeCommand($this->serviceManager->get(\Autowp\Message\MessageService::class)),
-            NewCommand::class,
-            InboxCommand::class,
-            MessagesCommand::class
+            new MeCommand($this->serviceManager->get(\Autowp\Message\MessageService::class), $this->telegramChatTable),
+            new NewCommand($this->telegramItemTable, $this->telegramChatTable),
+            new InboxCommand($this->telegramItemTable, $this->telegramChatTable),
+            new MessagesCommand($this->telegramChatTable)
         ]);
 
         return $api;
@@ -117,13 +133,11 @@ class TelegramService
             throw new Exception("`chat_id` is invalid");
         }
 
-        $telegramBrandTable = new DbTable\Telegram\Brand();
-        $telegramBrandTable->delete([
+        $this->telegramItemTable->delete([
             'chat_id = ?' => (int)$chatId
         ]);
 
-        $telegramChatTable = new DbTable\Telegram\Chat();
-        $telegramChatTable->delete([
+        $this->telegramChatTable->delete([
             'chat_id = ?' => (int)$chatId
         ]);
     }
@@ -143,22 +157,18 @@ class TelegramService
         $brandIds = $this->getPictureBrandIds($picture);
 
         if (count($brandIds)) {
-            $telegramBrandTable = new DbTable\Telegram\Brand();
+            $select = new Sql\Select($this->telegramItemTable->getTable());
+            $select->columns(['chat_id'])
+                ->where([
+                    new Sql\Predicate\In('telegram_brand.item_id', $brandIds),
+                    'telegram_brand.inbox',
+                    'users.id <> ?' => (int)$picture->owner_id,
+                    'not users.deleted'
+                ])
+                ->join('telegram_chat', 'telegram_brand.chat_id = telegram_chat.chat_id', [])
+                ->join('users', 'telegram_chat.user_id = users.id', []);
 
-            $db = $telegramBrandTable->getAdapter();
-
-            $rows = $db->fetchAll(
-                $db->select()
-                    ->from($telegramBrandTable->info('name'), ['chat_id'])
-                    ->where('telegram_brand.item_id in (?)', $brandIds)
-                    ->where('telegram_brand.inbox')
-                    ->join('telegram_chat', 'telegram_brand.chat_id = telegram_chat.chat_id', null)
-                    ->join('users', 'telegram_chat.user_id = users.id', null)
-                    ->where('users.id <> ?', (int)$picture->owner_id)
-                    ->where('not users.deleted')
-            );
-
-            foreach ($rows as $row) {
+            foreach ($this->telegramItemTable->selectWith($select) as $row) {
                 $url = $this->getPictureUrl($row['chat_id'], $picture);
 
                 $this->sendMessage([
@@ -179,27 +189,27 @@ class TelegramService
         $brandIds = $this->getPictureBrandIds($picture);
 
         if (count($brandIds)) {
-            $telegramBrandTable = new DbTable\Telegram\Brand();
+            $select = new Sql\Select($this->telegramChatTable->getTable());
+            $select->columns(['chat_id'])
+                ->where(['user_id' => (int)$picture->owner_id]);
 
-            $db = $telegramBrandTable->getAdapter();
+            $row = $this->telegramChatTable->selectWith($select)->current();
 
-            $authorChatId = $db->fetchOne(
-                $db->select()
-                    ->from('telegram_chat', 'chat_id')
-                    ->where('user_id = ?', (int)$picture->owner_id)
-            );
+            $authorChatId = $row ? $row['chat_id'] : null;
 
-            $select = $db->select()
-                ->distinct()
-                ->from('telegram_brand', ['chat_id'])
-                ->where('telegram_brand.item_id in (?)', $brandIds)
-                ->where('telegram_brand.new');
+            $select = new Sql\Select($this->telegramItemTable->getTable());
+            $select->columns(['chat_id'])
+                ->quantifier($select::QUANTIFIER_DISTINCT)
+                ->where([
+                    new Sql\Predicate\In('telegram_brand.item_id', $brandIds),
+                    'telegram_brand.new'
+                ]);
 
             if ($authorChatId) {
-                $select->where('telegram_brand.chat_id <> ?', $authorChatId);
+                $select->where(['telegram_brand.chat_id != ?' => $authorChatId]);
             }
 
-            $rows = $db->fetchAll($select);
+            $rows = $this->telegramItemTable->selectWith($select);
 
             foreach ($rows as $row) {
                 $url = $this->getPictureUrl($row['chat_id'], $picture);
@@ -270,10 +280,8 @@ class TelegramService
             }
         }
 
-        $chatTable = new DbTable\Telegram\Chat();
-
-        $chatRows = $chatTable->fetchAll([
-            'user_id = ?' => (int)$userId,
+        $chatRows = $this->telegramChatTable->select([
+            'user_id' => (int)$userId,
             'messages'
         ]);
 
@@ -281,7 +289,7 @@ class TelegramService
             $url = $this->router->assemble([], [
                 'name'            => $fromId ? 'account/personal-messages' : 'account/personal-messages/system',
                 'force_canonical' => true,
-                'uri'             => $this->getUriByChatId($chatRow->chat_id)
+                'uri'             => $this->getUriByChatId($chatRow['chat_id'])
             ]);
 
             $telegramMessage = sprintf(
@@ -293,7 +301,7 @@ class TelegramService
 
             $this->sendMessage([
                 'text'    => $telegramMessage,
-                'chat_id' => $chatRow->chat_id
+                'chat_id' => $chatRow['chat_id']
             ]);
         }
     }

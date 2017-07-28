@@ -3,8 +3,8 @@
 namespace Application\Telegram\Command;
 
 use Telegram\Bot\Commands\Command;
-
-use Application\Model\DbTable;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 
 class MessagesCommand extends Command
 {
@@ -19,20 +19,32 @@ class MessagesCommand extends Command
     protected $description = "Enable/disable personal messages";
 
     /**
+     * @var TableGateway
+     */
+    private $telegramChatTable;
+
+    public function __construct(TableGateway $telegramChatTable)
+    {
+        $this->telegramChatTable = $telegramChatTable;
+    }
+
+    /**
      * @inheritdoc
      */
     public function handle($arguments)
     {
         $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
 
-        $chatTable = new DbTable\Telegram\Chat();
+        $primaryKey = [
+            'chat_id' => $chatId
+        ];
 
-        $chatRow = $chatTable->fetchRow(
-            $chatTable->select(true)
-                ->where('chat_id = ?', $chatId)
-                ->join('users', 'telegram_chat.user_id = users.id', null)
-                ->where('not users.deleted')
-        );
+        $select = new Sql\Select($this->telegramChatTable->getTable());
+        $select->join('users', 'telegram_chat.user_id = users.id', [])
+            ->where(array_replace([
+                'not users.deleted'
+            ], $primaryKey));
+        $chatRow = $this->telegramChatTable->selectWith($select)->current();
 
         if (! $chatRow) {
             $this->replyWithMessage([
@@ -41,22 +53,21 @@ class MessagesCommand extends Command
             return;
         }
 
-        if ($arguments == 'on') {
-            $chatRow->messages = 1;
-            $chatRow->save();
-        } elseif ($arguments == 'off') {
-            $chatRow->messages = 0;
-            $chatRow->save();
-        }
+        $value = $arguments == 'on' ? 1 : 0;
 
-        if ($chatRow->messages) {
+        $this->telegramChatTable->update([
+            'messages' => $value
+        ], $primaryKey);
+
+        if ($value) {
             $this->replyWithMessage([
                 'text' => "Subscription to new personal messages is enabled. Send `/messages off` to disable"
             ]);
-        } else {
-            $this->replyWithMessage([
-                'text' => "Subscription to new personal messages is disabled. Send `/messages on` to enable"
-            ]);
+            return;
         }
+
+        $this->replyWithMessage([
+            'text' => "Subscription to new personal messages is disabled. Send `/messages on` to enable"
+        ]);
     }
 }

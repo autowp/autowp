@@ -3,10 +3,11 @@
 namespace Application\Telegram\Command;
 
 use Telegram\Bot\Commands\Command;
-
-use Autowp\User\Model\DbTable\User;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\Math\Rand;
 
 use Autowp\Message\MessageService;
+use Autowp\User\Model\DbTable\User;
 
 class MeCommand extends Command
 {
@@ -25,9 +26,15 @@ class MeCommand extends Command
      */
     private $message;
 
-    public function __construct($message)
+    /**
+     * @var TableGateway
+     */
+    private $telegramChatTable;
+
+    public function __construct(MessageService $message, TableGateway $telegramChatTable)
     {
         $this->message = $message;
+        $this->telegramChatTable = $telegramChatTable;
     }
 
     /**
@@ -40,82 +47,84 @@ class MeCommand extends Command
             $args = [];
         }
 
+        $userTable = new User();
+
         $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
 
-        $telegramChatTable = new \Application\Model\DbTable\Telegram\Chat();
+        $primaryKey = [
+            'chat_id' => $chatId
+        ];
 
-        $telegramChatRow = $telegramChatTable->fetchRow([
-            'chat_id = ?' => $chatId
-        ]);
+        $telegramChatRow = $this->telegramChatTable->select($primaryKey)->current();
 
         if (count($args) <= 0) {
-            if (! $telegramChatRow || ! $telegramChatRow->user_id) {
+            if (! $telegramChatRow || ! $telegramChatRow['user_id']) {
                 $this->replyWithMessage([
                     'disable_web_page_preview' => true,
                     'text' => 'Use this command to identify you as autowp.ru user.' . PHP_EOL .
                               'For example type "/me 12345" to identify you as user number 12345'
                 ]);
-            } else {
-                $userTable = new User();
-                $userRow = $userTable->find($telegramChatRow->user_id)->current();
-
-                $this->replyWithMessage([
-                    'disable_web_page_preview' => true,
-                    'text' => 'You identified as ' . $userRow->name
-                ]);
+                return;
             }
-        } else {
-            $userId = (int)$args[0];
 
-            $userTable = new User();
+            $userRow = $userTable->find($telegramChatRow['user_id'])->current();
 
-            $userRow = $userTable->find($userId)->current();
+            $this->replyWithMessage([
+                'disable_web_page_preview' => true,
+                'text' => 'You identified as ' . $userRow->name
+            ]);
 
-            if (! $userRow) {
-                $this->replyWithMessage([
-                    'text' => 'User "' . $args[0] . '" not found'
-                ]);
-            } else {
-                if (! $telegramChatRow) {
-                    $telegramChatRow = $telegramChatTable->createRow([
-                        'chat_id' => $chatId
-                    ]);
-                    $telegramChatRow->save();
-                }
-
-                if (count($args) == 1) {
-                    $token = md5(uniqid());
-
-                    $telegramChatRow->token = $token;
-                    $telegramChatRow->save();
-
-                    $command = '/me ' . $userRow->id . ' ' . $token;
-                    $message = "To complete identifications type `$command` to @autowp_bot";
-
-                    $this->message->send(null, $userRow->id, $message);
-
-                    $this->replyWithMessage([
-                        'text' => 'Check your personal messages / system notifications'
-                    ]);
-                } else {
-                    $token = (string)$args[1];
-
-                    if (strcmp($telegramChatRow->token, $token) != 0) {
-                        $command = '/me ' . $userRow->id;
-                        $this->replyWithMessage([
-                            'text' => "Token not matched. Try again with `$command`"
-                        ]);
-                    } else {
-                        $telegramChatRow->user_id = $userRow->id;
-                        $telegramChatRow->token = null;
-                        $telegramChatRow->save();
-
-                        $this->replyWithMessage([
-                            'text' => "Complete. Nice to see you, `{$userRow->name}`"
-                        ]);
-                    }
-                }
-            }
+            return;
         }
+        $userId = (int)$args[0];
+
+        $userRow = $userTable->find($userId)->current();
+
+        if (! $userRow) {
+            $this->replyWithMessage([
+                'text' => 'User "' . $args[0] . '" not found'
+            ]);
+            return;
+        }
+
+        if (count($args) == 1) {
+            $token = Rand::getString(20);
+
+            $set = ['token' => $token];
+            if ($telegramChatRow) {
+                $this->telegramChatTable->update($set, $primaryKey);
+            } else {
+                $this->telegramChatTable->insert(array_replace($set, $primaryKey));
+            }
+
+            $command = '/me ' . $userRow->id . ' ' . $token;
+            $message = "To complete identifications type `$command` to @autowp_bot";
+
+            $this->message->send(null, $userRow->id, $message);
+
+            $this->replyWithMessage([
+                'text' => 'Check your personal messages / system notifications'
+            ]);
+            return;
+        }
+
+        $token = (string)$args[1];
+
+        if (! $telegramChatRow || strcmp($telegramChatRow['token'], $token) != 0) {
+            $command = '/me ' . $userRow->id;
+            $this->replyWithMessage([
+                'text' => "Token not matched. Try again with `$command`"
+            ]);
+            return;
+        }
+
+        $this->telegramChatTable->update([
+            'user_id' => $userRow->id,
+            'token'   => null
+        ], $primaryKey);
+
+        $this->replyWithMessage([
+            'text' => "Complete. Nice to see you, `{$userRow->name}`"
+        ]);
     }
 }

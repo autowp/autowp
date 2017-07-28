@@ -15,6 +15,7 @@ class UsersServiceFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('Config');
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new UsersService(
             $config['users'],
             $config['hosts'],
@@ -26,7 +27,8 @@ class UsersServiceFactory implements FactoryInterface
             $container->get(\Application\Model\UserItemSubscribe::class),
             $container->get(\Application\Model\Contact::class),
             $container->get(\Application\Model\UserAccount::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\DbTable\Picture::class),
+            $tables->get('telegram_chat')
         );
     }
 }
