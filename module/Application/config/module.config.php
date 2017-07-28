@@ -145,6 +145,7 @@ return [
             Model\ItemParent::class              => Model\ItemParentFactory::class,
             Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
             Model\Log::class                     => Model\Service\LogFactory::class,
+            Model\Modification::class            => Model\ModificationFactory::class,
             Model\Perspective::class             => Model\PerspectiveFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,
             Model\PictureModerVote::class        => Model\PictureModerVoteFactory::class,

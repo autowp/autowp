@@ -108,6 +108,11 @@ class Pic extends AbstractPlugin
      */
     private $pictureModerVote;
 
+    /**
+     * @var TableGateway
+     */
+    private $modificationTable;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -125,7 +130,8 @@ class Pic extends AbstractPlugin
         UserAccount $userAccount,
         TableGateway $itemLinkTable,
         PictureModerVote $pictureModerVote,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        TableGateway $modificationTable
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -144,6 +150,7 @@ class Pic extends AbstractPlugin
         $this->itemLinkTable = $itemLinkTable;
         $this->pictureModerVote = $pictureModerVote;
         $this->pictureTable = $pictureTable;
+        $this->modificationTable = $modificationTable;
     }
 
     public function href($row, array $options = [])
@@ -1032,19 +1039,19 @@ class Pic extends AbstractPlugin
         ]);
         $name = $names[$picture->id];
 
-        $mTable = new DbTable\Modification();
-        $mRows = $mTable->fetchAll(
-            $mTable->select(true)
-                ->join('modification_picture', 'modification.id = modification_picture.modification_id', null)
-                ->where('modification_picture.picture_id = ?', $picture['id'])
-                ->order('modification.name')
-        );
+
+        $select = new Sql\Select($this->modificationTable->getTable());
+
+        $select->join('modification_picture', 'modification.id = modification_picture.modification_id', [])
+            ->where(['modification_picture.picture_id' => $picture['id']])
+            ->order('modification.name');
+        $mRows = $this->modificationTable->selectWith($select);
 
         $modifications = [];
         $itemTable = new DbTable\Item();
         foreach ($mRows as $mRow) {
             $url = null;
-            $carRow = $itemTable->find($mRow->item_id)->current();
+            $carRow = $itemTable->find($mRow['item_id'])->current();
             if ($carRow) {
                 $paths = $this->catalogue->getCataloguePaths($carRow->id, [
                     'breakOnFirst' => true
@@ -1057,7 +1064,7 @@ class Pic extends AbstractPlugin
                         'brand_catname' => $path['brand_catname'],
                         'car_catname'   => $path['car_catname'],
                         'path'          => $path['path'],
-                        'mod'           => $mRow->id
+                        'mod'           => $mRow['id']
                     ], [
                         'name' => 'catalogue'
                     ]);
@@ -1065,7 +1072,7 @@ class Pic extends AbstractPlugin
             }
 
             $modifications[] = [
-                'name' => $mRow->name,
+                'name' => $mRow['name'],
                 'url'  => $url
             ];
         }

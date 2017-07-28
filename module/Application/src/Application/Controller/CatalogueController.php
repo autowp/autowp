@@ -84,6 +84,16 @@ class CatalogueController extends AbstractActionController
      */
     private $pictureTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $modificationTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $modificationGroupTable;
+
     public function __construct(
         $textStorage,
         $cache,
@@ -97,7 +107,9 @@ class CatalogueController extends AbstractActionController
         TableGateway $itemLinkTable,
         Mosts $mosts,
         VehicleType $vehicleType,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        TableGateway $modificationTable,
+        TableGateway $modificationGroupTable
     ) {
 
         $this->textStorage = $textStorage;
@@ -113,6 +125,8 @@ class CatalogueController extends AbstractActionController
         $this->mosts = $mosts;
         $this->vehicleType = $vehicleType;
         $this->pictureTable = $pictureTable;
+        $this->modificationTable = $modificationTable;
+        $this->modificationGroupTable = $modificationGroupTable;
     }
 
     private function doBrandAction(callable $callback)
@@ -1040,9 +1054,7 @@ class CatalogueController extends AbstractActionController
             $modification = null;
             $modId = (int)$this->params('mod');
             if ($modId) {
-                $mTable = new DbTable\Modification();
-
-                $modification = $mTable->find($modId)->current();
+                $modification = $this->modificationTable->select(['id' => $modId])->current();
                 if (! $modification) {
                     return $this->notFoundAction();
                 }
@@ -1050,9 +1062,7 @@ class CatalogueController extends AbstractActionController
 
             $modgroupId = (int)$this->params('modgroup');
             if ($modgroupId) {
-                $mgTable = new DbTable\Modification\Group();
-
-                $modgroup = $mgTable->find($modgroupId)->current();
+                $modgroup = $this->modificationGroupTable->select(['id' => $modgroupId])->current();
                 if (! $modgroup) {
                     return $this->notFoundAction();
                 }
@@ -1178,38 +1188,37 @@ class CatalogueController extends AbstractActionController
 
     private function brandItemGroupModifications(int $carId, int $groupId, int $modificationId)
     {
-        $mTable = new DbTable\Modification();
-        $db = $mTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
-        $select = $mTable->select(true)
-            ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', null)
-            ->where('item_parent_cache.item_id = ?', $carId)
+        $select = new Sql\Select($this->modificationTable->getTable());
+        $select->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
+            ->where(['item_parent_cache.item_id' => $carId])
             ->order('modification.name');
 
         if ($groupId) {
-            $select->where('modification.group_id = ?', $groupId);
+            $select->where(['modification.group_id' => $groupId]);
         } else {
-            $select->where('modification.group_id IS NULL');
+            $select->where(['modification.group_id IS NULL']);
         }
 
         $modifications = [];
-        foreach ($mTable->fetchAll($select) as $mRow) {
+        foreach ($this->modificationTable->selectWith($select) as $mRow) {
             $modifications[] = [
-                'name'      => $mRow->name,
+                'name'      => $mRow['name'],
                 'url'       => $this->url()->fromRoute('catalogue', [
                     'action' => 'brand-item', // -pictures
-                    'mod'    => $mRow->id,
+                    'mod'    => $mRow['id'],
                 ], [], true),
                 'count'     => $db->fetchOne(
                     $db->select()
                         ->from('modification_picture', 'count(1)')
-                        ->where('modification_picture.modification_id = ?', $mRow->id)
+                        ->where('modification_picture.modification_id = ?', $mRow['id'])
                         ->join('pictures', 'modification_picture.picture_id = pictures.id', null)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                         ->where('item_parent_cache.parent_id = ?', $carId)
                 ),
-                'active' => $mRow->id == $modificationId
+                'active' => $mRow['id'] == $modificationId
             ];
         }
 
@@ -1219,29 +1228,28 @@ class CatalogueController extends AbstractActionController
     private function brandItemModifications(int $carId, int $modificationId)
     {
         // modifications
-        $mgTable = new DbTable\Modification\Group();
-
         $modificationGroups = [];
 
-        $mgRows = $mgTable->fetchAll(
-            $mgTable->select(true)
-                ->join('modification', 'modification_group.id = modification.group_id', null)
-                ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', $carId)
-                ->group('modification_group.id')
-                ->order('modification_group.name')
-        );
+        $select = new Sql\Select($this->modificationGroupTable->getTable());
+
+        $select
+            ->join('modification', 'modification_group.id = modification.group_id', [])
+            ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
+            ->where(['item_parent_cache.item_id' => $carId])
+            ->group('modification_group.id')
+            ->order('modification_group.name');
+        $mgRows = $this->modificationGroupTable->selectWith($select);
 
         foreach ($mgRows as $mgRow) {
-            $modifications = $this->brandItemGroupModifications($carId, $mgRow->id, $modificationId);
+            $modifications = $this->brandItemGroupModifications($carId, $mgRow['id'], $modificationId);
 
             if ($modifications) {
                 $modificationGroups[] = [
-                    'name'          => $mgRow->name,
+                    'name'          => $mgRow['name'],
                     'modifications' => $modifications,
                     'url'           => $this->url()->fromRoute('catalogue', [
                         'action'   => 'brand-item',
-                        'modgroup' => $mgRow->id,
+                        'modgroup' => $mgRow['id'],
                     ], [], true)
                 ];
             }
@@ -1390,21 +1398,22 @@ class CatalogueController extends AbstractActionController
     ) {
         $currentCarId = $currentCar['id'];
 
-        $mTable = new DbTable\Modification();
         $imageStorage = $this->imageStorage();
         $catalogue = $this->catalogue();
 
         $g = $this->perspective->getPageGroupIds(2);
 
-        $select = $mTable->select(true)
-            ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', null)
-            ->where('item_parent_cache.item_id = ?', $currentCarId)
-            ->where('modification.group_id = ?', $modgroupId)
+        $select = new Sql\Select($this->modificationTable->getTable());
+        $select->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
+            ->where([
+                'item_parent_cache.item_id' => $currentCarId,
+                'modification.group_id'     => $modgroupId
+            ])
             ->group('modification.id')
             ->order('modification.name');
 
         $modifications = [];
-        foreach ($mTable->fetchAll($select) as $modification) {
+        foreach ($this->modificationTable->selectWith($select) as $modification) {
             $pictures = [];
 
             $pictureRows = $this->getModgroupPictureList($currentCarId, $modification['id'], $g);
@@ -1745,9 +1754,7 @@ class CatalogueController extends AbstractActionController
             $modification = null;
             $modId = (int)$this->params('mod');
             if ($modId) {
-                $mTable = new DbTable\Modification();
-
-                $modification = $mTable->find($modId)->current();
+                $modification = $this->modificationTable->select(['id' => $modId])->current();
                 if (! $modification) {
                     return $this->notFoundAction();
                 }

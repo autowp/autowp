@@ -41,6 +41,7 @@ class TableManager implements ServiceLocatorInterface
         'brand_alias' => [], //TODO: rename to item_alias
         'car_types'   => [], //TODO: rename to vehicle_type
         'car_types_parents' => [], //TODO: rename to vehicle_type_parent
+        'combination_modification' => [],
         'comment_message' => [],
         'comment_vote' => [],
         'comment_topic' => [],
@@ -67,6 +68,9 @@ class TableManager implements ServiceLocatorInterface
         'log_events_pictures' => [],
         'log_events_user' => [],
         'login_state' => [],
+        'modification' => [],
+        'modification_group' => [],
+        'modification_picture' => [],
         'pages' => [], //TODO: rename to page
         'personal_messages' => [],
         'perspectives' => [],

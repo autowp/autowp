@@ -2,41 +2,44 @@
 
 namespace Application\Model;
 
-use Application\Model\DbTable\Modification as ModificationTable;
-
 use Exception;
+
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+
+use Application\Model\DbTable\Modification as ModificationTable;
 
 class Modification
 {
+    /**
+     * @var TableGateway
+     */
     private $modTable;
 
-    public function __construct()
+    public function __construct(TableGateway $modificationTable)
     {
-        $this->modTable = new ModificationTable();
+        $this->modTable = $modificationTable;
     }
 
-    public function canDelete($id)
+    public function canDelete(int $id)
     {
-        $db = $this->modTable->getAdapter();
+        $select = new Sql\Select($this->modTable->getTable());
+        $select->columns(['count' => new Sql\Expression('count(1)')])
+            ->where(['modification_picture.modification_id' => $id]);
 
-        $picturesCount = $db->fetchOne(
-            $db->select()
-                ->from('modification_picture', 'count(1)')
-                ->where('modification_picture.modification_id = ?', (int)$id)
-        );
+        $row = $this->modTable->selectWith($select)->current();
 
-        return ! $picturesCount;
+        return $row ? $row['count'] <= 0 : true;
     }
 
-    public function delete($id)
+    public function delete(int $id)
     {
         if (! $this->canDelete($id)) {
             throw new Exception("Modification can not be deleted");
         }
 
-        $row = $this->modTable->find($id)->current();
-        if ($row) {
-            $row->delete();
-        }
+        $this->modTable->delete([
+            'id = ?' => $id
+        ]);
     }
 }

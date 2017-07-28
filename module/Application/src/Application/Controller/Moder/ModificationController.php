@@ -2,14 +2,47 @@
 
 namespace Application\Controller\Moder;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Modification as ModificationForm;
-use Application\Model\DbTable;
 use Application\Model\Modification;
 
 class ModificationController extends AbstractActionController
 {
+    /**
+     * @var TableGateway
+     */
+    private $combinationModificationTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $modificationTable;
+
+    /**
+     * @var Modification
+     */
+    private $modification;
+
+    /**
+     * @var TableGateway
+     */
+    private $modificationGroupTable;
+
+    public function __construct(
+        TableGateway $combinationModificationTable,
+        TableGateway $modificationTable,
+        ModificationForm $modification,
+        TableGateway $modificationGroupTable
+    ) {
+        $this->combinationModificationTable = $combinationModificationTable;
+        $this->modificationTable = $modificationTable;
+        $this->modification = $modification;
+        $this->modificationGroupTable = $modificationGroupTable;
+    }
+
     private function carModerUrl($carId, $full = false, $tab = null)
     {
         $url = 'moder/items/item/' . $carId;
@@ -43,15 +76,12 @@ class ModificationController extends AbstractActionController
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $mTable = new DbTable\Modification();
-        $mgTable = new DbTable\Modification\Group();
-
         $groupOptions = [
             '' => 'без группы'
         ];
 
-        foreach ($mgTable->fetchAll() as $mgRow) {
-            $groupOptions[$mgRow->id] = $mgRow->name;
+        foreach ($this->modificationGroupTable->select([]) as $mgRow) {
+            $groupOptions[$mgRow['id']] = $mgRow['name'];
         }
 
         $form = new ModificationForm([
@@ -88,7 +118,7 @@ class ModificationController extends AbstractActionController
                 }
             }
 
-            $mRow = $mTable->createRow([
+            $this->modificationTable->insert([
                 'item_id'          => $car->id,
                 'name'             => $values['name'],
                 'group_id'         => $values['group_id'] ? $values['group_id'] : null,
@@ -102,7 +132,6 @@ class ModificationController extends AbstractActionController
                 'produced'         => $values['produced'],
                 'produced_exactly' => $values['produced_exactly'] ? 1 : 0,
             ]);
-            $mRow->save();
 
             return $this->redirectToCar($car->id, 'modifications');
         }
@@ -119,28 +148,24 @@ class ModificationController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->_helper->catalogue()->getItemTable();
+        $cars = $this->catalogue()->getItemTable();
 
         $car = $cars->find($this->_getParam('item_id'))->current();
         if (! $car) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
-        $mTable = new DbTable\Modification();
-
-        $mRow = $mTable->find($this->getParam('modification_id'))->current();
+        $mRow = $this->modificationTable->select(['id' => (int)$this->getParam('modification_id')])->current();
         if (! $mRow) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
-
-        $mgTable = new DbTable\Modification\Group();
 
         $groupOptions = [
             '' => 'без группы'
         ];
 
-        foreach ($mgTable->fetchAll() as $mgRow) {
-            $groupOptions[$mgRow->id] = $mgRow->name;
+        foreach ($this->modificationGroupTable->select([]) as $mgRow) {
+            $groupOptions[$mgRow['id']] = $mgRow['name'];
         }
 
         $form = new ModificationForm([
@@ -149,17 +174,17 @@ class ModificationController extends AbstractActionController
         ]);
 
         $form->populate([
-            'name'             => $mRow->name,
-            'group_id'         => $mRow->group_id,
-            'begin_year'       => $mRow->begin_year,
-            'end_year'         => $mRow->end_year,
-            'begin_month'      => $mRow->begin_month,
-            'end_month'        => $mRow->end_month,
-            'begin_model_year' => $mRow->begin_model_year,
-            'end_model_year'   => $mRow->end_model_year,
-            'today'            => $mRow->today ? 1 : 0,
-            'produced'         => $mRow->produced,
-            'produced_exactly' => $mRow->produced_exactly,
+            'name'             => $mRow['name'],
+            'group_id'         => $mRow['group_id'],
+            'begin_year'       => $mRow['begin_year'],
+            'end_year'         => $mRow['end_year'],
+            'begin_month'      => $mRow['begin_month'],
+            'end_month'        => $mRow['end_month'],
+            'begin_model_year' => $mRow['begin_model_year'],
+            'end_model_year'   => $mRow['end_model_year'],
+            'today'            => $mRow['today'] ? 1 : 0,
+            'produced'         => $mRow['produced'],
+            'produced_exactly' => $mRow['produced_exactly'],
         ]);
 
         $request = $this->getRequest();
@@ -191,7 +216,7 @@ class ModificationController extends AbstractActionController
                 }
             }
 
-            $mRow->setFromArray([
+            $this->modificationTable->update([
                 'name'             => $values['name'],
                 'group_id'         => $values['group_id'] ? $values['group_id'] : null,
                 'begin_year'       => $values['begin_year'] ? $values['begin_year'] : null,
@@ -203,8 +228,9 @@ class ModificationController extends AbstractActionController
                 'today'            => $today,
                 'produced'         => $values['produced'],
                 'produced_exactly' => $values['produced_exactly'] ? 1 : 0,
+            ], [
+                'id' => $mRow['id']
             ]);
-            $mRow->save();
 
             return $this->redirectToCar($car->id, 'modifications');
         }
@@ -228,54 +254,56 @@ class ModificationController extends AbstractActionController
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $mgTable = new DbTable\Modification\Group();
+        $select = new Sql\Select($this->modificationGroupTable->getTable());
 
-        $mgRows = $mgTable->fetchAll(
-            $mgTable->select(true)
-                ->join('modification', 'modification_group.id = modification.group_id', null)
-                ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', $car->id)
-                ->group('modification_group.id')
-        );
+        $select->join('modification', 'modification_group.id = modification.group_id', [])
+            ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
+            ->where(['item_parent_cache.item_id' => $car->id])
+            ->group('modification_group.id');
+        $mgRows = $this->modificationGroupTable->selectWith($select);
 
-        $mTable = new DbTable\Modification();
-        $db = $mTable->getAdapter();
-
-        $names = $db->fetchPairs(
-            $db->select()
-                ->from($mTable->info('name'), ['id', 'name'])
-                ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', $car->id)
-                ->order(['modification.group_id', 'modification.name'])
-        );
+        $select = new Sql\Select($this->modificationTable->getTable());
+        $select->columns(['id', 'name'])
+            ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
+            ->where(['item_parent_cache.item_id' => $car->id])
+            ->order(['modification.group_id', 'modification.name']);
+        $names = [];
+        foreach ($this->modificationTable->selectWith($select) as $row) {
+            $names[$row['id']] = $row['name'];
+        }
 
         $map = [];
 
         foreach ($mgRows as $mgRow) {
-            $map[] = $db->fetchCol(
-                $db->select()
-                    ->from($mTable->info('name'), 'id')
-                    ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', null)
-                    ->where('item_parent_cache.item_id = ?', $car->id)
-                    ->where('modification.group_id = ?', $mgRow->id)
-                    ->order(['modification.group_id', 'modification.name'])
-            );
+
+            $select = new Sql\Select($this->modificationTable->getTable());
+            $select->columns(['id'])
+                ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
+                ->where([
+                    'item_parent_cache.item_id' => $car->id,
+                    'modification.group_id'     => $mgRow['id']
+                ])
+                ->order(['modification.group_id', 'modification.name']);
+
+            $ids = [];
+            foreach ($this->modificationTable->selectWith($select) as $row) {
+                $ids[] = (int)$row['id'];
+            }
+
+            $map[] = $ids;
         }
 
         $combinations = $this->groupCombinations($map);
 
         // get selected combinations
-        $combModTable = new DbTable\CombinationModification();
-        $db = $combModTable->getAdapter();
-        $combModRows = $db->fetchAll(
-            $db->select(true)
-                ->from($combModTable->info('name'), ['combination_id', 'modification_id'])
-                ->join('combination', 'combination_modification.combination_id = combination.id', null)
-                ->where('combination.item_id = ?', $car->id)
-        );
+        $select = new Sql\Select($this->combinationModificationTable->getTable());
+        $select->columns(['combination_id', 'modification_id'])
+            ->join('combination', 'combination_modification.combination_id = combination.id', [])
+            ->where(['combination.item_id' => $car->id]);
+        $combModRows = $this->combinationModificationTable->selectWith($select);
         $values = [];
         foreach ($combModRows as $combModRow) {
-            $values[$combModRow->combination_id][] = $combModRow['modification_id'];
+            $values[$combModRow['combination_id']][] = $combModRow['modification_id'];
         }
 
         // check combinations active
@@ -326,13 +354,11 @@ class ModificationController extends AbstractActionController
 
         $id = (int)$this->getParam('id');
 
-        $modModel = new Modification();
-
-        if (! $modModel->canDelete($id)) {
-            return $this->forward('forbidden', 'error');
+        if (! $this->modification->canDelete($id)) {
+            return $this->forbiddenAction();
         }
 
-        $modModel->delete($id);
+        $this->modification->delete($id);
 
         return $this->redirectToCar($this->getParam('item_id'), 'modifications');
     }
