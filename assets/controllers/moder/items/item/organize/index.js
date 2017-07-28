@@ -168,7 +168,7 @@ angular.module(Module)
                         ctrl.loading++;
                         $q.all(promises).then(function(results) {
                             $state.go('moder-items-item', {
-                                id: response.data.id,
+                                id: ctrl.item.id,
                                 tab: 'catalogue'
                             });
                             ctrl.loading--;
