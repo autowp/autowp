@@ -1183,7 +1183,7 @@ class SpecificationsService
         ];
     }
 
-    public function getActualValue($attribute, iny $itemId)
+    public function getActualValue($attribute, int $itemId)
     {
         if (! $itemId) {
             throw new Exception("Item_id not set");
