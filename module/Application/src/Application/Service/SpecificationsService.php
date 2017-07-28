@@ -1943,8 +1943,8 @@ class SpecificationsService
     {
         $select = new Sql\Select($this->valueTable->getTable());
 
-        $select->columns(['item_parent.parent_id'])
-            ->join('item_parent', 'attrs_values.item_id = item_parent.item_id', []);
+        $select->columns([])
+            ->join('item_parent', 'attrs_values.item_id = item_parent.item_id', ['parent_id']);
         if (is_array($itemId)) {
             if (count($itemId) <= 0) {
                 return [];
@@ -1992,7 +1992,7 @@ class SpecificationsService
         }
     }
 
-    public function getContributors(int $itemId): array
+    public function getContributors($itemId): array
     {
         if (! $itemId) {
             return [];
