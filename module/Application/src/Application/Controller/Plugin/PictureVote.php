@@ -12,6 +12,7 @@ use Application\Model\DbTable;
 use Application\Model\PictureModerVote;
 
 use Zend_Db_Expr;
+use Application\Model\Picture;
 
 class PictureVote extends AbstractPlugin
 {
@@ -43,7 +44,7 @@ class PictureVote extends AbstractPlugin
     private function isLastPicture($picture)
     {
         $result = null;
-        if ($picture->status == DbTable\Picture::STATUS_ACCEPTED) {
+        if ($picture->status == Picture::STATUS_ACCEPTED) {
             $db = $this->table->getAdapter();
             $result = ! $db->fetchOne(
                 $db->select()
@@ -55,7 +56,7 @@ class PictureVote extends AbstractPlugin
                         null
                     )
                     ->where('pi2.picture_id = ?', $picture->id)
-                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                     ->where('pictures.id <> ?', $picture->id)
             );
         }
@@ -78,7 +79,7 @@ class PictureVote extends AbstractPlugin
                     null
                 )
                 ->where('pi2.picture_id = ?', $picture->id)
-                ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                ->where('status = ?', Picture::STATUS_ACCEPTED)
         );
 
         return $result;

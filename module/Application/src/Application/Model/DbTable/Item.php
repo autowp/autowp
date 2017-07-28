@@ -8,8 +8,6 @@ use Autowp\Commons\Db\Table;
 
 class Item extends Table
 {
-    const MAX_NAME = 100;
-
     protected $_name = 'item';
     protected $_referenceMap = [
         'Meta_Last_Editor' => [

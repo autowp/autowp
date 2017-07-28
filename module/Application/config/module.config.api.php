@@ -1195,9 +1195,9 @@ return [
                         'name' => 'InArray',
                         'options' => [
                             'haystack' => [
-                                DbTable\Picture::STATUS_INBOX,
-                                DbTable\Picture::STATUS_ACCEPTED,
-                                DbTable\Picture::STATUS_REMOVING,
+                                Model\Picture::STATUS_INBOX,
+                                Model\Picture::STATUS_ACCEPTED,
+                                Model\Picture::STATUS_REMOVING,
                             ]
                         ]
                     ]
@@ -1213,7 +1213,7 @@ return [
                         'name' => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => DbTable\Picture::MAX_NAME,
+                            'max' => Model\Picture::MAX_NAME,
                         ]
                     ]
                 ]

@@ -10,6 +10,7 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Application\ItemNameFormatter;
 use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Service\DayPictures;
 use Application\Service\SpecificationsService;
@@ -58,7 +59,7 @@ class NewController extends AbstractActionController
             'timezone'     => $this->user()->timezone(),
             'dbTimezone'   => MYSQL_TIMEZONE,
             'select'       => $this->pictureTable->select(true)
-            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED),
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED),
             'orderColumn'  => 'accept_datetime',
             'currentDate'  => $this->params('date'),
         ]);
@@ -252,7 +253,7 @@ class NewController extends AbstractActionController
         $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->where('picture_item.item_id = ?', $item['id'])
-            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
 
         $service = new DayPictures([
             'timezone'     => $this->user()->timezone(),

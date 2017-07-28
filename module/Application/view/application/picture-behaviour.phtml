@@ -3,10 +3,10 @@
         <span title="Status">
             <?php
                 switch ($this->status) {
-                    case Application\Model\DbTable\Picture::STATUS_ACCEPTED: ?><i class="fa fa-check text-success"></i><?php break;
-                    case Application\Model\DbTable\Picture::STATUS_INBOX:    ?><i class="fa fa-hourglass text-warning"></i><?php break;
-                    case Application\Model\DbTable\Picture::STATUS_REMOVED:  ?><i class="fa fa-trash text-danger"></i><?php break;
-                    case Application\Model\DbTable\Picture::STATUS_REMOVING: ?><i class="fa fa-trash text-danger"></i><?php break;
+                    case Application\Model\Picture::STATUS_ACCEPTED: ?><i class="fa fa-check text-success"></i><?php break;
+                    case Application\Model\Picture::STATUS_INBOX:    ?><i class="fa fa-hourglass text-warning"></i><?php break;
+                    case Application\Model\Picture::STATUS_REMOVED:  ?><i class="fa fa-trash text-danger"></i><?php break;
+                    case Application\Model\Picture::STATUS_REMOVING: ?><i class="fa fa-trash text-danger"></i><?php break;
                 }
             ?>
         </span>
@@ -43,13 +43,13 @@
             <?php } ?>
         </span>
     </span>
-    
+
     <?php if ($this->ownerId || $this->votes['positive'] > 0) { ?>
         <br />
         <?php if ($this->ownerId) { ?>
             <?=$this->user($this->ownerId)?>
         <?php } ?>
-        
+
         <?php if ($this->votes['positive'] > 0) { ?>
             <span class="pull-right">
                 <?=$this->votes['positive']?>

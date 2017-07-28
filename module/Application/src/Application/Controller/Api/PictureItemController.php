@@ -11,6 +11,7 @@ use Autowp\User\Model\DbTable\User;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\DbTable;
 use Application\Model\Log;
+use Application\Model\Picture;
 use Application\Model\PictureItem;
 
 class PictureItemController extends AbstractRestfulController
@@ -66,7 +67,7 @@ class PictureItemController extends AbstractRestfulController
         }
 
         if ($picture->owner_id == $currentUser->id) {
-            if ($picture->status == DbTable\Picture::STATUS_INBOX) {
+            if ($picture->status == Picture::STATUS_INBOX) {
                 return true;
             }
         }

@@ -8,6 +8,7 @@ use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
+use Application\Model\Picture;
 
 class PictureController extends AbstractActionController
 {
@@ -50,7 +51,7 @@ class PictureController extends AbstractActionController
     private function getPicturesSelect(\Autowp\Commons\Db\Table\Row $picture)
     {
         $galleryStatuses = [
-            DbTable\Picture::STATUS_ACCEPTED
+            Picture::STATUS_ACCEPTED
         ];
 
         if (in_array($picture->status, $galleryStatuses)) {
@@ -108,7 +109,7 @@ class PictureController extends AbstractActionController
 
         $isModer = $this->user()->inheritsRole('moder');
 
-        if ($picture->status == DbTable\Picture::STATUS_REMOVING) {
+        if ($picture->status == Picture::STATUS_REMOVING) {
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();
@@ -165,7 +166,7 @@ class PictureController extends AbstractActionController
 
         $isModer = $this->user()->inheritsRole('moder');
 
-        if ($picture->status == DbTable\Picture::STATUS_REMOVING) {
+        if ($picture->status == Picture::STATUS_REMOVING) {
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();

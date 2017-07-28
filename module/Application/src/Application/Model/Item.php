@@ -24,6 +24,8 @@ class Item
           FACTORY  = 6,
           MUSEUM   = 7;
 
+    const MAX_NAME = 100;
+
     /**
      * @var TableGateway
      */

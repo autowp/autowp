@@ -19,6 +19,7 @@ use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
 
 use Zend\Authentication\AuthenticationService;
+use Application\Model\Picture;
 
 class CatalogueController extends AbstractActionController
 {
@@ -84,7 +85,7 @@ class CatalogueController extends AbstractActionController
     {
         $rows = $this->pictureTable->fetchAll([
             'type = ?'   => DbTable\Picture::UNSORTED_TYPE_ID,
-            'status = ?' => DbTable\Picture::STATUS_INBOX,
+            'status = ?' => Picture::STATUS_INBOX,
             'add_date < DATE_SUB(NOW(), INTERVAL 2 YEAR)'
         ], 'id');
 

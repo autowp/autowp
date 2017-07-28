@@ -2,9 +2,9 @@
 
 namespace Application\Model\Item;
 
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
+use Application\Model\Picture;
 
 class PerspectivePictureFetcher extends PictureFetcher
 {
@@ -175,7 +175,7 @@ class PerspectivePictureFetcher extends PictureFetcher
                         'crop_width', 'crop_height', 'width', 'height', 'identity',
                         'status', 'owner_id', 'filesize'
                     ])
-                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->where('picture_item.perspective_id = ?', 17) // under the hood
                     ->join('item', 'picture_item.item_id = item.id', null)

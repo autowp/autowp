@@ -4,6 +4,7 @@ namespace Application\Model\Item;
 
 use Application\Model\DbTable;
 use Application\Model\ItemParent;
+use Application\Model\Picture;
 
 use Zend_Db_Expr;
 
@@ -84,7 +85,7 @@ abstract class PictureFetcher
                 'pictures.id = picture_item.picture_id',
                 ['perspective_id', 'item_id']
             )
-            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->limit($options['limit']);
 
         $order = [];
@@ -179,7 +180,7 @@ abstract class PictureFetcher
             $pictureTableAdapter = $this->pictureTable->getAdapter();
 
             $select = $pictureTableAdapter->select()
-                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
 
             if ($onlyExactly) {
                 $select

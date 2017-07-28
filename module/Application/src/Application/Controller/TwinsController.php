@@ -13,6 +13,7 @@ use Autowp\TextStorage;
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
+use Application\Model\Picture;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
@@ -294,7 +295,7 @@ class TwinsController extends AbstractActionController
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                         ->where('item_parent_cache.parent_id = ?', (int)$car['id'])
-                        ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                        ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                         ->order([
                             new Zend_Db_Expr('picture_item.perspective_id=7 DESC'),
                             new Zend_Db_Expr('picture_item.perspective_id=8 DESC')

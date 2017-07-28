@@ -5,8 +5,6 @@ namespace Application\Model;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
-use Application\Model\DbTable;
-
 class UserPicture
 {
     public function __construct(TableGateway $pictureTable, TableGateway $userTable)
@@ -22,7 +20,7 @@ class UserPicture
             'owner_id',
             'count' => new Sql\Expression('count(1)')
         ])
-            ->where(['status' => DbTable\Picture::STATUS_ACCEPTED])
+            ->where(['status' => Picture::STATUS_ACCEPTED])
             ->group(['owner_id']);
 
         $userIds = [];
@@ -53,7 +51,7 @@ class UserPicture
         $select->columns(['count' => new Sql\Expression('count(1)')])
             ->where([
                 'owner_id' => $userId,
-                'status'   => DbTable\Picture::STATUS_ACCEPTED
+                'status'   => Picture::STATUS_ACCEPTED
             ]);
 
         $row = $this->pictureTable->selectWith($select)->current();

@@ -9,20 +9,13 @@ use Autowp\ZFComponents\Filter\FilenameSafe;
 use Application\Model\DbTable;
 use Application\Model\Item as ItemModel;
 use Application\Model\Perspective;
+use Application\Model\Picture as PictureModel;
 use Application\Model\PictureModerVote;
 
 use Zend_Db_Expr;
 
 class Picture extends Table
 {
-    const
-        STATUS_ACCEPTED = 'accepted',
-        STATUS_REMOVING = 'removing',
-        STATUS_REMOVED  = 'removed',
-        STATUS_INBOX    = 'inbox';
-
-    const MAX_NAME = 255;
-
     protected $_name = 'pictures';
 
     protected $_referenceMap = [
@@ -234,7 +227,7 @@ class Picture extends Table
         }
 
         $picture->setFromArray([
-            'status' => Picture::STATUS_ACCEPTED,
+            'status' => PictureModel::STATUS_ACCEPTED,
             'change_status_user_id' => $userId
         ]);
         if (! $picture->accept_datetime) {
@@ -249,7 +242,7 @@ class Picture extends Table
 
     public function canAccept(\Autowp\Commons\Db\Table\Row $row): bool
     {
-        if (! in_array($row['status'], [self::STATUS_INBOX])) {
+        if (! in_array($row['status'], [PictureModel::STATUS_INBOX])) {
             return false;
         }
 
@@ -260,7 +253,7 @@ class Picture extends Table
 
     public function canDelete(\Autowp\Commons\Db\Table\Row $row): bool
     {
-        if (! in_array($row['status'], [DbTable\Picture::STATUS_INBOX])) {
+        if (! in_array($row['status'], [PictureModel::STATUS_INBOX])) {
             return false;
         }
 

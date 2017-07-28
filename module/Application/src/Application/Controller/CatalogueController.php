@@ -25,6 +25,7 @@ use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Select;
+use Application\Model\Picture;
 
 class CatalogueController extends AbstractActionController
 {
@@ -184,7 +185,7 @@ class CatalogueController extends AbstractActionController
         $select = $this->pictureTable->select(true);
 
         if ($onlyAccepted) {
-            $select->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+            $select->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
         }
 
         return $select;
@@ -417,7 +418,7 @@ class CatalogueController extends AbstractActionController
                 ->group('item.id')
                 ->join('picture_item', 'item.id = picture_item.item_id', [])
                 ->join('pictures', 'picture_item.picture_id = pictures.id', [])
-                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                 ->order('cars_count desc')
                 ->limit(4)
         );
@@ -434,7 +435,7 @@ class CatalogueController extends AbstractActionController
                         'pictures.crop_width', 'pictures.crop_height',
                         'pictures.status', 'pictures.image_id'
                     ])
-                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'picture_item.picture_id = pictures.id', [])
                     ->where('picture_item.item_id = ?', $picture['factory_id'])
                     ->limit(1)
@@ -568,7 +569,7 @@ class CatalogueController extends AbstractActionController
                 $inboxPictures = $db->fetchOne(
                     $db->select()
                         ->from('pictures', 'count(distinct pictures.id)')
-                        ->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX)
+                        ->where('pictures.status = ?', Picture::STATUS_INBOX)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                         ->where('item_parent_cache.parent_id = ?', $brand['id'])
@@ -726,13 +727,13 @@ class CatalogueController extends AbstractActionController
 
             switch ($this->params('gallery')) {
                 case 'inbox':
-                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX);
+                    $select->where('pictures.status = ?', Picture::STATUS_INBOX);
                     break;
                 case 'removing':
-                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_REMOVING);
+                    $select->where('pictures.status = ?', Picture::STATUS_REMOVING);
                     break;
                 default:
-                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+                    $select->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
                     break;
             }
 
@@ -1278,7 +1279,7 @@ class CatalogueController extends AbstractActionController
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
             )
-            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
             ->where('item_parent_cache.parent_id = ?', $carId)
@@ -1704,7 +1705,7 @@ class CatalogueController extends AbstractActionController
     private function getCarInboxCount(int $carId)
     {
         $select = $this->pictureTable->select(true)
-            ->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX)
+            ->where('pictures.status = ?', Picture::STATUS_INBOX)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
             ->where('item_parent_cache.parent_id = ?', $carId);
@@ -1814,7 +1815,7 @@ class CatalogueController extends AbstractActionController
 
         $isModer = $this->user()->inheritsRole('moder');
 
-        if ($picture->status == DbTable\Picture::STATUS_REMOVING) {
+        if ($picture->status == Picture::STATUS_REMOVING) {
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();
@@ -1826,11 +1827,11 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $select->where('pictures.status = ?', DbTable\Picture::STATUS_REMOVING);
-        } elseif ($picture->status == DbTable\Picture::STATUS_INBOX) {
-            $select->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX);
+            $select->where('pictures.status = ?', Picture::STATUS_REMOVING);
+        } elseif ($picture->status == Picture::STATUS_INBOX) {
+            $select->where('pictures.status = ?', Picture::STATUS_INBOX);
         } else {
-            $select->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+            $select->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
         }
 
         return $callback($select, $picture);
@@ -1838,9 +1839,9 @@ class CatalogueController extends AbstractActionController
 
     private function galleryType($picture)
     {
-        if ($picture->status == DbTable\Picture::STATUS_REMOVING) {
+        if ($picture->status == Picture::STATUS_REMOVING) {
             $gallery = 'removing';
-        } elseif ($picture->status == DbTable\Picture::STATUS_INBOX) {
+        } elseif ($picture->status == Picture::STATUS_INBOX) {
             $gallery = 'inbox';
         } else {
             $gallery = null;
@@ -1882,13 +1883,13 @@ class CatalogueController extends AbstractActionController
 
             switch ($this->params('gallery')) {
                 case 'inbox':
-                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX);
+                    $select->where('pictures.status = ?', Picture::STATUS_INBOX);
                     break;
                 case 'removing':
-                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_REMOVING);
+                    $select->where('pictures.status = ?', Picture::STATUS_REMOVING);
                     break;
                 default:
-                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+                    $select->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
                     break;
             }
 

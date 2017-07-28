@@ -2,6 +2,8 @@
 
 namespace Application;
 
+use Exception;
+
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Session\SessionManager;
@@ -10,8 +12,7 @@ use Autowp\Cron;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
-
-use Exception;
+use Application\Model\Picture;
 
 use Zend_ProgressBar;
 use Zend_ProgressBar_Adapter_Console;
@@ -107,7 +108,7 @@ class Maintenance extends AbstractListenerAggregate
     ) {
         $pictures = $pictureTable->fetchAll(
             $pictureTable->select(true)
-                ->where('status = ?', DbTable\Picture::STATUS_REMOVING)
+                ->where('status = ?', Picture::STATUS_REMOVING)
                 ->where('removing_date is null OR (removing_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY) )')
                 ->limit(1000)
         );

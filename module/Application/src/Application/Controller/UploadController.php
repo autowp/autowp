@@ -18,14 +18,15 @@ use Application\ExifGPSExtractor;
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Perspective;
+use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\UserPicture;
 use Application\Service\TelegramService;
 
 use Zend_Db_Expr;
-use Application\Model\Item;
 
 class UploadController extends AbstractActionController
 {
@@ -223,7 +224,7 @@ class UploadController extends AbstractActionController
                 'owner_id'      => $user ? $user->id : null,
                 'add_date'      => new Zend_Db_Expr('NOW()'),
                 'filesize'      => $fileSize,
-                'status'        => DbTable\Picture::STATUS_INBOX,
+                'status'        => Picture::STATUS_INBOX,
                 'removing_date' => null,
                 'ip'            => inet_pton($this->getRequest()->getServer('REMOTE_ADDR')),
                 'identity'      => $this->pictureTable->generateIdentity(),
@@ -596,7 +597,7 @@ class UploadController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        if ($picture->status != DbTable\Picture::STATUS_INBOX) {
+        if ($picture->status != Picture::STATUS_INBOX) {
             return $this->forbiddenAction();
         }
 

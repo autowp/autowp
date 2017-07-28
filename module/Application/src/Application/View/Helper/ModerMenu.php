@@ -7,6 +7,7 @@ use Zend\View\Helper\AbstractHtmlElement;
 use Autowp\Comments;
 
 use Application\Model\DbTable;
+use Application\Model\Picture;
 
 class ModerMenu extends AbstractHtmlElement
 {
@@ -34,7 +35,7 @@ class ModerMenu extends AbstractHtmlElement
             $inboxCount = $this->pictureTable->getAdapter()->fetchOne(
                 $this->pictureTable->getAdapter()->select()
                     ->from($this->pictureTable->info('name'), 'count(1)')
-                    ->where('status = ?', DbTable\Picture::STATUS_INBOX)
+                    ->where('status = ?', Picture::STATUS_INBOX)
             );
 
             $items[] = [

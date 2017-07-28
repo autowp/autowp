@@ -2,7 +2,7 @@
 
 namespace Application\Model\Item;
 
-use Application\Model\DbTable;
+use Application\Model\Picture;
 
 use Zend_Db_Expr;
 
@@ -53,7 +53,7 @@ class NewPictureFetcher extends PictureFetcher
             $select = $pictureTableAdapter->select()
                 ->from($this->pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
                 ->where('pictures.id IN (?)', $this->pictureIds)
-                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('picture_item.item_id IN (?)', $itemIds)
                 ->group('picture_item.item_id');

@@ -12,7 +12,7 @@ use Autowp\Image;
 
 use Application\ItemNameFormatter;
 use Application\Model\Catalogue;
-use Application\Model\DbTable\Picture;
+use Application\Model\DbTable;
 use Application\Service\SpecificationsService;
 
 use Facebook;
@@ -560,7 +560,7 @@ class CarOfDay
 
             $select = $this->pictureTable->select(true)
                 ->where('mp.group_id = ?', $groupId)
-                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
@@ -614,7 +614,7 @@ class CarOfDay
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                 //->order('ratio DESC')
                 ->limit(count($left));
 
@@ -644,7 +644,7 @@ class CarOfDay
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
         );
 
         if ($car->item_type_id == Item::CATEGORY) {

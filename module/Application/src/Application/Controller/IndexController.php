@@ -14,6 +14,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
+use Application\Model\Picture;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
@@ -189,7 +190,7 @@ class IndexController extends AbstractActionController
 
         $select = $this->pictureTable->select(true)
             ->where('pictures.accept_datetime > DATE_SUB(CURDATE(), INTERVAL 3 DAY)')
-            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->order(['pictures.accept_datetime DESC', 'pictures.id DESC'])
             ->limit(6);
 

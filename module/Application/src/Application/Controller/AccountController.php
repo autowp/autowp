@@ -30,6 +30,7 @@ use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
 
 use Zend_Db_Expr;
+use Application\Model\Picture;
 
 class AccountController extends AbstractActionController
 {
@@ -160,7 +161,7 @@ class AccountController extends AbstractActionController
             $db->select()
                  ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
                  ->where('owner_id = ?', $user->id)
-                 ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                 ->where('status = ?', Picture::STATUS_ACCEPTED)
         );
 
         $subscribesCount = $db->fetchOne(
@@ -175,7 +176,7 @@ class AccountController extends AbstractActionController
             $this->pictureTable->select()
                 ->from($this->pictureTable, new Zend_Db_Expr('COUNT(1)'))
                 ->where('owner_id = ?', $user->id)
-                ->where('status = ?', DbTable\Picture::STATUS_INBOX)
+                ->where('status = ?', Picture::STATUS_INBOX)
         );
 
         return [
@@ -656,7 +657,7 @@ class AccountController extends AbstractActionController
 
         $select = $this->pictureTable->select(true)
             ->where('owner_id = ?', $this->user()->get()->id)
-            ->where('status = ?', DbTable\Picture::STATUS_INBOX)
+            ->where('status = ?', Picture::STATUS_INBOX)
             ->order(['add_date DESC']);
 
         $paginator = new \Zend\Paginator\Paginator(

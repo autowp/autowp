@@ -172,7 +172,7 @@ class Brand
                             ->join('picture_item', 'ipc_all.item_id = picture_item.item_id', null)
                             ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                             ->where('item.id = ipc_all.parent_id')
-                            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                             ->assemble() .
                     ')'
                 ),

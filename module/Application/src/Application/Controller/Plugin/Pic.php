@@ -20,6 +20,7 @@ use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Perspective;
+use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
@@ -940,7 +941,7 @@ class Pic extends AbstractPlugin
 
             $replacePicture = $controller->pic()->href($replacePictureRow->toArray());
 
-            if ($replacePictureRow->status == DbTable\Picture::STATUS_REMOVING) {
+            if ($replacePictureRow->status == Picture::STATUS_REMOVING) {
                 if (! $controller->user()->inheritsRole('moder')) {
                     $replacePicture = null;
                 }

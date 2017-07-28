@@ -201,9 +201,9 @@
                 <?=$this->escapeHtml($this->translate('picture/status:'))?>
                 <?php
                     switch ($this->picture->status) {
-                        case Application\Model\DbTable\Picture::STATUS_INBOX:    echo $this->escapeHtml($this->translate('picture/status/inbox')); break;
-                        case Application\Model\DbTable\Picture::STATUS_ACCEPTED: echo $this->escapeHtml($this->translate('picture/status/accepted')); break;
-                        case Application\Model\DbTable\Picture::STATUS_REMOVING: echo '<span class="text-danger">'.$this->escapeHtml($this->translate('picture/status/removing')).'</span>'; break;
+                        case Application\Model\Picture::STATUS_INBOX:    echo $this->escapeHtml($this->translate('picture/status/inbox')); break;
+                        case Application\Model\Picture::STATUS_ACCEPTED: echo $this->escapeHtml($this->translate('picture/status/accepted')); break;
+                        case Application\Model\Picture::STATUS_REMOVING: echo '<span class="text-danger">'.$this->escapeHtml($this->translate('picture/status/removing')).'</span>'; break;
                     }
                 ?>
             </li>

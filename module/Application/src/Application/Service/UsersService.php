@@ -15,6 +15,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Contact;
 use Application\Model\DbTable;
+use Application\Model\Picture;
 use Application\Model\UserAccount;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
@@ -384,7 +385,7 @@ class UsersService
             $db->select()
                 ->from($this->pictureTable->info('name'), [new Zend_Db_Expr('COUNT(1)')])
                 ->where('owner_id = ?', $userRow->id)
-                ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                ->where('status = ?', Picture::STATUS_ACCEPTED)
         );
 
         $value = round($default + $avgVote + $age + $picturesExists / 100);

@@ -13,7 +13,9 @@ use Autowp\User\Model\DbTable\User;
 use Application\Comments;
 use Application\DuplicateFinder;
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\Perspective;
+use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
@@ -21,7 +23,6 @@ use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
 
 use Zend_Db_Expr;
-use Application\Model\Item;
 
 class PictureHydrator extends RestHydrator
 {
@@ -420,15 +421,15 @@ class PictureHydrator extends RestHydrator
             if ($role) {
                 $picture['rights'] = [
                     'move'      => $this->acl->isAllowed($role, 'picture', 'move'),
-                    'unaccept'  => ($object['status'] == DbTable\Picture::STATUS_ACCEPTED)
+                    'unaccept'  => ($object['status'] == Picture::STATUS_ACCEPTED)
                                 && $this->acl->isAllowed($role, 'picture', 'unaccept'),
                     'accept'    => $this->pictureTable->canAccept($object)
                                 && $this->acl->isAllowed($role, 'picture', 'accept'),
-                    'restore'   => ($object['status'] == DbTable\Picture::STATUS_REMOVING)
+                    'restore'   => ($object['status'] == Picture::STATUS_REMOVING)
                                 && $this->acl->isAllowed($role, 'picture', 'restore'),
-                    'normalize' => ($object['status'] == DbTable\Picture::STATUS_INBOX)
+                    'normalize' => ($object['status'] == Picture::STATUS_INBOX)
                                 && $this->acl->isAllowed($role, 'picture', 'normalize'),
-                    'flop'      => ($object['status'] == DbTable\Picture::STATUS_INBOX)
+                    'flop'      => ($object['status'] == Picture::STATUS_INBOX)
                                 && $this->acl->isAllowed($role, 'picture', 'flop'),
                     'crop'      => $this->acl->isAllowed($role, 'picture', 'crop'),
                     'delete'    => $this->canDelete($object)
@@ -438,7 +439,7 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('is_last')) {
             $isLastPicture = null;
-            if ($object['status'] == DbTable\Picture::STATUS_ACCEPTED) {
+            if ($object['status'] == Picture::STATUS_ACCEPTED) {
                 $db = $this->pictureTable->getAdapter();
                 $isLastPicture = ! $db->fetchOne(
                     $db->select()
@@ -450,7 +451,7 @@ class PictureHydrator extends RestHydrator
                             null
                         )
                         ->where('pi2.picture_id = ?', $object['id'])
-                        ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                        ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                         ->where('pictures.id <> ?', $object['id'])
                 );
             }
@@ -470,7 +471,7 @@ class PictureHydrator extends RestHydrator
                         null
                     )
                     ->where('pi2.picture_id = ?', $object['id'])
-                    ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                    ->where('status = ?', Picture::STATUS_ACCEPTED)
             );
 
             $picture['accepted_count'] = $acceptedCount;
@@ -516,7 +517,7 @@ class PictureHydrator extends RestHydrator
             $prevNewPicture = $this->pictureTable->fetchRow(
                 $this->pictureTable->select(true)
                     ->where('id < ?', $object['id'])
-                    ->where('status = ?', DbTable\Picture::STATUS_INBOX)
+                    ->where('status = ?', Picture::STATUS_INBOX)
                     ->order('id DESC')
                     ->limit(1)
             );
@@ -527,7 +528,7 @@ class PictureHydrator extends RestHydrator
             $nextNewPicture = $this->pictureTable->fetchRow(
                 $this->pictureTable->select(true)
                     ->where('id > ?', $object['id'])
-                    ->where('status = ?', DbTable\Picture::STATUS_INBOX)
+                    ->where('status = ?', Picture::STATUS_INBOX)
                     ->order('id')
                     ->limit(1)
             );

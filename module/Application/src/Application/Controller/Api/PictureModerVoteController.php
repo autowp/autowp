@@ -12,6 +12,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
 use Application\Model\DbTable;
+use Application\Model\Picture;
 use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
 
@@ -104,7 +105,7 @@ class PictureModerVoteController extends AbstractRestfulController
 
         $user = $this->user()->get();
         $picture->setFromArray([
-            'status'                => DbTable\Picture::STATUS_INBOX,
+            'status'                => Picture::STATUS_INBOX,
             'change_status_user_id' => $user->id
         ]);
         $picture->save();
@@ -195,12 +196,12 @@ class PictureModerVoteController extends AbstractRestfulController
 
         $this->pictureModerVote->add($picture['id'], $user['id'], $vote ? 1 : 0, $values['reason']);
 
-        if ($vote && $picture->status == DbTable\Picture::STATUS_REMOVING) {
-            $picture->status = DbTable\Picture::STATUS_INBOX;
+        if ($vote && $picture->status == Picture::STATUS_REMOVING) {
+            $picture->status = Picture::STATUS_INBOX;
             $picture->save();
         }
 
-        if ((! $vote) && $picture->status == DbTable\Picture::STATUS_ACCEPTED) {
+        if ((! $vote) && $picture->status == Picture::STATUS_ACCEPTED) {
             $this->unaccept($picture);
         }
 

@@ -6,6 +6,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Comments;
 use Application\Model\DbTable;
+use Application\Model\Picture;
 
 class CommentHydrator extends RestHydrator
 {
@@ -90,25 +91,25 @@ class CommentHydrator extends RestHydrator
             $picture = $this->pictureTable->find($object['item_id'])->current();
             if ($picture) {
                 switch ($picture->status) {
-                    case DbTable\Picture::STATUS_ACCEPTED:
+                    case Picture::STATUS_ACCEPTED:
                         $status = [
                             'class' => 'success',
                             'name'  => 'moder/picture/acceptance/accepted'
                         ];
                         break;
-                    case DbTable\Picture::STATUS_INBOX:
+                    case Picture::STATUS_INBOX:
                         $status = [
                             'class' => 'warning',
                             'name'  => 'moder/picture/acceptance/inbox'
                         ];
                         break;
-                    case DbTable\Picture::STATUS_REMOVED:
+                    case Picture::STATUS_REMOVED:
                         $status = [
                             'class' => 'danger',
                             'name'  => 'moder/picture/acceptance/removed'
                         ];
                         break;
-                    case DbTable\Picture::STATUS_REMOVING:
+                    case Picture::STATUS_REMOVING:
                         $status = [
                             'class' => 'danger',
                             'name'  => 'moder/picture/acceptance/removing'

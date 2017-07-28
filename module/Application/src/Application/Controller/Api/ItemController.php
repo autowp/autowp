@@ -648,7 +648,7 @@ class ItemController extends AbstractRestfulController
                         'name' => 'StringLength',
                         'options' => [
                             'min' => 2,
-                            'max' => DbTable\Item::MAX_NAME
+                            'max' => Item::MAX_NAME
                         ]
                     ]
                 ]

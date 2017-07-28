@@ -10,6 +10,7 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
+use Application\Model\Picture;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
@@ -72,7 +73,7 @@ class FactoriesController extends AbstractActionController
         $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->where('picture_item.item_id = ?', $factory->id)
-            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
 
         $pictures = $this->pic()->listData($select, [
             'width' => 4
@@ -92,7 +93,7 @@ class FactoriesController extends AbstractActionController
 
             foreach ($cars as $car) {
                 $select = $this->pictureTable->select(true)
-                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item', 'picture_item.item_id = item.id', null)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)

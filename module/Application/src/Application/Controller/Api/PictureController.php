@@ -19,12 +19,13 @@ use Application\Hydrator\Api\RestHydrator;
 use Application\Model\CarOfDay;
 use Application\Model\DbTable;
 use Application\Model\Log;
+use Application\Model\Picture;
 use Application\Model\PictureItem;
+use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
 use Application\Service\TelegramService;
 
 use Zend_Db_Expr;
-use Application\Model\PictureModerVote;
 
 class PictureController extends AbstractRestfulController
 {
@@ -136,7 +137,7 @@ class PictureController extends AbstractRestfulController
     public function randomPictureAction()
     {
         $select = $this->table->select(true)
-            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->order('rand() desc')
             ->limit(1);
 
@@ -163,7 +164,7 @@ class PictureController extends AbstractRestfulController
     public function newPictureAction()
     {
         $select = $this->table->select(true)
-            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->order('accept_datetime desc')
             ->limit(1);
 
@@ -201,7 +202,7 @@ class PictureController extends AbstractRestfulController
                 foreach ([31, null] as $groupId) {
                     $select = $this->table->select(true)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                        ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                         ->where('item_parent_cache.parent_id = ?', $carRow->id)
                         ->limit(1);
@@ -294,15 +295,15 @@ class PictureController extends AbstractRestfulController
 
         if (strlen($data['status'])) {
             switch ($data['status']) {
-                case DbTable\Picture::STATUS_INBOX:
-                case DbTable\Picture::STATUS_ACCEPTED:
-                case DbTable\Picture::STATUS_REMOVING:
+                case Picture::STATUS_INBOX:
+                case Picture::STATUS_ACCEPTED:
+                case Picture::STATUS_REMOVING:
                     $select->where('pictures.status = ?', $data['status']);
                     break;
                 case 'custom1':
                     $select->where('pictures.status not in (?)', [
-                        DbTable\Picture::STATUS_REMOVING,
-                        DbTable\Picture::STATUS_REMOVED
+                        Picture::STATUS_REMOVING,
+                        Picture::STATUS_REMOVED
                     ]);
                     break;
             }
@@ -381,15 +382,15 @@ class PictureController extends AbstractRestfulController
                 }
 
                 switch ($data['status']) {
-                    case DbTable\Picture::STATUS_INBOX:
-                    case DbTable\Picture::STATUS_ACCEPTED:
-                    case DbTable\Picture::STATUS_REMOVING:
+                    case Picture::STATUS_INBOX:
+                    case Picture::STATUS_ACCEPTED:
+                    case Picture::STATUS_REMOVING:
                         $select->where('similar.status = ?', $data['status']);
                         break;
                     case 'custom1':
                         $select->where('similar.status not in (?)', [
-                            DbTable\Picture::STATUS_REMOVING,
-                            DbTable\Picture::STATUS_REMOVED
+                            Picture::STATUS_REMOVING,
+                            Picture::STATUS_REMOVED
                         ]);
                         break;
                 }
@@ -695,7 +696,7 @@ class PictureController extends AbstractRestfulController
             $user = $this->user()->get();
             $previousStatusUserId = $picture->change_status_user_id;
 
-            if ($data['status'] == DbTable\Picture::STATUS_ACCEPTED) {
+            if ($data['status'] == Picture::STATUS_ACCEPTED) {
                 $canAccept = $this->canAccept($picture);
 
                 if (! $canAccept) {
@@ -743,15 +744,15 @@ class PictureController extends AbstractRestfulController
                 ), $picture);
             }
 
-            if ($data['status'] == DbTable\Picture::STATUS_INBOX) {
-                if ($picture['status'] == DbTable\Picture::STATUS_REMOVING) {
+            if ($data['status'] == Picture::STATUS_INBOX) {
+                if ($picture['status'] == Picture::STATUS_REMOVING) {
                     $canRestore = $this->user()->isAllowed('picture', 'restore');
                     if (! $canRestore) {
                         return $this->forbiddenAction();
                     }
 
                     $picture->setFromArray([
-                        'status'                => DbTable\Picture::STATUS_INBOX,
+                        'status'                => Picture::STATUS_INBOX,
                         'change_status_user_id' => $user->id
                     ]);
                     $picture->save();
@@ -760,14 +761,14 @@ class PictureController extends AbstractRestfulController
                         'Картинки `%s` восстановлена из очереди удаления',
                         htmlspecialchars($this->pic()->name($picture, $this->language()))
                     ), $picture);
-                } elseif ($picture['status'] == DbTable\Picture::STATUS_ACCEPTED) {
+                } elseif ($picture['status'] == Picture::STATUS_ACCEPTED) {
                     $canUnaccept = $this->user()->isAllowed('picture', 'unaccept');
                     if (! $canUnaccept) {
                         return $this->forbiddenAction();
                     }
 
                     $picture->setFromArray([
-                        'status'                => DbTable\Picture::STATUS_INBOX,
+                        'status'                => Picture::STATUS_INBOX,
                         'change_status_user_id' => $user->id
                     ]);
                     $picture->save();
@@ -795,7 +796,7 @@ class PictureController extends AbstractRestfulController
                 }
             }
 
-            if ($data['status'] == DbTable\Picture::STATUS_REMOVING) {
+            if ($data['status'] == Picture::STATUS_REMOVING) {
                 $canDelete = $this->pictureCanDelete($picture);
                 if (! $canDelete) {
                     return $this->forbiddenAction();
@@ -803,7 +804,7 @@ class PictureController extends AbstractRestfulController
 
                 $user = $this->user()->get();
                 $picture->setFromArray([
-                    'status'                => DbTable\Picture::STATUS_REMOVING,
+                    'status'                => Picture::STATUS_REMOVING,
                     'removing_date'         => new Zend_Db_Expr('CURDATE()'),
                     'change_status_user_id' => $user->id
                 ]);
@@ -908,7 +909,7 @@ class PictureController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $canNormalize = $row['status'] == DbTable\Picture::STATUS_INBOX
+        $canNormalize = $row['status'] == Picture::STATUS_INBOX
                      && $this->user()->isAllowed('picture', 'normalize');
 
         if (! $canNormalize) {
@@ -938,7 +939,7 @@ class PictureController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $canFlop = $row['status'] == DbTable\Picture::STATUS_INBOX
+        $canFlop = $row['status'] == Picture::STATUS_INBOX
                 && $this->user()->isAllowed('picture', 'flop');
 
         if (! $canFlop) {
@@ -1017,28 +1018,28 @@ class PictureController extends AbstractRestfulController
     {
         $can1 = false;
         switch ($picture->status) {
-            case DbTable\Picture::STATUS_ACCEPTED:
+            case Picture::STATUS_ACCEPTED:
                 $can1 = true;
                 break;
 
-            case DbTable\Picture::STATUS_INBOX:
+            case Picture::STATUS_INBOX:
                 $can1 = $this->user()->isAllowed('picture', 'accept');
                 break;
         }
 
         $can2 = false;
         switch ($replacedPicture->status) {
-            case DbTable\Picture::STATUS_ACCEPTED:
+            case Picture::STATUS_ACCEPTED:
                 $can2 = $this->user()->isAllowed('picture', 'unaccept')
                      && $this->user()->isAllowed('picture', 'remove_by_vote');
                 break;
 
-            case DbTable\Picture::STATUS_INBOX:
+            case Picture::STATUS_INBOX:
                 $can2 = $this->user()->isAllowed('picture', 'remove_by_vote');
                 break;
 
-            case DbTable\Picture::STATUS_REMOVING:
-            case DbTable\Picture::STATUS_REMOVED:
+            case Picture::STATUS_REMOVING:
+            case Picture::STATUS_REMOVED:
                 $can2 = true;
                 break;
         }
@@ -1073,9 +1074,9 @@ class PictureController extends AbstractRestfulController
         $user = $this->user()->get();
 
         // statuses
-        if ($picture->status != DbTable\Picture::STATUS_ACCEPTED) {
+        if ($picture->status != Picture::STATUS_ACCEPTED) {
             $picture->setFromArray([
-                'status'                => DbTable\Picture::STATUS_ACCEPTED,
+                'status'                => Picture::STATUS_ACCEPTED,
                 'change_status_user_id' => $user->id
             ]);
             if (! $picture->accept_datetime) {
@@ -1088,9 +1089,9 @@ class PictureController extends AbstractRestfulController
             }
         }
 
-        if (! in_array($replacePicture->status, [DbTable\Picture::STATUS_REMOVING, DbTable\Picture::STATUS_REMOVED])) {
+        if (! in_array($replacePicture->status, [Picture::STATUS_REMOVING, Picture::STATUS_REMOVED])) {
             $replacePicture->setFromArray([
-                'status'                => DbTable\Picture::STATUS_REMOVING,
+                'status'                => Picture::STATUS_REMOVING,
                 'removing_date'         => new Zend_Db_Expr('now()'),
                 'change_status_user_id' => $user->id
             ]);

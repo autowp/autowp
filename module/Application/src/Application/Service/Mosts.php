@@ -13,6 +13,7 @@ use Application\Most;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
+use Application\Model\Picture;
 
 class Mosts
 {
@@ -525,10 +526,10 @@ class Mosts
                     ->where('mp.group_id = ?', $groupId)
                     ->where('item_parent_cache.parent_id = ?', $carId)
                     ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
-                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                     ->order([
                         'mp.position',
-                        new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', DbTable\Picture::STATUS_ACCEPTED)),
+                        new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
                         'pictures.width DESC', 'pictures.height DESC'
                     ])
                     ->limit(1)
@@ -555,7 +556,7 @@ class Mosts
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id = ?', $carId)
                     ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
-                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
+                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                     ->limit(1);
 
                 if (count($ids) > 0) {

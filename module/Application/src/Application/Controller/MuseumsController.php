@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Picture;
 
 class MuseumsController extends AbstractActionController
 {
@@ -67,7 +68,7 @@ class MuseumsController extends AbstractActionController
         $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->where('picture_item.item_id = ?', $museum->id)
-            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
 
         $pictures = $this->pic()->listData($select, [
             'width' => 4
