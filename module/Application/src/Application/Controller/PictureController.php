@@ -47,7 +47,7 @@ class PictureController extends AbstractActionController
         return $viewModel;
     }
 
-    private function getPicturesSelect(DbTable\Picture\Row $picture)
+    private function getPicturesSelect(\Autowp\Commons\Db\Table\Row $picture)
     {
         $galleryStatuses = [
             DbTable\Picture::STATUS_ACCEPTED

@@ -231,25 +231,6 @@ class Catalogue
         return $result;
     }
 
-    private static function between($a, $min, $max)
-    {
-        return ($min <= $a) && ($a <= $max);
-    }
-
-    public function cropParametersExists(array $picture)
-    {
-        // проверяем установлены ли границы обрезания
-        // проверяем верные ли значения границ обрезания
-        $canCrop = ! is_null($picture['crop_left']) && ! is_null($picture['crop_top']) &&
-            ! is_null($picture['crop_width']) && ! is_null($picture['crop_height']) &&
-            self::between($picture['crop_left'], 0, $picture['width']) &&
-            self::between($picture['crop_width'], 1, $picture['width']) &&
-            self::between($picture['crop_top'], 0, $picture['height']) &&
-            self::between($picture['crop_height'], 1, $picture['height']);
-
-        return $canCrop;
-    }
-
     /**
      * @return Request
      */
@@ -258,7 +239,7 @@ class Catalogue
         $options = [
             'imageId' => $picture['image_id']
         ];
-        if ($this->cropParametersExists($picture)) {
+        if (DbTable\Picture::checkCropParameters($picture)) {
             $options['crop'] = [
                 'left'   => $picture['crop_left'],
                 'top'    => $picture['crop_top'],

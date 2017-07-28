@@ -7,7 +7,7 @@ use Zend\Form\Form;
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Model\DbTable;
 
-class PictureRowTest extends AbstractHttpControllerTestCase
+class PictureTableTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
@@ -16,7 +16,7 @@ class PictureRowTest extends AbstractHttpControllerTestCase
         $table = new DbTable\Picture();
         $row = $table->fetchRow([]);
 
-        $pattern = $row->getFileNamePattern();
+        $pattern = $table->getFileNamePattern($row);
 
         $this->assertNotEmpty($pattern);
     }

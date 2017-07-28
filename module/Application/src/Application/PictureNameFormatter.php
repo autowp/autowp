@@ -50,7 +50,7 @@ class PictureNameFormatter
 
     public function format($picture, $language)
     {
-        if ($picture instanceof DbTable\Picture\Row) {
+        if ($picture instanceof \Autowp\Commons\Db\Table\Row) {
             $names = $this->pictureTable->getNameData([$picture->toArray()], [
                 'language' => $language,
                 'large'    => true

@@ -184,7 +184,7 @@ class PictureHydrator extends RestHydrator
             throw new Exception("Unexpected object");
         }
 
-        $cropped = DbTable\Picture\Row::checkCropParameters($object);
+        $cropped = DbTable\Picture::checkCropParameters($object);
 
         $picture = [
             'id'             => (int)$object['id'],

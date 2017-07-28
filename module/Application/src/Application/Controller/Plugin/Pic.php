@@ -416,7 +416,7 @@ class Pic extends AbstractPlugin
 
                 $item = array_replace($item, [
                     'resolution'     => (int)$row['width'] . '×' . (int)$row['height'],
-                    'cropped'        => DbTable\Picture\Row::checkCropParameters($row),
+                    'cropped'        => DbTable\Picture::checkCropParameters($row),
                     'cropResolution' => $row['crop_width'] . '×' . $row['crop_height'],
                     'status'         => $row['status'],
                     'views'          => (int)$row['views'],
@@ -1279,7 +1279,7 @@ class Pic extends AbstractPlugin
         foreach ($rows as $idx => $picture) {
             $request = DbTable\Picture::buildFormatRequest($picture);
             $fullRequests[$idx] = $request;
-            if (DbTable\Picture\Row::checkCropParameters($picture)) {
+            if (DbTable\Picture::checkCropParameters($picture)) {
                 $cropRequests[$idx] = $request;
             }
             $ids[] = (int)$picture['id'];
@@ -1330,7 +1330,7 @@ class Pic extends AbstractPlugin
 
             $sUrl = $image->getSrc();
 
-            if (DbTable\Picture\Row::checkCropParameters($row)) {
+            if (DbTable\Picture::checkCropParameters($row)) {
                 $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
 
                 $crop['crop'] = [

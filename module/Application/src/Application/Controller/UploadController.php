@@ -247,7 +247,7 @@ class UploadController extends AbstractActionController
 
             // rename file to new
             $this->imageStorage()->changeImageName($picture->image_id, [
-                'pattern' => $picture->getFileNamePattern(),
+                'pattern' => $this->pictureTable->getFileNamePattern($picture)
             ]);
 
             // add comment

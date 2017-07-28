@@ -50,7 +50,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function behaviour(DbTable\Picture\Row $picture)
+    public function behaviour(\Autowp\Commons\Db\Table\Row $picture)
     {
         return $this->userBehaviour($picture, $this->isPictureModer());
     }
@@ -77,7 +77,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    private function userBehaviour(DbTable\Picture\Row $picture, $isModer)
+    private function userBehaviour(\Autowp\Commons\Db\Table\Row $picture, $isModer)
     {
         if ($this->view->user()->logedIn()) {
             $commentsStat = $this->comments->getTopicStatForUser(
@@ -98,7 +98,7 @@ class Pictures extends AbstractHelper
 
         $data = [
             'url'         => $this->view->pic($picture)->url(),
-            'cropped'     => $picture->cropParametersExists(),
+            'cropped'     => $this->pictureTable->cropParametersExists($picture),
             'width'       => $picture['width'],
             'height'      => $picture['height'],
             'crop_width'  => $picture->crop_width,
@@ -125,7 +125,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function picture(DbTable\Picture\Row $picture)
+    public function picture(\Autowp\Commons\Db\Table\Row $picture)
     {
         $view = $this->view;
 

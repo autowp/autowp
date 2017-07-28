@@ -13,7 +13,7 @@ class InlinePicture extends AbstractHelper
         $this->pictureTable = $pictureTable;
     }
 
-    public function __invoke(DbTable\Picture\Row $picture)
+    public function __invoke(\Autowp\Commons\Db\Table\Row $picture)
     {
         $view = $this->view;
 

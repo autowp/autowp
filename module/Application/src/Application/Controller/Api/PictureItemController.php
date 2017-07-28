@@ -35,6 +35,11 @@ class PictureItemController extends AbstractRestfulController
      */
     private $itemInputFilter;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         PictureItem $pictureItem,
         Log $log,
@@ -136,7 +141,7 @@ class PictureItemController extends AbstractRestfulController
 
             if ($picture->image_id) {
                 $this->imageStorage()->changeImageName($picture->image_id, [
-                    'pattern' => $picture->getFileNamePattern(),
+                    'pattern' => $this->pictureTable->getFileNamePattern($picture)
                 ]);
             }
         }

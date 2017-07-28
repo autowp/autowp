@@ -517,7 +517,7 @@ class PictureController extends AbstractRestfulController
         ]);
     }
 
-    private function canAccept(DbTable\Picture\Row $picture)
+    private function canAccept(\Autowp\Commons\Db\Table\Row $picture)
     {
         return $this->table->canAccept($picture)
             && $this->user()->isAllowed('picture', 'accept');
@@ -539,7 +539,7 @@ class PictureController extends AbstractRestfulController
         ]);
     }
 
-    private function pictureUrl(DbTable\Picture\Row $picture, $forceCanonical = false, $uri = null)
+    private function pictureUrl(\Autowp\Commons\Db\Table\Row $picture, $forceCanonical = false, $uri = null)
     {
         return $this->url()->fromRoute('index', [], [
             'force_canonical' => $forceCanonical,
@@ -990,7 +990,7 @@ class PictureController extends AbstractRestfulController
 
         if ($row->image_id) {
             $this->imageStorage()->changeImageName($row->image_id, [
-                'pattern' => $row->getFileNamePattern(),
+                'pattern' => $this->table->getFileNamePattern($row)
             ]);
         }
 
