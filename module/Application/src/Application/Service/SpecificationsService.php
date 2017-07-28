@@ -2628,7 +2628,6 @@ class SpecificationsService
             ->where(['attrs_user_values.conflict']);
 
         foreach ($this->valueTable->selectWith($select) as $valueRow) {
-            print $valueRow['attribute_id'] . '#' . $valueRow['item_id'] . PHP_EOL;
             $this->refreshConflictFlag($valueRow['attribute_id'], $valueRow['item_id']);
         }
     }

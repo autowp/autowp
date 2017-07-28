@@ -84,7 +84,6 @@ class TrafficHydrator extends RestHydrator
         }
 
         $object['whois_url'] = 'http://nic.ru/whois/?query='.urlencode($object['ip']);
-        //print_r($object); exit;
         unset($object['ban']['ip']);
 
 

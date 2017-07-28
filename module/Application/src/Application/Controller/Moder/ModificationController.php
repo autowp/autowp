@@ -289,8 +289,6 @@ class ModificationController extends AbstractActionController
             }
         }*/
 
-        //print_r($combinations); exit;
-
         $this->view->assign([
             'combinations' => $combinations,
             'values'       => $values,

@@ -240,8 +240,6 @@ class Brand
                 $line = 'other';
             }
 
-            //print $this->utfCharToNumber($char) . PHP_EOL;
-
             if (! isset($result[$line][$char])) {
                 $result[$line][$char] = [
                     'id'     => $this->utfCharToNumber($char),

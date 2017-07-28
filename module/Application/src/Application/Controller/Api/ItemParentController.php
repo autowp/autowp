@@ -295,7 +295,7 @@ class ItemParentController extends AbstractRestfulController
 
         $this->itemModel->updateInteritance($item);
 
-        $this->vehicleType->refreshInheritanceFromParents($item->id);
+        $this->vehicleType->refreshInheritanceFromParents($item['id']);
 
         $this->specificationsService->updateActualValues($item->id);
 

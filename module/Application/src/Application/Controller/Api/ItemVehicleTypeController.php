@@ -35,6 +35,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
             (int) $this->params()->fromQuery('item_id'),
             (int) $this->params()->fromQuery('vehicle_type_id')
         );
+        $select->where('not inherited');
 
         $paginator = new Paginator\Paginator(
             new Paginator\Adapter\DbSelect(
@@ -71,7 +72,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
             $this->params('vehicle_type_id')
         );
 
-        if (! $row) {
+        if (! $row || $row['inherited']) {
             return $this->notFoundAction();
         }
 

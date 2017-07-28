@@ -30,7 +30,8 @@ class ItemControllerFactory implements FactoryInterface
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Application\Model\UserItemSubscribe::class),
             $tables->get('spec'),
-            $container->get(\Application\Model\Item::class)
+            $container->get(\Application\Model\Item::class),
+            $container->get(\Application\Model\VehicleType::class)
         );
     }
 }

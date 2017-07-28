@@ -606,8 +606,6 @@ class CatalogueController extends AbstractActionController
                 break;
         }
 
-        //print $select;
-
         return $select;
     }
 

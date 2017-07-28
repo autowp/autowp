@@ -33,6 +33,7 @@ use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
+use Application\Model\VehicleType;
 
 class ItemController extends AbstractRestfulController
 {
@@ -101,6 +102,11 @@ class ItemController extends AbstractRestfulController
      */
     private $itemModel;
 
+    /**
+     * @var VehicleType
+     */
+    private $vehicleType;
+
     public function __construct(
         RestHydrator $hydrator,
         Image $logoHydrator,
@@ -113,7 +119,8 @@ class ItemController extends AbstractRestfulController
         MessageService $message,
         UserItemSubscribe $userItemSubscribe,
         TableGateway $specTable,
-        Item $itemModel
+        Item $itemModel,
+        VehicleType $vehicleType
     ) {
         $this->hydrator = $hydrator;
         $this->logoHydrator = $logoHydrator;
@@ -127,6 +134,7 @@ class ItemController extends AbstractRestfulController
         $this->userItemSubscribe = $userItemSubscribe;
         $this->specTable = $specTable;
         $this->itemModel = $itemModel;
+        $this->vehicleType = $vehicleType;
 
         $this->table = new DbTable\Item();
     }
@@ -524,8 +532,6 @@ class ItemController extends AbstractRestfulController
             ->setCurrentPageNumber($data['page']);
 
         $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-        //print $select->assemble(); exit;
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
@@ -1013,15 +1019,11 @@ class ItemController extends AbstractRestfulController
             $this->itemModel->setLanguageName($item['id'], 'xx', $values['name']);
         }
 
-        /*$vehicleType = new VehicleType();
-        $vehicleType->setVehicleTypes($item->id, (array)$values['vehicle_type_id']);*/
-
         $this->itemModel->updateOrderCache($item['id']);
 
         $this->itemParent->rebuildCache($item['id']);
 
-        /*$vehicleType = new VehicleType();
-        $vehicleType->refreshInheritanceFromParents($item->id);*/
+        $this->vehicleType->refreshInheritanceFromParents($item['id']);
 
         $namespace = new \Zend\Session\Container('Moder_Car');
         $namespace->lastCarId = $item->id;

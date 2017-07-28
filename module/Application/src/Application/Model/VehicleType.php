@@ -48,6 +48,7 @@ class VehicleType
         ]);
 
         if ($deleted > 0) {
+            $this->refreshInheritanceFromParents($vehicleId);
             $this->refreshInheritance($vehicleId);
         }
     }
@@ -57,6 +58,7 @@ class VehicleType
         $changed = $this->setRow($vehicleId, $type, false);
 
         if ($changed) {
+            $this->refreshInheritanceFromParents($vehicleId);
             $this->refreshInheritance($vehicleId);
         }
     }
@@ -89,10 +91,10 @@ class VehicleType
         }
 
         $filter = [
-            'vehicle_id = ?' => $vehicleId
+            'vehicle_id' => $vehicleId
         ];
         if ($types) {
-            $filter[] = new Sql\Predicate\In('vehicle_type_id', $types);
+            $filter[] = new Sql\Predicate\NotIn('vehicle_type_id', $types);
         }
 
         $deleted = $this->itemVehicleTypeTable->delete($filter);
@@ -109,19 +111,18 @@ class VehicleType
             'vehicle_id'      => $vehicleId,
             'vehicle_type_id' => $type
         ];
+        $set = [
+            'inherited' => $inherited ? 1 : 0
+        ];
 
         $row = $this->itemVehicleTypeTable->select($primaryKey)->current();
         if (! $row) {
-            $this->itemVehicleTypeTable->insert(array_replace([
-                'inherited' => $inherited ? 1 : 0
-            ], $primaryKey));
+            $this->itemVehicleTypeTable->insert(array_replace($set, $primaryKey));
             return true;
         }
 
         if ($inherited !== (bool)$row['inherited']) {
-            $this->itemVehicleTypeTable->update([
-                'inherited' => $inherited ? 1 : 0
-            ], $primaryKey);
+            $this->itemVehicleTypeTable->update($set, $primaryKey);
 
             return true;
         }
@@ -149,30 +150,45 @@ class VehicleType
     {
         $typeIds = $this->getVehicleTypes($vehicleId);
 
-        $this->setVehicleTypes($vehicleId, $typeIds);
+        if ($typeIds) {
+            // do not inherit when own value
+            $affected = $this->itemVehicleTypeTable->delete([
+                'vehicle_id' => $vehicleId,
+                'inherited'
+            ]);
+            if ($affected > 0) {
+                $this->refreshInheritance($vehicleId);
+            }
+            return;
+        }
+
+        $types = $this->getInheritedIds($vehicleId);
+
+        $changed = $this->setRows($vehicleId, $types, true);
+
+        if ($changed) {
+            $this->refreshInheritance($vehicleId);
+        }
     }
 
-    public function refreshInheritance(int $vehicleId): array
+    private function refreshInheritance(int $vehicleId)
     {
         $select = new Sql\Select($this->itemParentTable->getTable());
         $select->columns(['item_id'])
             ->where(['parent_id' => $vehicleId]);
 
-        $result = [];
         foreach ($this->itemParentTable->selectWith($select) as $row) {
-            $result[] = (int)$row['item_id'];
+            $this->refreshInheritanceFromParents($row['item_id']);
         }
-
-        return $result;
     }
 
-    public function getVehicleTypes(int $vehicleId): array
+    public function getVehicleTypes(int $vehicleId, bool $inherited = false): array
     {
         $select = new Sql\Select($this->itemVehicleTypeTable->getTable());
         $select->columns(['vehicle_type_id'])
             ->where([
                 'vehicle_id' => $vehicleId,
-                'not inherited'
+                $inherited ? 'inherited' : 'not inherited'
             ]);
 
         $result = [];
