@@ -8,6 +8,8 @@ use Imagick;
 use Locale;
 
 use Zend\Authentication\AuthenticationService;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -101,6 +103,11 @@ class AccountController extends AbstractActionController
      */
     private $pictureTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $loginStateTable;
+
     public function __construct(
         UsersService $service,
         Form $emailForm,
@@ -115,7 +122,8 @@ class AccountController extends AbstractActionController
         MessageService $message,
         UserRename $userRename,
         UserAccount $userAccount,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        TableGateway $loginStateTable
     ) {
 
         $this->service = $service;
@@ -132,6 +140,7 @@ class AccountController extends AbstractActionController
         $this->userRename = $userRename;
         $this->userAccount = $userAccount;
         $this->pictureTable = $pictureTable;
+        $this->loginStateTable = $loginStateTable;
     }
 
     private function forwardToLogin()
@@ -271,17 +280,14 @@ class AccountController extends AbstractActionController
 
             $loginUrl = $service->getLoginUrl();
 
-            $table = new DbTable\LoginState();
-            $row = $table->createRow([
+            $this->loginStateTable->insert([
                 'state'    => $service->getState(),
-                'time'     => new Zend_Db_Expr('now()'),
-                'user_id'  => $user->id,
+                'time'     => new Sql\Expression('now()'),
+                'user_id'  => $user['id'],
                 'language' => $this->language(),
                 'service'  => $serviceId,
                 'url'      => $this->url()->fromRoute('account/accounts')
             ]);
-
-            $row->save();
 
             return $this->redirect()->toUrl($loginUrl);
         }

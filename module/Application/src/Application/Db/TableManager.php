@@ -66,6 +66,7 @@ class TableManager implements ServiceLocatorInterface
         'log_events_item' => [],
         'log_events_pictures' => [],
         'log_events_user' => [],
+        'login_state' => [],
         'pages' => [], //TODO: rename to page
         'personal_messages' => [],
         'perspectives' => [],

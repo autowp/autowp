@@ -6,6 +6,8 @@ use Exception;
 use Imagick;
 
 use Zend\Authentication\AuthenticationService;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Uri\Http as HttpUri;
@@ -16,11 +18,8 @@ use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\UserRemember;
 
-use Application\Model\DbTable\LoginState;
 use Application\Model\UserAccount;
 use Application\Service\UsersService;
-
-use Zend_Db_Expr;
 
 class LoginController extends AbstractActionController
 {
@@ -54,13 +53,19 @@ class LoginController extends AbstractActionController
      */
     private $userAccount;
 
+    /**
+     * @var TableGateway
+     */
+    private $loginStateTable;
+
     public function __construct(
         UsersService $service,
         Form $form,
         ExternalLoginServices $externalLoginServices,
         array $hosts,
         UserRemember $userRemember,
-        UserAccount $userAccount
+        UserAccount $userAccount,
+        TableGateway $loginStateTable
     ) {
 
         $this->service = $service;
@@ -69,6 +74,7 @@ class LoginController extends AbstractActionController
         $this->hosts = $hosts;
         $this->userRemember = $userRemember;
         $this->userAccount = $userAccount;
+        $this->loginStateTable = $loginStateTable;
     }
 
     public function indexAction()
@@ -194,33 +200,28 @@ class LoginController extends AbstractActionController
 
         $loginUrl = $service->getLoginUrl();
 
-        $table = new LoginState();
-        $row = $table->createRow([
+        $this->loginStateTable->insert([
             'state'    => $service->getState(),
-            'time'     => new Zend_Db_Expr('now()'),
+            'time'     => new Sql\Expression('now()'),
             'user_id'  => null,
             'language' => $this->language(),
             'service'  => $serviceId,
             'url'      => $this->url()->fromRoute('login')
         ]);
 
-        $row->save();
-
         return $this->redirect()->toUrl($loginUrl);
     }
 
     public function callbackAction()
     {
-        $table = new LoginState();
-
         $state = (string)$this->params()->fromQuery('state');
         if (! $state) { // twitter workaround
             $state = (string)$this->params()->fromQuery('oauth_token');
         }
 
-        $stateRow = $table->fetchRow([
-            'state = ?' => $state
-        ]);
+        $stateRow = $this->loginStateTable->select([
+            'state' => $state
+        ])->current();
 
         if (! $stateRow) {
             return $this->notFoundAction();
@@ -228,27 +229,27 @@ class LoginController extends AbstractActionController
 
         $params = $this->params()->fromQuery();
 
-        if ($stateRow->language != $this->language()) {
-            if (! isset($this->hosts[$stateRow->language])) {
-                throw new Exception("Host {$stateRow->language} not found");
+        if ($stateRow['language'] != $this->language()) {
+            if (! isset($this->hosts[$stateRow['language']])) {
+                throw new Exception("Host {$stateRow['language']} not found");
             }
 
             $url = $this->url()->fromRoute('login/callback', [], [
                 'force_canonical' => true,
                 'query'           => $params,
-                'uri'             => new HttpUri('http://' . $this->hosts[$stateRow->language]['hostname'])
+                'uri'             => new HttpUri('http://' . $this->hosts[$stateRow['language']]['hostname'])
             ]);
             return $this->redirect()->toUrl($url);
         }
 
-        $service = $this->getExternalLoginService($stateRow->service);
+        $service = $this->getExternalLoginService($stateRow['service']);
         $success = $service->callback($params);
         if (! $success) {
             throw new Exception("Error processing callback");
         }
 
         $data = $service->getData([
-            'language' => $stateRow->language
+            'language' => $stateRow['language']
         ]);
 
         if (! $data) {
@@ -264,13 +265,13 @@ class LoginController extends AbstractActionController
 
         $uTable = new User();
 
-        $userId = $this->userAccount->getUserId($stateRow->service, $data->getExternalId());
+        $userId = $this->userAccount->getUserId($stateRow['service'], $data->getExternalId());
 
         if (! $userId) {
-            if ($stateRow->user_id) {
-                $uRow = $uTable->find($stateRow->user_id)->current();
+            if ($stateRow['user_id']) {
+                $uRow = $uTable->find($stateRow['user_id'])->current();
                 if (! $uRow) {
-                    throw new Exception("Account `{$stateRow->user_id}` not found");
+                    throw new Exception("Account `{$stateRow['user_id']}` not found");
                 }
             } else {
                 $ip = $this->getRequest()->getServer('REMOTE_ADDR');
@@ -290,14 +291,14 @@ class LoginController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $this->userAccount->create($stateRow->service, $data->getExternalId(), [
+            $this->userAccount->create($stateRow['service'], $data->getExternalId(), [
                 'user_id'      => $uRow->id,
-                'used_for_reg' => $stateRow->user_id ? 0 : 1,
+                'used_for_reg' => $stateRow['user_id'] ? 0 : 1,
                 'name'         => $data->getName(),
                 'link'         => $data->getProfileUrl(),
             ]);
 
-            if (! $stateRow->user_id) { // first login
+            if (! $stateRow['user_id']) { // first login
                 if ($photoUrl = $data->getPhotoUrl()) {
                     $photo = file_get_contents($photoUrl);
 
@@ -331,7 +332,7 @@ class LoginController extends AbstractActionController
             }
 
             $this->userAccount->setAccountData(
-                $stateRow->service,
+                $stateRow['service'],
                 $data->getExternalId(),
                 [
                     'name' => $data->getName(),
@@ -340,9 +341,11 @@ class LoginController extends AbstractActionController
             );
         }
 
-        $url = $stateRow->url;
+        $url = $stateRow['url'];
 
-        $stateRow->delete();
+        $this->loginStateTable->delete([
+            'state' => $stateRow['state']
+        ]);
 
         $adapter = new IdAuthAdapter();
         $adapter->setIdentity($uRow->id);

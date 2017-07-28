@@ -15,6 +15,7 @@ class AccountControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('Config');
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get(\Application\Service\UsersService::class),
             $container->get('AccountEmailForm'),
@@ -29,7 +30,8 @@ class AccountControllerFactory implements FactoryInterface
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Autowp\User\Model\UserRename::class),
             $container->get(\Application\Model\UserAccount::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\DbTable\Picture::class),
+            $tables->get('login_state')
         );
     }
 }
