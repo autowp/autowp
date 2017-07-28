@@ -27,14 +27,21 @@ class Pictures extends AbstractHelper
      */
     private $pictureModerVote;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         Comments\CommentsService $comments,
         PictureView $pictureView,
-        PictureModerVote $pictureModerVote
+        PictureModerVote $pictureModerVote,
+        DbTable\Picture $pictureTable
     ) {
         $this->comments = $comments;
         $this->pictureView = $pictureView;
         $this->pictureModerVote = $pictureModerVote;
+        $this->pictureTable = $pictureTable;
     }
 
     private function isPictureModer()
@@ -129,7 +136,7 @@ class Pictures extends AbstractHelper
 
         $url = $view->pic($picture)->url();
 
-        $imageHtml = $this->view->img($picture->getFormatRequest(), [
+        $imageHtml = $this->view->img($this->pictureTable->getFormatRequest($picture), [
             'format'  => 'picture-thumb',
             'alt'     => $name,
             'title'   => $name,

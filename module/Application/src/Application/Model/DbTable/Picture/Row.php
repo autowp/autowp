@@ -4,7 +4,6 @@ namespace Application\Model\DbTable\Picture;
 
 use Exception;
 
-use Autowp\Image\Storage\Request;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 use Application\Model\DbTable;
@@ -145,43 +144,5 @@ class Row extends \Autowp\Commons\Db\Table\Row
     public function getFileNameTemplate($ext)
     {
         return $this->getFileNamePattern() . '_%d.' . $ext;
-    }
-
-    /**
-     * @return Request
-     */
-    public function getFormatRequest()
-    {
-        return self::buildFormatRequest($this->toArray());
-    }
-
-    /**
-     * @param array $options
-     * @return Request
-     */
-    public static function buildFormatRequest(array $options)
-    {
-        $defaults = [
-            'image_id'    => null,
-            'crop_left'   => null,
-            'crop_top'    => null,
-            'crop_width'  => null,
-            'crop_height' => null
-        ];
-        $options = array_replace($defaults, $options);
-
-        $request = [
-            'imageId' => $options['image_id']
-        ];
-        if (self::checkCropParameters($options)) {
-            $request['crop'] = [
-                'left'   => $options['crop_left'],
-                'top'    => $options['crop_top'],
-                'width'  => $options['crop_width'],
-                'height' => $options['crop_height']
-            ];
-        }
-
-        return new Request($request);
     }
 }

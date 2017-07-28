@@ -891,7 +891,7 @@ class SpecificationsService
                         ], $userValuePrimaryKey));
                     } else {
                         $this->userValueTable->update([
-                            'update_date' => new Zend_Db_Expr('NOW()')
+                            'update_date' => new Sql\Expression('NOW()')
                         ], $userValuePrimaryKey);
                     }
 
@@ -1374,17 +1374,30 @@ class SpecificationsService
                 $name = $this->itemNameFormatter->format($this->itemModel->getNameData($car, $language), $language);
             }
 
+            $topPicture = $this->specPicture($car, $topPerspectives);
+            $topPictureRequest = null;
+            if ($topPicture) {
+                $topPictureRequest = $this->pictureTable->getFormatRequest($topPicture);
+            }
+            $bottomPicture = $this->specPicture($car, $bottomPerspectives);
+            $bottomPictureRequest = null;
+            if ($bottomPicture) {
+                $bottomPictureRequest = $this->pictureTable->getFormatRequest($bottomPicture);
+            }
+
             $result[] = [
-                'id'               => $itemId,
-                'name'             => $name,
-                'beginYear'        => $car->begin_year,
-                'endYear'          => $car->end_year,
-                'produced'         => $car->produced,
-                'produced_exactly' => $car->produced_exactly,
-                'topPicture'       => $this->specPicture($car, $topPerspectives),
-                'bottomPicture'    => $this->specPicture($car, $bottomPerspectives),
-                'carType'          => null,
-                'values'           => $values
+                'id'                   => $itemId,
+                'name'                 => $name,
+                'beginYear'            => $car->begin_year,
+                'endYear'              => $car->end_year,
+                'produced'             => $car->produced,
+                'produced_exactly'     => $car->produced_exactly,
+                'topPicture'           => $topPicture,
+                'topPictureRequest'    => $topPictureRequest,
+                'bottomPicture'        => $bottomPicture,
+                'bottomPictureRequest' => $bottomPictureRequest,
+                'carType'              => null,
+                'values'               => $values
             ];
         }
 

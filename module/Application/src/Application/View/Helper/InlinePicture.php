@@ -8,6 +8,11 @@ use Application\Model\DbTable;
 
 class InlinePicture extends AbstractHelper
 {
+    public function __construct(DbTable\Picture $pictureTable)
+    {
+        $this->pictureTable = $pictureTable;
+    }
+
     public function __invoke(DbTable\Picture\Row $picture)
     {
         $view = $this->view;
@@ -16,7 +21,7 @@ class InlinePicture extends AbstractHelper
 
         $name = $view->pic()->name($picture, $this->view->language());
 
-        $imageHtml = $view->img($picture->getFormatRequest(), [
+        $imageHtml = $view->img($this->pictureTable->getFormatRequest($picture), [
             'format'  => 'picture-thumb',
             'alt'     => $name,
             'title'   => $name,

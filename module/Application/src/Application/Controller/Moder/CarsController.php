@@ -236,7 +236,7 @@ class CarsController extends AbstractActionController
         );
 
         foreach ($pictureRows as $pictureRow) {
-            $request = DbTable\Picture\Row::buildFormatRequest($pictureRow->toArray());
+            $request = DbTable\Picture::buildFormatRequest($pictureRow->toArray());
             $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
 
             $modificationIds = $db->fetchCol(

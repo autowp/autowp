@@ -427,7 +427,7 @@ class CatalogueController extends AbstractActionController
             );
 
             if ($pictureRow) {
-                $requests[$idx] = DbTable\Picture\Row::buildFormatRequest($pictureRow->toArray());
+                $requests[$idx] = DbTable\Picture::buildFormatRequest($pictureRow->toArray());
             }
         }
 
@@ -1559,7 +1559,7 @@ class CatalogueController extends AbstractActionController
             $currentPictures = [];
 
             foreach ($pPaginator->getCurrentItems() as $pictureRow) {
-                $imageInfo = $imageStorage->getFormatedImage($pictureRow->getFormatRequest(), 'picture-thumb');
+                $imageInfo = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($pictureRow), 'picture-thumb');
 
                 $currentPictures[] = [
                     'name' => $this->pic()->name($pictureRow, $language),
@@ -2068,7 +2068,7 @@ class CatalogueController extends AbstractActionController
             foreach ($data['carList']['cars'] as $car) {
                 foreach ($car['pictures'] as $picture) {
                     if ($picture) {
-                        $formatRequests[$idx++] = $picture->getFormatRequest();
+                        $formatRequests[$idx++] = $this->pictureTable->getFormatRequest($picture);
                         $allPictures[] = $picture->toArray();
                     }
                 }

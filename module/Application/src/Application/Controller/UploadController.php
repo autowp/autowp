@@ -283,7 +283,7 @@ class UploadController extends AbstractActionController
                 $picture->save();
             }
 
-            $formatRequest = $picture->getFormatRequest();
+            $formatRequest = $this->pictureTable->getFormatRequest($picture);
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-thumb');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-medium');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-gallery-full');
@@ -641,7 +641,7 @@ class UploadController extends AbstractActionController
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), [$picture]);
 
-        $image = $this->imageStorage()->getFormatedImage($picture->getFormatRequest(), 'picture-thumb');
+        $image = $this->imageStorage()->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'picture-thumb');
 
         return new JsonModel([
             'ok'  => true,
@@ -712,7 +712,7 @@ class UploadController extends AbstractActionController
         $result = [];
         foreach ($pictures as $picture) {
             $image = $this->imageStorage()->getFormatedImage(
-                $picture->getFormatRequest(),
+                $this->pictureTable->getFormatRequest($picture),
                 'picture-gallery-full'
             );
 

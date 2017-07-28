@@ -153,7 +153,7 @@ class CategoryController extends AbstractActionController
 
             $image = null;
             if ($picture) {
-                $image = $this->imageStorage()->getFormatedImage($picture->getFormatRequest(), 'picture-thumb');
+                $image = $this->imageStorage()->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'picture-thumb');
             }
 
             $category['top_picture'] = [
@@ -523,7 +523,7 @@ class CategoryController extends AbstractActionController
 
                 $imageStorage = $this->imageStorage();
                 foreach ($pictureRows as $pictureRow) {
-                    $imageInfo = $imageStorage->getFormatedImage($pictureRow->getFormatRequest(), 'picture-thumb');
+                    $imageInfo = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($pictureRow), 'picture-thumb');
 
                     $otherPictures[] = [
                         'name' => $this->pic()->name($pictureRow, $language),

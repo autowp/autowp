@@ -458,7 +458,7 @@ class CarOfDay
         foreach ($carOfDayPictures as $idx => $picture) {
             if ($picture) {
                 $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
-                $formatRequests[$format][$idx] = $picture->getFormatRequest();
+                $formatRequests[$format][$idx] = $this->pictureTable->getFormatRequest($picture);
             }
         }
 

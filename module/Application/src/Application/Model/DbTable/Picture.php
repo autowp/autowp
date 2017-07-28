@@ -268,4 +268,42 @@ class Picture extends Table
 
         return $votes <= 0;
     }
+
+    /**
+     * @param array $options
+     * @return Image\Storage\Request
+     */
+    public static function buildFormatRequest(array $options)
+    {
+        $defaults = [
+            'image_id'    => null,
+            'crop_left'   => null,
+            'crop_top'    => null,
+            'crop_width'  => null,
+            'crop_height' => null
+        ];
+        $options = array_replace($defaults, $options);
+
+        $request = [
+            'imageId' => $options['image_id']
+        ];
+        if (Picture\Row::checkCropParameters($options)) {
+            $request['crop'] = [
+                'left'   => $options['crop_left'],
+                'top'    => $options['crop_top'],
+                'width'  => $options['crop_width'],
+                'height' => $options['crop_height']
+            ];
+        }
+
+        return new Image\Storage\Request($request);
+    }
+
+    /**
+     * @return Request
+     */
+    public function getFormatRequest(Picture\Row $row)
+    {
+        return self::buildFormatRequest($row->toArray());
+    }
 }

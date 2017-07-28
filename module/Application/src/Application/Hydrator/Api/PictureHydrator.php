@@ -326,7 +326,7 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('thumbnail')) {
             $picture['thumbnail'] = $this->extractValue('picture-thumb', [
-                'image'  => DbTable\Picture\Row::buildFormatRequest($object->toArray()),
+                'image'  => DbTable\Picture::buildFormatRequest($object->toArray()),
                 'format' => 'picture-thumb'
             ]);
         }
@@ -348,7 +348,7 @@ class PictureHydrator extends RestHydrator
                 /*$similarRow = $this->pictureTable->find($similar['picture_id'])->current();
                 if ($similarRow) {
 
-                    $similarRow->getFormatRequest()
+                    $this->pictureTable->getFormatRequest($similarRow)
 
                     $picture['similar'] = [
                         'url'      => $this->router->assemble([

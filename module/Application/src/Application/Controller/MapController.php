@@ -20,10 +20,17 @@ class MapController extends AbstractActionController
      */
     private $itemNameFormatter;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
-        ItemNameFormatter $itemNameFormatter
+        ItemNameFormatter $itemNameFormatter,
+        DbTable\Picture $pictureTable
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
+        $this->pictureTable = $pictureTable;
     }
 
     public function indexAction()
@@ -60,8 +67,6 @@ class MapController extends AbstractActionController
         $polygon = new Polygon([$line]);
 
         $pointsOnly = (bool)$this->params()->fromQuery('points-only', 14);
-
-        $pictureTable = new DbTable\Picture();
 
         $language = $this->language();
 
@@ -123,15 +128,15 @@ class MapController extends AbstractActionController
                     'url'  => $url,
                 ]);
 
-                $picture = $pictureTable->fetchRow(
-                    $pictureTable->select(true)
+                $picture = $this->pictureTable->fetchRow(
+                    $this->pictureTable->select(true)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->where('picture_item.item_id = ?', $item['id'])
                         ->limit(1)
                 );
 
                 if ($picture) {
-                    $image = $imageStorage->getFormatedImage($picture->getFormatRequest(), 'format9');
+                    $image = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'format9');
                     if ($image) {
                         $row['image'] = $image->getSrc();
                     }

@@ -361,7 +361,7 @@ class Pic extends AbstractPlugin
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = DbTable\Picture\Row::buildFormatRequest($picture);
+            $requests[$idx] = DbTable\Picture::buildFormatRequest($picture);
         }
 
         $imagesInfo = $imageStorage->getFormatedImages($requests, 'picture-thumb');
@@ -959,10 +959,10 @@ class Pic extends AbstractPlugin
         $image = $imageStorage->getImage($picture->image_id);
         $sourceUrl = $image ? $image->getSrc() : null;
 
-        $preview = $imageStorage->getFormatedImage($picture->getFormatRequest(), 'picture-medium');
+        $preview = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'picture-medium');
         $previewUrl = $preview ? $preview->getSrc() : null;
 
-        $galleryImage = $imageStorage->getFormatedImage($picture->getFormatRequest(), 'picture-gallery');
+        $galleryImage = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'picture-gallery');
 
         $paginator = false;
         $pageNumbers = false;
@@ -1277,7 +1277,7 @@ class Pic extends AbstractPlugin
         $cropRequests = [];
         $imageIds = [];
         foreach ($rows as $idx => $picture) {
-            $request = DbTable\Picture\Row::buildFormatRequest($picture);
+            $request = DbTable\Picture::buildFormatRequest($picture);
             $fullRequests[$idx] = $request;
             if (DbTable\Picture\Row::checkCropParameters($picture)) {
                 $cropRequests[$idx] = $request;
