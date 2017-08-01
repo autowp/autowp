@@ -171,7 +171,7 @@ class ItemParent
 
         $vehicleName = $langName ? $langName : $vehicleRow['name'];
 
-        $aliases = $this->itemAlias->getAliases($parentRow['id'], $parentRow['name']);
+        $aliases = $this->itemAlias->getAliases($parentRow['id']);
 
         $name = $vehicleName;
         foreach ($aliases as $alias) {

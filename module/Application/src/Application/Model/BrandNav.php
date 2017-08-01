@@ -51,11 +51,6 @@ class BrandNav
      */
     private $vehicleType;
 
-    /**
-     * @var Brand
-     */
-    private $brand;
-
     public function __construct(
         StorageInterface $cache,
         TranslatorInterface $translator,
@@ -64,8 +59,7 @@ class BrandNav
         ItemAlias $itemAlias,
         DbTable\Picture $pictureTable,
         Item $itemModel,
-        VehicleType $vehicleType,
-        Brand $brand
+        VehicleType $vehicleType
     ) {
 
         $this->cache = $cache;
@@ -76,7 +70,6 @@ class BrandNav
         $this->pictureTable = $pictureTable;
         $this->itemModel = $itemModel;
         $this->vehicleType = $vehicleType;
-        $this->brand = $brand;
     }
 
     public function getMenu(array $params)
@@ -90,7 +83,11 @@ class BrandNav
         ];
         $params = array_replace($defaults, $params);
 
-        $brand = $this->brand->getBrandById($params['brand_id'], $params['language']);
+        $brand = $this->itemModel->getRow([
+            'id'           => $params['brand_id'],
+            'item_type_id' => Item::BRAND,
+            'columns'      => ['id', 'catname']
+        ]);
         if (! $brand) {
             return;
         }
@@ -100,13 +97,13 @@ class BrandNav
         $type = strlen($type) ? (string)$type : null;
         $isConcepts = (bool)$params['is_concepts'];
 
-        return $this->brandSections($params['language'], $brand, $type, $carId, $isConcepts);
+        return $this->brandSections($params['language'], $brand['id'], $brand['catname'], $type, $carId, $isConcepts);
     }
 
-    private function brandSections(string $language, $brand, $type, int $carId, bool $isConcepts)
+    private function brandSections(string $language, int $brandId, string $brandCatname, $type, int $carId, bool $isConcepts)
     {
         // create groups array
-        $sections = $this->carSections($language, $brand, true, $carId);
+        $sections = $this->carSections($language, $brandId, $brandCatname, true, $carId);
 
         $sections = array_merge(
             $sections,
@@ -115,8 +112,8 @@ class BrandNav
                     'name'   => null,
                     'groups' => $this->otherGroups(
                         $language,
-                        $brand['id'],
-                        $brand['catname'],
+                        $brandId,
+                        $brandCatname,
                         true,
                         $type,
                         $isConcepts
@@ -321,12 +318,12 @@ class BrandNav
         return $select;
     }
 
-    private function carSectionGroups(string $language, array $brand, array $section, bool $conceptsSeparatly)
+    private function carSectionGroups(string $language, int $brandId, string $brandCatname, array $section, bool $conceptsSeparatly)
     {
         $rows = [];
         if ($section['car_type_id']) {
             $select = $this->carSectionGroupsSelect(
-                $brand['id'],
+                $brandId,
                 $section['item_type_id'],
                 $section['car_type_id'],
                 null,
@@ -336,7 +333,7 @@ class BrandNav
         } else {
             $rows = [];
             $select = $this->carSectionGroupsSelect(
-                $brand['id'],
+                $brandId,
                 $section['item_type_id'],
                 0,
                 false,
@@ -346,7 +343,7 @@ class BrandNav
                 $rows[$row['item_id']] = $row;
             }
             $select = $this->carSectionGroupsSelect(
-                $brand['id'],
+                $brandId,
                 $section['item_type_id'],
                 0,
                 true,
@@ -357,13 +354,13 @@ class BrandNav
             }
         }
 
-        $aliases = $this->itemAlias->getAliases($brand['id'], $brand['name']);
+        $aliases = $this->itemAlias->getAliases($brandId);
 
         $groups = [];
         foreach ($rows as $brandItemRow) {
             $url = $this->url('catalogue', [
                 'action'        => 'brand-item',
-                'brand_catname' => $brand['catname'],
+                'brand_catname' => $brandCatname,
                 'car_catname'   => $brandItemRow['brand_item_catname']
             ]);
 
@@ -405,11 +402,11 @@ class BrandNav
         return $groups;
     }
 
-    private function carSections(string $language, array $brand, bool $conceptsSeparatly, int $carId)
+    private function carSections(string $language, int $brandId, string $brandCatname, bool $conceptsSeparatly, int $carId)
     {
         $cacheKey = implode('_', [
             'SIDEBAR',
-            $brand['id'],
+            $brandId,
             $language,
             '40'
         ]);
@@ -448,7 +445,7 @@ class BrandNav
                     'car_type_id' => null,
                     'item_type_id' => Item::ENGINE,
                     'url'          => $this->router->assemble([
-                        'brand_catname' => $brand['catname'],
+                        'brand_catname' => $brandCatname,
                         'action'        => 'engines'
                     ], [
                         'name' => 'catalogue'
@@ -460,7 +457,8 @@ class BrandNav
             foreach ($sectionsPresets as $sectionsPreset) {
                 $sectionGroups = $this->carSectionGroups(
                     $language,
-                    $brand,
+                    $brandId,
+                    $brandCatname,
                     $sectionsPreset,
                     $conceptsSeparatly
                 );
