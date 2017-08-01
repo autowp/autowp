@@ -2,7 +2,7 @@
     <?php if ($this->isModer) { ?>
         <span title="Status">
             <?php
-                switch ($this['status']) {
+                switch ($this->status) {
                     case Application\Model\Picture::STATUS_ACCEPTED: ?><i class="fa fa-check text-success"></i><?php break;
                     case Application\Model\Picture::STATUS_INBOX:    ?><i class="fa fa-hourglass text-warning"></i><?php break;
                     case Application\Model\Picture::STATUS_REMOVED:  ?><i class="fa fa-trash text-danger"></i><?php break;

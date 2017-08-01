@@ -803,7 +803,7 @@ class CatalogueController extends AbstractActionController
 
             $currentCar = $this->itemModel->getRow([
                 'language' => $language,
-                'columns'  => ['id', 'name', 'is_concept', 'item_type_id', 'is_group'],
+                'columns'  => ['id', 'name', 'is_concept', 'item_type_id', 'is_group', 'produced', 'produced_exactly'],
                 'parent'   => $parent
             ]);
 
@@ -956,7 +956,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandItemAction()
     {
-        return $this->doBrandItemAction(function (array $currentCar, $breadcrumbs, $brand, $brandItemCatname, $path) {
+        return $this->doBrandItemAction(function ($currentCar, $breadcrumbs, $brand, $brandItemCatname, $path) {
 
             $modification = null;
             $modId = (int)$this->params('mod');
@@ -1412,7 +1412,7 @@ class CatalogueController extends AbstractActionController
 
     private function brandItemGroup(
         $brand,
-        array $currentCar,
+        $currentCar,
         $brandItemCatname,
         $path,
         int $modId,
@@ -1435,7 +1435,7 @@ class CatalogueController extends AbstractActionController
 
         $listCars = [];
 
-        $this->itemModel->getPaginator([
+        $paginator = $this->itemModel->getPaginator([
             'parent' => [
                 'id'        => $currentCarId,
                 'link_type' => $type
@@ -1647,7 +1647,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandItemPicturesAction()
     {
-        return $this->doBrandItemAction(function (array $currentCar, $breadcrumbs, $brand, $brandItemCatname, $path) {
+        return $this->doBrandItemAction(function ($currentCar, $breadcrumbs, $brand, $brandItemCatname, $path) {
 
             $exact = (bool)$this->params('exact');
 
@@ -1753,7 +1753,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandItemPictureAction()
     {
-        return $this->doBrandItemAction(function (array $currentCar, $breadcrumbs) {
+        return $this->doBrandItemAction(function ($currentCar, $breadcrumbs) {
             $exact = (bool)$this->params('exact');
 
             $select = $this->getBrandItemPicturesSelect($currentCar['id'], $exact, false);
@@ -1777,7 +1777,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandItemGalleryAction()
     {
-        return $this->doBrandItemAction(function (array $currentCar) {
+        return $this->doBrandItemAction(function ($currentCar) {
 
             $exact = (bool)$this->params('exact');
             $select = $this->getBrandItemPicturesSelect($currentCar['id'], $exact, false);
@@ -1807,7 +1807,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandItemSpecificationsAction()
     {
-        return $this->doBrandItemAction(function (array $currentCar, $breadcrumbs) {
+        return $this->doBrandItemAction(function ($currentCar, $breadcrumbs) {
 
             $currentCarId = $currentCar['id'];
 

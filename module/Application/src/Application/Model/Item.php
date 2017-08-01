@@ -11,6 +11,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
 
 use Autowp\TextStorage\Service as TextStorage;
+use Zend\Db\Sql\TableIdentifier;
 
 class Item
 {
@@ -846,6 +847,77 @@ class Item
         return $result;
     }
 
+    private function applyChildFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
+    {
+        if (! is_array($options)) {
+            $options = [
+                'id' => $options
+            ];
+        }
+
+        $alias = $prefix.'ip2';
+
+        $columns = [];
+
+        if (isset($options['columns']) && $options['columns']) {
+            $columns = $this->applyColumns($options['columns'], $alias . '.item_id', $language);
+        }
+
+        $select->join([$alias => 'item_parent'], $id . ' = ' . $alias. '.parent_id', $columns);
+
+        if (isset($options['link_catname']) && $options['link_catname']) {
+            $select->where([$alias . '.catname' => $options['link_catname']]);
+        }
+
+        return $this->applyFilters($select, $options, $alias . '.item_id', $alias);
+    }
+
+    private function applyParentFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
+    {
+        if (! is_array($options)) {
+            $options = [
+                'id' => $options
+            ];
+        }
+
+        $alias = $prefix.'ip1';
+
+        $columns = [];
+
+        if (isset($options['columns']) && $options['columns']) {
+            $columns = $this->applyColumns($options['columns'], $alias . '.parent_id', $language);
+        }
+
+        $select->join([$alias => 'item_parent'], $id . ' = ' . $alias . '.item_id', $columns);
+
+        if (isset($options['linked_in_days']) && $options['linked_in_days']) {
+            $select->where([
+                new Sql\Expression(
+                    $alias . '.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)',
+                    [$options['linked_in_days']]
+                )
+            ]);
+        }
+
+        if (isset($options['link_catname']) && $options['link_catname']) {
+            $select->where([$alias . '.catname' => $options['link_catname']]);
+        }
+
+        if (isset($options['link_type']) && $options['link_type']) {
+            $select->where([$alias . '.type' => $options['link_type']]);
+        }
+
+        $group = $this->applyFilters($select, $options, $alias . '.parent_id', $alias);
+
+        /*if ($group) {
+            foreach ($columns as $column) {
+                $group[] = $column;
+            }
+        }*/
+
+        return $group;
+    }
+
     private function applyFilters(Sql\Select $select, array $options, $id, string $prefix): array
     {
         $defaults = [
@@ -970,62 +1042,13 @@ class Item
         }
 
         if ($options['parent']) {
-            $alias = $prefix.'ip1';
-
-            $columns = [];
-
-            if (is_array($options['parent']) && isset($options['parent']['columns']) && $options['parent']['columns']) {
-                $columns = $this->applyColumns($options['parent']['columns'], $alias . '.parent_id', $language);
-            }
-
-            $select->join([$alias => 'item_parent'], $id . ' = ' . $alias . '.item_id', $columns);
-
-            if (is_array($options['parent'])) {
-                if (isset($options['parent']['linked_in_days']) && $options['parent']['linked_in_days']) {
-                    $select->where([
-                        new Sql\Expression(
-                            $alias . '.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)',
-                            [$options['parent']['linked_in_days']]
-                        )
-                    ]);
-                }
-
-                if (isset($options['parent']['link_catname']) && $options['parent']['link_catname']) {
-                    $select->where([$alias . '.catname' => $options['parent']['link_catname']]);
-                }
-
-                if (isset($options['parent']['link_type']) && $options['parent']['link_type']) {
-                    $select->where([$alias . '.type' => $options['parent']['link_type']]);
-                }
-
-                $subGroup = $this->applyFilters($select, $options['parent'], $alias . '.parent_id', $alias);
-                $group = array_merge($group, $subGroup);
-            } else {
-                $select->where([$alias . '.parent_id' => $options['parent']]);
-            }
+            $subGroup = $this->applyParentFilters($select, $options['parent'], $prefix, $language, $id);
+            $group = array_merge($group, $subGroup);
         }
 
         if ($options['child']) {
-            $alias = $prefix.'ip2';
-
-            $columns = [];
-
-            if (is_array($options['child']) && isset($options['child']['columns']) && $options['child']['columns']) {
-                $columns = $this->applyColumns($options['child']['columns'], $alias . '.item_id', $language);
-            }
-
-            $select->join([$alias => 'item_parent'], $id . ' = ' . $alias. '.parent_id', $columns);
-
-            if (is_array($options['child'])) {
-                if (isset($options['child']['link_catname']) && $options['child']['link_catname']) {
-                    $select->where([$alias . '.catname' => $options['child']['link_catname']]);
-                }
-
-                $subGroup = $this->applyFilters($select, $options['child'], $alias . '.item_id', $alias);
-                $group = array_merge($group, $subGroup);
-            } else {
-                $select->where([$alias . '.item_id' => $options['child']]);
-            }
+            $subGroup = $this->applyChildFilters($select, $options['child'], $prefix, $language, $id);
+            $group = array_merge($group, $subGroup);
         }
 
         if ($options['has_specs_of_user']) {
@@ -1165,6 +1188,8 @@ class Item
                     case 'full_name':
                     case 'logo_id':
                     case 'position':
+                    case 'produced':
+                    case 'produced_exactly':
                         $columns[] = $column;
                         break;
                     case 'name':
@@ -1315,6 +1340,20 @@ class Item
         $group = array_unique($group, SORT_STRING);
 
         if ($group) {
+            $joins = $select->getRawState($select::JOINS);
+            foreach ($joins as $join) {
+                if ($join['type'] != $select::JOIN_LEFT) {
+                    foreach ($join['columns'] as $column) {
+                        if (is_array($join['name'])) {
+                            $column = key($join['name']) . '.' . $column;
+                        } else {
+                            $column = $join['name'] . '.' . $column;
+                        }
+                        $group[] = $column;
+                    }
+                }
+            }
+
             $select->group($group);
         }
 

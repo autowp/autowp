@@ -23,12 +23,12 @@ class Car extends AbstractHelper
         return $this;
     }
 
-    public function htmlTitle(array $item)
+    public function htmlTitle($item)
     {
         return $this->itemNameFormatter->formatHtml($item, $this->view->language());
     }
 
-    public function textTitle(array $item)
+    public function textTitle($item)
     {
         return $this->itemNameFormatter->format($item, $this->view->language());
     }

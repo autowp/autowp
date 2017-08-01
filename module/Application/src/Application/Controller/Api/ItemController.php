@@ -323,7 +323,7 @@ class ItemController extends AbstractRestfulController
 
             $select
                 ->join(['ils' => 'item_language'], 'item.id = ils.item_id', [])
-                ->join(['ils2' => 'item_language'], 'INSTR(ils.name, ils2.name)', [])
+                ->join(['ils2' => 'item_language'], new Sql\Expression('INSTR(ils.name, ils2.name)'), [])
                 ->where([
                     'item.item_type_id' => Item::BRAND,
                     'ils2.item_id'      => $data['suggestions_to'],

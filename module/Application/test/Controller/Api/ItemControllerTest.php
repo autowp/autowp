@@ -255,30 +255,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($json);
     }
 
-    public function testVehicleIsNotForbidden()
-    {
-        /**
-         * @var Request $request
-         */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('http://www.autowp.ru/api/item/1', 'GET', [
-            'fields' => 'name_text'
-        ]);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/item/get');
-        $this->assertActionName('item');
-
-        $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertContains('test car', $json['name_text']);
-    }
-
     public function testCreateCarAndAddToBrand()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

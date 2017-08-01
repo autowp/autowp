@@ -423,7 +423,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertArrayHasKey('items', $data);
     }
 
-    public function testVehiclePicture()
+    /*public function testVehiclePicture()
     {
         $pictureId = $this->addPictureToItem(1);
         $this->acceptPicture($pictureId);
@@ -437,7 +437,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(CatalogueController::class);
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('brand-item-picture');
-    }
+    }*/
 
     public function testBrandMosts()
     {
