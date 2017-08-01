@@ -8,6 +8,16 @@ use Application\Model\Brand;
 
 class BuildController extends AbstractActionController
 {
+    /**
+     * @var Brand
+     */
+    private $brand;
+
+    public function __construct(Brand $brand)
+    {
+        $this->brand = $brand;
+    }
+
     public function brandsSpriteAction()
     {
         $dir = 'public_html/img';
@@ -19,8 +29,7 @@ class BuildController extends AbstractActionController
 
         $imageStorage = $this->imageStorage();
 
-        $brandModel = new Brand();
-        $brandModel->createIconsSprite($imageStorage, $destSprite, $destCss);
+        $this->brand->createIconsSprite($imageStorage, $destSprite, $destCss);
 
         return "done\n";
     }

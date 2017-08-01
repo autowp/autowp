@@ -2,11 +2,12 @@
 
 namespace Application\Controller;
 
+use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\Brand as BrandModel;
+use Application\Model\Brand;
 use Application\Model\DbTable;
 use Application\Model\Picture;
 
@@ -17,9 +18,15 @@ class PictureController extends AbstractActionController
      */
     private $pictureTable;
 
-    public function __construct(DbTable\Picture $pictureTable)
+    /**
+     * @var Brand
+     */
+    private $brand;
+
+    public function __construct(DbTable\Picture $pictureTable, Brand $brand)
     {
         $this->pictureTable = $pictureTable;
+        $this->brand = $brand;
     }
 
     private function picture()
@@ -54,7 +61,7 @@ class PictureController extends AbstractActionController
             Picture::STATUS_ACCEPTED
         ];
 
-        if (in_array($picture->status, $galleryStatuses)) {
+        if (in_array($picture['status'], $galleryStatuses)) {
             $picSelect = $this->pictureTable->select(true)
                 ->where('pictures.status IN (?)', $galleryStatuses)
                 ->order($this->catalogue()->picturesOrdering());
@@ -66,10 +73,10 @@ class PictureController extends AbstractActionController
                     'picture_item.item_id = pi2.item_id',
                     null
                 )
-                ->where('pi2.picture_id = ?', $picture->id);
+                ->where('pi2.picture_id = ?', $picture['id']);
         } else {
             $picSelect = $this->pictureTable->select(true)
-                ->where('pictures.id = ?', $picture->id);
+                ->where('pictures.id = ?', $picture['id']);
         }
 
         return $picSelect;
@@ -97,8 +104,6 @@ class PictureController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandModel = new BrandModel();
-
         $url = $this->pic()->href($picture->toArray(), [
             'fallback' => false
         ]);
@@ -109,13 +114,13 @@ class PictureController extends AbstractActionController
 
         $isModer = $this->user()->inheritsRole('moder');
 
-        if ($picture->status == Picture::STATUS_REMOVING) {
+        if ($picture['status'] == Picture::STATUS_REMOVING) {
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();
             }
 
-            if (! $isModer && ($user->id != $picture->owner_id)) {
+            if (! $isModer && ($user['id'] != $picture['owner_id'])) {
                 return $this->notFoundAction();
             }
 
@@ -127,11 +132,11 @@ class PictureController extends AbstractActionController
         $brands = [];
 
         $language = $this->language();
-        $brandList = $brandModel->getList($language, function ($select) use ($picture) {
+        $brandList = $this->brand->getList($language, function (Sql\Select $select) use ($picture) {
             $select
-                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                ->where('picture_item.picture_id = ?', $picture->id)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
+                ->where(['picture_item.picture_id' => $picture['id']])
                 ->group('item.id');
         });
         foreach ($brandList as $brand) {
@@ -147,7 +152,7 @@ class PictureController extends AbstractActionController
 
         return array_replace($data, [
             'galleryUrl' => $this->url()->fromRoute('picture/picture', [
-                'picture_id' => $picture->identity
+                'picture_id' => $picture['identity']
             ], [
                 'query' => [
                     'gallery' => '1'
@@ -166,13 +171,13 @@ class PictureController extends AbstractActionController
 
         $isModer = $this->user()->inheritsRole('moder');
 
-        if ($picture->status == Picture::STATUS_REMOVING) {
+        if ($picture['status'] == Picture::STATUS_REMOVING) {
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();
             }
 
-            if (! $isModer && ($user->id != $picture->owner_id)) {
+            if (! $isModer && ($user['id'] != $picture['owner_id'])) {
                 return $this->notFoundAction();
             }
         }

@@ -1,10 +1,9 @@
 <?php
 
-namespace Application\Validator\ItemParent;
+namespace Application\Validator\Item;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Model\ItemParent;
 
 class CatnameNotExistsFactory implements FactoryInterface
 {
@@ -13,8 +12,8 @@ class CatnameNotExistsFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new CatnameNotExists(array_merge($options, [
-            'itemParent' => $container->get(ItemParent::class)
+        return new CatnameNotExists(array_replace($options, [
+            'item' => $container->get(\Application\Model\Item::class)
         ]));
     }
 }

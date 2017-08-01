@@ -35,7 +35,7 @@ class Comments extends AbstractHelper
         $comments = $this->comments->get($type, $item, $user);
 
         if ($user) {
-            $this->comments->updateTopicView($type, $item, $user->id);
+            $this->comments->updateTopicView($type, $item, $user['id']);
         }
 
         $canAddComments = (bool)$user;

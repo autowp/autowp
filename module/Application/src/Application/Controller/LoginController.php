@@ -102,7 +102,7 @@ class LoginController extends AbstractActionController
 
                 if ($result->isValid()) {
                     if ($values['remember']) {
-                        $token = $this->userRemember->createToken($this->user()->get()->id);
+                        $token = $this->userRemember->createToken($this->user()->get()['id']);
 
                         $this->service->setRememberCookie($token, $this->language());
                     } else {
@@ -292,7 +292,7 @@ class LoginController extends AbstractActionController
             }
 
             $this->userAccount->create($stateRow['service'], $data->getExternalId(), [
-                'user_id'      => $uRow->id,
+                'user_id'      => $uRow['id'],
                 'used_for_reg' => $stateRow['user_id'] ? 0 : 1,
                 'name'         => $data->getName(),
                 'link'         => $data->getProfileUrl(),
@@ -316,8 +316,8 @@ class LoginController extends AbstractActionController
 
                         $imagick->clear();
 
-                        $oldImageId = $uRow->img;
-                        $uRow->img = $newImageId;
+                        $oldImageId = $uRow['img'];
+                        $uRow['img'] = $newImageId;
                         $uRow->save();
                         if ($oldImageId) {
                             $this->imageStorage()->removeImage($oldImageId);
@@ -348,7 +348,7 @@ class LoginController extends AbstractActionController
         ]);
 
         $adapter = new IdAuthAdapter();
-        $adapter->setIdentity($uRow->id);
+        $adapter->setIdentity($uRow['id']);
         $auth = new AuthenticationService();
         $authResult = $auth->authenticate($adapter);
         if ($authResult->isValid()) {

@@ -23,7 +23,8 @@ class TelegramServiceFactory implements FactoryInterface
             $container,
             $container->get(\Application\Model\DbTable\Picture::class),
             $tables->get('telegram_brand'),
-            $tables->get('telegram_chat')
+            $tables->get('telegram_chat'),
+            $tables->get('item')
         );
     }
 }

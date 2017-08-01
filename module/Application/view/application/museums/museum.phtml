@@ -6,8 +6,8 @@
         ],
         'pageId' => 159,
         'args'   => [
-            'MUSEUM_ID'   => $this->museum->id,
-            'MUSEUM_NAME' => $this->museum->name
+            'MUSEUM_ID'   => $this->museum['id'],
+            'MUSEUM_NAME' => $this->museum['name']
         ]
     ]);
 
@@ -50,6 +50,6 @@
 <div id="comments">
     <?=$this->comments([
         'type'    => \Application\Comments::ITEM_TYPE_ID,
-        'item_id' => $this->museum->id
+        'item_id' => $this->museum['id']
     ]) ?>
 </div>

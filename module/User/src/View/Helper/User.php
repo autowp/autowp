@@ -103,14 +103,14 @@ class User extends AbstractHelper
                 return '';
             }
 
-            if ($user->deleted) {
+            if ($user['deleted']) {
                 return '<span class="muted"><i class="fa fa-user"></i> ' .
                            $this->view->escapeHtml($this->view->translate('deleted-user')).
                        '</span>';
             }
 
             $url = $this->view->url('users/user', [
-                'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
             ]);
 
             $classes = ['user'];
@@ -150,8 +150,8 @@ class User extends AbstractHelper
             return '';
         }
 
-        if ($user->img) {
-            $image = $this->view->img($user->img, [
+        if ($user['img']) {
+            $image = $this->view->img($user['img'], [
                 'format' => 'avatar',
             ])->__toString();
 
@@ -160,9 +160,9 @@ class User extends AbstractHelper
             }
         }
 
-        if ($user->e_mail) {
+        if ($user['e_mail']) {
             // gravatar
-            return $this->view->gravatar($user->e_mail, [
+            return $this->view->gravatar($user['e_mail'], [
                 'img_size'    => 70,
                 'default_img' => 'https://www.autowp.ru/_.gif'
             ])->__toString();
@@ -179,8 +179,8 @@ class User extends AbstractHelper
     public function isAllowed($resource = null, $privilege = null)
     {
         return $this->user
-            && $this->user->role
-            && $this->acl->isAllowed($this->user->role, $resource, $privilege);
+            && $this->user['role']
+            && $this->acl->isAllowed($this->user['role'], $resource, $privilege);
     }
 
     /**
@@ -190,15 +190,15 @@ class User extends AbstractHelper
     public function inheritsRole($inherit)
     {
         return $this->user
-            && $this->user->role
+            && $this->user['role']
             && $this->acl->hasRole($inherit)
-            && $this->acl->inheritsRole($this->user->role, $inherit);
+            && $this->acl->inheritsRole($this->user['role'], $inherit);
     }
 
     public function timezone()
     {
-        return $this->user && $this->user->timezone
-            ? $this->user->timezone
+        return $this->user && $this->user['timezone']
+            ? $this->user['timezone']
             : 'UTC';
     }
 

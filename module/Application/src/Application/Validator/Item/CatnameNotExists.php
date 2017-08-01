@@ -4,7 +4,7 @@ namespace Application\Validator\Item;
 
 use Zend\Validator\AbstractValidator;
 
-use Application\Model\DbTable;
+use Application\Model\Item;
 
 class CatnameNotExists extends AbstractValidator
 {
@@ -15,6 +15,18 @@ class CatnameNotExists extends AbstractValidator
     ];
 
     private $exclude;
+
+    /**
+     * @var Item
+     */
+    private $item;
+
+    public function setItem(Item $item)
+    {
+        $this->item = $item;
+
+        return $this;
+    }
 
     public function setExclude($exclude)
     {
@@ -27,11 +39,11 @@ class CatnameNotExists extends AbstractValidator
     {
         $this->setValue($value);
 
-        $table = new DbTable\Item();
-        $row = $table->fetchRow([
-            'catname = ?' => (string)$value,
-            'id <> ?'     => (int)$this->exclude
+        $row = $this->item->getRow([
+            'catname'    => (string)$value,
+            'exclude_id' => (int)$this->exclude
         ]);
+
         if ($row) {
             $this->error(self::EXISTS);
             return false;

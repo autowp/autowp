@@ -2,12 +2,10 @@
 
 namespace Application;
 
-use Zend\ServiceManager\Factory\InvokableFactory;
-
 return [
     'controllers' => [
         'factories' => [
-            Controller\Console\BuildController::class     => InvokableFactory::class,
+            Controller\Console\BuildController::class     => Controller\Console\BuildControllerFactory::class,
             Controller\Console\CatalogueController::class => Controller\Console\Service\CatalogueControllerFactory::class,
             Controller\Console\PicturesController::class  => Controller\Console\Service\PicturesControllerFactory::class,
             Controller\Console\RefererController::class   => Controller\Console\RefererControllerFactory::class,

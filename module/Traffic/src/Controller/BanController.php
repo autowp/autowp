@@ -63,7 +63,7 @@ class BanController extends AbstractActionController
         $this->service->ban(
             $ip,
             $this->params()->fromPost('period') * 3600,
-            $this->user()->get()->id,
+            $this->user()->get()['id'],
             $this->params()->fromPost('reason')
         );
 
@@ -86,24 +86,24 @@ class BanController extends AbstractActionController
         }
 
         $canBan = $this->user()->isAllowed('user', 'ban')
-              && ($this->user()->get()->id != $user->id);
+            && ($this->user()->get()['id'] != $user['id']);
         if (! $canBan) {
             return $this->forbiddenAction();
         }
 
-        if ($user->last_ip === null) {
+        if ($user['last_ip'] === null) {
             return $this->notFoundAction();
         }
 
         $this->service->ban(
-            inet_ntop($user->last_ip),
+            inet_ntop($user['last_ip']),
             $this->params()->fromPost('period') * 3600,
-            $this->user()->get()->id,
+            $this->user()->get()['id'],
             $this->params()->fromPost('reason')
         );
 
         return $this->redirect()->toUrl($this->url()->fromRoute('users/user', [
-            'user_id'  => $user->identity ? $user->identity : 'user' . $user->id,
+            'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id'],
         ]));
     }
 
@@ -121,20 +121,20 @@ class BanController extends AbstractActionController
         }
 
         $canBan = $this->user()->isAllowed('user', 'ban')
-              && ($this->user()->get()->id != $user->id);
+            && ($this->user()->get()['id'] != $user['id']);
 
         if (! $canBan) {
             return $this->forbiddenAction();
         }
 
-        if ($user->last_ip === null) {
+        if ($user['last_ip'] === null) {
             return $this->notFoundAction();
         }
 
-        $this->service->unban(inet_ntop($user->last_ip));
+        $this->service->unban(inet_ntop($user['last_ip']));
 
         return $this->redirect()->toUrl($this->url()->fromRoute('users/user', [
-            'user_id'  => $user->identity ? $user->identity : 'user' . $user->id,
+            'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
         ]));
     }
 }

@@ -13,6 +13,8 @@ class CatalogueFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $options['itemParent'] = $container->get(\Application\Model\ItemParent::class);
+        $tables = $container->get(\Application\Db\TableManager::class);
+        $options['itemTable'] = $tables->get('item');
         return new Catalogue($options);
     }
 }

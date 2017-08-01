@@ -9,6 +9,7 @@ use Autowp\Comments;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
+use Application\Model\Item;
 
 class AboutController extends AbstractActionController
 {
@@ -27,14 +28,21 @@ class AboutController extends AbstractActionController
      */
     private $pictureTable;
 
+    /**
+     * @var Item
+     */
+    private $item;
+
     public function __construct(
         Acl $acl,
         Comments\CommentsService $comments,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        Item $item
     ) {
         $this->acl = $acl;
         $this->comments = $comments;
         $this->pictureTable = $pictureTable;
+        $this->item = $item;
     }
 
     public function indexAction()
@@ -65,7 +73,7 @@ class AboutController extends AbstractActionController
             ]);
 
             foreach ($greenUsers as $greenUser) {
-                $contributors[$greenUser->id] = $greenUser;
+                $contributors[$greenUser['id']] = $greenUser;
             }
         }
 
@@ -74,7 +82,7 @@ class AboutController extends AbstractActionController
         ], 'pictures_total desc', 20);
 
         foreach ($picturesUsers as $greenUser) {
-            $contributors[$greenUser->id] = $greenUser;
+            $contributors[$greenUser['id']] = $greenUser;
         }
 
         ksort($contributors, SORT_NUMERIC);
@@ -88,12 +96,7 @@ class AboutController extends AbstractActionController
         );
         $totalPictures = round($totalPictures, -4);
 
-        $itemTable = new DbTable\Item();
-        $itemTableAdapter = $itemTable->getAdapter();
-        $totalCars = $itemTableAdapter->fetchOne(
-            $itemTableAdapter->select()
-                ->from($itemTable->info('name'), 'count(1)')
-        );
+        $totalCars = $this->item->getCount([]);
         $totalCars = round($totalCars, -3);
 
         $totalComments = $this->comments->getTotalMessagesCount();

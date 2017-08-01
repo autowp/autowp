@@ -89,7 +89,7 @@ class CarsController extends AbstractActionController
 
         $select = new Sql\Select($this->modificationTable->getTable());
         $select->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
-            ->where(['item_parent_cache.item_id' => $car->id])
+            ->where(['item_parent_cache.item_id' => $car['id']])
             ->order('modification.name');
 
         if ($groupId) {
@@ -107,10 +107,10 @@ class CarsController extends AbstractActionController
                     ->join('pictures', 'modification_picture.picture_id = pictures.id', null)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $car->id)
+                    ->where('item_parent_cache.parent_id = ?', $car['id'])
             );
 
-            $isInherited = $mRow['item_id'] != $car->id;
+            $isInherited = $mRow['item_id'] != $car['id'];
             $inheritedFrom = null;
 
             if ($isInherited) {
@@ -213,7 +213,7 @@ class CarsController extends AbstractActionController
                         ->where('pictures.id = ?', (int)$pictureId)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                        ->where('item_parent_cache.parent_id = ?', $car->id)
+                        ->where('item_parent_cache.parent_id = ?', $car['id'])
                 );
 
                 if ($pictureRow) {
@@ -221,12 +221,12 @@ class CarsController extends AbstractActionController
                         $modificationId = (int)$modificationId;
 
                         $mpRow = $this->modificationPicture->select([
-                            'picture_id'      => $pictureRow->id,
+                            'picture_id'      => $pictureRow['id'],
                             'modification_id' => $modificationId
                         ])->current();
                         if (! $mpRow) {
                             $this->modificationPicture->insert([
-                                'picture_id'      => $pictureRow->id,
+                                'picture_id'      => $pictureRow['id'],
                                 'modification_id' => $modificationId
                             ]);
                         }
@@ -238,8 +238,8 @@ class CarsController extends AbstractActionController
                         ->join('modification', 'modification_picture.modification_id = modification.id', [])
                         ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
                         ->where([
-                            'modification_picture.picture_id' => $pictureRow->id,
-                            'item_parent_cache.item_id'       => $car->id
+                            'modification_picture.picture_id' => $pictureRow['id'],
+                            'item_parent_cache.item_id'       => $car['id']
                         ]);
 
                     if ($modificationIds) {
@@ -270,7 +270,7 @@ class CarsController extends AbstractActionController
             $pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car->id)
+                ->where('item_parent_cache.parent_id = ?', $car['id'])
                 ->order('pictures.id')
         );
 
@@ -280,7 +280,7 @@ class CarsController extends AbstractActionController
 
             $select = new Sql\Select($this->modificationPicture->getTable());
             $select->columns(['modification_id'])
-                ->where(['picture_id' => $pictureRow->id]);
+                ->where(['picture_id' => $pictureRow['id']]);
 
             $modificationIds = [];
             foreach ($this->modificationPicture->selectWith($select) as $row) {
@@ -288,7 +288,7 @@ class CarsController extends AbstractActionController
             }
 
             $pictures[] = [
-                'id'              => $pictureRow->id,
+                'id'              => $pictureRow['id'],
                 'name'            => $this->pic()->name($pictureRow, $language),
                 'url'             => $this->pic()->href($pictureRow),
                 'src'             => $imageInfo ? $imageInfo->getSrc() : null,
@@ -306,7 +306,7 @@ class CarsController extends AbstractActionController
             $select->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
                 ->where([
                     'modification.group_id'    => $mgRow['id'],
-                    'item_parent_cache.item_id' => $car->id
+                    'item_parent_cache.item_id' => $car['id']
                 ])
                 ->order('modification.name');
             $mRows = $this->modificationTable->selectWith($select);
@@ -330,7 +330,7 @@ class CarsController extends AbstractActionController
         $select->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
             ->where([
                 'modification.group_id IS NULL',
-                'item_parent_cache.item_id' => $car->id
+                'item_parent_cache.item_id' => $car['id']
             ])
             ->order('modification.name');
         $mRows = $this->modificationTable->selectWith($select);

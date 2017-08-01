@@ -2,16 +2,19 @@
 
 namespace Application\Controller;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
+use Autowp\Votings\Votings;
 
 use Application\Comments;
 use Application\HostManager;
 use Application\Model\DbTable;
+use Application\Model\Item;
 
 use DateTime;
 use Exception;
@@ -42,18 +45,39 @@ class CommentsController extends AbstractRestfulController
      */
     private $pictureTable;
 
+    /**
+     * @var Item
+     */
+    private $item;
+
+    /**
+     * @var Votings
+     */
+    private $votings;
+
+    /**
+     * @var TableGateway
+     */
+    private $articleTable;
+
     public function __construct(
         HostManager $hostManager,
         $form,
         MessageService $message,
         Comments $comments,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        Item $item,
+        Votings $votings,
+        TableGateway $articleTable
     ) {
         $this->hostManager = $hostManager;
         $this->form = $form;
         $this->comments = $comments;
         $this->message = $message;
         $this->pictureTable = $pictureTable;
+        $this->item = $item;
+        $this->votings = $votings;
+        $this->articleTable = $articleTable;
     }
 
     private function canAddComments()
@@ -142,18 +166,15 @@ class CommentsController extends AbstractRestfulController
                     break;
 
                 case \Application\Comments::ITEM_TYPE_ID:
-                    $twinsGroups = new DbTable\Item();
-                    $object = $twinsGroups->find($itemId)->current();
+                    $object = $this->item->getRow(['id' => $itemId]);
                     break;
 
                 case \Application\Comments::VOTINGS_TYPE_ID:
-                    $vTable = new DbTable\Voting();
-                    $object = $vTable->find($itemId)->current();
+                    $object = $this->votings->isVotingExists($itemId);
                     break;
 
                 case \Application\Comments::ARTICLES_TYPE_ID:
-                    $articles = new DbTable\Article();
-                    $object = $articles->find($itemId)->current();
+                    $object = $this->articleTable->select(['id' => $itemId])->current();
                     break;
 
                 default:
@@ -180,7 +201,7 @@ class CommentsController extends AbstractRestfulController
                 'typeId'             => $typeId,
                 'itemId'             => $itemId,
                 'parentId'           => $values['parent_id'] ? $values['parent_id'] : null,
-                'authorId'           => $user->id,
+                'authorId'           => $user['id'],
                 'message'            => $values['message'],
                 'ip'                 => $ip,
                 'moderatorAttention' => $moderatorAttention
@@ -190,7 +211,7 @@ class CommentsController extends AbstractRestfulController
                 throw new Exception("Message add fails");
             }
 
-            $user->last_message_time = new Zend_Db_Expr('NOW()');
+            $user['last_message_time'] = new Zend_Db_Expr('NOW()');
             $user->save();
 
             if ($this->user()->inheritsRole('moder')) {
@@ -203,24 +224,24 @@ class CommentsController extends AbstractRestfulController
 
             if ($values['parent_id']) {
                 $authorId = $this->comments->service()->getMessageAuthorId($values['parent_id']);
-                if ($authorId && ($authorId != $user->id)) {
+                if ($authorId && ($authorId != $user['id'])) {
                     $parentMessageAuthor = $userTable->find($authorId)->current();
-                    if ($parentMessageAuthor && ! $parentMessageAuthor->deleted) {
-                        $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor->language);
+                    if ($parentMessageAuthor && ! $parentMessageAuthor['deleted']) {
+                        $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor['language']);
 
                         $url = $this->comments->getMessageUrl($messageId, true, $uri) . '#msg' . $messageId;
                         $moderUrl = $this->url()->fromRoute('users/user', [
-                            'user_id' => $user->identity ? $user->identity : 'user' . $user->id,
+                            'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id'],
                         ], [
                             'force_canonical' => true,
                             'uri'             => $uri
                         ]);
                         $message = sprintf(
-                            $this->translate('pm/user-%s-replies-to-you-%s', 'default', $parentMessageAuthor->language),
+                            $this->translate('pm/user-%s-replies-to-you-%s', 'default', $parentMessageAuthor['language']),
                             $moderUrl,
                             $url
                         );
-                        $this->message->send(null, $parentMessageAuthor->id, $message);
+                        $this->message->send(null, $parentMessageAuthor['id'], $message);
                     }
                 }
             }
@@ -247,7 +268,7 @@ class CommentsController extends AbstractRestfulController
         $comments = $this->comments->service()->get($type, $item, $user);
 
         if ($user) {
-            $this->comments->service()->updateTopicView($type, $item, $user->id);
+            $this->comments->service()->updateTopicView($type, $item, $user['id']);
         }
 
         $canAddComments = $this->canAddComments();
@@ -282,7 +303,7 @@ class CommentsController extends AbstractRestfulController
 
         $success = $this->comments->service()->queueDeleteMessage(
             $this->params()->fromPost('comment_id'),
-            $this->user()->get()->id
+            $this->user()->get()['id']
         );
 
         return new JsonModel([
@@ -320,7 +341,7 @@ class CommentsController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if ($user->votes_left <= 0) {
+        if ($user['votes_left'] <= 0) {
             return new JsonModel([
                 'ok'    => false,
                 'error' => $this->translate('comments/vote/no-more-votes')
@@ -329,7 +350,7 @@ class CommentsController extends AbstractRestfulController
 
         $result = $this->comments->service()->voteMessage(
             $this->params()->fromPost('id'),
-            $user->id,
+            $user['id'],
             $this->params()->fromPost('vote')
         );
         if (! $result['success']) {
@@ -339,7 +360,7 @@ class CommentsController extends AbstractRestfulController
             ]);
         }
 
-        $user->votes_left = new Zend_Db_Expr('votes_left - 1');
+        $user['votes_left'] = new Zend_Db_Expr('votes_left - 1');
         $user->save();
 
         return new JsonModel([

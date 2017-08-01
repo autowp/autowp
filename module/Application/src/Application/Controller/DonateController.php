@@ -5,9 +5,8 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\Brand as BrandModel;
+use Application\Model\Brand;
 use Application\Model\CarOfDay;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 
@@ -30,16 +29,23 @@ class DonateController extends AbstractActionController
      */
     private $itemParent;
 
+    /**
+     * @var Brand
+     */
+    private $brand;
+
     public function __construct(
         CarOfDay $carOfDay,
         array $yandexConfig,
         Item $itemModel,
-        ItemParent $itemParent
+        ItemParent $itemParent,
+        Brand $brand
     ) {
         $this->carOfDay = $carOfDay;
         $this->yandexConfig = $yandexConfig;
         $this->itemModel = $itemModel;
         $this->itemParent = $itemParent;
+        $this->brand = $brand;
     }
 
     public function indexAction()
@@ -72,20 +78,18 @@ class DonateController extends AbstractActionController
 
         $itemId = $this->carOfDay->isComplies($itemId) ? $itemId : null;
 
-        $itemTable = new DbTable\Item();
-
         $item = null;
         if ($itemId) {
-            $item = $itemTable->fetchRow([
-                'id = ?'           => $itemId,
-                'item_type_id = ?' => Item::VEHICLE
+            $item = $this->itemModel->getRow([
+                'id'           => $itemId,
+                'item_type_id' => Item::VEHICLE
             ]);
         }
 
         $userId = null;
         $user = $this->user()->get();
         if ($user) {
-            $userId = $user->id;
+            $userId = $user['id'];
         }
 
         $anonymous = (bool)$this->params('anonymous');
@@ -115,13 +119,11 @@ class DonateController extends AbstractActionController
 
     public function vodSelectItemAction()
     {
-        $brandModel = new BrandModel();
-
         $language = $this->language();
 
-        $brand = $brandModel->getBrandById($this->params('brand_id'), $language);
+        $brand = $this->brand->getBrandById($this->params('brand_id'), $language);
         if (! $brand) {
-            $rows = $brandModel->getList($language, function () {
+            $rows = $this->brand->getList($language, function () {
             });
 
             return [
@@ -130,76 +132,27 @@ class DonateController extends AbstractActionController
             ];
         }
 
-        $itemTable = new DbTable\Item();
+        $haveConcepts = (bool)$this->itemModel->getRow([
+            'ancestor'   => $brand['id'],
+            'is_concept' => true
+        ]);
 
-        $haveConcepts = (bool)$itemTable->fetchRow(
-            $itemTable->select(true)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $brand['id'])
-                ->where('item.is_concept')
-        );
+        $rows = $this->itemModel->getRows([
+            'language' => $this->language(),
+            'columns'  => ['id', 'name', 'is_group'],
+            'order'    => [
+                'name',
+                'item.begin_year',
+                'item.end_year',
+                'item.begin_model_year',
+                'item.end_model_year'
+            ],
+            'item_type_id' => Item::VEHICLE,
+            'is_concept'   => false,
+            'parent'       => $brand['id']
+        ]);
 
-        $db = $itemTable->getAdapter();
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('item', [
-                    'item.id',
-                    'name' => 'if(item_language.name, item_language.name, item.name)',
-                    'item.begin_model_year', 'item.end_model_year',
-                    'spec' => 'spec.short_name',
-                    'spec_full' => 'spec.name',
-                    'item.body', 'item.today',
-                    'item.begin_year', 'item.end_year',
-                    'item.is_group'
-                ])
-                ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
-                ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->join('item_parent', 'item.id = item_parent.item_id', null)
-                ->where('item_parent.parent_id = ?', $brand['id'])
-                ->where('NOT item.is_concept')
-                ->where('item.item_type_id = ?', Item::VEHICLE)
-                ->order([
-                    'item.name',
-                    'item.begin_year',
-                    'item.end_year',
-                    'item.begin_model_year',
-                    'item.end_model_year'
-                ])
-                ->bind([
-                    'lang' => $this->language()
-                ])
-        );
         $vehicles = $this->prepareVehicles($rows);
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('item', [
-                    'item.id',
-                    'name' => 'if(item_language.name, item_language.name, item.name)',
-                    'item.begin_model_year', 'item.end_model_year',
-                    'spec' => 'spec.short_name',
-                    'spec_full' => 'spec.name',
-                    'item.body', 'item.today',
-                    'item.begin_year', 'item.end_year',
-                    'item.is_group'
-                ])
-                ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
-                ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->join('item_parent', 'item.id = item_parent.item_id', null)
-                ->where('item_parent.parent_id = ?', $brand['id'])
-                ->where('item.item_type_id = ?', Item::ENGINE)
-                ->order([
-                    'item.name',
-                    'item.begin_year',
-                    'item.end_year',
-                    'item.begin_model_year',
-                    'item.end_model_year'
-                ])
-                ->bind([
-                    'lang' => $this->language()
-                ])
-        );
 
         return [
             'brand'        => $brand,
@@ -245,36 +198,17 @@ class DonateController extends AbstractActionController
 
     public function vehicleChildsAction()
     {
-        $itemTable = new DbTable\Item();
-
-        $car = $itemTable->find($this->params('item_id'))->current();
+        $car = $this->itemModel->getRow(['id' => (int)$this->params('item_id')]);
         if (! $car) {
             return $this->notfoundAction();
         }
 
-        $db = $itemTable->getAdapter();
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('item', [
-                    'item.id',
-                    'name' => 'if(item_language.name, item_language.name, item.name)',
-                    'item.begin_model_year', 'item.end_model_year',
-                    'spec' => 'spec.short_name',
-                    'spec_full' => 'spec.name',
-                    'item.body', 'item.today',
-                    'item.begin_year', 'item.end_year',
-                    'item.is_group'
-                ])
-                ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
-                ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->join('item_parent', 'item.id = item_parent.item_id', 'type')
-                ->where('item_parent.parent_id = ?', $car->id)
-                ->order(['item_parent.type', 'item.name', 'item.begin_year', 'item.end_year'])
-                ->bind([
-                    'lang' => $this->language()
-                ])
-        );
+        $rows = $this->itemModel->getRows([
+            'language' => $this->language(),
+            'columns'  => ['id', 'name', 'is_group'],
+            'order'    => ['ip1.type', 'name', 'item.begin_year', 'item.end_year'],
+            'parent'   => $car['id']
+        ]);
 
         $viewModel = new ViewModel([
             'cars' => $this->prepareItemParentRows($rows)
@@ -316,40 +250,21 @@ class DonateController extends AbstractActionController
 
     public function conceptsAction()
     {
-        $itemTable = new DbTable\Item();
-        $brand = $itemTable->fetchRow([
-            'item_type_id = ?' => Item::BRAND,
-            'id = ?'           => (int)$this->params('brand_id')
+        $brand = $this->itemModel->getRow([
+            'item_type_id' => Item::BRAND,
+            'id'           => (int)$this->params('brand_id')
         ]);
         if (! $brand) {
             return $this->notfoundAction();
         }
 
-        $db = $itemTable->getAdapter();
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('item', [
-                    'item.id',
-                    'name' => 'if(item_language.name, item_language.name, item.name)',
-                    'item.begin_model_year', 'item.end_model_year',
-                    'spec' => 'spec.short_name',
-                    'spec_full' => 'spec.name',
-                    'item.body', 'item.today',
-                    'item.begin_year', 'item.end_year',
-                    'item.is_group'
-                ])
-                ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
-                ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $brand->id)
-                ->where('item.is_concept')
-                ->order(['item.name', 'item.begin_year', 'item.end_year'])
-                ->group('item.id')
-                ->bind([
-                    'lang' => $this->language()
-                ])
-        );
+        $rows = $this->itemModel->getRows([
+            'language'   => $this->language(),
+            'columns'    => ['id', 'name', 'is_group'],
+            'is_concept' => true,
+            'ancestor'   => $brand['id'],
+            'order'      => ['name', 'item.begin_year', 'item.end_year']
+        ]);
 
         $concepts = $this->prepareVehicles($rows);
 

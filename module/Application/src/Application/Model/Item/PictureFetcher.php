@@ -20,7 +20,7 @@ abstract class PictureFetcher
      */
     protected $pictureTable;
 
-    abstract public function fetch(array $item, array $options = []);
+    abstract public function fetch($item, array $options = []);
 
     public function __construct(array $options)
     {

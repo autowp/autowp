@@ -6,8 +6,8 @@
         ],
         'pageId' => 181,
         'args'   => [
-            'FACTORY_ID'   => $this->factory->id,
-            'FACTORY_NAME' => $this->factory->name
+            'FACTORY_ID'   => $this->factory['id'],
+            'FACTORY_NAME' => $this->factory['name']
         ]
     ]);
 
@@ -25,18 +25,18 @@
 <ul class="nav nav-pills" style="margin-bottom:10px">
     <li class="active">
         <?=$this->htmlA($this->url('factories/factory', [
-            'id'   => $this->factory->id,
+            'id'   => $this->factory['id'],
             'page' => null
-        ]), $this->factory->name) ?>
+        ]), $this->factory['name']) ?>
     </li>
     <li>
         <?=$this->htmlA($this->url('factories/factory-cars', [
-            'id' => $this->factory->id,
+            'id' => $this->factory['id'],
         ]), $this->translate('factories/factory-items')) ?>
     </li>
     <?php if ($this->canEdit) { ?>
         <li>
-            <?=$this->htmlA('/ng/moder/items/item/' . $this->factory->id, '<i class="fa fa-cog"></i> ' . $this->escapeHtml($this->translate('moder/edit-object')), false) ?>
+            <?=$this->htmlA('/ng/moder/items/item/' . $this->factory['id'], '<i class="fa fa-cog"></i> ' . $this->escapeHtml($this->translate('moder/edit-object')), false) ?>
         </li>
     <?php } ?>
 </ul>
@@ -79,6 +79,6 @@
         </div>
     <?php } ?>
     <p><?=$this->htmlA($this->url('factories/factory-cars', [
-        'id' => $this->factory->id
+        'id' => $this->factory['id']
     ]), $this->translate('carlist/details'))?></p>
 <?php } ?>

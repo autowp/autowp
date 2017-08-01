@@ -16,7 +16,7 @@
 <ul class="nav nav-pills" style="margin-bottom: 20px">
     <?php if ($this->user()->inheritsRole('cars-moder')) { ?>
         <li>
-            <a href="/ng/moder/items/item/<?=$this->car->id?>">
+            <a href="/ng/moder/items/item/<?=$this->car['id']?>">
                 <i class="fa fa-cog"></i>
                 <?=$this->escapeHtml($this->translate('moder/edit-object'))?>
                 <?=$this->car()->htmlTitle($this->nameData)?>
@@ -32,7 +32,7 @@
 </ul>
 
 
-<?php if ($this->user()->get()->specs_weight < 1) { ?>
+<?php if ($this->user()->get()['specs_weight'] < 1) { ?>
     <div class="alert alert-danger">
         <?=$this->markdown($this->translate('specifications-editor/errors-alert'))?>
     </div>
@@ -63,13 +63,13 @@
     <div class="tab-pane<?=$this->tabs['info']['active'] ? ' active' : ''?>" id="info">
         <?=$this->markdown($this->translate('specifications-editor/description'))?>
     </div>
-    <?php if ($this->car->item_type_id == Application\Model\Item::VEHICLE) { ?>
+    <?php if ($this->car['item_type_id']== Application\Model\Item::VEHICLE) { ?>
         <div class="tab-pane<?=$this->tabs['engine']['active'] ? ' active' : ''?>" id="engine">
             <h2><?=$this->escapeHtml($this->translate('specifications-editor/engine'))?></h2>
 
             <?php if ($this->user()->isAllowed('specifications', 'edit-engine')) { ?>
                 <?php if ($this->engine) { ?>
-                    <p><?=$this->htmlA('/ng/moder/items/item/' . $this->engine->id, $this->car()->textTitle($this->engineNameData))?></p>
+                    <p><?=$this->htmlA('/ng/moder/items/item/' . $this->engine['id'], $this->car()->textTitle($this->engineNameData))?></p>
                     <?php if ($this->engineInherited) { ?>
                         <?php foreach ($this->engineInheritedFrom as $car) { ?>
                             <h6><em>
@@ -80,20 +80,20 @@
                     <?php } ?>
                     <form id="select-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                         'action'  => 'select-car-engine',
-                        'item_id' => $this->car->id
+                        'item_id' => $this->car['id']
                     ], [], true))?>">
                         <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('specifications-editor/engine/select-another'))?>" class="btn btn-primary" />
                     </form>
                     <form id="select-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                         'action'  => 'cancel-car-engine',
-                        'item_id' => $this->car->id
+                        'item_id' => $this->car['id']
                     ], [], true))?>">
                         <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('specifications-editor/engine/cancel'))?>" class="btn btn-warning" />
                     </form>
                     <?php if (!$this->engineInherited) { ?>
                         <form id="inherit-car-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                             'action'  => 'inherit-car-engine',
-                            'item_id' => $this->car->id
+                            'item_id' => $this->car['id']
                         ], [], true))?>">
                             <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/inherit'))?>" class="btn btn-warning" />
                         </form>
@@ -102,21 +102,21 @@
                     <p><?=$this->escapeHtml($this->translate('specifications-editor/engine/not-selected'))?></p>
                     <form id="select-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                         'action'  => 'select-car-engine',
-                        'item_id' => $this->car->id
+                        'item_id' => $this->car['id']
                     ], [], true))?>">
                         <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/select'))?>" class="btn btn-primary" />
                     </form>
                     <?php if (!$this->engineInherited) { ?>
                         <form id="inherit-car-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                             'action'  => 'inherit-car-engine',
-                            'item_id' => $this->car->id
+                            'item_id' => $this->car['id']
                         ], [], true))?>">
                             <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/inherit'))?>" class="btn btn-warning" />
                         </form>
                     <?php } else { ?>
                         <form id="inherit-car-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                             'action'  => 'cancel-car-engine',
-                            'item_id' => $this->car->id
+                            'item_id' => $this->car['id']
                         ], [], true))?>">
                             <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/dont-inherit'))?>" class="btn btn-warning" />
                         </form>
@@ -124,7 +124,7 @@
                 <?php } ?>
             <?php } else { ?>
                 <?php if ($this->engine) { ?>
-                    <p><?=$this->escapeHtml($this->engine->name)?></p>
+                    <p><?=$this->escapeHtml($this->engine['name'])?></p>
                     <?php if ($this->engineInherited) { ?>
                         <?php foreach ($this->engineInheritedFrom as $car) { ?>
                             <h6><em>Inherited from <?=$this->escapeHtml($car['name'])?></em></h6>
@@ -147,7 +147,7 @@
             <p><?=$this->htmlA($this->url('cars/params', [
                 'action'       => 'specs-admin',
                 'item_type_id' => 1,
-                'item_id'      => $this->car->id
+                'item_id'      => $this->car['id']
             ], [], true), 'Admin')?></p>
             <form action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                 'action' => 'refresh-inheritance'

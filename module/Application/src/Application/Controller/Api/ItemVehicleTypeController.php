@@ -8,7 +8,6 @@ use Zend\View\Model\JsonModel;
 
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\VehicleType;
 
@@ -19,10 +18,17 @@ class ItemVehicleTypeController extends AbstractRestfulController
      */
     private $vehicleType;
 
+    /**
+     * @var Item
+     */
+    private $item;
+
     public function __construct(
-        VehicleType $vehicleType
+        VehicleType $vehicleType,
+        Item $item
     ) {
         $this->vehicleType = $vehicleType;
+        $this->item = $item;
     }
 
     public function indexAction()
@@ -104,10 +110,12 @@ class ItemVehicleTypeController extends AbstractRestfulController
         $vehicleTypeId = (int)$this->params('vehicle_type_id');
         $itemId        = (int)$this->params('item_id');
 
-        $itemTable = new DbTable\Item();
-        $itemRow = $itemTable->find($itemId)->current();
+        $itemRow = $this->item->getRow([
+            'id'           => $itemId,
+            'item_type_id' => [Item::VEHICLE, Item::TWINS]
+        ]);
 
-        if (! in_array($itemRow['item_type_id'], [Item::VEHICLE, Item::TWINS])) {
+        if (! $itemRow) {
             return $this->notFoundAction();
         }
 

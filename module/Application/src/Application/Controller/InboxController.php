@@ -2,10 +2,11 @@
 
 namespace Application\Controller;
 
+use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Service\DayPictures;
-use Application\Model\Brand as BrandModel;
+use Application\Model\Brand;
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Picture;
@@ -20,31 +21,36 @@ class InboxController extends AbstractActionController
      */
     private $pictureTable;
 
-    public function __construct(DbTable\Picture $pictureTable)
+    /**
+     * @var Brand
+     */
+    private $brand;
+
+    public function __construct(DbTable\Picture $pictureTable, Brand $brand)
     {
         $this->pictureTable = $pictureTable;
+        $this->brand = $brand;
     }
 
     private function getBrandControl($brand = null)
     {
-        $brandModel = new BrandModel();
         $language = $this->language();
 
-        $brands = $brandModel->getList($language, function ($select) use ($language) {
-            $db = $select->getAdapter();
-            $select->where(
-                'item.id IN (?)',
-                $db->select()
-                    ->from('item', 'id')
-                    ->where('item.item_type_id = ?', Item::BRAND)
-                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                    ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                    ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                    ->where('pictures.status = ?', Picture::STATUS_INBOX)
-                    ->bind([
-                        'language' => $language
-                    ])
-            );
+        $brands = $this->brand->getList($language, function (Sql\Select $select) {
+
+            $subSelect = new Sql\Select('item');
+            $subSelect->columns(['id'])
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
+                ->join('pictures', 'picture_item.picture_id = pictures.id', [])
+                ->where([
+                    'item.item_type_id' => Item::BRAND,
+                    'pictures.status'   => Picture::STATUS_INBOX
+                ]);
+
+            $select->where([
+                new Sql\Predicate\In('item.id', $subSelect)
+            ]);
         });
 
         $url = $this->url()->fromRoute('inbox', [
@@ -78,10 +84,9 @@ class InboxController extends AbstractActionController
 
     public function indexAction()
     {
-        $brandModel = new BrandModel();
         $language = $this->language();
 
-        $brand = $brandModel->getBrandByCatname($this->params('brand'), $language);
+        $brand = $this->brand->getBrandByCatname((string)$this->params('brand'), $language);
 
         $select = $this->pictureTable->select(true)
             ->where('pictures.status = ?', Picture::STATUS_INBOX);

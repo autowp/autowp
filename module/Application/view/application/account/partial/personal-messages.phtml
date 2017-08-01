@@ -9,9 +9,9 @@
                 <?php } ?>
             </div>
             <div class="photo">
-                <?php if ($message['author'] && !$message['author']->deleted) { ?>
+                <?php if ($message['author'] && !$message['author']['deleted']) { ?>
                     <?=$this->htmlA($this->url('users/user', [
-                        'user_id' => $message['author']->identity ? $message['author']->identity : 'user' . $message['author']->id
+                        'user_id' => $message['author']['identity'] ? $message['author']['identity'] : 'user' . $message['author']['id']
                     ]), $this->user($message['author'])->avatar(), false)?>
                 <?php } ?>
             </div>
@@ -36,13 +36,13 @@
                         <?=$this->htmlA([
                             'href'         => '#',
                             'data-trigger' => 'show-pm-dialog',
-                            'data-user-id' => $message['author']->id
+                            'data-user-id' => $message['author']['id']
                         ], $this->translate('account/personal-message/reply')) ?>
                         &nbsp;
                         <?php if ($message['allMessagesLink']) { ?>
                             <i class="fa fa-comments-o"></i>
                             <?=$this->htmlA($this->url('account/personal-messages/user', [
-                                'user_id' => $message['author']->id
+                                'user_id' => $message['author']['id']
                             ]), $this->translate('account/personal-message/entire-dialog')) ?>
                             <small>(<?=$message['dialogCount']?>)</small>
                             &nbsp;

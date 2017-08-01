@@ -24,7 +24,8 @@ class ItemLanguageControllerFactory implements FactoryInterface
             $container->get(\Application\HostManager::class),
             $filters->get('api_item_language_put'),
             $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Application\Model\UserItemSubscribe::class)
+            $container->get(\Application\Model\UserItemSubscribe::class),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

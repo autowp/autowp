@@ -284,11 +284,20 @@ class VehicleType
         ])->current();
     }
 
-    public function getDescendantsAndSelfIds(int $parentId): array
+    public function getDescendantsAndSelfIds($parentId): array
     {
         $select = new Sql\Select($this->vehicleTypeParentTable->getTable());
-        $select->columns(['id'])
-            ->where(['parent_id' => $parentId]);
+        $select->columns(['id']);
+
+        if (is_array($parentId)) {
+            if (count($parentId) <= 0) {
+                return [];
+            }
+
+            $select->where([new Sql\Predicate\In('parent_id', $parentId)]);
+        } else {
+            $select->where(['parent_id' => $parentId]);
+        }
 
         $result = [];
         foreach ($this->vehicleTypeParentTable->selectWith($select) as $row) {

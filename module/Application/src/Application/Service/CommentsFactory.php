@@ -20,7 +20,8 @@ class CommentsFactory implements FactoryInterface
             $container->get(\Autowp\Message\MessageService::class),
             $container->get('MvcTranslator'),
             $container->get(\Application\Model\DbTable\Picture::class),
-            $tables->get('articles')
+            $tables->get('articles'),
+            $tables->get('item')
         );
     }
 }

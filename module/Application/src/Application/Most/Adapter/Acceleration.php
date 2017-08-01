@@ -2,12 +2,9 @@
 
 namespace Application\Most\Adapter;
 
-use Application\Model\DbTable\Attr;
+use Zend\Db\Sql;
 
-use Zend_Db_Expr;
-use Zend_Db_Select;
-use Zend_Db_Table;
-use Zend_Db_Table_Select;
+use Application\Model\DbTable\Attr;
 
 class Acceleration extends AbstractAdapter
 {
@@ -30,7 +27,7 @@ class Acceleration extends AbstractAdapter
         $this->order = $value;
     }
 
-    public function getCars(Zend_Db_Table_Select $select, $language)
+    public function getCars(Sql\Select $select, $language)
     {
         $axises = [
             [
@@ -43,23 +40,25 @@ class Acceleration extends AbstractAdapter
             ]
         ];
 
-        $wheres = implode($select->getPart(Zend_Db_Select::WHERE));
-        $joins = $select->getPart(Zend_Db_Select::FROM);
+
+
+        $wheres = $select->getRawState($select::WHERE);
+        $joins = $select->getRawState($select::JOINS)->getJoins();
         unset($joins['cars']);
 
         $limit = $this->most->getCarsCount();
 
-        $axisBaseSelect = $axisSelect = $select->getAdapter()->select()
-            ->from('item', []);
+        $axisBaseSelect = new Sql\Select('item');
+        $axisBaseSelect->columns([]);
         if ($wheres) {
-            $axisSelect->where($wheres);
+            $axisBaseSelect->where($wheres);
         }
         foreach ($joins as $join) {
-            if ($join['joinType'] == Zend_Db_Select::INNER_JOIN) {
-                $axisSelect->join($join['tableName'], $join['joinCondition'], null, $join['schema']);
+            if ($join['type'] == Sql\Join::JOIN_INNER) {
+                $axisBaseSelect->join($join['name'], $join['on'], $join['columns']);
             }
         }
-        $axisSelect->reset(Zend_Db_Table::COLUMNS);
+        $axisBaseSelect->reset($select::COLUMNS);
 
         $specService = $this->most->getSpecs();
 
@@ -71,13 +70,15 @@ class Acceleration extends AbstractAdapter
 
             $attrValuesTable = $specService->getValueDataTable($attr['type_id'])->getTable();
 
-            $valueColumn = $axis['q'] != 1 ? new Zend_Db_Expr('axis.value / ' . $axis['q']) : 'axis.value';
+            $valueColumn = $axis['q'] != 1 ? new Sql\Expression('axis.value / ?', [$axis['q']]) : 'axis.value';
 
             $axisSelect
                 ->columns(['item_id' => 'item.id', 'size_value' => $valueColumn])
-                ->join(['axis' => $attrValuesTable], 'item.id = axis.item_id', null)
-                ->where('axis.attribute_id = ?', $attr['id'])
-                ->where('axis.value > 0')
+                ->join(['axis' => $attrValuesTable], 'item.id = axis.item_id', [])
+                ->where([
+                    'axis.attribute_id' => $attr['id'],
+                    'axis.value > 0'
+                ])
                 ->order('size_value ' . $this->order)
                 ->limit($limit);
 
@@ -86,9 +87,9 @@ class Acceleration extends AbstractAdapter
 
         $select
             ->join(
-                ['tbl' => new Zend_Db_Expr('((' . $selects[0] . ') UNION (' . $selects[1] . '))')],
+                ['tbl' => new Sql\Expression('((' . $selects[0] . ') UNION (' . $selects[1] . '))')],
                 'item.id = tbl.item_id',
-                null
+                []
             )
             ->group('item.id');
 
@@ -99,11 +100,9 @@ class Acceleration extends AbstractAdapter
             $select->order('max(tbl.size_value) ' . $this->order);
         }
 
-        $cars = $select->getTable()->fetchAll($select);
-
         $result = [];
 
-        foreach ($cars as $car) {
+        foreach ($this->itemTable->selectWith($select) as $car) {
             $result[] = [
                 'car'       => $car,
                 'valueHtml' => $this->getText($car, $language),
@@ -134,7 +133,7 @@ class Acceleration extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         foreach ($axises as $axis) {
-            $value = $specService->getActualValueText($axis['attr']->id, $car->id, $language);
+            $value = $specService->getActualValueText($axis['attr']['id'], $car['id'], $language);
 
             if ($value > 0) {
                 $text[] = $value . ' <span class="unit">' . $axis['unit'] . '</span>';

@@ -5,6 +5,7 @@ namespace Application\Controller\Api;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
+use Zend\InputFilter\InputFilterPluginManager;
 use Zend\Hydrator\Strategy\StrategyInterface;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
@@ -15,7 +16,6 @@ use ZF\ApiProblem\ApiProblemResponse;
 use geoPHP;
 use Point;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 use Autowp\ZFComponents\Filter\FilenameSafe;
@@ -25,23 +25,15 @@ use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Hydrator\Api\Strategy\Image;
 use Application\ItemNameFormatter;
-use Application\Model\Brand as BrandModel;
+use Application\Model\Brand;
 use Application\Model\Item;
 use Application\Model\ItemParent;
-use Application\Model\DbTable;
 use Application\Model\UserItemSubscribe;
-use Application\Service\SpecificationsService;
-
-use Zend_Db_Expr;
 use Application\Model\VehicleType;
+use Application\Service\SpecificationsService;
 
 class ItemController extends AbstractRestfulController
 {
-    /**
-     * @var DbTable\Item
-     */
-    private $table;
-
     /**
      * @var RestHydrator
      */
@@ -107,6 +99,11 @@ class ItemController extends AbstractRestfulController
      */
     private $vehicleType;
 
+    /**
+     * @var InputFilterPluginManager
+     */
+    private $inputFilterManager;
+
     public function __construct(
         RestHydrator $hydrator,
         Image $logoHydrator,
@@ -120,7 +117,8 @@ class ItemController extends AbstractRestfulController
         UserItemSubscribe $userItemSubscribe,
         TableGateway $specTable,
         Item $itemModel,
-        VehicleType $vehicleType
+        VehicleType $vehicleType,
+        InputFilterPluginManager $inputFilterManager
     ) {
         $this->hydrator = $hydrator;
         $this->logoHydrator = $logoHydrator;
@@ -135,8 +133,7 @@ class ItemController extends AbstractRestfulController
         $this->specTable = $specTable;
         $this->itemModel = $itemModel;
         $this->vehicleType = $vehicleType;
-
-        $this->table = new DbTable\Item();
+        $this->inputFilterManager = $inputFilterManager;
     }
 
     public function indexAction()
@@ -155,8 +152,7 @@ class ItemController extends AbstractRestfulController
 
         $data = $this->listInputFilter->getValues();
 
-        $select = $this->table->getAdapter()->select()
-            ->from('item');
+        $select = new Sql\Select($this->itemModel->getTable()->getTable());
 
         $group = false;
         $itemLanguageJoined = false;
@@ -164,9 +160,9 @@ class ItemController extends AbstractRestfulController
         if ($data['last_item']) {
             $namespace = new \Zend\Session\Container('Moder_Car');
             if (isset($namespace->lastCarId)) {
-                $select->where('item.id = ?', (int)$namespace->lastCarId);
+                $select->where(['item.id' => (int)$namespace->lastCarId]);
             } else {
-                $select->where(new Zend_Db_Expr('0'));
+                $select->where([new Sql\Expression('0')]);
             }
         }
 
@@ -180,8 +176,8 @@ class ItemController extends AbstractRestfulController
             case 'childs_count':
                 $group = true;
                 $select
-                    ->columns(['childs_count' => new Zend_Db_Expr('count(item_parent.item_id)')])
-                    ->join('item_parent', 'item_parent.parent_id = item.id', null)
+                    ->columns(['childs_count' => new Sql\Expression('count(item_parent.item_id)')])
+                    ->join('item_parent', 'item_parent.parent_id = item.id', [])
                     ->order('childs_count desc');
                 break;
             case 'age':
@@ -192,7 +188,7 @@ class ItemController extends AbstractRestfulController
                     $itemLanguageJoined = true;
                     $select->join('item_language', 'item.id = item_language.item_id', []);
                 }
-                $select->order(['length(item_language.name)', 'item_language.name']);
+                $select->order([new Sql\Expression('length(item_language.name)'), 'item_language.name']);
                 $group = true;
                 break;
             default:
@@ -211,41 +207,41 @@ class ItemController extends AbstractRestfulController
                 $itemLanguageJoined = true;
                 $select->join('item_language', 'item.id = item_language.item_id', []);
             }
-            $select->where('item_language.name like ?', $data['name']);
+            $select->where(['item_language.name like ?' => $data['name']]);
 
             $group = true;
         }
 
         if ($data['name_exclude']) {
             $select
-                ->join(['ile' => 'item_language'], 'item.id = ile.item_id', null)
-                ->where('ile.name not like ?', $data['name_exclude']);
+                ->join(['ile' => 'item_language'], 'item.id = ile.item_id', [])
+                ->where(['ile.name not like ?' => $data['name_exclude']]);
         }
 
         $id = (int)$this->params()->fromQuery('id');
         if ($id) {
-            $select->where('item.id = ?', $id);
+            $select->where(['item.id' => $id]);
         }
 
         if ($data['descendant']) {
             $group = true;
-            $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', $data['descendant']);
+            $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->where(['item_parent_cache.item_id' => $data['descendant']]);
         }
 
         if ($data['type_id']) {
-            $select->where('item.item_type_id = ?', $data['type_id']);
+            $select->where(['item.item_type_id' => $data['type_id']]);
         }
 
         if ($data['vehicle_type_id']) {
             if ($data['vehicle_type_id'] == 'empty') {
                 $select
-                    ->joinLeft('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
-                    ->where('vehicle_vehicle_type.vehicle_id is null');
+                    ->joinLeft('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
+                    ->where(['vehicle_vehicle_type.vehicle_id is null']);
             } else {
                 $select
-                    ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
-                    ->where('vehicle_vehicle_type.vehicle_type_id = ?', $data['vehicle_type_id']);
+                    ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
+                    ->where(['vehicle_vehicle_type.vehicle_type_id' => $data['vehicle_type_id']]);
             }
         }
 
@@ -255,50 +251,53 @@ class ItemController extends AbstractRestfulController
                 ->join(
                     ['cpc_childs' => 'item_parent_cache'],
                     'item.id = cpc_childs.parent_id',
-                    null
+                    []
                 )
                 ->join(
                     ['vvt_child' => 'vehicle_vehicle_type'],
                     'cpc_childs.item_id = vvt_child.vehicle_id',
-                    null
+                    []
                 )
-                ->join('car_types_parents', 'vvt_child.vehicle_type_id = car_types_parents.id', null)
-                ->where('car_types_parents.parent_id = ?', $data['vehicle_childs_type_id']);
+                ->join('car_types_parents', 'vvt_child.vehicle_type_id = car_types_parents.id', [])
+                ->where(['car_types_parents.parent_id' => $data['vehicle_childs_type_id']]);
         }
 
         if ($data['spec']) {
-            $select->where('item.spec_id = ?', $data['spec']);
+            $select->where(['item.spec_id' => $data['spec']]);
         }
 
         if ($data['ancestor_id']) {
             $select
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $data['parent_id'])
-                ->where('item_parent_cache.item_id <> item_parent_cache.parent_id');
+                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
+                ->where([
+                    'item_parent_cache.parent_id' => $data['parent_id'],
+                    'item_parent_cache.item_id <> item_parent_cache.parent_id'
+                ]);
         }
 
         if ($data['from_year']) {
-            $select->where('item.begin_year = ?', $data['from_year']);
+            $select->where(['item.begin_year' => $data['from_year']]);
         }
 
         if ($data['to_year']) {
-            $select->where('item.end_year = ?', $data['to_year']);
+            $select->where(['item.end_year' => $data['to_year']]);
         }
 
         if ($data['parent_id']) {
             $select
-                ->join('item_parent', 'item.id = item_parent.item_id', null)
-                ->where('item_parent.parent_id = ?', $data['parent_id']);
+                ->join('item_parent', 'item.id = item_parent.item_id', [])
+                ->where(['item_parent.parent_id' => $data['parent_id']]);
         }
 
         if ($data['no_parent']) {
             $select
-                ->joinLeft(
+                ->join(
                     ['np_ip' => 'item_parent'],
                     'item.id = np_ip.item_id',
-                    null
+                    [],
+                    $select::JOIN_LEFT
                 )
-                ->where('np_ip.item_id IS NULL');
+                ->where(['np_ip.item_id IS NULL']);
         }
 
         if ($data['text']) {
@@ -307,28 +306,29 @@ class ItemController extends AbstractRestfulController
                 $select->join('item_language', 'item.id = item_language.item_id', []);
             }
             $select
-                ->join('textstorage_text', 'item_language.text_id = textstorage_text.id', null)
-                ->where('textstorage_text.text like ?', '%' . $data['text'] . '%');
+                ->join('textstorage_text', 'item_language.text_id = textstorage_text.id', [])
+                ->where(['textstorage_text.text like ?' => '%' . $data['text'] . '%']);
 
             $group = true;
         }
 
         if ($data['suggestions_to']) {
-            $db = $this->table->getAdapter();
+            $subSelect = new Sql\Select('item');
+            $subSelect->columns(['id'])
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->where([
+                    'item.item_type_id'         => Item::BRAND,
+                    'item_parent_cache.item_id' => $data['suggestions_to']
+                ]);
 
             $select
                 ->join(['ils' => 'item_language'], 'item.id = ils.item_id', [])
                 ->join(['ils2' => 'item_language'], 'INSTR(ils.name, ils2.name)', [])
-                ->where('item.item_type_id = ?', Item::BRAND)
-                ->where('ils2.item_id = ?', $data['suggestions_to'])
-                ->where(
-                    'item.id NOT IN (?)',
-                    $db->select()
-                        ->from('item', ['id'])
-                        ->where('item.item_type_id = ?', Item::BRAND)
-                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-                        ->where('item_parent_cache.item_id = ?', $data['suggestions_to'])
-                );
+                ->where([
+                    'item.item_type_id' => Item::BRAND,
+                    'ils2.item_id'      => $data['suggestions_to'],
+                    new Sql\Predicate\In('item.id', $subSelect)
+                ]);
 
             $group = true;
         }
@@ -337,16 +337,16 @@ class ItemController extends AbstractRestfulController
             $select
                 ->join(['ipc3' => 'item_parent_cache'], 'item.id = ipc3.parent_id', [])
                 ->join(['child' => 'item'], 'ipc3.item_id = child.id', [])
-                ->where('child.item_type_id = ?', (int)$data['have_childs_of_type']);
+                ->where(['child.item_type_id' => (int)$data['have_childs_of_type']]);
 
             $group = true;
         }
 
         if ($data['have_common_childs_with']) {
             $select
-                ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', null)
-                ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
-                ->where('ipc2.parent_id = ?', (int)$data['have_common_childs_with']);
+                ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', [])
+                ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', [])
+                ->where(['ipc2.parent_id' => (int)$data['have_common_childs_with']]);
 
             $group = true;
         }
@@ -356,17 +356,17 @@ class ItemController extends AbstractRestfulController
                 ->join(['ipc4' => 'item_parent_cache'], 'item.id = ipc4.parent_id', [])
                 ->join(['ip5' => 'item_parent'], 'ipc4.item_id = ip5.item_id', [])
                 ->join(['child2' => 'item'], 'ip5.parent_id = child2.id', [])
-                ->where('child2.item_type_id = ?', (int)$data['have_childs_with_parent_of_type']);
+                ->where(['child2.item_type_id' => (int)$data['have_childs_with_parent_of_type']]);
 
             $group = true;
         }
 
         if ($data['engine_id']) {
-            $select->where('item.engine_item_id = ?', (int)$data['engine_id']);
+            $select->where(['item.engine_item_id' => (int)$data['engine_id']]);
         }
 
         if ($data['is_group']) {
-            $select->where('item.is_group');
+            $select->where(['item.is_group']);
         }
 
         if ($data['autocomplete']) {
@@ -439,43 +439,47 @@ class ItemController extends AbstractRestfulController
                 $select->join('item_language', 'item.id = item_language.item_id', []);
             }
 
-            $select->where('item_language.name like ?', $query . '%');
+            $select->where(['item_language.name like ?' => $query . '%']);
 
             if ($specId) {
-                $select->where('spec_id = ?', $specId);
+                $select->where(['spec_id' => $specId]);
             }
 
             if ($beginYear) {
-                $select->where('item.begin_year = ?', $beginYear);
+                $select->where(['item.begin_year' => $beginYear]);
             }
             if ($today) {
-                $select->where('item.today');
+                $select->where(['item.today']);
             } elseif ($endYear) {
-                $select->where('item.end_year = ?', $endYear);
+                $select->where(['item.end_year' => $endYear]);
             }
             if ($body) {
-                $select->where('item.body like ?', $body . '%');
+                $select->where(['item.body like ?' => $body . '%']);
             }
 
             if ($beginModelYear) {
-                $select->where('item.begin_model_year = ?', $beginModelYear);
+                $select->where(['item.begin_model_year' => $beginModelYear]);
             }
 
             if ($endModelYear) {
-                $select->where('item.end_model_year = ?', $endModelYear);
+                $select->where(['item.end_model_year' => $endModelYear]);
             }
 
             $group = true;
         }
 
         if ($data['exclude_self_and_childs']) {
-            $expr = $this->table->getAdapter()->quoteInto(
-                'item.id = esac.item_id and esac.parent_id = ?',
-                $data['exclude_self_and_childs']
-            );
             $select
-                ->joinLeft(['esac' => 'item_parent_cache'], $expr, [])
-                ->where('esac.item_id is null');
+                ->join(
+                    ['esac' => 'item_parent_cache'],
+                    new Sql\Expression(
+                        'item.id = esac.item_id and esac.parent_id = ?',
+                        [$data['exclude_self_and_childs']]
+                    ),
+                    [],
+                    $select::JOIN_LEFT
+                )
+                ->where(['esac.item_id is null']);
         }
 
         if ($data['parent_types_of']) {
@@ -514,7 +518,7 @@ class ItemController extends AbstractRestfulController
                     break;
             }
 
-            $select->where('item.item_type_id IN (?)', $allowedItemTypes);
+            $select->where([new Sql\Predicate\In('item.item_type_id', $allowedItemTypes)]);
         }
 
         if ($group) {
@@ -522,7 +526,10 @@ class ItemController extends AbstractRestfulController
         }
 
         $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbSelect($select)
+            new \Zend\Paginator\Adapter\DbSelect(
+                $select,
+                $this->itemModel->getTable()->getAdapter()
+            )
         );
 
         $limit = $data['limit'] ? $data['limit'] : 1;
@@ -531,8 +538,6 @@ class ItemController extends AbstractRestfulController
             ->setItemCountPerPage($limit)
             ->setCurrentPageNumber($data['page']);
 
-        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
@@ -540,7 +545,7 @@ class ItemController extends AbstractRestfulController
         ]);
 
         $items = [];
-        foreach ($this->table->getAdapter()->fetchAll($select) as $row) {
+        foreach ($paginator->getCurrentItems() as $row) {
             $items[] = $this->hydrator->extract($row);
         }
 
@@ -556,14 +561,15 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $itemTable = $this->catalogue()->getItemTable();
-        $carAdapter = $itemTable->getAdapter();
-        $chars = $carAdapter->fetchCol(
-            $carAdapter->select()
-                ->distinct()
-                ->from('item', ['char' => new Zend_Db_Expr('UPPER(LEFT(name, 1))')])
-                ->order('char')
-        );
+        $select = new Sql\Select($this->itemModel->getTable()->getTable());
+        $select->columns(['char' => new Sql\Expression('UPPER(LEFT(name, 1))')])
+            ->quantifier($select::QUANTIFIER_DISTINCT)
+            ->order('char');
+
+        $chars = [];
+        foreach ($this->itemModel->getTable()->selectWith($select) as $row) {
+            $chars[] = $row['char'];
+        }
 
         $groups = [
             'numbers' => [],
@@ -602,11 +608,7 @@ class ItemController extends AbstractRestfulController
 
         $data = $this->itemInputFilter->getValues();
 
-        $select = $this->table->getAdapter()->select()
-            ->from('item')
-            ->where('id = ?', (int)$this->params('id'));
-
-        $row = $this->table->getAdapter()->fetchRow($select);
+        $row = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
 
         if (! $row) {
             return $this->notFoundAction();
@@ -663,7 +665,7 @@ class ItemController extends AbstractRestfulController
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => BrandModel::MAX_FULLNAME
+                            'max' => Brand::MAX_FULLNAME
                         ]
                     ]
                 ]
@@ -684,7 +686,7 @@ class ItemController extends AbstractRestfulController
                         ]
                     ],
                     [
-                        'name'    => \Application\Validator\Item\CatnameNotExists::class,
+                        'name'    => 'ItemCatnameNotExists',
                         'options' => [
                             'exclude' => $itemId
                         ]
@@ -841,6 +843,7 @@ class ItemController extends AbstractRestfulController
         }
 
         $factory = new \Zend\InputFilter\Factory();
+        $this->inputFilterManager->populateFactoryPluginManagers($factory);
         return $factory->createInputFilter($spec);
     }
 
@@ -889,39 +892,39 @@ class ItemController extends AbstractRestfulController
 
         $values = $inputFilter->getValues();
 
-        $itemTable = $this->catalogue()->getItemTable();
-        $item = $itemTable->createRow([
+        $set = [
             'item_type_id'       => $itemTypeId,
             'body'               => '',
             'produced_exactly'   => 0,
             'is_concept_inherit' => 1,
             'spec_inherit'       => 1,
-            'is_concept'         => 0
-        ]);
+            'is_concept'         => 0,
+            'add_datetime'       => new Sql\Expression('NOW()')
+        ];
 
         if (array_key_exists('name', $values)) {
-            $item['name'] = $values['name'];
+            $set['name'] = $values['name'];
         }
 
         if (array_key_exists('full_name', $values)) {
-            $item['full_name'] = $values['full_name'] ? $values['full_name'] : null;
+            $set['full_name'] = $values['full_name'] ? $values['full_name'] : null;
         }
 
         if (array_key_exists('body', $values)) {
-            $item['body'] = (string)$values['body'];
+            $set['body'] = (string)$values['body'];
         }
 
         if (array_key_exists('begin_year', $values)) {
-            $item['begin_year'] = $values['begin_year'] ? $values['begin_year'] : null;
+            $set['begin_year'] = $values['begin_year'] ? $values['begin_year'] : null;
         }
 
         if (array_key_exists('begin_month', $values)) {
-            $item['begin_month'] = $values['begin_month'] ? $values['begin_month'] : null;
+            $set['begin_month'] = $values['begin_month'] ? $values['begin_month'] : null;
         }
 
         if (array_key_exists('end_year', $values)) {
             $endYear = $values['end_year'] ? $values['end_year'] : null;
-            $item['end_year'] = $endYear;
+            $set['end_year'] = $endYear;
 
             if ($endYear) {
                 if ($endYear < date('Y')) {
@@ -931,29 +934,29 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('end_month', $values)) {
-            $item['end_month'] = $values['end_month'] ? $values['end_month'] : null;
+            $set['end_month'] = $values['end_month'] ? $values['end_month'] : null;
         }
 
         if (array_key_exists('today', $values)) {
             if (strlen($values['today'])) {
-                $item['today'] = $values['today'] ? 1 : 0;
+                $set['today'] = $values['today'] ? 1 : 0;
             } else {
-                $item['today'] = null;
+                $set['today'] = null;
             }
         }
 
         if (array_key_exists('begin_model_year', $values)) {
-            $item['begin_model_year'] = $values['begin_model_year'] ? $values['begin_model_year'] : null;
+            $set['begin_model_year'] = $values['begin_model_year'] ? $values['begin_model_year'] : null;
         }
 
         if (array_key_exists('end_model_year', $values)) {
-            $item['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
+            $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
         }
 
         if (array_key_exists('is_concept', $values)) {
-            $item['is_concept_inherit'] = $values['is_concept'] == 'inherited' ? 1 : 0;
-            if (! $item['is_concept_inherit']) {
-                $item['is_concept'] = $values['is_concept'] ? 1 : 0;
+            $set['is_concept_inherit'] = $values['is_concept'] == 'inherited' ? 1 : 0;
+            if (! $set['is_concept_inherit']) {
+                $set['is_concept'] = $values['is_concept'] ? 1 : 0;
             }
         }
 
@@ -963,25 +966,25 @@ class ItemController extends AbstractRestfulController
                 $values['catname'] = $filter->filter($values['name']);
             }
 
-            $item['catname'] = $values['catname'];
+            $set['catname'] = $values['catname'];
         } else {
             $filter = new \Autowp\ZFComponents\Filter\FilenameSafe();
             $values['catname'] = $filter->filter($values['name']);
         }
 
         if (array_key_exists('produced', $values)) {
-            $item['produced'] = strlen($values['produced']) ? (int)$values['produced'] : null;
+            $set['produced'] = strlen($values['produced']) ? (int)$values['produced'] : null;
         }
 
         if (array_key_exists('produced_exactly', $values)) {
-            $item['produced_exactly'] = $values['produced_exactly'] ? 1 : 0;
+            $set['produced_exactly'] = $values['produced_exactly'] ? 1 : 0;
         }
 
         switch ($itemTypeId) {
             case Item::VEHICLE:
             case Item::ENGINE:
                 if (array_key_exists('is_group', $values)) {
-                    $item['is_group'] = $values['is_group'] ? 1 : 0;
+                    $set['is_group'] = $values['is_group'] ? 1 : 0;
                 }
                 break;
             case Item::CATEGORY:
@@ -989,7 +992,7 @@ class ItemController extends AbstractRestfulController
             case Item::BRAND:
             case Item::FACTORY:
             case Item::MUSEUM:
-                $item['is_group'] = 1;
+                $set['is_group'] = 1;
                 break;
             default:
                 return $this->notFoundAction();
@@ -997,14 +1000,15 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('spec_id', $values)) {
             if ($values['spec_id'] === 'inherited') {
-                $item['spec_inherit'] = 1;
+                $set['spec_inherit'] = 1;
             } else {
-                $item['spec_inherit'] = 0;
-                $item['spec_id'] = $values['spec_id'] ? (int)$values['spec_id'] : null;
+                $set['spec_inherit'] = 0;
+                $set['spec_id'] = $values['spec_id'] ? (int)$values['spec_id'] : null;
             }
         }
 
-        $item->save();
+        $this->itemModel->getTable()->insert($set);
+        $itemId = $this->itemModel->getTable()->getLastInsertValue();
 
         if (array_key_exists('lat', $values) && array_key_exists('lng', $values)) {
             $point = null;
@@ -1012,35 +1016,38 @@ class ItemController extends AbstractRestfulController
                 geoPHP::version(); // for autoload classes
                 $point = new Point($values['lng'], $values['lat']);
             }
-            $this->itemModel->setPoint($item['id'], $point);
+            $this->itemModel->setPoint($itemId, $point);
         }
 
         if (array_key_exists('name', $values)) {
-            $this->itemModel->setLanguageName($item['id'], 'xx', $values['name']);
+            $this->itemModel->setLanguageName($itemId, 'xx', $values['name']);
         }
 
-        $this->itemModel->updateOrderCache($item['id']);
+        $this->itemModel->updateOrderCache($itemId);
 
-        $this->itemParent->rebuildCache($item['id']);
+        $this->itemParent->rebuildCache($itemId);
 
-        $this->vehicleType->refreshInheritanceFromParents($item['id']);
+        $this->vehicleType->refreshInheritanceFromParents($itemId);
 
         $namespace = new \Zend\Session\Container('Moder_Car');
-        $namespace->lastCarId = $item->id;
+        $namespace->lastCarId = $itemId;
 
+        $this->userItemSubscribe->subscribe($user['id'], $itemId);
+
+        $this->itemModel->updateInteritance($itemId);
+
+        $this->specificationsService->updateInheritedValues($itemId);
+
+        $item = $this->itemModel->getRow(['id' => $itemId]);
         $this->log(sprintf(
             'Создан новый автомобиль %s',
             htmlspecialchars($this->car()->formatName($item, 'en'))
-        ), $item);
-
-        $this->userItemSubscribe->subscribe($user['id'], $item['id']);
-
-        $this->itemModel->updateInteritance($item);
-
-        $this->specificationsService->updateInheritedValues($item->id);
+        ), [
+            'items' => $itemId
+        ]);
 
         $url = $this->url()->fromRoute('api/item/item/get', [
-            'id' => $item->id
+            'id' => $itemId
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -1053,9 +1060,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $item = $itemTable->find($this->params('id'))->current();
+        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -1085,9 +1090,11 @@ class ItemController extends AbstractRestfulController
             return $this->inputFilterResponse($inputFilter);
         }
 
-        $oldData = $item->toArray();
+        $oldData = $item;
 
         $values = $inputFilter->getValues();
+
+        $set = [];
 
         if (array_key_exists('subscription', $values)) {
             if ($values['subscription']) {
@@ -1098,29 +1105,29 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('name', $values)) {
-            $item['name'] = $values['name'];
+            $set['name'] = $values['name'];
             $this->itemModel->setLanguageName($item['id'], 'xx', $values['name']);
         }
 
         if (array_key_exists('full_name', $values)) {
-            $item['full_name'] = $values['full_name'] ? $values['full_name'] : null;
+            $set['full_name'] = $values['full_name'] ? $values['full_name'] : null;
         }
 
         if (array_key_exists('body', $values)) {
-            $item['body'] = (string)$values['body'];
+            $set['body'] = (string)$values['body'];
         }
 
         if (array_key_exists('begin_year', $values)) {
-            $item['begin_year'] = $values['begin_year'] ? $values['begin_year'] : null;
+            $set['begin_year'] = $values['begin_year'] ? $values['begin_year'] : null;
         }
 
         if (array_key_exists('begin_month', $values)) {
-            $item['begin_month'] = $values['begin_month'] ? $values['begin_month'] : null;
+            $set['begin_month'] = $values['begin_month'] ? $values['begin_month'] : null;
         }
 
         if (array_key_exists('end_year', $values)) {
             $endYear = $values['end_year'] ? $values['end_year'] : null;
-            $item['end_year'] = $endYear;
+            $set['end_year'] = $endYear;
 
             if ($endYear) {
                 if ($endYear < date('Y')) {
@@ -1130,7 +1137,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('end_month', $values)) {
-            $item['end_month'] = $values['end_month'] ? $values['end_month'] : null;
+            $set['end_month'] = $values['end_month'] ? $values['end_month'] : null;
         }
 
         if (array_key_exists('today', $values)) {
@@ -1138,24 +1145,24 @@ class ItemController extends AbstractRestfulController
                 $values['today'] = strlen($values['today']) ? (bool)strlen($values['today']) : null;
             }
             if ($values['today'] !== null) {
-                $item['today'] = $values['today'] ? 1 : 0;
+                $set['today'] = $values['today'] ? 1 : 0;
             } else {
-                $item['today'] = null;
+                $set['today'] = null;
             }
         }
 
         if (array_key_exists('begin_model_year', $values)) {
-            $item['begin_model_year'] = $values['begin_model_year'] ? $values['begin_model_year'] : null;
+            $set['begin_model_year'] = $values['begin_model_year'] ? $values['begin_model_year'] : null;
         }
 
         if (array_key_exists('end_model_year', $values)) {
-            $item['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
+            $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
         }
 
         if (array_key_exists('is_concept', $values)) {
-            $item['is_concept_inherit'] = $values['is_concept'] === 'inherited' ? 1 : 0;
-            if (! $item['is_concept_inherit']) {
-                $item['is_concept'] = $values['is_concept'] ? 1 : 0;
+            $set['is_concept_inherit'] = $values['is_concept'] === 'inherited' ? 1 : 0;
+            if (! $set['is_concept_inherit']) {
+                $set['is_concept'] = $values['is_concept'] ? 1 : 0;
             }
         }
 
@@ -1165,15 +1172,15 @@ class ItemController extends AbstractRestfulController
                 $values['catname'] = $filter->filter($values['name']);
             }
 
-            $item['catname'] = $values['catname'];
+            $set['catname'] = $values['catname'];
         }
 
         if (array_key_exists('produced', $values)) {
-            $item['produced'] = strlen($values['produced']) ? (int)$values['produced'] : null;
+            $set['produced'] = strlen($values['produced']) ? (int)$values['produced'] : null;
         }
 
         if (array_key_exists('produced_exactly', $values)) {
-            $item['produced_exactly'] = $values['produced_exactly'] ? 1 : 0;
+            $set['produced_exactly'] = $values['produced_exactly'] ? 1 : 0;
         }
 
         switch ($item['item_type_id']) {
@@ -1183,9 +1190,9 @@ class ItemController extends AbstractRestfulController
                     $hasChildItems = $this->itemParent->hasChildItems($item['id']);
 
                     if ($hasChildItems) {
-                        $item['is_group'] = 1;
+                        $set['is_group'] = 1;
                     } else {
-                        $item['is_group'] = $values['is_group'] ? 1 : 0;
+                        $set['is_group'] = $values['is_group'] ? 1 : 0;
                     }
                 }
                 break;
@@ -1194,20 +1201,22 @@ class ItemController extends AbstractRestfulController
             case Item::BRAND:
             case Item::FACTORY:
             case Item::MUSEUM:
-                $item['is_group'] = 1;
+                $set['is_group'] = 1;
                 break;
         }
 
         if (array_key_exists('spec_id', $values)) {
             if ($values['spec_id'] === 'inherited') {
-                $item['spec_inherit'] = 1;
+                $set['spec_inherit'] = 1;
             } else {
-                $item['spec_inherit'] = 0;
-                $item['spec_id'] = $values['spec_id'] ? (int)$values['spec_id'] : null;
+                $set['spec_inherit'] = 0;
+                $set['spec_id'] = $values['spec_id'] ? (int)$values['spec_id'] : null;
             }
         }
 
-        $item->save();
+        $this->itemModel->getTable()->update($set, [
+            'id' => $item['id']
+        ]);
 
         if (isset($values['lat'], $values['lng'])) {
             $point = null;
@@ -1218,14 +1227,14 @@ class ItemController extends AbstractRestfulController
             $this->itemModel->setPoint($item['id'], $point);
         }
 
-        $this->itemModel->updateInteritance($item);
+        $this->itemModel->updateInteritance($item['id']);
         $this->itemModel->updateOrderCache($item['id']);
 
-        $this->itemParent->refreshAutoByVehicle($item->id);
+        $this->itemParent->refreshAutoByVehicle($item['id']);
 
         $this->userItemSubscribe->subscribe($user['id'], $item['id']);
 
-        $newData = $item->toArray();
+        $newData = $item = $this->itemModel->getRow(['id' => $item['id']]);
         $htmlChanges = [];
         foreach ($this->buildChangesMessage($oldData, $newData, 'en') as $line) {
             $htmlChanges[] = htmlspecialchars($line);
@@ -1236,28 +1245,30 @@ class ItemController extends AbstractRestfulController
             htmlspecialchars($this->car()->formatName($item, 'en')).
             ( count($htmlChanges) ? '<p>'.implode('<br />', $htmlChanges).'</p>' : '')
         );
-        $this->log($message, $item);
+        $this->log($message, [
+            'items' => $item['id']
+        ]);
 
         $user = $this->user()->get();
         foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-            if ($subscriber && ($subscriber->id != $user->id)) {
-                $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+            if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
-                $changes = $this->buildChangesMessage($oldData, $newData, $subscriber->language);
+                $changes = $this->buildChangesMessage($oldData, $newData, $subscriber['language']);
 
                 $message = sprintf(
                     $this->translate(
                         'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s',
                         'default',
-                        $subscriber->language
+                        $subscriber['language']
                     ),
                     $this->userModerUrl($user, true, $uri),
-                    $this->car()->formatName($item, $subscriber->language),
+                    $this->car()->formatName($item, $subscriber['language']),
                     $this->itemModerUrl($item, true, null, $uri),
                     ( count($changes) ? implode("\n", $changes) : '')
                 );
 
-                $this->message->send(null, $subscriber->id, $message);
+                $this->message->send(null, $subscriber['id'], $message);
             }
         }
 
@@ -1273,7 +1284,7 @@ class ItemController extends AbstractRestfulController
     private function userModerUrl(\Autowp\Commons\Db\Table\Row $user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
-            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+            'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
         ], [
             'force_canonical' => $full,
             'uri'             => $uri
@@ -1375,9 +1386,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $item = $itemTable->find($this->params('id'))->current();
+        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -1397,9 +1406,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $item = $itemTable->find($this->params('id'))->current();
+        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -1447,12 +1454,15 @@ class ItemController extends AbstractRestfulController
             return $this->inputResponse($input);
         }
 
-        $oldImageId = $item->logo_id;
+        $oldImageId = $item['logo_id'];
 
         $imageId = $this->imageStorage()->addImageFromFile($filePath, 'brand');
 
-        $item->logo_id = $imageId;
-        $item->save();
+        $this->itemModel->getTable()->update([
+            'logo_id' => $imageId
+        ], [
+            'id' => $item['id']
+        ]);
 
         if ($oldImageId) {
             $this->imageStorage()->removeImage($oldImageId);
@@ -1460,13 +1470,15 @@ class ItemController extends AbstractRestfulController
 
         $this->log(sprintf(
             'Закачен логотип %s',
-            htmlspecialchars($item->name)
-        ), $item);
+            htmlspecialchars($item['name'])
+        ), [
+            'items' => $item['id']
+        ]);
 
         return $this->getResponse()->setStatusCode(200);
     }
 
-    private function carTreeWalk(\Autowp\Commons\Db\Table\Row $car, int $parentType = 0)
+    private function carTreeWalk($car, int $parentType = 0)
     {
         $data = [
             'id'     => (int)$car['id'],
@@ -1484,9 +1496,8 @@ class ItemController extends AbstractRestfulController
             ->where(['item_parent.parent_id' => $car['id']])
             ->order(array_merge(['item_parent.type'], $this->catalogue()->itemOrdering()));
 
-        $itemTable = $this->catalogue()->getItemTable();
         foreach ($table->selectWith($select) as $itemParentRow) {
-            $carRow = $itemTable->find($itemParentRow['item_id'])->current();
+            $carRow = $this->itemModel->getRow(['id' => $itemParentRow['item_id']]);
             if ($carRow) {
                 $data['childs'][] = $this->carTreeWalk($carRow, (int)$itemParentRow['type']);
             }
@@ -1501,9 +1512,7 @@ class ItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $item = $itemTable->find($this->params('id'))->current();
+        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }

@@ -2,11 +2,13 @@
 
 namespace Application\Model\DbTable;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+
 use Autowp\Commons\Db\Table;
 use Autowp\Image;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
-use Application\Model\DbTable;
 use Application\Model\Item as ItemModel;
 use Application\Model\Perspective;
 use Application\Model\Picture as PictureModel;
@@ -49,6 +51,11 @@ class Picture extends Table
     private $perspective;
 
     /**
+     * @var TableGateway
+     */
+    private $itemTable;
+
+    /**
      * setOptions()
      *
      * @param array $options
@@ -69,6 +76,11 @@ class Picture extends Table
         if (isset($options['perspective'])) {
             $this->perspective = $options['perspective'];
             unset($options['perspective']);
+        }
+
+        if (isset($options['itemTable'])) {
+            $this->itemTable = $options['itemTable'];
+            unset($options['itemTable']);
         }
     }
 
@@ -134,17 +146,11 @@ class Picture extends Table
 
         $items = [];
         if (count($itemIds)) {
-            $table = new Item();
-
-            $db = $table->getAdapter();
-
             $columns = [
                 'id',
                 'begin_model_year', 'end_model_year',
-                'spec' => 'spec.short_name',
-                'spec_full' => 'spec.name',
                 'body',
-                'name' => 'if(length(item_language.name) > 0, item_language.name, item.name)',
+                'name' => new Sql\Expression('if(length(item_language.name) > 0, item_language.name, item.name)'),
                 'begin_year', 'end_year', 'today',
             ];
             if ($large) {
@@ -152,13 +158,24 @@ class Picture extends Table
                 $columns[] = 'end_month';
             }
 
-            $select = $db->select()
-                ->from('item', $columns)
-                ->where('item.id in (?)', array_keys($itemIds))
-                ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :language', null);
+            $select = new Sql\Select($this->itemTable->getTable());
+            $select->columns($columns)
+                ->where([new Sql\Predicate\In('item.id', array_keys($itemIds))])
+                ->join('spec', 'item.spec_id = spec.id', [
+                    'spec'      => 'short_name',
+                    'spec_full' => 'name',
+                ], $select::JOIN_LEFT)
+                ->join(
+                    'item_language',
+                    new Sql\Expression(
+                        'item.id = item_language.item_id and item_language.language = ?',
+                        [$language]
+                    ),
+                    [],
+                    $select::JOIN_LEFT
+                );
 
-            foreach ($db->fetchAll($select, ['language' => $language]) as $row) {
+            foreach ($this->itemTable->selectWith($select) as $row) {
                 $data = [
                     'begin_model_year' => $row['begin_model_year'],
                     'end_model_year'   => $row['end_model_year'],
@@ -230,8 +247,8 @@ class Picture extends Table
             'status' => PictureModel::STATUS_ACCEPTED,
             'change_status_user_id' => $userId
         ]);
-        if (! $picture->accept_datetime) {
-            $picture->accept_datetime = new Zend_Db_Expr('NOW()');
+        if (! $picture['accept_datetime']) {
+            $picture['accept_datetime'] = new Zend_Db_Expr('NOW()');
 
             $isFirstTimeAccepted = true;
         }
@@ -323,29 +340,40 @@ class Picture extends Table
 
     public function getFileNamePattern(\Autowp\Commons\Db\Table\Row $row): string
     {
+        if (! $this->itemTable) {
+            throw new Exception("itemTable not provided");
+        }
+
         $result = rand(1, 9999);
 
         $filenameFilter = new FilenameSafe();
 
-        $itemTable = new Item();
-        $cars = $itemTable->fetchAll(
-            $itemTable->select(true)
-                ->join('picture_item', 'item.id = picture_item.item_id', [])
-                ->where('picture_item.picture_id = ?', $row['id'])
-        );
+        $select = new Sql\Select($this->itemTable->getTable());
+        $select
+            ->join('picture_item', 'item.id = picture_item.item_id', [])
+            ->where(['picture_item.picture_id' => $row['id']])
+            ->limit(1);
+
+        $cars = [];
+        foreach ($this->itemTable->selectWith($select) as $itemRow) {
+            $cars[] = $itemRow;
+        }
 
         if (count($cars) > 1) {
-            $brands = $itemTable->fetchAll(
-                $itemTable->select(true)
-                    ->where('item.item_type_id = ?', ItemModel::BRAND)
-                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-                    ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                    ->where('picture_item.picture_id = ?', $row['id'])
-            );
+            $select = new Sql\Select($this->itemTable->getTable());
+            $select
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
+                ->where([
+                    'item.item_type_id'       => ItemModel::BRAND,
+                    'picture_item.picture_id' => $row['id']
+                ]);
+
+            $brands = $this->itemTable->selectWith($select);
 
             $f = [];
             foreach ($brands as $brand) {
-                $f[] = $filenameFilter->filter($brand->catname);
+                $f[] = $filenameFilter->filter($brand['catname']);
             }
             $f = array_unique($f);
             sort($f, SORT_STRING);
@@ -357,24 +385,26 @@ class Picture extends Table
         } elseif (count($cars) == 1) {
             $car = $cars[0];
 
-            $carCatname = $filenameFilter->filter($car->name);
+            $carCatname = $filenameFilter->filter($car['name']);
 
-            $brands = $itemTable->fetchAll(
-                $itemTable->select(true)
-                    ->where('item.item_type_id = ?', ItemModel::BRAND)
-                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-                    ->where('item_parent_cache.item_id = ?', $car->id)
-            );
+            $select = new Sql\Select($this->itemTable->getTable());
+            $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->where([
+                    'item.item_type_id'         => ItemModel::BRAND,
+                    'item_parent_cache.item_id' => $car['id']
+                ]);
+
+            $brands = $this->itemTable->selectWith($select);
 
             $sBrands = [];
             foreach ($brands as $brand) {
-                $sBrands[$brand->id] = $brand;
+                $sBrands[$brand['id']] = $brand;
             }
 
             if (count($sBrands) > 1) {
                 $f = [];
                 foreach ($sBrands as $brand) {
-                    $f[] = $filenameFilter->filter($brand->catname);
+                    $f[] = $filenameFilter->filter($brand['catname']);
                 }
                 $f = array_unique($f);
                 sort($f, SORT_STRING);
@@ -396,7 +426,7 @@ class Picture extends Table
                     $sBrandsA = array_values($sBrands);
                     $brand = $sBrandsA[0];
 
-                    $brandFolder = $filenameFilter->filter($brand->catname);
+                    $brandFolder = $filenameFilter->filter($brand['catname']);
                     $firstChar = mb_substr($brandFolder, 0, 1);
 
                     $carFolder = $carCatname;
@@ -409,7 +439,7 @@ class Picture extends Table
                         $carCatname
                     ]);
                 } else {
-                    $carFolder = $filenameFilter->filter($car->name);
+                    $carFolder = $filenameFilter->filter($car['name']);
                     $firstChar = mb_substr($carFolder, 0, 1);
                     $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
                 }

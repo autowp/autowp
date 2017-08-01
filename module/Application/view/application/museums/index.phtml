@@ -22,25 +22,25 @@
             <div class="thumbnail">
                 <h4><?=$this->htmlA($this->url([
                     'action' => 'museum',
-                    'id'     => $museum->id
-                ]), $museum->name)?></h4>
-                <?=$this->img($museum->img, [
+                    'id'     => $museum['id']
+                ]), $museum['name'])?></h4>
+                <?=$this->img($museum['img'], [
                     'format' => 'format9'
                 ])?>
-                <?php if ($museum->address) { ?>
+                <?php if ($museum['address']) { ?>
                     <address>
                         <?=$this->escapeHtml($this->translate('museums/museum/address:'))?>
-                        <?=$this->escapeHtml($museum->address)?>
+                        <?=$this->escapeHtml($museum['address'])?>
                         (<?=$this->htmlA([
                             'href' => '#',
-                            'id'   => 'museum' . $museum->id . 'maplink'
+                            'id'   => 'museum' . $museum['id']. 'maplink'
                         ], $this->translate('museums/museum/on-the-map'))?>)
                     </address>
                 <?php } ?>
-                <?php if ($museum->url) { ?>
+                <?php if ($museum['url']) { ?>
                     <p>
                         <?=$this->escapeHtml($this->translate('museums/museum/website'))?>
-                        <?=$this->htmlA()->url($museum->url)?>
+                        <?=$this->htmlA()->url($museum['url'])?>
                     </p>
                 <?php } ?>
             </div>

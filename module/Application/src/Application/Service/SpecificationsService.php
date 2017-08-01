@@ -70,11 +70,6 @@ class SpecificationsService
     private $zoneAttrs = [];
 
     /**
-     * @var DbTable\Item
-     */
-    private $itemTable = null;
-
-    /**
      * @var array
      */
     private $carChildsCache = [];
@@ -252,16 +247,6 @@ class SpecificationsService
         }
 
         return $this->users[$userId];
-    }
-
-    /**
-     * @return DbTable\Item
-     */
-    private function getItemTable()
-    {
-        return $this->itemTable
-            ? $this->itemTable
-            : $this->itemTable = new DbTable\Item();
     }
 
     private function loadUnits()
@@ -471,7 +456,7 @@ class SpecificationsService
                     'date'  => $date
                 ];
 
-                if ($userId == $user->id) {
+                if ($userId == $user['id']) {
                     $currentUserValues[$attributeId] = $value;
                 }
             }
@@ -669,7 +654,7 @@ class SpecificationsService
         ]);
         $form->prepareElement($form);
 
-        $currentUserValues = $this->getZoneUserValues($zoneId, $itemId, $user->id);
+        $currentUserValues = $this->getZoneUserValues($zoneId, $itemId, $user['id']);
 
         //$form = new AttrsZoneAttributesForm(null, $options);
         $formValues = $this->walkTreeR($zoneId, function ($attribute) use ($currentUserValues) {
@@ -696,18 +681,18 @@ class SpecificationsService
     }
 
     public function getCarForm(
-        \Autowp\Commons\Db\Table\Row $car,
+        $car,
         \Autowp\Commons\Db\Table\Row $user,
         array $options,
         string $language
     ) {
-        $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car->id);
+        $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
 
-        $zoneId = $this->zoneIdByCarTypeId($car->item_type_id, $vehicleTypeIds);
+        $zoneId = $this->zoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
 
         return [
-            'form' => $this->getForm($car->id, $zoneId, $user, $options),
-            'data' => $this->getFormData($car->id, $zoneId, $user, $language)
+            'form' => $this->getForm($car['id'], $zoneId, $user, $options),
+            'data' => $this->getFormData($car['id'], $zoneId, $user, $language)
         ];
     }
 
@@ -928,13 +913,13 @@ class SpecificationsService
     }
 
     public function saveCarAttributes(
-        \Autowp\Commons\Db\Table\Row $car,
+        $car,
         array $values,
         \Autowp\Commons\Db\Table\Row $user
     ) {
-        $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car->id);
+        $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
 
-        $zoneId = $this->zoneIdByCarTypeId($car->item_type_id, $vehicleTypeIds);
+        $zoneId = $this->zoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
 
         $attributes = $this->getAttributes([
             'zone'   => $zoneId,
@@ -945,9 +930,9 @@ class SpecificationsService
 
         foreach ($linearValues as $attributeId => $value) {
             $this->setUserValue(
-                $user->id,
+                $user['id'],
                 $attributeId,
-                $car->id,
+                $car['id'],
                 $value
             );
         }
@@ -988,12 +973,12 @@ class SpecificationsService
             return;
         }
 
-        $carRows = $this->getItemTable()->fetchAll([
-            'engine_item_id = ?' => $itemId
+        $vehicles = $this->itemModel->getTable()->select([
+            'engine_item_id' => $itemId
         ]);
 
-        foreach ($carRows as $carRow) {
-            $this->updateAttributeActualValue($attribute, $carRow->id);
+        foreach ($vehicles as $vehicle) {
+            $this->updateAttributeActualValue($attribute, $vehicle['id']);
         }
     }
 
@@ -1051,7 +1036,7 @@ class SpecificationsService
             $this->pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car->id)
+                ->where('item_parent_cache.parent_id = ?', $car['id'])
                 ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                 ->order($order)
                 ->limit(1)
@@ -1297,7 +1282,7 @@ class SpecificationsService
 
         $ids = [];
         foreach ($cars as $car) {
-            $ids[] = $car->id;
+            $ids[] = $car['id'];
         }
 
         $result = [];
@@ -1305,8 +1290,8 @@ class SpecificationsService
 
         $zoneIds = [];
         foreach ($cars as $car) {
-            $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car->id);
-            $zoneId = $this->zoneIdByCarTypeId($car->item_type_id, $vehicleTypeIds);
+            $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
+            $zoneId = $this->zoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
 
             $zoneIds[$zoneId] = true;
         }
@@ -1326,12 +1311,11 @@ class SpecificationsService
             'parent'    => 0
         ]);
 
-        $itemTable = $this->getItemTable();
         $engineNameAttr = 100;
 
         $carIds = [];
         foreach ($cars as $car) {
-            $carIds[] = $car->id;
+            $carIds[] = $car['id'];
         }
 
         if ($specsZoneId) {
@@ -1354,22 +1338,22 @@ class SpecificationsService
         unset($itemActualValues); // prevent future bugs
 
         foreach ($cars as $car) {
-            $itemId = (int)$car->id;
+            $itemId = (int)$car['id'];
 
             //$values = $this->loadValues($attributes, $itemId);
             $values = isset($actualValues[$itemId]) ? $actualValues[$itemId] : [];
 
             // append engine name
-            if (! (isset($values[$engineNameAttr]) && $values[$engineNameAttr]) && $car->engine_item_id) {
-                $engineRow = $itemTable->find($car->engine_item_id)->current();
+            if (! (isset($values[$engineNameAttr]) && $values[$engineNameAttr]) && $car['engine_item_id']) {
+                $engineRow = $this->itemModel->getTable()->select(['id' => (int)$car['engine_item_id']])->current();
                 if ($engineRow) {
-                    $values[$engineNameAttr] = $engineRow->name;
+                    $values[$engineNameAttr] = $engineRow['name'];
                 }
             }
 
             $name = null;
             if ($contextCarId) {
-                $name = $this->itemParent->getNamePreferLanguage($contextCarId, $car->id, $language);
+                $name = $this->itemParent->getNamePreferLanguage($contextCarId, $car['id'], $language);
             }
             if (! $name) {
                 $name = $this->itemNameFormatter->format($this->itemModel->getNameData($car, $language), $language);
@@ -1389,10 +1373,10 @@ class SpecificationsService
             $result[] = [
                 'id'                   => $itemId,
                 'name'                 => $name,
-                'beginYear'            => $car->begin_year,
-                'endYear'              => $car->end_year,
-                'produced'             => $car->produced,
-                'produced_exactly'     => $car->produced_exactly,
+                'beginYear'            => $car['begin_year'],
+                'endYear'              => $car['end_year'],
+                'produced'             => $car['produced'],
+                'produced_exactly'     => $car['produced_exactly'],
                 'topPicture'           => $topPicture,
                 'topPictureRequest'    => $topPictureRequest,
                 'bottomPicture'        => $bottomPicture,
@@ -1663,9 +1647,9 @@ class SpecificationsService
             ];
         }
 
-        $carRow = $this->getItemTable()->fetchRow([
-            'id = ?' => $itemId
-        ]);
+        $carRow = $this->itemModel->getTable()->select([
+            'id' => $itemId
+        ])->current();
 
         if (! $carRow) {
             return [
@@ -1674,7 +1658,7 @@ class SpecificationsService
             ];
         }
 
-        if (! $carRow->engine_item_id) {
+        if (! $carRow['engine_item_id']) {
             return [
                 'empty' => true,
                 'value' => null
@@ -1686,7 +1670,7 @@ class SpecificationsService
         if (! $attribute['isMultiple']) {
             $valueDataRow = $valueDataTable->select([
                 'attribute_id' => $attribute['id'],
-                'item_id'      => $carRow->engine_item_id,
+                'item_id'      => $carRow['engine_item_id'],
                 'value IS NOT NULL'
             ])->current();
 
@@ -1704,7 +1688,7 @@ class SpecificationsService
         } else {
             $valueDataRows = $valueDataTable->select([
                 'attribute_id' => $attribute['id'],
-                'item_id'      => $carRow->engine_item_id,
+                'item_id'      => $carRow['engine_item_id'],
                 'value IS NOT NULL'
             ]);
 
@@ -2786,7 +2770,7 @@ class SpecificationsService
         if (! array_key_exists($userId, $this->valueWeights)) {
             $userRow = $this->getUserTable()->find($userId)->current();
             if ($userRow) {
-                $this->valueWeights[$userId] = $userRow->specs_weight;
+                $this->valueWeights[$userId] = $userRow['specs_weight'];
             } else {
                 $this->valueWeights[$userId] = 1;
             }

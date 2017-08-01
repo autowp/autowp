@@ -596,8 +596,8 @@ class PictureHydrator extends RestHydrator
             return false;
         }
 
-        $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture->id);
-        $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture->id);
+        $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);
+        $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);
 
         return $deleteVotes > $acceptVotes;
     }

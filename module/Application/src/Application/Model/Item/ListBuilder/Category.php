@@ -78,7 +78,7 @@ class Category extends ListBuilder
 
         // found parent row
         if ($this->currentItem) {
-            $itemParentRow = $this->itemParent->getRow($this->currentItem->id, $item['id']);
+            $itemParentRow = $this->itemParent->getRow($this->currentItem['id'], $item['id']);
             if (! $itemParentRow) {
                 return null;
             }
@@ -92,7 +92,7 @@ class Category extends ListBuilder
 
         return $this->router->assemble([
             'action'           => 'category',
-            'category_catname' => $this->category->catname,
+            'category_catname' => $this->category['catname'],
             'other'            => $this->isOther,
             'path'             => $currentPath,
             'page'             => 1
@@ -115,7 +115,7 @@ class Category extends ListBuilder
 
         // found parent row
         if ($this->currentItem) {
-            $itemParentRow = $this->itemParent->getRow($this->currentItem->id, $item['id']);
+            $itemParentRow = $this->itemParent->getRow($this->currentItem['id'], $item['id']);
             if (! $itemParentRow) {
                 return null;
             }
@@ -129,7 +129,7 @@ class Category extends ListBuilder
 
         return $this->router->assemble([
             'action'           => 'category-pictures',
-            'category_catname' => $this->category->catname,
+            'category_catname' => $this->category['catname'],
             'other'            => $this->isOther,
             'path'             => $currentPath,
             'page'             => 1
@@ -157,7 +157,7 @@ class Category extends ListBuilder
 
         // found parent row
         if ($this->currentItem) {
-            $itemParentRow = $this->itemParent->getRow($this->currentItem->id, $item['id']);
+            $itemParentRow = $this->itemParent->getRow($this->currentItem['id'], $item['id']);
             if (! $itemParentRow) {
                 return null;
             }
@@ -171,7 +171,7 @@ class Category extends ListBuilder
 
         return $this->router->assemble([
             'action'           => 'category-picture',
-            'category_catname' => $this->category->catname,
+            'category_catname' => $this->category['catname'],
             'other'            => $this->isOther,
             'path'             => $currentPath,
             'picture_id'       => $picture['identity']

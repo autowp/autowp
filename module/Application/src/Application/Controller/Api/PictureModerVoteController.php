@@ -71,7 +71,7 @@ class PictureModerVoteController extends AbstractRestfulController
         return $this->url()->fromRoute('index', [], [
             'force_canonical' => $forceCanonical,
             'uri'             => $uri
-        ]) . 'ng/moder/pictures/' . $picture->id;
+        ]) . 'ng/moder/pictures/' . $picture['id'];
     }
 
     private function notifyVote($picture, $vote, $reason)
@@ -79,8 +79,8 @@ class PictureModerVoteController extends AbstractRestfulController
         $owner = $picture->findParentRow(User::class, 'Owner');
         $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
         if ($ownerIsModer) {
-            if ($owner->id != $this->user()->get()->id) {
-                $uri = $this->hostManager->getUriByLanguage($owner->language);
+            if ($owner['id'] != $this->user()->get()['id']) {
+                $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                 $message = sprintf(
                     $this->translate(
@@ -88,47 +88,49 @@ class PictureModerVoteController extends AbstractRestfulController
                             ? 'pm/new-picture-%s-vote-%s/accept'
                             : 'pm/new-picture-%s-vote-%s/delete',
                         'default',
-                        $owner->language
+                        $owner['language']
                     ),
                     $this->pictureUrl($picture, true, $uri),
                     $reason
                 );
 
-                $this->message->send(null, $owner->id, $message);
+                $this->message->send(null, $owner['id'], $message);
             }
         }
     }
 
     private function unaccept(\Autowp\Commons\Db\Table\Row $picture)
     {
-        $previousStatusUserId = $picture->change_status_user_id;
+        $previousStatusUserId = $picture['change_status_user_id'];
 
         $user = $this->user()->get();
         $picture->setFromArray([
             'status'                => Picture::STATUS_INBOX,
-            'change_status_user_id' => $user->id
+            'change_status_user_id' => $user['id']
         ]);
         $picture->save();
 
-        if ($picture->owner_id) {
-            $this->userPicture->refreshPicturesCount($picture->owner_id);
+        if ($picture['owner_id']) {
+            $this->userPicture->refreshPicturesCount($picture['owner_id']);
         }
 
         $this->log(sprintf(
             'С картинки %s снят статус "принято"',
             htmlspecialchars($this->pic()->name($picture, $this->language()))
-        ), $picture);
+        ), [
+            'pictures' => $picture['id']
+        ]);
 
 
-        $pictureUrl = $this->pic()->url($picture->identity, true);
-        if ($previousStatusUserId != $user->id) {
+        $pictureUrl = $this->pic()->url($picture['identity'], true);
+        if ($previousStatusUserId != $user['id']) {
             $userTable = new User();
             foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                 $message = sprintf(
                     'С картинки %s снят статус "принято"',
                     $pictureUrl
                 );
-                $this->message->send(null, $prevUser->id, $message);
+                $this->message->send(null, $prevUser['id'], $message);
             }
         }
     }
@@ -196,23 +198,23 @@ class PictureModerVoteController extends AbstractRestfulController
 
         $this->pictureModerVote->add($picture['id'], $user['id'], $vote ? 1 : 0, $values['reason']);
 
-        if ($vote && $picture->status == Picture::STATUS_REMOVING) {
-            $picture->status = Picture::STATUS_INBOX;
+        if ($vote && $picture['status'] == Picture::STATUS_REMOVING) {
+            $picture['status'] = Picture::STATUS_INBOX;
             $picture->save();
         }
 
-        if ((! $vote) && $picture->status == Picture::STATUS_ACCEPTED) {
+        if ((! $vote) && $picture['status'] == Picture::STATUS_ACCEPTED) {
             $this->unaccept($picture);
         }
 
         if ($values['save']) {
             $row = $this->templateTable->select([
-                'user_id' => $user->id,
+                'user_id' => $user['id'],
                 'reason'  => $values['reason'],
             ])->current();
             if (! $row) {
                 $this->templateTable->insert([
-                    'user_id' => $user->id,
+                    'user_id' => $user['id'],
                     'reason'  => $values['reason'],
                     'vote'    => $vote ? 1 : -1
                 ]);
@@ -225,7 +227,9 @@ class PictureModerVoteController extends AbstractRestfulController
                 : 'Подана заявка на удаление картинки %s',
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         );
-        $this->log($message, $picture);
+        $this->log($message, [
+            'pictures' => $picture['id']
+        ]);
 
         $this->notifyVote($picture, $vote, $values['reason']);
 
@@ -259,13 +263,15 @@ class PictureModerVoteController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $this->pictureModerVote->delete($picture->id, $user->id);
+        $this->pictureModerVote->delete($picture['id'], $user['id']);
 
         $message = sprintf(
             'Отменена заявка на принятие/удаление картинки %s',
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         );
-        $this->log($message, $picture);
+        $this->log($message, [
+            'pictures' => $picture['id']
+        ]);
 
         return $this->getResponse()->setStatusCode(204);
     }

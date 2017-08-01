@@ -161,7 +161,7 @@ class CarOfDay
             ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->where('item_parent_cache.parent_id = ?', $car->id)
+            ->where('item_parent_cache.parent_id = ?', $car['id'])
             ->order([
                 'pictures.width DESC', 'pictures.height DESC'
             ])
@@ -190,10 +190,8 @@ class CarOfDay
             return;
         }
 
-        $itemTable = new DbTable\Item();
-
-        $car = $itemTable->fetchRow([
-            'id = ?' => (int)$dayRow->item_id
+        $car = $this->itemModel->getRow([
+            'id' => (int)$dayRow['item_id']
         ]);
 
         if (! $car) {
@@ -220,7 +218,7 @@ class CarOfDay
             return;
         }
 
-        $url = 'http://wheelsage.org/picture/' . $picture->identity;
+        $url = 'http://wheelsage.org/picture/' . $picture['identity'];
 
         if ($car['item_type_id'] == Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
@@ -246,7 +244,7 @@ class CarOfDay
         $response = $twitter->statusesUpdate($text);
 
         if ($response->isSuccess()) {
-            $dayRow->twitter_sent = true;
+            $dayRow['twitter_sent'] = true;
             $dayRow->save();
 
             print 'ok' . PHP_EOL;
@@ -267,10 +265,8 @@ class CarOfDay
             return;
         }
 
-        $itemTable = new DbTable\Item();
-
-        $car = $itemTable->fetchRow([
-            'id = ?' => (int)$dayRow->item_id
+        $car = $this->itemModel->getRow([
+            'id' => (int)$dayRow['item_id']
         ]);
 
         if (! $car) {
@@ -297,7 +293,7 @@ class CarOfDay
             return;
         }
 
-        $url = 'http://wheelsage.org/picture/' . $picture->identity;
+        $url = 'http://wheelsage.org/picture/' . $picture['identity'];
 
         if ($car['item_type_id'] == Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
@@ -328,7 +324,7 @@ class CarOfDay
             return;
         }
 
-        $dayRow->facebook_sent = true;
+        $dayRow['facebook_sent'] = true;
         $dayRow->save();
 
         print 'ok' . PHP_EOL;
@@ -348,10 +344,8 @@ class CarOfDay
             return;
         }
 
-        $itemTable = new DbTable\Item();
-
-        $car = $itemTable->fetchRow([
-            'id = ?' => (int)$dayRow->item_id
+        $car = $this->itemModel->getRow([
+            'id' => (int)$dayRow['item_id']
         ]);
 
         if (! $car) {
@@ -380,7 +374,7 @@ class CarOfDay
 
 
 
-        $url = 'http://autowp.ru/picture/' . $picture->identity;
+        $url = 'http://autowp.ru/picture/' . $picture['identity'];
 
         if ($car['item_type_id'] == Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'ru');
@@ -416,7 +410,7 @@ class CarOfDay
             throw new \Exception("Failed to post to vk" . $json['error']['error_msg']);
         }
 
-        $dayRow->vk_sent = true;
+        $dayRow['vk_sent'] = true;
         $dayRow->save();
 
         print 'ok' . PHP_EOL;
@@ -448,8 +442,9 @@ class CarOfDay
 
     public function getItemOfDay($itemId, $userId, $language)
     {
-        $itemTable = new DbTable\Item();
-        $carOfDay = $itemTable->find($itemId)->current();
+        $carOfDay = $this->itemModel->getRow([
+            'id' => (int)$itemId
+        ]);
 
         $carOfDayPictures = $this->getOrientedPictureList($carOfDay);
 
@@ -478,7 +473,7 @@ class CarOfDay
             'language' => $language
         ]);
 
-        $paths = $this->catalogue->getCataloguePaths($carOfDay->id, [
+        $paths = $this->catalogue->getCataloguePaths($carOfDay['id'], [
             'breakOnFirst' => true,
             'toBrand'      => false
         ]);
@@ -563,7 +558,7 @@ class CarOfDay
                 ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car->id)
+                ->where('item_parent_cache.parent_id = ?', $car['id'])
                 ->joinRight(
                     ['mp' => 'perspectives_groups_perspectives'],
                     'picture_item.perspective_id = mp.perspective_id',
@@ -583,7 +578,7 @@ class CarOfDay
 
             if ($picture) {
                 $pictures[] = $picture;
-                $usedIds[] = $picture->id;
+                $usedIds[] = $picture['id'];
             } else {
                 $pictures[] = null;
             }
@@ -613,7 +608,7 @@ class CarOfDay
             $select = $this->pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car->id)
+                ->where('item_parent_cache.parent_id = ?', $car['id'])
                 ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                 //->order('ratio DESC')
                 ->limit(count($left));
@@ -631,28 +626,26 @@ class CarOfDay
         return $pictures;
     }
 
-    private function carLinks(\Autowp\Commons\Db\Table\Row $car, $language)
+    private function carLinks($car, $language)
     {
         $items = [];
 
-        $itemTable = $this->catalogue->getItemTable();
-
-        $db = $itemTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
         $totalPictures = $db->fetchOne(
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car->id)
+                ->where('item_parent_cache.parent_id = ?', $car['id'])
                 ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
         );
 
-        if ($car->item_type_id == Item::CATEGORY) {
+        if ($car['item_type_id'] == Item::CATEGORY) {
             $items[] = [
                 'icon'  => 'align-left',
                 'url'   => $this->router->assemble([
                     'action'           => 'category',
-                    'category_catname' => $car->catname,
+                    'category_catname' => $car['catname'],
                 ], [
                     'name' => 'categories'
                 ]),
@@ -664,7 +657,7 @@ class CarOfDay
                     'icon'  => 'th',
                     'url'   => $this->router->assemble([
                         'action'           => 'category-pictures',
-                        'category_catname' => $car->catname,
+                        'category_catname' => $car['catname'],
                     ], [
                     'name' => 'categories'
                     ]),
@@ -695,7 +688,7 @@ class CarOfDay
                 }
             }
 
-            if ($this->specsService->hasSpecs($car->id)) {
+            if ($this->specsService->hasSpecs($car['id'])) {
                 foreach ($cataloguePaths as $path) {
                     $items[] = [
                         'icon'  => 'list-alt',
@@ -713,7 +706,7 @@ class CarOfDay
                 }
             }
 
-            foreach ($this->twins->getCarGroups($car->id) as $twinsGroup) {
+            foreach ($this->twins->getCarGroups($car['id']) as $twinsGroup) {
                 $items[] = [
                     'icon'  => 'adjust',
                     'url'   => $this->router->assemble([
@@ -725,29 +718,15 @@ class CarOfDay
                 ];
             }
 
-            $categoryRows = $db->fetchAll(
-                $db->select()
-                    ->from($itemTable->info('name'), [
-                        'catname', 'begin_year', 'end_year',
-                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,item.name)')
-                    ])
-                    ->where('item.item_type_id = ?', Item::CATEGORY)
-                    ->joinLeft(
-                        'item_language',
-                        'item.id = item_language.item_id and item_language.language = :language',
-                        null
-                    )
-                    ->join('item_parent', 'item.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
-                    ->where('top_item.item_type_id IN (?)', [Item::VEHICLE, Item::ENGINE])
-                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
-                    ->where('item_parent_cache.item_id = :item_id')
-                    ->group(['item_parent_cache.item_id', 'item.id'])
-                    ->bind([
-                        'language' => $language,
-                        'item_id'  => $car['id']
-                    ])
-            );
+            $categoryRows = $this->itemModel->getRows([
+                'language'     => $language,
+                'columns'      => ['catname', 'name'],
+                'item_type_id' => Item::CATEGORY,
+                'child'        => [
+                    'item_type_id' => [Item::VEHICLE, Item::ENGINE],
+                    'descendant'   => $car['id']
+                ]
+            ]);
 
             foreach ($categoryRows as $category) {
                 $items[] = [
@@ -812,8 +791,8 @@ class CarOfDay
             return false;
         }
 
-        $dayRow->item_id = $itemId;
-        $dayRow->user_id = $userId ? $userId : null;
+        $dayRow['item_id'] = $itemId;
+        $dayRow['user_id'] = $userId ? $userId : null;
         $dayRow->save();
 
         return true;

@@ -14,6 +14,7 @@ use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\ItemParent;
 use Application\Model\UserItemSubscribe;
+use Application\Model\Item;
 
 class ItemLanguageController extends AbstractRestfulController
 {
@@ -52,6 +53,11 @@ class ItemLanguageController extends AbstractRestfulController
      */
     private $userItemSubscribe;
 
+    /**
+     * @var Item
+     */
+    private $item;
+
     public function __construct(
         TableGateway $table,
         TextStorage $textStorage,
@@ -60,7 +66,8 @@ class ItemLanguageController extends AbstractRestfulController
         HostManager $hostManager,
         InputFilter $putInputFilter,
         MessageService $message,
-        UserItemSubscribe $userItemSubscribe
+        UserItemSubscribe $userItemSubscribe,
+        Item $item
     ) {
         $this->table = $table;
         $this->textStorage = $textStorage;
@@ -70,6 +77,7 @@ class ItemLanguageController extends AbstractRestfulController
         $this->putInputFilter = $putInputFilter;
         $this->message = $message;
         $this->userItemSubscribe = $userItemSubscribe;
+        $this->item = $item;
     }
 
     public function indexAction()
@@ -117,9 +125,7 @@ class ItemLanguageController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $item = $itemTable->find($this->params('id'))->current();
+        $item = $this->item->getRow(['id' => (int)$this->params('id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -172,11 +178,11 @@ class ItemLanguageController extends AbstractRestfulController
             if ($row && $row['text_id']) {
                 $textChanged = ($text != $this->textStorage->getText($row['text_id']));
 
-                $this->textStorage->setText($row['text_id'], $text, $user->id);
+                $this->textStorage->setText($row['text_id'], $text, $user['id']);
             } elseif ($text) {
                 $textChanged = true;
 
-                $textId = $this->textStorage->createText($text, $user->id);
+                $textId = $this->textStorage->createText($text, $user['id']);
                 $set['text_id'] = $textId;
             }
 
@@ -193,11 +199,11 @@ class ItemLanguageController extends AbstractRestfulController
             if ($row && $row['full_text_id']) {
                 $fullTextChanged = ($fullText != $this->textStorage->getText($row['full_text_id']));
 
-                $this->textStorage->setText($row['full_text_id'], $fullText, $user->id);
+                $this->textStorage->setText($row['full_text_id'], $fullText, $user['id']);
             } elseif ($fullText) {
                 $fullTextChanged = true;
 
-                $fullTextId = $this->textStorage->createText($fullText, $user->id);
+                $fullTextId = $this->textStorage->createText($fullText, $user['id']);
                 $set['full_text_id'] = $fullTextId;
             }
 
@@ -218,7 +224,7 @@ class ItemLanguageController extends AbstractRestfulController
                 $this->table->insert(array_merge($set, $primaryKey));
             }
 
-            $this->itemParent->refreshAutoByVehicle($item->id);
+            $this->itemParent->refreshAutoByVehicle($item['id']);
         }
 
         if ($changes) {
@@ -227,15 +233,15 @@ class ItemLanguageController extends AbstractRestfulController
             $language = $this->language();
 
             foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-                if ($subscriber && ($subscriber->id != $user->id)) {
-                    $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+                if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                    $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                     $changesStr = [];
                     foreach ($changes as $field) {
                         $changesStr[] = $this->translate(
                             $field,
                             'default',
-                            $subscriber->language
+                            $subscriber['language']
                         ) . ' (' . $language . ')';
                     }
 
@@ -243,22 +249,24 @@ class ItemLanguageController extends AbstractRestfulController
                         $this->translate(
                             'pm/user-%s-edited-item-language-%s-%s',
                             'default',
-                            $subscriber->language
+                            $subscriber['language']
                         ),
                         $this->userModerUrl($user, true, $uri),
-                        $this->car()->formatName($item, $subscriber->language),
+                        $this->car()->formatName($item, $subscriber['language']),
                         $this->itemModerUrl($item, true, null, $uri),
                         implode("\n", $changesStr)
                     );
 
-                    $this->message->send(null, $subscriber->id, $message);
+                    $this->message->send(null, $subscriber['id'], $message);
                 }
             }
 
             $this->log(sprintf(
                 'Редактирование языковых названия, описания и полного описания автомобиля %s',
-                htmlspecialchars($this->car()->formatName($item, 'en'))
-            ), $item);
+                htmlspecialchars($this->car()->formatName($item, 'en')) //TODO: formatter
+            ), [
+                'items' => $item['id']
+            ]);
         }
 
         return $this->getResponse()->setStatusCode(200);
@@ -273,7 +281,7 @@ class ItemLanguageController extends AbstractRestfulController
     private function userModerUrl(\Autowp\Commons\Db\Table\Row $user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
-            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+            'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
         ], [
             'force_canonical' => $full,
             'uri'             => $uri

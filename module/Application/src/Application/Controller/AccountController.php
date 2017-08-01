@@ -31,6 +31,7 @@ use Application\Service\UsersService;
 
 use Zend_Db_Expr;
 use Application\Model\Picture;
+use Application\Model\Item;
 
 class AccountController extends AbstractActionController
 {
@@ -109,6 +110,11 @@ class AccountController extends AbstractActionController
      */
     private $loginStateTable;
 
+    /**
+     * @var Item
+     */
+    private $item;
+
     public function __construct(
         UsersService $service,
         Form $emailForm,
@@ -124,7 +130,8 @@ class AccountController extends AbstractActionController
         UserRename $userRename,
         UserAccount $userAccount,
         DbTable\Picture $pictureTable,
-        TableGateway $loginStateTable
+        TableGateway $loginStateTable,
+        Item $item
     ) {
 
         $this->service = $service;
@@ -142,6 +149,7 @@ class AccountController extends AbstractActionController
         $this->userAccount = $userAccount;
         $this->pictureTable = $pictureTable;
         $this->loginStateTable = $loginStateTable;
+        $this->item = $item;
     }
 
     private function forwardToLogin()
@@ -160,7 +168,7 @@ class AccountController extends AbstractActionController
         $picsCount = $db->fetchOne(
             $db->select()
                  ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                 ->where('owner_id = ?', $user->id)
+                ->where('owner_id = ?', $user['id'])
                  ->where('status = ?', Picture::STATUS_ACCEPTED)
         );
 
@@ -168,23 +176,23 @@ class AccountController extends AbstractActionController
             $db->select()
                  ->from('forums_topics', new Zend_Db_Expr('COUNT(*)'))
                  ->join('forums_topics_subscribers', 'forums_topics.id=forums_topics_subscribers.topic_id', null)
-                 ->where('forums_topics_subscribers.user_id = ?', $user->id)
+                ->where('forums_topics_subscribers.user_id = ?', $user['id'])
                  ->where('forums_topics.status IN (?)', [Forums::STATUS_CLOSED, Forums::STATUS_NORMAL])
         );
 
         $notTakenPicturesCount = $this->pictureTable->getAdapter()->fetchOne(
             $this->pictureTable->select()
                 ->from($this->pictureTable, new Zend_Db_Expr('COUNT(1)'))
-                ->where('owner_id = ?', $user->id)
+                ->where('owner_id = ?', $user['id'])
                 ->where('status = ?', Picture::STATUS_INBOX)
         );
 
         return [
-            'smCount'    => $this->message->getSystemCount($user->id),
-            'newSmCount' => $this->message->getNewSystemCount($user->id),
-            'pmCount'    => $this->message->getInboxCount($user->id),
-            'newPmCount' => $this->message->getInboxNewCount($user->id),
-            'omCount'    => $this->message->getSentCount($user->id),
+            'smCount'    => $this->message->getSystemCount($user['id']),
+            'newSmCount' => $this->message->getNewSystemCount($user['id']),
+            'pmCount'    => $this->message->getInboxCount($user['id']),
+            'newPmCount' => $this->message->getInboxNewCount($user['id']),
+            'omCount'    => $this->message->getSentCount($user['id']),
             'notTakenPicturesCount' => $notTakenPicturesCount,
             'subscribesCount'       => $subscribesCount,
             'picsCount'             => $picsCount
@@ -207,7 +215,7 @@ class AccountController extends AbstractActionController
 
         $message = $this->params()->fromPost('message');
 
-        $this->message->send($currentUser->id, $user->id, $message);
+        $this->message->send($currentUser['id'], $user['id'], $message);
 
         return new JsonModel([
             'ok'      => true,
@@ -223,7 +231,7 @@ class AccountController extends AbstractActionController
 
         $user = $this->user()->get();
 
-        $this->message->delete($user->id, $this->params()->fromPost('id'));
+        $this->message->delete($user['id'], $this->params()->fromPost('id'));
 
         return new JsonModel([
             'ok' => true
@@ -264,7 +272,7 @@ class AccountController extends AbstractActionController
         }
 
         $accounts = [];
-        foreach ($this->userAccount->getAccounts($user->id) as $row) {
+        foreach ($this->userAccount->getAccounts($user['id']) as $row) {
             $accounts[] = array_replace($row, [
                 'canRemove' => $this->canRemoveAccount($row['service_id']),
                 'removeUrl' => $this->url()->fromRoute('account/remove-account', [
@@ -313,12 +321,12 @@ class AccountController extends AbstractActionController
             return false;
         }
 
-        if ($this->user()->get()->e_mail) {
+        if ($this->user()->get()['e_mail']) {
             return true;
         }
 
         $haveAccounts = $this->userAccount->haveAccountsForOtherServices(
-            $this->user()->get()->id,
+            $this->user()->get()['id'],
             $serviceId
         );
         if ($haveAccounts) {
@@ -369,23 +377,23 @@ class AccountController extends AbstractActionController
         ]));
 
         $this->profileForm->setData([
-            'name' => $user->name
+            'name' => $user['name']
         ]);
         if ($request->isPost() && $this->params('form') == 'profile') {
             $this->profileForm->setData($this->params()->fromPost());
             if ($this->profileForm->isValid()) {
                 $values = $this->profileForm->getData();
 
-                $oldName = $user->name;
+                $oldName = $user['name'];
 
                 $user->setFromArray([
                     'name' => $values['name']
                 ])->save();
 
-                $newName = $user->name;
+                $newName = $user['name'];
 
                 if ($oldName != $newName) {
-                    $this->userRename->add($user->id, $oldName, $newName);
+                    $this->userRename->add($user['id'], $oldName, $newName);
                 }
 
                 $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/saved'));
@@ -395,9 +403,9 @@ class AccountController extends AbstractActionController
         }
 
         if ($request->isPost() && $this->params('form') == 'reset-photo') {
-            $oldImageId = $user->img;
+            $oldImageId = $user['img'];
             if ($oldImageId) {
-                $user->img = null;
+                $user['img'] = null;
                 $user->save();
                 $this->imageStorage()->removeImage($oldImageId);
             }
@@ -432,8 +440,8 @@ class AccountController extends AbstractActionController
 
                 $imagick->clear();
 
-                $oldImageId = $user->img;
-                $user->img = $newImageId;
+                $oldImageId = $user['img'];
+                $user['img'] = $newImageId;
                 $user->save();
                 if ($oldImageId) {
                     $imageStorage->removeImage($oldImageId);
@@ -469,8 +477,8 @@ class AccountController extends AbstractActionController
         $this->settingsForm->get('timezone')->setValueOptions($list);
 
         $this->settingsForm->setData([
-            'timezone' => $user->timezone,
-            'language' => $user->language
+            'timezone' => $user['timezone'],
+            'language' => $user['language']
         ]);
 
         if ($request->isPost() && $this->params('form') == 'settings') {
@@ -478,8 +486,8 @@ class AccountController extends AbstractActionController
             if ($this->settingsForm->isValid()) {
                 $values = $this->settingsForm->getData();
 
-                $user->timezone = $values['timezone'];
-                $user->language = $values['language'];
+                $user['timezone'] = $values['timezone'];
+                $user['language'] = $values['language'];
                 $user->save();
 
                 $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/saved'));
@@ -507,7 +515,7 @@ class AccountController extends AbstractActionController
 
         $this->emailForm->setAttribute('action', $this->url()->fromRoute('account/email'));
         $this->emailForm->setData([
-            'email' => $user->e_mail
+            'email' => $user['e_mail']
         ]);
         if ($request->isPost()) {
             $this->emailForm->setData($this->params()->fromPost());
@@ -540,7 +548,7 @@ class AccountController extends AbstractActionController
         if ($user) {
             if (! $this->user()->logedIn()) {
                 $adapter = new IdAuthAdapter();
-                $adapter->setIdentity($user->id);
+                $adapter->setIdentity($user['id']);
                 $auth = new AuthenticationService();
                 $result = $auth->authenticate($adapter);
 
@@ -579,7 +587,7 @@ class AccountController extends AbstractActionController
 
         $user = $this->user()->get();
 
-        $inbox = $this->message->getInbox($user->id, $this->params('page'));
+        $inbox = $this->message->getInbox($user['id'], $this->params('page'));
 
         return [
             'paginator' => $inbox['paginator'],
@@ -596,7 +604,7 @@ class AccountController extends AbstractActionController
 
         $user = $this->user()->get();
 
-        $sentbox = $this->message->getSentbox($user->id, $this->params('page'));
+        $sentbox = $this->message->getSentbox($user['id'], $this->params('page'));
 
         return [
             'paginator' => $sentbox['paginator'],
@@ -613,7 +621,7 @@ class AccountController extends AbstractActionController
 
         $user = $this->user()->get();
 
-        $systembox = $this->message->getSystembox($user->id, $this->params('page'));
+        $systembox = $this->message->getSystembox($user['id'], $this->params('page'));
 
         return [
             'paginator' => $systembox['paginator'],
@@ -637,14 +645,14 @@ class AccountController extends AbstractActionController
 
         $logedInUser = $this->user()->get();
 
-        $dialogbox = $this->message->getDialogbox($logedInUser->id, $user->id, $this->params('page'));
+        $dialogbox = $this->message->getDialogbox($logedInUser['id'], $user['id'], $this->params('page'));
 
         return [
             'paginator' => $dialogbox['paginator'],
             'messages'  => $this->preparePersonalMessages($dialogbox['messages']),
             'sidebar'   => $this->sidebar(),
             'urlParams' => [
-                'user_id' => $user->id
+                'user_id' => $user['id']
             ]
         ];
     }
@@ -656,7 +664,7 @@ class AccountController extends AbstractActionController
         }
 
         $select = $this->pictureTable->select(true)
-            ->where('owner_id = ?', $this->user()->get()->id)
+            ->where('owner_id = ?', $this->user()->get()['id'])
             ->where('status = ?', Picture::STATUS_INBOX)
             ->order(['add_date DESC']);
 
@@ -687,7 +695,7 @@ class AccountController extends AbstractActionController
             return $this->forwardToLogin();
         }
 
-        $this->message->deleteAllSystem($this->user()->get()->id);
+        $this->message->deleteAllSystem($this->user()->get()['id']);
 
         return $this->redirect()->toRoute('account/personal-messages/system');
     }
@@ -698,7 +706,7 @@ class AccountController extends AbstractActionController
             return $this->forwardToLogin();
         }
 
-        $this->message->deleteAllSent($this->user()->get()->id);
+        $this->message->deleteAllSent($this->user()->get()['id']);
 
         return $this->redirect()->toRoute('account/personal-messages/sent');
     }
@@ -717,7 +725,7 @@ class AccountController extends AbstractActionController
             if ($this->changePasswordForm->isValid()) {
                 $values = $this->changePasswordForm->getData();
 
-                $correct = $this->service->checkPassword($user->id, $values['password_old']);
+                $correct = $this->service->checkPassword($user['id'], $values['password_old']);
 
                 if (! $correct) {
                     $this->changePasswordForm->get('password_old')->setMessages([
@@ -758,17 +766,17 @@ class AccountController extends AbstractActionController
 
                 $user = $this->user()->get();
 
-                $valid = $this->service->checkPassword($user->id, $values['password']);
+                $valid = $this->service->checkPassword($user['id'], $values['password']);
 
                 if (! $valid) {
                     $this->deleteUserForm->get('password')->setMessages([
                         $this->translate('account/access/self-delete/password-is-incorrect')
                     ]);
                 } else {
-                    $user->deleted = true;
+                    $user['deleted'] = true;
                     $user->save();
 
-                    $this->service->markDeleted($user->id);
+                    $this->service->markDeleted($user['id']);
 
                     $auth = new AuthenticationService();
                     $auth->clearIdentity();
@@ -798,7 +806,7 @@ class AccountController extends AbstractActionController
         $filter = $this->params('conflict', '0');
         $page = (int)$this->params('page');
 
-        $userId = $this->user()->get()->id;
+        $userId = $this->user()->get()['id'];
 
         $language = $this->language();
 
@@ -807,14 +815,13 @@ class AccountController extends AbstractActionController
         $paginator = $data['paginator'];
 
         $userTable = new User();
-        $itemTable = new DbTable\Item();
 
         foreach ($conflicts as &$conflict) {
             foreach ($conflict['values'] as &$value) {
                 $value['user'] = $userTable->find($value['userId'])->current();
             }
 
-            $car = $itemTable->find($conflict['itemId'])->current();
+            $car = $this->item->getRow(['id' => $conflict['itemId']]);
             $conflict['object'] = $car ? $this->car()->formatName($car, $language) : null;
             $conflict['url'] = $this->url()->fromRoute('cars/params', [
                 'action'  => 'car-specifications-editor',
@@ -829,7 +836,7 @@ class AccountController extends AbstractActionController
             'filter'    => (string)$filter,
             'conflicts' => $conflicts,
             'paginator' => $paginator,
-            'weight'    => $this->user()->get()->specs_weight
+            'weight'    => $this->user()->get()['specs_weight']
         ];
     }
 
@@ -846,7 +853,7 @@ class AccountController extends AbstractActionController
         $userRows = $userTable->fetchAll(
             $userTable->select(true)
                 ->join('contact', 'users.id = contact.contact_user_id', null)
-                ->where('contact.user_id = ?', $user->id)
+                ->where('contact.user_id = ?', $user['id'])
                 ->order(['users.deleted', 'users.name'])
         );
         $users = [];

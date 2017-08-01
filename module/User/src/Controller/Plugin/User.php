@@ -119,8 +119,8 @@ class User extends AbstractPlugin
     public function isAllowed($resource = null, $privilege = null)
     {
         return $this->user
-            && $this->user->role
-            && $this->acl->isAllowed($this->user->role, $resource, $privilege);
+            && $this->user['role']
+            && $this->acl->isAllowed($this->user['role'], $resource, $privilege);
     }
 
     /**
@@ -130,15 +130,15 @@ class User extends AbstractPlugin
     public function inheritsRole($inherit)
     {
         return $this->user
-            && $this->user->role
+            && $this->user['role']
             && $this->acl->hasRole($inherit)
-            && $this->acl->inheritsRole($this->user->role, $inherit);
+            && $this->acl->inheritsRole($this->user['role'], $inherit);
     }
 
     public function timezone()
     {
-        return $this->user && $this->user->timezone
-            ? $this->user->timezone
+        return $this->user && $this->user['timezone']
+            ? $this->user['timezone']
             : 'UTC';
     }
 }

@@ -3,16 +3,14 @@
 namespace Application\Model;
 
 use DateTime;
+use Exception;
 
 use geoPHP;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Paginator;
 
 use Autowp\TextStorage\Service as TextStorage;
-
-use Application\Model\DbTable;
-
-use Zend_Db_Expr;
 
 class Item
 {
@@ -32,7 +30,7 @@ class Item
     private $specTable;
 
     /**
-     * @var DbTable\Item
+     * @var TableGateway
      */
     private $itemTable;
 
@@ -56,49 +54,69 @@ class Item
      */
     private $textStorage;
 
+    /**
+     * @var TableGateway
+     */
+    private $itemParentCacheTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $itemParentTable;
+
+    private $languagePriority = ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'zh', 'xx'];
+
     public function __construct(
         TableGateway $specTable,
         TableGateway $itemPointTable,
         TableGateway $vehicleTypeParentTable,
         TableGateway $itemLanguageTable,
-        TextStorage $textStorage
+        TextStorage $textStorage,
+        TableGateway $itemTable,
+        TableGateway $itemParentTable,
+        TableGateway $itemParentCacheTable
     ) {
         $this->specTable = $specTable;
-
-        $this->itemTable = new DbTable\Item();
+        $this->itemTable = $itemTable;
         $this->itemPointTable = $itemPointTable;
         $this->vehicleTypeParentTable = $vehicleTypeParentTable;
         $this->itemLanguageTable = $itemLanguageTable;
         $this->textStorage = $textStorage;
+        $this->itemParentTable = $itemParentTable;
+        $this->itemParentCacheTable = $itemParentCacheTable;
     }
 
-    public function getEngineVehiclesGroups(int $engineId, array $options = [])
+    public function getEngineVehiclesGroups(int $engineId, array $options = []): array
     {
         $defaults = [
             'groupJoinLimit' => null
         ];
         $options = array_replace($defaults, $options);
 
-        $db = $this->itemTable->getAdapter();
-
-        $vehicleIds = $db->fetchCol(
-            $db->select()
-                ->from('item', 'id')
-                ->join('item_parent_cache', 'item.engine_item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $engineId)
-        );
+        $select = new Sql\Select($this->itemTable->getTable());
+        $select->columns(['id'])
+            ->join('item_parent_cache', 'item.engine_item_id = item_parent_cache.item_id', [])
+            ->where(['item_parent_cache.parent_id' => $engineId]);
+        $vehicleIds = [];
+        foreach ($this->itemTable->selectWith($select) as $row) {
+            $vehicleIds[] = (int)$row['id'];
+        }
 
         $vectors = [];
         foreach ($vehicleIds as $vehicleId) {
-            $parentIds = $db->fetchCol(
-                $db->select()
-                    ->from('item_parent_cache', 'parent_id')
-                    ->join('item', 'item_parent_cache.parent_id = item.id', null)
-                    ->where('item.item_type_id = ?', self::VEHICLE)
-                    ->where('item_parent_cache.item_id = ?', $vehicleId)
-                    ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
-                    ->order('item_parent_cache.diff desc')
-            );
+            $select = new Sql\Select($this->itemParentCacheTable->getTable());
+            $select->columns(['parent_id'])
+                ->join('item', 'item_parent_cache.parent_id = item.id', [])
+                ->where([
+                    'item.item_type_id'         => self::VEHICLE,
+                    'item_parent_cache.item_id' => $vehicleId,
+                    'item_parent_cache.item_id != item_parent_cache.parent_id'
+                ])
+                ->order('item_parent_cache.diff desc');
+            $parentIds = [];
+            foreach ($this->itemParentCacheTable->selectWith($select) as $row) {
+                $parentIds[] = (int)$row['parent_id'];
+            }
 
             // remove parents
             foreach ($parentIds as $parentId) {
@@ -189,7 +207,7 @@ class Item
 
         $rows = $this->itemLanguageTable->select([
             new Sql\Predicate\In('item_id', $ids),
-            'language = ?'   => $language,
+            'language' => $language,
             new Sql\Predicate\Expression('length(name) > 0')
         ]);
         $result = [];
@@ -213,10 +231,10 @@ class Item
         $textIds = [];
         $fullTextIds = [];
         foreach ($rows as $row) {
-            if ($row->text_id) {
+            if ($row['text_id']) {
                 $textIds[] = $row['text_id'];
             }
-            if ($row->full_text_id) {
+            if ($row['full_text_id']) {
                 $fullTextIds[] = $row['full_text_id'];
             }
         }
@@ -313,23 +331,14 @@ class Item
 
     public function getName(int $itemId, string $language)
     {
-        $languages = array_merge([$language], ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'zh', 'xx']);
-
-        $select = new Sql\Select($this->itemLanguageTable->getTable());
-        $select->columns(['name'])
-            ->where([
-                'item_id' => $itemId,
-                new Sql\Predicate\Expression('length(name) > 0')
-            ])
-            ->order([new Sql\Expression('FIELD(language' . str_repeat(', ?', count($languages)) . ')', $languages)])
-            ->limit(1);
+        $select = $this->getNameSelect($itemId, Sql\ExpressionInterface::TYPE_VALUE, $language);
 
         $row = $this->itemLanguageTable->selectWith($select)->current();
 
         return $row ? $row['name'] : '';
     }
 
-    public function getNameData(\Autowp\Commons\Db\Table\Row $row, string $language = 'en')
+    public function getNameData($row, string $language = 'en')
     {
         $name = $this->getName($row['id'], $language);
 
@@ -358,30 +367,50 @@ class Item
         ];
     }
 
+    private function getAncestorsId(int $itemId, array $itemTypes): array
+    {
+        $select = new Sql\Select($this->itemParentCacheTable->getTable());
+
+        $select->columns(['parent_id'])
+            ->join('item', 'item_parent_cache.parent_id = item.id', [])
+            ->where([
+                new Sql\Predicate\In('item.item_type_id', $itemTypes),
+                'item_parent_cache.item_id' => $itemId,
+                'item_parent_cache.item_id != item_parent_cache.parent_id'
+            ])
+            ->order('item_parent_cache.diff desc');
+        $parentIds = [];
+        foreach ($this->itemParentCacheTable->selectWith($select) as $row) {
+            $parentIds[] = (int)$row['parent_id'];
+        }
+
+        return $parentIds;
+    }
+
+    private function getChildItemsId(int $itemId): array
+    {
+        $select = new Sql\Select($this->itemParentTable->getTable());
+        $select->columns(['item_id'])
+            ->where(['item_parent.parent_id' => $itemId]);
+
+        $result = [];
+        foreach ($this->itemParentTable->selectWith($select) as $row) {
+            $result[] = (int)$row['item_id'];
+        }
+
+        return $result;
+    }
+
     public function getRelatedCarGroups(int $itemId): array
     {
-        $db = $this->itemTable->getAdapter();
-
-        $carIds = $db->fetchCol(
-            $db->select()
-                ->from('item_parent', 'item_id')
-                ->where('item_parent.parent_id = ?', $itemId)
-        );
+        $carIds = $this->getChildItemsId($itemId);
 
         $vectors = [];
         foreach ($carIds as $carId) {
-            $parentIds = $db->fetchCol(
-                $db->select()
-                    ->from('item_parent_cache', 'parent_id')
-                    ->join('item', 'item_parent_cache.parent_id = item.id', null)
-                    ->where('item.item_type_id IN (?)', [
-                        self::VEHICLE,
-                        self::ENGINE
-                    ])
-                    ->where('item_parent_cache.item_id = ?', $carId)
-                    ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
-                    ->order('item_parent_cache.diff desc')
-            );
+            $parentIds = $this->getAncestorsId($carId, [
+                self::VEHICLE,
+                self::ENGINE
+            ]);
 
             // remove parents
             foreach ($parentIds as $parentId) {
@@ -435,28 +464,14 @@ class Item
 
     public function getRelatedCarGroupId(int $itemId): array
     {
-        $db = $this->itemTable->getAdapter();
-
-        $carIds = $db->fetchCol(
-            $db->select()
-                ->from('item_parent', 'item_id')
-                ->where('item_parent.parent_id = ?', $itemId)
-        );
+        $carIds = $this->getChildItemsId($itemId);
 
         $vectors = [];
         foreach ($carIds as $carId) {
-            $parentIds = $db->fetchCol(
-                $db->select()
-                    ->from('item_parent_cache', 'parent_id')
-                    ->join('item', 'item_parent_cache.parent_id = item.id', null)
-                    ->where('item.item_type_id IN (?)', [
-                        self::VEHICLE,
-                        self::ENGINE
-                    ])
-                    ->where('item_id = ?', $carId)
-                    ->where('item_id <> parent_id')
-                    ->order('diff desc')
-            );
+            $parentIds = $this->getAncestorsId($carId, [
+                self::VEHICLE,
+                self::ENGINE
+            ]);
 
             // remove parents
             foreach ($parentIds as $parentId) {
@@ -503,7 +518,9 @@ class Item
 
     public function updateOrderCache(int $itemId): bool
     {
-        $row = $this->itemTable->find($itemId)->current();
+        $primaryKey = ['id' => $itemId];
+
+        $row = $this->itemTable->select($primaryKey)->current();
         if (! $row) {
             return false;
         }
@@ -551,11 +568,10 @@ class Item
             $end = $begin;
         }
 
-        $row->setFromArray([
+        $this->itemTable->update([
             'begin_order_cache' => $begin ? $begin->format(MYSQL_DATETIME_FORMAT) : null,
             'end_order_cache'   => $end ? $end->format(MYSQL_DATETIME_FORMAT) : null,
-        ]);
-        $row->save();
+        ], $primaryKey);
 
         return true;
     }
@@ -582,36 +598,46 @@ class Item
         return $result;
     }
 
-    public function updateInteritance(\Autowp\Commons\Db\Table\Row $car)
+    public function updateInteritance(int $itemId)
     {
-        $parents = $this->itemTable->fetchAll(
-            $this->itemTable->select(true)
-                ->join('item_parent', 'item.id = item_parent.parent_id', null)
-                ->where('item_parent.item_id = ?', $car->id)
-        );
+        $item = $this->itemTable->select(['id' => $itemId])->current();
+        if (! $item) {
+            throw new Exception("Item `$itemId` not found");
+        }
+
+        $this->updateItemInteritance($item);
+    }
+
+    private function updateItemInteritance($car)
+    {
+        $parents = $this->getRows([
+            'child' => $car['id']
+        ]);
 
         $somethingChanged = false;
 
-        if ($car->is_concept_inherit) {
+        $set = [];
+
+        if ($car['is_concept_inherit']) {
             $isConcept = false;
             foreach ($parents as $parent) {
-                if ($parent->is_concept) {
+                if ($parent['is_concept']) {
                     $isConcept = true;
                 }
             }
 
-            $oldIsConcept = (bool)$car->is_concept;
+            $oldIsConcept = (bool)$car['is_concept'];
 
             if ($oldIsConcept !== $isConcept) {
-                $car->is_concept = $isConcept ? 1 : 0;
+                $set['is_concept'] = $isConcept ? 1 : 0;
                 $somethingChanged = true;
             }
         }
 
-        if ($car->engine_inherit) {
+        if ($car['engine_inherit']) {
             $map = [];
             foreach ($parents as $parent) {
-                $engineId = $parent->engine_item_id;
+                $engineId = $parent['engine_item_id'];
                 if ($engineId) {
                     if (isset($map[$engineId])) {
                         $map[$engineId]++;
@@ -631,18 +657,18 @@ class Item
                 }
             }
 
-            $oldEngineId = isset($car->engine_item_id) ? (int)$car->engine_item_id : null;
+            $oldEngineId = isset($car['engine_item_id']) ? (int)$car['engine_item_id'] : null;
 
             if ($oldEngineId !== $selectedId) {
-                $car->engine_item_id = $selectedId;
+                $set['engine_item_id'] = $selectedId;
                 $somethingChanged = true;
             }
         }
 
-        if ($car->car_type_inherit) {
+        if ($car['car_type_inherit']) {
             $map = [];
             foreach ($parents as $parent) {
-                $typeId = $parent->car_type_id;
+                $typeId = $parent['car_type_id'];
                 if ($typeId) {
                     if (isset($map[$typeId])) {
                         $map[$typeId]++;
@@ -676,18 +702,18 @@ class Item
                 }
             }
 
-            $oldCarTypeId = isset($car->car_type_id) ? (int)$car->car_type_id : null;
+            $oldCarTypeId = isset($car['car_type_id']) ? (int)$car['car_type_id'] : null;
 
             if ($oldCarTypeId !== $selectedId) {
-                $car->car_type_id = $selectedId;
+                $set['car_type_id'] = $selectedId;
                 $somethingChanged = true;
             }
         }
 
-        if ($car->spec_inherit) {
+        if ($car['spec_inherit']) {
             $map = [];
             foreach ($parents as $parent) {
-                $specId = $parent->spec_id;
+                $specId = $parent['spec_id'];
                 if ($specId) {
                     if (isset($map[$specId])) {
                         $map[$specId]++;
@@ -707,44 +733,38 @@ class Item
                 }
             }
 
-            $oldSpecId = isset($car->spec_id) ? (int)$car->spec_id : null;
+            $oldSpecId = isset($car['spec_id']) ? (int)$car['spec_id'] : null;
 
             if ($oldSpecId !== $selectedId) {
-                $car->spec_id = $selectedId;
+                $set['spec_id'] = $selectedId;
                 $somethingChanged = true;
             }
         }
 
-        if ($somethingChanged || ! $car->car_type_inherit) {
-            $car->save();
+        if ($somethingChanged || ! $car['car_type_inherit']) {
+            if ($set) {
+                $this->itemTable->update($set, [
+                    'id' => $car['id']
+                ]);
+            }
 
-            $childs = $this->itemTable->fetchAll(
-                $this->itemTable->select(true)
-                    ->join('item_parent', 'item.id = item_parent.item_id', null)
-                    ->where('item_parent.parent_id = ?', $car->id)
-            );
+            $childItems = $this->getRows([
+                'parent' => $car['id']
+            ]);
 
-            foreach ($childs as $child) {
-                $this->updateInteritance($child);
+            foreach ($childItems as $child) {
+                $this->updateItemInteritance($child);
             }
         }
     }
 
     public function getVehiclesAndEnginesCount(int $parentId): int
     {
-        $db = $this->itemTable->getAdapter();
-
-        $select = $db->select()
-            ->from('item', new Zend_Db_Expr('COUNT(1)'))
-            ->where('item.item_type_id IN (?)', [
-                self::ENGINE,
-                self::VEHICLE
-            ])
-            ->where('not item.is_group')
-            ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-            ->where('item_parent_cache.parent_id = ?', $parentId);
-
-        return (int)$db->fetchOne($select);
+        return $this->getCount([
+            'item_type_id' => [self::ENGINE, self::VEHICLE],
+            'ancestor'     => $parentId,
+            'is_group'     => false
+        ]);
     }
 
     public function setPoint(int $itemId, $point)
@@ -778,5 +798,604 @@ class Item
         }
 
         return $point;
+    }
+
+    public function getTable(): TableGateway
+    {
+        return $this->itemTable;
+    }
+
+    private function applyColumns(array $columns, string $id, $language)
+    {
+        $result = [];
+
+        foreach ($columns as $key => $column) {
+            switch ($column) {
+                case 'parent_id':
+                    if (is_numeric($key)) {
+                        $result[] = $column;
+                    } else {
+                        $result[$key] = $column;
+                    }
+                    break;
+                case 'link_catname':
+                    if (is_numeric($key)) {
+                        $result[] = 'catname';
+                    } else {
+                        $result[$key] = 'catname';
+                    }
+                    break;
+                case 'link_name':
+                    if (! $language) {
+                        throw new \Exception("Language is required for `name` select");
+                    }
+                    $nameSelect = $this->getItemParentNameSelect(
+                        $id,
+                        Sql\ExpressionInterface::TYPE_IDENTIFIER,
+                        $language
+                    );
+                    if (is_numeric($key)) {
+                        $result['link_name'] = $nameSelect;
+                    } else {
+                        $result[$key] = $nameSelect;
+                    }
+                    break;
+            }
+        }
+
+        return $result;
+    }
+
+    private function applyFilters(Sql\Select $select, array $options, $id, string $prefix): array
+    {
+        $defaults = [
+            'id'                 => null,
+            'item_type_id'       => null,
+            'descendant'         => null,
+            'descendant_or_self' => null,
+            'ancestor'           => null,
+            'ancestor_or_self'   => null,
+            'parent'             => null,
+            'child'              => null,
+            'has_specs_of_user'  => null,
+            'linked_in_days'     => null,
+            'catname'            => null,
+            'language'           => null,
+        ];
+        $options = array_replace($defaults, $options);
+
+        $language = isset($options['language']) ? $options['language'] : null;
+
+        $group = [];
+
+        if ($options['id']) {
+            if (is_array($options['id'])) {
+                $select->where([new Sql\Predicate\In($id, $options['id'])]);
+            } else {
+                $select->where([$id => $options['id']]);
+            }
+        }
+
+        if ($options['item_type_id']) {
+            $alias = $prefix.'i1';
+            $select->join([$alias => 'item'], $id . ' = ' . $alias. '.id', []);
+            if (is_array($options['item_type_id'])) {
+                $select->where([new Sql\Predicate\In($alias . '.item_type_id', $options['item_type_id'])]);
+            } else {
+                $select->where([$alias . '.item_type_id' => $options['item_type_id']]);
+            }
+        }
+
+        if ($options['descendant']) {
+            $group[] = 'item.id';
+            $alias = $prefix.'ipc1';
+            $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.parent_id', [])
+                ->where([$alias . '.item_id != ' . $alias . '.parent_id']);
+
+            if (is_array($options['descendant'])) {
+                $subGroup = $this->applyFilters($select, $options['descendant'], $alias . '.item_id', $alias);
+                $group = array_merge($group, $subGroup);
+            } else {
+                $select->where([$alias . '.item_id' => $options['descendant']]);
+            }
+        }
+
+        if ($options['descendant_or_self']) {
+            $group[] = 'item.id';
+            $alias = $prefix.'ipc2';
+
+            $columns = [];
+            if (is_array($options['descendant_or_self'])) {
+                if (isset($options['descendant_or_self']['columns'])) {
+                    foreach ((array)$options['descendant_or_self']['columns'] as $key => $column) {
+                        switch ($column) {
+                            case 'id':
+                                if (is_numeric($key)) {
+                                    $columns[] = 'item_id';
+                                    $group[] = 'item_id';
+                                } else {
+                                    $columns[$key] = 'item_id';
+                                    $group[] = $key;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+
+            $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.parent_id', $columns);
+
+            if (is_array($options['descendant_or_self'])) {
+                $subGroup = $this->applyFilters($select, $options['descendant_or_self'], $alias . '.item_id', $alias);
+                $group = array_merge($group, $subGroup);
+            } else {
+                $select->where([$alias . '.item_id' => $options['descendant_or_self']]);
+            }
+        }
+
+        if ($options['ancestor']) {
+            $group[] = 'item.id';
+            $alias = $prefix.'ipc3';
+            $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.item_id', [])
+                ->where([$alias . '.item_id != ' . $alias . '.parent_id']);
+
+            if (is_array($options['ancestor'])) {
+                $subGroup = $this->applyFilters($select, $options['ancestor'], $alias . '.parent_id', $alias);
+                $group = array_merge($group, $subGroup);
+            } else {
+                $select->where([$alias . '.parent_id' => $options['ancestor']]);
+            }
+        }
+
+        if ($options['ancestor_or_self']) {
+            $group[] = 'item.id';
+            $alias = $prefix.'ipc4';
+            $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.item_id', []);
+
+            if (is_array($options['ancestor_or_self'])) {
+                if (isset($options['ancestor_or_self']['max_diff']) && $options['ancestor_or_self']['max_diff']) {
+                    $select->where([$alias . '.diff <= ?' => $options['ancestor_or_self']['max_diff']]);
+                }
+
+                if (isset($options['ancestor_or_self']['stock_only']) && $options['ancestor_or_self']['stock_only']) {
+                    $select->where('not ' . $alias . '.tuning')
+                           ->where('not ' . $alias . '.sport');
+                }
+
+                $subGroup = $this->applyFilters($select, $options['ancestor_or_self'], $alias . '.parent_id', $alias);
+                $group = array_merge($group, $subGroup);
+            } else {
+                $select->where([$alias . '.parent_id' => $options['ancestor_or_self']]);
+            }
+        }
+
+        if ($options['parent']) {
+            $alias = $prefix.'ip1';
+
+            $columns = [];
+
+            if (is_array($options['parent']) && isset($options['parent']['columns']) && $options['parent']['columns']) {
+                $columns = $this->applyColumns($options['parent']['columns'], $alias . '.parent_id', $language);
+            }
+
+            $select->join([$alias => 'item_parent'], $id . ' = ' . $alias . '.item_id', $columns);
+
+            if (is_array($options['parent'])) {
+                if (isset($options['parent']['linked_in_days']) && $options['parent']['linked_in_days']) {
+                    $select->where([
+                        new Sql\Expression(
+                            $alias . '.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)',
+                            [$options['parent']['linked_in_days']]
+                        )
+                    ]);
+                }
+
+                if (isset($options['parent']['link_catname']) && $options['parent']['link_catname']) {
+                    $select->where([$alias . '.catname' => $options['parent']['link_catname']]);
+                }
+
+                if (isset($options['parent']['link_type']) && $options['parent']['link_type']) {
+                    $select->where([$alias . '.type' => $options['parent']['link_type']]);
+                }
+
+                $subGroup = $this->applyFilters($select, $options['parent'], $alias . '.parent_id', $alias);
+                $group = array_merge($group, $subGroup);
+            } else {
+                $select->where([$alias . '.parent_id' => $options['parent']]);
+            }
+        }
+
+        if ($options['child']) {
+            $alias = $prefix.'ip2';
+
+            $columns = [];
+
+            if (is_array($options['child']) && isset($options['child']['columns']) && $options['child']['columns']) {
+                $columns = $this->applyColumns($options['child']['columns'], $alias . '.item_id', $language);
+            }
+
+            $select->join([$alias => 'item_parent'], $id . ' = ' . $alias. '.parent_id', $columns);
+
+            if (is_array($options['child'])) {
+                if (isset($options['child']['link_catname']) && $options['child']['link_catname']) {
+                    $select->where([$alias . '.catname' => $options['child']['link_catname']]);
+                }
+
+                $subGroup = $this->applyFilters($select, $options['child'], $alias . '.item_id', $alias);
+                $group = array_merge($group, $subGroup);
+            } else {
+                $select->where([$alias . '.item_id' => $options['child']]);
+            }
+        }
+
+        if ($options['has_specs_of_user']) {
+            $group[] = 'item.id';
+            $select->join('attrs_user_values', $id . ' = attrs_user_values.item_id', [])
+                ->where(['attrs_user_values.user_id' => $options['has_specs_of_user']]);
+        }
+
+        if (isset($options['pictures']) && $options['pictures']) {
+            $group[] = 'item.id';
+
+            $this->applyPicturesFilter($select, $id, $options['pictures']);
+        }
+
+        return $group;
+    }
+
+    private function applyPicturesFilter(Sql\Select $select, $id, array $options)
+    {
+        $defaults = [
+            'user'   => null,
+            'status' => null,
+            'id'     => null
+        ];
+        $options = array_replace($defaults, $options);
+
+        $select->join(['pi1' => 'picture_item'], $id . ' = pi1.item_id', [])
+            ->join(['p1' => 'pictures'], 'pi1.picture_id = p1.id', []);
+
+        if ($options['user']) {
+            $select->where(['p1.owner_id' => $options['user']]);
+        }
+
+        if ($options['status']) {
+            $select->where(['p1.status' => $options['status']]);
+        }
+
+        if ($options['id']) {
+            $select->where(['p1.id' => $options['id']]);
+        }
+    }
+
+    private function getNameSelect($value, string $valueType, string $language): Sql\Select
+    {
+        $predicate = new Sql\Predicate\Operator(
+            'item_id',
+            Sql\Predicate\Operator::OP_EQ,
+            $value,
+            Sql\ExpressionInterface::TYPE_IDENTIFIER,
+            $valueType
+        );
+
+        $languages = array_merge([$language], $this->languagePriority);
+
+        $select = new Sql\Select($this->itemLanguageTable->getTable());
+        $select->columns(['name'])
+            ->where([
+                $predicate,
+                new Sql\Predicate\Expression('length(item_language.name) > 0')
+            ])
+            ->order([new Sql\Expression('FIELD(item_language.language' . str_repeat(', ?', count($languages)) . ')', $languages)])
+            ->limit(1);
+
+        return $select;
+    }
+
+    private function getItemParentNameSelect($value, string $valueType, string $language): Sql\Select
+    {
+        $predicate = new Sql\Predicate\Operator(
+            'item_id',
+            Sql\Predicate\Operator::OP_EQ,
+            $value,
+            Sql\ExpressionInterface::TYPE_IDENTIFIER,
+            $valueType
+        );
+
+        $languages = array_merge([$language], $this->languagePriority);
+
+        $select = new Sql\Select($this->itemLanguageTable->getTable());
+        $select->columns(['name'])
+            ->where([
+                $predicate,
+                new Sql\Predicate\Expression('length(item_language.name) > 0')
+            ])
+            ->order([new Sql\Expression('FIELD(item_language.language' . str_repeat(', ?', count($languages)) . ')', $languages)])
+            ->limit(1);
+
+        return $select;
+    }
+
+    public function getSelect(array $options): Sql\Select
+    {
+        $defaults = [
+            'columns'         => null,
+            'language'        => null,
+            'item_type_id'    => null,
+            'item_type_id_exclude' => null,
+            'exclude_id'      => null,
+            'limit'           => null,
+            'order'           => null,
+            'created_in_days' => null,
+            'engine_id'       => null,
+            'dateless'        => null,
+            'dateful'         => null,
+            'is_group'        => null,
+            'is_concept'      => null,
+            'is_concept_inherit' => null,
+            'no_parents'      => null,
+            'catname'         => null,
+            'vehicle_type_id' => null,
+        ];
+        $options = array_replace($defaults, $options);
+
+        $select = new Sql\Select($this->itemTable->getTable());
+
+        $language = isset($options['language']) ? $options['language'] : null;
+
+        if ($options['columns']) {
+            $columns = [];
+            foreach ((array)$options['columns'] as $key => $column) {
+                if ($column instanceof Sql\Expression) {
+                    $columns[$key] = $column;
+                    continue;
+                }
+
+                if ($column instanceof Sql\Select) {
+                    $columns[$key] = $column;
+                    continue;
+                }
+
+                switch ($column) {
+                    case 'id':
+                    case 'catname':
+                    case 'is_group':
+                    case 'is_concept':
+                    case 'item_type_id':
+                    case 'full_name':
+                    case 'logo_id':
+                    case 'position':
+                        $columns[] = $column;
+                        break;
+                    case 'name':
+                        if (! $language) {
+                            throw new \Exception("Language is required for `name` select");
+                        }
+
+                        $languages = array_merge([$language], $this->languagePriority);
+
+                        $platform = $this->itemTable->getAdapter()->platform;
+                        $quoted = [];
+                        foreach ($languages as $lang) {
+                            $quoted[] = $platform->quoteValue($lang);
+                        }
+
+                        $subSelect = '
+                            SELECT name
+                            FROM item_language
+                            WHERE item_id = item.id AND length(name) > 0
+                            ORDER BY FIELD(language, '.implode(', ', $quoted).')
+                            LIMIT 1
+                        ';
+
+                        $columns = array_merge($columns, [
+                            'begin_year', 'end_year', 'today',
+                            'begin_model_year', 'end_model_year',
+                            'body',
+                            //'name' => $this->getNameSelect('item.id', Sql\ExpressionInterface::TYPE_IDENTIFIER, $language)
+                            'name' => new Sql\Expression('(' . $subSelect . ')')
+                        ]);
+
+                        $select->join('spec', 'item.spec_id = spec.id', [
+                            'spec'      => 'short_name',
+                            'spec_full' => 'name',
+                        ], $select::JOIN_LEFT);
+
+                        break;
+                }
+            }
+
+            $select->columns($columns);
+        }
+
+
+        $recursiveOptions = $options;
+        unset($recursiveOptions['item_type_id']);
+        unset($recursiveOptions['item_type_id_exclude']);
+        unset($recursiveOptions['catname']);
+        unset($recursiveOptions['columns']);
+
+        $group = $this->applyFilters($select, $recursiveOptions, 'item.id', '');
+
+        if ($options['item_type_id']) {
+            if (is_array($options['item_type_id'])) {
+                $select->where([new Sql\Predicate\In('item.item_type_id', $options['item_type_id'])]);
+            } else {
+                $select->where(['item.item_type_id' => $options['item_type_id']]);
+            }
+        }
+
+        if ($options['item_type_id_exclude']) {
+            if (is_array($options['item_type_id_exclude'])) {
+                $select->where([new Sql\Predicate\NotIn('item.item_type_id', $options['item_type_id_exclude'])]);
+            } else {
+                $select->where(['item.item_type_id != ?' => $options['item_type_id_exclude']]);
+            }
+        }
+
+        if ($options['exclude_id']) {
+            $select->where(['item.id != ?' => $options['exclude_id']]);
+        }
+
+        if ($options['limit']) {
+            $select->limit($options['limit']);
+        }
+
+        if ($options['created_in_days']) {
+            $select->where([
+                new Sql\Predicate\Expression(
+                    'item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)',
+                    [$options['created_in_days']]
+                )
+            ]);
+        }
+
+        if ($options['engine_id']) {
+            $select->where(['item.engine_item_id' => $options['engine_id']]);
+        }
+
+        if ($options['dateless']) {
+            $select->where([
+                'item.begin_year is null',
+                'item.begin_model_year is null'
+            ]);
+        }
+
+        if ($options['dateful']) {
+            $select->where([
+                '(item.begin_year is null or item.begin_model_year is null)'
+            ]);
+        }
+
+        if (isset($options['is_group'])) {
+            if ($options['is_group']) {
+                $select->where(['item.is_group']);
+            } else {
+                $select->where(['not item.is_group']);
+            }
+        }
+
+        if (isset($options['is_concept'])) {
+            if ($options['is_concept']) {
+                $select->where(['item.is_concept']);
+            } else {
+                $select->where(['not item.is_concept']);
+            }
+        }
+
+        if (isset($options['is_concept_inherit'])) {
+            if ($options['is_concept_inherit']) {
+                $select->where(['item.is_concept_inherit']);
+            } else {
+                $select->where(['not item.is_concept_inherit']);
+            }
+        }
+
+        if ($options['no_parents']) {
+            $select
+                ->join(['ip3' => 'item_parent'], 'item.id = ip3.item_id', [], $select::JOIN_LEFT)
+                ->where(['ip3.parent_id is null']);
+        }
+
+        if (isset($options['catname'])) {
+            $select->where(['item.catname' => $options['catname']]);
+        }
+
+        if ($options['vehicle_type_id']) {
+            $group[] = ['item.id'];
+            $select
+                ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
+                ->where(['vehicle_vehicle_type.vehicle_type_id' => $options['vehicle_type_id']]);
+        }
+
+        if ($options['order']) {
+            $select->order($options['order']);
+        }
+
+        $group = array_unique($group, SORT_STRING);
+
+        if ($group) {
+            $select->group($group);
+        }
+
+        return $select;
+    }
+
+    public function getPaginator(array $options): Paginator\Paginator
+    {
+        return new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect(
+                $this->getSelect($options),
+                $this->itemTable->getAdapter()
+            )
+        );
+    }
+
+    public function getCount(array $options): int
+    {
+        return $this->getPaginator($options)->getTotalItemCount();
+    }
+
+    public function getCountPairs(array $options): array
+    {
+        $select = $this->getSelect($options);
+        $select->reset($select::COLUMNS);
+        $select->reset($select::ORDER);
+        $select->reset($select::GROUP);
+        $select->columns(['id', 'count' => new Sql\Expression('count(1)')])
+            ->group('item.id')
+            ->order('count DESC');
+
+        $result = [];
+        foreach ($this->itemTable->selectWith($select) as $row) {
+            $result[(int)$row['id']] = (int)$row['count'];
+        }
+
+        return $result;
+    }
+
+    public function getRow(array $options)
+    {
+        $select = $this->getSelect($options);
+        $select->limit(1);
+
+        return $this->itemTable->selectWith($select)->current();
+    }
+
+    public function isExists(array $options): bool
+    {
+        $select = $this->getSelect($options);
+        $select->reset($select::COLUMNS);
+        $select->reset($select::ORDER);
+        $select->reset($select::GROUP);
+        $select->columns(['id']);
+        $select->limit(1);
+
+        return (bool)$this->itemTable->selectWith($select)->current();
+    }
+
+    public function getRows(array $options): array
+    {
+        $select = $this->getSelect($options);
+        $result = [];
+        foreach ($this->itemTable->selectWith($select) as $row) {
+            $result[] = $row;
+        }
+
+        return $result;
+    }
+
+    public function getIds(array $options): array
+    {
+        $select = $this->getSelect($options);
+        $select->reset($select::COLUMNS);
+        $select->columns(['id']);
+
+        $result = [];
+        foreach ($this->itemTable->selectWith($select) as $row) {
+            $result[] = (int)$row['id'];
+        }
+
+        return $result;
     }
 }

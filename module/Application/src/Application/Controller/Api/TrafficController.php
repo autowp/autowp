@@ -129,7 +129,7 @@ class TrafficController extends AbstractRestfulController
         $this->service->ban(
             $ip,
             $data['period'] * 3600,
-            $this->user()->get()->id,
+            $this->user()->get()['id'],
             $data['reason']
         );
 

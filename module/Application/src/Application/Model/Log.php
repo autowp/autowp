@@ -14,8 +14,6 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
 
-use Zend_Db_Table_Row_Abstract;
-
 class Log
 {
     const EVENTS_PER_PAGE = 40;
@@ -50,14 +48,21 @@ class Log
      */
     private $eventUserTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $itemTable;
+
     public function __construct(
         DbTable\Picture $pictureTable,
         TableGateway $logTable,
         TableGateway $eventArticleTable,
         TableGateway $eventItemTable,
         TableGateway $eventPictureTable,
-        TableGateway $eventUserTable
+        TableGateway $eventUserTable,
+        TableGateway $itemTable
     ) {
+        $this->itemTable = $itemTable;
         $this->eventTable = $logTable;
         $this->pictureTable = $pictureTable;
         $this->eventArticleTable = $eventArticleTable;
@@ -66,11 +71,11 @@ class Log
         $this->eventUserTable = $eventUserTable;
     }
 
-    public function addEvent($userId, $message, $objects)
+    public function addEvent(int $userId, string $message, array $objects)
     {
         $this->eventTable->insert([
             'description'  => $message,
-            'user_id'      => (int)$userId,
+            'user_id'      => $userId,
             'add_datetime' => new Sql\Expression('NOW()')
         ]);
         $id = $this->eventTable->getLastInsertValue();
@@ -78,53 +83,67 @@ class Log
         $this->assign($id, $objects);
     }
 
-    private function assign($id, $items)
+    private function assign($id, array $items)
     {
-        $items = is_array($items) ? $items : [$items];
+        $defaults = [
+            'items'    => [],
+            'pictures' => [],
+            'users'    => [],
+            'articles' => []
+        ];
+        $items = array_replace($defaults, $items);
 
-        foreach ($items as $item) {
-            if (! ($item instanceof Zend_Db_Table_Row_Abstract)) {
-                throw new Exception('Not a table row');
-            }
-
-            $table = $item->getTable();
-
-            $col = $linkTable = null;
-            switch (true) {
-                case $table instanceof DbTable\Picture:
-                    $col = 'picture_id';
-                    $linkTable = $this->eventPictureTable;
-                    break;
-                case $table instanceof DbTable\Item:
-                    $col = 'item_id';
-                    $linkTable = $this->eventItemTable;
-                    break;
-                case $table instanceof DbTable\Article:
-                    $col = 'article_id';
-                    $linkTable = $this->eventArticleTable;
-                    break;
-                case $table instanceof User:
-                    $col = 'user_id';
-                    $linkTable = $this->eventUserTable;
-                    break;
-                default:
-                    throw new Exception('Unknown data type');
-            }
-
-            if ($col && $linkTable) {
-                try {
-                    $linkTable->insert([
-                        'log_event_id' => $id,
-                        $col           => $item['id']
-                    ]);
-                } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $e) {
-                    if (strpos($e->getMessage(), 'Duplicate entry') === false) {
-                        throw $e;
-                    }
+        foreach ((array)$items['items'] as $item) {
+            try {
+                $this->eventItemTable->insert([
+                    'log_event_id' => $id,
+                    'item_id'      => $item
+                ]);
+            } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $e) {
+                if (strpos($e->getMessage(), 'Duplicate entry') === false) {
+                    throw $e;
                 }
             }
         }
-        return $this;
+
+        foreach ((array)$items['pictures'] as $item) {
+            try {
+                $this->eventPictureTable->insert([
+                    'log_event_id' => $id,
+                    'picture_id'   => $item
+                ]);
+            } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $e) {
+                if (strpos($e->getMessage(), 'Duplicate entry') === false) {
+                    throw $e;
+                }
+            }
+        }
+
+        foreach ((array)$items['users'] as $item) {
+            try {
+                $this->eventUserTable->insert([
+                    'log_event_id' => $id,
+                    'user_id'      => $item
+                ]);
+            } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $e) {
+                if (strpos($e->getMessage(), 'Duplicate entry') === false) {
+                    throw $e;
+                }
+            }
+        }
+
+        foreach ((array)$items['articles'] as $item) {
+            try {
+                $this->eventArticleTable->insert([
+                    'log_event_id' => $id,
+                    'article_id'      => $item
+                ]);
+            } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $e) {
+                if (strpos($e->getMessage(), 'Duplicate entry') === false) {
+                    throw $e;
+                }
+            }
+        }
     }
 
     public function getList(array $options)
@@ -139,7 +158,6 @@ class Log
         ];
         $options = array_replace($defaults, $options);
 
-        $itemTable = new DbTable\Item();
         $userTable = new User();
 
         $select = new Sql\Select($this->eventTable->getTable());
@@ -181,11 +199,14 @@ class Log
 
         $events = [];
         foreach ($paginator->getCurrentItems() as $event) {
-            $itemRows = $itemTable->fetchAll(
-                $itemTable->select(true)
-                    ->join('log_events_item', 'item.id = log_events_item.item_id', null)
-                    ->where('log_events_item.log_event_id = ?', $event['id'])
-            );
+            $select = new Sql\Select($this->itemTable->getTable());
+            $select->join('log_events_item', 'item.id = log_events_item.item_id', [])
+                ->where(['log_events_item.log_event_id' => $event['id']]);
+
+            $itemRows = [];
+            foreach ($this->itemTable->selectWith($select) as $row) {
+                $itemRows[] = $row;
+            }
 
             $pictureRows = $this->pictureTable->fetchAll(
                 $this->pictureTable->select(true)
@@ -197,7 +218,7 @@ class Log
                 'user'     => $userTable->find($event['user_id'])->current(),
                 'date'     => Table\Row::getDateTimeByColumnType('timestamp', $event['add_datetime']),
                 'desc'     => $event['description'],
-                'items'    => $itemRows->toArray(),
+                'items'    => $itemRows,
                 'pictures' => $pictureRows
             ];
         }

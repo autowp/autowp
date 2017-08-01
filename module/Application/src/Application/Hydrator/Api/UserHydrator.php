@@ -89,14 +89,14 @@ class UserHydrator extends RestHydrator
                 $longAway = true;
             }
 
-            $isGreen = $object->role && $this->acl->isAllowed($object->role, 'status', 'be-green');
+            $isGreen = $object['role'] && $this->acl->isAllowed($object['role'], 'status', 'be-green');
 
             $user = [
                 'id'        => (int)$object['id'],
                 'name'      => $object['name'],
                 'deleted'   => $deleted,
                 'url'       => $this->router->assemble([
-                    'user_id' => $object->identity ? $object->identity : 'user' . $object->id
+                    'user_id' => $object['identity'] ? $object['identity'] : 'user' . $object['id']
                 ], [
                     'name' => 'users/user'
                 ]),

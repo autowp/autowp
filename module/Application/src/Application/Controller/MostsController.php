@@ -106,7 +106,7 @@ class MostsController extends AbstractActionController
 
             foreach ($car['pictures'] as $picture) {
                 if ($picture) {
-                    $id = $picture->id;
+                    $id = $picture['id'];
 
                     $url = null;
                     foreach ($paths as $path) {

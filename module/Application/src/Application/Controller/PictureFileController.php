@@ -70,7 +70,7 @@ class PictureFileController extends AbstractActionController
         if ($referer) {
             $blacklisted = $this->referer->isUrlBlacklisted($referer);
 
-            /*if ($blacklistRow && $blacklistRow->hard) {
+            /*if ($blacklistRow && $blacklistRow['hard']) {
                 return $this->getResponse()
                     ->setStatusCode(429)
                     ->getHeaders()

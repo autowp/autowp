@@ -12,8 +12,6 @@ use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Application\ItemNameFormatter;
 
-use Zend_Db_Expr;
-
 class Car extends AbstractPlugin
 {
     /**
@@ -112,11 +110,9 @@ class Car extends AbstractPlugin
         $language = $controller->language();
         $catalogue = $controller->catalogue();
 
-        $itemTable = new DbTable\Item();
-
         $carIds = [];
         foreach ($cars as $car) {
-            $carIds[] = (int)$car->id;
+            $carIds[] = (int)$car['id'];
         }
 
         if ($carIds) {
@@ -128,26 +124,20 @@ class Car extends AbstractPlugin
         // categories
         $carsCategories = [];
         if ($carIds && ! $disableCategories) {
-            $db = $itemTable->getAdapter();
-            $langExpr = $db->quoteInto(
-                'item.id = item_language.item_id and item_language.language = ?',
-                $language
-            );
-            $categoryRows = $db->fetchAll(
-                $db->select()
-                    ->from($itemTable->info('name'), [
-                        'catname', 'begin_year', 'end_year',
-                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,item.name)')
-                    ])
-                    ->where('item.item_type_id = ?', Item::CATEGORY)
-                    ->joinLeft('item_language', $langExpr, ['lang_name' => 'name'])
-                    ->join('item_parent', 'item.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
-                    ->where('top_item.item_type_id IN (?)', [Item::VEHICLE, Item::ENGINE])
-                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
-                    ->where('item_parent_cache.item_id IN (?)', $carIds)
-                    ->group(['item_parent_cache.item_id', 'item.id'])
-            );
+            $categoryRows = $this->itemModel->getRows([
+                'language'     => $language,
+                'columns'      => ['catname', 'name'],
+                'item_type_id' => Item::CATEGORY,
+                'child'        => [
+                    'item_type_id'       => [Item::VEHICLE, Item::ENGINE],
+                    'descendant_or_self' => [
+                        'id'      => $carIds,
+                        'columns' => [
+                            'item_id' => 'id'
+                        ]
+                    ]
+                ]
+            ]);
 
             foreach ($categoryRows as $category) {
                 $carId = (int)$category['item_id'];
@@ -200,30 +190,28 @@ class Car extends AbstractPlugin
         $carsTotalPictures = $pictureFetcher->getTotalPictures($carIds, $onlyExactlyPictures);
         $items = [];
         foreach ($cars as $car) {
-            $totalPictures = isset($carsTotalPictures[$car->id]) ? $carsTotalPictures[$car->id] : null;
+            $totalPictures = isset($carsTotalPictures[$car['id']]) ? $carsTotalPictures[$car['id']] : null;
 
-            // design projects
-            $designCarsRow = $itemTable->getAdapter()->fetchRow(
-                $itemTable->getAdapter()->select()
-                    ->from('item', [
-                        'brand_name'    => 'name',
-                        'brand_catname' => 'catname'
-                    ])
-                    ->join('item_parent', 'item.id = item_parent.parent_id', [
-                        'brand_item_catname' => 'catname'
-                    ])
-                    ->where('item_parent.type = ?', ItemParent::TYPE_DESIGN)
-                    ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
-                    ->where('item_parent_cache.item_id = ?', $car->id)
-                    ->limit(1)
-            );
+            $designCarsRow = $this->itemModel->getRow([
+                'language' => $language,
+                'columns'  => ['catname', 'name'],
+                'child'    => [
+                    'link_type'  => ItemParent::TYPE_DESIGN,
+                    'columns'    => [
+                        'brand_item_catname' => 'link_catname'
+                    ],
+                    'descendant' => $car['id']
+                ]
+            ]);
+
+            // design project
             $designProjectData = false;
             if ($designCarsRow) {
                 $designProjectData = [
-                    'brandName' => $designCarsRow['brand_name'],
+                    'brandName' => $designCarsRow['name'], //TODO: formatter
                     'url'       => $controller->url()->fromRoute('catalogue', [
                         'action'        => 'brand-item',
-                        'brand_catname' => $designCarsRow['brand_catname'] ? $designCarsRow['brand_catname'] : 'test',
+                        'brand_catname' => $designCarsRow['catname'] ? $designCarsRow['catname'] : 'test',
                         'car_catname'   => $designCarsRow['brand_item_catname']
                     ])
                 ];
@@ -231,7 +219,7 @@ class Car extends AbstractPlugin
 
             $categories = [];
             if (! $disableCategories) {
-                $categories = isset($carsCategories[$car->id]) ? $carsCategories[$car->id] : [];
+                $categories = isset($carsCategories[$car['id']]) ? $carsCategories[$car['id']] : [];
             }
 
             $cFetcher = $pictureFetcher;
@@ -239,7 +227,7 @@ class Car extends AbstractPlugin
                 $cFetcher = $this->getCategoryPictureFetcher();
             }
 
-            $pictures = $cFetcher->fetch($car->toArray(), [
+            $pictures = $cFetcher->fetch($car, [
                 'totalPictures' => $totalPictures
             ]);
             $largeFormat = false;
@@ -290,21 +278,21 @@ class Car extends AbstractPlugin
                 }
             }
 
-            $childsCount = isset($childsCounts[$car->id]) ? $childsCounts[$car->id] : 0;
+            $childsCount = isset($childsCounts[$car['id']]) ? $childsCounts[$car['id']] : 0;
 
             $vehiclesOnEngine = [];
-            if ($car->item_type_id == Item::ENGINE) {
+            if ($car['item_type_id'] == Item::ENGINE) {
                 $vehiclesOnEngine = $this->getVehiclesOnEngine($car);
             }
 
             $item = [
-                'id'               => $car->id,
+                'id'               => $car['id'],
                 'itemTypeId'       => $car['item_type_id'],
-                'name'             => $car->name,
+                'name'             => $car['name'],
                 'nameData'         => $this->itemModel->getNameData($car, $language),
-                'langName'         => isset($carsLangName[$car->id]) ? $carsLangName[$car->id] : null,
-                'produced'         => $car->produced,
-                'produced_exactly' => $car->produced_exactly,
+                'langName'         => isset($carsLangName[$car['id']]) ? $carsLangName[$car['id']] : null,
+                'produced'         => $car['produced'],
+                'produced_exactly' => $car['produced_exactly'],
                 'designProject'    => $designProjectData,
                 'totalPictures'    => $totalPictures,
                 'categories'       => $categories,
@@ -318,7 +306,7 @@ class Car extends AbstractPlugin
             ];
 
             if (! $disableTwins) {
-                $item['twinsGroups'] = isset($carsTwinsGroups[$car->id]) ? $carsTwinsGroups[$car->id] : [];
+                $item['twinsGroups'] = isset($carsTwinsGroups[$car['id']]) ? $carsTwinsGroups[$car['id']] : [];
             }
 
             if (count($item['pictures']) < $item['totalPictures']) {
@@ -347,7 +335,7 @@ class Car extends AbstractPlugin
             if ($specEditor) {
                 $item['specEditorUrl'] = $controller->url()->fromRoute('cars/params', [
                     'action'  => 'car-specifications-editor',
-                    'item_id' => $car->id
+                    'item_id' => $car['id']
                 ]);
             }
 
@@ -356,8 +344,8 @@ class Car extends AbstractPlugin
             }
 
             if ($listBuilder->isTypeUrlEnabled()) {
-                $tuningCount = isset($carsTypeCounts[$car->id][ItemParent::TYPE_TUNING])
-                    ? $carsTypeCounts[$car->id][ItemParent::TYPE_TUNING]
+                $tuningCount = isset($carsTypeCounts[$car['id']][ItemParent::TYPE_TUNING])
+                    ? $carsTypeCounts[$car['id']][ItemParent::TYPE_TUNING]
                     : 0;
                 if ($tuningCount) {
                     $url = $listBuilder->getTypeUrl($car, ItemParent::TYPE_TUNING);
@@ -367,8 +355,8 @@ class Car extends AbstractPlugin
                     ];
                 }
 
-                $sportCount = isset($carsTypeCounts[$car->id][ItemParent::TYPE_SPORT])
-                    ? $carsTypeCounts[$car->id][ItemParent::TYPE_SPORT]
+                $sportCount = isset($carsTypeCounts[$car['id']][ItemParent::TYPE_SPORT])
+                    ? $carsTypeCounts[$car['id']][ItemParent::TYPE_SPORT]
                     : 0;
                 if ($sportCount) {
                     $url = $listBuilder->getTypeUrl($car, ItemParent::TYPE_SPORT);
@@ -441,7 +429,7 @@ class Car extends AbstractPlugin
     {
         $result = [];
 
-        $ids = $this->itemModel->getEngineVehiclesGroups($engine->id, [
+        $ids = $this->itemModel->getEngineVehiclesGroups($engine['id'], [
             'groupJoinLimit' => 3
         ]);
 
@@ -449,11 +437,12 @@ class Car extends AbstractPlugin
             $controller = $this->getController();
             $language = $controller->language();
             $catalogue = $controller->catalogue();
-            $itemTable = new DbTable\Item();
 
-            $rows = $itemTable->fetchAll([
-                'id in (?)' => $ids
-            ], $catalogue->itemOrdering());
+            $rows = $this->itemModel->getRows([
+                'id'    => $ids,
+                'order' => $catalogue->itemOrdering()
+            ]);
+
             foreach ($rows as $row) {
                 $cataloguePaths = $catalogue->getCataloguePaths($row['id']);
                 foreach ($cataloguePaths as $cPath) {
@@ -474,7 +463,7 @@ class Car extends AbstractPlugin
         return $result;
     }
 
-    public function formatName(\Autowp\Commons\Db\Table\Row $vehicle, $language)
+    public function formatName($vehicle, $language)
     {
         return $this->itemNameFormatter->format(
             $this->itemModel->getNameData($vehicle, $language),

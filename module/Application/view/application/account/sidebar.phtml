@@ -33,7 +33,7 @@ $items = [
     [
         'active' => $this->pageEnv()->isOnPath(130),
         'url'    => $this->url('users/user/pictures', [
-            'user_id'  => $this->user()->get()->identity ? $this->user()->get()->identity : 'user' . $this->user()->get()->id
+            'user_id'  => $this->user()->get()['identity'] ? $this->user()->get()['identity'] : 'user' . $this->user()->get()['id']
         ]),
         'icon'   => 'th',
         'name'   => $this->page(130)->name,

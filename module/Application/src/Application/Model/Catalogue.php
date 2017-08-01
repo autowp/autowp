@@ -18,14 +18,9 @@ class Catalogue
     private $carsPerPage = 7;
 
     /**
-     * @var DbTable\Item
-     */
-    private $itemTable;
-
-    /**
      * @var TableGateway
      */
-    private $itemTable2;
+    private $itemTable;
 
     /**
      * @var ItemParent
@@ -34,7 +29,7 @@ class Catalogue
 
     public function __construct(ItemParent $itemParent, TableGateway $itemTable)
     {
-        $this->itemTable2 = $itemTable;
+        $this->itemTable = $itemTable;
         $this->itemParent = $itemParent;
     }
 
@@ -87,16 +82,6 @@ class Catalogue
     }
 
     /**
-     * @return DbTable\Item
-     */
-    public function getItemTable()
-    {
-        return $this->itemTable
-            ? $this->itemTable
-            : $this->itemTable = new DbTable\Item();
-    }
-
-    /**
      * @param int $id
      * @param array $options
      * @return array
@@ -128,7 +113,7 @@ class Catalogue
         $result = [];
 
         if (! $toBrandId || $id == $toBrandId) {
-            $select = new Sql\Select($this->itemTable2->getTable());
+            $select = new Sql\Select($this->itemTable->getTable());
             $select
                 ->columns(['catname'])
                 ->where([
@@ -136,7 +121,7 @@ class Catalogue
                     'item_type_id' => Item::BRAND
                 ]);
 
-            $brand = $this->itemTable2->selectWith($select)->current();
+            $brand = $this->itemTable->selectWith($select)->current();
 
             if ($brand) {
                 $result[] = [
@@ -154,7 +139,7 @@ class Catalogue
         }
 
         if ($toBrand === false) {
-            $select = new Sql\Select($this->itemTable2->getTable());
+            $select = new Sql\Select($this->itemTable->getTable());
             $select
                 ->columns(['catname'])
                 ->where([
@@ -162,7 +147,7 @@ class Catalogue
                     'item_type_id' => Item::CATEGORY
                 ]);
 
-            $category = $this->itemTable2->selectWith($select)->current();
+            $category = $this->itemTable->selectWith($select)->current();
 
             if ($category) {
                 $result[] = [

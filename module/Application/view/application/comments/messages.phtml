@@ -24,10 +24,10 @@
             <?=$comment['author'] ? $this->user($comment['author']) : $this->escapeHtml($this->translate('comments/author/anonymous'))?>
         </div>
         <div class="photo">
-            <?php if ($comment['author'] && !$comment['author']->deleted) { ?>
+            <?php if ($comment['author'] && !$comment['author']['deleted']) { ?>
                 <?=$this->htmlA([
                     'href'  => $this->url('users/user', [
-                        'user_id' => $comment['author']->identity ? $comment['author']->identity : 'user' . $comment['author']->id
+                        'user_id' => $comment['author']['identity'] ? $comment['author']['identity'] : 'user' . $comment['author']['id']
                     ]),
                     'class' => 'photo'
                 ], $this->user($comment['author'])->avatar(), false) ?>

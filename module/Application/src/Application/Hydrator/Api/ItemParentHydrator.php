@@ -2,7 +2,7 @@
 
 namespace Application\Hydrator\Api;
 
-use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\ItemParent;
 
 class ItemParentHydrator extends RestHydrator
@@ -15,9 +15,9 @@ class ItemParentHydrator extends RestHydrator
     private $router;
 
     /**
-     * @var DbTable\Item
+     * @var Item
      */
-    private $itemTable;
+    private $item;
 
     /**
      * @var ItemParent
@@ -32,7 +32,7 @@ class ItemParentHydrator extends RestHydrator
         $this->router = $serviceManager->get('HttpRouter');
         $this->itemParent = $serviceManager->get(ItemParent::class);
 
-        $this->itemTable = new DbTable\Item();
+        $this->item = $serviceManager->get(Item::class);
 
         $strategy = new Strategy\Item($serviceManager);
         $this->addStrategy('item', $strategy);
@@ -95,13 +95,13 @@ class ItemParentHydrator extends RestHydrator
         ];
 
         if ($this->filterComposite->filter('item')) {
-            $item = $this->itemTable->find($object['item_id'])->current();
-            $result['item'] = $item ? $this->extractValue('item', $item->toArray()) : null;
+            $item = $this->item->getRow(['id' => $object['item_id']]);
+            $result['item'] = $item ? $this->extractValue('item', $item) : null;
         }
 
         if ($this->filterComposite->filter('parent')) {
-            $item = $this->itemTable->find($object['parent_id'])->current();
-            $result['parent'] = $item ? $this->extractValue('parent', $item->toArray()) : null;
+            $item = $this->item->getRow(['id' => $object['parent_id']]);
+            $result['parent'] = $item ? $this->extractValue('parent', $item) : null;
         }
 
         if ($this->filterComposite->filter('name')) {
@@ -113,35 +113,34 @@ class ItemParentHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('duplicate_parent')) {
-            $select = $this->itemTable->select(true)
-                ->join('item_parent', 'item.id = item_parent.parent_id', null)
-                ->where('item_parent.item_id = ?', $object['item_id'])
-                ->where('item_parent.parent_id <> ?', $object['parent_id'])
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $object['parent_id'])
-                ->where('not item_parent_cache.tuning')
-                ->where('not item_parent_cache.sport')
-                ->where('item_parent.type = ?', ItemParent::TYPE_DEFAULT);
-
-            $duplicateRow = $this->itemTable->fetchRow($select);
+            $duplicateRow = $this->item->getRow([
+                'exclude_id' => $object['parent_id'],
+                'child' => [
+                    'id' => $object['item_id'],
+                    'link_type' => ItemParent::TYPE_DEFAULT
+                ],
+                'ancestor_or_self' => [
+                    'id'         => $object['parent_id'],
+                    'stock_only' => true
+                ]
+            ]);
 
             $result['duplicate_parent'] = $duplicateRow
-                ? $this->extractValue('duplicate_parent', $duplicateRow->toArray()) : null;
+                ? $this->extractValue('duplicate_parent', $duplicateRow) : null;
         }
 
         if ($this->filterComposite->filter('duplicate_child')) {
-            $select = $this->itemTable->select(true)
-                ->join('item_parent', 'item.id = item_parent.item_id', null)
-                ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', $object['item_id'])
-                ->where('item_parent.parent_id = ?', $object['parent_id'])
-                ->where('item_parent.item_id <> ?', $object['item_id'])
-                ->where('item_parent.type = ?', $object['type']);
-
-            $duplicateRow = $this->itemTable->fetchRow($select);
+            $duplicateRow = $this->item->getRow([
+                'exclude_id' => $object['item_id'],
+                'parent' => [
+                    'id' => $object['parent_id'],
+                    'link_type' => $object['type']
+                ],
+                'descendant_or_self' => $object['item_id']
+            ]);
 
             $result['duplicate_child'] = $duplicateRow
-                ? $this->extractValue('duplicate_child', $duplicateRow->toArray()) : null;
+                ? $this->extractValue('duplicate_child', $duplicateRow) : null;
         }
 
         return $result;

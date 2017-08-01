@@ -12,7 +12,7 @@
     <ul>
         <?php foreach ($this->themes as $theme) { ?>
             <li><?=$this->htmlA($this->url('forums/move-message', [
-                'id' => $this->id
+                'id' => $this['id']
             ], [
                 'query' => [
                     'theme_id' => $theme['id']
@@ -24,7 +24,7 @@
     <?php foreach ($this->topics as $topic) { ?>
         <p>
             <?=$this->htmlA($this->url('forums/move-message', [
-                'id' => $this->id
+                'id' => $this['id']
             ], [
                 'query' => [
                     'theme_id' => $this->theme['id'],

@@ -22,10 +22,10 @@
         ])?>
         <div class="content">
             <?php /* if ($this->brandLanguage) { ?>
-                <h1><?=$this->escapeHtml($this->brandLanguage->name) ?></h1>
+                <h1><?=$this->escapeHtml($this->brandLanguage['name']) ?></h1>
                 <p>
-                    <?=$this->escapeHtml($this->brand->name) ?>
-                    <?php if ( $this->brand->full_name && ($this->brand->full_name != $this->brand->name) ) { ?>
+                    <?=$this->escapeHtml($this->brand['name']) ?>
+                    <?php if ( $this->brand->full_name && ($this->brand->full_name != $this->brand['name']) ) { ?>
                         <small>(<?=$this->escapeHtml($this->brand->full_name)?>)</small>
                     <?php } ?>
                 </p>
@@ -71,7 +71,7 @@
         <?php if ($this->inboxPictures) { ?>
             <li>
                 <?=$this->htmlA('/ng/moder/pictures?' . http_build_query([
-                    'status'  => Application\Model\DbTable\Picture::STATUS_INBOX,
+                    'status'  => Application\Model\Picture::STATUS_INBOX,
                     'item_id' => $this->brand['id'],
                 ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge">' . $this->inboxPictures . '</span>', false)?>
             </li>

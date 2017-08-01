@@ -2,7 +2,7 @@
 
 namespace Application\Most\Adapter;
 
-use Zend_Db_Table_Select;
+use Zend\Db\Sql;
 
 class Power extends AbstractAdapter
 {
@@ -20,10 +20,8 @@ class Power extends AbstractAdapter
         $this->order = $value;
     }
 
-    public function getCars(Zend_Db_Table_Select $select, $language)
+    public function getCars(Sql\Select $select, $language)
     {
-        $itemTable = $select->getTable();
-
         $powerAttr = $this->attributeTable->select(['id' => (int)$this->attributes['power']])->current();
 
         $specService = $this->most->getSpecs();
@@ -32,20 +30,20 @@ class Power extends AbstractAdapter
         $valuesTableName = $valuesTable->getTable();
 
         $select
-            ->join($valuesTableName, 'item.id = '.$valuesTableName.'.item_id', null)
-            ->where($valuesTableName.'.attribute_id = ?', $powerAttr['id'])
-            ->where($valuesTableName.'.value > 0')
+            ->join($valuesTableName, 'item.id = '.$valuesTableName.'.item_id', [])
+            ->where([
+                $valuesTableName.'.attribute_id' => $powerAttr['id'],
+                $valuesTableName.'.value > 0'
+            ])
             ->group('item.id')
             ->order($valuesTableName.'.value ' . $this->order)
             ->limit($this->most->getCarsCount());
 
-        $cars = $itemTable->fetchAll($select);
-
         $result = [];
-        foreach ($cars as $car) {
+        foreach ($this->itemTable->selectWith($select) as $car) {
             $html = '';
-            $value = $specService->getActualValue($powerAttr['id'], $car->id);
-            $turbo = $specService->getActualValueText($this->attributes['turbo'], $car->id, $language);
+            $value = $specService->getActualValue($powerAttr['id'], $car['id']);
+            $turbo = $specService->getActualValueText($this->attributes['turbo'], $car['id'], $language);
             switch ($turbo) {
                 case 'нет':
                     $turbo = null;
@@ -59,15 +57,15 @@ class Power extends AbstractAdapter
                     }
                     break;
             }
-            $volume = $specService->getActualValue($this->attributes['volume'], $car->id);
+            $volume = $specService->getActualValue($this->attributes['volume'], $car['id']);
             $cylindersLayout = $specService->getActualValueText(
                 $this->attributes['cylindersLayout'],
                 1,
-                $car->id,
+                $car['id'],
                 $language
             );
-            $cylindersCount = $specService->getActualValue($this->attributes['cylindersCount'], $car->id);
-            $valvePerCylinder = $specService->getActualValue($this->attributes['valvePerCylinder'], $car->id);
+            $cylindersCount = $specService->getActualValue($this->attributes['cylindersCount'], $car['id']);
+            $valvePerCylinder = $specService->getActualValue($this->attributes['valvePerCylinder'], $car['id']);
 
             $cyl = $this->cylinders($cylindersLayout, $cylindersCount, $valvePerCylinder);
 
@@ -95,8 +93,8 @@ class Power extends AbstractAdapter
             }
 
             $result[] = [
-                'car'         => $car,
-                'valueHtml'    => $html,
+                'car'       => $car,
+                'valueHtml' => $html,
             ];
         }
 

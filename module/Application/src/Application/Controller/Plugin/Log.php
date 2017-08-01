@@ -18,13 +18,13 @@ class Log extends AbstractPlugin
         $this->log = $log;
     }
 
-    public function __invoke($message, $objects)
+    public function __invoke(string $message, array $objects)
     {
         $user = $this->getController()->user()->get();
         if (! $user) {
             throw new \Exception('User id not detected');
         }
 
-        $this->log->addEvent($user->id, $message, $objects);
+        $this->log->addEvent($user['id'], $message, $objects);
     }
 }

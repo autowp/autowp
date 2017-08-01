@@ -31,7 +31,8 @@ class CatalogueControllerFactory implements FactoryInterface
             $container->get(\Application\Model\VehicleType::class),
             $container->get(\Application\Model\DbTable\Picture::class),
             $tables->get('modification'),
-            $tables->get('modification_group')
+            $tables->get('modification_group'),
+            $container->get(\Application\Model\Brand::class)
         );
     }
 }

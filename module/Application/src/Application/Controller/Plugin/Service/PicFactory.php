@@ -33,7 +33,8 @@ class PicFactory implements FactoryInterface
             $tables->get('links'),
             $container->get(\Application\Model\PictureModerVote::class),
             $container->get(\Application\Model\DbTable\Picture::class),
-            $tables->get('modification')
+            $tables->get('modification'),
+            $container->get(\Application\Model\Brand::class)
         );
     }
 }

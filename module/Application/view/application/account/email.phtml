@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col-sm-8 col-sm-push-4">
         <div class="well">
-            <?php if ($email = $this->user()->get()->e_mail) { ?>
+            <?php if ($email = $this->user()->get()['e_mail']) { ?>
                 <p>
                     <?=$this->escapeHtml($this->translate('account/email/your-current-email:'))?>
                     <?=$this->htmlA('mailto:' . $email, $email) ?>

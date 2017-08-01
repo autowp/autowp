@@ -4,7 +4,7 @@ namespace Application\Most\Adapter;
 
 use Exception;
 
-use Zend_Db_Table_Select;
+use Zend\Db\Sql;
 
 class Attr extends AbstractAdapter
 {
@@ -22,7 +22,7 @@ class Attr extends AbstractAdapter
         $this->order = $value;
     }
 
-    public function getCars(Zend_Db_Table_Select $select, $language)
+    public function getCars(Sql\Select $select, $language)
     {
         $attribute = $this->attributeTable->select(['id' => (int)$this->attribute])->current();
         if (! $attribute) {
@@ -35,16 +35,16 @@ class Attr extends AbstractAdapter
         $tableName = $valuesTable->getTable();
 
         $select
-            ->where($tableName.'.attribute_id = ?', $attribute['id'])
-            ->where($tableName.'.value IS NOT NULL')
-            ->join($tableName, 'item.id='.$tableName.'.item_id', null)
+            ->where([
+                $tableName.'.attribute_id' => $attribute['id'],
+                $tableName.'.value IS NOT NULL'
+            ])
+            ->join($tableName, 'item.id='.$tableName.'.item_id', [])
             ->order($tableName.'.value ' . $this->order);
 
-        $cars = $select->getTable()->fetchAll($select);
-
         $result = [];
-        foreach ($cars as $car) {
-            $valueText = $specService->getActualValueText($attribute['id'], $car->id, $language);
+        foreach ($this->itemTable->selectWith($select) as $car) {
+            $valueText = $specService->getActualValueText($attribute['id'], $car['id'], $language);
 
             $result[] = [
                 'car'       => $car,

@@ -132,18 +132,18 @@ class Maintenance extends AbstractListenerAggregate
             foreach ($pictures as $idx => $picture) {
                 $comments->deleteTopic(
                     \Application\Comments::PICTURES_TYPE_ID,
-                    $picture->id
+                    $picture['id']
                 );
 
-                $imageId = $picture->image_id;
+                $imageId = $picture['image_id'];
                 if ($imageId) {
                     $picture->delete();
                     $imageStorage->removeImage($imageId);
                 } else {
-                    print "Brokern image `{$picture->id}`. Skip\n";
+                    print "Brokern image `{$picture['id']}`. Skip\n";
                 }
 
-                $progressBar->update($idx + 1, $picture->id);
+                $progressBar->update($idx + 1, $picture['id']);
             }
 
             $progressBar->finish();

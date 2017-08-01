@@ -107,7 +107,7 @@ class PictureItem
             throw new \Exception("Item not found");
         }
 
-        $row->item_id = $newItemId;
+        $row['item_id'] = $newItemId;
         $row->save();
     }
 
@@ -247,7 +247,7 @@ class PictureItem
         if ($row) {
             if (array_key_exists('perspective', $properties)) {
                 $perspective = $properties['perspective'];
-                $row->perspective_id = $perspective ? (int)$perspective : null;
+                $row['perspective_id'] = $perspective ? (int)$perspective : null;
             }
 
             if (array_key_exists('area', $properties)) {
@@ -280,7 +280,7 @@ class PictureItem
             return null;
         }
 
-        return $row->perspective_id;
+        return $row['perspective_id'];
     }
 
     public function getArea($pictureId, $itemId)
@@ -290,13 +290,13 @@ class PictureItem
             return null;
         }
 
-        if (! $row->crop_left || ! $row->crop_top || ! $row->crop_width || ! $row->crop_height) {
+        if (! $row['crop_left'] || ! $row['crop_top'] || ! $row['crop_width'] || ! $row['crop_height']) {
             return null;
         }
 
         return [
-            (int)$row->crop_left,  (int)$row->crop_top,
-            (int)$row->crop_width, (int)$row->crop_height,
+            (int)$row['crop_left'],  (int)$row['crop_top'],
+            (int)$row['crop_width'], (int)$row['crop_height'],
         ];
     }
 }

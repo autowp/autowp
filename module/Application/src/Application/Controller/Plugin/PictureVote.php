@@ -44,7 +44,7 @@ class PictureVote extends AbstractPlugin
     private function isLastPicture($picture)
     {
         $result = null;
-        if ($picture->status == Picture::STATUS_ACCEPTED) {
+        if ($picture['status'] == Picture::STATUS_ACCEPTED) {
             $db = $this->table->getAdapter();
             $result = ! $db->fetchOne(
                 $db->select()
@@ -55,9 +55,9 @@ class PictureVote extends AbstractPlugin
                         'picture_item.item_id = pi2.item_id',
                         null
                     )
-                    ->where('pi2.picture_id = ?', $picture->id)
+                    ->where('pi2.picture_id = ?', $picture['id'])
                     ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                    ->where('pictures.id <> ?', $picture->id)
+                    ->where('pictures.id <> ?', $picture['id'])
             );
         }
 
@@ -78,7 +78,7 @@ class PictureVote extends AbstractPlugin
                     'picture_item.item_id = pi2.item_id',
                     null
                 )
-                ->where('pi2.picture_id = ?', $picture->id)
+                ->where('pi2.picture_id = ?', $picture['id'])
                 ->where('status = ?', Picture::STATUS_ACCEPTED)
         );
 
@@ -147,14 +147,14 @@ class PictureVote extends AbstractPlugin
             'acceptedCount'     => $this->getAcceptedCount($picture),
             'canDelete'         => $this->pictureCanDelete($picture),
             'apiUrl'            => $controller->url()->fromRoute('api/picture/picture/update', [
-                'id' => $picture->id
+                'id' => $picture['id']
             ]),
             'canVote'           => ! $voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
             'voteExists'        => $voteExists,
             'moderVotes'        => $moderVotes,
             'voteOptions' => $this->getVoteOptions2(),
             'voteUrl' => $controller->url()->fromRoute('api/picture-moder-vote', [
-                'id' => $picture->id
+                'id' => $picture['id']
             ]),
         ];
     }

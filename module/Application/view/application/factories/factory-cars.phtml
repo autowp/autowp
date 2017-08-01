@@ -6,20 +6,20 @@
         ],
         'pageId' => 182,
         'args'   => [
-            'FACTORY_ID'   => $this->factory->id,
-            'FACTORY_NAME' => $this->factory->name
+            'FACTORY_ID'   => $this->factory['id'],
+            'FACTORY_NAME' => $this->factory['name']
         ]
     ]);
 ?>
 <ul class="nav nav-pills" style="margin-bottom:10px">
     <li>
         <?=$this->htmlA($this->url('factories/factory', [
-            'id' => $this->factory->id,
-        ]), $this->factory->name) ?>
+            'id' => $this->factory['id'],
+        ]), $this->factory['name']) ?>
     </li>
     <li class="active">
         <?=$this->htmlA($this->url('factories/factory-cars', [
-            'id' => $this->factory->id,
+            'id' => $this->factory['id'],
         ]), $this->translate('factories/factory-items')) ?>
     </li>
 </ul>

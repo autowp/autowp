@@ -106,9 +106,9 @@ class LanguageRouteListener extends AbstractListenerAggregate
             $user = $userTable->find($auth->getIdentity())->current();
 
             if ($user) {
-                $isAllowed = in_array($user->language, $whitelist);
+                $isAllowed = in_array($user['language'], $whitelist);
                 if ($isAllowed) {
-                    $result = $user->language;
+                    $result = $user['language'];
                 }
             }
         }

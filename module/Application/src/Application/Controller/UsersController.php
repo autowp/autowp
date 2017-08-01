@@ -6,6 +6,7 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 
+use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
@@ -16,7 +17,7 @@ use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\UserRename;
 
 use Application\Comments;
-use Application\Model\Brand as BrandModel;
+use Application\Model\Brand;
 use Application\Model\DbTable;
 use Application\Model\Contact;
 use Application\Model\Item;
@@ -65,6 +66,16 @@ class UsersController extends AbstractActionController
      */
     private $pictureTable;
 
+    /**
+     * @var Item
+     */
+    private $item;
+
+    /**
+     * @var Brand
+     */
+    private $brand;
+
     public function __construct(
         $cache,
         TrafficControl $trafficControl,
@@ -73,7 +84,9 @@ class UsersController extends AbstractActionController
         UserRename $userRename,
         Perspective $perspective,
         UserAccount $userAccount,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        Item $item,
+        Brand $brand
     ) {
         $this->cache = $cache;
         $this->trafficControl = $trafficControl;
@@ -83,6 +96,8 @@ class UsersController extends AbstractActionController
         $this->perspective = $perspective;
         $this->userAccount = $userAccount;
         $this->pictureTable = $pictureTable;
+        $this->item = $item;
+        $this->brand = $brand;
     }
 
     private function getUser()
@@ -108,7 +123,7 @@ class UsersController extends AbstractActionController
     private function getLastComments($user)
     {
         $paginator = $this->comments->service()->getMessagesPaginator([
-            'user'            => $user->id,
+            'user'            => $user['id'],
             'exclude_type'    => \Application\Comments::FORUMS_TYPE_ID,
             'exclude_deleted' => true,
             'order'           => 'datetime DESC'
@@ -141,14 +156,14 @@ class UsersController extends AbstractActionController
         $picturesExists = $pictureAdapter->fetchOne(
             $pictureAdapter->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
-                ->where('owner_id = ?', $user->id)
+                ->where('owner_id = ?', $user['id'])
                 ->where('status = ?', Picture::STATUS_ACCEPTED)
         );
 
         $lastPictureRows = $this->pictureTable->fetchAll(
             $this->pictureTable->select()
                 ->from('pictures')
-                ->where('owner_id = ?', $user->id)
+                ->where('owner_id = ?', $user['id'])
                 ->order('id DESC')
                 ->limit(12)
         );
@@ -161,16 +176,16 @@ class UsersController extends AbstractActionController
         $lastPictures = [];
         foreach ($lastPictureRows as $lastPictureRow) {
             $lastPictures[] = [
-                'url'  => $this->pic()->url($lastPictureRow->identity),
-                'name' => $names[$lastPictureRow->id]
+                'url'  => $this->pic()->url($lastPictureRow['identity']),
+                'name' => $names[$lastPictureRow['id']]
             ];
         }
 
-        $renames = $this->userRename->getRenames($user->id);
+        $renames = $this->userRename->getRenames($user['id']);
 
         $canRemovePhoto = $ban = $canBan = $canViewIp = $canDeleteUser = false;
         if ($this->user()->logedIn()) {
-            if ($this->user()->get()->id != $user->id) {
+            if ($this->user()->get()['id'] != $user['id']) {
                 $canBan = $this->user()->isAllowed('user', 'ban');
                 $canDeleteUser = $this->user()->isAllowed('user', 'delete');
             }
@@ -178,9 +193,9 @@ class UsersController extends AbstractActionController
             $canViewIp = $this->user()->isAllowed('user', 'ip');
         }
 
-        if ($canBan && $user->last_ip !== null) {
-            if ($user->last_ip) {
-                $ban = $this->trafficControl->getBanInfo(inet_ntop($user->last_ip));
+        if ($canBan && $user['last_ip'] !== null) {
+            if ($user['last_ip']) {
+                $ban = $this->trafficControl->getBanInfo(inet_ntop($user['last_ip']));
                 if ($ban) {
                     $ban['user'] = $users->find($ban['user_id'])->current();
                 }
@@ -188,9 +203,9 @@ class UsersController extends AbstractActionController
         }
 
         $currentUser = $this->user()->get();
-        $isMe = $currentUser && ($currentUser->id == $user->id);
-        $inContacts = $currentUser && ! $isMe && $this->contact->exists($currentUser->id, $user->id);
-        $canBeInContacts = $currentUser && ! $currentUser->deleted && ! $isMe ;
+        $isMe = $currentUser && ($currentUser['id'] == $user['id']);
+        $inContacts = $currentUser && ! $isMe && $this->contact->exists($currentUser['id'], $user['id']);
+        $canBeInContacts = $currentUser && ! $currentUser['deleted'] && ! $isMe ;
 
         return [
             'currentUser'     => $user,
@@ -202,7 +217,7 @@ class UsersController extends AbstractActionController
             'accounts'        => $this->userAccount->getAccounts($user['id']),
             'inContacts'      => $inContacts,
             'canBeInContacts' => $canBeInContacts,
-            'contactApiUrl'   => sprintf('/api/contacts/%d', $user->id),
+            'contactApiUrl'   => sprintf('/api/contacts/%d', $user['id']),
             'picturesExists'  => $picturesExists,
             'lastPictures'    => $lastPictures,
             'lastComments'    => $this->getLastComments($user),
@@ -220,8 +235,6 @@ class UsersController extends AbstractActionController
 
 
         // СПИСОК БРЕНДОВ
-        $brandModel = new BrandModel();
-
         $options = [
             'language' => $this->language(),
             'columns'  => [
@@ -230,13 +243,15 @@ class UsersController extends AbstractActionController
             ]
         ];
 
-        $rows = $brandModel->getList($options, function ($select) use ($user) {
+        $rows = $this->brand->getList($options, function (Sql\Select $select) use ($user) {
             $select
-                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                ->where('pictures.owner_id = ?', $user->id)
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
+                ->join('pictures', 'picture_item.picture_id = pictures.id', [])
+                ->where([
+                    'pictures.owner_id' => $user['id'],
+                    'pictures.status'   => Picture::STATUS_ACCEPTED
+                ])
                 ->group('item.id');
         });
 
@@ -248,7 +263,7 @@ class UsersController extends AbstractActionController
                 'catname'       => $row['catname'],
                 'picturesCount' => $row['pictures_count'],
                 'url'           => $this->url()->fromRoute('users/user/pictures/brand', [
-                    'user_id'       => $user->identity ? $user->identity : 'user' . $user->id,
+                    'user_id'       => $user['identity'] ? $user['identity'] : 'user' . $user['id'],
                     'brand_catname' => $row['catname']
                 ])
             ];
@@ -270,8 +285,7 @@ class UsersController extends AbstractActionController
 
         $language = $this->language();
 
-        $brandModel = new BrandModel();
-        $brand = $brandModel->getBrandByCatname($this->params('brand_catname'), $language);
+        $brand = $this->brand->getBrandByCatname($this->params('brand_catname'), $language);
 
         if (! $brand) {
             return $this->notFoundAction();
@@ -280,7 +294,7 @@ class UsersController extends AbstractActionController
         $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->where('pictures.owner_id = ?', $user->id)
+            ->where('pictures.owner_id = ?', $user['id'])
             ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->where('item_parent_cache.parent_id = ?', $brand['id'])
             ->group('pictures.id')
@@ -306,7 +320,7 @@ class UsersController extends AbstractActionController
             'paginator'    => $paginator,
             'picturesData' => $picturesData,
             'urlParams'    => [
-                'user_id'       => $user->identity ? $user->identity : 'user' . $user->id,
+                'user_id'       => $user['identity'] ? $user['identity'] : 'user' . $user['id'],
                 'brand_catname' => $brand['catname']
             ]
         ];
@@ -337,7 +351,6 @@ class UsersController extends AbstractActionController
     private function specsRating()
     {
         $userTable = new User();
-        $itemTable = new DbTable\Item();
 
         $select = $userTable->select(true)
             ->where('not deleted')
@@ -347,50 +360,36 @@ class UsersController extends AbstractActionController
 
         $valueTitle = 'users/rating/specs-volume';
 
-        $db = $itemTable->getAdapter();
-
         $precisionLimit = 50;
 
         $users = [];
         foreach ($userTable->fetchAll($select) as $idx => $user) {
             $brands = [];
             if ($idx < 5) {
-                $cacheKey = 'RATING_USER_BRAND_5_'.$precisionLimit.'_' . $user->id;
+                $cacheKey = 'RATING_USER_BRAND_5_'.$precisionLimit.'_' . $user['id'];
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (! $success) {
-                    $carSelect = $db->select()
-                        ->from('item', ['id', 'count(1)'])
-                        ->where('item.item_type_id = ?', Item::BRAND)
-                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                        ->join('attrs_user_values', 'item_parent_cache.item_id = attrs_user_values.item_id', null)
-                        ->where('attrs_user_values.user_id = ?', $user->id)
-                        ->group('item.id')
-                        ->order('count(1) desc')
-                        ->limit($precisionLimit);
-
-                    $data = [];
-                    $pairs = $db->fetchPairs($carSelect);
-                    foreach ($pairs as $brandId => $value) {
-                        if (! isset($data[$brandId])) {
-                            $data[$brandId] = $value;
-                        } else {
-                            $data[$brandId] += $value;
-                        }
-                    }
+                    $data = $this->item->getCountPairs([
+                        'item_type_id' => Item::BRAND,
+                        'descendant' => [
+                            'has_specs_of_user' => $user['id']
+                        ],
+                        'limit'        => $precisionLimit
+                    ]);
 
                     arsort($data, SORT_NUMERIC);
                     $data = array_slice($data, 0, 3, true);
 
                     foreach ($data as $brandId => $value) {
-                        $row = $itemTable->fetchRow([
-                            'id = ?'           => $brandId,
-                            'item_type_id = ?' => Item::BRAND
+                        $row = $this->item->getRow([
+                            'id'           => $brandId,
+                            'item_type_id' => Item::BRAND
                         ]);
                         $brands[] = [
-                            'name' => $row->name,
+                            'name' => $row['name'],
                             'url'  => $this->url()->fromRoute('catalogue', [
                                 'action'        => 'brand',
-                                'brand_catname' => $row->catname
+                                'brand_catname' => $row['catname']
                             ]),
                             'value' => $value
                         ];
@@ -402,9 +401,9 @@ class UsersController extends AbstractActionController
 
             $users[] = [
                 'row'    => $user,
-                'volume' => $user->specs_volume,
+                'volume' => $user['specs_volume'],
                 'brands' => $brands,
-                'weight' => $user->specs_weight
+                'weight' => $user['specs_weight']
             ];
         }
 
@@ -418,7 +417,6 @@ class UsersController extends AbstractActionController
     private function picturesRating()
     {
         $userTable = new User();
-        $itemTable = new DbTable\Item();
 
         $select = $userTable->select(true)
             ->where('not deleted')
@@ -432,25 +430,27 @@ class UsersController extends AbstractActionController
         foreach ($userTable->fetchAll($select) as $idx => $user) {
             $brands = [];
             if ($idx < 10) {
-                $cacheKey = 'RATING_USER_PICTURES_BRAND_6_' . $user->id;
+                $cacheKey = 'RATING_USER_PICTURES_BRAND_6_' . $user['id'];
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (! $success) {
-                    $select = $itemTable->select(true)
-                        ->where('item.item_type_id = ?', Item::BRAND)
-                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                        ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                        ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                        ->group('item.id')
-                        ->where('pictures.owner_id = ?', $user->id)
-                        ->order('count(distinct pictures.id) desc')
-                        ->limit(3);
+                    $rows = $this->item->getRows([
+                        'item_type_id' => Item::BRAND,
+                        'descendant' => [
+                            'pictures' => [
+                                'user'   => $user['id'],
+                                'status' => Picture::STATUS_ACCEPTED
+                            ]
+                        ],
+                        'order' => new Sql\Expression('count(distinct pictures.id) desc'),
+                        'limit' => 3
+                    ]);
 
-                    foreach ($itemTable->fetchAll($select) as $brand) {
+                    foreach ($rows as $brand) {
                         $brands[] = [
-                            'name' => $brand->name,
+                            'name' => $brand['name'],
                             'url'  => $this->url()->fromRoute('catalogue', [
                                 'action'        => 'brand',
-                                'brand_catname' => $brand->catname
+                                'brand_catname' => $brand['catname']
                             ]),
                         ];
                     }
@@ -461,7 +461,7 @@ class UsersController extends AbstractActionController
 
             $users[] = [
                 'row'    => $user,
-                'volume' => $user->pictures_total,
+                'volume' => $user['pictures_total'],
                 'brands' => $brands
             ];
         }
@@ -594,7 +594,7 @@ class UsersController extends AbstractActionController
 
         $order = $this->params('order');
 
-        $paginator = $this->comments->service()->getPaginatorByUser($user->id, $order);
+        $paginator = $this->comments->service()->getPaginatorByUser($user['id'], $order);
 
         $paginator
             ->setItemCountPerPage(30)

@@ -17,7 +17,7 @@ class NewPictureFetcher extends PictureFetcher
         $this->pictureIds = $pictureIds;
     }
 
-    public function fetch(array $item, array $options = [])
+    public function fetch($item, array $options = [])
     {
         $select = $this->pictureTable->select();
 

@@ -171,16 +171,16 @@
         <p><?=$this->escapeHtml($this->translate('picture/image-specifications'))?>:</p>
         <ul>
             <li>
-                <?=$this->escapeHtml($this->translate('Resolution'))?>: <strong><?=(int)$this->picture->width.'×'.(int)$this->picture->height ?></strong>
-                <?php if ($this->picture->dpi_x || $this->picture->dpi_y) { ?>
-                    @ <strong><?=$this->picture->dpi_x ?>×<?=$this->picture->dpi_y ?></strong>
+                <?=$this->escapeHtml($this->translate('Resolution'))?>: <strong><?=(int)$this->picture['width'].'×'.(int)$this->picture['height'] ?></strong>
+                <?php if ($this->picture['dpi_x'] || $this->picture['dpi_y']) { ?>
+                    @ <strong><?=$this->picture['dpi_x'] ?>×<?=$this->picture['dpi_y'] ?></strong>
                     <a href="https://en.wikipedia.org/wiki/Dots_per_inch"><abbr title="Dots Per Inch">DPI</abbr></a>
-                    <?php if ($this->picture->dpi_x > 0 && $this->picture->dpi_y > 0) { ?>
-                        <?=round(2.54 * $this->picture->width / $this->picture->dpi_x) ?>×<?=round(2.54 * $this->picture->height / $this->picture->dpi_y) ?>cm
+                    <?php if ($this->picture['dpi_x'] > 0 && $this->picture['dpi_y'] > 0) { ?>
+                        <?=round(2.54 * $this->picture['width'] / $this->picture['dpi_x']) ?>×<?=round(2.54 * $this->picture['height'] / $this->picture['dpi_y']) ?>cm
                     <?php } ?>
                 <?php } ?>
             </li>
-            <li><?=$this->escapeHtml($this->translate('Filesize'))?>: <strong><?=$this->escapeHtml($this->fileSize($this->picture->filesize)) ?></strong></li>
+            <li><?=$this->escapeHtml($this->translate('Filesize'))?>: <strong><?=$this->escapeHtml($this->fileSize($this->picture['filesize'])) ?></strong></li>
             <?php if ($this->owner) { ?>
                 <li>
                     <?=$this->escapeHtml($this->translate('picture/added-by:'))?>
@@ -200,7 +200,7 @@
             <li>
                 <?=$this->escapeHtml($this->translate('picture/status:'))?>
                 <?php
-                    switch ($this->picture->status) {
+                    switch ($this->picture['status']) {
                         case Application\Model\Picture::STATUS_INBOX:    echo $this->escapeHtml($this->translate('picture/status/inbox')); break;
                         case Application\Model\Picture::STATUS_ACCEPTED: echo $this->escapeHtml($this->translate('picture/status/accepted')); break;
                         case Application\Model\Picture::STATUS_REMOVING: echo '<span class="text-danger">'.$this->escapeHtml($this->translate('picture/status/removing')).'</span>'; break;
@@ -388,7 +388,7 @@
                 if (count($this->items) || count($this->engines)) {
                     $list[] = $this->htmlA($this->url('upload/params', [
                         'action'  => 'index',
-                        'replace' => $this->picture->identity
+                        'replace' => $this->picture['identity']
                     ]), '<i class="fa fa-exchange"></i> ' . $this->escapeHtml($this->translate('picture/propose-image-replacement')), false);
                 }
             }
@@ -462,6 +462,6 @@
 <div id="comments">
     <?=$this->comments([
         'type'    => Application\Comments::PICTURES_TYPE_ID,
-        'item_id' => $this->picture->id
+        'item_id' => $this->picture['id']
     ]) ?>
 </div>

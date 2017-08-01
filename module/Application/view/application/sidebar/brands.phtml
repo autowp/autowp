@@ -1,7 +1,7 @@
 <?php if (count($this->brands) > 1) { ?>
     <ul class="brands-switch nav nav-tabs" style="margin-bottom:0">
         <?php foreach ($this->brands as $i => $brand) { ?>
-            <li<?=$brand['active'] ? ' class="active"' : ''?>><?=$this->htmlA('#', $brand['brand']->name)?></li>
+            <li<?=$brand['active'] ? ' class="active"' : ''?>><?=$this->htmlA('#', $brand['brand']['name'])?></li>
         <?php } ?>
     </ul>
 <?php } ?>

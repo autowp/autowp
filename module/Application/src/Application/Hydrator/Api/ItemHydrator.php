@@ -38,11 +38,6 @@ class ItemHydrator extends RestHydrator
     private $specTable;
 
     /**
-     * @var DbTable\Item
-     */
-    private $itemTable;
-
-    /**
      * @var Catalogue
      */
     private $catalogue;
@@ -85,11 +80,6 @@ class ItemHydrator extends RestHydrator
     private $specificationsService;
 
     /**
-     * @var TableGateway
-     */
-    private $itemTableGateway;
-
-    /**
      * @var UserItemSubscribe
      */
     private $userItemSubscribe;
@@ -112,7 +102,6 @@ class ItemHydrator extends RestHydrator
         $tables = $serviceManager->get(\Application\Db\TableManager::class);
         $this->pictureTable = $tables->get('pictures');
         $this->linkTable = $tables->get('links');
-        $this->itemTableGateway = $tables->get('item');
         $this->specTable = $tables->get('spec');
 
         $this->pictureTableZf1 = $serviceManager->get(DbTable\Picture::class);
@@ -125,7 +114,6 @@ class ItemHydrator extends RestHydrator
         $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
         $this->router = $serviceManager->get('HttpRouter');
 
-        $this->itemTable = new DbTable\Item();
         $this->itemModel = $serviceManager->get(\Application\Model\Item::class);
         $this->itemParent = $serviceManager->get(ItemParent::class);
 
@@ -195,7 +183,7 @@ class ItemHydrator extends RestHydrator
         return $this;
     }
 
-    private function getNameData(array $object, string $language = 'en'): array
+    private function getNameData($object, string $language = 'en'): array
     {
         if (! is_string($language)) {
             throw new \Exception('`language` is not string');
@@ -456,9 +444,9 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('engine_vehicles_count')) {
-            $select = new Sql\Select($this->itemTableGateway->getTable());
+            $select = new Sql\Select($this->itemModel->getTable()->getTable());
             $select->where(['engine_item_id' => $object['id']]);
-            $result['engine_vehicles_count'] = $this->getCountBySelect($select, $this->itemTableGateway);
+            $result['engine_vehicles_count'] = $this->getCountBySelect($select, $this->itemModel->getTable());
         }
 
         if ($this->filterComposite->filter('name')) {
@@ -485,42 +473,33 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('brands')) {
-            $rows = $this->itemTable->fetchAll(
-                $this->itemTable->select(true)
-                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                    ->where('item_parent_cache.item_id = ?', $object['id'])
-                    ->where('item.item_type_id = ?', Item::BRAND)
-                    ->group('item.id')
-            );
+            $rows = $this->itemModel->getRows([
+                'item_type_id' => Item::BRAND,
+                'descendant'   => $object['id']
+            ]);
 
-            $result['brands'] = $this->extractValue('brands', $rows->toArray());
+            $result['brands'] = $this->extractValue('brands', $rows);
         }
 
         if ($this->filterComposite->filter('categories')) {
-            $rows = $this->itemTable->fetchAll(
-                $this->itemTable->select(true)
-                    ->where('item.item_type_id = ?', Item::CATEGORY)
-                    ->join('item_parent', 'item.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
-                    ->where('top_item.item_type_id IN (?)', [Item::VEHICLE, Item::ENGINE])
-                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', null)
-                    ->where('item_parent_cache.item_id = ?', $object['id'])
-                    ->group(['item.id'])
-            );
+            $rows = $this->itemModel->getRows([
+                'item_type_id' => Item::CATEGORY,
+                'child'        => [
+                    'item_type_id' => [Item::VEHICLE, Item::ENGINE],
+                    'descendant'   => $object['id']
+                ]
+            ]);
 
-            $result['categories'] = $this->extractValue('categories', $rows->toArray());
+            $result['categories'] = $this->extractValue('categories', $rows);
         }
 
         if ($this->filterComposite->filter('twins_groups')) {
-            $rows = $this->itemTable->fetchAll(
-                $this->itemTable->select(true)
-                    ->where('item.item_type_id = ?', Item::TWINS)
-                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                    ->where('item_parent_cache.item_id = ?', $object['id'])
-                    ->group('item.id')
-            );
+            $rows = $this->itemModel->getRows([
+                'item_type_id' => Item::TWINS,
+                'descendant'   => $object['id']
+            ]);
 
-            $result['twins_groups'] = $this->extractValue('twins_groups', $rows->toArray());
+            $result['twins_groups'] = $this->extractValue('twins_groups', $rows);
         }
 
         if ($this->filterComposite->filter('url')) {
@@ -558,26 +537,24 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('design')) {
-            $db = $this->itemTable->getAdapter();
-            $designRow = $db->fetchRow(
-                $db->select()
-                    ->from('item', [
-                        'brand_name'    => 'name',
-                        'brand_catname' => 'catname'
-                    ])
-                    ->join('item_parent', 'item.id = item_parent.parent_id', [
-                        'brand_item_catname' => 'catname'
-                    ])
-                    ->where('item_parent.type = ?', ItemParent::TYPE_DESIGN)
-                    ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
-                    ->where('item_parent_cache.item_id = ?', $object['id'])
-            );
+            $designRow = $this->itemModel->getRow([
+                'language' => $this->language,
+                'columns'  => ['catname', 'name'],
+                'child'    => [
+                    'link_type' => ItemParent::TYPE_DESIGN,
+                    'columns'   => [
+                        'brand_item_catname' => 'link_catname'
+                    ],
+                    'descendant_or_self' => $object['id']
+                ]
+            ]);
+
             if ($designRow) {
                 $result['design'] = [
-                    'brand_name' => $designRow['brand_name'],
+                    'brand_name' => $designRow['name'], //TODO: formatter
                     'url'        => $this->router->assemble([
                         'action'        => 'brand-item',
-                        'brand_catname' => $designRow['brand_catname'] ? $designRow['brand_catname'] : 'test',
+                        'brand_catname' => $designRow['catname'] ? $designRow['catname'] : 'test',
                         'car_catname'   => $designRow['brand_item_catname']
                     ], [
                         'name' => 'catalogue'
@@ -667,9 +644,10 @@ class ItemHydrator extends RestHydrator
         ]);
 
         if ($ids) {
-            $rows = $this->itemTable->fetchAll([
-                'id in (?)' => $ids
-            ], $this->catalogue->itemOrdering());
+            $rows = $this->itemModel->getRows([
+                'id'    => $ids,
+                'order' => $this->catalogue->itemOrdering()
+            ]);
             foreach ($rows as $row) {
                 $cataloguePaths = $this->catalogue->getCataloguePaths($row['id']);
                 foreach ($cataloguePaths as $cPath) {
@@ -749,15 +727,15 @@ class ItemHydrator extends RestHydrator
         $parentRows = $this->itemParent->getParentRows($id);
 
         foreach ($parentRows as $parentRow) {
-            $brand = $this->itemTable->fetchRow([
-                'item_type_id = ?' => Item::BRAND,
-                'id = ?'           => $parentRow['parent_id']
+            $brand = $this->itemModel->getRow([
+                'item_type_id' => Item::BRAND,
+                'id'           => $parentRow['parent_id']
             ]);
 
             if ($brand) {
                 $urls[] = $this->router->assemble([
                     'action'        => 'brand-item',
-                    'brand_catname' => $brand->catname,
+                    'brand_catname' => $brand['catname'],
                     'car_catname'   => $parentRow['catname'],
                     'path'          => $path
                 ], [
