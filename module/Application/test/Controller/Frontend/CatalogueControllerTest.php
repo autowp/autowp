@@ -183,7 +183,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         return $json['items'][0];
     }
 
-    public function testBrand()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testBrand(string $token)
     {
         $catname = 'brand-' . microtime(true);
         $name = 'Test brand';
@@ -195,6 +198,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         ]);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/' . $catname, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -206,7 +210,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertXpathQuery("//h1[contains(text(), '$name')]");
     }
 
-    public function testCars()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testCars(string $token)
     {
         $carId = $this->createItem([
             'name'         => 'Test car',
@@ -222,6 +229,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         // request
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/'.$brand['catname'].'/cars', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -233,7 +241,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertXpathQuery("//h1[contains(text(), '{$brand['name']}')]");
     }
 
-    public function testRecent()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testRecent(string $token)
     {
         $brand = $this->getRandomBrand();
 
@@ -241,6 +252,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->acceptPicture($pictureId);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/'.$brand['catname'].'/recent', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -252,7 +264,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertXpathQuery("//h1[contains(text(), '{$brand['name']}')]");
     }
 
-    public function testConcepts()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testConcepts(string $token)
     {
         $carId = $this->createItem([
             'item_type_id' => 1,
@@ -281,7 +296,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         // request concept
         $this->reset();
-
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/'.$brand['catname'].'/concepts', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -293,12 +308,16 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertXpathQuery("//h1[contains(text(), '{$brand['name']}')]");
     }
 
-    public function testOther()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testOther(string $token)
     {
         $pictureId = $this->addPictureToItem(204);
         $this->acceptPicture($pictureId);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/bmw/other', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -310,13 +329,17 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery(".thumbnail");
     }
 
-    public function testMixed()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testMixed(string $token)
     {
         $pictureId = $this->addPictureToItem(204);
         $this->acceptPicture($pictureId);
         $this->setPerspective(204, $pictureId, 25);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/bmw/mixed', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -328,13 +351,17 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery(".thumbnail");
     }
 
-    public function testLogotypes()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testLogotypes(string $token)
     {
         $pictureId = $this->addPictureToItem(204);
         $this->acceptPicture($pictureId);
         $this->setPerspective(204, $pictureId, 22);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/bmw/logotypes', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -346,13 +373,17 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery(".thumbnail");
     }
 
-    public function testOtherPicture()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testOtherPicture(string $token)
     {
         $pictureId = $this->addPictureToItem(204);
         $this->acceptPicture($pictureId);
         $picture = $this->getPicture($pictureId);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/bmw/other/'.$picture['identity'].'/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -364,7 +395,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery(".thumbnail");
     }
 
-    public function testMixedPicture()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testMixedPicture(string $token)
     {
         $pictureId = $this->addPictureToItem(204);
         $this->acceptPicture($pictureId);
@@ -372,6 +406,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $picture = $this->getPicture($pictureId);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/bmw/mixed/'.$picture['identity'].'/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -383,7 +418,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery(".thumbnail");
     }
 
-    public function testLogotypesPicture()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testLogotypesPicture(string $token)
     {
         $pictureId = $this->addPictureToItem(204);
         $this->acceptPicture($pictureId);
@@ -391,6 +429,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $picture = $this->getPicture($pictureId);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/bmw/logotypes/'.$picture['identity'].'/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -402,8 +441,12 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery(".thumbnail");
     }
 
-    public function testOtherGallery()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testOtherGallery(string $token)
     {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/bmw/other/gallery/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -421,8 +464,12 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertArrayHasKey('items', $data);
     }
 
-    public function testMixedGallery()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testMixedGallery(string $token)
     {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/bmw/mixed/gallery/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -440,8 +487,12 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertArrayHasKey('items', $data);
     }
 
-    public function testLogotypesGallery()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testLogotypesGallery(string $token)
     {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/bmw/logotypes/gallery/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -475,7 +526,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('brand-item-picture');
     }*/
 
-    public function testBrandMosts()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testBrandMosts(string $token)
     {
         // add to brand
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -491,6 +545,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertResponseStatusCode(201);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/bmw/mosts', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -500,7 +555,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('brand-mosts');
     }
 
-    public function testBrandFactories()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testBrandFactories(string $token)
     {
         $factoryId = $this->createItem([
             'item_type_id' => 6,
@@ -521,6 +579,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->acceptPicture($pictureId);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/'.$brand['catname'], Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -532,7 +591,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertXpathQuery("//h2[contains(text(), 'Factories')]");
     }
 
-    public function testBrandItem()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testBrandItem(string $token)
     {
         $catname = 'brand-item-' . microtime(true);
         $name = 'Vehicle';
@@ -549,6 +611,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         ]);
 
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -560,7 +623,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertXpathQuery("//h3[contains(text(), '$name')]");
     }
 
-    public function testBrandItemSubitem()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testBrandItemSubitem(string $token)
     {
         $catname = 'brand-item-' . microtime(true);
         $name = 'Vehicle';
@@ -588,9 +654,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
             'catname' => $subCatname
         ]);
 
-
-
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname . '/' . $subCatname, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -602,7 +667,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertXpathQuery("//h3[contains(text(), '$subName')]");
     }
 
-    public function testBrandItemGroup()
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testBrandItemGroup(string $token)
     {
         $catname = 'brand-item-' . microtime(true);
         $name = 'Vehicle';
@@ -630,9 +698,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
             'catname' => $subCatname
         ]);
 
-
-
         $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
         $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
@@ -643,5 +710,14 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertXpathQuery("//h1[contains(text(), '$name')]");
         $this->assertXpathQuery("//h3[contains(text(), '$subName')]");
+    }
+
+    public function userTokenProvider()
+    {
+        return [
+            [''],
+            ['token'],
+            ['admin-token'],
+        ];
     }
 }
