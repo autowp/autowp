@@ -175,14 +175,19 @@ class Twins
         );
     }
 
-    public function getGroupCars(int $groupId)
+    public function getGroupCars(int $groupId): array
     {
         $select = new Sql\Select($this->itemTable->getTable());
         $select->join('item_parent', 'item.id = item_parent.item_id', [])
             ->where(['item_parent.parent_id' => $groupId])
             ->order('name');
 
-        return $this->itemTable->selectWith($select);
+        $result = [];
+        foreach ($this->itemTable->selectWith($select) as $row) {
+            $result[] = $row;
+        }
+
+        return $result;
     }
 
     /**
@@ -221,7 +226,7 @@ class Twins
         $row = $this->itemTable->select([
             'id'           => $groupId,
             'item_type_id' => Item::TWINS
-        ]);
+        ])->current();
         if (! $row) {
             return null;
         }
