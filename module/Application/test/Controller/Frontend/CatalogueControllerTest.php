@@ -45,7 +45,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
-        $filename = 'test1.jpg';
+        $filename = '640x480.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
         $request->getFiles()->fromArray([
@@ -498,5 +498,37 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(CatalogueController::class);
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('brand-mosts');
+    }
+
+    public function testBrandFactories()
+    {
+        $factoryId = $this->createItem([
+            'item_type_id' => 6,
+            'name'         => 'Factory'
+        ]);
+        $pictureId = $this->addPictureToItem($factoryId);
+
+        $vehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => 'Vehicle builded on factory'
+        ]);
+
+        $this->addItemParent($vehicleId, $factoryId);
+
+        $brand = $this->getRandomBrand();
+        $this->addItemParent($vehicleId, $brand['id']);
+
+        $this->acceptPicture($pictureId);
+
+        $this->reset();
+        $this->dispatch('https://www.autowp.ru/'.$brand['catname'], Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand');
+
+        $this->assertXpathQuery("//h2[contains(text(), 'Factories')]");
     }
 }

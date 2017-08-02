@@ -11,7 +11,6 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
 
 use Autowp\TextStorage\Service as TextStorage;
-use Zend\Db\Sql\TableIdentifier;
 
 class Item
 {

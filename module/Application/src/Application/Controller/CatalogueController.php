@@ -383,7 +383,7 @@ class CatalogueController extends AbstractActionController
         });
     }
 
-    private function getBrandFactories($brandId)
+    private function getBrandFactories(int $brandId)
     {
         $rows = $this->itemModel->getRows([
             'language' => $this->language(),
@@ -556,12 +556,12 @@ class CatalogueController extends AbstractActionController
             }
 
             return [
-                'topPictures' => $topPictures,
-                'link_types'  => $types,
-                'haveTwins'   => $haveTwins,
-                'mostsActive' => $this->mostsActive($brand['id']),
-                'description' => $description,
-                'factories'   => $this->getBrandFactories($brand['id']),
+                'topPictures'      => $topPictures,
+                'link_types'       => $types,
+                'haveTwins'        => $haveTwins,
+                'mostsActive'      => $this->mostsActive($brand['id']),
+                'description'      => $description,
+                'factories'        => $this->getBrandFactories($brand['id']),
                 'inboxPictures'    => $inboxPictures,
                 'requireAttention' => $requireAttention
             ];
