@@ -217,11 +217,12 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
             'is_group'     => 0
         ]);
 
-        $this->addItemParent($carId, 204);
+        $brand = $this->getRandomBrand();
+        $this->addItemParent($carId, $brand['id']);
 
         // request
         $this->reset();
-        $this->dispatch('https://www.autowp.ru/bmw/cars', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/'.$brand['catname'].'/cars', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -229,7 +230,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('cars');
 
-        $this->assertXpathQuery("//h1[contains(text(), 'BMW')]");
+        $this->assertXpathQuery("//h1[contains(text(), '{$brand['name']}')]");
     }
 
     public function testRecent()
