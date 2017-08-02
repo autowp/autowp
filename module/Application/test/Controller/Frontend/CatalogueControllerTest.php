@@ -822,6 +822,38 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($json['items']);
     }
 
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testBrandEngines(string $token)
+    {
+        $catname = 'brand-item-' . microtime(true);
+        $name = 'Some Engine';
+
+        $brand = $this->getRandomBrand();
+
+        $vehicleId = $this->createItem([
+            'item_type_id' => 2,
+            'name'         => $name
+        ]);
+
+        $this->addItemParent($vehicleId, $brand['id'], [
+            'catname' => $catname
+        ]);
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
+        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/engines', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('engines');
+
+        $this->assertXpathQuery("//h3[contains(text(), '$name')]");
+    }
+
     public function userTokenProvider()
     {
         return [
