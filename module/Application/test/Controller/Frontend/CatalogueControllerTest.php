@@ -601,4 +601,47 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertXpathQuery("//h3[contains(text(), '$subName')]");
     }
+
+    public function testBrandItemGroup()
+    {
+        $catname = 'brand-item-' . microtime(true);
+        $name = 'Vehicle';
+        $subName = 'Sub vehicle';
+        $subCatname = 'sub';
+
+        $brand = $this->getRandomBrand();
+
+        $vehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => $name,
+            'is_group'     => true
+        ]);
+
+        $this->addItemParent($vehicleId, $brand['id'], [
+            'catname' => $catname
+        ]);
+
+        $subVehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => $subName
+        ]);
+
+        $this->addItemParent($subVehicleId, $vehicleId, [
+            'catname' => $subCatname
+        ]);
+
+
+
+        $this->reset();
+        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname, Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand-item');
+
+        $this->assertXpathQuery("//h1[contains(text(), '$name')]");
+        $this->assertXpathQuery("//h3[contains(text(), '$subName')]");
+    }
 }
