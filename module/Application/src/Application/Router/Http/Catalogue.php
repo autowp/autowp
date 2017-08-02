@@ -687,7 +687,7 @@ class Catalogue implements RouteInterface
             array_shift($path);
 
             if (! $path) {
-                // :brand/:car_catname/:path[]/pictures/pageX
+                // :brand/:car_catname/:path[]/pictures/gallery
                 return $this->assembleMatch([
                     'action'        => 'brand-item-gallery',
                     'brand_catname' => $brand['catname'],
@@ -701,7 +701,7 @@ class Catalogue implements RouteInterface
                 $gallery = array_shift($path);
 
                 if (! $path) {
-                    // :brand/:car_catname/:path[]/pictures/pageX
+                    // :brand/:car_catname/:path[]/pictures/gallery/:gallery
                     return $this->assembleMatch([
                         'action'        => 'brand-item-gallery',
                         'brand_catname' => $brand['catname'],

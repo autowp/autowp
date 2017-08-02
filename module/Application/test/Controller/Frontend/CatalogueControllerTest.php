@@ -747,6 +747,81 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertXpathQuery("//h1[contains(text(), '$name')]");
     }
 
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testBrandItemPicturesPicture(string $token)
+    {
+        $catname = 'brand-item-' . microtime(true);
+        $name = 'Vehicle';
+
+        $brand = $this->getRandomBrand();
+
+        $vehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => $name
+        ]);
+
+        $this->addItemParent($vehicleId, $brand['id'], [
+            'catname' => $catname
+        ]);
+
+        $pictureId = $this->addPictureToItem($vehicleId);
+        $this->acceptPicture($pictureId);
+
+        $picture = $this->getPicture($pictureId);
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
+        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname . '/pictures/' . $picture['identity'], Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand-item-picture');
+
+        $this->assertXpathQuery("//h1[contains(text(), '$name')]");
+    }
+
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testBrandItemGallery(string $token)
+    {
+        $catname = 'brand-item-' . microtime(true);
+        $name = 'Vehicle';
+
+        $brand = $this->getRandomBrand();
+
+        $vehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => $name
+        ]);
+
+        $this->addItemParent($vehicleId, $brand['id'], [
+            'catname' => $catname
+        ]);
+
+        $pictureId = $this->addPictureToItem($vehicleId);
+        $this->acceptPicture($pictureId);
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
+        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname . '/pictures/gallery', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand-item-gallery');
+
+        $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+        $this->assertNotEmpty($json['items']);
+    }
+
     public function userTokenProvider()
     {
         return [
