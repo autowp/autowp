@@ -1626,8 +1626,9 @@ class CatalogueController extends AbstractActionController
     private function getBrandItemPicturesSelect(int $carId, bool $exact, bool $onlyAccepted = true)
     {
         $select = $this->selectFromPictures($onlyAccepted)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->joinLeft('perspectives', 'picture_item.perspective_id = perspectives.id', null)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
+            ->joinLeft('perspectives', 'picture_item.perspective_id = perspectives.id', [])
+            ->group(['pictures.id', 'perspectives.position'])
             ->order(array_merge(
                 ['perspectives.position'],
                 $this->catalogue()->picturesOrdering()
@@ -1638,7 +1639,7 @@ class CatalogueController extends AbstractActionController
                 ->where('picture_item.item_id = ?', $carId);
         } else {
             $select
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
                 ->where('item_parent_cache.parent_id = ?', $carId);
         }
 
