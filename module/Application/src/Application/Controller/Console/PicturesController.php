@@ -46,7 +46,10 @@ class PicturesController extends AbstractActionController
                 $console->writeLine("Picture " . $row['id']);
 
                 $point = new Point($gps['lng'], $gps['lat']);
-                $pointExpr = new Zend_Db_Expr($$this->pictureTable->getAdapter()->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
+                $pointExpr = new Zend_Db_Expr(
+                    $$this->pictureTable->getAdapter()
+                        ->quoteInto('GeomFromWKB(?)', $point->out('wkb'))
+                );
 
                 $row['point'] = $pointExpr;
                 $row->save();

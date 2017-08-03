@@ -190,7 +190,10 @@ abstract class PictureFetcher
                     ->group('picture_item.item_id');
             } else {
                 $select
-                    ->from($this->pictureTable->info('name'), ['item_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
+                    ->from(
+                        $this->pictureTable->info('name'),
+                        ['item_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')]
+                    )
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id IN (?)', $itemIds)

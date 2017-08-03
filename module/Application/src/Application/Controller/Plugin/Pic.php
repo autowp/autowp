@@ -963,7 +963,10 @@ class Pic extends AbstractPlugin
         $preview = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'picture-medium');
         $previewUrl = $preview ? $preview->getSrc() : null;
 
-        $galleryImage = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'picture-gallery');
+        $galleryImage = $imageStorage->getFormatedImage(
+            $this->pictureTable->getFormatRequest($picture),
+            'picture-gallery'
+        );
 
         $paginator = false;
         $pageNumbers = false;
@@ -1382,7 +1385,10 @@ class Pic extends AbstractPlugin
                         'width'  => $pictureItem['area'][2] / $image->getWidth(),
                         'height' => $pictureItem['area'][3] / $image->getHeight(),
                     ],
-                    'name' => $this->itemNameFormatter->formatHtml($this->itemModel->getNameData($item, $language), $language)
+                    'name' => $this->itemNameFormatter->formatHtml(
+                        $this->itemModel->getNameData($item, $language),
+                        $language
+                    )
                 ];
             }
 

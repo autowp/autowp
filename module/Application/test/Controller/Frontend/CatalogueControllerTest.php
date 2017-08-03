@@ -656,7 +656,13 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname . '/' . $subCatname, Request::METHOD_GET);
+        $url = sprintf(
+            'https://www.autowp.ru/%s/%s/%s',
+            $brand['catname'],
+            $catname,
+            $subCatname
+        );
+        $this->dispatch($url, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -736,7 +742,12 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname . '/pictures', Request::METHOD_GET);
+        $url = sperintf(
+            'https://www.autowp.ru/%s/%s/pictures',
+            $brand['catname'],
+            $catname
+        );
+        $this->dispatch($url, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -773,7 +784,13 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname . '/pictures/' . $picture['identity'], Request::METHOD_GET);
+        $url = sprintf(
+            'https://www.autowp.ru/%s/%s/pictures/%s',
+            $brand['catname'],
+            $catname,
+            $picture['identity']
+        );
+        $this->dispatch($url, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -808,7 +825,12 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname . '/pictures/gallery', Request::METHOD_GET);
+        $url = sperintf(
+            'https://www.autowp.ru/%s/%s/pictures/gallery',
+            $brand['catname'],
+            $catname
+        );
+        $this->dispatch($url, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -875,7 +897,12 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/' . $brand['catname'] . '/' . $catname . '/specifications', Request::METHOD_GET);
+        $url = sprintf(
+            'https://www.autowp.ru/%s/%s/specifications',
+            $brand['catname'],
+            $catname
+        );
+        $this->dispatch($url, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');

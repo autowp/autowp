@@ -105,7 +105,10 @@ class Brand
                 ->where([
                     'item_parent_cache.parent_id' => $brandRow['id'],
                     'item_parent_cache.item_id <> item_parent_cache.parent_id',
-                    new Sql\Predicate\Expression('item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)', [self::NEW_DAYS])
+                    new Sql\Predicate\Expression(
+                        'item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)',
+                        [self::NEW_DAYS]
+                    )
                 ]);
             $row = $this->item->getTable()->selectWith($select)->current();
 

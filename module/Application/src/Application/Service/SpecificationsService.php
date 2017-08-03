@@ -864,7 +864,9 @@ class SpecificationsService
                 }
 
                 if ($userValueData) {
-                    $valueChanged = $value === null ? $userValueData['value'] !== null : $userValueData['value'] != $value;
+                    $valueChanged = $value === null
+                        ? $userValueData['value'] !== null
+                        : $userValueData['value'] != $value;
                 } else {
                     $valueChanged = true;
                 }

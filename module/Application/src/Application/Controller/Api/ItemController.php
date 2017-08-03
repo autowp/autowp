@@ -1371,7 +1371,11 @@ class ItemController extends AbstractRestfulController
                     if ($old !== $new) {
                         $old = $this->specTable->select(['id' => $old])->current();
                         $new = $this->specTable->select(['id' => $new])->current();
-                        $changes[] = sprintf($message, $old ? $old['short_name'] : '-', $new ? $new['short_name'] : '-');
+                        $changes[] = sprintf(
+                            $message,
+                            $old ? $old['short_name'] : '-',
+                            $new ? $new['short_name'] : '-'
+                        );
                     }
                     break;
             }

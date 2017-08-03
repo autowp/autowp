@@ -59,7 +59,10 @@ class Brakes extends AbstractAdapter
             $thicknessValuesTable = $specService->getValueDataTable($thickness['type_id'])->getTable();
 
             $axisSelect
-                ->columns(['item_id' => 'item.id', 'size_value' => new Sql\Expression('diameter.value*thickness.value')])
+                ->columns([
+                    'item_id'    => 'item.id',
+                    'size_value' => new Sql\Expression('diameter.value*thickness.value')
+                ])
                 ->join(['diameter' => $diameterValuesTable], 'item.id = diameter.item_id', [])
                 ->join(['thickness' => $thicknessValuesTable], 'item.id = thickness.item_id', [])
                 ->where([

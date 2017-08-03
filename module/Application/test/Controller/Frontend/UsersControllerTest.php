@@ -11,19 +11,6 @@ class UsersControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    private function getUser()
-    {
-        $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch(
-            'https://www.autowp.ru/api/user/' . $userRow['id'],
-            Request::METHOD_PUT,
-            [
-                'deleted' => 1
-            ]
-        );
-    }
-
     public function testIndexActionCanBeAccessed()
     {
         $this->dispatch('https://www.autowp.ru/users/user1/comments', 'GET');

@@ -237,7 +237,11 @@ class CommentsController extends AbstractRestfulController
                             'uri'             => $uri
                         ]);
                         $message = sprintf(
-                            $this->translate('pm/user-%s-replies-to-you-%s', 'default', $parentMessageAuthor['language']),
+                            $this->translate(
+                                'pm/user-%s-replies-to-you-%s',
+                                'default',
+                                $parentMessageAuthor['language']
+                            ),
                             $moderUrl,
                             $url
                         );

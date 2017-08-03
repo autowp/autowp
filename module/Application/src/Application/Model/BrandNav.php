@@ -100,8 +100,14 @@ class BrandNav
         return $this->brandSections($params['language'], $brand['id'], $brand['catname'], $type, $carId, $isConcepts);
     }
 
-    private function brandSections(string $language, int $brandId, string $brandCatname, $type, int $carId, bool $isConcepts)
-    {
+    private function brandSections(
+        string $language,
+        int $brandId,
+        string $brandCatname,
+        $type,
+        int $carId,
+        bool $isConcepts
+    ) {
         // create groups array
         $sections = $this->carSections($language, $brandId, $brandCatname, true, $carId);
 
@@ -137,8 +143,14 @@ class BrandNav
         ]);
     }
 
-    private function otherGroups(string $language, int $brandId, string $brandCatname, bool $conceptsSeparatly, $type, bool $isConcepts)
-    {
+    private function otherGroups(
+        string $language,
+        int $brandId,
+        string $brandCatname,
+        bool $conceptsSeparatly,
+        $type,
+        bool $isConcepts
+    ) {
         $cacheKey = implode('_', [
             'SIDEBAR_OTHER',
             $brandId,
@@ -254,8 +266,13 @@ class BrandNav
         return array_values($groups);
     }
 
-    private function carSectionGroupsSelect(int $brandId, int $itemTypeId, int $carTypeId, $nullType, bool $conceptsSeparatly): Sql\Select
-    {
+    private function carSectionGroupsSelect(
+        int $brandId,
+        int $itemTypeId,
+        int $carTypeId,
+        $nullType,
+        bool $conceptsSeparatly
+    ): Sql\Select {
         $select = new Sql\Select($this->itemModel->getTable()->getTable());
         $select
             ->columns([
@@ -318,8 +335,13 @@ class BrandNav
         return $select;
     }
 
-    private function carSectionGroups(string $language, int $brandId, string $brandCatname, array $section, bool $conceptsSeparatly)
-    {
+    private function carSectionGroups(
+        string $language,
+        int $brandId,
+        string $brandCatname,
+        array $section,
+        bool $conceptsSeparatly
+    ) {
         $rows = [];
         if ($section['car_type_id']) {
             $select = $this->carSectionGroupsSelect(
@@ -402,8 +424,13 @@ class BrandNav
         return $groups;
     }
 
-    private function carSections(string $language, int $brandId, string $brandCatname, bool $conceptsSeparatly, int $carId)
-    {
+    private function carSections(
+        string $language,
+        int $brandId,
+        string $brandCatname,
+        bool $conceptsSeparatly,
+        int $carId
+    ) {
         $cacheKey = implode('_', [
             'SIDEBAR',
             $brandId,

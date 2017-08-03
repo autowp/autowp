@@ -1108,7 +1108,12 @@ class Item
                 $predicate,
                 new Sql\Predicate\Expression('length(item_language.name) > 0')
             ])
-            ->order([new Sql\Expression('FIELD(item_language.language' . str_repeat(', ?', count($languages)) . ')', $languages)])
+            ->order([
+                new Sql\Expression(
+                    'FIELD(item_language.language' . str_repeat(', ?', count($languages)) . ')',
+                    $languages
+                )
+            ])
             ->limit(1);
 
         return $select;
@@ -1132,7 +1137,12 @@ class Item
                 $predicate,
                 new Sql\Predicate\Expression('length(item_language.name) > 0')
             ])
-            ->order([new Sql\Expression('FIELD(item_language.language' . str_repeat(', ?', count($languages)) . ')', $languages)])
+            ->order([
+                new Sql\Expression(
+                    'FIELD(item_language.language' . str_repeat(', ?', count($languages)) . ')',
+                    $languages
+                )
+            ])
             ->limit(1);
 
         return $select;
@@ -1216,7 +1226,11 @@ class Item
                             'begin_year', 'end_year', 'today',
                             'begin_model_year', 'end_model_year',
                             'body',
-                            //'name' => $this->getNameSelect('item.id', Sql\ExpressionInterface::TYPE_IDENTIFIER, $language)
+                            /*'name' => $this->getNameSelect(
+                                'item.id',
+                                Sql\ExpressionInterface::TYPE_IDENTIFIER,
+                                $language
+                            )*/
                             'name' => new Sql\Expression('(' . $subSelect . ')')
                         ]);
 

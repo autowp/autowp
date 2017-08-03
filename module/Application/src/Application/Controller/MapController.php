@@ -141,7 +141,10 @@ class MapController extends AbstractActionController
                 );
 
                 if ($picture) {
-                    $image = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'format9');
+                    $image = $imageStorage->getFormatedImage(
+                        $this->pictureTable->getFormatRequest($picture),
+                        'format9'
+                    );
                     if ($image) {
                         $row['image'] = $image->getSrc();
                     }
