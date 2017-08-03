@@ -441,7 +441,7 @@ class UsersController extends AbstractActionController
                                 'status' => Picture::STATUS_ACCEPTED
                             ]
                         ],
-                        'order' => new Sql\Expression('count(distinct pictures.id) desc'),
+                        'order' => new Sql\Expression('count(distinct p1.id) desc'),
                         'limit' => 3
                     ]);
 
