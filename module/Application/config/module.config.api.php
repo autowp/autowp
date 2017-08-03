@@ -247,7 +247,7 @@ return [
                             'twins_groups', 'url', 'more_pictures_url',
                             'preview_pictures', 'design', 'engine_vehicles',
                             'catname', 'is_concept', 'spec_id', 'begin_year',
-                            'end_year', 'body']]
+                            'end_year', 'body', 'lat', 'lng']]
                     ]
                 ]
             ],

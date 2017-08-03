@@ -539,4 +539,26 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
             $this->assertNotEmpty($item['url']);
         }
     }
+
+    public function testFields()
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
+            'fields' => 'childs_count,name_html,name_text,name_default,description,' .
+                'has_text,brands,upload_url,spec_editor_url,specs_url,categories,' .
+                'twins_groups,url,more_pictures_url,preview_pictures,design,'.
+                'engine_vehicles,catname,is_concept,spec_id,begin_year,end_year,body',
+            'limit'  => 100
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/list');
+        $this->assertActionName('index');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertNotEmpty($json['items']);
+    }
 }
