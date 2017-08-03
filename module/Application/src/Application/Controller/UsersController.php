@@ -239,7 +239,7 @@ class UsersController extends AbstractActionController
             'language' => $this->language(),
             'columns'  => [
                 'logo_id',
-                'pictures_count' => new Zend_Db_Expr('COUNT(distinct pictures.id)')
+                'pictures_count' => new Sql\Expression('COUNT(distinct pictures.id)')
             ]
         ];
 

@@ -43,8 +43,6 @@ class UserControllerTest extends AbstractHttpControllerTestCase
 
         // delete user
         $this->reset();
-
-        $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch(
             'https://www.autowp.ru/api/user/' . $userRow['id'],
