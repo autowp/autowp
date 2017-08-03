@@ -492,4 +492,50 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertSame(20.5, $json['lat']);
         $this->assertSame(-15, $json['lng']);
     }
+
+    public function testEngineVehicles()
+    {
+        $engineId = $this->createItem([
+            'item_type_id' => 2,
+            'name'         => 'GM 5.0 V6',
+        ]);
+
+        $brand = $this->getRandomBrand();
+        $this->addItemParent($engineId, $brand['id']);
+
+        $itemId1 = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => 'Chevrolet Corvette',
+        ]);
+        $this->addItemParent($itemId1, $brand['id']);
+
+        $itemId2 = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => 'Pontiac Firebird',
+        ]);
+        $this->addItemParent($itemId2, $brand['id']);
+
+        $this->setEngineToVehicle($brand['catname'], $engineId, $itemId1);
+        $this->setEngineToVehicle($brand['catname'], $engineId, $itemId2);
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item/' . $engineId, Request::METHOD_GET, [
+            'fields'  => 'engine_vehicles'
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/item/get');
+        $this->assertActionName('item');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertArrayHasKey('engine_vehicles', $json);
+        foreach ($json['engine_vehicles'] as $item) {
+            $this->assertNotEmpty($item['name_html']);
+            $this->assertNotEmpty($item['url']);
+        }
+    }
 }
