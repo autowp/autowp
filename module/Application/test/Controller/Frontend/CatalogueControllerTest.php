@@ -742,7 +742,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $url = sperintf(
+        $url = sprintf(
             'https://www.autowp.ru/%s/%s/pictures',
             $brand['catname'],
             $catname
@@ -825,7 +825,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $url = sperintf(
+        $url = sprintf(
             'https://www.autowp.ru/%s/%s/pictures/gallery',
             $brand['catname'],
             $catname

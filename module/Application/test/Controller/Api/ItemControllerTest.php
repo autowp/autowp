@@ -145,7 +145,8 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
                 ]
             ]
         ]);
-        $this->dispatch('https://www.autowp.ru/upload/send/type/1/item_id/' . $vehicleId, Request::METHOD_POST, [], true);
+        $url = 'https://www.autowp.ru/upload/send/type/1/item_id/' . $vehicleId;
+        $this->dispatch($url, Request::METHOD_POST, [], true);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
