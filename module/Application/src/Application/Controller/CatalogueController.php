@@ -1392,9 +1392,9 @@ class CatalogueController extends AbstractActionController
 
         $texts = $this->itemModel->getTextsOfItem($currentCar['id'], $this->language());
 
-        $currentCar['description'] = $texts['description'];
-        $currentCar['text'] = $texts['text'];
-        $hasHtml = (bool)$currentCar['text'];
+        $currentCar['description'] = $texts['text'];
+        $currentCar['text'] = $texts['full_text'];
+        $hasHtml = (bool)$currentCar['full_text'];
 
         return [
             'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
