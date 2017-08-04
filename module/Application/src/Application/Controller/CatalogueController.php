@@ -1394,7 +1394,7 @@ class CatalogueController extends AbstractActionController
 
         $currentCar['description'] = $texts['text'];
         $currentCar['text'] = $texts['full_text'];
-        $hasHtml = (bool)$currentCar['full_text'];
+        $hasHtml = (bool)$currentCar['text'];
 
         return [
             'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
