@@ -322,7 +322,7 @@ class PictureItemController extends AbstractRestfulController
                 htmlspecialchars('#' . $dstItem['id'])
             ), [
                 'items'    => [$srcItem['id'], $dstItem['id']],
-                'pictures' => $picture
+                'pictures' => $picture['id']
             ]);
 
             $namespace = new \Zend\Session\Container('Moder_Car');
