@@ -187,21 +187,25 @@ class CarsController extends AbstractActionController
                 return $this->redirect()->toUrl($this->editorUrl($car, 'spec'));
             }
         }
-        $engine = $this->itemModel->getRow(['id' => $car['engine_item_id']]);
+
+        $engine = null;
         $engineInherited = $car['engine_inherit'];
         $engineInheritedFrom = [];
-        if ($engine && $car['engine_inherit']) {
-            $carRows = $this->itemModel->getRows([
-                'descendant' => $car['id'],
-                'engine_id'  => $engine['id'],
-                'order'      => 'ipc1.diff desc'
-            ]);
+        if ($car['engine_item_id']) {
+            $engine = $this->itemModel->getRow(['id' => $car['engine_item_id']]);
+            if ($engine && $car['engine_inherit']) {
+                $carRows = $this->itemModel->getRows([
+                    'descendant' => $car['id'],
+                    'engine_id'  => $engine['id'],
+                    'order'      => 'ipc1.diff desc'
+                ]);
 
-            foreach ($carRows as $carRow) {
-                $engineInheritedFrom[] = [
-                    'name' => $this->car()->formatName($carRow, $this->language()),
-                    'url'  => '/ng/moder/items/item/' . $carRow['id']
-                ];
+                foreach ($carRows as $carRow) {
+                    $engineInheritedFrom[] = [
+                        'name' => $this->car()->formatName($carRow, $this->language()),
+                        'url'  => '/ng/moder/items/item/' . $carRow['id']
+                    ];
+                }
             }
         }
 
