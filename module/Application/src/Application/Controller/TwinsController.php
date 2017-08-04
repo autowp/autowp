@@ -367,7 +367,7 @@ class TwinsController extends AbstractActionController
         $brand = $this->itemModel->getTable()->select([
             'item_type_id' => Item::BRAND,
             'catname'      => (string)$this->params('brand_catname')
-        ]);
+        ])->current();
 
         if (! $brand) {
             return $this->notFoundAction();
