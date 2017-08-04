@@ -1050,8 +1050,9 @@ class Pic extends AbstractPlugin
             $url = null;
 
             $carRow = $this->itemModel->getRow([
-                'id'      => $mRow['item_id'],
-                'columns' => ['id', 'name']
+                'id'       => $mRow['item_id'],
+                'columns'  => ['id', 'name'],
+                'language' => $language
             ]);
 
             if ($carRow) {
