@@ -939,9 +939,10 @@ class Item
 
         $group = [];
 
-        if ($options['id']) {
+        if ($options['id'] !== null) {
             if (is_array($options['id'])) {
-                $select->where([new Sql\Predicate\In($id, $options['id'])]);
+                $ids = count($options['id']) ? $options['id'] : [0];
+                $select->where([new Sql\Predicate\In($id, $ids)]);
             } else {
                 $select->where([$id => $options['id']]);
             }
