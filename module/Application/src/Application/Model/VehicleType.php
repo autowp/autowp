@@ -369,14 +369,14 @@ class VehicleType
                 'id',
                 'name',
                 'catname',
-                'cars_count' => new Sql\Expression('COUNT(1)')
+                'cars_count' => new Sql\Expression('COUNT(DISTINCT item.id)')
             ])
             ->join('vehicle_vehicle_type', 'car_types.id = vehicle_vehicle_type.vehicle_type_id', [])
             ->join('item', 'vehicle_vehicle_type.vehicle_id = item.id', [])
             ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
             ->where([
                 'item_parent_cache.parent_id' => $brandId,
-                'item.begin_year or item.begin_model_year',
+                '(item.begin_year or item.begin_model_year)',
                 'not item.is_group'
             ])
             ->group('car_types.id')
