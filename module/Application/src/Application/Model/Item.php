@@ -898,7 +898,7 @@ class Item
 
         if (isset($options['linked_in_days']) && $options['linked_in_days']) {
             $select->where([
-                new Sql\Expression(
+                new Sql\Predicate\Expression(
                     $alias . '.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)',
                     [$options['linked_in_days']]
                 )
