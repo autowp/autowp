@@ -290,46 +290,52 @@ class BrandNav
             $select->where(['NOT item.is_concept']);
         }
 
-        if ($itemTypeId == Item::VEHICLE) {
-            $select->where([
-                new Sql\Predicate\In('item.item_type_id', [Item::VEHICLE, Item::BRAND])
-            ]);
-            if ($carTypeId) {
-                $select
-                    ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
-                    ->join('car_types_parents', 'vehicle_vehicle_type.vehicle_type_id = car_types_parents.id', [])
-                    ->where(['car_types_parents.parent_id' => $carTypeId]);
-            } else {
-                if ($nullType) {
-                    $select
-                        ->join(
-                            'vehicle_vehicle_type',
-                            'item.id = vehicle_vehicle_type.vehicle_id',
-                            [],
-                            $select::JOIN_LEFT
-                        )
-                        ->where(['vehicle_vehicle_type.vehicle_id is null']);
-                } else {
-                    $otherTypesIds = $this->vehicleType->getDescendantsAndSelfIds([43, 44, 17, 19]);
-
-                    $select->join(
-                        'vehicle_vehicle_type',
-                        'item.id = vehicle_vehicle_type.vehicle_id',
-                        []
-                    );
-
-                    if ($otherTypesIds) {
-                        $select->where([
-                            new Sql\Predicate\NotIn(
-                                'vehicle_vehicle_type.vehicle_type_id',
-                                $otherTypesIds
-                            )
-                        ]);
-                    }
-                }
-            }
-        } else {
+        if ($itemTypeId != Item::VEHICLE) {
             $select->where(['item.item_type_id' => $itemTypeId]);
+
+            return $select;
+        }
+
+        $select->where([
+            new Sql\Predicate\In('item.item_type_id', [Item::VEHICLE, Item::BRAND])
+        ]);
+        if ($carTypeId) {
+            $select
+                ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
+                ->join('car_types_parents', 'vehicle_vehicle_type.vehicle_type_id = car_types_parents.id', [])
+                ->where(['car_types_parents.parent_id' => $carTypeId]);
+
+            return $select;
+        }
+
+        if ($nullType) {
+            $select
+                ->join(
+                    'vehicle_vehicle_type',
+                    'item.id = vehicle_vehicle_type.vehicle_id',
+                    [],
+                    $select::JOIN_LEFT
+                )
+                ->where(['vehicle_vehicle_type.vehicle_id is null']);
+
+            return $select;
+        }
+
+        $otherTypesIds = $this->vehicleType->getDescendantsAndSelfIds([43, 44, 17, 19]);
+
+        $select->join(
+            'vehicle_vehicle_type',
+            'item.id = vehicle_vehicle_type.vehicle_id',
+            []
+        );
+
+        if ($otherTypesIds) {
+            $select->where([
+                new Sql\Predicate\NotIn(
+                    'vehicle_vehicle_type.vehicle_type_id',
+                    $otherTypesIds
+                )
+            ]);
         }
 
         return $select;
@@ -435,7 +441,7 @@ class BrandNav
             'SIDEBAR',
             $brandId,
             $language,
-            '46'
+            '50'
         ]);
 
         $sections = $this->cache->getItem($cacheKey, $success);

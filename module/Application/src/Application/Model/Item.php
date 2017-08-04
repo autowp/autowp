@@ -868,7 +868,10 @@ class Item
             $select->where([$alias . '.catname' => $options['link_catname']]);
         }
 
-        return $this->applyFilters($select, $options, $alias . '.item_id', $alias, $language);
+        return $this->applyFilters($select, array_replace(
+            ['language' => $language],
+            $options
+        ), $alias . '.item_id', $alias, $language);
     }
 
     private function applyParentFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
@@ -906,7 +909,10 @@ class Item
             $select->where([$alias . '.type' => $options['link_type']]);
         }
 
-        $group = $this->applyFilters($select, $options, $alias . '.parent_id', $alias, $language);
+        $group = $this->applyFilters($select, array_replace(
+            ['language' => $language],
+            $options
+        ), $alias . '.parent_id', $alias);
 
         /*if ($group) {
             foreach ($columns as $column) {
@@ -965,7 +971,10 @@ class Item
                 ->where([$alias . '.item_id != ' . $alias . '.parent_id']);
 
             if (is_array($options['descendant'])) {
-                $subGroup = $this->applyFilters($select, $options['descendant'], $alias . '.item_id', $alias, $language);
+                $subGroup = $this->applyFilters($select, array_replace(
+                    ['language' => $language],
+                    $options['descendant']
+                ), $alias . '.item_id', $alias, $language);
                 $group = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.item_id' => $options['descendant']]);
@@ -998,7 +1007,10 @@ class Item
             $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.parent_id', $columns);
 
             if (is_array($options['descendant_or_self'])) {
-                $subGroup = $this->applyFilters($select, $options['descendant_or_self'], $alias . '.item_id', $alias, $language);
+                $subGroup = $this->applyFilters($select, array_replace(
+                    ['language' => $language],
+                    $options['descendant_or_self']
+                ), $alias . '.item_id', $alias, $language);
                 $group = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.item_id' => $options['descendant_or_self']]);
@@ -1012,7 +1024,10 @@ class Item
                 ->where([$alias . '.item_id != ' . $alias . '.parent_id']);
 
             if (is_array($options['ancestor'])) {
-                $subGroup = $this->applyFilters($select, $options['ancestor'], $alias . '.parent_id', $alias, $language);
+                $subGroup = $this->applyFilters($select, array_replace(
+                    ['language' => $language],
+                    $options['ancestor']
+                ), $alias . '.parent_id', $alias, $language);
                 $group = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.parent_id' => $options['ancestor']]);
@@ -1034,7 +1049,10 @@ class Item
                            ->where('not ' . $alias . '.sport');
                 }
 
-                $subGroup = $this->applyFilters($select, $options['ancestor_or_self'], $alias . '.parent_id', $alias, $language);
+                $subGroup = $this->applyFilters($select, array_replace(
+                    ['language' => $language],
+                    $options['ancestor_or_self']
+                ), $alias . '.parent_id', $alias, $language);
                 $group = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.parent_id' => $options['ancestor_or_self']]);
@@ -1254,7 +1272,10 @@ class Item
         unset($recursiveOptions['catname']);
         unset($recursiveOptions['columns']);
 
-        $group = $this->applyFilters($select, $recursiveOptions, 'item.id', '', $language);
+        $group = $this->applyFilters($select, array_replace(
+            ['language' => $language],
+            $recursiveOptions
+        ), 'item.id', '', $language);
 
         if ($options['item_type_id']) {
             if (is_array($options['item_type_id'])) {
