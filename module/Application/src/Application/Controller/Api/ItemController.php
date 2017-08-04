@@ -1292,10 +1292,10 @@ class ItemController extends AbstractRestfulController
     }
 
     /**
-     * @param \Autowp\Commons\Db\Table\Row $car
+     * @param array|\ArrayObject $car
      * @return string
      */
-    private function itemModerUrl(\Autowp\Commons\Db\Table\Row $item, $full = false, $tab = null, $uri = null)
+    private function itemModerUrl($item, $full = false, $tab = null, $uri = null)
     {
         $url = 'moder/items/item/' . $item['id'];
 

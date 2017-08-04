@@ -52,10 +52,10 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param \Autowp\Commons\Db\Table\Row $car
+     * @param array|\ArrayObject $car
      * @return string
      */
-    private function carModerUrl(\Autowp\Commons\Db\Table\Row $item, $full = false, $tab = null, $uri = null)
+    private function carModerUrl($item, $full = false, $tab = null, $uri = null)
     {
         $url = 'moder/items/item/' . $item['id'];
 
@@ -72,15 +72,15 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param \Autowp\Commons\Db\Table\Row $car
+     * @param array|\ArrayObject $car
      * @return void
      */
-    private function redirectToCar(\Autowp\Commons\Db\Table\Row $car, $tab = null)
+    private function redirectToCar($car, $tab = null)
     {
         return $this->redirect()->toUrl($this->carModerUrl($car, true, $tab));
     }
 
-    private function carMofificationsGroupModifications(\Autowp\Commons\Db\Table\Row $car, $groupId)
+    private function carMofificationsGroupModifications($car, $groupId)
     {
         $db = $this->pictureTable->getAdapter();
         $itemTable = $this->catalogue()->getItemTable();

@@ -102,7 +102,7 @@ class CarsController extends AbstractActionController
         $this->brand = $brand;
     }
 
-    private function carModerUrl(\Autowp\Commons\Db\Table\Row $item, $uri = null)
+    private function carModerUrl($item, $uri = null)
     {
         $url = 'moder/items/item/' . $item['id'];
 
