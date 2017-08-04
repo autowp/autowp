@@ -200,7 +200,7 @@ class Car extends AbstractPlugin
                     'columns'    => [
                         'brand_item_catname' => 'link_catname'
                     ],
-                    'descendant' => $car['id']
+                    'descendant_or_self' => $car['id']
                 ]
             ]);
 
