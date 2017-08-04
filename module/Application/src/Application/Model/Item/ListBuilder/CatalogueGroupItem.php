@@ -170,7 +170,7 @@ class CatalogueGroupItem extends CatalogueItem
         ]);
     }
 
-    public function getTypeUrl(\Autowp\Commons\Db\Table\Row $item, $type)
+    public function getTypeUrl($item, $type)
     {
         switch ($type) {
             case ItemParent::TYPE_TUNING:

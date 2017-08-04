@@ -157,7 +157,7 @@ class ListBuilder
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getTypeUrl(\Autowp\Commons\Db\Table\Row $item, $type)
+    public function getTypeUrl($item, $type)
     {
         return null;
     }
