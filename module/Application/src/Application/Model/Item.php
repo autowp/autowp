@@ -1362,7 +1362,7 @@ class Item
         }
 
         if ($options['vehicle_type_id']) {
-            $group[] = ['item.id'];
+            $group[] = 'item.id';
             $select
                 ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
                 ->where(['vehicle_vehicle_type.vehicle_type_id' => $options['vehicle_type_id']]);
