@@ -868,7 +868,7 @@ class Item
             $select->where([$alias . '.catname' => $options['link_catname']]);
         }
 
-        if (isset($options['link_type']) && $options['link_type']) {
+        if (isset($options['link_type'])) {
             $select->where([$alias . '.type' => $options['link_type']]);
         }
 
@@ -909,7 +909,7 @@ class Item
             $select->where([$alias . '.catname' => $options['link_catname']]);
         }
 
-        if (isset($options['link_type']) && $options['link_type']) {
+        if (isset($options['link_type'])) {
             $select->where([$alias . '.type' => $options['link_type']]);
         }
 
