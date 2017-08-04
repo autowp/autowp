@@ -316,7 +316,7 @@ class UploadController extends AbstractActionController
     {
         $language = $this->language();
 
-        $brand = $this->brand->getBrandById($this->params('brand_id'), $language);
+        $brand = $this->brand->getBrandById((int)$this->params('brand_id'), $language);
         if ($brand) {
             return $this->forward()->dispatch(self::class, [
                 'action'   => 'select-in-brand',
@@ -336,7 +336,7 @@ class UploadController extends AbstractActionController
     {
         $language = $this->language();
 
-        $brand = $this->brand->getBrandById($this->params('brand_id'), $language);
+        $brand = $this->brand->getBrandById((int)$this->params('brand_id'), $language);
 
         if (! $brand) {
             return $this->forward()->dispatch(self::class, [
