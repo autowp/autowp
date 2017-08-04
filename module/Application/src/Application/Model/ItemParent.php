@@ -360,7 +360,7 @@ class ItemParent
 
     public function move(int $itemId, int $fromParentId, int $toParentId)
     {
-        $oldParentRow = $this->select(['id' => $fromParentId])->current();
+        $oldParentRow = $this->itemTable->select(['id' => $fromParentId])->current();
         $newParentRow = $this->itemTable->select(['id' => $toParentId])->current();
         $itemRow = $this->itemTable->select(['id' => $itemId])->current();
         if (! $oldParentRow || ! $newParentRow || ! $itemRow) {
