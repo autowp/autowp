@@ -320,7 +320,7 @@ class BrandNav
 
                     if ($otherTypesIds) {
                         $select->where([
-                            new Sql\Predicate\In(
+                            new Sql\Predicate\NotIn(
                                 'vehicle_vehicle_type.vehicle_type_id',
                                 $otherTypesIds
                             )
@@ -435,7 +435,7 @@ class BrandNav
             'SIDEBAR',
             $brandId,
             $language,
-            '40'
+            '46'
         ]);
 
         $sections = $this->cache->getItem($cacheKey, $success);
