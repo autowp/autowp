@@ -162,7 +162,7 @@ class ItemController extends AbstractRestfulController
             if (isset($namespace->lastCarId)) {
                 $select->where(['item.id' => (int)$namespace->lastCarId]);
             } else {
-                $select->where([new Sql\Expression('0')]);
+                $select->where([new Sql\Predicate\Expression('0')]);
             }
         }
 
