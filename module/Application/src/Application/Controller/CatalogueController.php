@@ -1294,7 +1294,7 @@ class CatalogueController extends AbstractActionController
 
     private function brandItemModgroup(
         $brand,
-        array $currentCar,
+        $currentCar,
         $brandItemCatname,
         $path,
         int $modgroupId,
