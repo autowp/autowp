@@ -167,32 +167,32 @@ class AccountController extends AbstractActionController
 
         $picsCount = $db->fetchOne(
             $db->select()
-                 ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
+                ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
                 ->where('owner_id = ?', $user['id'])
-                 ->where('status = ?', Picture::STATUS_ACCEPTED)
+                ->where('status = ?', Picture::STATUS_ACCEPTED)
         );
 
         $subscribesCount = $db->fetchOne(
             $db->select()
-                 ->from('forums_topics', new Zend_Db_Expr('COUNT(*)'))
-                 ->join('forums_topics_subscribers', 'forums_topics.id=forums_topics_subscribers.topic_id', null)
+                ->from('forums_topics', new Zend_Db_Expr('COUNT(*)'))
+                ->join('forums_topics_subscribers', 'forums_topics.id=forums_topics_subscribers.topic_id', [])
                 ->where('forums_topics_subscribers.user_id = ?', $user['id'])
-                 ->where('forums_topics.status IN (?)', [Forums::STATUS_CLOSED, Forums::STATUS_NORMAL])
+                ->where('forums_topics.status IN (?)', [Forums::STATUS_CLOSED, Forums::STATUS_NORMAL])
         );
 
-        $notTakenPicturesCount = $this->pictureTable->getAdapter()->fetchOne(
-            $this->pictureTable->select()
-                ->from($this->pictureTable, new Zend_Db_Expr('COUNT(1)'))
+        $notTakenPicturesCount = $db->fetchOne(
+            $db->select()
+                ->from($this->pictureTable->info('name'), new Zend_Db_Expr('COUNT(1)'))
                 ->where('owner_id = ?', $user['id'])
                 ->where('status = ?', Picture::STATUS_INBOX)
         );
 
         return [
-            'smCount'    => $this->message->getSystemCount($user['id']),
-            'newSmCount' => $this->message->getNewSystemCount($user['id']),
-            'pmCount'    => $this->message->getInboxCount($user['id']),
-            'newPmCount' => $this->message->getInboxNewCount($user['id']),
-            'omCount'    => $this->message->getSentCount($user['id']),
+            'smCount'               => $this->message->getSystemCount($user['id']),
+            'newSmCount'            => $this->message->getNewSystemCount($user['id']),
+            'pmCount'               => $this->message->getInboxCount($user['id']),
+            'newPmCount'            => $this->message->getInboxNewCount($user['id']),
+            'omCount'               => $this->message->getSentCount($user['id']),
             'notTakenPicturesCount' => $notTakenPicturesCount,
             'subscribesCount'       => $subscribesCount,
             'picsCount'             => $picsCount
