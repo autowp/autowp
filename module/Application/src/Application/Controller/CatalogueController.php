@@ -1400,7 +1400,7 @@ class CatalogueController extends AbstractActionController
             'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
             'modgroup'         => true,
             'breadcrumbs'      => $breadcrumbs,
-            'car'              => $currentCar,
+            'car'              => (array) $currentCar,
             'modifications'    => $modifications,
             'canAcceptPicture' => $canAcceptPicture,
             'inboxCount'       => $inboxCount,
