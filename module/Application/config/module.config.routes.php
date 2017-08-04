@@ -618,6 +618,15 @@ return [
                             'defaults' => [
                                 'action' => 'factory-cars',
                             ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'page' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/page:page',
+                                ],
+                            ]
                         ]
                     ],
                     'newcars' => [
