@@ -39,8 +39,9 @@ class Attr extends AbstractAdapter
                 $tableName.'.attribute_id' => $attribute['id'],
                 $tableName.'.value IS NOT NULL'
             ])
-            ->join($tableName, 'item.id='.$tableName.'.item_id', [])
-            ->order($tableName.'.value ' . $this->order);
+            ->join($tableName, 'item.id = '.$tableName.'.item_id', [])
+            ->order($tableName.'.value ' . $this->order)
+            ->group(['item.id']);
 
         $result = [];
         foreach ($this->itemTable->selectWith($select) as $car) {
