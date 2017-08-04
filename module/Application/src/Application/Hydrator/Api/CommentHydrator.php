@@ -90,7 +90,7 @@ class CommentHydrator extends RestHydrator
         if ($object['type_id'] == \Application\Comments::PICTURES_TYPE_ID) {
             $picture = $this->pictureTable->find($object['item_id'])->current();
             if ($picture) {
-                switch ($picture->status) {
+                switch ($picture['status']) {
                     case Picture::STATUS_ACCEPTED:
                         $status = [
                             'class' => 'success',

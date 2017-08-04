@@ -68,7 +68,8 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
             if (! in_array($id, $vehicleTypeIds)) {
                 $this->reset();
                 $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-                $this->dispatch('https://www.autowp.ru/api/item-vehicle-type/' . $itemId . '/' . $id, Request::METHOD_DELETE);
+                $url = 'https://www.autowp.ru/api/item-vehicle-type/' . $itemId . '/' . $id;
+                $this->dispatch($url, Request::METHOD_DELETE);
 
                 $this->assertResponseStatusCode(204);
                 $this->assertModuleName('application');
@@ -82,7 +83,12 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
             if (! in_array($id, $ids)) {
                 $this->reset();
                 $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-                $this->dispatch('https://www.autowp.ru/api/item-vehicle-type/' . $itemId . '/' . $id, Request::METHOD_POST);
+                $url = sprintf(
+                    'https://www.autowp.ru/api/item-vehicle-type/%s/%s',
+                    $itemId,
+                    $id
+                );
+                $this->dispatch($url, Request::METHOD_POST);
 
                 $this->assertResponseStatusCode(201);
                 $this->assertModuleName('application');

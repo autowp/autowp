@@ -30,7 +30,8 @@ class PictureControllerFactory implements FactoryInterface
             $container->get(\Autowp\TextStorage\Service::class),
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get(\Application\Model\PictureModerVote::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

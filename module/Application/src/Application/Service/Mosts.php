@@ -4,16 +4,17 @@ namespace Application\Service;
 
 use Exception;
 
+use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 use Application\Model\DbTable;
 use Application\Model\Perspective;
+use Application\Model\Picture;
 use Application\Model\VehicleType;
 use Application\Most;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
-use Application\Model\Picture;
 
 class Mosts
 {
@@ -360,18 +361,25 @@ class Mosts
      */
     private $attributeTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $itemTable;
+
     public function __construct(
         SpecificationsService $specs,
         Perspective $perspective,
         VehicleType $vehicleType,
         DbTable\Picture $pictureTable,
-        TableGateway $attributeTable
+        TableGateway $attributeTable,
+        TableGateway $itemTable
     ) {
         $this->specs = $specs;
         $this->perspective = $perspective;
         $this->vehicleType = $vehicleType;
         $this->pictureTable = $pictureTable;
         $this->attributeTable = $attributeTable;
+        $this->itemTable = $itemTable;
     }
 
     private function betweenYearsExpr($from, $to)
@@ -545,7 +553,7 @@ class Mosts
         $ids = [];
         foreach ($pictures as $picture) {
             if ($picture) {
-                $ids[] = $picture->id;
+                $ids[] = $picture['id'];
             }
         }
 
@@ -567,7 +575,7 @@ class Mosts
 
                 if ($pic) {
                     $pictures[$key] = $pic;
-                    $ids[] = $pic->id;
+                    $ids[] = $pic['id'];
                 } else {
                     break;
                 }
@@ -579,9 +587,7 @@ class Mosts
 
     private function getCarsData(array $cMost, int $carTypeId, $cYear, int $brandId, string $language)
     {
-        $itemTable = new DbTable\Item();
-
-        $select = $itemTable->select(true);
+        $select = new Sql\Select($this->itemTable->getTable());
 
         if ($carTypeId) {
             $ids = $this->vehicleType->getDescendantsAndSelfIds($carTypeId);
@@ -593,9 +599,9 @@ class Mosts
             $select->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', []);
 
             if (count($ids) == 1) {
-                $select->where('vehicle_vehicle_type.vehicle_type_id = ?', $ids[0]);
+                $select->where(['vehicle_vehicle_type.vehicle_type_id' => $ids[0]]);
             } else {
-                $select->where('vehicle_vehicle_type.vehicle_type_id IN (?)', $ids);
+                $select->where([new Sql\Predicate\In('vehicle_vehicle_type.vehicle_type_id', $ids)]);
             }
         }
 
@@ -605,14 +611,17 @@ class Mosts
 
         if ($brandId) {
             $select
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('not item_parent_cache.tuning')
-                ->where('item_parent_cache.parent_id = ?', $brandId)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
+                ->where([
+                    'not item_parent_cache.tuning',
+                    'item_parent_cache.parent_id' => $brandId
+                ])
                 ->group('item.id');
         }
 
         $most = new Most([
             'attributeTable' => $this->attributeTable,
+            'itemTable'      => $this->itemTable,
             'specs'          => $this->specs,
             'carsSelect'     => $select,
             'adapter'        => $cMost['adapter'],
@@ -623,7 +632,7 @@ class Mosts
 
         $data = $most->getData($language);
         foreach ($data['cars'] as &$car) {
-            $car['pictures'] = $this->getOrientedPictureList($car['car']->id, $g);
+            $car['pictures'] = $this->getOrientedPictureList($car['car']['id'], $g);
         }
 
         return $data;
@@ -669,17 +678,18 @@ class Mosts
         $years = $this->getYears();
 
         if ($brandId) {
-            $itemTable = new DbTable\Item();
-            $select = $itemTable->select(true)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('not item_parent_cache.tuning')
-                ->where('item_parent_cache.parent_id = ?', $brandId)
+            $select = new Sql\Select($this->itemTable->getTable());
+            $select->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
+                ->where([
+                    'not item_parent_cache.tuning',
+                    'item_parent_cache.parent_id' => $brandId
+                ])
                 ->limit(1);
 
             foreach ($years as $idx => $year) {
                 $cSelect = clone $select;
                 $cSelect->where($year['where']);
-                $rowExists = (bool)$itemTable->fetchRow($cSelect);
+                $rowExists = (bool)$this->itemTable->select($cSelect)->current();
                 if (! $rowExists) {
                     unset($years[$idx]);
                 }

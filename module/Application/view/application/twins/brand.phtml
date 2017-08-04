@@ -6,8 +6,8 @@
         ],
         'pageId' => 153,
         'args'   => [
-            'BRAND_NAME'    => $this->brand->name,
-            'BRAND_CATNAME' => $this->brand->catname
+            'BRAND_NAME'    => $this->brand['name'],
+            'BRAND_CATNAME' => $this->brand['catname']
         ]
     ]);
 ?>
@@ -18,6 +18,6 @@
 <?=$this->paginationControl($this->paginator, null, null, [
     'route'     => 'twins/brand',
     'urlParams' => [
-        'brand_catname' => $this->brand->catname
+        'brand_catname' => $this->brand['catname']
     ]
 ]) ?>

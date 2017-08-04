@@ -198,11 +198,11 @@ class UsersService
         ]);
         $user->save();
 
-        $this->specsService->refreshUserConflicts($user->id);
+        $this->specsService->refreshUserConflicts($user['id']);
 
         $this->sendRegistrationConfirmEmail($user, $host['hostname']);
 
-        $this->updateUserVoteLimit($user->id);
+        $this->updateUserVoteLimit($user['id']);
 
         return $user;
     }
@@ -218,8 +218,8 @@ class UsersService
 
         $emailCheckCode = $this->emailCheckCode($email);
 
-        $user->email_to_check = $email;
-        $user->email_check_code = $emailCheckCode;
+        $user['email_to_check'] = $email;
+        $user['email_check_code'] = $emailCheckCode;
         $user->save();
 
         $this->sendChangeConfirmEmail($user, $host['hostname']);
@@ -245,7 +245,7 @@ class UsersService
         }
 
         $user->setFromArray([
-            'e_mail'           => $user->email_to_check,
+            'e_mail'           => $user['email_to_check'],
             'email_check_code' => null,
             'email_to_check'   => null
         ]);
@@ -260,11 +260,11 @@ class UsersService
      */
     public function sendRegistrationConfirmEmail(\Autowp\Commons\Db\Table\Row $user, $hostname)
     {
-        if ($user->email_to_check && $user->email_check_code) {
+        if ($user['email_to_check'] && $user['email_check_code']) {
             $values = [
-                'email' => $user->email_to_check,
-                'name'  => $user->name,
-                'url'   => 'http://'.$hostname.'/account/emailcheck/' . $user->email_check_code
+                'email' => $user['email_to_check'],
+                'name'  => $user['name'],
+                'url'   => 'http://'.$hostname.'/account/emailcheck/' . $user['email_check_code']
             ];
 
             $subject = $this->translator->translate('users/registration/email-confirm-subject');
@@ -297,11 +297,11 @@ class UsersService
      */
     public function sendChangeConfirmEmail(\Autowp\Commons\Db\Table\Row $user, $hostname)
     {
-        if ($user->email_to_check && $user->email_check_code) {
+        if ($user['email_to_check'] && $user['email_check_code']) {
             $values = [
-                'email' => $user->email_to_check,
-                'name'  => $user->name,
-                'url'   => 'http://'.$hostname.'/account/emailcheck/' . $user->email_check_code
+                'email' => $user['email_to_check'],
+                'name'  => $user['name'],
+                'url'   => 'http://'.$hostname.'/account/emailcheck/' . $user['email_check_code']
             ];
 
             $subject = $this->translator->translate('users/change-email/confirm-subject');
@@ -370,7 +370,7 @@ class UsersService
 
         $default = 10;
 
-        $avgVote = $this->comments->getUserAvgVote($userRow->id);
+        $avgVote = $this->comments->getUserAvgVote($userRow['id']);
 
         $age = 0;
         $regDate = $userRow->getDateTime('reg_date');
@@ -384,7 +384,7 @@ class UsersService
         $picturesExists = $db->fetchOne(
             $db->select()
                 ->from($this->pictureTable->info('name'), [new Zend_Db_Expr('COUNT(1)')])
-                ->where('owner_id = ?', $userRow->id)
+                ->where('owner_id = ?', $userRow['id'])
                 ->where('status = ?', Picture::STATUS_ACCEPTED)
         );
 
@@ -393,7 +393,7 @@ class UsersService
             $value = 0;
         }
 
-        $userRow->votes_per_day = $value;
+        $userRow['votes_per_day'] = $value;
         $userRow->save();
     }
 
@@ -411,7 +411,7 @@ class UsersService
     {
         $passwordExpr = $this->passwordHashExpr($password);
 
-        $user->password = new Zend_Db_Expr($passwordExpr);
+        $user['password'] = new Zend_Db_Expr($passwordExpr);
         $user->save();
     }
 
@@ -454,9 +454,9 @@ class UsersService
         );
 
         foreach ($rows as $row) {
-            print 'Delete ' . $row->id . ' ' . $row->name . ' ' . PHP_EOL;
+            print 'Delete ' . $row['id']. ' ' . $row['name']. ' ' . PHP_EOL;
 
-            $this->delete($row->id);
+            $this->delete($row['id']);
         }
     }
 
@@ -470,16 +470,16 @@ class UsersService
             return;
         }
 
-        if ($row->img) {
-            $imageId = $row->img;
-            $row->img = null;
+        if ($row['img']) {
+            $imageId = $row['img'];
+            $row['img'] = null;
             $row->save();
 
             $this->imageStorage->removeImage($imageId);
         }
 
         $db->delete('log_events_user', [
-            'user_id = ?' => $row->id
+            'user_id = ?' => $row['id']
         ]);
 
         $row->delete();
@@ -514,14 +514,14 @@ class UsersService
             return false;
         }
 
-        $oldImageId = $row->img;
+        $oldImageId = $row['img'];
         if ($oldImageId) {
-            $row->img = null;
+            $row['img'] = null;
             $row->save();
             $this->imageStorage->removeImage($oldImageId);
         }
 
-        $row->deleted = 1;
+        $row['deleted'] = 1;
         $row->save();
 
         // delete from contacts

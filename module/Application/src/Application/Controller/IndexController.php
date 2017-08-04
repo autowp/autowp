@@ -3,14 +3,13 @@
 namespace Application\Controller;
 
 use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\CarOfDay;
 use Application\Model\Categories;
-use Application\Model\Brand as BrandModel;
+use Application\Model\Brand;
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
@@ -33,9 +32,9 @@ class IndexController extends AbstractActionController
     private $carOfDay;
 
     /**
-     * @var TableGateway
+     * @var Item
      */
-    private $itemTable;
+    private $item;
 
     /**
      * @var Perspective
@@ -52,6 +51,11 @@ class IndexController extends AbstractActionController
      */
     private $pictureTable;
 
+    /**
+     * @var Brand
+     */
+    private $brand;
+
     public function __construct(
         $cache,
         SpecificationsService $specsService,
@@ -60,7 +64,8 @@ class IndexController extends AbstractActionController
         Perspective $perspective,
         Twins $twins,
         DbTable\Picture $pictureTable,
-        TableGateway $itemTable
+        Item $item,
+        Brand $brand
     ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
@@ -70,7 +75,8 @@ class IndexController extends AbstractActionController
         $this->twins = $twins;
         $this->pictureTable = $pictureTable;
 
-        $this->itemTable = $itemTable;
+        $this->item = $item;
+        $this->brand = $brand;
     }
 
     private function brands()
@@ -81,9 +87,8 @@ class IndexController extends AbstractActionController
         $brands = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             // cache missing
-            $brandModel = new BrandModel();
 
-            $items = $brandModel->getTopBrandsList($language);
+            $items = $this->brand->getTopBrandsList($language);
             foreach ($items as &$item) {
                 $item['url'] = $this->url()->fromRoute('catalogue', [
                     'action'        => 'brand',
@@ -97,7 +102,9 @@ class IndexController extends AbstractActionController
 
             $brands = [
                 'brands'      => $items,
-                'totalBrands' => $brandModel->getTotalCount()
+                'totalBrands' => $this->item->getCount([
+                    'item_type_id' => Item::BRAND
+                ])
             ];
 
             $this->cache->setItem($cacheKey, $brands);
@@ -134,7 +141,7 @@ class IndexController extends AbstractActionController
         $cacheKey = 'INDEX_FACTORIES_5';
         $factories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $select = new Sql\Select($this->itemTable->getTable());
+            $select = new Sql\Select($this->item->getTable()->getTable());
             $select
                 ->columns([
                     'id',
@@ -158,7 +165,7 @@ class IndexController extends AbstractActionController
                 ->order(['new_count desc', 'count desc'])
                 ->limit(8);
 
-            $items = $this->itemTable->selectWith($select);
+            $items = $this->item->getTable()->selectWith($select);
 
             $factories = [];
             foreach ($items as $item) {
@@ -184,8 +191,6 @@ class IndexController extends AbstractActionController
 
     public function indexAction()
     {
-        $itemTable = $this->catalogue()->getItemTable();
-
         $language = $this->language();
 
         $select = $this->pictureTable->select(true)
@@ -240,20 +245,22 @@ class IndexController extends AbstractActionController
 
         $userTable = new User();
 
-        $cacheKey = 'INDEX_SPEC_CARS_15_' . $language;
+        $cacheKey = 'INDEX_SPEC_CARS_16_' . $language;
         $cars = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $itemTable = $this->catalogue()->getItemTable();
+            $select = new Sql\Select($this->item->getTable()->getTable());
+            $select
+                ->join('attrs_user_values', 'item.id = attrs_user_values.item_id', [])
+                ->where(['update_date > DATE_SUB(NOW(), INTERVAL 3 DAY)'])
+                ->having(['count(attrs_user_values.attribute_id) > 10'])
+                ->group('item.id')
+                ->order(new Sql\Expression('MAX(attrs_user_values.update_date) DESC'))
+                ->limit(4);
 
-            $cars = $itemTable->fetchAll(
-                $select = $itemTable->select(true)
-                    ->join('attrs_user_values', 'item.id = attrs_user_values.item_id', null)
-                    ->where('update_date > DATE_SUB(NOW(), INTERVAL 3 DAY)')
-                    ->having('count(attrs_user_values.attribute_id) > 10')
-                    ->group('item.id')
-                    ->order('MAX(attrs_user_values.update_date) DESC')
-                    ->limit(4)
-            );
+            $cars = [];
+            foreach ($this->item->getTable()->selectWith($select) as $row) {
+                $cars[] = $row;
+            }
 
             $this->cache->setItem($cacheKey, $cars);
         }

@@ -208,7 +208,7 @@ class MainMenu
     {
         $newMessages = 0;
         if ($user) {
-            $newMessages = $this->message->getNewCount($user->id);
+            $newMessages = $this->message->getNewCount($user['id']);
         }
 
         $language = $this->language->getLanguage();

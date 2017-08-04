@@ -41,16 +41,23 @@ class NewController extends AbstractActionController
      */
     private $pictureTable;
 
+    /**
+     * @var PictureItem
+     */
+    private $pictureItem;
+
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
         SpecificationsService $specsService,
         Item $itemModel,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        PictureItem $pictureItem
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->specsService = $specsService;
         $this->itemModel = $itemModel;
         $this->pictureTable = $pictureTable;
+        $this->pictureItem = $pictureItem;
     }
 
     public function indexAction()
@@ -88,18 +95,16 @@ class NewController extends AbstractActionController
 
         $select = $service->getCurrentDateSelect();
 
-        $pictureItem = new PictureItem();
-
         $paginator = new Paginator(
             new Zend1DbTableSelect($select)
         );
         $paginator
-        ->setItemCountPerPage(self::PER_PAGE)
-        ->setCurrentPageNumber($this->params('page'));
+            ->setItemCountPerPage(self::PER_PAGE)
+            ->setCurrentPageNumber($this->params('page'));
 
         $items = [];
         foreach ($paginator->getCurrentItems() as $pictureRow) {
-            $itemIds = $pictureItem->getPictureItems($pictureRow['id']);
+            $itemIds = $this->pictureItem->getPictureItems($pictureRow['id']);
             if (count($itemIds) != 1) {
                 $items[] = [
                     'type'    => 'picture',
@@ -177,15 +182,13 @@ class NewController extends AbstractActionController
             $picturesBuffer = [];
         }
 
-        $itemTable = new DbTable\Item();
-
         foreach ($items as &$item) {
             if ($item['type'] == 'item') {
-                $itemRow = $itemTable->find($item['item_id'])->current();
+                $itemRow = $this->itemModel->getRow(['id' => $item['item_id']]);
 
                 $ids = [];
                 foreach ($item['pictures'] as $row) {
-                    $ids[] = $row->id;
+                    $ids[] = $row['id'];
                 }
 
                 $item['listData'] = $this->car()->listData([$itemRow], [
@@ -244,8 +247,7 @@ class NewController extends AbstractActionController
 
     public function itemAction()
     {
-        $itemTable = new DbTable\Item();
-        $item = $itemTable->find($this->params('item_id'))->current();
+        $item = $this->itemModel->getRow(['id' => $this->params('item_id')]);
         if (! $item) {
             return $this->notFoundAction();
         }

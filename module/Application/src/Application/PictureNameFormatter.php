@@ -55,7 +55,7 @@ class PictureNameFormatter
                 'language' => $language,
                 'large'    => true
             ]);
-            $picture = $names[$picture->id];
+            $picture = $names[$picture['id']];
         }
 
         if (isset($picture['name']) && $picture['name']) {

@@ -71,7 +71,7 @@ class FrontendController extends AbstractActionController
     public function indexAction()
     {
         $user = $this->user()->get();
-        $userId = $user ? $user->id : null;
+        $userId = $user ? $user['id'] : null;
 
         $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
         $isModearator = $this->user()->inheritsRole('moder');
@@ -159,13 +159,13 @@ class FrontendController extends AbstractActionController
                         $values = $this->commentForm->getData();
 
                         $values['topic_id'] = $topic['id'];
-                        $values['user_id'] = $user->id;
+                        $values['user_id'] = $user['id'];
                         $values['ip'] = $request->getServer('REMOTE_ADDR');
                         $values['resolve'] = $isModearator && $values['parent_id'] && $values['resolve'];
                         $messageId = $this->model->addMessage($values);
 
-                        $user->forums_messages = new Zend_Db_Expr('forums_messages + 1');
-                        $user->last_message_time = new Zend_Db_Expr('NOW()');
+                        $user['forums_messages'] = new Zend_Db_Expr('forums_messages + 1');
+                        $user['last_message_time'] = new Zend_Db_Expr('NOW()');
                         $user->save();
 
                         $messageUrl = $this->topicMessageUrl($messageId, true);
@@ -174,14 +174,14 @@ class FrontendController extends AbstractActionController
 
                         if ($values['parent_id']) {
                             $authorId = $this->comments->service()->getMessageAuthorId($values['parent_id']);
-                            if ($authorId && ($authorId != $user->id)) {
+                            if ($authorId && ($authorId != $user['id'])) {
                                 $parentMessageAuthor = $userTable->fetchRow([
                                     'id = ?' => $authorId,
                                     'not deleted'
                                 ]);
                                 if ($parentMessageAuthor) {
                                     $moderUrl = $this->url()->fromRoute('users/user', [
-                                        'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                                        'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
                                     ], [
                                         'force_canonical' => true
                                     ]);
@@ -191,7 +191,7 @@ class FrontendController extends AbstractActionController
                                         $messageUrl
                                     );
 
-                                    $this->message->send(null, $parentMessageAuthor->id, $message);
+                                    $this->message->send(null, $parentMessageAuthor['id'], $message);
                                 }
                             }
                         }
@@ -208,7 +208,7 @@ class FrontendController extends AbstractActionController
 
         $data = $this->model->topicPage(
             $topic['id'],
-            $user ? $user->id : null,
+            $user ? $user['id'] : null,
             $this->params('page'),
             $isModearator
         );
@@ -275,7 +275,7 @@ class FrontendController extends AbstractActionController
 
         $topicId = (int)$this->params('topic_id');
 
-        $this->model->subscribe($topicId, $user->id);
+        $this->model->subscribe($topicId, $user['id']);
 
         $referer = $this->getRequest()->getServer('HTTP_REFERER');
 
@@ -293,7 +293,7 @@ class FrontendController extends AbstractActionController
 
         $topicId = (int)$this->params('topic_id');
 
-        $this->model->unsubscribe($topicId, $user->id);
+        $this->model->unsubscribe($topicId, $user['id']);
 
         $referer = $this->getRequest()->getServer('HTTP_REFERER');
 
@@ -344,7 +344,7 @@ class FrontendController extends AbstractActionController
                     if (! $needWait) {
                         $values = $this->newTopicForm->getData();
 
-                        $values['user_id'] = $user->id;
+                        $values['user_id'] = $user['id'];
                         $values['theme_id'] = $theme['id'];
                         $values['ip'] = $request->getServer('REMOTE_ADDR');
 
@@ -458,7 +458,7 @@ class FrontendController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $topics = $this->model->getSubscribedTopics($user->id);
+        $topics = $this->model->getSubscribedTopics($user['id']);
 
         $userTable = new User();
 

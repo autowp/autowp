@@ -39,22 +39,28 @@ class Referer
     {
         $host = @parse_url($url, PHP_URL_HOST);
 
+        if (! $host) {
+            return;
+        }
+
         $whitelisted = $this->isHostWhitelisted($host);
 
-        if (! $whitelisted) {
-            if (mb_strlen($url) > self::MAX_URL) {
-                $url = mb_substr($url, 0, self::MAX_URL);
-            }
-
-            $adapter = $this->table->getAdapter();
-            $stmt = $adapter->query('
-                insert into referer (host, url, count, last_date, accept)
-                values (?, ?, 1, NOW(), LEFT(?, ?))
-                on duplicate key
-                update count=count+1, host=VALUES(host), last_date=VALUES(last_date), accept=VALUES(accept)
-            ', $adapter::QUERY_MODE_PREPARE);
-            $stmt->execute([$host, $url, $accept, self::MAX_ACCEPT]);
+        if ($whitelisted) {
+            return;
         }
+
+        if (mb_strlen($url) > self::MAX_URL) {
+            $url = mb_substr($url, 0, self::MAX_URL);
+        }
+
+        $adapter = $this->table->getAdapter();
+        $stmt = $adapter->query('
+            insert into referer (host, url, count, last_date, accept)
+            values (?, ?, 1, NOW(), LEFT(?, ?))
+            on duplicate key
+            update count=count+1, host=VALUES(host), last_date=VALUES(last_date), accept=VALUES(accept)
+        ', $adapter::QUERY_MODE_PREPARE);
+        $stmt->execute([$host, $url, $accept, self::MAX_ACCEPT]);
     }
 
     public function isImageRequest(string $accept): bool

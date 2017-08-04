@@ -14,12 +14,16 @@ class CommentsControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get(\Application\HostManager::class),
             $container->get('CommentForm'),
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Application\Comments::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Item::class),
+            $container->get(\Autowp\Votings\Votings::class),
+            $tables->get('articles')
         );
     }
 }

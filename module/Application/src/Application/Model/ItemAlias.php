@@ -22,9 +22,9 @@ class ItemAlias
         $this->itemModel = $itemModel;
     }
 
-    public function getAliases(int $itemId, string $name): array
+    public function getAliases(int $itemId): array
     {
-        $aliases = [$name];
+        $aliases = [];
 
         $rows = $this->table->select([
             'item_id' => $itemId

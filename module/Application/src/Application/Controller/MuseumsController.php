@@ -47,17 +47,15 @@ class MuseumsController extends AbstractActionController
 
     public function museumAction()
     {
-        $table = new DbTable\Item();
-
-        $museum = $table->fetchRow([
-            'id = ?'           => (int)$this->params()->fromRoute('id'),
-            'item_type_id = ?' => Item::MUSEUM
+        $museum = $this->itemModel->getRow([
+            'id'           => (int)$this->params()->fromRoute('id'),
+            'item_type_id' => Item::MUSEUM
         ]);
         if (! $museum) {
             return $this->notFoundAction();
         }
 
-        $point = $this->itemModel->getPoint($museum->id);
+        $point = $this->itemModel->getPoint($museum['id']);
 
         $links = $this->itemLinkTable->select([
             'item_id' => $museum['id']
@@ -67,7 +65,7 @@ class MuseumsController extends AbstractActionController
 
         $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->where('picture_item.item_id = ?', $museum->id)
+            ->where('picture_item.item_id = ?', $museum['id'])
             ->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
 
         $pictures = $this->pic()->listData($select, [

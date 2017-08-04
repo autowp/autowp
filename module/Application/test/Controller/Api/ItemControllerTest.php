@@ -145,7 +145,8 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
                 ]
             ]
         ]);
-        $this->dispatch('https://www.autowp.ru/upload/send/type/1/item_id/' . $vehicleId, Request::METHOD_POST, [], true);
+        $url = 'https://www.autowp.ru/upload/send/type/1/item_id/' . $vehicleId;
+        $this->dispatch($url, Request::METHOD_POST, [], true);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -253,30 +254,6 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
 
         $this->assertNotEmpty($json);
-    }
-
-    public function testVehicleIsNotForbidden()
-    {
-        /**
-         * @var Request $request
-         */
-        $request = $this->getRequest();
-        $request->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('http://www.autowp.ru/api/item/1', 'GET', [
-            'fields' => 'name_text'
-        ]);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ItemController::class);
-        $this->assertMatchedRouteName('api/item/item/get');
-        $this->assertActionName('item');
-
-        $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertContains('test car', $json['name_text']);
     }
 
     public function testCreateCarAndAddToBrand()
@@ -515,5 +492,73 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertSame(20.5, $json['lat']);
         $this->assertSame(-15, $json['lng']);
+    }
+
+    public function testEngineVehicles()
+    {
+        $engineId = $this->createItem([
+            'item_type_id' => 2,
+            'name'         => 'GM 5.0 V6',
+        ]);
+
+        $brand = $this->getRandomBrand();
+        $this->addItemParent($engineId, $brand['id']);
+
+        $itemId1 = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => 'Chevrolet Corvette',
+        ]);
+        $this->addItemParent($itemId1, $brand['id']);
+
+        $itemId2 = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => 'Pontiac Firebird',
+        ]);
+        $this->addItemParent($itemId2, $brand['id']);
+
+        $this->setEngineToVehicle($brand['catname'], $engineId, $itemId1);
+        $this->setEngineToVehicle($brand['catname'], $engineId, $itemId2);
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item/' . $engineId, Request::METHOD_GET, [
+            'fields'  => 'engine_vehicles'
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/item/get');
+        $this->assertActionName('item');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertArrayHasKey('engine_vehicles', $json);
+        foreach ($json['engine_vehicles'] as $item) {
+            $this->assertNotEmpty($item['name_html']);
+            $this->assertNotEmpty($item['url']);
+        }
+    }
+
+    public function testFields()
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
+            'fields' => 'childs_count,name_html,name_text,name_default,description,' .
+                'has_text,brands,upload_url,spec_editor_url,specs_url,categories,' .
+                'twins_groups,url,more_pictures_url,preview_pictures,design,'.
+                'engine_vehicles,catname,is_concept,spec_id,begin_year,end_year,body',
+            'limit'  => 100
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/list');
+        $this->assertActionName('index');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertNotEmpty($json['items']);
     }
 }

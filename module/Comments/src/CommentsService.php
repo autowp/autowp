@@ -154,7 +154,7 @@ class CommentsService
     private function getRecursive($type, $item, $parentId, $userId, $perPage = 0, $page = 0)
     {
         if ($userId instanceof \Autowp\Commons\Db\Table\Row) {
-            $userId = $userId->id;
+            $userId = $userId['id'];
         }
 
         if ($perPage) {
@@ -626,7 +626,7 @@ class CommentsService
             'id = ?' => $messageRow['id']
         ]);
 
-        $this->moveMessageRecursive($messageRow->id, $newTypeId, $newItemId);
+        $this->moveMessageRecursive($messageRow['id'], $newTypeId, $newItemId);
 
         $this->updateTopicStat($oldTypeId, $oldItemId);
         $this->updateTopicStat($newTypeId, $newItemId);

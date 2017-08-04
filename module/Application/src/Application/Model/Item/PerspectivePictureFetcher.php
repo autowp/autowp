@@ -80,7 +80,7 @@ class PerspectivePictureFetcher extends PictureFetcher
         return $this;
     }
 
-    public function fetch(array $item, array $options = [])
+    public function fetch($item, array $options = [])
     {
         $pictures = [];
         $usedIds = [];

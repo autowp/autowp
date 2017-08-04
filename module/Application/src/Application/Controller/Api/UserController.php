@@ -188,8 +188,10 @@ class UserController extends AbstractRestfulController
 
                 $this->log(sprintf(
                     'Удаление пользователя №%s',
-                    $row->id
-                ), [$row]);
+                    $row['id']
+                ), [
+                    'users' => $row['id']
+                ]);
             }
         }
 
@@ -218,17 +220,19 @@ class UserController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $oldImageId = $row->img;
+        $oldImageId = $row['img'];
         if ($oldImageId) {
-            $row->img = null;
+            $row['img'] = null;
             $row->save();
             $this->imageStorage()->removeImage($oldImageId);
         }
 
         $this->log(sprintf(
             'Удаление фотографии пользователя №%s',
-            $row->id
-        ), [$row]);
+            $row['id']
+        ), [
+            'users' => $row['id']
+        ]);
 
         return $this->getResponse()->setStatusCode(204);
     }

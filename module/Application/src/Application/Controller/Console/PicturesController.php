@@ -39,16 +39,19 @@ class PicturesController extends AbstractActionController
         geoPHP::version();
 
         foreach ($rows as $row) {
-            $console->writeLine($row->id);
-            $exif = $imageStorage->getImageEXIF($row->image_id);
+            $console->writeLine($row['id']);
+            $exif = $imageStorage->getImageEXIF($row['image_id']);
             $gps = $extractor->extract($exif);
             if ($gps !== false) {
-                $console->writeLine("Picture " . $row->id);
+                $console->writeLine("Picture " . $row['id']);
 
                 $point = new Point($gps['lng'], $gps['lat']);
-                $pointExpr = new Zend_Db_Expr($$this->pictureTable->getAdapter()->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
+                $pointExpr = new Zend_Db_Expr(
+                    $$this->pictureTable->getAdapter()
+                        ->quoteInto('GeomFromWKB(?)', $point->out('wkb'))
+                );
 
-                $row->point = $pointExpr;
+                $row['point'] = $pointExpr;
                 $row->save();
             }
         }

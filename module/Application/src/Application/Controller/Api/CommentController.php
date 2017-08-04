@@ -98,7 +98,7 @@ class CommentController extends AbstractRestfulController
                     'identity = ?' => $values['user']
                 ]);
                 if ($userRow) {
-                    $values['user'] = $userRow->id;
+                    $values['user'] = $userRow['id'];
                 }
             }
 

@@ -10,15 +10,29 @@ use Application\Model\Item;
 
 class StatController extends AbstractActionController
 {
+    /**
+     * @var Item
+     */
+    private $item;
+
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
+    public function __construct(Item $item, DbTable\Picture $pictureTable)
+    {
+        $this->item = $item;
+        $this->pictureTable = $pictureTable;
+    }
+
     public function globalSummaryAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        $cars = new DbTable\Item();
-
-        $db = $cars->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
         $totalPictures = $db->fetchOne('
             select count(1) from pictures
@@ -28,9 +42,9 @@ class StatController extends AbstractActionController
             select count(1) from item where item_type_id = ?
         ', [Item::BRAND]);
 
-        $totalCars = $db->fetchOne('
-            select count(1) from item where item_type_id = ?
-        ', [Item::VEHICLE]);
+        $totalCars = $this->item->getCount([
+            'item_type_id' => Item::VEHICLE
+        ]);
 
         $totalCarAttrs = $db->fetchOne('
             select count(1)

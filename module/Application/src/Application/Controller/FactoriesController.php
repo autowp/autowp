@@ -5,8 +5,6 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
-
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
@@ -60,11 +58,9 @@ class FactoriesController extends AbstractActionController
 
     public function factoryAction()
     {
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $factory = $itemTable->fetchRow([
-            'id = ?'           => (int)$this->params()->fromRoute('id'),
-            'item_type_id = ?' => Item::FACTORY
+        $factory = $this->itemModel->getRow([
+            'id'           => (int)$this->params()->fromRoute('id'),
+            'item_type_id' => Item::FACTORY
         ]);
         if (! $factory) {
             return $this->notFoundAction();
@@ -72,7 +68,7 @@ class FactoriesController extends AbstractActionController
 
         $select = $this->pictureTable->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->where('picture_item.item_id = ?', $factory->id)
+            ->where('picture_item.item_id = ?', $factory['id'])
             ->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
 
         $pictures = $this->pic()->listData($select, [
@@ -85,9 +81,10 @@ class FactoriesController extends AbstractActionController
         $carPictures = [];
         $groups = $this->itemModel->getRelatedCarGroups($factory['id']);
         if (count($groups) > 0) {
-            $cars = $itemTable->fetchAll([
-                'id in (?)' => array_keys($groups)
-            ], $this->catalogue()->itemOrdering());
+            $cars = $this->itemModel->getRows([
+                'id'    => array_keys($groups),
+                'order' => $this->catalogue()->itemOrdering()
+            ]);
 
             $catalogue = $this->catalogue();
 
@@ -97,7 +94,7 @@ class FactoriesController extends AbstractActionController
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item', 'picture_item.item_id = item.id', null)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $car->id)
+                    ->where('item_parent_cache.parent_id = ?', $car['id'])
                     ->order([
                         new Zend_Db_Expr('item_parent_cache.tuning asc'),
                         new Zend_Db_Expr('item_parent_cache.sport asc'),
@@ -108,14 +105,14 @@ class FactoriesController extends AbstractActionController
                         new Zend_Db_Expr('picture_item.perspective_id = 8 desc')
                     ]);
 
-                if (count($groups[$car->id]) > 1) {
+                if (count($groups[$car['id']]) > 1) {
                     $select
                         ->join(
                             ['cpc_oc' => 'item_parent_cache'],
                             'cpc_oc.item_id = picture_item.item_id',
                             null
                         )
-                        ->where('cpc_oc.parent_id IN (?)', $groups[$car->id]);
+                        ->where('cpc_oc.parent_id IN (?)', $groups[$car['id']]);
                 }
 
                 $pictureRow = $this->pictureTable->fetchRow($select);
@@ -126,7 +123,7 @@ class FactoriesController extends AbstractActionController
                     $src = $imagesInfo->getSrc();
                 }
 
-                $cataloguePaths = $catalogue->getCataloguePaths($car->id, [
+                $cataloguePaths = $catalogue->getCataloguePaths($car['id'], [
                     'breakOnFirst' => true
                 ]);
 
@@ -149,7 +146,7 @@ class FactoriesController extends AbstractActionController
             }
         }
 
-        $point = $this->itemModel->getPoint($factory->id);
+        $point = $this->itemModel->getPoint($factory['id']);
 
         $description = $this->itemModel->getTextOfItem($factory['id'], $this->language());
 
@@ -166,11 +163,9 @@ class FactoriesController extends AbstractActionController
 
     public function factoryCarsAction()
     {
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $factory = $itemTable->fetchRow([
-            'id = ?'           => (int)$this->params()->fromRoute('id'),
-            'item_type_id = ?' => Item::FACTORY
+        $factory = $this->itemModel->getRow([
+            'id'           => (int)$this->params()->fromRoute('id'),
+            'item_type_id' => Item::FACTORY
         ]);
         if (! $factory) {
             return $this->notFoundAction();
@@ -181,13 +176,10 @@ class FactoriesController extends AbstractActionController
         $cars = [];
         $groups = $this->itemModel->getRelatedCarGroups($factory['id']);
         if (count($groups) > 0) {
-            $select = $itemTable->select(true)
-                ->where('id IN (?)', array_keys($groups))
-                ->order($this->catalogue()->itemOrdering());
-
-            $paginator = new \Zend\Paginator\Paginator(
-                new Zend1DbTableSelect($select)
-            );
+            $paginator = $this->itemModel->getPaginator([
+                'id'    => array_keys($groups),
+                'order' => $this->catalogue()->itemOrdering()
+            ]);
 
             $paginator
                 ->setItemCountPerPage($this->catalogue()->getCarsPerPage())
@@ -222,11 +214,9 @@ class FactoriesController extends AbstractActionController
 
     public function newcarsAction()
     {
-        $itemTable = new DbTable\Item();
-
-        $factory = $itemTable->fetchRow([
-            'item_type_id = ?' => Item::FACTORY,
-            'id = ?'           => (int)$this->params('item_id')
+        $factory = $this->itemModel->getRow([
+            'item_type_id' => Item::FACTORY,
+            'id'           => (int)$this->params('item_id')
         ]);
         if (! $factory) {
             return $this->notFoundAction();
@@ -234,19 +224,18 @@ class FactoriesController extends AbstractActionController
 
         $language = $this->language();
 
-        $rows = $itemTable->fetchAll(
-            $itemTable->select(true)
-                ->where('item.item_type_id IN (?)', [
-                    Item::VEHICLE,
-                    Item::ENGINE
-                ])
-                ->join('item_parent', 'item.id = item_parent.item_id', null)
-                ->where('item_parent.parent_id = ?', $factory->id)
-                ->where('item_parent.timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)', 7)
-                ->group('item.id')
-                ->order(['item_parent.timestamp DESC'])
-                ->limit(20)
-        );
+        $rows = $this->itemModel->getRows([
+            'item_type_id' => [
+                Item::VEHICLE,
+                Item::ENGINE
+            ],
+            'parent' => [
+                'id'             => $factory['id'],
+                'linked_in_days' => 7,
+            ],
+            'order' => 'item_parent.timestamp DESC',
+            'limit' => 20
+        ]);
 
         $items = [];
         foreach ($rows as $row) {

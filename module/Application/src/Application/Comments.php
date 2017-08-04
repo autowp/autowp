@@ -60,6 +60,11 @@ class Comments
      */
     private $articleTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $itemTable;
+
     public function __construct(
         CommentsService $service,
         TreeRouteStack $router,
@@ -67,7 +72,8 @@ class Comments
         MessageService $message,
         $translator,
         DbTable\Picture $pictureTable,
-        TableGateway $articleTable
+        TableGateway $articleTable,
+        TableGateway $itemTable
     ) {
         $this->service = $service;
         $this->router = $router;
@@ -76,6 +82,7 @@ class Comments
         $this->translator = $translator;
         $this->pictureTable = $pictureTable;
         $this->articleTable = $articleTable;
+        $this->itemTable = $itemTable;
     }
 
     public function getMessageUrl($messageId, $canonical = false, $uri = null)
@@ -110,8 +117,7 @@ class Comments
                 break;
 
             case self::ITEM_TYPE_ID:
-                $itemTable = new DbTable\Item();
-                $item = $itemTable->find($message['item_id'])->current();
+                $item = $this->itemTable->select(['id' => (int)$message['item_id']])->current();
                 if (! $item) {
                     throw new Exception("Item `{$message['item_id']}` not found");
                 }
@@ -292,16 +298,16 @@ class Comments
         $subscribers = $userTable->find($ids);
 
         foreach ($subscribers as $subscriber) {
-            if ($subscriber->id == $author->id) {
+            if ($subscriber['id'] == $author['id']) {
                 continue;
             }
 
-            $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+            $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
             $url = $this->getMessageUrl($messageId, true, $uri) . '#msg' . $messageId;
 
             $userUrl = $this->router->assemble([
-                'user_id' => $author->identity ? $author->identity : 'user' . $author->id
+                'user_id' => $author['identity'] ? $author['identity'] : 'user' . $author['id']
             ], [
                 'name'            => 'users/user',
                 'force_canonical' => true,
@@ -309,13 +315,13 @@ class Comments
             ]);
 
             $message = sprintf(
-                $this->translator->translate('pm/user-%s-post-new-message-%s', 'default', $subscriber->language),
+                $this->translator->translate('pm/user-%s-post-new-message-%s', 'default', $subscriber['language']),
                 $userUrl,
                 $url
             );
-            $this->message->send(null, $subscriber->id, $message);
+            $this->message->send(null, $subscriber['id'], $message);
 
-            $this->service->markSubscriptionSent($comment['type_id'], $comment['item_id'], $subscriber->id);
+            $this->service->markSubscriptionSent($comment['type_id'], $comment['item_id'], $subscriber['id']);
         }
     }
 }

@@ -41,7 +41,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
 
                 if ($user) {
                     $acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
-                    $unlimitedTraffic = $acl->isAllowed($user->role, 'website', 'unlimited-traffic');
+                    $unlimitedTraffic = $acl->isAllowed($user['role'], 'website', 'unlimited-traffic');
                 }
             }
 

@@ -123,7 +123,7 @@ class IpHydrator extends RestHydrator
 
             /*if ($canBan) {
                 $this->banForm->setAttribute('action', $this->url()->fromRoute('ban/ban-ip', [
-                    'ip' => inet_ntop($picture->ip)
+                    'ip' => inet_ntop($picture['ip'])
                 ]));
                 $this->banForm->populateValues([
                     'submit' => 'ban/ban'

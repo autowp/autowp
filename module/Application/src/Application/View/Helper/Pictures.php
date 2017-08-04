@@ -82,15 +82,15 @@ class Pictures extends AbstractHelper
         if ($this->view->user()->logedIn()) {
             $commentsStat = $this->comments->getTopicStatForUser(
                 \Application\Comments::PICTURES_TYPE_ID,
-                $picture->id,
-                $this->view->user()->get()->id
+                $picture['id'],
+                $this->view->user()->get()['id']
             );
             $msgCount = $commentsStat['messages'];
             $newMsgCount = $commentsStat['newMessages'];
         } else {
             $commentsStat = $this->comments->getTopicStat(
                 \Application\Comments::PICTURES_TYPE_ID,
-                $picture->id
+                $picture['id']
             );
             $msgCount = $commentsStat['messages'];
             $newMsgCount = 0;
@@ -101,12 +101,12 @@ class Pictures extends AbstractHelper
             'cropped'     => $this->pictureTable->cropParametersExists($picture),
             'width'       => $picture['width'],
             'height'      => $picture['height'],
-            'crop_width'  => $picture->crop_width,
-            'crop_height' => $picture->crop_height,
+            'crop_width'  => $picture['crop_width'],
+            'crop_height' => $picture['crop_height'],
             'msgCount'    => $msgCount,
             'newMsgCount' => $newMsgCount,
             'views'       => $this->pictureView->get($picture['id']),
-            'status'      => $picture->status,
+            'status'      => $picture['status'],
         ];
 
         return $this->renderBehaviour($data, $isModer);
@@ -143,7 +143,7 @@ class Pictures extends AbstractHelper
             'shuffle' => true
         ]);
 
-        if ($isModer && $picture->name) {
+        if ($isModer && $picture['name']) {
             $title = $this->view->escapeHtmlAttr($this->view->translate('picture-preview/special-name'));
             $escName = '<span style="color:darkgreen" title="'.$title.'">' .
                               $escName .

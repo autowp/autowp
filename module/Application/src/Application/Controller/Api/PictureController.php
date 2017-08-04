@@ -18,6 +18,7 @@ use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\CarOfDay;
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
@@ -96,6 +97,11 @@ class PictureController extends AbstractRestfulController
      */
     private $pictureModerVote;
 
+    /**
+     * @var Item
+     */
+    private $item;
+
     public function __construct(
         RestHydrator $hydrator,
         PictureItem $pictureItem,
@@ -112,7 +118,8 @@ class PictureController extends AbstractRestfulController
         $textStorage,
         \Autowp\Comments\CommentsService $comments,
         PictureModerVote $pictureModerVote,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        Item $item
     ) {
         $this->carOfDay = $carOfDay;
 
@@ -132,6 +139,7 @@ class PictureController extends AbstractRestfulController
         $this->pictureModerVote = $pictureModerVote;
 
         $this->table = $pictureTable;
+        $this->item = $item;
     }
 
     public function randomPictureAction()
@@ -148,12 +156,12 @@ class PictureController extends AbstractRestfulController
         ];
 
         if ($pictureRow) {
-            $imageInfo = $this->imageStorage()->getImage($pictureRow->image_id);
+            $imageInfo = $this->imageStorage()->getImage($pictureRow['image_id']);
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->pic()->url($pictureRow->identity, true)
+                'page'   => $this->pic()->url($pictureRow['identity'], true)
             ];
         }
 
@@ -175,12 +183,12 @@ class PictureController extends AbstractRestfulController
         ];
 
         if ($pictureRow) {
-            $imageInfo = $this->imageStorage()->getImage($pictureRow->image_id);
+            $imageInfo = $this->imageStorage()->getImage($pictureRow['image_id']);
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->pic()->url($pictureRow->identity, true)
+                'page'   => $this->pic()->url($pictureRow['identity'], true)
             ];
         }
 
@@ -195,16 +203,14 @@ class PictureController extends AbstractRestfulController
         $pictureRow = null;
 
         if ($itemOfDay) {
-            $itemTable = new DbTable\Item();
-
-            $carRow = $itemTable->find($itemOfDay['item_id'])->current();
+            $carRow = $this->item->getRow(['id' => (int)$itemOfDay['item_id']]);
             if ($carRow) {
                 foreach ([31, null] as $groupId) {
                     $select = $this->table->select(true)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                        ->where('item_parent_cache.parent_id = ?', $carRow->id)
+                        ->where('item_parent_cache.parent_id = ?', $carRow['id'])
                         ->limit(1);
 
                     if ($groupId) {
@@ -239,12 +245,12 @@ class PictureController extends AbstractRestfulController
         ];
 
         if ($pictureRow) {
-            $imageInfo = $this->imageStorage()->getImage($pictureRow->image_id);
+            $imageInfo = $this->imageStorage()->getImage($pictureRow['image_id']);
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->pic()->url($pictureRow->identity, true)
+                'page'   => $this->pic()->url($pictureRow['identity'], true)
             ];
         }
 
@@ -533,7 +539,7 @@ class PictureController extends AbstractRestfulController
     private function userModerUrl(\Autowp\Commons\Db\Table\Row $user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
-            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+            'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
         ], [
             'force_canonical' => $full,
             'uri'             => $uri
@@ -545,7 +551,7 @@ class PictureController extends AbstractRestfulController
         return $this->url()->fromRoute('index', [], [
             'force_canonical' => $forceCanonical,
             'uri'             => $uri
-        ]) . 'ng/moder/pictures/' . $picture->id;
+        ]) . 'ng/moder/pictures/' . $picture['id'];
     }
 
     public function updateAction()
@@ -574,8 +580,8 @@ class PictureController extends AbstractRestfulController
         $data = $this->editInputFilter->getValues();
 
         if (array_key_exists('replace_picture_id', $data)) {
-            if ($picture->replace_picture_id && ! $data['replace_picture_id']) {
-                $replacePicture = $this->table->find($picture->replace_picture_id)->current();
+            if ($picture['replace_picture_id'] && ! $data['replace_picture_id']) {
+                $replacePicture = $this->table->find($picture['replace_picture_id'])->current();
                 if (! $replacePicture) {
                     return $this->notFoundAction();
                 }
@@ -584,7 +590,7 @@ class PictureController extends AbstractRestfulController
                     return $this->forbiddenAction();
                 }
 
-                $picture->replace_picture_id = null;
+                $picture['replace_picture_id'] = null;
                 $picture->save();
 
                 // log
@@ -592,7 +598,9 @@ class PictureController extends AbstractRestfulController
                     'Замена %s на %s отклонена',
                     htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
                     htmlspecialchars($this->pic()->name($picture, $this->language()))
-                ), [$picture, $replacePicture]);
+                ), [
+                    'pictures' => [$picture['id'], $replacePicture['id']]
+                ]);
             }
         }
 
@@ -607,16 +615,16 @@ class PictureController extends AbstractRestfulController
             $height = round($data['crop']['height']);
 
             $left = max(0, $left);
-            $left = min($picture->width, $left);
+            $left = min($picture['width'], $left);
             $width = max(1, $width);
-            $width = min($picture->width, $width);
+            $width = min($picture['width'], $width);
 
             $top = max(0, $top);
-            $top = min($picture->height, $top);
+            $top = min($picture['height'], $top);
             $height = max(1, $height);
-            $height = min($picture->height, $height);
+            $height = min($picture['height'], $height);
 
-            if ($left > 0 || $top > 0 || $width < $picture->width || $height < $picture->height) {
+            if ($left > 0 || $top > 0 || $width < $picture['width'] || $height < $picture['height']) {
                 $picture->setFromArray([
                     'crop_left'   => $left,
                     'crop_top'    => $top,
@@ -634,17 +642,19 @@ class PictureController extends AbstractRestfulController
             $picture->save();
 
             $this->imageStorage()->flush([
-                'image' => $picture->image_id
+                'image' => $picture['image_id']
             ]);
 
             $this->log(sprintf(
                 'Выделение области на картинке %s',
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
-            ), [$picture]);
+            ), [
+                'pictures' => $picture['id']
+            ]);
         }
 
         if (isset($data['special_name'])) {
-            $picture->name = $data['special_name'];
+            $picture['name'] = $data['special_name'];
             $picture->save();
         }
 
@@ -653,39 +663,41 @@ class PictureController extends AbstractRestfulController
 
             $user = $this->user()->get();
 
-            if ($picture->copyrights_text_id) {
-                $this->textStorage->setText($picture->copyrights_text_id, $text, $user->id);
+            if ($picture['copyrights_text_id']) {
+                $this->textStorage->setText($picture['copyrights_text_id'], $text, $user['id']);
             } elseif ($text) {
-                $textId = $this->textStorage->createText($text, $user->id);
-                $picture->copyrights_text_id = $textId;
+                $textId = $this->textStorage->createText($text, $user['id']);
+                $picture['copyrights_text_id'] = $textId;
                 $picture->save();
             }
 
             $this->log(sprintf(
                 'Редактирование текста копирайтов изображения %s',
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
-            ), $picture);
+            ), [
+                'pictures' => $picture['id']
+            ]);
 
-            if ($picture->copyrights_text_id) {
-                $userIds = $this->textStorage->getTextUserIds($picture->copyrights_text_id);
+            if ($picture['copyrights_text_id']) {
+                $userIds = $this->textStorage->getTextUserIds($picture['copyrights_text_id']);
 
                 foreach ($userIds as $userId) {
-                    if ($userId != $user->id) {
+                    if ($userId != $user['id']) {
                         foreach ($userTable->find($userId) as $userRow) {
-                            $uri = $this->hostManager->getUriByLanguage($userRow->language);
+                            $uri = $this->hostManager->getUriByLanguage($userRow['language']);
 
                             $message = sprintf(
                                 $this->translate(
                                     'pm/user-%s-edited-picture-copyrights-%s-%s',
                                     'default',
-                                    $userRow->language
+                                    $userRow['language']
                                 ),
                                 $this->userModerUrl($user, true, $uri),
-                                $this->pic()->name($picture, $userRow->language),
+                                $this->pic()->name($picture, $userRow['language']),
                                 $this->pictureUrl($picture, true, $uri)
                             );
 
-                            $this->message->send(null, $userRow->id, $message);
+                            $this->message->send(null, $userRow['id'], $message);
                         }
                     }
                 }
@@ -694,7 +706,7 @@ class PictureController extends AbstractRestfulController
 
         if (isset($data['status'])) {
             $user = $this->user()->get();
-            $previousStatusUserId = $picture->change_status_user_id;
+            $previousStatusUserId = $picture['change_status_user_id'];
 
             if ($data['status'] == Picture::STATUS_ACCEPTED) {
                 $canAccept = $this->canAccept($picture);
@@ -703,7 +715,7 @@ class PictureController extends AbstractRestfulController
                     return $this->forbiddenAction();
                 }
 
-                $success = $this->table->accept($picture->id, $user->id, $isFirstTimeAccepted);
+                $success = $this->table->accept($picture['id'], $user['id'], $isFirstTimeAccepted);
                 if ($success) {
                     $owner = $picture->findParentRow(User::class, 'Owner');
 
@@ -712,36 +724,38 @@ class PictureController extends AbstractRestfulController
                     }
 
                     if ($isFirstTimeAccepted) {
-                        if ($owner && ($owner->id != $user->id)) {
-                            $uri = $this->hostManager->getUriByLanguage($owner->language);
+                        if ($owner && ($owner['id'] != $user['id'])) {
+                            $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                             $message = sprintf(
-                                $this->translate('pm/your-picture-accepted-%s', 'default', $owner->language),
-                                $this->pic()->url($picture->identity, true, $uri)
+                                $this->translate('pm/your-picture-accepted-%s', 'default', $owner['language']),
+                                $this->pic()->url($picture['identity'], true, $uri)
                             );
 
-                            $this->message->send(null, $owner->id, $message);
+                            $this->message->send(null, $owner['id'], $message);
                         }
 
-                        $this->telegram->notifyPicture($picture->id);
+                        $this->telegram->notifyPicture($picture['id']);
                     }
                 }
 
 
-                if ($previousStatusUserId != $user->id) {
+                if ($previousStatusUserId != $user['id']) {
                     foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                         $message = sprintf(
                             'Принята картинка %s',
-                            $this->pic()->url($picture->identity, true)
+                            $this->pic()->url($picture['identity'], true)
                         );
-                        $this->message->send(null, $prevUser->id, $message);
+                        $this->message->send(null, $prevUser['id'], $message);
                     }
                 }
 
                 $this->log(sprintf(
                     'Картинка %s принята',
                     htmlspecialchars($this->pic()->name($picture, $this->language()))
-                ), $picture);
+                ), [
+                    'pictures' => $picture['id']
+                ]);
             }
 
             if ($data['status'] == Picture::STATUS_INBOX) {
@@ -753,14 +767,16 @@ class PictureController extends AbstractRestfulController
 
                     $picture->setFromArray([
                         'status'                => Picture::STATUS_INBOX,
-                        'change_status_user_id' => $user->id
+                        'change_status_user_id' => $user['id']
                     ]);
                     $picture->save();
 
                     $this->log(sprintf(
                         'Картинки `%s` восстановлена из очереди удаления',
                         htmlspecialchars($this->pic()->name($picture, $this->language()))
-                    ), $picture);
+                    ), [
+                        'pictures' => $picture['id']
+                    ]);
                 } elseif ($picture['status'] == Picture::STATUS_ACCEPTED) {
                     $canUnaccept = $this->user()->isAllowed('picture', 'unaccept');
                     if (! $canUnaccept) {
@@ -769,28 +785,30 @@ class PictureController extends AbstractRestfulController
 
                     $picture->setFromArray([
                         'status'                => Picture::STATUS_INBOX,
-                        'change_status_user_id' => $user->id
+                        'change_status_user_id' => $user['id']
                     ]);
                     $picture->save();
 
-                    if ($picture->owner_id) {
-                        $this->userPicture->refreshPicturesCount($picture->owner_id);
+                    if ($picture['owner_id']) {
+                        $this->userPicture->refreshPicturesCount($picture['owner_id']);
                     }
 
                     $this->log(sprintf(
                         'С картинки %s снят статус "принято"',
                         htmlspecialchars($this->pic()->name($picture, $this->language()))
-                    ), $picture);
+                    ), [
+                        'pictures' => $picture['id']
+                    ]);
 
 
-                    $pictureUrl = $this->pic()->url($picture->identity, true);
-                    if ($previousStatusUserId != $user->id) {
+                    $pictureUrl = $this->pic()->url($picture['identity'], true);
+                    if ($previousStatusUserId != $user['id']) {
                         foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                             $message = sprintf(
                                 'С картинки %s снят статус "принято"',
                                 $pictureUrl
                             );
-                            $this->message->send(null, $prevUser->id, $message);
+                            $this->message->send(null, $prevUser['id'], $message);
                         }
                     }
                 }
@@ -806,13 +824,13 @@ class PictureController extends AbstractRestfulController
                 $picture->setFromArray([
                     'status'                => Picture::STATUS_REMOVING,
                     'removing_date'         => new Zend_Db_Expr('CURDATE()'),
-                    'change_status_user_id' => $user->id
+                    'change_status_user_id' => $user['id']
                 ]);
                 $picture->save();
 
                 if ($owner = $picture->findParentRow(User::class, 'Owner')) {
-                    if ($owner->id != $user->id) {
-                        $uri = $this->hostManager->getUriByLanguage($owner->language);
+                    if ($owner['id'] != $user['id']) {
+                        $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                         $deleteRequests = $this->pictureModerVote->getNegativeVotes($picture['id']);
 
@@ -825,19 +843,21 @@ class PictureController extends AbstractRestfulController
                         }
 
                         $message = sprintf(
-                            $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner->language),
-                            $this->pic()->url($picture->identity, true, $uri),
+                            $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner['language']),
+                            $this->pic()->url($picture['identity'], true, $uri),
                             implode("\n", $reasons)
                         );
 
-                        $this->message->send(null, $owner->id, $message);
+                        $this->message->send(null, $owner['id'], $message);
                     }
                 }
 
                 $this->log(sprintf(
                     'Картинка %s поставлена в очередь на удаление',
                     htmlspecialchars($this->pic()->name($picture, $this->language()))
-                ), $picture);
+                ), [
+                    'pictures' => $picture['id']
+                ]);
             }
         }
 
@@ -883,13 +903,13 @@ class PictureController extends AbstractRestfulController
         $canDelete = false;
         $user = $this->user()->get();
         if ($this->user()->isAllowed('picture', 'remove')) {
-            if ($this->pictureModerVote->hasVote($picture->id, $user->id)) {
+            if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $canDelete = true;
             }
         } elseif ($this->user()->isAllowed('picture', 'remove_by_vote')) {
-            if ($this->pictureModerVote->hasVote($picture->id, $user->id)) {
-                $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture->id);
-                $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture->id);
+            if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
+                $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);
+                $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);
 
                 $canDelete = ($deleteVotes > $acceptVotes);
             }
@@ -916,14 +936,16 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if ($row->image_id) {
-            $this->imageStorage()->normalize($row->image_id);
+        if ($row['image_id']) {
+            $this->imageStorage()->normalize($row['image_id']);
         }
 
         $this->log(sprintf(
             'К картинке %s применён normalize',
             htmlspecialchars($this->pic()->name($row, $this->language()))
-        ), $row);
+        ), [
+            'pictures' => $row['id']
+        ]);
 
         return $this->getResponse()->setStatusCode(200);
     }
@@ -946,14 +968,16 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if ($row->image_id) {
-            $this->imageStorage()->flop($row->image_id);
+        if ($row['image_id']) {
+            $this->imageStorage()->flop($row['image_id']);
         }
 
         $this->log(sprintf(
             'К картинке %s применён flop',
             htmlspecialchars($this->pic()->name($row, $this->language()))
-        ), $row);
+        ), [
+            'pictures' => $row['id']
+        ]);
 
         return $this->getResponse()->setStatusCode(200);
     }
@@ -969,9 +993,9 @@ class PictureController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        if ($row->image_id) {
+        if ($row['image_id']) {
             $this->imageStorage()->flush([
-                'image' => $row->image_id
+                'image' => $row['image_id']
             ]);
         }
 
@@ -989,8 +1013,8 @@ class PictureController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        if ($row->image_id) {
-            $this->imageStorage()->changeImageName($row->image_id, [
+        if ($row['image_id']) {
+            $this->imageStorage()->changeImageName($row['image_id'], [
                 'pattern' => $this->table->getFileNamePattern($row)
             ]);
         }
@@ -1009,7 +1033,9 @@ class PictureController extends AbstractRestfulController
 
         $this->duplicateFinder->hideSimilar($srcPicture['id'], $dstPicture['id']);
 
-        $this->log('Отменёно предупреждение о повторе', [$srcPicture, $dstPicture]);
+        $this->log('Отменёно предупреждение о повторе', [
+            'pictures' => [$srcPicture['id'], $dstPicture['id']]
+        ]);
 
         return $this->getResponse()->setStatusCode(204);
     }
@@ -1017,7 +1043,7 @@ class PictureController extends AbstractRestfulController
     private function canReplace($picture, $replacedPicture)
     {
         $can1 = false;
-        switch ($picture->status) {
+        switch ($picture['status']) {
             case Picture::STATUS_ACCEPTED:
                 $can1 = true;
                 break;
@@ -1028,7 +1054,7 @@ class PictureController extends AbstractRestfulController
         }
 
         $can2 = false;
-        switch ($replacedPicture->status) {
+        switch ($replacedPicture['status']) {
             case Picture::STATUS_ACCEPTED:
                 $can2 = $this->user()->isAllowed('picture', 'unaccept')
                      && $this->user()->isAllowed('picture', 'remove_by_vote');
@@ -1058,11 +1084,11 @@ class PictureController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        if (! $picture->replace_picture_id) {
+        if (! $picture['replace_picture_id']) {
             return $this->notFoundAction();
         }
 
-        $replacePicture = $this->table->find($picture->replace_picture_id)->current();
+        $replacePicture = $this->table->find($picture['replace_picture_id'])->current();
         if (! $replacePicture) {
             return $this->notFoundAction();
         }
@@ -1074,39 +1100,39 @@ class PictureController extends AbstractRestfulController
         $user = $this->user()->get();
 
         // statuses
-        if ($picture->status != Picture::STATUS_ACCEPTED) {
+        if ($picture['status'] != Picture::STATUS_ACCEPTED) {
             $picture->setFromArray([
                 'status'                => Picture::STATUS_ACCEPTED,
-                'change_status_user_id' => $user->id
+                'change_status_user_id' => $user['id']
             ]);
-            if (! $picture->accept_datetime) {
-                $picture->accept_datetime = new Zend_Db_Expr('NOW()');
+            if (! $picture['accept_datetime']) {
+                $picture['accept_datetime'] = new Zend_Db_Expr('NOW()');
             }
             $picture->save();
 
-            if ($picture->owner_id) {
-                $this->userPicture->refreshPicturesCount($picture->owner_id);
+            if ($picture['owner_id']) {
+                $this->userPicture->refreshPicturesCount($picture['owner_id']);
             }
         }
 
-        if (! in_array($replacePicture->status, [Picture::STATUS_REMOVING, Picture::STATUS_REMOVED])) {
+        if (! in_array($replacePicture['status'], [Picture::STATUS_REMOVING, Picture::STATUS_REMOVED])) {
             $replacePicture->setFromArray([
                 'status'                => Picture::STATUS_REMOVING,
                 'removing_date'         => new Zend_Db_Expr('now()'),
-                'change_status_user_id' => $user->id
+                'change_status_user_id' => $user['id']
             ]);
             $replacePicture->save();
-            if ($replacePicture->owner_id) {
-                $this->userPicture->refreshPicturesCount($replacePicture->owner_id);
+            if ($replacePicture['owner_id']) {
+                $this->userPicture->refreshPicturesCount($replacePicture['owner_id']);
             }
         }
 
         // comments
         $this->comments->moveMessages(
             \Application\Comments::PICTURES_TYPE_ID,
-            $replacePicture->id,
+            $replacePicture['id'],
             \Application\Comments::PICTURES_TYPE_ID,
-            $picture->id
+            $picture['id']
         );
 
         // pms
@@ -1114,34 +1140,34 @@ class PictureController extends AbstractRestfulController
         $replaceOwner = $replacePicture->findParentRow(User::class, 'Owner');
         $recepients = [];
         if ($owner) {
-            $recepients[$owner->id] = $owner;
+            $recepients[$owner['id']] = $owner;
         }
         if ($replaceOwner) {
-            $recepients[$replaceOwner->id] = $replaceOwner;
+            $recepients[$replaceOwner['id']] = $replaceOwner;
         }
-        unset($recepients[$user->id]);
+        unset($recepients[$user['id']]);
         if ($recepients) {
             foreach ($recepients as $recepient) {
-                $uri = $this->hostManager->getUriByLanguage($recepient->language);
+                $uri = $this->hostManager->getUriByLanguage($recepient['language']);
 
-                $url = $this->pic()->url($picture->identity, true, $uri);
-                $replaceUrl = $this->pic()->url($replacePicture->identity, true, $uri);
+                $url = $this->pic()->url($picture['identity'], true, $uri);
+                $replaceUrl = $this->pic()->url($replacePicture['identity'], true, $uri);
 
                 $moderUrl = $this->url()->fromRoute('users/user', [
-                    'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                    'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
                 ], [
                     'force_canonical' => true,
                     'uri'             => $uri
                 ]);
 
                 $message = sprintf(
-                    $this->translate('pm/user-%s-accept-replace-%s-%s', 'default', $recepient->language),
+                    $this->translate('pm/user-%s-accept-replace-%s-%s', 'default', $recepient['language']),
                     $moderUrl,
                     $replaceUrl,
                     $url
                 );
 
-                $this->message->send(null, $recepient->id, $message);
+                $this->message->send(null, $recepient['id'], $message);
             }
         }
 
@@ -1150,7 +1176,9 @@ class PictureController extends AbstractRestfulController
             'Замена %s на %s',
             htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
             htmlspecialchars($this->pic()->name($picture, $this->language()))
-        ), [$picture, $replacePicture]);
+        ), [
+            'pictures' => [$picture['id'], $replacePicture['id']]
+        ]);
 
         return $this->getResponse()->setStatusCode(200);
     }

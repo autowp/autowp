@@ -7,8 +7,8 @@
         'pageId' => 141,
         'args'   => [
             'BRAND_NAME'    => $this->brand['name'],
-            'USER_NAME'     => $this->user->name,
-            'USER_IDENTITY' => $this->user->identity ? $this->user->identity : 'user' . $this->user->id,
+            'USER_NAME'     => $this->user['name'],
+            'USER_IDENTITY' => $this->user['identity'] ? $this->user['identity'] : 'user' . $this->user['id'],
             'BRAND_NAME'    => $this->brand['name'],
             'BRAND_CATNAME' => $this->brand['catname']
         ]

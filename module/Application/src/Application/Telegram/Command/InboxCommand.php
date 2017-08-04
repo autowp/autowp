@@ -6,7 +6,6 @@ use Telegram\Bot\Commands\Command;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
-use Application\Model\DbTable;
 use Application\Model\Item;
 
 class InboxCommand extends Command
@@ -31,10 +30,19 @@ class InboxCommand extends Command
      */
     private $telegramChatTable;
 
-    public function __construct(TableGateway $telegramItemTable, TableGateway $telegramChatTable)
-    {
+    /**
+     * @var TableGateway
+     */
+    private $itemTable;
+
+    public function __construct(
+        TableGateway $telegramItemTable,
+        TableGateway $telegramChatTable,
+        TableGateway $itemTable
+    ) {
         $this->telegramItemTable = $telegramItemTable;
         $this->telegramChatTable = $telegramChatTable;
+        $this->itemTable = $itemTable;
     }
 
     /**
@@ -62,16 +70,14 @@ class InboxCommand extends Command
         }
 
         if ($arguments) {
-            $itemTable = new DbTable\Item();
-
-            $brandRow = $itemTable->fetchRow([
-                'name = ?'         => (string)$arguments,
-                'item_type_id = ?' => Item::BRAND
-            ]);
+            $brandRow = $this->itemTable->select([
+                'name'         => (string)$arguments,
+                'item_type_id' => Item::BRAND
+            ])->current();
 
             if ($brandRow) {
                 $primaryKey = [
-                    'item_id' => $brandRow->id,
+                    'item_id' => $brandRow['id'],
                     'chat_id' => $chatId
                 ];
                 $telegramBrandRow = $this->telegramItemTable->select($primaryKey)->current();
@@ -79,7 +85,7 @@ class InboxCommand extends Command
                 if ($telegramBrandRow && $telegramBrandRow['inbox']) {
                     $this->telegramItemTable->update(['inbox' => 0], $primaryKey);
                     $this->replyWithMessage([
-                        'text' => 'Successful unsubscribed from ' . $brandRow->name
+                        'text' => 'Successful unsubscribed from ' . $brandRow['name']
                     ]);
                 } else {
                     $set = ['inbox' => 1];
@@ -90,7 +96,7 @@ class InboxCommand extends Command
                     }
 
                     $this->replyWithMessage([
-                        'text' => 'Successful subscribed to ' . $brandRow->name
+                        'text' => 'Successful subscribed to ' . $brandRow['name']
                     ]);
                 }
             } else {

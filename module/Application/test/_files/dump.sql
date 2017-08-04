@@ -2232,7 +2232,7 @@ CREATE TABLE `pictures_moder_votes` (
   `user_id` int(10) unsigned NOT NULL DEFAULT '0',
   `picture_id` int(10) unsigned NOT NULL DEFAULT '0',
   `day_date` datetime NOT NULL,
-  `reason` varchar(50) NOT NULL DEFAULT '',
+  `reason` varchar(80) NOT NULL DEFAULT '',
   `vote` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_id`,`picture_id`),
   KEY `picture_id` (`picture_id`),
@@ -2973,7 +2973,7 @@ ALTER TABLE `users` ADD `pictures_total` INT NOT NULL DEFAULT '0' AFTER `picture
 CREATE TABLE `picture_moder_vote_template` (
   `id` int(11) NOT NULL,
   `user_id` int(10) UNSIGNED NOT NULL,
-  `reason` varchar(50) NOT NULL,
+  `reason` varchar(80) NOT NULL,
   `vote` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

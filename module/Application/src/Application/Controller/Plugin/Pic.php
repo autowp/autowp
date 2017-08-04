@@ -14,7 +14,7 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User as UserTable;
 
 use Application\ItemNameFormatter;
-use Application\Model\Brand as BrandModel;
+use Application\Model\Brand;
 use Application\Model\Catalogue;
 use Application\Model\DbTable;
 use Application\Model\Item;
@@ -114,6 +114,11 @@ class Pic extends AbstractPlugin
      */
     private $modificationTable;
 
+    /**
+     * @var Brand
+     */
+    private $brand;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -132,7 +137,8 @@ class Pic extends AbstractPlugin
         TableGateway $itemLinkTable,
         PictureModerVote $pictureModerVote,
         DbTable\Picture $pictureTable,
-        TableGateway $modificationTable
+        TableGateway $modificationTable,
+        Brand $brand
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -152,6 +158,7 @@ class Pic extends AbstractPlugin
         $this->pictureModerVote = $pictureModerVote;
         $this->pictureTable = $pictureTable;
         $this->modificationTable = $modificationTable;
+        $this->brand = $brand;
     }
 
     public function href($row, array $options = [])
@@ -260,7 +267,7 @@ class Pic extends AbstractPlugin
         $userId = null;
         if ($controller->user()->logedIn()) {
             $user = $controller->user()->get();
-            $userId = $user ? $user->id : null;
+            $userId = $user ? $user['id'] : null;
         }
 
         $language = $controller->language();
@@ -457,8 +464,6 @@ class Pic extends AbstractPlugin
         $language = $controller->language();
         $isModer = $controller->user()->inheritsRole('moder');
 
-        $itemTable = $this->catalogue->getItemTable();
-
         $db = $this->pictureTable->getAdapter();
 
         if ($isModer) {
@@ -469,9 +474,9 @@ class Pic extends AbstractPlugin
 
         $itemRows = [];
         if ($carIds) {
-            $itemRows = $itemTable->fetchAll([
-                'id IN (?)'        => $carIds,
-                'item_type_id = ?' => Item::VEHICLE
+            $itemRows = $this->itemModel->getRows([
+                'id'           => $carIds,
+                'item_type_id' => Item::VEHICLE
             ]);
         }
         $itemsCount = count($itemRows);
@@ -487,17 +492,16 @@ class Pic extends AbstractPlugin
             $specsEditUrl = null;
 
             if ($itemsCount == 1) {
-                $twinsGroupsRows = $itemTable->fetchAll(
-                    $itemTable->select(true)
-                        ->where('item.item_type_id = ?', Item::TWINS)
-                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                        ->where('item_parent_cache.item_id = ?', $item->id)
-                );
+                $twinsGroupsRows = $this->itemModel->getRows([
+                    'item_type_id' => Item::TWINS,
+                    'descendant'   => $item['id'],
+                    'columns'      => ['id']
+                ]);
 
                 foreach ($twinsGroupsRows as $twinsGroup) {
                     $twins[] = [
                         'url' => $this->httpRouter->assemble([
-                            'id' => $twinsGroup->id
+                            'id' => $twinsGroup['id']
                         ], [
                             'name' => 'twins/group'
                         ])
@@ -515,7 +519,7 @@ class Pic extends AbstractPlugin
                         ])
                         ->where('item_parent.type = ?', ItemParent::TYPE_DESIGN)
                         ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
-                        ->where('item_parent_cache.item_id = ?', $item->id)
+                        ->where('item_parent_cache.item_id = ?', $item['id'])
                 );
                 if ($designCarsRow) {
                     $designProject = [
@@ -550,17 +554,15 @@ class Pic extends AbstractPlugin
                 }
 
                 // factories
-                $factoryRows = $itemTable->fetchAll(
-                    $itemTable->select(true)
-                        ->where('item.item_type_id = ?', Item::FACTORY)
-                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                        ->where('item_parent_cache.item_id = ?', $item->id)
-                );
+                $factoryRows = $this->itemModel->getRows([
+                    'item_type_id' => Item::FACTORY,
+                    'descendant'   => $item['id']
+                ]);
                 foreach ($factoryRows as $factoryRow) {
                     $factories[] = [
-                        'name' => $factoryRow->name,
+                        'name' => $factoryRow['name'], // TODO: formatter
                         'url'  => $this->httpRouter->assemble([
-                            'id' => $factoryRow->id
+                            'id' => $factoryRow['id']
                         ], [
                             'name' => 'factories/factory'
                         ])
@@ -591,7 +593,7 @@ class Pic extends AbstractPlugin
             $altNames = [];
             $altNames2 = [];
 
-            $langNames = $this->itemModel->getNames($item->id);
+            $langNames = $this->itemModel->getNames($item['id']);
 
             $currentLangName = null;
             foreach ($langNames as $lang => $langName) {
@@ -622,26 +624,20 @@ class Pic extends AbstractPlugin
             // categories
             $categories = [];
 
-            $db = $itemTable->getAdapter();
-            $langExpr = $db->quoteInto(
-                'item.id = item_language.item_id and item_language.language = ?',
-                $language
-            );
-            $categoryRows = $db->fetchAll(
-                $db->select()
-                    ->from($itemTable->info('name'), [
-                        'id', 'catname', 'begin_year', 'end_year',
-                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,item.name)')
-                    ])
-                    ->where('item.item_type_id = ?', Item::CATEGORY)
-                    ->joinLeft('item_language', $langExpr, ['lang_name' => 'name'])
-                    ->join('item_parent', 'item.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
-                    ->where('top_item.item_type_id IN (?)', [Item::VEHICLE, Item::ENGINE])
-                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
-                    ->where('item_parent_cache.item_id IN (?)', $item['id'])
-                    ->group(['item_parent_cache.item_id', 'item.id'])
-            );
+            $categoryRows = $this->itemModel->getRows([
+                'language'     => $language,
+                'columns'      => ['id', 'name', 'catname'],
+                'item_type_id' => Item::CATEGORY,
+                'child'        => [
+                    'item_type_id' => [Item::VEHICLE, Item::ENGINE],
+                    'descendant_or_self' => [
+                        'id'      => $item['id'],
+                        'columns' => [
+                            'item_id' => 'id'
+                        ]
+                    ]
+                ]
+            ]);
 
             foreach ($categoryRows as $row) {
                 $categories[$row['id']] = [
@@ -665,12 +661,12 @@ class Pic extends AbstractPlugin
                     ], [
                         'name' => 'api/picture-item/update'
                     ]),
-                    'value'   => $this->pictureItem->getPerspective($picture->id, $item->id),
+                    'value'   => $this->pictureItem->getPerspective($picture['id'], $item['id']),
                     'name'    => $this->itemModel->getNameData($item, $language)
                 ];
             }
 
-            $hasSpecs = $this->specsService->hasSpecs($item->id);
+            $hasSpecs = $this->specsService->hasSpecs($item['id']);
             $specsUrl = null;
             foreach ($this->catalogue->getCataloguePaths($item['id']) as $path) {
                 $specsUrl = $this->httpRouter->assemble([
@@ -714,13 +710,11 @@ class Pic extends AbstractPlugin
 
         $language = $controller->language();
 
-        $itemTable = $this->catalogue->getItemTable();
-
         $engineRows = [];
         if ($itemIds) {
-            $engineRows = $itemTable->fetchAll([
-                'id IN (?)'        => $itemIds,
-                'item_type_id = ?' => Item::ENGINE
+            $engineRows = $this->itemModel->getRows([
+                'id'           => $itemIds,
+                'item_type_id' => Item::ENGINE
             ]);
         }
 
@@ -728,19 +722,20 @@ class Pic extends AbstractPlugin
         foreach ($engineRows as $engineRow) {
             $vehicles = [];
 
-            $vehicleIds = $this->itemModel->getEngineVehiclesGroups($engineRow->id);
+            $vehicleIds = $this->itemModel->getEngineVehiclesGroups($engineRow['id']);
 
             if ($vehicleIds) {
-                $carRows = $itemTable->fetchAll([
-                    'id in (?)' => $vehicleIds
-                ], $this->catalogue->itemOrdering());
+                $carRows = $this->itemModel->getRows([
+                    'id'    => $vehicleIds,
+                    'order' => $this->catalogue->itemOrdering()
+                ]);
 
                 foreach ($carRows as $carRow) {
                     $cataloguePaths = $this->catalogue->getCataloguePaths($carRow['id']);
 
                     foreach ($cataloguePaths as $cPath) {
                         $vehicles[] = [
-                            'name' => $controller->car()->formatName($carRow, $language),
+                            'name' => $controller->car()->formatName($carRow, $language), // TODO: formatter
                             'url'  => $this->httpRouter->assemble([
                                 'action'        => 'brand-item',
                                 'brand_catname' => $cPath['brand_catname'],
@@ -756,7 +751,7 @@ class Pic extends AbstractPlugin
             }
 
             $specsUrl = false;
-            $hasSpecs = $this->specsService->hasSpecs($engineRow->id);
+            $hasSpecs = $this->specsService->hasSpecs($engineRow['id']);
 
             if ($hasSpecs) {
                 $cataloguePaths = $this->catalogue->getCataloguePaths($engineRow['id']);
@@ -778,14 +773,14 @@ class Pic extends AbstractPlugin
             if ($controller->user()->isAllowed('specifications', 'edit')) {
                 $specsEditUrl = $this->httpRouter->assemble([
                     'action'  => 'car-specifications-editor',
-                    'item_id' => $engineRow->id
+                    'item_id' => $engineRow['id']
                 ], [
                     'name' => 'cars/params'
                 ]);
             }
 
             $engines[] = [
-                'name'         => $engineRow->name,
+                'name'         => $engineRow['name'],
                 'vehicles'     => $vehicles,
                 'hasSpecs'     => $hasSpecs,
                 'specsUrl'     => $specsUrl,
@@ -802,14 +797,13 @@ class Pic extends AbstractPlugin
 
         $language = $controller->language();
 
-        $itemTable = $this->catalogue->getItemTable();
-
-        $factories = $itemTable->fetchAll(
-            $itemTable->select(true)
-                ->where('item.item_type_id = ?', Item::FACTORY)
-                ->join('picture_item', 'item.id = picture_item.item_id', null)
-                ->where('picture_item.picture_id = ?', $picture['id'])
-        );
+        $factories = $this->itemModel->getRows([
+            'item_type_id' => Item::FACTORY,
+            'pictures'     => [
+                'id'     => $picture['id'],
+                'status' => Picture::STATUS_ACCEPTED
+            ]
+        ]);
 
         $result = [];
 
@@ -819,11 +813,10 @@ class Pic extends AbstractPlugin
 
             $carIds = $this->itemModel->getRelatedCarGroupId($factory['id']);
             if ($carIds) {
-                $itemTable = $this->catalogue->getItemTable();
-
-                $carRows = $itemTable->fetchAll([
-                    'id in (?)' => $carIds
-                ], $this->catalogue->itemOrdering());
+                $carRows = $this->itemModel->getRows([
+                    'id'    => $carIds,
+                    'order' => $this->catalogue->itemOrdering()
+                ]);
 
                 $limit = 10;
 
@@ -920,7 +913,7 @@ class Pic extends AbstractPlugin
                 ->where('item.item_type_id = ?', Item::BRAND)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                ->where('picture_item.picture_id = ?', $picture->id)
+                ->where('picture_item.picture_id = ?', $picture['id'])
         );
 
         // links
@@ -936,12 +929,12 @@ class Pic extends AbstractPlugin
         }
 
         $replacePicture = null;
-        if ($picture->replace_picture_id) {
-            $replacePictureRow = $this->pictureTable->find($picture->replace_picture_id)->current();
+        if ($picture['replace_picture_id']) {
+            $replacePictureRow = $this->pictureTable->find($picture['replace_picture_id'])->current();
 
             $replacePicture = $controller->pic()->href($replacePictureRow->toArray());
 
-            if ($replacePictureRow->status == Picture::STATUS_REMOVING) {
+            if ($replacePictureRow['status'] == Picture::STATUS_REMOVING) {
                 if (! $controller->user()->inheritsRole('moder')) {
                     $replacePicture = null;
                 }
@@ -964,13 +957,16 @@ class Pic extends AbstractPlugin
             ];
         }
 
-        $image = $imageStorage->getImage($picture->image_id);
+        $image = $imageStorage->getImage($picture['image_id']);
         $sourceUrl = $image ? $image->getSrc() : null;
 
         $preview = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'picture-medium');
         $previewUrl = $preview ? $preview->getSrc() : null;
 
-        $galleryImage = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'picture-gallery');
+        $galleryImage = $imageStorage->getFormatedImage(
+            $this->pictureTable->getFormatRequest($picture),
+            'picture-gallery'
+        );
 
         $paginator = false;
         $pageNumbers = false;
@@ -992,7 +988,7 @@ class Pic extends AbstractPlugin
 
                 $pageNumber = 0;
                 foreach ($paginatorPictures as $n => $p) {
-                    if ($p['id'] == $picture->id) {
+                    if ($p['id'] == $picture['id']) {
                         $pageNumber = $n + 1;
                         break;
                     }
@@ -1038,7 +1034,7 @@ class Pic extends AbstractPlugin
             'language' => $language,
             'large'    => true
         ]);
-        $name = $names[$picture->id];
+        $name = $names[$picture['id']];
 
 
         $select = new Sql\Select($this->modificationTable->getTable());
@@ -1049,12 +1045,17 @@ class Pic extends AbstractPlugin
         $mRows = $this->modificationTable->selectWith($select);
 
         $modifications = [];
-        $itemTable = new DbTable\Item();
+
         foreach ($mRows as $mRow) {
             $url = null;
-            $carRow = $itemTable->find($mRow['item_id'])->current();
+
+            $carRow = $this->itemModel->getRow([
+                'id'      => $mRow['item_id'],
+                'columns' => ['id', 'name']
+            ]);
+
             if ($carRow) {
-                $paths = $this->catalogue->getCataloguePaths($carRow->id, [
+                $paths = $this->catalogue->getCataloguePaths($carRow['id'], [
                     'breakOnFirst' => true
                 ]);
                 if (count($paths) > 0) {
@@ -1073,25 +1074,25 @@ class Pic extends AbstractPlugin
             }
 
             $modifications[] = [
-                'name' => $mRow['name'],
+                'name' => $mRow['name'], // TODO: formatter
                 'url'  => $url
             ];
         }
 
         $copyrights = null;
-        if ($picture->copyrights_text_id) {
-            $copyrights = $this->textStorage->getText($picture->copyrights_text_id);
+        if ($picture['copyrights_text_id']) {
+            $copyrights = $this->textStorage->getText($picture['copyrights_text_id']);
         }
 
         $point = null;
-        if ($picture->point) {
-            $point = \geoPHP::load(substr($picture->point, 4), 'wkb');
+        if ($picture['point']) {
+            $point = \geoPHP::load(substr($picture['point'], 4), 'wkb');
         }
 
         $itemIds = $this->pictureItem->getPictureItems($picture['id']);
 
         $user = $controller->user()->get();
-        $votes = $this->pictureVote->getVote($picture['id'], $user ? $user->id : null);
+        $votes = $this->pictureVote->getVote($picture['id'], $user ? $user['id'] : null);
 
         $subscribed = false;
         if ($user) {
@@ -1126,13 +1127,13 @@ class Pic extends AbstractPlugin
             ]),
             'replacePicture'    => $replacePicture,
             'gallery'           => [
-                'current' => $picture->id
+                'current' => $picture['id']
             ],
             'paginator'         => $paginator,
             'paginatorPictures' => $pageNumbers,
             'moderLinks'        => $moderLinks,
             'modifications'     => $modifications,
-            'pictureVote'       => $this->getController()->pictureVote($picture->id, [
+            'pictureVote'       => $this->getController()->pictureVote($picture['id'], [
                 'hideVote' => true
             ]),
             //'picturePerspectives' => $picturePerspectives,
@@ -1162,27 +1163,28 @@ class Pic extends AbstractPlugin
         $language = $controller->language();
 
         $links = [];
-        $links['/ng/moder/pictures/' . $picture->id] = sprintf(
+        $links['/ng/moder/pictures/' . $picture['id']] = sprintf(
             $this->translator->translate('moder/picture/edit-picture-%s'),
-            $picture->id
+            $picture['id']
         );
 
         $carIds = $this->pictureItem->getPictureItems($picture['id']);
         if ($carIds) {
-            $vehicleTable = new DbTable\Item();
-            $brandModel = new BrandModel();
+            $rows = $this->itemModel->getRows([
+                'id' => $carIds
+            ]);
 
-            foreach ($vehicleTable->find($carIds) as $car) {
+            foreach ($rows as $car) {
                 $url = '/ng/moder/items/item/' . $car['id'];
                 $links[$url] = sprintf(
                     $this->translator->translate('moder/picture/edit-vehicle-%s'),
                     $controller->car()->formatName($car, $language)
                 );
 
-                $brands = $brandModel->getList(['language' => $language], function ($select) use ($car) {
+                $brands = $this->brand->getList(['language' => $language], function (Sql\Select $select) use ($car) {
                     $select
-                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                        ->where('item_parent_cache.item_id = ?', $car->id)
+                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                        ->where(['item_parent_cache.item_id' => $car['id']])
                         ->group('item.id');
                 });
 
@@ -1308,7 +1310,7 @@ class Pic extends AbstractPlugin
         // comments
         $userId = null;
         if ($controller->user()->logedIn()) {
-            $userId = $controller->user()->get()->id;
+            $userId = $controller->user()->get()['id'];
         }
 
         if ($userId) {
@@ -1373,11 +1375,9 @@ class Pic extends AbstractPlugin
                 'onlyWithArea' => true
             ]);
 
-            $itemTable = new DbTable\Item();
-
             $areas = [];
             foreach ($itemsData as $pictureItem) {
-                $item = $itemTable->find($pictureItem['item_id'])->current();
+                $item = $this->itemModel->getRow(['id' => $pictureItem['item_id']]);
                 $areas[] = [
                     'area' => [
                         'left'   => $pictureItem['area'][0] / $image->getWidth(),
@@ -1385,7 +1385,10 @@ class Pic extends AbstractPlugin
                         'width'  => $pictureItem['area'][2] / $image->getWidth(),
                         'height' => $pictureItem['area'][3] / $image->getHeight(),
                     ],
-                    'name' => $this->itemNameFormatter->formatHtml($this->itemModel->getNameData($item, $language), $language)
+                    'name' => $this->itemNameFormatter->formatHtml(
+                        $this->itemModel->getNameData($item, $language),
+                        $language
+                    )
                 ];
             }
 
@@ -1417,7 +1420,7 @@ class Pic extends AbstractPlugin
             'language' => $language,
             'large'    => true
         ]);
-        $name = $names[$pictureRow->id];
+        $name = $names[$pictureRow['id']];
 
         return $this->pictureNameFormatter->format($name, $language);
     }

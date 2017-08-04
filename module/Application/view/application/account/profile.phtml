@@ -19,8 +19,8 @@
         <h2><?=$this->escapeHtml($this->translate('account/profile/photo'))?></h2>
         <div class="well">
             <p><?=$this->translate('account/profile/use-gravatar')?></p>
-            <?php if ($this->user()->get()->img) { ?>
-                <?=$this->img($this->user()->get()->img) ?>
+            <?php if ($this->user()->get()['img']) { ?>
+                <?=$this->img($this->user()->get()['img']) ?>
                 <form action="<?=$this->escapeHtmlAttr($this->url('account/profile', [
                     'form' => 'reset-photo'
                  ]))?>" method="post">
@@ -37,8 +37,8 @@
 
         <h2><?=$this->escapeHtml($this->translate('account/profile/other'))?></h2>
         <div class="well">
-            <p><?=$this->escapeHtml($this->translate('account/profile/votes-per-day'))?>: <?=$this->user()->get()->votes_per_day?></p>
-            <p><?=$this->escapeHtml($this->translate('account/profile/votes-left'))?>: <?=$this->user()->get()->votes_left?></p>
+            <p><?=$this->escapeHtml($this->translate('account/profile/votes-per-day'))?>: <?=$this->user()->get()['votes_per_day']?></p>
+            <p><?=$this->escapeHtml($this->translate('account/profile/votes-left'))?>: <?=$this->user()->get()['votes_left']?></p>
             <?=$this->partial('application/forms/bootstrap-horizontal', [
                 'form' => $this->settingsForm
             ])?>

@@ -5,8 +5,7 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable;
+use Application\Model\Brand;
 use Application\Model\Item;
 
 class BrandsController extends AbstractActionController
@@ -18,10 +17,16 @@ class BrandsController extends AbstractActionController
      */
     private $itemModel;
 
-    public function __construct($cache, Item $itemModel)
+    /**
+     * @var Brand
+     */
+    private $brand;
+
+    public function __construct($cache, Item $itemModel, Brand $brand)
     {
         $this->cache = $cache;
         $this->itemModel = $itemModel;
+        $this->brand = $brand;
     }
 
     public function indexAction()
@@ -36,9 +41,7 @@ class BrandsController extends AbstractActionController
         if (! $success) {
             $imageStorage = $this->imageStorage();
 
-            $brandModel = new BrandModel();
-
-            $items = $brandModel->getFullBrandsList($language);
+            $items = $this->brand->getFullBrandsList($language);
 
             foreach ($items as &$line) {
                 foreach ($line as &$char) {
@@ -79,30 +82,25 @@ class BrandsController extends AbstractActionController
             return $this->notFoundAction();
         }*/
 
-        $itemTable = new DbTable\Item();
-
-        $brand = $itemTable->fetchRow([
-            'item_type_id = ?' => Item::BRAND,
-            'id = ?'           => (int)$this->params('brand_id')
+        $brand = $this->itemModel->getRow([
+            'item_type_id' => Item::BRAND,
+            'id'           => (int)$this->params('brand_id')
         ]);
+
         if (! $brand) {
             return $this->notFoundAction();
         }
 
         $language = $this->language();
 
-        $langName = $this->itemModel->getName($brand->id, $language);
+        $langName = $this->itemModel->getName($brand['id'], $language);
 
-        $carList = $itemTable->fetchAll(
-            $itemTable->select(true)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $brand->id)
-                ->where('item.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY)')
-                ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
-                ->group('item.id')
-                ->order(['item.add_datetime DESC'])
-                ->limit(30)
-        );
+        $carList = $this->itemModel->getRows([
+            'ancestor'        => $brand['id'],
+            'created_in_days' => 7,
+            'limit'           => 30,
+            'order'           => 'item.add_datetime DESC'
+        ]);
 
         $cars = [];
         foreach ($carList as $car) {
@@ -112,7 +110,7 @@ class BrandsController extends AbstractActionController
         $viewModel = new ViewModel([
             'brand'     => $brand,
             'carList'   => $cars,
-            'name'      => $langName ? $langName : $brand->name
+            'name'      => $langName ? $langName : $brand['name']
         ]);
         $viewModel->setTerminal(true);
 

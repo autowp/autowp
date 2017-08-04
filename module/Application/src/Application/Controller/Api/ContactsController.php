@@ -37,7 +37,7 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        if ($currentUser->id == $id) {
+        if ($currentUser['id'] == $id) {
             return $this->notFoundAction();
         }
 
@@ -51,7 +51,7 @@ class ContactsController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $this->contact->create($currentUser->id, $user->id);
+        $this->contact->create($currentUser['id'], $user['id']);
 
         $this->getResponse()->setStatusCode(200);
 
@@ -73,7 +73,7 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        if ($currentUser->id == $id) {
+        if ($currentUser['id'] == $id) {
             return $this->notFoundAction();
         }
 
@@ -86,7 +86,7 @@ class ContactsController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $this->contact->delete($currentUser->id, $user->id);
+        $this->contact->delete($currentUser['id'], $user['id']);
 
         $this->getResponse()->setStatusCode(204);
 

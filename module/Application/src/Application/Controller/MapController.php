@@ -6,6 +6,8 @@ use geoPHP;
 use LineString;
 use Point;
 use Polygon;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
@@ -25,12 +27,19 @@ class MapController extends AbstractActionController
      */
     private $pictureTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $itemTable;
+
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        TableGateway $itemTable
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->pictureTable = $pictureTable;
+        $this->itemTable = $itemTable;
     }
 
     public function indexAction()
@@ -72,21 +81,17 @@ class MapController extends AbstractActionController
 
         $imageStorage = $this->imageStorage();
 
-        $itemTable = new DbTable\Item();
-        $db = $itemTable->getAdapter();
+        $select = new Sql\Select($this->itemTable->getTable());
+        $select->columns(
+            $pointsOnly
+                    ? []
+                    : ['id', 'name', 'begin_year', 'end_year', 'item_type_id']
+        )
+            ->join('item_point', 'item.id = item_point.item_id', ['point'])
+            ->where(['ST_Contains(GeomFromText(?), item_point.point)' => $polygon->out('wkt')])
+            ->order('item.name');
 
-        $factories = $db->fetchAll(
-            $db->select()
-                ->from(
-                    'item',
-                    $pointsOnly
-                        ? []
-                        : ['id', 'name', 'begin_year', 'end_year', 'item_type_id']
-                )
-                ->join('item_point', 'item.id = item_point.item_id', 'point')
-                ->where('ST_Contains(GeomFromText(?), item_point.point)', $polygon->out('wkt'))
-                ->order('item.name')
-        );
+        $factories = $this->itemTable->selectWith($select);
 
         $data = [];
         foreach ($factories as $item) {
@@ -136,7 +141,10 @@ class MapController extends AbstractActionController
                 );
 
                 if ($picture) {
-                    $image = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'format9');
+                    $image = $imageStorage->getFormatedImage(
+                        $this->pictureTable->getFormatRequest($picture),
+                        'format9'
+                    );
                     if ($image) {
                         $row['image'] = $image->getSrc();
                     }

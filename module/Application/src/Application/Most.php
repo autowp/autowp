@@ -4,36 +4,40 @@ namespace Application;
 
 use Exception;
 
+use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 use Application\Most\Adapter\AbstractAdapter;
 use Application\Service\SpecificationsService;
 
-use Zend_Db_Table_Select;
-
 class Most
 {
-    protected $carsCount = 10;
+    private $carsCount = 10;
 
     /**
-     * @var Zend_Db_Table_Select
+     * @var Sql\Select
      */
-    protected $carsSelect;
+    private $carsSelect;
 
     /**
      * @var AbstractAdapter
      */
-    protected $adapter = null;
+    private $adapter = null;
 
     /**
      * @var SpecificationsService
      */
-    protected $specs;
+    private $specs;
 
     /**
      * @var TableGateway
      */
-    protected $attributeTable;
+    private $attributeTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $itemTable;
 
     public function __construct(array $options)
     {
@@ -57,6 +61,11 @@ class Most
     public function setAttributeTable(TableGateway $table)
     {
         $this->attributeTable = $table;
+    }
+
+    public function setItemTable(TableGateway $table)
+    {
+        $this->itemTable = $table;
     }
 
     public function setCarsCount($value)
@@ -117,6 +126,7 @@ class Most
          */
         $options['most'] = $this;
         $options['attributeTable'] = $this->attributeTable;
+        $options['itemTable'] = $this->itemTable;
         $mostAdapter = new $adapterName($options);
 
         /*
@@ -146,11 +156,7 @@ class Most
         return $this->adapter->getCars($select, $language);
     }
 
-    /**
-     * @param Zend_Db_Table_Select $select
-     * @return Most
-     */
-    public function setCarsSelect(Zend_Db_Table_Select $select)
+    public function setCarsSelect(Sql\Select $select): Most
     {
         $this->carsSelect = $select;
 

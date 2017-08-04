@@ -184,7 +184,7 @@ class TwinsController extends AbstractActionController
         $hasSpecs = false;
 
         foreach ($carList as $car) {
-            $hasSpecs = $hasSpecs || $this->specsService->hasSpecs($car->id);
+            $hasSpecs = $hasSpecs || $this->specsService->hasSpecs($car['id']);
         }
 
         $picturesCount = $twins->getGroupPicturesCount($group['id']);
@@ -238,7 +238,7 @@ class TwinsController extends AbstractActionController
 
         $ids = [];
         foreach ($list as $group) {
-            $ids[] = $group->id;
+            $ids[] = $group['id'];
         }
 
         $picturesCounts = $this->twins->getGroupPicturesCount($ids);
@@ -253,29 +253,16 @@ class TwinsController extends AbstractActionController
 
         $carLists = [];
         if (count($ids)) {
-            $itemTable = new DbTable\Item();
+            $rows = $this->itemModel->getRows([
+                'language' => $language,
+                'columns' => ['id', 'name'],
+                'parent'  => [
+                    'id' => $ids,
+                    'columns' => ['parent_id']
+                ],
+                'order' => 'name'
+            ]);
 
-            $db = $itemTable->getAdapter();
-
-            $langJoinExpr = 'item.id = item_language.item_id and ' .
-                $db->quoteInto('item_language.language = ?', $language);
-
-            $rows = $db->fetchAll(
-                $db->select()
-                    ->from('item', [
-                        'item.id',
-                        'name' => 'if(length(item_language.name), item_language.name, item.name)',
-                        'item.body', 'item.begin_model_year', 'item.end_model_year',
-                        'item.begin_year', 'item.end_year', 'item.today',
-                        'spec' => 'spec.short_name',
-                        'spec_full' => 'spec.name',
-                    ])
-                    ->join('item_parent', 'item.id = item_parent.item_id', 'parent_id')
-                    ->joinLeft('item_language', $langJoinExpr, null)
-                    ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                    ->where('item_parent.parent_id in (?)', $ids)
-                    ->order('name')
-            );
             foreach ($rows as $row) {
                 $carLists[$row['parent_id']][] = $row;
             }
@@ -284,7 +271,7 @@ class TwinsController extends AbstractActionController
         $groups = [];
         $requests = [];
         foreach ($list as $group) {
-            $carList = isset($carLists[$group->id]) ? $carLists[$group->id] : [];
+            $carList = isset($carLists[$group['id']]) ? $carLists[$group['id']] : [];
 
             $picturesShown = 0;
             $cars = [];
@@ -307,7 +294,7 @@ class TwinsController extends AbstractActionController
                 if ($pictureRow) {
                     $picturesShown++;
 
-                    $key = 'g' . $group->id . 'p' . $pictureRow->id;
+                    $key = 'g' . $group['id']. 'p' . $pictureRow['id'];
 
                     $request = $this->pictureTable->getFormatRequest($pictureRow);
                     $requests[$key] = $request;
@@ -330,28 +317,28 @@ class TwinsController extends AbstractActionController
                 ];
             }
 
-            $commentsStat = isset($commentsStats[$group->id]) ? $commentsStats[$group->id] : null;
+            $commentsStat = isset($commentsStats[$group['id']]) ? $commentsStats[$group['id']] : null;
             $msgCount = $commentsStat ? $commentsStat['messages'] : 0;
 
-            $picturesCount = isset($picturesCounts[$group->id]) ? $picturesCounts[$group->id] : null;
+            $picturesCount = isset($picturesCounts[$group['id']]) ? $picturesCounts[$group['id']] : null;
 
             $groups[] = [
                 'name'          => $this->itemModel->getNameData($group, $language),
                 'cars'          => $cars,
                 'picturesShown' => $picturesShown,
                 'picturesCount' => $picturesCount,
-                'hasSpecs'      => isset($hasSpecs[$group->id]) && $hasSpecs[$group->id],
+                'hasSpecs'      => isset($hasSpecs[$group['id']]) && $hasSpecs[$group['id']],
                 'msgCount'      => $msgCount,
                 'detailsUrl'    => $this->url()->fromRoute('twins/group', [
-                    'id' => $group->id
+                    'id' => $group['id']
                 ]),
                 'specsUrl'      => $this->url()->fromRoute('twins/group/specifications', [
-                    'id' => $group->id,
+                    'id' => $group['id']
                 ]),
                 'picturesUrl'   => $this->url()->fromRoute('twins/group/pictures', [
-                    'id' => $group->id,
+                    'id' => $group['id']
                 ]),
-                'moderUrl'      => '/ng/moder/items/item/' . $group->id
+                'moderUrl'      => '/ng/moder/items/item/' . $group['id']
             ];
         }
 
@@ -377,9 +364,9 @@ class TwinsController extends AbstractActionController
 
     public function brandAction()
     {
-        $brand = $this->catalogue()->getItemTable()->fetchRow([
-            'item_type_id = ?' => Item::BRAND,
-            'catname = ?'      => (string)$this->params('brand_catname')
+        $brand = $this->itemModel->getTable()->select([
+            'item_type_id' => Item::BRAND,
+            'catname'      => (string)$this->params('brand_catname')
         ]);
 
         if (! $brand) {
@@ -389,14 +376,14 @@ class TwinsController extends AbstractActionController
         $canEdit = $this->user()->isAllowed('twins', 'edit');
 
         $paginator = $this->twins->getGroupsPaginator([
-            'brandId' => $brand->id
+            'brandId' => $brand['id']
         ])
             ->setItemCountPerPage(self::GROUPS_PER_PAGE)
             ->setCurrentPageNumber($this->params('page'));
 
         $groups = $this->prepareList($paginator->getCurrentItems());
 
-        $this->getBrands([$brand->id]);
+        $this->getBrands([$brand['id']]);
 
         return [
             'groups'    => $groups,

@@ -22,7 +22,7 @@ class Sidebar extends AbstractHtmlElement
     {
         $newPersonalMessages = null;
         if ($this->view->user()->logedIn()) {
-            $count = $this->message->getNewCount($this->view->user()->get()->id);
+            $count = $this->message->getNewCount($this->view->user()->get()['id']);
 
             $newPersonalMessages = (int)$count;
         }

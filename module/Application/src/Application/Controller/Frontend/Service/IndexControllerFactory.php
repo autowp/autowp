@@ -14,7 +14,6 @@ class IndexControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get('fastCache'),
             $container->get(\Application\Service\SpecificationsService::class),
@@ -23,7 +22,8 @@ class IndexControllerFactory implements FactoryInterface
             $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\Twins::class),
             $container->get(\Application\Model\DbTable\Picture::class),
-            $tables->get('item')
+            $container->get(\Application\Model\Item::class),
+            $container->get(\Application\Model\Brand::class)
         );
     }
 }

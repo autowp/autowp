@@ -57,7 +57,7 @@ class Login implements AdapterInterface
             $this->authenticateResultInfo['messages'][] = 'A record with the supplied identity could not be found.';
         } else {
             $this->authenticateResultInfo['code'] = Result::SUCCESS;
-            $this->authenticateResultInfo['identity'] = (int)$userRow->id;
+            $this->authenticateResultInfo['identity'] = (int)$userRow['id'];
             $this->authenticateResultInfo['messages'][] = 'Authentication successful.';
         }
 

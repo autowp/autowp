@@ -13,7 +13,6 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\UserItemSubscribe;
@@ -63,11 +62,6 @@ class ItemParentController extends AbstractRestfulController
     private $postInputFilter;
 
     /**
-     * @var DbTable\Item
-     */
-    private $itemTable;
-
-    /**
      * @var UserItemSubscribe
      */
     private $userItemSubscribe;
@@ -101,8 +95,6 @@ class ItemParentController extends AbstractRestfulController
         $this->itemInputFilter = $itemInputFilter;
         $this->postInputFilter = $postInputFilter;
         $this->putInputFilter = $putInputFilter;
-
-        $this->itemTable = new DbTable\Item();
 
         $this->itemParent = $itemParent;
         $this->specificationsService = $specificationsService;
@@ -271,14 +263,16 @@ class ItemParentController extends AbstractRestfulController
 
         $data = $this->postInputFilter->getValues();
 
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $item = $itemTable->find($data['item_id'])->current();
+        $item = $this->itemModel->getRow([
+            'id' => (int)$data['item_id']
+        ]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
-        $parentItem = $itemTable->find($data['parent_id'])->current();
+        $parentItem = $this->itemModel->getRow([
+            'id' => (int)$data['parent_id']
+        ]);
         if (! $parentItem) {
             return $this->notFoundAction();
         }
@@ -291,56 +285,58 @@ class ItemParentController extends AbstractRestfulController
             $params['type'] = $data['type_id'];
         }
 
-        $this->itemParent->create((int)$parentItem->id, (int)$item->id, $params);
+        $this->itemParent->create((int)$parentItem['id'], (int)$item['id'], $params);
 
-        $this->itemModel->updateInteritance($item);
+        $this->itemModel->updateInteritance($item['id']);
 
         $this->vehicleType->refreshInheritanceFromParents($item['id']);
 
-        $this->specificationsService->updateActualValues($item->id);
+        $this->specificationsService->updateActualValues($item['id']);
 
         $message = sprintf(
             '%s выбран как родительский для %s',
             htmlspecialchars($this->car()->formatName($parentItem, 'en')),
             htmlspecialchars($this->car()->formatName($item, 'en'))
         );
-        $this->log($message, [$item, $parentItem]);
+        $this->log($message, [
+            'items' => [$item['id'], $parentItem['id']]
+        ]);
 
         $user = $this->user()->get();
 
         $subscribers = [];
         foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-            $subscribers[$subscriber->id] = $subscriber;
+            $subscribers[$subscriber['id']] = $subscriber;
         }
 
         foreach ($this->userItemSubscribe->getItemSubscribers($parentItem['id']) as $subscriber) {
-            $subscribers[$subscriber->id] = $subscriber;
+            $subscribers[$subscriber['id']] = $subscriber;
         }
 
         foreach ($subscribers as $subscriber) {
-            if ($subscriber->id != $user->id) {
-                $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+            if ($subscriber['id'] != $user['id']) {
+                $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                 $message = sprintf(
                     $this->translate(
                         'pm/user-%s-adds-item-%s-%s-to-item-%s-%s',
                         'default',
-                        $subscriber->language
+                        $subscriber['language']
                     ),
                     $this->userModerUrl($user, true, $uri),
-                    $this->car()->formatName($item, $subscriber->language),
+                    $this->car()->formatName($item, $subscriber['language']),
                     $this->itemModerUrl($item, true, null, $uri),
-                    $this->car()->formatName($parentItem, $subscriber->language),
+                    $this->car()->formatName($parentItem, $subscriber['language']),
                     $this->itemModerUrl($parentItem, true, null, $uri)
                 );
 
-                $this->message->send(null, $subscriber->id, $message);
+                $this->message->send(null, $subscriber['id'], $message);
             }
         }
 
         $url = $this->url()->fromRoute('api/item-parent/item/get', [
-            'parent_id' => $parentItem->id,
-            'item_id'   => $item->id
+            'parent_id' => $parentItem['id'],
+            'item_id'   => $item['id']
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -400,9 +396,9 @@ class ItemParentController extends AbstractRestfulController
         if (array_key_exists('parent_id', $data) && $data['parent_id']) {
             $success = $this->itemParent->move($row['item_id'], $row['parent_id'], $data['parent_id']);
             if ($success) {
-                $item = $this->itemTable->find($row['item_id'])->current();
-                $oldParent = $this->itemTable->find($row['parent_id'])->current();
-                $newParent = $this->itemTable->find($data['parent_id'])->current();
+                $item = $this->itemModel->getRow(['id' => $row['item_id']]);
+                $oldParent = $this->itemModel->getRow(['id' => $row['parent_id']]);
+                $newParent = $this->itemModel->getRow(['id' => $data['parent_id']]);
 
                 $message = sprintf(
                     '%s перемещен из %s в %s',
@@ -410,9 +406,11 @@ class ItemParentController extends AbstractRestfulController
                     htmlspecialchars($this->car()->formatName($oldParent, 'en')),
                     htmlspecialchars($this->car()->formatName($newParent, 'en'))
                 );
-                $this->log($message, [$item, $newParent, $oldParent]);
+                $this->log($message, [
+                    'items' => [$item['id'], $newParent['id'], $oldParent['id']]
+                ]);
 
-                $this->itemModel->updateInteritance($item);
+                $this->itemModel->updateInteritance($item['id']);
 
                 $this->specificationsService->updateActualValues($row['item_id']);
             }
@@ -430,7 +428,7 @@ class ItemParentController extends AbstractRestfulController
     private function userModerUrl(\Autowp\Commons\Db\Table\Row $user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
-            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+            'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
         ], [
             'force_canonical' => $full,
             'uri'             => $uri
@@ -477,61 +475,63 @@ class ItemParentController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $item = $this->itemTable->find($row['item_id'])->current();
+        $item = $this->itemModel->getRow(['id' => $row['item_id']]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
-        $parentItem = $this->itemTable->find($row['parent_id'])->current();
+        $parentItem = $this->itemModel->getRow(['id' => $row['parent_id']]);
         if (! $parentItem) {
             return $this->notFoundAction();
         }
 
-        $this->itemParent->remove($parentItem->id, $item->id);
+        $this->itemParent->remove($parentItem['id'], $item['id']);
 
-        $this->itemModel->updateInteritance($item);
+        $this->itemModel->updateInteritance($item['id']);
 
-        $this->vehicleType->refreshInheritanceFromParents($item->id);
+        $this->vehicleType->refreshInheritanceFromParents($item['id']);
 
-        $this->specificationsService->updateActualValues($item->id);
+        $this->specificationsService->updateActualValues($item['id']);
 
         $message = sprintf(
             '%s перестал быть родительским автомобилем для %s',
             htmlspecialchars($this->car()->formatName($parentItem, 'en')),
             htmlspecialchars($this->car()->formatName($item, 'en'))
         );
-        $this->log($message, [$item, $parentItem]);
+        $this->log($message, [
+            'items' => $item['id'], $parentItem['id']
+        ]);
 
 
         $user = $this->user()->get();
 
         $subscribers = [];
         foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-            $subscribers[$subscriber->id] = $subscriber;
+            $subscribers[$subscriber['id']] = $subscriber;
         }
 
         foreach ($this->userItemSubscribe->getItemSubscribers($parentItem['id']) as $subscriber) {
-            $subscribers[$subscriber->id] = $subscriber;
+            $subscribers[$subscriber['id']] = $subscriber;
         }
 
         foreach ($subscribers as $subscriber) {
-            if ($subscriber->id != $user->id) {
-                $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+            if ($subscriber['id'] != $user['id']) {
+                $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                 $message = sprintf(
                     $this->translate(
                         'pm/user-%s-removed-item-%s-%s-from-item-%s-%s',
                         'default',
-                        $subscriber->language
+                        $subscriber['language']
                     ),
                     $this->userModerUrl($user, true, $uri),
-                    $this->car()->formatName($item, $subscriber->language),
+                    $this->car()->formatName($item, $subscriber['language']),
                     $this->itemModerUrl($item, true, null, $uri),
-                    $this->car()->formatName($parentItem, $subscriber->language),
+                    $this->car()->formatName($parentItem, $subscriber['language']),
                     $this->itemModerUrl($parentItem, true, null, $uri)
                 );
 
-                $this->message->send(null, $subscriber->id, $message);
+                $this->message->send(null, $subscriber['id'], $message);
             }
         }
 

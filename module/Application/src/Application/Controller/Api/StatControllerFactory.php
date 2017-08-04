@@ -1,23 +1,20 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\Controller\BrandsController as Controller;
-
-class BrandsControllerFactory implements FactoryInterface
+class StatControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Controller(
-            $container->get('longCache'),
+        return new StatController(
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\Brand::class)
+            $container->get(\Application\Model\DbTable\Picture::class)
         );
     }
 }

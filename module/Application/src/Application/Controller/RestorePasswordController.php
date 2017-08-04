@@ -77,9 +77,9 @@ class RestorePasswordController extends AbstractActionController
                 ]);
 
                 if ($user) {
-                    $code = $this->userPasswordRemind->createToken($user->id);
+                    $code = $this->userPasswordRemind->createToken($user['id']);
 
-                    $uri = $this->hostManager->getUriByLanguage($user->language);
+                    $uri = $this->hostManager->getUriByLanguage($user['language']);
 
                     $url = $this->url()->fromRoute('restorepassword/new', [
                         'code' => $code
@@ -89,7 +89,7 @@ class RestorePasswordController extends AbstractActionController
                     ]);
 
                     $message = sprintf(
-                        $this->translate('restore-password/new-password/mail/body-%s', 'default', $user->language),
+                        $this->translate('restore-password/new-password/mail/body-%s', 'default', $user['language']),
                         $url
                     );
 
@@ -98,11 +98,11 @@ class RestorePasswordController extends AbstractActionController
                         ->setEncoding('utf-8')
                         ->setBody($message)
                         ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
-                        ->addTo($user->e_mail, $user->name)
+                        ->addTo($user['e_mail'], $user['name'])
                         ->setSubject($this->translate(
                             'restore-password/new-password/mail/subject',
                             'default',
-                            $user->language
+                            $user['language']
                         ));
 
                     $this->transport->send($mail);
@@ -150,7 +150,7 @@ class RestorePasswordController extends AbstractActionController
                 $this->userPasswordRemind->deleteToken($code);
 
                 $adapter = new IdAuthAdapter();
-                $adapter->setIdentity($user->id);
+                $adapter->setIdentity($user['id']);
 
                 $auth = new AuthenticationService();
                 $result = $auth->authenticate($adapter);

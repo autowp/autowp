@@ -16,7 +16,7 @@ use Autowp\Comments;
 use Application\DuplicateFinder;
 use Application\ExifGPSExtractor;
 use Application\Form\Upload as UploadForm;
-use Application\Model\Brand as BrandModel;
+use Application\Model\Brand;
 use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\ItemParent;
@@ -72,6 +72,16 @@ class UploadController extends AbstractActionController
      */
     private $pictureTable;
 
+    /**
+     * @var Item
+     */
+    private $item;
+
+    /**
+     * @var Brand
+     */
+    private $brand;
+
     public function __construct(
         $partial,
         TelegramService $telegram,
@@ -81,7 +91,9 @@ class UploadController extends AbstractActionController
         UserPicture $userPicture,
         Perspective $perspective,
         ItemParent $itemParent,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        Item $item,
+        Brand $brand
     ) {
         $this->partial = $partial;
         $this->telegram = $telegram;
@@ -92,6 +104,8 @@ class UploadController extends AbstractActionController
         $this->perspective = $perspective;
         $this->itemParent = $itemParent;
         $this->pictureTable = $pictureTable;
+        $this->item = $item;
+        $this->brand = $brand;
     }
 
     public function onlyRegisteredAction()
@@ -102,7 +116,7 @@ class UploadController extends AbstractActionController
     {
         $user = $this->user()->get();
 
-        if (! $user || $user->deleted) {
+        if (! $user || $user['deleted']) {
             return $this->forward()->dispatch(self::class, [
                 'action' => 'only-registered'
             ]);
@@ -119,7 +133,7 @@ class UploadController extends AbstractActionController
         $perspectiveId = null;
 
         if ($replacePicture) {
-            $itemIds = $this->pictureItem->getPictureItems($replacePicture->id);
+            $itemIds = $this->pictureItem->getPictureItems($replacePicture['id']);
         } else {
             $itemId = (int)$this->params('item_id');
             $itemIds = $itemId ? [$itemId] : [];
@@ -128,10 +142,8 @@ class UploadController extends AbstractActionController
 
         $selected = false;
 
-        $itemTable = new DbTable\Item();
-        $items = $itemTable->find($itemIds);
         $names = [];
-        foreach ($items as $item) {
+        foreach ($this->item->getRows(['id' => $itemIds]) as $item) {
             $selected = true;
             $names[] = $this->car()->formatName($item, $this->language());
         }
@@ -221,21 +233,21 @@ class UploadController extends AbstractActionController
                 'height'        => $height,
                 'dpi_x'         => $resolution ? $resolution['x'] : null,
                 'dpi_y'         => $resolution ? $resolution['y'] : null,
-                'owner_id'      => $user ? $user->id : null,
+                'owner_id'      => $user ? $user['id'] : null,
                 'add_date'      => new Zend_Db_Expr('NOW()'),
                 'filesize'      => $fileSize,
                 'status'        => Picture::STATUS_INBOX,
                 'removing_date' => null,
                 'ip'            => inet_pton($this->getRequest()->getServer('REMOTE_ADDR')),
                 'identity'      => $this->pictureTable->generateIdentity(),
-                'replace_picture_id' => $replacePicture ? $replacePicture->id : null,
+                'replace_picture_id' => $replacePicture ? $replacePicture['id'] : null,
             ]);
             $picture->save();
 
             if ($itemIds) {
-                $this->pictureItem->setPictureItems($picture->id, $itemIds);
+                $this->pictureItem->setPictureItems($picture['id'], $itemIds);
                 if ($perspectiveId && count($itemIds) == 1) {
-                    $this->pictureItem->setProperties($picture->id, $itemIds[0], [
+                    $this->pictureItem->setProperties($picture['id'], $itemIds[0], [
                         'perspective' => $perspectiveId
                     ]);
                 }
@@ -247,7 +259,7 @@ class UploadController extends AbstractActionController
             }
 
             // rename file to new
-            $this->imageStorage()->changeImageName($picture->image_id, [
+            $this->imageStorage()->changeImageName($picture['image_id'], [
                 'pattern' => $this->pictureTable->getFileNamePattern($picture)
             ]);
 
@@ -255,9 +267,9 @@ class UploadController extends AbstractActionController
             if ($values['note']) {
                 $this->comments->add([
                     'typeId'             => \Application\Comments::PICTURES_TYPE_ID,
-                    'itemId'             => $picture->id,
+                    'itemId'             => $picture['id'],
                     'parentId'           => null,
-                    'authorId'           => $user->id,
+                    'authorId'           => $user['id'],
                     'message'            => $values['note'],
                     'ip'                 => $this->getRequest()->getServer('REMOTE_ADDR'),
                     'moderatorAttention' => Comments\Attention::NONE
@@ -266,12 +278,12 @@ class UploadController extends AbstractActionController
 
             $this->comments->subscribe(
                 \Application\Comments::PICTURES_TYPE_ID,
-                $picture->id,
+                $picture['id'],
                 $user['id']
             );
 
             // read gps
-            $exif = $this->imageStorage()->getImageEXIF($picture->image_id);
+            $exif = $this->imageStorage()->getImageEXIF($picture['image_id']);
             $extractor = new ExifGPSExtractor();
             $gps = $extractor->extract($exif);
             if ($gps !== false) {
@@ -280,7 +292,7 @@ class UploadController extends AbstractActionController
                 $db = $this->pictureTable->getAdapter();
                 $pointExpr = new Zend_Db_Expr($db->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
 
-                $picture->point = $pointExpr;
+                $picture['point'] = $pointExpr;
                 $picture->save();
             }
 
@@ -290,9 +302,9 @@ class UploadController extends AbstractActionController
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-gallery-full');
 
             // index
-            $this->duplicateFinder->indexImage($picture->id, $tempFilePath);
+            $this->duplicateFinder->indexImage($picture['id'], $tempFilePath);
 
-            $this->telegram->notifyInbox($picture->id);
+            $this->telegram->notifyInbox($picture['id']);
 
             $result[] = $picture;
         }
@@ -302,11 +314,9 @@ class UploadController extends AbstractActionController
 
     public function selectBrandAction()
     {
-        $brandModel = new BrandModel();
-
         $language = $this->language();
 
-        $brand = $brandModel->getBrandById($this->params('brand_id'), $language);
+        $brand = $this->brand->getBrandById($this->params('brand_id'), $language);
         if ($brand) {
             return $this->forward()->dispatch(self::class, [
                 'action'   => 'select-in-brand',
@@ -314,7 +324,7 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $rows = $brandModel->getList($language, function () {
+        $rows = $this->brand->getList($language, function () {
         });
 
         return [
@@ -324,11 +334,9 @@ class UploadController extends AbstractActionController
 
     public function selectInBrandAction()
     {
-        $brandModel = new BrandModel();
-
         $language = $this->language();
 
-        $brand = $brandModel->getBrandById($this->params('brand_id'), $language);
+        $brand = $this->brand->getBrandById($this->params('brand_id'), $language);
 
         if (! $brand) {
             return $this->forward()->dispatch(self::class, [
@@ -336,76 +344,44 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $itemTable = new DbTable\Item();
+        $haveConcepts = (bool)$this->item->getRow([
+            'ancestor'   => $brand['id'],
+            'is_concept' => true,
+            'limit'      => 1
+        ]);
 
-        $haveConcepts = (bool)$itemTable->fetchRow(
-            $itemTable->select(true)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $brand['id'])
-                ->where('item.is_concept')
-        );
+        $rows = $this->item->getRows([
+            'language'     => $this->language(),
+            'columns'      => ['id', 'name', 'is_group'],
+            'item_type_id' => Item::VEHICLE,
+            'is_concept'   => false,
+            'parent'       => $brand['id'],
+            'order'        => [
+                'item.name',
+                'item.begin_year',
+                'item.end_year',
+                'item.begin_model_year',
+                'item.end_model_year'
+            ]
+        ]);
 
-        $db = $itemTable->getAdapter();
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('item', [
-                    'item.id',
-                    'name' => 'if(item_language.name, item_language.name, item.name)',
-                    'item.begin_model_year', 'item.end_model_year',
-                    'spec' => 'spec.short_name',
-                    'spec_full' => 'spec.name',
-                    'item.body', 'item.today',
-                    'item.begin_year', 'item.end_year',
-                    'item.is_group'
-                ])
-                ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
-                ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->join('item_parent', 'item.id = item_parent.item_id', null)
-                ->where('item_parent.parent_id = ?', $brand['id'])
-                ->where('NOT item.is_concept')
-                ->where('item.item_type_id = ?', Item::VEHICLE)
-                ->order([
-                    'item.name',
-                    'item.begin_year',
-                    'item.end_year',
-                    'item.begin_model_year',
-                    'item.end_model_year'
-                ])
-                ->bind([
-                    'lang' => $this->language()
-                ])
-        );
         $vehicles = $this->prepareCars($rows);
 
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('item', [
-                    'item.id',
-                    'name' => 'if(item_language.name, item_language.name, item.name)',
-                    'item.begin_model_year', 'item.end_model_year',
-                    'spec' => 'spec.short_name',
-                    'spec_full' => 'spec.name',
-                    'item.body', 'item.today',
-                    'item.begin_year', 'item.end_year',
-                    'item.is_group'
-                ])
-                ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
-                ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->join('item_parent', 'item.id = item_parent.item_id', null)
-                ->where('item_parent.parent_id = ?', $brand['id'])
-                ->where('item.item_type_id = ?', Item::ENGINE)
-                ->order([
-                    'item.name',
-                    'item.begin_year',
-                    'item.end_year',
-                    'item.begin_model_year',
-                    'item.end_model_year'
-                ])
-                ->bind([
-                    'lang' => $this->language()
-                ])
-        );
+        $rows = $this->item->getRows([
+            'language'     => $this->language(),
+            'columns'      => ['id', 'name', 'is_group'],
+            'item_type_id' => Item::ENGINE,
+            'is_concept'   => false,
+            'parent'       => $brand['id'],
+            'order'        => [
+                'item.name',
+                'item.begin_year',
+                'item.end_year',
+                'item.begin_model_year',
+                'item.end_model_year'
+            ]
+        ]);
+
         $engines = $this->prepareCars($rows);
 
         return [
@@ -490,36 +466,17 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $itemTable = new DbTable\Item();
-
-        $car = $itemTable->find($this->params('item_id'))->current();
+        $car = $this->item->getRow(['id' => (int)$this->params('item_id')]);
         if (! $car) {
             return $this->notfoundAction();
         }
 
-        $db = $itemTable->getAdapter();
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('item', [
-                    'item.id',
-                    'name' => 'if(item_language.name, item_language.name, item.name)',
-                    'item.begin_model_year', 'item.end_model_year',
-                    'spec' => 'spec.short_name',
-                    'spec_full' => 'spec.name',
-                    'item.body', 'item.today',
-                    'item.begin_year', 'item.end_year',
-                    'item.is_group'
-                ])
-                ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
-                ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->join('item_parent', 'item.id = item_parent.item_id', 'type')
-                ->where('item_parent.parent_id = ?', $car->id)
-                ->order(['item_parent.type', 'item.name', 'item.begin_year', 'item.end_year'])
-                ->bind([
-                    'lang' => $this->language()
-                ])
-        );
+        $rows = $this->item->getRows([
+            'language' => $this->language(),
+            'columns'  => ['id', 'name', 'is_group'],
+            'parent'   => $car['id'],
+            'order'    => ['ip1.type', 'name', 'item.begin_year', 'item.end_year']
+        ]);
 
         $viewModel = new ViewModel([
             'cars' => $this->prepareCarParentRows($rows)
@@ -537,40 +494,21 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $itemTable = new DbTable\Item();
-        $brand = $itemTable->fetchRow([
-            'item_type_id = ?' => Item::BRAND,
-            'id = ?'           => (int)$this->params('brand_id')
+        $brand = $this->item->getRow([
+            'item_type_id' => Item::BRAND,
+            'id'           => (int)$this->params('brand_id')
         ]);
         if (! $brand) {
             return $this->notfoundAction();
         }
 
-        $db = $itemTable->getAdapter();
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('item', [
-                    'item.id',
-                    'name' => 'if(item_language.name, item_language.name, item.name)',
-                    'item.begin_model_year', 'item.end_model_year',
-                    'spec' => 'spec.short_name',
-                    'spec_full' => 'spec.name',
-                    'item.body', 'item.today',
-                    'item.begin_year', 'item.end_year',
-                    'item.is_group'
-                ])
-                ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
-                ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $brand->id)
-                ->where('item.is_concept')
-                ->order(['item.name', 'item.begin_year', 'item.end_year'])
-                ->group('item.id')
-                ->bind([
-                    'lang' => $this->language()
-                ])
-        );
+        $rows = $this->item->getRows([
+            'language'   => $this->language(),
+            'columns'    => ['id', 'name', 'is_group'],
+            'parent'     => $brand['id'],
+            'order'      => ['name', 'item.begin_year', 'item.end_year'],
+            'is_concept' => true
+        ]);
 
         $concepts = $this->prepareCars($rows);
 
@@ -593,11 +531,11 @@ class UploadController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        if ($picture->owner_id != $user->id) {
+        if ($picture['owner_id'] != $user['id']) {
             return $this->forbiddenAction();
         }
 
-        if ($picture->status != Picture::STATUS_INBOX) {
+        if ($picture['status'] != Picture::STATUS_INBOX) {
             return $this->forbiddenAction();
         }
 
@@ -607,16 +545,16 @@ class UploadController extends AbstractActionController
         $height = round($this->params()->fromPost('h'));
 
         $left = max(0, $left);
-        $left = min($picture->width, $left);
+        $left = min($picture['width'], $left);
         $width = max(400, $width);
-        $width = min($picture->width, $width);
+        $width = min($picture['width'], $width);
 
         $top = max(0, $top);
-        $top = min($picture->height, $top);
+        $top = min($picture['height'], $top);
         $height = max(300, $height);
-        $height = min($picture->height, $height);
+        $height = min($picture['height'], $height);
 
-        if ($left > 0 || $top > 0 || $width < $picture->width || $height < $picture->height) {
+        if ($left > 0 || $top > 0 || $width < $picture['width'] || $height < $picture['height']) {
             $picture->setFromArray([
                 'crop_left'   => $left,
                 'crop_top'    => $top,
@@ -634,15 +572,20 @@ class UploadController extends AbstractActionController
         $picture->save();
 
         $this->imageStorage()->flush([
-            'image' => $picture->image_id
+            'image' => $picture['image_id']
         ]);
 
         $this->log(sprintf(
             'Выделение области на картинке %s',
             htmlspecialchars($this->pic()->name($picture, $this->language()))
-        ), [$picture]);
+        ), [
+            'pictures' => $picture['id']
+        ]);
 
-        $image = $this->imageStorage()->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'picture-thumb');
+        $image = $this->imageStorage()->getFormatedImage(
+            $this->pictureTable->getFormatRequest($picture),
+            'picture-thumb'
+        );
 
         return new JsonModel([
             'ok'  => true,
@@ -654,7 +597,7 @@ class UploadController extends AbstractActionController
     {
         $user = $this->user()->get();
 
-        if (! $user || $user->deleted) {
+        if (! $user || $user['deleted']) {
             return $this->forward()->dispatch(self::class, [
                 'action' => 'only-registered'
             ]);
@@ -677,9 +620,9 @@ class UploadController extends AbstractActionController
         $perspectiveId = null;
 
         if ($replacePicture) {
-            $itemIds = $this->pictureItem->getPictureItems($replacePicture->id);
+            $itemIds = $this->pictureItem->getPictureItems($replacePicture['id']);
             if (count($itemIds) == 1) {
-                $perspectiveId = $this->pictureItem->getPerspective($replacePicture->id, $itemIds[0]);
+                $perspectiveId = $this->pictureItem->getPerspective($replacePicture['id'], $itemIds[0]);
             }
         } else {
             $itemId = (int)$this->params('item_id');
@@ -687,8 +630,7 @@ class UploadController extends AbstractActionController
             $perspectiveId = (int)$this->params('perspective_id');
         }
 
-        $itemTable = new DbTable\Item();
-        $selectedItems = $itemTable->find($itemIds);
+        $selectedItems = $this->item->getRows(['id' => $itemIds]);
 
         if (count($selectedItems) <= 0) {
             return $this->forbiddenAction();
@@ -742,8 +684,8 @@ class UploadController extends AbstractActionController
                 $result[] = [
                     'id'     => $picture['id'],
                     'html'   => $html,
-                    'width'  => $picture->width,
-                    'height' => $picture->height,
+                    'width'  => $picture['width'],
+                    'height' => $picture['height'],
                     'src'    => $image->getSrc(),
                     'perspectiveUrl' => $perspectiveUrl,
                     'perspectiveId'  => $cPerspectiveId

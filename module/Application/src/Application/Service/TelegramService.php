@@ -51,6 +51,11 @@ class TelegramService
      */
     private $telegramChatTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $itemTable;
+
     public function __construct(
         array $options,
         TreeRouteStack $router,
@@ -58,7 +63,8 @@ class TelegramService
         $serviceManager,
         DbTable\Picture $pictureTable,
         TableGateway $telegramItemTable,
-        TableGateway $telegramChatTable
+        TableGateway $telegramChatTable,
+        TableGateway $itemTable
     ) {
 
         $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
@@ -71,6 +77,7 @@ class TelegramService
         $this->pictureTable = $pictureTable;
         $this->telegramItemTable = $telegramItemTable;
         $this->telegramChatTable = $telegramChatTable;
+        $this->itemTable = $itemTable;
     }
 
     /**
@@ -83,8 +90,8 @@ class TelegramService
         $api->addCommands([
             StartCommand::class,
             new MeCommand($this->serviceManager->get(\Autowp\Message\MessageService::class), $this->telegramChatTable),
-            new NewCommand($this->telegramItemTable, $this->telegramChatTable),
-            new InboxCommand($this->telegramItemTable, $this->telegramChatTable),
+            new NewCommand($this->telegramItemTable, $this->telegramChatTable, $this->itemTable),
+            new InboxCommand($this->telegramItemTable, $this->telegramChatTable, $this->itemTable),
             new MessagesCommand($this->telegramChatTable)
         ]);
 
@@ -162,7 +169,7 @@ class TelegramService
                 ->where([
                     new Sql\Predicate\In('telegram_brand.item_id', $brandIds),
                     'telegram_brand.inbox',
-                    'users.id <> ?' => (int)$picture->owner_id,
+                    'users.id <> ?' => (int)$picture['owner_id'],
                     'not users.deleted'
                 ])
                 ->join('telegram_chat', 'telegram_brand.chat_id = telegram_chat.chat_id', [])
@@ -191,7 +198,7 @@ class TelegramService
         if (count($brandIds)) {
             $select = new Sql\Select($this->telegramChatTable->getTable());
             $select->columns(['chat_id'])
-                ->where(['user_id' => (int)$picture->owner_id]);
+                ->where(['user_id' => (int)$picture['owner_id']]);
 
             $row = $this->telegramChatTable->selectWith($select)->current();
 
@@ -232,7 +239,7 @@ class TelegramService
                 ->where('item.item_type_id = ?', Item::BRAND)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                ->where('picture_item.picture_id = ?', $picture->id)
+                ->where('picture_item.picture_id = ?', $picture['id'])
         );
 
         return $brandIds;
@@ -243,7 +250,7 @@ class TelegramService
         $uri = $this->getUriByChatId($chatId);
 
         return $this->router->assemble([
-            'picture_id' => $picture->identity
+            'picture_id' => $picture['identity']
         ], [
             'name'            => 'picture/picture',
             'force_canonical' => true,
@@ -261,8 +268,8 @@ class TelegramService
                 ->where('telegram_chat.chat_id = ?', $chatId)
         );
 
-        if ($userRow && $userRow->language) {
-            return $this->hostManager->getUriByLanguage($userRow->language);
+        if ($userRow && $userRow['language']) {
+            return $this->hostManager->getUriByLanguage($userRow['language']);
         }
 
         return \Zend\Uri\UriFactory::factory('http://wheelsage.org');
@@ -276,7 +283,7 @@ class TelegramService
             $userTable = new User();
             $userRow = $userTable->find($fromId)->current();
             if ($userRow) {
-                $fromName = $userRow->name;
+                $fromName = $userRow['name'];
             }
         }
 

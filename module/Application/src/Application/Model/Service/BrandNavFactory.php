@@ -21,7 +21,8 @@ class BrandNavFactory implements FactoryInterface
             $container->get(\Application\Model\ItemParent::class),
             $container->get(\Application\Model\ItemAlias::class),
             $container->get(\Application\Model\DbTable\Picture::class),
-            $container->get(\Application\Model\Item::class)
+            $container->get(\Application\Model\Item::class),
+            $container->get(\Application\Model\VehicleType::class)
         );
     }
 }

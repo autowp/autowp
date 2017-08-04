@@ -15,7 +15,8 @@ class ItemVehicleTypeControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(
-            $container->get(\Application\Model\VehicleType::class)
+            $container->get(\Application\Model\VehicleType::class),
+            $container->get(\Application\Model\Item::class)
         );
     }
 }

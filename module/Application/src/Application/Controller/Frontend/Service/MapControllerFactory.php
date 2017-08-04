@@ -14,9 +14,11 @@ class MapControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get(\Application\ItemNameFormatter::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\DbTable\Picture::class),
+            $tables->get('item')
         );
     }
 }

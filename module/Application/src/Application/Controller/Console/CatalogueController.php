@@ -13,7 +13,6 @@ use Application\Model\PictureItem;
 use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
@@ -108,29 +107,29 @@ class CatalogueController extends AbstractActionController
         }
 
         foreach ($rows as $picture) {
-            print $picture->id . PHP_EOL;
+            print $picture['id']. PHP_EOL;
 
-            $previousStatusUserId = $picture->change_status_user_id;
+            $previousStatusUserId = $picture['change_status_user_id'];
 
-            $success = $this->pictureTable->accept($picture->id, $userId, $isFirstTimeAccepted);
+            $success = $this->pictureTable->accept($picture['id'], $userId, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
                 $owner = $picture->findParentRow(User::class, 'Owner');
-                if ($owner && ($owner->id != $userId)) {
-                    $uri = $this->hostManager->getUriByLanguage($owner->language);
+                if ($owner && ($owner['id'] != $userId)) {
+                    $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                     if (! $uri) {
                         $uri = \Zend\Uri\UriFactory::factory('https://www.autowp.ru');
                     }
 
                     $message = sprintf(
-                        $this->translate('pm/your-picture-accepted-%s', 'default', $owner->language),
-                        $this->pic()->url($picture->identity, true, $uri)
+                        $this->translate('pm/your-picture-accepted-%s', 'default', $owner['language']),
+                        $this->pic()->url($picture['identity'], true, $uri)
                     );
 
-                    $this->message->send(null, $owner->id, $message);
+                    $this->message->send(null, $owner['id'], $message);
                 }
 
-                $this->telegram->notifyPicture($picture->id);
+                $this->telegram->notifyPicture($picture['id']);
             }
 
             if ($previousStatusUserId != $userId) {
@@ -138,16 +137,18 @@ class CatalogueController extends AbstractActionController
                 foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                     $message = sprintf(
                         'Принята картинка %s',
-                        $this->pic()->url($picture->identity, true)
+                        $this->pic()->url($picture['identity'], true)
                     );
-                    $this->message->send(null, $prevUser->id, $message);
+                    $this->message->send(null, $prevUser['id'], $message);
                 }
             }
 
             $this->log(sprintf(
                 'Картинка %s принята',
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
-            ), $picture);
+            ), [
+                'pictures' => $picture['id']
+            ]);
 
             sleep(20);
         }
@@ -157,14 +158,9 @@ class CatalogueController extends AbstractActionController
 
     public function rebuildCarOrderCacheAction()
     {
-        $itemTable = new DbTable\Item();
-
-        $select = $itemTable->select(true)
-            ->order('id');
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
-        );
+        $paginator = $this->itemModel->getPaginator([
+            'columns' => ['id']
+        ]);
         $paginator->setItemCountPerPage(100);
 
         $pagesCount = $paginator->count();

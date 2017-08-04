@@ -163,10 +163,10 @@ class Votings
         ];
     }
 
-    public function getVotes($id)
+    public function getVotes(int $id)
     {
         $variant = $this->variantTable->select([
-            'id' => (int)$id
+            'id' => $id
         ])->current();
 
         if (! $variant) {
@@ -177,7 +177,7 @@ class Votings
         $users = $uTable->fetchAll(
             $uTable->select(true)
                 ->join('voting_variant_vote', 'users.id = voting_variant_vote.user_id', null)
-                ->where('voting_variant_vote.voting_variant_id = ?', $variant->id)
+                ->where('voting_variant_vote.voting_variant_id = ?', $variant['id'])
         );
 
         return [
@@ -185,7 +185,7 @@ class Votings
         ];
     }
 
-    public function vote($id, $variantId, $userId)
+    public function vote(int $id, int $variantId, int $userId)
     {
         $voting = $this->votingTable->select([
             'id' => (int)$id
@@ -237,7 +237,7 @@ class Votings
         return true;
     }
 
-    private function updateVariantVotesCount($variantId)
+    private function updateVariantVotesCount(int $variantId)
     {
         $count = $this->voteTable->select(function (Sql\Select $select) use ($variantId) {
             $select
@@ -252,7 +252,7 @@ class Votings
         ]);
     }
 
-    private function updateVotingVotesCount($votingId)
+    private function updateVotingVotesCount(int $votingId)
     {
         $count = $this->voteTable->select(function (Sql\Select $select) use ($votingId) {
             $select
@@ -265,5 +265,14 @@ class Votings
         ], [
             'id' => $votingId
         ]);
+    }
+
+    public function isVotingExists(int $votingId): bool
+    {
+        $voting = $this->votingTable->select([
+            'id' => $votingId
+        ])->current();
+
+        return (bool)$voting;
     }
 }

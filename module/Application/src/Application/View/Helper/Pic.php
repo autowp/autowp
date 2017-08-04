@@ -43,7 +43,7 @@ class Pic extends AbstractHtmlElement
     {
         if ($this->picture) {
             return $this->view->url('picture/picture', [
-                'picture_id' => $this->picture->identity
+                'picture_id' => $this->picture['identity']
             ]);
         }
         return false;
@@ -65,7 +65,7 @@ class Pic extends AbstractHtmlElement
             'language' => $language,
             'large'    => true
         ]);
-        $name = $names[$pictureRow->id];
+        $name = $names[$pictureRow['id']];
 
         return $this->pictureNameFormatter->format($name, $language);
     }

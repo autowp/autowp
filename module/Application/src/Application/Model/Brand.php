@@ -5,11 +5,9 @@ namespace Application\Model;
 use Collator;
 use Transliterator;
 
+use Zend\Db\Sql;
+
 use Autowp\Image;
-
-use Application\Model\DbTable;
-
-use Zend_Db_Expr;
 
 class Brand
 {
@@ -24,36 +22,15 @@ class Brand
     const ICON_FORMAT = 'brandicon';
 
     /**
-     * @var DbTable\Item
+     * @var Item
      */
-    private $table;
+    private $item;
 
     private $collators = [];
 
-    public function __construct()
+    public function __construct(Item $item)
     {
-        $this->table = new DbTable\Item();
-    }
-
-    public function getTotalCount()
-    {
-        $sql = 'SELECT COUNT(1) FROM item WHERE item_type_id = ?';
-        return $this->table->getAdapter()->fetchOne($sql, [Item::BRAND]);
-    }
-
-    private function countExpr()
-    {
-        $db = $this->table->getAdapter();
-
-        return new Zend_Db_Expr('(' .
-            '(' .
-                $db->select()
-                    ->from(['product' => 'item'], 'count(distinct product.id)')
-                    ->join('item_parent_cache', 'product.id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = item.id')
-                    ->assemble() .
-            ')' .
-        ')');
+        $this->item = $item;
     }
 
     private function getCollator($language)
@@ -90,41 +67,52 @@ class Brand
         }
     }
 
-    public function getTopBrandsList($language)
+    public function getTopBrandsList(string $language)
     {
-        $db = $this->table->getAdapter();
+        $subSelect = new Sql\Select(['product' => 'item']);
+        $subSelect->columns([new Sql\Expression('count(distinct product.id)')])
+            ->join('item_parent_cache', 'product.id = item_parent_cache.item_id', [])
+            ->where('item_parent_cache.parent_id = item.id')
+            ->limit(1);
+
+        $select = $this->item->getSelect([
+            'language'     => $language,
+            'columns'      => [
+                'id', 'catname', 'name',
+                'cars_count' => $subSelect
+            ],
+            'item_type_id' => Item::BRAND,
+            'limit'        => self::TOP_COUNT,
+            'order'        => 'cars_count DESC'
+        ]);
+
+        $rows = $this->item->getRows([
+            'language'     => $language,
+            'columns'      => [
+                'id', 'catname', 'name',
+                'cars_count' => $subSelect
+            ],
+            'item_type_id' => Item::BRAND,
+            'limit'        => self::TOP_COUNT,
+            'order'        => 'cars_count DESC'
+        ]);
 
         $items = [];
+        foreach ($rows as $brandRow) {
+            $select = new Sql\Select($this->item->getTable()->getTable());
+            $select->columns(['count' => new Sql\Expression('count(distinct item.id)')])
+                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
+                ->where([
+                    'item_parent_cache.parent_id' => $brandRow['id'],
+                    'item_parent_cache.item_id <> item_parent_cache.parent_id',
+                    new Sql\Predicate\Expression(
+                        'item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)',
+                        [self::NEW_DAYS]
+                    )
+                ]);
+            $row = $this->item->getTable()->selectWith($select)->current();
 
-        $select = $db->select(true)
-            ->from('item', [
-                'id', 'catname',
-                'name' => 'IF(LENGTH(item_language.name)>0, item_language.name, item.name)',
-                'cars_count' => $this->countExpr()
-            ])
-            ->joinLeft(
-                'item_language',
-                'item.id = item_language.item_id and item_language.language = :language',
-                null
-            )
-            ->where('item.item_type_id = ?', Item::BRAND)
-            ->where('item.position = 0') // exclude "other"
-            ->group('item.id')
-            ->order('cars_count DESC')
-            ->limit(self::TOP_COUNT)
-            ->bind([
-                'language' => $language
-            ]);
-
-        foreach ($db->fetchAll($select) as $brandRow) {
-            $newCarsCount = $db->fetchOne(
-                $db->select()
-                    ->from('item', 'count(distinct item.id)')
-                    ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $brandRow['id'])
-                    ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
-                    ->where('item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)', self::NEW_DAYS)
-            );
+            $newCarsCount = $row ? (int)$row['count'] : 0;
 
             $items[] = [
                 'id'             => $brandRow['id'],
@@ -153,40 +141,36 @@ class Brand
         return $number;
     }
 
-    public function getFullBrandsList($language)
+    public function getFullBrandsList(string $language)
     {
+        $select = new Sql\Select(['ipc_all' => 'item_parent_cache']);
+        $select->columns([new Sql\Expression('COUNT(DISTINCT pictures.id)')])
+            ->join('picture_item', 'ipc_all.item_id = picture_item.item_id', [])
+            ->join('pictures', 'picture_item.picture_id = pictures.id', [])
+            ->where([
+                'item.id = ipc_all.parent_id',
+                'pictures.status' => Picture::STATUS_ACCEPTED
+            ]);
+
         $rows = $this->getList([
             'language' => $language,
             'columns'  => [
                 'logo_id',
-                'cars_count' => new Zend_Db_Expr(
+                'cars_count' => new Sql\Expression(
                     'COUNT(subitem.id)'
                 ),
-                'new_cars_count' => new Zend_Db_Expr(
-                    'COUNT(IF(subitem.add_datetime > DATE_SUB(NOW(), INTERVAL :new_days DAY), 1, NULL))'
+                'new_cars_count' => new Sql\Expression(
+                    'COUNT(IF(subitem.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY), 1, NULL))',
+                    [self::NEW_DAYS]
                 ),
-                'pictures_count' => new Zend_Db_Expr(
-                    '(' .
-                        $this->table->getAdapter()->select()
-                            ->from(['ipc_all' => 'item_parent_cache'], 'COUNT(DISTINCT pictures.id)')
-                            ->join('picture_item', 'ipc_all.item_id = picture_item.item_id', null)
-                            ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                            ->where('item.id = ipc_all.parent_id')
-                            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                            ->assemble() .
-                    ')'
-                ),
+                'pictures_count' => $select
             ]
-        ], function ($select) use ($language) {
+        ], function (Sql\Select $select) use ($language) {
             $select
-                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
-                ->join(['subitem' => 'item'], 'item_parent_cache.item_id = subitem.id', null)
-                ->group('item.id')
-                ->bind([
-                    'language' => $language,
-                    'new_days' => self::NEW_DAYS
-                ]);
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->where(['item_parent_cache.item_id <> item_parent_cache.parent_id'])
+                ->join(['subitem' => 'item'], 'item_parent_cache.item_id = subitem.id', [])
+                ->group('item.id');
         });
 
         $result = [
@@ -273,40 +257,17 @@ class Brand
         return $result;
     }
 
-    public function getBrandIdByCatname($catname)
+    private function fetchBrand(string $language, $callback)
     {
-        $db = $this->table->getAdapter();
-
-        return $db->fetchOne(
-            $db->select()
-                ->from('brands', 'id')
-                ->where('catname = ?', (string)$catname)
-        );
-    }
-
-    private function fetchBrand($language, $callback)
-    {
-        $db = $this->table->getAdapter();
-
-        $select = $db->select()
-            ->from('item', [
-                'id', 'catname',
-                'name' => 'IF(LENGTH(item_language.name)>0, item_language.name, item.name)',
-                'full_name', 'logo_id'
-            ])
-            ->joinLeft(
-                'item_language',
-                'item.id = item_language.item_id and item_language.language = :language',
-                null
-            )
-            ->where('item.item_type_id = ?', Item::BRAND)
-            ->bind([
-                'language' => (string)$language
-            ]);
+        $select = $this->item->getSelect([
+            'language'     => $language,
+            'columns'      => ['id', 'catname', 'name', 'full_name', 'logo_id'],
+            'item_type_id' => Item::BRAND
+        ]);
 
         $callback($select);
 
-        $brand = $db->fetchRow($select);
+        $brand = $this->item->getTable()->selectWith($select)->current();
 
         if (! $brand) {
             return null;
@@ -321,31 +282,21 @@ class Brand
         ];
     }
 
-    public function getBrandById($id, $language)
+    public function getBrandById(int $id, string $language)
     {
-        return $this->fetchBrand($language, function ($select) use ($id) {
-            $select->where('item.id = ?', (int)$id);
+        return $this->fetchBrand($language, function (Sql\Select $select) use ($id) {
+            $select->where(['item.id' => $id]);
         });
     }
 
-    public function getBrandByCatname($catname, $language)
+    public function getBrandByCatname(string $catname, string $language)
     {
-        return $this->fetchBrand($language, function ($select) use ($catname) {
-            $select->where('item.catname = ?', (string)$catname);
+        return $this->fetchBrand($language, function (Sql\Select $select) use ($catname) {
+            $select->where(['item.catname' => $catname]);
         });
     }
 
-    public function getBrand($options, callable $callback)
-    {
-        $result = $this->getList($options, $callback);
-        if (count($result) > 0) {
-            return $result;
-        }
-
-        return null;
-    }
-
-    public function getList($options, callable $callback = null)
+    public function getList($options, callable $callback = null): array
     {
         if (is_string($options)) {
             $options = [
@@ -359,17 +310,11 @@ class Brand
         ];
         $options = array_replace($defaults, $options);
 
-        $db = $this->table->getAdapter();
-
         $columns = [
             'id',
             'catname',
             'position',
-            'name'    => 'IF(' .
-                'item_language.name IS NOT NULL and LENGTH(item_language.name)>0,' .
-                'item_language.name,' .
-                'item.name' .
-            ')'
+            'name'
         ];
         foreach ($options['columns'] as $column => $expr) {
             switch ($expr) {
@@ -388,24 +333,21 @@ class Brand
             }
         }
 
-        $select = $db->select()
-            ->from('item', $columns)
-            ->where('item.item_type_id = ?', Item::BRAND)
-            ->joinLeft(
-                'item_language',
-                'item.id = item_language.item_id and item_language.language = :language',
-                null
-            )
-            ->order(['item.position'])
-            ->bind([
-                'language' => (string)$options['language']
-            ]);
+        $select = $this->item->getSelect([
+            'language'     => (string)$options['language'],
+            'columns'      => $columns,
+            'item_type_id' => Item::BRAND,
+            'order'        => 'item.position'
+        ]);
 
         if ($callback) {
             $callback($select);
         }
 
-        $items = $db->fetchAll($select);
+        $items = [];
+        foreach ($this->item->getTable()->selectWith($select) as $row) {
+            $items[] = $row;
+        }
 
         usort($items, function ($a, $b) use ($options) {
 
@@ -427,7 +369,7 @@ class Brand
                 'logo_id'
             ]
         ], function ($select) {
-            $select->where('logo_id');
+            $select->where(['logo_id']);
         });
 
         $images = [];

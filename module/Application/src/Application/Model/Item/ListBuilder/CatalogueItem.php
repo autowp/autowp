@@ -101,7 +101,7 @@ class CatalogueItem extends Catalogue
                 break;
         }
 
-        $itemParentRow = $this->itemParent->getRow($this->itemId, $item->id);
+        $itemParentRow = $this->itemParent->getRow($this->itemId, $item['id']);
 
         if ($itemParentRow) {
             $currentPath = array_merge($this->path, [

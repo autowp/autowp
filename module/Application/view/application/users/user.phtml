@@ -6,8 +6,8 @@
         ],
         'pageId' => 62,
         'args'   => [
-            'USER_NAME'     => $this->currentUser->name,
-            'USER_IDENTITY' => $this->currentUser->identity ? $this->currentUser->identity : 'user' . $this->currentUser->id,
+            'USER_NAME'     => $this->currentUser['name'],
+            'USER_IDENTITY' => $this->currentUser['identity'] ? $this->currentUser['identity'] : 'user' . $this->currentUser['id'],
         ]
     ]);
 
@@ -20,13 +20,13 @@
     <div class="col-md-6">
 
         <div class="user-photo">
-            <?php if ($this->currentUser->img) { ?>
-                <?=$this->img($this->currentUser->img, [
+            <?php if ($this->currentUser['img']) { ?>
+                <?=$this->img($this->currentUser['img'], [
                     'format' => 'photo',
-                    'alt'    => $this->currentUser->name,
+                    'alt'    => $this->currentUser['name'],
                 ])?>
-            <?php } elseif ($this->currentUser->e_mail) { ?>
-                <?=$this->gravatar($this->currentUser->e_mail, [
+            <?php } elseif ($this->currentUser['e_mail']) { ?>
+                <?=$this->gravatar($this->currentUser['e_mail'], [
                     'img_size'    => 270,
                     'default_img' => 'http://www.autowp.ru/_.gif'
                 ]) ?>
@@ -35,7 +35,7 @@
 
         <p>
             <?=$this->escapeHtml($this->translate('users/user/known-as:'))?>
-            <strong>«<?=$this->escapeHtml($this->currentUser->name) ?>»</strong>
+            <strong>«<?=$this->escapeHtml($this->currentUser['name']) ?>»</strong>
         </p>
         <?php foreach ($this->renames as $rename) { ?>
             <div style="color:#666666;margin-left:40px;cursor:help" title="<?=$this->escapeHtmlAttr($this->user()->humanTime($rename['date']))?>">
@@ -61,7 +61,7 @@
             <strong><?=$this->escapeHtml($this->user()->humanTime($this->currentUser->getDateTime('last_online')))?></strong>
         </p>
 
-        <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->currentUser->id))?></p>
+        <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->currentUser['id']))?></p>
 
         <?php if ($this->user()->logedIn()) { ?>
             <p>
@@ -69,7 +69,7 @@
                 <?=$this->htmlA([
                     'href'         => '#',
                     'data-trigger' => 'show-pm-dialog',
-                    'data-user-id' => $this->currentUser->id
+                    'data-user-id' => $this->currentUser['id']
                 ], $this->translate('users/user/send-personal-message'))?>
             </p>
         <?php } ?>
@@ -89,14 +89,14 @@
 
         <h2><?=$this->escapeHtml($this->translate('users/user/recent-activity'))?></h2>
         <div class="well">
-            <?php if ($this->currentUser->pictures_added > 0) { ?>
-                <p><?=$this->escapeHtml($this->translate('users/user/upload-pictures:'))?> <strong><?=$this->currentUser->pictures_added ?></strong></p>
-                <?php if ($this->picturesExists < $this->currentUser->pictures_added) { ?>
+            <?php if ($this->currentUser['pictures_added']> 0) { ?>
+                <p><?=$this->escapeHtml($this->translate('users/user/upload-pictures:'))?> <strong><?=$this->currentUser['pictures_added']?></strong></p>
+                <?php if ($this->picturesExists < $this->currentUser['pictures_added']) { ?>
                     <p><?=$this->escapeHtml($this->translate('users/user/pictures-left-on-site:'))?> <strong><?=$this->picturesExists?></strong></p>
                 <?php } ?>
 
                 <p><a href="<?=$this->escapeHtmlAttr($this->url('users/user/pictures', [
-                    'user_id'  => $this->currentUser->identity ? $this->currentUser->identity : 'user' . $this->currentUser->id,
+                    'user_id'  => $this->currentUser['identity'] ? $this->currentUser['identity'] : 'user' . $this->currentUser['id'],
                 ])) ?>"><?=$this->escapeHtml($this->translate('users/user/uploaded-pictures'))?></a></p>
             <?php } else { ?>
                 <p><?=$this->escapeHtml($this->translate('users/user/not-upload-pictures'))?></p>
@@ -104,7 +104,7 @@
 
 
             <?php if ($this->user()->inheritsRole('moder')) { ?>
-                <p><?=$this->htmlA('/ng/log?user_id='.$this->currentUser->id, $this->translate('users/user/log')) ?></p>
+                <p><?=$this->htmlA('/ng/log?user_id='.$this->currentUser['id'], $this->translate('users/user/log')) ?></p>
             <?php } ?>
         </div>
 
@@ -160,9 +160,9 @@
         <?php if ($this->canViewIp) { ?>
             <h2><?=$this->escapeHtml($this->translate('users/for-moderators'))?></h2>
             <div class="well">
-                <?php if ($this->canRemovePhoto && $this->currentUser->img) { ?>
+                <?php if ($this->canRemovePhoto && $this->currentUser['img']) { ?>
                     <div>
-                        <button class="btn btn-warning btn-block btn-delete-photo" data-id="<?=$this->currentUser->id?>">
+                        <button class="btn btn-warning btn-block btn-delete-photo" data-id="<?=$this->currentUser['id']?>">
                             <?=$this->escapeHtml($this->translate('users/for-moderators/remove-photo'))?>
                         </button>
                     </div>
@@ -170,7 +170,7 @@
 
                 <?php if ($this->canDeleteUser) { ?>
                     <div>
-                        <button class="btn btn-danger btn-block btn-delete-user" data-id="<?=$this->currentUser->id?>">
+                        <button class="btn btn-danger btn-block btn-delete-user" data-id="<?=$this->currentUser['id']?>">
                             <?=$this->escapeHtml($this->translate('users/for-moderators/remove-user'))?>
                         </button>
                     </div>
@@ -178,7 +178,7 @@
 
                 <p>
                     <?=$this->escapeHtml($this->translate('users/for-moderators/last-visit-from-ip'))?>
-                    <?=inet_ntop($this->currentUser->last_ip) ?>
+                    <?=inet_ntop($this->currentUser['last_ip']) ?>
                 </p>
 
                 <?php if ($this->ban) { ?>
@@ -198,7 +198,7 @@
 
                     <?php if ($this->canBan) { ?>
                         <form action="<?=$this->escapeHtmlAttr($this->url('ban/unban-user', [
-                            'user_id' => $this->currentUser->id
+                            'user_id' => $this->currentUser['id']
                         ])) ?>" method="post" style="margin:10px 0">
                             <input type="submit" class="btn btn-success" value="<?=$this->escapeHtmlAttr($this->translate('ban/unban'))?>" />
                         </form>
@@ -207,7 +207,7 @@
 
                 <?php if ($this->canBan) { ?>
                     <form action="<?=$this->escapeHtmlAttr($this->url('ban/ban-user', [
-                        'user_id' => $this->currentUser->id
+                        'user_id' => $this->currentUser['id']
                     ])) ?>" method="post" class="form-horizontal">
                         <fieldset>
                             <legend><?=$this->escapeHtml($this->translate('ban/ban'))?></legend>

@@ -9,8 +9,6 @@ use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
-use Application\Model\DbTable;
-
 use Zend_Db_Expr;
 use Zend_Db_Table;
 
@@ -26,7 +24,7 @@ class ItemParent
         TYPE_DESIGN = 3;
 
     /**
-     * @var DbTable\Item
+     * @var TableGateway
      */
     private $itemTable;
 
@@ -94,6 +92,7 @@ class ItemParent
         array $languages,
         TableGateway $specTable,
         TableGateway $itemParentTable,
+        TableGateway $itemTable,
         \Zend_Db_Adapter_Abstract $zf1db,
         ItemAlias $itemAlias,
         Item $itemModel
@@ -102,9 +101,7 @@ class ItemParent
         $this->specTable = $specTable;
         $this->itemModel = $itemModel;
 
-        $this->itemTable = new DbTable\Item([
-            'db' => $zf1db
-        ]);
+        $this->itemTable = $itemTable;
         $this->itemParentTable = $itemParentTable;
         $this->itemParentLanguageTable = new Zend_Db_Table([
             'db'      => $zf1db,
@@ -124,9 +121,9 @@ class ItemParent
         $parentId = (int)$parentId;
         $itemId = (int)$itemId;
 
-        $brandRow = $this->itemTable->fetchRow([
-            'id = ?' => (int)$parentId
-        ]);
+        $brandRow = $this->itemTable->select([
+            'id' => (int)$parentId
+        ])->current();
         if (! $brandRow) {
             return false;
         }
@@ -168,13 +165,13 @@ class ItemParent
         return $begin . '–xx';
     }
 
-    private function extractName(\Autowp\Commons\Db\Table\Row $parentRow, \Autowp\Commons\Db\Table\Row $vehicleRow, $language)
+    private function extractName($parentRow, $vehicleRow, $language)
     {
-        $langName = $this->itemModel->getName($vehicleRow->id, $language);
+        $langName = $this->itemModel->getName($vehicleRow['id'], $language);
 
-        $vehicleName = $langName ? $langName : $vehicleRow->name;
+        $vehicleName = $langName ? $langName : $vehicleRow['name'];
 
-        $aliases = $this->itemAlias->getAliases($parentRow['id'], $parentRow['name']);
+        $aliases = $this->itemAlias->getAliases($parentRow['id']);
 
         $name = $vehicleName;
         foreach ($aliases as $alias) {
@@ -191,34 +188,34 @@ class ItemParent
         $name = trim(preg_replace("|[[:space:]]+|", ' ', $name));
         $name = ltrim($name, '/');
         if (! $name) {
-            if ($vehicleRow->body && ($vehicleRow->body != $parentRow->body)) {
-                $name = $vehicleRow->body;
+            if ($vehicleRow['body'] && ($vehicleRow['body'] != $parentRow['body'])) {
+                $name = $vehicleRow['body'];
             }
         }
 
-        if (! $name && $vehicleRow->begin_model_year) {
-            $modelYearsDifferent = $vehicleRow->begin_model_year != $parentRow->begin_model_year
-                                || $vehicleRow->end_model_year != $parentRow->end_model_year;
+        if (! $name && $vehicleRow['begin_model_year']) {
+            $modelYearsDifferent = $vehicleRow['begin_model_year'] != $parentRow['begin_model_year']
+                || $vehicleRow['end_model_year'] != $parentRow['end_model_year'];
             if ($modelYearsDifferent) {
-                $name = $this->getYearsPrefix($vehicleRow->begin_model_year, $vehicleRow->end_model_year);
+                $name = $this->getYearsPrefix($vehicleRow['begin_model_year'], $vehicleRow['end_model_year']);
             }
         }
 
-        if (! $name && $vehicleRow->begin_year) {
-            $yearsDifferent = $vehicleRow->begin_year != $parentRow->begin_year
-                           || $vehicleRow->end_year != $parentRow->end_year;
+        if (! $name && $vehicleRow['begin_year']) {
+            $yearsDifferent = $vehicleRow['begin_year'] != $parentRow['begin_year']
+                || $vehicleRow['end_year'] != $parentRow['end_year'];
             if ($yearsDifferent) {
-                $name = $this->getYearsPrefix($vehicleRow->begin_year, $vehicleRow->end_year);
+                $name = $this->getYearsPrefix($vehicleRow['begin_year'], $vehicleRow['end_year']);
             }
         }
 
-        if (! $name && $vehicleRow->spec_id) {
-            $specsDifferent = $vehicleRow->spec_id != $parentRow->spec_id;
+        if (! $name && $vehicleRow['spec_id']) {
+            $specsDifferent = $vehicleRow['spec_id'] != $parentRow['spec_id'];
             if ($specsDifferent) {
-                $specRow = $this->specTable->select(['id' => (int)$vehicleRow->spec_id])->current();
+                $specRow = $this->specTable->select(['id' => (int)$vehicleRow['spec_id']])->current();
 
                 if ($specRow) {
-                    $name = $specRow->short_name;
+                    $name = $specRow['short_name'];
                 }
             }
         }
@@ -247,7 +244,7 @@ class ItemParent
         ])->current();
     }
 
-    private function extractCatname(\Autowp\Commons\Db\Table\Row $brandRow, \Autowp\Commons\Db\Table\Row $vehicleRow)
+    private function extractCatname($brandRow, $vehicleRow)
     {
         $diffName = $this->getNamePreferLanguage($brandRow['id'], $vehicleRow['id'], 'en');
         if (! $diffName) {
@@ -276,22 +273,22 @@ class ItemParent
 
     public function create(int $parentId, int $itemId, array $options = [])
     {
-        $parentRow = $this->itemTable->find($parentId)->current();
-        $itemRow = $this->itemTable->find($itemId)->current();
+        $parentRow = $this->itemTable->select(['id' => $parentId])->current();
+        $itemRow = $this->itemTable->select(['id' => $itemId])->current();
         if (! $parentRow || ! $itemRow) {
             return false;
         }
 
-        if (! $parentRow->is_group) {
+        if (! $parentRow['is_group']) {
             throw new Exception("Only groups can have childs");
         }
 
-        if (! $this->isAllowedCombination($itemRow->item_type_id, $parentRow->item_type_id)) {
+        if (! $this->isAllowedCombination($itemRow['item_type_id'], $parentRow['item_type_id'])) {
             throw new Exception("That type of parent is not allowed for this type");
         }
 
-        $itemId = (int)$itemRow->id;
-        $parentId = (int)$parentRow->id;
+        $itemId = (int)$itemRow['id'];
+        $parentId = (int)$parentRow['id'];
 
         if (isset($options['catname'])) {
             $allowed = $this->isAllowedCatname($itemId, $parentId, $options['catname']);
@@ -363,32 +360,32 @@ class ItemParent
 
     public function move(int $itemId, int $fromParentId, int $toParentId)
     {
-        $oldParentRow = $this->itemTable->find($fromParentId)->current();
-        $newParentRow = $this->itemTable->find($toParentId)->current();
-        $itemRow = $this->itemTable->find($itemId)->current();
+        $oldParentRow = $this->select(['id' => $fromParentId])->current();
+        $newParentRow = $this->itemTable->select(['id' => $toParentId])->current();
+        $itemRow = $this->itemTable->select(['id' => $itemId])->current();
         if (! $oldParentRow || ! $newParentRow || ! $itemRow) {
             return false;
         }
 
-        if ($oldParentRow->id == $newParentRow->id) {
+        if ($oldParentRow['id'] == $newParentRow['id']) {
             return false;
         }
 
-        if (! $oldParentRow->is_group) {
+        if (! $oldParentRow['is_group']) {
             throw new Exception("Only groups can have childs");
         }
 
-        if (! $newParentRow->is_group) {
+        if (! $newParentRow['is_group']) {
             throw new Exception("Only groups can have childs");
         }
 
-        if (! $this->isAllowedCombination($itemRow->item_type_id, $newParentRow->item_type_id)) {
+        if (! $this->isAllowedCombination($itemRow['item_type_id'], $newParentRow['item_type_id'])) {
             throw new Exception("That type of parent is not allowed for this type");
         }
 
-        $itemId = (int)$itemRow->id;
+        $itemId = (int)$itemRow['id'];
 
-        $parentIds = $this->collectAncestorsIds($newParentRow->id);
+        $parentIds = $this->collectAncestorsIds($newParentRow['id']);
         if (in_array($itemId, $parentIds)) {
             throw new Exception('Cycle detected');
         }
@@ -429,14 +426,14 @@ class ItemParent
 
     public function remove(int $parentId, int $itemId)
     {
-        $parentRow = $this->itemTable->find($parentId)->current();
-        $itemRow = $this->itemTable->find($itemId)->current();
+        $parentRow = $this->itemTable->select(['id' => $parentId])->current();
+        $itemRow = $this->itemTable->select(['id' => $itemId])->current();
         if (! $parentRow || ! $itemRow) {
             return false;
         }
 
-        $itemId = (int)$itemRow->id;
-        $parentId = (int)$parentRow->id;
+        $itemId = (int)$itemRow['id'];
+        $parentId = (int)$parentRow['id'];
 
         $this->itemParentTable->delete([
             'item_id = ?'   => $itemId,
@@ -474,15 +471,15 @@ class ItemParent
         if ($forceIsAuto) {
             $isAuto = true;
         } else {
-            $isAuto = $bvlRow->is_auto;
-            if ($bvlRow->name != $newName) {
+            $isAuto = $bvlRow['is_auto'];
+            if ($bvlRow['name'] != $newName) {
                 $isAuto = false;
             }
         }
 
         if (! $values['name']) {
-            $parentRow = $this->itemTable->find($parentId)->current();
-            $itemRow = $this->itemTable->find($itemId)->current();
+            $parentRow = $this->itemTable->select(['id' => $parentId])->current();
+            $itemRow = $this->itemTable->select(['id' => $itemId])->current();
             $values['name'] = $this->extractName($parentRow, $itemRow, $language);
             $isAuto = true;
         }
@@ -542,8 +539,8 @@ class ItemParent
             }
 
             if (! $newCatname || $newCatname == '_' || in_array($newCatname, $this->catnameBlacklist)) {
-                $parentRow = $this->itemTable->find($parentId)->current();
-                $itemRow = $this->itemTable->find($itemId)->current();
+                $parentRow = $this->itemTable->select(['id' => $parentId])->current();
+                $itemRow = $this->itemTable->select(['id' => $itemId])->current();
                 $newCatname = $this->extractCatname($parentRow, $itemRow);
                 $isAuto = true;
             }
@@ -573,8 +570,8 @@ class ItemParent
 
         $values = [];
         foreach ($bvlRows as $bvlRow) {
-            $values[$bvlRow->language] = [
-                'name' => $bvlRow->is_auto ? null : $bvlRow->name
+            $values[$bvlRow['language']] = [
+                'name' => $bvlRow['is_auto'] ? null : $bvlRow['name']
             ];
         }
 
@@ -589,10 +586,8 @@ class ItemParent
             return false;
         }
         if (! $bvRow['manual_catname']) {
-            $brandRow = $this->itemTable->fetchRow([
-                'id = ?' => (int)$parentId
-            ]);
-            $vehicleRow = $this->itemTable->find($itemId)->current();
+            $brandRow = $this->itemTable->select(['id' => (int)$parentId])->current();
+            $vehicleRow = $this->itemTable->select(['id' => $itemId])->current();
 
             $catname = $this->extractCatname($brandRow, $vehicleRow);
             if (! $catname) {
@@ -626,7 +621,7 @@ class ItemParent
         ], ['parent_id', 'item_id']);
 
         foreach ($itemParentRows as $itemParentRow) {
-            $this->refreshAuto($itemParentRow->parent_id, $itemParentRow->item_id);
+            $this->refreshAuto($itemParentRow['parent_id'], $itemParentRow['item_id']);
         }
 
         return true;
@@ -697,7 +692,7 @@ class ItemParent
             return null;
         }
 
-        return $bvlRow->name;
+        return $bvlRow['name'];
     }
 
     public function getNamePreferLanguage(int $parentId, int $itemId, string $language): string
@@ -816,23 +811,23 @@ class ItemParent
                 $row->save();
             }
             $changes = false;
-            if ($row->diff != $info['diff']) {
-                $row->diff = $info['diff'];
+            if ($row['diff'] != $info['diff']) {
+                $row['diff'] = $info['diff'];
                 $changes = true;
             }
 
-            if ($row->tuning xor $info['tuning']) {
-                $row->tuning = $info['tuning'] ? 1 : 0;
+            if ($row['tuning'] xor $info['tuning']) {
+                $row['tuning'] = $info['tuning'] ? 1 : 0;
                 $changes = true;
             }
 
-            if ($row->sport xor $info['sport']) {
-                $row->sport = $info['sport'] ? 1 : 0;
+            if ($row['sport'] xor $info['sport']) {
+                $row['sport'] = $info['sport'] ? 1 : 0;
                 $changes = true;
             }
 
-            if ($row->design xor $info['design']) {
-                $row->design = $info['design'] ? 1 : 0;
+            if ($row['design'] xor $info['design']) {
+                $row['design'] = $info['design'] ? 1 : 0;
                 $changes = true;
             }
 
@@ -948,5 +943,21 @@ class ItemParent
     public function getTable()
     {
         return $this->itemParentTable;
+    }
+
+    public function getChildItemLinkTypesCount(int $itemId): array
+    {
+        $select = new Sql\Select($this->itemParentTable->getTable());
+
+        $select->columns(['type', 'count' => new Sql\Expression('count(1)')])
+            ->where(['parent_id' => $itemId])
+            ->group('type');
+
+        $result = [];
+        foreach ($this->itemParentTable->selectWith($select) as $row) {
+            $typeId = (int)$row['type'];
+            $result[$typeId] = (int)$row['count'];
+        }
+        return $result;
     }
 }

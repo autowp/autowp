@@ -91,7 +91,7 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
         }
 
         $this->table->delete([
-            'user_id' => $this->user()->get()->id,
+            'user_id' => $this->user()->get()['id'],
             'id'      => (int)$this->params('id')
         ]);
 
@@ -118,7 +118,7 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
 
 
         $this->table->insert([
-            'user_id' => $user->id,
+            'user_id' => $user['id'],
             'reason'  => $data['name'],
             'vote'    => $data['vote']
         ]);

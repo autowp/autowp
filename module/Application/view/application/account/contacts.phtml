@@ -9,7 +9,7 @@
 
     $cols = 2;
     $rows = ceil(count($this->users) / $cols);
-    
+
     $this->layout()->moduleName = 'default/account/contacts';
 ?>
 
@@ -22,10 +22,10 @@
                         <?php foreach (array_slice($this->users, $i*$rows, $rows) as $user) { ?>
                             <li class="media">
                                 <div class="media-left media-middle">
-                                    <?php if (!$user->deleted) { ?>
+                                    <?php if (! $user['deleted']) { ?>
                                         <?=$this->htmlA([
                                             'href'  => $this->url('users/user', [
-                                                'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                                                'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
                                             ]),
                                             'class' => 'photo'
                                         ], $this->user($user)->avatar(), false) ?>
@@ -33,7 +33,7 @@
                                 </div>
                                 <div class="media-body">
                                     <a href="#" class="close" data-url="<?=$this->escapeHtmlAttr($this->url('api/contacts', [
-                                        'id' => $user->id
+                                        'id' => $user['id']
                                     ]))?>">&times;</a>
                                     <h4 class="media-heading"><?=$this->user($user)?></h4>
                                     <?php if ($lastOnline = $user->getDateTime('last_online')) { ?>

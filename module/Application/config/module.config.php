@@ -135,6 +135,7 @@ return [
             Language::class                      => Service\LanguageFactory::class,
             LanguagePicker::class                => Service\LanguagePickerFactory::class,
             MainMenu::class                      => Service\MainMenuFactory::class,
+            Model\Brand::class                   => Model\BrandFactory::class,
             Model\BrandNav::class                => Model\Service\BrandNavFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\Catalogue::class               => Model\Service\CatalogueFactory::class,
@@ -267,8 +268,12 @@ return [
     ],
 
     'validators' => [
+        'aliases' => [
+            'ItemCatnameNotExists' => Validator\Item\CatnameNotExists::class,
+        ],
         'factories' => [
             Validator\Brand\NameNotExists::class => InvokableFactory::class,
+            Validator\Item\CatnameNotExists::class => Validator\Item\CatnameNotExistsFactory::class,
             Validator\ItemParent\CatnameNotExists::class => Validator\ItemParent\CatnameNotExistsFactory::class,
             Validator\User\EmailExists::class    => InvokableFactory::class,
             Validator\User\EmailNotExists::class => InvokableFactory::class,

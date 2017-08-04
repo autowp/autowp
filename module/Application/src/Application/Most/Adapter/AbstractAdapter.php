@@ -4,11 +4,10 @@ namespace Application\Most\Adapter;
 
 use Exception;
 
+use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 use Application\Most;
-
-use Zend_Db_Table_Select;
 
 abstract class AbstractAdapter
 {
@@ -22,6 +21,11 @@ abstract class AbstractAdapter
      */
     protected $attributeTable;
 
+    /**
+     * @var TableGateway
+     */
+    protected $itemTable;
+
     public function __construct(array $options)
     {
         $this->setOptions($options);
@@ -31,6 +35,12 @@ abstract class AbstractAdapter
     {
         $this->attributeTable = $table;
     }
+
+    public function setItemTable(TableGateway $itemTable)
+    {
+        $this->itemTable = $itemTable;
+    }
+
 
     public function setMost(Most $most)
     {
@@ -55,5 +65,5 @@ abstract class AbstractAdapter
         return $this;
     }
 
-    abstract public function getCars(Zend_Db_Table_Select $select, $language);
+    abstract public function getCars(Sql\Select $select, $language);
 }

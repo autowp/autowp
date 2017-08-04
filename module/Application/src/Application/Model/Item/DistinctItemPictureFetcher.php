@@ -9,7 +9,7 @@ class DistinctItemPictureFetcher extends PictureFetcher
     const PERSPECTIVE_GROUP_ID = 31;
     const COUNT = 4;
 
-    public function fetch(array $item, array $options = [])
+    public function fetch($item, array $options = [])
     {
         $db = $this->pictureTable->getAdapter();
 

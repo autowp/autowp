@@ -28,8 +28,16 @@ class ItemNameFormatter
         return $this->translator->translate($string, 'default', $language);
     }
 
-    public function formatHtml(array $item, $language)
+    public function formatHtml($item, $language)
     {
+        if (! $item instanceof \ArrayAccess && ! is_array($item)) {
+            throw new \Exception("`item` must be array or ArrayAccess");
+        }
+
+        if ($item instanceof \ArrayAccess) {
+            $item = (array)$item;
+        }
+
         $defaults = [
             'begin_model_year' => null,
             'end_model_year'   => null,
@@ -128,8 +136,16 @@ class ItemNameFormatter
         return $result;
     }
 
-    public function format(array $item, $language)
+    public function format($item, $language)
     {
+        if (! $item instanceof \ArrayAccess && ! is_array($item)) {
+            throw new \Exception("`item` must be array or ArrayAccess");
+        }
+
+        if ($item instanceof \ArrayAccess) {
+            $item = (array)$item;
+        }
+
         $defaults = [
             'begin_model_year' => null,
             'end_model_year'   => null,

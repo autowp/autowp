@@ -71,7 +71,7 @@ class MeCommand extends Command
 
             $this->replyWithMessage([
                 'disable_web_page_preview' => true,
-                'text' => 'You identified as ' . $userRow->name
+                'text' => 'You identified as ' . $userRow['name']
             ]);
 
             return;
@@ -97,10 +97,10 @@ class MeCommand extends Command
                 $this->telegramChatTable->insert(array_replace($set, $primaryKey));
             }
 
-            $command = '/me ' . $userRow->id . ' ' . $token;
+            $command = '/me ' . $userRow['id'] . ' ' . $token;
             $message = "To complete identifications type `$command` to @autowp_bot";
 
-            $this->message->send(null, $userRow->id, $message);
+            $this->message->send(null, $userRow['id'], $message);
 
             $this->replyWithMessage([
                 'text' => 'Check your personal messages / system notifications'
@@ -111,7 +111,7 @@ class MeCommand extends Command
         $token = (string)$args[1];
 
         if (! $telegramChatRow || strcmp($telegramChatRow['token'], $token) != 0) {
-            $command = '/me ' . $userRow->id;
+            $command = '/me ' . $userRow['id'];
             $this->replyWithMessage([
                 'text' => "Token not matched. Try again with `$command`"
             ]);
@@ -119,12 +119,12 @@ class MeCommand extends Command
         }
 
         $this->telegramChatTable->update([
-            'user_id' => $userRow->id,
+            'user_id' => $userRow['id'],
             'token'   => null
         ], $primaryKey);
 
         $this->replyWithMessage([
-            'text' => "Complete. Nice to see you, `{$userRow->name}`"
+            'text' => "Complete. Nice to see you, `{$userRow['name']}`"
         ]);
     }
 }

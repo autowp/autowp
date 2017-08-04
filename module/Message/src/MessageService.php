@@ -377,18 +377,18 @@ class MessageService
 
             $isNew = $message['to_user_id'] == $userId && ! $message['readen'];
             $canDelete = $message['from_user_id'] == $userId || $message['to_user_id'] == $userId;
-            $authorIsMe = $author && ($author->id == $userId);
-            $canReply = $author && ! $author->deleted && ! $authorIsMe;
+            $authorIsMe = $author && ($author['id'] == $userId);
+            $canReply = $author && ! $author['deleted'] && ! $authorIsMe;
 
             $dialogCount = 0;
 
             if ($canReply) {
                 if ($options['allMessagesLink'] && $author && ! $authorIsMe) {
-                    if (isset($cache[$author->id])) {
-                        $dialogCount = $cache[$author->id];
+                    if (isset($cache[$author['id']])) {
+                        $dialogCount = $cache[$author['id']];
                     } else {
-                        $dialogCount = $this->getDialogCount($userId, $author->id);
-                        $cache[$author->id] = $dialogCount;
+                        $dialogCount = $this->getDialogCount($userId, $author['id']);
+                        $cache[$author['id']] = $dialogCount;
                     }
                 }
             }

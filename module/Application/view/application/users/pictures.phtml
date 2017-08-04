@@ -6,15 +6,15 @@
         ],
         'pageId' => 63,
         'args'   => [
-            'USER_NAME'     => $this->user->name,
-            'USER_IDENTITY' => $this->user->identity ? $this->user->identity : 'user' . $this->user->id,
+            'USER_NAME'     => $this->user['name'],
+            'USER_IDENTITY' => $this->user['identity'] ? $this->user['identity'] : 'user' . $this->user['id'],
         ]
     ]);
 
     $cols = 4;
     $count = count($this->brands);
     $rows = ceil($count / $cols);
-    
+
     $this->layout()->moduleName = 'default/users/user-brands';
 ?>
 

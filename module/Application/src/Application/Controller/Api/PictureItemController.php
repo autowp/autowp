@@ -10,6 +10,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\DbTable;
+use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
@@ -41,18 +42,25 @@ class PictureItemController extends AbstractRestfulController
      */
     private $pictureTable;
 
+    /**
+     * @var Item
+     */
+    private $item;
+
     public function __construct(
         PictureItem $pictureItem,
         Log $log,
         RestHydrator $hydrator,
         InputFilter $itemInputFilter,
-        DbTable\Picture $pictureTable
+        DbTable\Picture $pictureTable,
+        Item $item
     ) {
         $this->pictureItem = $pictureItem;
         $this->log = $log;
         $this->hydrator = $hydrator;
         $this->itemInputFilter = $itemInputFilter;
         $this->pictureTable = $pictureTable;
+        $this->item = $item;
     }
 
     private function canChangePerspective($picture)
@@ -66,8 +74,8 @@ class PictureItemController extends AbstractRestfulController
             return false;
         }
 
-        if ($picture->owner_id == $currentUser->id) {
-            if ($picture->status == Picture::STATUS_INBOX) {
+        if ($picture['owner_id'] == $currentUser['id']) {
+            if ($picture['status'] == Picture::STATUS_INBOX) {
                 return true;
             }
         }
@@ -86,8 +94,7 @@ class PictureItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $itemTable = new DbTable\Item();
-        $item = $itemTable->find($this->params('item_id'))->current();
+        $item = $this->item->getRow(['id' => (int)$this->params('item_id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -125,23 +132,25 @@ class PictureItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $itemTable = new DbTable\Item();
-        $item = $itemTable->find($this->params('item_id'))->current();
+        $item = $this->item->getRow(['id' => (int)$this->params('item_id')]);
         if (! $item) {
             return $this->notFoundAction();
         }
 
-        if ($this->pictureItem->isExists($picture->id, $item->id)) {
-            $this->pictureItem->remove($picture->id, $item->id);
+        if ($this->pictureItem->isExists($picture['id'], $item['id'])) {
+            $this->pictureItem->remove($picture['id'], $item['id']);
 
             $this->log(sprintf(
                 'Картинка %s отвязана от %s',
-                htmlspecialchars('#' . $picture->id),
-                htmlspecialchars('#' . $item->id)
-            ), [$item, $picture]);
+                htmlspecialchars('#' . $picture['id']),
+                htmlspecialchars('#' . $item['id'])
+            ), [
+                'items'    => $item['id'],
+                'pictures' => $picture['id']
+            ]);
 
-            if ($picture->image_id) {
-                $this->imageStorage()->changeImageName($picture->image_id, [
+            if ($picture['image_id']) {
+                $this->imageStorage()->changeImageName($picture['image_id'], [
                     'pattern' => $this->pictureTable->getFileNamePattern($picture)
                 ]);
             }
@@ -157,7 +166,7 @@ class PictureItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $userId = $this->user()->get()->id;
+        $userId = $this->user()->get()['id'];
 
         $pictureId = (int)$this->params('picture_id');
         $itemId    = (int)$this->params('item_id');
@@ -167,8 +176,7 @@ class PictureItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $itemTable = new DbTable\Item();
-        $item = $itemTable->find($itemId)->current();
+        $item = $this->item->getRow(['id' => $itemId]);
         if (! $item) {
             return $this->notFoundAction();
         }
@@ -188,9 +196,12 @@ class PictureItemController extends AbstractRestfulController
 
         $this->log->addEvent($userId, sprintf(
             'Картинка %s связана с %s',
-            htmlspecialchars('#' . $picture->id),
-            htmlspecialchars('#' . $item->id)
-        ), [$item, $picture]);
+            htmlspecialchars('#' . $picture['id']),
+            htmlspecialchars('#' . $item['id'])
+        ), [
+            'items'    => $item['id'],
+            'pictures' => $picture['id']
+        ]);
 
         $url = $this->url()->fromRoute('api/picture-item/create', [
             'picture_id' => $picture['id'],
@@ -220,14 +231,16 @@ class PictureItemController extends AbstractRestfulController
         if (isset($data['perspective_id'])) {
             $perspectiveId = (int)$data['perspective_id'];
 
-            $this->pictureItem->setProperties($picture->id, $itemId, [
+            $this->pictureItem->setProperties($picture['id'], $itemId, [
                 'perspective' => $perspectiveId ? $perspectiveId : null
             ]);
 
             $this->log(sprintf(
                 'Установка ракурса картинки %s',
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
-            ), [$picture]);
+            ), [
+                'pictures' => $picture['id']
+            ]);
         }
 
         if (isset($data['area'])) {
@@ -235,9 +248,7 @@ class PictureItemController extends AbstractRestfulController
                 return $this->forbiddenAction();
             }
 
-            $itemTable = new DbTable\Item();
-
-            $item = $itemTable->find($itemId)->current();
+            $item = $this->item->getRow(['id' => $itemId]);
             if (! $item) {
                 return $this->notFoundAction();
             }
@@ -248,16 +259,16 @@ class PictureItemController extends AbstractRestfulController
             $height = round($data['area']['height']);
 
             $left = max(0, $left);
-            $left = min($picture->width, $left);
+            $left = min($picture['width'], $left);
             $width = max(1, $width);
-            $width = min($picture->width, $width);
+            $width = min($picture['width'], $width);
 
             $top = max(0, $top);
-            $top = min($picture->height, $top);
+            $top = min($picture['height'], $top);
             $height = max(1, $height);
-            $height = min($picture->height, $height);
+            $height = min($picture['height'], $height);
 
-            if ($left > 0 || $top > 0 || $width < $picture->width || $height < $picture->height) {
+            if ($left > 0 || $top > 0 || $width < $picture['width'] || $height < $picture['height']) {
                 $area = [
                     'left'   => $left,
                     'top'    => $top,
@@ -272,14 +283,17 @@ class PictureItemController extends AbstractRestfulController
                     'height' => null
                 ];
             }
-            $this->pictureItem->setProperties($picture->id, $item->id, [
+            $this->pictureItem->setProperties($picture['id'], $item['id'], [
                 'area' => $area
             ]);
 
             $this->log(sprintf(
                 'Выделение области на картинке %s',
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
-            ), [$picture, $item]);
+            ), [
+                'pictures' => $picture['id'],
+                'items'    => $item['id']
+            ]);
         }
 
         if (isset($data['item_id'])) {
@@ -288,30 +302,31 @@ class PictureItemController extends AbstractRestfulController
                 return $this->forbiddenAction();
             }
 
-            $itemTable = new DbTable\Item();
-
-            $srcItem = $itemTable->find($itemId)->current();
+            $srcItem = $this->item->getRow(['id' => $itemId]);
             if (! $srcItem) {
                 return $this->notFoundAction();
             }
-            $dstItem = $itemTable->find((int)$data['item_id'])->current();
+            $dstItem = $this->item->getRow(['id' => (int)$data['item_id']]);
             if (! $dstItem) {
                 return $this->notFoundAction();
             }
 
-            $this->pictureItem->changePictureItem($picture->id, $srcItem->id, $dstItem->id);
+            $this->pictureItem->changePictureItem($picture['id'], $srcItem['id'], $dstItem['id']);
 
-            $userId = $this->user()->get()->id;
+            $userId = $this->user()->get()['id'];
 
             $this->log->addEvent($userId, sprintf(
                 'Картинка %s перемещена из %s в %s',
-                htmlspecialchars('#' . $picture->id),
-                htmlspecialchars('#' . $srcItem->id),
-                htmlspecialchars('#' . $dstItem->id)
-            ), [$srcItem, $dstItem, $picture]);
+                htmlspecialchars('#' . $picture['id']),
+                htmlspecialchars('#' . $srcItem['id']),
+                htmlspecialchars('#' . $dstItem['id'])
+            ), [
+                'items'    => [$srcItem['id'], $dstItem['id']],
+                'pictures' => $picture
+            ]);
 
             $namespace = new \Zend\Session\Container('Moder_Car');
-            $namespace->lastCarId = $dstItem->id;
+            $namespace->lastCarId = $dstItem['id'];
         }
 
         return $this->getResponse()->setStatusCode(200);
