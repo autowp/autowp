@@ -192,7 +192,7 @@ class CarsController extends AbstractActionController
         $engineInherited = $car['engine_inherit'];
         $engineInheritedFrom = [];
         if ($car['engine_item_id']) {
-            $engine = $this->itemModel->getRow(['id' => $car['engine_item_id']]);
+            $engine = $this->itemModel->getRow(['id' => (int)$car['engine_item_id']]);
             if ($engine && $car['engine_inherit']) {
                 $carRows = $this->itemModel->getRows([
                     'descendant' => $car['id'],

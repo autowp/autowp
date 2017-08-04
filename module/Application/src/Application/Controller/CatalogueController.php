@@ -961,7 +961,7 @@ class CatalogueController extends AbstractActionController
             $modification = null;
             $modId = (int)$this->params('mod');
             if ($modId) {
-                $modification = $this->modificationTable->select(['id' => $modId])->current();
+                $modification = $this->modificationTable->select(['id' => (int)$modId])->current();
                 if (! $modification) {
                     return $this->notFoundAction();
                 }
@@ -969,7 +969,7 @@ class CatalogueController extends AbstractActionController
 
             $modgroupId = (int)$this->params('modgroup');
             if ($modgroupId) {
-                $modgroup = $this->modificationGroupTable->select(['id' => $modgroupId])->current();
+                $modgroup = $this->modificationGroupTable->select(['id' => (int)$modgroupId])->current();
                 if (! $modgroup) {
                     return $this->notFoundAction();
                 }
@@ -1013,7 +1013,7 @@ class CatalogueController extends AbstractActionController
 
             $currentCarId = $currentCar['id'];
 
-            $listCars = $this->itemModel->getRows(['id' => $currentCarId]);
+            $listCars = $this->itemModel->getRows(['id' => (int)$currentCarId]);
 
             $currentPictures = [];
             $currentPicturesCount = 0;
@@ -1660,7 +1660,7 @@ class CatalogueController extends AbstractActionController
             $modification = null;
             $modId = (int)$this->params('mod');
             if ($modId) {
-                $modification = $this->modificationTable->select(['id' => $modId])->current();
+                $modification = $this->modificationTable->select(['id' => (int)$modId])->current();
                 if (! $modification) {
                     return $this->notFoundAction();
                 }

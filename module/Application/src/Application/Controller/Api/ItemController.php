@@ -1369,8 +1369,8 @@ class ItemController extends AbstractRestfulController
                     $old = $oldData[$field];
                     $new = $newData[$field];
                     if ($old !== $new) {
-                        $old = $this->specTable->select(['id' => $old])->current();
-                        $new = $this->specTable->select(['id' => $new])->current();
+                        $old = $this->specTable->select(['id' => (int)$old])->current();
+                        $new = $this->specTable->select(['id' => (int)$new])->current();
                         $changes[] = sprintf(
                             $message,
                             $old ? $old['short_name'] : '-',

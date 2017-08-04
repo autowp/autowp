@@ -247,7 +247,7 @@ class NewController extends AbstractActionController
 
     public function itemAction()
     {
-        $item = $this->itemModel->getRow(['id' => $this->params('item_id')]);
+        $item = $this->itemModel->getRow(['id' => (int)$this->params('item_id')]);
         if (! $item) {
             return $this->notFoundAction();
         }

@@ -84,7 +84,7 @@ class ArticlesController extends AbstractActionController
         }
 
         $htmlRow = $this->htmlTable->select([
-            'id' => $article['html_id']
+            'id' => (int)$article['html_id']
         ])->current();
 
         return [
