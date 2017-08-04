@@ -135,8 +135,8 @@ return [
                             'label' => 'moder/picture/acceptance/reason',
                         ],
                         'attributes' => [
-                            'size'      => 60,
-                            'maxlength' => 255,
+                            'size'      => Model\PictureModerVote::MAX_LENGTH,
+                            'maxlength' => Model\PictureModerVote::MAX_LENGTH,
                             'class'     => 'form-control',
                         ]
                     ]

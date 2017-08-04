@@ -1324,7 +1324,7 @@ return [
                         'name' => 'StringLength',
                         'options' => [
                             'min' => 1,
-                            'max' => 50
+                            'max' => Model\PictureModerVote::MAX_LENGTH
                         ]
                     ]
                 ]
