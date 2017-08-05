@@ -474,7 +474,12 @@ class UploadController extends AbstractActionController
         $rows = $this->item->getRows([
             'language' => $this->language(),
             'columns'  => ['id', 'name', 'is_group'],
-            'parent'   => $car['id'],
+            'parent'   => [
+                'id'   => $car['id'],
+                'columns' => [
+                    'type' => 'link_type'
+                ]
+            ],
             'order'    => ['ip1.type', 'name', 'item.begin_year', 'item.end_year']
         ]);
 

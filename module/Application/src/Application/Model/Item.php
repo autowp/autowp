@@ -840,6 +840,13 @@ class Item
                         $result[$key] = $nameSelect;
                     }
                     break;
+                case 'link_type':
+                    if (is_numeric($key)) {
+                        $result['link_type'] = 'type';
+                    } else {
+                        $result[$key] = 'type';
+                    }
+                    break;
             }
         }
 
