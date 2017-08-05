@@ -1884,7 +1884,7 @@ class CatalogueController extends AbstractActionController
     private function mostsActive(int $brandId)
     {
         $carsCount = $this->itemModel->getCount([
-            'parent' => $brandId
+            'ancestor' => $brandId
         ]);
 
         return $carsCount >= $this->mostsMinCarsCount;
