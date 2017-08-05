@@ -55,7 +55,7 @@ class Wheelsize extends AbstractAdapter
                 'radius.attribute_id' => $radius['id'],
                 'radius.value > 0'
             ])
-            ->group('item.id')
+            ->group(['item.id', 'tyrewidth.value', 'tyreseries.value', 'radius.value'])
             ->order(new Sql\Expression('2*tyrewidth.value*tyreseries.value/100+radius.value*25.4 ' . $this->order));
 
         $cars = $this->itemTable->selectWith($select);

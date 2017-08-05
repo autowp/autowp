@@ -35,7 +35,7 @@ class Power extends AbstractAdapter
                 $valuesTableName.'.attribute_id' => $powerAttr['id'],
                 $valuesTableName.'.value > 0'
             ])
-            ->group('item.id')
+            ->group(['item.id', $valuesTableName.'.value'])
             ->order($valuesTableName.'.value ' . $this->order)
             ->limit($this->most->getCarsCount());
 

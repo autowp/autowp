@@ -41,7 +41,7 @@ class Attr extends AbstractAdapter
             ])
             ->join($tableName, 'item.id = '.$tableName.'.item_id', [])
             ->order($tableName.'.value ' . $this->order)
-            ->group(['item.id']);
+            ->group(['item.id', $tableName.'.value']);
 
         $result = [];
         foreach ($this->itemTable->selectWith($select) as $car) {
