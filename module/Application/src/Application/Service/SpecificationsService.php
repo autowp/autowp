@@ -1171,17 +1171,13 @@ class SpecificationsService
         ];
     }
 
-    public function getActualValue($attribute, int $itemId)
+    public function getActualValue(int $attribute, int $itemId)
     {
         if (! $itemId) {
             throw new Exception("Item_id not set");
         }
 
-        if ($attribute instanceof \Autowp\Commons\Db\Table\Row) {
-            $attribute = $this->getAttribute($attribute['id']);
-        } elseif (is_numeric($attribute)) {
-            $attribute = $this->getAttribute($attribute);
-        }
+        $attribute = $this->getAttribute($attribute);
 
         $valuesTable = $this->getValueDataTable($attribute['typeId']);
 
@@ -1254,7 +1250,7 @@ class SpecificationsService
     {
         $values = [];
         foreach ($attributes as $attribute) {
-            $value = $this->getActualValue($attribute, $itemId);
+            $value = $this->getActualValue($attribute['id'], $itemId);
             $valueText = $this->valueToText($attribute, $value, $language);
             $values[$attribute['id']] = $valueText;
 
@@ -2266,7 +2262,7 @@ class SpecificationsService
             throw new Exception("attribute not found");
         }
 
-        $value = $this->getActualValue($attribute, $itemId);
+        $value = $this->getActualValue($attribute['id'], $itemId);
 
         if ($attribute['isMultiple'] && is_array($value)) {
             $text = [];
