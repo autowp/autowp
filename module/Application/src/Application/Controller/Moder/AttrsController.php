@@ -641,7 +641,7 @@ class AttrsController extends AbstractActionController
         } else {
             $select->where(['attrs_attributes.parent_id IS NULL']);
         }
-        $next = $this->zoneAttributeTable->select($select)->current();
+        $next = $this->zoneAttributeTable->selectWith($select)->current();
 
         if ($next) {
             $nextPos = $next->position;
