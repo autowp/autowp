@@ -1174,7 +1174,7 @@ class SpecificationsService
     public function getActualValue(int $attribute, int $itemId)
     {
         if (! $itemId) {
-            throw new Exception("Item_id not set");
+            throw new Exception("item_id not set");
         }
 
         $attribute = $this->getAttribute($attribute);
@@ -1221,7 +1221,7 @@ class SpecificationsService
     public function deleteUserValue(int $attributeId, int $itemId, int $userId)
     {
         if (! $itemId) {
-            throw new Exception("Item_id not set");
+            throw new Exception("item_id not set");
         }
 
         $attribute = $this->getAttribute($attributeId);
@@ -2040,7 +2040,7 @@ class SpecificationsService
     private function getZoneUserValues(int $zoneId, int $itemId, int $userId): array
     {
         if (! $itemId) {
-            throw new Exception("Item_id not set");
+            throw new Exception("item_id not set");
         }
 
         $this->loadZone($zoneId);
@@ -2109,7 +2109,7 @@ class SpecificationsService
     private function getZoneUsersValues(int $zoneId, int $itemId)
     {
         if (! $itemId) {
-            throw new Exception("Item_id not set");
+            throw new Exception("item_id not set");
         }
 
         $this->loadZone($zoneId);
@@ -2173,7 +2173,7 @@ class SpecificationsService
     public function getUserValue(int $attributeId, int $itemId, int $userId)
     {
         if (! $itemId) {
-            throw new Exception("Item_id not set");
+            throw new Exception("item_id not set");
         }
 
         $attribute = $this->getAttribute($attributeId);
@@ -2210,7 +2210,7 @@ class SpecificationsService
     public function getUserValueText(int $attributeId, int $itemId, int $userId, string $language)
     {
         if (! $itemId) {
-            throw new Exception("Item_id not set");
+            throw new Exception("item_id not set");
         }
 
         $attribute = $this->getAttribute($attributeId);
@@ -2254,7 +2254,7 @@ class SpecificationsService
     public function getActualValueText(int $attributeId, int $itemId, string $language)
     {
         if (! $itemId) {
-            throw new Exception("Item_id not set");
+            throw new Exception("item_id not set");
         }
 
         $attribute = $this->getAttribute($attributeId);
@@ -2394,7 +2394,7 @@ class SpecificationsService
     private function getZoneActualValues(int $zoneId, int $itemId): array
     {
         if (! $itemId) {
-            throw new Exception("Item_id not set");
+            throw new Exception("item_id not set");
         }
 
         $this->loadZone($zoneId);
@@ -2675,7 +2675,7 @@ class SpecificationsService
                 'attribute_id' => $valueRow['attribute_id'],
                 'item_id'      => $valueRow['item_id'],
                 'user_id != ?' => $userId
-            ])->current();
+            ]);
 
             $values = [];
             foreach ($userValueRows as $userValueRow) {
