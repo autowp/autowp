@@ -525,12 +525,19 @@ class ItemController extends AbstractRestfulController
             $select->group('item.id');
         }
 
-        $paginator = new \Zend\Paginator\Paginator(
-            new \Zend\Paginator\Adapter\DbSelect(
-                $select,
-                $this->itemModel->getTable()->getAdapter()
-            )
-        );
+        try {
+            $paginator = new \Zend\Paginator\Paginator(
+                new \Zend\Paginator\Adapter\DbSelect(
+                    $select,
+                    $this->itemModel->getTable()->getAdapter()
+                )
+            );
+        } catch (\Exception $e) {
+            throw new Exception(
+                'SQL Error : ' .
+                $select->getSqlString($this->itemModel->getTable()->getAdapter()->getPlatform())
+            );
+        }
 
         $limit = $data['limit'] ? $data['limit'] : 1;
 
