@@ -913,6 +913,137 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertXpathQuery("//h1[contains(text(), '$name')]");
     }
 
+    /**
+     * @dataProvider userTokenProvider
+     */
+    public function testBrandItemRelatedAndSportSubitem(string $token)
+    {
+        $catname = 'brand-item-' . microtime(true);
+        $name = 'Vehicle';
+        $relatedName = 'Related vehicle';
+        $relatedCatname = 'related-vehicle';
+        $sportName = 'Sport vehicle';
+        $sportCatname = 'sport-vehicle';
+        $stockName = 'Stock vehicle';
+        $stockCatname = 'stock-vehicle';
+        $designName = 'Design vehicle';
+        $designCatname = 'design-vehicle';
+
+        $brand = $this->getRandomBrand();
+
+        $vehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => $name,
+            'is_group'     => true
+        ]);
+
+        $this->addItemParent($vehicleId, $brand['id'], [
+            'catname' => $catname
+        ]);
+
+        $stockVehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => $stockName
+        ]);
+
+        $this->addItemParent($stockVehicleId, $vehicleId, [
+            'catname' => $stockCatname,
+            'type_id' => 0
+        ]);
+
+        $relatedVehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => $relatedName
+        ]);
+
+        $this->addItemParent($relatedVehicleId, $vehicleId, [
+            'catname' => $relatedCatname,
+            'type_id' => 1
+        ]);
+
+        $sportVehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => $sportName
+        ]);
+
+        $this->addItemParent($sportVehicleId, $vehicleId, [
+            'catname' => $sportCatname,
+            'type_id' => 2
+        ]);
+
+        $designVehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => $designName
+        ]);
+
+        $this->addItemParent($designVehicleId, $vehicleId, [
+            'catname' => $designCatname,
+            'type_id' => 3
+        ]);
+
+        // test contains stock & design
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
+        $url = sprintf(
+            'https://www.autowp.ru/%s/%s',
+            $brand['catname'],
+            $catname
+        );
+        $this->dispatch($url, Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand-item');
+
+        $this->assertXpathQuery("//h3[contains(text(), '$stockName')]");
+        $this->assertNotXpathQuery("//h3[contains(text(), '$relatedName')]");
+        $this->assertNotXpathQuery("//h3[contains(text(), '$sportName')]");
+        $this->assertXpathQuery("//h3[contains(text(), '$designName')]");
+
+        // test contains related
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
+        $url = sprintf(
+            'https://www.autowp.ru/%s/%s/tuning',
+            $brand['catname'],
+            $catname
+        );
+        $this->dispatch($url, Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand-item');
+
+        $this->assertNotXpathQuery("//h3[contains(text(), '$stockName')]");
+        $this->assertXpathQuery("//h3[contains(text(), '$relatedName')]");
+        $this->assertNotXpathQuery("//h3[contains(text(), '$sportName')]");
+        $this->assertNotXpathQuery("//h3[contains(text(), '$designName')]");
+
+        // test contains sport
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
+        $url = sprintf(
+            'https://www.autowp.ru/%s/%s/sport',
+            $brand['catname'],
+            $catname
+        );
+        $this->dispatch($url, Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand-item');
+
+        $this->assertNotXpathQuery("//h3[contains(text(), '$relatedName')]");
+        $this->assertXpathQuery("//h3[contains(text(), '$sportName')]");
+        $this->assertNotXpathQuery("//h3[contains(text(), '$designName')]");
+    }
+
     public function userTokenProvider()
     {
         return [

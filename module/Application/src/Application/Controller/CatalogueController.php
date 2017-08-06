@@ -1429,7 +1429,7 @@ class CatalogueController extends AbstractActionController
                 $type = ItemParent::TYPE_SPORT;
                 break;
             default:
-                $type = ItemParent::TYPE_DEFAULT;
+                $type = [ItemParent::TYPE_DEFAULT, ItemParent::TYPE_DESIGN];
                 break;
         }
 

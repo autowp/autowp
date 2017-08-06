@@ -876,7 +876,7 @@ class Item
         }
 
         if (isset($options['link_type'])) {
-            $select->where([$alias . '.type' => $options['link_type']]);
+            $this->applyLinkTypeFilter($select, $alias, $options['link_type']);
         }
 
         return $this->applyFilters($select, array_replace(
@@ -917,7 +917,7 @@ class Item
         }
 
         if (isset($options['link_type'])) {
-            $select->where([$alias . '.type' => $options['link_type']]);
+            $this->applyLinkTypeFilter($select, $alias, $options['link_type']);
         }
 
         $group = $this->applyFilters($select, array_replace(
@@ -932,6 +932,19 @@ class Item
         }*/
 
         return $group;
+    }
+
+    private function applyLinkTypeFilter(Sql\Select $select, string $alias, $value)
+    {
+        $column = $alias . '.type';
+        if (is_array($value)) {
+            if (count($value) <= 0) {
+                throw new Exception("Empty link_type value");
+            }
+            $select->where([new Sql\Predicate\In($column, $value)]);
+        } else {
+            $select->where([$column=> $value]);
+        }
     }
 
     private function applyFilters(Sql\Select $select, array $options, $id, string $prefix): array
