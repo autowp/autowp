@@ -1214,9 +1214,11 @@ class ItemController extends AbstractRestfulController
             }
         }
 
-        $this->itemModel->getTable()->update($set, [
-            'id' => $item['id']
-        ]);
+        if ($set) {
+            $this->itemModel->getTable()->update($set, [
+                'id' => $item['id']
+            ]);
+        }
 
         if (isset($values['lat'], $values['lng'])) {
             $point = null;
