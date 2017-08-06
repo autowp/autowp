@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Application\Hydrator\Api;
 
 class ItemParentLanguageHydrator extends RestHydrator

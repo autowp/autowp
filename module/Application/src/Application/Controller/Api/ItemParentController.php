@@ -225,8 +225,8 @@ class ItemParentController extends AbstractRestfulController
         $data = $this->itemInputFilter->getValues();
 
         $row = $this->itemParent->getRow(
-            $this->params('parent_id'),
-            $this->params('item_id')
+            (int)$this->params('parent_id'),
+            (int)$this->params('item_id')
         );
         if (! $row) {
             return $this->notFoundAction();
