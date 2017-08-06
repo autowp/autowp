@@ -513,7 +513,7 @@ class BrandNav
         $selectedIds = [];
         if ($carId) {
             $selectedIds = $this->itemModel->getIds([
-                'descendant' => $carId
+                'ancestor_or_self' => $carId
             ]);
         }
 
