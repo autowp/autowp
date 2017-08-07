@@ -178,8 +178,9 @@ class ItemController extends AbstractRestfulController
             case 'childs_count':
                 $group = true;
                 $select
-                    ->columns(['childs_count' => new Sql\Expression('count(item_parent.item_id)')])
-                    ->join('item_parent', 'item_parent.parent_id = item.id', [])
+                    ->join('item_parent', 'item_parent.parent_id = item.id', [
+                        'childs_count' => new Sql\Expression('count(item_parent.item_id)')
+                    ])
                     ->order('childs_count desc');
                 break;
             case 'age':
@@ -543,6 +544,7 @@ class ItemController extends AbstractRestfulController
         } catch (Exception $e) {
             throw new Exception(
                 'SQL Error : ' .
+                print_r($this->params()->fromQuery(), true) . "\n" .
                 $select->getSqlString($this->itemModel->getTable()->getAdapter()->getPlatform())
             );
         }
