@@ -532,18 +532,18 @@ class ItemController extends AbstractRestfulController
                     $this->itemModel->getTable()->getAdapter()
                 )
             );
+
+            $limit = $data['limit'] ? $data['limit'] : 1;
+
+            $paginator
+                ->setItemCountPerPage($limit)
+                ->setCurrentPageNumber($data['page']);
         } catch (\Exception $e) {
             throw new Exception(
                 'SQL Error : ' .
                 $select->getSqlString($this->itemModel->getTable()->getAdapter()->getPlatform())
             );
         }
-
-        $limit = $data['limit'] ? $data['limit'] : 1;
-
-        $paginator
-            ->setItemCountPerPage($limit)
-            ->setCurrentPageNumber($data['page']);
 
         $this->hydrator->setOptions([
             'language' => $this->language(),

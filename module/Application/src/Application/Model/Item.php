@@ -943,7 +943,7 @@ class Item
             }
             $select->where([new Sql\Predicate\In($column, $value)]);
         } else {
-            $select->where([$column=> $value]);
+            $select->where([$column => $value]);
         }
     }
 
