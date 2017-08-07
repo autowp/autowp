@@ -2,6 +2,8 @@
 
 namespace Application\Controller\Api;
 
+use Exception;
+
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
@@ -538,7 +540,7 @@ class ItemController extends AbstractRestfulController
             $paginator
                 ->setItemCountPerPage($limit)
                 ->setCurrentPageNumber($data['page']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new Exception(
                 'SQL Error : ' .
                 $select->getSqlString($this->itemModel->getTable()->getAdapter()->getPlatform())
