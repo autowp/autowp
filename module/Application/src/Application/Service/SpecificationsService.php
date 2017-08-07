@@ -2717,7 +2717,7 @@ class SpecificationsService
             $cAttr = $attribute;
             do {
                 $attributeName[] = $this->translator->translate($cAttr['name']);
-                $cAttr = $this->getAttribute($cAttr['parentId']);
+                $cAttr = $this->getAttribute((int)$cAttr['parentId']);
             } while ($cAttr);
 
             $conflicts[] = [
