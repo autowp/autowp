@@ -947,6 +947,32 @@ class Item
         }
     }
 
+    private function applyIdFilter(Sql\Select $select, $value, string $id)
+    {
+        if (is_array($value)) {
+            $value = array_values($value);
+
+            if (count($value) == 1) {
+                $this->applyIdFilter($select, $value[0], $id);
+                return;
+            }
+
+            if (count($value) < 1) {
+                $this->applyIdFilter($select, 0, $id);
+                return;
+            }
+
+            $select->where([new Sql\Predicate\In($id, $value)]);
+            return;
+        }
+
+        if (! is_scalar($value)) {
+            throw new \Exception('`id` must be scalar or array of scalar');
+        }
+
+        $select->where([$id => $value]);
+    }
+
     private function applyFilters(Sql\Select $select, array $options, $id, string $prefix): array
     {
         $defaults = [
@@ -970,12 +996,7 @@ class Item
         $group = [];
 
         if ($options['id'] !== null) {
-            if (is_array($options['id'])) {
-                $ids = count($options['id']) ? $options['id'] : [0];
-                $select->where([new Sql\Predicate\In($id, $ids)]);
-            } else {
-                $select->where([$id => $options['id']]);
-            }
+            $this->applyIdFilter($select, $options['id'], $id);
         }
 
         if ($options['item_type_id']) {

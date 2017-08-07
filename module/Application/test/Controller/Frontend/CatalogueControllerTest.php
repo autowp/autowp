@@ -988,7 +988,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
             'https://www.autowp.ru/%s/%s',
             $brand['catname'],
             $catname
-            );
+        );
         $this->dispatch($url, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
