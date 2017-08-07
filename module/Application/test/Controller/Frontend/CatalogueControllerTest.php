@@ -981,6 +981,25 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
             'type_id' => 3
         ]);
 
+        // test parent page contains links to related and sport
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
+        $url = sprintf(
+            'https://www.autowp.ru/%s/%s',
+            $brand['catname'],
+            $catname
+            );
+        $this->dispatch($url, Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand-item');
+
+        $this->assertXpathQuery("//a[contains(text(), 'Related')]");
+        $this->assertXpathQuery("//a[contains(text(), 'Sport')]");
+
         // test contains stock & design
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
