@@ -161,11 +161,8 @@ class ItemController extends AbstractRestfulController
 
         if ($data['last_item']) {
             $namespace = new \Zend\Session\Container('Moder_Car');
-            if (isset($namespace->lastCarId)) {
-                $select->where(['item.id' => (int)$namespace->lastCarId]);
-            } else {
-                $select->where([new Sql\Predicate\Expression('0')]);
-            }
+            $itemId = isset($namespace->lastCarId) ? (int)$namespace->lastCarId : 0;
+            $select->where(['item.id' => $itemId]);
         }
 
         switch ($data['order']) {

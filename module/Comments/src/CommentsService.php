@@ -491,7 +491,7 @@ class CommentsService
 
     /**
      * @param int $id
-     * @return Zend_Db_Table_Row
+     * @return array|\ArrayObject
      */
     public function getMessageRow($id)
     {
