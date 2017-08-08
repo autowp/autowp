@@ -9,9 +9,6 @@ use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
-use Zend_Db_Expr;
-use Zend_Db_Table;
-
 class ItemParent
 {
     const MAX_CATNAME = 150;
@@ -34,7 +31,7 @@ class ItemParent
     private $itemParentTable;
 
     /**
-     * @var Zend_Db_Table
+     * @var TableGateway
      */
     private $itemParentLanguageTable;
 
@@ -74,7 +71,7 @@ class ItemParent
     private $specTable;
 
     /**
-     * @var Zend_Db_Table
+     * @var TableGateway
      */
     private $itemParentCacheTable;
 
@@ -93,7 +90,8 @@ class ItemParent
         TableGateway $specTable,
         TableGateway $itemParentTable,
         TableGateway $itemTable,
-        \Zend_Db_Adapter_Abstract $zf1db,
+        TableGateway $itemParentLanguageTable,
+        TableGateway $itemParentCacheTable,
         ItemAlias $itemAlias,
         Item $itemModel
     ) {
@@ -103,16 +101,8 @@ class ItemParent
 
         $this->itemTable = $itemTable;
         $this->itemParentTable = $itemParentTable;
-        $this->itemParentLanguageTable = new Zend_Db_Table([
-            'db'      => $zf1db,
-            'name'    => 'item_parent_language',
-            'primary' => ['item_id', 'parent_id', 'language']
-        ]);
-        $this->itemParentCacheTable = new Zend_Db_Table([
-            'db'      => $zf1db,
-            'name'    => 'item_parent_cache',
-            'primary' => ['item_id', 'parent_id']
-        ]);
+        $this->itemParentLanguageTable = $itemParentLanguageTable;
+        $this->itemParentCacheTable = $itemParentCacheTable;
         $this->itemAlias = $itemAlias;
     }
 
@@ -390,10 +380,12 @@ class ItemParent
             throw new Exception('Cycle detected');
         }
 
-        $itemParentRow = $this->itemParentTable->select([
+        $primaryKey = [
             'parent_id' => $fromParentId,
             'item_id'   => $itemId
-        ])->current();
+        ];
+
+        $itemParentRow = $this->itemParentTable->select($primaryKey)->current();
 
         if (! $itemParentRow) {
             return false;
@@ -401,21 +393,11 @@ class ItemParent
 
         $this->itemParentTable->update([
             'parent_id' => $toParentId
-        ], [
-            'parent_id = ?' => $fromParentId,
-            'item_id = ?'   => $itemId
-        ]);
+        ], $primaryKey);
 
-        $bvlRows = $this->itemParentLanguageTable->fetchAll([
-            'item_id = ?'   => $itemId,
-            'parent_id = ?' => $fromParentId
-        ]);
-        foreach ($bvlRows as $bvlRow) {
-            $bvlRow->setFromArray([
-                'parent_id' => $toParentId
-            ]);
-            $bvlRow->save();
-        }
+        $this->itemParentLanguageTable->update([
+            'parent_id' => $toParentId
+        ], $primaryKey);
 
         $this->rebuildCache($itemRow['id']);
 
@@ -440,39 +422,31 @@ class ItemParent
             'parent_id = ?' => $parentId
         ]);
 
-        $bvlRows = $this->itemParentLanguageTable->fetchAll([
+        $this->itemParentLanguageTable->delete([
             'item_id = ?'   => $itemId,
             'parent_id = ?' => $parentId
         ]);
-        foreach ($bvlRows as $bvlRow) {
-            $bvlRow->delete();
-        }
 
         $this->rebuildCache($itemRow['id']);
     }
 
     public function setItemParentLanguage(int $parentId, int $itemId, string $language, array $values, $forceIsAuto)
     {
-        $bvlRow = $this->itemParentLanguageTable->fetchRow([
-            'item_id = ?'   => $itemId,
-            'parent_id = ?' => $parentId,
-            'language = ?'  => $language
-        ]);
-        if (! $bvlRow) {
-            $bvlRow = $this->itemParentLanguageTable->createRow([
-                'item_id'   => $itemId,
-                'parent_id' => $parentId,
-                'language'  => $language
-            ]);
-        }
+        $primaryKey = [
+            'item_id'   => $itemId,
+            'parent_id' => $parentId,
+            'language'  => $language
+        ];
 
-        $newName = $values['name'];
+        $bvlRow = $this->itemParentLanguageTable->select($primaryKey)->current();
+
+        $set = [];
 
         if ($forceIsAuto) {
             $isAuto = true;
         } else {
-            $isAuto = $bvlRow['is_auto'];
-            if ($bvlRow['name'] != $newName) {
+            $isAuto = $bvlRow ? $bvlRow['is_auto'] : true;
+            if ($set['name'] != $values['name']) {
                 $isAuto = false;
             }
         }
@@ -484,11 +458,15 @@ class ItemParent
             $isAuto = true;
         }
 
-        $bvlRow->setFromArray([
-            'name'    => mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME),
-            'is_auto' => $isAuto ? 1 : 0
-        ]);
-        $bvlRow->save();
+        $set['name'] = mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME);
+        $set['is_auto'] = $isAuto ? 1 : 0;
+
+        if ($bvlRow) {
+            $this->itemParentLanguageTable->update($set, $primaryKey);
+            return;
+        }
+
+        $this->itemParentLanguageTable->insert(array_replace($set, $primaryKey));
     }
 
     private function setItemParentLanguages(int $parentId, int $itemId, array $values, $forceIsAuto)
@@ -563,9 +541,9 @@ class ItemParent
 
     public function refreshAuto(int $parentId, int $itemId)
     {
-        $bvlRows = $this->itemParentLanguageTable->fetchAll([
-            'item_id = ?'   => $itemId,
-            'parent_id = ?' => $parentId
+        $bvlRows = $this->itemParentLanguageTable->select([
+            'item_id'   => $itemId,
+            'parent_id' => $parentId
         ]);
 
         $values = [];
@@ -682,11 +660,11 @@ class ItemParent
 
     public function getName(int $parentId, int $itemId, string $language)
     {
-        $bvlRow = $this->itemParentLanguageTable->fetchRow([
-            'parent_id = ?' => $parentId,
-            'item_id = ?'   => $itemId,
-            'language = ?'  => $language
-        ]);
+        $bvlRow = $this->itemParentLanguageTable->select([
+            'parent_id' => $parentId,
+            'item_id'   => $itemId,
+            'language'  => $language
+        ])->current();
 
         if (! $bvlRow) {
             return null;
@@ -697,15 +675,16 @@ class ItemParent
 
     public function getNamePreferLanguage(int $parentId, int $itemId, string $language): string
     {
-        $db = $this->itemParentLanguageTable->getAdapter();
-        $langSortExpr = new Zend_Db_Expr(
-            $db->quoteInto('language = ? desc', $language)
-        );
-        $row = $this->itemParentLanguageTable->fetchRow([
-            'item_id = ?'   => $itemId,
-            'parent_id = ?' => $parentId,
-            'length(name) > 0'
-        ], $langSortExpr);
+        $select = new Sql\Select($this->itemParentLanguageTable->getTable());
+        $select->columns(['name'])
+            ->where([
+                'item_id = ?'   => $itemId,
+                'parent_id = ?' => $parentId,
+                'length(name) > 0'
+            ])
+            ->order(new Sql\Expression('language = ? desc', [$language]));
+
+        $row = $this->itemParentLanguageTable->selectWith($select)->current();
 
         return $row ? $row['name'] : '';
     }
@@ -794,46 +773,44 @@ class ItemParent
         $updates = 0;
 
         foreach ($parentInfo as $parentId => $info) {
-            $row = $this->itemParentCacheTable->fetchRow([
-                'item_id = ?'   => $itemId,
-                'parent_id = ?' => $parentId
-            ]);
-            if (! $row) {
-                $row = $this->itemParentCacheTable->createRow([
-                    'item_id'   => $itemId,
-                    'parent_id' => $parentId,
+            $primaryKey = [
+                'item_id'   => $itemId,
+                'parent_id' => $parentId
+            ];
+            $row = $this->itemParentCacheTable->select($primaryKey)->current();
+
+            if ($row) {
+                $set = [];
+                if ($row['diff'] != $info['diff']) {
+                    $set['diff'] = $info['diff'];
+                    $changes = true;
+                }
+
+                if ($row['tuning'] xor $info['tuning']) {
+                    $set['tuning'] = $info['tuning'] ? 1 : 0;
+                    $changes = true;
+                }
+
+                if ($row['sport'] xor $info['sport']) {
+                    $set['sport'] = $info['sport'] ? 1 : 0;
+                    $changes = true;
+                }
+
+                if ($row['design'] xor $info['design']) {
+                    $set['design'] = $info['design'] ? 1 : 0;
+                    $changes = true;
+                }
+
+                if ($set) {
+                    $updates += $this->itemParentCacheTable->update($set, $primaryKey);
+                }
+            } else {
+                $updates += $this->itemParentCacheTable->insert(array_replace([
                     'diff'      => $info['diff'],
                     'tuning'    => $info['tuning'] ? 1 : 0,
                     'sport'     => $info['sport'] ? 1 : 0,
                     'design'    => $info['design'] ? 1 : 0
-                ]);
-                $updates++;
-                $row->save();
-            }
-            $changes = false;
-            if ($row['diff'] != $info['diff']) {
-                $row['diff'] = $info['diff'];
-                $changes = true;
-            }
-
-            if ($row['tuning'] xor $info['tuning']) {
-                $row['tuning'] = $info['tuning'] ? 1 : 0;
-                $changes = true;
-            }
-
-            if ($row['sport'] xor $info['sport']) {
-                $row['sport'] = $info['sport'] ? 1 : 0;
-                $changes = true;
-            }
-
-            if ($row['design'] xor $info['design']) {
-                $row['design'] = $info['design'] ? 1 : 0;
-                $changes = true;
-            }
-
-            if ($changes) {
-                $updates++;
-                $row->save();
+                ], $primaryKey));
             }
         }
 
@@ -841,15 +818,15 @@ class ItemParent
             'item_id = ?' => $itemId
         ];
         if ($parentInfo) {
-            $filter['parent_id not in (?)'] = array_keys($parentInfo);
+            $filter[] = new Sql\Predicate\NotIn('parent_id', array_keys($parentInfo));
         }
 
-        $this->itemParentCacheTable->delete($filter);
+        $updates += $this->itemParentCacheTable->delete($filter);
 
         $childs = $this->getChildItemsIds($itemId);
 
         foreach ($childs as $child) {
-            $this->rebuildCache($child);
+            $updates += $this->rebuildCache($child);
         }
 
         return $updates;

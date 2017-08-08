@@ -19,7 +19,8 @@ class ItemParentFactory implements FactoryInterface
             $tables->get('spec'),
             $tables->get('item_parent'),
             $tables->get('item'),
-            $container->get(\Zend_Db_Adapter_Abstract::class),
+            $tables->get('item_parent_language'),
+            $tables->get('item_parent_cache'),
             $container->get(ItemAlias::class),
             $container->get(Item::class)
         );
