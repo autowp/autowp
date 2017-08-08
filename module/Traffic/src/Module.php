@@ -41,14 +41,8 @@ class Module implements
 
     public function onBootstrap(Event $e)
     {
-        $application = $e->getApplication();
-        $serviceManager = $application->getServiceManager();
-        $eventManager = $application->getEventManager();
-
-        $serviceManager->get(\Zend_Db_Adapter_Abstract::class);
-
         $trafficListener = new TrafficRouteListener();
-        $trafficListener->attach($eventManager);
+        $trafficListener->attach($e->getApplication()->getEventManager());
     }
 
     /**

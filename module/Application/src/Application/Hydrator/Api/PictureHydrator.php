@@ -327,7 +327,7 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('thumbnail')) {
             $picture['thumbnail'] = $this->extractValue('picture-thumb', [
-                'image'  => DbTable\Picture::buildFormatRequest($object->toArray()),
+                'image'  => DbTable\Picture::buildFormatRequest((array)$object),
                 'format' => 'picture-thumb'
             ]);
         }

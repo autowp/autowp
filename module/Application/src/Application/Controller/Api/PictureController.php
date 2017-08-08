@@ -3,12 +3,10 @@
 namespace Application\Controller\Api;
 
 use Zend\InputFilter\InputFilter;
-use Zend\Db\Sql;
 use Zend\Http\Request;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 
@@ -102,6 +100,11 @@ class PictureController extends AbstractRestfulController
      */
     private $item;
 
+    /**
+     * @var Picture
+     */
+    private $picture;
+
     public function __construct(
         RestHydrator $hydrator,
         PictureItem $pictureItem,
@@ -119,7 +122,8 @@ class PictureController extends AbstractRestfulController
         \Autowp\Comments\CommentsService $comments,
         PictureModerVote $pictureModerVote,
         DbTable\Picture $pictureTable,
-        Item $item
+        Item $item,
+        Picture $picture
     ) {
         $this->carOfDay = $carOfDay;
 
@@ -137,6 +141,7 @@ class PictureController extends AbstractRestfulController
         $this->textStorage = $textStorage;
         $this->comments = $comments;
         $this->pictureModerVote = $pictureModerVote;
+        $this->picture = $picture;
 
         $this->table = $pictureTable;
         $this->item = $item;
@@ -273,239 +278,131 @@ class PictureController extends AbstractRestfulController
 
         $data = $this->listInputFilter->getValues();
 
-        $orders = [
-            1 => ['sql' => 'pictures.add_date DESC'],
-            2 => ['sql' => 'pictures.add_date'],
-            3 => ['sql' => ['pictures.width DESC', 'pictures.height DESC']],
-            4 => ['sql' => ['pictures.width', 'pictures.height']],
-            5 => ['sql' => 'pictures.filesize DESC'],
-            6 => ['sql' => 'pictures.filesize'],
-            7 => ['sql' => 'comment_topic.messages DESC'],
-            8 => ['sql' => 'picture_view.views DESC'],
-            9 => ['sql' => 'pdr.day_date DESC'],
-            10 => ['sql' => 'df_distance.distance ASC'],
-            11 => ['sql' => ['pictures.removing_date DESC', 'pictures.id']],
-            12 => ['sql' => 'picture_vote_summary.positive DESC'],
-            13 => ['sql' => 'picture_vote_summary.negative DESC'],
-            14 => ['sql' => 'pictures.status']
-        ];
-
-        $select = $this->table->select(true)
-            ->group('pictures.id');
-
-        $joinPdr = false;
-        $joinLeftComments = false;
-        $joinComments = false;
-        $pictureItemJoined = false;
-        $similarPictureJoined = false;
+        $filter = [];
 
         if (strlen($data['status'])) {
             switch ($data['status']) {
                 case Picture::STATUS_INBOX:
                 case Picture::STATUS_ACCEPTED:
                 case Picture::STATUS_REMOVING:
-                    $select->where('pictures.status = ?', $data['status']);
+                    $filter['status'] = $data['status'];
                     break;
                 case 'custom1':
-                    $select->where('pictures.status not in (?)', [
-                        Picture::STATUS_REMOVING,
-                        Picture::STATUS_REMOVED
-                    ]);
+                    $filter['status'] = [
+                        Picture::STATUS_INBOX,
+                        Picture::STATUS_ACCEPTED
+                    ];
                     break;
             }
         }
 
         if ($data['exact_item_id']) {
-            if (! $pictureItemJoined) {
-                $pictureItemJoined = true;
-                $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
-            }
-            $select->where('picture_item.item_id = ?', $data['exact_item_id']);
+            $filter['item']['id'] = $data['exact_item_id'];
         }
 
         if ($data['item_id']) {
-            if (! $pictureItemJoined) {
-                $pictureItemJoined = true;
-                $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
-            }
-            $select
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $data['item_id']);
+            $filter['item']['ancestor_or_self'] = $data['item_id'];
         }
 
         if ($data['perspective_id']) {
-            if (! $pictureItemJoined) {
-                $pictureItemJoined = true;
-                $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
-            }
             if ($data['perspective_id'] == 'null') {
-                $select->where('picture_item.perspective_id IS NULL');
+                $filter['item']['perspective_is_null'] = true;
             } else {
-                $select->where('picture_item.perspective_id = ?', $data['perspective_id']);
+                $filter['item']['perspective_id'] = $data['perspective_id'];
             }
         }
 
         if (strlen($data['comments'])) {
             if ($data['comments'] == '1') {
-                $joinComments = true;
-                $select->where('comment_topic.messages > 0');
+                $filter['has_comments'] = true;
             } elseif ($data['comments'] == '0') {
-                $joinLeftComments = true;
-                $select->where('comment_topic.messages = 0 or comment_topic.messages is null');
+                $filter['has_comments'] = false;
             }
         }
 
         if ($data['owner_id']) {
-            $select->where('pictures.owner_id = ?', $data['owner_id']);
+            $filter['user'] = $data['owner_id'];
         }
 
         if ($data['car_type_id']) {
-            if (! $pictureItemJoined) {
-                $pictureItemJoined = true;
-                $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
-            }
-            $select
-                ->join('item', 'picture_item.item_id = item.id', null)
-                ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
-                ->join('car_types_parents', 'vehicle_vehicle_type.vehicle_type_id = car_types_parents.id', null)
-                ->where('car_types_parents.parent_id = ?', $data['car_type_id']);
+            $filter['item']['vehicle_type'] = $data['car_type_id'];
         }
 
         if ($data['special_name']) {
-            $select->where('pictures.name <> "" and pictures.name is not null');
+            $filter['has_special_name'] = true;
         }
 
         if ($data['similar']) {
+            $filter['has_similar'] = true;
             $data['order'] = 10;
-            $select
-                ->join('df_distance', 'pictures.id = df_distance.src_picture_id', null)
-                ->where('not df_distance.hide');
-
-            if (strlen($data['status'])) {
-                if (! $similarPictureJoined) {
-                    $similarPictureJoined = true;
-                    $select->join(['similar' => 'pictures'], 'df_distance.dst_picture_id = similar.id', null);
-                }
-
-                switch ($data['status']) {
-                    case Picture::STATUS_INBOX:
-                    case Picture::STATUS_ACCEPTED:
-                    case Picture::STATUS_REMOVING:
-                        $select->where('similar.status = ?', $data['status']);
-                        break;
-                    case 'custom1':
-                        $select->where('similar.status not in (?)', [
-                            Picture::STATUS_REMOVING,
-                            Picture::STATUS_REMOVED
-                        ]);
-                        break;
-                }
-            }
         }
 
         if (strlen($data['requests'])) {
             switch ($data['requests']) {
                 case '0':
-                    $select
-                        ->joinLeft(['pdr' => 'pictures_moder_votes'], 'pictures.id=pdr.picture_id', null)
-                        ->where('pdr.picture_id IS NULL');
+                    $filter['has_moder_votes'] = false;
                     break;
 
                 case '1':
-                    $select
-                        ->join(['pdr' => 'pictures_moder_votes'], 'pictures.id=pdr.picture_id', null)
-                        ->where('pdr.vote > 0');
+                    $filter['has_accept_votes'] = true;
                     break;
 
                 case '2':
-                    $select
-                        ->join(['pdr' => 'pictures_moder_votes'], 'pictures.id=pdr.picture_id', null)
-                        ->where('pdr.vote <= 0');
+                    $filter['has_delete_votes'] = true;
                     break;
 
                 case '3':
-                    $joinPdr = true;
+                    $filter['has_moder_votes'] = true;
                     break;
             }
         }
 
         if (strlen($data['replace'])) {
             if ($data['replace'] == '1') {
-                $select->where('pictures.replace_picture_id');
+                $filter['is_replace'] = true;
             } elseif ($data['replace'] == '0') {
-                $select->where('pictures.replace_picture_id is null');
+                $filter['is_replace'] = false;
             }
         }
 
         if ($data['lost']) {
-            $select
-            ->joinLeft(
-                ['pi_left' => 'picture_item'],
-                'pictures.id = pi_left.picture_id',
-                null
-            )
-            ->where('pi_left.item_id IS NULL');
+            $filter['is_lost'] = true;
         }
 
         if ($data['gps']) {
-            $select->where('pictures.point IS NOT NULL');
+            $filter['has_point'] = true;
         }
+
+        $orders = [
+            1 => 'add_date_desc',
+            2 => 'add_date_asc',
+            3 => 'resolution_desc',
+            4 => 'resolution_asc',
+            5 => 'filesize_desc',
+            6 => 'filesize_asc',
+            7 => 'comments',
+            8 => 'views',
+            9 => 'moder_votes',
+            10 => 'similarity',
+            11 => 'removing_date',
+            12 => 'likes',
+            13 => 'dislikes',
+            14 => 'status'
+        ];
 
         if ($data['order']) {
-            $select->order($orders[$data['order']]['sql']);
-            switch ($data['order']) {
-                case 7:
-                    $joinLeftComments = true;
-                    break;
-                case 8:
-                    $select->joinLeft('picture_view', 'pictures.id = picture_view.picture_id', null);
-                    break;
-                case 9:
-                    $joinPdr = true;
-                    break;
-                case 12:
-                    $select
-                        ->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', null)
-                        ->where('picture_vote_summary.positive > 0');
-                    break;
-                case 13:
-                    $select
-                        ->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', null)
-                        ->where('picture_vote_summary.negative > 0');
-                    break;
-            }
+            $filter['order'] = $orders[$data['order']];
         } else {
-            $select->order($orders[1]['sql']);
+            $filter['order'] = $orders[1];
         }
 
-        if ($joinPdr) {
-            $select->join(['pdr' => 'pictures_moder_votes'], 'pictures.id=pdr.picture_id', null);
-        }
-
-        if ($joinLeftComments) {
-            $expr = 'pictures.id = comment_topic.item_id and ' .
-                $this->table->getAdapter()->quoteInto(
-                    'comment_topic.type_id = ?',
-                    \Application\Comments::PICTURES_TYPE_ID
-                );
-                $select->joinLeft('comment_topic', $expr, null);
-        } elseif ($joinComments) {
-            $select
-                ->join('comment_topic', 'pictures.id = comment_topic.item_id', null)
-                ->where('comment_topic.type_id = ?', \Application\Comments::PICTURES_TYPE_ID);
-        }
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
-        );
+        $paginator = $this->picture->getPaginator($filter);
 
         $data['limit'] = $data['limit'] ? $data['limit'] : 1;
 
         $paginator
             ->setItemCountPerPage($data['limit'])
             ->setCurrentPageNumber($data['page']);
-
-        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
@@ -514,7 +411,7 @@ class PictureController extends AbstractRestfulController
         ]);
 
         $pictures = [];
-        foreach ($this->table->fetchAll($select) as $pictureRow) {
+        foreach ($paginator->getCurrentItems() as $pictureRow) {
             $pictures[] = $this->hydrator->extract($pictureRow);
         }
 

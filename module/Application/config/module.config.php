@@ -148,6 +148,7 @@ return [
             Model\Log::class                     => Model\Service\LogFactory::class,
             Model\Modification::class            => Model\ModificationFactory::class,
             Model\Perspective::class             => Model\PerspectiveFactory::class,
+            Model\Picture::class                 => Model\PictureFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,
             Model\PictureModerVote::class        => Model\PictureModerVoteFactory::class,
             Model\PictureView::class             => Model\PictureViewFactory::class,
