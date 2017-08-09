@@ -8,7 +8,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator;
 
-use Autowp\Commons\Db\Table;
+use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable\Article;
@@ -52,7 +52,7 @@ class ArticlesController extends AbstractActionController
                 'name'        => $row['name'],
                 'description' => $row['description'],
                 'author'      => $userTable->find($row['author_id'])->current(),
-                'date'        => Table\Row::getDateTimeByColumnType('timestamp', $row['first_enabled_datetime']),
+                'date'        => Row::getDateTimeByColumnType('timestamp', $row['first_enabled_datetime']),
                 'url'         => $this->url()->fromRoute('articles', [
                     'action'          => 'article',
                     'article_catname' => $row['catname']

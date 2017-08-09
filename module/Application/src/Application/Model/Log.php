@@ -9,7 +9,7 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
 
-use Autowp\Commons\Db\Table;
+use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
@@ -216,7 +216,7 @@ class Log
 
             $events[] = [
                 'user'     => $userTable->find($event['user_id'])->current(),
-                'date'     => Table\Row::getDateTimeByColumnType('timestamp', $event['add_datetime']),
+                'date'     => Row::getDateTimeByColumnType('timestamp', $event['add_datetime']),
                 'desc'     => $event['description'],
                 'items'    => $itemRows,
                 'pictures' => $pictureRows

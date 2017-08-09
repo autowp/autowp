@@ -2,7 +2,7 @@
 
 namespace Autowp\Comments;
 
-use Autowp\Commons\Db\Table;
+use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\DbTable\User;
 
 use Zend\Db\Sql;
@@ -202,7 +202,7 @@ class CommentsService
                 'id'                  => $row['id'],
                 'author'              => $author,
                 'message'             => $row['message'],
-                'datetime'            => Table\Row::getDateTimeByColumnType('timestamp', $row['datetime']),
+                'datetime'            => Row::getDateTimeByColumnType('timestamp', $row['datetime']),
                 'ip'                  => $row['ip'] ? inet_ntop($row['ip']) : null,
                 'vote'                => $row['vote'],
                 'moderator_attention' => $row['moderator_attention'],

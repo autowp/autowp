@@ -7,7 +7,6 @@ use DateTime;
 
 use Zend\Db\Sql;
 
-use Autowp\Commons\Db\Table;
 use Autowp\Image;
 
 use Application\ItemNameFormatter;
@@ -18,13 +17,14 @@ use Application\Service\SpecificationsService;
 use Facebook;
 
 use Zend_Db_Expr;
+use Zend_Db_Table;
 use Zend_Oauth_Token_Access;
 use Zend_Service_Twitter;
 
 class CarOfDay
 {
     /**
-     * @var Table
+     * @var Zend_Db_Table
      */
     private $table;
 
@@ -102,7 +102,7 @@ class CarOfDay
         $this->pictureTable = $pictureTable;
         $this->twins = $twins;
 
-        $this->table = new Table([
+        $this->table = new Zend_Db_Table([
             'name'    => 'of_day',
             'primary' => 'day_date'
         ]);

@@ -5,9 +5,11 @@ namespace Autowp\User\Model\DbTable;
 use DateInterval;
 use DateTime;
 
-use Autowp\Commons\Db\Table;
+use Autowp\Commons\Db\Table\Row;
 
-class User extends Table
+use Zend_Db_Table;
+
+class User extends Zend_Db_Table
 {
     protected $_name = 'users';
 
@@ -48,7 +50,7 @@ class User extends Table
 
     private function getMessagingInterval($row)
     {
-        $date = Table\Row::getDateTimeByColumnType('timestamp', $row['reg_date']);
+        $date = Row::getDateTimeByColumnType('timestamp', $row['reg_date']);
 
         $defaultInterval = 300;
 
@@ -71,7 +73,7 @@ class User extends Table
             return false;
         }
 
-        $lastMessageTime = Table\Row::getDateTimeByColumnType('timestamp', $row['last_message_time']);
+        $lastMessageTime = Row::getDateTimeByColumnType('timestamp', $row['last_message_time']);
 
         if ($lastMessageTime) {
             $messagingInterval = $this->getMessagingInterval($row);

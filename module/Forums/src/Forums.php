@@ -3,7 +3,7 @@
 namespace Autowp\Forums;
 
 use Autowp\Comments;
-use Autowp\Commons\Db\Table;
+use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\DbTable\User;
 
 use Zend\Db\Adapter\Adapter;
@@ -98,7 +98,7 @@ class Forums
                 if ($lastMessageRow) {
                     $lastMessage = [
                         'id'     => $lastMessageRow['id'],
-                        'date'   => Table\Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
+                        'date'   => Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
                         'author' => $userTable->find($lastMessageRow['author_id'])->current(),
                     ];
                 }
@@ -311,7 +311,7 @@ class Forums
                 if ($lastMessageRow) {
                     $lastMessage = [
                         'id'     => $lastMessageRow['id'],
-                        'date'   => Table\Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
+                        'date'   => Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
                         'author' => $userTable->find($lastMessageRow['author_id'])->current(),
                     ];
                 }
@@ -324,7 +324,7 @@ class Forums
                 'messages'    => $messages,
                 'oldMessages' => $oldMessages,
                 'newMessages' => $newMessages,
-                'addDatetime' => Table\Row::getDateTimeByColumnType('timestamp', $topicRow['add_datetime']),
+                'addDatetime' => Row::getDateTimeByColumnType('timestamp', $topicRow['add_datetime']),
                 'authorId'    => $topicRow['author_id'],
                 'lastMessage' => $lastMessage,
                 'status'      => $topicRow['status']
@@ -739,7 +739,7 @@ class Forums
                 if ($lastMessageRow) {
                     $lastMessage = [
                         'id'     => $lastMessageRow['id'],
-                        'date'   => Table\Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
+                        'date'   => Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
                         'author' => $userTable->find($lastMessageRow['author_id'])->current(),
                     ];
                 }

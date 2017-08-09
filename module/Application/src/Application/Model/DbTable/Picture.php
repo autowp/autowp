@@ -5,12 +5,13 @@ namespace Application\Model\DbTable;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
-use Autowp\Commons\Db\Table;
 use Autowp\Image;
 
 use Application\Model\Perspective;
 
-class Picture extends Table
+use Zend_Db_Table;
+
+class Picture extends Zend_Db_Table
 {
     protected $_name = 'pictures';
 

@@ -6,7 +6,7 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
 
-use Autowp\Commons\Db\Table;
+use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Service\TelegramService;
@@ -399,7 +399,7 @@ class MessageService
                 'contents'        => $message['contents'],
                 'isNew'           => $isNew,
                 'canDelete'       => $canDelete,
-                'date'            => Table\Row::getDateTimeByColumnType('timestamp', $message['add_datetime']),
+                'date'            => Row::getDateTimeByColumnType('timestamp', $message['add_datetime']),
                 'canReply'        => $canReply,
                 'dialogCount'     => $dialogCount,
                 'allMessagesLink' => $options['allMessagesLink']

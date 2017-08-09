@@ -7,7 +7,7 @@ use DateTime;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
-use Autowp\Commons\Db\Table;
+use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\DbTable\User;
 
 class Votings
@@ -45,11 +45,11 @@ class Votings
 
         $now = new DateTime();
 
-        $beginDate = Table\Row::getDateTimeByColumnType('date', $voting['begin_date']);
+        $beginDate = Row::getDateTimeByColumnType('date', $voting['begin_date']);
         if ($beginDate >= $now) {
             return false;
         }
-        $endDate   = Table\Row::getDateTimeByColumnType('date', $voting['end_date']);
+        $endDate   = Row::getDateTimeByColumnType('date', $voting['end_date']);
         if ($endDate <= $now) {
             return false;
         }
@@ -144,8 +144,8 @@ class Votings
             }
         }
 
-        $beginDate = Table\Row::getDateTimeByColumnType('date', $voting['begin_date']);
-        $endDate   = Table\Row::getDateTimeByColumnType('date', $voting['end_date']);
+        $beginDate = Row::getDateTimeByColumnType('date', $voting['begin_date']);
+        $endDate   = Row::getDateTimeByColumnType('date', $voting['end_date']);
 
         return [
             'canVote'  => $this->canVote($voting, $userId),
