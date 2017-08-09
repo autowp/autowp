@@ -68,41 +68,6 @@ class Picture extends Table
         }
     }
 
-    public function generateIdentity()
-    {
-        do {
-            $identity = $this->randomIdentity();
-
-            $exists = $this->getAdapter()->fetchOne(
-                $this->getAdapter()->select()
-                    ->from($this->info('name'), 'id')
-                    ->where('identity = ?', $identity)
-            );
-        } while ($exists);
-
-        return $identity;
-    }
-
-    public function randomIdentity()
-    {
-        $alpha = "abcdefghijklmnopqrstuvwxyz";
-        $number = "0123456789";
-        $length = 6;
-
-        $dict = $alpha;
-
-        $result = '';
-
-        for ($i = 0; $i < $length; $i++) {
-            $index = rand(0, strlen($dict) - 1);
-            $result .= $dict{$index};
-
-            $dict = $alpha . $number;
-        }
-
-        return $result;
-    }
-
     public function getNameData($rows, array $options = [])
     {
         $result = [];

@@ -4,6 +4,7 @@ namespace Application\Model;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Math\Rand;
 use Zend\Paginator;
 
 use Autowp\ZFComponents\Filter\FilenameSafe;
@@ -19,6 +20,8 @@ class Picture
         STATUS_INBOX    = 'inbox';
 
     const MAX_NAME = 255;
+
+    const IDENTITY_LENGTH = 6;
 
     /**
      * @var TableGateway
@@ -180,6 +183,10 @@ class Picture
         $joinPdr = false;
         $joinLeftComments = false;
         $joinComments = false;
+
+        if ($options['identity'] !== null) {
+            $select->where(['pictures.identity' => (string)$options['identity']]);
+        }
 
         if ($options['id'] !== null) {
             $this->applyIdFilter($select, $options['id'], 'pictures.id');
@@ -585,5 +592,26 @@ class Picture
         $this->table->update($set, $primaryKey);
 
         return true;
+    }
+
+    public function generateIdentity()
+    {
+        do {
+            $identity = $this->randomIdentity();
+
+            $exists = $this->isExists([
+                'identity' => $identity
+            ]);
+        } while ($exists);
+
+        return $identity;
+    }
+
+    private function randomIdentity()
+    {
+        $alpha = "abcdefghijklmnopqrstuvwxyz";
+        $number = "0123456789";
+
+        return Rand::getString(1, $alpha) . Rand::getString(self::IDENTITY_LENGTH - 1, $alpha . $number);
     }
 }

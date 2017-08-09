@@ -246,7 +246,7 @@ class UploadController extends AbstractActionController
                 'status'        => Picture::STATUS_INBOX,
                 'removing_date' => null,
                 'ip'            => inet_pton($this->getRequest()->getServer('REMOTE_ADDR')),
-                'identity'      => $this->pictureTable->generateIdentity(),
+                'identity'      => $this->picture->generateIdentity(),
                 'replace_picture_id' => $replacePicture ? $replacePicture['id'] : null,
             ]);
             $picture->save();
