@@ -8,6 +8,7 @@ use DateInterval;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Permissions\Acl\Acl;
 
+use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Hydrator\Api\Strategy\Image as HydratorImageStrategy;
@@ -79,7 +80,8 @@ class UserHydrator extends RestHydrator
             ];
         } else {
             $longAway = false;
-            if ($lastOnline = $object->getDateTime('last_online')) {
+            $lastOnline = Row::getDateTimeByColumnType('timestamp', $object['last_online']);
+            if ($lastOnline) {
                 $date = new DateTime();
                 $date->sub(new DateInterval('P6M'));
                 if ($date > $lastOnline) {
@@ -105,13 +107,13 @@ class UserHydrator extends RestHydrator
             ];
 
             if ($this->filterComposite->filter('last_online')) {
-                $lastOnline = $object->getDateTime('last_online');
+                $lastOnline = Row::getDateTimeByColumnType('timestamp', $object['last_online']);
                 $user['last_online'] = $this->extractValue('last_online', $lastOnline);
             }
 
             if ($this->filterComposite->filter('reg_date')) {
-                $lastOnline = $object->getDateTime('reg_date');
-                $user['reg_date'] = $this->extractValue('reg_date', $lastOnline);
+                $regDate = Row::getDateTimeByColumnType('timestamp', $object['reg_date']);
+                $user['reg_date'] = $this->extractValue('reg_date', $regDate);
             }
 
             if ($this->filterComposite->filter('image')) {

@@ -9,6 +9,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Mail;
 
 use Autowp\Comments;
+use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
 use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
 use Autowp\User\Model\DbTable\User;
@@ -373,7 +374,7 @@ class UsersService
         $avgVote = $this->comments->getUserAvgVote($userRow['id']);
 
         $age = 0;
-        $regDate = $userRow->getDateTime('reg_date');
+        $regDate = Row::getDateTimeByColumnType('timestamp', $userRow['reg_date']);
         if ($regDate) {
             $now = new DateTime();
             $diff = $now->getTimestamp() - $regDate->getTimestamp();

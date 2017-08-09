@@ -2,13 +2,15 @@
 
 namespace Application;
 
+use DateInterval;
+use DateTime;
+
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Mvc\MvcEvent;
 
-use DateInterval;
-use DateTime;
+use Autowp\Commons\Db\Table\Row;
 
 use Zend_Db_Expr;
 
@@ -45,7 +47,7 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
                 if ($user) {
                     $changes = false;
                     $nowExpiresDate = (new DateTime())->sub(new DateInterval('PT1S'));
-                    $lastOnline = $user->getDateTime('last_online');
+                    $lastOnline = Row::getDateTimeByColumnType('timestamp', $user['last_online']);
                     if (! $lastOnline || ($lastOnline < $nowExpiresDate)) {
                         $user['last_online'] = new Zend_Db_Expr('NOW()');
                         $changes = true;

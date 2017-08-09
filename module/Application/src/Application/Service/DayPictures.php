@@ -5,9 +5,11 @@ namespace Application\Service;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use Zend_Db_Table_Select;
 
+use Autowp\Commons\Db\Table\Row;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
+
+use Zend_Db_Table_Select;
 
 class DayPictures
 {
@@ -240,7 +242,7 @@ class DayPictures
             return null;
         }
 
-        $lastDate = $lastPicture->getDateTime($this->orderColumn);
+        $lastDate = Row::getDateTimeByColumnType('timestamp', $lastPicture[$this->orderColumn]);
         if (! $lastDate) {
             return null;
         }
@@ -274,7 +276,7 @@ class DayPictures
 
             $prevDate = false;
             if ($prevDatePicture) {
-                $date = $prevDatePicture->getDateTime($this->orderColumn);
+                $date = Row::getDateTimeByColumnType('timestamp', $prevDatePicture[$this->orderColumn]);
                 if ($date) {
                     $prevDate = $date;
                 }
@@ -342,7 +344,7 @@ class DayPictures
 
             $nextDate = false;
             if ($nextDatePicture) {
-                $date = $nextDatePicture->getDateTime($this->orderColumn);
+                $date = Row::getDateTimeByColumnType('timestamp', $nextDatePicture[$this->orderColumn]);
                 if ($date) {
                     $nextDate = $date;
                 }

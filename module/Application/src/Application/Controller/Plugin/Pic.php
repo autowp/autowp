@@ -9,6 +9,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Autowp\Comments;
+use Autowp\Commons\Db\Table\Row;
 use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User as UserTable;
@@ -32,7 +33,6 @@ use Application\Service\SpecificationsService;
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;
-use Autowp\Commons\Db\Table\Row;
 
 class Pic extends AbstractPlugin
 {
@@ -1118,7 +1118,7 @@ class Pic extends AbstractPlugin
             'name'              => $name,
             'picture'           => $picture,
             'owner'             => $picture->findParentRow(UserTable::class, 'Owner'),
-            'addDate'           => $picture->getDateTime('add_date'),
+            'addDate'           => Row::getDateTimeByColumnType('timestamp', $picture['add_date']),
             'ofLinks'           => $ofLinks,
             'moderVotes'        => $moderVotes,
             'sourceUrl'         => $sourceUrl,
