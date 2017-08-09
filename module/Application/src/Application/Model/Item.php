@@ -1232,6 +1232,11 @@ class Item
             'no_parents'      => null,
             'catname'         => null,
             'vehicle_type_id' => null,
+            'has_logo'        => null,
+            'has_begin_year'  => null,
+            'has_end_year'    => null,
+            'has_begin_month' => null,
+            'has_end_month'   => null,
         ];
         $options = array_replace($defaults, $options);
 
@@ -1328,6 +1333,26 @@ class Item
             } else {
                 $select->where(['item.item_type_id' => $options['item_type_id']]);
             }
+        }
+
+        if ($options['has_logo']) {
+            $select->where('item.logo_id is not null');
+        }
+
+        if ($options['has_begin_year']) {
+            $select->where('item.begin_year');
+        }
+
+        if ($options['has_end_year']) {
+            $select->where('item.end_year');
+        }
+
+        if ($options['has_begin_month']) {
+            $select->where('item.begin_month');
+        }
+
+        if ($options['has_end_month']) {
+            $select->where('item.end_month');
         }
 
         if ($options['item_type_id_exclude']) {

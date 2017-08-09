@@ -19,7 +19,7 @@ class PictureModerVoteControllerFactory implements FactoryInterface
             $container->get('ModerPictureVoteForm2'),
             $container->get(\Application\Model\UserPicture::class),
             $container->get(\Application\Model\PictureModerVote::class),
-            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Picture::class),
             $tables->get('picture_moder_vote_template')
         );
     }

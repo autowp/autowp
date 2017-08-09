@@ -5,8 +5,8 @@ namespace Application\Controller\Api;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
-use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Picture;
 
 class StatController extends AbstractActionController
 {
@@ -16,14 +16,14 @@ class StatController extends AbstractActionController
     private $item;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
-    public function __construct(Item $item, DbTable\Picture $pictureTable)
+    public function __construct(Item $item, Picture $picture)
     {
         $this->item = $item;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function globalSummaryAction()
@@ -32,53 +32,54 @@ class StatController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $db = $this->pictureTable->getAdapter();
+        $totalPictures = $this->picture->getCount([]);
 
-        $totalPictures = $db->fetchOne('
-            select count(1) from pictures
-        ');
-
-        $totalBrands = $db->fetchOne('
-            select count(1) from item where item_type_id = ?
-        ', [Item::BRAND]);
+        $totalBrands = $this->item->getCount([
+            'item_type_id' => Item::BRAND
+        ]);
 
         $totalCars = $this->item->getCount([
             'item_type_id' => Item::VEHICLE
         ]);
 
-        $totalCarAttrs = $db->fetchOne('
-            select count(1)
+        $db = $this->item->getTable()->getAdapter();
+
+        $row = $db->query('
+            select count(1) as count
             from attrs_attributes
                 join attrs_zone_attributes on attrs_attributes.id=attrs_zone_attributes.attribute_id
             where attrs_zone_attributes.zone_id = 1
-        ');
+        ')->execute()->current();
+        $totalCarAttrs = $row ? (int)$row['count'] : null;
 
-        $carAttrsValues = $db->fetchOne('
-            select count(1)
+        $row = $db->query('
+            select count(1) as count
             from attrs_values
-        ');
+        ')->execute()->current();
+        $carAttrsValues = $row ? (int)$row['count'] : null;
+
+        $carsWith4OrMorePictures = $db->query('
+            select count(1) as count from (
+                select item.id, count(pictures.id) as c
+                from item
+                    inner join picture_item on item.id = picture_item.item_id
+                    inner join pictures on picture_item.picture_id = pictures.id
+                group by item.id
+                having c >= 4
+            ) as T1
+        ')->execute()->current();
+        $carsWith4OrMorePictures = $row ? (int)$row['count'] : null;
 
         $data = [
             [
                 'name'    => 'moder/statistics/photos-with-copyrights',
                 'total'    => $totalPictures,
-                'value'    => $db->fetchOne('
-                    select count(1) from pictures where copyrights_text_id
-                ')
+                'value'    => $this->picture->getCount(['has_copyrights' => true])
             ],
             [
                 'name'     => 'moder/statistics/vehicles-with-4-or-more-photos',
                 'total'    => $totalCars,
-                'value'    => $db->fetchOne('
-                    select count(1) from (
-                        select item.id, count(pictures.id) as c
-                        from item
-                            inner join picture_item on item.id = picture_item.item_id
-                            inner join pictures on picture_item.picture_id = pictures.id
-                        group by item.id
-                        having c >= 4
-                    ) as T1
-                ')
+                'value'    => $carsWith4OrMorePictures
             ],
             [
                 'name'     => 'moder/statistics/specifications-values',
@@ -88,38 +89,35 @@ class StatController extends AbstractActionController
             [
                 'name'     => 'moder/statistics/brand-logos',
                 'total'    => $totalBrands,
-                'value'    => $db->fetchOne('
-                    select count(1)
-                    from item
-                    where logo_id is not null and item_type_id = ?
-                ', [Item::BRAND])
+                'value'    => $this->item->getCount([
+                    'has_logo'     => true,
+                    'item_type_id' => Item::BRAND
+                ])
             ],
             [
                 'name'    => 'moder/statistics/from-years',
                 'total'    => $totalCars,
-                'value'    => $db->fetchOne('
-                    select count(1)
-                    from item
-                    where begin_year
-                ')
+                'value'    => $this->item->getCount([
+                    'has_begin_year' => true
+                ])
             ],
             [
                 'name'    => 'moder/statistics/from-and-to-years',
                 'total'    => $totalCars,
-                'value'    => $db->fetchOne('
-                    select count(1)
-                    from item
-                    where begin_year and end_year
-                ')
+                'value'    => $this->item->getCount([
+                    'has_begin_year' => true,
+                    'has_end_year'   => true,
+                ])
             ],
             [
                 'name'    => 'moder/statistics/from-and-to-years-and-months',
                 'total'    => $totalCars,
-                'value'    => $db->fetchOne('
-                    select count(1)
-                    from item
-                    where begin_year and end_year and begin_month and end_month
-                ')
+                'value'    => $this->item->getCount([
+                    'has_begin_year ' => true,
+                    'has_end_year'    => true,
+                    'has_begin_month' => true,
+                    'has_end_month'   => true,
+                ])
             ],
         ];
 

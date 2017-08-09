@@ -14,7 +14,7 @@ class StatControllerFactory implements FactoryInterface
     {
         return new StatController(
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\Picture::class)
         );
     }
 }

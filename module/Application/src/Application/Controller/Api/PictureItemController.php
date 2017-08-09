@@ -9,7 +9,6 @@ use Zend\View\Model\JsonModel;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Hydrator\Api\RestHydrator;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
@@ -38,11 +37,6 @@ class PictureItemController extends AbstractRestfulController
     private $itemInputFilter;
 
     /**
-     * @var DbTable\Picture
-     */
-    private $pictureTable;
-
-    /**
      * @var Item
      */
     private $item;
@@ -57,7 +51,6 @@ class PictureItemController extends AbstractRestfulController
         Log $log,
         RestHydrator $hydrator,
         InputFilter $itemInputFilter,
-        DbTable\Picture $pictureTable,
         Item $item,
         Picture $picture
     ) {
@@ -65,7 +58,6 @@ class PictureItemController extends AbstractRestfulController
         $this->log = $log;
         $this->hydrator = $hydrator;
         $this->itemInputFilter = $itemInputFilter;
-        $this->pictureTable = $pictureTable;
         $this->item = $item;
         $this->picture = $picture;
     }
@@ -96,7 +88,7 @@ class PictureItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $picture = $this->pictureTable->find($this->params('picture_id'))->current();
+        $picture = $this->picture->getRow(['id' => (int)$this->params('picture_id')]);
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -134,7 +126,7 @@ class PictureItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $picture = $this->pictureTable->find($this->params('picture_id'))->current();
+        $picture = $this->picture->getRow(['id' => (int)$this->params('picture_id')]);
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -178,7 +170,7 @@ class PictureItemController extends AbstractRestfulController
         $pictureId = (int)$this->params('picture_id');
         $itemId    = (int)$this->params('item_id');
 
-        $picture = $this->pictureTable->find($pictureId)->current();
+        $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -224,7 +216,7 @@ class PictureItemController extends AbstractRestfulController
         $pictureId = (int)$this->params('picture_id');
         $itemId    = (int)$this->params('item_id');
 
-        $picture = $this->pictureTable->find($pictureId)->current();
+        $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
             return $this->notFoundAction();
         }

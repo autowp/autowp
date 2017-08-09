@@ -175,6 +175,7 @@ class Picture
             'is_lost'          => null,
             'has_point'        => null,
             'order'            => null,
+            'has_copyrights'   => null,
         ];
         $options = array_replace($defaults, $options);
 
@@ -280,6 +281,10 @@ class Picture
 
         if ($options['has_point']) {
             $select->where(['pictures.point IS NOT NULL']);
+        }
+
+        if ($options['has_copyrights']) {
+            $select->where(['pictures.copyrights_text_id IS NOT NULL']);
         }
 
         switch ($options['order']) {

@@ -11,7 +11,6 @@ use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
-use Application\Model\DbTable;
 use Application\Model\Picture;
 use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
@@ -44,9 +43,9 @@ class PictureModerVoteController extends AbstractRestfulController
     private $pictureModerVote;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var User
@@ -59,7 +58,7 @@ class PictureModerVoteController extends AbstractRestfulController
         Form $voteForm,
         UserPicture $userPicture,
         PictureModerVote $pictureModerVote,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         TableGateway $templateTable
     ) {
         $this->hostManager = $hostManager;
@@ -68,7 +67,7 @@ class PictureModerVoteController extends AbstractRestfulController
         $this->templateTable = $templateTable;
         $this->userPicture = $userPicture;
         $this->pictureModerVote = $pictureModerVote;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->userTable = new User();
     }
 
@@ -176,7 +175,7 @@ class PictureModerVoteController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $picture = $this->pictureTable->find($id)->current();
+        $picture = $this->picture->getRow(['id' => (int)$id]);
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -253,7 +252,7 @@ class PictureModerVoteController extends AbstractRestfulController
      */
     public function delete($id)
     {
-        $picture = $this->pictureTable->find($id)->current();
+        $picture = $this->picture->getRow(['id' => (int)$id]);
         if (! $picture) {
             return $this->notFoundAction();
         }
