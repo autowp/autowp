@@ -36,7 +36,7 @@
                                         'id' => $user['id']
                                     ]))?>">&times;</a>
                                     <h4 class="media-heading"><?=$this->user($user)?></h4>
-                                    <?php if ($lastOnline = $user->getDateTime('last_online')) { ?>
+                                    <?php if ($lastOnline = \Autowp\Commons\Db\Table\Row::getDateTimeByColumnType('timestamp', $user['last_online'])) { ?>
                                         <p><?=$this->escapeHtml($this->humanTime($lastOnline))?></p>
                                     <?php } ?>
                                 </div>

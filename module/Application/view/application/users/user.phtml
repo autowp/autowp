@@ -54,11 +54,11 @@
 
         <p>
             <?=$this->escapeHtml($this->translate('users/user/registration-date'))?>:
-            <strong><?=$this->escapeHtml($this->user()->humanDate($this->currentUser->getDateTime('reg_date')))?></strong>
+            <strong><?=$this->escapeHtml($this->user()->humanDate(\Autowp\Commons\Db\Table\Row::getDateTimeByColumnType('timestamp', $this->currentUser['reg_date'])))?></strong>
         </p>
         <p>
             <?=$this->escapeHtml($this->translate('users/user/last-visited'))?>:
-            <strong><?=$this->escapeHtml($this->user()->humanTime($this->currentUser->getDateTime('last_online')))?></strong>
+            <strong><?=$this->escapeHtml($this->user()->humanTime(\Autowp\Commons\Db\Table\Row::getDateTimeByColumnType('timestamp', $this->currentUser['last_online'])))?></strong>
         </p>
 
         <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->currentUser['id']))?></p>

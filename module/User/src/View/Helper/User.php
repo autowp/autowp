@@ -2,16 +2,17 @@
 
 namespace Autowp\User\View\Helper;
 
+use DateInterval;
+use DateTime;
+use DateTimeZone;
+use Exception;
+
 use Zend\Authentication\AuthenticationService;
 use Zend\View\Helper\AbstractHelper;
 use Zend\View\Exception\InvalidArgumentException;
 use Zend\Permissions\Acl\Acl;
 
-use DateInterval;
-use DateTime;
-use DateTimeZone;
-
-use Exception;
+use Autowp\Commons\Db\Table\Row;
 
 class User extends AbstractHelper
 {
@@ -114,7 +115,8 @@ class User extends AbstractHelper
             ]);
 
             $classes = ['user'];
-            if ($lastOnline = $user->getDateTime('last_online')) {
+            $lastOnline = Row::getDateTimeByColumnType('timestamp', $user['last_online']);
+            if ($lastOnline) {
                 $date = new DateTime();
                 $date->sub(new DateInterval('P6M'));
                 if ($date > $lastOnline) {
