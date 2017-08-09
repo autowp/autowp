@@ -18,7 +18,8 @@ class PictureVoteFactory implements FactoryInterface
         return new Plugin(
             $container->get(\Application\Model\PictureModerVote::class),
             $container->get(\Application\Model\DbTable\Picture::class),
-            $tables->get('picture_moder_vote_template')
+            $tables->get('picture_moder_vote_template'),
+            $container->get(\Application\Model\Picture::class)
         );
     }
 }

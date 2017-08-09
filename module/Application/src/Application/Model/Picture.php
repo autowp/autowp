@@ -6,6 +6,10 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
 
+use Autowp\ZFComponents\Filter\FilenameSafe;
+
+use Application\Model\Item as ItemModel;
+
 class Picture
 {
     const
@@ -21,9 +25,24 @@ class Picture
      */
     private $table;
 
-    public function __construct(TableGateway $table)
-    {
+    /**
+     * @var TableGateway
+     */
+    private $itemTable;
+
+    /**
+     * @var PictureModerVote
+     */
+    private $pictureModerVote;
+
+    public function __construct(
+        TableGateway $table,
+        TableGateway $itemTable,
+        PictureModerVote $pictureModerVote
+    ) {
         $this->table = $table;
+        $this->itemTable = $itemTable;
+        $this->pictureModerVote = $pictureModerVote;
     }
 
     private function applyIdFilter(Sql\Select $select, $value, string $id)
@@ -52,6 +71,35 @@ class Picture
         $select->where([$id => $value]);
     }
 
+    private function applyPerspectiveFilter(Sql\Select $select, $options)
+    {
+        if (! is_array($options)) {
+            $options = [
+                'id' => $options
+            ];
+        }
+
+        $defaults = [
+            'id'    => null,
+            'group' => null
+        ];
+        $options = array_replace($defaults, $options);
+
+        if ($options['id'] !== null) {
+            $this->applyIdFilter($select, $options['id'], 'picture_item.perspective_id');
+        }
+
+        if ($options['group'] !== null) {
+            $select
+                ->join(
+                    ['mp' => 'perspectives_groups_perspectives'],
+                    'picture_item.perspective_id = mp.perspective_id',
+                    []
+                )
+                ->where(['mp.group_id' => $options['group']]);
+        }
+    }
+
     private function applyItemFilters(Sql\Select $select, $options)
     {
         if (! is_array($options)) {
@@ -63,7 +111,7 @@ class Picture
         $defaults = [
             'id'                  => null,
             'ancestor_or_self'    => null,
-            'perspective_id'      => null,
+            'perspective'         => null,
             'perspective_is_null' => null,
             'vehicle_type'        => null,
         ];
@@ -81,8 +129,8 @@ class Picture
                 ->where(['item_parent_cache.parent_id' => $options['ancestor_or_self']]);
         }
 
-        if ($options['perspective_id'] !== null) {
-            $select->where(['picture_item.perspective_id' => $options['perspective_id']]);
+        if ($options['perspective'] !== null) {
+            $this->applyPerspectiveFilter($select, $options['perspective']);
         }
 
         if ($options['perspective_is_null'] !== null) {
@@ -106,6 +154,7 @@ class Picture
     public function getSelect(array $options)
     {
         $defaults = [
+            'id'               => null,
             'columns'          => null,
             'status'           => null,
             'item'             => null,
@@ -131,6 +180,10 @@ class Picture
         $joinPdr = false;
         $joinLeftComments = false;
         $joinComments = false;
+
+        if ($options['id'] !== null) {
+            $this->applyIdFilter($select, $options['id'], 'pictures.id');
+        }
 
         if ($options['status'] !== null) {
             $value = $options['status'];
@@ -222,6 +275,9 @@ class Picture
         }
 
         switch ($options['order']) {
+            case 'accept_datetime_desc':
+                $select->order('accept_datetime desc');
+                break;
             case 'add_date_desc':
                 $select->order('pictures.add_date DESC');
                 break;
@@ -270,6 +326,13 @@ class Picture
                 break;
             case 'status':
                 $select->order('pictures.status');
+                break;
+            case 'random':
+                $select->order(new Sql\Expression('rand() desc'));
+                break;
+            case 'perspective_group':
+                $select->order(['mp.position', 'pictures.width DESC', 'pictures.height DESC']);
+                $group[] = 'mp.position';
                 break;
         }
 
@@ -360,5 +423,167 @@ class Picture
         }
 
         return $result;
+    }
+
+    public function getTable(): TableGateway
+    {
+        return $this->table;
+    }
+
+    public function getFileNamePattern($row): string
+    {
+        $result = rand(1, 9999);
+
+        $filenameFilter = new FilenameSafe();
+
+        $select = new Sql\Select($this->itemTable->getTable());
+        $select
+            ->join('picture_item', 'item.id = picture_item.item_id', [])
+            ->where(['picture_item.picture_id' => $row['id']])
+            ->limit(1);
+
+        $cars = [];
+        foreach ($this->itemTable->selectWith($select) as $itemRow) {
+            $cars[] = $itemRow;
+        }
+
+        if (count($cars) > 1) {
+            $select = new Sql\Select($this->itemTable->getTable());
+            $select
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
+                ->where([
+                    'item.item_type_id'       => ItemModel::BRAND,
+                    'picture_item.picture_id' => $row['id']
+                ]);
+
+            $brands = $this->itemTable->selectWith($select);
+
+            $f = [];
+            foreach ($brands as $brand) {
+                $f[] = $filenameFilter->filter($brand['catname']);
+            }
+            $f = array_unique($f);
+            sort($f, SORT_STRING);
+
+            $brandsFolder = implode('/', $f);
+            $firstChar = mb_substr($brandsFolder, 0, 1);
+
+            $result = $firstChar . '/' . $brandsFolder .'/mixed';
+        } elseif (count($cars) == 1) {
+            $car = $cars[0];
+
+            $carCatname = $filenameFilter->filter($car['name']);
+
+            $select = new Sql\Select($this->itemTable->getTable());
+            $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->where([
+                    'item.item_type_id'         => ItemModel::BRAND,
+                    'item_parent_cache.item_id' => $car['id']
+                ]);
+
+            $brands = $this->itemTable->selectWith($select);
+
+            $sBrands = [];
+            foreach ($brands as $brand) {
+                $sBrands[$brand['id']] = $brand;
+            }
+
+            if (count($sBrands) > 1) {
+                $f = [];
+                foreach ($sBrands as $brand) {
+                    $f[] = $filenameFilter->filter($brand['catname']);
+                }
+                $f = array_unique($f);
+                sort($f, SORT_STRING);
+
+                $carFolder = $carCatname;
+                foreach ($f as $i) {
+                    $carFolder = str_replace($i, '', $carFolder);
+                }
+
+                $carFolder = str_replace('__', '_', $carFolder);
+                $carFolder = trim($carFolder, '_-');
+
+                $brandsFolder = implode('/', $f);
+                $firstChar = mb_substr($brandsFolder, 0, 1);
+
+                $result = $firstChar . '/' . $brandsFolder . '/' . $carFolder . '/' . $carCatname;
+            } else {
+                if (count($sBrands) == 1) {
+                    $sBrandsA = array_values($sBrands);
+                    $brand = $sBrandsA[0];
+
+                    $brandFolder = $filenameFilter->filter($brand['catname']);
+                    $firstChar = mb_substr($brandFolder, 0, 1);
+
+                    $carFolder = $carCatname;
+                    $carFolder = trim(str_replace($brandFolder, '', $carFolder), '_-');
+
+                    $result = implode('/', [
+                        $firstChar,
+                        $brandFolder,
+                        $carFolder,
+                        $carCatname
+                    ]);
+                } else {
+                    $carFolder = $filenameFilter->filter($car['name']);
+                    $firstChar = mb_substr($carFolder, 0, 1);
+                    $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
+                }
+            }
+        }
+
+        $result = str_replace('//', '/', $result);
+
+        return $result;
+    }
+
+    public function canAccept($row): bool
+    {
+        if (! in_array($row['status'], [self::STATUS_INBOX])) {
+            return false;
+        }
+
+        $votes = $this->pictureModerVote->getNegativeVotesCount($row['id']);
+
+        return $votes <= 0;
+    }
+
+    public function canDelete($row): bool
+    {
+        if (! in_array($row['status'], [self::STATUS_INBOX])) {
+            return false;
+        }
+
+        $votes = $this->pictureModerVote->getPositiveVotesCount($row['id']);
+
+        return $votes <= 0;
+    }
+
+    public function accept(int $pictureId, int $userId, &$isFirstTimeAccepted): bool
+    {
+        $primaryKey = ['id' => $pictureId];
+
+        $isFirstTimeAccepted = false;
+
+        $picture = $this->getRow($primaryKey);
+        if (! $picture) {
+            return false;
+        }
+
+        $set = [
+            'status'                => self::STATUS_ACCEPTED,
+            'change_status_user_id' => $userId
+        ];
+
+        if (! $picture['accept_datetime']) {
+            $set['accept_datetime'] = new Sql\Expression('NOW()');
+
+            $isFirstTimeAccepted = true;
+        }
+        $this->table->update($set, $primaryKey);
+
+        return true;
     }
 }

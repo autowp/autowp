@@ -92,11 +92,17 @@ class PictureHydrator extends RestHydrator
      */
     private $pictureModerVote;
 
+    /**
+     * @var Picture
+     */
+    private $picture;
+
     public function __construct(
         $serviceManager
     ) {
         parent::__construct();
 
+        $this->picture = $serviceManager->get(Picture::class);
         $this->pictureTable = $serviceManager->get(DbTable\Picture::class);
         $this->userTable = new User();
 
@@ -423,7 +429,7 @@ class PictureHydrator extends RestHydrator
                     'move'      => $this->acl->isAllowed($role, 'picture', 'move'),
                     'unaccept'  => ($object['status'] == Picture::STATUS_ACCEPTED)
                                 && $this->acl->isAllowed($role, 'picture', 'unaccept'),
-                    'accept'    => $this->pictureTable->canAccept($object)
+                    'accept'    => $this->picture->canAccept($object)
                                 && $this->acl->isAllowed($role, 'picture', 'accept'),
                     'restore'   => ($object['status'] == Picture::STATUS_REMOVING)
                                 && $this->acl->isAllowed($role, 'picture', 'restore'),
@@ -573,7 +579,7 @@ class PictureHydrator extends RestHydrator
 
     private function canDelete($picture)
     {
-        if (! $this->pictureTable->canDelete($picture)) {
+        if (! $this->picture->canDelete($picture)) {
             return false;
         }
 

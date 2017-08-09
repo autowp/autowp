@@ -47,13 +47,19 @@ class PictureItemController extends AbstractRestfulController
      */
     private $item;
 
+    /**
+     * @var Picture
+     */
+    private $picture;
+
     public function __construct(
         PictureItem $pictureItem,
         Log $log,
         RestHydrator $hydrator,
         InputFilter $itemInputFilter,
         DbTable\Picture $pictureTable,
-        Item $item
+        Item $item,
+        Picture $picture
     ) {
         $this->pictureItem = $pictureItem;
         $this->log = $log;
@@ -61,6 +67,7 @@ class PictureItemController extends AbstractRestfulController
         $this->itemInputFilter = $itemInputFilter;
         $this->pictureTable = $pictureTable;
         $this->item = $item;
+        $this->picture = $picture;
     }
 
     private function canChangePerspective($picture)
@@ -151,7 +158,7 @@ class PictureItemController extends AbstractRestfulController
 
             if ($picture['image_id']) {
                 $this->imageStorage()->changeImageName($picture['image_id'], [
-                    'pattern' => $this->pictureTable->getFileNamePattern($picture)
+                    'pattern' => $this->picture->getFileNamePattern($picture)
                 ]);
             }
         }

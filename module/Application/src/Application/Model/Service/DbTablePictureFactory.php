@@ -14,11 +14,10 @@ class DbTablePictureFactory implements FactoryInterface
     {
         $tables = $container->get(\Application\Db\TableManager::class);
         return new \Application\Model\DbTable\Picture([
-            'db'               => $container->get(\Zend_Db_Adapter_Abstract::class),
-            'imageStorage'     => $container->get(\Autowp\Image\Storage::class),
-            'pictureModerVote' => $container->get(\Application\Model\PictureModerVote::class),
-            'perspective'      => $container->get(\Application\Model\Perspective::class),
-            'itemTable'        => $tables->get('item')
+            'db'           => $container->get(\Zend_Db_Adapter_Abstract::class),
+            'imageStorage' => $container->get(\Autowp\Image\Storage::class),
+            'perspective'  => $container->get(\Application\Model\Perspective::class),
+            'itemTable'    => $tables->get('item')
         ]);
     }
 }

@@ -8,7 +8,7 @@ use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Model\Item;
 use Application\Model\ItemParent;
-use Application\Model\DbTable;
+use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
@@ -18,7 +18,6 @@ use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
 
 use Zend\Authentication\AuthenticationService;
-use Application\Model\Picture;
 
 class CatalogueController extends AbstractActionController
 {
@@ -45,9 +44,9 @@ class CatalogueController extends AbstractActionController
     private $itemModel;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     public function __construct(
         ItemParent $itemParent,
@@ -59,7 +58,7 @@ class CatalogueController extends AbstractActionController
         $textStorage,
         DuplicateFinder $duplicateFinder,
         Item $itemModel,
-        DbTable\Picture $pictureTable
+        Picture $picture
     ) {
         $this->itemParent = $itemParent;
         $this->pictureItem = $pictureItem;
@@ -70,7 +69,7 @@ class CatalogueController extends AbstractActionController
         $this->textStorage = $textStorage;
         $this->duplicateFinder = $duplicateFinder;
         $this->itemModel = $itemModel;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function refreshBrandVehicleAction()
@@ -82,11 +81,16 @@ class CatalogueController extends AbstractActionController
 
     public function acceptOldUnsortedAction()
     {
-        $rows = $this->pictureTable->fetchAll([
-            'type = ?'   => DbTable\Picture::UNSORTED_TYPE_ID,
-            'status = ?' => Picture::STATUS_INBOX,
-            'add_date < DATE_SUB(NOW(), INTERVAL 2 YEAR)'
-        ], 'id');
+        $select = $this->picture->getTable()->getSql()->select();
+        $select
+            ->where([
+                'type = ?'   => Picture::UNSORTED_TYPE_ID,
+                'status = ?' => Picture::STATUS_INBOX,
+                'add_date < DATE_SUB(NOW(), INTERVAL 2 YEAR)'
+            ])
+            ->order('id');
+
+        $rows = $this->picture->getTable()->selectWith($select);
 
         $userId = 9;
 
@@ -111,7 +115,7 @@ class CatalogueController extends AbstractActionController
 
             $previousStatusUserId = $picture['change_status_user_id'];
 
-            $success = $this->pictureTable->accept($picture['id'], $userId, $isFirstTimeAccepted);
+            $success = $this->picture->accept($picture['id'], $userId, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
                 $owner = $picture->findParentRow(User::class, 'Owner');
                 if ($owner && ($owner['id'] != $userId)) {

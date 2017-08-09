@@ -4,10 +4,10 @@ namespace ApplicationTest\Form;
 
 use Zend\Form\Form;
 
+use Application\Model\Picture;
 use Application\Test\AbstractHttpControllerTestCase;
-use Application\Model\DbTable;
 
-class PictureTableTest extends AbstractHttpControllerTestCase
+class PictureTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
@@ -15,9 +15,9 @@ class PictureTableTest extends AbstractHttpControllerTestCase
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
-        $table = $serviceManager->get(DbTable\Picture::class);
+        $table = $serviceManager->get(Picture::class);
 
-        $row = $table->fetchRow([]);
+        $row = $table->getRow([]);
 
         $pattern = $table->getFileNamePattern($row);
 

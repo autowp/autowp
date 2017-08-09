@@ -32,6 +32,7 @@ use Application\Service\SpecificationsService;
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;
+use Autowp\Commons\Db\Table\Row;
 
 class Pic extends AbstractPlugin
 {
@@ -1417,7 +1418,13 @@ class Pic extends AbstractPlugin
 
     public function name($pictureRow, $language)
     {
-        $names = $this->pictureTable->getNameData([$pictureRow->toArray()], [
+        if ($pictureRow instanceof Row) {
+            $pictureRow = $pictureRow->toArray();
+        } elseif ($pictureRow instanceof \ArrayObject) {
+            $pictureRow = (array)$pictureRow;
+        }
+
+        $names = $this->pictureTable->getNameData([$pictureRow], [
             'language' => $language,
             'large'    => true
         ]);

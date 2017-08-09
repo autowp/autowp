@@ -82,6 +82,11 @@ class UploadController extends AbstractActionController
      */
     private $brand;
 
+    /**
+     * @var Picture
+     */
+    private $picture;
+
     public function __construct(
         $partial,
         TelegramService $telegram,
@@ -93,7 +98,8 @@ class UploadController extends AbstractActionController
         ItemParent $itemParent,
         DbTable\Picture $pictureTable,
         Item $item,
-        Brand $brand
+        Brand $brand,
+        Picture $picture
     ) {
         $this->partial = $partial;
         $this->telegram = $telegram;
@@ -106,6 +112,7 @@ class UploadController extends AbstractActionController
         $this->pictureTable = $pictureTable;
         $this->item = $item;
         $this->brand = $brand;
+        $this->picture = $picture;
     }
 
     public function onlyRegisteredAction()
@@ -260,7 +267,7 @@ class UploadController extends AbstractActionController
 
             // rename file to new
             $this->imageStorage()->changeImageName($picture['image_id'], [
-                'pattern' => $this->pictureTable->getFileNamePattern($picture)
+                'pattern' => $this->picture->getFileNamePattern($picture)
             ]);
 
             // add comment

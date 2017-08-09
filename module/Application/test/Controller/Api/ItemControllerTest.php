@@ -236,6 +236,14 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->addItemParent($engineId, $brand['id']);
         $this->setEngineToVehicle($brand['catname'], $engineId, $vehicleId);
         $pictureId = $this->addPictureToItem($vehicleId);
+
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/api/picture/' . $pictureId, Request::METHOD_GET);
+        $this->assertResponseStatusCode(200);
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+        $this->assertEquals('inbox', $json['status']);
+
         $this->acceptPicture($pictureId);
         $this->setPerspective($pictureId, $vehicleId, 17);
 

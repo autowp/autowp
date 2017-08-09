@@ -31,14 +31,21 @@ class PictureVote extends AbstractPlugin
      */
     private $pictureModerVote;
 
+    /**
+     * @var Picture
+     */
+    private $picture;
+
     public function __construct(
         PictureModerVote $pictureModerVote,
         DbTable\Picture $pictureTable,
-        TableGateway $voteTemplateTeable
+        TableGateway $voteTemplateTeable,
+        Picture $picture
     ) {
         $this->table = $pictureTable;
         $this->voteTemplateTable = $voteTemplateTeable;
         $this->pictureModerVote = $pictureModerVote;
+        $this->picture = $picture;
     }
 
     private function isLastPicture($picture)
@@ -161,7 +168,7 @@ class PictureVote extends AbstractPlugin
 
     private function pictureCanDelete($picture)
     {
-        if (! $this->table->canDelete($picture)) {
+        if (! $this->picture->canDelete($picture)) {
             return false;
         }
 

@@ -7,14 +7,8 @@ use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\Commons\Db\Table;
 use Autowp\Image;
-use Autowp\ZFComponents\Filter\FilenameSafe;
 
-use Application\Model\Item as ItemModel;
 use Application\Model\Perspective;
-use Application\Model\Picture as PictureModel;
-use Application\Model\PictureModerVote;
-
-use Zend_Db_Expr;
 
 class Picture extends Table
 {
@@ -41,11 +35,6 @@ class Picture extends Table
     private $imageStorage;
 
     /**
-     * @var PictureModerVote
-     */
-    private $pictureModerVote;
-
-    /**
      * @var Perspective
      */
     private $perspective;
@@ -66,11 +55,6 @@ class Picture extends Table
         if (isset($options['imageStorage'])) {
             $this->imageStorage = $options['imageStorage'];
             unset($options['imageStorage']);
-        }
-
-        if (isset($options['pictureModerVote'])) {
-            $this->pictureModerVote = $options['pictureModerVote'];
-            unset($options['pictureModerVote']);
         }
 
         if (isset($options['perspective'])) {
@@ -234,51 +218,6 @@ class Picture extends Table
         return $result;
     }
 
-    public function accept($pictureId, $userId, &$isFirstTimeAccepted)
-    {
-        $isFirstTimeAccepted = false;
-
-        $picture = $this->find($pictureId)->current();
-        if (! $picture) {
-            return false;
-        }
-
-        $picture->setFromArray([
-            'status' => PictureModel::STATUS_ACCEPTED,
-            'change_status_user_id' => $userId
-        ]);
-        if (! $picture['accept_datetime']) {
-            $picture['accept_datetime'] = new Zend_Db_Expr('NOW()');
-
-            $isFirstTimeAccepted = true;
-        }
-        $picture->save();
-
-        return true;
-    }
-
-    public function canAccept(\Autowp\Commons\Db\Table\Row $row): bool
-    {
-        if (! in_array($row['status'], [PictureModel::STATUS_INBOX])) {
-            return false;
-        }
-
-        $votes = $this->pictureModerVote->getNegativeVotesCount($row['id']);
-
-        return $votes <= 0;
-    }
-
-    public function canDelete(\Autowp\Commons\Db\Table\Row $row): bool
-    {
-        if (! in_array($row['status'], [PictureModel::STATUS_INBOX])) {
-            return false;
-        }
-
-        $votes = $this->pictureModerVote->getPositiveVotesCount($row['id']);
-
-        return $votes <= 0;
-    }
-
     /**
      * @param array $options
      * @return Image\Storage\Request
@@ -336,118 +275,5 @@ class Picture extends Table
     public function cropParametersExists(\Autowp\Commons\Db\Table\Row $row)
     {
         return self::checkCropParameters($row->toArray());
-    }
-
-    public function getFileNamePattern(\Autowp\Commons\Db\Table\Row $row): string
-    {
-        if (! $this->itemTable) {
-            throw new Exception("itemTable not provided");
-        }
-
-        $result = rand(1, 9999);
-
-        $filenameFilter = new FilenameSafe();
-
-        $select = new Sql\Select($this->itemTable->getTable());
-        $select
-            ->join('picture_item', 'item.id = picture_item.item_id', [])
-            ->where(['picture_item.picture_id' => $row['id']])
-            ->limit(1);
-
-        $cars = [];
-        foreach ($this->itemTable->selectWith($select) as $itemRow) {
-            $cars[] = $itemRow;
-        }
-
-        if (count($cars) > 1) {
-            $select = new Sql\Select($this->itemTable->getTable());
-            $select
-                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
-                ->where([
-                    'item.item_type_id'       => ItemModel::BRAND,
-                    'picture_item.picture_id' => $row['id']
-                ]);
-
-            $brands = $this->itemTable->selectWith($select);
-
-            $f = [];
-            foreach ($brands as $brand) {
-                $f[] = $filenameFilter->filter($brand['catname']);
-            }
-            $f = array_unique($f);
-            sort($f, SORT_STRING);
-
-            $brandsFolder = implode('/', $f);
-            $firstChar = mb_substr($brandsFolder, 0, 1);
-
-            $result = $firstChar . '/' . $brandsFolder .'/mixed';
-        } elseif (count($cars) == 1) {
-            $car = $cars[0];
-
-            $carCatname = $filenameFilter->filter($car['name']);
-
-            $select = new Sql\Select($this->itemTable->getTable());
-            $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-                ->where([
-                    'item.item_type_id'         => ItemModel::BRAND,
-                    'item_parent_cache.item_id' => $car['id']
-                ]);
-
-            $brands = $this->itemTable->selectWith($select);
-
-            $sBrands = [];
-            foreach ($brands as $brand) {
-                $sBrands[$brand['id']] = $brand;
-            }
-
-            if (count($sBrands) > 1) {
-                $f = [];
-                foreach ($sBrands as $brand) {
-                    $f[] = $filenameFilter->filter($brand['catname']);
-                }
-                $f = array_unique($f);
-                sort($f, SORT_STRING);
-
-                $carFolder = $carCatname;
-                foreach ($f as $i) {
-                    $carFolder = str_replace($i, '', $carFolder);
-                }
-
-                $carFolder = str_replace('__', '_', $carFolder);
-                $carFolder = trim($carFolder, '_-');
-
-                $brandsFolder = implode('/', $f);
-                $firstChar = mb_substr($brandsFolder, 0, 1);
-
-                $result = $firstChar . '/' . $brandsFolder . '/' . $carFolder . '/' . $carCatname;
-            } else {
-                if (count($sBrands) == 1) {
-                    $sBrandsA = array_values($sBrands);
-                    $brand = $sBrandsA[0];
-
-                    $brandFolder = $filenameFilter->filter($brand['catname']);
-                    $firstChar = mb_substr($brandFolder, 0, 1);
-
-                    $carFolder = $carCatname;
-                    $carFolder = trim(str_replace($brandFolder, '', $carFolder), '_-');
-
-                    $result = implode('/', [
-                        $firstChar,
-                        $brandFolder,
-                        $carFolder,
-                        $carCatname
-                    ]);
-                } else {
-                    $carFolder = $filenameFilter->filter($car['name']);
-                    $firstChar = mb_substr($carFolder, 0, 1);
-                    $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
-                }
-            }
-        }
-
-        $result = str_replace('//', '/', $result);
-
-        return $result;
     }
 }

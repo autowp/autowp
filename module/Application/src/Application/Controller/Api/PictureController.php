@@ -15,7 +15,6 @@ use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\CarOfDay;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
@@ -23,8 +22,6 @@ use Application\Model\PictureItem;
 use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
 use Application\Service\TelegramService;
-
-use Zend_Db_Expr;
 
 class PictureController extends AbstractRestfulController
 {
@@ -47,11 +44,6 @@ class PictureController extends AbstractRestfulController
      * @var DuplicateFinder
      */
     private $duplicateFinder;
-
-    /**
-     * @var DbTable\Picture
-     */
-    private $table;
 
     /**
      * @var UserPicture
@@ -121,7 +113,6 @@ class PictureController extends AbstractRestfulController
         $textStorage,
         \Autowp\Comments\CommentsService $comments,
         PictureModerVote $pictureModerVote,
-        DbTable\Picture $pictureTable,
         Item $item,
         Picture $picture
     ) {
@@ -142,19 +133,15 @@ class PictureController extends AbstractRestfulController
         $this->comments = $comments;
         $this->pictureModerVote = $pictureModerVote;
         $this->picture = $picture;
-
-        $this->table = $pictureTable;
         $this->item = $item;
     }
 
     public function randomPictureAction()
     {
-        $select = $this->table->select(true)
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-            ->order('rand() desc')
-            ->limit(1);
-
-        $pictureRow = $this->table->fetchRow($select);
+        $pictureRow = $this->picture->getRow([
+            'status' => Picture::STATUS_ACCEPTED,
+            'order'  => 'random'
+        ]);
 
         $result = [
             'status' => false
@@ -176,12 +163,10 @@ class PictureController extends AbstractRestfulController
 
     public function newPictureAction()
     {
-        $select = $this->table->select(true)
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-            ->order('accept_datetime desc')
-            ->limit(1);
-
-        $pictureRow = $this->table->fetchRow($select);
+        $pictureRow = $this->picture->getRow([
+            'status' => Picture::STATUS_ACCEPTED,
+            'order'  => 'accept_datetime_desc'
+        ]);
 
         $result = [
             'status' => false
@@ -211,33 +196,22 @@ class PictureController extends AbstractRestfulController
             $carRow = $this->item->getRow(['id' => (int)$itemOfDay['item_id']]);
             if ($carRow) {
                 foreach ([31, null] as $groupId) {
-                    $select = $this->table->select(true)
-                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                        ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                        ->where('item_parent_cache.parent_id = ?', $carRow['id'])
-                        ->limit(1);
+                    $filter = [
+                        'status' => Picture::STATUS_ACCEPTED,
+                        'item'   => [
+                            'ancestor_or_self' => $carRow['id']
+                        ],
+                        'order'  => 'resolution_desc'
+                    ];
 
                     if ($groupId) {
-                        $select
-                            ->join(
-                                ['mp' => 'perspectives_groups_perspectives'],
-                                'picture_item.perspective_id = mp.perspective_id',
-                                null
-                            )
-                            ->where('mp.group_id = ?', $groupId)
-                            ->order([
-                                'mp.position',
-                                'pictures.width DESC', 'pictures.height DESC'
-                            ]);
-                    } else {
-                        $select
-                            ->order([
-                                'pictures.width DESC', 'pictures.height DESC'
-                            ]);
+                        $filter['item']['perspective'] = [
+                            'group' => $groupId
+                        ];
+                        $filter['order'] = 'perspective_group';
                     }
 
-                    $pictureRow = $this->table->fetchRow($select);
+                    $pictureRow = $this->picture->getRow($filter);
                     if ($pictureRow) {
                         break;
                     }
@@ -308,7 +282,7 @@ class PictureController extends AbstractRestfulController
             if ($data['perspective_id'] == 'null') {
                 $filter['item']['perspective_is_null'] = true;
             } else {
-                $filter['item']['perspective_id'] = $data['perspective_id'];
+                $filter['item']['perspective'] = $data['perspective_id'];
             }
         }
 
@@ -421,9 +395,9 @@ class PictureController extends AbstractRestfulController
         ]);
     }
 
-    private function canAccept(\Autowp\Commons\Db\Table\Row $picture)
+    private function canAccept($picture)
     {
-        return $this->table->canAccept($picture)
+        return $this->picture->canAccept($picture)
             && $this->user()->isAllowed('picture', 'accept');
     }
 
@@ -443,7 +417,7 @@ class PictureController extends AbstractRestfulController
         ]);
     }
 
-    private function pictureUrl(\Autowp\Commons\Db\Table\Row $picture, $forceCanonical = false, $uri = null)
+    private function pictureUrl($picture, $forceCanonical = false, $uri = null)
     {
         return $this->url()->fromRoute('index', [], [
             'force_canonical' => $forceCanonical,
@@ -457,7 +431,7 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $picture = $this->table->find($this->params('id'))->current();
+        $picture = $this->picture->getRow(['id' => (int)$this->params('id')]);
 
         if (! $picture) {
             return $this->notFoundAction();
@@ -476,9 +450,11 @@ class PictureController extends AbstractRestfulController
 
         $data = $this->editInputFilter->getValues();
 
+        $set = [];
+
         if (array_key_exists('replace_picture_id', $data)) {
             if ($picture['replace_picture_id'] && ! $data['replace_picture_id']) {
-                $replacePicture = $this->table->find($picture['replace_picture_id'])->current();
+                $replacePicture = $this->picture->getRow(['id' => (int)$picture['replace_picture_id']]);
                 if (! $replacePicture) {
                     return $this->notFoundAction();
                 }
@@ -487,8 +463,7 @@ class PictureController extends AbstractRestfulController
                     return $this->forbiddenAction();
                 }
 
-                $picture['replace_picture_id'] = null;
-                $picture->save();
+                $set['replace_picture_id'] = null;
 
                 // log
                 $this->log(sprintf(
@@ -522,21 +497,20 @@ class PictureController extends AbstractRestfulController
             $height = min($picture['height'], $height);
 
             if ($left > 0 || $top > 0 || $width < $picture['width'] || $height < $picture['height']) {
-                $picture->setFromArray([
+                $set = array_replace($set, [
                     'crop_left'   => $left,
                     'crop_top'    => $top,
                     'crop_width'  => $width,
                     'crop_height' => $height
                 ]);
             } else {
-                $picture->setFromArray([
+                $set = array_replace($set, [
                     'crop_left'   => null,
                     'crop_top'    => null,
                     'crop_width'  => null,
                     'crop_height' => null
                 ]);
             }
-            $picture->save();
 
             $this->imageStorage()->flush([
                 'image' => $picture['image_id']
@@ -551,8 +525,7 @@ class PictureController extends AbstractRestfulController
         }
 
         if (isset($data['special_name'])) {
-            $picture['name'] = $data['special_name'];
-            $picture->save();
+            $set['name'] = $data['special_name'];
         }
 
         if (isset($data['copyrights'])) {
@@ -564,8 +537,7 @@ class PictureController extends AbstractRestfulController
                 $this->textStorage->setText($picture['copyrights_text_id'], $text, $user['id']);
             } elseif ($text) {
                 $textId = $this->textStorage->createText($text, $user['id']);
-                $picture['copyrights_text_id'] = $textId;
-                $picture->save();
+                $set['copyrights_text_id'] = $textId;
             }
 
             $this->log(sprintf(
@@ -612,9 +584,10 @@ class PictureController extends AbstractRestfulController
                     return $this->forbiddenAction();
                 }
 
-                $success = $this->table->accept($picture['id'], $user['id'], $isFirstTimeAccepted);
+                $success = $this->picture->accept($picture['id'], $user['id'], $isFirstTimeAccepted);
                 if ($success) {
-                    $owner = $picture->findParentRow(User::class, 'Owner');
+                    $userTable = new User();
+                    $owner = $userTable->find((int)$picture['owner_id'])->current();
 
                     if ($owner) {
                         $this->userPicture->refreshPicturesCount($owner['id']);
@@ -662,11 +635,10 @@ class PictureController extends AbstractRestfulController
                         return $this->forbiddenAction();
                     }
 
-                    $picture->setFromArray([
+                    $set = array_replace($set, [
                         'status'                => Picture::STATUS_INBOX,
                         'change_status_user_id' => $user['id']
                     ]);
-                    $picture->save();
 
                     $this->log(sprintf(
                         'Картинки `%s` восстановлена из очереди удаления',
@@ -680,11 +652,12 @@ class PictureController extends AbstractRestfulController
                         return $this->forbiddenAction();
                     }
 
-                    $picture->setFromArray([
+                    $this->picture->getTable()->update([
                         'status'                => Picture::STATUS_INBOX,
                         'change_status_user_id' => $user['id']
+                    ], [
+                        'id' => $picture['id']
                     ]);
-                    $picture->save();
 
                     if ($picture['owner_id']) {
                         $this->userPicture->refreshPicturesCount($picture['owner_id']);
@@ -718,35 +691,34 @@ class PictureController extends AbstractRestfulController
                 }
 
                 $user = $this->user()->get();
-                $picture->setFromArray([
+                $set = array_replace($set, [
                     'status'                => Picture::STATUS_REMOVING,
-                    'removing_date'         => new Zend_Db_Expr('CURDATE()'),
+                    'removing_date'         => new Sql\Expression('CURDATE()'),
                     'change_status_user_id' => $user['id']
                 ]);
-                $picture->save();
 
-                if ($owner = $picture->findParentRow(User::class, 'Owner')) {
-                    if ($owner['id'] != $user['id']) {
-                        $uri = $this->hostManager->getUriByLanguage($owner['language']);
+                $userTable = new User();
+                $owner = $userTable->find((int)$picture['owner_id'])->current();
+                if ($owner && $owner['id'] != $user['id']) {
+                    $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
-                        $deleteRequests = $this->pictureModerVote->getNegativeVotes($picture['id']);
+                    $deleteRequests = $this->pictureModerVote->getNegativeVotes($picture['id']);
 
-                        $reasons = [];
-                        foreach ($deleteRequests as $request) {
-                            $user = $userTable->find($request['user_id'])->current();
-                            if ($user) {
-                                $reasons[] = $this->userModerUrl($user, true, $uri) . ' : ' . $request['reason'];
-                            }
+                    $reasons = [];
+                    foreach ($deleteRequests as $request) {
+                        $user = $userTable->find($request['user_id'])->current();
+                        if ($user) {
+                            $reasons[] = $this->userModerUrl($user, true, $uri) . ' : ' . $request['reason'];
                         }
-
-                        $message = sprintf(
-                            $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner['language']),
-                            $this->pic()->url($picture['identity'], true, $uri),
-                            implode("\n", $reasons)
-                        );
-
-                        $this->message->send(null, $owner['id'], $message);
                     }
+
+                    $message = sprintf(
+                        $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner['language']),
+                        $this->pic()->url($picture['identity'], true, $uri),
+                        implode("\n", $reasons)
+                    );
+
+                    $this->message->send(null, $owner['id'], $message);
                 }
 
                 $this->log(sprintf(
@@ -756,6 +728,11 @@ class PictureController extends AbstractRestfulController
                     'pictures' => $picture['id']
                 ]);
             }
+        }
+        if ($set) {
+            $this->picture->getTable()->update($set, [
+                'id' => $picture['id']
+            ]);
         }
 
         return $this->getResponse()->setStatusCode(200);
@@ -783,7 +760,7 @@ class PictureController extends AbstractRestfulController
             'fields'   => $data['fields']
         ]);
 
-        $row = $this->table->find($this->params('id'))->current();
+        $row = $this->picture->getRow(['id' => (int)$this->params('id')]);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -793,7 +770,7 @@ class PictureController extends AbstractRestfulController
 
     private function pictureCanDelete($picture)
     {
-        if (! $this->table->canDelete($picture)) {
+        if (! $this->picture->canDelete($picture)) {
             return false;
         }
 
@@ -821,7 +798,7 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->table->find($this->params('id'))->current();
+        $row = $this->picture->getRow(['id' => (int)$this->params('id')]);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -853,7 +830,7 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->table->find($this->params('id'))->current();
+        $row = $this->picture->getRow(['id' => (int)$this->params('id')]);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -885,7 +862,7 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->table->find($this->params('id'))->current();
+        $row = $this->picture->getRow(['id' => (int)$this->params('id')]);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -905,14 +882,14 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $row = $this->table->find($this->params('id'))->current();
+        $row = $this->picture->getRow(['id' => (int)$this->params('id')]);
         if (! $row) {
             return $this->notFoundAction();
         }
 
         if ($row['image_id']) {
             $this->imageStorage()->changeImageName($row['image_id'], [
-                'pattern' => $this->table->getFileNamePattern($row)
+                'pattern' => $this->picture->getFileNamePattern($row)
             ]);
         }
 
@@ -921,8 +898,8 @@ class PictureController extends AbstractRestfulController
 
     public function deleteSimilarAction()
     {
-        $srcPicture = $this->table->find($this->params('id'))->current();
-        $dstPicture = $this->table->find($this->params('similar_picture_id'))->current();
+        $srcPicture = $this->picture->getRow(['id' => (int)$this->params('id')]);
+        $dstPicture = $this->picture->getRow(['id' => (int)$this->params('similar_picture_id')]);
 
         if (! $srcPicture || ! $dstPicture) {
             return $this->notFoundAction();
@@ -976,7 +953,7 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $picture = $this->table->find($this->params('id'))->current();
+        $picture = $this->picture->getRow(['id' => (int)$this->params('id')]);
         if (! $picture) {
             return $this->notFoundAction();
         }
@@ -985,7 +962,7 @@ class PictureController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $replacePicture = $this->table->find($picture['replace_picture_id'])->current();
+        $replacePicture = $this->picture->getRow(['id' => (int)$picture['replace_picture_id']]);
         if (! $replacePicture) {
             return $this->notFoundAction();
         }
@@ -998,14 +975,17 @@ class PictureController extends AbstractRestfulController
 
         // statuses
         if ($picture['status'] != Picture::STATUS_ACCEPTED) {
-            $picture->setFromArray([
+            $set = [
                 'status'                => Picture::STATUS_ACCEPTED,
                 'change_status_user_id' => $user['id']
-            ]);
+            ];
             if (! $picture['accept_datetime']) {
-                $picture['accept_datetime'] = new Zend_Db_Expr('NOW()');
+                $set['accept_datetime'] = new Sql\Expression('NOW()');
             }
-            $picture->save();
+
+            $this->picture->getTable()->update($set, [
+                'id' => $picture['id']
+            ]);
 
             if ($picture['owner_id']) {
                 $this->userPicture->refreshPicturesCount($picture['owner_id']);
@@ -1013,12 +993,13 @@ class PictureController extends AbstractRestfulController
         }
 
         if (! in_array($replacePicture['status'], [Picture::STATUS_REMOVING, Picture::STATUS_REMOVED])) {
-            $replacePicture->setFromArray([
+            $this->picture->getTable()->update([
                 'status'                => Picture::STATUS_REMOVING,
-                'removing_date'         => new Zend_Db_Expr('now()'),
+                'removing_date'         => new Sql\Expression('now()'),
                 'change_status_user_id' => $user['id']
+            ], [
+                'id' => $picture['id']
             ]);
-            $replacePicture->save();
             if ($replacePicture['owner_id']) {
                 $this->userPicture->refreshPicturesCount($replacePicture['owner_id']);
             }
@@ -1033,8 +1014,9 @@ class PictureController extends AbstractRestfulController
         );
 
         // pms
-        $owner = $picture->findParentRow(User::class, 'Owner');
-        $replaceOwner = $replacePicture->findParentRow(User::class, 'Owner');
+        $userTable = new User();
+        $owner = $userTable->find($picture['owner_id'])->current();
+        $replaceOwner = $userTable->find($replacePicture['owner_id'])->current();
         $recepients = [];
         if ($owner) {
             $recepients[$owner['id']] = $owner;
