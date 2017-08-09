@@ -1117,7 +1117,7 @@ class Pic extends AbstractPlugin
             'identity'          => $picture['identity'],
             'name'              => $name,
             'picture'           => $picture,
-            'owner'             => $picture->findParentRow(UserTable::class, 'Owner'),
+            'owner'             => $userTable->find((int)$picture['owner_id'])->current(),
             'addDate'           => Row::getDateTimeByColumnType('timestamp', $picture['add_date']),
             'ofLinks'           => $ofLinks,
             'moderVotes'        => $moderVotes,

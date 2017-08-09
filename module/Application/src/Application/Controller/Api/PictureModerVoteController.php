@@ -48,6 +48,11 @@ class PictureModerVoteController extends AbstractRestfulController
      */
     private $pictureTable;
 
+    /**
+     * @var User
+     */
+    private $userTable;
+
     public function __construct(
         HostManager $hostManager,
         MessageService $message,
@@ -64,6 +69,7 @@ class PictureModerVoteController extends AbstractRestfulController
         $this->userPicture = $userPicture;
         $this->pictureModerVote = $pictureModerVote;
         $this->pictureTable = $pictureTable;
+        $this->userTable = new User();
     }
 
     private function pictureUrl(\Autowp\Commons\Db\Table\Row $picture, $forceCanonical = false, $uri = null)
@@ -76,7 +82,7 @@ class PictureModerVoteController extends AbstractRestfulController
 
     private function notifyVote($picture, $vote, $reason)
     {
-        $owner = $picture->findParentRow(User::class, 'Owner');
+        $owner = $this->userTable->find((int)$picture['owner_id'])->current();
         $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
         if ($ownerIsModer) {
             if ($owner['id'] != $this->user()->get()['id']) {
@@ -124,8 +130,7 @@ class PictureModerVoteController extends AbstractRestfulController
 
         $pictureUrl = $this->pic()->url($picture['identity'], true);
         if ($previousStatusUserId != $user['id']) {
-            $userTable = new User();
-            foreach ($userTable->find($previousStatusUserId) as $prevUser) {
+            foreach ($this->userTable->find($previousStatusUserId) as $prevUser) {
                 $message = sprintf(
                     'С картинки %s снят статус "принято"',
                     $pictureUrl

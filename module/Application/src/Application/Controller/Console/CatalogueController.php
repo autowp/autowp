@@ -48,6 +48,11 @@ class CatalogueController extends AbstractActionController
      */
     private $picture;
 
+    /**
+     * @var User
+     */
+    private $userTable;
+
     public function __construct(
         ItemParent $itemParent,
         PictureItem $pictureItem,
@@ -70,6 +75,7 @@ class CatalogueController extends AbstractActionController
         $this->duplicateFinder = $duplicateFinder;
         $this->itemModel = $itemModel;
         $this->picture = $picture;
+        $this->userTable = new User();
     }
 
     public function refreshBrandVehicleAction()
@@ -117,7 +123,7 @@ class CatalogueController extends AbstractActionController
 
             $success = $this->picture->accept($picture['id'], $userId, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
-                $owner = $picture->findParentRow(User::class, 'Owner');
+                $owner = $this->userTable->find((int)$picture['owner_id'])->current();
                 if ($owner && ($owner['id'] != $userId)) {
                     $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
@@ -137,8 +143,7 @@ class CatalogueController extends AbstractActionController
             }
 
             if ($previousStatusUserId != $userId) {
-                $userTable = new User();
-                foreach ($userTable->find($previousStatusUserId) as $prevUser) {
+                foreach ($this->userTable->find($previousStatusUserId) as $prevUser) {
                     $message = sprintf(
                         'Принята картинка %s',
                         $this->pic()->url($picture['identity'], true)
