@@ -408,7 +408,7 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('change_status_user')) {
-            $user = $this->userTable->find((int)$user['change_status_user_id'])->current();
+            $user = $this->userTable->find((int)$object['change_status_user_id'])->current();
             $picture['change_status_user'] = $user ? $this->extractValue('change_status_user', $user) : null;
         }
 
