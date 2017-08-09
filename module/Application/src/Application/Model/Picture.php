@@ -366,6 +366,7 @@ class Picture
         }
 
         if ($joinPdr) {
+            $group[] = 'pictures.id';
             $select->join(['pdr' => 'pictures_moder_votes'], 'pictures.id = pdr.picture_id', []);
         }
 
