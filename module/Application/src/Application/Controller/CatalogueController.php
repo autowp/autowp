@@ -159,7 +159,7 @@ class CatalogueController extends AbstractActionController
     /**
      * @param Zend_Db_Table_Select $select
      * @param string $pictureId
-     * @return \Autowp\Commons\Db\Table\Row
+     * @return \Zend_Db_Table_Row_Abstract
      */
     private function fetchSelectPicture(Zend_Db_Table_Select $select, $pictureId)
     {

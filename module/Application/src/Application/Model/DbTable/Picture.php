@@ -216,7 +216,7 @@ class Picture extends Table
     /**
      * @return Request
      */
-    public function getFormatRequest(\Autowp\Commons\Db\Table\Row $row)
+    public function getFormatRequest(\Zend_Db_Table_Row_Abstract $row)
     {
         return self::buildFormatRequest($row->toArray());
     }
@@ -237,7 +237,7 @@ class Picture extends Table
             self::between($options['crop_height'], 1, $options['height']);
     }
 
-    public function cropParametersExists(\Autowp\Commons\Db\Table\Row $row)
+    public function cropParametersExists(\Zend_Db_Table_Row_Abstract $row)
     {
         return self::checkCropParameters($row->toArray());
     }

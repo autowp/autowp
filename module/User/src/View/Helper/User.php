@@ -54,7 +54,7 @@ class User extends AbstractHelper
             $user = $this->getLogedInUser();
         }
 
-        if (! $user instanceof \Autowp\Commons\Db\Table\Row) {
+        if (! $user instanceof \Zend_Db_Table_Row_Abstract) {
             $user = $this->user($user);
         }
 
@@ -64,7 +64,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return \Autowp\Commons\Db\Table\Row|bool
+     * @return \Zend_Db_Table_Row_Abstract|bool
      */
     private function getLogedInUser()
     {
@@ -86,7 +86,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return \Autowp\Commons\Db\Table\Row
+     * @return \Zend_Db_Table_Row_Abstract
      */
     public function get()
     {

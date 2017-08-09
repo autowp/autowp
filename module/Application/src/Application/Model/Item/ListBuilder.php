@@ -92,7 +92,7 @@ class ListBuilder
     }
 
     /**
-     * @param \Autowp\Commons\Db\Table\Row|array $item
+     * @param \ArrayObject|array $item
      * @return mixed|string|NULL
      */
     public function getDetailsUrl($item)
@@ -116,7 +116,7 @@ class ListBuilder
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      *
-     * @param \Autowp\Commons\Db\Table\Row|array $item
+     * @param \ArrayObject|array $item
      * @return string|NULL
      */
     public function getPicturesUrl($item)
@@ -125,7 +125,7 @@ class ListBuilder
     }
 
     /**
-     * @param \Autowp\Commons\Db\Table\Row|array $item
+     * @param \ArrayObject|array $item
      * @return string|NULL
      */
     public function getSpecificationsUrl($item)

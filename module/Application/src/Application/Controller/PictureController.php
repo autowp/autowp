@@ -55,7 +55,7 @@ class PictureController extends AbstractActionController
         return $viewModel;
     }
 
-    private function getPicturesSelect(\Autowp\Commons\Db\Table\Row $picture)
+    private function getPicturesSelect(\Zend_Db_Table_Row_Abstract $picture)
     {
         $galleryStatuses = [
             Picture::STATUS_ACCEPTED

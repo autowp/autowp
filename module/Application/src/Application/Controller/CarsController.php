@@ -8,6 +8,7 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Commons\Db\Table\Row;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 
@@ -19,7 +20,6 @@ use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
-use Autowp\Commons\Db\Table\Row;
 
 class CarsController extends AbstractActionController
 {
@@ -567,7 +567,7 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    private function userUrl(\Autowp\Commons\Db\Table\Row $user, $uri = null)
+    private function userUrl(\Zend_Db_Table_Row_Abstract $user, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']

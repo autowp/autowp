@@ -273,12 +273,12 @@ class ItemLanguageController extends AbstractRestfulController
     }
 
     /**
-     * @param \Autowp\Commons\Db\Table\Row $user
+     * @param \Zend_Db_Table_Row_Abstract $user
      * @param bool $full
      * @param \Zend\Uri\Uri $uri
      * @return string
      */
-    private function userModerUrl(\Autowp\Commons\Db\Table\Row $user, $full = false, $uri = null)
+    private function userModerUrl(\Zend_Db_Table_Row_Abstract $user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']

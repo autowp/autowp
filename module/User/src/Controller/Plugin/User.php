@@ -26,7 +26,7 @@ class User extends AbstractPlugin
     private $users = [];
 
     /**
-     * @var \Autowp\Commons\Db\Table\Row
+     * @var \Zend_Db_Table_Row_Abstract
      */
     private $user = null;
 
@@ -47,7 +47,7 @@ class User extends AbstractPlugin
 
     /**
      * @param int $id
-     * @return \Autowp\Commons\Db\Table\Row
+     * @return \Zend_Db_Table_Row_Abstract
      */
     private function user($id)
     {
@@ -72,7 +72,7 @@ class User extends AbstractPlugin
             $user = $this->getLogedInUser();
         }
 
-        if (! $user instanceof \Autowp\Commons\Db\Table\Row) {
+        if (! $user instanceof \Zend_Db_Table_Row_Abstract) {
             $user = $this->user($user);
         }
 
@@ -82,7 +82,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return \Autowp\Commons\Db\Table\Row
+     * @return \Zend_Db_Table_Row_Abstract
      */
     private function getLogedInUser()
     {
@@ -104,7 +104,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return \Autowp\Commons\Db\Table\Row
+     * @return \Zend_Db_Table_Row_Abstract
      */
     public function get()
     {

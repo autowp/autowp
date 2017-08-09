@@ -13,7 +13,7 @@ class InlinePicture extends AbstractHelper
         $this->pictureTable = $pictureTable;
     }
 
-    public function __invoke(\Autowp\Commons\Db\Table\Row $picture)
+    public function __invoke(\Zend_Db_Table_Row_Abstract $picture)
     {
         $view = $this->view;
 

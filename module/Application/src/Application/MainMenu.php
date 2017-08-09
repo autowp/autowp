@@ -201,10 +201,10 @@ class MainMenu
     }
 
     /**
-     * @param \Autowp\Commons\Db\Table\Row $user
+     * @param \Zend_Db_Table_Row_Abstract $user
      * @return array
      */
-    public function getMenu(\Autowp\Commons\Db\Table\Row $user = null)
+    public function getMenu(\Zend_Db_Table_Row_Abstract $user = null)
     {
         $newMessages = 0;
         if ($user) {

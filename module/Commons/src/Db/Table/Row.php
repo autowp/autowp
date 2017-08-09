@@ -6,9 +6,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 
-use Zend_Db_Table_Row;
-
-class Row extends Zend_Db_Table_Row
+class Row
 {
     public static function getDateTimeByColumnType($type, $value)
     {

@@ -209,11 +209,11 @@ class UsersService
     }
 
     /**
-     * @param \Autowp\Commons\Db\Table\Row $user
+     * @param \Zend_Db_Table_Row_Abstract $user
      * @param string $email
      * @param string $language
      */
-    public function changeEmailStart(\Autowp\Commons\Db\Table\Row $user, $email, $language)
+    public function changeEmailStart(\Zend_Db_Table_Row_Abstract $user, $email, $language)
     {
         $host = $this->getHostOptions($language);
 
@@ -228,7 +228,7 @@ class UsersService
 
     /**
      * @param string $code
-     * @return boolean|\Autowp\Commons\Db\Table\Row
+     * @return boolean|\Zend_Db_Table_Row_Abstract
      */
     public function emailChangeFinish($code)
     {
@@ -256,10 +256,10 @@ class UsersService
     }
 
     /**
-     * @param \Autowp\Commons\Db\Table\Row $user
+     * @param \Zend_Db_Table_Row_Abstract $user
      * @param string $hostname
      */
-    public function sendRegistrationConfirmEmail(\Autowp\Commons\Db\Table\Row $user, $hostname)
+    public function sendRegistrationConfirmEmail(\Zend_Db_Table_Row_Abstract $user, $hostname)
     {
         if ($user['email_to_check'] && $user['email_check_code']) {
             $values = [
@@ -293,10 +293,10 @@ class UsersService
     }
 
     /**
-     * @param \Autowp\Commons\Db\Table\Row $user
+     * @param \Zend_Db_Table_Row_Abstract $user
      * @param string $hostname
      */
-    public function sendChangeConfirmEmail(\Autowp\Commons\Db\Table\Row $user, $hostname)
+    public function sendChangeConfirmEmail(\Zend_Db_Table_Row_Abstract $user, $hostname)
     {
         if ($user['email_to_check'] && $user['email_check_code']) {
             $values = [
@@ -408,7 +408,7 @@ class UsersService
         ]);
     }
 
-    public function setPassword(\Autowp\Commons\Db\Table\Row $user, $password)
+    public function setPassword(\Zend_Db_Table_Row_Abstract $user, $password)
     {
         $passwordExpr = $this->passwordHashExpr($password);
 

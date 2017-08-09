@@ -7,6 +7,7 @@ use Exception;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Permissions\Acl\Acl;
 
+use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
 use Autowp\User\Model\DbTable\User;
 
@@ -23,7 +24,6 @@ use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
 
 use Zend_Db_Expr;
-use Autowp\Commons\Db\Table\Row;
 
 class PictureHydrator extends RestHydrator
 {

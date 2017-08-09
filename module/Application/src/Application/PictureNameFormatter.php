@@ -50,7 +50,7 @@ class PictureNameFormatter
 
     public function format($picture, $language)
     {
-        if ($picture instanceof \Autowp\Commons\Db\Table\Row) {
+        if ($picture instanceof \Zend_Db_Table_Row_Abstract) {
             $names = $this->pictureTable->getNameData([$picture->toArray()], [
                 'language' => $language,
                 'large'    => true

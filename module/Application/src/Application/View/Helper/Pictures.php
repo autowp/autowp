@@ -50,7 +50,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function behaviour(\Autowp\Commons\Db\Table\Row $picture)
+    public function behaviour(\Zend_Db_Table_Row_Abstract $picture)
     {
         return $this->userBehaviour($picture, $this->isPictureModer());
     }
@@ -77,7 +77,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    private function userBehaviour(\Autowp\Commons\Db\Table\Row $picture, $isModer)
+    private function userBehaviour(\Zend_Db_Table_Row_Abstract $picture, $isModer)
     {
         if ($this->view->user()->logedIn()) {
             $commentsStat = $this->comments->getTopicStatForUser(
@@ -125,7 +125,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function picture(\Autowp\Commons\Db\Table\Row $picture)
+    public function picture(\Zend_Db_Table_Row_Abstract $picture)
     {
         $view = $this->view;
 

@@ -153,7 +153,7 @@ class CommentsService
      */
     private function getRecursive($type, $item, $parentId, $userId, $perPage = 0, $page = 0)
     {
-        if ($userId instanceof \Autowp\Commons\Db\Table\Row) {
+        if ($userId instanceof \Zend_Db_Table_Row_Abstract) {
             $userId = $userId['id'];
         }
 

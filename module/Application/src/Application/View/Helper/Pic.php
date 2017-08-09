@@ -10,7 +10,7 @@ use Application\PictureNameFormatter;
 class Pic extends AbstractHtmlElement
 {
     /**
-     * @var \Autowp\Commons\Db\Table\Row
+     * @var \Zend_Db_Table_Row_Abstract
      */
     private $picture = null;
 
@@ -32,7 +32,7 @@ class Pic extends AbstractHtmlElement
         $this->pictureTable = $pictureTable;
     }
 
-    public function __invoke(\Autowp\Commons\Db\Table\Row $picture = null)
+    public function __invoke(\Zend_Db_Table_Row_Abstract $picture = null)
     {
         $this->picture = $picture;
 

@@ -72,7 +72,7 @@ class PictureModerVoteController extends AbstractRestfulController
         $this->userTable = new User();
     }
 
-    private function pictureUrl(\Autowp\Commons\Db\Table\Row $picture, $forceCanonical = false, $uri = null)
+    private function pictureUrl($picture, $forceCanonical = false, $uri = null)
     {
         return $this->url()->fromRoute('index', [], [
             'force_canonical' => $forceCanonical,
@@ -105,7 +105,7 @@ class PictureModerVoteController extends AbstractRestfulController
         }
     }
 
-    private function unaccept(\Autowp\Commons\Db\Table\Row $picture)
+    private function unaccept($picture)
     {
         $previousStatusUserId = $picture['change_status_user_id'];
 
