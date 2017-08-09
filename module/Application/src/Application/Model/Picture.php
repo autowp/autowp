@@ -158,6 +158,7 @@ class Picture
     {
         $defaults = [
             'id'               => null,
+            'identity'         => null,
             'columns'          => null,
             'status'           => null,
             'item'             => null,
