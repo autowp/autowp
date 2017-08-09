@@ -23,6 +23,7 @@ use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
 
 use Zend_Db_Expr;
+use Autowp\Commons\Db\Table\Row;
 
 class PictureHydrator extends RestHydrator
 {
@@ -279,7 +280,7 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('add_date')) {
-            $addDate = $object->getDateTime('add_date');
+            $addDate = Row::getDateTimeByColumnType('timestamp', $object['add_date']);
             $picture['add_date'] = $this->extractValue('add_date', $addDate);
         }
 
