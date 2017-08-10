@@ -691,12 +691,12 @@ class Forums
         return $messageId;
     }
 
-    public function getSubscribersIds($topicId)
+    public function getSubscribersIds(int $topicId)
     {
         return $this->comments->getSubscribersIds(\Application\Comments::FORUMS_TYPE_ID, $topicId);
     }
 
-    public function getSubscribedTopics($userId)
+    public function getSubscribedTopics(int $userId)
     {
         $select = new Sql\Select($this->topicTable->getTable());
         $select
@@ -758,5 +758,25 @@ class Forums
         }
 
         return $topics;
+    }
+
+    public function getSubscribedTopicsCount(int $userId): int
+    {
+        $select = new Sql\Select($this->topicTable->getTable());
+        $select->columns(['count' => new Sql\Expression('count(1)')])
+            ->join(
+                'comment_topic_subscribe',
+                'forums_topics.id = comment_topic_subscribe.item_id',
+                []
+            )
+            ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', [])
+            ->where([
+                'comment_topic_subscribe.user_id' => $userId,
+                'comment_topic.type_id'           => \Application\Comments::FORUMS_TYPE_ID,
+                'comment_topic_subscribe.type_id' => \Application\Comments::FORUMS_TYPE_ID,
+            ]);
+        $row = $this->topicTable->selectWith($select)->current();
+
+        return $row ? (int)$row['count'] : 0;
     }
 }

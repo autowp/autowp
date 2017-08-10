@@ -12,8 +12,8 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
 use Application\ItemNameFormatter;
-use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Picture;
 
 class MapController extends AbstractActionController
 {
@@ -23,9 +23,9 @@ class MapController extends AbstractActionController
     private $itemNameFormatter;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var TableGateway
@@ -34,11 +34,11 @@ class MapController extends AbstractActionController
 
     public function __construct(
         ItemNameFormatter $itemNameFormatter,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         TableGateway $itemTable
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->itemTable = $itemTable;
     }
 
@@ -133,16 +133,14 @@ class MapController extends AbstractActionController
                     'url'  => $url,
                 ]);
 
-                $picture = $this->pictureTable->fetchRow(
-                    $this->pictureTable->select(true)
-                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->where('picture_item.item_id = ?', $item['id'])
-                        ->limit(1)
-                );
+                $picture = $this->picture->getRow([
+                    'status' => Picture::STATUS_ACCEPTED,
+                    'item'   => $item['id']
+                ]);
 
                 if ($picture) {
                     $image = $imageStorage->getFormatedImage(
-                        $this->pictureTable->getFormatRequest($picture),
+                        $this->picture->getFormatRequest($picture),
                         'format9'
                     );
                     if ($image) {

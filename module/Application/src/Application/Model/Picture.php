@@ -644,4 +644,9 @@ class Picture
     {
         return $this->pictureTable;
     }
+
+    public function getFormatRequest($row)
+    {
+        return $this->pictureTable->getFormatRequest($row);
+    }
 }

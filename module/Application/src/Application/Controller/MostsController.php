@@ -7,9 +7,9 @@ use Zend\View\Model\ViewModel;
 
 use Autowp\TextStorage;
 
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
+use Application\Model\Picture;
 use Application\Service\Mosts;
 
 class MostsController extends AbstractActionController
@@ -27,23 +27,23 @@ class MostsController extends AbstractActionController
     private $mosts;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     public function __construct(
         TextStorage\Service $textStorage,
         Item $itemModel,
         Perspective $perspective,
         Mosts $mosts,
-        DbTable\Picture $pictureTable
+        Picture $picture
     ) {
 
         $this->textStorage = $textStorage;
         $this->itemModel = $itemModel;
         $this->perspective = $perspective;
         $this->mosts = $mosts;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function indexAction()
@@ -81,7 +81,7 @@ class MostsController extends AbstractActionController
         foreach ($data['carList']['cars'] as $car) {
             foreach ($car['pictures'] as $picture) {
                 if ($picture) {
-                    $formatRequests[$idx++] = $this->pictureTable->getFormatRequest($picture);
+                    $formatRequests[$idx++] = $this->picture->getFormatRequest($picture);
                     $allPictures[] = $picture->toArray();
                 }
             }
@@ -90,7 +90,7 @@ class MostsController extends AbstractActionController
         $imageStorage = $this->imageStorage();
         $imagesInfo = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb');
 
-        $names = $this->pictureTable->getNameData($allPictures, [
+        $names = $this->picture->getNameData($allPictures, [
             'language' => $language
         ]);
 

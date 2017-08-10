@@ -15,23 +15,19 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
-use Application\Model\UserAccount;
 use Autowp\User\Model\UserRename;
 
 use Application\Controller\LoginController;
-use Application\Model\DbTable;
+use Application\Model\Item;
+use Application\Model\Picture;
+use Application\Model\UserAccount;
 use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
-
-use Zend_Db_Expr;
-use Application\Model\Picture;
-use Application\Model\Item;
 
 class AccountController extends AbstractActionController
 {
@@ -101,9 +97,9 @@ class AccountController extends AbstractActionController
     private $userAccount;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var TableGateway
@@ -114,6 +110,11 @@ class AccountController extends AbstractActionController
      * @var Item
      */
     private $item;
+
+    /**
+     * @var Forums
+     */
+    private $forums;
 
     public function __construct(
         UsersService $service,
@@ -129,9 +130,10 @@ class AccountController extends AbstractActionController
         MessageService $message,
         UserRename $userRename,
         UserAccount $userAccount,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         TableGateway $loginStateTable,
-        Item $item
+        Item $item,
+        Forums $forums
     ) {
 
         $this->service = $service;
@@ -147,9 +149,10 @@ class AccountController extends AbstractActionController
         $this->message = $message;
         $this->userRename = $userRename;
         $this->userAccount = $userAccount;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->loginStateTable = $loginStateTable;
         $this->item = $item;
+        $this->forums = $forums;
     }
 
     private function forwardToLogin()
@@ -163,29 +166,15 @@ class AccountController extends AbstractActionController
     {
         $user = $this->user()->get();
 
-        $db = $this->pictureTable->getAdapter();
+        $picsCount = $this->picture->getCount([
+            'status' => Picture::STATUS_ACCEPTED,
+            'user'   => $user['id']
+        ]);
 
-        $picsCount = $db->fetchOne(
-            $db->select()
-                ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                ->where('owner_id = ?', $user['id'])
-                ->where('status = ?', Picture::STATUS_ACCEPTED)
-        );
-
-        $subscribesCount = $db->fetchOne(
-            $db->select()
-                ->from('forums_topics', new Zend_Db_Expr('COUNT(*)'))
-                ->join('forums_topics_subscribers', 'forums_topics.id=forums_topics_subscribers.topic_id', [])
-                ->where('forums_topics_subscribers.user_id = ?', $user['id'])
-                ->where('forums_topics.status IN (?)', [Forums::STATUS_CLOSED, Forums::STATUS_NORMAL])
-        );
-
-        $notTakenPicturesCount = $db->fetchOne(
-            $db->select()
-                ->from($this->pictureTable->info('name'), new Zend_Db_Expr('COUNT(1)'))
-                ->where('owner_id = ?', $user['id'])
-                ->where('status = ?', Picture::STATUS_INBOX)
-        );
+        $notTakenPicturesCount = $this->picture->getCount([
+            'status' => Picture::STATUS_INBOX,
+            'user'   => $user['id']
+        ]);
 
         return [
             'smCount'               => $this->message->getSystemCount($user['id']),
@@ -194,7 +183,7 @@ class AccountController extends AbstractActionController
             'newPmCount'            => $this->message->getInboxNewCount($user['id']),
             'omCount'               => $this->message->getSentCount($user['id']),
             'notTakenPicturesCount' => $notTakenPicturesCount,
-            'subscribesCount'       => $subscribesCount,
+            'subscribesCount'       => $this->forums->getSubscribedTopicsCount($user['id']),
             'picsCount'             => $picsCount
         ];
     }
@@ -663,22 +652,17 @@ class AccountController extends AbstractActionController
             return $this->forwardToLogin();
         }
 
-        $select = $this->pictureTable->select(true)
-            ->where('owner_id = ?', $this->user()->get()['id'])
-            ->where('status = ?', Picture::STATUS_INBOX)
-            ->order(['add_date DESC']);
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
-        );
+        $paginator = $this->picture->getPaginator([
+            'user'   => $this->user()->get()['id'],
+            'status' => Picture::STATUS_INBOX,
+            'order'  => 'add_date_desc'
+        ]);
 
         $paginator
             ->setItemCountPerPage(16)
             ->setCurrentPageNumber($this->params('page'));
 
-        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-        $picturesData = $this->pic()->listData($select, [
+        $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
             'width' => 4
         ]);
 
