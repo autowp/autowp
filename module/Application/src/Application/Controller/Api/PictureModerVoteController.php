@@ -109,11 +109,13 @@ class PictureModerVoteController extends AbstractRestfulController
         $previousStatusUserId = $picture['change_status_user_id'];
 
         $user = $this->user()->get();
-        $picture->setFromArray([
+
+        $this->picture->getTable()->update([
             'status'                => Picture::STATUS_INBOX,
             'change_status_user_id' => $user['id']
+        ], [
+            'id' => $picture['id']
         ]);
-        $picture->save();
 
         if ($picture['owner_id']) {
             $this->userPicture->refreshPicturesCount($picture['owner_id']);
@@ -203,8 +205,11 @@ class PictureModerVoteController extends AbstractRestfulController
         $this->pictureModerVote->add($picture['id'], $user['id'], $vote ? 1 : 0, $values['reason']);
 
         if ($vote && $picture['status'] == Picture::STATUS_REMOVING) {
-            $picture['status'] = Picture::STATUS_INBOX;
-            $picture->save();
+            $this->picture->getTable()->update([
+                'status' => Picture::STATUS_INBOX
+            ], [
+                'id' => $picture['id']
+            ]);
         }
 
         if ((! $vote) && $picture['status'] == Picture::STATUS_ACCEPTED) {
