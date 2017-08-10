@@ -32,7 +32,7 @@ class Pic extends AbstractHtmlElement
         $this->pictureTable = $pictureTable;
     }
 
-    public function __invoke(\Zend_Db_Table_Row_Abstract $picture = null)
+    public function __invoke($picture = null)
     {
         $this->picture = $picture;
 
