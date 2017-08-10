@@ -153,12 +153,10 @@ class Twins
         ];
 
         if ($brandId) {
-            $filter['parent'] = [
-                'child' => [
-                    'ancestor_or_self' => [
-                        'item_type_id' => Item::BRAND,
-                        'id'           => $brandId
-                    ]
+            $filter['child'] = [
+                'ancestor_or_self' => [
+                    'item_type_id' => Item::BRAND,
+                    'id'           => $brandId
                 ]
             ];
         }
