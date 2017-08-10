@@ -448,7 +448,7 @@ class CatalogueController extends AbstractActionController
 
             $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
-            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_7_' . $language . '_' . $httpsFlag;
+            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_10_' . $language . '_' . $httpsFlag;
             $topPictures = $this->cache->getItem($key, $success);
             if (! $success) {
                 $select = $this->selectFromPictures(true)
@@ -483,7 +483,7 @@ class CatalogueController extends AbstractActionController
                             'breakOnFirst' => true
                         ]);
 
-                        if (count($paths) <= 0) {
+                        if (count($paths) <= 0 || $paths[0]['type'] != 'brand-item') {
                             return $this->pic()->url($picture['identity']);
                         }
 
