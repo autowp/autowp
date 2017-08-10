@@ -188,8 +188,16 @@ class Picture extends Zend_Db_Table
      * @param array $options
      * @return Image\Storage\Request
      */
-    public static function buildFormatRequest(array $options)
+    public static function buildFormatRequest($options)
     {
+        if ($options instanceof \ArrayAccess) {
+            $options = (array)$options;
+        }
+
+        if (! is_array($options)) {
+            throw new \Exception("array or ArrayAccess expected");
+        }
+
         $defaults = [
             'image_id'    => null,
             'crop_left'   => null,

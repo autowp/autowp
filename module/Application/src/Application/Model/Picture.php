@@ -111,7 +111,7 @@ class Picture
         }
     }
 
-    private function applyItemFilters(Sql\Select $select, $options)
+    private function applyItemFilters(Sql\Select $select, $options, bool $forceJoinItem)
     {
         if (! is_array($options)) {
             $options = [
@@ -129,6 +129,10 @@ class Picture
         $options = array_replace($defaults, $options);
 
         $select->join('picture_item', 'pictures.id = picture_item.picture_id', []);
+
+        if ($forceJoinItem) {
+            $select->join('item', 'picture_item.item_id = item.id', []);
+        }
 
         if ($options['id'] !== null) {
             $this->applyIdFilter($select, $options['id'], 'picture_item.item_id');
@@ -185,8 +189,14 @@ class Picture
             'order'            => null,
             'has_copyrights'   => null,
             'limit'            => null,
+            'accepted_in_days' => null,
         ];
         $options = array_replace($defaults, $options);
+
+        $forceJoinItem = false;
+        if ($options['order'] == 'ancestor_stock_front_first') {
+            $forceJoinItem = true;
+        }
 
         $select = $this->table->getSql()->select();
         $group = [];
@@ -213,7 +223,7 @@ class Picture
         }
 
         if ($options['item']) {
-            $subGroup = $this->applyItemFilters($select, $options['item']);
+            $subGroup = $this->applyItemFilters($select, $options['item'], $forceJoinItem);
             $group = array_merge($group, $subGroup);
         }
 
@@ -296,6 +306,15 @@ class Picture
             $select->where(['pictures.copyrights_text_id IS NOT NULL']);
         }
 
+        if ($options['accepted_in_days']) {
+            $select->where([
+                new Sql\Predicate\Expression(
+                    'pictures.accept_datetime > DATE_SUB(CURDATE(), INTERVAL ? DAY)',
+                    [(int)$options['accepted_in_days']]
+                )
+            ]);
+        }
+
         switch ($options['order']) {
             case 'accept_datetime_desc':
                 $select->order('accept_datetime desc');
@@ -357,6 +376,10 @@ class Picture
                 $group[] = 'mp.position';
                 break;
             case 'ancestor_stock_front_first':
+                $group[] = 'ipc_ancestor.tuning';
+                $group[] = 'ipc_ancestor.sport';
+                $group[] = 'item.is_concept';
+                $group[] = 'picture_item.perspective_id';
                 $select->order([
                     new Sql\Expression('ipc_ancestor.tuning asc'),
                     new Sql\Expression('ipc_ancestor.sport asc'),
@@ -369,6 +392,7 @@ class Picture
                 break;
 
             case 'front_angle':
+                $group[] = 'picture_item.perspective_id';
                 $select->order([
                     new Sql\Expression('picture_item.perspective_id=7 DESC'),
                     new Sql\Expression('picture_item.perspective_id=8 DESC')

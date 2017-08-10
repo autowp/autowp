@@ -10,7 +10,6 @@ use Autowp\User\Model\DbTable\User;
 use Application\Model\CarOfDay;
 use Application\Model\Categories;
 use Application\Model\Brand;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\Picture;
@@ -47,9 +46,9 @@ class IndexController extends AbstractActionController
     private $twins;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var Brand
@@ -63,7 +62,7 @@ class IndexController extends AbstractActionController
         Categories $categories,
         Perspective $perspective,
         Twins $twins,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         Item $item,
         Brand $brand
     ) {
@@ -73,7 +72,7 @@ class IndexController extends AbstractActionController
         $this->categories = $categories;
         $this->perspective = $perspective;
         $this->twins = $twins;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
 
         $this->item = $item;
         $this->brand = $brand;
@@ -193,13 +192,14 @@ class IndexController extends AbstractActionController
     {
         $language = $this->language();
 
-        $select = $this->pictureTable->select(true)
-            ->where('pictures.accept_datetime > DATE_SUB(CURDATE(), INTERVAL 3 DAY)')
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-            ->order(['pictures.accept_datetime DESC', 'pictures.id DESC'])
-            ->limit(6);
+        $rows = $this->picture->getRows([
+            'status'           => Picture::STATUS_ACCEPTED,
+            'order'            => 'accept_datetime_desc',
+            'accepted_in_days' => 3,
+            'limit'            => 6
+        ]);
 
-        $newPicturesData = $this->pic()->listData($select, [
+        $newPicturesData = $this->pic()->listData($rows, [
             'width' => 3
         ]);
 
@@ -267,7 +267,7 @@ class IndexController extends AbstractActionController
 
         $specsCars = $this->car()->listData($cars, [
             'pictureFetcher' => new Item\PerspectivePictureFetcher([
-                'pictureTable'         => $this->pictureTable,
+                'pictureTable'         => $this->picture->getPictureTable(),
                 'perspective'          => $this->perspective,
                 'type'                 => null,
                 'onlyExactlyPictures'  => false,
