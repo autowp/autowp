@@ -999,7 +999,7 @@ class PictureController extends AbstractRestfulController
                 'removing_date'         => new Sql\Expression('now()'),
                 'change_status_user_id' => $user['id']
             ], [
-                'id' => $picture['id']
+                'id' => $replacePicture['id']
             ]);
             if ($replacePicture['owner_id']) {
                 $this->userPicture->refreshPicturesCount($replacePicture['owner_id']);
