@@ -588,6 +588,8 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
+        $engine = $this->itemModel->getRow(['id' => (int)$car['engine_item_id']]);
+
         $this->itemModel->getTable()->update([
             'engine_inherit' => 0,
             'engine_item_id' => null
