@@ -8,8 +8,8 @@ use Zend\Permissions\Acl\Acl;
 use Autowp\Comments;
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Picture;
 
 class AboutController extends AbstractActionController
 {
@@ -24,9 +24,9 @@ class AboutController extends AbstractActionController
     private $comments;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var Item
@@ -36,12 +36,12 @@ class AboutController extends AbstractActionController
     public function __construct(
         Acl $acl,
         Comments\CommentsService $comments,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         Item $item
     ) {
         $this->acl = $acl;
         $this->comments = $comments;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->item = $item;
     }
 
@@ -87,13 +87,7 @@ class AboutController extends AbstractActionController
 
         ksort($contributors, SORT_NUMERIC);
 
-        $pictureTableAdapter = $this->pictureTable->getAdapter();
-        $pictureTableName = $this->pictureTable->info('name');
-
-        $totalPictures = $pictureTableAdapter->fetchOne(
-            $pictureTableAdapter->select()
-                ->from($pictureTableName, 'count(1)')
-        );
+        $totalPictures = $this->picture->getCount([]);
         $totalPictures = round($totalPictures, -4);
 
         $totalCars = $this->item->getCount([]);
@@ -108,10 +102,7 @@ class AboutController extends AbstractActionController
             'zhTranslator'  => $userTable->find(25155)->current(),
             'contributors'  => $contributors,
             'totalPictures' => $totalPictures,
-            'picturesSize'  => $pictureTableAdapter->fetchOne(
-                $pictureTableAdapter->select()
-                    ->from($pictureTableName, 'sum(filesize)')
-            ),
+            'picturesSize'  => $this->picture->getTotalPicturesSize(),
             'totalUsers'    => $totalUsers,
             'totalCars'     => $totalCars,
             'totalComments' => $totalComments

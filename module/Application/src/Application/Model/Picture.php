@@ -649,4 +649,12 @@ class Picture
     {
         return $this->pictureTable->getFormatRequest($row);
     }
+
+    public function getTotalPicturesSize()
+    {
+        $select = $this->table->getSql()->select();
+        $select->columns(['sum' => new Sql\Expression('sum(filesize)')]);
+        $row = $this->table->selectWith($select)->current();
+        return $row ? $row['sum'] : 0;
+    }
 }
