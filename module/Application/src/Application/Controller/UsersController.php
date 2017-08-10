@@ -150,7 +150,7 @@ class UsersController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $picturesExists = $this->picture->isExists([
+        $picturesExists = $this->picture->getCount([
             'user'   => $user['id'],
             'status' => Picture::STATUS_ACCEPTED
         ]);
