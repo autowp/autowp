@@ -50,7 +50,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function behaviour(\Zend_Db_Table_Row_Abstract $picture)
+    public function behaviour($picture)
     {
         return $this->userBehaviour($picture, $this->isPictureModer());
     }
@@ -77,8 +77,14 @@ class Pictures extends AbstractHelper
     }
 
 
-    private function userBehaviour(\Zend_Db_Table_Row_Abstract $picture, $isModer)
+    private function userBehaviour($picture, $isModer)
     {
+        if ($picture instanceof \Zend_Db_Table_Row_Abstract) {
+            $picture = $picture->toArray();
+        } elseif ($picture instanceof \ArrayObject) {
+            $picture= (array)$picture;
+        }
+
         if ($this->view->user()->logedIn()) {
             $commentsStat = $this->comments->getTopicStatForUser(
                 \Application\Comments::PICTURES_TYPE_ID,

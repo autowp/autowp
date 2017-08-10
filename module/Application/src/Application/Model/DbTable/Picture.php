@@ -217,9 +217,15 @@ class Picture extends Zend_Db_Table
     /**
      * @return Request
      */
-    public function getFormatRequest(\Zend_Db_Table_Row_Abstract $row)
+    public function getFormatRequest($row)
     {
-        return self::buildFormatRequest($row->toArray());
+        if ($row instanceof \Zend_Db_Table_Row_Abstract) {
+            $row = $row->toArray();
+        } elseif ($row instanceof \ArrayObject) {
+            $row = (array)$row;
+        }
+
+        return self::buildFormatRequest($row);
     }
 
     private static function between($a, $min, $max)

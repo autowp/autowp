@@ -61,7 +61,13 @@ class Pic extends AbstractHtmlElement
 
     public function name($pictureRow, $language)
     {
-        $names = $this->pictureTable->getNameData([$pictureRow->toArray()], [
+        if ($pictureRow instanceof \Zend_Db_Table_Row_Abstract) {
+            $pictureRow = $pictureRow->toArray();
+        } elseif ($pictureRow instanceof \ArrayObject) {
+            $pictureRow = (array)$pictureRow;
+        }
+
+        $names = $this->pictureTable->getNameData([$pictureRow], [
             'language' => $language,
             'large'    => true
         ]);
