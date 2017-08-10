@@ -244,8 +244,14 @@ class Picture extends Zend_Db_Table
             self::between($options['crop_height'], 1, $options['height']);
     }
 
-    public function cropParametersExists(\Zend_Db_Table_Row_Abstract $row)
+    public function cropParametersExists($row)
     {
-        return self::checkCropParameters($row->toArray());
+        if ($row instanceof \Zend_Db_Table_Row_Abstract) {
+            $row = $row->toArray();
+        } elseif ($row instanceof \ArrayObject) {
+            $row = (array)$row;
+        }
+
+        return self::checkCropParameters($row);
     }
 }
