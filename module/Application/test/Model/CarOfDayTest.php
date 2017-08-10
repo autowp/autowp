@@ -1,8 +1,7 @@
 <?php
 
-namespace ApplicationTest\Form;
+namespace ApplicationTest\Model;
 
-use Zend\Form\Form;
 use Application\Test\AbstractHttpControllerTestCase;
 
 use Application\Model\CarOfDay;

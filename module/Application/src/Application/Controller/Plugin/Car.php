@@ -162,10 +162,11 @@ class Car extends AbstractPlugin
         if ($carIds && ! $disableTwins) {
             $carsTwinsGroups = [];
 
-            foreach ($this->twins->getCarsGroups($carIds) as $carId => $twinsGroups) {
+            foreach ($this->twins->getCarsGroups($carIds, $language) as $carId => $twinsGroups) {
                 $carsTwinsGroups[$carId] = [];
                 foreach ($twinsGroups as $twinsGroup) {
                     $carsTwinsGroups[$carId][] = [
+                        'name' => $twinsGroup['name'],
                         'url'  => $controller->url()->fromRoute('twins/group', [
                             'id' => $twinsGroup['id']
                         ]),

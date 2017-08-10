@@ -243,17 +243,19 @@ class Twins
         return $result;
     }
 
-    public function getCarsGroups(array $itemIds): array
+    public function getCarsGroups(array $itemIds, string $language): array
     {
         if (! $itemIds) {
             return [];
         }
 
         $rows = $this->item->getRows([
+            'language'           => $language,
+            'columns'            => ['id', 'name'],
             'item_type_id'       => Item::TWINS,
             'descendant_or_self' => [
                 'id'      => $itemIds,
-                'columns' => ['item_id']
+                'columns' => ['item_id' => 'id']
             ]
         ]);
 

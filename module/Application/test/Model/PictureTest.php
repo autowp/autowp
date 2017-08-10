@@ -1,8 +1,6 @@
 <?php
 
-namespace ApplicationTest\Form;
-
-use Zend\Form\Form;
+namespace ApplicationTest\Model;
 
 use Application\Model\Picture;
 use Application\Test\AbstractHttpControllerTestCase;

@@ -163,7 +163,10 @@ $singleThumbPart = round(12 / $thumbColumns);
                 <?php foreach ($item['twinsGroups'] as $twinsGroup) { ?>
                     <li>
                         <i class="fa fa-adjust"></i>
-                        <?=$this->htmlA($twinsGroup['url'], $this->translate('carlist/twins')) ?>
+                        <?=$this->htmlA([
+                            'href'  => $twinsGroup['url'],
+                            'title' => $twinsGroup['name']
+                        ], $this->translate('carlist/twins')) ?>
                     </li>
                 <?php } ?>
             <?php } ?>

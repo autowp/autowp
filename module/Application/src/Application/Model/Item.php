@@ -1044,6 +1044,8 @@ class Item
                                     $group[] = $key;
                                 }
                                 break;
+                            default:
+                                throw new Exception("Unexpected column `$column`");
                         }
                     }
                 }

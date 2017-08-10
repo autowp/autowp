@@ -82,7 +82,7 @@ class Pictures extends AbstractHelper
         if ($picture instanceof \Zend_Db_Table_Row_Abstract) {
             $picture = $picture->toArray();
         } elseif ($picture instanceof \ArrayObject) {
-            $picture= (array)$picture;
+            $picture = (array)$picture;
         }
 
         if ($this->view->user()->logedIn()) {
