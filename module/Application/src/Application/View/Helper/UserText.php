@@ -2,6 +2,8 @@
 
 namespace Application\View\Helper;
 
+use Exception;
+
 use Zend\Http\Request;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Uri;
@@ -9,9 +11,7 @@ use Zend\View\Helper\AbstractHtmlElement;
 
 use Autowp\User\Model\DbTable\User as UserTable;
 
-use Application\Model\DbTable;
-
-use Exception;
+use Application\Model\Picture;
 
 class UserText extends AbstractHtmlElement
 {
@@ -35,14 +35,14 @@ class UserText extends AbstractHtmlElement
     private $router;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
-    public function __construct($router, DbTable\Picture $pictureTable)
+    public function __construct($router, Picture $picture)
     {
         $this->router = $router;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function __invoke($text)
@@ -226,8 +226,8 @@ class UserText extends AbstractHtmlElement
         }
 
         if ($pictureId) {
-            $picture = $this->pictureTable->fetchRow([
-                'identity = ?' => $pictureId
+            $picture = $this->picture->getRow([
+                'identity' => $pictureId
             ]);
 
             if ($picture) {

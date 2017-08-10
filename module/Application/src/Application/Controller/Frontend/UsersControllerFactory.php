@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Application\Controller\Frontend;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
@@ -22,7 +22,7 @@ class UsersControllerFactory implements FactoryInterface
             $container->get(\Autowp\User\Model\UserRename::class),
             $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\UserAccount::class),
-            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\Item::class),
             $container->get(\Application\Model\Brand::class)
         );

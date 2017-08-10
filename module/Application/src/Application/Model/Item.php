@@ -1480,6 +1480,29 @@ class Item
         return $this->getPaginator($options)->getTotalItemCount();
     }
 
+    public function getCountDistinct(array $options): int
+    {
+        $select = $this->getSelect($options);
+
+        $select->reset(Sql\Select::LIMIT);
+        $select->reset(Sql\Select::OFFSET);
+        $select->reset(Sql\Select::ORDER);
+        $select->reset(Sql\Select::COLUMNS);
+        $select->reset(Sql\Select::GROUP);
+        $select->columns(['id']);
+        $select->quantifier(Sql\Select::QUANTIFIER_DISTINCT);
+
+        $countSelect = new Sql\Select();
+
+        $countSelect->columns(['count' => new Sql\Expression('COUNT(1)')]);
+        $countSelect->from(['original_select' => $select]);
+
+        $statement = $this->itemTable->getSql()->prepareStatementForSqlObject($countSelect);
+        $row = $statement->execute()->current();
+
+        return (int) $row['count'];
+    }
+
     public function getCountPairs(array $options): array
     {
         $select = $this->getSelect($options);

@@ -9,6 +9,7 @@ use Zend\Paginator;
 
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
+use Application\Model\DbTable;
 use Application\Model\Item as ItemModel;
 
 class Picture
@@ -38,14 +39,21 @@ class Picture
      */
     private $pictureModerVote;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         TableGateway $table,
         TableGateway $itemTable,
-        PictureModerVote $pictureModerVote
+        PictureModerVote $pictureModerVote,
+        DbTable\Picture $pictureTable
     ) {
         $this->table = $table;
         $this->itemTable = $itemTable;
         $this->pictureModerVote = $pictureModerVote;
+        $this->pictureTable = $pictureTable;
     }
 
     private function applyIdFilter(Sql\Select $select, $value, string $id)
@@ -176,6 +184,7 @@ class Picture
             'has_point'        => null,
             'order'            => null,
             'has_copyrights'   => null,
+            'limit'            => null,
         ];
         $options = array_replace($defaults, $options);
 
@@ -292,10 +301,10 @@ class Picture
                 $select->order('accept_datetime desc');
                 break;
             case 'add_date_desc':
-                $select->order('pictures.add_date DESC');
+                $select->order(['pictures.add_date DESC', 'pictures.id DESC']);
                 break;
             case 'add_date_asc':
-                $select->order('pictures.add_date ASC');
+                $select->order(['pictures.add_date ASC', 'pictures.id ASC']);
                 break;
             case 'resolution_desc':
                 $select->order(['pictures.width DESC', 'pictures.height DESC']);
@@ -374,6 +383,10 @@ class Picture
 
         if ($group) {
             $select->group($group);
+        }
+
+        if ($options['limit']) {
+            $select->limit($options['limit']);
         }
 
         return $select;
@@ -620,5 +633,15 @@ class Picture
         $number = "0123456789";
 
         return Rand::getString(1, $alpha) . Rand::getString(self::IDENTITY_LENGTH - 1, $alpha . $number);
+    }
+
+    public function getNameData($rows, array $options = [])
+    {
+        return $this->pictureTable->getNameData($rows, $options);
+    }
+
+    public function getPictureTable(): DbTable\Picture
+    {
+        return $this->pictureTable;
     }
 }

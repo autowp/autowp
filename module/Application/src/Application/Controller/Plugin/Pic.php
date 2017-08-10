@@ -275,11 +275,23 @@ class Pic extends AbstractPlugin
 
         $ids = [];
 
+        if ($pictures instanceof \ArrayIterator) {
+            $rows = [];
+            foreach ($pictures as $picture) {
+                $rows[] = (array)$picture;
+            }
+            $pictures = $rows;
+        }
+
         if (is_array($pictures)) {
             $rows = [];
             foreach ($pictures as $picture) {
+                if ($picture instanceof \Zend_Db_Table_Row_Abstract) {
+                    $picture = $picture->toArray();
+                }
+
                 $ids[] = $picture['id'];
-                $rows[] = $picture->toArray();
+                $rows[] = $picture;
             }
 
             // moder votes
@@ -371,7 +383,7 @@ class Pic extends AbstractPlugin
                 $ids[] = (int)$picture['id'];
             }
         } else {
-            throw new Exception("Unexpected type of pictures");
+            throw new Exception(sprintf("Unexpected type of pictures: %s", get_class($pictures)));
         }
 
         // prefetch

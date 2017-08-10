@@ -45,7 +45,7 @@ html {
                         <?=$this->htmlA($brand['url'], $brand['name']) ?>
                         <span class="count">(<?=$brand['count'] - $brand['new_count'] ?><?php if ($brand['new_count'] > 0) { ?><span>+<?=$brand['new_count'] ?></span><?php } ?>)</span>,
                     <?php } ?>
-                    <?php if ($more = $this->twinsBlock['more_count']) { ?>
+                    <?php if ($more = $this->twinsBlock['brands_count'] - count($this->twinsBlock['brands'])) { ?>
                         …
                         <?=$this->escapeHtml($this->translate('and'))?>
                         <?=$this->htmlA(

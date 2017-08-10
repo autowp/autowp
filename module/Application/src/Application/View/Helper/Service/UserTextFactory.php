@@ -16,7 +16,7 @@ class UserTextFactory implements FactoryInterface
     {
         return new Helper(
             $container->get('Router'),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\Picture::class)
         );
     }
 }

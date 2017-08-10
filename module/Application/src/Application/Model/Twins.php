@@ -3,32 +3,35 @@
 namespace Application\Model;
 
 use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
 
 use Application\Model\Brand;
-use Application\Model\DbTable;
 
 use Zend_Db_Select;
 
 class Twins
 {
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
-     * @var TableGateway
+     * @var Item
      */
-    private $itemTable;
+    private $item;
+
+    /**
+     * @var Brand
+     */
+    private $brand;
 
     public function __construct(
-        DbTable\Picture $pictureTable,
-        TableGateway $itemTable,
+        Picture $picture,
+        Item $item,
         Brand $brand
     ) {
-        $this->pictureTable = $pictureTable;
-        $this->itemTable = $itemTable;
+        $this->picture = $picture;
+        $this->item = $item;
         $this->brand = $brand;
     }
 
@@ -71,123 +74,104 @@ class Twins
     }
 
     /**
-     * @param int|array $groupId
-     * @return int
+     * @param array $groupId
+     * @return array
      */
-    public function getGroupPicturesCount($groupId)
+    public function getGroupsPicturesCount(array $groupIds): array
     {
-        $db = $this->pictureTable->getAdapter();
+        if (! $groupIds) {
+            return [];
+        }
 
-        $select = $db->select()
-            ->from($this->pictureTable->info('name'), null)
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null);
+        $select = $this->picture->getTable()->getSql()->select();
 
-        if (is_array($groupId)) {
-            if ($groupId) {
-                $select
-                    ->columns(['item_parent_cache.parent_id', 'COUNT(1)'])
-                    ->group('item_parent_cache.parent_id')
-                    ->where('item_parent_cache.parent_id in (?)', $groupId);
+        $select->columns(['count' => new Sql\Expression('COUNT(DISTINCT pictures.id)')])
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
+            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', ['parent_id'])
+            ->where([
+                'pictures.status' => Picture::STATUS_ACCEPTED,
+                new Sql\Predicate\In('item_parent_cache.parent_id', $groupIds)
+            ])
+            ->group('item_parent_cache.parent_id');
 
-                $result = $db->fetchPairs($select);
-            } else {
-                $result = [];
-            }
-        } else {
-            $select
-                ->columns('COUNT(1)')
-                ->where('item_parent_cache.parent_id = ?', (int)$groupId);
-
-            $result = (int)$db->fetchOne($select);
+        $result = [];
+        foreach ($this->picture->getTable()->selectWith($select) as $row) {
+            $result[(int)$row['parent_id']] = (int)$row['count'];
         }
 
         return $result;
+    }
+
+    /**
+     * @param int $groupId
+     * @return int
+     */
+    public function getGroupPicturesCount(int $groupId): int
+    {
+        return $this->picture->getCount([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => [
+                'ancestor_or_self' => (int)$groupId
+            ]
+        ]);
     }
 
     public function getGroupBrandIds(int $groupId): array
     {
-        $select = new Sql\Select($this->itemTable->getTable());
-        $select->columns(['id'])
-            ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-            ->join(['vehicle' => 'item'], 'item_parent_cache.item_id = vehicle.id', [])
-            ->where([
-                'item.item_type_id'         => Item::BRAND,
-                'item_parent_cache.item_id' => $groupId,
-                'vehicle.item_type_id'      => Item::TWINS,
-            ]);
-
-        $result = [];
-        foreach ($this->itemTable->selectWith($select) as $row) {
-            $result[] = (int)$row['id'];
-        }
-
-        return $result;
+        return $this->item->getIds([
+            'item_type_id' => Item::BRAND,
+            'descendant_or_self' => [
+                'parent' => [
+                    'id'           => $groupId,
+                    'item_type_id' => Item::TWINS
+                ]
+            ]
+        ]);
     }
 
     public function getTotalBrandsCount(): int
     {
-        $select = new Sql\Select($this->itemTable->getTable());
-        $select->columns(['count' => new Sql\Expression('count(distinct item.id)')])
-            ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-            ->join(['vehicle' => 'item'], 'item_parent_cache.item_id = vehicle.id', [])
-            ->where([
-                'item.item_type_id'    => Item::BRAND,
-                'vehicle.item_type_id' => Item::TWINS
-            ]);
-
-        $row = $this->itemTable->selectWith($select)->current();
-        return $row ? (int)$row['count'] : 0;
+        return $this->item->getCountDistinct([
+            'item_type_id'    => Item::BRAND,
+            'descendant_or_self' => [
+                'parent' => [
+                    'item_type_id' => Item::TWINS
+                ]
+            ]
+        ]);
     }
 
     /**
-     * @param array $options
+     * @param int $brandId
      * @return \Zend\Paginator\Paginator
      */
-    public function getGroupsPaginator(array $options = [])
+    public function getGroupsPaginator(int $brandId = 0)
     {
-        $defaults = [
-            'brandId' => null
+        $filter = [
+            'item_type_id' => Item::TWINS,
+            'order'        => 'item.add_datetime desc'
         ];
-        $options = array_merge($defaults, $options);
 
-        $brandId = (int)$options['brandId'];
-
-        $select = new Sql\Select($this->itemTable->getTable());
-        $select->where(['item.item_type_id' => Item::TWINS])
-            ->order('item.add_datetime desc');
-
-        if ($options['brandId']) {
-            $select
-                ->join('item_parent', 'item.id = item_parent.parent_id', [])
-                ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.item_id', [])
-                ->join(['brand' => 'item'], 'item_parent_cache.parent_id = brand.id', [])
-                ->where([
-                    'brand.item_type_id'          => Item::BRAND,
-                    'item_parent_cache.parent_id' => $brandId
-                ])
-                ->group('item.id');
+        if ($brandId) {
+            $filter['parent'] = [
+                'child' => [
+                    'ancestor_or_self' => [
+                        'item_type_id' => Item::BRAND,
+                        'id'           => $brandId
+                    ]
+                ]
+            ];
         }
 
-        return new \Zend\Paginator\Paginator(
-            new \Zend\Paginator\Adapter\DbSelect($select, $this->itemTable->getAdapter())
-        );
+        return $this->item->getPaginator($filter);
     }
 
     public function getGroupCars(int $groupId): array
     {
-        $select = new Sql\Select($this->itemTable->getTable());
-        $select->join('item_parent', 'item.id = item_parent.item_id', [])
-            ->where(['item_parent.parent_id' => $groupId])
-            ->order('name');
-
-        $result = [];
-        foreach ($this->itemTable->selectWith($select) as $row) {
-            $result[] = $row;
-        }
-
-        return $result;
+        return $this->item->getRows([
+            'parent' => $groupId,
+            'order'  => 'name'
+        ]);
     }
 
     /**
@@ -204,9 +188,9 @@ class Twins
 
         $ordering = $options['ordering'];
 
-        $select = $this->pictureTable->select(true)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+        $select = $this->picture->getPictureTable()->select(true)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
+            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
             ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
             ->where('item_parent_cache.parent_id = ?', (int)$groupId);
 
@@ -223,10 +207,10 @@ class Twins
      */
     public function getGroup(int $groupId)
     {
-        $row = $this->itemTable->select([
+        $row = $this->item->getRow([
             'id'           => $groupId,
             'item_type_id' => Item::TWINS
-        ])->current();
+        ]);
         if (! $row) {
             return null;
         }
@@ -245,16 +229,13 @@ class Twins
      */
     public function getCarGroups(int $itemId)
     {
-        $select = new Sql\Select($this->itemTable->getTable());
-        $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-            ->where([
-                'item_parent_cache.item_id' => $itemId,
-                'item.item_type_id'         => Item::TWINS
-            ])
-            ->group('item.id');
+        $rows = $this->item->getRows([
+            'item_type_id'       => Item::TWINS,
+            'descendant_or_self' => $itemId
+        ]);
 
         $result = [];
-        foreach ($this->itemTable->selectWith($select) as $row) {
+        foreach ($rows as $row) {
             $result[] = [
                 'id'   => (int)$row['id'],
                 'name' => $row['name']
@@ -270,20 +251,20 @@ class Twins
             return [];
         }
 
-        $select = new Sql\Select($this->itemTable->getTable());
-        $select->columns(['id', 'name'])
-            ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', ['item_id'])
-            ->where([
-                'item.item_type_id' => Item::TWINS,
-                new Sql\Predicate\In('item_parent_cache.item_id', $itemIds)
-            ])
-            ->group(['item_parent_cache.item_id', 'item.id']);
+        $rows = $this->item->getRows([
+            'item_type_id'       => Item::TWINS,
+            'descendant_or_self' => [
+                'id'      => $itemIds,
+                'columns' => ['item_id']
+            ]
+        ]);
+
 
         $result = [];
         foreach ($itemIds as $itemId) {
             $result[(int)$itemId] = [];
         }
-        foreach ($this->itemTable->selectWith($select) as $row) {
+        foreach ($rows as $row) {
             $itemId = (int)$row['item_id'];
             $result[$itemId][] = [
                 'id'   => (int)$row['id'],

@@ -14,9 +14,6 @@ use Autowp\User\Model\DbTable\User;
 use Application\Model\DbTable;
 use Application\Model\Picture;
 
-use Zend_ProgressBar;
-use Zend_ProgressBar_Adapter_Console;
-
 class Maintenance extends AbstractListenerAggregate
 {
     /**
@@ -118,18 +115,7 @@ class Maintenance extends AbstractListenerAggregate
         if ($count) {
             print sprintf("Removing %d pictures\n", $count);
 
-            $adapter = new Zend_ProgressBar_Adapter_Console([
-                'textWidth' => 80,
-                'elements'  => [
-                    Zend_ProgressBar_Adapter_Console::ELEMENT_PERCENT,
-                    Zend_ProgressBar_Adapter_Console::ELEMENT_BAR,
-                    Zend_ProgressBar_Adapter_Console::ELEMENT_ETA,
-                    Zend_ProgressBar_Adapter_Console::ELEMENT_TEXT
-                ]
-            ]);
-            $progressBar = new Zend_ProgressBar($adapter, 0, count($pictures));
-
-            foreach ($pictures as $idx => $picture) {
+            foreach ($pictures as $picture) {
                 $comments->deleteTopic(
                     \Application\Comments::PICTURES_TYPE_ID,
                     $picture['id']
@@ -142,11 +128,7 @@ class Maintenance extends AbstractListenerAggregate
                 } else {
                     print "Brokern image `{$picture['id']}`. Skip\n";
                 }
-
-                $progressBar->update($idx + 1, $picture['id']);
             }
-
-            $progressBar->finish();
         } else {
             print "Nothing to clear\n";
         }

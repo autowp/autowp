@@ -5,21 +5,23 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
+use Application\Model\Picture;
+
 class WidgetController extends AbstractActionController
 {
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
-    public function __construct(DbTable\Picture $pictureTable)
+    public function __construct(Picture $picture)
     {
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function picturePreviewAction()
     {
-        $picture = $this->pictureTable->find($this->params('picture_id'))->current();
+        $picture = $this->picture->getRow(['id' => (int)$this->params('picture_id')]);
 
         if (! $picture) {
             return $this->notFoundAction();

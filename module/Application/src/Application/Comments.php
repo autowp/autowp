@@ -14,8 +14,8 @@ use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
-use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Picture;
 use Application\StringUtils;
 
 class Comments
@@ -51,9 +51,9 @@ class Comments
     private $translator;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var TableGateway
@@ -71,7 +71,7 @@ class Comments
         HostManager $hostManager,
         MessageService $message,
         $translator,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         TableGateway $articleTable,
         TableGateway $itemTable
     ) {
@@ -80,7 +80,7 @@ class Comments
         $this->hostManager = $hostManager;
         $this->message = $message;
         $this->translator = $translator;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->articleTable = $articleTable;
         $this->itemTable = $itemTable;
     }
@@ -102,7 +102,7 @@ class Comments
 
         switch ($message['type_id']) {
             case self::PICTURES_TYPE_ID:
-                $picture = $this->pictureTable->find($message['item_id'])->current();
+                $picture = $this->picture->getRow(['id' => (int)$message['item_id']]);
                 if (! $picture) {
                     throw new Exception("Picture `{$message['item_id']}` not found");
                 }

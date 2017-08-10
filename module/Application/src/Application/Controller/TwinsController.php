@@ -130,14 +130,12 @@ class TwinsController extends AbstractActionController
 
     public function picturesAction()
     {
-        $twins = $this->twins;
-
-        $group = $twins->getGroup($this->params('id'));
+        $group = $this->twins->getGroup($this->params('id'));
         if (! $group) {
             return $this->notFoundAction();
         }
 
-        $select = $twins->getGroupPicturesSelect($group['id'], [
+        $select = $this->twins->getGroupPicturesSelect($group['id'], [
             'ordering' => $this->catalogue()->picturesOrdering()
         ]);
 
@@ -161,7 +159,7 @@ class TwinsController extends AbstractActionController
             }
         ]);
 
-        $this->getBrands($twins->getGroupBrandIds($group['id']));
+        $this->getBrands($this->twins->getGroupBrandIds($group['id']));
 
         return [
             'group'        => $group,
@@ -241,7 +239,7 @@ class TwinsController extends AbstractActionController
             $ids[] = $group['id'];
         }
 
-        $picturesCounts = $this->twins->getGroupPicturesCount($ids);
+        $picturesCounts = $this->twins->getGroupsPicturesCount($ids);
 
         //TODO: topic stat for authenticated user
         $commentsStats = $this->comments->getTopicStat(
@@ -375,9 +373,7 @@ class TwinsController extends AbstractActionController
 
         $canEdit = $this->user()->isAllowed('twins', 'edit');
 
-        $paginator = $this->twins->getGroupsPaginator([
-            'brandId' => $brand['id']
-        ])
+        $paginator = $this->twins->getGroupsPaginator($brand['id'])
             ->setItemCountPerPage(self::GROUPS_PER_PAGE)
             ->setCurrentPageNumber($this->params('page'));
 
@@ -414,16 +410,14 @@ class TwinsController extends AbstractActionController
 
     private function doPictureAction($callback)
     {
-        $twins = $this->twins;
-
-        $group = $twins->getGroup($this->params('id'));
+        $group = $this->twins->getGroup($this->params('id'));
         if (! $group) {
             return $this->notFoundAction();
         }
 
         $pictureId = (string)$this->params('picture_id');
 
-        $select = $twins->getGroupPicturesSelect($group['id'])
+        $select = $this->twins->getGroupPicturesSelect($group['id'])
             ->where('pictures.identity = ?', $pictureId);
 
         $picture = $select->getTable()->fetchRow($select);
@@ -439,9 +433,7 @@ class TwinsController extends AbstractActionController
     {
         return $this->doPictureAction(function ($group, $picture) {
 
-            $twins = $this->twins;
-
-            $select = $twins->getGroupPicturesSelect($group['id'], [
+            $select = $this->twins->getGroupPicturesSelect($group['id'], [
                 'ordering' => $this->catalogue()->picturesOrdering()
             ]);
 
@@ -454,7 +446,7 @@ class TwinsController extends AbstractActionController
                 ]
             ]);
 
-            $this->getBrands($twins->getGroupBrandIds($group['id']));
+            $this->getBrands($this->twins->getGroupBrandIds($group['id']));
 
             return array_replace($data, [
                 'group'      => $group,

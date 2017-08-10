@@ -220,7 +220,7 @@ class IndexController extends AbstractActionController
         }
 
         // БЛИЗНЕЦЫ
-        $cacheKey = 'INDEX_INTERESTS_TWINS_BLOCK_27_' . $language;
+        $cacheKey = 'INDEX_INTERESTS_TWINS_BLOCK_30_' . $language;
         $twinsBlock = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             $twinsBrands = $this->twins->getBrands([
@@ -236,8 +236,8 @@ class IndexController extends AbstractActionController
             unset($brand);
 
             $twinsBlock = [
-                'brands'     => $twinsBrands,
-                'more_count' => $this->twins->getTotalBrandsCount()
+                'brands'       => $twinsBrands,
+                'brands_count' => $this->twins->getTotalBrandsCount()
             ];
 
             $this->cache->setItem($cacheKey, $twinsBlock);
@@ -266,7 +266,7 @@ class IndexController extends AbstractActionController
         }
 
         $specsCars = $this->car()->listData($cars, [
-            'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+            'pictureFetcher' => new Item\PerspectivePictureFetcher([
                 'pictureTable'         => $this->pictureTable,
                 'perspective'          => $this->perspective,
                 'type'                 => null,
@@ -276,7 +276,7 @@ class IndexController extends AbstractActionController
                 'perspectivePageId'    => 1,
                 'onlyChilds'           => []
             ]),
-            'listBuilder' => new \Application\Model\Item\ListBuilder([
+            'listBuilder' => new Item\ListBuilder([
                 'catalogue'    => $this->catalogue(),
                 'router'       => $this->getEvent()->getRouter(),
                 'picHelper'    => $this->getPluginManager()->get('pic'),

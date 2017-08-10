@@ -11,14 +11,12 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\UserRename;
 
 use Application\Comments;
 use Application\Model\Brand;
-use Application\Model\DbTable;
 use Application\Model\Contact;
 use Application\Model\Item;
 use Application\Model\Perspective;
@@ -62,9 +60,9 @@ class UsersController extends AbstractActionController
     private $userAccount;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var Item
@@ -84,7 +82,7 @@ class UsersController extends AbstractActionController
         UserRename $userRename,
         Perspective $perspective,
         UserAccount $userAccount,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         Item $item,
         Brand $brand
     ) {
@@ -95,7 +93,7 @@ class UsersController extends AbstractActionController
         $this->userRename = $userRename;
         $this->perspective = $perspective;
         $this->userAccount = $userAccount;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->item = $item;
         $this->brand = $brand;
     }
@@ -152,23 +150,18 @@ class UsersController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $pictureAdapter = $this->pictureTable->getAdapter();
-        $picturesExists = $pictureAdapter->fetchOne(
-            $pictureAdapter->select()
-                ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
-                ->where('owner_id = ?', $user['id'])
-                ->where('status = ?', Picture::STATUS_ACCEPTED)
-        );
+        $picturesExists = $this->picture->isExists([
+            'user'   => $user['id'],
+            'status' => Picture::STATUS_ACCEPTED
+        ]);
 
-        $lastPictureRows = $this->pictureTable->fetchAll(
-            $this->pictureTable->select()
-                ->from('pictures')
-                ->where('owner_id = ?', $user['id'])
-                ->order('id DESC')
-                ->limit(12)
-        );
+        $lastPictureRows = $this->picture->getRows([
+            'user'  => $user['id'],
+            'limit' => 12,
+            'order' => 'add_date_desc'
+        ]);
 
-        $names = $this->pictureTable->getNameData($lastPictureRows, [
+        $names = $this->picture->getNameData($lastPictureRows, [
             'language' => $this->language(),
             'large'    => true
         ]);
@@ -291,26 +284,20 @@ class UsersController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $select = $this->pictureTable->select(true)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->where('pictures.owner_id = ?', $user['id'])
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-            ->where('item_parent_cache.parent_id = ?', $brand['id'])
-            ->group('pictures.id')
-            ->order(['pictures.add_date DESC', 'pictures.id DESC']);
-
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
-        );
+        $paginator = $this->picture->getPaginator([
+            'user'   => $user['id'],
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => [
+                'ancestor_or_self' => $brand['id']
+            ],
+            'order'  => 'add_date_desc'
+        ]);
 
         $paginator
             ->setItemCountPerPage(18)
             ->setCurrentPageNumber($this->params('page'));
 
-        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-        $picturesData = $this->pic()->listData($select, [
+        $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
             'width' => 6
         ]);
 
