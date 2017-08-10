@@ -68,10 +68,7 @@ class Perspective
 
         $result = [];
         foreach ($this->table->selectWith($select) as $row) {
-            $result[] = [
-                'id'   => (int)$row['id'],
-                'name' => $row['name']
-            ];
+            $result[(int)$row['id']] = $row['name'];
         }
 
         return $result;

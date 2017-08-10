@@ -145,7 +145,7 @@ class Picture extends Zend_Db_Table
             }
         }
 
-        $perspectives = $this->perspective->getOnlyPairs($perspectiveIds);
+        $perspectives = $this->perspective->getOnlyPairs(array_keys($perspectiveIds));
 
         foreach ($rows as $index => $row) {
             if ($row['name']) {
