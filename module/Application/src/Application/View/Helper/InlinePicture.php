@@ -13,7 +13,7 @@ class InlinePicture extends AbstractHelper
         $this->pictureTable = $pictureTable;
     }
 
-    public function __invoke(\Zend_Db_Table_Row_Abstract $picture)
+    public function __invoke($picture)
     {
         $view = $this->view;
 
