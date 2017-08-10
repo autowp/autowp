@@ -20,7 +20,7 @@ class CommentsControllerFactory implements FactoryInterface
             $container->get('CommentForm'),
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Application\Comments::class),
-            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\Item::class),
             $container->get(\Autowp\Votings\Votings::class),
             $tables->get('articles')

@@ -136,8 +136,8 @@ class Picture
 
         if ($options['ancestor_or_self'] !== null) {
             $select
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
-                ->where(['item_parent_cache.parent_id' => $options['ancestor_or_self']]);
+                ->join(['ipc_ancestor' => 'item_parent_cache'], 'picture_item.item_id = ipc_ancestor.item_id', [])
+                ->where(['ipc_ancestor.parent_id' => $options['ancestor_or_self']]);
         }
 
         if ($options['perspective'] !== null) {
@@ -355,6 +355,24 @@ class Picture
             case 'perspective_group':
                 $select->order(['mp.position', 'pictures.width DESC', 'pictures.height DESC']);
                 $group[] = 'mp.position';
+                break;
+            case 'ancestor_stock_front_first':
+                $select->order([
+                    new Sql\Expression('ipc_ancestor.tuning asc'),
+                    new Sql\Expression('ipc_ancestor.sport asc'),
+                    new Sql\Expression('item.is_concept asc'),
+                    new Sql\Expression('picture_item.perspective_id = 10 desc'),
+                    new Sql\Expression('picture_item.perspective_id = 1 desc'),
+                    new Sql\Expression('picture_item.perspective_id = 7 desc'),
+                    new Sql\Expression('picture_item.perspective_id = 8 desc')
+                ]);
+                break;
+
+            case 'front_angle':
+                $select->order([
+                    new Sql\Expression('picture_item.perspective_id=7 DESC'),
+                    new Sql\Expression('picture_item.perspective_id=8 DESC')
+                ]);
                 break;
         }
 

@@ -10,14 +10,11 @@ use Autowp\Comments;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\TextStorage;
 
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
-
-use Zend_Db_Expr;
 
 class TwinsController extends AbstractActionController
 {
@@ -53,9 +50,9 @@ class TwinsController extends AbstractActionController
     private $itemModel;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     public function __construct(
         TextStorage\Service $textStorage,
@@ -64,7 +61,7 @@ class TwinsController extends AbstractActionController
         Comments\CommentsService $comments,
         Perspective $perspective,
         Item $itemModel,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         Twins $twins
     ) {
 
@@ -74,7 +71,7 @@ class TwinsController extends AbstractActionController
         $this->comments = $comments;
         $this->perspective = $perspective;
         $this->itemModel = $itemModel;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->twins = $twins;
     }
 
@@ -198,7 +195,7 @@ class TwinsController extends AbstractActionController
             'description'        => $description,
             'cars'               => $this->car()->listData($carList, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureTable'         => $this->pictureTable,
+                    'pictureTable'         => $this->picture->getPictureTable(),
                     'perspective'          => $this->perspective,
                     'type'                 => null,
                     'onlyExactlyPictures'  => false,
@@ -275,18 +272,13 @@ class TwinsController extends AbstractActionController
             $cars = [];
 
             foreach ($carList as $car) {
-                $pictureRow = $this->pictureTable->fetchRow(
-                    $this->pictureTable->select(true)
-                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                        ->where('item_parent_cache.parent_id = ?', (int)$car['id'])
-                        ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                        ->order([
-                            new Zend_Db_Expr('picture_item.perspective_id=7 DESC'),
-                            new Zend_Db_Expr('picture_item.perspective_id=8 DESC')
-                        ])
-                        ->limit(1)
-                );
+                $pictureRow = $this->picture->getRow([
+                    'status' => Picture::STATUS_ACCEPTED,
+                    'item' => [
+                        'ancestor_or_self' => (int)$car['id']
+                    ],
+                    'order' => 'front_angle'
+                ]);
 
                 $picture = null;
                 if ($pictureRow) {
@@ -294,7 +286,7 @@ class TwinsController extends AbstractActionController
 
                     $key = 'g' . $group['id']. 'p' . $pictureRow['id'];
 
-                    $request = $this->pictureTable->getFormatRequest($pictureRow);
+                    $request = $this->picture->getFormatRequest($pictureRow);
                     $requests[$key] = $request;
 
                     $url = $this->url()->fromRoute('twins/group/pictures/picture', [

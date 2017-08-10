@@ -13,8 +13,8 @@ use Autowp\Votings\Votings;
 
 use Application\Comments;
 use Application\HostManager;
-use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Picture;
 
 use DateTime;
 use Exception;
@@ -41,9 +41,9 @@ class CommentsController extends AbstractRestfulController
     private $message;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var Item
@@ -65,7 +65,7 @@ class CommentsController extends AbstractRestfulController
         $form,
         MessageService $message,
         Comments $comments,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         Item $item,
         Votings $votings,
         TableGateway $articleTable
@@ -74,7 +74,7 @@ class CommentsController extends AbstractRestfulController
         $this->form = $form;
         $this->comments = $comments;
         $this->message = $message;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->item = $item;
         $this->votings = $votings;
         $this->articleTable = $articleTable;
@@ -162,7 +162,7 @@ class CommentsController extends AbstractRestfulController
             $object = null;
             switch ($typeId) {
                 case \Application\Comments::PICTURES_TYPE_ID:
-                    $object = $this->pictureTable->find($itemId)->current();
+                    $object = $this->picture->getRow(['id' => $itemId]);
                     break;
 
                 case \Application\Comments::ITEM_TYPE_ID:

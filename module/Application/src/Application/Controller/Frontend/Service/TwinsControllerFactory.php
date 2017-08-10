@@ -21,7 +21,7 @@ class TwinsControllerFactory implements FactoryInterface
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\Twins::class)
         );
     }

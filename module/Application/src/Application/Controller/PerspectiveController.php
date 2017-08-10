@@ -4,42 +4,35 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
-
-use Application\Model\DbTable;
 use Application\Model\Picture;
 
 class PerspectiveController extends AbstractActionController
 {
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
-    public function __construct(DbTable\Picture $pictureTable)
+    public function __construct(Picture $picture)
     {
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function indexAction()
     {
-        $select = $this->pictureTable->select(true)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-            ->where('picture_item.perspective_id = ?', (int)$this->params('perspective'))
-            ->order('pictures.accept_datetime DESC');
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
-        );
+        $paginator = $this->picture->getPaginator([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => [
+                'perspective' => (int)$this->params('perspective')
+            ],
+            'order'  => 'accept_datetime_desc'
+        ]);
 
         $paginator
             ->setItemCountPerPage(18)
             ->setCurrentPageNumber($this->params('page'));
 
-        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-        $picturesData = $this->pic()->listData($select, [
+        $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
             'width' => 6
         ]);
 

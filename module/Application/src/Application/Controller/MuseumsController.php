@@ -5,7 +5,6 @@ namespace Application\Controller;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Picture;
 
@@ -24,20 +23,20 @@ class MuseumsController extends AbstractActionController
     private $itemModel;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     public function __construct(
         $textStorage,
         TableGateway $itemLinkTable,
         Item $itemModel,
-        DbTable\Picture $pictureTable
+        Picture $picture
     ) {
         $this->textStorage = $textStorage;
         $this->itemLinkTable = $itemLinkTable;
         $this->itemModel = $itemModel;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function indexAction()
@@ -63,12 +62,12 @@ class MuseumsController extends AbstractActionController
 
         $description = $this->itemModel->getTextOfItem($museum['id'], $this->language());
 
-        $select = $this->pictureTable->select(true)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->where('picture_item.item_id = ?', $museum['id'])
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
+        $rows = $this->picture->getRows([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => $museum['id']
+        ]);
 
-        $pictures = $this->pic()->listData($select, [
+        $pictures = $this->pic()->listData($rows, [
             'width' => 4
         ]);
 

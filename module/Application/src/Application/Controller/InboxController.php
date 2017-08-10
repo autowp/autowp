@@ -7,7 +7,6 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Service\DayPictures;
 use Application\Model\Brand;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Picture;
 
@@ -17,18 +16,18 @@ class InboxController extends AbstractActionController
     const BRAND_ALL = 'all';
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var Brand
      */
     private $brand;
 
-    public function __construct(DbTable\Picture $pictureTable, Brand $brand)
+    public function __construct(Picture $picture, Brand $brand)
     {
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->brand = $brand;
     }
 
@@ -88,7 +87,7 @@ class InboxController extends AbstractActionController
 
         $brand = $this->brand->getBrandByCatname((string)$this->params('brand'), $language);
 
-        $select = $this->pictureTable->select(true)
+        $select = $this->picture->getPictureTable()->select(true)
             ->where('pictures.status = ?', Picture::STATUS_INBOX);
         if ($brand) {
             $select

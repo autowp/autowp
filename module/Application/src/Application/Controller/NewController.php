@@ -8,7 +8,6 @@ use Zend\Paginator\Paginator;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 
 use Application\ItemNameFormatter;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
@@ -37,9 +36,9 @@ class NewController extends AbstractActionController
     private $itemModel;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var PictureItem
@@ -50,13 +49,13 @@ class NewController extends AbstractActionController
         ItemNameFormatter $itemNameFormatter,
         SpecificationsService $specsService,
         Item $itemModel,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         PictureItem $pictureItem
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->specsService = $specsService;
         $this->itemModel = $itemModel;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->pictureItem = $pictureItem;
     }
 
@@ -65,8 +64,8 @@ class NewController extends AbstractActionController
         $service = new DayPictures([
             'timezone'     => $this->user()->timezone(),
             'dbTimezone'   => MYSQL_TIMEZONE,
-            'select'       => $this->pictureTable->select(true)
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED),
+            'select'       => $this->picture->getPictureTable()->select(true)
+                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED),
             'orderColumn'  => 'accept_datetime',
             'currentDate'  => $this->params('date'),
         ]);
@@ -196,7 +195,7 @@ class NewController extends AbstractActionController
                     'disableDetailsLink' => true,
                     'disableSpecs'       => true,
                     'pictureFetcher' => new \Application\Model\Item\NewPictureFetcher([
-                        'pictureTable' => $this->pictureTable,
+                        'pictureTable' => $this->picture->getPictureTable(),
                         'pictureIds'   => $ids
                     ]),
                     'listBuilder' => new \Application\Model\Item\ListBuilder\NewPicturesListBuilder([
@@ -252,7 +251,7 @@ class NewController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $select = $this->pictureTable->select(true)
+        $select = $this->picture->getPictureTable()->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->where('picture_item.item_id = ?', $item['id'])
             ->where('pictures.status = ?', Picture::STATUS_ACCEPTED);

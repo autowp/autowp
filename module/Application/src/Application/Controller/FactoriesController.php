@@ -5,13 +5,10 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Service\SpecificationsService;
-
-use Zend_Db_Expr;
 
 class FactoriesController extends AbstractActionController
 {
@@ -33,22 +30,22 @@ class FactoriesController extends AbstractActionController
     private $itemModel;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     public function __construct(
         $textStorage,
         SpecificationsService $specsService,
         Perspective $perspective,
         Item $itemModel,
-        DbTable\Picture $pictureTable
+        Picture $picture
     ) {
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
         $this->perspective = $perspective;
         $this->itemModel = $itemModel;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function indexAction()
@@ -66,12 +63,12 @@ class FactoriesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $select = $this->pictureTable->select(true)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->where('picture_item.item_id = ?', $factory['id'])
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
+        $rows = $this->picture->getRows([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => $factory['id']
+        ]);
 
-        $pictures = $this->pic()->listData($select, [
+        $pictures = $this->pic()->listData($rows, [
             'width' => 4
         ]);
 
@@ -89,33 +86,18 @@ class FactoriesController extends AbstractActionController
             $catalogue = $this->catalogue();
 
             foreach ($cars as $car) {
-                $select = $this->pictureTable->select(true)
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('item', 'picture_item.item_id = item.id', null)
-                    ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $car['id'])
-                    ->order([
-                        new Zend_Db_Expr('item_parent_cache.tuning asc'),
-                        new Zend_Db_Expr('item_parent_cache.sport asc'),
-                        new Zend_Db_Expr('item.is_concept asc'),
-                        new Zend_Db_Expr('picture_item.perspective_id = 10 desc'),
-                        new Zend_Db_Expr('picture_item.perspective_id = 1 desc'),
-                        new Zend_Db_Expr('picture_item.perspective_id = 7 desc'),
-                        new Zend_Db_Expr('picture_item.perspective_id = 8 desc')
-                    ]);
+                $ancestor = count($groups[$car['id']]) > 1
+                    ? $groups[$car['id']]
+                    : $car['id'];
 
-                if (count($groups[$car['id']]) > 1) {
-                    $select
-                        ->join(
-                            ['cpc_oc' => 'item_parent_cache'],
-                            'cpc_oc.item_id = picture_item.item_id',
-                            null
-                        )
-                        ->where('cpc_oc.parent_id IN (?)', $groups[$car['id']]);
-                }
+                $pictureRow = $this->picture->getRow([
+                    'status' => Picture::STATUS_ACCEPTED,
+                    'item'   => [
+                        'ancestor_or_self' => $ancestor
+                    ],
+                    'order'  => 'ancestor_stock_front_first'
+                ]);
 
-                $pictureRow = $this->pictureTable->fetchRow($select);
                 $src = null;
                 if ($pictureRow) {
                     $request = $catalogue->getPictureFormatRequest($pictureRow->toArray());
@@ -192,7 +174,7 @@ class FactoriesController extends AbstractActionController
             'factory'  => $factory,
             'carsData' => $this->car()->listData($cars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureTable'         => $this->pictureTable,
+                    'pictureTable'         => $this->picture->getPictureTable(),
                     'perspective'          => $this->perspective,
                     'type'                 => null,
                     'onlyExactlyPictures'  => false,

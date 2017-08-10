@@ -19,7 +19,7 @@ class MuseumsControllerFactory implements FactoryInterface
             $container->get(\Autowp\TextStorage\Service::class),
             $tables->get('links'),
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\Picture::class)
         );
     }
 }

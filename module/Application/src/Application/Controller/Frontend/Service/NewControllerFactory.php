@@ -18,7 +18,7 @@ class NewControllerFactory implements FactoryInterface
             $container->get(\Application\ItemNameFormatter::class),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\PictureItem::class)
         );
     }
