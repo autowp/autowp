@@ -312,7 +312,9 @@ class CategoryController extends AbstractActionController
             $this->cache->setItem($key, $menu);
         }
 
-        $categoryParentIds = $this->itemParent->getParentIds($currentCategory['id']);
+        $categoryParentIds = $this->itemModel->getIds([
+            'descendant_or_self' => $currentCategory['id']
+        ]);
 
         $this->categoriesMenuActive($menu, $categoryParentIds, $isOther);
 
