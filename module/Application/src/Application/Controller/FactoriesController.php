@@ -100,7 +100,7 @@ class FactoriesController extends AbstractActionController
 
                 $src = null;
                 if ($pictureRow) {
-                    $request = $catalogue->getPictureFormatRequest($pictureRow->toArray());
+                    $request = $catalogue->getPictureFormatRequest($pictureRow);
                     $imagesInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
                     $src = $imagesInfo->getSrc();
                 }

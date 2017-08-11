@@ -219,7 +219,7 @@ class Catalogue
     /**
      * @return Request
      */
-    public function getPictureFormatRequest(array $picture)
+    public function getPictureFormatRequest($picture)
     {
         $options = [
             'imageId' => $picture['image_id']
