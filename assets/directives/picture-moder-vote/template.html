@@ -40,7 +40,8 @@
     {{'moder/picture/acceptance/already-voted'|translate}}
     <ul class="list-unstyled">
         <li ng-repeat="moder_vote in picture.moder_votes">
-            <i style="color:green" class="fa fa-thumbs-up"></i>
+            <i style="color:green" class="fa fa-thumbs-up" ng-if="moder_vote.vote > 0"></i>
+            <i style="color:red" class="fa fa-thumbs-down" ng-if="moder_vote.vote <= 0"></i>
             <autowp-user user="moder_vote.user"></autowp-user>
             <span style="color:{{moder_vote.vote > 0 ? 'green' : 'red'}}" ng-bind="moder_vote.reason"></span>
         </li>

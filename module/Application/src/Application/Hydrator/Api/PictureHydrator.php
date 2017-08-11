@@ -315,7 +315,7 @@ class PictureHydrator extends RestHydrator
                 $user = $this->userTable->find($row['user_id'])->current();
                 $moderVotes[] = [
                     'reason' => $row['reason'],
-                    'vote'   => $row['vote'],
+                    'vote'   => (int)$row['vote'],
                     'user'   => $user ? $this->extractValue('moder_vote_user', $user) : null
                 ];
             }
