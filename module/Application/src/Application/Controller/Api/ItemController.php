@@ -962,7 +962,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('is_concept', $values)) {
-            $set['is_concept_inherit'] = $values['is_concept'] == 'inherited' ? 1 : 0;
+            $set['is_concept_inherit'] = ((string)$values['is_concept']) == 'inherited' ? 1 : 0;
             if (! $set['is_concept_inherit']) {
                 $set['is_concept'] = $values['is_concept'] ? 1 : 0;
             }
