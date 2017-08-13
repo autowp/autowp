@@ -236,7 +236,7 @@ class ItemController extends AbstractRestfulController
         if ($data['vehicle_type_id']) {
             if ($data['vehicle_type_id'] == 'empty') {
                 $select
-                    ->joinLeft('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
+                    ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [], $select::JOIN_LEFT)
                     ->where(['vehicle_vehicle_type.vehicle_id is null']);
             } else {
                 $select
