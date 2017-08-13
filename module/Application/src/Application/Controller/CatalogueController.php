@@ -1424,12 +1424,15 @@ class CatalogueController extends AbstractActionController
         switch ($type) {
             case 'tuning':
                 $type = ItemParent::TYPE_TUNING;
+                $fetchType = ItemParent::TYPE_TUNING;
                 break;
             case 'sport':
                 $type = ItemParent::TYPE_SPORT;
+                $fetchType = ItemParent::TYPE_SPORT;
                 break;
             default:
-                $type = [ItemParent::TYPE_DEFAULT, ItemParent::TYPE_DESIGN];
+                $type = ItemParent::TYPE_DEFAULT;
+                $fetchType = [ItemParent::TYPE_DEFAULT, ItemParent::TYPE_DESIGN];
                 break;
         }
 
@@ -1438,7 +1441,7 @@ class CatalogueController extends AbstractActionController
         $paginator = $this->itemModel->getPaginator([
             'parent' => [
                 'id'        => $currentCarId,
-                'link_type' => $type
+                'link_type' => $fetchType
             ],
             'order' => $this->carsOrder()
         ]);

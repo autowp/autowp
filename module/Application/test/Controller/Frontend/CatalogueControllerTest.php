@@ -58,6 +58,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
                 ]
             ]
         ]);
+
         $this->dispatch('https://www.autowp.ru/upload/send/type/1/item_id/' . $itemId, Request::METHOD_POST, [], true);
 
         $this->assertResponseStatusCode(200);
@@ -1063,12 +1064,39 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotXpathQuery("//h3[contains(text(), '$designName')]");
     }
 
-    public function userTokenProvider()
+    public function testBrandItemGroupOtherPictures()
     {
-        return [
-            [''],
-            ['token'],
-            ['admin-token'],
-        ];
+        $catname = 'item-' . microtime(true);
+
+        $brand = $this->getRandomBrand();
+
+        $vehicleId = $this->createItem([
+            'item_type_id' => 1,
+            'name'         => 'Vehicle',
+            'is_group'     => true
+        ]);
+
+        $this->addItemParent($vehicleId, $brand['id'], [
+            'catname' => $catname
+        ]);
+
+        $pictureId = $this->addPictureToItem($vehicleId);
+        $this->acceptPicture($pictureId);
+
+        $this->reset();
+        $url = sprintf(
+            'https://www.autowp.ru/%s/%s',
+            $brand['catname'],
+            $catname
+        );
+        $this->dispatch($url, Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand-item');
+
+        $this->assertXpathQuery("//h3[contains(text(), 'Other pictures of')]");
     }
 }
