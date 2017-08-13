@@ -1099,4 +1099,13 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertXpathQuery("//h3[contains(text(), 'Other pictures of')]");
     }
+
+    public function userTokenProvider()
+    {
+        return [
+            [''],
+            ['token'],
+            ['admin-token'],
+        ];
+    }
 }
