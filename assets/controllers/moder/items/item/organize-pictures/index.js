@@ -126,13 +126,27 @@ angular.module(Module)
                     lng: ctrl.newItem.lng
                 };
                 
-                $http({
-                    method: 'POST',
-                    url: '/api/item',
-                    data: data
-                }).then(function(response) {
+                var promises = {
+                    createItem: $http({
+                        method: 'POST',
+                        url: '/api/item',
+                        data: data
+                    })
+                };
+                
+                if (! ctrl.item.is_group) {
+                    promises.setIsGroup = $http({
+                        method: 'PUT',
+                        url: '/api/item/' + ctrl.item.id,
+                        data: {
+                            is_group: true
+                        }
+                    });
+                }
+                
+                $q.all(promises).then(function(response) {
                     
-                    var location = response.headers('Location');
+                    var location = response.createItem.headers('Location');
                     
                     ctrl.loading++;
                     $http({

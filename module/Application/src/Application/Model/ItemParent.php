@@ -446,7 +446,11 @@ class ItemParent
             $isAuto = true;
         } else {
             $isAuto = $bvlRow ? $bvlRow['is_auto'] : true;
-            if ($set['name'] != $values['name']) {
+            $name = $bvlRow ? $bvlRow['name'] : '';
+            if (! array_key_exists('name', $values)) {
+                throw new Exception("`name` not provided");
+            }
+            if ($name != $values['name']) {
                 $isAuto = false;
             }
         }
