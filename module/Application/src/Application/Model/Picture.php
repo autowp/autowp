@@ -121,21 +121,36 @@ class Picture
 
         $defaults = [
             'id'                  => null,
+            'item_type_id'        => null,
             'ancestor_or_self'    => null,
             'perspective'         => null,
             'perspective_is_null' => null,
+            'perspective_exclude' => null,
             'vehicle_type'        => null,
+            'parent'              => null,
+            'contains_picture'    => null,
         ];
         $options = array_replace($defaults, $options);
 
+        $joinItem = $forceJoinItem;
+
+        if ($options['item_type_id']) {
+            $joinItem = true;
+        }
+
+
         $select->join('picture_item', 'pictures.id = picture_item.picture_id', []);
 
-        if ($forceJoinItem) {
+        if ($joinItem) {
             $select->join('item', 'picture_item.item_id = item.id', []);
         }
 
         if ($options['id'] !== null) {
             $this->applyIdFilter($select, $options['id'], 'picture_item.item_id');
+        }
+
+        if ($options['item_type_id']) {
+            $this->applyIdFilter($select, $options['item_type_id'], 'item.item_type_id');
         }
 
         if ($options['ancestor_or_self'] !== null) {
@@ -156,6 +171,15 @@ class Picture
             }
         }
 
+        if ($options['perspective_exclude']) {
+            $predicate = new Sql\Predicate\PredicateSet([
+                new Sql\Predicate\NotIn('picture_item.perspective_id', $options['perspective_exclude']),
+                new Sql\Predicate\IsNull('picture_item.perspective_id')
+            ], Sql\Predicate\PredicateSet::COMBINED_BY_OR);
+
+            $select->where($predicate);
+        }
+
         if ($options['vehicle_type'] !== null) {
             $select
                 ->join('vehicle_vehicle_type', 'picture_item.item_id = vehicle_vehicle_type.vehicle_id', [])
@@ -163,7 +187,69 @@ class Picture
                 ->where(['car_types_parents.parent_id' => $options['vehicle_type']]);
         }
 
+        if ($options['parent']) {
+            $select->join('item_parent', 'picture_item.item_id = item_parent.item_id', [])
+                ->where(['item_parent.parent_id' => $options['parent']]);
+        }
+
+        if ($options['contains_picture']) {
+            $select->join(['pi2' => 'picture_item'], 'picture_item.item_id = pi2.item_id', []);
+
+            $this->applyIdFilter($select, $options['contains_picture'], 'pi2.picture_id');
+        }
+
         return ['pictures.id'];
+    }
+
+    private function applyColumns(Sql\Select $select, array $columns)
+    {
+        $result = [];
+
+        foreach ($columns as $key => $column) {
+            switch ($column) {
+                case 'id':
+                case 'identity':
+                case 'name':
+                case 'width':
+                case 'height':
+                case 'crop_left':
+                case 'crop_top':
+                case 'crop_width':
+                case 'crop_height':
+                case 'image_id':
+                case 'filesize':
+                    if (is_numeric($key)) {
+                        $result[] = $column;
+                    } else {
+                        $result[$key] = $column;
+                    }
+                    break;
+                case 'messages':
+                    $predicate = new Sql\Predicate\PredicateSet([
+                        new Sql\Predicate\Operator(
+                            'ct.type_id',
+                            Sql\Predicate\Operator::OPERATOR_EQUAL_TO,
+                            \Application\Comments::PICTURES_TYPE_ID
+                        ),
+                        new Sql\Predicate\Operator(
+                            'ct.item_id',
+                            Sql\Predicate\Operator::OPERATOR_EQUAL_TO,
+                            'pictures.id',
+                            Sql\Predicate\Operator::TYPE_IDENTIFIER,
+                            Sql\Predicate\Operator::TYPE_IDENTIFIER
+                        )
+                    ]);
+                    $select->join(
+                        ['ct' => 'comment_topic'],
+                        $predicate,
+                        ['messages'],
+                        $select::JOIN_LEFT
+                    );
+                    break;
+            }
+        }
+
+        $select->columns($result);
     }
 
     public function getSelect(array $options)
@@ -183,6 +269,8 @@ class Picture
             'has_accept_votes' => null,
             'has_delete_votes' => null,
             'has_moder_votes'  => null,
+            'has_likes'        => null,
+            'has_dislikes'     => null,
             'is_replace'       => null,
             'is_lost'          => null,
             'has_point'        => null,
@@ -190,6 +278,7 @@ class Picture
             'has_copyrights'   => null,
             'limit'            => null,
             'accepted_in_days' => null,
+            'modification'     => null,
         ];
         $options = array_replace($defaults, $options);
 
@@ -204,6 +293,12 @@ class Picture
         $joinPdr = false;
         $joinLeftComments = false;
         $joinComments = false;
+        $joinVotesSummary = false;
+        $joinLeftVotesSummary = false;
+
+        if (isset($options['columns']) && $options['columns']) {
+            $this->applyColumns($select, $options['columns']);
+        }
 
         if ($options['identity'] !== null) {
             $select->where(['pictures.identity' => (string)$options['identity']]);
@@ -284,6 +379,16 @@ class Picture
                 ->where('pdr3.vote <= 0');
         }
 
+        if ($options['has_likes']) {
+            $joinVotesSummary = true;
+            $select->where('picture_vote_summary.positive > 0');
+        }
+
+        if ($options['has_dislikes']) {
+            $joinVotesSummary = true;
+            $select->where('picture_vote_summary.negative > 0');
+        }
+
         if ($options['is_replace'] !== null) {
             if ($options['is_replace']) {
                 $select->where(['pictures.replace_picture_id']);
@@ -315,9 +420,14 @@ class Picture
             ]);
         }
 
+        if ($options['modification']) {
+            $select->join('modification_picture', 'pictures.id = modification_picture.picture_id', []);
+            $this->applyIdFilter($select, $options['modification'], 'modification_picture.modification_id');
+        }
+
         switch ($options['order']) {
             case 'accept_datetime_desc':
-                $select->order('accept_datetime desc');
+                $select->order(['accept_datetime desc', 'pictures.add_date DESC', 'pictures.id DESC']);
                 break;
             case 'add_date_desc':
                 $select->order(['pictures.add_date DESC', 'pictures.id DESC']);
@@ -326,7 +436,7 @@ class Picture
                 $select->order(['pictures.add_date ASC', 'pictures.id ASC']);
                 break;
             case 'resolution_desc':
-                $select->order(['pictures.width DESC', 'pictures.height DESC']);
+                $select->order(['pictures.width DESC', 'pictures.height DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
                 break;
             case 'resolution_asc':
                 $select->order(['pictures.width', 'pictures.height']);
@@ -356,14 +466,12 @@ class Picture
                 $select->order(['pictures.removing_date DESC', 'pictures.id']);
                 break;
             case 'likes':
-                $select->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', [])
-                    ->where('picture_vote_summary.positive > 0')
-                    ->order('picture_vote_summary.positive DESC');
+                $joinLeftVotesSummary = true;
+                $select->order(['picture_vote_summary.positive DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
                 break;
             case 'dislikes':
-                $select->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', [])
-                    ->where('picture_vote_summary.negative > 0')
-                    ->order('picture_vote_summary.negative DESC');
+                $joinLeftVotesSummary = true;
+                $select->order(['picture_vote_summary.negative DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
                 break;
             case 'status':
                 $select->order('pictures.status');
@@ -395,8 +503,20 @@ class Picture
                 $group[] = 'picture_item.perspective_id';
                 $select->order([
                     new Sql\Expression('picture_item.perspective_id=7 DESC'),
-                    new Sql\Expression('picture_item.perspective_id=8 DESC')
+                    new Sql\Expression('picture_item.perspective_id=8 DESC'),
+                    new Sql\Expression('picture_item.perspective_id=1 DESC')
                 ]);
+                break;
+
+            case 'perspectives':
+                $group[] = 'perspectives.position';
+                $select
+                    ->join('perspectives', 'picture_item.perspective_id = perspectives.id', [], $select::JOIN_LEFT)
+                    ->order([
+                        'perspectives.position',
+                        'pictures.width DESC', 'pictures.height DESC',
+                        'pictures.add_date DESC', 'pictures.id DESC'
+                    ]);
                 break;
         }
 
@@ -420,6 +540,13 @@ class Picture
             $group[] = 'pictures.id';
             $select->join(['pdr' => 'pictures_moder_votes'], 'pictures.id = pdr.picture_id', []);
         }
+
+        if ($joinVotesSummary) {
+            $select->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', []);
+        } elseif ($joinLeftVotesSummary) {
+            $select->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', [], $select::JOIN_LEFT);
+        }
+
 
         $group = array_unique($group, SORT_STRING);
 
@@ -447,6 +574,29 @@ class Picture
     public function getCount(array $options): int
     {
         return $this->getPaginator($options)->getTotalItemCount();
+    }
+
+    public function getCountDistinct(array $options): int
+    {
+        $select = $this->getSelect($options);
+
+        $select->reset(Sql\Select::LIMIT);
+        $select->reset(Sql\Select::OFFSET);
+        $select->reset(Sql\Select::ORDER);
+        $select->reset(Sql\Select::COLUMNS);
+        $select->reset(Sql\Select::GROUP);
+        $select->columns(['id']);
+        $select->quantifier(Sql\Select::QUANTIFIER_DISTINCT);
+
+        $countSelect = new Sql\Select();
+
+        $countSelect->columns(['count' => new Sql\Expression('COUNT(1)')]);
+        $countSelect->from(['original_select' => $select]);
+
+        $statement = $this->itemTable->getSql()->prepareStatementForSqlObject($countSelect);
+        $row = $statement->execute()->current();
+
+        return (int) $row['count'];
     }
 
     public function getRow(array $options)

@@ -6,17 +6,12 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
-
 use Application\Model\Categories;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Service\SpecificationsService;
-
-use Zend_Db_Expr;
 
 class CategoryController extends AbstractActionController
 {
@@ -50,9 +45,9 @@ class CategoryController extends AbstractActionController
     private $itemParent;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     public function __construct(
         $cache,
@@ -62,7 +57,7 @@ class CategoryController extends AbstractActionController
         Perspective $perspective,
         Item $itemModel,
         ItemParent $itemParent,
-        DbTable\Picture $pictureTable
+        Picture $picture
     ) {
         $this->cache = $cache;
         $this->textStorage = $textStorage;
@@ -71,7 +66,7 @@ class CategoryController extends AbstractActionController
         $this->perspective = $perspective;
         $this->itemModel = $itemModel;
         $this->itemParent = $itemParent;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function indexAction()
@@ -111,24 +106,18 @@ class CategoryController extends AbstractActionController
         }
 
         foreach ($categories as &$category) {
-            $picture = $this->pictureTable->fetchRow(
-                $this->pictureTable->select(true)
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                    ->where('item_parent_cache.parent_id = ?', $category['id'])
-                    ->order([
-                        new Zend_Db_Expr('picture_item.perspective_id = 7 DESC'),
-                        new Zend_Db_Expr('picture_item.perspective_id = 8 DESC'),
-                        new Zend_Db_Expr('picture_item.perspective_id = 1 DESC')
-                    ])
-                    ->limit(1)
-            );
+            $picture = $this->picture->getRow([
+                'status' => Picture::STATUS_ACCEPTED,
+                'item'   => [
+                    'ancestor_or_self' => $category['id']
+                ],
+                'order'  => 'front_angle'
+            ]);
 
             $image = null;
             if ($picture) {
                 $image = $this->imageStorage()->getFormatedImage(
-                    $this->pictureTable->getFormatRequest($picture),
+                    $this->picture->getFormatRequest($picture),
                     'picture-thumb'
                 );
             }
@@ -435,7 +424,7 @@ class CategoryController extends AbstractActionController
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureTable' => $this->pictureTable,
+                    'pictureTable' => $this->picture->getPictureTable(),
                     'perspective'  => $this->perspective
                 ]),
                 'useFrontPictures' => $haveSubcategories,
@@ -459,25 +448,20 @@ class CategoryController extends AbstractActionController
 
                 $otherItemsCount = $otherPaginator->getTotalItemCount();
 
-                $pictureRows = $this->pictureTable->fetchAll(
-                    $this->pictureTable->select(true)
-                        ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->join('item', 'picture_item.item_id = item.id', null)
-                        ->where('item.item_type_id IN (?)', [
-                            Item::ENGINE,
-                            Item::VEHICLE
-                        ])
-                        ->join('item_parent', 'item.id = item_parent.item_id', null)
-                        ->where('item_parent.parent_id = ?', $currentCategory['id'])
-                        ->order($this->catalogue()->picturesOrdering())
-                        ->limit(4)
-                );
+                $pictureRows = $this->picture->getRows([
+                    'status' => Picture::STATUS_ACCEPTED,
+                    'item'   => [
+                        'item_type_id' => [Item::ENGINE, Item::VEHICLE],
+                        'parent'       => $currentCategory['id']
+                    ],
+                    'limit'  => 4,
+                    'order'  => 'resolution_desc'
+                ]);
 
                 $imageStorage = $this->imageStorage();
                 foreach ($pictureRows as $pictureRow) {
                     $imageInfo = $imageStorage->getFormatedImage(
-                        $this->pictureTable->getFormatRequest($pictureRow),
+                        $this->picture->getFormatRequest($pictureRow),
                         'picture-thumb'
                     );
 
@@ -524,25 +508,19 @@ class CategoryController extends AbstractActionController
             $breadcrumbs
         ) {
 
-            $select = $this->pictureTable->select(true)
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                ->order($this->catalogue()->picturesOrdering())
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $currentCar ? $currentCar['id'] : $currentCategory['id'])
-                ->group('pictures.id');
-
-            $paginator = new \Zend\Paginator\Paginator(
-                new Zend1DbTableSelect($select)
-            );
+            $paginator = $this->picture->getPaginator([
+                'status' => Picture::STATUS_ACCEPTED,
+                'order'  => 'resolution_desc',
+                'item'   => [
+                    'ancestor_or_self' => $currentCar ? $currentCar['id'] : $currentCategory['id']
+                ]
+            ]);
 
             $paginator
                 ->setItemCountPerPage($this->catalogue()->getPicturesPerPage())
                 ->setCurrentPageNumber($this->params('page'));
 
-            $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-            $picturesData = $this->pic()->listData($select, [
+            $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
                 'width' => 4,
                 'url'   => function ($picture) use ($currentCategory, $isOther, $path) {
                     return $this->url()->fromRoute('categories', [
@@ -573,20 +551,19 @@ class CategoryController extends AbstractActionController
             $breadcrumbs
         ) {
 
-            $select = $this->pictureTable->select(true)
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                ->order($this->catalogue()->picturesOrdering())
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $currentCar ? $currentCar['id'] : $currentCategory['id']);
+            $filter = [
+                'item'   => [
+                    'ancestor_or_self' => $currentCar ? $currentCar['id'] : $currentCategory['id']
+                ],
+                'status' => Picture::STATUS_ACCEPTED,
+                'order'  => 'resolution_desc'
+            ];
 
-            $selectRow = clone $select;
-
+            $pictureFilter = $filter;
+            $pictureFilter['identity'] = (string)$this->params('picture_id');
             $pictureId = (string)$this->params('picture_id');
 
-            $selectRow->where('pictures.identity = ?', $pictureId);
-
-            $picture = $selectRow->getTable()->fetchRow($selectRow);
+            $picture = $this->picture->getRow($pictureFilter);
 
             if (! $picture) {
                 return $this->notFoundAction();
@@ -595,7 +572,7 @@ class CategoryController extends AbstractActionController
             return [
                 'breadcrumbs' => $breadcrumbs,
                 'picture'     => array_replace(
-                    $this->pic()->picPageData($picture, $select, []),
+                    $this->pic()->picPageData($picture, $filter, []),
                     [
                         'galleryUrl' => $this->url()->fromRoute('categories', [
                             'action'           => 'category-picture-gallery',
@@ -615,27 +592,25 @@ class CategoryController extends AbstractActionController
 
         return $this->doCategoryAction(function ($currentCategory, $currentCar) {
 
-            $select = $this->pictureTable->select(true)
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                ->order($this->catalogue()->picturesOrdering())
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->group('pictures.id')
-                ->where('item_parent_cache.parent_id = ?', $currentCar ? $currentCar['id'] : $currentCategory['id']);
+            $filter = [
+                'item'   => [
+                    'ancestor_or_self' => $currentCar ? $currentCar['id'] : $currentCategory['id']
+                ],
+                'status' => Picture::STATUS_ACCEPTED,
+                'order'  => 'resolution_desc'
+            ];
 
-            $selectRow = clone $select;
-
+            $pictureFilter = $filter;
+            $pictureFilter['identity'] = $pictureId;
             $pictureId = (string)$this->params('picture_id');
 
-            $selectRow->where('pictures.identity = ?', $pictureId);
-
-            $picture = $selectRow->getTable()->fetchRow($selectRow);
+            $picture = $this->picture->getRow($pictureFilter);
 
             if (! $picture) {
                 return $this->notFoundAction();
             }
 
-            return new JsonModel($this->pic()->gallery2($select, [
+            return new JsonModel($this->pic()->gallery2($filter, [
                 'page'        => $this->params()->fromQuery('page'),
                 'pictureId'   => $this->params()->fromQuery('pictureId'),
                 'reuseParams' => true,

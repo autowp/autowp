@@ -365,6 +365,15 @@ class PictureController extends AbstractRestfulController
             14 => 'status'
         ];
 
+        switch ($data['order']) {
+            case 12:
+                $filter['has_likes'] = true;
+                break;
+            case 13:
+                $filter['has_dislikes'] = true;
+                break;
+        }
+
         if ($data['order']) {
             $filter['order'] = $orders[$data['order']];
         } else {

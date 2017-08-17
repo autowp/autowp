@@ -425,11 +425,15 @@ class TwinsController extends AbstractActionController
     {
         return $this->doPictureAction(function ($group, $picture) {
 
-            $select = $this->twins->getGroupPicturesSelect($group['id'], [
-                'ordering' => $this->catalogue()->picturesOrdering()
-            ]);
+            $filter = [
+                'order'  => 'resolution_desc',
+                'status' => Picture::STATUS_ACCEPTED,
+                'item'   => [
+                    'ancestor_or_self' => $group['id']
+                ]
+            ];
 
-            $data = $this->pic()->picPageData($picture, $select, [], [
+            $data = $this->pic()->picPageData($picture, $filter, [], [
                 'paginator' => [
                     'route'     => 'twins/group/pictures/picture',
                     'urlParams' => [
@@ -454,11 +458,15 @@ class TwinsController extends AbstractActionController
     {
         return $this->doPictureAction(function ($group, $picture) {
 
-            $select = $this->twins->getGroupPicturesSelect($group['id'], [
-                'ordering' => $this->catalogue()->picturesOrdering()
-            ]);
+            $filter = [
+                'order'  => 'resolution_desc',
+                'status' => Picture::STATUS_ACCEPTED,
+                'item'   => [
+                    'ancestor_or_self' => $group['id']
+                ]
+            ];
 
-            return new JsonModel($this->pic()->gallery2($select, [
+            return new JsonModel($this->pic()->gallery2($filter, [
                 'page'      => $this->params()->fromQuery('page'),
                 'pictureId' => $this->params()->fromQuery('pictureId'),
                 'route'     => 'twins/group/pictures/picture',

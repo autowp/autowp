@@ -10,8 +10,6 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
-use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User as UserTable;
 
 use Application\ItemNameFormatter;
@@ -30,7 +28,6 @@ use Application\Model\UserAccount;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
 
-use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;
 
@@ -120,6 +117,11 @@ class Pic extends AbstractPlugin
      */
     private $brand;
 
+    /**
+     * @var Picture
+     */
+    private $picture;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -139,7 +141,8 @@ class Pic extends AbstractPlugin
         PictureModerVote $pictureModerVote,
         DbTable\Picture $pictureTable,
         TableGateway $modificationTable,
-        Brand $brand
+        Brand $brand,
+        Picture $picture
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -160,6 +163,7 @@ class Pic extends AbstractPlugin
         $this->pictureTable = $pictureTable;
         $this->modificationTable = $modificationTable;
         $this->brand = $brand;
+        $this->picture = $picture;
     }
 
     public function href($row, array $options = [])
@@ -902,7 +906,7 @@ class Pic extends AbstractPlugin
         return $result;
     }
 
-    public function picPageData($picture, $picSelect, $brandIds = [], array $options = [])
+    public function picPageData($picture, array $filter, $brandIds = [], array $options = [])
     {
         $options = array_replace([
             'paginator' => [
@@ -984,20 +988,18 @@ class Pic extends AbstractPlugin
         $paginator = false;
         $pageNumbers = false;
 
-        if ($picSelect) {
-            $paginator = new \Zend\Paginator\Paginator(
-                new Zend1DbTableSelect($picSelect)
-            );
+        if ($filter) {
+            $paginator = $this->picture->getPaginator($filter);
 
             $total = $paginator->getTotalItemCount();
 
             if ($total < 500) {
                 $db = $this->pictureTable->getAdapter();
 
-                $paginatorPictures = $db->fetchAll(
-                    $db->select()
-                        ->from(['_pic' => new Zend_Db_Expr('('.$picSelect->assemble() .')')], ['id', 'identity'])
-                );
+                $paginatorPicturesFilter = $filter;
+                $paginatorPicturesFilter['columns'] = ['id', 'identity'];
+
+                $paginatorPictures = $this->picture->getRows($paginatorPicturesFilter);
 
                 $pageNumber = 0;
                 foreach ($paginatorPictures as $n => $p) {
@@ -1043,7 +1045,7 @@ class Pic extends AbstractPlugin
             }
         }
 
-        $names = $this->pictureTable->getNameData([$picture->toArray()], [
+        $names = $this->pictureTable->getNameData([$picture], [
             'language' => $language,
             'large'    => true
         ]);
@@ -1215,7 +1217,7 @@ class Pic extends AbstractPlugin
     }
 
 
-    public function gallery2(Zend_Db_Table_Select $picSelect, array $options = [])
+    public function gallery2(array $filter, array $options = [])
     {
         $defaults = [
             'page'      => 1,
@@ -1236,64 +1238,32 @@ class Pic extends AbstractPlugin
 
         if ($options['pictureId']) {
             // look for page of that picture
-            $select = clone $picSelect;
+            $filterCopy = $filter;
+            $filterCopy['columns'] = ['id'];
 
-            $select
-                ->setIntegrityCheck(false)
-                ->reset(Zend_Db_Select::COLUMNS)
-                ->columns([
-                    'pictures.id'
-                ]);
+            $rows = $this->picture->getRows($filterCopy);
 
-            $col = $select->getAdapter()->fetchCol($select);
-            foreach ($col as $index => $id) {
-                if ($id == $options['pictureId']) {
+            foreach ($rows as $index => $row) {
+                if ($row['id'] == $options['pictureId']) {
                     $options['page'] = ceil(($index + 1) / $itemsPerPage);
                     break;
                 }
             }
         }
 
-        $select = clone $picSelect;
+        $filter['columns'] = [
+            'id', 'identity', 'name', 'width', 'height',
+            'crop_left', 'crop_top', 'crop_width', 'crop_height',
+            'image_id', 'filesize', 'messages'
+        ];
 
-        $select
-            ->setIntegrityCheck(false)
-            ->reset(Zend_Db_Select::COLUMNS)
-            ->columns([
-                'pictures.id', 'pictures.identity', 'pictures.name',
-                'pictures.width', 'pictures.height',
-                'pictures.crop_left', 'pictures.crop_top',
-                'pictures.crop_width', 'pictures.crop_height',
-                'pictures.image_id', 'pictures.filesize'
-            ])
-            ->joinLeft(
-                ['ct' => 'comment_topic'],
-                'ct.type_id = :type_id and ct.item_id = pictures.id',
-                'messages'
-            )
-            ->bind([
-                'type_id' => \Application\Comments::PICTURES_TYPE_ID
-            ]);
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbSelect($select)
-        );
-
-        $count = $paginator->getTotalItemCount();
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new \Zend\Paginator\Adapter\NullFill($count)
-        );
+        $paginator = $this->picture->getPaginator($filter);
 
         $paginator
             ->setItemCountPerPage($itemsPerPage)
             ->setCurrentPageNumber($options['page']);
 
-        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-        $rows = $select->getAdapter()->fetchAll($select);
-
-
+        $rows = $paginator->getCurrentItems();
 
         // prefetch
         $ids = [];

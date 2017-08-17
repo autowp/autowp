@@ -55,31 +55,25 @@ class PictureController extends AbstractActionController
         return $viewModel;
     }
 
-    private function getPicturesSelect(\Zend_Db_Table_Row_Abstract $picture)
+    private function getPicturesFilter($picture): array
     {
         $galleryStatuses = [
             Picture::STATUS_ACCEPTED
         ];
 
-        if (in_array($picture['status'], $galleryStatuses)) {
-            $picSelect = $this->pictureTable->select(true)
-                ->where('pictures.status IN (?)', $galleryStatuses)
-                ->order($this->catalogue()->picturesOrdering());
-
-            $picSelect
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join(
-                    ['pi2' => 'picture_item'],
-                    'picture_item.item_id = pi2.item_id',
-                    null
-                )
-                ->where('pi2.picture_id = ?', $picture['id']);
-        } else {
-            $picSelect = $this->pictureTable->select(true)
-                ->where('pictures.id = ?', $picture['id']);
+        if (! in_array($picture['status'], $galleryStatuses)) {
+            return [
+                'id' => $picture['id']
+            ];
         }
 
-        return $picSelect;
+        return [
+            'status' => $galleryStatuses,
+            'order'  => 'resolution_desc',
+            'item'   => [
+                'contains_picture' => $picture['id']
+            ]
+        ];
     }
 
     public function indexAction()
@@ -127,7 +121,7 @@ class PictureController extends AbstractActionController
             $this->getResponse()->setStatusCode(404);
         }
 
-        $picSelect = $this->getPicturesSelect($picture);
+        $picFilter = $this->getPicturesFilter($picture);
 
         $brands = [];
 
@@ -143,7 +137,7 @@ class PictureController extends AbstractActionController
             $brands[] = $brand['id'];
         }
 
-        $data = $this->pic()->picPageData($picture, $picSelect, $brands, [
+        $data = $this->pic()->picPageData($picture, $picFilter, $brands, [
             'paginator' => [
                 'route'     => 'picture/picture',
                 'urlParams' => []
@@ -182,9 +176,9 @@ class PictureController extends AbstractActionController
             }
         }
 
-        $select = $this->getPicturesSelect($picture);
+        $filter = $this->getPicturesFilter($picture);
 
-        return new JsonModel($this->pic()->gallery2($select, [
+        return new JsonModel($this->pic()->gallery2($filter, [
             'page'      => $this->params()->fromQuery('page'),
             'pictureId' => $this->params()->fromQuery('pictureId'),
             'reuseParams' => true,
