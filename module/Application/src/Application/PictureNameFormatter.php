@@ -4,7 +4,7 @@ namespace Application;
 
 use Zend\View\Renderer\PhpRenderer;
 
-use Application\Model\DbTable;
+use Application\Model\Picture;
 
 class PictureNameFormatter
 {
@@ -21,21 +21,21 @@ class PictureNameFormatter
     private $renderer;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     public function __construct(
         $translator,
         PhpRenderer $renderer,
         ItemNameFormatter $itemNameFormatter,
-        DbTable\Picture $pictureTable
+        Picture $picture
     ) {
 
         $this->translator = $translator;
         $this->renderer = $renderer;
         $this->itemNameFormatter = $itemNameFormatter;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     private static function mbUcfirst($str)
@@ -51,7 +51,7 @@ class PictureNameFormatter
     public function format($picture, $language)
     {
         if ($picture instanceof \Zend_Db_Table_Row_Abstract) {
-            $names = $this->pictureTable->getNameData([$picture->toArray()], [
+            $names = $this->picture->getNameData([$picture->toArray()], [
                 'language' => $language,
                 'large'    => true
             ]);

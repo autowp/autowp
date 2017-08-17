@@ -7,8 +7,6 @@ use Zend\Db\Sql;
 use Zend\I18n\Translator\TranslatorInterface;
 use Zend\Router\Http\TreeRouteStack;
 
-use Zend_Db_Expr;
-
 class BrandNav
 {
     /**
@@ -37,9 +35,9 @@ class BrandNav
     private $itemAlias;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var Item
@@ -57,7 +55,7 @@ class BrandNav
         TreeRouteStack $router,
         ItemParent $itemParent,
         ItemAlias $itemAlias,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         Item $itemModel,
         VehicleType $vehicleType
     ) {
@@ -67,7 +65,7 @@ class BrandNav
         $this->router = $router;
         $this->itemParent = $itemParent;
         $this->itemAlias = $itemAlias;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->itemModel = $itemModel;
         $this->vehicleType = $vehicleType;
     }
@@ -159,8 +157,6 @@ class BrandNav
             '9'
         ]);
 
-        $picturesAdapter = $this->pictureTable->getAdapter();
-
         $groups = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             $groups = [];
@@ -184,14 +180,14 @@ class BrandNav
             }
 
             // logotypes
-            $logoPicturesCount = $picturesAdapter->fetchOne(
-                $select = $picturesAdapter->select()
-                    ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->where('picture_item.perspective_id = ?', 22)
-                    ->where('picture_item.item_id = ?', $brandId)
-            );
+            $logoPicturesCount = $this->picture->getCount([
+                'status' => Picture::STATUS_ACCEPTED,
+                'item'   => [
+                    'id'          => $brandId,
+                    'perspective' => 22
+                ],
+            ]);
+
             if ($logoPicturesCount > 0) {
                 $groups['logo'] = [
                     'url' => $this->url('catalogue', [
@@ -204,14 +200,13 @@ class BrandNav
             }
 
             // mixed
-            $mixedPicturesCount = $picturesAdapter->fetchOne(
-                $select = $picturesAdapter->select()
-                    ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->where('picture_item.perspective_id = ?', 25)
-                    ->where('picture_item.item_id = ?', $brandId)
-            );
+            $mixedPicturesCount = $this->picture->getCount([
+                'status' => Picture::STATUS_ACCEPTED,
+                'item'   => [
+                    'id'          => $brandId,
+                    'perspective' => 25
+                ],
+            ]);
             if ($mixedPicturesCount > 0) {
                 $groups['mixed'] = [
                     'url' => $this->url('catalogue', [
@@ -224,15 +219,13 @@ class BrandNav
             }
 
             // unsorted
-            $unsortedPicturesCount = $picturesAdapter->fetchOne(
-                $select = $picturesAdapter->select()
-                    ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->where('picture_item.perspective_id NOT IN (?) OR picture_item.perspective_id IS NULL', [22, 25])
-                    ->where('picture_item.item_id = ?', $brandId)
-            );
-
+            $unsortedPicturesCount = $this->picture->getCount([
+                'status' => Picture::STATUS_ACCEPTED,
+                'item'   => [
+                    'id'                  => $brandId,
+                    'perspective_exclude' => [22, 25]
+                ],
+            ]);
             if ($unsortedPicturesCount > 0) {
                 $groups['unsorted'] = [
                     'url'     => $this->url('catalogue', [

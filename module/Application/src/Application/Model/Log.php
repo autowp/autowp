@@ -12,8 +12,6 @@ use Zend\Paginator;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable;
-
 class Log
 {
     const EVENTS_PER_PAGE = 40;
@@ -24,9 +22,9 @@ class Log
     private $eventTable;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var TableGateway
@@ -54,7 +52,7 @@ class Log
     private $itemTable;
 
     public function __construct(
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         TableGateway $logTable,
         TableGateway $eventArticleTable,
         TableGateway $eventItemTable,
@@ -64,7 +62,7 @@ class Log
     ) {
         $this->itemTable = $itemTable;
         $this->eventTable = $logTable;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->eventArticleTable = $eventArticleTable;
         $this->eventItemTable = $eventItemTable;
         $this->eventPictureTable = $eventPictureTable;
@@ -208,11 +206,9 @@ class Log
                 $itemRows[] = $row;
             }
 
-            $pictureRows = $this->pictureTable->fetchAll(
-                $this->pictureTable->select(true)
-                    ->join('log_events_pictures', 'pictures.id = log_events_pictures.picture_id', null)
-                    ->where('log_events_pictures.log_event_id = ?', $event['id'])
-            );
+            $pictureRows = $this->picture->getRows([
+                'log' => $event['id']
+            ]);
 
             $events[] = [
                 'user'     => $userTable->find($event['user_id'])->current(),

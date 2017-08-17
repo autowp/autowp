@@ -6,7 +6,6 @@ use Zend\View\Helper\AbstractHtmlElement;
 
 use Autowp\Comments;
 
-use Application\Model\DbTable;
 use Application\Model\Picture;
 
 class ModerMenu extends AbstractHtmlElement
@@ -17,14 +16,14 @@ class ModerMenu extends AbstractHtmlElement
     private $comments;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
-    public function __construct(Comments\CommentsService $comments, DbTable\Picture $pictureTable)
+    public function __construct(Comments\CommentsService $comments, Picture $picture)
     {
         $this->comments = $comments;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function __invoke($data = false)
@@ -32,11 +31,10 @@ class ModerMenu extends AbstractHtmlElement
         $items = [];
 
         if ($this->view->user()->inheritsRole('moder')) {
-            $inboxCount = $this->pictureTable->getAdapter()->fetchOne(
-                $this->pictureTable->getAdapter()->select()
-                    ->from($this->pictureTable->info('name'), 'count(1)')
-                    ->where('status = ?', Picture::STATUS_INBOX)
-            );
+
+            $inboxCount = $this->picture->getCount([
+                'status' => Picture::STATUS_INBOX
+            ]);
 
             $items[] = [
                 'href'  => '/ng/moder/pictures?order=1&status=inbox',

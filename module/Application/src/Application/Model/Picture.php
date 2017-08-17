@@ -279,6 +279,7 @@ class Picture
             'limit'            => null,
             'accepted_in_days' => null,
             'modification'     => null,
+            'log'              => null,
         ];
         $options = array_replace($defaults, $options);
 
@@ -423,6 +424,11 @@ class Picture
         if ($options['modification']) {
             $select->join('modification_picture', 'pictures.id = modification_picture.picture_id', []);
             $this->applyIdFilter($select, $options['modification'], 'modification_picture.modification_id');
+        }
+
+        if ($options['log']) {
+            $select->join('log_events_pictures', 'pictures.id = log_events_pictures.picture_id', []);
+            $this->applyIdFilter($select, $options['log'], 'log_events_pictures.log_event_id');
         }
 
         switch ($options['order']) {

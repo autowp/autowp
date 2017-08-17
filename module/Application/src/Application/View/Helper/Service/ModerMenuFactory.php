@@ -16,7 +16,7 @@ class ModerMenuFactory implements FactoryInterface
     {
         return new Helper(
             $container->get(\Autowp\Comments\CommentsService::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\Picture::class)
         );
     }
 }

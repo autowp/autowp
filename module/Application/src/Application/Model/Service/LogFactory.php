@@ -14,7 +14,7 @@ class LogFactory implements FactoryInterface
     {
         $tables = $container->get(\Application\Db\TableManager::class);
         return new \Application\Model\Log(
-            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Picture::class),
             $tables->get('log_events'),
             $tables->get('log_events_articles'),
             $tables->get('log_events_item'),

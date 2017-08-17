@@ -561,7 +561,6 @@ class CategoryController extends AbstractActionController
 
             $pictureFilter = $filter;
             $pictureFilter['identity'] = (string)$this->params('picture_id');
-            $pictureId = (string)$this->params('picture_id');
 
             $picture = $this->picture->getRow($pictureFilter);
 

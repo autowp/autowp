@@ -5,7 +5,6 @@ namespace Application\Hydrator\Api;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Comments;
-use Application\Model\DbTable;
 use Application\Model\Picture;
 
 class CommentHydrator extends RestHydrator
@@ -16,9 +15,9 @@ class CommentHydrator extends RestHydrator
     private $comments;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var User
@@ -40,7 +39,7 @@ class CommentHydrator extends RestHydrator
         $this->comments = $serviceManager->get(\Application\Comments::class);
         $this->router = $serviceManager->get('HttpRouter');
 
-        $this->pictureTable = $serviceManager->get(DbTable\Picture::class);
+        $this->picture = $serviceManager->get(Picture::class);
         $this->userTable = new User();
 
         $this->userId = null;
@@ -88,7 +87,7 @@ class CommentHydrator extends RestHydrator
     {
         $status = null;
         if ($object['type_id'] == \Application\Comments::PICTURES_TYPE_ID) {
-            $picture = $this->pictureTable->find($object['item_id'])->current();
+            $picture = $this->picture->getRow(['id' => (int)$object['item_id']]);
             if ($picture) {
                 switch ($picture['status']) {
                     case Picture::STATUS_ACCEPTED:
