@@ -267,7 +267,8 @@ class IndexController extends AbstractActionController
 
         $specsCars = $this->car()->listData($cars, [
             'pictureFetcher' => new Item\PerspectivePictureFetcher([
-                'pictureTable'         => $this->picture->getPictureTable(),
+                'pictureModel'         => $this->picture,
+                'itemModel'            => $this->item,
                 'perspective'          => $this->perspective,
                 'type'                 => null,
                 'onlyExactlyPictures'  => false,

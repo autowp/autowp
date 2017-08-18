@@ -11,12 +11,10 @@ use Autowp\Image;
 
 use Application\ItemNameFormatter;
 use Application\Model\Catalogue;
-use Application\Model\DbTable;
 use Application\Service\SpecificationsService;
 
 use Facebook;
 
-use Zend_Db_Expr;
 use Zend_Db_Table;
 use Zend_Oauth_Token_Access;
 use Zend_Service_Twitter;
@@ -68,9 +66,9 @@ class CarOfDay
     private $itemParent;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var Twins
@@ -87,7 +85,7 @@ class CarOfDay
         Item $itemModel,
         Perspective $perspective,
         ItemParent $itemParent,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         Twins $twins
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
@@ -99,7 +97,7 @@ class CarOfDay
         $this->itemModel = $itemModel;
         $this->perspective = $perspective;
         $this->itemParent = $itemParent;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->twins = $twins;
 
         $this->table = new Zend_Db_Table([
@@ -155,21 +153,16 @@ class CarOfDay
         ] : null;
     }
 
-    private function pictureByPerspective($car, $perspective)
+    private function pictureByPerspective(int $itemId, $perspective)
     {
-        $select = $this->pictureTable->select(true)
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->where('item_parent_cache.parent_id = ?', $car['id'])
-            ->order([
-                'pictures.width DESC', 'pictures.height DESC'
-            ])
-            ->limit(1);
-        if ($perspective) {
-            $select->where('picture_item.perspective_id = ?', $perspective);
-        }
-        return $this->pictureTable->fetchRow($select);
+        return $this->picture->getRow([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => [
+                'ancestor_or_self' => $itemId,
+                'perspective'      => $perspective ? $perspective : null
+            ],
+            'order'  => 'resolution_desc'
+        ]);
     }
 
     private static function ucfirst($str)
@@ -203,14 +196,14 @@ class CarOfDay
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
         foreach ($perspectives as $perspective) {
-            $picture = $this->pictureByPerspective($car, $perspective);
+            $picture = $this->pictureByPerspective($car['id'], $perspective);
             if ($picture) {
                 break;
             }
         }
 
         if (! $picture) {
-            $picture = $this->pictureByPerspective($car, false);
+            $picture = $this->pictureByPerspective($car['id'], false);
         }
 
         if (! $picture) {
@@ -278,14 +271,14 @@ class CarOfDay
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
         foreach ($perspectives as $perspective) {
-            $picture = $this->pictureByPerspective($car, $perspective);
+            $picture = $this->pictureByPerspective($car['id'], $perspective);
             if ($picture) {
                 break;
             }
         }
 
         if (! $picture) {
-            $picture = $this->pictureByPerspective($car, false);
+            $picture = $this->pictureByPerspective($car['id'], false);
         }
 
         if (! $picture) {
@@ -357,14 +350,14 @@ class CarOfDay
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
         foreach ($perspectives as $perspective) {
-            $picture = $this->pictureByPerspective($car, $perspective);
+            $picture = $this->pictureByPerspective($car['id'], $perspective);
             if ($picture) {
                 break;
             }
         }
 
         if (! $picture) {
-            $picture = $this->pictureByPerspective($car, false);
+            $picture = $this->pictureByPerspective($car['id'], false);
         }
 
         if (! $picture) {
@@ -453,7 +446,7 @@ class CarOfDay
         foreach ($carOfDayPictures as $idx => $picture) {
             if ($picture) {
                 $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
-                $formatRequests[$format][$idx] = $this->pictureTable->getFormatRequest($picture);
+                $formatRequests[$format][$idx] = $this->picture->getFormatRequest($picture);
             }
         }
 
@@ -469,7 +462,7 @@ class CarOfDay
                 $notEmptyPics[] = $picture;
             }
         }
-        $names = $this->pictureTable->getNameData($notEmptyPics, [
+        $names = $this->picture->getNameData($notEmptyPics, [
             'language' => $language
         ]);
 
@@ -553,28 +546,32 @@ class CarOfDay
         foreach ($perspectivesGroupIds as $groupId) {
             $picture = null;
 
-            $select = $this->pictureTable->select(true)
-                ->where('mp.group_id = ?', $groupId)
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car['id'])
-                ->joinRight(
+            $select = $this->picture->getSelect([
+                'id_exclude' => $usedIds,
+                'status'     => Picture::STATUS_ACCEPTED,
+                'item'       => [
+                    'ancestor_or_self' => $car['id']
+                ]
+            ]);
+
+            $select
+                ->join(
                     ['mp' => 'perspectives_groups_perspectives'],
                     'picture_item.perspective_id = mp.perspective_id',
-                    null
+                    [],
+                    $select::JOIN_RIGHT
                 )
-                ->joinLeft('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', null)
+                ->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', [], $select::JOIN_LEFT)
+                ->where(['mp.group_id' => $groupId])
                 ->order([
-                    'item_parent_cache.sport', 'item_parent_cache.tuning', 'mp.position',
+                    'ipc_ancestor.sport', 'ipc_ancestor.tuning', 'mp.position',
                     'picture_vote_summary.positive DESC',
                     'pictures.width DESC', 'pictures.height DESC'
                 ])
+                ->group(['ipc_ancestor.sport', 'ipc_ancestor.tuning', 'mp.position'])
                 ->limit(1);
-            if ($usedIds) {
-                $select->where('pictures.id not in (?)', $usedIds);
-            }
-            $picture = $this->pictureTable->fetchRow($select);
+
+            $picture = $this->picture->getTable()->selectWith($select)->current();
 
             if ($picture) {
                 $pictures[] = $picture;
@@ -605,19 +602,17 @@ class CarOfDay
         }
 
         if (count($left) > 0) {
-            $select = $this->pictureTable->select(true)
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car['id'])
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                //->order('ratio DESC')
-                ->limit(count($left));
 
-            if (count($usedIds) > 0) {
-                $select->where('pictures.id NOT IN (?)', $usedIds);
-            }
+            $rows = $this->picture->getRows([
+                'id_exclude' => $usedIds,
+                'status'     => Picture::STATUS_ACCEPTED,
+                'item'       => [
+                    'ancestor_or_self' => $car['id']
+                ],
+                'limit'      => count($left)
+            ]);
 
-            foreach ($this->pictureTable->fetchAll($select) as $pic) {
+            foreach ($rows as $pic) {
                 $key = array_shift($left);
                 $pictures[$key] = $pic;
             }
@@ -630,15 +625,12 @@ class CarOfDay
     {
         $items = [];
 
-        $db = $this->pictureTable->getAdapter();
-        $totalPictures = $db->fetchOne(
-            $db->select()
-                ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car['id'])
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-        );
+        $totalPictures = $this->picture->getCount([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item' => [
+                'ancestor_or_self' => $car['id']
+            ]
+        ]);
 
         if ($car['item_type_id'] == Item::CATEGORY) {
             $items[] = [

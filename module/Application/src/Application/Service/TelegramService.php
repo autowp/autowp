@@ -10,8 +10,8 @@ use Zend\Router\Http\TreeRouteStack;
 use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
-use Application\Model\DbTable;
 use Application\Model\Item;
+use Application\Model\Picture;
 use Application\Telegram\Command\InboxCommand;
 use Application\Telegram\Command\MeCommand;
 use Application\Telegram\Command\NewCommand;
@@ -37,9 +37,14 @@ class TelegramService
     private $hostManager;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
+
+    /**
+     * @var Item
+     */
+    private $item;
 
     /**
      * @var TableGateway
@@ -51,20 +56,15 @@ class TelegramService
      */
     private $telegramChatTable;
 
-    /**
-     * @var TableGateway
-     */
-    private $itemTable;
-
     public function __construct(
         array $options,
         TreeRouteStack $router,
         HostManager $hostManager,
         $serviceManager,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
+        Item $item,
         TableGateway $telegramItemTable,
-        TableGateway $telegramChatTable,
-        TableGateway $itemTable
+        TableGateway $telegramChatTable
     ) {
 
         $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
@@ -74,10 +74,10 @@ class TelegramService
         $this->router = $router;
         $this->hostManager = $hostManager;
         $this->serviceManager = $serviceManager;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
+        $this->item = $item;
         $this->telegramItemTable = $telegramItemTable;
         $this->telegramChatTable = $telegramChatTable;
-        $this->itemTable = $itemTable;
     }
 
     /**
@@ -90,8 +90,8 @@ class TelegramService
         $api->addCommands([
             StartCommand::class,
             new MeCommand($this->serviceManager->get(\Autowp\Message\MessageService::class), $this->telegramChatTable),
-            new NewCommand($this->telegramItemTable, $this->telegramChatTable, $this->itemTable),
-            new InboxCommand($this->telegramItemTable, $this->telegramChatTable, $this->itemTable),
+            new NewCommand($this->telegramItemTable, $this->telegramChatTable, $this->item->getTable()),
+            new InboxCommand($this->telegramItemTable, $this->telegramChatTable, $this->item->getTable()),
             new MessagesCommand($this->telegramChatTable)
         ]);
 
@@ -154,9 +154,9 @@ class TelegramService
         return $this->getApi()->commandsHandler($webhook);
     }
 
-    public function notifyInbox($pictureId)
+    public function notifyInbox(int $pictureId)
     {
-        $picture = $this->pictureTable->find($pictureId)->current();
+        $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
             return;
         }
@@ -186,9 +186,9 @@ class TelegramService
         }
     }
 
-    public function notifyPicture($pictureId)
+    public function notifyPicture(int $pictureId)
     {
-        $picture = $this->pictureTable->find($pictureId)->current();
+        $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
             return;
         }
@@ -231,18 +231,14 @@ class TelegramService
 
     private function getPictureBrandIds($picture)
     {
-        $db = $picture->getTable()->getAdapter();
-
-        $brandIds = $db->fetchCol(
-            $db->select()
-                ->from('item', 'id')
-                ->where('item.item_type_id = ?', Item::BRAND)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                ->where('picture_item.picture_id = ?', $picture['id'])
-        );
-
-        return $brandIds;
+        return $this->item->getIds([
+            'item_type_id' => Item::BRAND,
+            'descendant_or_self' => [
+                'pictures' => [
+                    'id' => $picture['id']
+                ]
+            ]
+        ]);
     }
 
     private function getPictureUrl($chatId, $picture)

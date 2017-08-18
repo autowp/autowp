@@ -165,7 +165,7 @@ class ListBuilder
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getPictureUrl($item, array $picture)
+    public function getPictureUrl($item, $picture)
     {
         return $this->picHelper->href($picture);
     }

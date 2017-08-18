@@ -9,12 +9,12 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\ItemNameFormatter;
 use Application\Model\Catalogue;
-use Application\Model\DbTable;
-use Application\Model\Perspective;
-use Application\Model\UserItemSubscribe;
-use Application\Service\SpecificationsService;
 use Application\Model\ItemParent;
 use Application\Model\Item;
+use Application\Model\Perspective;
+use Application\Model\Picture;
+use Application\Model\UserItemSubscribe;
+use Application\Service\SpecificationsService;
 
 class ItemHydrator extends RestHydrator
 {
@@ -60,14 +60,9 @@ class ItemHydrator extends RestHydrator
     private $textStorage;
 
     /**
-     * @var TableGateway
+     * @var Picture
      */
-    private $pictureTable;
-
-    /**
-     * @var DbTable\Picture
-     */
-    private $pictureTableZf1;
+    private $picture;
 
     /**
      * @var TableGateway
@@ -100,11 +95,9 @@ class ItemHydrator extends RestHydrator
         parent::__construct();
 
         $tables = $serviceManager->get(\Application\Db\TableManager::class);
-        $this->pictureTable = $tables->get('pictures');
+        $this->picture = $serviceManager->get(Picture::class);
         $this->linkTable = $tables->get('links');
         $this->specTable = $tables->get('spec');
-
-        $this->pictureTableZf1 = $serviceManager->get(DbTable\Picture::class);
 
         $this->perspective = $serviceManager->get(Perspective::class);
         $this->userItemSubscribe = $serviceManager->get(UserItemSubscribe::class);
@@ -360,7 +353,8 @@ class ItemHydrator extends RestHydrator
 
         if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
             $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
-                'pictureTable'         => $this->pictureTableZf1,
+                'pictureModel'         => $this->picture,
+                'itemModel'            => $this->itemModel,
                 'perspective'          => $this->perspective,
                 'type'                 => null,
                 'onlyExactlyPictures'  => $onlyExactlyPictures,
@@ -411,10 +405,9 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('pictures_count')) {
-            $select = new Sql\Select($this->pictureTable->getTable());
-            $select->join('picture_item', 'pictures.id = picture_item.picture_id', [])
-                ->where(['picture_item.item_id' => $object['id']]);
-            $result['pictures_count'] = $this->getCountBySelect($select, $this->pictureTable);
+            $result['pictures_count'] = $this->picture->getCount([
+                'item' => $object['id']
+            ]);
         }
 
         if ($this->filterComposite->filter('specifications_count')) {

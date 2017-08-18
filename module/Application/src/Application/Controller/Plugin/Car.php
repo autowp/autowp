@@ -4,13 +4,13 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
-use Application\Model\DbTable;
+use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Item\PictureFetcher;
+use Application\Model\Picture;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
-use Application\ItemNameFormatter;
 
 class Car extends AbstractPlugin
 {
@@ -42,23 +42,23 @@ class Car extends AbstractPlugin
     private $itemParent;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     public function __construct(
         SpecificationsService $specsService,
         ItemNameFormatter $itemNameFormatter,
         Item $itemModel,
         ItemParent $itemParent,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         Twins $twins
     ) {
         $this->specsService = $specsService;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->itemModel = $itemModel;
         $this->itemParent = $itemParent;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->twins = $twins;
     }
 
@@ -75,8 +75,9 @@ class Car extends AbstractPlugin
         return $this->categoryPictureFetcher
             ? $this->categoryPictureFetcher
             : $this->categoryPictureFetcher = new \Application\Model\Item\DistinctItemPictureFetcher([
-                'pictureTable' => $this->pictureTable,
-                'dateSort' => false
+                'pictureModel' => $this->picture,
+                'itemModel'    => $this->itemModel,
+                'dateSort'     => false
             ]);
     }
 
@@ -390,7 +391,7 @@ class Car extends AbstractPlugin
 
 
         // prefetch names
-        $pictureNames = $this->pictureTable->getNameData($allPictures, [
+        $pictureNames = $this->picture->getNameData($allPictures, [
             'language' => $language
         ]);
 

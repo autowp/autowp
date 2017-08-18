@@ -15,7 +15,7 @@ class Twins extends ListBuilder
         return $this;
     }
 
-    public function getPictureUrl($item, array $picture)
+    public function getPictureUrl($item, $picture)
     {
         return $this->router->assemble([
             'id'         => $this->group['id'],

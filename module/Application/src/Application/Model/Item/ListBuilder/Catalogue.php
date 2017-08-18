@@ -114,7 +114,7 @@ class Catalogue extends ListBuilder
         ]);
     }
 
-    public function getPictureUrl($item, array $picture)
+    public function getPictureUrl($item, $picture)
     {
         $paths = $this->getPathsToBrand($item['id'], $this->brand['id'], [
             'breakOnFirst' => true

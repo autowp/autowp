@@ -21,10 +21,10 @@ class TelegramServiceFactory implements FactoryInterface
             $container->get('HttpRouter'),
             $container->get(\Application\HostManager::class),
             $container,
-            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Picture::class),
+            $container->get(\Application\Model\Item::class),
             $tables->get('telegram_brand'),
-            $tables->get('telegram_chat'),
-            $tables->get('item')
+            $tables->get('telegram_chat')
         );
     }
 }

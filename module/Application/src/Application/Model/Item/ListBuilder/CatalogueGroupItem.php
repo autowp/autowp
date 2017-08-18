@@ -205,7 +205,7 @@ class CatalogueGroupItem extends CatalogueItem
         ]);
     }
 
-    public function getPictureUrl($item, array $picture)
+    public function getPictureUrl($item, $picture)
     {
         // found parent row
         $itemParentRow = $this->getItemParentRow($item['id'], $this->itemId);

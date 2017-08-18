@@ -7,6 +7,7 @@ use Exception;
 use geoPHP;
 use Point;
 
+use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -17,7 +18,6 @@ use Application\DuplicateFinder;
 use Application\ExifGPSExtractor;
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Perspective;
@@ -25,8 +25,6 @@ use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\UserPicture;
 use Application\Service\TelegramService;
-
-use Zend_Db_Expr;
 
 class UploadController extends AbstractActionController
 {
@@ -68,9 +66,9 @@ class UploadController extends AbstractActionController
     private $itemParent;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var Item
@@ -82,11 +80,6 @@ class UploadController extends AbstractActionController
      */
     private $brand;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
-
     public function __construct(
         $partial,
         TelegramService $telegram,
@@ -96,7 +89,6 @@ class UploadController extends AbstractActionController
         UserPicture $userPicture,
         Perspective $perspective,
         ItemParent $itemParent,
-        DbTable\Picture $pictureTable,
         Item $item,
         Brand $brand,
         Picture $picture
@@ -109,7 +101,6 @@ class UploadController extends AbstractActionController
         $this->userPicture = $userPicture;
         $this->perspective = $perspective;
         $this->itemParent = $itemParent;
-        $this->pictureTable = $pictureTable;
         $this->item = $item;
         $this->brand = $brand;
         $this->picture = $picture;
@@ -132,8 +123,8 @@ class UploadController extends AbstractActionController
         $replace = $this->params('replace');
         $replacePicture = false;
         if ($replace) {
-            $replacePicture = $this->pictureTable->fetchRow([
-                'identity = ?' => $replace
+            $replacePicture = $this->picture->getRow([
+                'identity' => (string)$replace
             ]);
         }
 
@@ -234,14 +225,14 @@ class UploadController extends AbstractActionController
             $resolution = $this->imageStorage()->getImageResolution($imageId);
 
             // add record to db
-            $picture = $this->pictureTable->createRow([
+            $this->picture->getTable()->insert([
                 'image_id'      => $imageId,
                 'width'         => $width,
                 'height'        => $height,
                 'dpi_x'         => $resolution ? $resolution['x'] : null,
                 'dpi_y'         => $resolution ? $resolution['y'] : null,
                 'owner_id'      => $user ? $user['id'] : null,
-                'add_date'      => new Zend_Db_Expr('NOW()'),
+                'add_date'      => new Sql\Expression('NOW()'),
                 'filesize'      => $fileSize,
                 'status'        => Picture::STATUS_INBOX,
                 'removing_date' => null,
@@ -249,12 +240,15 @@ class UploadController extends AbstractActionController
                 'identity'      => $this->picture->generateIdentity(),
                 'replace_picture_id' => $replacePicture ? $replacePicture['id'] : null,
             ]);
-            $picture->save();
+
+            $pictureId = $this->picture->getTable()->getLastInsertValue();
+
+            $picture = $this->picture->getRow(['id' => (int)$pictureId]);
 
             if ($itemIds) {
-                $this->pictureItem->setPictureItems($picture['id'], $itemIds);
+                $this->pictureItem->setPictureItems($pictureId, $itemIds);
                 if ($perspectiveId && count($itemIds) == 1) {
-                    $this->pictureItem->setProperties($picture['id'], $itemIds[0], [
+                    $this->pictureItem->setProperties($pictureId, $itemIds[0], [
                         'perspective' => $perspectiveId
                     ]);
                 }
@@ -266,7 +260,7 @@ class UploadController extends AbstractActionController
             }
 
             // rename file to new
-            $this->imageStorage()->changeImageName($picture['image_id'], [
+            $this->imageStorage()->changeImageName($imageId, [
                 'pattern' => $this->picture->getFileNamePattern($picture)
             ]);
 
@@ -274,7 +268,7 @@ class UploadController extends AbstractActionController
             if ($values['note']) {
                 $this->comments->add([
                     'typeId'             => \Application\Comments::PICTURES_TYPE_ID,
-                    'itemId'             => $picture['id'],
+                    'itemId'             => $pictureId,
                     'parentId'           => null,
                     'authorId'           => $user['id'],
                     'message'            => $values['note'],
@@ -285,33 +279,34 @@ class UploadController extends AbstractActionController
 
             $this->comments->subscribe(
                 \Application\Comments::PICTURES_TYPE_ID,
-                $picture['id'],
+                $pictureId,
                 $user['id']
             );
 
             // read gps
-            $exif = $this->imageStorage()->getImageEXIF($picture['image_id']);
+            $exif = $this->imageStorage()->getImageEXIF($imageId);
             $extractor = new ExifGPSExtractor();
             $gps = $extractor->extract($exif);
             if ($gps !== false) {
                 geoPHP::version();
                 $point = new Point($gps['lng'], $gps['lat']);
-                $db = $this->pictureTable->getAdapter();
-                $pointExpr = new Zend_Db_Expr($db->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
 
-                $picture['point'] = $pointExpr;
-                $picture->save();
+                $this->picture->getTable()->update([
+                    'point' => new Sql\Expression('GeomFromWKB(?)', [$point->out('wkb')])
+                ], [
+                    'id' => $pictureId
+                ]);
             }
 
-            $formatRequest = $this->pictureTable->getFormatRequest($picture);
+            $formatRequest = $this->picture->getFormatRequest($picture);
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-thumb');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-medium');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-gallery-full');
 
             // index
-            $this->duplicateFinder->indexImage($picture['id'], $tempFilePath);
+            $this->duplicateFinder->indexImage($pictureId, $tempFilePath);
 
-            $this->telegram->notifyInbox($picture['id']);
+            $this->telegram->notifyInbox($pictureId);
 
             $result[] = $picture;
         }
@@ -533,7 +528,7 @@ class UploadController extends AbstractActionController
 
     public function cropSaveAction()
     {
-        $picture = $this->pictureTable->find($this->params()->fromPost('id'))->current();
+        $picture = $this->picture->getRow(['id' => (int)$this->params()->fromPost('id')]);
         if (! $picture) {
             return $this->notfoundAction();
         }
@@ -567,21 +562,25 @@ class UploadController extends AbstractActionController
         $height = min($picture['height'], $height);
 
         if ($left > 0 || $top > 0 || $width < $picture['width'] || $height < $picture['height']) {
-            $picture->setFromArray([
+            $set = [
                 'crop_left'   => $left,
                 'crop_top'    => $top,
                 'crop_width'  => $width,
                 'crop_height' => $height
-            ]);
+            ];
         } else {
-            $picture->setFromArray([
+            $set = [
                 'crop_left'   => null,
                 'crop_top'    => null,
                 'crop_width'  => null,
                 'crop_height' => null
-            ]);
+            ];
         }
-        $picture->save();
+        $this->picture->getTable()->update($set, [
+            'id' => $picture['id']
+        ]);
+
+        $picture = $this->picture->getRow(['id' => $picture['id']]);
 
         $this->imageStorage()->flush([
             'image' => $picture['image_id']
@@ -595,7 +594,7 @@ class UploadController extends AbstractActionController
         ]);
 
         $image = $this->imageStorage()->getFormatedImage(
-            $this->pictureTable->getFormatRequest($picture),
+            $this->picture->getFormatRequest($picture),
             'picture-thumb'
         );
 
@@ -624,8 +623,8 @@ class UploadController extends AbstractActionController
         $replace = $this->params('replace');
         $replacePicture = false;
         if ($replace) {
-            $replacePicture = $this->pictureTable->fetchRow([
-                'identity = ?' => $replace
+            $replacePicture = $this->picture->getRow([
+                'identity' => (string)$replace
             ]);
         }
 
@@ -667,7 +666,7 @@ class UploadController extends AbstractActionController
         $result = [];
         foreach ($pictures as $picture) {
             $image = $this->imageStorage()->getFormatedImage(
-                $this->pictureTable->getFormatRequest($picture),
+                $this->picture->getFormatRequest($picture),
                 'picture-gallery-full'
             );
 

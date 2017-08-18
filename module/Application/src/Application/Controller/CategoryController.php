@@ -424,7 +424,8 @@ class CategoryController extends AbstractActionController
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureTable' => $this->picture->getPictureTable(),
+                    'pictureModel' => $this->picture,
+                    'itemModel'    => $this->itemModel,
                     'perspective'  => $this->perspective
                 ]),
                 'useFrontPictures' => $haveSubcategories,

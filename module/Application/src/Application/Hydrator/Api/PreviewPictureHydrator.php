@@ -2,7 +2,7 @@
 
 namespace Application\Hydrator\Api;
 
-use Application\Model\DbTable;
+use Application\Model\Picture;
 
 class PreviewPictureHydrator extends RestHydrator
 {
@@ -69,7 +69,7 @@ class PreviewPictureHydrator extends RestHydrator
             'url'       => $object['url'],
             'large'     => $object['format'] == 'picture-thumb-medium',
             'thumbnail' => $object['row'] ? $this->extractValue('thumbnail', [
-                'image'  => DbTable\Picture::buildFormatRequest($object['row']),
+                'image'  => Picture::buildFormatRequest($object['row']),
                 'format' => $object['format']
             ]) : null
         ];

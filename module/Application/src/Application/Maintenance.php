@@ -11,7 +11,6 @@ use Zend\Session\SessionManager;
 use Autowp\Cron;
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable;
 use Application\Model\Picture;
 
 class Maintenance extends AbstractListenerAggregate
@@ -34,7 +33,7 @@ class Maintenance extends AbstractListenerAggregate
 
         $application = $event->getApplication();
         $serviceManager = $application->getServiceManager();
-        $pictureTable = $serviceManager->get(DbTable\Picture::class);
+        $pictureModel = $serviceManager->get(Picture::class);
 
         $comments = $serviceManager->get(Comments::class);
         /* $comments->cleanBrokenMessages();
@@ -42,7 +41,7 @@ class Maintenance extends AbstractListenerAggregate
         $comments->service()->cleanTopics();*/
 
         $imageStorage = $serviceManager->get(\Autowp\Image\Storage::class);
-        $this->clearPicturesQueue($pictureTable, $comments->service(), $imageStorage);
+        $this->clearPicturesQueue($pictureModel, $comments->service(), $imageStorage);
 
         $sessionManager = $serviceManager->get(\Zend\Session\SessionManager::class);
         $this->clearSessions($sessionManager);
@@ -99,16 +98,18 @@ class Maintenance extends AbstractListenerAggregate
     }
 
     private function clearPicturesQueue(
-        DbTable\Picture $pictureTable,
+        Picture $pictureModel,
         \Autowp\Comments\CommentsService $comments,
         \Autowp\Image\Storage $imageStorage
     ) {
-        $pictures = $pictureTable->fetchAll(
-            $pictureTable->select(true)
-                ->where('status = ?', Picture::STATUS_REMOVING)
-                ->where('removing_date is null OR (removing_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY) )')
-                ->limit(1000)
-        );
+        $select = $pictureModel->getTable()->getSql()->select();
+
+        $select->where([
+            'status' => Picture::STATUS_REMOVING,
+            new Sql\Predicate\Expression('(removing_date is null OR (removing_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY) ))'),
+        ])->limit(1000);
+
+        $pictures = $pictureModel->getTable()->selectWith($select);
 
         $count = count($pictures);
 
@@ -123,7 +124,11 @@ class Maintenance extends AbstractListenerAggregate
 
                 $imageId = $picture['image_id'];
                 if ($imageId) {
-                    $picture->delete();
+
+                    $pictureModel->getTable()->delete([
+                        'id = ?' => $picture['id']
+                    ]);
+
                     $imageStorage->removeImage($imageId);
                 } else {
                     print "Brokern image `{$picture['id']}`. Skip\n";

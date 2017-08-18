@@ -143,7 +143,7 @@ class Category extends ListBuilder
         return null;
     }
 
-    public function getPictureUrl($item, array $picture)
+    public function getPictureUrl($item, $picture)
     {
         if ($item['item_type_id'] == Item::CATEGORY) {
             return $this->router->assemble([

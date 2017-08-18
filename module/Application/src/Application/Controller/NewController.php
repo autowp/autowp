@@ -195,7 +195,8 @@ class NewController extends AbstractActionController
                     'disableDetailsLink' => true,
                     'disableSpecs'       => true,
                     'pictureFetcher' => new \Application\Model\Item\NewPictureFetcher([
-                        'pictureTable' => $this->picture->getPictureTable(),
+                        'pictureModel' => $this->picture,
+                        'itemModel'    => $this->itemModel,
                         'pictureIds'   => $ids
                     ]),
                     'listBuilder' => new \Application\Model\Item\ListBuilder\NewPicturesListBuilder([

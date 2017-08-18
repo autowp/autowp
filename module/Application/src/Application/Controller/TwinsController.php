@@ -7,7 +7,6 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Autowp\Comments;
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\TextStorage;
 
 use Application\Model\Item;
@@ -132,21 +131,19 @@ class TwinsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $select = $this->twins->getGroupPicturesSelect($group['id'], [
-            'ordering' => $this->catalogue()->picturesOrdering()
+        $paginator = $this->picture->getPaginator([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => [
+                'ancestor_or_self' => $group['id']
+            ],
+            'order'  => 'resolution_desc'
         ]);
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
-        );
 
         $paginator
             ->setItemCountPerPage($this->catalogue()->getPicturesPerPage())
             ->setCurrentPageNumber($this->params('page'));
 
-        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-        $picturesData = $this->pic()->listData($select, [
+        $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
             'width' => 4,
             'url'   => function ($row) use ($group) {
                 return $this->url()->fromRoute('twins/group/pictures/picture', [
@@ -182,7 +179,12 @@ class TwinsController extends AbstractActionController
             $hasSpecs = $hasSpecs || $this->specsService->hasSpecs($car['id']);
         }
 
-        $picturesCount = $twins->getGroupPicturesCount($group['id']);
+        $picturesCount = $this->picture->getCount([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => [
+                'ancestor_or_self' => (int)$group['id']
+            ]
+        ]);
 
 
         $description = $this->itemModel->getTextOfItem($group['id'], $this->language());
@@ -195,7 +197,8 @@ class TwinsController extends AbstractActionController
             'description'        => $description,
             'cars'               => $this->car()->listData($carList, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureTable'         => $this->picture->getPictureTable(),
+                    'pictureModel'         => $this->picture,
+                    'itemModel'            => $this->itemModel,
                     'perspective'          => $this->perspective,
                     'type'                 => null,
                     'onlyExactlyPictures'  => false,
@@ -409,10 +412,13 @@ class TwinsController extends AbstractActionController
 
         $pictureId = (string)$this->params('picture_id');
 
-        $select = $this->twins->getGroupPicturesSelect($group['id'])
-            ->where('pictures.identity = ?', $pictureId);
-
-        $picture = $select->getTable()->fetchRow($select);
+        $picture = $this->itemModel->getRow([
+            'identity' => $pictureId,
+            'status'   => Picture::STATUS_ACCEPTED,
+            'item'     => [
+                'ancestor_or_self' => $group['id']
+            ]
+        ]);
 
         if (! $picture) {
             return $this->notFoundAction();

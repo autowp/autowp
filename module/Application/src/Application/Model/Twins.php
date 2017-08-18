@@ -6,8 +6,6 @@ use Zend\Db\Sql;
 
 use Application\Model\Brand;
 
-use Zend_Db_Select;
-
 class Twins
 {
     /**
@@ -102,20 +100,6 @@ class Twins
         return $result;
     }
 
-    /**
-     * @param int $groupId
-     * @return int
-     */
-    public function getGroupPicturesCount(int $groupId): int
-    {
-        return $this->picture->getCount([
-            'status' => Picture::STATUS_ACCEPTED,
-            'item'   => [
-                'ancestor_or_self' => (int)$groupId
-            ]
-        ]);
-    }
-
     public function getGroupBrandIds(int $groupId): array
     {
         return $this->item->getIds([
@@ -170,33 +154,6 @@ class Twins
             'parent' => $groupId,
             'order'  => 'name'
         ]);
-    }
-
-    /**
-     * @param int $groupId
-     * @param array $options
-     * @return Zend_Db_Select
-     */
-    public function getGroupPicturesSelect($groupId, array $options = [])
-    {
-        $defaults = [
-            'ordering' => null
-        ];
-        $options = array_merge($defaults, $options);
-
-        $ordering = $options['ordering'];
-
-        $select = $this->picture->getPictureTable()->select(true)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-            ->where('item_parent_cache.parent_id = ?', (int)$groupId);
-
-        if ($ordering) {
-            $select->order($ordering);
-        }
-
-        return $select;
     }
 
     /**

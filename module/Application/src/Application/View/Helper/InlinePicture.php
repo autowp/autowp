@@ -4,13 +4,18 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Application\Model\DbTable;
+use Application\Model\Picture;
 
 class InlinePicture extends AbstractHelper
 {
-    public function __construct(DbTable\Picture $pictureTable)
+    /**
+     * @var Picture
+     */
+    private $picture;
+
+    public function __construct(Picture $picture)
     {
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function __invoke($picture)
@@ -21,7 +26,7 @@ class InlinePicture extends AbstractHelper
 
         $name = $view->pic()->name($picture, $this->view->language());
 
-        $imageHtml = $view->img($this->pictureTable->getFormatRequest($picture), [
+        $imageHtml = $view->img($this->picture->getFormatRequest($picture), [
             'format'  => 'picture-thumb',
             'alt'     => $name,
             'title'   => $name,

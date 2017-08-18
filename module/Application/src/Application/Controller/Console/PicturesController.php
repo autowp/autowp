@@ -2,27 +2,26 @@
 
 namespace Application\Controller\Console;
 
+use geoPHP;
+use Point;
+
+use Zend\Db\Sql;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\ExifGPSExtractor;
-use Application\Model\DbTable;
-
-use Zend_Db_Expr;
-
-use geoPHP;
-use Point;
+use Application\Model\Picture;
 
 class PicturesController extends AbstractActionController
 {
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
-    public function __construct(DbTable\Picture $pictureTable)
+    public function __construct(Picture $picture)
     {
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     public function fillPointAction()
@@ -30,9 +29,10 @@ class PicturesController extends AbstractActionController
         $console = Console::getInstance();
         $imageStorage = $this->imageStorage();
 
-        $rows = $this->pictureTable->fetchAll([
-            'point is null'
-        ], 'id');
+        $rows = $this->picture->getRows([
+            'has_point' => false,
+            'order'     => 'id'
+        ]);
 
         $extractor = new ExifGPSExtractor();
 
@@ -46,13 +46,12 @@ class PicturesController extends AbstractActionController
                 $console->writeLine("Picture " . $row['id']);
 
                 $point = new Point($gps['lng'], $gps['lat']);
-                $pointExpr = new Zend_Db_Expr(
-                    $$this->pictureTable->getAdapter()
-                        ->quoteInto('GeomFromWKB(?)', $point->out('wkb'))
-                );
 
-                $row['point'] = $pointExpr;
-                $row->save();
+                $this->picture->getTable()->update([
+                    'point' => new Sql\Expression('GeomFromWKB(?)', [$point->out('wkb')])
+                ], [
+                    'id' => $row['id']
+                ]);
             }
         }
 

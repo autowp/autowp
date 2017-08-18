@@ -7,8 +7,8 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\DbTable;
 use Application\Model\Modification;
+use Application\Model\Picture;
 
 class CarsController extends AbstractActionController
 {
@@ -18,9 +18,9 @@ class CarsController extends AbstractActionController
     private $modificationTable;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var Modification
@@ -39,13 +39,13 @@ class CarsController extends AbstractActionController
 
     public function __construct(
         TableGateway $modificationTable,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         Modification $modification,
         TableGateway $modificationPicture,
         TableGateway $modificationGroupTable
     ) {
         $this->modificationTable = $modificationTable;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->modification = $modification;
         $this->modificationPicture = $modificationPicture;
         $this->modificationGroupTable = $modificationGroupTable;
@@ -198,7 +198,6 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $pictureTable = new DbTable\Picture();
         $imageStorage = $this->imageStorage();
         $language = $this->language();
 
@@ -208,13 +207,13 @@ class CarsController extends AbstractActionController
             $picture = (array)$this->params('picture', []);
 
             foreach ($picture as $pictureId => $modificationIds) {
-                $pictureRow = $pictureTable->fetchRow(
-                    $pictureTable->select(true)
-                        ->where('pictures.id = ?', (int)$pictureId)
-                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                        ->where('item_parent_cache.parent_id = ?', $car['id'])
-                );
+
+                $pictureRow = $this->picture->getRow([
+                    'id' => (int)$pictureId,
+                    'item' => [
+                        'ancestor_or_self' => $car['id']
+                    ]
+                ]);
 
                 if ($pictureRow) {
                     foreach ($modificationIds as &$modificationId) {
@@ -275,7 +274,7 @@ class CarsController extends AbstractActionController
         );
 
         foreach ($pictureRows as $pictureRow) {
-            $request = DbTable\Picture::buildFormatRequest($pictureRow->toArray());
+            $request = Picture::buildFormatRequest($pictureRow->toArray());
             $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
 
             $select = new Sql\Select($this->modificationPicture->getTable());

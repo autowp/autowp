@@ -123,7 +123,7 @@ class CatalogueItem extends Catalogue
         ]);
     }
 
-    public function getPictureUrl($item, array $picture)
+    public function getPictureUrl($item, $picture)
     {
         return $this->router->assemble([
             'action'        => 'brand-item-picture',

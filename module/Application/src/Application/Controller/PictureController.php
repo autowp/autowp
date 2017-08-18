@@ -8,24 +8,23 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand;
-use Application\Model\DbTable;
 use Application\Model\Picture;
 
 class PictureController extends AbstractActionController
 {
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var Brand
      */
     private $brand;
 
-    public function __construct(DbTable\Picture $pictureTable, Brand $brand)
+    public function __construct(Picture $picture, Brand $brand)
     {
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->brand = $brand;
     }
 
@@ -33,8 +32,8 @@ class PictureController extends AbstractActionController
     {
         $identity = (string)$this->params('picture_id');
 
-        return $this->pictureTable->fetchRow([
-            'identity = ?' => $identity
+        return $this->picture->getRow([
+            'identity' => $identity
         ]);
     }
 

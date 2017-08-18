@@ -7,14 +7,12 @@ use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
-use Application\Model\DbTable;
+use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
 use Application\Most;
 use Application\Service\SpecificationsService;
-
-use Zend_Db_Expr;
 
 class Mosts
 {
@@ -352,9 +350,9 @@ class Mosts
     private $vehicleType;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var TableGateway
@@ -370,14 +368,14 @@ class Mosts
         SpecificationsService $specs,
         Perspective $perspective,
         VehicleType $vehicleType,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         TableGateway $attributeTable,
         TableGateway $itemTable
     ) {
         $this->specs = $specs;
         $this->perspective = $perspective;
         $this->vehicleType = $vehicleType;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->attributeTable = $attributeTable;
         $this->itemTable = $itemTable;
     }
@@ -519,35 +517,23 @@ class Mosts
     private function getOrientedPictureList($carId, array $perspectiveGroupIds)
     {
         $pictures = [];
-        $db = $this->pictureTable->getAdapter();
 
         foreach ($perspectiveGroupIds as $groupId) {
-            $picture = $this->pictureTable->fetchRow(
-                $this->pictureTable->select(true)
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->join(
-                        ['mp' => 'perspectives_groups_perspectives'],
-                        'picture_item.perspective_id = mp.perspective_id',
-                        null
-                    )
-                    ->where('mp.group_id = ?', $groupId)
-                    ->where('item_parent_cache.parent_id = ?', $carId)
-                    ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                    ->order([
-                        'mp.position',
-                        new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
-                        'pictures.width DESC', 'pictures.height DESC'
-                    ])
-                    ->limit(1)
-            );
+            $picture = $this->picture->getRow([
+                'status' => Picture::STATUS_ACCEPTED,
+                'item'   => [
+                    'perspective'      => [
+                        'group' => $groupId
+                    ],
+                    'ancestor_or_self' => [
+                        'link_type' => [ItemParent::TYPE_DEFAULT, ItemParent::TYPE_DESIGN],
+                        'id'        => $carId
+                    ]
+                ],
+                'order' => 'perspective_group'
+            ]);
 
-            if ($picture) {
-                $pictures[] = $picture;
-            } else {
-                $pictures[] = null;
-            }
+            $pictures[] = $picture ? $picture : null;
         }
 
         $ids = [];
@@ -559,26 +545,23 @@ class Mosts
 
         foreach ($pictures as $key => $picture) {
             if (! $picture) {
-                $select = $this->pictureTable->select(true)
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $carId)
-                    ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                    ->limit(1);
+                $pic = $this->picture->getRow([
+                    'id_exclude' => $ids,
+                    'status'     => Picture::STATUS_ACCEPTED,
+                    'item'       => [
+                        'ancestor_or_self' => [
+                            'link_type' => [ItemParent::TYPE_DEFAULT, ItemParent::TYPE_DESIGN],
+                            'id'        => $carId
+                        ]
+                    ],
+                ]);
 
-                if (count($ids) > 0) {
-                    $select->where('id NOT IN (?)', $ids);
-                }
-
-                $pic = $this->pictureTable->fetchAll($select)->current();
-
-                if ($pic) {
-                    $pictures[$key] = $pic;
-                    $ids[] = $pic['id'];
-                } else {
+                if (! $pic) {
                     break;
                 }
+
+                $pictures[$key] = $pic;
+                $ids[] = $pic['id'];
             }
         }
 

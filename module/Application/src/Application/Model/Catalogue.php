@@ -9,8 +9,6 @@ use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\Image\Storage\Request;
 
-use Application\Model\DbTable;
-
 class Catalogue
 {
     private $picturesPerPage = 20;
@@ -224,7 +222,7 @@ class Catalogue
         $options = [
             'imageId' => $picture['image_id']
         ];
-        if (DbTable\Picture::checkCropParameters($picture)) {
+        if (Picture::checkCropParameters($picture)) {
             $options['crop'] = [
                 'left'   => $picture['crop_left'],
                 'top'    => $picture['crop_top'],

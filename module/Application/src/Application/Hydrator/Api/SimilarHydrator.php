@@ -3,20 +3,20 @@
 namespace Application\Hydrator\Api;
 
 use Application\Hydrator\Api\Strategy\Picture as HydratorPictureStrategy;
-use Application\Model\DbTable;
+use Application\Model\Picture;
 
 class SimilarHydrator extends RestHydrator
 {
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     public function __construct($serviceManager)
     {
         parent::__construct();
 
-        $this->pictureTable = $serviceManager->get(DbTable\Picture::class);
+        $this->picture = $serviceManager->get(Picture::class);
 
         $strategy = new HydratorPictureStrategy($serviceManager);
         $this->addStrategy('picture', $strategy);
@@ -30,7 +30,7 @@ class SimilarHydrator extends RestHydrator
         ];
 
         if ($this->filterComposite->filter('picture')) {
-            $row = $this->pictureTable->find($object['picture_id'])->current();
+            $row = $this->picture->getRow(['id' => (int)$object['picture_id']]);
             if ($row) {
                 $result['picture'] = $this->extractValue('picture', $row);
             } else {

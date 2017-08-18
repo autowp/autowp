@@ -11,16 +11,12 @@ class DistinctItemPictureFetcher extends PictureFetcher
 
     public function fetch($item, array $options = [])
     {
-        $db = $this->pictureTable->getAdapter();
 
-        $ids = $db->fetchCol(
-            $db->select()
-                ->from('item', 'id')
-                ->where('item.item_type_id <> ?', Item::CATEGORY)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $item['id'])
-                ->limit(self::COUNT)
-        );
+        $ids = $this->itemModel->getIds([
+            'item_type_id'     => Item::CATEGORY,
+            'ancestor_or_self' => $item['id'],
+            'limit'            => self::COUNT
+        ]);
 
         if (! $ids) {
             return [];

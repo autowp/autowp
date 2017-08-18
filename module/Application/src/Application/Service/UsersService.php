@@ -15,7 +15,6 @@ use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Contact;
-use Application\Model\DbTable;
 use Application\Model\Picture;
 use Application\Model\UserAccount;
 use Application\Model\UserItemSubscribe;
@@ -77,9 +76,9 @@ class UsersService
     private $userAccount;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var TableGateway
@@ -107,7 +106,7 @@ class UsersService
         UserItemSubscribe $userItemSubscribe,
         Contact $contact,
         UserAccount $userAccount,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         TableGateway $telegramChatTable
     ) {
 
@@ -125,7 +124,7 @@ class UsersService
         $this->userItemSubscribe = $userItemSubscribe;
         $this->contact = $contact;
         $this->userAccount = $userAccount;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->telegramChatTable = $telegramChatTable;
     }
 
@@ -381,13 +380,10 @@ class UsersService
             $age = ((($diff / 60) / 60) / 24) / 365;
         }
 
-        $db = $this->pictureTable->getAdapter();
-        $picturesExists = $db->fetchOne(
-            $db->select()
-                ->from($this->pictureTable->info('name'), [new Zend_Db_Expr('COUNT(1)')])
-                ->where('owner_id = ?', $userRow['id'])
-                ->where('status = ?', Picture::STATUS_ACCEPTED)
-        );
+        $picturesExists = $this->picture->isExists([
+            'user'   => $userRow['id'],
+            'status' => Picture::STATUS_ACCEPTED
+        ]);
 
         $value = round($default + $avgVote + $age + $picturesExists / 100);
         if ($value < 0) {

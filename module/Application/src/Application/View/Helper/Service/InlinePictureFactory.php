@@ -15,7 +15,7 @@ class InlinePictureFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Helper(
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $container->get(\Application\Model\Picture::class)
         );
     }
 }

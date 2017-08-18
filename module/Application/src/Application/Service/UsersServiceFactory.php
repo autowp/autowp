@@ -27,7 +27,7 @@ class UsersServiceFactory implements FactoryInterface
             $container->get(\Application\Model\UserItemSubscribe::class),
             $container->get(\Application\Model\Contact::class),
             $container->get(\Application\Model\UserAccount::class),
-            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Picture::class),
             $tables->get('telegram_chat')
         );
     }

@@ -14,12 +14,11 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
 use Application\Model\Brand;
-use Application\Model\DbTable;
-use Application\Model\DbTable\Attr;
 use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
+use Application\Model\Picture;
 
 class CarsController extends AbstractActionController
 {
@@ -59,9 +58,9 @@ class CarsController extends AbstractActionController
     private $itemModel;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var TableGateway
@@ -83,7 +82,7 @@ class CarsController extends AbstractActionController
         UserItemSubscribe $userItemSubscribe,
         Perspective $perspective,
         Item $itemModel,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         TableGateway $attributeTable,
         TableGateway $userValueTable,
         Brand $brand
@@ -96,7 +95,7 @@ class CarsController extends AbstractActionController
         $this->userItemSubscribe = $userItemSubscribe;
         $this->perspective = $perspective;
         $this->itemModel = $itemModel;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->attributeTable = $attributeTable;
         $this->userValueTable = $userValueTable;
         $this->brand = $brand;
@@ -881,7 +880,8 @@ class CarsController extends AbstractActionController
             'paginator'     => $paginator,
             'childListData' => $this->car()->listData($listCars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureTable'         => $this->pictureTable,
+                    'pictureModel'         => $this->picture,
+                    'itemModel'            => $this->itemModel,
                     'perspective'          => $this->perspective,
                     'type'                 => null,
                     'onlyExactlyPictures'  => false,

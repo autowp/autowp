@@ -23,7 +23,7 @@ class CarsControllerFactory implements FactoryInterface
             $container->get(\Application\Model\UserItemSubscribe::class),
             $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Picture::class),
             $tables->get('attrs_attributes'),
             $tables->get('attrs_user_values'),
             $container->get(\Application\Model\Brand::class)

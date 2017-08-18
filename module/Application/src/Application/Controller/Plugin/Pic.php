@@ -15,7 +15,6 @@ use Autowp\User\Model\DbTable\User as UserTable;
 use Application\ItemNameFormatter;
 use Application\Model\Brand;
 use Application\Model\Catalogue;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Perspective;
@@ -61,11 +60,6 @@ class Pic extends AbstractPlugin
      * @var PictureItem
      */
     private $pictureItem;
-
-    /**
-     * @var DbTable\Picture
-     */
-    private $pictureTable;
 
     /**
      * @var Comments\CommentsService
@@ -139,7 +133,6 @@ class Pic extends AbstractPlugin
         UserAccount $userAccount,
         TableGateway $itemLinkTable,
         PictureModerVote $pictureModerVote,
-        DbTable\Picture $pictureTable,
         TableGateway $modificationTable,
         Brand $brand,
         Picture $picture
@@ -160,7 +153,6 @@ class Pic extends AbstractPlugin
         $this->userAccount = $userAccount;
         $this->itemLinkTable = $itemLinkTable;
         $this->pictureModerVote = $pictureModerVote;
-        $this->pictureTable = $pictureTable;
         $this->modificationTable = $modificationTable;
         $this->brand = $brand;
         $this->picture = $picture;
@@ -393,13 +385,13 @@ class Pic extends AbstractPlugin
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = DbTable\Picture::buildFormatRequest($picture);
+            $requests[$idx] = Picture::buildFormatRequest($picture);
         }
 
         $imagesInfo = $imageStorage->getFormatedImages($requests, 'picture-thumb');
 
         // names
-        $names = $this->pictureTable->getNameData($rows, [
+        $names = $this->picture->getNameData($rows, [
             'language' => $language
         ]);
 
@@ -448,7 +440,7 @@ class Pic extends AbstractPlugin
 
                 $item = array_replace($item, [
                     'resolution'     => (int)$row['width'] . '×' . (int)$row['height'],
-                    'cropped'        => DbTable\Picture::checkCropParameters($row),
+                    'cropped'        => Picture::checkCropParameters($row),
                     'cropResolution' => $row['crop_width'] . '×' . $row['crop_height'],
                     'status'         => $row['status'],
                     'views'          => (int)$row['views'],
@@ -480,8 +472,6 @@ class Pic extends AbstractPlugin
 
         $language = $controller->language();
         $isModer = $controller->user()->inheritsRole('moder');
-
-        $db = $this->pictureTable->getAdapter();
 
         if ($isModer) {
             $multioptions = array_replace([
@@ -525,25 +515,22 @@ class Pic extends AbstractPlugin
                     ];
                 }
 
-                $designCarsRow = $db->fetchRow(
-                    $db->select()
-                        ->from('item', [
-                            'brand_name'    => 'name',
-                            'brand_catname' => 'catname'
-                        ])
-                        ->join('item_parent', 'item.id = item_parent.parent_id', [
-                            'brand_item_catname' => 'catname'
-                        ])
-                        ->where('item_parent.type = ?', ItemParent::TYPE_DESIGN)
-                        ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
-                        ->where('item_parent_cache.item_id = ?', $item['id'])
-                );
+                $designCarsRow = $this->itemModel->getRow([
+                    'columns'  => ['name', 'catname'],
+                    'language' => $language,
+                    'child'  => [
+                        'link_type'          => ItemParent::TYPE_DESIGN,
+                        'columns'            => ['brand_item_catname' => 'catname'],
+                        'descendant_or_self' => $item['id']
+                    ]
+                ]);
+
                 if ($designCarsRow) {
                     $designProject = [
-                        'brand' => $designCarsRow['brand_name'],
+                        'brand' => $designCarsRow['name'],
                         'url'   => $this->httpRouter->assemble([
                             'action'        => 'brand-item',
-                            'brand_catname' => $designCarsRow['brand_catname'],
+                            'brand_catname' => $designCarsRow['catname'],
                             'car_catname'   => $designCarsRow['brand_item_catname']
                         ], [
                             'name' => 'catalogue'
@@ -920,18 +907,16 @@ class Pic extends AbstractPlugin
 
         $isModer = $controller->user()->inheritsRole('moder');
 
-        $db = $this->pictureTable->getAdapter();
+        $brandIds = $this->itemModel->getIds([
+            'item_type_id'       => Item::BRAND,
+            'descendant_or_self' => [
+                'pictures' => [
+                    'id' => $picture['id']
+                ]
+            ]
+        ]);
 
         $language = $controller->language();
-
-        $brandIds = $db->fetchCol(
-            $db->select()
-                ->from('item', 'id')
-                ->where('item.item_type_id = ?', Item::BRAND)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                ->where('picture_item.picture_id = ?', $picture['id'])
-        );
 
         // links
         $ofLinks = [];
@@ -947,7 +932,7 @@ class Pic extends AbstractPlugin
 
         $replacePicture = null;
         if ($picture['replace_picture_id']) {
-            $replacePictureRow = $this->pictureTable->find($picture['replace_picture_id'])->current();
+            $replacePictureRow = $this->picture->getRow(['id' => (int)$picture['replace_picture_id']]);
 
             $replacePicture = $controller->pic()->href($replacePictureRow->toArray());
 
@@ -977,11 +962,11 @@ class Pic extends AbstractPlugin
         $image = $imageStorage->getImage($picture['image_id']);
         $sourceUrl = $image ? $image->getSrc() : null;
 
-        $preview = $imageStorage->getFormatedImage($this->pictureTable->getFormatRequest($picture), 'picture-medium');
+        $preview = $imageStorage->getFormatedImage($this->picture->getFormatRequest($picture), 'picture-medium');
         $previewUrl = $preview ? $preview->getSrc() : null;
 
         $galleryImage = $imageStorage->getFormatedImage(
-            $this->pictureTable->getFormatRequest($picture),
+            $this->picture->getFormatRequest($picture),
             'picture-gallery'
         );
 
@@ -994,8 +979,6 @@ class Pic extends AbstractPlugin
             $total = $paginator->getTotalItemCount();
 
             if ($total < 500) {
-                $db = $this->pictureTable->getAdapter();
-
                 $paginatorPicturesFilter = $filter;
                 $paginatorPicturesFilter['columns'] = ['id', 'identity'];
 
@@ -1045,7 +1028,7 @@ class Pic extends AbstractPlugin
             }
         }
 
-        $names = $this->pictureTable->getNameData([$picture], [
+        $names = $this->picture->getNameData([$picture], [
             'language' => $language,
             'large'    => true
         ]);
@@ -1271,9 +1254,9 @@ class Pic extends AbstractPlugin
         $cropRequests = [];
         $imageIds = [];
         foreach ($rows as $idx => $picture) {
-            $request = DbTable\Picture::buildFormatRequest($picture);
+            $request = Picture::buildFormatRequest($picture);
             $fullRequests[$idx] = $request;
-            if (DbTable\Picture::checkCropParameters($picture)) {
+            if (Picture::checkCropParameters($picture)) {
                 $cropRequests[$idx] = $request;
             }
             $ids[] = (int)$picture['id'];
@@ -1287,7 +1270,7 @@ class Pic extends AbstractPlugin
 
 
         // names
-        $names = $this->pictureTable->getNameData($rows, [
+        $names = $this->picture->getNameData($rows, [
             'language' => $language
         ]);
 
@@ -1324,7 +1307,7 @@ class Pic extends AbstractPlugin
 
             $sUrl = $image->getSrc();
 
-            if (DbTable\Picture::checkCropParameters($row)) {
+            if (Picture::checkCropParameters($row)) {
                 $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
 
                 $crop['crop'] = [
@@ -1406,7 +1389,7 @@ class Pic extends AbstractPlugin
             $pictureRow = (array)$pictureRow;
         }
 
-        $names = $this->pictureTable->getNameData([$pictureRow], [
+        $names = $this->picture->getNameData([$pictureRow], [
             'language' => $language,
             'large'    => true
         ]);

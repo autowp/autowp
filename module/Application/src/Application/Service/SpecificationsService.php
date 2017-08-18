@@ -14,7 +14,6 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\ItemNameFormatter;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Picture;
@@ -119,9 +118,9 @@ class SpecificationsService
     private $itemParent;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var VehicleType
@@ -183,7 +182,7 @@ class SpecificationsService
         ItemNameFormatter $itemNameFormatter,
         Item $itemModel,
         ItemParent $itemParent,
-        DbTable\Picture $pictureTable,
+        Picture $picture,
         VehicleType $vehicleType,
         TableGateway $unitTable,
         TableGateway $listOptionsTable,
@@ -205,7 +204,7 @@ class SpecificationsService
         $this->itemNameFormatter = $itemNameFormatter;
         $this->itemModel = $itemModel;
         $this->itemParent = $itemParent;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
         $this->vehicleType = $vehicleType;
 
         $this->unitTable = $unitTable;
@@ -1022,27 +1021,23 @@ class SpecificationsService
 
     private function specPicture($car, $perspectives)
     {
-        $pictureTableAdapter = $this->pictureTable->getAdapter();
-
         $order = [];
         if ($perspectives) {
             foreach ($perspectives as $pid) {
-                $order[] = new Zend_Db_Expr(
-                    $pictureTableAdapter->quoteInto('picture_item.perspective_id = ? DESC', $pid)
-                );
+                $order[] = new Sql\Expression('picture_item.perspective_id = ? DESC', [$pid]);
             }
         } else {
             $order[] = 'pictures.id desc';
         }
-        return $this->pictureTable->fetchRow(
-            $this->pictureTable->select(true)
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car['id'])
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                ->order($order)
-                ->limit(1)
-        );
+
+        return $this->picture->getRow([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => [
+                'ancestor_or_self' => $car['id']
+            ],
+            'order'  => $order,
+            'group'  => ['picture_item.perspective_id']
+        ]);
     }
 
     public function getAttributes(array $options = [])
@@ -1360,12 +1355,12 @@ class SpecificationsService
             $topPicture = $this->specPicture($car, $topPerspectives);
             $topPictureRequest = null;
             if ($topPicture) {
-                $topPictureRequest = $this->pictureTable->getFormatRequest($topPicture);
+                $topPictureRequest = $this->picture->getFormatRequest($topPicture);
             }
             $bottomPicture = $this->specPicture($car, $bottomPerspectives);
             $bottomPictureRequest = null;
             if ($bottomPicture) {
-                $bottomPictureRequest = $this->pictureTable->getFormatRequest($bottomPicture);
+                $bottomPictureRequest = $this->picture->getFormatRequest($bottomPicture);
             }
 
             $result[] = [

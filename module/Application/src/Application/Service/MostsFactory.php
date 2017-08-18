@@ -17,7 +17,7 @@ class MostsFactory implements FactoryInterface
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\VehicleType::class),
-            $container->get(\Application\Model\DbTable\Picture::class),
+            $container->get(\Application\Model\Picture::class),
             $tables->get('attrs_attributes'),
             $tables->get('item')
         );

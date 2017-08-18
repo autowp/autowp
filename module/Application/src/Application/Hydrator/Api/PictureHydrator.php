@@ -13,7 +13,6 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Comments;
 use Application\DuplicateFinder;
-use Application\Model\DbTable;
 use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\Picture;
@@ -22,8 +21,6 @@ use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
 use Application\Model\PictureVote;
 use Application\PictureNameFormatter;
-
-use Zend_Db_Expr;
 
 class PictureHydrator extends RestHydrator
 {
@@ -52,9 +49,9 @@ class PictureHydrator extends RestHydrator
     private $pictureNameFormatter;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     /**
      * @var User
@@ -93,18 +90,12 @@ class PictureHydrator extends RestHydrator
      */
     private $pictureModerVote;
 
-    /**
-     * @var Picture
-     */
-    private $picture;
-
     public function __construct(
         $serviceManager
     ) {
         parent::__construct();
 
         $this->picture = $serviceManager->get(Picture::class);
-        $this->pictureTable = $serviceManager->get(DbTable\Picture::class);
         $this->userTable = new User();
 
         $this->pictureView = $serviceManager->get(PictureView::class);
@@ -192,7 +183,7 @@ class PictureHydrator extends RestHydrator
             throw new Exception("Unexpected object");
         }
 
-        $cropped = DbTable\Picture::checkCropParameters($object);
+        $cropped = Picture::checkCropParameters($object);
 
         $picture = [
             'id'             => (int)$object['id'],
@@ -221,7 +212,7 @@ class PictureHydrator extends RestHydrator
 
         $nameData = null;
         if ($showNameHtml || $showNameText) {
-            $nameDatas = $this->pictureTable->getNameData([$object], [
+            $nameDatas = $this->picture->getNameData([$object], [
                 'language' => $this->language
             ]);
             $nameData = $nameDatas[$object['id']];
@@ -334,7 +325,7 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('thumbnail')) {
             $picture['thumbnail'] = $this->extractValue('picture-thumb', [
-                'image'  => DbTable\Picture::buildFormatRequest((array)$object),
+                'image'  => Picture::buildFormatRequest((array)$object),
                 'format' => 'picture-thumb'
             ]);
         }
@@ -353,20 +344,6 @@ class PictureHydrator extends RestHydrator
             $similar = $this->duplicateFinder->findSimilar($object['id']);
             if ($similar) {
                 $picture['similar'] = $this->extractValue('similar', $similar);
-                /*$similarRow = $this->pictureTable->find($similar['picture_id'])->current();
-                if ($similarRow) {
-
-                    $this->pictureTable->getFormatRequest($similarRow)
-
-                    $picture['similar'] = [
-                        'url'      => $this->router->assemble([
-                            'picture_id' => $similarRow['identity']
-                        ], [
-                            'name' => 'picture/picture'
-                        ]),
-                        'distance' => $similar['distance']
-                    ];
-                }*/
             }
         }
 
@@ -447,47 +424,31 @@ class PictureHydrator extends RestHydrator
         if ($this->filterComposite->filter('is_last')) {
             $isLastPicture = null;
             if ($object['status'] == Picture::STATUS_ACCEPTED) {
-                $db = $this->pictureTable->getAdapter();
-                $isLastPicture = ! $db->fetchOne(
-                    $db->select()
-                        ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->join(
-                            ['pi2' => 'picture_item'],
-                            'picture_item.item_id = pi2.item_id',
-                            null
-                        )
-                        ->where('pi2.picture_id = ?', $object['id'])
-                        ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                        ->where('pictures.id <> ?', $object['id'])
-                );
+                $isLastPicture = ! $this->picture->isExists([
+                    'id_exclude' => $object['id'],
+                    'status'     => Picture::STATUS_ACCEPTED,
+                    'item'       => [
+                        'contains_picture' => $object['id']
+                    ]
+                ]);
             }
 
             $picture['is_last'] = $isLastPicture;
         }
 
         if ($this->filterComposite->filter('accepted_count')) {
-            $db = $this->pictureTable->getAdapter();
-            $acceptedCount = (int)$db->fetchOne(
-                $db->select()
-                    ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join(
-                        ['pi2' => 'picture_item'],
-                        'picture_item.item_id = pi2.item_id',
-                        null
-                    )
-                    ->where('pi2.picture_id = ?', $object['id'])
-                    ->where('status = ?', Picture::STATUS_ACCEPTED)
-            );
-
-            $picture['accepted_count'] = $acceptedCount;
+            $picture['accepted_count'] = $this->picture->getCount([
+                'status' => Picture::STATUS_ACCEPTED,
+                'item'   => [
+                    'contains_picture' => $object['id']
+                ]
+            ]);
         }
 
         if ($this->filterComposite->filter('replaceable')) {
             $picture['replaceable'] = null;
             if ($object['replace_picture_id']) {
-                $row = $this->pictureTable->find($object['replace_picture_id'])->current();
+                $row = $this->picture->getRow(['id' => (int)$object['replace_picture_id']]);
                 if ($row) {
                     $picture['replaceable'] = $this->extractValue('replaceable', $row);
                 }
@@ -501,44 +462,37 @@ class PictureHydrator extends RestHydrator
                 'prev_new' => null,
                 'next_new' => null
             ];
-            $prevPicture = $this->pictureTable->fetchRow(
-                $this->pictureTable->select(true)
-                    ->where('id < ?', $object['id'])
-                    ->order('id DESC')
-                    ->limit(1)
-            );
+
+            $prevPicture = $this->picture->getRow([
+                'id_lt' => $object['id'],
+                'order' => 'id_desc'
+            ]);
             if ($prevPicture) {
                 $picture['siblings']['prev'] = $this->extractValue('siblings', $prevPicture);
             }
 
-            $nextPicture = $this->pictureTable->fetchRow(
-                $this->pictureTable->select(true)
-                    ->where('id > ?', $object['id'])
-                    ->order('id')
-                    ->limit(1)
-            );
+            $nextPicture = $this->picture->getRow([
+                'id_gt' => $object['id'],
+                'order' => 'id_desc'
+            ]);
             if ($nextPicture) {
                 $picture['siblings']['next'] = $this->extractValue('siblings', $nextPicture);
             }
 
-            $prevNewPicture = $this->pictureTable->fetchRow(
-                $this->pictureTable->select(true)
-                    ->where('id < ?', $object['id'])
-                    ->where('status = ?', Picture::STATUS_INBOX)
-                    ->order('id DESC')
-                    ->limit(1)
-            );
+            $prevNewPicture = $this->picture->getRow([
+                'id_lt'  => $object['id'],
+                'status' => Picture::STATUS_INBOX,
+                'order'  => 'id_desc'
+            ]);
             if ($prevNewPicture) {
                 $picture['siblings']['prev_new'] = $this->extractValue('siblings', $prevNewPicture);
             }
 
-            $nextNewPicture = $this->pictureTable->fetchRow(
-                $this->pictureTable->select(true)
-                    ->where('id > ?', $object['id'])
-                    ->where('status = ?', Picture::STATUS_INBOX)
-                    ->order('id')
-                    ->limit(1)
-            );
+            $nextNewPicture = $this->picture->getRow([
+                'id_gt'  => $object['id'],
+                'status' => Picture::STATUS_INBOX,
+                'order'  => 'id_desc'
+            ]);
             if ($nextNewPicture) {
                 $picture['siblings']['next_new'] = $this->extractValue('siblings', $nextNewPicture);
             }

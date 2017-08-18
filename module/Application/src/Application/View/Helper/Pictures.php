@@ -6,7 +6,7 @@ use Zend\View\Helper\AbstractHelper;
 
 use Autowp\Comments;
 
-use Application\Model\DbTable;
+use Application\Model\Picture;
 use Application\Model\PictureModerVote;
 use Application\Model\PictureView;
 
@@ -28,20 +28,20 @@ class Pictures extends AbstractHelper
     private $pictureModerVote;
 
     /**
-     * @var DbTable\Picture
+     * @var Picture
      */
-    private $pictureTable;
+    private $picture;
 
     public function __construct(
         Comments\CommentsService $comments,
         PictureView $pictureView,
         PictureModerVote $pictureModerVote,
-        DbTable\Picture $pictureTable
+        Picture $picture
     ) {
         $this->comments = $comments;
         $this->pictureView = $pictureView;
         $this->pictureModerVote = $pictureModerVote;
-        $this->pictureTable = $pictureTable;
+        $this->picture = $picture;
     }
 
     private function isPictureModer()
@@ -104,7 +104,7 @@ class Pictures extends AbstractHelper
 
         $data = [
             'url'         => $this->view->pic($picture)->url(),
-            'cropped'     => $this->pictureTable->cropParametersExists($picture),
+            'cropped'     => $this->picture->cropParametersExists($picture),
             'width'       => $picture['width'],
             'height'      => $picture['height'],
             'crop_width'  => $picture['crop_width'],
@@ -142,7 +142,7 @@ class Pictures extends AbstractHelper
 
         $url = $view->pic($picture)->url();
 
-        $imageHtml = $this->view->img($this->pictureTable->getFormatRequest($picture), [
+        $imageHtml = $this->view->img($this->picture->getFormatRequest($picture), [
             'format'  => 'picture-thumb',
             'alt'     => $name,
             'title'   => $name,

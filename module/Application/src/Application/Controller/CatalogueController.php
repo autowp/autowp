@@ -240,7 +240,8 @@ class CatalogueController extends AbstractActionController
                         'specsService'    => $this->specsService
                     ]),
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                        'pictureTable'         => $this->picture->getPictureTable(),
+                        'pictureModel'         => $this->picture,
+                        'itemModel'            => $this->itemModel,
                         'perspective'          => $this->perspective,
                         'type'                 => null,
                         'onlyExactlyPictures'  => false,
@@ -302,7 +303,8 @@ class CatalogueController extends AbstractActionController
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                        'pictureTable'         => $this->picture->getPictureTable(),
+                        'pictureModel'         => $this->picture,
+                        'itemModel'            => $this->itemModel,
                         'perspective'          => $this->perspective,
                         'type'                 => null,
                         'onlyExactlyPictures'  => false,
@@ -984,7 +986,8 @@ class CatalogueController extends AbstractActionController
                 ], [], true),
                 'childListData' => $this->car()->listData($listCars, [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                        'pictureTable'         => $this->picture->getPictureTable(),
+                        'pictureModel'         => $this->picture,
+                        'itemModel'            => $this->itemModel,
                         'perspective'          => $this->perspective,
                         'type'                 => $type == ItemParent::TYPE_DEFAULT ? $type : null,
                         'onlyExactlyPictures'  => true,
@@ -1488,7 +1491,8 @@ class CatalogueController extends AbstractActionController
             ], [], true),
             'childListData' => $this->car()->listData($listCars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureTable'         => $this->picture->getPictureTable(),
+                    'pictureModel'         => $this->picture,
+                    'itemModel'            => $this->itemModel,
                     'perspective'          => $this->perspective,
                     'type'                 => $type == ItemParent::TYPE_DEFAULT ? $type : null,
                     'onlyExactlyPictures'  => false,
@@ -1973,7 +1977,8 @@ class CatalogueController extends AbstractActionController
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                        'pictureTable'         => $this->picture->getPictureTable(),
+                        'pictureModel'         => $this->picture,
+                        'itemModel'            => $this->itemModel,
                         'perspective'          => $this->perspective,
                         'type'                 => null,
                         'onlyExactlyPictures'  => false,

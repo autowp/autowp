@@ -7,6 +7,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Math\Rand;
 use Zend\Paginator;
 
+use Autowp\Image;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 use Application\Model\DbTable;
@@ -111,6 +112,48 @@ class Picture
         }
     }
 
+    private function applyAncestorFilter(Sql\Select $select, $options, $idColumn)
+    {
+        if (! is_array($options)) {
+            $options = ['id' => $options];
+        }
+
+        $defaults = [
+            'id'        => null,
+            'link_type' => null
+        ];
+        $options = array_replace($defaults, $options);
+
+        $select->join(['ipc_ancestor' => 'item_parent_cache'], $idColumn . ' = ipc_ancestor.item_id', []);
+
+        if ($options['id']) {
+            $select->where(['ipc_ancestor.parent_id' => $options['id']]);
+        }
+
+        if ($options['link_type']) {
+
+            if (! in_array(ItemParent::TYPE_SPORT, $options['link_type'])) {
+                $select->where(['not item_parent_cache.sport']);
+            }
+
+            if (! in_array(ItemParent::TYPE_TUNING, $options['link_type'])) {
+                $select->where(['not item_parent_cache.tuning']);
+            }
+        }
+    }
+
+    private function applyEngineFilter(Sql\Select $select, $options)
+    {
+        $defaults = [
+            'ancestor_or_self' => null
+        ];
+        $options = array_replace($defaults, $options);
+
+        if ($options['ancestor_or_self'] !== null) {
+            $this->applyAncestorFilter($select, $options['ancestor_or_self'], 'item.engine_item_id');
+        }
+    }
+
     private function applyItemFilters(Sql\Select $select, $options, bool $forceJoinItem)
     {
         if (! is_array($options)) {
@@ -129,20 +172,24 @@ class Picture
             'vehicle_type'        => null,
             'parent'              => null,
             'contains_picture'    => null,
+            'engine'              => null,
         ];
         $options = array_replace($defaults, $options);
 
         $joinItem = $forceJoinItem;
 
-        if ($options['item_type_id']) {
+        if ($options['item_type_id'] || $options['engine']) {
             $joinItem = true;
         }
-
 
         $select->join('picture_item', 'pictures.id = picture_item.picture_id', []);
 
         if ($joinItem) {
             $select->join('item', 'picture_item.item_id = item.id', []);
+        }
+
+        if ($options['engine']) {
+            $this->applyEngineFilter($select, $options['engine']);
         }
 
         if ($options['id'] !== null) {
@@ -154,9 +201,7 @@ class Picture
         }
 
         if ($options['ancestor_or_self'] !== null) {
-            $select
-                ->join(['ipc_ancestor' => 'item_parent_cache'], 'picture_item.item_id = ipc_ancestor.item_id', [])
-                ->where(['ipc_ancestor.parent_id' => $options['ancestor_or_self']]);
+            $this->applyAncestorFilter($select, $options['ancestor_or_self'], 'picture_item.item_id');
         }
 
         if ($options['perspective'] !== null) {
@@ -256,6 +301,9 @@ class Picture
     {
         $defaults = [
             'id'               => null,
+            'id_exclude'       => null,
+            'id_lt'            => null,
+            'id_gt'            => null,
             'identity'         => null,
             'columns'          => null,
             'status'           => null,
@@ -280,6 +328,7 @@ class Picture
             'accepted_in_days' => null,
             'modification'     => null,
             'log'              => null,
+            'group'            => [],
         ];
         $options = array_replace($defaults, $options);
 
@@ -289,7 +338,7 @@ class Picture
         }
 
         $select = $this->table->getSql()->select();
-        $group = [];
+        $group = $options['group'];
 
         $joinPdr = false;
         $joinLeftComments = false;
@@ -307,6 +356,25 @@ class Picture
 
         if ($options['id'] !== null) {
             $this->applyIdFilter($select, $options['id'], 'pictures.id');
+        }
+
+        if ($options['id_lt']) {
+            $select->where(['pictures.id < ?' => $options['id_lt']]);
+        }
+
+        if ($options['id_gt']) {
+            $select->where(['pictures.id > ?' => $options['id_gt']]);
+        }
+
+        if ($options['id_exclude']) {
+            $value = $options['id_exclude'];
+            if (is_array($value)) {
+                if (count($value) > 0) {
+                    $select->where([new Sql\Predicate\NotIn('pictures.id', $value)]);
+                }
+            } else {
+                $select->where(['pictures.id != ?' => $value]);
+            }
         }
 
         if ($options['status'] !== null) {
@@ -404,8 +472,12 @@ class Picture
                 ->where(['pi_left.item_id IS NULL']);
         }
 
-        if ($options['has_point']) {
-            $select->where(['pictures.point IS NOT NULL']);
+        if (isset($options['has_point'])) {
+            if ($options['has_point']) {
+                $select->where(['pictures.point IS NOT NULL']);
+            } else {
+                $select->where(['pictures.point IS NULL']);
+            }
         }
 
         if ($options['has_copyrights']) {
@@ -431,99 +503,108 @@ class Picture
             $this->applyIdFilter($select, $options['log'], 'log_events_pictures.log_event_id');
         }
 
-        switch ($options['order']) {
-            case 'accept_datetime_desc':
-                $select->order(['accept_datetime desc', 'pictures.add_date DESC', 'pictures.id DESC']);
-                break;
-            case 'add_date_desc':
-                $select->order(['pictures.add_date DESC', 'pictures.id DESC']);
-                break;
-            case 'add_date_asc':
-                $select->order(['pictures.add_date ASC', 'pictures.id ASC']);
-                break;
-            case 'resolution_desc':
-                $select->order(['pictures.width DESC', 'pictures.height DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
-                break;
-            case 'resolution_asc':
-                $select->order(['pictures.width', 'pictures.height']);
-                break;
-            case 'filesize_desc':
-                $select->order('pictures.filesize DESC');
-                break;
-            case 'filesize_asc':
-                $select->order('pictures.filesize ASC');
-                break;
-            case 'comments':
-                $joinLeftComments = true;
-                $select->order('comment_topic.messages DESC');
-                break;
-            case 'views':
-                $select->join('picture_view', 'pictures.id = picture_view.picture_id', [], $select::JOIN_LEFT)
-                    ->order('picture_view.views DESC');
-                break;
-            case 'moder_votes':
-                $joinPdr = true;
-                $select->order('pdr.day_date DESC');
-                break;
-            case 'similarity':
-                $select->order('df_distance.distance ASC');
-                break;
-            case 'removing_date':
-                $select->order(['pictures.removing_date DESC', 'pictures.id']);
-                break;
-            case 'likes':
-                $joinLeftVotesSummary = true;
-                $select->order(['picture_vote_summary.positive DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
-                break;
-            case 'dislikes':
-                $joinLeftVotesSummary = true;
-                $select->order(['picture_vote_summary.negative DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
-                break;
-            case 'status':
-                $select->order('pictures.status');
-                break;
-            case 'random':
-                $select->order(new Sql\Expression('rand() desc'));
-                break;
-            case 'perspective_group':
-                $select->order(['mp.position', 'pictures.width DESC', 'pictures.height DESC']);
-                $group[] = 'mp.position';
-                break;
-            case 'ancestor_stock_front_first':
-                $group[] = 'ipc_ancestor.tuning';
-                $group[] = 'ipc_ancestor.sport';
-                $group[] = 'item.is_concept';
-                $group[] = 'picture_item.perspective_id';
-                $select->order([
-                    new Sql\Expression('ipc_ancestor.tuning asc'),
-                    new Sql\Expression('ipc_ancestor.sport asc'),
-                    new Sql\Expression('item.is_concept asc'),
-                    new Sql\Expression('picture_item.perspective_id = 10 desc'),
-                    new Sql\Expression('picture_item.perspective_id = 1 desc'),
-                    new Sql\Expression('picture_item.perspective_id = 7 desc'),
-                    new Sql\Expression('picture_item.perspective_id = 8 desc')
-                ]);
-                break;
+        if (is_array($options['order'])) {
+            $select->order($options['order']);
+        } else {
 
-            case 'front_angle':
-                $group[] = 'picture_item.perspective_id';
-                $select->order([
-                    new Sql\Expression('picture_item.perspective_id=7 DESC'),
-                    new Sql\Expression('picture_item.perspective_id=8 DESC'),
-                    new Sql\Expression('picture_item.perspective_id=1 DESC')
-                ]);
-                break;
-
-            case 'perspectives':
-                $group[] = 'perspectives.position';
-                $select
-                    ->join('perspectives', 'picture_item.perspective_id = perspectives.id', [], $select::JOIN_LEFT)
-                    ->order([
-                        'perspectives.position',
-                        'pictures.width DESC', 'pictures.height DESC',
-                        'pictures.add_date DESC', 'pictures.id DESC'
+            switch ($options['order']) {
+                case 'accept_datetime_desc':
+                    $select->order(['accept_datetime desc', 'pictures.add_date DESC', 'pictures.id DESC']);
+                    break;
+                case 'add_date_desc':
+                    $select->order(['pictures.add_date DESC', 'pictures.id DESC']);
+                    break;
+                case 'add_date_asc':
+                    $select->order(['pictures.add_date ASC', 'pictures.id ASC']);
+                    break;
+                case 'resolution_desc':
+                    $select->order(['pictures.width DESC', 'pictures.height DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
+                    break;
+                case 'resolution_asc':
+                    $select->order(['pictures.width', 'pictures.height']);
+                    break;
+                case 'filesize_desc':
+                    $select->order('pictures.filesize DESC');
+                    break;
+                case 'filesize_asc':
+                    $select->order('pictures.filesize ASC');
+                    break;
+                case 'comments':
+                    $joinLeftComments = true;
+                    $select->order('comment_topic.messages DESC');
+                    break;
+                case 'views':
+                    $select->join('picture_view', 'pictures.id = picture_view.picture_id', [], $select::JOIN_LEFT)
+                        ->order('picture_view.views DESC');
+                    break;
+                case 'moder_votes':
+                    $joinPdr = true;
+                    $select->order('pdr.day_date DESC');
+                    break;
+                case 'similarity':
+                    $select->order('df_distance.distance ASC');
+                    break;
+                case 'removing_date':
+                    $select->order(['pictures.removing_date DESC', 'pictures.id']);
+                    break;
+                case 'likes':
+                    $joinLeftVotesSummary = true;
+                    $select->order(['picture_vote_summary.positive DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
+                    break;
+                case 'dislikes':
+                    $joinLeftVotesSummary = true;
+                    $select->order(['picture_vote_summary.negative DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
+                    break;
+                case 'status':
+                    $select->order('pictures.status');
+                    break;
+                case 'random':
+                    $select->order(new Sql\Expression('rand() desc'));
+                    break;
+                case 'perspective_group':
+                    $select->order(['mp.position', 'pictures.width DESC', 'pictures.height DESC']);
+                    $group[] = 'mp.position';
+                    break;
+                case 'ancestor_stock_front_first':
+                    $group[] = 'ipc_ancestor.tuning';
+                    $group[] = 'ipc_ancestor.sport';
+                    $group[] = 'item.is_concept';
+                    $group[] = 'picture_item.perspective_id';
+                    $select->order([
+                        new Sql\Expression('ipc_ancestor.tuning asc'),
+                        new Sql\Expression('ipc_ancestor.sport asc'),
+                        new Sql\Expression('item.is_concept asc'),
+                        new Sql\Expression('picture_item.perspective_id = 10 desc'),
+                        new Sql\Expression('picture_item.perspective_id = 1 desc'),
+                        new Sql\Expression('picture_item.perspective_id = 7 desc'),
+                        new Sql\Expression('picture_item.perspective_id = 8 desc')
                     ]);
-                break;
+                    break;
+
+                case 'front_angle':
+                    $group[] = 'picture_item.perspective_id';
+                    $select->order([
+                        new Sql\Expression('picture_item.perspective_id=7 DESC'),
+                        new Sql\Expression('picture_item.perspective_id=8 DESC'),
+                        new Sql\Expression('picture_item.perspective_id=1 DESC')
+                    ]);
+                    break;
+
+                case 'perspectives':
+                    $group[] = 'perspectives.position';
+                    $select
+                        ->join('perspectives', 'picture_item.perspective_id = perspectives.id', [], $select::JOIN_LEFT)
+                        ->order([
+                            'perspectives.position',
+                            'pictures.width DESC', 'pictures.height DESC',
+                            'pictures.add_date DESC', 'pictures.id DESC'
+                        ]);
+                    break;
+
+                case 'id':
+                    $select->order(['pictures.id']);
+                    break;
+            }
         }
 
         if ($joinLeftComments) {
@@ -845,7 +926,13 @@ class Picture
 
     public function getFormatRequest($row)
     {
-        return $this->pictureTable->getFormatRequest($row);
+        if ($row instanceof \Zend_Db_Table_Row_Abstract) {
+            $row = $row->toArray();
+        } elseif ($row instanceof \ArrayObject) {
+            $row = (array)$row;
+        }
+
+        return self::buildFormatRequest($row);
     }
 
     public function getTotalPicturesSize()
@@ -854,5 +941,70 @@ class Picture
         $select->columns(['sum' => new Sql\Expression('sum(filesize)')]);
         $row = $this->table->selectWith($select)->current();
         return $row ? $row['sum'] : 0;
+    }
+
+    public function cropParametersExists($row)
+    {
+        if ($row instanceof \Zend_Db_Table_Row_Abstract) {
+            $row = $row->toArray();
+        } elseif ($row instanceof \ArrayObject) {
+            $row = (array)$row;
+        }
+
+        return self::checkCropParameters($row);
+    }
+
+    private static function between($a, $min, $max)
+    {
+        return ($min <= $a) && ($a <= $max);
+    }
+
+    public static function checkCropParameters($options)
+    {
+        // Check existance and correct of crop parameters
+        return ! is_null($options['crop_left']) && ! is_null($options['crop_top']) &&
+               ! is_null($options['crop_width']) && ! is_null($options['crop_height']) &&
+               self::between($options['crop_left'], 0, $options['width']) &&
+               self::between($options['crop_width'], 1, $options['width']) &&
+               self::between($options['crop_top'], 0, $options['height']) &&
+               self::between($options['crop_height'], 1, $options['height']);
+    }
+
+    /**
+     * @param array $options
+     * @return Image\Storage\Request
+     */
+    public static function buildFormatRequest($options)
+    {
+        if ($options instanceof \ArrayAccess) {
+            $options = (array)$options;
+        }
+
+        if (! is_array($options)) {
+            throw new \Exception("array or ArrayAccess expected");
+        }
+
+        $defaults = [
+            'image_id'    => null,
+            'crop_left'   => null,
+            'crop_top'    => null,
+            'crop_width'  => null,
+            'crop_height' => null
+        ];
+        $options = array_replace($defaults, $options);
+
+        $request = [
+            'imageId' => $options['image_id']
+        ];
+        if (self::checkCropParameters($options)) {
+            $request['crop'] = [
+                'left'   => $options['crop_left'],
+                'top'    => $options['crop_top'],
+                'width'  => $options['crop_width'],
+                'height' => $options['crop_height']
+            ];
+        }
+
+        return new Image\Storage\Request($request);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Application\Model\Item;
 
-use Application\Model\Picture;
+use Zend\Db\Sql;
 
-use Zend_Db_Expr;
+use Application\Model\Picture;
 
 class NewPictureFetcher extends PictureFetcher
 {
@@ -19,19 +19,16 @@ class NewPictureFetcher extends PictureFetcher
 
     public function fetch($item, array $options = [])
     {
-        $select = $this->pictureTable->select();
-
         $select = $this->getPictureSelect($item['id'], [
             'ids'   => $this->pictureIds,
             'limit' => 6,
             'acceptedSort' => true
         ]);
 
-        $db = $this->pictureTable->getAdapter();
-        $db->fetchRow($select);
+        $rows = $this->pictureModel->getTable()->selectWith($select);
 
         $result = [];
-        foreach ($db->fetchAll($select) as $row) {
+        foreach ($rows as $row) {
             $result[] = [
                 'format' => 'picture-thumb',
                 'row'    => $row,
@@ -47,19 +44,26 @@ class NewPictureFetcher extends PictureFetcher
         foreach ($itemIds as $itemId) {
             $result[$itemId] = null;
         }
-        if (count($itemIds)) {
-            $pictureTableAdapter = $this->pictureTable->getAdapter();
 
-            $select = $pictureTableAdapter->select()
-                ->from($this->pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
-                ->where('pictures.id IN (?)', $this->pictureIds)
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->where('picture_item.item_id IN (?)', $itemIds)
-                ->group('picture_item.item_id');
-
-            $result = array_replace($result, $pictureTableAdapter->fetchPairs($select));
+        if (count($itemIds) <= 0) {
+            return $result;
         }
+
+        $select = $this->pictureModel->getTable()->getSql()->select();
+
+        $select->columns(['picture_item.item_id', 'count' => new Sql\Expression('COUNT(1)')])
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->where([
+                new Sql\Predicate\In('pictures.id', $this->pictureIds),
+                'pictures.status' => Picture::STATUS_ACCEPTED,
+                new Sql\Predicate\In('picture_item.item_id', $itemIds)
+            ])
+            ->group('picture_item.item_id');
+
+        foreach ($this->pictureModel->getTable()->selectWith($select) as $row) {
+            $result[(int)$row['item_id']] = (int)$row['count'];
+        }
+
         return $result;
     }
 }

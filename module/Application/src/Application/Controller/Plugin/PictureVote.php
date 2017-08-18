@@ -8,19 +8,11 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable;
-use Application\Model\PictureModerVote;
-
-use Zend_Db_Expr;
 use Application\Model\Picture;
+use Application\Model\PictureModerVote;
 
 class PictureVote extends AbstractPlugin
 {
-    /**
-     * @var DbTable\Picture
-     */
-    private $table;
-
     /**
      * @var TableGateway
      */
@@ -38,11 +30,9 @@ class PictureVote extends AbstractPlugin
 
     public function __construct(
         PictureModerVote $pictureModerVote,
-        DbTable\Picture $pictureTable,
         TableGateway $voteTemplateTeable,
         Picture $picture
     ) {
-        $this->table = $pictureTable;
         $this->voteTemplateTable = $voteTemplateTeable;
         $this->pictureModerVote = $pictureModerVote;
         $this->picture = $picture;
@@ -50,46 +40,27 @@ class PictureVote extends AbstractPlugin
 
     private function isLastPicture($picture)
     {
-        $result = null;
-        if ($picture['status'] == Picture::STATUS_ACCEPTED) {
-            $db = $this->table->getAdapter();
-            $result = ! $db->fetchOne(
-                $db->select()
-                    ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join(
-                        ['pi2' => 'picture_item'],
-                        'picture_item.item_id = pi2.item_id',
-                        null
-                    )
-                    ->where('pi2.picture_id = ?', $picture['id'])
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                    ->where('pictures.id <> ?', $picture['id'])
-            );
+        if ($picture['status'] != Picture::STATUS_ACCEPTED) {
+            return null;
         }
 
-        return $result;
+        return $this->picture->isExists([
+            'id_exclude' => $picture['id'],
+            'status'     => Picture::STATUS_ACCEPTED,
+            'item'       => [
+                'contains_picture' => $picture['id']
+            ]
+        ]);
     }
 
-    private function getAcceptedCount($picture)
+    private function getAcceptedCount(int $pictureId)
     {
-        $result = null;
-
-        $db = $this->table->getAdapter();
-        $result = $db->fetchOne(
-            $db->select()
-                ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join(
-                    ['pi2' => 'picture_item'],
-                    'picture_item.item_id = pi2.item_id',
-                    null
-                )
-                ->where('pi2.picture_id = ?', $picture['id'])
-                ->where('status = ?', Picture::STATUS_ACCEPTED)
-        );
-
-        return $result;
+        return $this->picture->getCount([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => [
+                'contains_picture' => $pictureId
+            ]
+        ]);
     }
 
     private function getVoteOptions2()
@@ -116,13 +87,13 @@ class PictureVote extends AbstractPlugin
         return $result;
     }
 
-    public function __invoke($pictureId, $options)
+    public function __invoke(int $pictureId, $options)
     {
         $options = array_replace([
             'hideVote' => false
         ], $options);
 
-        $picture = $this->table->find($pictureId)->current();
+        $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
             return false;
         }
@@ -151,7 +122,7 @@ class PictureVote extends AbstractPlugin
 
         return [
             'isLastPicture'     => $this->isLastPicture($picture),
-            'acceptedCount'     => $this->getAcceptedCount($picture),
+            'acceptedCount'     => $this->getAcceptedCount($picture['id']),
             'canDelete'         => $this->pictureCanDelete($picture),
             'apiUrl'            => $controller->url()->fromRoute('api/picture/picture/update', [
                 'id' => $picture['id']

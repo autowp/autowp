@@ -174,7 +174,8 @@ class FactoriesController extends AbstractActionController
             'factory'  => $factory,
             'carsData' => $this->car()->listData($cars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureTable'         => $this->picture->getPictureTable(),
+                    'pictureModel'         => $this->picture,
+                    'itemModel'            => $this->itemModel,
                     'perspective'          => $this->perspective,
                     'type'                 => null,
                     'onlyExactlyPictures'  => false,

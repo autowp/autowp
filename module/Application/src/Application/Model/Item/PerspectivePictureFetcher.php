@@ -85,8 +85,6 @@ class PerspectivePictureFetcher extends PictureFetcher
         $pictures = [];
         $usedIds = [];
 
-        $db = $this->pictureTable->getAdapter();
-
         $totalPictures = isset($options['totalPictures']) ? (int)$options['totalPictures'] : null;
         $itemOnlyChilds = isset($this->onlyChilds[$item['id']]) ? $this->onlyChilds[$item['id']] : null;
 
@@ -111,7 +109,9 @@ class PerspectivePictureFetcher extends PictureFetcher
                 'onlyChilds'          => $itemOnlyChilds
             ]);
 
-            $picture = $db->fetchRow($select);
+            $select->limit(1);
+
+            $picture = $this->pictureModel->getTable()->selectWith($select)->current();
 
             if ($picture) {
                 $pictures[] = $picture;
@@ -132,9 +132,10 @@ class PerspectivePictureFetcher extends PictureFetcher
                 'onlyChilds'          => $itemOnlyChilds
             ]);
 
-            $rows = $db->fetchAll(
-                $select->limit($needMore)
-            );
+            $select->limit($needMore);
+
+            $rows = $this->pictureModel->getTable()->selectWith($select);
+
             $morePictures = [];
             foreach ($rows as $row) {
                 $morePictures[] = $row;
@@ -167,22 +168,17 @@ class PerspectivePictureFetcher extends PictureFetcher
         }
 
         if ($emptyPictures > 0 && ($item['item_type_id'] == Item::ENGINE)) {
-            $pictureRows = $db->fetchAll(
-                $db->select()
-                    ->from('pictures', [
-                        'id', 'name',
-                        'image_id', 'crop_left', 'crop_top',
-                        'crop_width', 'crop_height', 'width', 'height', 'identity',
-                        'status', 'owner_id', 'filesize'
-                    ])
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->where('picture_item.perspective_id = ?', 17) // under the hood
-                    ->join('item', 'picture_item.item_id = item.id', null)
-                    ->join('item_parent_cache', 'item.engine_item_id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $item['id'])
-                    ->limit($emptyPictures)
-            );
+
+            $pictureRows = $this->pictureModel->getRows([
+                'status' => Picture::STATUS_ACCEPTED,
+                'item'   => [
+                    'perspective' => 17,
+                    'engine'      => [
+                        'ancestor_or_self' => $item['id']
+                    ]
+                ],
+                'limit'  => $emptyPictures
+            ]);
 
             $extraPicIdx = 0;
 
