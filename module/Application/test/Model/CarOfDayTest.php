@@ -17,11 +17,6 @@ class CarOfDayTest extends AbstractHttpControllerTestCase
         $model = $serviceManager->get(CarOfDay::class);
         $result = $model->getCarOfDayCadidate();
 
-        if ($result) {
-            $this->assertArrayHasKey('id', $result);
-            $this->assertNotEmpty($result['id']);
-        } else {
-            $this->assertFalse($result);
-        }
+        $this->assertNotEmpty($result);
     }
 }

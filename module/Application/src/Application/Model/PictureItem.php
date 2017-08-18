@@ -2,33 +2,28 @@
 
 namespace Application\Model;
 
-use Zend_Db_Table;
-
 use InvalidArgumentException;
+
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 
 class PictureItem
 {
+    /**
+     * @var TableGateway
+     */
     private $table;
 
-    public function __construct()
+    public function __construct(TableGateway $table)
     {
-        $this->table = new Zend_Db_Table([
-            'name'    => 'picture_item',
-            'primary' => ['picture_id', 'item_id']
-        ]);
+        $this->table = $table;
     }
 
     /**
-     * @param int $pictureId
-     * @param int $itemId
      * @throws InvalidArgumentException
-     * @return \Zend_Db_Table_Row_Abstract|NULL
      */
-    private function getRow($pictureId, $itemId)
+    private function getRow(int $pictureId, int $itemId)
     {
-        $pictureId = (int)$pictureId;
-        $itemId = (int)$itemId;
-
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
         }
@@ -37,19 +32,14 @@ class PictureItem
             throw new InvalidArgumentException("Item id is invalid");
         }
 
-        $row = $this->table->fetchRow([
-            'picture_id = ?' => $pictureId,
-            'item_id = ?'    => $itemId
-        ]);
-
-        return $row;
+        return $this->table->select([
+            'picture_id' => $pictureId,
+            'item_id'    => $itemId
+        ])->current();
     }
 
-    public function add($pictureId, $itemId)
+    public function add(int $pictureId, int $itemId)
     {
-        $pictureId = (int)$pictureId;
-        $itemId = (int)$itemId;
-
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
         }
@@ -61,19 +51,15 @@ class PictureItem
         $row = $this->getRow($pictureId, $itemId);
 
         if (! $row) {
-            $row = $this->table->createRow([
+            $this->table->insert([
                 'picture_id' => $pictureId,
                 'item_id'    => $itemId
             ]);
-            $row->save();
         }
     }
 
-    public function remove($pictureId, $itemId)
+    public function remove(int $pictureId, int $itemId)
     {
-        $pictureId = (int)$pictureId;
-        $itemId = (int)$itemId;
-
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
         }
@@ -82,21 +68,19 @@ class PictureItem
             throw new InvalidArgumentException("Item id is invalid");
         }
 
-        $row = $this->getRow($pictureId, $itemId);
-        if ($row) {
-            $row->delete();
-        }
+        $this->table->delete([
+            'picture_id = ?' => $pictureId,
+            'item_id = ?'    => $itemId
+        ]);
     }
 
-    public function isExists($pictureId, $itemId)
+    public function isExists(int $pictureId, int $itemId)
     {
         return (bool)$this->getRow($pictureId, $itemId);
     }
 
-    public function changePictureItem($pictureId, $oldItemId, $newItemId)
+    public function changePictureItem(int $pictureId, int $oldItemId, int $newItemId)
     {
-        $newItemId = (int)$newItemId;
-
         if (! $newItemId) {
             throw new InvalidArgumentException("Item id is invalid");
         }
@@ -107,14 +91,16 @@ class PictureItem
             throw new \Exception("Item not found");
         }
 
-        $row['item_id'] = $newItemId;
-        $row->save();
+        $this->table->update([
+            'item_id' => $newItemId
+        ], [
+            'picture_id = ?' => $pictureId,
+            'item_id = ?'    => $itemId
+        ]);
     }
 
-    public function setPictureItems($pictureId, array $itemIds)
+    public function setPictureItems(int $pictureId, array $itemIds)
     {
-        $pictureId = (int)$pictureId;
-
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
         }
@@ -131,11 +117,10 @@ class PictureItem
             $row = $this->getRow($pictureId, $itemId);
 
             if (! $row) {
-                $row = $this->table->createRow([
+                $this->table->insert([
                     'picture_id' => $pictureId,
                     'item_id'    => $itemId
                 ]);
-                $row->save();
             }
         }
 
@@ -143,56 +128,69 @@ class PictureItem
             'picture_id = ?' => $pictureId
         ];
         if ($itemIds) {
-            $filter['item_id not in (?)'] = $itemIds;
+            $filter[] = new Sql\Predicate\NotIn('item_id', $itemIds);
         }
 
         $this->table->delete($filter);
     }
 
-    public function getPictureItems($pictureId)
+    public function getPictureItems(int $pictureId): array
     {
-        $db = $this->table->getAdapter();
-        return $db->fetchCol(
-            $db->select()
-                ->from($this->table->info('name'), 'item_id')
-                ->where('picture_id = ?', $pictureId)
-        );
+        $rows = $this->table->select([
+            'picture_id' => $pictureId
+        ]);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = (int)$row['item_id'];
+        }
+
+        return $result;
     }
 
-    public function getPictureItemData($pictureId, $itemId)
+    public function getPictureItemData(int $pictureId, int $itemId)
     {
-        $db = $this->table->getAdapter();
-        return $db->fetchRow(
-            $db->select()
-                ->from($this->table->info('name'))
-                ->where('picture_id = ?', $pictureId)
-                ->where('item_id = ?', $itemId)
-        );
+        return $this->table->select([
+            'picture_id' => $pictureId,
+            'item_id'    => $itemId
+        ])->current();
     }
 
-    public function getPictureItemsData($pictureId)
+    public function getPictureItemsData(int $pictureId)
     {
-        $db = $this->table->getAdapter();
-        return $db->fetchAll(
-            $db->select()
-                ->from($this->table->info('name'))
-                ->where('picture_id = ?', $pictureId)
-        );
+        $rows = $this->table->select([
+            'picture_id' => $pictureId
+        ])->current();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = $row;
+        }
+
+        return $result;
     }
 
-    public function getPictureItemsByType($pictureId, $type)
+    public function getPictureItemsByType(int $pictureId, $type): array
     {
-        $db = $this->table->getAdapter();
-        return $db->fetchCol(
-            $db->select()
-                ->from($this->table->info('name'), 'item_id')
-                ->where('picture_id = ?', $pictureId)
-                ->join('item', 'picture_item.item_id = item.id', null)
-                ->where('item.item_type_id IN (?)', $type)
-        );
+        $select = $this->table->getSql()->select();
+        $select->columns(['item_id'])
+            ->join('item', 'picture_item.item_id = item.id', [])
+            ->where([
+                'picture_id' => $pictureId,
+                new Sql\Predicate\In('item.item_type_id', $type)
+            ]);
+
+        $rows = $this->table->selectWith($select);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = (int)$row['item_id'];
+        }
+
+        return $result;
     }
 
-    public function getData(array $options)
+    public function getData(array $options): array
     {
         $defaults = [
             'picture'      => null,
@@ -201,28 +199,27 @@ class PictureItem
         ];
         $options = array_replace($defaults, $options);
 
-        $db = $this->table->getAdapter();
+        $select = $this->table->getSql()->select();
 
-        $select = $db->select()
-            ->from($this->table->info('name'), [
-                'picture_id', 'item_id',
-                'crop_left', 'crop_top', 'crop_width', 'crop_height'
-            ]);
+        $select->columns([
+            'picture_id', 'item_id',
+            'crop_left', 'crop_top', 'crop_width', 'crop_height'
+        ]);
 
         if ($options['onlyWithArea']) {
-            $select->where('crop_left and crop_top and crop_width and crop_height');
+            $select->where(['crop_left and crop_top and crop_width and crop_height']);
         }
 
         if ($options['picture']) {
-            $select->where('picture_id = ?', $options['picture']);
+            $select->where(['picture_id' => $options['picture']]);
         }
 
         if ($options['item']) {
-            $select->where('item_id = ?', $options['item']);
+            $select->where(['item_id' => $options['item']]);
         }
 
         $result = [];
-        foreach ($db->fetchAll($select) as $row) {
+        foreach ($this->table->selectWith($select) as $row) {
             $area = null;
             if ($row['crop_left'] && $row['crop_top'] && $row['crop_width'] && $row['crop_height']) {
                 $area = [
@@ -232,8 +229,8 @@ class PictureItem
             }
 
             $result[] = [
-                'picture_id' => $row['picture_id'],
-                'item_id'    => $row['item_id'],
+                'picture_id' => (int)$row['picture_id'],
+                'item_id'    => (int)$row['item_id'],
                 'area'       => $area
             ];
         }
@@ -241,39 +238,48 @@ class PictureItem
         return $result;
     }
 
-    public function setProperties($pictureId, $itemId, array $properties)
+    public function setProperties(int $pictureId, int $itemId, array $properties)
     {
         $row = $this->getRow($pictureId, $itemId);
-        if ($row) {
-            if (array_key_exists('perspective', $properties)) {
-                $perspective = $properties['perspective'];
-                $row['perspective_id'] = $perspective ? (int)$perspective : null;
-            }
+        if (! $row) {
+            return;
+        }
 
-            if (array_key_exists('area', $properties)) {
-                $area = $properties['area'];
-                if ($area) {
-                    $row->setFromArray([
-                        'crop_left'   => $area['left'],
-                        'crop_top'    => $area['top'],
-                        'crop_width'  => $area['width'],
-                        'crop_height' => $area['height'],
-                    ]);
-                } else {
-                    $row->setFromArray([
-                        'crop_left'   => null,
-                        'crop_top'    => null,
-                        'crop_width'  => null,
-                        'crop_height' => null,
-                    ]);
-                }
-            }
+        $set = [];
 
-            $row->save();
+        if (array_key_exists('perspective', $properties)) {
+            $perspective = $properties['perspective'];
+            $set['perspective_id'] = $perspective ? (int)$perspective : null;
+        }
+
+        if (array_key_exists('area', $properties)) {
+            $area = $properties['area'];
+            if ($area) {
+                $set = array_replace($set, [
+                    'crop_left'   => $area['left'],
+                    'crop_top'    => $area['top'],
+                    'crop_width'  => $area['width'],
+                    'crop_height' => $area['height'],
+                ]);
+            } else {
+                $set = array_replace($set, [
+                    'crop_left'   => null,
+                    'crop_top'    => null,
+                    'crop_width'  => null,
+                    'crop_height' => null,
+                ]);
+            }
+        }
+
+        if ($set) {
+            $this->table->update($set, [
+                'picture_id = ?' => $pictureId,
+                'item_id = ?'    => $itemId
+            ]);
         }
     }
 
-    public function getPerspective($pictureId, $itemId)
+    public function getPerspective(int $pictureId, int $itemId)
     {
         $row = $this->getRow($pictureId, $itemId);
         if (! $row) {
@@ -283,7 +289,7 @@ class PictureItem
         return $row['perspective_id'];
     }
 
-    public function getArea($pictureId, $itemId)
+    public function getArea(int $pictureId, int $itemId)
     {
         $row = $this->getRow($pictureId, $itemId);
         if (! $row) {

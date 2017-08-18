@@ -5,7 +5,9 @@ namespace Application\Model;
 use DateInterval;
 use DateTime;
 
+use Facebook;
 use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\Image;
 
@@ -13,16 +15,13 @@ use Application\ItemNameFormatter;
 use Application\Model\Catalogue;
 use Application\Service\SpecificationsService;
 
-use Facebook;
-
-use Zend_Db_Table;
 use Zend_Oauth_Token_Access;
 use Zend_Service_Twitter;
 
 class CarOfDay
 {
     /**
-     * @var Zend_Db_Table
+     * @var TableGateway
      */
     private $table;
 
@@ -76,6 +75,7 @@ class CarOfDay
     private $twins;
 
     public function __construct(
+        TableGateway $table,
         ItemNameFormatter $itemNameFormatter,
         Image\Storage $imageStorage,
         Catalogue $catalogue,
@@ -100,15 +100,11 @@ class CarOfDay
         $this->picture = $picture;
         $this->twins = $twins;
 
-        $this->table = new Zend_Db_Table([
-            'name'    => 'of_day',
-            'primary' => 'day_date'
-        ]);
+        $this->table = $table;
     }
 
-    public function getCarOfDayCadidate()
+    public function getCarOfDayCadidate(): int
     {
-        $db = $this->table->getAdapter();
         $sql = '
             SELECT c.id, count(p.id) AS p_count
             FROM item AS c
@@ -119,21 +115,25 @@ class CarOfDay
                 AND (c.begin_year AND c.end_year OR c.begin_model_year AND c.end_model_year)
                 AND c.id NOT IN (SELECT item_id FROM of_day WHERE item_id)
             GROUP BY c.id
-            HAVING p_count >= 5
+            HAVING p_count >= ?
             ORDER BY RAND()
             LIMIT 1
         ';
-        return $db->fetchRow($sql, [Picture::STATUS_ACCEPTED]);
+
+        $stmt = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, 5]);
+        $row = $stmt->execute()->current();
+
+        return $row ? (int) $row['id'] : 0;
     }
 
     public function pick()
     {
-        $row = $this->getCarOfDayCadidate();
-        if ($row) {
-            print $row['id']  ."\n";
+        $itemId = $this->getCarOfDayCadidate();
+        if ($itemId) {
+            print $itemId ."\n";
 
             $now = new DateTime();
-            $this->setItemOfDay($now, $row['id'], null);
+            $this->setItemOfDay($now, $itemId, null);
 
             return true;
         }
@@ -143,9 +143,12 @@ class CarOfDay
 
     public function getCurrent()
     {
-        $row = $this->table->fetchRow([
-            'day_date <= CURDATE()'
-        ], 'day_date DESC');
+        $select = $this->table->getSql()->select();
+        $select->where(['day_date <= CURDATE()'])
+            ->order('day_date DESC')
+            ->limit(1);
+
+        $row = $this->table->selectWith($select)->current();
 
         return $row ? [
             'item_id' => $row['item_id'],
@@ -173,10 +176,10 @@ class CarOfDay
 
     public function putCurrentToTwitter(array $twOptions)
     {
-        $dayRow = $this->table->fetchRow([
+        $dayRow = $this->table->select([
             'day_date = CURDATE()',
             'not twitter_sent'
-        ]);
+        ])->current();
 
         if (! $dayRow) {
             print 'Day row not found or already sent' . PHP_EOL;
@@ -237,8 +240,11 @@ class CarOfDay
         $response = $twitter->statusesUpdate($text);
 
         if ($response->isSuccess()) {
-            $dayRow['twitter_sent'] = true;
-            $dayRow->save();
+            $this->table->update([
+                'twitter_sent' => 1
+            ], [
+                'day_date' => $dayRow['day_date']
+            ]);
 
             print 'ok' . PHP_EOL;
         } else {
@@ -248,10 +254,10 @@ class CarOfDay
 
     public function putCurrentToFacebook(array $fbOptions)
     {
-        $dayRow = $this->table->fetchRow([
+        $dayRow = $this->table->select([
             'day_date = CURDATE()',
             'not facebook_sent'
-        ]);
+        ])->current();
 
         if (! $dayRow) {
             print 'Day row not found or already sent' . PHP_EOL;
@@ -317,8 +323,11 @@ class CarOfDay
             return;
         }
 
-        $dayRow['facebook_sent'] = true;
-        $dayRow->save();
+        $this->table->update([
+            'facebook_sent' => 1
+        ], [
+            'day_date' => $dayRow['day_date']
+        ]);
 
         print 'ok' . PHP_EOL;
     }
@@ -327,10 +336,10 @@ class CarOfDay
     {
         $language = 'ru';
 
-        $dayRow = $this->table->fetchRow([
+        $dayRow = $this->table->select([
             'day_date = CURDATE()',
             'not vk_sent'
-        ]);
+        ])->current();
 
         if (! $dayRow) {
             print 'Day row not found or already sent' . PHP_EOL;
@@ -403,8 +412,11 @@ class CarOfDay
             throw new \Exception("Failed to post to vk" . $json['error']['error_msg']);
         }
 
-        $dayRow['vk_sent'] = true;
-        $dayRow->save();
+        $this->table->update([
+            'vk_sent' => 1
+        ], [
+            'day_date' => $dayRow['day_date']
+        ]);
 
         print 'ok' . PHP_EOL;
     }
@@ -417,10 +429,10 @@ class CarOfDay
         $result = [];
 
         for ($i = 0; $i < 10; $i++) {
-            $dayRow = $this->table->fetchRow([
-                'day_date = ?' => $now->format('Y-m-d'),
+            $dayRow = $this->table->select([
+                'day_date' => $now->format('Y-m-d'),
                 'item_id is not null'
-            ]);
+            ])->current();
 
             $result[] = [
                 'date' => clone $now,
@@ -739,9 +751,8 @@ class CarOfDay
         return $items;
     }
 
-    public function isComplies($itemId)
+    public function isComplies(int $itemId): bool
     {
-        $db = $this->table->getAdapter();
         $sql = '
             SELECT item.id, count(distinct pictures.id) AS p_count
             FROM item
@@ -751,10 +762,13 @@ class CarOfDay
             WHERE pictures.status = ?
                 AND item.id NOT IN (SELECT item_id FROM of_day WHERE item_id)
                 AND item.id = ?
-            HAVING p_count >= 3
+            HAVING p_count >= ?
             LIMIT 1
         ';
-        return (bool)$db->fetchRow($sql, [Picture::STATUS_ACCEPTED, (int)$itemId]);
+        $stmt = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, $itemId, 3]);
+        $row = $stmt->execute()->current();
+
+        return (bool) $row;
     }
 
     public function setItemOfDay(DateTime $dateTime, $itemId, $userId)
@@ -768,23 +782,26 @@ class CarOfDay
 
         $dateStr = $dateTime->format('Y-m-d');
 
-        $dayRow = $this->table->fetchRow([
-            'day_date = ?' => $dateStr
-        ]);
+        $primaryKey = [
+            'day_date' => $dateStr
+        ];
 
-        if (! $dayRow) {
-            $dayRow = $this->table->createRow([
-                'day_date' => $dateStr
-            ]);
-        }
+        $dayRow = $this->table->select($primaryKey)->current();
 
-        if ($dayRow['item_id']) {
+        if ($dayRow && $dayRow['item_id']) {
             return false;
         }
 
-        $dayRow['item_id'] = $itemId;
-        $dayRow['user_id'] = $userId ? $userId : null;
-        $dayRow->save();
+        $set = [
+            'item_id' => $itemId,
+            'user_id' => $userId ? $userId : null
+        ];
+
+        if ($dayRow) {
+            $this->table->update($set, $primaryKey);
+        } else {
+            $this->table->insert(array_replace($set, $primaryKey));
+        }
 
         return true;
     }

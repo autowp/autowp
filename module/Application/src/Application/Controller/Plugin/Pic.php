@@ -282,10 +282,6 @@ class Pic extends AbstractPlugin
         if (is_array($pictures)) {
             $rows = [];
             foreach ($pictures as $picture) {
-                if ($picture instanceof \Zend_Db_Table_Row_Abstract) {
-                    $picture = $picture->toArray();
-                }
-
                 $ids[] = $picture['id'];
                 $rows[] = $picture;
             }

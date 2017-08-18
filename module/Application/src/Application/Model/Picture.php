@@ -917,9 +917,7 @@ class Picture
 
     public function getFormatRequest($row)
     {
-        if ($row instanceof \Zend_Db_Table_Row_Abstract) {
-            $row = $row->toArray();
-        } elseif ($row instanceof \ArrayObject) {
+        if ($row instanceof \ArrayObject) {
             $row = (array)$row;
         }
 

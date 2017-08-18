@@ -71,6 +71,7 @@ class TableManager implements ServiceLocatorInterface
         'modification' => [],
         'modification_group' => [],
         'modification_picture' => [],
+        'of_day' => [],
         'pages' => [], //TODO: rename to page
         'personal_messages' => [],
         'perspectives' => [],

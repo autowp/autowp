@@ -148,7 +148,7 @@ return [
             Model\Modification::class            => Model\ModificationFactory::class,
             Model\Perspective::class             => Model\PerspectiveFactory::class,
             Model\Picture::class                 => Model\PictureFactory::class,
-            Model\PictureItem::class             => InvokableFactory::class,
+            Model\PictureItem::class             => Model\PictureItemFactory::class,
             Model\PictureModerVote::class        => Model\PictureModerVoteFactory::class,
             Model\PictureView::class             => Model\PictureViewFactory::class,
             Model\PictureVote::class             => Model\Service\PictureVoteFactory::class,

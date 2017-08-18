@@ -541,7 +541,11 @@ class DayPictures
 
         if ($this->minDate) {
             $select->where([
-                $column . ' >= ?' => $this->startOfDayDbValue($this->minDate)
+                new Sql\Predicate\Operator(
+                    $this->orderColumn,
+                    Sql\Predicate\Operator::OP_GTE,
+                    $this->startOfDayDbValue($this->minDate)
+                )
             ]);
         }
 
