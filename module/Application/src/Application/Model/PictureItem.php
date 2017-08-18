@@ -95,7 +95,7 @@ class PictureItem
             'item_id' => $newItemId
         ], [
             'picture_id = ?' => $pictureId,
-            'item_id = ?'    => $itemId
+            'item_id = ?'    => $oldItemId
         ]);
     }
 
