@@ -33,7 +33,9 @@ class DistinctItemPictureFetcher extends PictureFetcher
                 'dateSort'         => $this->dateSort,
             ]);
 
-            $picture = $db->fetchRow($select);
+            $select->limit(1);
+
+            $picture = $this->pictureModel->getTable()->selectWith($select)->current();
 
             if ($picture) {
                 $usedIds[] = $picture['id'];
