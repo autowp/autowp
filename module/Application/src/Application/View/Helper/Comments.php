@@ -32,7 +32,7 @@ class Comments extends AbstractHelper
 
         $user = $this->view->user()->get();
 
-        $comments = $this->comments->get($type, $item, $user);
+        $comments = $this->comments->get($type, $item, $user ? $user['id'] : 0);
 
         if ($user) {
             $this->comments->updateTopicView($type, $item, $user['id']);

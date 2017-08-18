@@ -151,12 +151,8 @@ class CommentsService
      * @param int $page
      * @return array
      */
-    private function getRecursive($type, $item, $parentId, $userId, $perPage = 0, $page = 0)
+    private function getRecursive($type, $item, $parentId, int $userId, $perPage = 0, $page = 0)
     {
-        if ($userId instanceof \Zend_Db_Table_Row_Abstract) {
-            $userId = $userId['id'];
-        }
-
         if ($perPage) {
             $paginator = $this->getPaginator($type, $item, $perPage, $page);
 
@@ -221,7 +217,7 @@ class CommentsService
      * @param int $item
      * @return array
      */
-    public function get($type, $item, $userId, $perPage = 0, $page = 0)
+    public function get($type, $item, int $userId, $perPage = 0, $page = 0)
     {
         return $this->getRecursive($type, $item, null, $userId, $perPage, $page);
     }

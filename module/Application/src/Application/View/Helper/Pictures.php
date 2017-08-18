@@ -79,9 +79,7 @@ class Pictures extends AbstractHelper
 
     private function userBehaviour($picture, $isModer)
     {
-        if ($picture instanceof \Zend_Db_Table_Row_Abstract) {
-            $picture = $picture->toArray();
-        } elseif ($picture instanceof \ArrayObject) {
+        if ($picture instanceof \ArrayObject) {
             $picture = (array)$picture;
         }
 
@@ -131,7 +129,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function picture(\Zend_Db_Table_Row_Abstract $picture)
+    public function picture($picture)
     {
         $view = $this->view;
 

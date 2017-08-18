@@ -6,8 +6,6 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Paginator;
 use Zend\View\Model\JsonModel;
 
-use Autowp\User\Model\DbTable\User;
-
 use Application\Model\Item;
 use Application\Model\VehicleType;
 

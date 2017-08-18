@@ -15,7 +15,7 @@ use Application\Service\TelegramService;
 
 use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Zend\Authentication\AuthenticationService;
 
@@ -51,7 +51,7 @@ class CatalogueController extends AbstractActionController
     /**
      * @var User
      */
-    private $userTable;
+    private $userModel;
 
     public function __construct(
         ItemParent $itemParent,
@@ -63,7 +63,8 @@ class CatalogueController extends AbstractActionController
         $textStorage,
         DuplicateFinder $duplicateFinder,
         Item $itemModel,
-        Picture $picture
+        Picture $picture,
+        User $userModel
     ) {
         $this->itemParent = $itemParent;
         $this->pictureItem = $pictureItem;
@@ -75,7 +76,7 @@ class CatalogueController extends AbstractActionController
         $this->duplicateFinder = $duplicateFinder;
         $this->itemModel = $itemModel;
         $this->picture = $picture;
-        $this->userTable = new User();
+        $this->userModel = $userModel;
     }
 
     public function refreshBrandVehicleAction()
@@ -123,7 +124,7 @@ class CatalogueController extends AbstractActionController
 
             $success = $this->picture->accept($picture['id'], $userId, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
-                $owner = $this->userTable->find((int)$picture['owner_id'])->current();
+                $owner = $this->userModel->getRow((int)$picture['owner_id']);
                 if ($owner && ($owner['id'] != $userId)) {
                     $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
@@ -143,7 +144,8 @@ class CatalogueController extends AbstractActionController
             }
 
             if ($previousStatusUserId != $userId) {
-                foreach ($this->userTable->find($previousStatusUserId) as $prevUser) {
+                $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
+                if ($prevUser) {
                     $message = sprintf(
                         'Принята картинка %s',
                         $this->pic()->url($picture['identity'], true)

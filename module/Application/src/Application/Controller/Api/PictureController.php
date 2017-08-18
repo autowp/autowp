@@ -9,7 +9,7 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Autowp\Message\MessageService;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Comments;
 use Application\DuplicateFinder;
@@ -98,6 +98,11 @@ class PictureController extends AbstractRestfulController
      */
     private $picture;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         RestHydrator $hydrator,
         PictureItem $pictureItem,
@@ -115,7 +120,8 @@ class PictureController extends AbstractRestfulController
         \Autowp\Comments\CommentsService $comments,
         PictureModerVote $pictureModerVote,
         Item $item,
-        Picture $picture
+        Picture $picture,
+        User $userModel
     ) {
         $this->carOfDay = $carOfDay;
 
@@ -135,6 +141,7 @@ class PictureController extends AbstractRestfulController
         $this->pictureModerVote = $pictureModerVote;
         $this->picture = $picture;
         $this->item = $item;
+        $this->userModel = $userModel;
     }
 
     public function randomPictureAction()
@@ -412,12 +419,12 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @param \Zend_Db_Table_Row_Abstract $user
+     * @param array|\ArrayObject $user
      * @param bool $full
      * @param \Zend\Uri\Uri $uri
      * @return string
      */
-    private function userModerUrl(\Zend_Db_Table_Row_Abstract $user, $full = false, $uri = null)
+    private function userModerUrl($user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
@@ -446,8 +453,6 @@ class PictureController extends AbstractRestfulController
         if (! $picture) {
             return $this->notFoundAction();
         }
-
-        $userTable = new User();
 
         $data = (array)$this->processBodyContent($this->getRequest());
         $validationGroup = array_keys($data); // TODO: intersect with real keys
@@ -562,7 +567,8 @@ class PictureController extends AbstractRestfulController
 
                 foreach ($userIds as $userId) {
                     if ($userId != $user['id']) {
-                        foreach ($userTable->find($userId) as $userRow) {
+                        $userRow = $this->userModel->getRow((int)$userId);
+                        if ($userRow) {
                             $uri = $this->hostManager->getUriByLanguage($userRow['language']);
 
                             $message = sprintf(
@@ -596,8 +602,7 @@ class PictureController extends AbstractRestfulController
 
                 $success = $this->picture->accept($picture['id'], $user['id'], $isFirstTimeAccepted);
                 if ($success) {
-                    $userTable = new User();
-                    $owner = $userTable->find((int)$picture['owner_id'])->current();
+                    $owner = $this->userModel->getRow((int)$picture['owner_id']);
 
                     if ($owner) {
                         $this->userPicture->refreshPicturesCount($owner['id']);
@@ -621,7 +626,8 @@ class PictureController extends AbstractRestfulController
 
 
                 if ($previousStatusUserId != $user['id']) {
-                    foreach ($userTable->find($previousStatusUserId) as $prevUser) {
+                    $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
+                    if ($prevUser) {
                         $message = sprintf(
                             'Принята картинка %s',
                             $this->pic()->url($picture['identity'], true)
@@ -683,7 +689,8 @@ class PictureController extends AbstractRestfulController
 
                     $pictureUrl = $this->pic()->url($picture['identity'], true);
                     if ($previousStatusUserId != $user['id']) {
-                        foreach ($userTable->find($previousStatusUserId) as $prevUser) {
+                        $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
+                        if ($prevUser) {
                             $message = sprintf(
                                 'С картинки %s снят статус "принято"',
                                 $pictureUrl
@@ -707,8 +714,7 @@ class PictureController extends AbstractRestfulController
                     'change_status_user_id' => $user['id']
                 ]);
 
-                $userTable = new User();
-                $owner = $userTable->find((int)$picture['owner_id'])->current();
+                $owner = $this->userModel->getRow((int)$picture['owner_id']);
                 if ($owner && $owner['id'] != $user['id']) {
                     $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
@@ -716,7 +722,7 @@ class PictureController extends AbstractRestfulController
 
                     $reasons = [];
                     foreach ($deleteRequests as $request) {
-                        $user = $userTable->find($request['user_id'])->current();
+                        $user = $this->userModel->getRow((int)$request['user_id']);
                         if ($user) {
                             $reasons[] = $this->userModerUrl($user, true, $uri) . ' : ' . $request['reason'];
                         }
@@ -1024,9 +1030,8 @@ class PictureController extends AbstractRestfulController
         );
 
         // pms
-        $userTable = new User();
-        $owner = $userTable->find($picture['owner_id'])->current();
-        $replaceOwner = $userTable->find($replacePicture['owner_id'])->current();
+        $owner = $this->userModel->getRow((int)$picture['owner_id']);
+        $replaceOwner = $this->userModel->getRow((int)$replacePicture['owner_id']);
         $recepients = [];
         if ($owner) {
             $recepients[$owner['id']] = $owner;

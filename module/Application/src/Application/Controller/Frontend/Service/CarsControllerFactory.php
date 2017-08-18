@@ -26,7 +26,8 @@ class CarsControllerFactory implements FactoryInterface
             $container->get(\Application\Model\Picture::class),
             $tables->get('attrs_attributes'),
             $tables->get('attrs_user_values'),
-            $container->get(\Application\Model\Brand::class)
+            $container->get(\Application\Model\Brand::class),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

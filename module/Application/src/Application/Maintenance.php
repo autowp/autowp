@@ -46,8 +46,8 @@ class Maintenance extends AbstractListenerAggregate
         $sessionManager = $serviceManager->get(\Zend\Session\SessionManager::class);
         $this->clearSessions($sessionManager);
 
-        $userTable = new User();
-        $userTable->updateSpecsVolumes();
+        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel->updateSpecsVolumes();
 
         $usersService = $serviceManager->get(Service\UsersService::class);
         $usersService->deleteUnused();
@@ -106,7 +106,9 @@ class Maintenance extends AbstractListenerAggregate
 
         $select->where([
             'status' => Picture::STATUS_REMOVING,
-            new Sql\Predicate\Expression('(removing_date is null OR (removing_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY) ))'),
+            new Sql\Predicate\Expression(
+                '(removing_date is null OR (removing_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY) ))'
+            ),
         ])->limit(1000);
 
         $pictures = $pictureModel->getTable()->selectWith($select);

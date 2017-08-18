@@ -5,8 +5,6 @@ namespace Application\Controller\Api;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
-use Autowp\User\Model\DbTable\User;
-
 use Application\Model\PictureVote;
 
 class PictureVoteController extends AbstractRestfulController

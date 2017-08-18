@@ -6,7 +6,7 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Model\Picture;
 use Application\Model\PictureModerVote;
@@ -28,14 +28,21 @@ class PictureVote extends AbstractPlugin
      */
     private $picture;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         PictureModerVote $pictureModerVote,
         TableGateway $voteTemplateTeable,
-        Picture $picture
+        Picture $picture,
+        User $userModel
     ) {
         $this->voteTemplateTable = $voteTemplateTeable;
         $this->pictureModerVote = $pictureModerVote;
         $this->picture = $picture;
+        $this->userModel = $userModel;
     }
 
     private function isLastPicture($picture)
@@ -110,12 +117,11 @@ class PictureVote extends AbstractPlugin
         $moderVotes = null;
         if (! $options['hideVote']) {
             $moderVotes = [];
-            $userTable = new User();
             foreach ($this->pictureModerVote->getVotes($picture['id']) as $vote) {
                 $moderVotes[] = [
                     'vote'   => $vote['vote'],
                     'reason' => $vote['reason'],
-                    'user'   => $userTable->find($vote['user_id'])->current()
+                    'user'   => $this->userModel->getRow((int)$vote['user_id'])
                 ];
             }
         }

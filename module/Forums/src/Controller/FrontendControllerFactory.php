@@ -17,7 +17,8 @@ class FrontendControllerFactory implements FactoryInterface
             $container->get('ForumsTopicNewForm'),
             $container->get('CommentForm'),
             $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Application\Comments::class)
+            $container->get(\Application\Comments::class),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

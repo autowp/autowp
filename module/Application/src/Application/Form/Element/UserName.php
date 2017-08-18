@@ -5,7 +5,7 @@ namespace Application\Form\Element;
 use Zend\Form\Element\Text;
 use Zend\InputFilter\InputProviderInterface;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class UserName extends Text implements InputProviderInterface

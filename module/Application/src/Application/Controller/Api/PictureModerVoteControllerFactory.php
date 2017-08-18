@@ -20,7 +20,8 @@ class PictureModerVoteControllerFactory implements FactoryInterface
             $container->get(\Application\Model\UserPicture::class),
             $container->get(\Application\Model\PictureModerVote::class),
             $container->get(\Application\Model\Picture::class),
-            $tables->get('picture_moder_vote_template')
+            $tables->get('picture_moder_vote_template'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

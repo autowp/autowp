@@ -8,8 +8,6 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
-use Autowp\User\Model\DbTable\User;
-
 use Application\Hydrator\Api\RestHydrator;
 
 class PerspectivePageController extends AbstractRestfulController

@@ -8,7 +8,7 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Autowp\Message\MessageService;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 use Autowp\Votings\Votings;
 
 use Application\Comments;
@@ -60,6 +60,11 @@ class CommentsController extends AbstractRestfulController
      */
     private $articleTable;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         HostManager $hostManager,
         $form,
@@ -68,7 +73,8 @@ class CommentsController extends AbstractRestfulController
         Picture $picture,
         Item $item,
         Votings $votings,
-        TableGateway $articleTable
+        TableGateway $articleTable,
+        User $userModel
     ) {
         $this->hostManager = $hostManager;
         $this->form = $form;
@@ -78,6 +84,7 @@ class CommentsController extends AbstractRestfulController
         $this->item = $item;
         $this->votings = $votings;
         $this->articleTable = $articleTable;
+        $this->userModel = $userModel;
     }
 
     private function canAddComments()
@@ -92,8 +99,7 @@ class CommentsController extends AbstractRestfulController
             return null;
         }
 
-        $userTable = new User();
-        return $userTable->getNextMessageTime($user['id']);
+        return $this->userModel->getNextMessageTime($user['id']);
     }
 
     private function needWait()
@@ -220,12 +226,10 @@ class CommentsController extends AbstractRestfulController
                 }
             }
 
-            $userTable = new User();
-
             if ($values['parent_id']) {
                 $authorId = $this->comments->service()->getMessageAuthorId($values['parent_id']);
                 if ($authorId && ($authorId != $user['id'])) {
-                    $parentMessageAuthor = $userTable->find($authorId)->current();
+                    $parentMessageAuthor = $this->userModel->getTable()->select(['id' => (int)$authorId])->current();
                     if ($parentMessageAuthor && ! $parentMessageAuthor['deleted']) {
                         $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor['language']);
 
@@ -269,7 +273,7 @@ class CommentsController extends AbstractRestfulController
 
         $user = $this->user()->get();
 
-        $comments = $this->comments->service()->get($type, $item, $user);
+        $comments = $this->comments->service()->get($type, $item, $user ? $user['id'] : 0);
 
         if ($user) {
             $this->comments->service()->updateTopicView($type, $item, $user['id']);

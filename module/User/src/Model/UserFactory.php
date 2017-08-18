@@ -1,11 +1,11 @@
 <?php
 
-namespace Application\Controller\Api;
+namespace Autowp\User\Model;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class ContactsControllerFactory implements FactoryInterface
+class UserFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -13,8 +13,7 @@ class ContactsControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $tables = $container->get(\Application\Db\TableManager::class);
-        return new ContactsController(
-            $container->get(\Application\Model\Contact::class),
+        return new User(
             $tables->get('users')
         );
     }

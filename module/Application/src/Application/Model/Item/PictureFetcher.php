@@ -200,7 +200,11 @@ abstract class PictureFetcher
                 $select
                     ->columns(['count' => new Sql\Expression('COUNT(1)')])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
-                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', ['id' => 'parent_id'])
+                    ->join(
+                        'item_parent_cache',
+                        'picture_item.item_id = item_parent_cache.item_id',
+                        ['id' => 'parent_id']
+                    )
                     ->where([new Sql\Predicate\In('item_parent_cache.parent_id', $itemIds)])
                     ->group('item_parent_cache.parent_id');
             }

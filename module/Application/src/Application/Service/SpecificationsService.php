@@ -418,7 +418,7 @@ class SpecificationsService
         return $this->translator->translate($this->listOptions[$attributeId][$id], 'default');
     }
 
-    public function getFormData(int $itemId, int $zoneId, \Zend_Db_Table_Row_Abstract $user, $language)
+    public function getFormData(int $itemId, int $zoneId, $user, $language)
     {
         $zoneUserValues = $this->getZoneUsersValues($zoneId, $itemId);
 
@@ -623,7 +623,7 @@ class SpecificationsService
     /**
      * @param int $itemId
      * @param int $zoneId
-     * @param \Zend_Db_Table_Row_Abstract $user
+     * @param array|\ArrayObject $user
      * @param array $options
      * @return AttrsZoneAttributesForm
      */
@@ -681,7 +681,7 @@ class SpecificationsService
 
     public function getCarForm(
         $car,
-        \Zend_Db_Table_Row_Abstract $user,
+        $user,
         array $options,
         string $language
     ) {
@@ -916,7 +916,7 @@ class SpecificationsService
     public function saveCarAttributes(
         $car,
         array $values,
-        \Zend_Db_Table_Row_Abstract $user
+        $user
     ) {
         $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
 

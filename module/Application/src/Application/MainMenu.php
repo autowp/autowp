@@ -201,10 +201,10 @@ class MainMenu
     }
 
     /**
-     * @param \Zend_Db_Table_Row_Abstract $user
+     * @param array|\ArrayObject $user
      * @return array
      */
-    public function getMenu(\Zend_Db_Table_Row_Abstract $user = null)
+    public function getMenu($user = null)
     {
         $newMessages = 0;
         if ($user) {

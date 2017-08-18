@@ -26,7 +26,7 @@ class User extends AbstractPlugin
     private $users = [];
 
     /**
-     * @var \Zend_Db_Table_Row_Abstract
+     * @var array|\ArrayObject
      */
     private $user = null;
 
@@ -47,7 +47,7 @@ class User extends AbstractPlugin
 
     /**
      * @param int $id
-     * @return \Zend_Db_Table_Row_Abstract
+     * @return array|\ArrayObject
      */
     private function user($id)
     {
@@ -72,7 +72,7 @@ class User extends AbstractPlugin
             $user = $this->getLogedInUser();
         }
 
-        if (! $user instanceof \Zend_Db_Table_Row_Abstract) {
+        if (! ($user instanceof \Zend_Db_Table_Row_Abstract || is_array($user) || $user instanceof \ArrayObject)) {
             $user = $this->user($user);
         }
 
@@ -82,7 +82,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return \Zend_Db_Table_Row_Abstract
+     * @return array|\ArrayObject
      */
     private function getLogedInUser()
     {
@@ -104,7 +104,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return \Zend_Db_Table_Row_Abstract
+     * @return array|\ArrayObject
      */
     public function get()
     {

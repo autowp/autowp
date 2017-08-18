@@ -41,6 +41,7 @@ class ConfigProvider
     {
         return [
             'factories' => [
+                Model\User::class               => Model\UserFactory::class,
                 Model\UserPasswordRemind::class => Model\UserPasswordRemindFactory::class,
                 Model\UserRename::class         => Model\UserRenameFactory::class,
                 Model\UserRemember::class       => Model\UserRememberFactory::class

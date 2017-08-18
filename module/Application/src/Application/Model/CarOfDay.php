@@ -120,8 +120,8 @@ class CarOfDay
             LIMIT 1
         ';
 
-        $stmt = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, 5]);
-        $row = $stmt->execute()->current();
+        $resultSet = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, 5]);
+        $row = $resultSet->current();
 
         return $row ? (int) $row['id'] : 0;
     }
@@ -765,8 +765,8 @@ class CarOfDay
             HAVING p_count >= ?
             LIMIT 1
         ';
-        $stmt = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, $itemId, 3]);
-        $row = $stmt->execute()->current();
+        $resultSet = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, $itemId, 3]);
+        $row = $resultSet->current();
 
         return (bool) $row;
     }

@@ -6,7 +6,6 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Autowp\Traffic\TrafficControl;
-use Autowp\User\Model\DbTable\User;
 
 use Application\Hydrator\Api\RestHydrator;
 
@@ -59,8 +58,6 @@ class TrafficController extends AbstractRestfulController
         }
 
         $data = $this->service->getWhitelistData();
-
-        //$users = new User();
 
         foreach ($data as &$row) {
             //$row['users'] = [];

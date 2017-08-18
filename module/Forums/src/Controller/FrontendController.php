@@ -7,7 +7,7 @@ use Zend\View\Model\JsonModel;
 
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Comments;
 
@@ -36,18 +36,25 @@ class FrontendController extends AbstractActionController
      */
     private $model;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         Forums $model,
         $newTopicForm,
         $commentForm,
         MessageService $message,
-        Comments $comments
+        Comments $comments,
+        User $userModel
     ) {
         $this->model = $model;
         $this->newTopicForm = $newTopicForm;
         $this->commentForm = $commentForm;
         $this->message = $message;
         $this->comments = $comments;
+        $this->userModel = $userModel;
     }
 
     private function prepareThemeList(&$themes)
@@ -87,10 +94,8 @@ class FrontendController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $userTable = new User();
-
         foreach ($data['topics'] as &$topic) {
-            $topic['author'] = $userTable->find($topic['authorId'])->current();
+            $topic['author'] = $this->userModel->getRow($topic['authorId']);
 
             $topic['url'] = $this->topicUrl($topic['id']);
 
@@ -170,15 +175,14 @@ class FrontendController extends AbstractActionController
 
                         $messageUrl = $this->topicMessageUrl($messageId, true);
 
-                        $userTable = new User();
-
                         if ($values['parent_id']) {
                             $authorId = $this->comments->service()->getMessageAuthorId($values['parent_id']);
                             if ($authorId && ($authorId != $user['id'])) {
-                                $parentMessageAuthor = $userTable->fetchRow([
-                                    'id = ?' => $authorId,
-                                    'not deleted'
+                                $parentMessageAuthor = $this->userModel->getRow([
+                                    'id' => (int)$authorId,
+                                    'not_deleted'
                                 ]);
+
                                 if ($parentMessageAuthor) {
                                     $moderUrl = $this->url()->fromRoute('users/user', [
                                         'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
@@ -306,8 +310,7 @@ class FrontendController extends AbstractActionController
     {
         $user = $this->user()->get();
         if ($user) {
-            $userTable = new User();
-            $nextMessageTime = $userTable->getNextMessageTime($user['id']);
+            $nextMessageTime = $this->userModel->getNextMessageTime($user['id']);
             if ($nextMessageTime) {
                 return $nextMessageTime > new DateTime();
             }
@@ -460,10 +463,8 @@ class FrontendController extends AbstractActionController
 
         $topics = $this->model->getSubscribedTopics($user['id']);
 
-        $userTable = new User();
-
         foreach ($topics as &$topic) {
-            $author = $userTable->find($topic['authorId'])->current();
+            $author = $this->userModel->getRow($topic['authorId']);
             $topic['author'] = $author;
             $topic['url'] = $this->topicUrl($topic['id']);
 

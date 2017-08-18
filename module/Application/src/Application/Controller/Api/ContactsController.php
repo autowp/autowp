@@ -2,10 +2,9 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
-use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Contact;
 
@@ -16,9 +15,15 @@ class ContactsController extends AbstractRestfulController
      */
     private $contact;
 
-    public function __construct(Contact $contact)
+    /**
+     * @var TableGateway
+     */
+    private $userTable;
+
+    public function __construct(Contact $contact, TableGateway $userTable)
     {
         $this->contact = $contact;
+        $this->userTable = $userTable;
     }
 
     /**
@@ -41,11 +46,10 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $userTable = new User();
-        $user = $userTable->fetchRow([
+        $user = $this->userTable->select([
             'id = ?' => (int)$id,
             'not deleted'
-        ]);
+        ])->current();
 
         if (! $user) {
             return $this->forbiddenAction();
@@ -77,10 +81,9 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $userTable = new User();
-        $user = $userTable->fetchRow([
-            'id = ?' => (int)$id
-        ]);
+        $user = $this->userTable->select([
+            'id' => (int)$id
+        ])->current();
 
         if (! $user) {
             return $this->forbiddenAction();

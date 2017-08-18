@@ -5,7 +5,7 @@ namespace Application\Form\Element;
 use Zend\Form\Element\Password;
 use Zend\InputFilter\InputProviderInterface;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class UserPassword extends Password implements InputProviderInterface
 {

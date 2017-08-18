@@ -9,19 +9,13 @@ use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Hydrator\Api\RestHydrator;
 use Application\Service\UsersService;
 
 class UserController extends AbstractRestfulController
 {
-    /**
-     * @var User
-     */
-    private $table;
-
     /**
      * @var RestHydrator
      */
@@ -42,18 +36,23 @@ class UserController extends AbstractRestfulController
      */
     private $userService;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         RestHydrator $hydrator,
         InputFilter $listInputFilter,
         InputFilter $putInputFilter,
-        UsersService $userService
+        UsersService $userService,
+        User $userModel
     ) {
         $this->hydrator = $hydrator;
         $this->listInputFilter = $listInputFilter;
         $this->putInputFilter = $putInputFilter;
         $this->userService = $userService;
-
-        $this->table = new User();
+        $this->userModel = $userModel;
     }
 
     public function indexAction()
@@ -68,30 +67,27 @@ class UserController extends AbstractRestfulController
 
         $data = $this->listInputFilter->getValues();
 
-        $select = $this->table->select(true)
-            ->where('not deleted');
+        $filter = [
+            'not_deleted'
+        ];
 
         $search = $data['search'];
         if ($search) {
-            $select->where('name like ?', $search . '%');
+            $filter['search'] = $search . '%';
         }
 
         $id = (int)$data['id'];
         if ($id) {
-            $select->where('id = ?', $id);
+            $filter['id'] = $id;
         }
 
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
-        );
+        $paginator = $this->userModel->getPaginator($filter);
 
         $limit = $data['limit'] ? $data['limit'] : 1;
 
         $paginator
             ->setItemCountPerPage($limit)
             ->setCurrentPageNumber($data['page']);
-
-        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
@@ -100,7 +96,7 @@ class UserController extends AbstractRestfulController
         ]);
 
         $items = [];
-        foreach ($this->table->fetchAll($select) as $row) {
+        foreach ($paginator->getCurrentItems() as $row) {
             $items[] = $this->hydrator->extract($row);
         }
 
@@ -123,7 +119,7 @@ class UserController extends AbstractRestfulController
             $id = $user['id'];
         }
 
-        $row = $this->table->find($id)->current();
+        $row = $this->userModel->getRow((int)$id);
         if (! $row) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }
@@ -149,7 +145,7 @@ class UserController extends AbstractRestfulController
             $id = $user['id'];
         }
 
-        $row = $this->table->find($id)->current();
+        $row = $this->userModel->getRow((int)$id);
         if (! $row) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }
@@ -210,7 +206,7 @@ class UserController extends AbstractRestfulController
             $id = $user['id'];
         }
 
-        $row = $this->table->find($id)->current();
+        $row = $this->userModel->getRow((int)$id);
         if (! $row) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }

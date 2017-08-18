@@ -4,8 +4,6 @@ namespace Application\Hydrator\Api;
 
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 
-use Autowp\User\Model\DbTable\User;
-
 class LogHydrator extends RestHydrator
 {
     /**

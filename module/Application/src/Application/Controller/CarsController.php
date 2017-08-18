@@ -10,7 +10,7 @@ use Zend\View\Model\ViewModel;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Message\MessageService;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\HostManager;
 use Application\Model\Brand;
@@ -72,7 +72,15 @@ class CarsController extends AbstractActionController
      */
     private $userValueTable;
 
+    /**
+     * @var Brand
+     */
     private $brand;
+
+    /**
+     * @var User
+     */
+    private $userModel;
 
     public function __construct(
         HostManager $hostManager,
@@ -85,7 +93,8 @@ class CarsController extends AbstractActionController
         Picture $picture,
         TableGateway $attributeTable,
         TableGateway $userValueTable,
-        Brand $brand
+        Brand $brand,
+        User $userModel
     ) {
 
         $this->hostManager = $hostManager;
@@ -99,6 +108,7 @@ class CarsController extends AbstractActionController
         $this->attributeTable = $attributeTable;
         $this->userValueTable = $userValueTable;
         $this->brand = $brand;
+        $this->userModel = $userModel;
     }
 
     private function carModerUrl($item, $uri = null)
@@ -156,17 +166,15 @@ class CarsController extends AbstractActionController
             if ($carForm->isValid()) {
                 $this->specsService->saveCarAttributes($car, $carForm->getData(), $user);
 
-                $userTable = new User();
-                $userTable->invalidateSpecsVolume($user['id']);
+                $this->userModel->invalidateSpecsVolume($user['id']);
 
                 $contribPairs = $this->specsService->getContributors([$car['id']]);
                 $contributors = [];
                 if ($contribPairs) {
-                    $contributors = $userTable->fetchAll(
-                        $userTable->select(true)
-                            ->where('id IN (?)', array_keys($contribPairs))
-                            ->where('not deleted')
-                    );
+                    $contributors = $this->userModel->getRows([
+                        'id' => array_keys($contribPairs),
+                        'not_deleted'
+                    ]);
                 }
 
                 foreach ($contributors as $contributor) {
@@ -387,8 +395,6 @@ class CarsController extends AbstractActionController
 
         $itemId = (int)$this->params('item_id');
 
-        $userTable = new User();
-
         $select = new Sql\Select($this->userValueTable->getTable());
         $select->where(['item_id' => $itemId])
             ->order('update_date');
@@ -400,7 +406,7 @@ class CarsController extends AbstractActionController
         $values = [];
         foreach ($rows as $row) {
             $attribute = $this->attributeTable->select(['id' => $row['attribute_id']])->current();
-            $user = $userTable->find($row['user_id'])->current();
+            $user = $this->userModel->getRow((int)$row['user_id']);
             $unit = $this->specsService->getUnit($attribute['unit_id']);
             $date = Row::getDateTimeByColumnType('timestamp', $row['update_date']);
             $values[] = [
@@ -502,8 +508,6 @@ class CarsController extends AbstractActionController
 
         $items = [];
 
-        $userTable = new User();
-
         $isModerator = $this->user()->inheritsRole('moder');
 
         foreach ($paginator->getCurrentItems() as $row) {
@@ -537,7 +541,7 @@ class CarsController extends AbstractActionController
                 $path = array_reverse($parents);
             }
 
-            $user = $userTable->find($row['user_id'])->current();
+            $user = $this->userModel->getRow((int)$row['user_id']);
 
             $items[] = [
                 'date'     => Row::getDateTimeByColumnType('timestamp', $row['update_date']),
@@ -566,7 +570,7 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    private function userUrl(\Zend_Db_Table_Row_Abstract $user, $uri = null)
+    private function userUrl($user, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']

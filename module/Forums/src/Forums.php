@@ -638,7 +638,7 @@ class Forums
         $messages = $this->comments->get(
             \Application\Comments::FORUMS_TYPE_ID,
             $topic['id'],
-            $userId,
+            $userId ? $userId : 0,
             self::TOPICS_PER_PAGE,
             $page
         );

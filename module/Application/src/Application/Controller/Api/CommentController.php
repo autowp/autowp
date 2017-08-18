@@ -3,12 +3,11 @@
 namespace Application\Controller\Api;
 
 use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Http\Request;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
-use Autowp\User\Model\DbTable\User;
 
 use Application\Comments;
 use Application\Hydrator\Api\RestHydrator;
@@ -30,11 +29,21 @@ class CommentController extends AbstractRestfulController
      */
     private $hydrator;
 
-    public function __construct(Comments $comments, Form $form, RestHydrator $hydrator)
-    {
+    /**
+     * @var TableGateway
+     */
+    private $userTable;
+
+    public function __construct(
+        Comments $comments,
+        Form $form,
+        RestHydrator $hydrator,
+        TableGateway $userTable
+    ) {
         $this->comments = $comments;
         $this->form = $form;
         $this->hydrator = $hydrator;
+        $this->userTable = $userTable;
     }
 
     public function subscribeAction()
@@ -77,8 +86,6 @@ class CommentController extends AbstractRestfulController
 
         $user = $this->user()->get();
 
-        $userTable = new User();
-
         $options = [
             'order' => 'comment_message.datetime DESC'
         ];
@@ -94,9 +101,9 @@ class CommentController extends AbstractRestfulController
 
         if ($values['user']) {
             if (! is_numeric($values['user'])) {
-                $userRow = $userTable->fetchRow([
-                    'identity = ?' => $values['user']
-                ]);
+                $userRow = $this->userTable->select([
+                    'identity' => $values['user']
+                ])->current();
                 if ($userRow) {
                     $values['user'] = $userRow['id'];
                 }

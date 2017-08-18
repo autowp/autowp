@@ -10,7 +10,7 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\DbTable\User as UserTable;
+use Autowp\User\Model\User;
 
 use Application\ItemNameFormatter;
 use Application\Model\Brand;
@@ -116,6 +116,11 @@ class Pic extends AbstractPlugin
      */
     private $picture;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -135,7 +140,8 @@ class Pic extends AbstractPlugin
         PictureModerVote $pictureModerVote,
         TableGateway $modificationTable,
         Brand $brand,
-        Picture $picture
+        Picture $picture,
+        User $userModel
     ) {
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -156,6 +162,7 @@ class Pic extends AbstractPlugin
         $this->modificationTable = $modificationTable;
         $this->brand = $brand;
         $this->picture = $picture;
+        $this->userModel = $userModel;
     }
 
     public function href($row, array $options = [])
@@ -944,14 +951,12 @@ class Pic extends AbstractPlugin
             $moderLinks = $this->getModerLinks($picture);
         }
 
-        $userTable = new UserTable();
-
         $moderVotes = [];
         foreach ($this->pictureModerVote->getVotes($picture['id']) as $moderVote) {
             $moderVotes[] = [
                 'vote'   => $moderVote['vote'],
                 'reason' => $moderVote['reason'],
-                'user'   => $userTable->find($moderVote['user_id'])->current()
+                'user'   => $this->userModel->getRow((int)$moderVote['user_id'])
             ];
         }
 
@@ -1110,7 +1115,7 @@ class Pic extends AbstractPlugin
             'identity'          => $picture['identity'],
             'name'              => $name,
             'picture'           => $picture,
-            'owner'             => $userTable->find((int)$picture['owner_id'])->current(),
+            'owner'             => $this->userModel->getRow((int)$picture['owner_id']),
             'addDate'           => Row::getDateTimeByColumnType('timestamp', $picture['add_date']),
             'ofLinks'           => $ofLinks,
             'moderVotes'        => $moderVotes,

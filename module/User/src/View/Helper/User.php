@@ -54,7 +54,7 @@ class User extends AbstractHelper
             $user = $this->getLogedInUser();
         }
 
-        if (! $user instanceof \Zend_Db_Table_Row_Abstract) {
+        if (! ($user instanceof \Zend_Db_Table_Row_Abstract || $user instanceof \ArrayObject || is_array($user))) {
             $user = $this->user($user);
         }
 
@@ -64,7 +64,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return \Zend_Db_Table_Row_Abstract|bool
+     * @return array|\ArrayObject|bool
      */
     private function getLogedInUser()
     {
@@ -86,7 +86,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return \Zend_Db_Table_Row_Abstract
+     * @return array|\ArrayObject
      */
     public function get()
     {

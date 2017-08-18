@@ -8,8 +8,6 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
-use Autowp\User\Model\DbTable\User;
-
 class PictureModerVoteTemplateController extends AbstractRestfulController
 {
     /**

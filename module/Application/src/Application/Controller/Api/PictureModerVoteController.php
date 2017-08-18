@@ -8,7 +8,7 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Autowp\Message\MessageService;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\HostManager;
 use Application\Model\Picture;
@@ -50,7 +50,7 @@ class PictureModerVoteController extends AbstractRestfulController
     /**
      * @var User
      */
-    private $userTable;
+    private $userModel;
 
     public function __construct(
         HostManager $hostManager,
@@ -59,7 +59,8 @@ class PictureModerVoteController extends AbstractRestfulController
         UserPicture $userPicture,
         PictureModerVote $pictureModerVote,
         Picture $picture,
-        TableGateway $templateTable
+        TableGateway $templateTable,
+        User $userModel
     ) {
         $this->hostManager = $hostManager;
         $this->message = $message;
@@ -68,7 +69,7 @@ class PictureModerVoteController extends AbstractRestfulController
         $this->userPicture = $userPicture;
         $this->pictureModerVote = $pictureModerVote;
         $this->picture = $picture;
-        $this->userTable = new User();
+        $this->userModel = $userModel;
     }
 
     private function pictureUrl($picture, $forceCanonical = false, $uri = null)
@@ -81,7 +82,7 @@ class PictureModerVoteController extends AbstractRestfulController
 
     private function notifyVote($picture, $vote, $reason)
     {
-        $owner = $this->userTable->find((int)$picture['owner_id'])->current();
+        $owner = $this->userModel->getRow((int)$picture['owner_id']);
         $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
         if ($ownerIsModer) {
             if ($owner['id'] != $this->user()->get()['id']) {
@@ -131,7 +132,8 @@ class PictureModerVoteController extends AbstractRestfulController
 
         $pictureUrl = $this->pic()->url($picture['identity'], true);
         if ($previousStatusUserId != $user['id']) {
-            foreach ($this->userTable->find($previousStatusUserId) as $prevUser) {
+            $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
+            if ($prevUser) {
                 $message = sprintf(
                     'С картинки %s снят статус "принято"',
                     $pictureUrl

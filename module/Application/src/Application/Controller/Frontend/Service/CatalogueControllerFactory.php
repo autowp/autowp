@@ -32,7 +32,8 @@ class CatalogueControllerFactory implements FactoryInterface
             $container->get(\Application\Model\Picture::class),
             $tables->get('modification'),
             $tables->get('modification_group'),
-            $container->get(\Application\Model\Brand::class)
+            $container->get(\Application\Model\Brand::class),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

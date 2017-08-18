@@ -3,9 +3,7 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Paginator\Paginator;
-
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
+use Zend\Paginator;
 
 use Application\ItemNameFormatter;
 use Application\Model\Item;
@@ -95,8 +93,8 @@ class NewController extends AbstractActionController
 
         $select = $service->getCurrentDateSelect();
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->picture->getTable()->getAdapter())
         );
         $paginator
             ->setItemCountPerPage(self::PER_PAGE)
@@ -277,10 +275,7 @@ class NewController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $select = $service->getCurrentDateSelect()
-            ->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-        $picturesData = $this->pic()->listData($select, [
+        $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
             'width' => 6
         ]);
 

@@ -208,11 +208,11 @@ class UsersService
     }
 
     /**
-     * @param \Zend_Db_Table_Row_Abstract $user
+     * @param array|\ArrayObject $user
      * @param string $email
      * @param string $language
      */
-    public function changeEmailStart(\Zend_Db_Table_Row_Abstract $user, $email, $language)
+    public function changeEmailStart($user, $email, $language)
     {
         $host = $this->getHostOptions($language);
 
@@ -227,7 +227,7 @@ class UsersService
 
     /**
      * @param string $code
-     * @return boolean|\Zend_Db_Table_Row_Abstract
+     * @return boolean|array|\ArrayObject
      */
     public function emailChangeFinish($code)
     {
@@ -255,10 +255,10 @@ class UsersService
     }
 
     /**
-     * @param \Zend_Db_Table_Row_Abstract $user
+     * @param array|\ArrayObject $user
      * @param string $hostname
      */
-    public function sendRegistrationConfirmEmail(\Zend_Db_Table_Row_Abstract $user, $hostname)
+    public function sendRegistrationConfirmEmail($user, $hostname)
     {
         if ($user['email_to_check'] && $user['email_check_code']) {
             $values = [
@@ -292,10 +292,10 @@ class UsersService
     }
 
     /**
-     * @param \Zend_Db_Table_Row_Abstract $user
+     * @param array|\ArrayObject $user
      * @param string $hostname
      */
-    public function sendChangeConfirmEmail(\Zend_Db_Table_Row_Abstract $user, $hostname)
+    public function sendChangeConfirmEmail($user, $hostname)
     {
         if ($user['email_to_check'] && $user['email_check_code']) {
             $values = [
@@ -404,7 +404,7 @@ class UsersService
         ]);
     }
 
-    public function setPassword(\Zend_Db_Table_Row_Abstract $user, $password)
+    public function setPassword($user, $password)
     {
         $passwordExpr = $this->passwordHashExpr($password);
 

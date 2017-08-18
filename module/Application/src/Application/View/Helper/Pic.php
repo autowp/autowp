@@ -10,7 +10,7 @@ use Application\PictureNameFormatter;
 class Pic extends AbstractHtmlElement
 {
     /**
-     * @var \Zend_Db_Table_Row_Abstract
+     * @var array|\ArrayObject
      */
     private $picture = null;
 
@@ -61,9 +61,7 @@ class Pic extends AbstractHtmlElement
 
     public function name($pictureRow, $language)
     {
-        if ($pictureRow instanceof \Zend_Db_Table_Row_Abstract) {
-            $pictureRow = $pictureRow->toArray();
-        } elseif ($pictureRow instanceof \ArrayObject) {
+        if ($pictureRow instanceof \ArrayObject) {
             $pictureRow = (array)$pictureRow;
         }
 

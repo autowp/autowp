@@ -9,7 +9,6 @@ use Zend\Paginator;
 use Zend\View\Model\JsonModel;
 
 use Autowp\Message\MessageService;
-use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
@@ -420,12 +419,12 @@ class ItemParentController extends AbstractRestfulController
     }
 
     /**
-     * @param \Zend_Db_Table_Row_Abstract $user
+     * @param array|\ArrayObject $user
      * @param bool $full
      * @param \Zend\Uri\Uri $uri
      * @return string
      */
-    private function userModerUrl(\Zend_Db_Table_Row_Abstract $user, $full = false, $uri = null)
+    private function userModerUrl($user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']

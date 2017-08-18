@@ -519,7 +519,12 @@ class Picture
                     $select->order(['pictures.add_date ASC', 'pictures.id ASC']);
                     break;
                 case 'resolution_desc':
-                    $select->order(['pictures.width DESC', 'pictures.height DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
+                    $select->order([
+                        'pictures.width DESC',
+                        'pictures.height DESC',
+                        'pictures.add_date DESC',
+                        'pictures.id DESC'
+                    ]);
                     break;
                 case 'resolution_asc':
                     $select->order(['pictures.width', 'pictures.height']);
@@ -550,11 +555,19 @@ class Picture
                     break;
                 case 'likes':
                     $joinLeftVotesSummary = true;
-                    $select->order(['picture_vote_summary.positive DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
+                    $select->order([
+                        'picture_vote_summary.positive DESC',
+                        'pictures.add_date DESC',
+                        'pictures.id DESC'
+                    ]);
                     break;
                 case 'dislikes':
                     $joinLeftVotesSummary = true;
-                    $select->order(['picture_vote_summary.negative DESC', 'pictures.add_date DESC', 'pictures.id DESC']);
+                    $select->order([
+                        'picture_vote_summary.negative DESC',
+                        'pictures.add_date DESC',
+                        'pictures.id DESC'
+                    ]);
                     break;
                 case 'status':
                     $select->order('pictures.status');
@@ -632,7 +645,12 @@ class Picture
         if ($joinVotesSummary) {
             $select->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', []);
         } elseif ($joinLeftVotesSummary) {
-            $select->join('picture_vote_summary', 'pictures.id = picture_vote_summary.picture_id', [], $select::JOIN_LEFT);
+            $select->join(
+                'picture_vote_summary',
+                'pictures.id = picture_vote_summary.picture_id',
+                [],
+                $select::JOIN_LEFT
+            );
         }
 
 
@@ -934,9 +952,7 @@ class Picture
 
     public function cropParametersExists($row)
     {
-        if ($row instanceof \Zend_Db_Table_Row_Abstract) {
-            $row = $row->toArray();
-        } elseif ($row instanceof \ArrayObject) {
+        if ($row instanceof \ArrayObject) {
             $row = (array)$row;
         }
 
