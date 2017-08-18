@@ -62,10 +62,11 @@ class NewController extends AbstractActionController
     public function indexAction()
     {
         $service = new DayPictures([
+            'picture'      => $this->picture,
             'timezone'     => $this->user()->timezone(),
             'dbTimezone'   => MYSQL_TIMEZONE,
-            'select'       => $this->picture->getPictureTable()->select(true)
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED),
+            'select'       => $this->picture->getTable()->getSql()->select()
+                ->where(['pictures.status' => Picture::STATUS_ACCEPTED]),
             'orderColumn'  => 'accept_datetime',
             'currentDate'  => $this->params('date'),
         ]);
@@ -252,12 +253,15 @@ class NewController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $select = $this->picture->getPictureTable()->select(true)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->where('picture_item.item_id = ?', $item['id'])
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED);
+        $select = $this->picture->getTable()->getSql()->select()
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
+            ->where([
+                'picture_item.item_id' => $item['id'],
+                'pictures.status'      => Picture::STATUS_ACCEPTED
+            ]);
 
         $service = new DayPictures([
+            'picture'      => $this->picture,
             'timezone'     => $this->user()->timezone(),
             'dbTimezone'   => MYSQL_TIMEZONE,
             'select'       => $select,

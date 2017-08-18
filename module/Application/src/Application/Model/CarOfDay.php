@@ -602,7 +602,6 @@ class CarOfDay
         }
 
         if (count($left) > 0) {
-
             $rows = $this->picture->getRows([
                 'id_exclude' => $usedIds,
                 'status'     => Picture::STATUS_ACCEPTED,

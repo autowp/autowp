@@ -87,19 +87,20 @@ class InboxController extends AbstractActionController
 
         $brand = $this->brand->getBrandByCatname((string)$this->params('brand'), $language);
 
-        $select = $this->picture->getPictureTable()->select(true)
-            ->where('pictures.status = ?', Picture::STATUS_INBOX);
+        $select = $this->picture->getTable()->getSql()->select()
+            ->where(['pictures.status' => Picture::STATUS_INBOX]);
         if ($brand) {
             $select
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $brand['id'])
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
+                ->where(['item_parent_cache.parent_id' => $brand['id']])
                 ->group('pictures.id');
         }
 
         $brandCatname = $brand ? $brand['catname'] : self::BRAND_ALL;
 
         $service = new DayPictures([
+            'picture'      => $this->picture,
             'timezone'     => $this->user()->timezone(),
             'dbTimezone'   => MYSQL_TIMEZONE,
             'select'       => $select,

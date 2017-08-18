@@ -78,6 +78,7 @@ class TableManager implements ServiceLocatorInterface
         'perspectives_pages' => [],
         'pictures' => [], //TODO: rename to picture
         'pictures_moder_votes' => [],
+        'picture_item' => [],
         'picture_moder_vote_template' => [],
         'picture_view' => [],
         'picture_vote' => [],

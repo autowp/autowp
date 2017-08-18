@@ -31,7 +31,6 @@ class ModerMenu extends AbstractHtmlElement
         $items = [];
 
         if ($this->view->user()->inheritsRole('moder')) {
-
             $inboxCount = $this->picture->getCount([
                 'status' => Picture::STATUS_INBOX
             ]);

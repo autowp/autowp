@@ -17,7 +17,8 @@ class PictureFactory implements FactoryInterface
             $tables->get('pictures'),
             $tables->get('item'),
             $container->get(\Application\Model\PictureModerVote::class),
-            $container->get(\Application\Model\DbTable\Picture::class)
+            $tables->get('picture_item'),
+            $container->get(\Application\Model\Perspective::class)
         );
     }
 }

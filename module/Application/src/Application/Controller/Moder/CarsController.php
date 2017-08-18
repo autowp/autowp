@@ -207,7 +207,6 @@ class CarsController extends AbstractActionController
             $picture = (array)$this->params('picture', []);
 
             foreach ($picture as $pictureId => $modificationIds) {
-
                 $pictureRow = $this->picture->getRow([
                     'id' => (int)$pictureId,
                     'item' => [

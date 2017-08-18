@@ -124,7 +124,6 @@ class Maintenance extends AbstractListenerAggregate
 
                 $imageId = $picture['image_id'];
                 if ($imageId) {
-
                     $pictureModel->getTable()->delete([
                         'id = ?' => $picture['id']
                     ]);

@@ -168,7 +168,6 @@ class PerspectivePictureFetcher extends PictureFetcher
         }
 
         if ($emptyPictures > 0 && ($item['item_type_id'] == Item::ENGINE)) {
-
             $pictureRows = $this->pictureModel->getRows([
                 'status' => Picture::STATUS_ACCEPTED,
                 'item'   => [

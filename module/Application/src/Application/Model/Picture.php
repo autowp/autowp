@@ -10,8 +10,8 @@ use Zend\Paginator;
 use Autowp\Image;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
-use Application\Model\DbTable;
 use Application\Model\Item as ItemModel;
+use Application\Model\Perspective;
 
 class Picture
 {
@@ -40,21 +40,24 @@ class Picture
      */
     private $pictureModerVote;
 
-    /**
-     * @var DbTable\Picture
-     */
-    private $pictureTable;
+    private $pictureItemTable;
+
+    private $prefixedPerspectives = [5, 6, 17, 20, 21, 22, 23, 24];
+
+    private $perspective;
 
     public function __construct(
         TableGateway $table,
         TableGateway $itemTable,
         PictureModerVote $pictureModerVote,
-        DbTable\Picture $pictureTable
+        TableGateway $pictureItemTable,
+        Perspective $perspective
     ) {
         $this->table = $table;
         $this->itemTable = $itemTable;
         $this->pictureModerVote = $pictureModerVote;
-        $this->pictureTable = $pictureTable;
+        $this->pictureItemTable = $pictureItemTable;
+        $this->perspective = $perspective;
     }
 
     private function applyIdFilter(Sql\Select $select, $value, string $id)
@@ -131,7 +134,6 @@ class Picture
         }
 
         if ($options['link_type']) {
-
             if (! in_array(ItemParent::TYPE_SPORT, $options['link_type'])) {
                 $select->where(['not item_parent_cache.sport']);
             }
@@ -506,7 +508,6 @@ class Picture
         if (is_array($options['order'])) {
             $select->order($options['order']);
         } else {
-
             switch ($options['order']) {
                 case 'accept_datetime_desc':
                     $select->order(['accept_datetime desc', 'pictures.add_date DESC', 'pictures.id DESC']);
@@ -914,16 +915,6 @@ class Picture
         return Rand::getString(1, $alpha) . Rand::getString(self::IDENTITY_LENGTH - 1, $alpha . $number);
     }
 
-    public function getNameData($rows, array $options = [])
-    {
-        return $this->pictureTable->getNameData($rows, $options);
-    }
-
-    public function getPictureTable(): DbTable\Picture
-    {
-        return $this->pictureTable;
-    }
-
     public function getFormatRequest($row)
     {
         if ($row instanceof \Zend_Db_Table_Row_Abstract) {
@@ -1006,5 +997,115 @@ class Picture
         }
 
         return new Image\Storage\Request($request);
+    }
+
+    public function getNameData($rows, array $options = [])
+    {
+        $result = [];
+
+        $language = isset($options['language']) ? $options['language'] : 'en';
+        $large = isset($options['large']) && $options['large'];
+
+        // prefetch
+        $itemIds = [];
+        $perspectiveIds = [];
+        foreach ($rows as $index => $row) {
+            $pictureItemRows = $this->pictureItemTable->select([
+                'picture_id' => $row['id']
+            ]);
+
+            foreach ($pictureItemRows as $pictureItemRow) {
+                $itemIds[$pictureItemRow['item_id']] = true;
+                if (in_array($pictureItemRow['perspective_id'], $this->prefixedPerspectives)) {
+                    $perspectiveIds[$pictureItemRow['perspective_id']] = true;
+                }
+            }
+        }
+
+        $items = [];
+        if (count($itemIds)) {
+            $columns = [
+                'id',
+                'begin_model_year', 'end_model_year',
+                'body',
+                'name' => new Sql\Expression('if(length(item_language.name) > 0, item_language.name, item.name)'),
+                'begin_year', 'end_year', 'today',
+            ];
+            if ($large) {
+                $columns[] = 'begin_month';
+                $columns[] = 'end_month';
+            }
+
+            $select = new Sql\Select($this->itemTable->getTable());
+            $select->columns($columns)
+                ->where([new Sql\Predicate\In('item.id', array_keys($itemIds))])
+                ->join('spec', 'item.spec_id = spec.id', [
+                    'spec'      => 'short_name',
+                    'spec_full' => 'name',
+                ], $select::JOIN_LEFT)
+                ->join(
+                    'item_language',
+                    new Sql\Expression(
+                        'item.id = item_language.item_id and item_language.language = ?',
+                        [$language]
+                    ),
+                    [],
+                    $select::JOIN_LEFT
+                );
+
+            foreach ($this->itemTable->selectWith($select) as $row) {
+                $data = [
+                    'begin_model_year' => $row['begin_model_year'],
+                    'end_model_year'   => $row['end_model_year'],
+                    'spec'             => $row['spec'],
+                    'spec_full'        => $row['spec_full'],
+                    'body'             => $row['body'],
+                    'name'             => $row['name'],
+                    'begin_year'       => $row['begin_year'],
+                    'end_year'         => $row['end_year'],
+                    'today'            => $row['today']
+                ];
+                if ($large) {
+                    $data['begin_month'] = $row['begin_month'];
+                    $data['end_month'] = $row['end_month'];
+                }
+                $items[$row['id']] = $data;
+            }
+        }
+
+        $perspectives = $this->perspective->getOnlyPairs(array_keys($perspectiveIds));
+
+        foreach ($rows as $index => $row) {
+            if ($row['name']) {
+                $result[$row['id']] = [
+                    'name' => $row['name']
+                ];
+                continue;
+            }
+
+            $pictureItemRows = $this->pictureItemTable->select([
+                'picture_id' => $row['id']
+            ]);
+
+            $resultItems = [];
+            foreach ($pictureItemRows as $pictureItemRow) {
+                $itemId = $pictureItemRow['item_id'];
+                $perspectiveId = $pictureItemRow['perspective_id'];
+
+                $item = isset($items[$itemId]) ? $items[$itemId] : [];
+
+                $resultItems[] = array_replace($item, [
+                    'perspective' => isset($perspectives[$perspectiveId])
+                        ? $perspectives[$perspectiveId]
+                        : null
+                ]);
+            }
+
+            $result[$row['id']] = [
+                'items' => $resultItems
+            ];
+        }
+
+        return $result;
     }
 }

@@ -10,7 +10,6 @@ use Zend\View\Model\ViewModel;
 use Zend\Paginator\Paginator;
 
 use Autowp\Comments;
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\ItemNameFormatter;
@@ -396,21 +395,18 @@ class CatalogueController extends AbstractActionController
                     'width' => 4,
                     'url'   => function ($picture) use ($brand) {
 
-                        $db = $this->picture->getPictureTable()->getAdapter();
+                        $row = $this->itemModel->getRow([
+                            'ancestor_or_self' => $brand['id'],
+                            'pictures'         => [
+                                'id' => $picture['id']
+                            ]
+                        ]);
 
-                        $carId = $db->fetchOne(
-                            $db->select()
-                                ->from('picture_item', 'item_id')
-                                ->where('picture_item.picture_id = ?', $picture['id'])
-                                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                                ->where('item_parent_cache.parent_id = ?', $brand['id'])
-                        );
-
-                        if (! $carId) {
+                        if (! $row) {
                             return $this->pic()->url($picture['identity']);
                         }
 
-                        $paths = $this->catalogue()->getCataloguePaths($carId, [
+                        $paths = $this->catalogue()->getCataloguePaths($row['id'], [
                             'toBrand'      => $brand['id'],
                             'breakOnFirst' => true
                         ]);
@@ -1020,8 +1016,6 @@ class CatalogueController extends AbstractActionController
 
     private function brandItemGroupModifications(int $carId, int $groupId, int $modificationId)
     {
-        $db = $this->picture->getPictureTable()->getAdapter();
-
         $select = new Sql\Select($this->modificationTable->getTable());
         $select->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
             ->where(['item_parent_cache.item_id' => $carId])
@@ -1035,21 +1029,20 @@ class CatalogueController extends AbstractActionController
 
         $modifications = [];
         foreach ($this->modificationTable->selectWith($select) as $mRow) {
+            $count = $this->picture->getCount([
+                'item' => [
+                    'ancestor_or_self' => $carId
+                ],
+                'modification' => $mRow['id']
+            ]);
+
             $modifications[] = [
                 'name'      => $mRow['name'],
                 'url'       => $this->url()->fromRoute('catalogue', [
                     'action' => 'brand-item', // -pictures
                     'mod'    => $mRow['id'],
                 ], [], true),
-                'count'     => $db->fetchOne(
-                    $db->select()
-                        ->from('modification_picture', 'count(1)')
-                        ->where('modification_picture.modification_id = ?', $mRow['id'])
-                        ->join('pictures', 'modification_picture.picture_id = pictures.id', null)
-                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                        ->where('item_parent_cache.parent_id = ?', $carId)
-                ),
+                'count'     => $count,
                 'active' => $mRow['id'] == $modificationId
             ];
         }
@@ -1098,24 +1091,24 @@ class CatalogueController extends AbstractActionController
         return $modificationGroups;
     }
 
-    private function getModgroupPicturesSelect(int $carId, int $modId)
+    private function getModgroupPicturesSelect(int $carId, int $modId): Sql\Select
     {
-        $db = $this->picture->getPictureTable()->getAdapter();
+        $select = $this->picture->getTable()->getSql()->select();
 
-        return $db->select()
-            ->from(
-                'pictures',
-                [
+        return $select->columns(
+            [
                     'id', 'name', 'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
-            )
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->where('item_parent_cache.parent_id = ?', $carId)
-            ->join('modification_picture', 'pictures.id = modification_picture.picture_id', null)
-            ->where('modification_picture.modification_id = ?', $modId)
+        )
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
+            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
+            ->join('modification_picture', 'pictures.id = modification_picture.picture_id', [])
+            ->where([
+                'pictures.status'                      => Picture::STATUS_ACCEPTED,
+                'item_parent_cache.parent_id'          => $carId,
+                'modification_picture.modification_id' => $modId
+            ])
             ->limit(1);
     }
 
@@ -1124,16 +1117,14 @@ class CatalogueController extends AbstractActionController
         $pictures = [];
         $usedIds = [];
 
-        $db = $this->picture->getPictureTable()->getAdapter();
-
         foreach ($perspectiveGroupIds as $groupId) {
             $select = $this->getModgroupPicturesSelect($carId, $modId)
                 ->join(
                     ['mp' => 'perspectives_groups_perspectives'],
                     'picture_item.perspective_id = mp.perspective_id',
-                    null
+                    []
                 )
-                ->where('mp.group_id = ?', $groupId)
+                ->where(['mp.group_id' => $groupId])
                 ->order([
                     //'item.is_concept asc',
                     'item_parent_cache.sport asc',
@@ -1162,8 +1153,7 @@ class CatalogueController extends AbstractActionController
                     ->where('pictures.id not in (?)', $usedIds);
             }
 
-
-            $picture = $db->fetchRow($select);
+            $picture = $this->picture->getTable()->selectWith($select)->current();
 
             if ($picture) {
                 $pictures[] = $picture;
@@ -1182,10 +1172,10 @@ class CatalogueController extends AbstractActionController
                         'item_parent_cache.tuning asc'
                     ]);
                 if ($usedIds) {
-                    $select->where('pictures.id not in (?)', $usedIds);
+                    $select->where([new Sql\Predicate\NotIn('pictures.id', $usedIds)]);
                 }
 
-                $picture = $db->fetchRow($select);
+                $picture = $this->picture->getTable()->selectWith($select)->current();
                 if ($picture) {
                     $usedIds[] = $picture['id'];
                 }
@@ -1251,7 +1241,7 @@ class CatalogueController extends AbstractActionController
             $pictureRows = $this->getModgroupPictureList($currentCarId, $modification['id'], $g);
             $select = $this->getModgroupPicturesSelect($currentCarId, $modification['id']);
             $pPaginator = new Paginator(
-                new Zend1DbTableSelect($select)
+                new \Zend\Paginator\Adapter\DbSelect($select, $this->picture->getTable()->getAdapter())
             );
 
             foreach ($pictureRows as $pictureRow) {

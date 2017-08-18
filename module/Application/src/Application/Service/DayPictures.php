@@ -6,10 +6,12 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 
-use Autowp\Commons\Db\Table\Row;
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
+use Zend\Db\Sql;
+use Zend\Paginator;
 
-use Zend_Db_Table_Select;
+use Autowp\Commons\Db\Table\Row;
+
+use Application\Model\Picture;
 
 class DayPictures
 {
@@ -26,7 +28,7 @@ class DayPictures
     private $dbTimezone = 'UTC';
 
     /**
-     * @var Zend_Db_Table_Select
+     * @var Sql\Select
      */
     private $select = null;
 
@@ -66,9 +68,14 @@ class DayPictures
     private $minDate = null;
 
     /**
-     * @var \Zend\Paginator\Paginator
+     * @var Paginator\Paginator
      */
     private $paginator;
+
+    /**
+     * @var Picture
+     */
+    private $picture;
 
     /**
      * @param array $options
@@ -100,6 +107,13 @@ class DayPictures
         return $this;
     }
 
+    public function setPicture(Picture $picture)
+    {
+        $this->picture = $picture;
+
+        return $this;
+    }
+
     /**
      * @param string $timezone
      * @return DayPictures
@@ -123,10 +137,10 @@ class DayPictures
     }
 
     /**
-     * @param Zend_Db_Table_Select $select
+     * @param Sql\Select $select
      * @return DayPictures
      */
-    public function setSelect(Zend_Db_Table_Select $select)
+    public function setSelect(Sql\Select $select)
     {
         $this->select = $select;
 
@@ -235,9 +249,10 @@ class DayPictures
     public function getLastDateStr()
     {
         $select = $this->selectClone()
-            ->order($this->orderColumn . ' desc');
+            ->order($this->orderColumn . ' desc')
+            ->limit(1);
 
-        $lastPicture = $select->getTable()->fetchRow($select);
+        $lastPicture = $this->picture->getTable()->selectWith($select)->current();
         if (! $lastPicture) {
             return null;
         }
@@ -262,17 +277,28 @@ class DayPictures
         }
 
         if ($this->prevDate === null) {
-            $column = $this->quotedOrderColumn();
-
             $select = $this->selectClone()
-                ->where($column . ' < ?', $this->startOfDayDbValue($this->currentDate))
-                ->order($this->orderColumn . ' DESC');
+                ->where([
+                    new Sql\Predicate\Operator(
+                        $this->orderColumn,
+                        Sql\Predicate\Operator::OP_LT,
+                        $this->startOfDayDbValue($this->currentDate)
+                    )
+                ])
+                ->order($this->orderColumn . ' DESC')
+                ->limit(1);
 
             if ($this->minDate) {
-                $select->where($column . ' >= ?', $this->startOfDayDbValue($this->minDate));
+                $select->where([
+                    new Sql\Predicate\Operator(
+                        $this->orderColumn,
+                        Sql\Predicate\Operator::OP_GTE,
+                        $this->startOfDayDbValue($this->minDate)
+                    )
+                ]);
             }
 
-            $prevDatePicture = $select->getTable()->fetchRow($select);
+            $prevDatePicture = $this->picture->getTable()->selectWith($select)->current();
 
             $prevDate = false;
             if ($prevDatePicture) {
@@ -334,13 +360,18 @@ class DayPictures
         }
 
         if ($this->nextDate === null) {
-            $column = $this->quotedOrderColumn();
-
             $select = $this->selectClone()
-                ->where($column . ' > ?', $this->endOfDayDbValue($this->currentDate))
-                ->order($this->orderColumn);
+                ->where([
+                    new Sql\Predicate\Operator(
+                        $this->orderColumn,
+                        Sql\Predicate\Operator::OP_GT,
+                        $this->endOfDayDbValue($this->currentDate)
+                    )
+                ])
+                ->order($this->orderColumn)
+                ->limit(1);
 
-            $nextDatePicture = $select->getTable()->fetchRow($select);
+            $nextDatePicture = $this->picture->getTable()->selectWith($select)->current();
 
             $nextDate = false;
             if ($nextDatePicture) {
@@ -393,7 +424,7 @@ class DayPictures
     }
 
     /**
-     * @return \Zend\Paginator\Paginator|false
+     * @return Paginator\Paginator|false
      */
     public function getPaginator()
     {
@@ -404,8 +435,8 @@ class DayPictures
         if ($this->paginator === null) {
             $select = $this->getCurrentDateSelect();
 
-            $this->paginator = new \Zend\Paginator\Paginator(
-                new Zend1DbTableSelect($select)
+            $this->paginator = new Paginator\Paginator(
+                new Paginator\Adapter\DbSelect($select, $this->picture->getTable()->getAdapter())
             );
         }
 
@@ -418,14 +449,16 @@ class DayPictures
      */
     private function dateCount(DateTime $date)
     {
-        $column = $this->quotedOrderColumn();
+        $select = $this->selectClone()->where([
+            new Sql\Predicate\Between(
+                $this->orderColumn,
+                $this->startOfDayDbValue($date),
+                $this->endOfDayDbValue($date)
+            ),
+        ]);
 
-        $select = $this->selectClone()
-            ->where($column . ' >= ?', $this->startOfDayDbValue($date))
-            ->where($column . ' <= ?', $this->endOfDayDbValue($date));
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->picture->getTable()->getAdapter())
         );
 
         return $paginator->getTotalItemCount();
@@ -484,7 +517,7 @@ class DayPictures
     }
 
     /**
-     * @return Zend_Db_Table_Select
+     * @return Sql\Select
      */
     private function selectClone()
     {
@@ -492,38 +525,26 @@ class DayPictures
     }
 
     /**
-     * @return Zend_Db_Table_Select
+     * @return Sql\Select
      */
     public function getCurrentDateSelect()
     {
-        $column = $this->quotedOrderColumn();
-
         $select = $this->selectClone()
-            ->where($column . ' >= ?', $this->startOfDayDbValue($this->currentDate))
-            ->where($column . ' <= ?', $this->endOfDayDbValue($this->currentDate))
+            ->where([
+                new Sql\Predicate\Between(
+                    $this->orderColumn,
+                    $this->startOfDayDbValue($this->currentDate),
+                    $this->endOfDayDbValue($this->currentDate)
+                )
+            ])
             ->order($this->orderColumn . ' DESC');
 
         if ($this->minDate) {
-            $select->where($column . ' >= ?', $this->startOfDayDbValue($this->minDate));
+            $select->where([
+                $column . ' >= ?' => $this->startOfDayDbValue($this->minDate)
+            ]);
         }
 
         return $select;
-    }
-
-    /**
-     * @return string
-     * @throws Exception
-     */
-    private function quotedOrderColumn()
-    {
-        if (! $this->orderColumn) {
-            throw new Exception('Order column not configured');
-        }
-
-        $db = $this->select->getAdapter();
-
-        $tableName = $this->select->getTable()->info('name');
-
-        return $db->quoteIdentifier($tableName . '.' . $this->orderColumn);
     }
 }
