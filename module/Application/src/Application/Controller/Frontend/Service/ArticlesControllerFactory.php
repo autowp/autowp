@@ -17,7 +17,8 @@ class ArticlesControllerFactory implements FactoryInterface
         $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $tables->get('articles'),
-            $tables->get('htmls')
+            $tables->get('htmls'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

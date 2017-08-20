@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\ItemNameFormatter;
 use Application\Model\Catalogue;
@@ -89,6 +89,11 @@ class ItemHydrator extends RestHydrator
      */
     private $itemParent;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         $serviceManager
     ) {
@@ -98,6 +103,8 @@ class ItemHydrator extends RestHydrator
         $this->picture = $serviceManager->get(Picture::class);
         $this->linkTable = $tables->get('links');
         $this->specTable = $tables->get('spec');
+
+        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $this->perspective = $serviceManager->get(Perspective::class);
         $this->userItemSubscribe = $serviceManager->get(UserItemSubscribe::class);
@@ -607,13 +614,7 @@ class ItemHydrator extends RestHydrator
         }
 
         if (! $this->userRole) {
-            $table = new User();
-            $db = $table->getAdapter();
-            $this->userRole = $db->fetchOne(
-                $db->select()
-                    ->from($table->info('name'), ['role'])
-                    ->where('id = ?', $this->userId)
-            );
+            $this->userRole = $this->userModel->getUserRole($this->userId);
         }
 
         return $this->userRole;

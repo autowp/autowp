@@ -20,7 +20,8 @@ class LogFactory implements FactoryInterface
             $tables->get('log_events_item'),
             $tables->get('log_events_pictures'),
             $tables->get('log_events_user'),
-            $tables->get('item')
+            $tables->get('item'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

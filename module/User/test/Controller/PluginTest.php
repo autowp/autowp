@@ -26,7 +26,10 @@ class PluginTest extends AbstractHttpControllerTestCase
 
         $this->assertFalse($this->getPlugin()->__invoke()->logedIn());
 
-        $adapter = new Id();
+        $serviceManager = $this->getApplicationServiceLocator();
+        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+
+        $adapter = new Id($userModel);
         $adapter->setIdentity(1);
 
         $auth = new AuthenticationService();

@@ -17,7 +17,8 @@ class InfoControllerFactory implements FactoryInterface
         $tables = $container->get(\Application\Db\TableManager::class);
         return new Controller(
             $container->get(\Autowp\TextStorage\Service::class),
-            $tables->get('spec')
+            $tables->get('spec'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

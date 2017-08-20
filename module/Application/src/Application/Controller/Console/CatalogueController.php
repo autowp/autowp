@@ -101,7 +101,7 @@ class CatalogueController extends AbstractActionController
 
         $userId = 9;
 
-        $adapter = new IdAuthAdapter();
+        $adapter = new IdAuthAdapter($this->userModel);
         $adapter->setIdentity($userId);
 
         $auth = new AuthenticationService();

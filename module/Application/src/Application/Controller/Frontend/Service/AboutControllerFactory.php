@@ -18,7 +18,8 @@ class AboutControllerFactory implements FactoryInterface
             $container->get(\Zend\Permissions\Acl\Acl::class),
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get(\Application\Model\Picture::class),
-            $container->get(\Application\Model\Item::class)
+            $container->get(\Application\Model\Item::class),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

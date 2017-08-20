@@ -598,9 +598,9 @@ class ItemParent
 
     public function refreshAllAuto()
     {
-        $itemParentRows = $this->itemParentTable->fetchAll([
+        $itemParentRows = $this->itemParentTable->select([
             'not manual_catname',
-        ], ['parent_id', 'item_id']);
+        ]);
 
         foreach ($itemParentRows as $itemParentRow) {
             $this->refreshAuto($itemParentRow['parent_id'], $itemParentRow['item_id']);

@@ -10,7 +10,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
 
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\ItemNameFormatter;
@@ -19,8 +19,6 @@ use Application\Model\ItemParent;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
 use Application\Spec\Table\Car as CarSpecTable;
-
-use Zend_Db_Expr;
 
 class SpecificationsService
 {
@@ -91,7 +89,7 @@ class SpecificationsService
     /**
      * @var User
      */
-    private $userTable;
+    private $userModel;
 
     /**
      * @var array
@@ -184,6 +182,7 @@ class SpecificationsService
         ItemParent $itemParent,
         Picture $picture,
         VehicleType $vehicleType,
+        User $userModel,
         TableGateway $unitTable,
         TableGateway $listOptionsTable,
         TableGateway $typeTable,
@@ -206,6 +205,7 @@ class SpecificationsService
         $this->itemParent = $itemParent;
         $this->picture = $picture;
         $this->vehicleType = $vehicleType;
+        $this->userModel = $userModel;
 
         $this->unitTable = $unitTable;
         $this->listOptionsTable = $listOptionsTable;
@@ -225,23 +225,13 @@ class SpecificationsService
     }
 
     /**
-     * @return User
-     */
-    private function getUserTable()
-    {
-        return $this->userTable
-            ? $this->userTable
-            : $this->userTable = new User();
-    }
-
-    /**
      * @param int $userId
      * @return array
      */
-    private function getUser($userId)
+    private function getUser(int $userId)
     {
         if (! isset($this->users[$userId])) {
-            $userRow = $this->getUserTable()->find($userId)->current();
+            $userRow = $this->userModel->getRow($userId);
             $this->users[$userId] = $userRow;
         }
 
@@ -1541,11 +1531,6 @@ class SpecificationsService
         $idx = 0;
         $registry = $freshness = $ratios = [];
         foreach ($data as $uid => $valueRows) {
-            /*$user = $uTable->find($uid)->current();
-            if (!$user) {
-                throw new Exception('User not found');
-            }*/
-
             if ($attribute['isMultiple']) {
                 $value = [];
                 foreach ($valueRows as $valueRow) {
@@ -2593,14 +2578,14 @@ class SpecificationsService
 
             $nSelect = 'SELECT abs(sum(weight)) FROM attrs_user_values WHERE user_id = users.id AND weight < 0';
 
-            $expr = new Zend_Db_Expr(
+            $expr = new Sql\Expression(
                 '1.5 * ((1 + IFNULL((' . $pSelect . '), 0)) / (1 + IFNULL((' . $nSelect . '), 0)))'
             );
 
-            $this->getUserTable()->update([
+            $this->userModel->getTable()->update([
                 'specs_weight' => $expr,
             ], [
-                'id IN (?)' => $userId
+                new Sql\Predicate\In('id', $userId)
             ]);
         }
     }
@@ -2749,11 +2734,11 @@ class SpecificationsService
 
         $nSelect = 'SELECT abs(sum(weight)) FROM attrs_user_values WHERE user_id = users.id AND weight < 0';
 
-        $expr = new Zend_Db_Expr(
+        $expr = new Sql\Expression(
             '1.5 * ((1 + IFNULL((' . $pSelect . '), 0)) / (1 + IFNULL((' . $nSelect . '), 0)))'
         );
 
-        $this->getUserTable()->update([
+        $this->userModel->getTable()->update([
             'specs_weight' => $expr
         ], []);
     }
@@ -2761,7 +2746,7 @@ class SpecificationsService
     private function getUserValueWeight(int $userId)
     {
         if (! array_key_exists($userId, $this->valueWeights)) {
-            $userRow = $this->getUserTable()->find($userId)->current();
+            $userRow = $this->userModel->getRow($userId);
             if ($userRow) {
                 $this->valueWeights[$userId] = $userRow['specs_weight'];
             } else {

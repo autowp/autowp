@@ -1,19 +1,20 @@
 <?php
 
-namespace Application\Service;
+namespace Autowp\Traffic\Controller;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class ZF1DbAdapterFactory implements FactoryInterface
+class BanControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $container->get('Config');
-        $resource = new \Zend_Application_Resource_Db($config['zf1db']);
-        return $resource->init();
+        return new BanController(
+            $container->get(\Autowp\Traffic\TrafficControl::class),
+            $container->get(\Autowp\User\Model\User::class)
+        );
     }
 }

@@ -7,7 +7,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Math\Rand;
 
 use Autowp\Message\MessageService;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class MeCommand extends Command
 {
@@ -31,10 +31,16 @@ class MeCommand extends Command
      */
     private $telegramChatTable;
 
-    public function __construct(MessageService $message, TableGateway $telegramChatTable)
+    /**
+     * @var User
+     */
+    private $userModel;
+
+    public function __construct(MessageService $message, TableGateway $telegramChatTable, User $userModel)
     {
         $this->message = $message;
         $this->telegramChatTable = $telegramChatTable;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -46,8 +52,6 @@ class MeCommand extends Command
         if ($args[0] == '') {
             $args = [];
         }
-
-        $userTable = new User();
 
         $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
 
@@ -67,7 +71,7 @@ class MeCommand extends Command
                 return;
             }
 
-            $userRow = $userTable->find($telegramChatRow['user_id'])->current();
+            $userRow = $this->userModel->getRow((int)$telegramChatRow['user_id']);
 
             $this->replyWithMessage([
                 'disable_web_page_preview' => true,
@@ -78,7 +82,7 @@ class MeCommand extends Command
         }
         $userId = (int)$args[0];
 
-        $userRow = $userTable->find($userId)->current();
+        $userRow = $this->userModel->getRow($userId);
 
         if (! $userRow) {
             $this->replyWithMessage([

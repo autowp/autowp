@@ -21,7 +21,8 @@ class CommentsFactory implements FactoryInterface
             $container->get('MvcTranslator'),
             $container->get(\Application\Model\Picture::class),
             $tables->get('articles'),
-            $tables->get('item')
+            $tables->get('item'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

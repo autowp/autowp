@@ -7,7 +7,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
 
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Service\TelegramService;
 
@@ -21,6 +21,11 @@ class MessageService
      */
     private $table;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     const MESSAGES_PER_PAGE = 20;
 
     /**
@@ -28,11 +33,13 @@ class MessageService
      */
     private $telegram;
 
-    public function __construct(TelegramService $telegram, TableGateway $table)
+    public function __construct(TelegramService $telegram, TableGateway $table, User $userModel)
     {
         $this->table = $table;
 
         $this->telegram = $telegram;
+
+        $this->userModel = $userModel;
     }
 
     public function send($fromId, $toId, $message)
@@ -369,11 +376,9 @@ class MessageService
 
         $cache = [];
 
-        $userTable = new User();
-
         $messages = [];
         foreach ($rows as $message) {
-            $author = $userTable->find($message['from_user_id'])->current();
+            $author = $this->userModel->getRow(['id' => (int)$message['from_user_id']]);
 
             $isNew = $message['to_user_id'] == $userId && ! $message['readen'];
             $canDelete = $message['from_user_id'] == $userId || $message['to_user_id'] == $userId;

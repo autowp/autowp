@@ -23,7 +23,8 @@ class IndexControllerFactory implements FactoryInterface
             $container->get(\Application\Model\Twins::class),
             $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\Brand::class)
+            $container->get(\Application\Model\Brand::class),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

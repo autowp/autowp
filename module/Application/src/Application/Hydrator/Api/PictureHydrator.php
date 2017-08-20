@@ -9,7 +9,7 @@ use Zend\Permissions\Acl\Acl;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Comments;
 use Application\DuplicateFinder;
@@ -56,7 +56,7 @@ class PictureHydrator extends RestHydrator
     /**
      * @var User
      */
-    private $userTable;
+    private $userModel;
 
     /**
      * @var DuplicateFinder
@@ -96,7 +96,7 @@ class PictureHydrator extends RestHydrator
         parent::__construct();
 
         $this->picture = $serviceManager->get(Picture::class);
-        $this->userTable = new User();
+        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $this->pictureView = $serviceManager->get(PictureView::class);
         $this->pictureModerVote = $serviceManager->get(PictureModerVote::class);
@@ -303,7 +303,7 @@ class PictureHydrator extends RestHydrator
         if ($this->filterComposite->filter('moder_votes')) {
             $moderVotes = [];
             foreach ($this->pictureModerVote->getVotes($object['id']) as $row) {
-                $user = $this->userTable->find($row['user_id'])->current();
+                $user = $this->userModel->getRow((int)$row['user_id']);
                 $moderVotes[] = [
                     'reason' => $row['reason'],
                     'vote'   => (int)$row['vote'],
@@ -332,7 +332,7 @@ class PictureHydrator extends RestHydrator
 
         $owner = null;
         if ($object['owner_id']) {
-            $owner = $this->userTable->find($object['owner_id'])->current();
+            $owner = $this->userModel->getRow((int)$object['owner_id']);
         }
 
         if ($owner && $this->filterComposite->filter('owner')) {
@@ -385,7 +385,7 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('change_status_user')) {
-            $user = $this->userTable->find((int)$object['change_status_user_id'])->current();
+            $user = $this->userModel->getRow((int)$object['change_status_user_id']);
             $picture['change_status_user'] = $user ? $this->extractValue('change_status_user', $user) : null;
         }
 
@@ -520,13 +520,7 @@ class PictureHydrator extends RestHydrator
         }
 
         if (! $this->userRole) {
-            $table = new User();
-            $db = $table->getAdapter();
-            $this->userRole = $db->fetchOne(
-                $db->select()
-                    ->from($table->info('name'), ['role'])
-                    ->where('id = ?', $this->userId)
-            );
+            $this->userRole = $this->userModel->getUserRole($this->userId);
         }
 
         return $this->userRole;

@@ -6,7 +6,7 @@ use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 use Zend\Authentication\Adapter\Exception\InvalidArgumentException;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class Remember implements AdapterInterface
 {
@@ -22,18 +22,30 @@ class Remember implements AdapterInterface
      */
     private $authenticateResultInfo = null;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
+    public function __construct(User $userModel)
+    {
+        $this->userModel = $userModel;
+    }
+
     public function authenticate()
     {
         $this->authenticateSetup();
 
-        $userTable = new User();
+        $select = $this->userModel->getTable()->getSql()->select();
 
-        $userRow = $userTable->fetchRow(
-            $userTable->select(true)
+        $userRow = $this->userModel->getTable()->selectWith(
+            $select
                 ->join('user_remember', 'users.id = user_remember.user_id', [])
-                ->where('user_remember.token = ?', (string)$this->credential)
-                ->where('not users.deleted')
-        );
+                ->where([
+                    'user_remember.token' => (string)$this->credential,
+                    'not users.deleted'
+                ])
+        )->current();
 
         if (! $userRow) {
             $this->authenticateResultInfo['code'] = Result::FAILURE_IDENTITY_NOT_FOUND;

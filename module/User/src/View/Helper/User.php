@@ -13,9 +13,13 @@ use Zend\View\Exception\InvalidArgumentException;
 use Zend\Permissions\Acl\Acl;
 
 use Autowp\Commons\Db\Table\Row;
+use Autowp\User\Model\User as UserModel;
 
 class User extends AbstractHelper
 {
+    /**
+     * @var UserModel
+     */
     private $userModel;
 
     private $users = [];
@@ -27,9 +31,10 @@ class User extends AbstractHelper
      */
     private $acl;
 
-    public function __construct(Acl $acl)
+    public function __construct(Acl $acl, UserModel $userModel)
     {
         $this->acl = $acl;
+        $this->userModel = $userModel;
     }
 
     private function user($id)
@@ -39,10 +44,7 @@ class User extends AbstractHelper
         }
 
         if (! isset($this->users[$id])) {
-            if (! $this->userModel) {
-                $this->userModel = new \Autowp\User\Model\DbTable\User();
-            }
-            $this->users[$id] = $this->userModel->find($id)->current();
+            $this->users[$id] = $this->userModel->getRow(['id' => (int)$id]);
         }
 
         return $this->users[$id];
@@ -54,7 +56,7 @@ class User extends AbstractHelper
             $user = $this->getLogedInUser();
         }
 
-        if (! ($user instanceof \Zend_Db_Table_Row_Abstract || $user instanceof \ArrayObject || is_array($user))) {
+        if (! ($user instanceof \ArrayObject || is_array($user))) {
             $user = $this->user($user);
         }
 

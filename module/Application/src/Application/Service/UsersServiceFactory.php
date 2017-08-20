@@ -28,7 +28,9 @@ class UsersServiceFactory implements FactoryInterface
             $container->get(\Application\Model\Contact::class),
             $container->get(\Application\Model\UserAccount::class),
             $container->get(\Application\Model\Picture::class),
-            $tables->get('telegram_chat')
+            $tables->get('telegram_chat'),
+            $container->get(\Autowp\User\Model\User::class),
+            $tables->get('log_events_user')
         );
     }
 }

@@ -2,32 +2,9 @@
 
 namespace Application;
 
-use Zend_Cache_Manager;
-
 $host = getenv('AUTOWP_MEMCACHED_HOST');
 
 return [
-    'cachemanager' => [
-        'fast' => [
-            'frontend' => [
-                'name' => 'Core',
-                'customFrontendNaming' => 0,
-                'options' => [
-                    'lifetime' => 1800,
-                    'automatic_serialization' => true
-                ]
-            ],
-            'backend' => [
-                'name' => 'Memcached',
-                'options' => [
-                    'servers' => [
-                        'host' => $host,
-                        'port' => 11211
-                    ]
-                ]
-            ]
-        ]
-    ],
     'caches' => [
         'fastCache' => [
             'adapter' => [
@@ -112,10 +89,5 @@ return [
                 ]
             ],
         ],
-    ],
-    'service_manager' => [
-        'factories' => [
-            Zend_Cache_Manager::class => Service\ZF1CacheManagerFactory::class,
-        ]
     ]
 ];

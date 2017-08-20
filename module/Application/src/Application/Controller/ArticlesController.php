@@ -9,7 +9,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator;
 
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Model\DbTable\Article;
 
@@ -18,10 +18,16 @@ class ArticlesController extends AbstractActionController
     const ARTICLES_PER_PAGE = 10;
     const PREVIEW_CAT_PATH = '/img/articles/preview/';
 
-    public function __construct(TableGateway $table, TableGateway $htmlTable)
+    /**
+     * @var User
+     */
+    private $userModel;
+
+    public function __construct(TableGateway $table, TableGateway $htmlTable, User $userModel)
     {
         $this->table = $table;
         $this->htmlTable = $htmlTable;
+        $this->userModel = $userModel;
     }
 
     public function indexAction()
@@ -39,8 +45,6 @@ class ArticlesController extends AbstractActionController
             ->setItemCountPerPage(self::ARTICLES_PER_PAGE)
             ->setCurrentPageNumber($this->params('page'));
 
-        $userTable = new User();
-
         $articles = [];
         foreach ($paginator->getCurrentItems() as $row) {
             $previewUrl = null;
@@ -51,7 +55,7 @@ class ArticlesController extends AbstractActionController
                 'previewUrl'  => $previewUrl,
                 'name'        => $row['name'],
                 'description' => $row['description'],
-                'author'      => $userTable->find($row['author_id'])->current(),
+                'author'      => $this->userModel->getRow((int)$row['author_id']),
                 'date'        => Row::getDateTimeByColumnType('timestamp', $row['first_enabled_datetime']),
                 'url'         => $this->url()->fromRoute('articles', [
                     'action'          => 'article',

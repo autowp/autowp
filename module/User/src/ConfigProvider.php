@@ -27,7 +27,7 @@ class ConfigProvider
                 'User' => Controller\Plugin\User::class,
             ],
             'factories' => [
-                Controller\Plugin\User::class => Controller\Plugin\Service\UserFactory::class,
+                Controller\Plugin\User::class => Controller\Plugin\UserFactory::class,
             ],
         ];
     }
@@ -60,7 +60,7 @@ class ConfigProvider
                 'User' => View\Helper\User::class,
             ],
             'factories' => [
-                View\Helper\User::class => View\Helper\Service\UserFactory::class,
+                View\Helper\User::class => View\Helper\UserFactory::class,
             ],
         ];
     }

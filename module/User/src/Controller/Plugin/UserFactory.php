@@ -1,19 +1,20 @@
 <?php
 
-namespace Application\Service;
+namespace Autowp\User\Controller\Plugin;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class ZF1CacheManagerFactory implements FactoryInterface
+class UserFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $container->get('Config');
-        $resource = new \Zend_Application_Resource_Cachemanager($config['cachemanager']);
-        return $resource->init();
+        return new User(
+            $container->get(\Zend\Permissions\Acl\Acl::class),
+            $container->get(\Autowp\User\Model\User::class)
+        );
     }
 }

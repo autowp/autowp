@@ -15,7 +15,7 @@ use Zend\View\Model\ViewModel;
 
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 use Autowp\User\Model\UserRemember;
 
 use Application\Model\UserAccount;
@@ -58,6 +58,11 @@ class LoginController extends AbstractActionController
      */
     private $loginStateTable;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         UsersService $service,
         Form $form,
@@ -65,7 +70,8 @@ class LoginController extends AbstractActionController
         array $hosts,
         UserRemember $userRemember,
         UserAccount $userAccount,
-        TableGateway $loginStateTable
+        TableGateway $loginStateTable,
+        User $userModel
     ) {
 
         $this->service = $service;
@@ -75,6 +81,7 @@ class LoginController extends AbstractActionController
         $this->userRemember = $userRemember;
         $this->userAccount = $userAccount;
         $this->loginStateTable = $loginStateTable;
+        $this->userModel = $userModel;
     }
 
     public function indexAction()
@@ -263,13 +270,11 @@ class LoginController extends AbstractActionController
             throw new Exception('name not found');
         }
 
-        $uTable = new User();
-
         $userId = $this->userAccount->getUserId($stateRow['service'], $data->getExternalId());
 
         if (! $userId) {
             if ($stateRow['user_id']) {
-                $uRow = $uTable->find($stateRow['user_id'])->current();
+                $uRow = $this->userModel->getRow((int)$stateRow['user_id']);
                 if (! $uRow) {
                     throw new Exception("Account `{$stateRow['user_id']}` not found");
                 }
@@ -326,7 +331,7 @@ class LoginController extends AbstractActionController
                 }
             }
         } else {
-            $uRow = $uTable->find($userId)->current();
+            $uRow = $this->userModel->getRow((int)$userId);
             if (! $uRow) {
                 throw new Exception('Not linked account row');
             }
@@ -347,7 +352,7 @@ class LoginController extends AbstractActionController
             'state' => $stateRow['state']
         ]);
 
-        $adapter = new IdAuthAdapter();
+        $adapter = new IdAuthAdapter($this->userModel);
         $adapter->setIdentity($uRow['id']);
         $auth = new AuthenticationService();
         $authResult = $auth->authenticate($adapter);

@@ -11,7 +11,7 @@ use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\Comments\CommentsService;
 use Autowp\Message\MessageService;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\HostManager;
 use Application\Model\Item;
@@ -65,6 +65,11 @@ class Comments
      */
     private $itemTable;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         CommentsService $service,
         TreeRouteStack $router,
@@ -73,7 +78,8 @@ class Comments
         $translator,
         Picture $picture,
         TableGateway $articleTable,
-        TableGateway $itemTable
+        TableGateway $itemTable,
+        User $userModel
     ) {
         $this->service = $service;
         $this->router = $router;
@@ -83,6 +89,7 @@ class Comments
         $this->picture = $picture;
         $this->articleTable = $articleTable;
         $this->itemTable = $itemTable;
+        $this->userModel = $userModel;
     }
 
     public function getMessageUrl($messageId, $canonical = false, $uri = null)
@@ -286,16 +293,14 @@ class Comments
             return false;
         }
 
-        $userTable = new User();
-
-        $author = $userTable->find($comment['author_id'])->current();
+        $author = $this->userModel->getRow(['id' => (int)$comment['author_id']]);
 
         if (! $author) {
             return false;
         }
 
         $ids = $this->service->getSubscribersIds($comment['type_id'], $comment['item_id'], true);
-        $subscribers = $userTable->find($ids);
+        $subscribers = $this->userModel->getRows(['id' => $ids]);
 
         foreach ($subscribers as $subscriber) {
             if ($subscriber['id'] == $author['id']) {

@@ -7,7 +7,7 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\HostManager;
 use Application\Model\Item;
@@ -56,6 +56,11 @@ class TelegramService
      */
     private $telegramChatTable;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         array $options,
         TreeRouteStack $router,
@@ -64,7 +69,8 @@ class TelegramService
         Picture $picture,
         Item $item,
         TableGateway $telegramItemTable,
-        TableGateway $telegramChatTable
+        TableGateway $telegramChatTable,
+        User $userModel
     ) {
 
         $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
@@ -78,6 +84,7 @@ class TelegramService
         $this->item = $item;
         $this->telegramItemTable = $telegramItemTable;
         $this->telegramChatTable = $telegramChatTable;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -89,7 +96,11 @@ class TelegramService
 
         $api->addCommands([
             StartCommand::class,
-            new MeCommand($this->serviceManager->get(\Autowp\Message\MessageService::class), $this->telegramChatTable),
+            new MeCommand(
+                $this->serviceManager->get(\Autowp\Message\MessageService::class),
+                $this->telegramChatTable,
+                $this->serviceManager->get(\Autowp\User\Model\User::class)
+            ),
             new NewCommand($this->telegramItemTable, $this->telegramChatTable, $this->item->getTable()),
             new InboxCommand($this->telegramItemTable, $this->telegramChatTable, $this->item->getTable()),
             new MessagesCommand($this->telegramChatTable)
@@ -256,35 +267,34 @@ class TelegramService
 
     private function getUriByChatId($chatId)
     {
-        $userTable = new User();
+        $chat = $this->telegramChatTable->select([
+            'chat_id' => $chatId
+        ])->current();
 
-        $userRow = $userTable->fetchRow(
-            $userTable->select(true)
-                ->join('telegram_chat', 'users.id = telegram_chat.user_id', null)
-                ->where('telegram_chat.chat_id = ?', $chatId)
-        );
+        if ($chat) {
+            $language = $this->userModel->getUserLanguage($chat['user_id']);
 
-        if ($userRow && $userRow['language']) {
-            return $this->hostManager->getUriByLanguage($userRow['language']);
+            if ($language) {
+                return $this->hostManager->getUriByLanguage($language);
+            }
         }
 
         return \Zend\Uri\UriFactory::factory('http://wheelsage.org');
     }
 
-    public function notifyMessage($fromId, $userId, $text)
+    public function notifyMessage($fromId, int $userId, $text)
     {
         $fromName = "New personal message";
 
         if ($fromId) {
-            $userTable = new User();
-            $userRow = $userTable->find($fromId)->current();
+            $userRow = $this->userModel->getRow((int)$fromId);
             if ($userRow) {
                 $fromName = $userRow['name'];
             }
         }
 
         $chatRows = $this->telegramChatTable->select([
-            'user_id' => (int)$userId,
+            'user_id' => $userId,
             'messages'
         ]);
 

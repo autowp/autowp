@@ -9,7 +9,7 @@ use Zend\Router\Http\TreeRouteStack;
 use Zend\Uri;
 use Zend\View\Helper\AbstractHtmlElement;
 
-use Autowp\User\Model\DbTable\User as UserTable;
+use Autowp\User\Model\User as UserModel;
 
 use Application\Model\Picture;
 
@@ -39,10 +39,16 @@ class UserText extends AbstractHtmlElement
      */
     private $picture;
 
-    public function __construct($router, Picture $picture)
+    /**
+     * @var UserModel
+     */
+    private $userModel;
+
+    public function __construct($router, Picture $picture, UserModel $userModel)
     {
         $this->router = $router;
         $this->picture = $picture;
+        $this->userModel = $userModel;
     }
 
     public function __invoke($text)
@@ -171,8 +177,7 @@ class UserText extends AbstractHtmlElement
         }
 
         if ($userId) {
-            $userTable = new UserTable();
-            $user = $userTable->find($userId)->current();
+            $user = $this->userModel->getRow(['id' => (int)$userId]);
 
             if ($user) {
                 return $this->view->user($user)->__toString();
@@ -180,9 +185,8 @@ class UserText extends AbstractHtmlElement
         }
 
         if ($userIdentity) {
-            $userTable = new UserTable();
-            $user = $userTable->fetchRow([
-                'identity = ?' => $userIdentity
+            $user = $this->userModel->getRow([
+                'identity' => (string)$userIdentity
             ]);
 
             if ($user) {

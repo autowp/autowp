@@ -4,7 +4,7 @@ namespace Autowp\Forums;
 
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
@@ -37,15 +37,22 @@ class Forums
      */
     private $comments;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         Comments\CommentsService $comments,
         TableGateway $themeTable,
-        TableGateway $topicTable
+        TableGateway $topicTable,
+        User $userModel
     ) {
         $this->comments = $comments;
 
         $this->themeTable = $themeTable;
         $this->topicTable = $topicTable;
+        $this->userModel = $userModel;
     }
 
     public function getThemeList($themeId, $isModerator)
@@ -63,8 +70,6 @@ class Forums
         if (! $isModerator) {
             $select->where(['not is_moderator']);
         }
-
-        $userTable = new User();
 
         $themes = [];
 
@@ -99,7 +104,7 @@ class Forums
                     $lastMessage = [
                         'id'     => $lastMessageRow['id'],
                         'date'   => Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
-                        'author' => $userTable->find($lastMessageRow['author_id'])->current(),
+                        'author' => $this->userModel->getRow(['id' => (int)$lastMessageRow['author_id']]),
                     ];
                 }
             }
@@ -269,8 +274,6 @@ class Forums
             ->setItemCountPerPage(self::TOPICS_PER_PAGE)
             ->setCurrentPageNumber($page);
 
-        $userTable = new User();
-
         $topics = [];
 
         foreach ($paginator->getCurrentItems() as $topicRow) {
@@ -312,7 +315,7 @@ class Forums
                     $lastMessage = [
                         'id'     => $lastMessageRow['id'],
                         'date'   => Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
-                        'author' => $userTable->find($lastMessageRow['author_id'])->current(),
+                        'author' => $this->userModel->getRow(['id' => (int)$lastMessageRow['author_id']]),
                     ];
                 }
             }
@@ -714,8 +717,6 @@ class Forums
             ->order('comment_topic.last_update DESC');
         $rows = $this->topicTable->selectWith($select);
 
-        $userTable = new User();
-
         $topics = [];
         foreach ($rows as $row) {
             $stat = $this->comments->getTopicStatForUser(
@@ -740,7 +741,7 @@ class Forums
                     $lastMessage = [
                         'id'     => $lastMessageRow['id'],
                         'date'   => Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
-                        'author' => $userTable->find($lastMessageRow['author_id'])->current(),
+                        'author' => $this->userModel->getRow(['id' => (int)$lastMessageRow['author_id']]),
                     ];
                 }
             }

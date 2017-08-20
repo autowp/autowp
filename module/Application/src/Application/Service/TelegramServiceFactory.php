@@ -24,7 +24,8 @@ class TelegramServiceFactory implements FactoryInterface
             $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\Item::class),
             $tables->get('telegram_brand'),
-            $tables->get('telegram_chat')
+            $tables->get('telegram_chat'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

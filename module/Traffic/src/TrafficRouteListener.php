@@ -7,6 +7,8 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Mvc\MvcEvent;
 
+use Autowp\User\Model\User;
+
 class TrafficRouteListener extends AbstractListenerAggregate
 {
     /**
@@ -35,9 +37,8 @@ class TrafficRouteListener extends AbstractListenerAggregate
 
             $unlimitedTraffic = false;
             if ($auth->hasIdentity()) {
-                $userId = $auth->getIdentity();
-                $userTable = new \Autowp\User\Model\DbTable\User();
-                $user = $userTable->find($userId)->current();
+                $userModel = $serviceManager->get(User::class);
+                $user = $userModel->getRow(['id' => (int)$auth->getIdentity()]);
 
                 if ($user) {
                     $acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);

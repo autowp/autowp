@@ -4,6 +4,8 @@ namespace Application\Validator\User;
 
 use Zend\Validator\AbstractValidator;
 
+use Autowp\User\Model\User;
+
 class EmailExists extends AbstractValidator
 {
     const NOT_EXISTS = 'userEmailNotExists';
@@ -12,18 +14,26 @@ class EmailExists extends AbstractValidator
         self::NOT_EXISTS => "E-mail '%value%' not registered"
     ];
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
+    public function setUserModel(User $userModel)
+    {
+        $this->userModel = $userModel;
+
+        return $this;
+    }
+
     public function isValid($value)
     {
         $this->setValue($value);
 
-        $table = new \Autowp\User\Model\DbTable\User();
-        $db = $table->getAdapter();
+        $exists = $this->userModel->isExists([
+            'email' => (string)$value
+        ]);
 
-        $exists = $db->fetchOne(
-            $db->select()
-                ->from($table->info('name'), 'id')
-                ->where('e_mail = ?', $value)
-        );
         if (! $exists) {
             $this->error(self::NOT_EXISTS);
             return false;

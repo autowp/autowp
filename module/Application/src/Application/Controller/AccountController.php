@@ -19,7 +19,7 @@ use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
 
 use Application\Controller\LoginController;
@@ -116,6 +116,11 @@ class AccountController extends AbstractActionController
      */
     private $forums;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         UsersService $service,
         Form $emailForm,
@@ -133,7 +138,8 @@ class AccountController extends AbstractActionController
         Picture $picture,
         TableGateway $loginStateTable,
         Item $item,
-        Forums $forums
+        Forums $forums,
+        User $userModel
     ) {
 
         $this->service = $service;
@@ -153,6 +159,7 @@ class AccountController extends AbstractActionController
         $this->loginStateTable = $loginStateTable;
         $this->item = $item;
         $this->forums = $forums;
+        $this->userModel = $userModel;
     }
 
     private function forwardToLogin()
@@ -195,9 +202,7 @@ class AccountController extends AbstractActionController
             return $this->forwardToLogin();
         }
 
-        $userTable = new User();
-
-        $user = $userTable->find($this->params()->fromPost('user_id'))->current();
+        $user = $this->userModel->getRow((int)$this->params()->fromPost('user_id'));
         if (! $user) {
             return $this->notFoundAction();
         }
@@ -375,11 +380,13 @@ class AccountController extends AbstractActionController
 
                 $oldName = $user['name'];
 
-                $user->setFromArray([
+                $this->userModel->getTable()->update([
                     'name' => $values['name']
-                ])->save();
+                ], [
+                    'id' => $user['id']
+                ]);
 
-                $newName = $user['name'];
+                $newName = $values['name'];
 
                 if ($oldName != $newName) {
                     $this->userRename->add($user['id'], $oldName, $newName);
@@ -536,7 +543,7 @@ class AccountController extends AbstractActionController
 
         if ($user) {
             if (! $this->user()->logedIn()) {
-                $adapter = new IdAuthAdapter();
+                $adapter = new IdAuthAdapter($this->userModel);
                 $adapter->setIdentity($user['id']);
                 $auth = new AuthenticationService();
                 $result = $auth->authenticate($adapter);
@@ -625,9 +632,7 @@ class AccountController extends AbstractActionController
             return $this->forwardToLogin();
         }
 
-        $users = new User();
-
-        $user = $users->find($this->params('user_id'))->current();
+        $user = $this->userModel->getRow((int)$this->params('user_id'));
         if (! $user) {
             return $this->notFoundAction();
         }
@@ -798,11 +803,9 @@ class AccountController extends AbstractActionController
         $conflicts = $data['conflicts'];
         $paginator = $data['paginator'];
 
-        $userTable = new User();
-
         foreach ($conflicts as &$conflict) {
             foreach ($conflict['values'] as &$value) {
-                $value['user'] = $userTable->find($value['userId'])->current();
+                $value['user'] = $this->userModel->getRow((int)$value['userId']);
             }
 
             $car = $this->item->getRow(['id' => $conflict['itemId']]);
@@ -832,14 +835,11 @@ class AccountController extends AbstractActionController
 
         $user = $this->user()->get();
 
-        $userTable = new User();
+        $userRows = $this->userModel->getRows([
+            'in_contacts' => $user['id'],
+            'order'       => ['users.deleted', 'users.name']
+        ]);
 
-        $userRows = $userTable->fetchAll(
-            $userTable->select(true)
-                ->join('contact', 'users.id = contact.contact_user_id', null)
-                ->where('contact.user_id = ?', $user['id'])
-                ->order(['users.deleted', 'users.name'])
-        );
         $users = [];
         foreach ($userRows as $row) {
             $users[] = $row;

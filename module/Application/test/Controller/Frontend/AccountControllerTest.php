@@ -6,7 +6,7 @@ use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Controller\AccountController;
 use Application\Controller\Api\UserController;
@@ -14,7 +14,6 @@ use Application\Controller\RegistrationController;
 use Application\Controller\UsersController;
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\LoginController;
-use Autowp\User\Model\DbTable\User\Remember;
 
 class AccountControllerTest extends AbstractHttpControllerTestCase
 {
@@ -37,12 +36,13 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('index');
 
         // get id
-        $userTable = new User();
-        $userRow = $userTable->fetchRow(
-            $userTable->select(true)
+        $userModel = $this->getApplicationServiceLocator()->get(User::class);
+        $table = $userModel->getTable();
+        $userRow = $table->selectWith(
+            $table->getSql()->select()
                 ->order('id desc')
                 ->limit(1)
-        );
+        )->current();
 
         return $userRow['id'];
     }

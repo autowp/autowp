@@ -2,12 +2,14 @@
 
 namespace Application;
 
+use Locale;
+
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Mvc\MvcEvent;
 
-use Locale;
+use Autowp\User\Model\User;
 
 class LanguageRouteListener extends AbstractListenerAggregate
 {
@@ -63,7 +65,7 @@ class LanguageRouteListener extends AbstractListenerAggregate
             if (in_array($hostname, $this->userDetectable)) {
                 $languageWhitelist = array_keys($hosts);
 
-                $userLanguage = $this->detectUserLanguage($request, $languageWhitelist);
+                $userLanguage = $this->detectUserLanguage($serviceManager, $request, $languageWhitelist);
 
                 if (isset($hosts[$userLanguage])) {
                     $redirectUrl = $request->getUri()->getScheme() . '://' .
@@ -94,40 +96,31 @@ class LanguageRouteListener extends AbstractListenerAggregate
         }
     }
 
-    private function detectUserLanguage($request, $whitelist)
+    private function detectUserLanguage($serviceManager, $request, $whitelist)
     {
-        $result = null;
-
         $auth = new AuthenticationService();
 
         if ($auth->hasIdentity()) {
-            $userTable = new \Autowp\User\Model\DbTable\User();
+            $userModel = $serviceManager->get(User::class);
 
-            $user = $userTable->find($auth->getIdentity())->current();
+            $userLanguage = $userModel->getUserLanguage($auth->getIdentity());
+            if (in_array($userLanguage, $whitelist)) {
+                return $userLanguage;
+            }
+        }
 
-            if ($user) {
-                $isAllowed = in_array($user['language'], $whitelist);
-                if ($isAllowed) {
-                    $result = $user['language'];
+        $acceptLanguage = $request->getServer('HTTP_ACCEPT_LANGUAGE');
+        if ($acceptLanguage) {
+            $locale = Locale::acceptFromHttp($acceptLanguage);
+            if ($locale) {
+                $localeLanguage = Locale::getPrimaryLanguage($locale);
+                if (in_array($localeLanguage, $whitelist)) {
+                    return $localeLanguage;
                 }
             }
         }
 
-        if (! $result) {
-            $acceptLanguage = $request->getServer('HTTP_ACCEPT_LANGUAGE');
-            if ($acceptLanguage) {
-                $locale = Locale::acceptFromHttp($acceptLanguage);
-                if ($locale) {
-                    $localeLanguage = Locale::getPrimaryLanguage($locale);
-                    $isAllowed = in_array($localeLanguage, $whitelist);
-                    if ($isAllowed) {
-                        $result = $localeLanguage;
-                    }
-                }
-            }
-        }
-
-        return $result;
+        return null;
     }
 
     private function redirect(MvcEvent $e, $url)

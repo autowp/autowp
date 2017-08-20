@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 
 use Autowp\Traffic\TrafficControl;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class IpHydrator extends RestHydrator
 {
@@ -23,6 +23,11 @@ class IpHydrator extends RestHydrator
      */
     private $trafficControl;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         $serviceManager
     ) {
@@ -30,6 +35,7 @@ class IpHydrator extends RestHydrator
 
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
         $this->trafficControl = $serviceManager->get(TrafficControl::class);
+        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('user', $strategy);
@@ -96,8 +102,7 @@ class IpHydrator extends RestHydrator
                 $result['blacklist'] = null;
                 $ban = $this->trafficControl->getBanInfo($ip);
                 if ($ban) {
-                    $userTable = new User();
-                    $user = $userTable->find($ban['user_id'])->current();
+                    $user = $this->userModel->getRow((int)$ban['user_id']);
                     $ban['user'] = $user ? $this->extractValue('user', $user) : null;
                     $ban['up_to'] = $this->extractValue('up_to', $ban['up_to']);
 
@@ -149,13 +154,7 @@ class IpHydrator extends RestHydrator
         }
 
         if (! $this->userRole) {
-            $table = new User();
-            $db = $table->getAdapter();
-            $this->userRole = $db->fetchOne(
-                $db->select()
-                    ->from($table->info('name'), ['role'])
-                    ->where('id = ?', $this->userId)
-            );
+            $this->userRole = $this->userModel->getUserRole($this->userId);
         }
 
         return $this->userRole;

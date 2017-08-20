@@ -18,7 +18,8 @@ class CommentsServiceFactory implements FactoryInterface
             $tables->get('comment_topic'),
             $tables->get('comment_message'),
             $tables->get('comment_topic_view'),
-            $tables->get('comment_topic_subscribe')
+            $tables->get('comment_topic_subscribe'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Application\Hydrator\Api;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Comments;
 use Application\Model\Picture;
@@ -19,17 +19,17 @@ class CommentHydrator extends RestHydrator
      */
     private $picture;
 
-    /**
-     * @var User
-     */
-    private $userTable;
-
     private $hydratorManager;
 
     /**
      * @var int|null
      */
     private $userId = null;
+
+    /**
+     * @var User
+     */
+    private $userModel;
 
     public function __construct($serviceManager)
     {
@@ -40,7 +40,7 @@ class CommentHydrator extends RestHydrator
         $this->router = $serviceManager->get('HttpRouter');
 
         $this->picture = $serviceManager->get(Picture::class);
-        $this->userTable = new User();
+        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $this->userId = null;
     }
@@ -120,9 +120,7 @@ class CommentHydrator extends RestHydrator
 
         $user = null;
         if ($object['author_id']) {
-            $userRow = $this->userTable->fetchRow([
-                'id = ?' => $object['author_id']
-            ]);
+            $userRow = $this->userModel->getRow((int) $object['author_id']);
             if ($userRow) {
                 $userHydrator = $this->hydratorManager->get(UserHydrator::class);
                 $user = $userHydrator->extract($userRow);

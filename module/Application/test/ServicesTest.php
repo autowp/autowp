@@ -29,7 +29,6 @@ class ServicesTest extends AbstractHttpControllerTestCase
             [\Autowp\Image\Storage::class],
             [\Application\HostManager::class],
             [\Application\Service\UsersService::class],
-            [\Zend_Db_Adapter_Abstract::class],
             [\Application\Service\TelegramService::class],
             [\Application\LanguagePicker::class],
             [\Application\MainMenu::class],
@@ -38,7 +37,6 @@ class ServicesTest extends AbstractHttpControllerTestCase
             [\Zend\Permissions\Acl\Acl::class],
             [\Application\FileSize::class],
             [\Application\Service\SpecificationsService::class],
-            [\Zend_Cache_Manager::class],
         ];
     }
 }

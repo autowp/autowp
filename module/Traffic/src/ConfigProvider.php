@@ -48,8 +48,8 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                Controller\ConsoleController::class => Controller\Service\ConsoleControllerFactory::class,
-                Controller\BanController::class     => Controller\Service\BanControllerFactory::class,
+                Controller\ConsoleController::class => Controller\ConsoleControllerFactory::class,
+                Controller\BanController::class     => Controller\BanControllerFactory::class,
             ]
         ];
     }

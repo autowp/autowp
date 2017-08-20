@@ -2,9 +2,7 @@
 
 namespace Application\Controller;
 
-use DateInterval;
 use DateTime;
-use DateTimeZone;
 
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -12,7 +10,7 @@ use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
 
 use Autowp\Traffic\TrafficControl;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
 
 use Application\Comments;
@@ -22,8 +20,6 @@ use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\UserAccount;
-
-use Zend_Db_Expr;
 
 class UsersController extends AbstractActionController
 {
@@ -74,6 +70,8 @@ class UsersController extends AbstractActionController
      */
     private $brand;
 
+    private $userModel;
+
     public function __construct(
         $cache,
         TrafficControl $trafficControl,
@@ -84,7 +82,8 @@ class UsersController extends AbstractActionController
         UserAccount $userAccount,
         Picture $picture,
         Item $item,
-        Brand $brand
+        Brand $brand,
+        User $userModel
     ) {
         $this->cache = $cache;
         $this->trafficControl = $trafficControl;
@@ -96,25 +95,24 @@ class UsersController extends AbstractActionController
         $this->picture = $picture;
         $this->item = $item;
         $this->brand = $brand;
+        $this->userModel = $userModel;
     }
 
     private function getUser()
     {
-        $users = new User();
-
         $identity = $this->params('user_id');
 
         if (preg_match('|^user([0-9]+)$|isu', $identity, $match)) {
-            return $users->fetchRow([
-                'id = ?' => (int)$match[1],
-                'identity is null',
-                'not deleted'
+            return $this->userModel->getRow([
+                'id'               => (int)$match[1],
+                'identity_is_null' => true,
+                'not_deleted'      => true
             ]);
         }
 
-        return $users->fetchRow([
-            'identity = ?' => $identity,
-            'not deleted'
+        return $this->userModel->getRow([
+            'identity'   => $identity,
+            'not_deleted' => true
         ]);
     }
 
@@ -142,8 +140,6 @@ class UsersController extends AbstractActionController
 
     public function userAction()
     {
-        $users = new User();
-
         $user = $this->getUser();
 
         if (! $user) {
@@ -190,7 +186,7 @@ class UsersController extends AbstractActionController
             if ($user['last_ip']) {
                 $ban = $this->trafficControl->getBanInfo(inet_ntop($user['last_ip']));
                 if ($ban) {
-                    $ban['user'] = $users->find($ban['user_id'])->current();
+                    $ban['user'] = $this->userModel->getRow((int)$ban['user_id']);
                 }
             }
         }
@@ -315,20 +311,10 @@ class UsersController extends AbstractActionController
 
     public function onlineAction()
     {
-        $userTable = new User();
-
-        $now = new DateTime();
-        $now->setTimezone(new DateTimeZone(MYSQL_TIMEZONE));
-        $now->sub(new DateInterval('PT5M'));
-
         $viewModel = new ViewModel([
-            'users' => $userTable->fetchAll(
-                $userTable->select(true)
-                    ->where('last_online >= ?', $now->format(MYSQL_DATETIME_FORMAT))
-                //->join('session', 'users.id = session.user_id', null)
-                //->where('session.modified >= ?', time() - 5 * 60)
-                //->group('users.id')
-            )
+            'users' => $this->userModel->getRows([
+                'online' => true
+            ])
         ]);
         $viewModel->setTerminal($this->getRequest()->isXmlHttpRequest());
 
@@ -337,20 +323,19 @@ class UsersController extends AbstractActionController
 
     private function specsRating()
     {
-        $userTable = new User();
-
-        $select = $userTable->select(true)
-            ->where('not deleted')
-            ->limit(30)
-            ->where('specs_volume > 0')
-            ->order('specs_volume desc');
+        $rows = $this->userModel->getRows([
+            'not_deleted' => true,
+            'has_specs'   => true,
+            'limit'       => 30,
+            'order'       => 'specs_volume desc'
+        ]);
 
         $valueTitle = 'users/rating/specs-volume';
 
         $precisionLimit = 50;
 
         $users = [];
-        foreach ($userTable->fetchAll($select) as $idx => $user) {
+        foreach ($rows as $idx => $user) {
             $brands = [];
             if ($idx < 5) {
                 $cacheKey = 'RATING_USER_BRAND_5_'.$precisionLimit.'_' . $user['id'];
@@ -403,18 +388,17 @@ class UsersController extends AbstractActionController
 
     private function picturesRating()
     {
-        $userTable = new User();
-
-        $select = $userTable->select(true)
-            ->where('not deleted')
-            ->limit(30)
-            ->where('pictures_total > 0')
-            ->order('pictures_total desc');
+        $rows = $this->userModel->getRows([
+            'not_deleted'  => true,
+            'limit'        => 30,
+            'order'        => 'pictures_total desc',
+            'has_pictures' => true
+        ]);
 
         $valueTitle = 'users/rating/pictures';
 
         $users = [];
-        foreach ($userTable->fetchAll($select) as $idx => $user) {
+        foreach ($rows as $idx => $user) {
             $brands = [];
             if ($idx < 10) {
                 $cacheKey = 'RATING_USER_PICTURES_BRAND_6_' . $user['id'];
@@ -462,23 +446,11 @@ class UsersController extends AbstractActionController
 
     private function likesRating()
     {
-        $userTable = new User();
-
-        $db = $userTable->getAdapter();
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('comment_message', ['author_id', 'volume' => new Zend_Db_Expr('sum(vote)')])
-                ->group('author_id')
-                ->order('volume DESC')
-                ->limit(30)
-        );
-
         $users = [];
-        foreach ($rows as $row) {
+        foreach ($this->comments->service()->getTopAuthors(30) as $id => $volume) {
             $users[] = [
-                'row'    => $userTable->find($row['author_id'])->current(),
-                'volume' => $row['volume'],
+                'row'    => $this->userModel->getRow($id),
+                'volume' => $volume,
                 'brands' => []
             ];
         }
@@ -492,48 +464,22 @@ class UsersController extends AbstractActionController
 
     private function pictureLikesRating()
     {
-        $userTable = new User();
-
-        $db = $userTable->getAdapter();
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('pictures', ['owner_id'])
-                ->join(
-                    'picture_vote',
-                    'pictures.id = picture_vote.picture_id',
-                    ['volume' => new Zend_Db_Expr('sum(value)')]
-                )
-                ->where('pictures.owner_id <> picture_vote.user_id')
-                ->group('pictures.owner_id')
-                ->order('volume DESC')
-                ->limit(30)
-        );
-
         $users = [];
-        foreach ($rows as $idx => $row) {
+        $idx = 0;
+        foreach ($this->picture->getTopLikes(30) as $ownerId => $volume) {
             $fans = [];
-            if ($idx < 10) {
-                $fanRows = $db->fetchAll(
-                    $db->select()
-                        ->from('picture_vote', ['user_id', 'volume' => new Zend_Db_Expr('count(1)')])
-                        ->join('pictures', 'pictures.id = picture_vote.picture_id', null)
-                        ->where('pictures.owner_id = ?', $row['owner_id'])
-                        ->group('user_id')
-                        ->order('volume desc')
-                        ->limit(2)
-                );
-                foreach ($fanRows as $fanRow) {
+            if ($idx++ < 10) {
+                foreach ($this->picture->getTopOwnerFans($ownerId, 2) as $fanId => $fanVolume) {
                     $fans[] = [
-                        'user_id' => $fanRow['user_id'],
-                        'volume'  => $fanRow['volume'],
+                        'user_id' => $fanId,
+                        'volume'  => $fanVolume
                     ];
                 }
             }
 
             $users[] = [
-                'row'    => $userTable->find($row['owner_id'])->current(),
-                'volume' => $row['volume'],
+                'row'    => $this->userModel->getRow($ownerId),
+                'volume' => $volume,
                 'brands' => [],
                 'fans'   => $fans
             ];

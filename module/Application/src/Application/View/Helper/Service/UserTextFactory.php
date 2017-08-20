@@ -16,7 +16,8 @@ class UserTextFactory implements FactoryInterface
     {
         return new Helper(
             $container->get('Router'),
-            $container->get(\Application\Model\Picture::class)
+            $container->get(\Application\Model\Picture::class),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

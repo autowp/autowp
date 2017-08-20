@@ -43,19 +43,6 @@ class Catalogue
             'item.body',
             'item.spec_id'
         ];
-
-        /*return [
-            new Zend_Db_Expr('item.begin_year IS NULL'),
-            'item.begin_year',
-            new Zend_Db_Expr('item.begin_month IS NULL'),
-            'item.begin_month',
-            new Zend_Db_Expr('item.end_year=0'),
-            'item.end_year',
-            new Zend_Db_Expr('item.end_month IS NULL'),
-            'item.end_month',
-            'item.name',
-            'item.body'
-        ];*/
     }
 
     /**

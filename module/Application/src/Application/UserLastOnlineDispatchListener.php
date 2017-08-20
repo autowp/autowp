@@ -2,17 +2,12 @@
 
 namespace Application;
 
-use DateInterval;
-use DateTime;
-
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Mvc\MvcEvent;
 
-use Autowp\Commons\Db\Table\Row;
-
-use Zend_Db_Expr;
+use Autowp\User\Model\User;
 
 class UserLastOnlineDispatchListener extends AbstractListenerAggregate
 {
@@ -40,32 +35,9 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
             $auth = new AuthenticationService();
             if ($auth->hasIdentity()) {
-                $userTable = new \Autowp\User\Model\DbTable\User();
-
-                $user = $userTable->find($auth->getIdentity())->current();
-
-                if ($user) {
-                    $changes = false;
-                    $nowExpiresDate = (new DateTime())->sub(new DateInterval('PT1S'));
-                    $lastOnline = Row::getDateTimeByColumnType('timestamp', $user['last_online']);
-                    if (! $lastOnline || ($lastOnline < $nowExpiresDate)) {
-                        $user['last_online'] = new Zend_Db_Expr('NOW()');
-                        $changes = true;
-                    }
-
-                    $remoteAddr = $request->getServer('REMOTE_ADDR');
-                    if ($remoteAddr) {
-                        $ip = inet_pton($remoteAddr);
-                        if ($ip != $user['last_ip']) {
-                            $user['last_ip'] = $ip;
-                            $changes = true;
-                        }
-                    }
-
-                    if ($changes) {
-                        $user->save();
-                    }
-                }
+                $serviceManager = $e->getApplication()->getServiceManager();
+                $userModel = $serviceManager->get(User::class);
+                $userModel->registerVisit($auth->getIdentity(), $request);
             }
         }
     }

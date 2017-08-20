@@ -9,7 +9,6 @@ use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Session\SessionManager;
 
 use Autowp\Cron;
-use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Picture;
 

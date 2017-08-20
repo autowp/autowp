@@ -5,8 +5,6 @@ namespace Application;
 use Zend\Permissions\Acl\Acl;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
-use Zend_Db_Adapter_Abstract;
-
 $host = getenv('AUTOWP_HOST');
 $hostCookie = ($host == 'localhost' ? '' : '.' . $host);
 
@@ -257,7 +255,6 @@ return [
     'textstorage' => [
         'textTableName'     => 'textstorage_text',
         'revisionTableName' => 'textstorage_revision',
-        'dbAdapter'         => Zend_Db_Adapter_Abstract::class
     ],
 
     'feedback' => [
@@ -272,12 +269,11 @@ return [
             'ItemCatnameNotExists' => Validator\Item\CatnameNotExists::class,
         ],
         'factories' => [
-            Validator\Brand\NameNotExists::class => InvokableFactory::class,
-            Validator\Item\CatnameNotExists::class => Validator\Item\CatnameNotExistsFactory::class,
+            Validator\Item\CatnameNotExists::class       => Validator\Item\CatnameNotExistsFactory::class,
             Validator\ItemParent\CatnameNotExists::class => Validator\ItemParent\CatnameNotExistsFactory::class,
-            Validator\User\EmailExists::class    => InvokableFactory::class,
-            Validator\User\EmailNotExists::class => InvokableFactory::class,
-            Validator\User\Login::class          => InvokableFactory::class,
+            Validator\User\EmailExists::class            => Validator\User\EmailExistsFactory::class,
+            Validator\User\EmailNotExists::class         => Validator\User\EmailNotExistsFactory::class,
+            Validator\User\Login::class                  => Validator\User\LoginFactory::class ,
         ],
     ],
 

@@ -173,7 +173,7 @@ class CarsController extends AbstractActionController
                 if ($contribPairs) {
                     $contributors = $this->userModel->getRows([
                         'id' => array_keys($contribPairs),
-                        'not_deleted'
+                        'not_deleted' => true
                     ]);
                 }
 

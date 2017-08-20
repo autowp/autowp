@@ -16,11 +16,5 @@ class EnvTest extends AbstractHttpControllerTestCase
         $timezone = $timezone->current();
 
         $this->assertEquals('UTC', $timezone['timezone']);
-
-        $zf1db = $this->getApplication()->getServiceManager()->get(\Zend_Db_Adapter_Abstract::class);
-
-        $timezone = $zf1db->fetchOne('select @@session.time_zone as timezone');
-
-        $this->assertEquals('UTC', $timezone);
     }
 }

@@ -10,7 +10,7 @@ use Zend\View\Model\ViewModel;
 use Zend\Paginator\Paginator;
 
 use Autowp\Comments;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\ItemNameFormatter;
 use Application\Model\Brand;
@@ -95,6 +95,11 @@ class CatalogueController extends AbstractActionController
      */
     private $brand;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         $textStorage,
         $cache,
@@ -111,7 +116,8 @@ class CatalogueController extends AbstractActionController
         Picture $picture,
         TableGateway $modificationTable,
         TableGateway $modificationGroupTable,
-        Brand $brand
+        Brand $brand,
+        User $userModel
     ) {
 
         $this->textStorage = $textStorage;
@@ -130,6 +136,7 @@ class CatalogueController extends AbstractActionController
         $this->modificationTable = $modificationTable;
         $this->modificationGroupTable = $modificationGroupTable;
         $this->brand = $brand;
+        $this->userModel = $userModel;
     }
 
     private function doBrandAction(callable $callback)
@@ -1788,8 +1795,7 @@ class CatalogueController extends AbstractActionController
 
             $contribPairs = $this->specsService->getContributors($ids);
 
-            $userTable = new User();
-            $contributors = $userTable->find(array_keys($contribPairs));
+            $contributors = $this->userModel->getRows(['id' => array_keys($contribPairs)]);
 
             return [
                 'breadcrumbs'  => $breadcrumbs,

@@ -16,7 +16,8 @@ class ForumsFactory implements FactoryInterface
         return new Forums(
             $container->get(\Autowp\Comments\CommentsService::class),
             $tables->get('forums_themes'),
-            $tables->get('forums_topics')
+            $tables->get('forums_topics'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

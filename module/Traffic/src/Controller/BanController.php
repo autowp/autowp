@@ -5,7 +5,7 @@ namespace Autowp\Traffic\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\Traffic\TrafficControl;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class BanController extends AbstractActionController
 {
@@ -14,9 +14,15 @@ class BanController extends AbstractActionController
      */
     private $service;
 
-    public function __construct(TrafficControl $service)
+    /**
+     * @var User
+     */
+    private $userModel;
+
+    public function __construct(TrafficControl $service, User $userModel)
     {
         $this->service = $service;
+        $this->userModel = $userModel;
     }
 
     public function unbanIpAction()
@@ -78,8 +84,7 @@ class BanController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $users = new User();
-        $user = $users->find($this->params('user_id'))->current();
+        $user = $this->userModel->getRow(['id' => (int)$this->params('user_id')]);
 
         if (! $user) {
             return $this->notFoundAction();
@@ -113,8 +118,7 @@ class BanController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $users = new User();
-        $user = $users->find($this->params('user_id'))->current();
+        $user = $this->userModel->getRow(['id' => (int)$this->params('user_id')]);
 
         if (! $user) {
             return $this->notFoundAction();

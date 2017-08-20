@@ -14,7 +14,8 @@ class PulseControllerFactory implements FactoryInterface
     {
         $tables = $container->get(\Application\Db\TableManager::class);
         return new \Application\Controller\PulseController(
-            $tables->get('log_events')
+            $tables->get('log_events'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

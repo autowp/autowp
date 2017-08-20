@@ -8,7 +8,7 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class Votings
 {
@@ -27,14 +27,21 @@ class Votings
      */
     private $voteTable;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         TableGateway $votingTable,
         TableGateway $variantTable,
-        TableGateway $voteTable
+        TableGateway $voteTable,
+        User $userModel
     ) {
         $this->votingTable = $votingTable;
         $this->variantTable = $variantTable;
         $this->voteTable = $voteTable;
+        $this->userModel = $userModel;
     }
 
     private function canVote($voting, $userId)
@@ -163,7 +170,7 @@ class Votings
         ];
     }
 
-    public function getVotes(int $id)
+    public function getVotes(int $id): array
     {
         $variant = $this->variantTable->select([
             'id' => $id
@@ -173,12 +180,14 @@ class Votings
             return null;
         }
 
-        $uTable = new User();
-        $users = $uTable->fetchAll(
-            $uTable->select(true)
-                ->join('voting_variant_vote', 'users.id = voting_variant_vote.user_id', null)
-                ->where('voting_variant_vote.voting_variant_id = ?', $variant['id'])
-        );
+        $select = $this->userModel->getTable()->getSql()->select()
+            ->join('voting_variant_vote', 'users.id = voting_variant_vote.user_id', [])
+            ->where(['voting_variant_vote.voting_variant_id' => $variant['id']]);
+
+        $users = [];
+        foreach ($this->userModel->getTable()->selectWith($select) as $row) {
+            $users[] = $row;
+        }
 
         return [
             'users' => $users

@@ -6,7 +6,7 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use DateInterval;
 use DateTime;
@@ -35,9 +35,12 @@ class PulseController extends AbstractActionController
         '#008888',
     ];
 
-    public function __construct(TableGateway $logTable)
+    private $userModel;
+
+    public function __construct(TableGateway $logTable, User $userModel)
     {
         $this->logTable = $logTable;
+        $this->userModel = $userModel;
     }
 
     private function randomColor()
@@ -47,8 +50,6 @@ class PulseController extends AbstractActionController
 
     public function indexAction()
     {
-        $userTable = new User();
-
         $now = new DateTime();
 
         switch ($this->params()->fromQuery('period')) {
@@ -147,7 +148,7 @@ class PulseController extends AbstractActionController
             ];
 
             $legend[$uid] = [
-                'user'  => $userTable->find($uid)->current(),
+                'user'  => $this->userModel->getRow((int)$uid),
                 'color' => $color
             ];
         }

@@ -5,6 +5,7 @@ namespace Application\Service;
 use DateTime;
 use Exception;
 
+use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mail;
 
@@ -12,7 +13,7 @@ use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
 use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Model\Contact;
 use Application\Model\Picture;
@@ -20,15 +21,8 @@ use Application\Model\UserAccount;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
 
-use Zend_Db_Expr;
-
 class UsersService
 {
-    /**
-     * @var User
-     */
-    private $table;
-
     /**
      * @var string
      */
@@ -86,14 +80,14 @@ class UsersService
     private $telegramChatTable;
 
     /**
-     * @return Comments\CommentsService
+     * @var User
      */
-    private function getTable()
-    {
-        return $this->table
-            ? $this->table
-            : $this->table = new User();
-    }
+    private $userModel;
+
+    /**
+     * @var TableGateway
+     */
+    private $logEventUserTable;
 
     public function __construct(
         array $options,
@@ -107,7 +101,9 @@ class UsersService
         Contact $contact,
         UserAccount $userAccount,
         Picture $picture,
-        TableGateway $telegramChatTable
+        TableGateway $telegramChatTable,
+        User $userModel,
+        TableGateway $logEventUserTable
     ) {
 
         $this->salt = $options['salt'];
@@ -126,21 +122,17 @@ class UsersService
         $this->userAccount = $userAccount;
         $this->picture = $picture;
         $this->telegramChatTable = $telegramChatTable;
+        $this->userModel = $userModel;
+        $this->logEventUserTable = $logEventUserTable;
     }
 
-    /**
-     * @param string $password
-     * @return string
-     */
-    private function passwordHashExpr($password)
+    public function getPasswordHashExpr(string $password): Sql\Expression
     {
         if (strlen($password) <= 0) {
             throw new Exception("Password cannot be empty");
         }
 
-        $db = $this->getTable()->getAdapter();
-
-        return 'MD5(CONCAT(' . $db->quote($this->salt) . ', ' . $db->quote($password) . '))';
+        return new Sql\Expression('MD5(CONCAT(?, ?))', [$this->salt, $password]);
     }
 
     /**
@@ -176,33 +168,28 @@ class UsersService
 
         $emailCheckCode = $this->emailCheckCode($values['email']);
 
-        $table = $this->getTable();
-        $db = $table->getAdapter();
-
-        $passwordExpr = $this->passwordHashExpr($values['password']);
-        $ipExpr = $db->quoteInto('INET6_ATON(?)', $values['ip']);
-
-        $user = $table->createRow([
+        $this->userModel->getTable()->insert([
             'login'            => null,
             'e_mail'           => null,
-            'password'         => new Zend_Db_Expr($passwordExpr),
+            'password'         => $this->getPasswordHashExpr($values['password']),
             'email_to_check'   => $values['email'],
             'hide_e_mail'      => 1,
             'email_check_code' => $emailCheckCode,
             'name'             => $values['name'],
-            'reg_date'         => new Zend_Db_Expr('NOW()'),
-            'last_online'      => new Zend_Db_Expr('NOW()'),
+            'reg_date'         => new Sql\Expression('NOW()'),
+            'last_online'      => new Sql\Expression('NOW()'),
             'timezone'         => $host['timezone'],
-            'last_ip'          => new Zend_Db_Expr($ipExpr),
+            'last_ip'          => new Sql\Expression('INET6_ATON(?)', [$values['ip']]),
             'language'         => $language
         ]);
-        $user->save();
+        $userId = $this->userModel->getTable()->getLastInsertValue();
+        $user = $this->userModel->getRow($userId);
 
-        $this->specsService->refreshUserConflicts($user['id']);
+        $this->specsService->refreshUserConflicts($userId);
 
         $this->sendRegistrationConfirmEmail($user, $host['hostname']);
 
-        $this->updateUserVoteLimit($user['id']);
+        $this->updateUserVoteLimit($userId);
 
         return $user;
     }
@@ -218,9 +205,14 @@ class UsersService
 
         $emailCheckCode = $this->emailCheckCode($email);
 
-        $user['email_to_check'] = $email;
-        $user['email_check_code'] = $emailCheckCode;
-        $user->save();
+        $this->userModel->getTable()->update([
+            'email_to_check'   => $email,
+            'email_check_code' => $emailCheckCode
+        ], [
+            'id' => $user['id']
+        ]);
+
+        $user = $this->userModel->getRow($user['id']);
 
         $this->sendChangeConfirmEmail($user, $host['hostname']);
     }
@@ -231,25 +223,24 @@ class UsersService
      */
     public function emailChangeFinish($code)
     {
-        $userTable = $this->getTable();
-        $user = $userTable->fetchRow(
-            $userTable->select(true)
-                ->where('not deleted')
-                ->where('email_check_code = ?', (string)$code)
-                ->where('LENGTH(email_check_code)')
-                ->where('LENGTH(email_to_check)')
-        );
+        $user = $this->userModel->getTable()->select([
+            'not deleted',
+            'email_check_code' => (string)$code,
+            new Sql\Predicate\Expression('LENGTH(email_check_code)'),
+            new Sql\Predicate\Expression('LENGTH(email_to_check)')
+        ])->current();
 
         if (! $user) {
             return false;
         }
 
-        $user->setFromArray([
+        $this->userModel->getTable()->update([
             'e_mail'           => $user['email_to_check'],
             'email_check_code' => null,
             'email_to_check'   => null
+        ], [
+            'id' => $user['id']
         ]);
-        $user->save();
 
         return $user;
     }
@@ -335,42 +326,40 @@ class UsersService
     public function getAuthAdapterLogin($login, $password)
     {
         return new LoginAuthAdapter(
+            $this->userModel,
             $login,
-            $this->passwordHashExpr($password)
+            $this->getPasswordHashExpr($password)
         );
     }
 
     public function updateUsersVoteLimits()
     {
-        $userTable = $this->getTable();
-        $db = $userTable->getAdapter();
-
-        $ids = $db->fetchCol(
-            $db->select()
-                ->from($userTable->info('name'), 'id')
-                ->where('not deleted')
-                ->where('last_online > DATE_SUB(NOW(), INTERVAL 3 MONTH)')
-        );
+        $select = $this->userModel->getTable()->getSql()->select()
+            ->columns(['id'])
+            ->where([
+                'not deleted',
+                new Sql\Predicate\Expression('last_online > DATE_SUB(NOW(), INTERVAL 3 MONTH)')
+            ]);
 
         $affected = 0;
-        foreach ($ids as $id) {
-            $this->updateUserVoteLimit($id);
+        foreach ($this->userModel->getTable()->selectWith($select) as $row) {
+            $this->updateUserVoteLimit($row['id']);
             $affected++;
         }
 
         return $affected;
     }
 
-    public function updateUserVoteLimit($userId)
+    public function updateUserVoteLimit(int $userId)
     {
-        $userRow = $this->getTable()->find($userId)->current();
+        $userRow = $this->userModel->getRow($userId);
         if (! $userRow) {
             return false;
         }
 
         $default = 10;
 
-        $avgVote = $this->comments->getUserAvgVote($userRow['id']);
+        $avgVote = $this->comments->getUserAvgVote($userId);
 
         $age = 0;
         $regDate = Row::getDateTimeByColumnType('timestamp', $userRow['reg_date']);
@@ -381,7 +370,7 @@ class UsersService
         }
 
         $picturesExists = $this->picture->isExists([
-            'user'   => $userRow['id'],
+            'user'   => $userId,
             'status' => Picture::STATUS_ACCEPTED
         ]);
 
@@ -390,14 +379,17 @@ class UsersService
             $value = 0;
         }
 
-        $userRow['votes_per_day'] = $value;
-        $userRow->save();
+        $this->userModel->getTable()->update([
+            'votes_per_day' => $value
+        ], [
+            'id' => $userId
+        ]);
     }
 
     public function restoreVotes()
     {
-        $this->getTable()->update([
-            'votes_left' => new Zend_Db_Expr('votes_per_day')
+        $this->userModel->getTable()->update([
+            'votes_left' => new Sql\Expression('votes_per_day')
         ], [
             'votes_left < votes_per_day',
             'not deleted'
@@ -406,47 +398,47 @@ class UsersService
 
     public function setPassword($user, $password)
     {
-        $passwordExpr = $this->passwordHashExpr($password);
-
-        $user['password'] = new Zend_Db_Expr($passwordExpr);
-        $user->save();
+        $this->userModel->getTable()->update([
+            'password' => $this->getPasswordHashExpr($password)
+        ], [
+            'id' => $user['id']
+        ]);
     }
 
     public function checkPassword($userId, $password)
     {
-        $passwordExpr = $this->passwordHashExpr($password);
-
-        return (bool)$this->getTable()->fetchRow([
-            'id = ?'       => (int)$userId,
-            'password = ?' => new Zend_Db_Expr($passwordExpr)
-        ]);
+        return (bool)$this->userModel->getTable()->select([
+            'id'       => (int)$userId,
+            'password' => $this->getPasswordHashExpr($password)
+        ])->current();
     }
 
     public function deleteUnused()
     {
-        $table = $this->getTable();
+        $table = $this->userModel->getTable();
 
-        $rows = $table->fetchAll(
-            $table->select(true)
-                ->where('users.last_online < DATE_SUB(NOW(), INTERVAL 2 YEAR)')
-                ->where('users.role = ?', 'user')
+        $rows = $table->selectWith(
+            $table->getSql()->select()
+                ->join('attrs_user_values', 'users.id = attrs_user_values.user_id', [], Sql\Select::JOIN_LEFT)
+                ->join('comment_message', 'users.id = comment_message.author_id', [], Sql\Select::JOIN_LEFT)
+                ->join('forums_topics', 'users.id = forums_topics.author_id', [], Sql\Select::JOIN_LEFT)
+                ->join('pictures', 'users.id = pictures.owner_id', [], Sql\Select::JOIN_LEFT)
+                ->join('voting_variant_vote', 'users.id = voting_variant_vote.user_id', [], Sql\Select::JOIN_LEFT)
+                ->join(['pmf' => 'personal_messages'], 'users.id = pmf.from_user_id', [], Sql\Select::JOIN_LEFT)
+                ->join(['pmt' => 'personal_messages'], 'users.id = pmt.to_user_id', [], Sql\Select::JOIN_LEFT)
+                ->where([
+                    'users.last_online < DATE_SUB(NOW(), INTERVAL 2 YEAR)',
+                    'users.role' => 'user',
+                    'attrs_user_values.user_id is null',
+                    'comment_message.author_id is null',
+                    'forums_topics.author_id is null',
+                    'pictures.owner_id is null',
+                    'voting_variant_vote.user_id is null',
+                    'pmf.from_user_id is null',
+                    'pmt.to_user_id is null',
+                    'log_events.user_id is null'
+                ])
                 ->order('users.id')
-                ->joinLeft('attrs_user_values', 'users.id = attrs_user_values.user_id', null)
-                ->where('attrs_user_values.user_id is null')
-                ->joinLeft('comment_message', 'users.id = comment_message.author_id', null)
-                ->where('comment_message.author_id is null')
-                ->joinLeft('forums_topics', 'users.id = forums_topics.author_id', null)
-                ->where('forums_topics.author_id is null')
-                ->joinLeft('pictures', 'users.id = pictures.owner_id', null)
-                ->where('pictures.owner_id is null')
-                ->joinLeft('voting_variant_vote', 'users.id = voting_variant_vote.user_id', null)
-                ->where('voting_variant_vote.user_id is null')
-                ->joinLeft(['pmf' => 'personal_messages'], 'users.id = pmf.from_user_id', null)
-                ->where('pmf.from_user_id is null')
-                ->joinLeft(['pmt' => 'personal_messages'], 'users.id = pmt.to_user_id', null)
-                ->where('pmt.to_user_id is null')
-                ->joinLeft('log_events', 'users.id = log_events.user_id', null)
-                ->where('log_events.user_id is null')
                 ->limit(1000)
         );
 
@@ -457,29 +449,29 @@ class UsersService
         }
     }
 
-    private function delete($userId)
+    private function delete(int $userId)
     {
-        $table = $this->getTable();
-        $db = $table->getAdapter();
-
-        $row = $table->find($userId)->current();
+        $row = $this->userModel->getRow($userId);
         if (! $row) {
             return;
         }
 
+        $imageId = null;
         if ($row['img']) {
             $imageId = $row['img'];
-            $row['img'] = null;
-            $row->save();
-
-            $this->imageStorage->removeImage($imageId);
         }
 
-        $db->delete('log_events_user', [
-            'user_id = ?' => $row['id']
+        $this->logEventUserTable->delete([
+            'user_id = ?' => $userId
         ]);
 
-        $row->delete();
+        $this->userModel->getTable()->delete([
+            'id' => $userId
+        ]);
+
+        if ($imageId) {
+            $this->imageStorage->removeImage($imageId);
+        }
     }
 
     public function clearRememberCookie($language)
@@ -504,37 +496,40 @@ class UsersService
         }
     }
 
-    public function markDeleted($userId)
+    public function markDeleted(int $userId)
     {
-        $row = $this->getTable()->find($userId)->current();
+        $row = $this->userModel->getRow($userId);
         if (! $row) {
             return false;
         }
 
         $oldImageId = $row['img'];
+
+        $this->userModel->getTable()->update([
+            'deleted' => 1,
+            'img'     => null
+        ], [
+            'id' => $userId
+        ]);
+
         if ($oldImageId) {
-            $row['img'] = null;
-            $row->save();
             $this->imageStorage->removeImage($oldImageId);
         }
 
-        $row['deleted'] = 1;
-        $row->save();
-
         // delete from contacts
-        $this->contact->deleteUserEverywhere($row['id']);
+        $this->contact->deleteUserEverywhere($userId);
 
         // unsubscribe from telegram
         $this->telegramChatTable->delete([
-            'user_id = ?' => $row['id']
+            'user_id = ?' => $userId
         ]);
 
         // delete linked profiles
-        $this->userAccount->removeUserAccounts($row['id']);
+        $this->userAccount->removeUserAccounts($userId);
 
 
         // unsubscribe from items
-        $this->userItemSubscribe->unsubscribeAll($row['id']);
+        $this->userItemSubscribe->unsubscribeAll($userId);
 
         return true;
     }

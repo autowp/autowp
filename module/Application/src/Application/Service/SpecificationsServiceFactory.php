@@ -22,6 +22,7 @@ class SpecificationsServiceFactory implements FactoryInterface
             $container->get(\Application\Model\ItemParent::class),
             $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\VehicleType::class),
+            $container->get(\Autowp\User\Model\User::class),
             $tables->get('attrs_units'),
             $tables->get('attrs_list_options'),
             $tables->get('attrs_types'),

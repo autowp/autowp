@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Permissions\Acl\Acl;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class TrafficHydrator extends RestHydrator
 {
@@ -14,8 +14,6 @@ class TrafficHydrator extends RestHydrator
      */
     protected $userId = null;
 
-    private $userRole = null;
-
     private $acl;
 
     private $router;
@@ -23,7 +21,7 @@ class TrafficHydrator extends RestHydrator
     /**
      * @var User
      */
-    private $userTable;
+    private $userModel;
 
     public function __construct($serviceManager)
     {
@@ -31,14 +29,13 @@ class TrafficHydrator extends RestHydrator
 
         $this->router = $serviceManager->get('HttpRouter');
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
+        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $strategy = new DateTimeFormatterStrategy();
         $this->addStrategy('up_to', $strategy);
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('ban_user', $strategy);
-
-        $this->userTable = new User();
     }
 
     /**
@@ -76,7 +73,7 @@ class TrafficHydrator extends RestHydrator
             $object['ban']['up_to'] = $this->extractValue('up_to', $date);
             $object['ban']['user'] = null;
             if ($object['ban']['by_user_id']) {
-                $user = $this->userTable->find($object['ban']['by_user_id'])->current();
+                $user = $this->userModel->getRow((int) $object['ban']['by_user_id']);
                 if ($user) {
                     $object['ban']['user'] = $this->extractValue('ban_user', $user);
                 }
@@ -102,7 +99,6 @@ class TrafficHydrator extends RestHydrator
     {
         if ($this->userId != $userId) {
             $this->userId = $userId;
-            $this->userRole = null;
         }
 
         return $this;

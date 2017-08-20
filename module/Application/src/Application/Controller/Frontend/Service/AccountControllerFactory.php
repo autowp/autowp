@@ -33,7 +33,8 @@ class AccountControllerFactory implements FactoryInterface
             $container->get(\Application\Model\Picture::class),
             $tables->get('login_state'),
             $container->get(\Application\Model\Item::class),
-            $container->get(\Autowp\Forums\Forums::class)
+            $container->get(\Autowp\Forums\Forums::class),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

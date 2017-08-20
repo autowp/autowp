@@ -2,11 +2,12 @@
 
 namespace Autowp\User\Auth\Adapter;
 
+use Zend\Db\Sql;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 use Zend\Authentication\Adapter\Exception\InvalidArgumentException;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class Login implements AdapterInterface
 {
@@ -20,7 +21,7 @@ class Login implements AdapterInterface
     /**
      * $_credential - Credential values
      *
-     * @var string
+     * @var Sql\Expression
      */
     private $credentialExpr = null;
 
@@ -29,28 +30,33 @@ class Login implements AdapterInterface
      */
     private $authenticateResultInfo = null;
 
-    public function __construct($identity, $credentialExpr)
+    /**
+     * @var User
+     */
+    private $userModel;
+
+    public function __construct(User $userModel, $identity, Sql\Expression $credentialExpr)
     {
+        $this->userModel = $userModel;
         $this->identity = (string)$identity;
-        $this->credentialExpr = (string)$credentialExpr;
+        $this->credentialExpr = $credentialExpr;
     }
 
     public function authenticate()
     {
         $this->authenticateSetup();
 
-        $userTable = new User();
         $filter = [
             'not deleted',
-            'password = ' . $this->credentialExpr
+            'password' => $this->credentialExpr
         ];
         if (mb_strpos($this->identity, '@') !== false) {
-            $filter['e_mail = ?'] = (string)$this->identity;
+            $filter['e_mail'] = (string)$this->identity;
         } else {
-            $filter['login = ?'] = (string)$this->identity;
+            $filter['login'] = (string)$this->identity;
         }
 
-        $userRow = $userTable->fetchRow($filter);
+        $userRow = $this->userModel->getTable()->select($filter)->current();
 
         if (! $userRow) {
             $this->authenticateResultInfo['code'] = Result::FAILURE_IDENTITY_NOT_FOUND;

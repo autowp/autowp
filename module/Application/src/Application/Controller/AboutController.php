@@ -6,7 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Permissions\Acl\Acl;
 
 use Autowp\Comments;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Model\Item;
 use Application\Model\Picture;
@@ -33,26 +33,28 @@ class AboutController extends AbstractActionController
      */
     private $item;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         Acl $acl,
         Comments\CommentsService $comments,
         Picture $picture,
-        Item $item
+        Item $item,
+        User $userModel
     ) {
         $this->acl = $acl;
         $this->comments = $comments;
         $this->picture = $picture;
         $this->item = $item;
+        $this->userModel = $userModel;
     }
 
     public function indexAction()
     {
-        $userTable = new User();
-        $userTableAdapter = $userTable->getAdapter();
-        $totalUsers = $userTableAdapter->fetchOne(
-            $userTableAdapter->select()
-                ->from($userTable->info('name'), 'count(1)')
-        );
+        $totalUsers = $this->userModel->getCount([]);
         $totalUsers = round($totalUsers, -3);
 
         $contributors = [];
@@ -65,10 +67,12 @@ class AboutController extends AbstractActionController
         }
 
         if ($greenUserRoles) {
-            $greenUsers = $userTable->fetchAll([
+            $userTable = $this->userModel->getTable();
+
+            $greenUsers = $userTable->select([
                 'not deleted',
-                'role in (?)' => $greenUserRoles,
-                'identity is null or identity <> "autowp"',
+                new Sql\Predicate\In('role', $greenUserRoles),
+                '(identity is null or identity <> "autowp")',
                 'last_online > DATE_SUB(CURDATE(), INTERVAL 6 MONTH)'
             ]);
 
@@ -77,9 +81,11 @@ class AboutController extends AbstractActionController
             }
         }
 
-        $picturesUsers = $userTable->fetchAll([
-            'not deleted',
-        ], 'pictures_total desc', 20);
+        $picturesUsers = $this->userModel->getRows([
+            'not_deleted' => true,
+            'order'       => 'pictures_total desc',
+            'limit'       => 20
+        ]);
 
         foreach ($picturesUsers as $greenUser) {
             $contributors[$greenUser['id']] = $greenUser;
@@ -97,9 +103,9 @@ class AboutController extends AbstractActionController
         $totalComments = round($totalComments, -3);
 
         return [
-            'developer'     => $userTable->find(1)->current(),
-            'frTranslator'  => $userTable->find(3282)->current(),
-            'zhTranslator'  => $userTable->find(25155)->current(),
+            'developer'     => $this->userModel->getRow(1),
+            'frTranslator'  => $this->userModel->getRow(3282),
+            'zhTranslator'  => $this->userModel->getRow(25155),
             'contributors'  => $contributors,
             'totalPictures' => $totalPictures,
             'picturesSize'  => $this->picture->getTotalPicturesSize(),

@@ -68,7 +68,7 @@ class UserController extends AbstractRestfulController
         $data = $this->listInputFilter->getValues();
 
         $filter = [
-            'not_deleted'
+            'not_deleted' => true
         ];
 
         $search = $data['search'];
@@ -218,8 +218,12 @@ class UserController extends AbstractRestfulController
 
         $oldImageId = $row['img'];
         if ($oldImageId) {
-            $row['img'] = null;
-            $row->save();
+            $this->userModel->getTable()->update([
+                'img' => null
+            ], [
+                'id' => $row['id']
+            ]);
+
             $this->imageStorage()->removeImage($oldImageId);
         }
 

@@ -2,6 +2,10 @@
 
 namespace Application\Controller;
 
+use DateTime;
+use Exception;
+
+use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
@@ -15,11 +19,6 @@ use Application\Comments;
 use Application\HostManager;
 use Application\Model\Item;
 use Application\Model\Picture;
-
-use DateTime;
-use Exception;
-
-use Zend_Db_Expr;
 
 class CommentsController extends AbstractRestfulController
 {
@@ -217,8 +216,11 @@ class CommentsController extends AbstractRestfulController
                 throw new Exception("Message add fails");
             }
 
-            $user['last_message_time'] = new Zend_Db_Expr('NOW()');
-            $user->save();
+            $this->userModel->getTable()->update([
+                'last_message_time' => new Sql\Expression('NOW()')
+            ], [
+                'id' => $user['id']
+            ]);
 
             if ($this->user()->inheritsRole('moder')) {
                 if ($values['parent_id'] && $values['resolve']) {
@@ -368,8 +370,7 @@ class CommentsController extends AbstractRestfulController
             ]);
         }
 
-        $user['votes_left'] = new Zend_Db_Expr('votes_left - 1');
-        $user->save();
+        $this->userModel->decVotes($user['id']);
 
         return new JsonModel([
             'ok'   => true,

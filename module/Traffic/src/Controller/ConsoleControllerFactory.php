@@ -1,20 +1,19 @@
 <?php
 
-namespace Autowp\User\Controller\Plugin\Service;
+namespace Autowp\Traffic\Controller;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class UserFactory implements FactoryInterface
+class ConsoleControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new \Autowp\User\Controller\Plugin\User(
-            $container->get(\Zend\Permissions\Acl\Acl::class),
-            $container->get('Config')['hosts']
+        return new ConsoleController(
+            $container->get(\Autowp\Traffic\TrafficControl::class)
         );
     }
 }

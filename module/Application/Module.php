@@ -8,9 +8,6 @@ use Zend\Mail;
 use Zend\ModuleManager\Feature;
 use Zend\Mvc\MvcEvent;
 
-use Zend_Cache_Manager;
-use Zend_Db_Table;
-
 class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\BootstrapListenerInterface,
@@ -78,14 +75,6 @@ class Module implements
         $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'handleError']);
         //handle the view render error (exception)
         $eventManager->attach(MvcEvent::EVENT_RENDER_ERROR, [$this, 'handleError']);
-
-
-        $cacheManager = $serviceManager->get(Zend_Cache_Manager::class);
-        $metadataCache = $cacheManager->getCache('fast');
-        $metadataCache->setOption('write_control', false);
-        Zend_Db_Table::setDefaultMetadataCache($metadataCache);
-
-        $serviceManager->get(\Zend_Db_Adapter_Abstract::class);
 
         $sessionListener = new SessionDispatchListener();
         $sessionListener->onBootstrap($e);

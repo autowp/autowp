@@ -7,7 +7,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\TextStorage;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class InfoController extends AbstractActionController
 {
@@ -18,10 +18,16 @@ class InfoController extends AbstractActionController
      */
     private $specTable;
 
-    public function __construct(TextStorage\Service $textStorage, TableGateway $specTable)
+    /**
+     * @var User
+     */
+    private $userModel;
+
+    public function __construct(TextStorage\Service $textStorage, TableGateway $specTable, User $userModel)
     {
         $this->textStorage = $textStorage;
         $this->specTable = $specTable;
+        $this->userModel = $userModel;
     }
 
     private function loadSpecs(int $parentId): array
@@ -95,9 +101,8 @@ class InfoController extends AbstractActionController
             ]);
         }
 
-        $userTable = new User();
-        $currentUser = $userTable->find($current['user_id'])->current();
-        $prevUser = $userTable->find($prevText['user_id'])->current();
+        $currentUser = $this->userModel->getRow((int)$current['user_id']);
+        $prevUser = $this->userModel->getRow((int)$prevText['user_id']);
 
         return [
             'current'     => $current,

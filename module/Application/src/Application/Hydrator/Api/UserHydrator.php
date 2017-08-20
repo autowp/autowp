@@ -9,7 +9,7 @@ use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Permissions\Acl\Acl;
 
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Hydrator\Api\Strategy\Image as HydratorImageStrategy;
 
@@ -26,12 +26,18 @@ class UserHydrator extends RestHydrator
 
     private $router;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct($serviceManager)
     {
         parent::__construct();
 
         $this->router = $serviceManager->get('HttpRouter');
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
+        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $strategy = new DateTimeFormatterStrategy();
         $this->addStrategy('last_online', $strategy);
@@ -179,13 +185,7 @@ class UserHydrator extends RestHydrator
         }
 
         if (! $this->userRole) {
-            $table = new User();
-            $db = $table->getAdapter();
-            $this->userRole = $db->fetchOne(
-                $db->select()
-                    ->from($table->info('name'), ['role'])
-                    ->where('id = ?', $this->userId)
-            );
+            $this->userRole = $this->userModel->getUserRole($this->userId);
         }
 
         return $this->userRole;

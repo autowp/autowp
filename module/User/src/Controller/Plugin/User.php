@@ -6,7 +6,7 @@ use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Permissions\Acl\Acl;
 
-use Autowp\User\Model\DbTable\User as UserTable;
+use Autowp\User\Model\User as UserModel;
 
 class User extends AbstractPlugin
 {
@@ -16,9 +16,9 @@ class User extends AbstractPlugin
     private $acl;
 
     /**
-     * @var UserTable
+     * @var UserModel
      */
-    private $userTable = null;
+    private $userModel = null;
 
     /**
      * @var array
@@ -30,19 +30,10 @@ class User extends AbstractPlugin
      */
     private $user = null;
 
-    public function __construct(Acl $acl)
+    public function __construct(Acl $acl, UserModel $userModel)
     {
         $this->acl = $acl;
-    }
-
-    /**
-     * @return UserTable
-     */
-    private function getUserTable()
-    {
-        return $this->userTable
-            ? $this->userTable
-            : $this->userTable = new UserTable();
+        $this->userModel = $userModel;
     }
 
     /**
@@ -56,7 +47,7 @@ class User extends AbstractPlugin
         }
 
         if (! array_key_exists($id, $this->users)) {
-            $this->users[$id] = $this->getUserTable()->find($id)->current();
+            $this->users[$id] = $this->userModel->getRow(['id' => (int)$id]);
         }
 
         return $this->users[$id];
@@ -72,7 +63,7 @@ class User extends AbstractPlugin
             $user = $this->getLogedInUser();
         }
 
-        if (! ($user instanceof \Zend_Db_Table_Row_Abstract || is_array($user) || $user instanceof \ArrayObject)) {
+        if (! (is_array($user) || $user instanceof \ArrayObject)) {
             $user = $this->user($user);
         }
 

@@ -25,9 +25,6 @@ abstract class AbstractConsoleControllerTestCase extends ZendTestCase
 
         $container = $this->getApplicationServiceLocator();
 
-        $zdb1 = $container->get(\Zend_Db_Adapter_Abstract::class);
-        $zdb1->closeConnection();
-
         $db = $container->get(\Zend\Db\Adapter\AdapterInterface::class);
         $db->driver->getConnection()->disconnect();
     }

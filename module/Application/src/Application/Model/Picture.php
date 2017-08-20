@@ -1122,4 +1122,43 @@ class Picture
 
         return $result;
     }
+
+    public function getTopLikes(int $limit): array
+    {
+        $select = $this->table->getSql()->select()
+            ->columns(['owner_id', 'volume' => new Sql\Expression('sum(picture_vote.value)')])
+            ->join('picture_vote', 'pictures.id = picture_vote.picture_id', [])
+            ->where(['pictures.owner_id != picture_vote.user_id'])
+            ->group('pictures.owner_id')
+            ->order('volume DESC')
+            ->limit($limit);
+
+        $result = [];
+        foreach ($this->table->selectWith($select) as $row) {
+            $result[(int)$row['owner_id']] = (int)$row['volume'];
+        }
+
+        return $result;
+    }
+
+    public function getTopOwnerFans(int $userId, int $limit): array
+    {
+        $select = $this->table->getSql()->select()
+            ->columns([])
+            ->join('picture_vote', 'pictures.id = picture_vote.picture_id', [
+                'user_id',
+                'volume' => new Sql\Expression('count(1)')
+            ])
+            ->where(['pictures.owner_id' => $userId])
+            ->group('picture_vote.user_id')
+            ->order('volume desc')
+            ->limit($limit);
+
+        $result = [];
+        foreach ($this->table->selectWith($select) as $row) {
+            $result[(int)$row['user_id']] = (int)$row['volume'];
+        }
+
+        return $result;
+    }
 }

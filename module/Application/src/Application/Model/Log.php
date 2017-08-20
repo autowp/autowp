@@ -10,7 +10,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
 
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class Log
 {
@@ -51,6 +51,11 @@ class Log
      */
     private $itemTable;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         Picture $picture,
         TableGateway $logTable,
@@ -58,7 +63,8 @@ class Log
         TableGateway $eventItemTable,
         TableGateway $eventPictureTable,
         TableGateway $eventUserTable,
-        TableGateway $itemTable
+        TableGateway $itemTable,
+        User $userModel
     ) {
         $this->itemTable = $itemTable;
         $this->eventTable = $logTable;
@@ -67,6 +73,7 @@ class Log
         $this->eventItemTable = $eventItemTable;
         $this->eventPictureTable = $eventPictureTable;
         $this->eventUserTable = $eventUserTable;
+        $this->userModel = $userModel;
     }
 
     public function addEvent(int $userId, string $message, array $objects)
@@ -156,8 +163,6 @@ class Log
         ];
         $options = array_replace($defaults, $options);
 
-        $userTable = new User();
-
         $select = new Sql\Select($this->eventTable->getTable());
         $select->order(['add_datetime DESC', 'id DESC']);
 
@@ -211,7 +216,7 @@ class Log
             ]);
 
             $events[] = [
-                'user'     => $userTable->find($event['user_id'])->current(),
+                'user'     => $this->userModel->getRow((int)$event['user_id']),
                 'date'     => Row::getDateTimeByColumnType('timestamp', $event['add_datetime']),
                 'desc'     => $event['description'],
                 'items'    => $itemRows,

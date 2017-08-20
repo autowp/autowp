@@ -3,7 +3,7 @@
 namespace Autowp\Comments;
 
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -24,11 +24,6 @@ class CommentsService
     private $topicTable;
 
     /**
-     * @var User
-     */
-    private $userTable;
-
-    /**
      * @var TableGateway
      */
     private $topicViewTable;
@@ -43,28 +38,25 @@ class CommentsService
      */
     private $topicSubscribeTable;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         TableGateway $voteTable,
         TableGateway $topicTable,
         TableGateway $messageTable,
         TableGateway $topicViewTable,
-        TableGateway $topicSubscribeTable
+        TableGateway $topicSubscribeTable,
+        User $userModel
     ) {
         $this->voteTable = $voteTable;
         $this->topicTable = $topicTable;
         $this->messageTable = $messageTable;
         $this->topicViewTable = $topicViewTable;
         $this->topicSubscribeTable = $topicSubscribeTable;
-    }
-
-    /**
-     * @return User
-     */
-    private function getUserTable()
-    {
-        return $this->userTable
-            ? $this->userTable
-            : $this->userTable = new User();
+        $this->userModel = $userModel;
     }
 
     /**
@@ -172,7 +164,7 @@ class CommentsService
 
         $comments = [];
         foreach ($rows as $row) {
-            $author = $this->getUserTable()->find($row['author_id'])->current();
+            $author = $this->userModel->getRow(['id' => (int)$row['author_id']]);
 
             $vote = null;
             if ($userId) {
@@ -185,7 +177,7 @@ class CommentsService
 
             $deletedBy = null;
             if ($row['deleted']) {
-                $deletedBy = $this->getUserTable()->find($row['deleted_by'])->current();
+                $deletedBy = $this->userModel->getRow(['id' => (int)$row['deleted_by']]);
             }
 
             if ($row['replies_count'] > 0) {
@@ -391,7 +383,7 @@ class CommentsService
 
         $positiveVotes = $negativeVotes = [];
         foreach ($voteRows as $voteRow) {
-            $user = $this->getUserTable()->find($voteRow['user_id'])->current();
+            $user = $this->userModel->getRow(['id' => (int)$voteRow['user_id']]);
             if ($voteRow['vote'] > 0) {
                 $positiveVotes[] = $user;
             } elseif ($voteRow['vote'] < 0) {
@@ -1263,5 +1255,21 @@ class CommentsService
             'item_id' => (int)$itemId,
             'user_id' => (int)$userId,
         ]);
+    }
+
+    public function getTopAuthors(int $limit): array
+    {
+        $select = $this->messageTable->getSql()->select()
+            ->columns(['author_id', 'volume' => new Sql\Expression('sum(vote)')])
+            ->group('author_id')
+            ->order('volume DESC')
+            ->limit($limit);
+
+        $result = [];
+        foreach ($this->messageTable->selectWith($select) as $row) {
+            $result[(int)$row['author_id']] = (int)$row['volume'];
+        }
+
+        return $result;
     }
 }

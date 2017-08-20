@@ -4,7 +4,7 @@ namespace Application\Model;
 
 use Zend\Db\TableGateway\TableGateway;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class UserItemSubscribe
 {
@@ -13,9 +13,15 @@ class UserItemSubscribe
      */
     private $table;
 
-    public function __construct(TableGateway $table)
+    /**
+     * @var User
+     */
+    private $userModel;
+
+    public function __construct(TableGateway $table, User $userModel)
     {
         $this->table = $table;
+        $this->userModel = $userModel;
     }
 
     public function subscribe(int $userId, int $itemId)
@@ -41,12 +47,12 @@ class UserItemSubscribe
 
     public function getItemSubscribers(int $itemId)
     {
-        $uTable = new User();
+        $table = $this->userModel->getTable();
 
-        return $uTable->fetchAll(
-            $uTable->select(true)
-                ->join('user_item_subscribe', 'users.id = user_item_subscribe.user_id', null)
-                ->where('user_item_subscribe.item_id = ?', $itemId)
+        return $table->selectWith(
+            $table->getSql()->select()
+                ->join('user_item_subscribe', 'users.id = user_item_subscribe.user_id', [])
+                ->where(['user_item_subscribe.item_id' => $itemId])
         );
     }
 

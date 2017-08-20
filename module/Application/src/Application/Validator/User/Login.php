@@ -2,7 +2,10 @@
 
 namespace Application\Validator\User;
 
+use Zend\Db\Sql;
 use Zend\Validator\AbstractValidator;
+
+use Autowp\User\Model\User;
 
 class Login extends AbstractValidator
 {
@@ -12,16 +15,27 @@ class Login extends AbstractValidator
         self::USER_NOT_FOUND => "login/user-%value%-not-found"
     ];
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
+    public function setUserModel(User $userModel)
+    {
+        $this->userModel = $userModel;
+
+        return $this;
+    }
+
     public function isValid($value)
     {
         $this->setValue($value);
 
-        $users = new \Autowp\User\Model\DbTable\User();
-        $user = $users->fetchRow(
-            $users->select(true)
-                  ->where('login = ?', (string)$value)
-                  ->orWhere('e_mail = ?', (string)$value)
-        );
+        $table = $this->userModel->getTable();
+
+        $user = $table->select([
+            new Sql\Predicate\Expression('login = ? or e_mail = ?', [(string)$value, (string)$value])
+        ])->current();
 
         if (! $user) {
             $this->error(self::USER_NOT_FOUND);

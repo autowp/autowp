@@ -6,7 +6,7 @@ use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 use Zend\Authentication\Adapter\Exception\InvalidArgumentException;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 class Id implements AdapterInterface
 {
@@ -24,14 +24,23 @@ class Id implements AdapterInterface
      */
     private $authenticateResultInfo = null;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
+    public function __construct(User $userModel)
+    {
+        $this->userModel = $userModel;
+    }
+
     public function authenticate()
     {
         $this->authenticateSetup();
 
-        $userTable = new User();
-        $userRow = $userTable->fetchRow([
-            'not deleted',
-            'id = ?' => (int)$this->identity
+        $userRow = $this->userModel->getRow([
+            'not_deleted' => true,
+            'id'          => (int)$this->identity
         ]);
 
         if (! $userRow) {

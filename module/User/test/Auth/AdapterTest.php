@@ -2,11 +2,13 @@
 
 namespace AutowpTest\User\Auth;
 
-use Application\Test\AbstractHttpControllerTestCase;
-
 use Autowp\User\Auth\Adapter\Id;
 use Autowp\User\Auth\Adapter\Login;
 use Autowp\User\Auth\Adapter\Remember;
+use Autowp\User\Model\User;
+
+use Application\Service\UsersService;
+use Application\Test\AbstractHttpControllerTestCase;
 
 class AdapterTest extends AbstractHttpControllerTestCase
 {
@@ -16,7 +18,10 @@ class AdapterTest extends AbstractHttpControllerTestCase
     {
         $this->getApplication(); // to initialize
 
-        $adapter = new Id();
+        $serviceManager = $this->getApplicationServiceLocator();
+        $userModel = $serviceManager->get(User::class);
+
+        $adapter = new Id($userModel);
         $adapter->setIdentity(1);
         $result = $adapter->authenticate();
 
@@ -27,11 +32,12 @@ class AdapterTest extends AbstractHttpControllerTestCase
     {
         $this->getApplication(); // to initialize
 
-        $config = $this->getApplicationServiceLocator()->get('Config');
-        $db = $this->getApplicationServiceLocator()->get(\Zend_Db_Adapter_Abstract::class);
+        $serviceManager = $this->getApplicationServiceLocator();
+        $userModel = $serviceManager->get(User::class);
+        $userService = $serviceManager->get(UsersService::class);
 
-        $expr = 'MD5(CONCAT(' . $db->quote($config['users']['salt']) . ', "123456"))';
-        $adapter = new Login('test@example.com', $expr);
+        $expr = $userService->getPasswordHashExpr('123456');
+        $adapter = new Login($userModel, 'test@example.com', $expr);
         $result = $adapter->authenticate();
 
         $this->assertTrue($result->isValid());
@@ -41,7 +47,10 @@ class AdapterTest extends AbstractHttpControllerTestCase
     {
         $this->getApplication(); // to initialize
 
-        $adapter = new Remember();
+        $serviceManager = $this->getApplicationServiceLocator();
+        $userModel = $serviceManager->get(User::class);
+
+        $adapter = new Remember($userModel);
         $adapter->setCredential('admin-token');
         $result = $adapter->authenticate();
 

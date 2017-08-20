@@ -20,6 +20,6 @@ class RegistrationTest extends AbstractHttpControllerTestCase
             'ip'       => '127.0.0.1'
         ], 'en');
 
-        $this->assertInstanceOf(\Zend_Db_Table_Row_Abstract::class, $user);
+        $this->assertNotEmpty($user['id']);
     }
 }

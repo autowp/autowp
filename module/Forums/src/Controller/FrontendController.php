@@ -2,6 +2,9 @@
 
 namespace Autowp\Forums\Controller;
 
+use DateTime;
+
+use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
@@ -10,10 +13,6 @@ use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 
 use Application\Comments;
-
-use DateTime;
-
-use Zend_Db_Expr;
 
 class FrontendController extends AbstractActionController
 {
@@ -169,9 +168,12 @@ class FrontendController extends AbstractActionController
                         $values['resolve'] = $isModearator && $values['parent_id'] && $values['resolve'];
                         $messageId = $this->model->addMessage($values);
 
-                        $user['forums_messages'] = new Zend_Db_Expr('forums_messages + 1');
-                        $user['last_message_time'] = new Zend_Db_Expr('NOW()');
-                        $user->save();
+                        $this->userModel->getTable()->update([
+                            'forums_messages'   => new Sql\Expression('forums_messages + 1'),
+                            'last_message_time' => new Sql\Expression('NOW()')
+                        ], [
+                            'id' => $user['id']
+                        ]);
 
                         $messageUrl = $this->topicMessageUrl($messageId, true);
 
@@ -179,8 +181,8 @@ class FrontendController extends AbstractActionController
                             $authorId = $this->comments->service()->getMessageAuthorId($values['parent_id']);
                             if ($authorId && ($authorId != $user['id'])) {
                                 $parentMessageAuthor = $this->userModel->getRow([
-                                    'id' => (int)$authorId,
-                                    'not_deleted'
+                                    'id'          => (int)$authorId,
+                                    'not_deleted' => true
                                 ]);
 
                                 if ($parentMessageAuthor) {
@@ -353,12 +355,13 @@ class FrontendController extends AbstractActionController
 
                         $topicId = $this->model->addTopic($values);
 
-                        $user->setFromArray([
-                            'forums_topics'     => new Zend_Db_Expr('forums_topics + 1'),
-                            'forums_messages'   => new Zend_Db_Expr('forums_messages + 1'),
-                            'last_message_time' => new Zend_Db_Expr('NOW()')
+                        $this->userModel->getTable()->update([
+                            'forums_topics'     => new Sql\Expression('forums_topics + 1'),
+                            'forums_messages'   => new Sql\Expression('forums_messages + 1'),
+                            'last_message_time' => new Sql\Expression('NOW()')
+                        ], [
+                            'id' => $user['id']
                         ]);
-                        $user->save();
 
                         return $this->redirect()->toUrl($this->topicUrl($topicId));
                     }

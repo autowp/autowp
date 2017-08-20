@@ -20,7 +20,8 @@ class MessageServiceFactory implements FactoryInterface
         $tables = $container->get(\Application\Db\TableManager::class);
         return new MessageService(
             $container->get(\Application\Service\TelegramService::class),
-            $tables->get('personal_messages')
+            $tables->get('personal_messages'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

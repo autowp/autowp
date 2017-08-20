@@ -5,7 +5,7 @@ namespace ApplicationTest\Controller\Api;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\RegistrationController;
@@ -34,12 +34,13 @@ class UserControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('index');
 
         // get id
-        $userTable = new User();
-        $userRow = $userTable->fetchRow(
-            $userTable->select(true)
+        $userModel = $this->getApplicationServiceLocator()->get(User::class);
+        $table = $userModel->getTable();
+        $userRow = $table->selectWith(
+            $table->getSql()->select()
                 ->order('id desc')
                 ->limit(1)
-        );
+        )->current();
 
         // delete user
         $this->reset();

@@ -14,7 +14,8 @@ class UserItemSubscribeFactory implements FactoryInterface
     {
         $tables = $container->get(\Application\Db\TableManager::class);
         return new UserItemSubscribe(
-            $tables->get('user_item_subscribe')
+            $tables->get('user_item_subscribe'),
+            $container->get(\Autowp\User\Model\User::class)
         );
     }
 }

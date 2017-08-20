@@ -8,7 +8,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Form\Form;
 
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 use Autowp\User\Model\UserPasswordRemind;
 
 use Application\HostManager;
@@ -43,13 +43,19 @@ class RestorePasswordController extends AbstractActionController
      */
     private $userPasswordRemind;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         UsersService $service,
         Form $restorePasswordForm,
         Form $newPasswordForm,
         $transport,
         HostManager $hostManager,
-        UserPasswordRemind $userPasswordRemind
+        UserPasswordRemind $userPasswordRemind,
+        User $userModel
     ) {
         $this->service = $service;
         $this->restorePasswordForm = $restorePasswordForm;
@@ -57,6 +63,7 @@ class RestorePasswordController extends AbstractActionController
         $this->transport = $transport;
         $this->hostManager = $hostManager;
         $this->userPasswordRemind = $userPasswordRemind;
+        $this->userModel = $userModel;
     }
 
     public function indexAction()
@@ -70,10 +77,9 @@ class RestorePasswordController extends AbstractActionController
             if ($this->restorePasswordForm->isValid()) {
                 $values = $this->restorePasswordForm->getData();
 
-                $users = new User();
-                $user = $users->fetchRow([
-                    'e_mail = ?' => (string)$values['email'],
-                    'not deleted'
+                $user = $this->userModel->getRow([
+                    'email'       => (string)$values['email'],
+                    'not_deleted' => true
                 ]);
 
                 if ($user) {
@@ -132,8 +138,7 @@ class RestorePasswordController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $userTable = new User();
-        $user = $userTable->find($userId)->current();
+        $user = $this->userModel->getRow((int)$userId);
 
         if (! $user) {
             return $this->notFoundAction();
@@ -149,7 +154,7 @@ class RestorePasswordController extends AbstractActionController
 
                 $this->userPasswordRemind->deleteToken($code);
 
-                $adapter = new IdAuthAdapter();
+                $adapter = new IdAuthAdapter($this->userModel);
                 $adapter->setIdentity($user['id']);
 
                 $auth = new AuthenticationService();

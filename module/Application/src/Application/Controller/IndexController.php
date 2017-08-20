@@ -5,7 +5,7 @@ namespace Application\Controller;
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\User;
 
 use Application\Model\CarOfDay;
 use Application\Model\Categories;
@@ -55,6 +55,11 @@ class IndexController extends AbstractActionController
      */
     private $brand;
 
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         $cache,
         SpecificationsService $specsService,
@@ -64,7 +69,8 @@ class IndexController extends AbstractActionController
         Twins $twins,
         Picture $picture,
         Item $item,
-        Brand $brand
+        Brand $brand,
+        User $userModel
     ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
@@ -76,6 +82,7 @@ class IndexController extends AbstractActionController
 
         $this->item = $item;
         $this->brand = $brand;
+        $this->userModel = $userModel;
     }
 
     private function brands()
@@ -243,8 +250,6 @@ class IndexController extends AbstractActionController
             $this->cache->setItem($cacheKey, $twinsBlock);
         }
 
-        $userTable = new User();
-
         $cacheKey = 'INDEX_SPEC_CARS_16_' . $language;
         $cars = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
@@ -284,14 +289,13 @@ class IndexController extends AbstractActionController
                 'specsService' => $this->specsService
             ]),
             'disableDescription'   => true,
-            'callback'             => function (&$item) use ($userTable) {
+            'callback'             => function (&$item) {
                 $contribPairs = $this->specsService->getContributors([$item['id']]);
                 if ($contribPairs) {
-                    $item['contributors'] = $userTable->fetchAll(
-                        $userTable->select(true)
-                            ->where('id IN (?)', array_keys($contribPairs))
-                            ->where('not deleted')
-                    );
+                    $item['contributors'] = $this->userModel->getRows([
+                        'id' => array_keys($contribPairs),
+                        'not_deleted'
+                    ]);
                 } else {
                     $item['contributors'] = [];
                 }
