@@ -52,7 +52,7 @@ class NewPictureFetcher extends PictureFetcher
         $select = $this->pictureModel->getTable()->getSql()->select();
 
         $select->columns(['picture_item.item_id', 'count' => new Sql\Expression('COUNT(1)')])
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
             ->where([
                 new Sql\Predicate\In('pictures.id', $this->pictureIds),
                 'pictures.status' => Picture::STATUS_ACCEPTED,

@@ -176,8 +176,8 @@ class User extends AbstractHelper
     }
 
     /**
-     * @param  Zend_Acl_Resource_Interface|string $resource
-     * @param  string                             $privilege
+     * @param  string $resource
+     * @param  string $privilege
      * @return boolean
      */
     public function isAllowed($resource = null, $privilege = null)

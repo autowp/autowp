@@ -104,9 +104,9 @@ class CarsController extends AbstractActionController
                 $db->select()
                     ->from('modification_picture', 'count(1)')
                     ->where('modification_picture.modification_id = ?', $mRow['id'])
-                    ->join('pictures', 'modification_picture.picture_id = pictures.id', null)
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->join('pictures', 'modification_picture.picture_id = pictures.id', [])
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
                     ->where('item_parent_cache.parent_id = ?', $car['id'])
             );
 
@@ -116,8 +116,8 @@ class CarsController extends AbstractActionController
             if ($isInherited) {
                 $carRow = $itemTable->fetchRow(
                     $itemTable->select(true)
-                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                        ->join('modification', 'item.id = modification.item_id', null)
+                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                        ->join('modification', 'item.id = modification.item_id', [])
                         ->where('modification.id = ?', $mRow['id'])
                 );
 
@@ -266,8 +266,8 @@ class CarsController extends AbstractActionController
 
         $pictureRows = $pictureTable->fetchAll(
             $pictureTable->select(true)
-                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
                 ->where('item_parent_cache.parent_id = ?', $car['id'])
                 ->order('pictures.id')
         );

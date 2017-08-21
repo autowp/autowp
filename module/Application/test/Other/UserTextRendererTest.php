@@ -34,25 +34,6 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
         $this->assertContains($expected, $result);
     }
 
-    /*public function testPictures()
-    {
-        $bootstrap = Zend_Controller_Front::getInstance()->getParam('bootstrap');
-        $view = $bootstrap->getResource('View');
-
-        $text = 'https://fr.wheelsage.org/subaru/impreza/ii/16899/pictures/225671/';
-
-        $renderer = new Renderer($view);
-        $result = $renderer->render($text);
-        $this->assertContains(
-                '/picture/225671',
-                $result
-        );
-        $this->assertContains(
-                '.jpeg',
-                $result
-        );
-    }*/
-
     public static function usersProvider()
     {
         return [

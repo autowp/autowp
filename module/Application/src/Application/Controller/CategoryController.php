@@ -376,8 +376,8 @@ class CategoryController extends AbstractActionController
             $contributors = [];
             /*$contributors = $users->fetchAll(
                 $users->select(true)
-                    ->join('category_item', 'users.id = category_item.user_id', null)
-                    ->join('category_parent', 'category_item.category_id = category_parent.category_id', null)
+                    ->join('category_item', 'users.id = category_item.user_id', [])
+                    ->join('category_parent', 'category_item.category_id = category_parent.category_id', [])
                     ->where('category_parent.parent_id = ?', $currentCategory['id'])
                     ->where('not users.deleted')
                     ->group('users.id')
