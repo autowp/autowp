@@ -523,7 +523,7 @@ class Pic extends AbstractPlugin
                     'language' => $language,
                     'child'  => [
                         'link_type'          => ItemParent::TYPE_DESIGN,
-                        'columns'            => ['brand_item_catname' => 'catname'],
+                        'columns'            => ['brand_item_catname' => 'link_catname'],
                         'descendant_or_self' => $item['id']
                     ]
                 ]);
