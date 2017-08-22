@@ -10,7 +10,7 @@ use Zend\Session\SessionManager;
 
 use Autowp\Cron;
 
-use Application\Model\Picture;
+use Application\Service\PictureService;
 
 class Maintenance extends AbstractListenerAggregate
 {
@@ -32,15 +32,14 @@ class Maintenance extends AbstractListenerAggregate
 
         $application = $event->getApplication();
         $serviceManager = $application->getServiceManager();
-        $pictureModel = $serviceManager->get(Picture::class);
 
-        $comments = $serviceManager->get(Comments::class);
-        /* $comments->cleanBrokenMessages();
+        /* $comments = $serviceManager->get(Comments::class);
+        $comments->cleanBrokenMessages();
         $comments->service()->cleanupDeleted();
         $comments->service()->cleanTopics();*/
 
-        $imageStorage = $serviceManager->get(\Autowp\Image\Storage::class);
-        $this->clearPicturesQueue($pictureModel, $comments->service(), $imageStorage);
+        $pictureService = $serviceManager->get(PictureService::class);
+        $pictureService->clearQueue();
 
         $sessionManager = $serviceManager->get(\Zend\Session\SessionManager::class);
         $this->clearSessions($sessionManager);
@@ -94,48 +93,5 @@ class Maintenance extends AbstractListenerAggregate
         $sessionManager->getSaveHandler()->gc($gcMaxLifetime);
 
         return "Garabage collected\n";
-    }
-
-    private function clearPicturesQueue(
-        Picture $pictureModel,
-        \Autowp\Comments\CommentsService $comments,
-        \Autowp\Image\Storage $imageStorage
-    ) {
-        $select = $pictureModel->getTable()->getSql()->select();
-
-        $select->where([
-            'status' => Picture::STATUS_REMOVING,
-            new Sql\Predicate\Expression(
-                '(removing_date is null OR (removing_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY) ))'
-            ),
-        ])->limit(1000);
-
-        $pictures = $pictureModel->getTable()->selectWith($select);
-
-        $count = count($pictures);
-
-        if ($count) {
-            print sprintf("Removing %d pictures\n", $count);
-
-            foreach ($pictures as $picture) {
-                $comments->deleteTopic(
-                    \Application\Comments::PICTURES_TYPE_ID,
-                    $picture['id']
-                );
-
-                $imageId = $picture['image_id'];
-                if ($imageId) {
-                    $pictureModel->getTable()->delete([
-                        'id = ?' => $picture['id']
-                    ]);
-
-                    $imageStorage->removeImage($imageId);
-                } else {
-                    print "Brokern image `{$picture['id']}`. Skip\n";
-                }
-            }
-        } else {
-            print "Nothing to clear\n";
-        }
     }
 }

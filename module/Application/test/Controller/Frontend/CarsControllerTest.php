@@ -100,7 +100,8 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/cars/car-specifications-editor/item_id/1/form/car/tab/spec', Request::METHOD_POST, [
+        $url = 'https://www.autowp.ru/cars/car-specifications-editor/item_id/1/form/car/tab/spec';
+        $this->dispatch($url, Request::METHOD_POST, [
             'attr_16[attr_66]' => '11',
             'attr_16[attr_13]' => '3',
             'attr_16[attr_12][attr_67]' => '5',

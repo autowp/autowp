@@ -2,20 +2,10 @@
 
 namespace Application\Controller;
 
-use Exception;
-
-use geoPHP;
-use Point;
-
-use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-use Autowp\Comments;
-
-use Application\DuplicateFinder;
-use Application\ExifGPSExtractor;
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand;
 use Application\Model\Item;
@@ -23,37 +13,16 @@ use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
-use Application\Model\UserPicture;
-use Application\Service\TelegramService;
+use Application\Service\PictureService;
 
 class UploadController extends AbstractActionController
 {
     private $partial;
 
     /**
-     * @var TelegramService
-     */
-    private $telegram;
-
-    /**
      * @var PictureItem
      */
     private $pictureItem;
-
-    /**
-     * @var DuplicateFinder
-     */
-    private $duplicateFinder;
-
-    /**
-     * @var Comments\CommentsService
-     */
-    private $comments;
-
-    /**
-     * @var UserPicture
-     */
-    private $userPicture;
 
     /**
      * @var Perspective
@@ -80,30 +49,29 @@ class UploadController extends AbstractActionController
      */
     private $brand;
 
+    /**
+     * @var PictureService
+     */
+    private $pictureService;
+
     public function __construct(
         $partial,
-        TelegramService $telegram,
         PictureItem $pictureItem,
-        DuplicateFinder $duplicateFinder,
-        Comments\CommentsService $comments,
-        UserPicture $userPicture,
         Perspective $perspective,
         ItemParent $itemParent,
         Item $item,
         Brand $brand,
-        Picture $picture
+        Picture $picture,
+        PictureService $pictureService
     ) {
         $this->partial = $partial;
-        $this->telegram = $telegram;
         $this->pictureItem = $pictureItem;
-        $this->duplicateFinder = $duplicateFinder;
-        $this->comments = $comments;
-        $this->userPicture = $userPicture;
         $this->perspective = $perspective;
         $this->itemParent = $itemParent;
         $this->item = $item;
         $this->brand = $brand;
         $this->picture = $picture;
+        $this->pictureService = $pictureService;
     }
 
     public function onlyRegisteredAction()
@@ -173,7 +141,7 @@ class UploadController extends AbstractActionController
         ];
     }
 
-    private function saveUpload($form, $itemIds, $perspectiveId, $replacePicture)
+    private function saveUpload($form, $itemIds, $perspectiveId, int $replacePictureId)
     {
         $user = $this->user()->get();
 
@@ -193,120 +161,15 @@ class UploadController extends AbstractActionController
         $result = [];
 
         foreach ($tempFilePaths as $tempFilePath) {
-            list ($width, $height, $imageType) = getimagesize($tempFilePath);
-            $width = (int)$width;
-            $height = (int)$height;
-            if ($width <= 0) {
-                throw new Exception("Width <= 0");
-            }
-
-            if ($height <= 0) {
-                throw new Exception("Height <= 0");
-            }
-
-            // generate filename
-            switch ($imageType) {
-                case IMAGETYPE_JPEG:
-                case IMAGETYPE_PNG:
-                    break;
-                default:
-                    throw new Exception("Unsupported image type");
-            }
-            $ext = image_type_to_extension($imageType, false);
-
-            $imageId = $this->imageStorage()->addImageFromFile($tempFilePath, 'picture', [
-                'extension' => $ext,
-                'pattern'   => 'autowp_' . rand()
-            ]);
-
-            $image = $this->imageStorage()->getImage($imageId);
-            $fileSize = $image->getFileSize();
-
-            $resolution = $this->imageStorage()->getImageResolution($imageId);
-
-            // add record to db
-            $this->picture->getTable()->insert([
-                'image_id'      => $imageId,
-                'width'         => $width,
-                'height'        => $height,
-                'dpi_x'         => $resolution ? $resolution['x'] : null,
-                'dpi_y'         => $resolution ? $resolution['y'] : null,
-                'owner_id'      => $user ? $user['id'] : null,
-                'add_date'      => new Sql\Expression('NOW()'),
-                'filesize'      => $fileSize,
-                'status'        => Picture::STATUS_INBOX,
-                'removing_date' => null,
-                'ip'            => inet_pton($this->getRequest()->getServer('REMOTE_ADDR')),
-                'identity'      => $this->picture->generateIdentity(),
-                'replace_picture_id' => $replacePicture ? $replacePicture['id'] : null,
-            ]);
-
-            $pictureId = $this->picture->getTable()->getLastInsertValue();
-
-            $picture = $this->picture->getRow(['id' => (int)$pictureId]);
-
-            if ($itemIds) {
-                $this->pictureItem->setPictureItems($pictureId, $itemIds);
-                if ($perspectiveId && count($itemIds) == 1) {
-                    $this->pictureItem->setProperties($pictureId, $itemIds[0], [
-                        'perspective' => $perspectiveId
-                    ]);
-                }
-            }
-
-            // increment uploads counter
-            if ($user) {
-                $this->userPicture->incrementUploads($user['id']);
-            }
-
-            // rename file to new
-            $this->imageStorage()->changeImageName($imageId, [
-                'pattern' => $this->picture->getFileNamePattern($picture)
-            ]);
-
-            // add comment
-            if ($values['note']) {
-                $this->comments->add([
-                    'typeId'             => \Application\Comments::PICTURES_TYPE_ID,
-                    'itemId'             => $pictureId,
-                    'parentId'           => null,
-                    'authorId'           => $user['id'],
-                    'message'            => $values['note'],
-                    'ip'                 => $this->getRequest()->getServer('REMOTE_ADDR'),
-                    'moderatorAttention' => Comments\Attention::NONE
-                ]);
-            }
-
-            $this->comments->subscribe(
-                \Application\Comments::PICTURES_TYPE_ID,
-                $pictureId,
-                $user['id']
+            $picture = $this->pictureService->addPictureFromFile(
+                $tempFilePath,
+                $user['id'],
+                $this->getRequest()->getServer('REMOTE_ADDR'),
+                $itemIds,
+                $perspectiveId,
+                $replacePictureId,
+                (string)$values['note']
             );
-
-            // read gps
-            $exif = $this->imageStorage()->getImageEXIF($imageId);
-            $extractor = new ExifGPSExtractor();
-            $gps = $extractor->extract($exif);
-            if ($gps !== false) {
-                geoPHP::version();
-                $point = new Point($gps['lng'], $gps['lat']);
-
-                $this->picture->getTable()->update([
-                    'point' => new Sql\Expression('GeomFromWKB(?)', [$point->out('wkb')])
-                ], [
-                    'id' => $pictureId
-                ]);
-            }
-
-            $formatRequest = $this->picture->getFormatRequest($picture);
-            $this->imageStorage()->getFormatedImage($formatRequest, 'picture-thumb');
-            $this->imageStorage()->getFormatedImage($formatRequest, 'picture-medium');
-            $this->imageStorage()->getFormatedImage($formatRequest, 'picture-gallery-full');
-
-            // index
-            $this->duplicateFinder->indexImage($pictureId, $tempFilePath);
-
-            $this->telegram->notifyInbox($pictureId);
 
             $result[] = $picture;
         }
@@ -661,7 +524,7 @@ class UploadController extends AbstractActionController
             return new JsonModel($form->getMessages());
         }
 
-        $pictures = $this->saveUpload($form, $itemIds, $perspectiveId, $replacePicture);
+        $pictures = $this->saveUpload($form, $itemIds, $perspectiveId, $replacePicture ? $replacePicture['id'] : 0);
 
         $result = [];
         foreach ($pictures as $picture) {

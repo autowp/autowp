@@ -158,6 +158,7 @@ return [
             Model\VehicleType::class             => Model\VehicleTypeFactory::class,
             PictureNameFormatter::class          => Service\PictureNameFormatterFactory::class,
             Service\Mosts::class                 => Service\MostsFactory::class,
+            Service\PictureService::class        => Service\PictureServiceFactory::class,
             Service\SpecificationsService::class => Service\SpecificationsServiceFactory::class,
             Service\TelegramService::class       => Service\TelegramServiceFactory::class,
             Service\UsersService::class          => Service\UsersServiceFactory::class,
