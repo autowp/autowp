@@ -937,7 +937,7 @@ class Pic extends AbstractPlugin
         if ($picture['replace_picture_id']) {
             $replacePictureRow = $this->picture->getRow(['id' => (int)$picture['replace_picture_id']]);
 
-            $replacePicture = $controller->pic()->href($replacePictureRow->toArray());
+            $replacePicture = $controller->pic()->href($replacePictureRow);
 
             if ($replacePictureRow['status'] == Picture::STATUS_REMOVING) {
                 if (! $controller->user()->inheritsRole('moder')) {
@@ -1384,9 +1384,7 @@ class Pic extends AbstractPlugin
 
     public function name($pictureRow, $language)
     {
-        if ($pictureRow instanceof Row) {
-            $pictureRow = $pictureRow->toArray();
-        } elseif ($pictureRow instanceof \ArrayObject) {
+        if ($pictureRow instanceof \ArrayObject) {
             $pictureRow = (array)$pictureRow;
         }
 

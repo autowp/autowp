@@ -97,7 +97,7 @@ class PictureController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $url = $this->pic()->href($picture->toArray(), [
+        $url = $this->pic()->href($picture, [
             'fallback' => false
         ]);
 
