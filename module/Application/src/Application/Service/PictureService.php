@@ -206,7 +206,7 @@ class PictureService
                 'authorId'           => $userId,
                 'message'            => $note,
                 'ip'                 => $remoteAddr,
-                'moderatorAttention' => Comments\Attention::NONE
+                'moderatorAttention' => \Autowp\Comments\Attention::NONE
             ]);
         }
 

@@ -412,7 +412,7 @@ class TwinsController extends AbstractActionController
 
         $pictureId = (string)$this->params('picture_id');
 
-        $picture = $this->itemModel->getRow([
+        $picture = $this->picture->getRow([
             'identity' => $pictureId,
             'status'   => Picture::STATUS_ACCEPTED,
             'item'     => [
