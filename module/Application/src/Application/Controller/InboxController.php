@@ -137,10 +137,7 @@ class InboxController extends AbstractActionController
             ->setItemCountPerPage(self::PER_PAGE)
             ->setCurrentPageNumber($this->params('page'));
 
-        $select = $service->getCurrentDateSelect()
-            ->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-        $picturesData = $this->pic()->listData($select, [
+        $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
             'width' => 6
         ]);
 
