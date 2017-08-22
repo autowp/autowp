@@ -141,7 +141,7 @@ class UploadController extends AbstractActionController
         ];
     }
 
-    private function saveUpload($form, $itemIds, $perspectiveId, int $replacePictureId)
+    private function saveUpload($form, $itemIds, int $perspectiveId, int $replacePictureId)
     {
         $user = $this->user()->get();
 
@@ -524,7 +524,7 @@ class UploadController extends AbstractActionController
             return new JsonModel($form->getMessages());
         }
 
-        $pictures = $this->saveUpload($form, $itemIds, $perspectiveId, $replacePicture ? $replacePicture['id'] : 0);
+        $pictures = $this->saveUpload($form, $itemIds, (int)$perspectiveId, $replacePicture ? $replacePicture['id'] : 0);
 
         $result = [];
         foreach ($pictures as $picture) {
