@@ -1156,8 +1156,7 @@ class CatalogueController extends AbstractActionController
             */
 
             if ($usedIds) {
-                $select
-                    ->where('pictures.id not in (?)', $usedIds);
+                $select->where([new Sql\Predicate\NotIn('pictures.id', $usedIds)]);
             }
 
             $picture = $this->picture->getTable()->selectWith($select)->current();
