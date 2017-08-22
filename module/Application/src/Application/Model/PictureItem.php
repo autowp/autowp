@@ -160,7 +160,7 @@ class PictureItem
     {
         $rows = $this->table->select([
             'picture_id' => $pictureId
-        ])->current();
+        ]);
 
         $result = [];
         foreach ($rows as $row) {
