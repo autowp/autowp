@@ -519,8 +519,9 @@ class Pic extends AbstractPlugin
                 }
 
                 $designCarsRow = $this->itemModel->getRow([
-                    'columns'  => ['name', 'catname'],
-                    'language' => $language,
+                    'columns'      => ['name', 'catname'],
+                    'item_type_id' => Item::BRAND,
+                    'language'     => $language,
                     'child'  => [
                         'link_type'          => ItemParent::TYPE_DESIGN,
                         'columns'            => ['brand_item_catname' => 'link_catname'],
