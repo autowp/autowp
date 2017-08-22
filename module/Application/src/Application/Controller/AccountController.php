@@ -401,8 +401,13 @@ class AccountController extends AbstractActionController
         if ($request->isPost() && $this->params('form') == 'reset-photo') {
             $oldImageId = $user['img'];
             if ($oldImageId) {
-                $user['img'] = null;
-                $user->save();
+
+                $this->userModel->getTable()->update([
+                    'img' => null
+                ], [
+                    'id' => $user['id']
+                ]);
+
                 $this->imageStorage()->removeImage($oldImageId);
             }
 
@@ -437,8 +442,13 @@ class AccountController extends AbstractActionController
                 $imagick->clear();
 
                 $oldImageId = $user['img'];
-                $user['img'] = $newImageId;
-                $user->save();
+
+                $this->userModel->getTable()->update([
+                    'img' => $newImageId
+                ], [
+                    'id' => $user['id']
+                ]);
+
                 if ($oldImageId) {
                     $imageStorage->removeImage($oldImageId);
                 }
@@ -482,9 +492,12 @@ class AccountController extends AbstractActionController
             if ($this->settingsForm->isValid()) {
                 $values = $this->settingsForm->getData();
 
-                $user['timezone'] = $values['timezone'];
-                $user['language'] = $values['language'];
-                $user->save();
+                $this->userModel->getTable()->update([
+                    'timezone' => $values['timezone'],
+                    'language' => $values['language']
+                ], [
+                    'id' => $user['id']
+                ]);
 
                 $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/saved'));
 
@@ -762,8 +775,6 @@ class AccountController extends AbstractActionController
                         $this->translate('account/access/self-delete/password-is-incorrect')
                     ]);
                 } else {
-                    $user['deleted'] = true;
-                    $user->save();
 
                     $this->service->markDeleted($user['id']);
 

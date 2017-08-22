@@ -322,8 +322,13 @@ class LoginController extends AbstractActionController
                         $imagick->clear();
 
                         $oldImageId = $uRow['img'];
-                        $uRow['img'] = $newImageId;
-                        $uRow->save();
+
+                        $this->userModel->getTable()->update([
+                            'img' => $newImageId
+                        ], [
+                            'id' => $uRow['id']
+                        ]);
+
                         if ($oldImageId) {
                             $this->imageStorage()->removeImage($oldImageId);
                         }
