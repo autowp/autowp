@@ -27,9 +27,6 @@ use Application\Model\UserAccount;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
 
-use Zend_Db_Select;
-use Zend_Db_Table_Select;
-
 class Pic extends AbstractPlugin
 {
     /**
@@ -335,7 +332,7 @@ class Pic extends AbstractPlugin
                 }
             }
             unset($row);
-        } elseif ($pictures instanceof Zend_Db_Table_Select) {
+        } elseif ($pictures instanceof \Zend_Db_Table_Select) {
             $table = $pictures->getTable();
             $db = $table->getAdapter();
 
@@ -343,7 +340,7 @@ class Pic extends AbstractPlugin
             $bind = [];
 
             $select
-                ->reset(Zend_Db_Select::COLUMNS)
+                ->reset(\Zend_Db_Select::COLUMNS)
                 ->setIntegrityCheck(false)
                 ->columns([
                     'pictures.id', 'pictures.identity', 'pictures.name',

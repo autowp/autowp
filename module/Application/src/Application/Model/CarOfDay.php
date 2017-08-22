@@ -6,17 +6,19 @@ use DateInterval;
 use DateTime;
 
 use Facebook;
+use League\OAuth1\Client\Credentials\TokenCredentials;
+use League\OAuth1\Client\Server\Twitter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Http\Client;
+use Zend\Http\Request;
+use Zend\Json\Json;
 
 use Autowp\Image;
 
 use Application\ItemNameFormatter;
 use Application\Model\Catalogue;
 use Application\Service\SpecificationsService;
-
-use Zend_Oauth_Token_Access;
-use Zend_Service_Twitter;
 
 class CarOfDay
 {
@@ -228,28 +230,45 @@ class CarOfDay
             $url
         );
 
-        $token = new Zend_Oauth_Token_Access();
-        $token->setParams($twOptions['token']);
 
-        $twitter = new Zend_Service_Twitter([
-            'username'     => $twOptions['username'],
-            'accessToken'  => $token,
-            'oauthOptions' => $twOptions['oauthOptions']
+        $server = new Twitter([
+            'identifier'   => $twOptions['oauthOptions']['consumerKey'],
+            'secret'       => $twOptions['oauthOptions']['consumerSecret'],
+            'callback_uri' => "http://example.com/",
         ]);
 
-        $response = $twitter->statusesUpdate($text);
+        $tokenCredentials = new TokenCredentials();
+        $tokenCredentials->setIdentifier($twOptions['token']['oauth_token']);
+        $tokenCredentials->setSecret($twOptions['token']['oauth_token_secret']);
 
-        if ($response->isSuccess()) {
-            $this->table->update([
-                'twitter_sent' => 1
-            ], [
-                'day_date' => $dayRow['day_date']
+        $url = 'https://api.twitter.com/1.1/statuses/update.json';
+        $params = [
+            'status' => $text
+        ];
+        $headers = $server->getHeaders($tokenCredentials, 'POST', $url, $params);
+
+        try {
+            $response = $server->createHttpClient()->post($url, [
+                'headers'     => $headers,
+                'form_params' => $params
             ]);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            $response = $e->getResponse();
+            $body = $response->getBody();
+            $statusCode = $response->getStatusCode();
 
-            print 'ok' . PHP_EOL;
-        } else {
-            print_r($response->getErrors());
+            throw new \Exception(
+                "Received error [$body] with status code [$statusCode] when retrieving token credentials."
+            );
         }
+
+        $this->table->update([
+            'twitter_sent' => 1
+        ], [
+            'day_date' => $dayRow['day_date']
+        ]);
+
+        print 'ok' . PHP_EOL;
     }
 
     public function putCurrentToFacebook(array $fbOptions)
@@ -389,9 +408,9 @@ class CarOfDay
             $this->itemNameFormatter->format($this->itemModel->getNameData($car, $language), $language)
         );
 
-        $client = new \Zend\Http\Client('https://api.vk.com/method/wall.post');
+        $client = new Client('https://api.vk.com/method/wall.post');
         $response = $client
-            ->setMethod(\Zend\Http\Request::METHOD_POST)
+            ->setMethod(Request::METHOD_POST)
             ->setParameterPost([
                 'owner_id'     => $vkOptions['owner_id'],
                 'from_group'   => 1,

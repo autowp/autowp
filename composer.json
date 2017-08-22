@@ -43,7 +43,6 @@
 		"zendframework/zend-session" : "^2.8.0",
 		"zendframework/zend-uri" : ">=2.5.2",
 		"zendframework/zend-view" : ">=2.9.0",
-		"zendframework/zendframework1" : "^1.12.20",
 		"zfcampus/zf-oauth2" : "^1.4.0",
 		"autowp/image" : "^2.0.4",
 		"jenssegers/imagehash" : "^0.4.1",
@@ -51,7 +50,8 @@
 		"zendframework/zend-hydrator" : "^2.2.1",
 		"autowp/cron" : "^0.1.1",
 		"zendframework/zend-filter" : ">=2.7.2",
-		"zendframework/zend-inputfilter" : ">=2.7.4"
+		"zendframework/zend-inputfilter" : ">=2.7.4",
+		"league/oauth1-client": "^1.7"
 	},
 	"autoload" : {
 		"psr-4" : {

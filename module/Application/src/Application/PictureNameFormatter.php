@@ -50,13 +50,13 @@ class PictureNameFormatter
 
     public function format($picture, $language)
     {
-        if ($picture instanceof \Zend_Db_Table_Row_Abstract) {
+        /*if ($picture instanceof \Zend_Db_Table_Row_Abstract) {
             $names = $this->picture->getNameData([$picture->toArray()], [
                 'language' => $language,
                 'large'    => true
             ]);
             $picture = $names[$picture['id']];
-        }
+        }*/
 
         if (isset($picture['name']) && $picture['name']) {
             return $picture['name'];

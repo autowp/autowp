@@ -401,7 +401,6 @@ class AccountController extends AbstractActionController
         if ($request->isPost() && $this->params('form') == 'reset-photo') {
             $oldImageId = $user['img'];
             if ($oldImageId) {
-
                 $this->userModel->getTable()->update([
                     'img' => null
                 ], [
@@ -775,7 +774,6 @@ class AccountController extends AbstractActionController
                         $this->translate('account/access/self-delete/password-is-incorrect')
                     ]);
                 } else {
-
                     $this->service->markDeleted($user['id']);
 
                     $auth = new AuthenticationService();
