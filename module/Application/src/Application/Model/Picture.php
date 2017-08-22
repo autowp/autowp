@@ -135,11 +135,11 @@ class Picture
 
         if ($options['link_type']) {
             if (! in_array(ItemParent::TYPE_SPORT, $options['link_type'])) {
-                $select->where(['not item_parent_cache.sport']);
+                $select->where(['not ipc_ancestor.sport']);
             }
 
             if (! in_array(ItemParent::TYPE_TUNING, $options['link_type'])) {
-                $select->where(['not item_parent_cache.tuning']);
+                $select->where(['not ipc_ancestor.tuning']);
             }
         }
     }
