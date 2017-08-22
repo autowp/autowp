@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Permissions\Acl\Acl;
 
