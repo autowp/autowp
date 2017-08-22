@@ -271,7 +271,7 @@ class TelegramService
             'chat_id' => $chatId
         ])->current();
 
-        if ($chat) {
+        if ($chat && $chat['user_id']) {
             $language = $this->userModel->getUserLanguage($chat['user_id']);
 
             if ($language) {
