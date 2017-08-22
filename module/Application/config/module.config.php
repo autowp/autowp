@@ -241,7 +241,7 @@ return [
     ],
 
     'hostname_whitelist' => ['www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
-        'i.' . $host, 'en.' . $host, 'fr.' . $host,
+        'i.' . $host, 'en.' . $host, 'fr.' . $host, 'ru.' . $host,
         'zh.' . $host, 'www.' . $host, $host],
 
     'pictures_hostname' => 'i.wheelsage.org',

@@ -14,11 +14,16 @@ import 'ng-tags-input/build/ng-tags-input.css';
 import 'ng-tags-input/build/ng-tags-input.bootstrap.css';
 import 'ui-leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'angular-moment';
+import 'moment/locale/fr.js';
+import 'moment/locale/ru.js';
+import 'moment/locale/zh-cn.js';
+import 'moment/locale/de.js';
 
 const MODULE_NAME = 'App';
 
-angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angularTranslate, 'nemLogging', 'btford.markdown', angularSanitize, "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet'])
-    .config(['$urlRouterProvider', '$locationProvider', '$translateProvider',
+angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angularTranslate, 'nemLogging', 'btford.markdown', angularSanitize, "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet', 'angularMoment'])
+    .config(['$urlRouterProvider', '$locationProvider', '$translateProvider', 
         function config($urlRouterProvider, $locationProvider, $translateProvider) {
             $locationProvider.html5Mode(true).hashPrefix('!');
     
@@ -39,7 +44,19 @@ angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angular
             $translateProvider.preferredLanguage(lang);
             $translateProvider.use(lang);
         }
-    ]);
+    ])
+    .run(['amMoment', function(amMoment) {
+        var lang = document.documentElement.getAttribute('lang');
+        var map = {
+            ru: 'ru',
+            en: 'en',
+            fr: 'fr',
+            zh: 'zh-cn',
+            de: 'de'
+        };
+        console.log(lang, map[lang]);
+        amMoment.changeLocale(map[lang]);
+    }]);
 
 
 export default MODULE_NAME;

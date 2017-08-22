@@ -10,35 +10,26 @@ class Language
     private $defaultLanguage = 'en';
 
     /**
-     * @var array
-     */
-    private $whitelist = [
-        'fr.wheelsage.org'  => 'fr',
-        'zh.wheelsage.org'  => 'zh',
-        'en.wheelsage.org'  => 'en',
-        'wheelsage.org'     => 'en',
-        'www.wheelsage.org' => 'en',
-        'autowp.ru'         => 'ru',
-        'www.autowp.ru'     => 'ru',
-        'ru.autowp.ru'      => 'ru',
-        'en.autowp.ru'      => 'ru',
-        'fr.autowp.ru'      => 'fr',
-        'i.wheelsage.org'   => 'en'
-    ];
-
-    /**
      * @var string
      */
     private $language;
 
-    public function __construct($request)
+    public function __construct($request, array $hosts)
     {
         $this->language = $this->defaultLanguage;
 
+        $map = [];
+        foreach ($hosts as $language => $host) {
+            $map[$host['hostname']] = $language;
+            foreach ($host['aliases'] as $alias) {
+                $map[$alias] = $language;
+            }
+        }
+
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
             $hostname = $request->getServer('HTTP_HOST');
-            if (isset($this->whitelist[$hostname])) {
-                $this->language = $this->whitelist[$hostname];
+            if (isset($map[$hostname])) {
+                $this->language = $map[$hostname];
             }
         }
     }
