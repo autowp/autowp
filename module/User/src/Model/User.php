@@ -33,7 +33,7 @@ class User
     public function updateSpecsVolumes()
     {
         $select = $this->table->getSql()->select()
-            ->columns(['id', 'count' => Sql\Expression('count(attrs_user_values.user_id)')])
+            ->columns(['id', 'count' => new Sql\Expression('count(attrs_user_values.user_id)')])
             ->join('attrs_user_values', 'attrs_user_values.user_id = users.id', [], $select::JOIN_LEFT)
             ->where('not users.specs_volume_valid')
             ->group('users.id');
