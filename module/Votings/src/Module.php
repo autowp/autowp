@@ -15,7 +15,8 @@ class Module implements
     {
         $provider = new ConfigProvider();
         return [
-            'service_manager' => $provider->getDependencyConfig()
+            'service_manager' => $provider->getDependencyConfig(),
+            'tables'          => $provider->getTablesConfig()
         ];
     }
 

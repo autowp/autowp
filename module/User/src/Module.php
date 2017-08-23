@@ -19,6 +19,7 @@ class Module implements
         return [
             'controller_plugins' => $provider->getControllerPluginConfig(),
             'service_manager'    => $provider->getDependencyConfig(),
+            'tables'             => $provider->getTablesConfig(),
             'view_helpers'       => $provider->getViewHelperConfig(),
         ];
     }

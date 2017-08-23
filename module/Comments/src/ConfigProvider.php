@@ -4,23 +4,18 @@ namespace Autowp\Comments;
 
 class ConfigProvider
 {
-    /**
-     * @return array
-     */
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
             'console'      => $this->getConsoleConfig(),
             'controllers'  => $this->getControllersConfig(),
             'dependencies' => $this->getDependencyConfig(),
-            'forms'        => $this->getFormsConfig()
+            'forms'        => $this->getFormsConfig(),
+            'tables'       => $this->getTablesConfig()
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getConsoleConfig()
+    public function getConsoleConfig(): array
     {
         return [
             'router' => [
@@ -38,10 +33,7 @@ class ConfigProvider
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getControllersConfig()
+    public function getControllersConfig(): array
     {
         return [
             'factories' => [
@@ -52,10 +44,8 @@ class ConfigProvider
 
     /**
      * Return application-level dependency configuration.
-     *
-     * @return array
      */
-    public function getDependencyConfig()
+    public function getDependencyConfig(): array
     {
         return [
             'factories' => [
@@ -64,7 +54,7 @@ class ConfigProvider
         ];
     }
 
-    public function getFormsConfig()
+    public function getFormsConfig(): array
     {
         return [
             'CommentForm' => [
@@ -129,6 +119,17 @@ class ConfigProvider
                     ],
                 ],
             ]
+        ];
+    }
+
+    public function getTablesConfig(): array
+    {
+        return [
+            'comment_message'         => [],
+            'comment_vote'            => [],
+            'comment_topic'           => [],
+            'comment_topic_subscribe' => [],
+            'comment_topic_view'      => [],
         ];
     }
 }

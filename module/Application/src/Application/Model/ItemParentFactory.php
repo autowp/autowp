@@ -13,7 +13,7 @@ class ItemParentFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('Config');
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new ItemParent(
             $config['content_languages'],
             $tables->get('spec'),

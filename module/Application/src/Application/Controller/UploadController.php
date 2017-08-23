@@ -524,7 +524,13 @@ class UploadController extends AbstractActionController
             return new JsonModel($form->getMessages());
         }
 
-        $pictures = $this->saveUpload($form, $itemIds, (int)$perspectiveId, $replacePicture ? $replacePicture['id'] : 0);
+        $pictures = $this->saveUpload(
+            $form,
+            $itemIds,
+            (int)$perspectiveId,
+            $replacePicture ? $replacePicture['id'] :
+            0
+        );
 
         $result = [];
         foreach ($pictures as $picture) {

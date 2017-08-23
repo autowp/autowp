@@ -17,7 +17,7 @@ class MessageServiceFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new MessageService(
             $container->get(\Application\Service\TelegramService::class),
             $tables->get('personal_messages'),

@@ -12,7 +12,7 @@ class LogFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new \Application\Model\Log(
             $container->get(\Application\Model\Picture::class),
             $tables->get('log_events'),

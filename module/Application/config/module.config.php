@@ -125,7 +125,6 @@ return [
         'factories' => [
             Acl::class                           => Permissions\AclFactory::class,
             Comments::class                      => Service\CommentsFactory::class,
-            Db\TableManager::class               => Db\TableManagerFactory::class,
             DuplicateFinder::class               => Service\DuplicateFinderFactory::class,
             FileSize::class                      => InvokableFactory::class,
             HostManager::class                   => Service\HostManagerFactory::class,

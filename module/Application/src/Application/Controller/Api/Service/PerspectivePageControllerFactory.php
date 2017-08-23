@@ -16,7 +16,7 @@ class PerspectivePageControllerFactory implements FactoryInterface
     {
         $hydrators = $container->get('HydratorManager');
         $filters = $container->get('InputFilterManager');
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new Controller(
             $hydrators->get(\Application\Hydrator\Api\PerspectivePageHydrator::class),
             $filters->get('api_perspective_page_list'),

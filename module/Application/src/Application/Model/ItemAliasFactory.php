@@ -12,7 +12,7 @@ class ItemAliasFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new ItemAlias(
             $tables->get('brand_alias'),
             $container->get(Item::class)

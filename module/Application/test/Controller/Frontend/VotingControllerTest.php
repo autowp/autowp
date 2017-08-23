@@ -25,7 +25,7 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
 
     public function testVoteAndGetVotes()
     {
-        $tables = $this->getApplication()->getServiceManager()->get(\Application\Db\TableManager::class);
+        $tables = $this->getApplication()->getServiceManager()->get('TableManager');
 
         $table = $tables->get('voting');
         $table->insert([

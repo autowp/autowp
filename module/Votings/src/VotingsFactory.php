@@ -12,7 +12,7 @@ class VotingsFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new Votings(
             $tables->get('voting'),
             $tables->get('voting_variant'),

@@ -12,7 +12,7 @@ class ItemLinkControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         $hydrators = $container->get('HydratorManager');
         $filters = $container->get('InputFilterManager');
 

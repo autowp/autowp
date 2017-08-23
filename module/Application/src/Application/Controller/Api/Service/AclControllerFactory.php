@@ -15,7 +15,7 @@ class AclControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $filters = $container->get('InputFilterManager');
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new Controller(
             $container->get('longCache'),
             $filters->get('api_acl_roles_list'),

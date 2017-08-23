@@ -57,7 +57,7 @@ class AclFactory implements FactoryInterface
 
     private function load(Acl $acl, ContainerInterface $container)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
 
         $roleTable = $tables->get('acl_roles');
         $resourceTable = $tables->get('acl_resources');

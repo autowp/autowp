@@ -14,7 +14,7 @@ class PictureVoteFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new Plugin(
             $container->get(\Application\Model\PictureModerVote::class),
             $tables->get('picture_moder_vote_template'),

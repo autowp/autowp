@@ -18,7 +18,7 @@ class PerspectivePageHydrator extends RestHydrator
     {
         parent::__construct();
 
-        $tables = $serviceManager->get(\Application\Db\TableManager::class);
+        $tables = $serviceManager->get('TableManager');
 
         $this->groupTable = $tables->get('perspectives_groups');
 

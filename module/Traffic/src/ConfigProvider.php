@@ -7,23 +7,18 @@ use Zend\Router\Http\Segment;
 
 class ConfigProvider
 {
-    /**
-     * @return array
-     */
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
             'console'      => $this->getConsoleConfig(),
             'controllers'  => $this->getControllersConfig(),
             'dependencies' => $this->getDependencyConfig(),
             'router'       => $this->getRouterConfig(),
+            'tables'       => $this->getTablesConfig()
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getConsoleConfig()
+    public function getConsoleConfig(): array
     {
         return [
             'router' => [
@@ -41,10 +36,7 @@ class ConfigProvider
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getControllersConfig()
+    public function getControllersConfig(): array
     {
         return [
             'factories' => [
@@ -56,10 +48,8 @@ class ConfigProvider
 
     /**
      * Return application-level dependency configuration.
-     *
-     * @return array
      */
-    public function getDependencyConfig()
+    public function getDependencyConfig(): array
     {
         return [
             'factories' => [
@@ -68,10 +58,7 @@ class ConfigProvider
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getRouterConfig()
+    public function getRouterConfig(): array
     {
         return [
             'routes' => [
@@ -125,6 +112,15 @@ class ConfigProvider
                     ]
                 ]
             ]
+        ];
+    }
+
+    public function getTablesConfig(): array
+    {
+        return [
+            'banned_ip'      => [],
+            'ip_monitoring4' => [],
+            'ip_whitelist'   => [],
         ];
     }
 }

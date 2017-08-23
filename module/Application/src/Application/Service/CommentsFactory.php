@@ -12,7 +12,7 @@ class CommentsFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new \Application\Comments(
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get('HttpRouter'),

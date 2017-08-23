@@ -12,7 +12,7 @@ class CarOfDayFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new \Application\Model\CarOfDay(
             $tables->get('of_day'),
             $container->get(\Application\ItemNameFormatter::class),

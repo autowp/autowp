@@ -12,7 +12,7 @@ class ContactsControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new ContactsController(
             $container->get(\Application\Model\Contact::class),
             $tables->get('users')

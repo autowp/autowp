@@ -25,6 +25,7 @@ class Module implements
             'controllers'     => $provider->getControllersConfig(),
             'service_manager' => $provider->getDependencyConfig(),
             'router'          => $provider->getRouterConfig(),
+            'tables'          => $provider->getTablesConfig(),
         ];
     }
 

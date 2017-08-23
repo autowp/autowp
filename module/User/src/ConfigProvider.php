@@ -4,22 +4,17 @@ namespace Autowp\User;
 
 class ConfigProvider
 {
-    /**
-     * @return array
-     */
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
             'controller_plugins' => $this->getControllerPluginConfig(),
             'dependencies'       => $this->getDependencyConfig(),
+            'tables'             => $this->getTablesConfig(),
             'view_helpers'       => $this->getViewHelperConfig(),
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getControllerPluginConfig()
+    public function getControllerPluginConfig(): array
     {
         return [
             'aliases' => [
@@ -34,10 +29,8 @@ class ConfigProvider
 
     /**
      * Return application-level dependency configuration.
-     *
-     * @return array
      */
-    public function getDependencyConfig()
+    public function getDependencyConfig(): array
     {
         return [
             'factories' => [
@@ -49,10 +42,14 @@ class ConfigProvider
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getViewHelperConfig()
+    public function getTablesConfig(): array
+    {
+        return [
+            'users' => [], //TODO: rename to user
+        ];
+    }
+
+    public function getViewHelperConfig(): array
     {
         return [
             'aliases' => [

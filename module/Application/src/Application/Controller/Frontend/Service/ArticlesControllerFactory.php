@@ -14,7 +14,7 @@ class ArticlesControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new Controller(
             $tables->get('articles'),
             $tables->get('htmls'),

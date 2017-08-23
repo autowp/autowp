@@ -22,7 +22,8 @@ class Module implements
             'console'         => $provider->getConsoleConfig(),
             'controllers'     => $provider->getControllersConfig(),
             'service_manager' => $provider->getDependencyConfig(),
-            'forms'           => $provider->getFormsConfig()
+            'forms'           => $provider->getFormsConfig(),
+            'tables'          => $provider->getTablesConfig()
         ];
     }
 

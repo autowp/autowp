@@ -7,24 +7,19 @@ use Zend\Router\Http\Literal;
 
 class ConfigProvider
 {
-    /**
-     * @return array
-     */
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
             'controllers'  => $this->getControllersConfig(),
             'dependencies' => $this->getDependencyConfig(),
             'forms'        => $this->getFormsConfig(),
             'router'       => $this->getRouterConfig(),
+            'tables'       => $this->getTablesConfig(),
             'translator'   => $this->getTranslatorConfig()
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getControllersConfig()
+    public function getControllersConfig(): array
     {
         return [
             'factories' => [
@@ -33,10 +28,7 @@ class ConfigProvider
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getRouterConfig()
+    public function getRouterConfig(): array
     {
         return [
             'routes' => [
@@ -162,7 +154,7 @@ class ConfigProvider
         ];
     }
 
-    public function getTranslatorConfig()
+    public function getTranslatorConfig(): array
     {
         return [
             'translation_file_patterns' => [
@@ -177,10 +169,8 @@ class ConfigProvider
 
     /**
      * Return application-level dependency configuration.
-     *
-     * @return array
      */
-    public function getDependencyConfig()
+    public function getDependencyConfig(): array
     {
         return [
             'factories' => [
@@ -189,7 +179,7 @@ class ConfigProvider
         ];
     }
 
-    public function getFormsConfig()
+    public function getFormsConfig(): array
     {
         return [
             'ForumsTopicNewForm' => [
@@ -277,6 +267,14 @@ class ConfigProvider
                     ],
                 ],
             ],
+        ];
+    }
+
+    public function getTablesConfig(): array
+    {
+        return [
+            'forums_themes' => [],
+            'forums_topics' => [],
         ];
     }
 }

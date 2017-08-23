@@ -4,27 +4,30 @@ namespace Autowp\Message;
 
 class ConfigProvider
 {
-    /**
-     * @return array
-     */
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
-            'dependencies' => $this->getDependencyConfig()
+            'dependencies' => $this->getDependencyConfig(),
+            'tables'       => $this->getTablesConfig()
         ];
     }
 
     /**
      * Return application-level dependency configuration.
-     *
-     * @return array
      */
-    public function getDependencyConfig()
+    public function getDependencyConfig(): array
     {
         return [
             'factories' => [
                 MessageService::class => Service\MessageServiceFactory::class
             ]
+        ];
+    }
+
+    public function getTablesConfig(): array
+    {
+        return [
+            'personal_messages' => [],
         ];
     }
 }

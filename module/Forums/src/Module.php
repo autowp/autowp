@@ -19,6 +19,7 @@ class Module implements
             'forms'           => $provider->getFormsConfig(),
             'router'          => $provider->getRouterConfig(),
             'service_manager' => $provider->getDependencyConfig(),
+            'tables'          => $provider->getTablesConfig(),
             'translator'      => $provider->getTranslatorConfig()
         ];
     }

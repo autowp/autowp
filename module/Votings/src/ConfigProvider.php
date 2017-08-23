@@ -4,27 +4,29 @@ namespace Autowp\Votings;
 
 class ConfigProvider
 {
-    /**
-     * @return array
-     */
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
-            'dependencies' => $this->getDependencyConfig()
+            'dependencies' => $this->getDependencyConfig(),
+            'tables'       => $this->getTablesConfig()
         ];
     }
 
-    /**
-     * Return application-level dependency configuration.
-     *
-     * @return array
-     */
-    public function getDependencyConfig()
+    public function getDependencyConfig(): array
     {
         return [
             'factories' => [
                 Votings::class => VotingsFactory::class
             ]
+        ];
+    }
+
+    public function getTablesConfig(): array
+    {
+        return [
+            'voting' => [],
+            'voting_variant' => [],
+            'voting_variant_vote' => [],
         ];
     }
 }

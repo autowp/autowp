@@ -99,7 +99,7 @@ class ItemHydrator extends RestHydrator
     ) {
         parent::__construct();
 
-        $tables = $serviceManager->get(\Application\Db\TableManager::class);
+        $tables = $serviceManager->get('TableManager');
         $this->picture = $serviceManager->get(Picture::class);
         $this->linkTable = $tables->get('links');
         $this->specTable = $tables->get('spec');

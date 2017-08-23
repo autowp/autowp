@@ -12,7 +12,7 @@ class VehicleTypeFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new VehicleType(
             $tables->get('vehicle_vehicle_type'),
             $tables->get('item_parent'),

@@ -12,7 +12,7 @@ class PerspectiveFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get(\Application\Db\TableManager::class);
+        $tables = $container->get('TableManager');
         return new Perspective(
             $tables->get('perspectives'),
             $tables->get('perspectives_groups')
