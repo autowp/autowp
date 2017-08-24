@@ -473,7 +473,7 @@ class PictureHydrator extends RestHydrator
 
             $nextPicture = $this->picture->getRow([
                 'id_gt' => $object['id'],
-                'order' => 'id_desc'
+                'order' => 'id_asc'
             ]);
             if ($nextPicture) {
                 $picture['siblings']['next'] = $this->extractValue('siblings', $nextPicture);
@@ -491,7 +491,7 @@ class PictureHydrator extends RestHydrator
             $nextNewPicture = $this->picture->getRow([
                 'id_gt'  => $object['id'],
                 'status' => Picture::STATUS_INBOX,
-                'order'  => 'id_desc'
+                'order'  => 'id_asc'
             ]);
             if ($nextNewPicture) {
                 $picture['siblings']['next_new'] = $this->extractValue('siblings', $nextNewPicture);

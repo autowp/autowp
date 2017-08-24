@@ -615,7 +615,12 @@ class Picture
                         ]);
                     break;
 
+                case 'id_desc':
+                    $select->order(['pictures.id DESC']);
+                    break;
+
                 case 'id':
+                case 'id_asc':
                     $select->order(['pictures.id']);
                     break;
             }
