@@ -1037,10 +1037,8 @@ class ItemController extends AbstractRestfulController
 
         $this->vehicleType->refreshInheritanceFromParents($itemId);
 
-        if ($itemTypeId != Item::PERSON) {
-            $namespace = new \Zend\Session\Container('Moder_Car');
-            $namespace->lastCarId = $itemId;
-        }
+        $namespace = new \Zend\Session\Container('Moder_Car');
+        $namespace->lastCarId = $itemId;
 
         $this->userItemSubscribe->subscribe($user['id'], $itemId);
 

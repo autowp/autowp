@@ -115,7 +115,7 @@
     </table>
     <div ng-if="picture.rights.move">
         <div ng-if="last_item && !hasItem(last_item.id)">
-            <button class="btn btn-default" ng-click="addItem(last_item.id)">
+            <button class="btn btn-default" ng-click="addItem(last_item)">
                 <i class="fa fa-plus"></i>
                 {{'moder/picture/catalogue/add-to'|translate}}
                 <span ng-bind-html="last_item.name_html"></span>
