@@ -1521,7 +1521,8 @@ INSERT INTO `item_type` (`id`, `name`) VALUES
 (4, 'twins'),
 (5, 'brand'),
 (6, 'factory'),
-(7, 'museum');
+(7, 'museum'),
+(8, 'person');
 /*!40000 ALTER TABLE `item_type` ENABLE KEYS */;
 
 --
@@ -2131,13 +2132,14 @@ DROP TABLE IF EXISTS `picture_item`;
 CREATE TABLE `picture_item` (
   `picture_id` int(10) unsigned NOT NULL,
   `item_id` int(10) unsigned NOT NULL,
+  type int default 1 NOT NULL,
   `perspective_id` int(10) unsigned DEFAULT NULL,
   `crop_left` smallint(5) unsigned DEFAULT NULL,
   `crop_top` smallint(5) unsigned DEFAULT NULL,
   `crop_width` smallint(5) unsigned DEFAULT NULL,
   `crop_height` smallint(5) unsigned DEFAULT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`picture_id`,`item_id`),
+  PRIMARY KEY (`picture_id`,`item_id`, type),
   KEY `item_id` (`item_id`),
   KEY `perspective_id` (`perspective_id`),
   CONSTRAINT `picture_item_ibfk_1` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`),
