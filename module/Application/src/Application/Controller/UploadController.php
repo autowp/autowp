@@ -557,7 +557,8 @@ class UploadController extends AbstractActionController
                     $cPerspectiveId = $this->pictureItem->getPerspective($picture['id'], $itemId);
                     $perspectiveUrl = $this->url()->fromRoute('api/picture-item/update', [
                         'picture_id' => $picture['id'],
-                        'item_id'    => $itemId
+                        'item_id'    => $itemId,
+                        'type'       => PictureItem::PICTURE_CONTENT
                     ]);
                 }
 

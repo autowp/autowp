@@ -177,7 +177,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch(
-            'https://www.autowp.ru/api/picture-item/' . $pictureId. '/' . $itemId,
+            'https://www.autowp.ru/api/picture-item/' . $pictureId. '/' . $itemId . '/1',
             Request::METHOD_PUT,
             [
                 'perspective_id' => $perspectiveId

@@ -23,7 +23,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     {
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId, Request::METHOD_PUT, [
+        $this->dispatch('https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId . '/1', Request::METHOD_PUT, [
             'perspective_id' => $perspectiveId
         ]);
 
