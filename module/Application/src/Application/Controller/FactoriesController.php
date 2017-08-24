@@ -218,7 +218,7 @@ class FactoriesController extends AbstractActionController
                 'id'             => $factory['id'],
                 'linked_in_days' => 7,
             ],
-            'order' => 'item_parent.timestamp DESC',
+            'order' => 'ip1.timestamp DESC',
             'limit' => 20
         ]);
 
