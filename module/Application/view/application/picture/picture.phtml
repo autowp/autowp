@@ -126,10 +126,13 @@
 
         <?php if ($this->authors) { ?>
             <p>
-                Photo by
-                <?php foreach ($this->authors as $author) { ?>
-                    <?=$this->htmlA($author['url'], $author['name'])?>
-                <?php } ?>
+                Author:
+                <?php foreach ($this->authors as $idx => $author) {
+                    echo $this->htmlA($author['url'], $author['name']);
+                    if ($idx) {
+                        echo ', ';
+                    }
+                } ?>
             </p>
         <?php } ?>
 
