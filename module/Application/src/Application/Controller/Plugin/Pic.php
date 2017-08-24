@@ -1110,7 +1110,6 @@ class Pic extends AbstractPlugin
         $authors = [];
         $pictureAuthors = $this->pictureItem->getPictureItemsData($picture['id'], PictureItem::PICTURE_AUTHOR);
         foreach ($pictureAuthors as $pictureAuthor) {
-
             $item = $this->itemModel->getRow([
                 'id'       => $pictureAuthor['item_id'],
                 'language' => $language,

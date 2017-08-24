@@ -138,7 +138,6 @@ class PictureItem
             $row = $this->getRow($pictureId, $itemId, $type);
 
             if (! $row) {
-
                 if (! $this->isAllowedTypeByItemId($itemId, $type)) {
                     throw new InvalidArgumentException("Combination not allowed");
                 }
@@ -288,7 +287,6 @@ class PictureItem
         $set = [];
 
         if ($type == self::PICTURE_CONTENT) {
-
             if (array_key_exists('perspective', $properties)) {
                 $perspective = $properties['perspective'];
                 $set['perspective_id'] = $perspective ? (int)$perspective : null;
