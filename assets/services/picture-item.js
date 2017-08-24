@@ -8,55 +8,55 @@ angular.module(Module)
         
         var perspectives = null;
         
-        this.setPerspective = function(pictureId, itemId, perspectiveId) {
+        this.setPerspective = function(pictureId, itemId, type, perspectiveId) {
             return $http({
                 method: 'PUT',
-                url: '/api/picture-item/' + pictureId + '/' + itemId,
+                url: '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
                 data: {
                     perspective_id: perspectiveId
                 }
             });
         };
         
-        this.setArea = function(pictureId, itemId, area) {
+        this.setArea = function(pictureId, itemId, type, area) {
             return $http({
                 method: 'PUT',
-                url: '/api/picture-item/' + pictureId + '/' + itemId,
+                url: '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
                 data: {
                     area: area
                 }
             });
         };
         
-        this.create = function(pictureId, itemId, data) {
+        this.create = function(pictureId, itemId, type, data) {
             return $http({
                 method: 'POST',
-                url: '/api/picture-item/' + pictureId + '/' + itemId,
+                url: '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
                 data: data
             });
         };
         
-        this.remove = function(pictureId, itemId) {
+        this.remove = function(pictureId, itemId, type) {
             return $http({
                 method: 'DELETE',
-                url: '/api/picture-item/' + pictureId + '/' + itemId
+                url: '/api/picture-item/' + pictureId + '/' + itemId + '/' + type
             });
         };
         
-        this.changeItem = function(pictureId, srcItemId, dstItemId) {
+        this.changeItem = function(pictureId, type, srcItemId, dstItemId) {
             return $http({
                 method: 'PUT',
-                url: '/api/picture-item/' + pictureId + '/' + srcItemId,
+                url: '/api/picture-item/' + pictureId + '/' + srcItemId + '/' + type,
                 data: {
                     item_id: dstItemId
                 }
             });
         };
         
-        this.get = function(pictureId, itemId, params) {
+        this.get = function(pictureId, itemId, type, params) {
             return $http({
                 method: 'GET',
-                url: '/api/picture-item/' + pictureId + '/' + itemId,
+                url: '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
                 params: params
             });
         };

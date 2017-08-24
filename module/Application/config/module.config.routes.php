@@ -850,6 +850,37 @@ return [
                     ],
                 ]
             ],
+            'persons' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/persons',
+                    'defaults' => [
+                        'controller' => Controller\Frontend\PersonsController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => false,
+                'child_routes'  => [
+                    'person' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/:id',
+                            'defaults' => [
+                                'action' => 'person',
+                            ]
+                        ],
+                        'may_terminate' => true,
+                        'child_routes' => [
+                            'page'    => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/page:page',
+                                ]
+                            ],
+                        ]
+                    ]
+                ]
+            ],
             'picture' => [
                 'type' => Literal::class,
                 'options' => [

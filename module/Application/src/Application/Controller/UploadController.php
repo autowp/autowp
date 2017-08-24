@@ -99,7 +99,7 @@ class UploadController extends AbstractActionController
         $perspectiveId = null;
 
         if ($replacePicture) {
-            $itemIds = $this->pictureItem->getPictureItems($replacePicture['id']);
+            $itemIds = $this->pictureItem->getPictureItems($replacePicture['id'], PictureItem::PICTURE_CONTENT);
         } else {
             $itemId = (int)$this->params('item_id');
             $itemIds = $itemId ? [$itemId] : [];
@@ -494,7 +494,7 @@ class UploadController extends AbstractActionController
         $perspectiveId = null;
 
         if ($replacePicture) {
-            $itemIds = $this->pictureItem->getPictureItems($replacePicture['id']);
+            $itemIds = $this->pictureItem->getPictureItems($replacePicture['id'], PictureItem::PICTURE_CONTENT);
             if (count($itemIds) == 1) {
                 $perspectiveId = $this->pictureItem->getPerspective($replacePicture['id'], $itemIds[0]);
             }

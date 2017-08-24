@@ -165,6 +165,11 @@ All images are posted for educational purposes.
     'item/type/7/new-item' => 'New museum',
     'item/type/7/add-sub-item' => 'Add sub-museum',
 
+    'item/type/8/name' => 'Person',
+    'item/type/8/name-plural' => 'Persons',
+    'item/type/8/new-item' => 'New person',
+    'item/type/8/add-sub-item"' => 'Add sub-person',
+
     /* BRAND PAGE*/
     'unsorted'                => 'Unsorted',
     'engines'                 => 'Engines',

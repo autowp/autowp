@@ -173,7 +173,7 @@ class Pic extends AbstractPlugin
 
         $url = null;
 
-        $carIds = $this->pictureItem->getPictureItems($row['id']);
+        $carIds = $this->pictureItem->getPictureItems($row['id'], PictureItem::PICTURE_CONTENT);
         if ($carIds) {
             $carId = $carIds[0];
             $paths = $this->catalogue->getCataloguePaths($carId, [
@@ -662,7 +662,8 @@ class Pic extends AbstractPlugin
                     'options' => $multioptions,
                     'url'     => $this->httpRouter->assemble([
                         'picture_id' => $picture['id'],
-                        'item_id'    => $item['id']
+                        'item_id'    => $item['id'],
+                        'type'       => PictureItem::PICTURE_CONTENT
                     ], [
                         'name' => 'api/picture-item/update'
                     ]),
@@ -1087,7 +1088,7 @@ class Pic extends AbstractPlugin
             $point = \geoPHP::load(substr($picture['point'], 4), 'wkb');
         }
 
-        $itemIds = $this->pictureItem->getPictureItems($picture['id']);
+        $itemIds = $this->pictureItem->getPictureItems($picture['id'], PictureItem::PICTURE_CONTENT);
 
         $user = $controller->user()->get();
         $votes = $this->pictureVote->getVote($picture['id'], $user ? $user['id'] : null);
@@ -1106,8 +1107,27 @@ class Pic extends AbstractPlugin
             $twitterCreatorId = $this->userAccount->getServiceExternalId($picture['owner_id'], 'twitter');
         }
 
+        $authors = [];
+        $pictureAuthors = $this->pictureItem->getPictureItemsData($picture['id'], PictureItem::PICTURE_AUTHOR);
+        foreach ($pictureAuthors as $pictureAuthor) {
+
+            $item = $this->itemModel->getRow([
+                'id'       => $pictureAuthor['item_id'],
+                'language' => $language,
+                'columns'  => ['name']
+            ]);
+
+            $authors[] = [
+                'name' => $item['name'],
+                'url'  => $controller->url()->fromRoute('persons/person', [
+                    'id' => $pictureAuthor['item_id']
+                ])
+            ];
+        }
+
         $data = [
             'id'                => $picture['id'],
+            'authors'           => $authors,
             'point'             => $point,
             'copyrights'        => $copyrights,
             'identity'          => $picture['identity'],
@@ -1166,7 +1186,7 @@ class Pic extends AbstractPlugin
             $picture['id']
         );
 
-        $carIds = $this->pictureItem->getPictureItems($picture['id']);
+        $carIds = $this->pictureItem->getPictureItems($picture['id'], PictureItem::PICTURE_CONTENT);
         if ($carIds) {
             $rows = $this->itemModel->getRows([
                 'id' => $carIds

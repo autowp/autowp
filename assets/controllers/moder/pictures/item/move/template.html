@@ -1,35 +1,49 @@
 <ul class="nav nav-pills" style="margin-bottom: 30px" ng-if="!src_item">
-    <li ng-class="{active: !show_factories && !show_museums}">
+    <li ng-class="{active: !show_factories && !show_museums && !show_persons}" ng-if="!src_type || src_type == 1">
         <a ui-sref=".({show_factories: null, show_museums: null})" translate>moder/pciture/move/brands</a>
     </li>
-    <li ng-class="{active: show_factories}">
-        <a ui-sref=".({show_factories: 1, show_museums: null})" translate>moder/pciture/move/factories</a>
+    <li ng-class="{active: show_factories}" ng-if="!src_type || src_type == 1">
+        <a ui-sref=".({show_factories: 1, show_museums: null, show_persons: null})" translate>moder/pciture/move/factories</a>
     </li>
-    <li ng-class="{active: show_museums}">
-        <a ui-sref=".({show_factories: null, show_museums: 1})" translate>item/type/7/name-plural</a>
+    <li ng-class="{active: show_museums}" ng-if="!src_type || src_type == 1">
+        <a ui-sref=".({show_factories: null, show_museums: 1, show_persons: null})" translate>item/type/7/name-plural</a>
+    </li>
+    <li ng-class="{active: show_persons}" ng-if="!src_type || src_type == 2">
+        <a ui-sref=".({show_factories: null, show_museums: null, show_persons: 1})" translate>item/type/8/name-plural</a>
     </li>
 </ul>
 
-<div ng-if="show_museums && !src_item">
+<div ng-if="show_museums && !src_item && (!src_type || src_type == 1)">
     <div class="well">
-        <a href="#" ng-repeat-start="item in museums" ng-click="selectItem(item.id)" ng-bind-html="item.name_html"></a>
+        <a href="#" ng-repeat-start="item in museums" ng-click="selectItem(item.id, null, 1)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </div>
     
     <autowp-paginator data="museums_paginator" ng-if="museums_paginator"></autowp-paginator>
 </div>
 
-<div ng-if="show_factories && !src_item">
+<div ng-if="show_factories && !src_item && (!src_type || src_type == 1)">
 
     <div class="well">
-        <a href="#" ng-repeat-start="item in factories" ng-click="selectItem(item.id)" ng-bind-html="item.name_html"></a>
+        <a href="#" ng-repeat-start="item in factories" ng-click="selectItem(item.id, null, 1)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </div>
     
     <autowp-paginator data="factories_paginator" ng-if="factories_paginator"></autowp-paginator>
 </div>
 
-<div ng-if="!show_factories && !show_museums">
+<div ng-if="show_persons && !src_item && (!src_type || src_type == 2)">
+
+    <div class="well">
+        <a href="#" ng-repeat-start="item in persons" ng-click="selectItem(item.id, null, 2)" ng-bind-html="item.name_html"></a>
+        <br ng-repeat-end />
+    </div>
+    
+    <autowp-paginator data="persons_paginator" ng-if="persons_paginator"></autowp-paginator>
+</div>
+
+
+<div ng-if="!show_factories && !show_museums && !show_persons && (!src_type || src_type == 1)">
     <div ng-if="!brand_id">
     
         <div class="well">
@@ -68,9 +82,9 @@
             </div>
 
             <div style="margin: 5px 0" ng-if="!src_item">
-                <a href="" ng-click="selectItem(brand_id, 22)" translate>upload/select/logo</a><br />
-                <a href="" ng-click="selectItem(brand_id, 25)" translate>upload/select/mixed-long</a><br />
-                <a href="" ng-click="selectItem(brand_id, 0)" translate>upload/select/unsorted-long</a><br />
+                <a href="" ng-click="selectItem(brand_id, 22, 1)" translate>upload/select/logo</a><br />
+                <a href="" ng-click="selectItem(brand_id, 25, 1)" translate>upload/select/mixed-long</a><br />
+                <a href="" ng-click="selectItem(brand_id, 0, 1)" translate>upload/select/unsorted-long</a><br />
             </div>
 
         </div>

@@ -20,7 +20,8 @@ class Item
           TWINS    = 4,
           BRAND    = 5,
           FACTORY  = 6,
-          MUSEUM   = 7;
+          MUSEUM   = 7,
+          PERSON   = 8;
 
     const MAX_NAME = 100;
 

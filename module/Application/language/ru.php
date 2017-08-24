@@ -180,6 +180,11 @@ return array_replace(include 'root.php', [
     'item/type/7/new-item' => 'Новый музей',
     'item/type/7/add-sub-item' => 'Добавить под-музей',
 
+    'item/type/8/name' => 'Персона',
+    'item/type/8/name-plural' => 'Персоны',
+    'item/type/8/new-item' => 'Новая персона',
+    'item/type/8/add-sub-item"' => 'Добавить суб-персону',
+
     /* BRAND PAGE*/
     'unsorted'                => 'Несортировано',
     'engines'                 => 'Двигатели',

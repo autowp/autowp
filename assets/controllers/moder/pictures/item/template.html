@@ -64,7 +64,7 @@
                     <a ui-sref="moder-items-item({id: item.item_id})" ng-bind-html="item.item.name_html"></a>
                 </td>
                 <td>
-                    <select class="form-control" ng-model="item.perspective_id" ng-change="savePerspective(item)" style="max-width:10em">
+                    <select class="form-control" ng-model="item.perspective_id" ng-change="savePerspective(item)" style="max-width:10em" ng-if="item.type == 1">
                         <option value="">--</option>
                         <option ng-repeat="perspective in perspectives" ng-value="perspective.id">
                             {{perspective.name | translate}}
@@ -79,17 +79,17 @@
                 </td>
                 <td ng-if="picture.rights.move">
                     <div class="btn-group" style="white-space:nowrap">
-                        <a ui-sref="moder-pictures-item-move({id: picture.id, src_item_id: item.item_id})" class="btn btn-default">
+                        <a ui-sref="moder-pictures-item-move({id: picture.id, src_item_id: item.item_id, src_type: item.type})" class="btn btn-default">
                             <i class="fa fa-arrow-right"></i>
                             {{'moder/picture/catalogue/move-to'|translate}} ...
                         </a>
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-if="item.type == 1">
                             <span class="caret"></span>
                             <span class="sr-only">Toggle Dropdown</span>
                         </button>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu" ng-if="item.type == 1">
                             <li ng-if="last_item && !hasItem(last_item.id)">
-                                <a href="" ng-click="moveItem(item.item_id, last_item.id)">
+                                <a href="" ng-click="moveItem(1, item.item_id, last_item.id)">
                                     <i class="fa fa-arrow-right"></i>
                                     {{'moder/picture/catalogue/move-to'|translate}}
                                     <span ng-bind-html="last_item.name_html"></span>
@@ -106,7 +106,7 @@
                     </div>
                 </td>
                 <td ng-if="picture.rights.move">
-                    <button class="btn btn-danger" ng-click="deletePictureItem(item.item_id)" aria-label="Delete" style="margin:0">
+                    <button class="btn btn-danger" ng-click="deletePictureItem(item)" aria-label="Delete" style="margin:0">
                         <span class="fa fa-times"></span>
                     </button>
                 </td>

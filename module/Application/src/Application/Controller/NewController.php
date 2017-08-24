@@ -102,7 +102,7 @@ class NewController extends AbstractActionController
 
         $items = [];
         foreach ($paginator->getCurrentItems() as $pictureRow) {
-            $itemIds = $this->pictureItem->getPictureItems($pictureRow['id']);
+            $itemIds = $this->pictureItem->getPictureItems($pictureRow['id'], PictureItem::PICTURE_CONTENT);
             if (count($itemIds) != 1) {
                 $items[] = [
                     'type'    => 'picture',

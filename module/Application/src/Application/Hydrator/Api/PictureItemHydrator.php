@@ -66,6 +66,7 @@ class PictureItemHydrator extends RestHydrator
         $result = [
             'picture_id'     => (int)$object['picture_id'],
             'item_id'        => (int)$object['item_id'],
+            'type'           => (int)$object['type'],
             'perspective_id' => (int)$object['perspective_id'],
         ];
 

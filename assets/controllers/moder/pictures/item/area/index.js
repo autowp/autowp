@@ -16,7 +16,7 @@ angular.module(Module)
         function config($stateProvider) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/pictures/{id}/area?item_id',
+                url: '/moder/pictures/{id}/area?item_id&type',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template,
@@ -67,7 +67,7 @@ angular.module(Module)
                         height: Math.round(currentCrop.h)
                     };
                     
-                    PictureItemService.setArea($state.params.id, $state.params.item_id, area).then(function() {
+                    PictureItemService.setArea($state.params.id, $state.params.item_id, $state.params.type, area).then(function() {
                         $state.go('moder-pictures-item', {
                             id: $scope.picture.id
                         });
@@ -84,7 +84,7 @@ angular.module(Module)
                     }
                 });
                 
-                var getPictureItemPromise = PictureItemService.get($state.params.id, $state.params.item_id, {
+                var getPictureItemPromise = PictureItemService.get($state.params.id, $state.params.item_id, $state.params.type, {
                     fields: 'area'
                 });
                 

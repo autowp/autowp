@@ -54,7 +54,6 @@ angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angular
             zh: 'zh-cn',
             de: 'de'
         };
-        console.log(lang, map[lang]);
         amMoment.changeLocale(map[lang]);
     }]);
 

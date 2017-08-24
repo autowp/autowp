@@ -1025,7 +1025,8 @@ class Picture
         $perspectiveIds = [];
         foreach ($rows as $index => $row) {
             $pictureItemRows = $this->pictureItemTable->select([
-                'picture_id' => $row['id']
+                'picture_id' => $row['id'],
+                'type'       => PictureItem::PICTURE_CONTENT
             ]);
 
             foreach ($pictureItemRows as $pictureItemRow) {
@@ -1098,7 +1099,8 @@ class Picture
             }
 
             $pictureItemRows = $this->pictureItemTable->select([
-                'picture_id' => $row['id']
+                'picture_id' => $row['id'],
+                'type'       => PictureItem::PICTURE_CONTENT
             ]);
 
             $resultItems = [];

@@ -60,7 +60,8 @@ class ItemParent
         Item::FACTORY => [
             Item::VEHICLE => true,
             Item::ENGINE  => true,
-        ]
+        ],
+        Item::PERSON => []
     ];
 
     private $catnameBlacklist = ['sport', 'tuning', 'related', 'pictures', 'specifications'];

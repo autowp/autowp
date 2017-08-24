@@ -14,7 +14,8 @@ class PictureItemFactory implements FactoryInterface
     {
         $tables = $container->get('TableManager');
         return new PictureItem(
-            $tables->get('picture_item')
+            $tables->get('picture_item'),
+            $tables->get('item')
         );
     }
 }

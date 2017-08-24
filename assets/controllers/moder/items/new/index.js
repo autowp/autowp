@@ -6,6 +6,7 @@ import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
 import SPEC_SERVICE from 'services/spec';
 import ITEM_SERVICE from 'services/item';
 var sprintf = require("sprintf-js").sprintf;
+import notify from 'notify';
 
 const STATE_NAME = 'moder-items-new';
 const CONTROLLER_NAME = 'ModerItemsNewController';
@@ -57,7 +58,7 @@ angular.module(Module)
             ctrl.parent = null;
             ctrl.parentSpec = null;
             
-            if ([1, 2, 3, 4, 5, 6, 7].indexOf(ctrl.item.item_type_id) == -1) {
+            if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(ctrl.item.item_type_id) == -1) {
                 $state.go('error-404');
                 return;
             }
@@ -79,7 +80,8 @@ angular.module(Module)
                         });
                     }
                     ctrl.loading--;
-                }, function() {
+                }, function(response) {
+                    notify.response(response);
                     ctrl.loading--;
                 });
             }
@@ -165,6 +167,7 @@ angular.module(Module)
                     
                     ctrl.loading--;
                 }, function(response) {
+                    notify.response(response);
                     ctrl.invalidParams = response.data.invalid_params;
                     ctrl.loading--;
                 });

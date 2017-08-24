@@ -37,6 +37,7 @@ angular.module(Module)
                             PictureItemService.setPerspective(
                                 $scope.picture.id,
                                 $scope.picture.perspective_item.item_id,
+                                $scope.picture.perspective_item.type,
                                 $scope.picture.perspective_item.perspective_id
                             );
                         }

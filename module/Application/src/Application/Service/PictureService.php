@@ -96,7 +96,8 @@ class PictureService
             print sprintf("Removing %d pictures\n", $count);
 
             foreach ($pictures as $picture) {
-                $this->pictureItem->setPictureItems($picture['id'], []);
+                $this->pictureItem->setPictureItems($picture['id'], PictureItem::PICTURE_CONTENT, []);
+                $this->pictureItem->setPictureItems($picture['id'], PictureItem::PICTURE_AUTHOR, []);
 
                 $this->comments->deleteTopic(
                     \Application\Comments::PICTURES_TYPE_ID,
@@ -181,9 +182,9 @@ class PictureService
         $picture = $this->picture->getRow(['id' => (int)$pictureId]);
 
         if ($itemIds) {
-            $this->pictureItem->setPictureItems($pictureId, $itemIds);
+            $this->pictureItem->setPictureItems($pictureId, PictureItem::PICTURE_CONTENT, $itemIds);
             if ($perspectiveId && count($itemIds) == 1) {
-                $this->pictureItem->setProperties($pictureId, $itemIds[0], [
+                $this->pictureItem->setProperties($pictureId, $itemIds[0], PictureItem::PICTURE_CONTENT, [
                     'perspective' => $perspectiveId
                 ]);
             }

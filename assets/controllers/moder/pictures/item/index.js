@@ -127,7 +127,7 @@ angular.module(Module)
             
             $scope.addItem = function(itemId) {
                 $scope.pictureItemLoading = true;
-                PictureItemService.create($state.params.id, itemId, {}).then(function() {
+                PictureItemService.create($state.params.id, itemId, 1, {}).then(function() {
                     loadPicture(function() {
                         $scope.pictureItemLoading = false;
                     });
@@ -136,9 +136,9 @@ angular.module(Module)
                 });
             };
             
-            $scope.moveItem = function(srcItemId, dstItemId) {
+            $scope.moveItem = function(type, srcItemId, dstItemId) {
                 $scope.pictureItemLoading = true;
-                PictureItemService.changeItem($state.params.id, srcItemId, dstItemId).then(function() {
+                PictureItemService.changeItem($state.params.id, type, srcItemId, dstItemId).then(function() {
                     loadPicture(function() {
                         $scope.pictureItemLoading = false;
                     });
@@ -323,13 +323,14 @@ angular.module(Module)
                 PictureItemService.setPerspective(
                     item.picture_id,
                     item.item_id,
+                    item.type,
                     item.perspective_id
                 );
             };
             
-            $scope.deletePictureItem = function(itemId) {
+            $scope.deletePictureItem = function(item) {
                 $scope.pictureItemLoading = true;
-                PictureItemService.remove($state.params.id, itemId).then(function() {
+                PictureItemService.remove(item.picture_id, item.item_id, item.type).then(function() {
                     loadPicture(function() {
                         $scope.pictureItemLoading = false;
                     });

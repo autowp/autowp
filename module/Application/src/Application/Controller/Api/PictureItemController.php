@@ -96,6 +96,8 @@ class PictureItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        $type = (int)$this->params('type');
+
         $this->itemInputFilter->setData($this->params()->fromQuery());
 
         if (! $this->itemInputFilter->isValid()) {
@@ -109,7 +111,7 @@ class PictureItemController extends AbstractRestfulController
             'fields'   => $data['fields']
         ]);
 
-        $row = $this->pictureItem->getPictureItemData($picture['id'], $item['id']);
+        $row = $this->pictureItem->getPictureItemData($picture['id'], $item['id'], $type);
         if (! $row) {
             return $this->notFoundAction();
         }
@@ -134,8 +136,10 @@ class PictureItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        if ($this->pictureItem->isExists($picture['id'], $item['id'])) {
-            $this->pictureItem->remove($picture['id'], $item['id']);
+        $type = (int)$this->params('type');
+
+        if ($this->pictureItem->isExists($picture['id'], $item['id'], $type)) {
+            $this->pictureItem->remove($picture['id'], $item['id'], $type);
 
             $this->log(sprintf(
                 'Картинка %s отвязана от %s',
@@ -167,6 +171,7 @@ class PictureItemController extends AbstractRestfulController
 
         $pictureId = (int)$this->params('picture_id');
         $itemId    = (int)$this->params('item_id');
+        $type      = (int)$this->params('type');
 
         $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
@@ -180,11 +185,11 @@ class PictureItemController extends AbstractRestfulController
 
         $data = $this->processBodyContent($this->getRequest());
 
-        $this->pictureItem->add($picture['id'], $item['id']);
+        $this->pictureItem->add($picture['id'], $item['id'], $type);
 
         $perspectiveId = isset($data['perspective_id']) ? (int)$data['perspective_id'] : null;
 
-        $this->pictureItem->setProperties($picture['id'], $item['id'], [
+        $this->pictureItem->setProperties($picture['id'], $item['id'], PictureItem::PICTURE_CONTENT, [
             'perspective' => $perspectiveId ? $perspectiveId : null
         ]);
 
@@ -202,7 +207,8 @@ class PictureItemController extends AbstractRestfulController
 
         $url = $this->url()->fromRoute('api/picture-item/create', [
             'picture_id' => $picture['id'],
-            'item_id'    => $item['id']
+            'item_id'    => $item['id'],
+            'type'       => $type
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
@@ -213,6 +219,7 @@ class PictureItemController extends AbstractRestfulController
     {
         $pictureId = (int)$this->params('picture_id');
         $itemId    = (int)$this->params('item_id');
+        $type      = (int)$this->params('type');
 
         $picture = $this->picture->getRow(['id' => $pictureId]);
         if (! $picture) {
@@ -228,7 +235,7 @@ class PictureItemController extends AbstractRestfulController
         if (isset($data['perspective_id'])) {
             $perspectiveId = (int)$data['perspective_id'];
 
-            $this->pictureItem->setProperties($picture['id'], $itemId, [
+            $this->pictureItem->setProperties($picture['id'], $itemId, $type, [
                 'perspective' => $perspectiveId ? $perspectiveId : null
             ]);
 
@@ -280,7 +287,7 @@ class PictureItemController extends AbstractRestfulController
                     'height' => null
                 ];
             }
-            $this->pictureItem->setProperties($picture['id'], $item['id'], [
+            $this->pictureItem->setProperties($picture['id'], $item['id'], $type, [
                 'area' => $area
             ]);
 
@@ -308,7 +315,7 @@ class PictureItemController extends AbstractRestfulController
                 return $this->notFoundAction();
             }
 
-            $this->pictureItem->changePictureItem($picture['id'], $srcItem['id'], $dstItem['id']);
+            $this->pictureItem->changePictureItem($picture['id'], $type, $srcItem['id'], $dstItem['id']);
 
             $userId = $this->user()->get()['id'];
 

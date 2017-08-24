@@ -124,6 +124,15 @@
             ])?>
         </div>
 
+        <?php if ($this->authors) { ?>
+            <p>
+                Photo by
+                <?php foreach ($this->authors as $author) { ?>
+                    <?=$this->htmlA($author['url'], $author['name'])?>
+                <?php } ?>
+            </p>
+        <?php } ?>
+
         <?php if ($this->copyrights) { ?>
             <div>
                 <?=$this->markdown($this->copyrights) ?>

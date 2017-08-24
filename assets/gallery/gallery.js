@@ -383,8 +383,6 @@ Gallery.prototype = {
                     var winCenter = $(window).height() / 2;
                     var nodeCenter = $(node).offset().top + ($(node).height()) / 2;
                     
-                    console.log(winCenter, nodeCenter);
-                    
                     return winCenter > nodeCenter ? 'bottom' : 'top';
                 }
             });

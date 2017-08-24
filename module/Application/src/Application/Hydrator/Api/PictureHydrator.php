@@ -348,10 +348,10 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('perspective_item')) {
-            $itemIds = $this->pictureItem->getPictureItemsByType($object['id'], [
-                Item::VEHICLE,
-                Item::BRAND
-            ]);
+            $itemIds = $this->pictureItem->getPictureItemsByItemType(
+                $object['id'],
+                [Item::VEHICLE, Item::BRAND]
+            );
 
             $picture['perspective_item'] = null;
 

@@ -153,6 +153,11 @@ return array_replace(include 'root.php', [
     'item/type/7/new-item' => '新增博物馆',
     'item/type/7/add-sub-item' => 'Add sub-museum',
 
+    'item/type/8/name' => 'Person',
+    'item/type/8/name-plural' => 'Persons',
+    'item/type/8/new-item' => 'New person',
+    'item/type/8/add-sub-item"' => 'Add sub-person',
+
     /* BRAND PAGE*/
     'unsorted'                => '未分类',
     'engines'                 => '发动机',

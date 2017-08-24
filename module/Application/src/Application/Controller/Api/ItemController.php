@@ -999,6 +999,7 @@ class ItemController extends AbstractRestfulController
             case Item::BRAND:
             case Item::FACTORY:
             case Item::MUSEUM:
+            case Item::PERSON:
                 $set['is_group'] = 1;
                 break;
             default:
@@ -1036,8 +1037,10 @@ class ItemController extends AbstractRestfulController
 
         $this->vehicleType->refreshInheritanceFromParents($itemId);
 
-        $namespace = new \Zend\Session\Container('Moder_Car');
-        $namespace->lastCarId = $itemId;
+        if ($itemTypeId != Item::PERSON) {
+            $namespace = new \Zend\Session\Container('Moder_Car');
+            $namespace->lastCarId = $itemId;
+        }
 
         $this->userItemSubscribe->subscribe($user['id'], $itemId);
 

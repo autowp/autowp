@@ -185,7 +185,7 @@ angular.module(Module)
                     delete ctrl.tabs.tree;
                 }
 
-                if ([5, 7].indexOf(ctrl.item.item_type_id) === -1) {
+                if ([5, 7, 8].indexOf(ctrl.item.item_type_id) === -1) {
                     delete ctrl.tabs.links;
                 }
 

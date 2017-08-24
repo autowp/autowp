@@ -177,6 +177,7 @@ return [
                                 Model\Item::BRAND,
                                 Model\Item::FACTORY,
                                 Model\Item::MUSEUM,
+                                Model\Item::PERSON,
                             ]
                         ]
                     ]
@@ -2393,7 +2394,7 @@ return [
                     'picture-item' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => '/picture-item/:picture_id/:item_id',
+                            'route' => '/picture-item/:picture_id/:item_id/:type',
                             'defaults' => [
                                 'controller' => Controller\Api\PictureItemController::class,
                             ],

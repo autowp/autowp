@@ -1,6 +1,6 @@
 <span class="text-muted" ng-if="item.type_id == 1" translate>catalogue/related</span>
 <span class="text-muted" ng-if="item.type_id == 2" translate>catalogue/sport</span>
-<a href="#" ng-if="!item.item.childs_count" ng-click="selectItem(item.item_id)" ng-bind-html="item.item.name_html"></a>
+<a href="#" ng-if="!item.item.childs_count" ng-click="selectItem(item.item_id, null, 1)" ng-bind-html="item.item.name_html"></a>
 <br ng-if="!item.item.childs_count" />
 <div ng-if="item.item.childs_count">
     <a href="" class="arrow" ng-click="toggleItem(item)">
@@ -13,6 +13,6 @@
         <span ng-show="loading">
             <i class="fa fa-spinner fa-spin fa-fw"></i>
         </span>
-        <a href="" ng-click="selectItem(item.item_id)" translate>upload/select/other-modification</a>
+        <a href="" ng-click="selectItem(item.item_id, null, 1)" translate>upload/select/other-modification</a>
     </div>
 </div>

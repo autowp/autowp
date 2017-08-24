@@ -9,20 +9,29 @@ use Zend\Db\TableGateway\TableGateway;
 
 class PictureItem
 {
+    const PICTURE_CONTENT = 1,
+          PICTURE_AUTHOR = 2;
+
     /**
      * @var TableGateway
      */
     private $table;
 
-    public function __construct(TableGateway $table)
+    /**
+     * @var TableGateway
+     */
+    private $itemTable;
+
+    public function __construct(TableGateway $table, TableGateway $itemTable)
     {
         $this->table = $table;
+        $this->itemTable = $itemTable;
     }
 
     /**
      * @throws InvalidArgumentException
      */
-    private function getRow(int $pictureId, int $itemId)
+    private function getRow(int $pictureId, int $itemId, int $type)
     {
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
@@ -34,11 +43,12 @@ class PictureItem
 
         return $this->table->select([
             'picture_id' => $pictureId,
-            'item_id'    => $itemId
+            'item_id'    => $itemId,
+            'type'       => $type
         ])->current();
     }
 
-    public function add(int $pictureId, int $itemId)
+    public function add(int $pictureId, int $itemId, int $type)
     {
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
@@ -48,17 +58,22 @@ class PictureItem
             throw new InvalidArgumentException("Item id is invalid");
         }
 
-        $row = $this->getRow($pictureId, $itemId);
+        if (! $this->isAllowedTypeByItemId($itemId, $type)) {
+            throw new InvalidArgumentException("Combination not allowed");
+        }
+
+        $row = $this->getRow($pictureId, $itemId, $type);
 
         if (! $row) {
             $this->table->insert([
                 'picture_id' => $pictureId,
-                'item_id'    => $itemId
+                'item_id'    => $itemId,
+                'type'       => $type
             ]);
         }
     }
 
-    public function remove(int $pictureId, int $itemId)
+    public function remove(int $pictureId, int $itemId, int $type)
     {
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
@@ -70,36 +85,42 @@ class PictureItem
 
         $this->table->delete([
             'picture_id = ?' => $pictureId,
-            'item_id = ?'    => $itemId
+            'item_id = ?'    => $itemId,
+            'type'           => $type
         ]);
     }
 
-    public function isExists(int $pictureId, int $itemId)
+    public function isExists(int $pictureId, int $itemId, int $type)
     {
-        return (bool)$this->getRow($pictureId, $itemId);
+        return (bool)$this->getRow($pictureId, $itemId, $type);
     }
 
-    public function changePictureItem(int $pictureId, int $oldItemId, int $newItemId)
+    public function changePictureItem(int $pictureId, int $type, int $oldItemId, int $newItemId)
     {
         if (! $newItemId) {
             throw new InvalidArgumentException("Item id is invalid");
         }
 
-        $row = $this->getRow($pictureId, $oldItemId);
+        $row = $this->getRow($pictureId, $oldItemId, $type);
 
         if (! $row) {
             throw new \Exception("Item not found");
         }
 
+        if (! $this->isAllowedTypeByItemId($newItemId, $type)) {
+            throw new InvalidArgumentException("Combination not allowed");
+        }
+
         $this->table->update([
             'item_id' => $newItemId
         ], [
+            'type'           => $type,
             'picture_id = ?' => $pictureId,
             'item_id = ?'    => $oldItemId
         ]);
     }
 
-    public function setPictureItems(int $pictureId, array $itemIds)
+    public function setPictureItems(int $pictureId, int $type, array $itemIds)
     {
         if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
@@ -114,18 +135,25 @@ class PictureItem
         unset($itemId);
 
         foreach ($itemIds as $itemId) {
-            $row = $this->getRow($pictureId, $itemId);
+            $row = $this->getRow($pictureId, $itemId, $type);
 
             if (! $row) {
+
+                if (! $this->isAllowedTypeByItemId($itemId, $type)) {
+                    throw new InvalidArgumentException("Combination not allowed");
+                }
+
                 $this->table->insert([
                     'picture_id' => $pictureId,
-                    'item_id'    => $itemId
+                    'item_id'    => $itemId,
+                    'type'       => $type,
                 ]);
             }
         }
 
         $filter = [
-            'picture_id = ?' => $pictureId
+            'picture_id = ?' => $pictureId,
+            'type'           => $type
         ];
         if ($itemIds) {
             $filter[] = new Sql\Predicate\NotIn('item_id', $itemIds);
@@ -134,10 +162,11 @@ class PictureItem
         $this->table->delete($filter);
     }
 
-    public function getPictureItems(int $pictureId): array
+    public function getPictureItems(int $pictureId, int $type): array
     {
         $rows = $this->table->select([
-            'picture_id' => $pictureId
+            'picture_id' => $pictureId,
+            'type'       => $type
         ]);
 
         $result = [];
@@ -148,19 +177,26 @@ class PictureItem
         return $result;
     }
 
-    public function getPictureItemData(int $pictureId, int $itemId)
+    public function getPictureItemData(int $pictureId, int $itemId, int $type)
     {
         return $this->table->select([
             'picture_id' => $pictureId,
-            'item_id'    => $itemId
+            'item_id'    => $itemId,
+            'type'       => $type
         ])->current();
     }
 
-    public function getPictureItemsData(int $pictureId)
+    public function getPictureItemsData(int $pictureId, int $type = 0)
     {
-        $rows = $this->table->select([
+        $filter = [
             'picture_id' => $pictureId
-        ]);
+        ];
+
+        if ($type) {
+            $filter['type'] = $type;
+        }
+
+        $rows = $this->table->select($filter);
 
         $result = [];
         foreach ($rows as $row) {
@@ -170,14 +206,14 @@ class PictureItem
         return $result;
     }
 
-    public function getPictureItemsByType(int $pictureId, $type): array
+    public function getPictureItemsByItemType(int $pictureId, $itemType): array
     {
         $select = $this->table->getSql()->select();
         $select->columns(['item_id'])
             ->join('item', 'picture_item.item_id = item.id', [])
             ->where([
                 'picture_id' => $pictureId,
-                new Sql\Predicate\In('item.item_type_id', $type)
+                new Sql\Predicate\In('item.item_type_id', $itemType)
             ]);
 
         $rows = $this->table->selectWith($select);
@@ -207,7 +243,10 @@ class PictureItem
         ]);
 
         if ($options['onlyWithArea']) {
-            $select->where(['crop_left and crop_top and crop_width and crop_height']);
+            $select->where([
+                'type' => self::PICTURE_CONTENT,
+                'crop_left and crop_top and crop_width and crop_height'
+            ]);
         }
 
         if ($options['picture']) {
@@ -231,6 +270,7 @@ class PictureItem
             $result[] = [
                 'picture_id' => (int)$row['picture_id'],
                 'item_id'    => (int)$row['item_id'],
+                'type'       => (int)$row['type'],
                 'area'       => $area
             ];
         }
@@ -238,50 +278,54 @@ class PictureItem
         return $result;
     }
 
-    public function setProperties(int $pictureId, int $itemId, array $properties)
+    public function setProperties(int $pictureId, int $itemId, int $type, array $properties)
     {
-        $row = $this->getRow($pictureId, $itemId);
+        $row = $this->getRow($pictureId, $itemId, $type);
         if (! $row) {
             return;
         }
 
         $set = [];
 
-        if (array_key_exists('perspective', $properties)) {
-            $perspective = $properties['perspective'];
-            $set['perspective_id'] = $perspective ? (int)$perspective : null;
-        }
+        if ($type == self::PICTURE_CONTENT) {
 
-        if (array_key_exists('area', $properties)) {
-            $area = $properties['area'];
-            if ($area) {
-                $set = array_replace($set, [
-                    'crop_left'   => $area['left'],
-                    'crop_top'    => $area['top'],
-                    'crop_width'  => $area['width'],
-                    'crop_height' => $area['height'],
-                ]);
-            } else {
-                $set = array_replace($set, [
-                    'crop_left'   => null,
-                    'crop_top'    => null,
-                    'crop_width'  => null,
-                    'crop_height' => null,
-                ]);
+            if (array_key_exists('perspective', $properties)) {
+                $perspective = $properties['perspective'];
+                $set['perspective_id'] = $perspective ? (int)$perspective : null;
+            }
+
+            if (array_key_exists('area', $properties)) {
+                $area = $properties['area'];
+                if ($area) {
+                    $set = array_replace($set, [
+                        'crop_left'   => $area['left'],
+                        'crop_top'    => $area['top'],
+                        'crop_width'  => $area['width'],
+                        'crop_height' => $area['height'],
+                    ]);
+                } else {
+                    $set = array_replace($set, [
+                        'crop_left'   => null,
+                        'crop_top'    => null,
+                        'crop_width'  => null,
+                        'crop_height' => null,
+                    ]);
+                }
             }
         }
 
         if ($set) {
             $this->table->update($set, [
                 'picture_id = ?' => $pictureId,
-                'item_id = ?'    => $itemId
+                'item_id = ?'    => $itemId,
+                'type'           => $type
             ]);
         }
     }
 
     public function getPerspective(int $pictureId, int $itemId)
     {
-        $row = $this->getRow($pictureId, $itemId);
+        $row = $this->getRow($pictureId, $itemId, self::PICTURE_CONTENT);
         if (! $row) {
             return null;
         }
@@ -291,7 +335,7 @@ class PictureItem
 
     public function getArea(int $pictureId, int $itemId)
     {
-        $row = $this->getRow($pictureId, $itemId);
+        $row = $this->getRow($pictureId, $itemId, self::PICTURE_CONTENT);
         if (! $row) {
             return null;
         }
@@ -304,5 +348,39 @@ class PictureItem
             (int)$row['crop_left'],  (int)$row['crop_top'],
             (int)$row['crop_width'], (int)$row['crop_height'],
         ];
+    }
+
+    public function isAllowedType(int $itemTypeId, int $type): bool
+    {
+        $allowed = [
+            Item::BRAND    => [self::PICTURE_CONTENT],
+            Item::CATEGORY => [self::PICTURE_CONTENT],
+            Item::ENGINE   => [self::PICTURE_CONTENT],
+            Item::FACTORY  => [self::PICTURE_CONTENT],
+            Item::VEHICLE  => [self::PICTURE_CONTENT],
+            Item::TWINS    => [self::PICTURE_CONTENT],
+            Item::MUSEUM   => [self::PICTURE_CONTENT],
+            Item::PERSON   => [self::PICTURE_AUTHOR],
+        ];
+
+        if (! isset($allowed[$itemTypeId])) {
+            return false;
+        }
+
+        return in_array($type, $allowed[$itemTypeId]);
+    }
+
+    public function isAllowedTypeByItemId(int $itemId, int $type)
+    {
+        $select = $this->itemTable->getSql()->select()
+            ->columns(['item_type_id'])
+            ->where(['id' => $itemId]);
+
+        $row = $this->itemTable->selectWith($select)->current();
+        if (! $row) {
+            return false;
+        }
+
+        return $this->isAllowedType($row['item_type_id'], $type);
     }
 }
