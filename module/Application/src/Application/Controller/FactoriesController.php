@@ -93,7 +93,9 @@ class FactoriesController extends AbstractActionController
                 $pictureRow = $this->picture->getRow([
                     'status' => Picture::STATUS_ACCEPTED,
                     'item'   => [
-                        'ancestor_or_self' => $ancestor
+                        'ancestor_or_self' => [
+                            'id' => $ancestor
+                        ]
                     ],
                     'order'  => 'ancestor_stock_front_first'
                 ]);
