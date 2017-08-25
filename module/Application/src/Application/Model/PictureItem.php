@@ -208,10 +208,11 @@ class PictureItem
     public function getPictureItemsByItemType(int $pictureId, $itemType): array
     {
         $select = $this->table->getSql()->select();
-        $select->columns(['item_id'])
+        $select->columns(['item_id', 'type'])
             ->join('item', 'picture_item.item_id = item.id', [])
             ->where([
-                'picture_id' => $pictureId,
+                'picture_item.picture_id' => $pictureId,
+                'picture_item.type'       => self::PICTURE_CONTENT,
                 new Sql\Predicate\In('item.item_type_id', $itemType)
             ]);
 
@@ -219,7 +220,10 @@ class PictureItem
 
         $result = [];
         foreach ($rows as $row) {
-            $result[] = (int)$row['item_id'];
+            $result[] = [
+                'item_id' => (int)$row['item_id'],
+                'type'    => (int)$row['type']
+            ];
         }
 
         return $result;

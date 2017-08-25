@@ -356,13 +356,14 @@ class PictureHydrator extends RestHydrator
             $picture['perspective_item'] = null;
 
             if (count($itemIds) == 1) {
-                $itemId = $itemIds[0];
+                $item = $itemIds[0];
 
-                $perspective = $this->pictureItem->getPerspective($object['id'], $itemId);
+                $perspective = $this->pictureItem->getPerspective($object['id'], $item['item_id']);
 
                 $picture['perspective_item'] = [
-                    'item_id'        => (int)$itemId,
-                    'perspective_id' => $perspective ? (int)$perspective : null
+                    'item_id'        => (int)$item['item_id'],
+                    'type'           => (int)$item['type'],
+                    'perspective_id' => $perspective ? (int)$perspective : null,
                 ];
             }
         }
