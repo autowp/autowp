@@ -237,7 +237,7 @@ class PictureItem
         $select = $this->table->getSql()->select();
 
         $select->columns([
-            'picture_id', 'item_id',
+            'picture_id', 'item_id', 'type',
             'crop_left', 'crop_top', 'crop_width', 'crop_height'
         ]);
 
