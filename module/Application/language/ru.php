@@ -1574,7 +1574,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 
     'pm/user-%s-edited-brand-description-%s-%s' => 'Пользователь %s редактировал описание бренда %s ( %s )',
     'pm/user-%s-edited-item-language-%s-%s' => "Пользователь %s редактировал языковую информацию %s ( %s )\n%s",
-    'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s' => "Пользователь %s редактировал информацию об автомобиле %s ( %s )\n%s",
+    'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s' => "Пользователь %s редактировал информацию о %s ( %s )\n%s",
     'pm/user-%s-adds-item-%s-%s-to-item-%s-%s' => 'Пользователь %s добавил %s ( %s ) в %s ( %s )',
     'pm/user-%s-removed-item-%s-%s-from-item-%s-%s' => 'Пользователь %s удалил %s ( %s ) из %s ( %s )',
     'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s' => 'Пользователь %s отменил вашу привязку автомобиля %s ( %s ) к категориям: %s',
@@ -1593,7 +1593,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'pm/user-%s-replies-to-you-%s' => "%s ответил на ваше сообщение\n%s",
     'pm/user-%s-post-new-message-%s' => "%s написал сообщение\n%s",
 
-    'moder/vehicle/changes/name-%s-%s' => 'название автомобиля с "%s" на "%s"',
+    'moder/vehicle/changes/name-%s-%s' => 'название с "%s" на "%s"',
     'moder/vehicle/changes/body-%s-%s' => 'номер кузова с "%s" на "%s"',
     'moder/vehicle/changes/from/year-%s-%s' => 'год начала выпуска c "%s" на "%s"',
     'moder/vehicle/changes/from/month-%s-%s' => 'месяц начала выпуска с "%s" на "%s"',

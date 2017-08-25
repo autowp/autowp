@@ -1552,7 +1552,7 @@ Certains d'entre eux, trouvés par d'autres utilisateurs, vous pouvez trouver [i
 
     'pm/user-%s-edited-brand-description-%s-%s' => 'User %s edited brand description %s ( %s )',
     'pm/user-%s-edited-item-language-%s-%s' => "User %s edited language data %s ( %s )\n%s",
-    'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s' => "User %s edited vehicle meta-data %s ( %s )\n%s",
+    'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s' => "User %s edited meta-data %s ( %s )\n%s",
     'pm/user-%s-adds-item-%s-%s-to-item-%s-%s' => 'User %s added %s ( %s ) to %s ( %s )',
     'pm/user-%s-removed-item-%s-%s-from-item-%s-%s' => 'User %s removed %s ( %s ) from %s ( %s )',
     'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s' => 'User %s cancel link vehicle %s ( %s ) with categories: %s',
@@ -1571,7 +1571,7 @@ Certains d'entre eux, trouvés par d'autres utilisateurs, vous pouvez trouver [i
     'pm/user-%s-replies-to-you-%s' => "%s replies to you\n%s",
     'pm/user-%s-post-new-message-%s' => "%s posted new message\n%s",
 
-    'moder/vehicle/changes/name-%s-%s' => 'vehicle name from "%s" to "%s"',
+    'moder/vehicle/changes/name-%s-%s' => 'name from "%s" to "%s"',
     'moder/vehicle/changes/body-%s-%s' => 'body number from "%s" to "%s"',
     'moder/vehicle/changes/from/year-%s-%s' => 'start year from "%s" to "%s"',
     'moder/vehicle/changes/from/month-%s-%s' => 'start month from "%s" to "%s"',
