@@ -201,7 +201,7 @@ angular.module(Module)
                     delete ctrl.tabs.vehicles;
                 }
 
-                if ([2, 1, 5, 6, 7].indexOf(ctrl.item.item_type_id) === -1) {
+                if ([2, 1, 5, 6, 7, 8].indexOf(ctrl.item.item_type_id) === -1) {
                     delete ctrl.tabs.pictures;
                 }
 
