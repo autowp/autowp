@@ -28,8 +28,8 @@
             <td>
                 <autowp-user user="user"></autowp-user>
             </td>
-            <td am-time-ago="user.last_online"></td>
-            <td am-time-ago="user.reg_date" title="{user.reg_date | date : 'fullDate'}"></td>
+            <td am-time-ago="user.last_online" am-full-date-threshold="2"></td>
+            <td am-time-ago="user.reg_date" title="{user.reg_date | date : 'fullDate'}" am-full-date-threshold="2"></td>
         </tr>
     </tbody>
 </table>

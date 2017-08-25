@@ -2,7 +2,7 @@
     <tr ng-repeat="event in ctrl.items">
         <td>
             <autowp-user user="event.user" ng-if="event.user"></autowp-user>
-            <div ng-if="event.date" am-time-ago="event.date"></div>
+            <div ng-if="event.date" am-time-ago="event.date" am-full-date-threshold="2"></div>
         </td>
         <td ng-bind-html="event.desc"></td>
         <td>
