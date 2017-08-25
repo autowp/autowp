@@ -15,9 +15,30 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    private function mockDuplicateFinder()
+    {
+        $serviceManager = $this->getApplicationServiceLocator();
+
+        $tables = $serviceManager->get('TableManager');
+
+        $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
+            ->setMethods(['indexImage'])
+            ->setConstructorArgs([
+                $tables->get('df_hash'),
+                $tables->get('df_distance')
+            ])
+            ->getMock();
+
+        $mock->method('indexImage')->willReturn(true);
+
+        $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
+    }
+
     private function addPictureToItem($vehicleId)
     {
         $this->reset();
+
+        $this->mockDuplicateFinder();
 
         $request = $this->getRequest();
         $request->getHeaders()

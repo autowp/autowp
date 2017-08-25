@@ -57,14 +57,36 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
+
+    private function mockDuplicateFinder()
+    {
+        $serviceManager = $this->getApplicationServiceLocator();
+
+        $tables = $serviceManager->get('TableManager');
+
+        $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
+            ->setMethods(['indexImage'])
+            ->setConstructorArgs([
+                $tables->get('df_hash'),
+                $tables->get('df_distance')
+            ])
+            ->getMock();
+
+        $mock->method('indexImage')->willReturn(true);
+
+        $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
+    }
+
     private function addPictureToItem($vehicleId)
     {
         $this->reset();
 
+        $this->mockDuplicateFinder();
+
         $request = $this->getRequest();
         $request->getHeaders()
-        ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
-        ->addHeaderLine('Content-Type', 'multipart/form-data');
+            ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
+            ->addHeaderLine('Content-Type', 'multipart/form-data');
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
