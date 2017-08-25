@@ -89,14 +89,14 @@
                         </button>
                         <ul class="dropdown-menu" ng-if="item.type == 1">
                             <li ng-if="last_item && !hasItem(last_item.id)">
-                                <a href="" ng-click="moveItem(1, item.item_id, last_item.id)">
+                                <a href="" ng-click="moveItem(item.type, item.item_id, last_item.id)">
                                     <i class="fa fa-arrow-right"></i>
                                     {{'moder/picture/catalogue/move-to'|translate}}
                                     <span ng-bind-html="last_item.name_html"></span>
                                 </a>
                             </li>
                             <li ng-repeat="brand in item.item.brands">
-                                <a ui-sref="moder-pictures-item-move({id: picture.id, src_item_id: item.item_id, brand_id: brand.id})">
+                                <a ui-sref="moder-pictures-item-move({id: picture.id, src_item_id: item.item_id, src_type: item.type, brand_id: brand.id})">
                                     <i class="fa fa-arrow-right"></i>
                                     {{'moder/picture/catalogue/move-to'|translate}}
                                     <span ng-bind-html="brand.name_html"></span> ...
