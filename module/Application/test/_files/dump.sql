@@ -144,7 +144,7 @@ CREATE TABLE `acl_roles_privileges_allowed` (
 
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` DISABLE KEYS */;
 INSERT IGNORE INTO `acl_roles_privileges_allowed` (`role_id`, `privilege_id`) 
-VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9),(5,10),(5,11),(5,12),(5, 13),(5,14),(5,17),(5,18),(5,19),(5,20);
+VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9),(5,10),(5,11),(5,12),(5, 13),(5,14),(5,17),(5,18),(5,19),(5,20),(5,16);
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` ENABLE KEYS */;
 
 --
