@@ -55,7 +55,13 @@ angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angular
             de: 'de'
         };
         amMoment.changeLocale(map[lang]);
-    }]);
+    }])
+    .constant('amTimeAgoConfig', {
+        fullDateThreshold: 2,
+        fullDateFormat: 'lll',
+        titleFormat: 'LLL'
+    });
+    //.constant('moment', require('moment-timezone'));
 
 
 export default MODULE_NAME;
