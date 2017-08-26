@@ -6,7 +6,7 @@
     <label class="col-md-2 control-label text-right" translate>moder/vehicle/pictures/turbo-group-creator/pictures</label>
     <div class="col-md-10 multicheckbox-pictures">
         <label class="btn btn-default" ng-repeat="picture in ctrl.pictures" ng-class="{active: picture.selected}" ng-click="ctrl.pictureSelected(picture)">
-            <img ng-src="{{picture.thumbnail.src}}" alt="" title="{{picture.name_html}}" />
+            <img ng-src="{{picture.picture.thumbnail.src}}" alt="" title="{{picture.picture.name_text}}" />
         </label>
     </div>
 </div>

@@ -7,6 +7,7 @@ import SPEC_SERVICE from 'services/spec';
 import CONTENT_LANGUAGE_SERVICE from 'services/content-language';
 import ITEM_SERVICE from 'services/item';
 import './styles.less';
+import notify from 'notify';
 
 const STATE_NAME = 'moder-items-item-organize-pictures';
 const CONTROLLER_NAME = 'ModerItemsItemOrganizePicturesController';
@@ -75,17 +76,17 @@ angular.module(Module)
             
             $http({
                 method: 'GET',
-                url: '/api/picture',
+                url: '/api/picture-item',
                 params: {
-                    exact_item_id: $state.params.id,
+                    item_id: $state.params.id,
                     limit: 500,
-                    fields: 'thumbnail,name_text',
-                    order: 14
+                    fields: 'picture.thumbnail,picture.name_text',
+                    order: 'status'
                 }
             }).then(function(response) {
-                ctrl.pictures = response.data.pictures;
-            }, function() {
-                
+                ctrl.pictures = response.data.items;
+            }, function(response) {
+                notify.response(response);
             });
             
             ctrl.pictureSelected = function(picture) {
@@ -172,10 +173,12 @@ angular.module(Module)
                                 promises.push(
                                     $http({
                                         method: 'PUT',
-                                        url: '/api/picture-item/' + picture.id + '/' + ctrl.item.id,
+                                        url: '/api/picture-item/' + picture.picture_id + '/' + picture.item_id + '/' + picture.type,
                                         data: {
                                             item_id: response.data.id
                                         }
+                                    }).then(function() {}, function(response) {
+                                        notify.response(response);
                                     })
                                 );
                             }
@@ -192,6 +195,8 @@ angular.module(Module)
                         });
                         
                         ctrl.loading--;
+                    }, function(response) {
+                        notify.response(response);
                     });
                     
                     ctrl.loading--;

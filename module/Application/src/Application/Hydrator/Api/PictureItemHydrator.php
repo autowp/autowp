@@ -2,8 +2,8 @@
 
 namespace Application\Hydrator\Api;
 
-use Application\Hydrator\Api\Strategy\Item as HydratorItemStrategy;
 use Application\Model\Item;
+use Application\Model\Picture;
 
 class PictureItemHydrator extends RestHydrator
 {
@@ -18,9 +18,13 @@ class PictureItemHydrator extends RestHydrator
         parent::__construct();
 
         $this->item = $serviceManager->get(Item::class);
+        $this->picture = $serviceManager->get(Picture::class);
 
-        $strategy = new HydratorItemStrategy($serviceManager);
+        $strategy = new Strategy\Item($serviceManager);
         $this->addStrategy('item', $strategy);
+
+        $strategy = new Strategy\Picture($serviceManager);
+        $this->addStrategy('picture', $strategy);
     }
 
     /**
@@ -71,9 +75,15 @@ class PictureItemHydrator extends RestHydrator
         ];
 
         if ($this->filterComposite->filter('item')) {
-            $row = $this->item->getRow(['id' => $object['item_id']]);
+            $row = $this->item->getRow(['id' => (int)$object['item_id']]);
 
             $result['item'] = $row ? $this->extractValue('item', $row) : null;
+        }
+
+        if ($this->filterComposite->filter('picture')) {
+            $row = $this->picture->getRow(['id' => (int)$object['picture_id']]);
+
+            $result['picture'] = $row ? $this->extractValue('picture', $row) : null;
         }
 
         if ($this->filterComposite->filter('area')) {

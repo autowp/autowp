@@ -4,6 +4,7 @@ namespace Application\Controller\Api;
 
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Paginator;
 use Zend\View\Model\JsonModel;
 
 use Application\Hydrator\Api\RestHydrator;
@@ -35,6 +36,11 @@ class PictureItemController extends AbstractRestfulController
     private $itemInputFilter;
 
     /**
+     * @var InputFilter
+     */
+    private $listInputFilter;
+
+    /**
      * @var Item
      */
     private $item;
@@ -48,6 +54,7 @@ class PictureItemController extends AbstractRestfulController
         PictureItem $pictureItem,
         Log $log,
         RestHydrator $hydrator,
+        InputFilter $listInputFilter,
         InputFilter $itemInputFilter,
         Item $item,
         Picture $picture
@@ -55,6 +62,7 @@ class PictureItemController extends AbstractRestfulController
         $this->pictureItem = $pictureItem;
         $this->log = $log;
         $this->hydrator = $hydrator;
+        $this->listInputFilter = $listInputFilter;
         $this->itemInputFilter = $itemInputFilter;
         $this->item = $item;
         $this->picture = $picture;
@@ -78,6 +86,70 @@ class PictureItemController extends AbstractRestfulController
         }
 
         return false;
+    }
+
+    public function indexAction()
+    {
+        if (! $this->user()->inheritsRole('moder')) {
+            return $this->forbiddenAction();
+        }
+
+        $this->listInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->listInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->listInputFilter);
+        }
+
+        $data = $this->listInputFilter->getValues();
+
+        $table = $this->pictureItem->getTable();
+
+        $select = $table->getSql()->select();
+
+        if ($data['item_id']) {
+            $select->where(['picture_item.item_id' => $data['item_id']]);
+        }
+
+        if ($data['picture_id']) {
+            $select->where(['picture_item.picture_id' => $data['picture_id']]);
+        }
+
+        if ($data['type']) {
+            $select->where(['picture_item.type' => $data['type']]);
+        }
+
+        if ($data['order']) {
+            switch ($data['order']) {
+                case 'status':
+                    $select->join('pictures', 'picture_item.picture_id = pictures.id', [])
+                        ->order(['pictures.status']);
+                    break;
+            }
+        }
+
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $table->getAdapter())
+        );
+
+        $paginator
+            ->setItemCountPerPage(500)
+            ->setCurrentPageNumber($this->params()->fromQuery('page'));
+
+        $this->hydrator->setOptions([
+            'language' => $this->language(),
+            'fields'   => $data['fields'],
+            //'user_id' => $user ? $user['id'] : null
+        ]);
+
+        $items = [];
+        foreach ($paginator->getCurrentItems() as $row) {
+            $items[] = $this->hydrator->extract($row);
+        }
+
+        return new JsonModel([
+            'paginator' => get_object_vars($paginator->getPages()),
+            'items'     => $items
+        ]);
     }
 
     public function itemAction()

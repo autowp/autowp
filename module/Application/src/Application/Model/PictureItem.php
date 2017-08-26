@@ -385,4 +385,9 @@ class PictureItem
 
         return $this->isAllowedType($row['item_type_id'], $type);
     }
+
+    public function getTable(): TableGateway
+    {
+        return $this->table;
+    }
 }

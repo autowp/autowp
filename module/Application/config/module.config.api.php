@@ -50,7 +50,7 @@ return [
             Controller\Api\PerspectiveController::class     => Controller\Api\Service\PerspectiveControllerFactory::class,
             Controller\Api\PerspectivePageController::class => Controller\Api\Service\PerspectivePageControllerFactory::class,
             Controller\Api\PictureController::class         => Controller\Api\PictureControllerFactory::class,
-            Controller\Api\PictureItemController::class     => Controller\Api\Service\PictureItemControllerFactory::class,
+            Controller\Api\PictureItemController::class     => Controller\Api\PictureItemControllerFactory::class,
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
             Controller\Api\PictureModerVoteTemplateController::class => Controller\Api\Service\PictureModerVoteTemplateControllerFactory::class,
             Controller\Api\PictureVoteController::class     => Controller\Api\Service\PictureVoteControllerFactory::class,
@@ -1301,6 +1301,87 @@ return [
                 ]
             ]
         ],
+        'api_picture_item_list' => [
+            'item_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ]
+            ],
+            'picture_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ]
+            ],
+            'type' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                Model\PictureItem::PICTURE_CONTENT,
+                                Model\PictureItem::PICTURE_AUTHOR
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'order' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'status'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'limit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 500
+                        ]
+                    ]
+                ]
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => [
+                            'area', 'item', 'picture'
+                        ]]
+                    ]
+                ]
+            ]
+        ],
         'api_picture_item_item' => [
             'fields' => [
                 'required' => false,
@@ -1308,7 +1389,7 @@ return [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => [
-                            'area'
+                            'area', 'item', 'picture'
                         ]]
                     ]
                 ]
@@ -2392,51 +2473,69 @@ return [
                         ],
                     ],
                     'picture-item' => [
-                        'type' => Segment::class,
+                        'type' => Literal::class,
                         'options' => [
-                            'route' => '/picture-item/:picture_id/:item_id/:type',
+                            'route' => '/picture-item',
                             'defaults' => [
                                 'controller' => Controller\Api\PictureItemController::class,
                             ],
                         ],
                         'may_terminate' => false,
                         'child_routes' => [
-                            'item' => [
+                            'get' => [
                                 'type' => Method::class,
                                 'options' => [
                                     'verb'     => 'get',
                                     'defaults' => [
-                                        'action' => 'item'
+                                        'action' => 'index'
                                     ]
                                 ]
-                            ],
-                            'create' => [
-                                'type' => Method::class,
+                            ] ,
+                            'item' => [
+                                'type' => Segment::class,
                                 'options' => [
-                                    'verb'     => 'post',
-                                    'defaults' => [
-                                        'action' => 'create'
-                                    ]
+                                    'route' => '/:picture_id/:item_id/:type'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'item' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'get',
+                                            'defaults' => [
+                                                'action' => 'item'
+                                            ]
+                                        ]
+                                    ],
+                                    'create' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'post',
+                                            'defaults' => [
+                                                'action' => 'create'
+                                            ]
+                                        ]
+                                    ],
+                                    'update' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'put',
+                                            'defaults' => [
+                                                'action' => 'update'
+                                            ]
+                                        ]
+                                    ],
+                                    'delete' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb'     => 'delete',
+                                            'defaults' => [
+                                                'action' => 'delete'
+                                            ]
+                                        ]
+                                    ],
                                 ]
-                            ],
-                            'update' => [
-                                'type' => Method::class,
-                                'options' => [
-                                    'verb'     => 'put',
-                                    'defaults' => [
-                                        'action' => 'update'
-                                    ]
-                                ]
-                            ],
-                            'delete' => [
-                                'type' => Method::class,
-                                'options' => [
-                                    'verb'     => 'delete',
-                                    'defaults' => [
-                                        'action' => 'delete'
-                                    ]
-                                ]
-                            ],
+                            ]
                         ]
                     ],
                     'traffic' => [
