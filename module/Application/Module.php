@@ -114,12 +114,12 @@ class Module implements
         }
     }
 
-    private function sendErrorEmail($exception, $serviceManager)
+    private function sendErrorEmail(\Exception $exception, $serviceManager)
     {
         $message = get_class($exception) . PHP_EOL .
-                   'File: ' . $exception->getFile() . PHP_EOL .
-                   'Message: ' . $exception->getMessage() . PHP_EOL .
-                   'Trace: ' . PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
+            'File: ' . $exception->getFile() . ' (' . $exception->getLine(). ')' . PHP_EOL .
+            'Message: ' . $exception->getMessage() . PHP_EOL .
+            'Trace: ' . PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
 
         $mail = new Mail\Message();
         $mail
