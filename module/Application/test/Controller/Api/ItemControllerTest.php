@@ -208,7 +208,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(PictureItemController::class);
-        $this->assertMatchedRouteName('api/picture-item/update');
+        $this->assertMatchedRouteName('api/picture-item/item/update');
         $this->assertActionName('update');
     }
 

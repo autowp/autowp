@@ -277,7 +277,7 @@ class PictureItemController extends AbstractRestfulController
             'pictures' => $picture['id']
         ]);
 
-        $url = $this->url()->fromRoute('api/picture-item/create', [
+        $url = $this->url()->fromRoute('api/picture-item/item/create', [
             'picture_id' => $picture['id'],
             'item_id'    => $item['id'],
             'type'       => $type

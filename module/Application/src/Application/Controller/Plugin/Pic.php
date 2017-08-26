@@ -665,7 +665,7 @@ class Pic extends AbstractPlugin
                         'item_id'    => $item['id'],
                         'type'       => PictureItem::PICTURE_CONTENT
                     ], [
-                        'name' => 'api/picture-item/update'
+                        'name' => 'api/picture-item/item/update'
                     ]),
                     'value'   => $this->pictureItem->getPerspective($picture['id'], $item['id']),
                     'name'    => $this->itemModel->getNameData($item, $language)
