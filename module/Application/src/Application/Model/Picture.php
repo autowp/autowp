@@ -180,7 +180,7 @@ class Picture
 
         $joinItem = $forceJoinItem;
 
-        if ($options['item_type_id'] || $options['engine']) {
+        if ($options['item_type_id'] || $options['engine'] || isset($options['perspective_is_null'])) {
             $joinItem = true;
         }
 
@@ -211,11 +211,10 @@ class Picture
         }
 
         if ($options['perspective_is_null'] !== null) {
+            $this->applyIdFilter($select, Item::VEHICLE, 'item.item_type_id');
+            $select->where(['picture_item.type' => PictureItem::PICTURE_CONTENT]);
             if ($options['perspective_is_null']) {
-                $selec->where([
-                    new Sql\Predicate\IsNull('picture_item.perspective_id'),
-                    'picture_item.type' => PictureItem::PICTURE_CONTENT
-                ]);
+                $select->where([new Sql\Predicate\IsNull('picture_item.perspective_id')]);
             } else {
                 $select->where([new Sql\Predicate\IsNotNull('picture_item.perspective_id')]);
             }
