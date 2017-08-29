@@ -82,6 +82,7 @@ class Brand
                 'cars_count' => $subSelect
             ],
             'item_type_id' => Item::BRAND,
+            'position'     => 0,
             'limit'        => self::TOP_COUNT,
             'order'        => 'cars_count DESC'
         ]);

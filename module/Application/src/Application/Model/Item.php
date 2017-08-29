@@ -1240,6 +1240,7 @@ class Item
             'has_end_year'    => null,
             'has_begin_month' => null,
             'has_end_month'   => null,
+            'position'        => null,
         ];
         $options = array_replace($defaults, $options);
 
@@ -1336,6 +1337,10 @@ class Item
             } else {
                 $select->where(['item.item_type_id' => $options['item_type_id']]);
             }
+        }
+
+        if (isset($options['position'])) {
+            $select->where(['item.position' => $options['position']]);
         }
 
         if ($options['has_logo']) {
