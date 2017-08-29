@@ -79,25 +79,6 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
     }
 
-    public function testSendMessage()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/account/send-personal-message', Request::METHOD_POST, [
-            'user_id' => 1,
-            'message' => 'Test personal message'
-        ]);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(AccountController::class);
-        $this->assertMatchedRouteName('account/send-personal-message');
-        $this->assertActionName('send-personal-message');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertTrue($json['ok']);
-    }
-
     public function testProfile()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

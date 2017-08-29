@@ -299,11 +299,12 @@ class TelegramService
         ]);
 
         foreach ($chatRows as $chatRow) {
-            $url = $this->router->assemble([], [
-                'name'            => $fromId ? 'account/personal-messages' : 'account/personal-messages/system',
+
+            $url = $this->router->assemble(['path' => ''], [
+                'name'            => 'ng',
                 'force_canonical' => true,
                 'uri'             => $this->getUriByChatId($chatRow['chat_id'])
-            ]);
+            ]) . 'account/messages' . ($fromId ? '' : '?folder=system');
 
             $telegramMessage = sprintf(
                 "%s: \n%s\n\n%s",

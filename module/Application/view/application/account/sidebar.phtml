@@ -67,7 +67,7 @@ $items = [
     ],
     [
         'active' => $this->pageEnv()->isOnPath(128),
-        'url'    => $this->url('account/personal-messages'),
+        'url'    => '/ng/account/messages',
         'icon'   => 'comments-o',
         'name'   => $this->page(128)->name,
         'count'    => $this->pmCount,
@@ -75,14 +75,14 @@ $items = [
     ],
     [
         'active' => $this->pageEnv()->isOnPath(80),
-        'url'    => $this->url('account/personal-messages/sent'),
+        'url'    => '/ng/account/messages?folder=sent',
         'icon'   => 'comments-o',
         'name'   => $this->page(80)->name,
         'count'    => $this->omCount,
     ],
     [
         'active' => $this->pageEnv()->isOnPath(81),
-        'url'    => $this->url('account/personal-messages/system'),
+        'url'    => '/ng/account/messages?folder=system',
         'icon'   => 'comments',
         'name'   => $this->page(81)->name,
         'count'    => $this->smCount,

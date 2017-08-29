@@ -89,16 +89,6 @@ class MessageHydrator extends RestHydrator
 
     public function extract($object)
     {
-        $dialogUrl = null;
-
-        if ($object['author_id']) {
-            $dialogUrl = $this->router->assemble([
-                'user_id' => $object['author_id']
-            ], [
-                'name' => 'account/personal-messages/user'
-            ]);
-        }
-
         $result = [
             'id'                => (int)$object['id'],
             'text_html'         => $this->userText->__invoke($object['contents']),
