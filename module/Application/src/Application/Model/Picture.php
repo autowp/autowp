@@ -212,7 +212,10 @@ class Picture
 
         if ($options['perspective_is_null'] !== null) {
             if ($options['perspective_is_null']) {
-                $select->where([new Sql\Predicate\IsNull('picture_item.perspective_id')]);
+                $selec->where([
+                    new Sql\Predicate\IsNull('picture_item.perspective_id'),
+                    'picture_item.type' => PictureItem::PICTURE_CONTENT
+                ]);
             } else {
                 $select->where([new Sql\Predicate\IsNotNull('picture_item.perspective_id')]);
             }
