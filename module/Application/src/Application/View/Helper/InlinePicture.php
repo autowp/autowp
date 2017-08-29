@@ -33,14 +33,9 @@ class InlinePicture extends AbstractHelper
             'shuffle' => true
         ]);
 
-        return
-            $view->htmlA([
-                'href'  => $url,
-                'class' => 'inline-picture-preview thumbnail thumbnail-inline'
-            ], $imageHtml, false) .
-            '<div class="inline-picture-details" style="display:none;">'.
-                '<h5>' . $view->htmlA($url, $name) . '</h5>' .
-                $view->pictures()->behaviour($picture) .
-            '</div>';
+        return $view->htmlA([
+            'href'  => $url,
+            'class' => 'thumbnail thumbnail-inline'
+        ], $imageHtml, false);
     }
 }

@@ -32,13 +32,6 @@ $(function() {
         });
     });
     
-    $('.inline-picture-preview').each(function() {
-        var element = this;
-        require(['inline-picture'], function(InlinePicture) {
-            new InlinePicture(element);
-        });
-    });
-    
     $('a.picture-hover-preview').each(function() {
         var href = $(this).attr('href');
         var element = null;
