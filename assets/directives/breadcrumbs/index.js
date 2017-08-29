@@ -32,7 +32,6 @@ angular.module(Module)
                         if (current) {
                             var args = PageService.getCurrentArgs();
                             PageService.getPath(current).then(function(path) {
-                                console.log(path);
                                 angular.forEach(path, function(item) {
                                     ctrl.items.push(item);
                                     $translate('page/' + item.id + '/name').then(function (translation) {
