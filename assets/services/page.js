@@ -43,7 +43,7 @@ angular.module(Module)
                 }
                 
                 pageId = pages[pageId].parent_id;
-            };
+            }
             
             return false;
         }
@@ -85,11 +85,6 @@ angular.module(Module)
                         return;
                     }
                     
-                    if (pages[id]) {
-                        var result = isDescendant(id, parentId);
-                        return resolve(result);
-                    }
-                    
                     var result = isDescendant(id, parentId);
                     resolve(result);
                 }, function(response) {
@@ -108,7 +103,7 @@ angular.module(Module)
                         result.push(pages[pageId]);
                         
                         pageId = pages[pageId].parent_id;
-                    };
+                    }
                     
                     resolve(result.reverse());
                 }, function(response) {

@@ -72,7 +72,7 @@ angular.module(Module)
                 }, function(response) {
                     notify.response(response);
                 });
-            };
+            }
             
             ctrl.deleteMessage = function(id) {
                 MessageService.deleteMessage(id).then(function(response) {
