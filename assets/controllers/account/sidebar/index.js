@@ -23,13 +23,13 @@ angular.module(Module)
                     ctrl.items = [
                         {
                             pageId: 129,
-                            url   : 'account/profile',
+                            url   : '/account/profile',
                             icon: 'user',
                             name: 'page/129/name'
                         },
                         {
                             pageId: 198,
-                            url: 'account/contacts',
+                            url: '/account/contacts',
                             icon: 'address-book',
                             name: 'page/198/name'
                         },
