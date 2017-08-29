@@ -88,7 +88,7 @@ angular.module(Module)
         };
         
         this.unbind = function(event, handler) {
-            let index = handlers[event].indexOf(handler);
+            var index = handlers[event].indexOf(handler);
             if (index !== -1) {
                 handlers[event].splice(index, 1);
             }
