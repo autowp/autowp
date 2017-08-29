@@ -1,0 +1,55 @@
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <div style="margin:0 0 20px;" ng-if="ctrl.folder =='sent' && ctrl.paginator.totalItemCount">
+            <button class="btn btn-danger" ng-click="ctrl.clearFolder('sent')" translate>account/personal-message/delete-all-sent</button>
+        </div>
+        
+        <div style="margin:0 0 20px;" ng-if="ctrl.folder =='system' && ctrl.paginator.totalItemCount">
+            <button class="btn btn-danger" ng-click="ctrl.clearFolder('system')" translate>account/personal-message/delete-all-system</button>
+        </div>
+
+        <div class="comments">
+            <div class="message" ng-repeat="message in ctrl.items">
+                <div>
+                    <autowp-user user="message.author" ng-if="message.author"></autowp-user>
+                    <span translate ng-if="! message.author">account/personal-message/system-notification</span>
+                    <?php } ?>
+                </div>
+                <div class="photo">
+                     <a ng-href="{{message.author.url}}" ng-if="! message.author.deleted">
+                        <img ng-src="{{message.author.avatar.src}}" ng-if="message.author.avatar" />
+                        <img ng-src="{{message.author.gravatar}}" ng-if="message.author.gravatar && ! message.author.avatar" />
+                     </a>
+                </div>
+                <div class="content">
+                    <div class="text">
+                        <p ng-bind-html="message.text_html"></p>
+                    </div>
+                    <div>
+                        <span class="label label-info" ng-if="message.is_new" translate>account/personal-message/new</span>
+                        <a href="#" class="pull-right" ng-click="ctrl.deleteMessage(message.id)" ng-if="message.can_delete">
+                            <i class="fa fa-trash"></i> {{'account/personal-message/delete'|translate}}
+                        </a>
+                        <span ng-if="message.can_reply">
+                            <i class="fa fa-reply"></i>
+                            <a href="#" ng-click="ctrl.openMessageForm(message.author.id)" translate>account/personal-message/reply</a>
+                            &nbsp;
+                        </span>
+                        <span ng-if="message.all_messages_link && message.dialog_with_user_id">
+                            <i class="fa fa-comments-o"></i>
+                            <a ui-sref="account-messages({folder: 'dialog', user_id: message.dialog_with_user_id})" ui-sref-options="{inherit: false}" translate>account/personal-message/entire-dialog</a>
+                            <small>({{message.dialog_count}})</small>
+                            &nbsp;
+                        </span>
+                        <i class="fa fa-clock-o"></i>
+                        <span am-time-ago="message.date"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <autowp-account-sidebar></autowp-account-sidebar>
+    </div>
+</div>

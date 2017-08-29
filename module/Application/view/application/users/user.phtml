@@ -52,10 +52,12 @@
         <?php } ?>
         </strong></p>
 
-        <p>
-            <?=$this->escapeHtml($this->translate('users/user/registration-date'))?>:
-            <strong><?=$this->escapeHtml($this->user()->humanDate(\Autowp\Commons\Db\Table\Row::getDateTimeByColumnType('timestamp', $this->currentUser['reg_date'])))?></strong>
-        </p>
+        <?php if ($date = \Autowp\Commons\Db\Table\Row::getDateTimeByColumnType('timestamp', $this->currentUser['reg_date'])) { ?>
+            <p>
+                <?=$this->escapeHtml($this->translate('users/user/registration-date'))?>:
+                <strong><?=$this->escapeHtml($this->user()->humanDate($date))?></strong>
+            </p>
+        <?php } ?>
         <p>
             <?=$this->escapeHtml($this->translate('users/user/last-visited'))?>:
             <strong><?=$this->escapeHtml($this->user()->humanTime(\Autowp\Commons\Db\Table\Row::getDateTimeByColumnType('timestamp', $this->currentUser['last_online'])))?></strong>

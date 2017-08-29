@@ -69,10 +69,11 @@ class PageController extends AbstractRestfulController
         foreach ($rows as $page) {
             $result[] = [
                 'id'            => (int)$page['id'],
-                'name'          => $page['name'],
-                'breadcrumbs'   => $page['breadcrumbs'],
+                //'name'          => $page['name'],
+                //'breadcrumbs'   => $page['breadcrumbs'],
                 'is_group_node' => (bool)$page['is_group_node'],
-                'childs'        => $this->getPagesList($page['id'])
+                'childs'        => $this->getPagesList($page['id']),
+                'url'           => $page['url'],
             ];
         }
 
@@ -307,5 +308,36 @@ class PageController extends AbstractRestfulController
         $page->delete();
 
         return $this->getResponse()->setStatusCode(204);
+    }
+
+    public function parentsAction()
+    {
+        $result = [];
+
+        $pageId = (int)$this->params()->fromQuery('id');
+
+        do {
+            $row = $this->table->select([
+                'id' => $pageId
+            ])->current();
+
+            if ($row) {
+                $result[] = [
+                    'id'            => (int)$row['id'],
+                    'parent_id'     => (int)$row['parent_id'],
+                    //'name'          => $row['name'],
+                    //'breadcrumbs'   => $row['breadcrumbs'],
+                    //'title'         => $row['title'],
+                    'is_group_node' => (bool)$row['is_group_node'],
+                    'url'           => $row['url'],
+                ];
+            }
+
+            $pageId = $row['parent_id'];
+        } while ($pageId);
+
+        return new JsonModel([
+            'items' => $result
+        ]);
     }
 }

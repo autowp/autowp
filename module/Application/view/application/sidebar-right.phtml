@@ -9,11 +9,11 @@
             <i class="fa fa-comment"></i>
             <?php if ($this->newPersonalMessages > 0) { ?>
                 <?=$this->htmlA([
-                    'href'  => '/account/pm',
+                    'href'  => '/ng/account/messages',
                     'class' => 'label label-danger'
                 ], sprintf($this->translatePlural('layout/you-have-%1$s-new-messages', null, $this->newPersonalMessages), $this->newPersonalMessages))?>
             <?php } else { ?>
-                <?=$this->htmlA('/account/pm', $this->translate('layout/personal-messages'))?>
+                <?=$this->htmlA('/ng/account/messages', $this->translate('layout/personal-messages'))?>
             <?php } ?>
         </p>
     </div>

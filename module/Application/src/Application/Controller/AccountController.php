@@ -12,7 +12,6 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
@@ -193,43 +192,6 @@ class AccountController extends AbstractActionController
             'subscribesCount'       => $this->forums->getSubscribedTopicsCount($user['id']),
             'picsCount'             => $picsCount
         ];
-    }
-
-    public function sendPersonalMessageAction()
-    {
-        $currentUser = $this->user()->get();
-        if (! $currentUser) {
-            return $this->forwardToLogin();
-        }
-
-        $user = $this->userModel->getRow((int)$this->params()->fromPost('user_id'));
-        if (! $user) {
-            return $this->notFoundAction();
-        }
-
-        $message = $this->params()->fromPost('message');
-
-        $this->message->send($currentUser['id'], $user['id'], $message);
-
-        return new JsonModel([
-            'ok'      => true,
-            'message' => $this->translate('account/personal-message/sent')
-        ]);
-    }
-
-    public function deletePersonalMessageAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $user = $this->user()->get();
-
-        $this->message->delete($user['id'], $this->params()->fromPost('id'));
-
-        return new JsonModel([
-            'ok' => true
-        ]);
     }
 
     public function addAccountFailedAction()
@@ -581,88 +543,6 @@ class AccountController extends AbstractActionController
         return $viewModel;
     }
 
-    private function preparePersonalMessages($messages)
-    {
-        //TODO: remove
-        return $messages;
-    }
-
-    public function personalMessagesInboxAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $user = $this->user()->get();
-
-        $inbox = $this->message->getInbox($user['id'], $this->params('page'));
-
-        return [
-            'paginator' => $inbox['paginator'],
-            'messages'  => $this->preparePersonalMessages($inbox['messages']),
-            'sidebar'   => $this->sidebar()
-        ];
-    }
-
-    public function personalMessagesSentAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $user = $this->user()->get();
-
-        $sentbox = $this->message->getSentbox($user['id'], $this->params('page'));
-
-        return [
-            'paginator' => $sentbox['paginator'],
-            'messages'  => $this->preparePersonalMessages($sentbox['messages']),
-            'sidebar'   => $this->sidebar()
-        ];
-    }
-
-    public function personalMessagesSystemAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $user = $this->user()->get();
-
-        $systembox = $this->message->getSystembox($user['id'], $this->params('page'));
-
-        return [
-            'paginator' => $systembox['paginator'],
-            'messages'  => $this->preparePersonalMessages($systembox['messages']),
-            'sidebar'   => $this->sidebar()
-        ];
-    }
-
-    public function personalMessagesUserAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $user = $this->userModel->getRow((int)$this->params('user_id'));
-        if (! $user) {
-            return $this->notFoundAction();
-        }
-
-        $logedInUser = $this->user()->get();
-
-        $dialogbox = $this->message->getDialogbox($logedInUser['id'], $user['id'], $this->params('page'));
-
-        return [
-            'paginator' => $dialogbox['paginator'],
-            'messages'  => $this->preparePersonalMessages($dialogbox['messages']),
-            'sidebar'   => $this->sidebar(),
-            'urlParams' => [
-                'user_id' => $user['id']
-            ]
-        ];
-    }
-
     public function notTakenPicturesAction()
     {
         if (! $this->user()->logedIn()) {
@@ -688,28 +568,6 @@ class AccountController extends AbstractActionController
             'picturesData' => $picturesData,
             'sidebar'      => $this->sidebar()
         ];
-    }
-
-    public function clearSystemMessagesAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $this->message->deleteAllSystem($this->user()->get()['id']);
-
-        return $this->redirect()->toRoute('account/personal-messages/system');
-    }
-
-    public function clearSentMessagesAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $this->message->deleteAllSent($this->user()->get()['id']);
-
-        return $this->redirect()->toRoute('account/personal-messages/sent');
     }
 
     public function accessAction()

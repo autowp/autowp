@@ -98,54 +98,6 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertTrue($json['ok']);
     }
 
-    public function testGetInboxMessages()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/account/pm', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(AccountController::class);
-        $this->assertMatchedRouteName('account/personal-messages');
-        $this->assertActionName('personal-messages-inbox');
-    }
-
-    public function testGetSentMessages()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/account/pm/sent', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(AccountController::class);
-        $this->assertMatchedRouteName('account/personal-messages/sent');
-        $this->assertActionName('personal-messages-sent');
-    }
-
-    public function testGetSystemMessages()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/account/pm/system', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(AccountController::class);
-        $this->assertMatchedRouteName('account/personal-messages/system');
-        $this->assertActionName('personal-messages-system');
-    }
-
-    public function testGetUserMessages()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/account/pm/user1', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(AccountController::class);
-        $this->assertMatchedRouteName('account/personal-messages/user');
-        $this->assertActionName('personal-messages-user');
-    }
-
     public function testProfile()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

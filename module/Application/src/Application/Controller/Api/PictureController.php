@@ -1076,4 +1076,28 @@ class PictureController extends AbstractRestfulController
 
         return $this->getResponse()->setStatusCode(200);
     }
+
+    public function userSummaryAction()
+    {
+        $user = $this->user()->get();
+
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        $acceptedCount = $this->picture->getCount([
+            'status' => Picture::STATUS_ACCEPTED,
+            'user'   => $user['id']
+        ]);
+
+        $inboxCount = $this->picture->getCount([
+            'status' => Picture::STATUS_INBOX,
+            'user'   => $user['id']
+        ]);
+
+        return new JsonModel([
+            'inboxCount'    => $inboxCount,
+            'acceptedCount' => $acceptedCount
+        ]);
+    }
 }

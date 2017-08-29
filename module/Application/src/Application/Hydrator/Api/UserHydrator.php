@@ -11,8 +11,6 @@ use Zend\Permissions\Acl\Acl;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 
-use Application\Hydrator\Api\Strategy\Image as HydratorImageStrategy;
-
 class UserHydrator extends RestHydrator
 {
     /**
@@ -43,8 +41,11 @@ class UserHydrator extends RestHydrator
         $this->addStrategy('last_online', $strategy);
         $this->addStrategy('reg_date', $strategy);
 
-        $strategy = new HydratorImageStrategy($serviceManager);
+        $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('image', $strategy);
+
+        $strategy = new Strategy\Image($serviceManager);
+        $this->addStrategy('avatar', $strategy);
     }
 
     /**
@@ -144,6 +145,21 @@ class UserHydrator extends RestHydrator
 
             if ($canViewLogin && $this->filterComposite->filter('login')) {
                 $user['login'] = $object['login'];
+            }
+
+            if ($this->filterComposite->filter('avatar')) {
+                $user['avatar'] = $this->extractValue('image', [
+                    'image'  => $object['img'],
+                    'format' => 'avatar'
+                ]);
+            }
+
+            if ($this->filterComposite->filter('gravatar')) {
+                $user['gravatar'] = sprintf(
+                    'https://www.gravatar.com/avatar/%s?s=70&d=%s&r=g',
+                    md5($object['e_mail']),
+                    urlencode('https://www.autowp.ru/_.gif')
+                );
             }
         }
 

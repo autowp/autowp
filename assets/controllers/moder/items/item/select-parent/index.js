@@ -48,7 +48,10 @@ angular.module(Module)
             
             $http({
                 method: 'GET',
-                url: '/api/item/' + $state.params.id
+                url: '/api/item/' + $state.params.id,
+                params: {
+                    fields: 'name_text'
+                }
             }).then(function(response) {
                 ctrl.item = response.data;
                 

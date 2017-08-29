@@ -65,30 +65,41 @@ module.exports = {
                 $btnCancel.prop("disabled", 1);
                 $textarea.prop("disabled", 1);
                 
-                self.sendMessage(userId, text, function() {
-                    $textarea.val('');
+                if (self.MessageService) {
                     
-                    $btnSend.button('reset').button('complete').addClass('btn-success disabled').prop("disabled", 1);
+                    self.MessageService.send(userId, text).then(function() {
+                        $textarea.val('');
+                        
+                        $btnSend.button('reset').button('complete').addClass('btn-success disabled').prop("disabled", 1);
+                        
+                        $textarea.prop("disabled", 0);
+                        $btnCancel.prop("disabled", 0);
+                        
+                        if (sentCallback) {
+                            sentCallback();
+                        }
+                    });
                     
-                    $textarea.prop("disabled", 0);
-                    $btnCancel.prop("disabled", 0);
-                    
-                    if (sentCallback) {
-                        sentCallback();
-                    }
-                });
+                } else {
+                
+                    self.sendMessage(userId, text, function() {
+                        $textarea.val('');
+                        
+                        $btnSend.button('reset').button('complete').addClass('btn-success disabled').prop("disabled", 1);
+                        
+                        $textarea.prop("disabled", 0);
+                        $btnCancel.prop("disabled", 0);
+                        
+                        if (sentCallback) {
+                            sentCallback();
+                        }
+                    });
+                }
             }
         });
     },
     sendMessage: function(userId, text, success) {
-        $.post('/account/send-personal-message', {user_id: userId, message: text}, function() {
-            if (success) {
-                success();
-            }
-        }, 'json');
-    },
-    deleteMessage: function(id, success) {
-        $.post('/account/delete-personal-message', {id: id}, function() {
+        $.post('/api/message', {user_id: userId, text: text}, function() {
             if (success) {
                 success();
             }

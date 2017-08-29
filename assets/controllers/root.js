@@ -1,11 +1,13 @@
 import angular from 'angular';
 import Module from 'app.module';
+import PageServiceName from 'services/page';
+import 'directives/breadcrumbs';
 
 const CONTROLLER_NAME = 'RootController';
 
 angular.module(Module).controller(CONTROLLER_NAME, [
-    '$scope', '$http', '$location', '$translate', '$rootScope', '$state',
-    function($scope, $http, $location,  $translate, $rootScope, $state) {
+    '$scope', '$http', '$location', '$translate', '$rootScope', '$state', PageServiceName,
+    function($scope, $http, $location,  $translate, $rootScope, $state, PageService) {
         var that = this;
         
         $scope.languages = opt.languages;
@@ -21,6 +23,7 @@ angular.module(Module).controller(CONTROLLER_NAME, [
         $scope.searchHostname = opt.searchHostname;
         $scope.pageName = null;
         $scope.title = 'WheelsAge';
+        $scope.pageId = null;
         $scope.pageEnv = function(data) {
             setSidebars(data.layout.needRight);
             $scope.isAdminPage = data.layout.isAdminPage;
@@ -32,6 +35,8 @@ angular.module(Module).controller(CONTROLLER_NAME, [
                 preparedUrlArgs['%' + key + '%'] = encodeURIComponent(value);
                 preparedNameArgs['%' + key + '%'] = value;
             });
+            
+            PageService.setCurrent(data.pageId, preparedNameArgs);
             
             if (data.pageId) {
                 var nameKey = 'page/' + data.pageId + '/name';

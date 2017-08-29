@@ -7,6 +7,7 @@ use Zend\Router\Http\Method;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
+use Autowp\Message\MessageService;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
 return [
@@ -21,6 +22,7 @@ return [
             Hydrator\Api\ItemParentHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemParentLanguageHydrator::class => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\LogHydrator::class              => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\MessageHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectiveHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectiveGroupHydrator::class => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\PerspectivePageHydrator::class  => Hydrator\Api\RestHydratorFactory::class,
@@ -37,6 +39,7 @@ return [
             Controller\Api\CommentController::class         => Controller\Api\Service\CommentControllerFactory::class,
             Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
             Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
+            Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
             Controller\Api\HotlinksController::class        => InvokableFactory::class,
             Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class            => Controller\Api\Service\ItemControllerFactory::class,
@@ -46,6 +49,7 @@ return [
             Controller\Api\ItemParentLanguageController::class => Controller\Api\ItemParentLanguageControllerFactory::class,
             Controller\Api\ItemVehicleTypeController::class => Controller\Api\Service\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LogController::class             => Controller\Api\Service\LogControllerFactory::class,
+            Controller\Api\MessageController::class         => Controller\Api\MessageControllerFactory::class,
             Controller\Api\PageController::class            => Controller\Api\Service\PageControllerFactory::class,
             Controller\Api\PerspectiveController::class     => Controller\Api\Service\PerspectiveControllerFactory::class,
             Controller\Api\PerspectivePageController::class => Controller\Api\Service\PerspectivePageControllerFactory::class,
@@ -861,6 +865,83 @@ return [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => ['user', 'pictures', 'items']]
+                    ]
+                ]
+            ]
+        ],
+        'api_message_list' => [
+            'user_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'folder' => [
+                'required' => false,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'inbox',
+                                'sent',
+                                'system',
+                                'dialog'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'page' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['author']]
+                    ]
+                ]
+            ]
+        ],
+        'api_message_post' => [
+            'user_id' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'text' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'max' => MessageService::MAX_TEXT
+                        ]
                     ]
                 ]
             ]
@@ -1695,6 +1776,27 @@ return [
                             ],
                         ]
                     ],
+                    'forum' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/forum',
+                            'defaults' => [
+                                'controller' => Controller\Api\ForumController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'user-summary' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/user-summary',
+                                    'defaults' => [
+                                        'action' => 'user-summary'
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ],
                     'hotlinks' => [
                         'type' => Literal::class,
                         'options' => [
@@ -2241,6 +2343,81 @@ return [
                             ]
                         ]
                     ],
+                    'message' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/message',
+                            'defaults' => [
+                                'controller' => Controller\Api\MessageController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'get' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
+                            ],
+                            'post' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'post',
+                                    'defaults' => [
+                                        'action' => 'post'
+                                    ]
+                                ]
+                            ],
+                            'delete' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'delete',
+                                    'defaults' => [
+                                        'action' => 'delete-list'
+                                    ]
+                                ]
+                            ],
+                            'item' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route'    => '/:id',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    /*'get' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'item'
+                                            ]
+                                        ]
+                                    ],*/
+                                    'delete' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'delete',
+                                            'defaults' => [
+                                                'action' => 'delete'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            'summary' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/summary',
+                                    'defaults' => [
+                                        'action' => 'summary'
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ],
                     'page' => [
                         'type' => Literal::class,
                         'options' => [
@@ -2304,6 +2481,15 @@ return [
                                         ]
                                     ],
                                 ]
+                            ],
+                            [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/parents',
+                                    'defaults' => [
+                                        'action' => 'parents',
+                                    ],
+                                ],
                             ]
                         ]
                     ],
@@ -2445,6 +2631,15 @@ return [
                                         'action' => 'car-of-day-picture'
                                     ],
                                 ]
+                            ],
+                            'user-summary' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/user-summary',
+                                    'defaults' => [
+                                        'action' => 'user-summary'
+                                    ],
+                                ],
                             ],
                         ]
                     ],

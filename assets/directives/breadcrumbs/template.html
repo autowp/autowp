@@ -1,0 +1,6 @@
+<ul class="breadcrumb">
+    <li ng-repeat="item in ctrl.items" ng-if="!item.is_group_node && !$last">
+        <a ng-href="{{item.url}}" ng-bind="item.name_translated" ng-if="item.url"></a>
+        <span ng-if="!item.url" ng-bind="item.name_translated"></span>
+    </li>
+</ul>

@@ -2152,11 +2152,11 @@ Send `/me 123456789` to recevice confirmation code.
 
 Where 123456789 - is your account number, which you can find on your profile page. For example, [Juliano Scotini](/users/juliano-scotini) has number 17322
 
-Confirmation code will be sent to you via [the private messaging system](/account/pm/system)
+Confirmation code will be sent to you via [the private messaging system](/ng/account/messages?folder=system)
 
 Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish process of association your telegram account with out website user.
 
-Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/account/pm/system)',
+Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/ng/account/messages?folder=system)',
 
     'personal-message-dialog/title' => 'Send personal message',
     'personal-message-dialog/send' => 'send',

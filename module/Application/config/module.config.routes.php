@@ -85,24 +85,6 @@ return [
                             ],
                         ],
                     ],
-                    'clear-sent-messages' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/clear-sent-messages',
-                            'defaults' => [
-                                'action' => 'clear-sent-messages',
-                            ],
-                        ],
-                    ],
-                    'clear-system-messages' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/clear-system-messages',
-                            'defaults' => [
-                                'action' => 'clear-system-messages',
-                            ],
-                        ],
-                    ],
                     'contacts' => [
                         'type' => Literal::class,
                         'options' => [
@@ -118,24 +100,6 @@ return [
                             'route'    => '/delete',
                             'defaults' => [
                                 'action' => 'delete',
-                            ],
-                        ],
-                    ],
-                    'delete-personal-message' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/delete-personal-message',
-                            'defaults' => [
-                                'action' => 'delete-personal-message',
-                            ],
-                        ],
-                    ],
-                    'send-personal-message' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/send-personal-message',
-                            'defaults' => [
-                                'action' => 'send-personal-message',
                             ],
                         ],
                     ],
@@ -171,78 +135,6 @@ return [
                                 'type' => Segment::class,
                                 'options' => [
                                     'route'    => '/page:page'
-                                ]
-                            ]
-                        ]
-                    ],
-                    'personal-messages' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/pm',
-                            'defaults' => [
-                                'action' => 'personal-messages-inbox',
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'page' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route'    => '/page:page'
-                                ]
-                            ],
-                            'sent' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route'    => '/sent',
-                                    'defaults' => [
-                                        'action' => 'personal-messages-sent',
-                                    ],
-                                ],
-                                'may_terminate' => true,
-                                'child_routes'  => [
-                                    'page' => [
-                                        'type' => Segment::class,
-                                        'options' => [
-                                            'route'    => '/page:page'
-                                        ]
-                                    ]
-                                ]
-                            ],
-                            'system' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route'    => '/system',
-                                    'defaults' => [
-                                        'action' => 'personal-messages-system',
-                                    ],
-                                ],
-                                'may_terminate' => true,
-                                'child_routes'  => [
-                                    'page' => [
-                                        'type' => Segment::class,
-                                        'options' => [
-                                            'route'    => '/page:page'
-                                        ]
-                                    ]
-                                ]
-                            ],
-                            'user' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route'    => '/user:user_id',
-                                    'defaults' => [
-                                        'action' => 'personal-messages-user',
-                                    ]
-                                ],
-                                'may_terminate' => true,
-                                'child_routes'  => [
-                                    'page' => [
-                                        'type' => Segment::class,
-                                        'options' => [
-                                            'route'    => '/page:page'
-                                        ]
-                                    ]
                                 ]
                             ]
                         ]

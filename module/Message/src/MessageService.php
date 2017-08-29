@@ -28,6 +28,8 @@ class MessageService
 
     const MESSAGES_PER_PAGE = 20;
 
+    const MAX_TEXT = 2000;
+
     /**
      * @var TelegramService
      */
@@ -42,7 +44,7 @@ class MessageService
         $this->userModel = $userModel;
     }
 
-    public function send($fromId, $toId, $message)
+    public function send($fromId, int $toId, string $message)
     {
         $message = trim($message);
         $msgLength = mb_strlen($message);
@@ -51,13 +53,13 @@ class MessageService
             throw new \Exception('Message is empty');
         }
 
-        if ($msgLength > 2000) {
+        if ($msgLength > self::MAX_TEXT) {
             throw new \Exception('Message is too long');
         }
 
         $this->table->insert([
             'from_user_id' => $fromId ? (int)$fromId : null,
-            'to_user_id'   => (int)$toId,
+            'to_user_id'   => $toId,
             'contents'     => $message,
             'add_datetime' => new Sql\Expression('NOW()'),
             'readen'       => 0
@@ -68,13 +70,13 @@ class MessageService
         }
     }
 
-    public function getNewCount($userId)
+    public function getNewCount(int $userId)
     {
         $row = $this->table->select(function (Sql\Select $select) use ($userId) {
             $select
                 ->columns(['count' => new Sql\Expression('COUNT(1)')])
                 ->where([
-                    'to_user_id = ?' => (int)$userId,
+                    'to_user_id = ?' => $userId,
                     'NOT readen'
                 ]);
         })->current();
@@ -82,37 +84,37 @@ class MessageService
         return $row ? $row['count'] : null;
     }
 
-    public function delete($userId, $messageId)
+    public function delete(int $userId, int $messageId)
     {
         $this->table->update([
             'deleted_by_from'  => 1
         ], [
-            'from_user_id = ?' => (int)$userId,
-            'id = ?'           => (int)$messageId
+            'from_user_id = ?' => $userId,
+            'id = ?'           => $messageId
         ]);
 
         $this->table->update([
             'deleted_by_to'  => 1
         ], [
-            'to_user_id = ?' => (int)$userId,
-            'id = ?'         => (int)$messageId
+            'to_user_id = ?' => $userId,
+            'id = ?'         => $messageId
         ]);
     }
 
-    public function deleteAllSystem($userId)
+    public function deleteAllSystem(int $userId)
     {
         $this->table->delete([
-            'to_user_id = ?' => (int)$userId,
+            'to_user_id = ?' => $userId,
             'from_user_id IS NULL'
         ]);
     }
 
-    public function deleteAllSent($userId)
+    public function deleteAllSent(int $userId)
     {
         $this->table->update([
             'deleted_by_from' => 1
         ], [
-            'from_user_id = ?' => (int)$userId,
+            'from_user_id = ?' => $userId,
         ]);
     }
 
@@ -267,7 +269,7 @@ class MessageService
         }
     }
 
-    private function markReadenRows($rows, $userId)
+    private function markReadenRows($rows, int $userId)
     {
         $ids = [];
         foreach ($rows as $message) {
@@ -279,7 +281,7 @@ class MessageService
         $this->markReaden($ids);
     }
 
-    public function getInbox($userId, $page)
+    public function getInbox(int $userId, int $page)
     {
         $select = $this->getInboxSelect($userId);
 
@@ -301,7 +303,7 @@ class MessageService
         ];
     }
 
-    public function getSentbox($userId, $page)
+    public function getSentbox(int $userId, int $page)
     {
         $select = $this->getSentSelect($userId);
 
@@ -321,7 +323,7 @@ class MessageService
         ];
     }
 
-    public function getSystembox($userId, $page)
+    public function getSystembox(int $userId, int $page)
     {
         $select = $this->getSystemSelect($userId);
 
@@ -343,7 +345,7 @@ class MessageService
         ];
     }
 
-    public function getDialogbox($userId, $withUserId, $page)
+    public function getDialogbox(int $userId, int $withUserId, int $page)
     {
         $select = $this->getDialogSelect($userId, $withUserId);
 
@@ -367,7 +369,7 @@ class MessageService
         ];
     }
 
-    private function prepareList($userId, $rows, array $options = [])
+    private function prepareList(int $userId, $rows, array $options = [])
     {
         $defaults = [
             'allMessagesLink' => true
@@ -387,27 +389,32 @@ class MessageService
 
             $dialogCount = 0;
 
-            if ($canReply) {
-                if ($options['allMessagesLink'] && $author && ! $authorIsMe) {
-                    if (isset($cache[$author['id']])) {
-                        $dialogCount = $cache[$author['id']];
-                    } else {
-                        $dialogCount = $this->getDialogCount($userId, $author['id']);
-                        $cache[$author['id']] = $dialogCount;
-                    }
+            if ($options['allMessagesLink'] && $author) {
+                $dialogWith = $message['from_user_id'] == $userId ? $message['to_user_id'] : $message['from_user_id'];
+
+                if (isset($cache[$dialogWith])) {
+                    $dialogCount = $cache[$dialogWith];
+                } else {
+                    $dialogCount = $this->getDialogCount($userId, $dialogWith);
+                    $cache[$dialogWith] = $dialogCount;
                 }
             }
 
             $messages[] = [
                 'id'              => $message['id'],
-                'author'          => $author,
+                'author_id'       => $message['from_user_id'] ? (int)$message['from_user_id'] : null,
+                'author'          => $author, //TODO: remove, not need in API
                 'contents'        => $message['contents'],
                 'isNew'           => $isNew,
                 'canDelete'       => $canDelete,
                 'date'            => Row::getDateTimeByColumnType('timestamp', $message['add_datetime']),
                 'canReply'        => $canReply,
                 'dialogCount'     => $dialogCount,
-                'allMessagesLink' => $options['allMessagesLink']
+                'allMessagesLink' => $options['allMessagesLink'],
+                'to_user_id'      => (int) $message['to_user_id'],
+                'dialog_with_user_id' => ($message['from_user_id'] && $message['from_user_id'] == $userId)
+                    ? (int) $message['to_user_id']
+                    : (int) $message['from_user_id'],
             ];
         }
 

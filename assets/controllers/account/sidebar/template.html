@@ -1,0 +1,31 @@
+<div class="well">
+    <ul class="nav nav-pills nav-stacked">
+        <li ng-repeat="item in ctrl.items" ng-class="{active: item.active}">
+            <a ng-href="{{item.url}}" ng-if="item.url">
+                <span ng-class="{badge: true, 'pull-right': true, 'alert-danger': item.newCount > 0}" ng-if="item.count !== undefined">
+                    <span ng-if="item.count <= 0" translate>count 0</span>
+                    <span ng-if="item.count > 0 && item.newCount === undefined">{{item.count}}</span>
+                    <span ng-if="item.count > 0 && item.newCount !== undefined && item.newCount <= 0">{{item.count}}</span>
+                    <span ng-if="item.count > 0 && item.newCount !== undefined && item.newCount > 0">{{item.count - item.newCount}}+{{item.newCount}}</span>
+                </span>
+                <i class="fa fa-{{item.icon}}" ng-if="item.icon"></i>
+                {{item.name|translate}}
+            </a>
+            {{$state.href('account-messages')}}
+            <a ng-href="{{$state.href(item.sref, {}, {inherit: false})}}" ng-if="item.sref">
+                <span ng-class="{badge: true, 'pull-right': true, 'alert-danger': item.newCount > 0}" ng-if="item.count !== undefined">
+                    <span ng-if="item.count <= 0" translate>count 0</span>
+                    <span ng-if="item.count > 0 && item.newCount === undefined">{{item.count}}</span>
+                    <span ng-if="item.count > 0 && item.newCount !== undefined && item.newCount <= 0">{{item.count}}</span>
+                    <span ng-if="item.count > 0 && item.newCount !== undefined && item.newCount > 0">{{item.count - item.newCount}}+{{item.newCount}}</span>
+                </span>
+                <i class="fa fa-{{item.icon}}" ng-if="item.icon"></i>
+                {{item.name|translate}}
+            </a>
+            <span ng-if="!item.url && !item.sref">
+                <i class="fa fa-{{item.icon}}" ng-if="item.icon"></i> 
+                {{item.name|translate}}
+            </span>
+        </li>
+    </ul>
+</div>
