@@ -54,9 +54,7 @@ angular.module(Module)
                         {
                             pageId: 130,
                             url: 'xxx',
-                            /*url: $this->url('users/user/pictures', {
-                                'user_id' : $this->user()->get()['identity'] ? $this->user()->get()['identity'] : 'user' . $this->user()->get(){'id'}
-                            }),*/
+                            url: '#',
                             icon: 'th',
                             name: 'page/130/name'
                         },
@@ -135,6 +133,7 @@ angular.module(Module)
                     }).then(function(response) {
                         ctrl.items[6].count = response.data.inboxCount;
                         ctrl.items[5].count = response.data.acceptedCount;
+                        ctrl.items[5].url = response.data.url;
                     }, function(response) {
                         notify.response(response);
                     });
