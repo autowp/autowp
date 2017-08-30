@@ -21,6 +21,7 @@ class ItemFactory implements FactoryInterface
             $container->get(\Autowp\TextStorage\Service::class),
             $tables->get('item'),
             $tables->get('item_parent'),
+            $tables->get('item_parent_language'),
             $tables->get('item_parent_cache')
         );
     }

@@ -65,6 +65,11 @@ class Item
      */
     private $itemParentTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $itemParentLanguageTable;
+
     private $languagePriority = ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'zh', 'xx'];
 
     public function __construct(
@@ -75,6 +80,7 @@ class Item
         TextStorage $textStorage,
         TableGateway $itemTable,
         TableGateway $itemParentTable,
+        TableGateway $itemParentLanguageTable,
         TableGateway $itemParentCacheTable
     ) {
         $this->specTable = $specTable;
@@ -84,6 +90,7 @@ class Item
         $this->itemLanguageTable = $itemLanguageTable;
         $this->textStorage = $textStorage;
         $this->itemParentTable = $itemParentTable;
+        $this->itemParentLanguageTable = $itemParentLanguageTable;
         $this->itemParentCacheTable = $itemParentCacheTable;
     }
 
@@ -806,7 +813,7 @@ class Item
         return $this->itemTable;
     }
 
-    private function applyColumns(array $columns, string $id, $language)
+    private function applyColumns(array $columns, string $itemParentAlias, $language)
     {
         $result = [];
 
@@ -831,8 +838,7 @@ class Item
                         throw new \Exception("Language is required for `name` select");
                     }
                     $nameSelect = $this->getItemParentNameSelect(
-                        $id,
-                        Sql\ExpressionInterface::TYPE_IDENTIFIER,
+                        $itemParentAlias,
                         $language
                     );
                     if (is_numeric($key)) {
@@ -867,7 +873,7 @@ class Item
         $columns = [];
 
         if (isset($options['columns']) && $options['columns']) {
-            $columns = $this->applyColumns($options['columns'], $alias . '.item_id', $language);
+            $columns = $this->applyColumns($options['columns'], $alias, $language);
         }
 
         $select->join([$alias => 'item_parent'], $id . ' = ' . $alias. '.parent_id', $columns);
@@ -899,7 +905,7 @@ class Item
         $columns = [];
 
         if (isset($options['columns']) && $options['columns']) {
-            $columns = $this->applyColumns($options['columns'], $alias . '.parent_id', $language);
+            $columns = $this->applyColumns($options['columns'], $alias, $language);
         }
 
         $select->join([$alias => 'item_parent'], $id . ' = ' . $alias . '.item_id', $columns);
@@ -1186,27 +1192,35 @@ class Item
         return $select;
     }
 
-    private function getItemParentNameSelect($value, string $valueType, string $language): Sql\Select
+    private function getItemParentNameSelect(string $itemParentAlias, string $language): Sql\Select
     {
-        $predicate = new Sql\Predicate\Operator(
+        $predicate1 = new Sql\Predicate\Operator(
             'item_id',
             Sql\Predicate\Operator::OP_EQ,
-            $value,
+            $itemParentAlias . '.item_id',
             Sql\ExpressionInterface::TYPE_IDENTIFIER,
-            $valueType
+            Sql\ExpressionInterface::TYPE_IDENTIFIER
+        );
+        $predicate2 = new Sql\Predicate\Operator(
+            'parent_id',
+            Sql\Predicate\Operator::OP_EQ,
+            $itemParentAlias . '.parent_id',
+            Sql\ExpressionInterface::TYPE_IDENTIFIER,
+            Sql\ExpressionInterface::TYPE_IDENTIFIER
         );
 
         $languages = array_merge([$language], $this->languagePriority);
 
-        $select = new Sql\Select($this->itemLanguageTable->getTable());
+        $select = $this->itemParentLanguageTable->getSql()->select();
         $select->columns(['name'])
             ->where([
-                $predicate,
-                new Sql\Predicate\Expression('length(item_language.name) > 0')
+                $predicate1,
+                $predicate2,
+                new Sql\Predicate\Expression('length(item_parent_language.name) > 0')
             ])
             ->order([
                 new Sql\Expression(
-                    'FIELD(item_language.language' . str_repeat(', ?', count($languages)) . ')',
+                    'FIELD(item_parent_language.language' . str_repeat(', ?', count($languages)) . ')',
                     $languages
                 )
             ])
