@@ -299,7 +299,6 @@ class TelegramService
         ]);
 
         foreach ($chatRows as $chatRow) {
-
             $url = $this->router->assemble(['path' => ''], [
                 'name'            => 'ng',
                 'force_canonical' => true,
