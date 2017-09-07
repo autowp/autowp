@@ -52,7 +52,7 @@ angular.module(Module)
                     x: 0,
                     y: 0
                 };
-                var minSize = [400, 300];
+                var minSize = [50, 50];
                 
                 $scope.selectAll = function() {
                     jcrop.setSelect([0, 0, $scope.picture.width, $scope.picture.height]);
