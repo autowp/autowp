@@ -125,14 +125,9 @@ angular.module(Module)
                 return found;
             };
             
-            $scope.addItem = function(item) {
+            $scope.addItem = function(item, type) {
                 $scope.pictureItemLoading = true;
-                
-                var type = 1;
-                if (item.item_type_id == 8) {
-                    type = 2;
-                }
-                
+
                 PictureItemService.create($state.params.id, item.id, type, {}).then(function() {
                     loadPicture(function() {
                         $scope.pictureItemLoading = false;
