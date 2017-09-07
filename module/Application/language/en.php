@@ -1285,7 +1285,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/categories/new' => 'New',
 
     'moder/picture/edit-picture-%s' => 'Edit picture №%s',
-    'moder/picture/edit-vehicle-%s' => 'Edit vehicle %s',
+    'moder/picture/edit-item-%s' => 'Edit item %s',
     'moder/picture/edit-brand-%s' => 'Edit brand %s',
     'moder/picture/edit-engine-%s' => 'Edit engine %s',
     'moder/picture/edit-factory-%s' => 'Edit factory %s',

@@ -1298,7 +1298,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/categories/new' => 'Новый',
 
     'moder/picture/edit-picture-%s' => 'Управление изображением №%s',
-    'moder/picture/edit-vehicle-%s' => 'Управление автомобилем %s',
+    'moder/picture/edit-item-%s' => 'Управление %s',
     'moder/picture/edit-brand-%s' => 'Управление брендом %s',
     'moder/picture/edit-engine-%s' => 'Управление двигателем %s',
     'moder/picture/edit-factory-%s' => 'Управление заводом %s',

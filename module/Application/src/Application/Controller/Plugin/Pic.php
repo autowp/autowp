@@ -1194,7 +1194,7 @@ class Pic extends AbstractPlugin
             foreach ($rows as $car) {
                 $url = '/ng/moder/items/item/' . $car['id'];
                 $links[$url] = sprintf(
-                    $this->translator->translate('moder/picture/edit-vehicle-%s'),
+                    $this->translator->translate('moder/picture/edit-item-%s'),
                     $controller->car()->formatName($car, $language)
                 );
 

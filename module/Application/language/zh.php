@@ -1249,7 +1249,7 @@ return array_replace(include 'root.php', [
     'moder/categories/new' => 'New',
 
     'moder/picture/edit-picture-%s' => '编辑图片№%s',
-    'moder/picture/edit-vehicle-%s' => '编辑车型%s',
+    'moder/picture/edit-item-%s' => '编辑%s',
     'moder/picture/edit-brand-%s' => '编辑品牌%s',
     'moder/picture/edit-engine-%s' => '编辑发动机%s',
     'moder/picture/edit-factory-%s' => '编辑工厂%s',
