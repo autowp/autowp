@@ -23,12 +23,18 @@ class LanguageRouteListener extends AbstractListenerAggregate
     /**
      * @var array
      */
-    private $skipHostname = ['i.wheelsage.org'];
+    private $skipHostname = [];
 
     /**
      * @var string
      */
     private $defaultLanguage = 'en';
+
+    public function __construct(array $skipHostname)
+    {
+        $this->skipHostname = $skipHostname;
+    }
+
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)

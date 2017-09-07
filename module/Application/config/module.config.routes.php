@@ -30,7 +30,7 @@ return [
                 'type' => Router\Http\PictureFile::class,
                 'options' => [
                     'defaults' => [
-                        'hostname'   => 'i.wheelsage.org',
+                        'hostname'   => getenv('AUTOWP_PICTURES_HOST'),
                         'controller' => Controller\PictureFileController::class,
                         'action'     => 'index'
                     ]

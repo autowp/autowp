@@ -244,7 +244,7 @@ return [
         'i.' . $host, 'en.' . $host, 'fr.' . $host, 'ru.' . $host,
         'zh.' . $host, 'www.' . $host, $host],
 
-    'pictures_hostname' => 'i.wheelsage.org',
+    'pictures_hostname' => getenv('AUTOWP_PICTURES_HOST'),
 
     'content_languages' => ['ru', 'en', 'it', 'fr', 'zh', 'de', 'es', 'pt'],
 

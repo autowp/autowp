@@ -1042,7 +1042,7 @@ class Picture
             ]);
 
             foreach ($pictureItemRows as $pictureItemRow) {
-                $itemIds[$pictureItemRow['item_id']] = true;
+                $itemIds[$pictureItemRow['item_id']] = $pictureItemRow['crop_left'];
                 if (in_array($pictureItemRow['perspective_id'], $this->prefixedPerspectives)) {
                     $perspectiveIds[$pictureItemRow['perspective_id']] = true;
                 }
@@ -1110,10 +1110,25 @@ class Picture
                 continue;
             }
 
-            $pictureItemRows = $this->pictureItemTable->select([
+            $subRows = $this->pictureItemTable->select([
                 'picture_id' => $row['id'],
                 'type'       => PictureItem::PICTURE_CONTENT
             ]);
+
+            $pictureItemRows = [];
+            foreach ($subRows as $subRow) {
+                $pictureItemRows[] = $subRow;
+            }
+
+            usort($pictureItemRows, function ($rowA, $rowB) use ($itemIds) {
+                $a = isset($itemIds[$rowA['item_id']]) ? $itemIds[$rowA['item_id']] : 0;
+                $b = isset($itemIds[$rowB['item_id']]) ? $itemIds[$rowB['item_id']] : 0;
+
+                if ($a == $b) {
+                    return 0;
+                }
+                return ($a < $b) ? -1 : 1;
+            });
 
             $resultItems = [];
             foreach ($pictureItemRows as $pictureItemRow) {

@@ -88,7 +88,9 @@ class Module implements
 
         $serviceManager->get(HostnameCheckRouteListener::class)->attach($eventManager);
 
-        $languageListener = new LanguageRouteListener();
+        $config = $serviceManager->get('Config');
+
+        $languageListener = new LanguageRouteListener([$config['pictures_hostname']]);
         $languageListener->attach($eventManager);
 
         $maintenance = new Maintenance();
