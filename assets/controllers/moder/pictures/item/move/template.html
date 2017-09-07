@@ -1,15 +1,18 @@
 <ul class="nav nav-pills" style="margin-bottom: 30px" ng-if="!src_item">
     <li ng-class="{active: !show_factories && !show_museums && !show_persons}" ng-if="!src_type || src_type == 1">
-        <a ui-sref=".({show_factories: null, show_museums: null})" translate>moder/pciture/move/brands</a>
+        <a ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: null})" translate>moder/pciture/move/brands</a>
     </li>
     <li ng-class="{active: show_factories}" ng-if="!src_type || src_type == 1">
-        <a ui-sref=".({show_factories: 1, show_museums: null, show_persons: null})" translate>moder/pciture/move/factories</a>
+        <a ui-sref=".({show_factories: 1, show_museums: null, show_persons: null, show_authors: null})" translate>moder/pciture/move/factories</a>
     </li>
     <li ng-class="{active: show_museums}" ng-if="!src_type || src_type == 1">
-        <a ui-sref=".({show_factories: null, show_museums: 1, show_persons: null})" translate>item/type/7/name-plural</a>
+        <a ui-sref=".({show_factories: null, show_museums: 1, show_persons: null, show_authors: null})" translate>item/type/7/name-plural</a>
     </li>
-    <li ng-class="{active: show_persons}" ng-if="!src_type || src_type == 2">
-        <a ui-sref=".({show_factories: null, show_museums: null, show_persons: 1})" translate>item/type/8/name-plural</a>
+    <li ng-class="{active: show_persons}" ng-if="!src_type || src_type == 1">
+        <a ui-sref=".({show_factories: null, show_museums: null, show_persons: 1, show_authors: null})">{{'item/type/8/name-plural'|translate}} (content)</a>
+    </li>
+    <li ng-class="{active: show_authors}" ng-if="!src_type || src_type == 2">
+        <a ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: 1})">{{'item/type/8/name-plural'|translate}} (author)</a>
     </li>
 </ul>
 
@@ -32,14 +35,24 @@
     <autowp-paginator data="factories_paginator" ng-if="factories_paginator"></autowp-paginator>
 </div>
 
-<div ng-if="show_persons && !src_item && (!src_type || src_type == 2)">
+<div ng-if="show_persons && !src_item && (!src_type || src_type == 1)">
 
     <div class="well">
-        <a href="#" ng-repeat-start="item in persons" ng-click="selectItem(item.id, null, 2)" ng-bind-html="item.name_html"></a>
+        <a href="#" ng-repeat-start="item in persons" ng-click="selectItem(item.id, null, 1)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </div>
     
     <autowp-paginator data="persons_paginator" ng-if="persons_paginator"></autowp-paginator>
+</div>
+
+<div ng-if="show_authors && !src_item && (!src_type || src_type == 2)">
+
+    <div class="well">
+        <a href="#" ng-repeat-start="item in authors" ng-click="selectItem(item.id, null, 2)" ng-bind-html="item.name_html"></a>
+        <br ng-repeat-end />
+    </div>
+    
+    <autowp-paginator data="authors_paginator" ng-if="authors_paginator"></autowp-paginator>
 </div>
 
 

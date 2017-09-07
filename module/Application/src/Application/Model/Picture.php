@@ -175,6 +175,7 @@ class Picture
             'parent'              => null,
             'contains_picture'    => null,
             'engine'              => null,
+            'link_type'           => null,
         ];
         $options = array_replace($defaults, $options);
 
@@ -192,6 +193,10 @@ class Picture
 
         if ($options['engine']) {
             $this->applyEngineFilter($select, $options['engine']);
+        }
+
+        if ($options['link_type']) {
+            $select->where(['picture_item.type' => $options['link_type']]);
         }
 
         if ($options['id'] !== null) {

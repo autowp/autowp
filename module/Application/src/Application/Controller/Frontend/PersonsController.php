@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\Item;
 use Application\Model\Picture;
+use Application\Model\PictureItem;
 
 class PersonsController extends AbstractActionController
 {
@@ -49,18 +50,39 @@ class PersonsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $paginator = $this->picture->getPaginator([
+        $authorPaginator = $this->picture->getPaginator([
             'status' => Picture::STATUS_ACCEPTED,
-            'item'   => $person['id']
+            'item'   => [
+                'id'        => $person['id'],
+                'link_type' => PictureItem::PICTURE_AUTHOR
+            ]
         ]);
 
-        $paginator
+        $authorPaginator
             ->setItemCountPerPage($this->catalogue()->getPicturesPerPage())
             ->setCurrentPageNumber($this->params()->fromRoute('page'));
 
-        $pictures = $this->pic()->listData($paginator->getCurrentItems(), [
+        $authorPictures = $this->pic()->listData($authorPaginator->getCurrentItems(), [
             'width' => 4
         ]);
+
+
+        $contentPaginator = $this->picture->getPaginator([
+            'status' => Picture::STATUS_ACCEPTED,
+            'item'   => [
+                'id'        => $person['id'],
+                'link_type' => PictureItem::PICTURE_CONTENT
+            ]
+        ]);
+
+        $contentPaginator
+            ->setItemCountPerPage($this->catalogue()->getPicturesPerPage())
+            ->setCurrentPageNumber($this->params()->fromRoute('page'));
+
+        $contentPictures = $this->pic()->listData($contentPaginator->getCurrentItems(), [
+            'width' => 4
+        ]);
+
 
         $language = $this->language();
 
@@ -71,13 +93,15 @@ class PersonsController extends AbstractActionController
         ]);
 
         return [
-            'person'      => $person,
-            'description' => $description,
-            'pictures'    => $pictures,
-            'canEdit'     => $this->user()->isAllowed('factory', 'edit'),
-            'personName'  => $this->itemModel->getNameData($person, $language),
-            'links'       => $links,
-            'paginator'   => $paginator
+            'person'           => $person,
+            'description'      => $description,
+            'canEdit'          => $this->user()->isAllowed('factory', 'edit'),
+            'personName'       => $this->itemModel->getNameData($person, $language),
+            'links'            => $links,
+            'authorPaginator'  => $authorPaginator,
+            'authorPictures'   => $authorPictures,
+            'contentPaginator' => $contentPaginator,
+            'contentPictures'  => $contentPictures,
         ];
     }
 }

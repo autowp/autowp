@@ -47,11 +47,20 @@
     </div>
 <?php } ?>
 
-<?php if ($this->pictures && count($this->pictures['items']) > 0) { ?>
+<?php if ($this->authorPictures && count($this->authorPictures['items']) > 0) { ?>
     <h3><?=$this->escapeHtml($this->translate('factories/factory/pictures'))?></h3>
-    <?=$this->partial('application/pictures', $this->pictures)?>
+    <?=$this->partial('application/pictures', $this->authorPictures)?>
+
+    <?=$this->paginationControl($this->authorPaginator, null, null, [
+        'route' => 'persons/person/page'
+    ]) ?>
 <?php } ?>
 
-<?=$this->paginationControl($this->paginator, null, null, [
-    'route' => 'persons/person/page'
-]) ?>
+<?php if ($this->contentPictures && count($this->contentPictures['items']) > 0) { ?>
+    <h3><?=$this->escapeHtml($this->translate('factories/factory/pictures'))?></h3>
+    <?=$this->partial('application/pictures', $this->contentPictures)?>
+
+    <?=$this->paginationControl($this->contentPaginator, null, null, [
+        'route' => 'persons/person/page'
+    ]) ?>
+<?php } ?>

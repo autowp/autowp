@@ -23,7 +23,7 @@ angular.module(Module)
         function config($stateProvider) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/pictures/{id}/move?show_museums&show_factories&show_persons&brand_id&src_item_id&src_type&page',
+                url: '/moder/pictures/{id}/move?show_museums&show_factories&show_authors&show_persons&brand_id&src_item_id&src_type&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template,
@@ -60,10 +60,11 @@ angular.module(Module)
             $scope.show_museums = $state.params.show_museums;
             $scope.show_factories = $state.params.show_factories;
             $scope.show_persons = $state.params.show_persons;
+            $scope.show_authors = $state.params.show_authors;
             $scope.brand_id = $state.params.brand_id;
             
             if ($scope.src_type == 2) {
-                $scope.show_persons = true;
+                $scope.show_authors = true;
             }
             
             $scope.museums = [];
@@ -134,6 +135,24 @@ angular.module(Module)
                 });
             }
             
+            if ($scope.show_authors) {
+                $http({
+                    method: 'GET',
+                    url: '/api/item',
+                    params: {
+                        type_id: 8,
+                        fields: 'name_html',
+                        limit: 50,
+                        page: $scope.page
+                    }
+                }).then(function(response) {
+                    $scope.authors = response.data.items;
+                    $scope.authors_paginator = response.data.paginator;
+                }, function(response) {
+                    notify.response(response);
+                });
+            }
+            
             function loadBrands() {
                 $http({
                     method: 'GET',
@@ -153,7 +172,7 @@ angular.module(Module)
                 });
             }
             
-            if (! $scope.show_museums && ! $scope.show_factories && ! $scope.show_persons) {
+            if (! $scope.show_museums && ! $scope.show_factories && ! $scope.show_persons && ! $scope.show_authors) {
                 if ($scope.brand_id) {
                     $http({
                         method: 'GET',

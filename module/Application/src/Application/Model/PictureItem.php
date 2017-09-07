@@ -10,7 +10,8 @@ use Zend\Db\TableGateway\TableGateway;
 class PictureItem
 {
     const PICTURE_CONTENT = 1,
-          PICTURE_AUTHOR = 2;
+          PICTURE_AUTHOR = 2,
+          PICTURE_COPYRIGHTS = 3;
 
     /**
      * @var TableGateway
@@ -355,14 +356,14 @@ class PictureItem
     public function isAllowedType(int $itemTypeId, int $type): bool
     {
         $allowed = [
-            Item::BRAND    => [self::PICTURE_CONTENT],
+            Item::BRAND    => [self::PICTURE_CONTENT, self::PICTURE_COPYRIGHTS],
             Item::CATEGORY => [self::PICTURE_CONTENT],
             Item::ENGINE   => [self::PICTURE_CONTENT],
             Item::FACTORY  => [self::PICTURE_CONTENT],
             Item::VEHICLE  => [self::PICTURE_CONTENT],
             Item::TWINS    => [self::PICTURE_CONTENT],
             Item::MUSEUM   => [self::PICTURE_CONTENT],
-            Item::PERSON   => [self::PICTURE_AUTHOR],
+            Item::PERSON   => [self::PICTURE_CONTENT, self::PICTURE_AUTHOR, self::PICTURE_COPYRIGHTS],
         ];
 
         if (! isset($allowed[$itemTypeId])) {
