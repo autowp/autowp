@@ -121,7 +121,7 @@
                 <span ng-bind-html="last_item.name_html"></span>
             </button>
         </div>
-        <div ng-if="last_item && !hasItem(last_item.id) && last_item.type == 8">
+        <div ng-if="last_item && !hasItem(last_item.id) && last_item.item_type_id == 8">
             <button class="btn btn-default" ng-click="addItem(last_item, 2)">
                 <i class="fa fa-plus"></i>
                 {{'moder/picture/catalogue/add-to'|translate}} (author)
