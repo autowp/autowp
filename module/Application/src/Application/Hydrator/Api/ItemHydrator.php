@@ -474,8 +474,8 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('brands')) {
             $rows = $this->itemModel->getRows([
-                'item_type_id' => Item::BRAND,
-                'descendant'   => $object['id']
+                'item_type_id'       => Item::BRAND,
+                'descendant_or_self' => $object['id']
             ]);
 
             $result['brands'] = $this->extractValue('brands', $rows);
