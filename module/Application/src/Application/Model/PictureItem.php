@@ -23,10 +23,16 @@ class PictureItem
      */
     private $itemTable;
 
-    public function __construct(TableGateway $table, TableGateway $itemTable)
+    /**
+     * @var TableGateway
+     */
+    private $pictureTable;
+
+    public function __construct(TableGateway $table, TableGateway $itemTable, TableGateway $pictureTable)
     {
         $this->table = $table;
         $this->itemTable = $itemTable;
+        $this->pictureTable = $pictureTable;
     }
 
     /**
@@ -71,6 +77,8 @@ class PictureItem
                 'item_id'    => $itemId,
                 'type'       => $type
             ]);
+
+            $this->updateContentCount($pictureId);
         }
     }
 
@@ -89,6 +97,8 @@ class PictureItem
             'item_id = ?'    => $itemId,
             'type'           => $type
         ]);
+
+        $this->updateContentCount($pictureId);
     }
 
     public function isExists(int $pictureId, int $itemId, int $type)
@@ -160,6 +170,8 @@ class PictureItem
         }
 
         $this->table->delete($filter);
+
+        $this->updateContentCount($pictureId);
     }
 
     public function getPictureItems(int $pictureId, int $type): array
@@ -390,5 +402,24 @@ class PictureItem
     public function getTable(): TableGateway
     {
         return $this->table;
+    }
+
+    public function updateContentCount(int $pictureId)
+    {
+        $select = $this->table->getSql()->select()
+            ->columns(['count' => new Sql\Expression('COUNT(1)')])
+            ->where([
+                'picture_id' => $pictureId,
+                'type'       => self::PICTURE_CONTENT
+            ]);
+
+        $row = $this->table->selectWith($select)->current();
+        $count = $row ? $row['count'] : 0;
+
+        $this->pictureTable->update([
+            'content_count' => $count
+        ], [
+            'id' => $pictureId
+        ]);
     }
 }

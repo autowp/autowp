@@ -2998,3 +2998,8 @@ ALTER TABLE `picture_moder_vote_template`
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2017-01-14 22:52:12
+
+
+alter table pictures add content_count int not null default 0;
+
+update pictures set content_count=(select count(1) from picture_item where picture_id=pictures.id and type=1);

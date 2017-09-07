@@ -158,7 +158,7 @@ abstract class PictureFetcher
             $order[] = 'pictures.accept_datetime DESC';
         }
 
-        $order = array_merge($order, ['pictures.width DESC', 'pictures.height DESC']);
+        $order = array_merge(['pictures.content_count ASC'], $order, ['pictures.width DESC', 'pictures.height DESC']);
 
         $select->order($order);
 
