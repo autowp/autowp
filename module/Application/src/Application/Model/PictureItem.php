@@ -261,7 +261,7 @@ class PictureItem
         if ($options['onlyWithArea']) {
             $select->where([
                 'type' => self::PICTURE_CONTENT,
-                'crop_left and crop_top and crop_width and crop_height'
+                'crop_width and crop_height'
             ]);
         }
 
