@@ -942,6 +942,80 @@ class Item
         return $group;
     }
 
+    private function applyDescendantFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
+    {
+        if (! is_array($options)) {
+            $options = [
+                'id' => $options
+            ];
+        }
+
+        $alias = $prefix.'ipc1';
+
+        $group = [];
+        $columns = [];
+        if (isset($options['columns'])) {
+            foreach ((array)$options['columns'] as $key => $column) {
+                switch ($column) {
+                    case 'id':
+                        if (is_numeric($key)) {
+                            $columns[] = 'item_id';
+                            $group[] = 'item_id';
+                        } else {
+                            $columns[$key] = 'item_id';
+                            $group[] = $key;
+                        }
+                        break;
+                    case 'diff':
+                        if (is_numeric($key)) {
+                            $columns[] = 'diff';
+                            $group[] = 'diff';
+                        } else {
+                            $columns[$key] = 'diff';
+                            $group[] = $key;
+                        }
+                        break;
+                    default:
+                        throw new Exception("Unexpected column `$column`");
+                }
+            }
+        }
+
+        $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.parent_id', $columns)
+            ->where([$alias . '.item_id != ' . $alias . '.parent_id']);
+
+        if (isset($options['link_type'])) {
+            switch ($options['link_type']) {
+                case ItemParent::TYPE_DEFAULT:
+                    $select->where([
+                        'not ' .$alias . '.sport',
+                        'not ' .$alias . '.tuning',
+                        'not ' .$alias . '.design'
+                    ]);
+                    break;
+                case ItemParent::TYPE_SPORT:
+                    $select->where([$alias . '.sport']);
+                    break;
+                case ItemParent::TYPE_TUNING:
+                    $select->where([$alias . '.tuning']);
+                    break;
+                case ItemParent::TYPE_DESIGN:
+                    $select->where([$alias . '.design']);
+                    break;
+                default:
+                    throw new \Exception("Unexpected link_type");
+            }
+        }
+
+        $subGroup = $this->applyFilters($select, array_replace(
+            ['language' => $language],
+            $options
+        ), $alias . '.item_id', $alias, $language);
+        $group = array_merge($group, $subGroup);
+
+        return $group;
+    }
+
     private function applyLinkTypeFilter(Sql\Select $select, string $alias, $value)
     {
         $column = $alias . '.type';
@@ -1019,50 +1093,8 @@ class Item
 
         if ($options['descendant']) {
             $group[] = 'item.id';
-            $alias = $prefix.'ipc1';
 
-            $columns = [];
-            if (is_array($options['descendant'])) {
-                if (isset($options['descendant']['columns'])) {
-                    foreach ((array)$options['descendant']['columns'] as $key => $column) {
-                        switch ($column) {
-                            case 'id':
-                                if (is_numeric($key)) {
-                                    $columns[] = 'item_id';
-                                    $group[] = 'item_id';
-                                } else {
-                                    $columns[$key] = 'item_id';
-                                    $group[] = $key;
-                                }
-                                break;
-                            case 'diff':
-                                if (is_numeric($key)) {
-                                    $columns[] = 'diff';
-                                    $group[] = 'diff';
-                                } else {
-                                    $columns[$key] = 'diff';
-                                    $group[] = $key;
-                                }
-                                break;
-                            default:
-                                throw new Exception("Unexpected column `$column`");
-                        }
-                    }
-                }
-            }
-
-            $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.parent_id', $columns)
-                ->where([$alias . '.item_id != ' . $alias . '.parent_id']);
-
-            if (is_array($options['descendant'])) {
-                $subGroup = $this->applyFilters($select, array_replace(
-                    ['language' => $language],
-                    $options['descendant']
-                ), $alias . '.item_id', $alias, $language);
-                $group = array_merge($group, $subGroup);
-            } else {
-                $select->where([$alias . '.item_id' => $options['descendant']]);
-            }
+            $this->applyDescendantFilters($select, $options['descendant'], $prefix, $language, $id);
         }
 
         if ($options['descendant_or_self']) {
@@ -1658,6 +1690,23 @@ class Item
         }
 
         $brand = $this->getRow([
+            'language'     => $language,
+            'columns'      => ['catname', 'name'],
+            'item_type_id' => Item::BRAND,
+            'child'        => [
+                'columns'    => [
+                    'brand_item_catname' => 'link_catname'
+                ],
+                'descendant' => [
+                    'link_type' => ItemParent::TYPE_DESIGN,
+                    'id'        => $itemId,
+                    'columns'   => ['diff']
+                ]
+            ],
+            'order'        => 'ip2ipc1.diff ASC'
+        ]);
+
+        $select = $this->getSelect([
             'language'     => $language,
             'columns'      => ['catname', 'name'],
             'item_type_id' => Item::BRAND,
