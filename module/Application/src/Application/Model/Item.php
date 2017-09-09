@@ -1697,6 +1697,36 @@ class Item
                 'columns'    => [
                     'brand_item_catname' => 'link_catname'
                 ],
+                'link_type' => ItemParent::TYPE_DESIGN,
+                'descendant' => [
+                    'id'        => $itemId,
+                    'columns'   => ['diff']
+                ]
+            ],
+            'order'        => 'ip2ipc1.diff ASC'
+        ]);
+
+        if ($brand) {
+            return [
+                'name' => $brand['name'], //TODO: formatter
+                'url'  => $url->assemble([
+                    'action'        => 'brand-item',
+                    'brand_catname' => $brand['catname'],
+                    'car_catname'   => $brand['brand_item_catname']
+                ], [
+                    'name' => 'catalogue'
+                ])
+            ];
+        }
+
+        $brand = $this->getRow([
+            'language'     => $language,
+            'columns'      => ['catname', 'name'],
+            'item_type_id' => Item::BRAND,
+            'child'        => [
+                'columns'    => [
+                    'brand_item_catname' => 'link_catname'
+                ],
                 'descendant' => [
                     'link_type' => ItemParent::TYPE_DESIGN,
                     'id'        => $itemId,
