@@ -16,7 +16,6 @@ use Application\ItemNameFormatter;
 use Application\Model\Brand;
 use Application\Model\Catalogue;
 use Application\Model\Item;
-use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
@@ -26,6 +25,7 @@ use Application\Model\PictureVote;
 use Application\Model\UserAccount;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
+use Zend\Router\Http\TreeRouteStack;
 
 class Pic extends AbstractPlugin
 {
@@ -118,6 +118,11 @@ class Pic extends AbstractPlugin
      */
     private $userModel;
 
+    /**
+     * @var TreeRouteStack
+     */
+    private $httpRouter;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -125,7 +130,7 @@ class Pic extends AbstractPlugin
         ItemNameFormatter $itemNameFormatter,
         SpecificationsService $specsService,
         PictureItem $pictureItem,
-        $httpRouter,
+        TreeRouteStack $httpRouter,
         Comments\CommentsService $comments,
         PictureVote $pictureVote,
         Catalogue $catalogue,
@@ -515,29 +520,7 @@ class Pic extends AbstractPlugin
                     ];
                 }
 
-                $designCarsRow = $this->itemModel->getRow([
-                    'columns'      => ['name', 'catname'],
-                    'item_type_id' => Item::BRAND,
-                    'language'     => $language,
-                    'child'  => [
-                        'link_type'          => ItemParent::TYPE_DESIGN,
-                        'columns'            => ['brand_item_catname' => 'link_catname'],
-                        'descendant_or_self' => $item['id']
-                    ]
-                ]);
-
-                if ($designCarsRow) {
-                    $designProject = [
-                        'brand' => $designCarsRow['name'],
-                        'url'   => $this->httpRouter->assemble([
-                            'action'        => 'brand-item',
-                            'brand_catname' => $designCarsRow['catname'],
-                            'car_catname'   => $designCarsRow['brand_item_catname']
-                        ], [
-                            'name' => 'catalogue'
-                        ])
-                    ];
-                }
+                $designProject = $this->itemModel->getDesignInfo($this->httpRouter, $item['id'], $language);
 
                 $texts = $this->itemModel->getTextsOfItem($item['id'], $language);
 

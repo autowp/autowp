@@ -2,7 +2,7 @@
 
     <h3 ng-if="!disableTitle">
         <span ng-bind-html="item.name_html"></span>
-        <sup class="designBrand" ng-if="item.design">{{'ng/carlist/designed by'|translate}}<a ng-href="{{item.design.url}}" ng-bind="item.design.brand_name"></a></sup>
+        <sup class="design-brand" ng-if="item.design">{{'ng/carlist/designed by'|translate}}<a ng-href="{{item.design.url}}" ng-bind="item.design.name"></a></sup>
         
         <small ng-if="item.produced > 1">
             <span ng-if="item.produced_exactly" translate="ng/carlist/produced/%1$s" translate-values="{count: item.produced}"></span>

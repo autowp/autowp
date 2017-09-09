@@ -38,12 +38,12 @@
     <?=$this->pic()->htmlTitle($this->name) ?>
     <?php if (count($this->items) == 1) { ?>
         <?php if ($this->items[0]['designProject']) { ?>
-            <sup class="designBrand">
+            <sup class="design-brand">
                 <?=sprintf(
                     $this->translate('carlist/designed by %s'),
                     $this->htmlA(
                         $this->items[0]['designProject']['url'],
-                        $this->items[0]['designProject']['brand']
+                        $this->items[0]['designProject']['name']
                     )
                 )?>
             </sup>

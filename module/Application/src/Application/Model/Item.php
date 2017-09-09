@@ -9,6 +9,7 @@ use geoPHP;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
+use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\TextStorage\Service as TextStorage;
 
@@ -1019,7 +1020,38 @@ class Item
         if ($options['descendant']) {
             $group[] = 'item.id';
             $alias = $prefix.'ipc1';
-            $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.parent_id', [])
+
+            $columns = [];
+            if (is_array($options['descendant'])) {
+                if (isset($options['descendant']['columns'])) {
+                    foreach ((array)$options['descendant']['columns'] as $key => $column) {
+                        switch ($column) {
+                            case 'id':
+                                if (is_numeric($key)) {
+                                    $columns[] = 'item_id';
+                                    $group[] = 'item_id';
+                                } else {
+                                    $columns[$key] = 'item_id';
+                                    $group[] = $key;
+                                }
+                                break;
+                            case 'diff':
+                                if (is_numeric($key)) {
+                                    $columns[] = 'diff';
+                                    $group[] = 'diff';
+                                } else {
+                                    $columns[$key] = 'diff';
+                                    $group[] = $key;
+                                }
+                                break;
+                            default:
+                                throw new Exception("Unexpected column `$column`");
+                        }
+                    }
+                }
+            }
+
+            $select->join([$alias => 'item_parent_cache'], $id . ' = ' . $alias . '.parent_id', $columns)
                 ->where([$alias . '.item_id != ' . $alias . '.parent_id']);
 
             if (is_array($options['descendant'])) {
@@ -1048,6 +1080,15 @@ class Item
                                     $group[] = 'item_id';
                                 } else {
                                     $columns[$key] = 'item_id';
+                                    $group[] = $key;
+                                }
+                                break;
+                            case 'diff':
+                                if (is_numeric($key)) {
+                                    $columns[] = 'diff';
+                                    $group[] = 'diff';
+                                } else {
+                                    $columns[$key] = 'diff';
                                     $group[] = $key;
                                 }
                                 break;
@@ -1586,5 +1627,66 @@ class Item
         }
 
         return $result;
+    }
+
+    public function getDesignInfo(TreeRouteStack $url, int $itemId, string $language)
+    {
+        $brand = $this->getRow([
+            'language'     => $language,
+            'columns'      => ['catname', 'name'],
+            'item_type_id' => Item::BRAND,
+            'child'        => [
+                'id'         => $itemId,
+                'link_type'  => ItemParent::TYPE_DESIGN,
+                'columns'    => [
+                    'brand_item_catname' => 'link_catname'
+                ]
+            ]
+        ]);
+
+        if ($brand) {
+            return [
+                'name' => $brand['name'], //TODO: formatter
+                'url'  => $url->assemble([
+                    'action'        => 'brand-item',
+                    'brand_catname' => $brand['catname'],
+                    'car_catname'   => $brand['brand_item_catname']
+                ], [
+                    'name' => 'catalogue'
+                ])
+            ];
+        }
+
+        $brand = $this->getRow([
+            'language'     => $language,
+            'columns'      => ['catname', 'name'],
+            'item_type_id' => Item::BRAND,
+            'child'        => [
+                'columns'    => [
+                    'brand_item_catname' => 'link_catname'
+                ],
+                'descendant' => [
+                    'link_type' => ItemParent::TYPE_DESIGN,
+                    'id'        => $itemId,
+                    'columns'   => ['diff']
+                ]
+            ],
+            'order'        => 'ip2ipc1.diff ASC'
+        ]);
+
+        if ($brand) {
+            return [
+                'name' => $brand['name'], //TODO: formatter
+                'url'  => $url->assemble([
+                    'action'        => 'brand-item',
+                    'brand_catname' => $brand['catname'],
+                    'car_catname'   => $brand['brand_item_catname']
+                ], [
+                    'name' => 'catalogue'
+                ])
+            ];
+        }
+
+        return null;
     }
 }

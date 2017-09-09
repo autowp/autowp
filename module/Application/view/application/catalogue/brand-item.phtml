@@ -22,7 +22,7 @@
 <?php $this->pageTitle()->setAutoEscape(false)->captureStart('SET') ?>
     <?=$this->car()->htmlTitle($this->car)?>
     <?php if ($this->design) { ?>
-        <sup class="designBrand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($this->design['url'], $this->design['name']))?></sup>
+        <sup class="design-brand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($this->design['url'], $this->design['name']))?></sup>
     <?php } ?>
     <?php if ($this->car['produced'] > 0) { ?>
         <small class="produced">

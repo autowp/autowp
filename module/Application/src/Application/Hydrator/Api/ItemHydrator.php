@@ -4,6 +4,7 @@ namespace Application\Hydrator\Api;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\User\Model\User;
 
@@ -30,6 +31,9 @@ class ItemHydrator extends RestHydrator
      */
     private $itemNameFormatter;
 
+    /**
+     * @var TreeRouteStack
+     */
     private $router;
 
     /**
@@ -537,32 +541,7 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('design')) {
-            $designRow = $this->itemModel->getRow([
-                'language' => $this->language,
-                'columns'  => ['catname', 'name'],
-                'child'    => [
-                    'link_type' => ItemParent::TYPE_DESIGN,
-                    'columns'   => [
-                        'brand_item_catname' => 'link_catname'
-                    ],
-                    'descendant_or_self' => $object['id']
-                ]
-            ]);
-
-            if ($designRow) {
-                $result['design'] = [
-                    'brand_name' => $designRow['name'], //TODO: formatter
-                    'url'        => $this->router->assemble([
-                        'action'        => 'brand-item',
-                        'brand_catname' => $designRow['catname'] ? $designRow['catname'] : 'test',
-                        'car_catname'   => $designRow['brand_item_catname']
-                    ], [
-                        'name' => 'catalogue'
-                    ])
-                ];
-            } else {
-                $result['design'] = null;
-            }
+            $result['design'] = $this->itemModel->getDesignInfo($this->router, $object['id'], $this->language);
         }
 
         if ($this->filterComposite->filter('engine_vehicles')) {

@@ -33,7 +33,8 @@ class CatalogueControllerFactory implements FactoryInterface
             $tables->get('modification'),
             $tables->get('modification_group'),
             $container->get(\Application\Model\Brand::class),
-            $container->get(\Autowp\User\Model\User::class)
+            $container->get(\Autowp\User\Model\User::class),
+            $container->get('HttpRouter')
         );
     }
 }

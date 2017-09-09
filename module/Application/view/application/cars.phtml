@@ -14,7 +14,7 @@ $singleThumbPart = round(12 / $thumbColumns);
             <h3>
                 <?=$this->car()->htmlTitle($item['nameData'])?>
                 <?php if ($item['designProject']) { ?>
-                    <sup class="designBrand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($item['designProject']['url'], $item['designProject']['brandName']))?></sup>
+                    <sup class="design-brand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($item['designProject']['url'], $item['designProject']['name']))?></sup>
                 <?php } ?>
                 <?php if ($item['produced'] > 0) { ?>
                     <small>

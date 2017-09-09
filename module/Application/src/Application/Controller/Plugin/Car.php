@@ -3,6 +3,7 @@
 namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Zend\Router\Http\TreeRouteStack;
 
 use Application\ItemNameFormatter;
 use Application\Model\Item;
@@ -46,13 +47,19 @@ class Car extends AbstractPlugin
      */
     private $picture;
 
+    /**
+     * @var TreeRouteStack
+     */
+    private $router;
+
     public function __construct(
         SpecificationsService $specsService,
         ItemNameFormatter $itemNameFormatter,
         Item $itemModel,
         ItemParent $itemParent,
         Picture $picture,
-        Twins $twins
+        Twins $twins,
+        TreeRouteStack $router
     ) {
         $this->specsService = $specsService;
         $this->itemNameFormatter = $itemNameFormatter;
@@ -60,6 +67,7 @@ class Car extends AbstractPlugin
         $this->itemParent = $itemParent;
         $this->picture = $picture;
         $this->twins = $twins;
+        $this->router = $router;
     }
 
     /**
@@ -194,30 +202,7 @@ class Car extends AbstractPlugin
         foreach ($cars as $car) {
             $totalPictures = isset($carsTotalPictures[$car['id']]) ? $carsTotalPictures[$car['id']] : null;
 
-            $designCarsRow = $this->itemModel->getRow([
-                'language' => $language,
-                'columns'  => ['catname', 'name'],
-                'child'    => [
-                    'link_type'  => ItemParent::TYPE_DESIGN,
-                    'columns'    => [
-                        'brand_item_catname' => 'link_catname'
-                    ],
-                    'descendant_or_self' => $car['id']
-                ]
-            ]);
-
-            // design project
-            $designProjectData = false;
-            if ($designCarsRow) {
-                $designProjectData = [
-                    'brandName' => $designCarsRow['name'], //TODO: formatter
-                    'url'       => $controller->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-item',
-                        'brand_catname' => $designCarsRow['catname'] ? $designCarsRow['catname'] : 'test',
-                        'car_catname'   => $designCarsRow['brand_item_catname']
-                    ])
-                ];
-            }
+            $designProjectData = $this->itemModel->getDesignInfo($this->router, $car['id'], $language);
 
             $categories = [];
             if (! $disableCategories) {

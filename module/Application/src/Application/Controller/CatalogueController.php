@@ -8,6 +8,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Zend\Paginator\Paginator;
+use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\Comments;
 use Autowp\User\Model\User;
@@ -100,6 +101,11 @@ class CatalogueController extends AbstractActionController
      */
     private $userModel;
 
+    /**
+     * @var TreeRouteStack
+     */
+    private $router;
+
     public function __construct(
         $textStorage,
         $cache,
@@ -117,7 +123,8 @@ class CatalogueController extends AbstractActionController
         TableGateway $modificationTable,
         TableGateway $modificationGroupTable,
         Brand $brand,
-        User $userModel
+        User $userModel,
+        TreeRouteStack $router
     ) {
 
         $this->textStorage = $textStorage;
@@ -137,6 +144,7 @@ class CatalogueController extends AbstractActionController
         $this->modificationGroupTable = $modificationGroupTable;
         $this->brand = $brand;
         $this->userModel = $userModel;
+        $this->router = $router;
     }
 
     private function doBrandAction(callable $callback)
@@ -820,33 +828,7 @@ class CatalogueController extends AbstractActionController
                 ];
             }
 
-            $design = false;
-
-            // new design projects
-
-            $designCarsRow = $this->itemModel->getRow([
-                'language'     => $language,
-                'columns'      => ['name', 'catname'],
-                'item_type_id' => Item::BRAND,
-                'child' => [
-                    'link_type' => ItemParent::TYPE_DESIGN,
-                    'columns'   => [
-                        'brand_item_catname' => 'link_catname',
-                    ],
-                    'descendant' => $currentCar['id']
-                ]
-            ]);
-
-            if ($designCarsRow) {
-                $design = [
-                    'name' => $designCarsRow['name'], //TODO: full name via formatter
-                    'url'  => $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-item',
-                        'brand_catname' => $designCarsRow['catname'],
-                        'car_catname'   => $designCarsRow['brand_item_catname']
-                    ])
-                ];
-            }
+            $design = $this->itemModel->getDesignInfo($this->router, $currentCar['id'], $language);
 
             $this->sidebar()->brand([
                 'brand_id'    => $brand['id'],
