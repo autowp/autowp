@@ -1706,23 +1706,6 @@ class Item
             'order'        => 'ip2ipc1.diff ASC'
         ]);
 
-        $select = $this->getSelect([
-            'language'     => $language,
-            'columns'      => ['catname', 'name'],
-            'item_type_id' => Item::BRAND,
-            'child'        => [
-                'columns'    => [
-                    'brand_item_catname' => 'link_catname'
-                ],
-                'descendant' => [
-                    'link_type' => ItemParent::TYPE_DESIGN,
-                    'id'        => $itemId,
-                    'columns'   => ['diff']
-                ]
-            ],
-            'order'        => 'ip2ipc1.diff ASC'
-        ]);
-
         if ($brand) {
             return [
                 'name' => $brand['name'], //TODO: formatter
