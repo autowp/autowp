@@ -347,7 +347,7 @@ return array_replace(include 'root.php', [
 Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.',
     'upload/only-registered' => 'Только зарегистрированный пользователи могут загружать изображения
 
-[Авторизируйтесь](/login) или [зарегистрируйтесь](/registration)',
+[Авторизируйтесь](/login) или [зарегистрируйтесь](/ng/signup)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Другие изображения %1$s',
@@ -452,7 +452,7 @@ return array_replace(include 'root.php', [
     'login/success-text' => 'Рады снова приветствовать вас на нашем сайте',
     'login/remember' => 'запомнить',
     'login/if-you-lose-password' => 'Если вы забыли свой логин или пароль, вы можете воспользоваться <a href="/restorepassword">формой восстановления по e-mail</a>',
-    'login/if-you-not-registered' => 'Если вы ещё не зарегистрированы на сайте, то можете <a href="/registration">сделать это сейчас</a>',
+    'login/if-you-not-registered' => 'Если вы ещё не зарегистрированы на сайте, то можете <a href="/ng/signup">сделать это сейчас</a>',
     'login/sign-in-using-account' => 'Войти, используя учётную запись',
     'login/login-or-password-is-incorrect' => 'Логин или пароль неверен',
     'login/user-%value%-not-found' => 'Пользователь с именем или e-mail "%value%" не найден',

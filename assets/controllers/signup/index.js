@@ -3,17 +3,17 @@ import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
 
-import './sent';
+import './ok';
 
-const CONTROLLER_NAME = 'FeedbackController';
-const STATE_NAME = 'feedback';
+const CONTROLLER_NAME = 'SignupController';
+const STATE_NAME = 'signup';
 
 angular.module(Module)
     .config(['$stateProvider',
         function config($stateProvider) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/feedback',
+                url: '/signup',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template
@@ -27,9 +27,10 @@ angular.module(Module)
             var ctrl = this;
             
             ctrl.form = {
-                name: '',
                 email: '',
-                message: '',
+                name: '',
+                password: '',
+                password_confirm: '',
                 captcha: ''
             };
             
@@ -50,18 +51,18 @@ angular.module(Module)
             $scope.pageEnv({
                 layout: {
                     blankPage: false,
-                    needRight: false
+                    needRight: true
                 },
-                pageId: 89
+                pageId: 52
             });
             
             ctrl.submit = function(id) {
                 $http({
                     method: 'POST',
-                    url: '/api/feedback',
+                    url: '/api/user',
                     data: ctrl.form
                 }).then(function() {
-                    $state.go('feedback-sent');
+                    $state.go('signup-ok');
                 }, function(response) {
                     if (response.status == 400) {
                         ctrl.invalidParams = response.data.invalid_params;

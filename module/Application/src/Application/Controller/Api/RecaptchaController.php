@@ -26,8 +26,11 @@ class RecaptchaController extends AbstractRestfulController
      */
     public function getAction()
     {
+        $namespace = new \Zend\Session\Container('Captcha');
+
         return new JsonModel([
-            'publicKey' => $this->publicKey
+            'publicKey' => $this->publicKey,
+            'success'   => isset($namespace->success) && $namespace->success
         ]);
     }
 }

@@ -16,12 +16,17 @@ class UserControllerFactory implements FactoryInterface
     {
         $hydrators = $container->get('HydratorManager');
         $filters = $container->get('InputFilterManager');
+        $config = $container->get('Config');
+
         return new Controller(
             $hydrators->get(\Application\Hydrator\Api\UserHydrator::class),
             $filters->get('api_user_list'),
+            $filters->get('api_user_post'),
             $filters->get('api_user_put'),
             $container->get(\Application\Service\UsersService::class),
-            $container->get(\Autowp\User\Model\User::class)
+            $container->get(\Autowp\User\Model\User::class),
+            $config['recaptcha'],
+            (bool)getenv('AUTOWP_CAPTCHA')
         );
     }
 }

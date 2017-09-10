@@ -58,23 +58,30 @@ class FeedbackController extends AbstractRestfulController
         }
 
         if ($this->captchaEnabled) {
-            $recaptcha = new ReCaptcha($this->recaptcha['privateKey']);
+            $namespace = new \Zend\Session\Container('Captcha');
+            $verified = isset($namespace->success) && $namespace->success;
 
-            $captchaResponse = null;
-            if (isset($data['captcha'])) {
-                $captchaResponse = (string)$data['captcha'];
-            }
+            if (! $verified) {
+                $recaptcha = new ReCaptcha($this->recaptcha['privateKey']);
 
-            $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
+                $captchaResponse = null;
+                if (isset($data['captcha'])) {
+                    $captchaResponse = (string)$data['captcha'];
+                }
 
-            if (! $result->isSuccess()) {
-                return new ApiProblemResponse(
-                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                        'invalid_params' => [
-                            'captcha' => 'Captcha is invalid'
-                        ]
-                    ])
-                );
+                $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
+
+                if (! $result->isSuccess()) {
+                    return new ApiProblemResponse(
+                        new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                            'invalid_params' => [
+                                'captcha' => 'Captcha is invalid'
+                            ]
+                        ])
+                    );
+                }
+
+                $namespace->success = true;
             }
         }
 

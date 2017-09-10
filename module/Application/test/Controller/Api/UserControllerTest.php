@@ -20,7 +20,7 @@ class UserControllerTest extends AbstractHttpControllerTestCase
         $email = 'test'.microtime(true).'@example.com';
         $password = 'password';
 
-        $this->dispatch('https://www.autowp.ru/registration', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/api/user', Request::METHOD_POST, [
             'email'            => $email,
             'name'             => 'Test user',
             'password'         => $password,
@@ -29,24 +29,21 @@ class UserControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(302);
         $this->assertModuleName('application');
-        $this->assertControllerName(RegistrationController::class);
-        $this->assertMatchedRouteName('registration');
-        $this->assertActionName('index');
+        $this->assertControllerName(UserController::class);
+        $this->assertMatchedRouteName('api/user/post');
+        $this->assertActionName('post');
 
         // get id
-        $userModel = $this->getApplicationServiceLocator()->get(User::class);
-        $table = $userModel->getTable();
-        $userRow = $table->selectWith(
-            $table->getSql()->select()
-                ->order('id desc')
-                ->limit(1)
-        )->current();
+        $headers = $this->getResponse()->getHeaders();
+        $uri = $headers->get('Location')->uri();
+        $parts = explode('/', $uri->getPath());
+        $userId = $parts[count($parts) - 1];
 
         // delete user
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch(
-            'https://www.autowp.ru/api/user/' . $userRow['id'],
+            'https://www.autowp.ru/api/user/' . $userId,
             Request::METHOD_PUT,
             [
                 'deleted' => 1

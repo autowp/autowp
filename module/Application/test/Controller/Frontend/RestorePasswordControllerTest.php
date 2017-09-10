@@ -7,8 +7,8 @@ use Zend\Http\Request;
 use Autowp\User\Model\User;
 
 use Application\Controller\AccountController;
+use Application\Controller\Api\UserController;
 use Application\Controller\LoginController;
-use Application\Controller\RegistrationController;
 use Application\Controller\RestorePasswordController;
 use Application\Test\AbstractHttpControllerTestCase;
 
@@ -19,7 +19,8 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
     private function createUser(string $email, string $password, string $name): int
     {
         $this->reset();
-        $this->dispatch('https://www.autowp.ru/registration', Request::METHOD_POST, [
+
+        $this->dispatch('https://www.autowp.ru/api/user', Request::METHOD_POST, [
             'email'            => $email,
             'name'             => $name,
             'password'         => $password,
@@ -28,20 +29,17 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(302);
         $this->assertModuleName('application');
-        $this->assertControllerName(RegistrationController::class);
-        $this->assertMatchedRouteName('registration');
-        $this->assertActionName('index');
+        $this->assertControllerName(UserController::class);
+        $this->assertMatchedRouteName('api/user/post');
+        $this->assertActionName('post');
 
         // get id
-        $userModel = $this->getApplicationServiceLocator()->get(User::class);
-        $table = $userModel->getTable();
-        $userRow = $table->selectWith(
-            $table->getSql()->select()
-                ->order('id desc')
-                ->limit(1)
-        )->current();
+        $headers = $this->getResponse()->getHeaders();
+        $uri = $headers->get('Location')->uri();
+        $parts = explode('/', $uri->getPath());
+        $userId = $parts[count($parts) - 1];
 
-        return $userRow['id'];
+        return $userId;
     }
 
     private function activateUser()

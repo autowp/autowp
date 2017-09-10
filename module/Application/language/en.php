@@ -328,7 +328,7 @@ All images are posted for educational purposes.
 Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.',
     'upload/only-registered' => 'Only registered users can upload pictures
 
-[Login](/login) or [register](/registration)',
+[Login](/login) or [register](/ng/signup)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Other pictures of %1$s',
@@ -433,7 +433,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'login/success-text' => 'We are glad to welcome you to our website',
     'login/remember' => 'remember',
     'login/if-you-lose-password' => 'If you have forgotten your username or password, you can use the <a href="/restorepassword">form of recovery by e-mail</a>',
-    'login/if-you-not-registered' => 'If you are not registered on the website, you can <a href="/registration">do it now</a>!',
+    'login/if-you-not-registered' => 'If you are not registered on the website, you can <a href="/ng/signup">do it now</a>!',
     'login/sign-in-using-account' => 'Sign in using existing account',
     'login/login-or-password-is-incorrect' => 'Login or password is incorrect',
     'login/user-%value%-not-found' => 'User with login or e-mail "%value%" not found',

@@ -9,6 +9,7 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Autowp\Message\MessageService;
 use Autowp\ZFComponents\Filter\SingleSpaces;
+use Autowp\User\Model\User;
 
 return [
     'hydrators' => [
@@ -1605,6 +1606,74 @@ return [
                     ['name' => 'StringTrim']
                 ]
             ]
+        ],
+        'api_user_post' => [
+            'email' => [
+                'required' => true,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'min' => null,
+                            'max' => 50
+                        ]
+                    ],
+                    [
+                        'name'                   => 'EmailAddress',
+                        'break_chain_on_failure' => true
+                    ],
+                    ['name' => Validator\User\EmailNotExists::class]
+                ]
+            ],
+            'name' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => User::MIN_NAME,
+                            'max' => User::MAX_NAME
+                        ]
+                    ]
+                ]
+            ],
+            'password' => [
+                'required'   => true,
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => User::MIN_PASSWORD,
+                            'max' => User::MAX_PASSWORD
+                        ]
+                    ]
+                ]
+            ],
+            'password_confirm' => [
+                'required'   => true,
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => User::MIN_PASSWORD,
+                            'max' => User::MAX_PASSWORD
+                        ]
+                    ],
+                    [
+                        'name' => 'Identical',
+                        'options' => [
+                            'token' => 'password',
+                        ],
+                    ]
+                ]
+            ]
         ]
     ],
     'router' => [
@@ -2969,6 +3038,15 @@ return [
                                     'verb' => 'get',
                                     'defaults' => [
                                         'action' => 'index'
+                                    ]
+                                ]
+                            ],
+                            'post' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'post',
+                                    'defaults' => [
+                                        'action' => 'post'
                                     ]
                                 ]
                             ],

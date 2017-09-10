@@ -6,6 +6,7 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+use ReCaptcha\ReCaptcha;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
@@ -41,18 +42,39 @@ class UserController extends AbstractRestfulController
      */
     private $userModel;
 
+    /**
+     * @var InputFilter
+     */
+    private $postInputFilter;
+
+    /**
+     * @var array
+     */
+    private $recaptcha;
+
+    /**
+     * @var bool
+     */
+    private $captchaEnabled;
+
     public function __construct(
         RestHydrator $hydrator,
         InputFilter $listInputFilter,
+        InputFilter $postInputFilter,
         InputFilter $putInputFilter,
         UsersService $userService,
-        User $userModel
+        User $userModel,
+        array $recaptcha,
+        bool $captchaEnabled
     ) {
         $this->hydrator = $hydrator;
         $this->listInputFilter = $listInputFilter;
+        $this->postInputFilter = $postInputFilter;
         $this->putInputFilter = $putInputFilter;
         $this->userService = $userService;
         $this->userModel = $userModel;
+        $this->recaptcha = $recaptcha;
+        $this->captchaEnabled = $captchaEnabled;
     }
 
     public function indexAction()
@@ -235,5 +257,69 @@ class UserController extends AbstractRestfulController
         ]);
 
         return $this->getResponse()->setStatusCode(204);
+    }
+
+    public function postAction()
+    {
+        $request = $this->getRequest();
+        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
+            $data = $this->jsonDecode($request->getContent());
+        } else {
+            $data = $request->getPost()->toArray();
+        }
+
+        if ($this->captchaEnabled) {
+            $namespace = new \Zend\Session\Container('Captcha');
+            $verified = isset($namespace->success) && $namespace->success;
+
+            if (! $verified) {
+                $recaptcha = new ReCaptcha($this->recaptcha['privateKey']);
+
+                $captchaResponse = null;
+                if (isset($data['captcha'])) {
+                    $captchaResponse = (string)$data['captcha'];
+                }
+
+                $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
+
+                if (! $result->isSuccess()) {
+                    return new ApiProblemResponse(
+                        new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                            'invalid_params' => [
+                                'captcha' => 'Captcha is invalid'
+                            ]
+                        ])
+                    );
+                }
+
+                $namespace->success = true;
+            }
+        }
+
+        $this->postInputFilter->setData($data);
+        if (! $this->postInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->postInputFilter);
+        }
+
+        $values = $this->postInputFilter->getValues();
+
+        $ip = $request->getServer('REMOTE_ADDR');
+        if (! $ip) {
+            $ip = '127.0.0.1';
+        }
+
+        $user = $this->userService->addUser([
+            'email'    => $values['email'],
+            'password' => $values['password'],
+            'name'     => $values['name'],
+            'ip'       => $ip
+        ], $this->language());
+
+        $url = $this->url()->fromRoute('api/user/user/item', [
+            'id' => $user['id']
+        ]);
+        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
+
+        return $this->getResponse()->setStatusCode(201);
     }
 }

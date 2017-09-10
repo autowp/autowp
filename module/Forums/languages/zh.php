@@ -33,12 +33,12 @@ return [
     'forums/unsubscribe' => '取消订阅',
     'forums/topic-closed-text' => '主题已被管理员关闭',
     'forums/need-wait-to-post' => '，您需要等待一段时间后才能添加新的消息',
-    'forums/register-to-post' => '为了能够创建和回复主题，您必须[注册](/registration/)。',
+    'forums/register-to-post' => '为了能够创建和回复主题，您必须[注册](/ng/signup)。',
     'forums/register-to-create-topic' => '只有注册用户才能添加主题。
 
 如果您已经注册，您必须登录才能进行操作。
 
-如果您还未注册，现在就可以到[注册页面](/registration/)注册。',
+如果您还未注册，现在就可以到[注册页面](/ng/signup)注册。',
     'forums/topic/open' => '打开',
     'forums/topic/close' => '关闭',
     'forums/topic/delete' => '删除',
