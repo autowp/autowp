@@ -51,7 +51,8 @@
 		"autowp/cron" : "^0.1.1",
 		"zendframework/zend-filter" : ">=2.7.2",
 		"zendframework/zend-inputfilter" : ">=2.7.4",
-		"league/oauth1-client": "^1.7"
+		"league/oauth1-client": "^1.7",
+		"google/recaptcha": "^1.1"
 	},
 	"autoload" : {
 		"psr-4" : {

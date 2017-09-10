@@ -771,7 +771,7 @@ We will try not to disappoint you.',
 
 ### Feedback
 
-Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/feedback)" администрации сайта.
+Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/ng/feedback)" администрации сайта.
 
 Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами, все они имеют единственный ответ: мы не размещаем рекламу.
 
@@ -802,7 +802,7 @@ Chinese site translation: %zh-translator%
 
 ### Поддержать проект
 
-You can support our project by [finances](/donate) or [moral](/feedback).
+You can support our project by [finances](/donate) or [moral](/ng/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.',
 
     'page/1/name' => "Index page",

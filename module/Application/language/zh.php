@@ -746,7 +746,7 @@ return array_replace(include 'root.php', [
 
 ### 意见反馈
 
-如果您有任何意见、建议或其他的想法，可以到[论坛](/forums/)联系他们, 选择通过站内信或写“[意见反馈](/feedback)”为网站管理提建议。
+如果您有任何意见、建议或其他的想法，可以到[论坛](/forums/)联系他们, 选择通过站内信或写“[意见反馈](/ng/feedback)”为网站管理提建议。
 
 如果您有关于广告、交换链接或推广产品的问题，很抱歉：我们不设置广告。
 
@@ -777,7 +777,7 @@ return array_replace(include 'root.php', [
 
 ### 支持我们
 
-您可以通过[捐助](/donate) 或[反馈意见](/feedback)支持我们网站
+您可以通过[捐助](/donate) 或[反馈意见](/ng/feedback)支持我们网站
 欲添加更多语言请参与 [翻译网站](https://github.com/autowp/autowp/tree/master/module/Application/language) 。',
 
     'page/1/name' => "主页",

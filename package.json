@@ -40,6 +40,7 @@
     "angular-markdown-directive": "git+https://github.com/autowp/angular-markdown-directive.git#master",
     "angular-messages": "^1.6.3",
     "angular-moment": "^1.0.1",
+    "angular-recaptcha": "^4.1.0",
     "angular-sanitize": "^1.6.3",
     "angular-translate": "^2.15.1",
     "angular-translate-interpolation-messageformat": "^2.15.1",

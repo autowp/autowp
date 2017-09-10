@@ -45,6 +45,8 @@ web:
     AUTOWP_ELS_LINKEDIN_CLIENTID: "linkedin_test_clientid"
     AUTOWP_ELS_LINKEDIN_SECRET: "linkedin_test_secret"
     AUTOWP_CAPTCHA: 0
+    AUTOWP_RECAPTCHA_PUBLICKEY: "public"
+    AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
   volumes:
   - ./config:/app/config
   - ./data:/app/data

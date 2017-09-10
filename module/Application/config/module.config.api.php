@@ -39,6 +39,7 @@ return [
             Controller\Api\CommentController::class         => Controller\Api\Service\CommentControllerFactory::class,
             Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
             Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
+            Controller\Api\FeedbackController::class        => Controller\Api\FeedbackControllerFactory::class,
             Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
             Controller\Api\HotlinksController::class        => InvokableFactory::class,
             Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,
@@ -58,6 +59,7 @@ return [
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
             Controller\Api\PictureModerVoteTemplateController::class => Controller\Api\Service\PictureModerVoteTemplateControllerFactory::class,
             Controller\Api\PictureVoteController::class     => Controller\Api\Service\PictureVoteControllerFactory::class,
+            Controller\Api\RecaptchaController::class       => Controller\Api\RecaptchaControllerFactory::class,
             Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
             Controller\Api\StatController::class            => Controller\Api\StatControllerFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
@@ -129,6 +131,29 @@ return [
                     ]
                 ]
             ],
+        ],
+        'api_feedback' => [
+            'name' => [
+                'required'   => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'email' => [
+                'required'   => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'EmailAddress']
+                ]
+            ],
+            'message' => [
+                'required'   => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ]
         ],
         'api_ip_item' => [
             'fields' => [
@@ -1827,6 +1852,27 @@ return [
                             ],
                         ]
                     ],
+                    'feedback' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/feedback',
+                            'defaults' => [
+                                'controller' => Controller\Api\FeedbackController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'post' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'post',
+                                    'defaults' => [
+                                        'action' => 'post'
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ],
                     'forum' => [
                         'type' => Literal::class,
                         'options' => [
@@ -2782,6 +2828,27 @@ return [
                                     ],
                                 ]
                             ]
+                        ]
+                    ],
+                    'recaptcha' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/recaptcha',
+                            'defaults' => [
+                                'controller' => Controller\Api\RecaptchaController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'get' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'get'
+                                    ],
+                                ],
+                            ],
                         ]
                     ],
                     'traffic' => [

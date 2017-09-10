@@ -21,7 +21,7 @@ class ContactsControllerTest extends AbstractHttpControllerTestCase
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(ContactsController::class);
-        $this->assertMatchedRouteName('api/contacts');
+        $this->assertMatchedRouteName('api/contacts/item/put');
         $this->assertActionName('update');
 
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
@@ -36,7 +36,7 @@ class ContactsControllerTest extends AbstractHttpControllerTestCase
         $this->assertResponseStatusCode(204);
         $this->assertModuleName('application');
         $this->assertControllerName(ContactsController::class);
-        $this->assertMatchedRouteName('api/contacts');
+        $this->assertMatchedRouteName('api/contacts/item/delete');
         $this->assertActionName('delete');
     }
 }

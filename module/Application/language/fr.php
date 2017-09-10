@@ -770,7 +770,7 @@ Une partie des \"verts\" sont les modérateurs.
 
 ### Dialogue et retour d'information.
 
-Si vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/forums/), demander personnellement via la messagerie, ou écrire dans le \"[Retour d'information](/feedback)\" de l'administration du site.
+Si vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/forums/), demander personnellement via la messagerie, ou écrire dans le \"[Retour d'information](/ng/feedback)\" de l'administration du site.
 
 Si vous avez des questions concernant la publicité, échange de lien ou de promouvoir votre produit par d'autres moyens, ils ont tous une réponse: on ne place pas la publicité.
 
@@ -801,7 +801,7 @@ Une partie du code source du site est ouverte et un cours de communication suppl
 
 ### Soutenir le projet
 
-Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/feedback).
+Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/ng/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.",
 
     'page/1/name' => "Page d'accueil",

@@ -523,28 +523,6 @@ return [
                     ],
                 ]
             ],
-            'feedback' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route'    => '/feedback',
-                    'defaults' => [
-                        'controller' => Controller\FeedbackController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'sent' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/sent',
-                            'defaults' => [
-                                'action' => 'sent',
-                            ],
-                        ]
-                    ]
-                ]
-            ],
             'inbox' => [
                 'type'    => Segment::class,
                 'options' => [

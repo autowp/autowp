@@ -49,7 +49,6 @@ return [
             Controller\CommentsController::class        => Controller\Frontend\Service\CommentsControllerFactory::class,
             Controller\DonateController::class          => Controller\Frontend\Service\DonateControllerFactory::class,
             Controller\FactoriesController::class       => Controller\Frontend\Service\FactoriesControllerFactory::class,
-            Controller\FeedbackController::class        => Controller\Frontend\Service\FeedbackControllerFactory::class,
             Controller\ForumsController::class          => Controller\Frontend\Service\ForumsControllerFactory::class,
             Controller\IndexController::class           => Controller\Frontend\Service\IndexControllerFactory::class,
             Controller\InboxController::class           => Controller\Frontend\Service\InboxControllerFactory::class,
@@ -344,4 +343,9 @@ return [
     'mail' => [
         'transport' => $mailTransport
     ],
+
+    'recaptcha' => [
+        'publicKey'  => getenv('AUTOWP_RECAPTCHA_PUBLICKEY'),
+        'privateKey' => getenv('AUTOWP_RECAPTCHA_PRIVATEKEY')
+    ]
 ];

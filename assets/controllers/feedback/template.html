@@ -1,0 +1,43 @@
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="well">
+            <form method="post" class="form-horizontal" ng-submit="ctrl.submit()"><fieldset>
+                <legend translate>feedback/title</legend>
+                <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.name}">
+                    <label class="col-md-2 control-label" for="name" translate>feedback/name</label>
+                    <div class="col-md-10">
+                        <input type="text" name="name" maxlength="255" size="80" autocomplete="name" class="form-control" ng-model="ctrl.form.name">
+                        <p ng-repeat="message in ctrl.invalidParams.name" ng-bind="message" class="help-block"></p>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.email}">
+                    <label class="col-md-2 control-label" for="email">E-mail</label>
+                    <div class="col-md-10">
+                        <input type="text" name="email" maxlength="255" size="80" autocomplete="email" class="form-control" ng-model="ctrl.form.email">
+                        <p ng-repeat="message in ctrl.invalidParams.email" ng-bind="message" class="help-block"></p>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.message}">
+                    <label class="col-md-2 control-label" for="message" translate>feedback/message</label>
+                    <div class="col-md-10">
+                        <textarea name="message" cols="80" rows="8" class="form-control" ng-model="ctrl.form.message"></textarea>
+                        <p ng-repeat="message in ctrl.invalidParams.message" ng-bind="message" class="help-block"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="captcha" translate>login/captcha</label>
+                    <div class="col-md-10">
+                        <div vc-recaptcha key="ctrl.recaptchaKey" ng-if="ctrl.recaptchaKey" ng-model="ctrl.form.captcha"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-10">
+                        <button type="submit" class="btn btn-primary" translate>submit</button>
+                    </div>
+                </div>
+            </fieldset></form>
+        </div>
+        <div btf-markdown="'feedback/donate-text'|translate"></div>
+    </div>
+</div>
