@@ -8,7 +8,6 @@ use Zend\Http\Request;
 use Autowp\User\Model\User;
 
 use Application\Test\AbstractHttpControllerTestCase;
-use Application\Controller\RegistrationController;
 use Application\Controller\Api\UserController;
 
 class UserControllerTest extends AbstractHttpControllerTestCase
@@ -27,7 +26,7 @@ class UserControllerTest extends AbstractHttpControllerTestCase
             'password_confirm' => $password
         ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
         $this->assertControllerName(UserController::class);
         $this->assertMatchedRouteName('api/user/post');

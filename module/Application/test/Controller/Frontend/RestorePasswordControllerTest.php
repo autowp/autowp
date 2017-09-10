@@ -27,7 +27,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
             'password_confirm' => $password
         ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
         $this->assertControllerName(UserController::class);
         $this->assertMatchedRouteName('api/user/post');
