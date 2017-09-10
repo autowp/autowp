@@ -66,7 +66,7 @@ angular.module(Module)
                     if (response.status == 400) {
                         ctrl.invalidParams = response.data.invalid_params;
                         
-                        ctrl.showCaptcha = !response.data.invalid_params.captcha;
+                        ctrl.showCaptcha = response.data.invalid_params.captcha;
                     } else {
                         notify.response(response);
                     }
