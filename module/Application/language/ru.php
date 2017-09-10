@@ -1229,15 +1229,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/picture/settings' => 'Настройки',
     'moder/picture/copyrights' => 'Копирайты',
 
-    'moder/picture/replacement' => 'Замена',
-    'moder/picture/replacement/photo-suggested-to-replace' => 'Фото предложено на замену',
-    'moder/picture/replacement/accept-and-delete-double' => 'Принять замену и удалить дубль',
-    'moder/picture/replacement/cancel' => 'Отклонить замену',
-
-    'moder/picture/uploader' => 'Закачал',
-    'moder/picture/uploader/unknown' => 'Неизвестно',
-    'moder/picture/uploader/id-address:' => 'IP-адрес закачавшего: ',
-
     'moder/pciture/move/brands' => 'Бренды',
     'moder/pciture/move/factories' => 'Заводы',
     'moder/pciture/move/engines' => 'Двигатели',
@@ -1252,14 +1243,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 * Логотип должен касаться краев изображения. Никаких полей не не надо
 * Закачивайте в максимальном доступном разрешении - это обеспечит качество и возможность в будущем где-то воспользоваться этим крупным фото. На сайте все размеры будут подогнанны',
     'moder/brands/logo/saved' => 'Логотип сохранен',
-
-    'moder/brands/links' => 'Ссылки',
-    'moder/brands/links/text' => 'Текст',
-    'moder/brands/links/address' => 'Адрес',
-    'moder/brands/links/type' => 'Тип',
-    'moder/brands/links/type/interest-link' => 'Интересная ссылка',
-    'moder/brands/links/type/official' => 'официальный сайт',
-    'moder/brands/links/type/club' => 'клуб',
 
     'moder/edit-object' => 'управление',
 

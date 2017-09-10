@@ -1212,15 +1212,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/settings' => 'Settings',
     'moder/picture/copyrights' => 'Copyrights',
 
-    'moder/picture/replacement' => 'Replacement',
-    'moder/picture/replacement/photo-suggested-to-replace' => 'Photo suggested to replace',
-    'moder/picture/replacement/accept-and-delete-double' => 'Accept and remove double',
-    'moder/picture/replacement/cancel' => 'Cancel replacement',
-
-    'moder/picture/uploader' => 'Uploader',
-    'moder/picture/uploader/unknown' => 'Unknown',
-    'moder/picture/uploader/id-address:' => 'IP-address of uploader: ',
-
     'moder/pciture/move/brands' => 'Brands',
     'moder/pciture/move/factories' => 'Factories',
     'moder/pciture/move/engines' => 'Engines',
@@ -1235,14 +1226,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
 * Logotype must be close to edges. Margin not required
 * Upload images in maximum resolution - thats give quality and ability to use it in future. On website logo scaled automaticaly',
     'moder/brands/logo/saved' => 'Logotype saved',
-
-    'moder/brands/links' => 'Links',
-    'moder/brands/links/text' => 'Text',
-    'moder/brands/links/address' => 'Address',
-    'moder/brands/links/type' => 'Type',
-    'moder/brands/links/type/interest-link' => 'interest link',
-    'moder/brands/links/type/official' => 'official',
-    'moder/brands/links/type/club' => 'club',
 
     'moder/edit-object' => 'edit',
 

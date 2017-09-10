@@ -1180,15 +1180,6 @@ return array_replace(include 'root.php', [
     'moder/picture/settings' => 'Settings',
     'moder/picture/copyrights' => '版权',
 
-    'moder/picture/replacement' => '替换',
-    'moder/picture/replacement/photo-suggested-to-replace' => '建议替换的图片e',
-    'moder/picture/replacement/accept-and-delete-double' => 'Accept and remove double',
-    'moder/picture/replacement/cancel' => '取消替换',
-
-    'moder/picture/uploader' => '上传者',
-    'moder/picture/uploader/unknown' => '未知',
-    'moder/picture/uploader/id-address:' => '上传者的IP地址： ',
-
     'moder/pciture/move/brands' => '品牌',
     'moder/pciture/move/factories' => '工厂',
     'moder/pciture/move/engines' => '发动机',
@@ -1203,14 +1194,6 @@ return array_replace(include 'root.php', [
 * 标识必须靠近边缘，不需要留白。
 * 上传最大分辨率的图像——这是为了追求更好的质量和未来使用它的能力。商标在网站上自动缩放。',
     'moder/brands/logo/saved' => 'Logotype saved',
-
-    'moder/brands/links' => 'Links',
-    'moder/brands/links/text' => '文章',
-    'moder/brands/links/address' => '地址',
-    'moder/brands/links/type' => '型号',
-    'moder/brands/links/type/interest-link' => '相关链接',
-    'moder/brands/links/type/official' => '官方网站',
-    'moder/brands/links/type/club' => '俱乐部',
 
     'moder/edit-object' => '编辑',
 
