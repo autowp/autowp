@@ -33,7 +33,6 @@ return [
     ],
     'forms' => [
         'RestorePasswordForm' => [
-            //'hydrator' => 'ObjectProperty',
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
@@ -80,7 +79,6 @@ return [
             ],
         ],
         'NewPasswordForm' => [
-            //'hydrator' => 'ObjectProperty',
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
@@ -127,42 +125,6 @@ return [
                     ]
                 ],
             ],
-        ],
-        'DescriptionForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'Textarea',
-                        'name' => 'markdown',
-                        'attributes' => [
-                            'maxlength' => 4096,
-                            'cols'      => 60,
-                            'rows'      => 10
-                        ]
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'markdown' => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'min' => 0,
-                                'max' => 4096
-                            ]
-                        ]
-                    ]
-                ]
-            ]
         ],
         'LoginForm' => [
             'type'     => 'Zend\Form\Form',
@@ -446,116 +408,6 @@ return [
                     'required' => true
                 ]
             ],
-        ],
-        'BrandLogoForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method'  => 'post',
-                'enctype' => 'multipart/form-data',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'File',
-                        'name' => 'logo',
-                        'options' => [
-                            'label' => 'brand/logo'
-                        ]
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'logo' => [
-                    'required' => true,
-                    'validators' => [
-                        [
-                            'name' => ZendValidator\File\Size::class,
-                            'break_chain_on_failure' => true,
-                            'options' => [
-                                'max' => 4194304
-                            ]
-                        ],
-                        [
-                            'name' => ZendValidator\File\IsImage::class,
-                            'break_chain_on_failure' => true,
-                        ],
-                        [
-                            'name' => ZendValidator\File\Extension::class,
-                            'break_chain_on_failure' => true,
-                            'options' => [
-                                'extension' => 'png'
-                            ]
-                        ],
-                        [
-                            'name' => ZendValidator\File\ImageSize::class,
-                            'break_chain_on_failure' => true,
-                            'options' => [
-                                'minWidth'  => 50,
-                                'minHeight' => 50
-                            ]
-                        ],
-
-                    ]
-                ]
-            ]
-        ],
-        'BanForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type'    => 'Select',
-                        'name'    => 'period',
-                        'options' => [
-                            'label'   => 'ban/period',
-                            'options' => [
-                                1  => 'ban/period/hour',
-                                2  => 'ban/period/2-hours',
-                                4  => 'ban/period/4-hours',
-                                8  => 'ban/period/8-hours',
-                                16 => 'ban/period/16-hours',
-                                24 => 'ban/period/day',
-                                48 => 'ban/period/2-days',
-                            ]
-                        ]
-                    ]
-                ],
-                [
-                    'spec' => [
-                        'type'    => 'Text',
-                        'name'    => 'reason',
-                        'options' => [
-                            'label' => 'ban/reason'
-                        ]
-                    ]
-                ],
-                [
-                    'spec' => [
-                        'type'    => 'Submit',
-                        'name'    => 'submit',
-                        'options' => [
-                            'label' => 'ban/ban',
-                        ]
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'period' => [
-                    'required' => true
-                ],
-                'reason' => [
-                    'required' => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ]
-                ],
-                'submit' => [
-                    'required' => false
-                ]
-            ]
         ],
         'AttrsLogFilterForm' => [
             'type'     => 'Zend\Form\Form',
