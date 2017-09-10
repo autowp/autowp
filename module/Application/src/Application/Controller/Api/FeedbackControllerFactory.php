@@ -19,7 +19,8 @@ class FeedbackControllerFactory implements FactoryInterface
             $filters->get('api_feedback'),
             $container->get(\Zend\Mail\Transport\TransportInterface::class),
             $config['feedback'],
-            $config['recaptcha']
+            $config['recaptcha'],
+            (bool)getenv('AUTOWP_CAPTCHA')
         );
     }
 }

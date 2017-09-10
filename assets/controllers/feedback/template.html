@@ -24,10 +24,10 @@
                         <p ng-repeat="message in ctrl.invalidParams.message" ng-bind="message" class="help-block"></p>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="captcha" translate>login/captcha</label>
-                    <div class="col-md-10">
+                <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.captcha}">
+                    <div class="col-md-10 col-md-offset-2">
                         <div vc-recaptcha key="ctrl.recaptchaKey" ng-if="ctrl.recaptchaKey" ng-model="ctrl.form.captcha"></div>
+                        <p ng-repeat="message in ctrl.invalidParams.captcha" ng-bind="message" class="help-block"></p>
                     </div>
                 </div>
                 <div class="form-group">

@@ -5,6 +5,7 @@ namespace Application\Controller\Api;
 use Zend\InputFilter\InputFilter;
 use Zend\Mail;
 use Zend\Mvc\Controller\AbstractRestfulController;
+
 use ReCaptcha\ReCaptcha;
 use ZF\ApiProblem\ApiProblemResponse;
 use ZF\ApiProblem\ApiProblem;
@@ -28,12 +29,23 @@ class FeedbackController extends AbstractRestfulController
      */
     private $recaptcha;
 
-    public function __construct(InputFilter $postInputFilter, $transport, array $options, array $recaptcha)
-    {
+    /**
+     * @var bool
+     */
+    private $captchaEnabled;
+
+    public function __construct(
+        InputFilter $postInputFilter,
+        $transport,
+        array $options,
+        array $recaptcha,
+        bool $captchaEnabled
+    ) {
         $this->postInputFilter = $postInputFilter;
         $this->transport = $transport;
         $this->options = $options;
         $this->recaptcha = $recaptcha;
+        $this->captchaEnabled = $captchaEnabled;
     }
 
     public function postAction()
@@ -45,6 +57,28 @@ class FeedbackController extends AbstractRestfulController
             $data = $request->getPost()->toArray();
         }
 
+        if ($this->captchaEnabled) {
+            $recaptcha = new ReCaptcha($this->recaptcha['privateKey']);
+
+            $captchaResponse = null;
+            if (isset($data['captcha'])) {
+                $captchaResponse = (string)$data['captcha'];
+            }
+
+            $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
+
+            if (! $result->isSuccess()) {
+                return new ApiProblemResponse(
+                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                        'invalid_params' => [
+                            'captcha' => 'Captcha is invalid'
+                        ]
+                    ])
+                );
+            }
+        }
+
+
         $this->postInputFilter->setData($data);
 
         if (! $this->postInputFilter->isValid()) {
@@ -52,26 +86,6 @@ class FeedbackController extends AbstractRestfulController
         }
 
         $data = $this->postInputFilter->getValues();
-
-
-        $recaptcha = new ReCaptcha($this->recaptcha['privateKey']);
-
-        $captchaResponse = null;
-        if (isset($data['captcha'])) {
-            $captchaResponse = $data['captcha'];
-        }
-
-        $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
-
-        if (! $result->isSuccess()) {
-            return new ApiProblemResponse(
-                new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                    'invalid_params' => [
-                        'captcha' => 'Captcha is invalid'
-                    ]
-                ])
-            );
-        }
 
 
         $message = sprintf(
