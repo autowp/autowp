@@ -1216,13 +1216,6 @@ Internal hyperlinks must be relative: ~~http://autowp.ru/bmw/~~ */bmw/*',
     'moder/users/last-visit' => '最后访问于',
     'moder/users/registration' => '注册',
 
-    'moder/twins/public-url:' => 'Public URL: ',
-    'moder/twins/meta-data' => '基本数据',
-    'moder/twins/name' => '名字',
-    'moder/twins/short-description' => '简介',
-    'moder/twins/vehicles' => '车型',
-    'moder/twins/add/title' => '创建新的姊妹车型组',
-
     'latitude' => 'Latitude',
     'longtitude' => 'Longtitude',
 

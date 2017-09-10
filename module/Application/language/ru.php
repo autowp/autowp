@@ -1267,13 +1267,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/users/last-visit' => 'Последний заход',
     'moder/users/registration' => 'Регистрация',
 
-    'moder/twins/public-url:' => 'На сайте: ',
-    'moder/twins/meta-data' => 'Мета-информация',
-    'moder/twins/name' => 'Название',
-    'moder/twins/short-description' => 'Краткое описание',
-    'moder/twins/vehicles' => 'Автомобили',
-    'moder/twins/add/title' => 'Создание новой группы близнецов',
-
     'latitude' => 'Широта',
     'longtitude' => 'Долгота',
 
