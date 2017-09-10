@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <div class="row">
+            <div class="col-md-6" ng-repeat="chunk in ctrl.chunks">
+                <ul class="media-list">
+                    <li class="media" ng-repeat="user in chunk">
+                        <div class="media-left media-middle">
+                            <a ng-href="{{user.url}}" ng-if="!user.deleted" class="photo">
+                                <img ng-src="{{user.avatar.src}}" ng-if="user.avatar" />
+                                <img ng-src="{{user.gravatar}}" ng-if="user.gravatar && ! user.avatar" />
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <a href="#" class="close" ng-click="ctrl.deleteContact(user.id)">&times;</a>
+                            <h4 class="media-heading">
+                                <autowp-user user="user"></autowp-user>
+                            </h4>
+                            <p><p ng-if="user.last_online" am-time-ago="user.last_online"></p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <autowp-account-sidebar></autowp-account-sidebar>
+    </div>
+</div>

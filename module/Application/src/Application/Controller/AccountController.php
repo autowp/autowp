@@ -693,28 +693,4 @@ class AccountController extends AbstractActionController
             'weight'    => $this->user()->get()['specs_weight']
         ];
     }
-
-    public function contactsAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $user = $this->user()->get();
-
-        $userRows = $this->userModel->getRows([
-            'in_contacts' => $user['id'],
-            'order'       => ['users.deleted', 'users.name']
-        ]);
-
-        $users = [];
-        foreach ($userRows as $row) {
-            $users[] = $row;
-        }
-
-        return [
-            'sidebar' => $this->sidebar(),
-            'users'   => $users
-        ];
-    }
 }

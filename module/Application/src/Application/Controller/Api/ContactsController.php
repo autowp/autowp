@@ -3,9 +3,13 @@
 namespace Application\Controller\Api;
 
 use Zend\Db\TableGateway\TableGateway;
+use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\User\Model\User;
+
+use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Contact;
 
 class ContactsController extends AbstractRestfulController
@@ -20,23 +24,76 @@ class ContactsController extends AbstractRestfulController
      */
     private $userTable;
 
-    public function __construct(Contact $contact, TableGateway $userTable)
-    {
-        $this->contact = $contact;
-        $this->userTable = $userTable;
-    }
+    /**
+     * @var User
+     */
+    private $userModel;
 
     /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * Update an existing resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return mixed
+     * @var InputFilter
      */
-    public function update($id, $data)
+    private $listInputFilter;
+
+    /**
+     * @var RestHydrator
+     */
+    private $hydrator;
+
+    public function __construct(
+        Contact $contact,
+        TableGateway $userTable,
+        User $userModel,
+        InputFilter $listInputFilter,
+        RestHydrator $hydrator
+    ) {
+        $this->contact = $contact;
+        $this->userTable = $userTable;
+        $this->userModel = $userModel;
+        $this->listInputFilter = $listInputFilter;
+        $this->hydrator = $hydrator;
+    }
+
+    public function indexAction()
     {
+        $user = $this->user()->get();
+
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        $this->listInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->listInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->listInputFilter);
+        }
+
+        $params = $this->listInputFilter->getValues();
+
+        $this->hydrator->setOptions([
+            'language' => $this->language(),
+            'fields'   => $params['fields'],
+            'user_id'  => $user ? $user['id'] : null
+        ]);
+
+        $userRows = $this->userModel->getRows([
+            'in_contacts' => $user['id'],
+            'order'       => ['users.deleted', 'users.name']
+        ]);
+
+        $items = [];
+        foreach ($userRows as $row) {
+            $items[] = $this->hydrator->extract($row);
+        }
+
+        return new JsonModel([
+            'items' => $items
+        ]);
+    }
+
+    public function putAction()
+    {
+        $id = (int)$this->params('id');
+
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->notFoundAction();
@@ -64,14 +121,10 @@ class ContactsController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * Delete an existing resource
-     *
-     * @param  mixed $id
-     * @return mixed
-     */
-    public function delete($id)
+    public function deleteAction()
     {
+        $id = (int)$this->params('id');
+
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->notFoundAction();

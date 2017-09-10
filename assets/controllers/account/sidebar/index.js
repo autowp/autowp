@@ -29,7 +29,7 @@ angular.module(Module)
                         },
                         {
                             pageId: 198,
-                            url: '/account/contacts',
+                            url: $state.href('account-contacts', {}, {inherit: false}),
                             icon: 'address-book',
                             name: 'page/198/name'
                         },
@@ -53,7 +53,6 @@ angular.module(Module)
                         },
                         {
                             pageId: 130,
-                            url: 'xxx',
                             url: '#',
                             icon: 'th',
                             name: 'page/130/name'

@@ -85,15 +85,6 @@ return [
                             ],
                         ],
                     ],
-                    'contacts' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/contacts',
-                            'defaults' => [
-                                'action' => 'contacts',
-                            ],
-                        ],
-                    ],
                     'delete' => [
                         'type' => Literal::class,
                         'options' => [

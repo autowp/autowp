@@ -119,6 +119,17 @@ return [
                 ]
             ]
         ],
+        'api_contacts_list' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['avatar', 'gravatar']]
+                    ]
+                ]
+            ],
+        ],
         'api_ip_item' => [
             'fields' => [
                 'required' => false,
@@ -1744,16 +1755,56 @@ return [
                         ]
                     ],
                     'contacts' => [
-                        'type' => Segment::class,
+                        'type'    => 'Literal',
                         'options' => [
-                            'route' => '/contacts/:id',
-                            'constraints' => [
-                                'id' => '[0-9]+'
-                            ],
+                            'route'    => '/contacts',
                             'defaults' => [
                                 'controller' => Controller\Api\ContactsController::class
                             ],
                         ],
+                        'may_terminate' => false,
+                        'child_routes'  => [
+                            'get' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
+                            ],
+                            'item' => [
+                                'type' => 'Segment',
+                                'options' => [
+                                    'route' => '/:id',
+                                    'constraints' => [
+                                        'id' => '[0-9]+'
+                                    ],
+
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'delete' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'delete',
+                                            'defaults' => [
+                                                'action' => 'delete'
+                                            ]
+                                        ]
+                                    ],
+                                    'put' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'put',
+                                            'defaults' => [
+                                                'action' => 'put'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
+                        ]
                     ],
                     'content-language' => [
                         'type' => Segment::class,

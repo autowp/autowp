@@ -7,6 +7,6 @@ define(
             init: function() {
                 
             }
-        }
+        };
     }
 );
