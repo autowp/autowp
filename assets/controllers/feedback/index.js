@@ -3,8 +3,6 @@ import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
 
-import 'angular-recaptcha';
-
 import './sent';
 
 const CONTROLLER_NAME = 'FeedbackController';
