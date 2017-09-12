@@ -116,7 +116,7 @@ class Module implements
         }
     }
 
-    private function sendErrorEmail(\Exception $exception, $serviceManager)
+    private function sendErrorEmail(\Throwable $exception, $serviceManager)
     {
         $message = get_class($exception) . PHP_EOL .
             'File: ' . $exception->getFile() . ' (' . $exception->getLine(). ')' . PHP_EOL .
