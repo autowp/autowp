@@ -128,10 +128,10 @@
             <p>
                 Author:
                 <?php foreach ($this->authors as $idx => $author) {
-                    echo $this->htmlA($author['url'], $author['name']);
                     if ($idx) {
                         echo ', ';
                     }
+                    echo $this->htmlA($author['url'], $author['name']);
                 } ?>
             </p>
         <?php } ?>
