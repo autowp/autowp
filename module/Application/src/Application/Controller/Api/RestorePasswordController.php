@@ -6,6 +6,9 @@ use Zend\Authentication\AuthenticationService;
 use Zend\InputFilter\InputFilter;
 use Zend\Mail;
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\View\Model\JsonModel;
+
+use ReCaptcha\ReCaptcha;
 
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
@@ -13,7 +16,6 @@ use Autowp\User\Model\UserPasswordRemind;
 
 use Application\HostManager;
 use Application\Service\UsersService;
-use Zend\View\Model\JsonModel;
 
 class RestorePasswordController extends AbstractRestfulController
 {
