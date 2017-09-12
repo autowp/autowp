@@ -77,6 +77,8 @@ class RestorePasswordController extends AbstractRestfulController
         $this->hostManager = $hostManager;
         $this->userPasswordRemind = $userPasswordRemind;
         $this->userModel = $userModel;
+        $this->recaptcha = $recaptcha;
+        $this->captchaEnabled = $captchaEnabled;
     }
 
     public function requestAction()
