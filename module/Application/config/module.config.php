@@ -49,7 +49,6 @@ return [
             Controller\CommentsController::class        => Controller\Frontend\Service\CommentsControllerFactory::class,
             Controller\DonateController::class          => Controller\Frontend\Service\DonateControllerFactory::class,
             Controller\FactoriesController::class       => Controller\Frontend\Service\FactoriesControllerFactory::class,
-            Controller\ForumsController::class          => Controller\Frontend\Service\ForumsControllerFactory::class,
             Controller\IndexController::class           => Controller\Frontend\Service\IndexControllerFactory::class,
             Controller\InboxController::class           => Controller\Frontend\Service\InboxControllerFactory::class,
             Controller\InfoController::class            => Controller\Frontend\Service\InfoControllerFactory::class,
