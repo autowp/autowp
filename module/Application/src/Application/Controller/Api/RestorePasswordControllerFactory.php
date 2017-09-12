@@ -1,11 +1,9 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
-use Application\Controller\RestorePasswordController as Controller;
 
 class RestorePasswordControllerFactory implements FactoryInterface
 {
@@ -14,14 +12,19 @@ class RestorePasswordControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Controller(
+        $filters = $container->get('InputFilterManager');
+        $config = $container->get('Config');
+
+        return new RestorePasswordController(
             $container->get(\Application\Service\UsersService::class),
-            $container->get('RestorePasswordForm'),
-            $container->get('NewPasswordForm'),
+            $filters->get('api_restore_password_request'),
+            $filters->get('api_restore_password_new'),
             $container->get(\Zend\Mail\Transport\TransportInterface::class),
             $container->get(\Application\HostManager::class),
             $container->get(\Autowp\User\Model\UserPasswordRemind::class),
-            $container->get(\Autowp\User\Model\User::class)
+            $container->get(\Autowp\User\Model\User::class),
+            $config['recaptcha'],
+            (bool)getenv('AUTOWP_CAPTCHA')
         );
     }
 }

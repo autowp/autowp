@@ -61,6 +61,7 @@ return [
             Controller\Api\PictureModerVoteTemplateController::class => Controller\Api\Service\PictureModerVoteTemplateControllerFactory::class,
             Controller\Api\PictureVoteController::class     => Controller\Api\Service\PictureVoteControllerFactory::class,
             Controller\Api\RecaptchaController::class       => Controller\Api\RecaptchaControllerFactory::class,
+            Controller\Api\RestorePasswordController::class => Controller\Api\RestorePasswordControllerFactory::class,
             Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
             Controller\Api\StatController::class            => Controller\Api\StatControllerFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
@@ -1541,6 +1542,68 @@ return [
                 ]
             ]
         ],
+        'api_restore_password_request' => [
+            'email' => [
+                'required'   => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'                   => 'EmailAddress',
+                        'break_chain_on_failure' => true
+                    ],
+                    ['name' => Validator\User\EmailExists::class]
+                ]
+            ],
+        ],
+        'api_restore_password_new' => [
+            'code' => [
+                'required'   => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'min' => null,
+                            'max' => 500
+                        ]
+                    ],
+                ]
+            ],
+            'password' => [
+                'required'   => true,
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => User::MIN_PASSWORD,
+                            'max' => User::MAX_PASSWORD
+                        ]
+                    ]
+                ]
+            ],
+            'password_confirm' => [
+                'required'   => true,
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => User::MIN_PASSWORD,
+                            'max' => User::MAX_PASSWORD
+                        ]
+                    ],
+                    [
+                        'name' => 'Identical',
+                        'options' => [
+                            'token' => 'password',
+                        ],
+                    ]
+                ]
+            ]
+        ],
         'api_user_list' => [
             'limit' => [
                 'required' => false,
@@ -2918,6 +2981,64 @@ return [
                                     ],
                                 ],
                             ],
+                        ]
+                    ],
+                    'restore-password' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/restore-password',
+                            'defaults' => [
+                                'controller' => Controller\Api\RestorePasswordController::class,
+                                'action'     => 'index',
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes'  => [
+                            'request' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/request',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'post' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'post',
+                                            'defaults' => [
+                                                'action' => 'request',
+                                            ]
+                                        ],
+                                    ]
+                                ]
+                            ],
+                            'new' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/new',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'new-get',
+                                            ]
+                                        ],
+                                    ],
+                                    'post' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'post',
+                                            'defaults' => [
+                                                'action' => 'new-post',
+                                            ]
+                                        ],
+                                    ]
+                                ]
+                            ]
                         ]
                     ],
                     'traffic' => [

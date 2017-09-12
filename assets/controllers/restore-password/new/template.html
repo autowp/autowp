@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="well">
+            <div btf-markdown="'restore-password/new-password/text'|translate"></div>
+            <form class="form-horizontal" ng-submit="ctrl.submit()"><fieldset>
+                <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.password}">
+                    <label class="col-md-2 control-label" for="password" translate>user/password</label>
+                    <div class="col-md-10">
+                        <input type="password" size="50" maxlength="50" name="password" class="form-control" ng-model="ctrl.form.password">
+                        <p ng-repeat="message in ctrl.invalidParams.password" ng-bind="message" class="help-block"></p>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.password_confirm}">
+                    <label class="col-md-2 control-label" for="password_confirm" translate>user/password-confirm</label>
+                    <div class="col-md-10">
+                        <input type="password" size="50" maxlength="50" name="password_confirm" class="form-control" ng-model="ctrl.form.password_confirm">
+                        <p ng-repeat="message in ctrl.invalidParams.password_confirm" ng-bind="message" class="help-block"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-10">
+                        <button type="submit" class="btn btn-primary" translate>submit</button>
+                    </div>
+                </div>
+            </fieldset></form>
+        </div>
+        
+        <p ng-if="ctrl.failure" translate>restore-password/new-password/email-not-found</p>
+    </div>
+</div>

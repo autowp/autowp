@@ -1,15 +1,15 @@
 <?php
 
-namespace ApplicationTest\Frontend\Controller;
+namespace ApplicationTest\Api\Controller;
 
 use Zend\Http\Request;
 
 use Autowp\User\Model\User;
 
 use Application\Controller\AccountController;
+use Application\Controller\Api\RestorePasswordController;
 use Application\Controller\Api\UserController;
 use Application\Controller\LoginController;
-use Application\Controller\RestorePasswordController;
 use Application\Test\AbstractHttpControllerTestCase;
 
 class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
@@ -59,19 +59,6 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('emailcheck');
     }
 
-    public function testIndex()
-    {
-        $this->dispatch('https://www.autowp.ru/restorepassword', 'GET');
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(RestorePasswordController::class);
-        $this->assertMatchedRouteName('restorepassword');
-        $this->assertActionName('index');
-
-        $this->assertQuery("h1");
-    }
-
     public function testRestorePassword()
     {
         $email = 'test'.microtime(true).'@example.com';
@@ -84,35 +71,48 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 
         // request email message
         $this->reset();
-        $this->dispatch('https://www.autowp.ru/restorepassword', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/api/restore-password/request', Request::METHOD_POST, [
             'email' => $email
         ]);
 
-        $this->assertResponseStatusCode(200);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
         $this->assertControllerName(RestorePasswordController::class);
-        $this->assertMatchedRouteName('restorepassword');
-        $this->assertActionName('index');
+        $this->assertMatchedRouteName('api/restore-password/request/post');
+        $this->assertActionName('request');
 
         // parse message for url with token
         $mailTransport = $this->getApplicationServiceLocator()->get(\Zend\Mail\Transport\TransportInterface::class);
         $message = $mailTransport->getLastMessage();
 
-        preg_match('|https?://en.localhost/restorepassword/new/[0-9a-f]+|u', $message->getBody(), $match);
-        $url = $match[0];
+        preg_match('|https?://en.localhost/ng/restore-password/new\?code=([0-9a-f]+)|u', $message->getBody(), $match);
+        $token = $match[1];
+
+        // check token availability
+        $this->reset();
+        $this->dispatch('https://www.autowp.ru/api/restore-password/new', Request::METHOD_GET, [
+            'code' => $token,
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(RestorePasswordController::class);
+        $this->assertMatchedRouteName('api/restore-password/new/get');
+        $this->assertActionName('new-get');
 
         // change password with token
         $this->reset();
-        $this->dispatch($url, Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/api/restore-password/new', Request::METHOD_POST, [
+            'code'             => $token,
             'password'         => $newPassword,
             'password_confirm' => $newPassword
         ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(RestorePasswordController::class);
-        $this->assertMatchedRouteName('restorepassword/new');
-        $this->assertActionName('new');
+        $this->assertMatchedRouteName('api/restore-password/new/post');
+        $this->assertActionName('new-post');
 
         // check new password
         // login

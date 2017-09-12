@@ -433,7 +433,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'login/forgot-password?' => 'Récupérer mot de passe',
     'login/success-text' => 'Nous sommes heureux de vous revoir sur notre site',
     'login/remember' => 'rappeller',
-    'login/if-you-lose-password' => 'Si vous avez oublié votre login ou mot de passe, vous pouvez utiliser <a href="/restorepassword">le formulaire de récupération par e-mail</a>',
+    'login/if-you-lose-password' => 'Si vous avez oublié votre login ou mot de passe, vous pouvez utiliser <a href="/ng/restore-password">le formulaire de récupération par e-mail</a>',
     'login/if-you-not-registered' => 'Si vous n\'êtes pas enregistré sur le site, vous <a href="/ng/signup">pouvez le faire maintenant</a>!',
     'login/sign-in-using-account' => 'Connectez-vous en utilisant un compte existant',
     'login/login-or-password-is-incorrect' => 'Login ou mot de passe est incorrect',

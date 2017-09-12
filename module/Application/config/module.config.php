@@ -64,7 +64,6 @@ return [
             Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
             Controller\PulseController::class           => Controller\Frontend\Service\PulseControllerFactory::class,
             Controller\RegistrationController::class    => Controller\Frontend\Service\RegistrationControllerFactory::class,
-            Controller\RestorePasswordController::class => Controller\Frontend\Service\RestorePasswordControllerFactory::class,
             Controller\DocController::class             => InvokableFactory::class,
             Controller\TelegramController::class        => Controller\Frontend\Service\TelegramControllerFactory::class,
             Controller\TwinsController::class           => Controller\Frontend\Service\TwinsControllerFactory::class,

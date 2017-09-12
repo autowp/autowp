@@ -532,7 +532,7 @@
     "login/forgot-password?": "Forgot your password?",
     "login/success-text": "We are glad to welcome you to our website",
     "login/remember": "remember",
-    "login/if-you-lose-password": "If you have forgotten your username or password, you can use the <a href=\"/restorepassword\">form of recovery by e-mail</a>",
+    "login/if-you-lose-password": "If you have forgotten your username or password, you can use the <a href=\"/ng/restore-password\">form of recovery by e-mail</a>",
     "login/if-you-not-registered": "If you are not registered on the website, you can <a href=\"/ng/signup\">do it now</a>!",
     "login/sign-in-using-account": "Sign in using existing account",
     "login/login-or-password-is-incorrect": "Login or password is incorrect",

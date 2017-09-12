@@ -773,37 +773,6 @@ return [
                     ],
                 ],
             ],
-            'restorepassword' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route'    => '/restorepassword',
-                    'defaults' => [
-                        'controller' => Controller\RestorePasswordController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'new' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/new/:code',
-                            'defaults' => [
-                                'action' => 'new',
-                            ]
-                        ]
-                    ],
-                    'saved' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/saved',
-                            'defaults' => [
-                                'action' => 'saved',
-                            ]
-                        ]
-                    ]
-                ]
-            ],
             'rules' => [
                 'type' => Literal::class,
                 'options' => [

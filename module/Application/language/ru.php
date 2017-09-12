@@ -451,7 +451,7 @@ return array_replace(include 'root.php', [
     'login/forgot-password?' => 'Забыли пароль?',
     'login/success-text' => 'Рады снова приветствовать вас на нашем сайте',
     'login/remember' => 'запомнить',
-    'login/if-you-lose-password' => 'Если вы забыли свой логин или пароль, вы можете воспользоваться <a href="/restorepassword">формой восстановления по e-mail</a>',
+    'login/if-you-lose-password' => 'Если вы забыли свой логин или пароль, вы можете воспользоваться <a href="/ng/restore-password">формой восстановления по e-mail</a>',
     'login/if-you-not-registered' => 'Если вы ещё не зарегистрированы на сайте, то можете <a href="/ng/signup">сделать это сейчас</a>',
     'login/sign-in-using-account' => 'Войти, используя учётную запись',
     'login/login-or-password-is-incorrect' => 'Логин или пароль неверен',
