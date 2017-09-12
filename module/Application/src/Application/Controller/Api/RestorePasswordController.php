@@ -111,7 +111,7 @@ class RestorePasswordController extends AbstractRestfulController
                                 ]
                             ]
                         ])
-                        );
+                    );
                 }
 
                 $namespace->success = true;
