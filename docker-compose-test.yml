@@ -1,6 +1,7 @@
 web:
   image: autowp/autowp
   container_name: autowp_test_web
+  restart: always
   environment:
     CODECLIMATE_REPO_TOKEN: ${CODECLIMATE_REPO_TOKEN}
     TRAVIS: ${TRAVIS}
@@ -72,12 +73,14 @@ web:
 memcached:
   image: memcached
   container_name: autowp_test_memcached
+  restart: always
   expose:
   - "11211"
   
 mysql:
   image: mysql
   container_name: autowp_test_mysql
+  restart: always
   environment:
   - "MYSQL_ROOT_PASSWORD=password"
   expose:

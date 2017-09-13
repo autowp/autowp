@@ -111,6 +111,8 @@ RUN rm -rf ./node_modules/ \
         git \
         libtool \
         nasm \
+        nodejs \
+        nodejs-npm \
         optipng \
         pngquant
 
