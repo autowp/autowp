@@ -292,6 +292,7 @@ class CatalogueController extends AbstractActionController
             unset($listItem);
 
             $paginator = $this->itemModel->getPaginator([
+                'item_type_id'    => Item::VEHICLE,
                 'is_group'        => false,
                 'order'           => $this->catalogue()->itemOrdering(),
                 'dateful'         => true,

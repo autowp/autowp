@@ -1488,7 +1488,7 @@ class Item
 
         if ($options['dateful']) {
             $select->where([
-                '(item.begin_year is null or item.begin_model_year is null)'
+                '(item.begin_year is not null or item.begin_model_year is not null)'
             ]);
         }
 
