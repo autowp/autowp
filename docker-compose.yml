@@ -1,5 +1,5 @@
 web:
-  image: autowp/autowp
+  image: autowp/autowp:alpine
   container_name: autowp_test_web
   environment:
     AUTOWP_DB_HOST: "autowp_test_mysql"

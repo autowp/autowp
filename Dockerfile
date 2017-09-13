@@ -1,78 +1,111 @@
-FROM ubuntu
+FROM alpine
 
 LABEL maintainer "dmitry@pereslegin.ru"
 
 WORKDIR /app
 
+EXPOSE 80
+
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
-RUN apt-get update -qq && \
-    apt-get dist-upgrade -qq --no-install-recommends --no-install-suggests -y && \
-    apt-get install -qq --no-install-recommends --no-install-suggests -y \
-        anacron \
-        apt-utils \
-        bash \
-        build-essential \
+RUN apk update && apk upgrade && \
+    apk add \
+        autoconf \
+        automake \
+        build-base \
         ca-certificates \
-        cron \
         curl \
-        dh-autoreconf \
         git \
         imagemagick \
+        libpng-dev \
+        libtool \
+        libxml2 \
+        logrotate \
+        nasm \
         nginx \
-        php7.0-cli \
-        php7.0-curl \
-        php7.0-fpm \
-        php7.0-intl \
-        php7.0-json \
-        php7.0-gd \
-        php7.0-mbstring \
-        php7.0-mysql \
-        php7.0-xml \
-        php7.0-zip \
-        php-imagick \
-        php-memcache \
-        php-memcached \
-        php-xdebug \
+        nodejs \
+        nodejs-npm \
+        openssh \
+        php7 \
+        php7-ctype \
+        php7-curl \
+        php7-dom \
+        php7-exif \
+        php7-fileinfo \
+        php7-fpm \
+        php7-ftp \
+        php7-iconv \
+        php7-imagick \
+        php7-intl \
+        php7-json \
+        php7-gd \
+        php7-mbstring \
+        php7-memcached \
+        php7-opcache \
+        php7-openssl \
+        php7-pcntl \
+        php7-pdo \
+        php7-pdo_mysql \
+        php7-phar \
+        php7-simplexml \
+        php7-tokenizer \
+        php7-xml \
+        php7-xmlwriter \
+        php7-zip \ 
+        php7-zlib \
+        postgresql-client \
+        rsyslog \
+        ssmtp \
         supervisor \
-        tzdata && \
-    \
-    curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
-    apt-get install -qq --no-install-recommends --no-install-suggests -y nodejs && \
-    \
+        tzdata \
+    && \
+    apk add php7-xdebug --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
+    && \
+    apk add optipng --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
+    && \
+    apk add pngquant --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
+    && \
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php --quiet && \
-    rm composer-setup.php && \
+    rm composer-setup.php \
+    && \
+    mkdir -p node_modules/pngquant-bin/vendor/ && \
+    mkdir -p node_modules/optipng-bin/vendor/ && \
+    ln -s /usr/bin/pngquant node_modules/pngquant-bin/vendor/pngquant && \
+    ln -s /usr/bin/optipng node_modules/optipng-bin/vendor/optipng && \
     \
-    mkdir -p /var/log/supervisor && \
-    rm /etc/nginx/sites-enabled/default && \
-    mkdir -p /var/run/php/ && \
-    rm /etc/php/7.0/fpm/pool.d/www.conf && \
-    rm /etc/php/7.0/cli/conf.d/20-xdebug.ini && \
-    rm /etc/php/7.0/fpm/conf.d/20-xdebug.ini
+    curl -Lk -o phantomjs.tar.gz https://github.com/fgrehm/docker-phantomjs2/releases/download/v2.0.0-20150722/dockerized-phantomjs.tar.gz \
+    && tar -xf phantomjs.tar.gz -C /tmp/ \
+    && cp -R /tmp/etc/fonts /etc/ \
+    && cp -R /tmp/lib/* /lib/ \
+    && cp -R /tmp/lib64 / \
+    && cp -R /tmp/usr/lib/* /usr/lib/ \
+    && cp -R /tmp/usr/lib/x86_64-linux-gnu /usr/ \
+    && cp -R /tmp/usr/share/* /usr/share/ \
+    && cp /tmp/usr/local/bin/phantomjs /usr/bin/ \
+    && rm -fr phantomjs.tar.gz  /tmp/* \
+    && mkdir -p /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/ \
+    && ln -s /usr/bin/phantomjs /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs
 
 COPY ./etc/ /etc/
 
-ADD composer.json /app/composer.json
+COPY composer.json /app/composer.json
 RUN php ./composer.phar install --no-progress --no-interaction --no-suggest --optimize-autoloader && \
     php ./composer.phar clearcache
 
-ADD package.json /app/package.json
+COPY package.json /app/package.json
 RUN npm install -y --silent --production && \
     npm cache clean
 
-ADD . /app
+COPY . /app
 
 RUN chmod +x zf && \
     chmod +x start.sh && \
     chmod +x wait-for-it.sh && \
-    mkdir logs && chmod 0777 logs && \
-    mkdir public_html/img && \
-    mkdir public_html/img/captcha && \
     crontab ./crontab
 
 RUN ./node_modules/.bin/webpack -p
 
-EXPOSE 80
+RUN rm -rf ./node_modules/
 
 CMD ["./start.sh"]

@@ -10,9 +10,11 @@
 	"require" : {
 		"php" : "^7.0",
 		"ext-curl" : "*",
+		"ext-exif" : "*",
 		"ext-imagick" : "*",
-		"ext-mysqli" : "*",
-		"ext-memcache" : "*",
+		"ext-pdo" : "*",
+		"ext-pdo_mysql" : "*",
+		"ext-memcached" : "*",
 		"ext-mbstring" : "*",
 		"ext-json" : "*",
 		"ext-intl" : "*",
