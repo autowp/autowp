@@ -9,6 +9,8 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use ReCaptcha\ReCaptcha;
+use ZF\ApiProblem\ApiProblemResponse;
+use ZF\ApiProblem\ApiProblem;
 
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
