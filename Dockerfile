@@ -59,8 +59,6 @@ RUN apk update && apk upgrade && \
         supervisor \
         tzdata \
     && \
-    apk add php7-xdebug --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
-    && \
     apk add optipng --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
     && \
     apk add pngquant --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
@@ -90,7 +88,7 @@ RUN apk update && apk upgrade && \
 COPY ./etc/ /etc/
 
 COPY composer.json /app/composer.json
-RUN php ./composer.phar install --no-progress --no-interaction --no-suggest --optimize-autoloader && \
+RUN php ./composer.phar install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader && \
     php ./composer.phar clearcache
 
 COPY package.json /app/package.json
@@ -106,6 +104,15 @@ RUN chmod +x zf && \
 
 RUN ./node_modules/.bin/webpack -p
 
-RUN rm -rf ./node_modules/
+RUN rm -rf ./node_modules/ \
+    && apk del \
+        autoconf \
+        automake \
+        build-base \
+        git \
+        libtool \
+        nasm \
+        optipng \
+        pngquant
 
 CMD ["./start.sh"]
