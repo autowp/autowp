@@ -36,8 +36,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', PICTURE_ITEM_SERVICE,
-        function($scope, $http, $state, PictureItemService) {
+        '$scope', '$http', '$state', '$q', PICTURE_ITEM_SERVICE,
+        function($scope, $http, $state, $q, PictureItemService) {
             
             var ctrl = this;
             
@@ -117,7 +117,16 @@ angular.module(Module)
                 });
             }
             
-            if ($scope.show_persons) {
+            var personsCanceler;
+            function loadPersons() {
+                
+                if (personsCanceler) {
+                    personsCanceler.resolve();
+                    personsCanceler = null;
+                }
+                
+                personsCanceler = $q.defer();
+                
                 $http({
                     method: 'GET',
                     url: '/api/item',
@@ -125,8 +134,10 @@ angular.module(Module)
                         type_id: 8,
                         fields: 'name_html',
                         limit: 50,
+                        name: ctrl.search ? '%' + ctrl.search + '%' : null,
                         page: $scope.page
-                    }
+                    },
+                    timeout: personsCanceler.promise
                 }).then(function(response) {
                     $scope.persons = response.data.items;
                     $scope.persons_paginator = response.data.paginator;
@@ -135,7 +146,24 @@ angular.module(Module)
                 });
             }
             
-            if ($scope.show_authors) {
+            if ($scope.show_persons) {
+                ctrl.doSearch = function() {
+                    loadPersons();
+                };
+                
+                loadPersons();
+            }
+            
+            var authorsCanceler;
+            function loadAuthors() {
+                
+                if (authorsCanceler) {
+                    authorsCanceler.resolve();
+                    authorsCanceler = null;
+                }
+                
+                authorsCanceler = $q.defer();
+                
                 $http({
                     method: 'GET',
                     url: '/api/item',
@@ -143,14 +171,25 @@ angular.module(Module)
                         type_id: 8,
                         fields: 'name_html',
                         limit: 50,
+                        name: ctrl.search ? '%' + ctrl.search + '%' : null,
                         page: $scope.page
-                    }
+                    },
+                    timeout: authorsCanceler.promise
                 }).then(function(response) {
                     $scope.authors = response.data.items;
                     $scope.authors_paginator = response.data.paginator;
                 }, function(response) {
                     notify.response(response);
                 });
+            }
+            
+            if ($scope.show_authors) {
+                
+                ctrl.doSearch = function() {
+                    loadAuthors();
+                };
+                
+                loadAuthors();
             }
             
             function loadBrands() {

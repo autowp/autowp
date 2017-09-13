@@ -38,6 +38,9 @@
 <div ng-if="show_persons && !src_item && (!src_type || src_type == 1)">
 
     <div class="well">
+        <div style="margin-bottom:20px">
+            <input type="text" ng-model="ctrl.search" ng-change="ctrl.doSearch()" class="form-control" placeholder="Type to search ..." auto-focus />
+        </div>
         <a href="#" ng-repeat-start="item in persons" ng-click="selectItem(item.id, null, 1)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </div>
@@ -48,6 +51,9 @@
 <div ng-if="show_authors && !src_item && (!src_type || src_type == 2)">
 
     <div class="well">
+        <div style="margin-bottom:20px">
+            <input type="text" ng-model="ctrl.search" ng-change="ctrl.doSearch()" class="form-control" placeholder="Type to search ..." auto-focus />
+        </div>
         <a href="#" ng-repeat-start="item in authors" ng-click="selectItem(item.id, null, 2)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </div>
@@ -60,7 +66,9 @@
     <div ng-if="!brand_id">
     
         <div class="well">
-            <input type="text" ng-model="ctrl.search" ng-change="ctrl.doSearch()" class="form-control" placeholder="Type to search ..." auto-focus />
+            <div style="margin-bottom:20px">
+                <input type="text" ng-model="ctrl.search" ng-change="ctrl.doSearch()" class="form-control" placeholder="Type to search ..." auto-focus />
+            </div>
             <div class="row">
                 <div ng-repeat="chunk in brands" class="col-xs-2">
                     <a ng-repeat-start="item in chunk" ui-sref=".({page: null, brand_id: item.id})" ng-bind-html="item.name_html"></a>
