@@ -53,7 +53,6 @@ RUN apk update && apk upgrade && \
         php7-xmlwriter \
         php7-zip \ 
         php7-zlib \
-        postgresql-client \
         rsyslog \
         ssmtp \
         supervisor \
