@@ -34,7 +34,7 @@ class User
     {
         $select = $this->table->getSql()->select()
             ->columns(['id', 'count' => new Sql\Expression('count(attrs_user_values.user_id)')])
-            ->join('attrs_user_values', 'attrs_user_values.user_id = users.id', [], $select::JOIN_LEFT)
+            ->join('attrs_user_values', 'attrs_user_values.user_id = users.id', [], Sql\Select::JOIN_LEFT)
             ->where('not users.specs_volume_valid')
             ->group('users.id');
 
