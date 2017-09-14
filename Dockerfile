@@ -12,6 +12,7 @@ RUN apk update && apk upgrade && \
     apk add \
         autoconf \
         automake \
+        bash \
         build-base \
         ca-certificates \
         curl \
