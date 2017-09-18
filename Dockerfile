@@ -109,7 +109,6 @@ RUN rm -rf ./node_modules/ \
         autoconf \
         automake \
         build-base \
-        git \
         libtool \
         nasm \
         nodejs \
