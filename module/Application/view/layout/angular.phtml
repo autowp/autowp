@@ -110,7 +110,7 @@ ga('send', 'pageview');
                             </a>
                         </li>
                         <li<?=$this->pageEnv()->isOnPath(79) ? ' class="active"' : ''?> ng-if="!user">
-                            <a href="/login">
+                            <a href="/ng/login">
                                 <i class="fa fa-sign-in"></i>
                                 {{'login/sign-in'|translate}}
                             </a>
@@ -123,7 +123,7 @@ ga('send', 'pageview');
                                 <?php /*if ($this->pageEnv()->isOnPath($page['id'])) {
                                     $classes[] = 'active';
                                 }*/?>
-                                <li ng-repeat="page in mainMenu.pages | filter: isSecondaryMenuItems">
+                                <li ng-repeat="page in mainMenu.pages | filter: isSecondaryMenuItems" ng-if="(!page.registered_only || user) && (!page.guest_only || !user)">
                                     <a ng-href="{{page.url}}" ng-bind="page.name" ng-class="{'visible-sm': [25, 117, 42].indexOf(+page.id) !== -1, 'visible-md': page.id == 42}"></a>
                                 </li>
                                 <li class="divider visible-sm visible-md"></li>
@@ -131,7 +131,7 @@ ga('send', 'pageview');
                                     <li class="divider"></li>
                                 <?php } */ ?>
                                 <?php /*=$this->pageEnv()->isOnPath($page['id']) ? 'active' : ''*/?>
-                                <li class="{{page.class}}" ng-repeat="page in mainMenu.secondMenu">
+                                <li class="{{page.class}}" ng-repeat="page in mainMenu.secondMenu" ng-if="(!page.registered_only || user) && (!page.guest_only || !user)">
                                     <a ng-href="{{page.url}}">
                                         <i class="{{page.icon}}" ng-if="page.icon"></i>
                                         {{page.name}}
@@ -198,12 +198,14 @@ ga('send', 'pageview');
 
                     <h3 ng-if="!user" translate>login/sign-in</h3>
                     <div class="well" ng-if="!user">
-                        <form action="/login" method="post" class="login"><div>
-                            <p><input type="text" name="login" placeholder="{{'login/login-or-email'|translate}}" class="form-control" /></p>
-                            <p><input type="password" name="password" placeholder="{{'user/password'|translate}}" class="form-control" /></p>
+                        <form class="login" ng-submit="doLogin()"><div>
+                            <p><input type="text" name="login" placeholder="{{'login/login-or-email'|translate}}" class="form-control" ng-model="loginForm.login" /></p>
+                            <p ng-repeat="message in loginInvalidParams.login" ng-bind="message" class="help-block"></p>
+                            <p><input type="password" name="password" placeholder="{{'user/password'|translate}}" class="form-control" ng-model="loginForm.password" /></p>
+                            <p ng-repeat="message in loginInvalidParams.password" ng-bind="message" class="help-block"></p>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" value="1" name="remember" />
+                                    <input type="checkbox" value="1" name="remember" ng-model="loginForm.remember" />
                                     {{'login/remember'|translate}}
                                 </label>
                             </div>

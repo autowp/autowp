@@ -53,7 +53,7 @@
                     </li>
                 <?php } else { ?>
                     <li<?=$this->pageEnv()->isOnPath(79) ? ' class="active"' : ''?>>
-                        <?=$this->htmlA('/login', '<i class="fa fa-sign-in"></i> ' . $this->escapeHtml($this->translate('login/sign-in')), false)?>
+                        <?=$this->htmlA('/ng/login', '<i class="fa fa-sign-in"></i> ' . $this->escapeHtml($this->translate('login/sign-in')), false)?>
                     </li>
                 <?php } ?>
                 <li class="dropdown">

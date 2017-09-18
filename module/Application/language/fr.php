@@ -329,7 +329,7 @@ Exigences pour les images ajoutées:
 S'il vous plaît noter que l'ajout d'images modérés. c'est-à-dire toutes les photos avant d'ajouter au catalogue seront testés par moderateurs.",
     'upload/only-registered' => 'Seuls les utilisateurs enregistrés peuvent télécharger des images
 
-[Login](/login) or [Enregistrer](/ng/signup)',
+[Login](/ng/login) or [Enregistrer](/ng/signup)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Autres photos de %1$s',
@@ -376,7 +376,7 @@ S'il vous plaît noter que l'ajout d'images modérés. c'est-à-dire toutes les 
     /* comments */
     'comments/title' => 'Commentaires',
     'comments/reply' => 'répondre',
-    'comments/what-to-do-for-write-comments' => 'Pour pouvoir poster un commentaire, vous devez <a href="/login">créer un compte ou de vous connecter en utilisant le compte des réseaux sociaux</a>',
+    'comments/what-to-do-for-write-comments' => 'Pour pouvoir poster un commentaire, vous devez <a href="/ng/login">créer un compte ou de vous connecter en utilisant le compte des réseaux sociaux</a>',
     'comments/it-requires-attention-of-moderators' => 'Il nécessite une attention des modérateurs',
     'comments/form-title' => 'Ajouter un commentaire',
     'comments/message' => 'Message',
@@ -433,8 +433,6 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'login/forgot-password?' => 'Récupérer mot de passe',
     'login/success-text' => 'Nous sommes heureux de vous revoir sur notre site',
     'login/remember' => 'rappeller',
-    'login/if-you-lose-password' => 'Si vous avez oublié votre login ou mot de passe, vous pouvez utiliser <a href="/ng/restore-password">le formulaire de récupération par e-mail</a>',
-    'login/if-you-not-registered' => 'Si vous n\'êtes pas enregistré sur le site, vous <a href="/ng/signup">pouvez le faire maintenant</a>!',
     'login/sign-in-using-account' => 'Connectez-vous en utilisant un compte existant',
     'login/login-or-password-is-incorrect' => 'Login ou mot de passe est incorrect',
     'login/user-%value%-not-found' => 'Utilisateur avec login ou e-mail "%value%" non trouvé',

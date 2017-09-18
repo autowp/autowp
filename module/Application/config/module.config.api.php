@@ -51,6 +51,7 @@ return [
             Controller\Api\ItemParentLanguageController::class => Controller\Api\ItemParentLanguageControllerFactory::class,
             Controller\Api\ItemVehicleTypeController::class => Controller\Api\Service\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LogController::class             => Controller\Api\Service\LogControllerFactory::class,
+            Controller\Api\LoginController::class           => Controller\Api\LoginControllerFactory::class,
             Controller\Api\MessageController::class         => Controller\Api\MessageControllerFactory::class,
             Controller\Api\PageController::class            => Controller\Api\Service\PageControllerFactory::class,
             Controller\Api\PerspectiveController::class     => Controller\Api\Service\PerspectiveControllerFactory::class,
@@ -905,6 +906,31 @@ return [
                         'options' => ['fields' => ['user', 'pictures', 'items']]
                     ]
                 ]
+            ]
+        ],
+        'api_login' => [
+            'login' => [
+                'required' => true,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'min' => null,
+                            'max' => 50
+                        ]
+                    ],
+                    ['name' => Validator\User\Login::class]
+                ]
+            ],
+            'password' => [
+                'required' => true
+            ],
+            'remember' => [
+                'required'    => false,
+                'allow_empty' => true
             ]
         ],
         'api_message_list' => [
@@ -2567,6 +2593,54 @@ return [
                                     'verb' => 'get',
                                     'defaults' => [
                                         'action' => 'index'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'login' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/login',
+                            'defaults' => [
+                                'controller' => Controller\Api\LoginController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'services' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/services'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => Method::class,
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'services'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            'login' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'post',
+                                    'defaults' => [
+                                        'action' => 'login'
+                                    ]
+                                ]
+                            ],
+                            'logout' => [
+                                'type' => Method::class,
+                                'options' => [
+                                    'verb' => 'delete',
+                                    'defaults' => [
+                                        'action' => 'delete'
                                     ]
                                 ]
                             ]

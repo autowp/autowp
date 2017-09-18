@@ -2,6 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import PageServiceName from 'services/page';
 import 'directives/breadcrumbs';
+import notify from 'notify';
 
 const CONTROLLER_NAME = 'RootController';
 
@@ -86,6 +87,36 @@ angular.module(Module).controller(CONTROLLER_NAME, [
             }
         });
 
+        $rootScope.loginForm = {
+            login: '',
+            password: '',
+            remember: false
+        };
+        
+        $rootScope.doLogin = function() {
+            $http({
+                method: 'POST',
+                url: '/api/login',
+                data: $rootScope.loginForm
+            }).then(function() {
+                $http({
+                    method: 'GET',
+                    url: '/api/user/me'
+                }).then(function(response) {
+                    $scope.user = response.data;
+                    $state.go('login-ok');
+                }, function(response) {
+                    notify.response(response);
+                });
+                
+            }, function(response) {
+                if (response.status == 400) {
+                    $scope.loginInvalidParams = response.data.invalid_params;
+                } else {
+                    notify.response(response);
+                }
+            });
+        };
     }
 ]);
 

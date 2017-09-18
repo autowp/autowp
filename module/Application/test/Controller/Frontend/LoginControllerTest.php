@@ -13,34 +13,30 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
 
     public function testLoginByEmail()
     {
-        $this->dispatch('https://www.autowp.ru/login', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
             'login'    => 'test@example.com',
             'password' => '123456'
         ]);
 
-        $this->assertResponseStatusCode(200);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(LoginController::class);
-        $this->assertMatchedRouteName('login');
-        $this->assertActionName('index');
-
-        $this->assertQuery('.alert-success');
+        $this->assertControllerName(\Application\Controller\Api\LoginController::class);
+        $this->assertMatchedRouteName('api/login/login');
+        $this->assertActionName('login');
     }
 
     public function testLoginByLogin()
     {
-        $this->dispatch('https://www.autowp.ru/login', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
             'login'    => 'test',
             'password' => '123456'
         ]);
 
-        $this->assertResponseStatusCode(200);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(LoginController::class);
-        $this->assertMatchedRouteName('login');
-        $this->assertActionName('index');
-
-        $this->assertQuery('.alert-success');
+        $this->assertControllerName(\Application\Controller\Api\LoginController::class);
+        $this->assertMatchedRouteName('api/login/login');
+        $this->assertActionName('login');
     }
 
     private function mockExternalLoginFactory($photoUrl)

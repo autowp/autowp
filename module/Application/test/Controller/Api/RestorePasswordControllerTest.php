@@ -117,17 +117,15 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         // check new password
         // login
         $this->reset();
-        $this->dispatch('https://www.autowp.ru/login', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/api/login', Request::METHOD_POST, [
             'login'    => $email,
             'password' => $newPassword
         ]);
 
-        $this->assertResponseStatusCode(200);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(LoginController::class);
-        $this->assertMatchedRouteName('login');
-        $this->assertActionName('index');
-
-        $this->assertQuery('.alert-success');
+        $this->assertControllerName(\Application\Controller\Api\LoginController::class);
+        $this->assertMatchedRouteName('api/login/login');
+        $this->assertActionName('login');
     }
 }

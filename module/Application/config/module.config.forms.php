@@ -32,68 +32,6 @@ return [
         ]
     ],
     'forms' => [
-        'LoginForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-                'legend' => 'login/sign-in',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'Text',
-                        'name' => 'login',
-                        'options' => [
-                            'label'        => 'login/login-or-email',
-                            'maxlength'    => 50,
-                            'autocomplete' => 'email',
-                        ]
-                    ]
-                ],
-                [
-                    'spec' => [
-                        'type' => 'password',
-                        'name' => 'password',
-                        'options' => [
-                            'label' => 'user/password'
-                        ]
-                    ]
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Checkbox',
-                        'name' => 'remember',
-                        'options' => [
-                            'label' => 'login/remember'
-                        ]
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'login' => [
-                    'required' => true,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        [
-                            'name'    => 'StringLength',
-                            'options' => [
-                                'min' => null,
-                                'max' => 50
-                            ]
-                        ],
-                        ['name' => Validator\User\Login::class]
-                    ]
-                ],
-                'password' => [
-                    'required' => true
-                ],
-                'remember' => [
-                    'required' => false
-                ]
-            ]
-        ],
         'AccountEmailForm' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [

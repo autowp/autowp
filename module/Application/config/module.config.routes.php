@@ -577,10 +577,9 @@ return [
                     'route'    => '/login',
                     'defaults' => [
                         'controller' => Controller\LoginController::class,
-                        'action'     => 'index',
                     ],
                 ],
-                'may_terminate' => true,
+                'may_terminate' => false,
                 'child_routes'  => [
                     'start' => [
                         'type' => Segment::class,

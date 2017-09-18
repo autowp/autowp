@@ -1,11 +1,9 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
-use Application\Controller\LoginController as Controller;
 
 class LoginControllerFactory implements FactoryInterface
 {
@@ -14,10 +12,11 @@ class LoginControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $filters = $container->get('InputFilterManager');
         $tables = $container->get('TableManager');
-        return new Controller(
+        return new LoginController(
             $container->get(\Application\Service\UsersService::class),
-            $container->get('ExternalLoginServiceManager'),
+            $filters->get('api_login'),
             $container->get('Config')['hosts'],
             $container->get(\Autowp\User\Model\UserRemember::class),
             $container->get(\Application\Model\UserAccount::class),

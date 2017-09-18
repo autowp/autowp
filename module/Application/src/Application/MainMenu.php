@@ -101,17 +101,19 @@ class MainMenu
      * @param string $language
      * @return array
      */
-    private function getMenuData($id, $logedIn)
+    private function getMenuData($id, bool $logedIn, bool $full = false)
     {
         $select = new Sql\Select($this->pageTable->getTable());
         $select
-            ->columns(['id', 'url', 'class'])
+            ->columns(['id', 'url', 'class', 'guest_only', 'registered_only'])
             ->where(['pages.parent_id' => $id])
             ->order('pages.position');
-        if ($logedIn) {
-            $select->where(['NOT pages.guest_only']);
-        } else {
-            $select->where(['NOT pages.registered_only']);
+        if (! $full) {
+            if ($logedIn) {
+                $select->where(['NOT pages.guest_only']);
+            } else {
+                $select->where(['NOT pages.registered_only']);
+            }
         }
 
         $result = [];
@@ -127,7 +129,9 @@ class MainMenu
                 'id'    => $row['id'],
                 'url'   => $row['url'],
                 'name'  => $name,
-                'class' => $row['class']
+                'class' => $row['class'],
+                'guest_only'      => (bool)$row['guest_only'],
+                'registered_only' => (bool)$row['registered_only']
             ];
         }
 
@@ -157,15 +161,18 @@ class MainMenu
      * @param boolean $logedIn
      * @return array
      */
-    private function getSecondaryMenu($logedIn)
+    private function getSecondaryMenu(bool$logedIn, bool $full = false)
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '14_' . $language;
+        $key = 'ZF2_SECOND_MENU_' .
+                ($logedIn ? 'LOGED' : 'NOTLOGED') .
+                ($full ? 'FULL' : 'NOTFULL') .
+                '16_' . $language;
 
         $secondMenu = $this->cache->getItem($key, $success);
         if (! $success) {
-            $secondMenu = $this->getMenuData(87, $logedIn);
+            $secondMenu = $this->getMenuData(87, $logedIn, $full);
 
             foreach ($secondMenu as &$item) {
                 if (isset($this->icons[$item['id']])) {
@@ -184,15 +191,18 @@ class MainMenu
      * @param boolean $logedIn
      * @return array
      */
-    private function getPrimaryMenu($logedIn)
+    private function getPrimaryMenu(bool $logedIn, bool $full = false)
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '_8_' . $language;
+        $key = 'ZF2_MAIN_MENU_' .
+                ($logedIn ? 'LOGED' : 'NOTLOGED') .
+                ($full ? 'FULL' : 'NOTFULL') .
+                '_10_' . $language;
 
         $pages = $this->cache->getItem($key, $success);
         if (! $success) {
-            $pages = $this->getMenuData(2, $logedIn);
+            $pages = $this->getMenuData(2, $logedIn, $full);
 
             $this->cache->setItem($key, $pages);
         }
@@ -204,7 +214,7 @@ class MainMenu
      * @param array|\ArrayObject $user
      * @return array
      */
-    public function getMenu($user = null)
+    public function getMenu($user = null, $full = false)
     {
         $newMessages = 0;
         if ($user) {
@@ -224,8 +234,8 @@ class MainMenu
         $logedIn = (bool)$user;
 
         return [
-            'pages'          => $this->getPrimaryMenu($logedIn),
-            'secondMenu'     => $this->getSecondaryMenu($logedIn),
+            'pages'          => $this->getPrimaryMenu($logedIn, $full),
+            'secondMenu'     => $this->getSecondaryMenu($logedIn, $full),
             'pm'             => $newMessages,
             'categories'     => $this->getCategoriesItems(),
             'languages'      => $this->languagePicker->getItems(),

@@ -1,6 +1,7 @@
 var Navbar = require("navbar/navbar.js");
 var $ = require("jquery");
 var i18next = require('i18next');
+import notify from 'notify';
 
 require("angular.app");
 require('app.module');
@@ -102,4 +103,37 @@ $(function() {
     });
     
     $('footer [data-toggle="tooltip"]').tooltip();
+    
+    $('form.login').on('submit', function(e) {
+        e.preventDefault();
+        
+        var $form = $(this);
+        
+        $form.find('.help-block').remove();
+        
+        $.ajax({
+            method: 'POST',
+            url: '/api/login',
+            data: {
+                login: $form.find(':input[name=login]').val(),
+                password: $form.find(':input[name=password]').val(),
+                remember: $form.find(':input[name=remember]').prop('checked') ? 1 : 0
+            }
+        }).then(function() {
+            window.location = '/ng/login/ok'; 
+        }, function(response) {
+            if (response.status == 400) {
+                $.each(response.responseJSON.invalid_params, function(field, errors) {
+                    var $input = $form.find(':input[name='+field+']');
+                    $.map(errors, function(message) {
+                        var $p = $('<p class="help-block" />').text(message);
+                        $p.insertAfter($input);
+                    });
+                });
+                
+            } else {
+                notify.response(response);
+            }
+        });
+    });
 });

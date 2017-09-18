@@ -14,6 +14,7 @@ import './controllers/error/404';
 import './controllers/account';
 import './controllers/feedback';
 import './controllers/log';
+import './controllers/login';
 import './controllers/restore-password';
 import './controllers/signup';
 import './controllers/moder';

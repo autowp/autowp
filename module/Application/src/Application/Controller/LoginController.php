@@ -8,10 +8,8 @@ use Imagick;
 use Zend\Authentication\AuthenticationService;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Uri\Http as HttpUri;
-use Zend\View\Model\ViewModel;
 
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
@@ -27,11 +25,6 @@ class LoginController extends AbstractActionController
      * @var UsersService
      */
     private $service;
-
-    /**
-     * @var Form
-     */
-    private $form;
 
     /**
      * @var ExternalLoginServices
@@ -65,7 +58,6 @@ class LoginController extends AbstractActionController
 
     public function __construct(
         UsersService $service,
-        Form $form,
         ExternalLoginServices $externalLoginServices,
         array $hosts,
         UserRemember $userRemember,
@@ -75,7 +67,6 @@ class LoginController extends AbstractActionController
     ) {
 
         $this->service = $service;
-        $this->form = $form;
         $this->externalLoginServices = $externalLoginServices;
         $this->hosts = $hosts;
         $this->userRemember = $userRemember;
@@ -84,101 +75,14 @@ class LoginController extends AbstractActionController
         $this->userModel = $userModel;
     }
 
-    public function indexAction()
-    {
-        if ($this->user()->logedIn()) {
-            $viewModel = new ViewModel();
-            return $viewModel->setTemplate('application/login/loginsuccess');
-        }
-
-        $errorMessage = '';
-
-        $this->form->setAttribute('action', $this->url()->fromRoute('login'));
-
-        $request = $this->getRequest();
-
-        if ($request->isPost()) {
-            $this->form->setData($this->params()->fromPost());
-            if ($this->form->isValid()) {
-                $values = $this->form->getData();
-
-                $adapter = $this->service->getAuthAdapterLogin($values['login'], $values['password']);
-
-                $auth = new AuthenticationService();
-                $result = $auth->authenticate($adapter);
-
-                if ($result->isValid()) {
-                    if ($values['remember']) {
-                        $token = $this->userRemember->createToken($this->user()->get()['id']);
-
-                        $this->service->setRememberCookie($token, $this->language());
-                    } else {
-                        $this->service->clearRememberCookie($this->language());
-                    }
-
-                    if ($url = $request->getServer('REQUEST_URI')) {
-                        return $this->redirect()->toUrl($url);
-                    }
-
-                    $viewModel = new ViewModel();
-                    return $viewModel->setTemplate('application/login/loginsuccess');
-                } else {
-                    // Invalid credentials
-                    $errorMessage = $this->translate('login/login-or-password-is-incorrect');
-                }
-            }
-        }
-
-        $services = [
-            'facebook'    => [
-                'name' => 'Facebook',
-                'icon' => 'fa-facebook'
-            ],
-            'vk'          => [
-                'name' => 'VK',
-                'icon' => 'fa-vk'
-            ],
-            'google-plus' => [
-                'name' => 'Google+',
-                'icon' => 'fa-google-plus'
-            ],
-            'twitter'     => [
-                'name' => 'Twitter',
-                'icon' => 'fa-twitter'
-            ],
-            'github'     => [
-                'name' => 'Github',
-                'icon' => 'fa-github'
-            ],
-            'linkedin'     => [
-                'name' => 'LinkedIn',
-                'icon' => 'fa-linkedin'
-            ],
-        ];
-
-        foreach ($services as $serviceId => &$service) {
-            $service['url'] = $this->url()->fromRoute('login/start', [
-                'type' => $serviceId
-            ]);
-        }
-        unset($service);
-
-
-        return [
-            'errorMessage' => $errorMessage,
-            'form'         => $this->form,
-            'services'     => $services
-        ];
-    }
-
     public function logoutAction()
     {
         $auth = new AuthenticationService();
         $auth->clearIdentity();
         $this->service->clearRememberCookie($this->language());
-        return $this->redirect()->toUrl(
-            $this->url()->fromRoute('login')
-        );
+        return $this->redirect()->toRoute('ng', [
+            'path' => 'login'
+        ]);
     }
 
     /**

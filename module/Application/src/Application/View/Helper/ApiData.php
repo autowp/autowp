@@ -59,7 +59,7 @@ class ApiData extends AbstractHelper
         return [
             'languages'  => $languages,
             'isModer'    => $this->view->user()->inheritsRole('moder'),
-            'mainMenu'   => $this->view->mainMenu(true),
+            'mainMenu'   => $this->view->mainMenu(true, true),
             'moderMenu'  => $moderMenu,
             'sidebar'    => $this->view->sidebar(true),
             'user'       => $userData

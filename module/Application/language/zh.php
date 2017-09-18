@@ -312,7 +312,7 @@ return array_replace(include 'root.php', [
 请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。',
     'upload/only-registered' => '只有注册用户才能上传图片
 
-[注册](/login)或[登录](/ng/signup)',
+[注册](/ng/login)或[登录](/ng/signup)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => '%1$s的其它图片',
@@ -359,7 +359,7 @@ return array_replace(include 'root.php', [
     /* comments */
     'comments/title' => '评论',
     'comments/reply' => '回复',
-    'comments/what-to-do-for-write-comments' => '为方便发表评论，您需要<a href="/login">注册账号或用社交网站账号登陆</a>',
+    'comments/what-to-do-for-write-comments' => '为方便发表评论，您需要<a href="/ng/login">注册账号或用社交网站账号登陆</a>',
     'comments/it-requires-attention-of-moderators' => '向管理员发送提示',
     'comments/form-title' => '添加评论',
     'comments/message' => '站内信',
@@ -416,8 +416,6 @@ return array_replace(include 'root.php', [
     'login/forgot-password?' => '忘记密码?',
     'login/success-text' => '欢迎来到我们的网站',
     'login/remember' => '保持登录状态',
-    'login/if-you-lose-password' => '如果您忘记了密码,您可以填写表格 <a href="/ng/restore-password">重设电子邮件</a>',
-    'login/if-you-not-registered' => '如果您尚未注册<a href="/ng/signup">现在就可注册</a>!',
     'login/sign-in-using-account' => '使用已有账号登录',
     'login/login-or-password-is-incorrect' => '您已登录或密码错误',
     'login/user-%value%-not-found' => '用户名或注册邮箱 "%value%" 不存在',
