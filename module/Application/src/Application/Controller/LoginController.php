@@ -117,7 +117,7 @@ class LoginController extends AbstractActionController
             'user_id'  => null,
             'language' => $this->language(),
             'service'  => $serviceId,
-            'url'      => $this->url()->fromRoute('login')
+            'url'      => '/ng/login'
         ]);
 
         return $this->redirect()->toUrl($loginUrl);
