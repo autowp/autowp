@@ -426,6 +426,7 @@ class UsersService
                 ->join('voting_variant_vote', 'users.id = voting_variant_vote.user_id', [], Sql\Select::JOIN_LEFT)
                 ->join(['pmf' => 'personal_messages'], 'users.id = pmf.from_user_id', [], Sql\Select::JOIN_LEFT)
                 ->join(['pmt' => 'personal_messages'], 'users.id = pmt.to_user_id', [], Sql\Select::JOIN_LEFT)
+                ->join('log_events', 'users.id = log_events.user_id', [], Sql\Select::JOIN_LEFT)
                 ->where([
                     'users.last_online < DATE_SUB(NOW(), INTERVAL 2 YEAR)',
                     'users.role' => 'user',
