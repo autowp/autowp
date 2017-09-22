@@ -119,6 +119,15 @@ class LoginController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    public function deleteAction()
+    {
+        $auth = new AuthenticationService();
+        $auth->clearIdentity();
+        $this->service->clearRememberCookie($this->language());
+
+        return $this->getResponse()->setStatusCode(204);
+    }
+
     public function servicesAction()
     {
         $services = [

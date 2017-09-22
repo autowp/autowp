@@ -117,6 +117,19 @@ angular.module(Module).controller(CONTROLLER_NAME, [
                 }
             });
         };
+        
+        $rootScope.doLogout = function() {
+            $http({
+                method: 'DELETE',
+                url: '/api/login'
+            }).then(function() {
+                $scope.user = null;
+                $state.go('login');
+                
+            }, function(response) {
+                notify.response(response);
+            });
+        };
     }
 ]);
 

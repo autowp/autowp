@@ -598,15 +598,6 @@ return [
                                 'action' => 'callback',
                             ],
                         ]
-                    ],
-                    'logout' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/logout',
-                            'defaults' => [
-                                'action' => 'logout',
-                            ],
-                        ]
                     ]
                 ]
             ],

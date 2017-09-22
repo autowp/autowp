@@ -132,7 +132,11 @@ ga('send', 'pageview');
                                 <?php } */ ?>
                                 <?php /*=$this->pageEnv()->isOnPath($page['id']) ? 'active' : ''*/?>
                                 <li class="{{page.class}}" ng-repeat="page in mainMenu.secondMenu" ng-if="(!page.registered_only || user) && (!page.guest_only || !user)">
-                                    <a ng-href="{{page.url}}">
+                                    <a ng-href="{{page.url}}" ng-if="page.url != '/login/logout'">
+                                        <i class="{{page.icon}}" ng-if="page.icon"></i>
+                                        {{page.name}}
+                                    </a>
+                                    <a href="#" ng-if="page.url == '/login/logout'" ng-click="doLogout()">
                                         <i class="{{page.icon}}" ng-if="page.icon"></i>
                                         {{page.name}}
                                     </a>
@@ -187,7 +191,7 @@ ga('send', 'pageview');
                         <div>
                             <autowp-user user="user"></autowp-user><br />
                             <a href="/account/profile" translate>page/48/name</a><br />
-                            <i class="fa fa-sign-out"></i> <a href="/login/logout" translate>login/sign-out</a>
+                            <i class="fa fa-sign-out"></i> <a href="#" ng-click="doLogout()" translate>login/sign-out</a>
                         </div>
                         <p>
                             <i class="fa fa-comment"></i>

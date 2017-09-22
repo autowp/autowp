@@ -88,7 +88,12 @@
                                 <li class="divider"></li>
                             <?php } ?>
                             <li class="<?=$page['class'] ? $this->escapeHtmlAttr($page['class']) : ''?> <?=$this->pageEnv()->isOnPath($page['id']) ? 'active' : ''?>">
-                                <?php if (isset($page['icon'])) { ?>
+                                <?php if ($page['url'] == '/login/logout') { ?>
+                                    <?=$this->htmlA([
+                                        'href'  => '#',
+                                        'class' => 'logout'
+                                    ], '<i class="'.$this->escapeHtmlAttr($page['icon']).'"></i> ' . $page['name'], false) ?>
+                                <?php } elseif (isset($page['icon'])) { ?>
                                     <?=$this->htmlA($page['url'], '<i class="'.$this->escapeHtmlAttr($page['icon']).'"></i> ' . $page['name'], false) ?>
                                 <?php } else { ?>
                                     <?=$this->htmlA($page['url'], $page['name']) ?>

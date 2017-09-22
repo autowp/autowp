@@ -136,4 +136,17 @@ $(function() {
             }
         });
     });
+    
+    $(document.body).on('click', 'a.logout', function() {
+        $.ajax({
+            method: 'DELETE',
+            url: '/api/login'
+        }).then(function() {
+            
+            window.location = '/ng/login';
+            
+        }, function(response) {
+            notify.response(response);
+        });
+    });
 });

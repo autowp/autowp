@@ -75,16 +75,6 @@ class LoginController extends AbstractActionController
         $this->userModel = $userModel;
     }
 
-    public function logoutAction()
-    {
-        $auth = new AuthenticationService();
-        $auth->clearIdentity();
-        $this->service->clearRememberCookie($this->language());
-        return $this->redirect()->toRoute('ng', [
-            'path' => 'login'
-        ]);
-    }
-
     /**
      * @param string $serviceId
      * @return \Autowp\ExternalLoginService\AbstractService
