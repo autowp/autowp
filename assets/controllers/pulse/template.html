@@ -1,0 +1,6 @@
+<div id="pulse-graph" style="height:600px;background:#333;margin-bottom:10px"></div>
+<p class="legend">
+    <span style="color:{{item.color}}" ng-mouseover="ctrl.selectUser(item.id)" ng-mouseout="ctrl.deselectUser()" ng-repeat="item in ctrl.legend">
+        <autowp-user user="item.user"></autowp-user>
+    </span>
+</p>

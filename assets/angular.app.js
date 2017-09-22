@@ -15,6 +15,7 @@ import './controllers/account';
 import './controllers/feedback';
 import './controllers/log';
 import './controllers/login';
+import './controllers/pulse';
 import './controllers/restore-password';
 import './controllers/signup';
 import './controllers/moder';

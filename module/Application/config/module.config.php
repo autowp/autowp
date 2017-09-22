@@ -61,7 +61,6 @@ return [
             Controller\PerspectiveController::class     => Controller\Frontend\PerspectiveControllerFactory::class,
             Controller\PictureController::class         => Controller\Frontend\PictureControllerFactory::class,
             Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
-            Controller\PulseController::class           => Controller\Frontend\Service\PulseControllerFactory::class,
             Controller\RegistrationController::class    => Controller\Frontend\Service\RegistrationControllerFactory::class,
             Controller\DocController::class             => InvokableFactory::class,
             Controller\TelegramController::class        => Controller\Frontend\Service\TelegramControllerFactory::class,

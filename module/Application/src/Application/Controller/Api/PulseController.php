@@ -1,15 +1,18 @@
 <?php
 
-namespace Application\Controller;
+namespace Application\Controller\Api;
+
+use DateInterval;
+use DateTime;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
 
 use Autowp\User\Model\User;
 
-use DateInterval;
-use DateTime;
+use Application\Hydrator\Api\RestHydrator;
 
 class PulseController extends AbstractActionController
 {
@@ -35,12 +38,24 @@ class PulseController extends AbstractActionController
         '#008888',
     ];
 
+    /**
+     * @var User
+     */
     private $userModel;
 
-    public function __construct(TableGateway $logTable, User $userModel)
-    {
+    /**
+     * @var RestHydrator
+     */
+    private $userHydrator;
+
+    public function __construct(
+        TableGateway $logTable,
+        User $userModel,
+        RestHydrator $userHydrator
+    ) {
         $this->logTable = $logTable;
         $this->userModel = $userModel;
+        $this->userHydrator = $userHydrator;
     }
 
     private function randomColor()
@@ -147,15 +162,17 @@ class PulseController extends AbstractActionController
                 'color' => $color
             ];
 
+            $user = $this->userModel->getRow((int)$uid);
+
             $legend[$uid] = [
-                'user'  => $this->userModel->getRow((int)$uid),
+                'user'  => $user ? $this->userHydrator->extract($user) : null,
                 'color' => $color
             ];
         }
 
-        return [
+        return new JsonModel([
             'grid'   => $grid,
             'legend' => $legend
-        ];
+        ]);
     }
 }

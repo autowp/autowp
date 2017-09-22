@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
@@ -13,9 +13,11 @@ class PulseControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $tables = $container->get('TableManager');
-        return new \Application\Controller\PulseController(
+        $hydrators = $container->get('HydratorManager');
+        return new PulseController(
             $tables->get('log_events'),
-            $container->get(\Autowp\User\Model\User::class)
+            $container->get(\Autowp\User\Model\User::class),
+            $hydrators->get(\Application\Hydrator\Api\UserHydrator::class)
         );
     }
 }

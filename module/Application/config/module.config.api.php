@@ -61,6 +61,7 @@ return [
             Controller\Api\PictureModerVoteController::class => Controller\Api\PictureModerVoteControllerFactory::class,
             Controller\Api\PictureModerVoteTemplateController::class => Controller\Api\Service\PictureModerVoteTemplateControllerFactory::class,
             Controller\Api\PictureVoteController::class     => Controller\Api\Service\PictureVoteControllerFactory::class,
+            Controller\Api\PulseController::class           => Controller\Api\PulseControllerFactory::class,
             Controller\Api\RecaptchaController::class       => Controller\Api\RecaptchaControllerFactory::class,
             Controller\Api\RestorePasswordController::class => Controller\Api\RestorePasswordControllerFactory::class,
             Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
@@ -3035,6 +3036,16 @@ return [
                                 ]
                             ]
                         ]
+                    ],
+                    'pulse' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/pulse',
+                            'defaults' => [
+                                'controller' => Controller\Api\PulseController::class,
+                                'action'     => 'index',
+                            ],
+                        ],
                     ],
                     'recaptcha' => [
                         'type' => 'Literal',

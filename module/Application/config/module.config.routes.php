@@ -762,16 +762,6 @@ return [
                     ],
                 ]
             ],
-            'pulse' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route'    => '/pulse',
-                    'defaults' => [
-                        'controller' => Controller\PulseController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-            ],
             'rules' => [
                 'type' => Literal::class,
                 'options' => [
