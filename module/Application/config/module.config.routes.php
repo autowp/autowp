@@ -939,15 +939,6 @@ return [
                             ]
                         ]
                     ],
-                    'online' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/online',
-                            'defaults' => [
-                                'action' => 'online',
-                            ],
-                        ]
-                    ],
                     'rating' => [
                         'type' => Literal::class,
                         'options' => [

@@ -7,7 +7,6 @@ use DateTime;
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Paginator\Paginator;
-use Zend\View\Model\ViewModel;
 
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\User;
@@ -307,18 +306,6 @@ class UsersController extends AbstractActionController
                 'brand_catname' => $brand['catname']
             ]
         ];
-    }
-
-    public function onlineAction()
-    {
-        $viewModel = new ViewModel([
-            'users' => $this->userModel->getRows([
-                'online' => true
-            ])
-        ]);
-        $viewModel->setTerminal($this->getRequest()->isXmlHttpRequest());
-
-        return $viewModel;
     }
 
     private function specsRating()

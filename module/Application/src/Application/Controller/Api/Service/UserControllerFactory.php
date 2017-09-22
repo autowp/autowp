@@ -19,6 +19,7 @@ class UserControllerFactory implements FactoryInterface
         $config = $container->get('Config');
 
         return new Controller(
+            $container->get(\Zend\Permissions\Acl\Acl::class),
             $hydrators->get(\Application\Hydrator\Api\UserHydrator::class),
             $filters->get('api_user_list'),
             $filters->get('api_user_post'),

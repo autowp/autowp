@@ -55,4 +55,15 @@ class UserControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/user/user/put');
         $this->assertActionName('put');
     }
+
+    public function testOnline()
+    {
+        $this->dispatch('https://www.autowp.ru/api/user/online', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(UserController::class);
+        $this->assertMatchedRouteName('api/user/online');
+        $this->assertActionName('online');
+    }
 }

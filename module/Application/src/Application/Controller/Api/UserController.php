@@ -2,14 +2,19 @@
 
 namespace Application\Controller\Api;
 
+use DateInterval;
+use DateTime;
+
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Permissions\Acl\Acl;
 use Zend\View\Model\JsonModel;
 
 use ReCaptcha\ReCaptcha;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
+use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 
 use Application\Hydrator\Api\RestHydrator;
@@ -17,6 +22,11 @@ use Application\Service\UsersService;
 
 class UserController extends AbstractRestfulController
 {
+    /**
+     * @var Acl
+     */
+    private $acl;
+
     /**
      * @var RestHydrator
      */
@@ -58,6 +68,7 @@ class UserController extends AbstractRestfulController
     private $captchaEnabled;
 
     public function __construct(
+        Acl $acl,
         RestHydrator $hydrator,
         InputFilter $listInputFilter,
         InputFilter $postInputFilter,
@@ -67,6 +78,7 @@ class UserController extends AbstractRestfulController
         array $recaptcha,
         bool $captchaEnabled
     ) {
+        $this->acl = $acl;
         $this->hydrator = $hydrator;
         $this->listInputFilter = $listInputFilter;
         $this->postInputFilter = $postInputFilter;
@@ -323,5 +335,56 @@ class UserController extends AbstractRestfulController
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
         return $this->getResponse()->setStatusCode(201);
+    }
+
+    public function onlineAction()
+    {
+        $rows = $this->userModel->getRows([
+            'online' => true
+        ]);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $deleted = (bool)$row['deleted'];
+
+            if ($deleted) {
+                $result[] = [
+                    'id'       => null,
+                    'name'     => null,
+                    'deleted'  => $deleted,
+                    'url'      => null,
+                    'longAway' => false,
+                    'green'    => false
+                ];
+            } else {
+                $longAway = false;
+                $lastOnline = Row::getDateTimeByColumnType('timestamp', $row['last_online']);
+                if ($lastOnline) {
+                    $date = new DateTime();
+                    $date->sub(new DateInterval('P6M'));
+                    if ($date > $lastOnline) {
+                        $longAway = true;
+                    }
+                } else {
+                    $longAway = true;
+                }
+
+                $isGreen = $row['role'] && $this->acl->isAllowed($row['role'], 'status', 'be-green');
+
+                $result[] = [
+                    'name'      => $row['name'],
+                    'deleted'   => $deleted,
+                    'url'       => $this->url()->fromRoute('users/user', [
+                        'user_id' => $row['identity'] ? $row['identity'] : 'user' . $row['id']
+                    ]),
+                    'long_away' => $longAway,
+                    'green'     => $isGreen
+                ];
+            }
+        }
+
+        return new JsonModel([
+            'items' => $result
+        ]);
     }
 }
