@@ -1,5 +1,5 @@
 web:
-  image: autowp/autowp:alpine
+  image: autowp/autowp
   container_name: autowp_test_web
   restart: always
   environment:
