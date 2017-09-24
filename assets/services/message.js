@@ -68,6 +68,20 @@ angular.module(Module)
             });
         };
         
+        this.getNewCount = function() {
+            return $q(function(resolve, reject) {
+                
+                $http({
+                    method: 'GET',
+                    url: '/api/message/new'
+                }).then(function(response) {
+                    resolve(response.data.count);
+                }, function(response) {
+                    reject(response);
+                });
+            });
+        };
+        
         this.send = function(userId, text) {
             var self = this;
             

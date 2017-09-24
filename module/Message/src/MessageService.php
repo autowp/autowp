@@ -70,7 +70,7 @@ class MessageService
         }
     }
 
-    public function getNewCount(int $userId)
+    public function getNewCount(int $userId): int
     {
         $row = $this->table->select(function (Sql\Select $select) use ($userId) {
             $select
@@ -81,7 +81,7 @@ class MessageService
                 ]);
         })->current();
 
-        return $row ? $row['count'] : null;
+        return $row ? (int)$row['count'] : null;
     }
 
     public function delete(int $userId, int $messageId)
@@ -190,7 +190,7 @@ class MessageService
             ->order('add_datetime DESC');
     }
 
-    public function getSystemCount($userId)
+    public function getSystemCount($userId): int
     {
         $select = $this->getSystemSelect($userId);
 
@@ -201,7 +201,7 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function getNewSystemCount($userId)
+    public function getNewSystemCount($userId): int
     {
         $select = $this->getSystemSelect($userId)
             ->where('NOT readen');
@@ -213,7 +213,7 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function getInboxCount($userId)
+    public function getInboxCount($userId): int
     {
         $select = $this->getInboxSelect($userId);
 
@@ -224,7 +224,7 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function getInboxNewCount($userId)
+    public function getInboxNewCount($userId): int
     {
         $select = $this->getInboxSelect($userId)
             ->where('NOT readen');
@@ -236,7 +236,7 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function getDialogCount($userId, $withUserId)
+    public function getDialogCount($userId, $withUserId): int
     {
         $select = $this->getDialogSelect($userId, $withUserId);
 
@@ -247,7 +247,7 @@ class MessageService
         return $paginator->getTotalItemCount();
     }
 
-    public function getSentCount($userId)
+    public function getSentCount($userId): int
     {
         $select = $this->getSentSelect($userId);
 

@@ -1,14 +1,15 @@
 import angular from 'angular';
 import Module from 'app.module';
 import PageServiceName from 'services/page';
+import MessageServiceName from 'services/message';
 import 'directives/breadcrumbs';
 import notify from 'notify';
 
 const CONTROLLER_NAME = 'RootController';
 
 angular.module(Module).controller(CONTROLLER_NAME, [
-    '$scope', '$http', '$location', '$translate', '$rootScope', '$state', PageServiceName,
-    function($scope, $http, $location,  $translate, $rootScope, $state, PageService) {
+    '$scope', '$http', '$location', '$translate', '$rootScope', '$state', PageServiceName, MessageServiceName,
+    function($scope, $http, $location,  $translate, $rootScope, $state, PageService, MessageService) {
         var that = this;
         
         $scope.languages = opt.languages;
@@ -123,12 +124,37 @@ angular.module(Module).controller(CONTROLLER_NAME, [
                 method: 'DELETE',
                 url: '/api/login'
             }).then(function() {
-                $scope.user = null;
+                
+                $rootScope.setUser(null);
+                
                 $state.go('login');
                 
             }, function(response) {
                 notify.response(response);
             });
+        };
+        
+        $rootScope.setUser = function(user) {
+            var lastUserId = $scope.user ? $scope.user.id : null;
+            var newUserId = user ? user.id : null;
+            $scope.user = user;
+            
+            if (lastUserId != newUserId) {
+                
+                if ($scope.user) {
+                    MessageService.getNewCount().then(function(count) {
+                        $scope.newPersonalMessages = count;
+                    }, function(response) {
+                        notify.response(response);
+                    });
+                } else {
+                    $scope.newPersonalMessages = null;
+                }
+            }
+        };
+        
+        $rootScope.getUser = function() {
+            return $scope.user;
         };
     }
 ]);

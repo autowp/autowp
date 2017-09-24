@@ -21,10 +21,10 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state',
-        function($scope, $http, $state) {
+        '$scope', '$rootScope', '$http', '$state',
+        function($scope, $rootScope, $http, $state) {
             
-            if ($scope.$parent.user) {
+            if ($rootScope.getUser()) {
                 $state.go('login-ok');
                 return;
             }
@@ -66,7 +66,7 @@ angular.module(Module)
                         method: 'GET',
                         url: '/api/user/me'
                     }).then(function(response) {
-                        $scope.$parent.user = response.data;
+                        $rootScope.setUser(response.data);
                         $state.go('login-ok');
                     }, function(response) {
                         notify.response(response);

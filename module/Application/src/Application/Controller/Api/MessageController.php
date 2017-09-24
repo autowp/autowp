@@ -203,4 +203,17 @@ class MessageController extends AbstractRestfulController
             ]
         ]);
     }
+
+    public function newAction()
+    {
+        $user = $this->user()->get();
+
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        return new JsonModel([
+            'count' => $this->message->getNewCount($user['id'])
+        ]);
+    }
 }

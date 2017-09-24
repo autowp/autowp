@@ -2738,6 +2738,15 @@ return [
                                     ],
                                 ],
                             ],
+                            'new' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/new',
+                                    'defaults' => [
+                                        'action' => 'new'
+                                    ],
+                                ],
+                            ],
                         ]
                     ],
                     'page' => [
