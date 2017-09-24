@@ -134,22 +134,25 @@ angular.module(Module).controller(CONTROLLER_NAME, [
             });
         };
         
+        $rootScope.refreshNewMessagesCount = function() {
+            if ($scope.user) {
+                MessageService.getNewCount().then(function(count) {
+                    $scope.newPersonalMessages = count;
+                }, function(response) {
+                    notify.response(response);
+                });
+            } else {
+                $scope.newPersonalMessages = null;
+            }
+        };
+        
         $rootScope.setUser = function(user) {
             var lastUserId = $scope.user ? $scope.user.id : null;
             var newUserId = user ? user.id : null;
             $scope.user = user;
             
             if (lastUserId != newUserId) {
-                
-                if ($scope.user) {
-                    MessageService.getNewCount().then(function(count) {
-                        $scope.newPersonalMessages = count;
-                    }, function(response) {
-                        notify.response(response);
-                    });
-                } else {
-                    $scope.newPersonalMessages = null;
-                }
+                $rootScope.refreshNewMessagesCount();
             }
         };
         

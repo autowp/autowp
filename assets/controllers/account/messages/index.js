@@ -21,8 +21,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', MessageServiceName, 
-        function($scope, $http, $state, MessageService) {
+        '$scope', '$rootScope', '$http', '$state', MessageServiceName, 
+        function($scope, $rootScope, $http, $state, MessageService) {
             
             var ctrl = this;
             
@@ -69,6 +69,18 @@ angular.module(Module)
                 }).then(function(response) {
                     ctrl.items = response.data.items;
                     ctrl.paginator = response.data.paginator;
+                    
+                    var newFound = false;
+                    angular.forEach(ctrl.items, function(message) {
+                        if (message.is_new) {
+                            newFound = true;
+                        }
+                    });
+                    
+                    if (newFound) {
+                        $rootScope.refreshNewMessagesCount();
+                    }
+                    
                 }, function(response) {
                     notify.response(response);
                 });
