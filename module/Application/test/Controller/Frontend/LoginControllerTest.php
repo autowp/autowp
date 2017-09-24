@@ -91,7 +91,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $this->assertModuleName('application');
         $this->assertControllerName(LoginController::class);
         $this->assertActionName('start');
-        $this->assertMatchedRouteName('login/start');
+        $this->assertMatchedRouteName('api/login/start');
         $this->assertResponseStatusCode(302);
         $this->assertHasResponseHeader('Location');
 
