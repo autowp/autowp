@@ -84,7 +84,9 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
     {
         $this->mockExternalLoginFactory(null);
 
-        $this->dispatch('https://www.autowp.ru/login/start/facebook', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/login/start', Request::METHOD_GET, [
+            'type' => 'facebook'
+        ]);
 
         $this->assertModuleName('application');
         $this->assertControllerName(LoginController::class);
