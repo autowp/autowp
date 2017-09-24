@@ -2644,6 +2644,24 @@ return [
                                         'action' => 'delete'
                                     ]
                                 ]
+                            ],
+                            'start' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/start',
+                                    'defaults' => [
+                                        'action' => 'start',
+                                    ],
+                                ]
+                            ],
+                            'callback' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/callback',
+                                    'defaults' => [
+                                        'action' => 'callback',
+                                    ],
+                                ]
                             ]
                         ]
                     ],

@@ -79,3 +79,5 @@ mysql:
   - "./mysql.conf.d:/etc/mysql/conf.d"
   expose:
   - "3306"
+  ports:
+  - "3306:3306"

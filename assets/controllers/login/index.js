@@ -80,6 +80,22 @@ angular.module(Module)
                     }
                 });
             };
+            
+            ctrl.start = function(serviceId) {
+                $http({
+                    method: 'GET',
+                    url: '/api/login/start',
+                    params: {
+                        type: serviceId
+                    }
+                }).then(function(response) {
+                    
+                    window.location = response.data.url;
+                    
+                }, function(response) {
+                    notify.response(response);
+                });
+            };
         }
     ]);
 

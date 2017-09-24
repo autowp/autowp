@@ -16,6 +16,7 @@ class LoginControllerFactory implements FactoryInterface
         $tables = $container->get('TableManager');
         return new LoginController(
             $container->get(\Application\Service\UsersService::class),
+            $container->get('ExternalLoginServiceManager'),
             $filters->get('api_login'),
             $container->get('Config')['hosts'],
             $container->get(\Autowp\User\Model\UserRemember::class),

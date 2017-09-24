@@ -576,20 +576,11 @@ return [
                 'options' => [
                     'route'    => '/login',
                     'defaults' => [
-                        'controller' => Controller\LoginController::class,
+                        'controller' => Controller\Api\LoginController::class,
                     ],
                 ],
                 'may_terminate' => false,
                 'child_routes'  => [
-                    'start' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/start/:type',
-                            'defaults' => [
-                                'action' => 'start',
-                            ],
-                        ]
-                    ],
                     'callback' => [
                         'type' => Literal::class,
                         'options' => [
