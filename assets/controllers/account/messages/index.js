@@ -105,6 +105,9 @@ angular.module(Module)
                         ctrl.items = [];
                         ctrl.paginator = null;
                     }
+                    
+                    $rootScope.refreshNewMessagesCount();
+                    
                 }, function(response) {
                     notify.response(response);
                 });
