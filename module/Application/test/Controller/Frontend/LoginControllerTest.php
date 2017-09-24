@@ -5,7 +5,7 @@ namespace ApplicationTest\Controller\Frontend;
 use Zend\Http\Request;
 use Application\Test\AbstractHttpControllerTestCase;
 
-use Application\Controller\LoginController;
+use Application\Controller\Api\LoginController;
 
 class LoginControllerTest extends AbstractHttpControllerTestCase
 {
@@ -20,7 +20,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\Api\LoginController::class);
+        $this->assertControllerName(LoginController::class);
         $this->assertMatchedRouteName('api/login/login');
         $this->assertActionName('login');
     }
@@ -34,7 +34,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\Api\LoginController::class);
+        $this->assertControllerName(LoginController::class);
         $this->assertMatchedRouteName('api/login/login');
         $this->assertActionName('login');
     }
