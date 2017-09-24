@@ -6,6 +6,10 @@ use Zend\Http\Request;
 use Application\Test\AbstractHttpControllerTestCase;
 
 use Application\Controller\Api\LoginController;
+use Zend\Json\Json;
+use Zend\Uri\Http;
+use Zend\Uri\Uri;
+use Zend\Uri\UriFactory;
 
 class LoginControllerTest extends AbstractHttpControllerTestCase
 {
@@ -92,11 +96,13 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(LoginController::class);
         $this->assertActionName('start');
         $this->assertMatchedRouteName('api/login/start');
-        $this->assertResponseStatusCode(302);
-        $this->assertHasResponseHeader('Location');
+        $this->assertResponseStatusCode(200);
 
-        $headers = $this->getResponse()->getHeaders();
-        $uri = $headers->get('Location')->uri();
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertArrayHasKey('url', $json);
+
+        $uri = UriFactory::factory($json['url']);
 
         $this->assertRegExp(
             '|^https://www\.facebook\.com/v[0-9.]+/dialog/oauth'.
