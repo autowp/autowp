@@ -37,6 +37,7 @@ return [
     'controllers' => [
         'factories' => [
             Controller\Api\AclController::class             => Controller\Api\Service\AclControllerFactory::class,
+            Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
             Controller\Api\CommentController::class         => Controller\Api\Service\CommentControllerFactory::class,
             Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
             Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
@@ -1914,6 +1915,36 @@ return [
                                     ],
                                 ]
                             ],
+                        ]
+                    ],
+                    'chart' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/chart',
+                            'defaults' => [
+                                'controller' => Controller\Api\ChartController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes'  => [
+                            'years' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/parameters',
+                                    'defaults' => [
+                                        'action' => 'parameters',
+                                    ],
+                                ],
+                            ],
+                            'years-data' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/data',
+                                    'defaults' => [
+                                        'action' => 'data',
+                                    ],
+                                ],
+                            ]
                         ]
                     ],
                     'comment' => [

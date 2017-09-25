@@ -45,7 +45,6 @@ return [
             Controller\CarsController::class            => Controller\Frontend\Service\CarsControllerFactory::class,
             Controller\CatalogueController::class       => Controller\Frontend\Service\CatalogueControllerFactory::class,
             Controller\CategoryController::class        => Controller\Frontend\Service\CategoryControllerFactory::class,
-            Controller\ChartController::class           => Controller\Frontend\Service\ChartControllerFactory::class,
             Controller\CommentsController::class        => Controller\Frontend\Service\CommentsControllerFactory::class,
             Controller\DonateController::class          => Controller\Frontend\Service\DonateControllerFactory::class,
             Controller\FactoriesController::class       => Controller\Frontend\Service\FactoriesControllerFactory::class,

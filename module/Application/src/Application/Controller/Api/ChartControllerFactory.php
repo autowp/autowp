@@ -1,11 +1,9 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
-use Application\Controller\ChartController as Controller;
 
 class ChartControllerFactory implements FactoryInterface
 {
@@ -15,7 +13,7 @@ class ChartControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $tables = $container->get('TableManager');
-        return new Controller(
+        return new ChartController(
             $container->get(\Application\Service\SpecificationsService::class),
             $tables->get('spec'),
             $tables->get('attrs_attributes')

@@ -12,6 +12,7 @@ import './controllers/root';
 import './controllers/error/403';
 import './controllers/error/404';
 import './controllers/account';
+import './controllers/chart';
 import './controllers/feedback';
 import './controllers/log';
 import './controllers/login';

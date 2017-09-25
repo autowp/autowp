@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Controller;
+namespace Application\Controller\Api;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -44,7 +44,7 @@ class ChartController extends AbstractRestfulController
         $this->attributeTable = $attributeTable;
     }
 
-    public function yearsAction()
+    public function parametersAction()
     {
         $rows = $this->attributeTable->select([new Sql\Predicate\In('id', $this->parameters)]);
 
@@ -56,9 +56,9 @@ class ChartController extends AbstractRestfulController
             ];
         }
 
-        return [
+        return new JsonModel([
             'parameters' => $params
-        ];
+        ]);
     }
 
     private function specIds(int $id)
@@ -80,7 +80,7 @@ class ChartController extends AbstractRestfulController
         return array_merge($ids, $result);
     }
 
-    public function yearsDataAction()
+    public function dataAction()
     {
         $id = (int)$this->params()->fromQuery('id');
 
@@ -108,7 +108,8 @@ class ChartController extends AbstractRestfulController
                     'value' => new Sql\Expression('round(avg(value))')
                 ])
                 ->join('item', $dataTableName . '.item_id = item.id', [])
-                ->join('car_types_parents', 'item.car_type_id = car_types_parents.id', [])
+                ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
+                ->join('car_types_parents', 'vehicle_vehicle_type.vehicle_type_id = car_types_parents.id', [])
                 ->where([
                     $dataTableName . '.attribute_id' => $attrRow['id'],
                     'car_types_parents.parent_id' => 29,
@@ -119,6 +120,7 @@ class ChartController extends AbstractRestfulController
                 ->group('year')
                 ->order('year');
 
+            $pairs = [];
             foreach ($dataTable->selectWith($select) as $row) {
                 $pairs[$row['year']] = $row['value'];
             }

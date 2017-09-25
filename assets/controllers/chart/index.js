@@ -1,41 +1,75 @@
-define(
-    ['jquery', 'chart'],
-    function($, ChartJS) {
-        return {
-            init: function(options) {
-                var $chart = $('.chart');
-                
-                this.chart = new ChartJS($chart[0], {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: []
-                    }
-                });
-                
-                var self = this;
-                
-                $('.nav-pills a').on('click', function(e) {
-                    e.preventDefault();
-                    self.loadData($(this).data('id'));
-                    $('.nav-pills li').removeClass('active');
-                    $(this).parent().addClass('active');
-                });
-                
-                $('.nav-pills a').first().click();
-            },
-            loadData: function(id) {
-                var self = this;
-                
+import angular from 'angular';
+import Module from 'app.module';
+import template from './template.html';
+import notify from 'notify';
+
+var $ = require('jquery');
+var ChartJS = require('chart');
+
+const CONTROLLER_NAME = 'ChartController';
+const STATE_NAME = 'chart';
+
+angular.module(Module)
+    .config(['$stateProvider',
+        function config($stateProvider) {
+            $stateProvider.state( {
+                name: STATE_NAME,
+                url: '/chart',
+                controller: CONTROLLER_NAME,
+                controllerAs: 'ctrl',
+                template: template
+            });
+        }
+    ])
+    .controller(CONTROLLER_NAME, [
+        '$scope', '$http', '$state',
+        function($scope, $http, $state) {
+            
+            $scope.pageEnv({
+                layout: {
+                    blankPage: false,
+                    needRight: false
+                },
+                pageId: 1
+            });
+            
+            var ctrl = this;
+            
+            ctrl.parameters = [];
+            
+            var $chart = $('.chart');
+            
+            var chart = new ChartJS($chart[0], {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: []
+                }
+            });
+            
+            $http({
+                method: 'GET',
+                url: '/api/chart/parameters'
+            }).then(function(response) {
+                ctrl.parameters = response.data.parameters;
+                ctrl.selectParam(ctrl.parameters[0]);
+            }, function(response) {
+                notify.response(response);
+            });
+            
+            function loadData(id) {
                 var colors = [
                     "rgba(41,84,109,1)",
                     "rgba(242,80,122,1)",
                 ];
                 
-                $.get('/chart/years-data', {id: id}, function(json) {
-                    
+                $http({
+                    method: 'GET',
+                    url: '/api/chart/data',
+                    params: {id: id}
+                }).then(function(response) {
                     var datasets = [];
-                    $.map(json.datasets, function(dataset, i) {
+                    $.map(response.data.datasets, function(dataset, i) {
                         datasets.push({
                             label: dataset.name,
                             fill: false,
@@ -88,16 +122,26 @@ define(
                     });
                     
                     var data = {
-                        labels: json.years,
+                        labels: response.data.years,
                         datasets: datasets
                     };
                     
-                    self.chart.chart.config.data = data;
+                    chart.chart.config.data = data;
                     
-                    self.chart.update();
-                    
+                    chart.update();
+                }, function(response) {
+                    notify.response(response);
                 });
             }
-        };
-    }
-);
+            
+            ctrl.selectParam = function(param) {
+                angular.forEach(ctrl.parameters, function(param) {
+                    param.active = false;
+                });
+                param.active = true;
+                loadData(param.id);
+            };
+        }
+    ]);
+
+export default CONTROLLER_NAME;
