@@ -16,6 +16,7 @@ import './controllers/chart';
 import './controllers/feedback';
 import './controllers/log';
 import './controllers/login';
+import './controllers/map';
 import './controllers/pulse';
 import './controllers/restore-password';
 import './controllers/signup';

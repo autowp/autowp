@@ -50,7 +50,7 @@ class FactoriesController extends AbstractActionController
 
     public function indexAction()
     {
-        return $this->redirect()->toUrl('/map/');
+        return $this->redirect()->toUrl('/ng/map/');
     }
 
     public function factoryAction()

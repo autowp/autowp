@@ -53,6 +53,7 @@ return [
             Controller\Api\ItemVehicleTypeController::class => Controller\Api\Service\ItemVehicleTypeControllerFactory::class,
             Controller\Api\LogController::class             => Controller\Api\Service\LogControllerFactory::class,
             Controller\Api\LoginController::class           => Controller\Api\LoginControllerFactory::class,
+            Controller\Api\MapController::class             => Controller\Api\MapControllerFactory::class,
             Controller\Api\MessageController::class         => Controller\Api\MessageControllerFactory::class,
             Controller\Api\PageController::class            => Controller\Api\Service\PageControllerFactory::class,
             Controller\Api\PerspectiveController::class     => Controller\Api\Service\PerspectiveControllerFactory::class,
@@ -2691,6 +2692,28 @@ return [
                                     'route' => '/callback',
                                     'defaults' => [
                                         'action' => 'callback',
+                                    ],
+                                ]
+                            ]
+                        ]
+                    ],
+                    'map' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/map',
+                            'defaults' => [
+                                'controller' => Controller\Api\MapController::class,
+                                'action'     => 'index',
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes'  => [
+                            'data' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/data',
+                                    'defaults' => [
+                                        'action' => 'data',
                                     ],
                                 ]
                             ]

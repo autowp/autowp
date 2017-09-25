@@ -1,14 +1,14 @@
-<h4><?=$this->escapeHtml($this->translate('index/factories'))?> <small><?=$this->htmlA('/map', $this->translate('all-link'))?></small></h4>
+<h4><?=$this->escapeHtml($this->translate('index/factories'))?> <small><?=$this->htmlA('/ng/map', $this->translate('all-link'))?></small></h4>
 <p>
     <?php foreach ($this->factories as $factory) {
         $new = $factory['new_count'];
         $old = $factory['count'] - $new;
         echo $this->htmlA(
-            $factory['url'], 
+            $factory['url'],
             $factory['name']
         ) .
-        '&#xa0;' . 
-        '<span class="count">(' . 
+        '&#xa0;' .
+        '<span class="count">(' .
             $old . ($new > 0 ? '<span data-href="'.$this->escapeHtmlAttr($factory['new_url']).'" data-toggle="popover" data-container="body" class="popover-handler">+' . $new . '</span>' : '') .
         ')</span> ';
     } ?>

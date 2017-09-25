@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Controller;
+namespace Application\Controller\Api;
 
 use geoPHP;
 use LineString;
@@ -40,14 +40,6 @@ class MapController extends AbstractActionController
         $this->itemNameFormatter = $itemNameFormatter;
         $this->picture = $picture;
         $this->itemTable = $itemTable;
-    }
-
-    public function indexAction()
-    {
-    }
-
-    public function index2Action()
-    {
     }
 
     public function dataAction()

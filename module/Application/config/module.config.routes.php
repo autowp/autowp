@@ -562,37 +562,6 @@ return [
                     ]
                 ]
             ],
-            'map' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route'    => '/map',
-                    'defaults' => [
-                        'controller' => Controller\MapController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'data' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/data',
-                            'defaults' => [
-                                'action' => 'data',
-                            ],
-                        ]
-                    ],
-                    'index2' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/index2',
-                            'defaults' => [
-                                'action' => 'index2',
-                            ],
-                        ]
-                    ]
-                ]
-            ],
             'mosts' => [
                 'type' => Segment::class,
                 'options' => [
