@@ -17,6 +17,7 @@ RUN apk update && apk upgrade && \
         ca-certificates \
         curl \
         git \
+        go \
         imagemagick \
         libpng-dev \
         libtool \
@@ -85,6 +86,13 @@ RUN apk update && apk upgrade && \
     && mkdir -p /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/ \
     && ln -s /usr/bin/phantomjs /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs
 
+RUN go get \
+        github.com/gin-gonic/gin \
+        github.com/go-sql-driver/mysql \
+        github.com/Masterminds/squirrel \
+    && echo $GOROOT \
+    && echo $GOPATH
+
 COPY ./etc/ /etc/
 
 COPY composer.json /app/composer.json
@@ -100,7 +108,8 @@ COPY . /app
 RUN chmod +x zf && \
     chmod +x start.sh && \
     chmod +x wait-for-it.sh && \
-    crontab ./crontab
+    crontab ./crontab && \
+    go build -o ./goautowp/goautowp ./goautowp/
 
 RUN ./node_modules/.bin/webpack -p
 

@@ -17,7 +17,7 @@ angular.module(Module)
                 if (perspectives === null) {
                     $http({
                         method: 'GET',
-                        url: '/api/perspective'
+                        url: '/go-api/perspective'
                     }).then(function(response) {
                         perspectives = response.data.items;
                         resolve(perspectives);

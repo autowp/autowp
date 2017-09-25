@@ -15,7 +15,7 @@ angular.module(Module)
                 if (types === null) {
                     $http({
                         method: 'GET',
-                        url: '/api/spec'
+                        url: '/go-api/spec'
                     }).then(function(response) {
                         types = response.data.items;
                         resolve(types);
@@ -42,17 +42,17 @@ angular.module(Module)
         };
         
         function findSpec(specs, id) {
-        	var spec = null;
-        	for (var i=0; i<specs.length; i++) {
-        		if (specs[i].id == id) {
-                	spec = specs[i];
-                	break;
+            var spec = null;
+            for (var i=0; i<specs.length; i++) {
+                if (specs[i].id == id) {
+                    spec = specs[i];
+                    break;
                 }
-        		spec = findSpec(specs[i].childs, id);
-        		if (spec) {
-        			break;
-        		}
-        	}
+                spec = findSpec(specs[i].childs, id);
+                if (spec) {
+                    break;
+                }
+            }
             return spec;
         }
     }]);

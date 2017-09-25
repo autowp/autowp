@@ -17,4 +17,6 @@ mkdir -p /app/public_html/img
 
 echo "Starting supervisor"
 
+./wait-for-it.sh $AUTOWP_DB_HOST:$AUTOWP_DB_PORT
+
 /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

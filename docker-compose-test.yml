@@ -18,6 +18,7 @@ web:
     TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}
     TRAVIS_TAG: ${TRAVIS_TAG}
     AUTOWP_DB_HOST: "autowp_test_mysql"
+    AUTOWP_DB_PORT: "3306"
     AUTOWP_DB_USERNAME: "autowp_test"
     AUTOWP_DB_PASSWORD: "test"
     AUTOWP_DB_DBNAME: "autowp_test"
@@ -62,6 +63,7 @@ web:
     AUTOWP_CAPTCHA: 0
     AUTOWP_RECAPTCHA_PUBLICKEY: "public"
     AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
+    AUTOWP_GO_LISTEN: ":81"
   volumes:
   - ./config/autoload/local.php:/app/config/autoload/local.php:ro
   - ./module/Application/test/_files/image:/app/public_html/image
