@@ -30,7 +30,7 @@ export function bind(element) {
             $.get(url, {}, function(response) {
                 $body.empty();
                 $.map(response.items, function(user) {
-                    var $e = $('<span class="user"><i class="fa fa-user"></i> </span>')
+                    var $e = $('<span class="user"><i class="fa fa-user"></i> </span> ')
                         .toggleClass('muted', !!user.deleted)
                         .toggleClass('long-away', !!user.long_away)
                         .toggleClass('green-man', !!user.green);
