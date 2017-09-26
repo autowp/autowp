@@ -57,6 +57,7 @@ web:
   - ./module:/app/module
   - ./public_html:/app/public_html
   - ./vendor:/app/vendor
+  - ./goautowp:/app/goautowp
   ports:
   - "80:80"
   links:

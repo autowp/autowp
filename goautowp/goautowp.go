@@ -56,6 +56,27 @@ func getSpecs(db *sql.DB, parentId int) []spec {
 	return specs
 }
 
+func getPerspectives(db *sql.DB) []perspective {
+	sqSelect := sq.Select("id, name").From("perspectives").OrderBy("position")
+
+	rows, err := sqSelect.RunWith(db).Query()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	perspectives := []perspective{}
+	for rows.Next() {
+		var r perspective
+		err = rows.Scan(&r.Id, &r.Name)
+		if err != nil {
+			panic(err)
+		}
+		perspectives = append(perspectives, r)
+	}
+
+	return perspectives
+}
+
 func main() {
 
 	var dsn string = fmt.Sprintf("%s:%s@tcp(%s)/%s", os.Getenv("AUTOWP_DB_USERNAME"), os.Getenv("AUTOWP_DB_PASSWORD"), os.Getenv("AUTOWP_DB_HOST"), os.Getenv("AUTOWP_DB_DBNAME"))
@@ -70,31 +91,15 @@ func main() {
 
 	apiGroup := r.Group("/go-api")
 	{
+		var perspectives []perspective = getPerspectives(db)
+
 		apiGroup.GET("/perspective", func(c *gin.Context) {
-
-			sqSelect := sq.Select("id, name").From("perspectives").OrderBy("position")
-
-			rows, err := sqSelect.RunWith(db).Query()
-			if err != nil {
-				panic(err.Error())
-			}
-
-			perspectives := []perspective{}
-			for rows.Next() {
-				var r perspective
-				err = rows.Scan(&r.Id, &r.Name)
-				if err != nil {
-					panic(err)
-				}
-				perspectives = append(perspectives, r)
-			}
-
 			c.JSON(200, perspectiveResult{perspectives})
 		})
 
-		apiGroup.GET("/spec", func(c *gin.Context) {
+		var specs []spec = getSpecs(db, 0)
 
-			var specs []spec = getSpecs(db, 0)
+		apiGroup.GET("/spec", func(c *gin.Context) {
 
 			c.JSON(200, specResult{specs})
 		})
