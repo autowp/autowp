@@ -3,6 +3,7 @@ import Module from 'app.module';
 import template from './template.html';
 import ACL_SERVICE_NAME from 'services/acl';
 import notify from 'notify';
+import $ from 'jquery';
 
 angular.module(Module)
     .directive('autowpCommentsList', function() {
@@ -42,9 +43,16 @@ angular.module(Module)
                             }
                         }).then(function() {
                             
-                            $.getJSON('/api/comment/' + message.id, {fields: 'vote'}, function(response) {
+                            message.user_vote = value;
+                            
+                            $http({
+                                method: 'GET',
+                                url: '/api/comment/' + message.id, 
+                                params: {fields: 'vote'}
+                            }).then(function(response) {
                                 message.vote = response.data.vote;
-                                message.user_vote = value;
+                            }, function(response) {
+                                notify.response(response);
                             });
                             
                             ga('send', 'event', 'comment-vote', value > 0 ? 'like' : 'dislike');
@@ -77,6 +85,8 @@ angular.module(Module)
                             }
                         }).then(function() {
                             message.deleted = value;
+                        }, function(response) {
+                            notify.response(response);
                         });
                     };
                     
@@ -86,6 +96,30 @@ angular.module(Module)
                         } else {
                             message.showReply = true;
                         }
+                    };
+                    
+                    ctrl.showVotes = function(message) {
+                        var $modal = $(require('./votes.html'));
+                        
+                        var $body = $modal.find('.modal-body');
+                        
+                        $modal.modal();
+                        $modal.on('hidden.bs.modal', function() {
+                            $modal.remove();
+                        });
+                        
+                        var $btnClose = $modal.find('.btn-default');
+                        
+                        $btnClose.button('loading');
+                        $http({
+                            url: '/comments/votes', 
+                            params: {id: message.id}
+                        }).then(function(response) {
+                            $body.html(response.data);
+                            $btnClose.button('reset');
+                        }, function(response) {
+                            notify.response(response);
+                        });
                     };
                 }
             ]

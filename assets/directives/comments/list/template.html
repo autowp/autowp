@@ -21,12 +21,12 @@
         <div>
             <span class="vote">
                 <a href="#" class="vote-up" ng-class="{active: message.user_vote > 0}" ng-if="user" ng-click="ctrl.vote(message, 1)"><i class="fa fa-thumbs-o-up"></i></a>
-                <a href="#" class="value" ng-class="{zero: message.vote == 0}" ng-if="user">
+                <a href="#" class="value" ng-class="{zero: message.vote == 0}" ng-if="user" ng-click="ctrl.showVotes(message)">
                     {{(message.vote > 0 ? '+' : '') + message.vote}}
                 </a>
                 <a href="#" class="vote-down" ng-class="{active: message.user_vote > 0}" ng-if="user" ng-click="ctrl.vote(message, -1)"><i class="fa fa-thumbs-o-down"></i></a>
                 <i class="fa fa-thumbs-o-up" ng-if="!user"></i>
-                <span class="value" ng-if="!user" ng-bind="message.vote"></span>
+                <span class="value" ng-if="!user" ng-bind="message.vote" ng-click="ctrl.showVotes(message)"></span>
                 <i class="fa fa-thumbs-o-down" ng-if="!user"></i>
             </span>
 

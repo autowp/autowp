@@ -312,7 +312,7 @@ class CommentsController extends AbstractRestfulController
         }
 
         $viewModel = new ViewModel($result);
-        $viewModel->setTerminal($this->getRequest()->isXmlHttpRequest());
+        $viewModel->setTerminal(true);
 
         return $viewModel;
     }

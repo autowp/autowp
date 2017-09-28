@@ -180,7 +180,7 @@ class UsersService
             'last_online'      => new Sql\Expression('NOW()'),
             'timezone'         => $host['timezone'],
             'last_ip'          => new Sql\Expression('INET6_ATON(?)', [$values['ip']]),
-            'language'         => $language
+            'language'         => $language,
         ]);
         $userId = $this->userModel->getTable()->getLastInsertValue();
         $user = $this->userModel->getRow($userId);
@@ -190,6 +190,12 @@ class UsersService
         $this->sendRegistrationConfirmEmail($user, $host['hostname']);
 
         $this->updateUserVoteLimit($userId);
+
+        $this->userModel->getTable()->update([
+            'votes_left' => new Sql\Expression('votes_per_day')
+        ], [
+            'id' => $userId
+        ]);
 
         return $user;
     }
