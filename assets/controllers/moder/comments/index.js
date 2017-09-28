@@ -66,7 +66,7 @@ angular.module(Module)
                     pictures_of_item_id: ctrl.pictures_of_item_id,
                     page: ctrl.page,
                     order: 'date_desc',
-                    fields: 'preview,user,is_new,status'
+                    fields: 'preview,user,is_new,status,url'
                 };
                 
                 $state.go(STATE_NAME, params, {
