@@ -2,6 +2,8 @@
 
 namespace Application\Controller\Api;
 
+use DateTime;
+
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
