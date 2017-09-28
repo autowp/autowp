@@ -95,6 +95,7 @@ angular.module(Module).controller(CONTROLLER_NAME, [
         };
         
         $rootScope.doLogin = function() {
+            console.log('doLogin');
             $http({
                 method: 'POST',
                 url: '/api/login',

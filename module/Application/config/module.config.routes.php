@@ -572,28 +572,6 @@ return [
                     ]
                 ]
             ],
-            'museums' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route'    => '/museums',
-                    'defaults' => [
-                        'controller' => Controller\MuseumsController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'museum' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/museum/id/:id',
-                            'defaults' => [
-                                'action' => 'museum',
-                            ],
-                        ]
-                    ]
-                ]
-            ],
             'new' => [
                 'type'    => Segment::class,
                 'options' => [

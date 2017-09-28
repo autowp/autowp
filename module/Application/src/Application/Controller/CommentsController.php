@@ -8,7 +8,6 @@ use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Autowp\Message\MessageService;
@@ -303,79 +302,6 @@ class CommentsController extends AbstractRestfulController
             'canAddComments'    => $canAddComments,
             'canRemoveComments' => $canRemoveComments,
         ];
-    }
-
-    public function deleteAction()
-    {
-        if (! $this->user()->isAllowed('comment', 'remove')) {
-            return $this->forbiddenAction();
-        }
-
-        $success = $this->comments->service()->queueDeleteMessage(
-            $this->params()->fromPost('comment_id'),
-            $this->user()->get()['id']
-        );
-
-        return new JsonModel([
-            'ok' => $success,
-            'result' => [
-                'ok' => $success
-            ]
-        ]);
-    }
-
-    public function restoreAction()
-    {
-        if (! $this->user()->isAllowed('comment', 'remove')) {
-            return $this->forbiddenAction();
-        }
-
-        $this->comments->service()->restoreMessage($this->params()->fromPost('comment_id'));
-
-        return new JsonModel([
-            'ok' => true,
-            'result' => [
-                'ok' => true
-            ]
-        ]);
-    }
-
-    public function voteAction()
-    {
-        if (! $this->getRequest()->isPost()) {
-            return $this->forbiddenAction();
-        }
-
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        if ($user['votes_left'] <= 0) {
-            return new JsonModel([
-                'ok'    => false,
-                'error' => $this->translate('comments/vote/no-more-votes')
-            ]);
-        }
-
-        $result = $this->comments->service()->voteMessage(
-            $this->params()->fromPost('id'),
-            $user['id'],
-            $this->params()->fromPost('vote')
-        );
-        if (! $result['success']) {
-            return new JsonModel([
-                'ok'    => false,
-                'error' => $result['error']
-            ]);
-        }
-
-        $this->userModel->decVotes($user['id']);
-
-        return new JsonModel([
-            'ok'   => true,
-            'vote' => $result['vote']
-        ]);
     }
 
     public function votesAction()

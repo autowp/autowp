@@ -52,10 +52,6 @@ class ItemLinkController extends AbstractRestfulController
 
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
         $this->listInputFilter->setData($this->params()->fromQuery());
 
         if (! $this->listInputFilter->isValid()) {

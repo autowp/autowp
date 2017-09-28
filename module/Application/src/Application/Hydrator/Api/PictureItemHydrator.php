@@ -59,7 +59,7 @@ class PictureItemHydrator extends RestHydrator
     {
         $this->userId = $userId;
 
-        //$this->getStrategy('content')->setUser($user);
+        $this->getStrategy('item')->setUserId($userId);
         //$this->getStrategy('replies')->setUser($user);
 
         return $this;

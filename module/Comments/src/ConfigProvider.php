@@ -75,7 +75,7 @@ class ConfigProvider
                             'attributes' => [
                                 'cols'      => 80,
                                 'rows'      => 5,
-                                'maxlength' => 1024 * 16
+                                'maxlength' => CommentsService::MAX_MESSAGE_LENGTH
                             ]
                         ],
                     ],
@@ -112,7 +112,7 @@ class ConfigProvider
                                 'name' => 'StringLength',
                                 'options' => [
                                     'min' => 0,
-                                    'max' => 1024 * 16
+                                    'max' => CommentsService::MAX_MESSAGE_LENGTH
                                 ]
                             ]
                         ]

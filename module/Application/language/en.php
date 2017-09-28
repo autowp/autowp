@@ -375,7 +375,7 @@ All images are posted for educational purposes.
     /* comments */
     'comments/title' => 'Comments',
     'comments/reply' => 'reply',
-    'comments/what-to-do-for-write-comments' => 'To be able to post a comment, you must <a href="/ng/login">create an account or sign in using social networks account</a>',
+    'comments/what-to-do-for-write-comments' => 'To be able to post a comment, you must [create an account or sign in using social networks account](/ng/login)',
     'comments/it-requires-attention-of-moderators' => 'It requires attention of moderators',
     'comments/form-title' => 'Add comment',
     'comments/message' => 'Message',

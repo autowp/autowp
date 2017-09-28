@@ -139,13 +139,11 @@ class Comments
                         ]);
                         break;
                     case Item::MUSEUM:
-                        $url = $this->router->assemble([
-                            'id' => $item['id']
-                        ], [
-                            'name'            => 'museums/museum',
+                        $url = $this->router->assemble([], [
+                            'name'            => 'ng',
                             'force_canonical' => $canonical,
                             'uri'             => $uri
-                        ]);
+                        ]) . 'museums/' . $item['id'];
                         break;
                     default:
                         throw new Exception(sprintf(

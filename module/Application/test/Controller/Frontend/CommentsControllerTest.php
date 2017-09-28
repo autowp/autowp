@@ -7,6 +7,7 @@ use Zend\Json\Json;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
+use Application\Controller\Api\CommentController;
 use Application\Controller\CommentsController;
 use Application\Controller\UploadController;
 use Application\Test\AbstractHttpControllerTestCase;
@@ -157,38 +158,28 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         // vote positive
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=token'));
-        $this->dispatch('https://www.autowp.ru/comments/vote', Request::METHOD_POST, [
-            'id'   => $comment['id'],
-            'vote' => 1
+        $this->dispatch('https://www.autowp.ru/api/comment/' . $comment['id'], Request::METHOD_PUT, [
+            'user_vote' => 1
         ]);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(CommentsController::class);
-        $this->assertMatchedRouteName('comments/vote');
-        $this->assertActionName('vote');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertTrue($json['ok']);
+        $this->assertControllerName(CommentController::class);
+        $this->assertMatchedRouteName('api/comment/item/put');
+        $this->assertActionName('put');
 
         // vote negative
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=token'));
-        $this->dispatch('https://www.autowp.ru/comments/vote', Request::METHOD_POST, [
-            'id'   => $comment['id'],
-            'vote' => -1
+        $this->dispatch('https://www.autowp.ru/api/comment/' . $comment['id'], Request::METHOD_PUT, [
+            'user_vote' => -1
         ]);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(CommentsController::class);
-        $this->assertMatchedRouteName('comments/vote');
-        $this->assertActionName('vote');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertTrue($json['ok']);
+        $this->assertControllerName(CommentController::class);
+        $this->assertMatchedRouteName('api/comment/item/put');
+        $this->assertActionName('put');
 
         // get votes
         $this->reset();
@@ -228,36 +219,28 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         // delete
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/comments/delete', Request::METHOD_POST, [
-            'comment_id' => $comment['id']
+        $this->dispatch('https://www.autowp.ru/api/comment/' . $comment['id'], Request::METHOD_PUT, [
+            'deleted' => 1
         ]);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(CommentsController::class);
-        $this->assertMatchedRouteName('comments/delete');
-        $this->assertActionName('delete');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertTrue($json['ok']);
+        $this->assertControllerName(CommentController::class);
+        $this->assertMatchedRouteName('api/comment/item/put');
+        $this->assertActionName('put');
 
         // restore
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/comments/restore', Request::METHOD_POST, [
-            'comment_id' => $comment['id']
+        $this->dispatch('https://www.autowp.ru/api/comment/' . $comment['id'], Request::METHOD_PUT, [
+            'deleted' => 0
         ]);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(CommentsController::class);
-        $this->assertMatchedRouteName('comments/restore');
-        $this->assertActionName('restore');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertTrue($json['ok']);
+        $this->assertControllerName(CommentController::class);
+        $this->assertMatchedRouteName('api/comment/item/put');
+        $this->assertActionName('put');
     }
 
     public function testCreateCommentAndResolve()

@@ -18,30 +18,35 @@ angular.module(Module)
             transclude: true,
             controller: ['$scope', '$timeout', PERSPECTIVE_SERVICE, PICTURE_ITEM_SERVICE, 
                 function($scope, $timeout, PerspectiveService, PictureItemService) {
-                    $scope.perspectiveOptions = [];
                     
-                    PerspectiveService.getPerspectives().then(function(perspectives) {
-                        $scope.perspectiveOptions = perspectives;
-                    });
-                    
-                    $scope.onPictureSelect = function($event, picture) {
-                        var element = $event.currentTarget;
-                        $timeout(function() {
-                            var active = angular.element(element).hasClass('active');
-                            $scope.onselect(picture, active);
+                    if ($scope.picture.perspective_item) {
+                        $scope.perspectiveOptions = [];
+                        
+                        PerspectiveService.getPerspectives().then(function(perspectives) {
+                            $scope.perspectiveOptions = perspectives;
                         });
-                    };
+                        
+                        $scope.savePerspective = function() {
+                            if ($scope.picture.perspective_item) {
+                                PictureItemService.setPerspective(
+                                    $scope.picture.id,
+                                    $scope.picture.perspective_item.item_id,
+                                    $scope.picture.perspective_item.type,
+                                    $scope.picture.perspective_item.perspective_id
+                                );
+                            }
+                        };
+                    }
                     
-                    $scope.savePerspective = function() {
-                        if ($scope.picture.perspective_item) {
-                            PictureItemService.setPerspective(
-                                $scope.picture.id,
-                                $scope.picture.perspective_item.item_id,
-                                $scope.picture.perspective_item.type,
-                                $scope.picture.perspective_item.perspective_id
-                            );
-                        }
-                    };
+                    if ($scope.onselect) {
+                        $scope.onPictureSelect = function($event, picture) {
+                            var element = $event.currentTarget;
+                            $timeout(function() {
+                                var active = angular.element(element).hasClass('active');
+                                $scope.onselect(picture, active);
+                            });
+                        };
+                    }
                 }
             ]
         };

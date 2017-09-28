@@ -13,6 +13,8 @@ class CommentsService
 {
     const DELETE_TTL_DAYS = 300;
 
+    const MAX_MESSAGE_LENGTH = 16 * 1024;
+
     /**
      * @var TableGateway
      */
@@ -230,11 +232,7 @@ class CommentsService
         $statement->execute([$userId, $typeId, $itemId]);
     }
 
-    /**
-     * @param int $id
-     * @return boolean
-     */
-    public function queueDeleteMessage($id, $userId)
+    public function queueDeleteMessage(int $id, int $userId): bool
     {
         $comment = $this->getMessageRow($id);
 
@@ -286,13 +284,7 @@ class CommentsService
         ]);
     }
 
-    /**
-     * @param int $id
-     * @param int $userId
-     * @param int $vote
-     * @return array
-     */
-    public function voteMessage($id, $userId, $vote)
+    public function voteMessage(int $id, int $userId, int $vote): array
     {
         $message = $this->getMessageRow($id);
         if (! $message) {
@@ -314,7 +306,7 @@ class CommentsService
             'user_id'    => $userId
         ])->current();
 
-        $vote = (int)$vote > 0 ? 1 : -1;
+        $vote = $vote > 0 ? 1 : -1;
 
         if (! $voteRow) {
             $voteRow = $this->voteTable->insert([
@@ -481,7 +473,7 @@ class CommentsService
      * @param int $id
      * @return array|\ArrayObject
      */
-    public function getMessageRow($id)
+    public function getMessageRow(int $id)
     {
         return $this->messageTable->select([
             'id = ?' => (int)$id
@@ -946,12 +938,15 @@ class CommentsService
     {
         $defaults = [
             'attention'       => null,
+            'item_id'         => null,
             'type'            => null,
             'user'            => null,
             'exclude_type'    => null,
             'exclude_deleted' => false,
             'callback'        => null,
-            'order'           => null
+            'order'           => null,
+            'parent_id'       => null,
+            'no_parents'      => null,
         ];
         $options = array_replace($defaults, $options);
 
@@ -960,6 +955,12 @@ class CommentsService
         if (isset($options['attention'])) {
             $select->where([
                 'comment_message.moderator_attention = ?' => $options['attention']
+            ]);
+        }
+
+        if (isset($options['item_id'])) {
+            $select->where([
+                'comment_message.item_id = ?' => $options['item_id']
             ]);
         }
 
@@ -979,6 +980,14 @@ class CommentsService
             $select->where([
                 'comment_message.type_id <> ?' => $options['exclude_type']
             ]);
+        }
+
+        if ($options['parent_id']) {
+            $select->where(['comment_message.parent_id' => $options['parent_id']]);
+        }
+
+        if ($options['no_parents']) {
+            $select->where(['comment_message.parent_id IS NULL']);
         }
 
         if ($options['exclude_deleted']) {

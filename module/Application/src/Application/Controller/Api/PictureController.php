@@ -74,6 +74,11 @@ class PictureController extends AbstractRestfulController
     /**
      * @var InputFilter
      */
+    private $publicListInputFilter;
+
+    /**
+     * @var InputFilter
+     */
     private $editInputFilter;
 
     private $textStorage;
@@ -115,6 +120,7 @@ class PictureController extends AbstractRestfulController
         CarOfDay $carOfDay,
         InputFilter $itemInputFilter,
         InputFilter $listInputFilter,
+        InputFilter $publicListInputFilter,
         InputFilter $editInputFilter,
         $textStorage,
         \Autowp\Comments\CommentsService $comments,
@@ -135,6 +141,7 @@ class PictureController extends AbstractRestfulController
         $this->message = $message;
         $this->itemInputFilter = $itemInputFilter;
         $this->listInputFilter = $listInputFilter;
+        $this->publicListInputFilter = $publicListInputFilter;
         $this->editInputFilter = $editInputFilter;
         $this->textStorage = $textStorage;
         $this->comments = $comments;
@@ -246,145 +253,149 @@ class PictureController extends AbstractRestfulController
 
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
+        $isModer = $this->user()->inheritsRole('moder');
 
         $user = $this->user()->get();
 
-        $this->listInputFilter->setData($this->params()->fromQuery());
+        $inputFilter = $isModer ? $this->listInputFilter : $this->publicListInputFilter;
+        $inputFilter->setData($this->params()->fromQuery());
 
-        if (! $this->listInputFilter->isValid()) {
-            return $this->inputFilterResponse($this->listInputFilter);
+        if (! $inputFilter->isValid()) {
+            return $this->inputFilterResponse($inputFilter);
         }
 
-        $data = $this->listInputFilter->getValues();
+        $data = $inputFilter->getValues();
 
         $filter = [];
-
-        if (strlen($data['status'])) {
-            switch ($data['status']) {
-                case Picture::STATUS_INBOX:
-                case Picture::STATUS_ACCEPTED:
-                case Picture::STATUS_REMOVING:
-                    $filter['status'] = $data['status'];
-                    break;
-                case 'custom1':
-                    $filter['status'] = [
-                        Picture::STATUS_INBOX,
-                        Picture::STATUS_ACCEPTED
-                    ];
-                    break;
-            }
-        }
-
-        if ($data['exact_item_id']) {
-            $filter['item']['id'] = $data['exact_item_id'];
-        }
 
         if ($data['item_id']) {
             $filter['item']['ancestor_or_self'] = $data['item_id'];
         }
 
-        if ($data['perspective_id']) {
-            if ($data['perspective_id'] == 'null') {
-                $filter['item']['perspective_is_null'] = true;
+        if ($isModer) {
+            if (strlen($data['status'])) {
+                switch ($data['status']) {
+                    case Picture::STATUS_INBOX:
+                    case Picture::STATUS_ACCEPTED:
+                    case Picture::STATUS_REMOVING:
+                        $filter['status'] = $data['status'];
+                        break;
+                    case 'custom1':
+                        $filter['status'] = [
+                            Picture::STATUS_INBOX,
+                            Picture::STATUS_ACCEPTED
+                        ];
+                        break;
+                }
+            }
+
+            if ($data['exact_item_id']) {
+                $filter['item']['id'] = $data['exact_item_id'];
+            }
+
+            if ($data['perspective_id']) {
+                if ($data['perspective_id'] == 'null') {
+                    $filter['item']['perspective_is_null'] = true;
+                } else {
+                    $filter['item']['perspective'] = $data['perspective_id'];
+                }
+            }
+
+            if (strlen($data['comments'])) {
+                if ($data['comments'] == '1') {
+                    $filter['has_comments'] = true;
+                } elseif ($data['comments'] == '0') {
+                    $filter['has_comments'] = false;
+                }
+            }
+
+            if ($data['owner_id']) {
+                $filter['user'] = $data['owner_id'];
+            }
+
+            if ($data['car_type_id']) {
+                $filter['item']['vehicle_type'] = $data['car_type_id'];
+            }
+
+            if ($data['special_name']) {
+                $filter['has_special_name'] = true;
+            }
+
+            if ($data['similar']) {
+                $filter['has_similar'] = true;
+                $data['order'] = 10;
+            }
+
+            if (strlen($data['requests'])) {
+                switch ($data['requests']) {
+                    case '0':
+                        $filter['has_moder_votes'] = false;
+                        break;
+
+                    case '1':
+                        $filter['has_accept_votes'] = true;
+                        break;
+
+                    case '2':
+                        $filter['has_delete_votes'] = true;
+                        break;
+
+                    case '3':
+                        $filter['has_moder_votes'] = true;
+                        break;
+                }
+            }
+
+            if (strlen($data['replace'])) {
+                if ($data['replace'] == '1') {
+                    $filter['is_replace'] = true;
+                } elseif ($data['replace'] == '0') {
+                    $filter['is_replace'] = false;
+                }
+            }
+
+            if ($data['lost']) {
+                $filter['is_lost'] = true;
+            }
+
+            if ($data['gps']) {
+                $filter['has_point'] = true;
+            }
+
+            $orders = [
+                1 => 'add_date_desc',
+                2 => 'add_date_asc',
+                3 => 'resolution_desc',
+                4 => 'resolution_asc',
+                5 => 'filesize_desc',
+                6 => 'filesize_asc',
+                7 => 'comments',
+                8 => 'views',
+                9 => 'moder_votes',
+                10 => 'similarity',
+                11 => 'removing_date',
+                12 => 'likes',
+                13 => 'dislikes',
+                14 => 'status'
+            ];
+
+            switch ($data['order']) {
+                case 12:
+                    $filter['has_likes'] = true;
+                    break;
+                case 13:
+                    $filter['has_dislikes'] = true;
+                    break;
+            }
+
+            if ($data['order']) {
+                $filter['order'] = $orders[$data['order']];
             } else {
-                $filter['item']['perspective'] = $data['perspective_id'];
+                $filter['order'] = $orders[1];
             }
-        }
-
-        if (strlen($data['comments'])) {
-            if ($data['comments'] == '1') {
-                $filter['has_comments'] = true;
-            } elseif ($data['comments'] == '0') {
-                $filter['has_comments'] = false;
-            }
-        }
-
-        if ($data['owner_id']) {
-            $filter['user'] = $data['owner_id'];
-        }
-
-        if ($data['car_type_id']) {
-            $filter['item']['vehicle_type'] = $data['car_type_id'];
-        }
-
-        if ($data['special_name']) {
-            $filter['has_special_name'] = true;
-        }
-
-        if ($data['similar']) {
-            $filter['has_similar'] = true;
-            $data['order'] = 10;
-        }
-
-        if (strlen($data['requests'])) {
-            switch ($data['requests']) {
-                case '0':
-                    $filter['has_moder_votes'] = false;
-                    break;
-
-                case '1':
-                    $filter['has_accept_votes'] = true;
-                    break;
-
-                case '2':
-                    $filter['has_delete_votes'] = true;
-                    break;
-
-                case '3':
-                    $filter['has_moder_votes'] = true;
-                    break;
-            }
-        }
-
-        if (strlen($data['replace'])) {
-            if ($data['replace'] == '1') {
-                $filter['is_replace'] = true;
-            } elseif ($data['replace'] == '0') {
-                $filter['is_replace'] = false;
-            }
-        }
-
-        if ($data['lost']) {
-            $filter['is_lost'] = true;
-        }
-
-        if ($data['gps']) {
-            $filter['has_point'] = true;
-        }
-
-        $orders = [
-            1 => 'add_date_desc',
-            2 => 'add_date_asc',
-            3 => 'resolution_desc',
-            4 => 'resolution_asc',
-            5 => 'filesize_desc',
-            6 => 'filesize_asc',
-            7 => 'comments',
-            8 => 'views',
-            9 => 'moder_votes',
-            10 => 'similarity',
-            11 => 'removing_date',
-            12 => 'likes',
-            13 => 'dislikes',
-            14 => 'status'
-        ];
-
-        switch ($data['order']) {
-            case 12:
-                $filter['has_likes'] = true;
-                break;
-            case 13:
-                $filter['has_dislikes'] = true;
-                break;
-        }
-
-        if ($data['order']) {
-            $filter['order'] = $orders[$data['order']];
         } else {
-            $filter['order'] = $orders[1];
+            $filter['status'] = Picture::STATUS_ACCEPTED;
+            $filter['order'] = 'likes';
         }
 
         $paginator = $this->picture->getPaginator($filter);

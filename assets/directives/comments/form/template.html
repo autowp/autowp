@@ -1,0 +1,23 @@
+<form class="add-message" method="post" ng-submit="ctrl.sendMessage()"><fieldset>
+    <legend translate>comments/form-title</legend>
+    <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.message}">
+        <div class="controls">
+            <textarea cols="80" rows="5" name="message" maxlength="16000" class="form-control" ng-model="ctrl.form.message"></textarea>
+            <p ng-repeat="message in ctrl.invalidParams.message" ng-bind="message" class="help-block"></p>
+        </div>
+    </div>
+    <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.moderator_attention}">
+        <div class="controls checkbox">
+            <div class="pull-right cancel">
+                <button class="btn btn-xs btn-warning" translate>comments/cancel</button>
+            </div>
+            <label>
+                <input type="checkbox" name="moderator_attention" value="1" ng-model="ctrl.form.moderator_attention" />
+                {{'comments/it-requires-attention-of-moderators'|translate}}
+            </label>
+        </div>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary" translate>comments/send</button>
+    </div>
+</fieldset></form>

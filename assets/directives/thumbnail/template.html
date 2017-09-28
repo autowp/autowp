@@ -46,11 +46,11 @@
                 </span>
             </p>
         </div>
-        <button type="button" class="btn btn-default btn-sm pull-left" data-toggle="button" aria-pressed="false" ng-click="onPictureSelect($event, picture)">
+        <button type="button" class="btn btn-default btn-sm pull-left" data-toggle="button" aria-pressed="false" ng-click="onPictureSelect($event, picture)" ng-if="onselect">
             <i class="fa fa-check"></i>
         </button>
-        <div style="margin-left:35px;">
-            <select class="form-control input-sm" ng-model="picture.perspective_item.perspective_id" ng-if="picture.perspective_item" ng-change="savePerspective()">
+        <div style="margin-left:35px;" ng-if="picture.perspective_item">
+            <select class="form-control input-sm" ng-model="picture.perspective_item.perspective_id" ng-change="savePerspective()">
                 <option value="">--</option>
                 <option ng-repeat="item in perspectiveOptions" ng-value="{{item.id}}">{{item.name|translate}}</option>
             </select>
@@ -59,7 +59,7 @@
             <span class="fa fa-file-image-o"></span>
             <a ui-sref="moder-pictures-item({id: picture.similar.picture_id})">Similar picture: {{picture.similar.distance}}</a>
         </p>
-        <a ui-sref="moder-pictures-item({id: picture.id})" class="btn btn-default btn-sm settings" aria-label="Settings">
+        <a ui-sref="moder-pictures-item({id: picture.id})" class="btn btn-default btn-sm settings" aria-label="Settings" ng-if="isModer">
             <i class="fa fa-cog"></i>
         </a>
     </div>

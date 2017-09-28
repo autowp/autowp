@@ -202,7 +202,7 @@ ga('send', 'pageview');
 
                     <h3 ng-if="!user" translate>login/sign-in</h3>
                     <div class="well" ng-if="!user">
-                        <form class="login" ng-submit="doLogin()"><div>
+                        <form ng-submit="doLogin()">
                             <p><input type="text" name="login" placeholder="{{'login/login-or-email'|translate}}" class="form-control" ng-model="loginForm.login" /></p>
                             <p ng-repeat="message in loginInvalidParams.login" ng-bind="message" class="help-block"></p>
                             <p><input type="password" name="password" placeholder="{{'user/password'|translate}}" class="form-control" ng-model="loginForm.password" /></p>
@@ -220,7 +220,7 @@ ga('send', 'pageview');
                                 </div>
                                 <input type="submit" value="{{'login/sign-in'|translate}}" class="btn btn-primary" />
                             </div>
-                        </div></form>
+                        </form>
                     </div>
 
                     <a class="twitter-timeline" href="https://twitter.com/autowp_ru" data-widget-id="323907714319253505" data-chrome="nofooter" width="370" height="730">@autowp_ru Twitter</a>

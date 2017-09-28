@@ -938,7 +938,7 @@ CREATE TABLE `comment_message` (
   `type_id` tinyint(11) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
   `author_id` int(11) unsigned DEFAULT NULL,
-  `datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `message` mediumtext NOT NULL,
   `moderator_attention` tinyint(3) unsigned NOT NULL,
   `vote` int(11) NOT NULL DEFAULT '0',

@@ -1,0 +1,7 @@
+<div class="comments">
+    <h2 translate ng-if="ctrl.messages">comments/title</h2>
+    <autowp-comments-list item-id="itemId" type-id="typeId" on-sent="ctrl.load" messages="ctrl.messages" deep="0" user="user" ng-if="ctrl.messages"></autowp-comments-list>
+
+    <autowp-comments-form item-id="itemId" type-id="typeId" on-sent="ctrl.load" ng-if="user"></autowp-comments-form>
+    <div ng-if="!user" class="alert alert-block alert-info" btf-markdown="'comments/what-to-do-for-write-comments'|translate"></div>
+</div>

@@ -1,0 +1,27 @@
+<p ng-if="ctrl.museumModer">
+    <i class="fa fa-cog"></i>
+    <a ui-sref="moder-items-item({id: ctrl.item.id})" ui-sref-options="{inherit: false}" translate>moder/edit-object</a>
+</p>
+
+<div id="google-map"></div>
+
+<div class="well" ng-if="ctrl.links.length > 0 || ctrl.item.description">
+    <div btf-markdown="ctrl.item.description"></div>
+
+    <p ng-if="ctrl.links.length > 0">
+        {{'museums/museum/website:'|translate}}
+        <a ng-href="{{link.url}}" ng-repeat-start="link in ctrl.links" ng-bind="link.name ? link.name : link.url"></a>
+        <br ng-repeat-end />
+    </p>
+</div>
+
+<div ng-if="ctrl.chunks.length > 0">
+    <h3 translate>factories/factory/pictures</h3>
+    <div class="row" ng-repeat="chunk in ctrl.chunks">
+        <div class="col-sm-3" ng-repeat="picture in chunk">
+            <autowp-thumbnail picture="picture" is-moder="isModer"></autowp-thumbnail>
+        </div>
+    </div>
+</div>
+
+<autowp-comments item-id="ctrl.item.id" type-id="2" user="user" ng-if="ctrl.item"></autowp-comments>

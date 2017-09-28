@@ -1,4 +1,7 @@
 import 'es6-shim';
+import './directives/comments';
+import './directives/comments/form';
+import './directives/comments/list';
 import './directives/item';
 import './directives/item-meta-form';
 import './directives/markdown-edit';
@@ -17,6 +20,7 @@ import './controllers/feedback';
 import './controllers/log';
 import './controllers/login';
 import './controllers/map';
+import './controllers/museum';
 import './controllers/pulse';
 import './controllers/restore-password';
 import './controllers/signup';

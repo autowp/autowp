@@ -109,9 +109,7 @@ class MapController extends AbstractActionController
                         break;
 
                     case Item::MUSEUM:
-                        $url = $this->url()->fromRoute('museums/museum', [
-                            'id' => $item['id']
-                        ]);
+                        $url = '/ng/museums/' . $item['id'];
                         break;
                 }
 

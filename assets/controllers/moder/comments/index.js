@@ -14,7 +14,7 @@ angular.module(Module)
         function config($stateProvider) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/comments?user&moderator_attention&item_id&page',
+                url: '/moder/comments?user&moderator_attention&pictures_of_item_id&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template,
@@ -54,7 +54,7 @@ angular.module(Module)
             ctrl.paginator = null;
             ctrl.user = $state.params.user;
             ctrl.moderator_attention = $state.params.moderator_attention;
-            ctrl.item_id = $state.params.item_id;
+            ctrl.pictures_of_item_id = $state.params.pictures_of_item_id;
             ctrl.page = $state.params.page;
             
             ctrl.load = function() {
@@ -63,8 +63,10 @@ angular.module(Module)
                 var params = {
                     user: ctrl.user,
                     moderator_attention: ctrl.moderator_attention,
-                    item_id: ctrl.item_id,
-                    page: ctrl.page
+                    pictures_of_item_id: ctrl.pictures_of_item_id,
+                    page: ctrl.page,
+                    order: 'date_desc',
+                    fields: 'preview,user,is_new,status'
                 };
                 
                 $state.go(STATE_NAME, params, {
@@ -78,7 +80,7 @@ angular.module(Module)
                     url: '/api/comment',
                     params: params
                 }).then(function(response) {
-                    ctrl.comments = response.data.comments;
+                    ctrl.comments = response.data.items;
                     ctrl.paginator = response.data.paginator;
                     ctrl.loading--;
                 }, function(response) {
@@ -135,8 +137,8 @@ angular.module(Module)
                     userIdLastValue = curValue;
                 });
             
-            var $itemIdElement = $($element[0]).find(':input[name=item_id]');
-            $itemIdElement.val(ctrl.item_id ? '#' + ctrl.item_id : '');
+            var $itemIdElement = $($element[0]).find(':input[name=pictures_of_item_id]');
+            $itemIdElement.val(ctrl.pictures_of_item_id ? '#' + ctrl.pictures_of_item_id : '');
             var itemIdLastValue = $itemIdElement.val();
             $itemIdElement
                 .typeahead({ }, {
@@ -172,13 +174,13 @@ angular.module(Module)
                 })
                 .on('typeahead:select', function(ev, item) {
                     itemIdLastValue = item.name_text;
-                    ctrl.item_id = item.id;
+                    ctrl.pictures_of_item_id = item.id;
                     ctrl.load();
                 })
                 .on('change blur', function(ev, item) {
                     var curValue = $(this).val();
                     if (itemIdLastValue && !curValue) {
-                        ctrl.item_id = null;
+                        ctrl.pictures_of_item_id = null;
                         ctrl.load();
                     }
                     itemIdLastValue = curValue;

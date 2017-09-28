@@ -1,0 +1,70 @@
+<div class="message" ng-class="{'moderator-attention': message.moderAttention == 1, deleted: message.deleted}" data-id="<?=(int)$comment['id']?>" id="msg<?=(int)$comment['id']?>" ng-repeat="message in messages">
+    <div>
+        <div class="pull-right" ng-if="message.datetime" am-time-ago="message.datetime"></div>
+        <autowp-user user="message.user" ng-if="message.user"></autowp-user>
+        <span ng-if="!message.user" translate>comments/author/anonymous</span>
+    </div>
+    <div class="photo">
+        <a ng-href="{{message.user.url}}" class="photo" ng-if="message.user && !message.user.deleted">
+            <img ng-src="{{message.user.avatar.src}}" ng-if="message.user.avatar" />
+            <img ng-src="{{message.user.gravatar}}" ng-if="message.user.gravatar && ! message.user.avatar" />
+        </a>
+    </div>
+    <div class="content">
+
+        <div class="text" ng-if="ctrl.canRemoveComments || !message.deleted">
+            <p ng-bind-html="message.text_html"></p>
+        </div>
+
+        <p class="alert alert-warning deleted-message" ng-if="ctrl.canRemoveComments || message.deleted" translate>comments/message-deleted-by-admin</p>
+
+        <div>
+            <span class="vote">
+                <a href="#" class="vote-up" ng-class="{active: message.user_vote > 0}" ng-if="user" ng-click="ctrl.vote(message, 1)"><i class="fa fa-thumbs-o-up"></i></a>
+                <a href="#" class="value" ng-class="{zero: message.vote == 0}" ng-if="user">
+                    {{(message.vote > 0 ? '+' : '') + message.vote}}
+                </a>
+                <a href="#" class="vote-down" ng-class="{active: message.user_vote > 0}" ng-if="user" ng-click="ctrl.vote(message, -1)"><i class="fa fa-thumbs-o-down"></i></a>
+                <i class="fa fa-thumbs-o-up" ng-if="!user"></i>
+                <span class="value" ng-if="!user" ng-bind="message.vote"></span>
+                <i class="fa fa-thumbs-o-down" ng-if="!user"></i>
+            </span>
+
+            <button class="btn btn-xs btn-primary reply" ng-if="user && deep < 21 && !message.deleted" ng-click="ctrl.reply(message, false)">
+                <i class="fa fa-reply"></i>
+                {{'comments/reply'|translate}}
+            </button>
+
+            <button class="btn btn-xs btn-success resolve" ng-if="moderAttention && isModer" ng-click="ctrl.reply(message, true)">
+                <i class="fa fa-reply"></i>
+                {{'comments/reply'|translate}} &amp; resolve
+            </button>
+
+            <a href="#" class="btn btn-danger btn-xs pull-right comment-remove-button" ng-if="ctrl.canRemoveComments" ng-click="ctrl.setIsDeleted(message, 1)">
+                <i class="fa fa-trash"></i>
+                {{'comments/message/delete'|translate}}
+            </a>
+            <a href="#" class="btn btn-success btn-xs pull-right comment-restore-button" ng-if="ctrl.canRemoveComments" ng-click="ctrl.setIsDeleted(message, 0)">
+                <i class="fa fa-arrow-up"></i>
+                {{'comments/message/restore'|translate}}
+            </a>
+
+            <a href="#" class="btn btn-default btn-xs pull-right" ng-if="ctrl.canMoveMessage">
+                <i class="fa fa-arrows"></i>
+                {{'comments/message/move'|translate}}
+            </a>
+
+            <i class="pull-right fa fa-eye" data-toggle="tooltip" title="{{comment.ip}}" style="margin-right:20px" ng-if="comment.ip"></i>
+
+            <div class="moderator-attention-sign" ng-if="moderAttention">
+                <i class="fa fa-info-circle"></i>
+                {{'comments/it-requires-attention-of-moderators'|translate}}
+            </div>
+
+        </div>
+    </div>
+    <div class="replies" ng-if="deep < 21">
+        <autowp-comments-list item-id="itemId" type-id="typeId" on-sent="onSent" messages="message.replies" user="user" deep="deep+1"></autowp-comments-list>
+        <autowp-comments-form item-id="itemId" type-id="typeId" on-sent="onSent" parent-id="message.id" ng-if="user && message.showReply"></autowp-comments-form>
+    </div>
+</div>

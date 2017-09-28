@@ -238,74 +238,16 @@ class ItemHydrator extends RestHydrator
             'specsService' => $this->specsService
         ]);
 
+        $isModer = false;
+        $role = $this->getUserRole();
+        if ($role) {
+            $isModer = $this->acl->inheritsRole($role, 'moder');
+        }
+
         $result = [
             'id'           => (int)$object['id'],
             'item_type_id' => (int)$object['item_type_id']
         ];
-
-        if ($this->filterComposite->filter('body')) { // only for moders
-            $result['body'] = (string)$object['body'];
-        }
-
-        if ($this->filterComposite->filter('is_concept')) { // only for moders
-            if ($object['is_concept_inherit']) {
-                $result['is_concept'] = 'inherited';
-            } else {
-                $result['is_concept'] = (bool)$object['is_concept'];
-            }
-        }
-
-        if ($this->filterComposite->filter('spec_id')) { // only for moders
-
-            if ($object['spec_inherit']) {
-                $result['spec_id'] = 'inherited';
-            } else {
-                $value = (int)$object['spec_id'];
-                $result['spec_id'] = $value > 0 ? $value : null;
-            }
-        }
-
-        if ($this->filterComposite->filter('is_group')) { // only for moders
-            $result['is_group'] = (bool)$object['is_group'];
-        }
-
-        if ($this->filterComposite->filter('begin_model_year')) { // only for moders
-            $value = (int)$object['begin_model_year'];
-            $result['begin_model_year'] = $value > 0 ? $value : null;
-        }
-
-        if ($this->filterComposite->filter('end_model_year')) { // only for moders
-            $value = (int)$object['end_model_year'];
-            $result['end_model_year'] = $value > 0 ? $value : null;
-        }
-
-        if ($this->filterComposite->filter('begin_year')) { // only for moders
-            $value = (int)$object['begin_year'];
-            $result['begin_year'] = $value > 0 ? $value : null;
-        }
-
-        if ($this->filterComposite->filter('begin_month')) { // only for moders
-            $value = (int)$object['begin_month'];
-            $result['begin_month'] = $value > 0 ? $value : null;
-        }
-
-        if ($this->filterComposite->filter('end_year')) { // only for moders
-            $value = (int)$object['end_year'];
-            $result['end_year'] = $value > 0 ? $value : null;
-        }
-
-        if ($this->filterComposite->filter('end_month')) { // only for moders
-            $value = (int)$object['end_month'];
-            $result['end_month'] = $value > 0 ? $value : null;
-        }
-
-        if ($this->filterComposite->filter('today')) { // only for moders
-            $result['today'] = $object['today'] === null ? null : (bool)$object['today'];
-        }
-
-        if ($this->filterComposite->filter('subscription') && $this->userId) { // only for moders
-            $result['subscription'] = $this->userItemSubscribe->isSubscribed((int)$this->userId, (int)$object['id']);
-        }
 
         if ($this->filterComposite->filter('upload_url')) {
             $result['upload_url'] = $this->router->assemble([
@@ -331,14 +273,6 @@ class ItemHydrator extends RestHydrator
             }
         }
 
-        if ($this->filterComposite->filter('full_name')) {
-            $result['full_name'] = $object['full_name'];
-        }
-
-        if ($this->filterComposite->filter('catname')) {
-            $result['catname'] = $object['catname'];
-        }
-
         $showLat = $this->filterComposite->filter('lat');
         $showLng = $this->filterComposite->filter('lng');
 
@@ -354,112 +288,8 @@ class ItemHydrator extends RestHydrator
             }
         }
 
-        $totalPictures = null;
-        $pictures = [];
-        $cFetcher = null;
-        $showTotalPictures = $this->filterComposite->filter('total_pictures');
-        $showMorePicturesUrl = $this->filterComposite->filter('more_pictures_url');
-        $showPreviewPictures = $this->filterComposite->filter('preview_pictures');
-        $onlyExactlyPictures = false;
-
-        if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
-            $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
-                'pictureModel'         => $this->picture,
-                'itemModel'            => $this->itemModel,
-                'perspective'          => $this->perspective,
-                'type'                 => null,
-                'onlyExactlyPictures'  => $onlyExactlyPictures,
-                'dateSort'             => false,
-                'disableLargePictures' => false,
-                'perspectivePageId'    => null,
-                'onlyChilds'           => []
-            ]);
-
-            $carsTotalPictures = $cFetcher->getTotalPictures([$object['id']], $onlyExactlyPictures);
-            $totalPictures = isset($carsTotalPictures[$object['id']]) ? (int)$carsTotalPictures[$object['id']] : 0;
-        }
-
-        if ($showPreviewPictures) {
-            $pictures = $cFetcher->fetch($object, [
-                'totalPictures' => $totalPictures
-            ]);
-
-            $largeFormat = false;
-            foreach ($pictures as &$picture) {
-                if ($picture) {
-                    if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
-                        $url = $this->picHelper->href($picture['row']);
-                    } else {
-                        $url = $listBuilder->getPictureUrl($object, $picture['row']);
-                    }
-                    $picture['url'] = $url;
-                    if ($picture['format'] == 'picture-thumb-medium') {
-                        $largeFormat = true;
-                    }
-                }
-            }
-            unset($picture);
-
-            $result['preview_pictures'] = $this->extractValue('preview_pictures', $pictures);
-        }
-
-        if ($showTotalPictures) {
-            $result['total_pictures'] = $totalPictures;
-        }
-
-        if ($showMorePicturesUrl) {
-            if (count($pictures) < $totalPictures) {
-                $result['more_pictures_url'] = $listBuilder->getPicturesUrl($object);
-            } else {
-                $result['more_pictures_url'] = null;
-            }
-        }
-
-        if ($this->filterComposite->filter('pictures_count')) {
-            $result['pictures_count'] = $this->picture->getCount([
-                'item' => $object['id']
-            ]);
-        }
-
-        if ($this->filterComposite->filter('specifications_count')) {
-            $result['specifications_count'] = $this->specificationsService->getSpecsCount($object['id']);
-        }
-
-        if ($this->filterComposite->filter('links_count')) {
-            $select = new Sql\Select($this->linkTable->getTable());
-            $select->where(['item_id' => $object['id']]);
-            $result['links_count'] = $this->getCountBySelect($select, $this->linkTable);
-        }
-
-        if ($this->filterComposite->filter('childs_count')) {
-            if (isset($object['childs_count'])) {
-                $result['childs_count'] = (int)$object['childs_count'];
-            } else {
-                $result['childs_count'] = $this->itemParent->getChildItemsCount($object['id']);
-            }
-        }
-
-        if ($this->filterComposite->filter('parents_count')) {
-            $result['parents_count'] = $this->itemParent->getParentItemsCount($object['id']);
-        }
-
-        if ($this->filterComposite->filter('item_language_count')) {
-            $result['item_language_count'] = $this->itemModel->getUsedLanguagesCount($object['id']);
-        }
-
-        if ($this->filterComposite->filter('engine_vehicles_count')) {
-            $select = new Sql\Select($this->itemModel->getTable()->getTable());
-            $select->where(['engine_item_id' => $object['id']]);
-            $result['engine_vehicles_count'] = $this->getCountBySelect($select, $this->itemModel->getTable());
-        }
-
-        if ($this->filterComposite->filter('name')) {
-            $result['name'] = $this->itemModel->getLanguageName($object['id'], 'xx');
-        }
-
-        if ($this->filterComposite->filter('name_default')) {
-            $name = $this->itemModel->getLanguageName($object['id'], 'xx');
-            $result['name_default'] = $nameData['name'] == $name ? null : $name;
+        if ($this->filterComposite->filter('description')) {
+            $result['description'] = $this->itemModel->getTextOfItem($object['id'], $this->language);
         }
 
         if ($this->filterComposite->filter('name_text')) {
@@ -469,110 +299,287 @@ class ItemHydrator extends RestHydrator
             );
         }
 
-        if ($this->filterComposite->filter('name_html')) {
-            $result['name_html'] = $this->itemNameFormatter->formatHtml(
-                $nameData,
-                $this->language
-            );
-        }
+        if ($isModer) {
+            if ($this->filterComposite->filter('body')) {
+                $result['body'] = (string)$object['body'];
+            }
 
-        if ($this->filterComposite->filter('brands')) {
-            $rows = $this->itemModel->getRows([
-                'item_type_id'       => Item::BRAND,
-                'descendant_or_self' => $object['id']
-            ]);
+            if ($this->filterComposite->filter('is_concept')) {
+                if ($object['is_concept_inherit']) {
+                    $result['is_concept'] = 'inherited';
+                } else {
+                    $result['is_concept'] = (bool)$object['is_concept'];
+                }
+            }
 
-            $result['brands'] = $this->extractValue('brands', $rows);
-        }
+            if ($this->filterComposite->filter('spec_id')) {
+                if ($object['spec_inherit']) {
+                    $result['spec_id'] = 'inherited';
+                } else {
+                    $value = (int)$object['spec_id'];
+                    $result['spec_id'] = $value > 0 ? $value : null;
+                }
+            }
 
-        if ($this->filterComposite->filter('categories')) {
-            $rows = $this->itemModel->getRows([
-                'item_type_id' => Item::CATEGORY,
-                'child'        => [
-                    'item_type_id' => [Item::VEHICLE, Item::ENGINE],
+            if ($this->filterComposite->filter('is_group')) {
+                $result['is_group'] = (bool)$object['is_group'];
+            }
+
+            if ($this->filterComposite->filter('begin_model_year')) {
+                $value = (int)$object['begin_model_year'];
+                $result['begin_model_year'] = $value > 0 ? $value : null;
+            }
+
+            if ($this->filterComposite->filter('end_model_year')) {
+                $value = (int)$object['end_model_year'];
+                $result['end_model_year'] = $value > 0 ? $value : null;
+            }
+
+            if ($this->filterComposite->filter('begin_year')) {
+                $value = (int)$object['begin_year'];
+                $result['begin_year'] = $value > 0 ? $value : null;
+            }
+
+            if ($this->filterComposite->filter('begin_month')) {
+                $value = (int)$object['begin_month'];
+                $result['begin_month'] = $value > 0 ? $value : null;
+            }
+
+            if ($this->filterComposite->filter('end_year')) {
+                $value = (int)$object['end_year'];
+                $result['end_year'] = $value > 0 ? $value : null;
+            }
+
+            if ($this->filterComposite->filter('end_month')) {
+                $value = (int)$object['end_month'];
+                $result['end_month'] = $value > 0 ? $value : null;
+            }
+
+            if ($this->filterComposite->filter('today')) {
+                $result['today'] = $object['today'] === null ? null : (bool)$object['today'];
+            }
+
+            if ($this->filterComposite->filter('subscription') && $this->userId) {
+                $result['subscription'] = $this->userItemSubscribe->isSubscribed((int)$this->userId, (int)$object['id']);
+            }
+
+            if ($this->filterComposite->filter('full_name')) {
+                $result['full_name'] = $object['full_name'];
+            }
+
+            if ($this->filterComposite->filter('catname')) {
+                $result['catname'] = $object['catname'];
+            }
+
+            $totalPictures = null;
+            $pictures = [];
+            $cFetcher = null;
+            $showTotalPictures = $this->filterComposite->filter('total_pictures');
+            $showMorePicturesUrl = $this->filterComposite->filter('more_pictures_url');
+            $showPreviewPictures = $this->filterComposite->filter('preview_pictures');
+            $onlyExactlyPictures = false;
+
+            if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
+                $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
+                    'pictureModel'         => $this->picture,
+                    'itemModel'            => $this->itemModel,
+                    'perspective'          => $this->perspective,
+                    'type'                 => null,
+                    'onlyExactlyPictures'  => $onlyExactlyPictures,
+                    'dateSort'             => false,
+                    'disableLargePictures' => false,
+                    'perspectivePageId'    => null,
+                    'onlyChilds'           => []
+                ]);
+
+                $carsTotalPictures = $cFetcher->getTotalPictures([$object['id']], $onlyExactlyPictures);
+                $totalPictures = isset($carsTotalPictures[$object['id']]) ? (int)$carsTotalPictures[$object['id']] : 0;
+            }
+
+            if ($showPreviewPictures) {
+                $pictures = $cFetcher->fetch($object, [
+                    'totalPictures' => $totalPictures
+                ]);
+
+                $largeFormat = false;
+                foreach ($pictures as &$picture) {
+                    if ($picture) {
+                        if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
+                            $url = $this->picHelper->href($picture['row']);
+                        } else {
+                            $url = $listBuilder->getPictureUrl($object, $picture['row']);
+                        }
+                        $picture['url'] = $url;
+                        if ($picture['format'] == 'picture-thumb-medium') {
+                            $largeFormat = true;
+                        }
+                    }
+                }
+                unset($picture);
+
+                $result['preview_pictures'] = $this->extractValue('preview_pictures', $pictures);
+            }
+
+            if ($showTotalPictures) {
+                $result['total_pictures'] = $totalPictures;
+            }
+
+            if ($showMorePicturesUrl) {
+                if (count($pictures) < $totalPictures) {
+                    $result['more_pictures_url'] = $listBuilder->getPicturesUrl($object);
+                } else {
+                    $result['more_pictures_url'] = null;
+                }
+            }
+
+            if ($this->filterComposite->filter('pictures_count')) {
+                $result['pictures_count'] = $this->picture->getCount([
+                    'item' => $object['id']
+                ]);
+            }
+
+            if ($this->filterComposite->filter('specifications_count')) {
+                $result['specifications_count'] = $this->specificationsService->getSpecsCount($object['id']);
+            }
+
+            if ($this->filterComposite->filter('links_count')) {
+                $select = new Sql\Select($this->linkTable->getTable());
+                $select->where(['item_id' => $object['id']]);
+                $result['links_count'] = $this->getCountBySelect($select, $this->linkTable);
+            }
+
+            if ($this->filterComposite->filter('childs_count')) {
+                if (isset($object['childs_count'])) {
+                    $result['childs_count'] = (int)$object['childs_count'];
+                } else {
+                    $result['childs_count'] = $this->itemParent->getChildItemsCount($object['id']);
+                }
+            }
+
+            if ($this->filterComposite->filter('parents_count')) {
+                $result['parents_count'] = $this->itemParent->getParentItemsCount($object['id']);
+            }
+
+            if ($this->filterComposite->filter('item_language_count')) {
+                $result['item_language_count'] = $this->itemModel->getUsedLanguagesCount($object['id']);
+            }
+
+            if ($this->filterComposite->filter('engine_vehicles_count')) {
+                $select = new Sql\Select($this->itemModel->getTable()->getTable());
+                $select->where(['engine_item_id' => $object['id']]);
+                $result['engine_vehicles_count'] = $this->getCountBySelect($select, $this->itemModel->getTable());
+            }
+
+            if ($this->filterComposite->filter('name')) {
+                $result['name'] = $this->itemModel->getLanguageName($object['id'], 'xx');
+            }
+
+            if ($this->filterComposite->filter('name_default')) {
+                $name = $this->itemModel->getLanguageName($object['id'], 'xx');
+                $result['name_default'] = $nameData['name'] == $name ? null : $name;
+            }
+
+            if ($this->filterComposite->filter('name_html')) {
+                $result['name_html'] = $this->itemNameFormatter->formatHtml(
+                    $nameData,
+                    $this->language
+                );
+            }
+
+            if ($this->filterComposite->filter('brands')) {
+                $rows = $this->itemModel->getRows([
+                    'item_type_id'       => Item::BRAND,
+                    'descendant_or_self' => $object['id']
+                ]);
+
+                $result['brands'] = $this->extractValue('brands', $rows);
+            }
+
+            if ($this->filterComposite->filter('categories')) {
+                $rows = $this->itemModel->getRows([
+                    'item_type_id' => Item::CATEGORY,
+                    'child'        => [
+                        'item_type_id' => [Item::VEHICLE, Item::ENGINE],
+                        'descendant'   => $object['id']
+                    ]
+                ]);
+
+                $result['categories'] = $this->extractValue('categories', $rows);
+            }
+
+            if ($this->filterComposite->filter('twins_groups')) {
+                $rows = $this->itemModel->getRows([
+                    'item_type_id' => Item::TWINS,
                     'descendant'   => $object['id']
-                ]
-            ]);
+                ]);
 
-            $result['categories'] = $this->extractValue('categories', $rows);
-        }
-
-        if ($this->filterComposite->filter('twins_groups')) {
-            $rows = $this->itemModel->getRows([
-                'item_type_id' => Item::TWINS,
-                'descendant'   => $object['id']
-            ]);
-
-            $result['twins_groups'] = $this->extractValue('twins_groups', $rows);
-        }
-
-        if ($this->filterComposite->filter('url')) {
-            $url = null;
-            switch ($object['item_type_id']) {
-                case Item::CATEGORY:
-                    $url = $this->router->assemble([
-                        'action'           => 'category',
-                        'category_catname' => $object['catname'],
-                    ], [
-                        'name' => 'categories'
-                    ]);
-                    break;
-                case Item::TWINS:
-                    $url = $this->router->assemble([
-                        'id' => $object['id'],
-                    ], [
-                        'name' => 'twins/group'
-                    ]);
-                    break;
-
-                case Item::ENGINE:
-                case Item::VEHICLE:
-                    $url = $listBuilder->getDetailsUrl($object);
-                    break;
+                $result['twins_groups'] = $this->extractValue('twins_groups', $rows);
             }
 
-            $result['url'] = $url;
-        }
+            if ($this->filterComposite->filter('url')) {
+                $url = null;
+                switch ($object['item_type_id']) {
+                    case Item::CATEGORY:
+                        $url = $this->router->assemble([
+                            'action'           => 'category',
+                            'category_catname' => $object['catname'],
+                        ], [
+                            'name' => 'categories'
+                        ]);
+                        break;
+                    case Item::TWINS:
+                        $url = $this->router->assemble([
+                            'id' => $object['id'],
+                        ], [
+                            'name' => 'twins/group'
+                        ]);
+                        break;
 
-        if ($this->filterComposite->filter('produced')) {
-            $value = (int)$object['produced'];
-            $result['produced'] = $value > 0 ? $value : null;
-            $result['produced_exactly'] = (bool)$object['produced_exactly'];
-        }
+                    case Item::ENGINE:
+                    case Item::VEHICLE:
+                        $url = $listBuilder->getDetailsUrl($object);
+                        break;
+                }
 
-        if ($this->filterComposite->filter('design')) {
-            $result['design'] = $this->itemModel->getDesignInfo($this->router, $object['id'], $this->language);
-        }
-
-        if ($this->filterComposite->filter('engine_vehicles')) {
-            if ($object['item_type_id'] == Item::ENGINE) {
-                $result['engine_vehicles'] = $this->getVehiclesOnEngine($object);
+                $result['url'] = $url;
             }
-        }
 
-        if ($this->filterComposite->filter('public_urls')) {
-            $result['public_urls'] = $this->getItemPublicUrls($object);
-        }
+            if ($this->filterComposite->filter('produced')) {
+                $value = (int)$object['produced'];
+                $result['produced'] = $value > 0 ? $value : null;
+                $result['produced_exactly'] = (bool)$object['produced_exactly'];
+            }
 
-        if ($this->filterComposite->filter('logo')) {
-            $result['logo'] = $this->extractValue('logo', [
-                'image' => $object['logo_id']
-            ]);
-        }
+            if ($this->filterComposite->filter('design')) {
+                $result['design'] = $this->itemModel->getDesignInfo($this->router, $object['id'], $this->language);
+            }
 
-        if ($this->filterComposite->filter('brandicon')) {
-            $result['brandicon'] = $this->extractValue('brandicon', [
-                'image'  => $object['logo_id'],
-                'format' => 'brandicon2'
-            ]);
-        }
+            if ($this->filterComposite->filter('engine_vehicles')) {
+                if ($object['item_type_id'] == Item::ENGINE) {
+                    $result['engine_vehicles'] = $this->getVehiclesOnEngine($object);
+                }
+            }
 
-        if ($this->filterComposite->filter('has_text')) {
-            $result['has_text'] = $this->itemModel->hasFullText($object['id']);
-        }
+            if ($this->filterComposite->filter('public_urls')) {
+                $result['public_urls'] = $this->getItemPublicUrls($object);
+            }
 
-        if ($this->filterComposite->filter('description')) {
-            $result['description'] = $this->itemModel->getTextOfItem($object['id'], $this->language);
+            if ($this->filterComposite->filter('logo')) {
+                $result['logo'] = $this->extractValue('logo', [
+                    'image' => $object['logo_id']
+                ]);
+            }
+
+            if ($this->filterComposite->filter('brandicon')) {
+                $result['brandicon'] = $this->extractValue('brandicon', [
+                    'image'  => $object['logo_id'],
+                    'format' => 'brandicon2'
+                ]);
+            }
+
+            if ($this->filterComposite->filter('has_text')) {
+                $result['has_text'] = $this->itemModel->hasFullText($object['id']);
+            }
         }
 
         return $result;

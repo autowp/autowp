@@ -601,10 +601,6 @@ class ItemController extends AbstractRestfulController
 
     public function itemAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
         $user = $this->user()->get();
 
         $this->itemInputFilter->setData($this->params()->fromQuery());

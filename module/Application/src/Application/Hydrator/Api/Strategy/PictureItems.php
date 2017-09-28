@@ -6,6 +6,8 @@ use Application\Hydrator\Api\PictureItemHydrator as Hydrator;
 
 class PictureItems extends HydratorStrategy
 {
+    private $userId;
+
     /**
      * @return Hydrator
      */
@@ -24,11 +26,19 @@ class PictureItems extends HydratorStrategy
 
         $hydrator->setFields($this->fields);
         $hydrator->setLanguage($this->language);
+        $hydrator->setUserId($this->userId);
 
         $result = [];
         foreach ($value as $row) {
             $result[] = $hydrator->extract($row);
         }
         return $result;
+    }
+
+    public function setUserId($userId)
+    {
+        $this->userId = $userId;
+
+        return $this;
     }
 }

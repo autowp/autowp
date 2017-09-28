@@ -2,11 +2,14 @@
 
 namespace Application\Hydrator\Api\Strategy;
 
-use Application\Hydrator\Api\IpHydrator as Hydrator;
+use Application\Hydrator\Api\CommentHydrator as Hydrator;
 
-class Ip extends HydratorStrategy
+class Comments extends HydratorStrategy
 {
-    private $userId;
+    /**
+     * @var int|null
+     */
+    protected $userId = null;
 
     /**
      * @return Hydrator
@@ -24,10 +27,15 @@ class Ip extends HydratorStrategy
     {
         $hydrator = $this->getHydrator();
 
-        $hydrator->setUserId($this->userId);
         $hydrator->setFields($this->fields);
+        $hydrator->setLanguage($this->language);
+        $hydrator->setUserId($this->userId);
 
-        return $hydrator->extract($value);
+        $result = [];
+        foreach ($value as $row) {
+            $result[] = $hydrator->extract($row);
+        }
+        return $result;
     }
 
     public function setUserId($userId)

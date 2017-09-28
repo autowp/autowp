@@ -118,7 +118,7 @@ angular.module(Module)
             
             function loadData(zoom) {
                 if (canceler) {
-                    canceler.resolve()
+                    canceler.resolve();
                     canceler = null;
                 }
                 

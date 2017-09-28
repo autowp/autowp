@@ -2,14 +2,14 @@
 
 namespace Application\Hydrator\Api;
 
+use Exception;
+use Traversable;
+
 use Zend\Hydrator\AbstractHydrator;
 use Zend\Hydrator\HydratorOptionsInterface;
 use Zend\Stdlib\ArrayUtils;
 
 use Application\Hydrator\Api\Filter\PropertyFilter;
-
-use Exception;
-use Traversable;
 use Application\Hydrator\Api\Strategy\HydratorStrategy;
 
 /**

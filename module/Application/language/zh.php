@@ -359,7 +359,7 @@ return array_replace(include 'root.php', [
     /* comments */
     'comments/title' => '评论',
     'comments/reply' => '回复',
-    'comments/what-to-do-for-write-comments' => '为方便发表评论，您需要<a href="/ng/login">注册账号或用社交网站账号登陆</a>',
+    'comments/what-to-do-for-write-comments' => '为方便发表评论，您需要[注册账号或用社交网站账号登陆](/ng/login)',
     'comments/it-requires-attention-of-moderators' => '向管理员发送提示',
     'comments/form-title' => '添加评论',
     'comments/message' => '站内信',

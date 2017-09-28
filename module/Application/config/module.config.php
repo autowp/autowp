@@ -52,7 +52,6 @@ return [
             Controller\InboxController::class           => Controller\Frontend\Service\InboxControllerFactory::class,
             Controller\InfoController::class            => Controller\Frontend\Service\InfoControllerFactory::class,
             Controller\MostsController::class           => Controller\Frontend\Service\MostsControllerFactory::class,
-            Controller\MuseumsController::class         => Controller\Frontend\Service\MuseumsControllerFactory::class,
             Controller\NewController::class             => Controller\Frontend\Service\NewControllerFactory::class,
             Controller\Frontend\PersonsController::class => Controller\Frontend\PersonsControllerFactory::class,
             Controller\PerspectiveController::class     => Controller\Frontend\PerspectiveControllerFactory::class,

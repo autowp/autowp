@@ -75,7 +75,7 @@
             <i class="fa fa-comment"></i>
             <?=$this->htmlA($this->url('ng', ['path' => 'moder/comments'], [
                 'query' => [
-                    'item_id' => $this->car['id'],
+                    'pictures_of_item_id' => $this->car['id'],
                     'moderator_attention' => 1
                 ]
             ]), $this->translate('catalogue/vehicle/comments') . ' ('.$this->requireAttention.')')?>

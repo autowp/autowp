@@ -11,40 +11,38 @@ var Comments = function(element) {
         e.preventDefault();
         
         var $message = $(this).closest('.message');
-        var params = {
-            comment_id: $message.data('id')
-        };
-        $.post('/comments/delete', params, function(json) {
-            if (json.ok) {
-                $message.addClass('deleted');
-            } else {
-                console.error(json.message);
+        $.ajax({
+            url: '/api/comment/' + $message.data('id'),
+            method: 'PUT',
+            data: {
+                deleted: 1
             }
-        }, 'json');
+        }).then(function() {
+            $message.addClass('deleted');
+        });
     });
     
     $element.find('.comment-restore-button').on('click', function(e) {
         e.preventDefault();
         
         var $message = $(this).closest('.message');
-        var params = {
-            comment_id: $message.data('id')
-        };
-        $.post('/comments/restore', params, function(json) {
-            if (json.ok) {
-                $message.removeClass('deleted');
-            } else {
-                console.error(json.message);
+        $.ajax({
+            url: '/api/comment/' + $message.data('id'),
+            method: 'PUT',
+            data: {
+                deleted: 0
             }
-        }, 'json');
+        }).then(function() {
+            $message.removeClass('deleted');
+        });
     });
     
     $element.find('.message .vote').each(function() {
         var $vote = $(this);
         
         function postVote(value) {
-            self.postVote($vote.data('id'), value, function(data) {
-                var newVote = parseInt(data.vote);
+            self.postVote($vote.data('id'), value, function(newVote) {
+                newVote = parseInt(newVote);
                 $vote.find('.value')
                     .text((newVote > 0 ? '+' : '') + newVote)
                     .removeClass('zero');
@@ -148,20 +146,17 @@ $.extend(Comments.prototype, {
         });
     },
     postVote: function(id, value, success) {
-        var params = {
-            id: id,
-            vote: value
-        };
-        
-        $.post('/comments/vote', params, function(json) {
-            if (json.ok) {
-                if (success) {
-                    success(json);
-                }
-            } else {
-                console.error(json.error);
+        $.ajax({
+            method: 'PUT',
+            url: '/api/comment/' + id,
+            data: {
+                user_vote: value
             }
-        }, 'json');
+        }).then(function(json) {
+            $.getJSON('/api/comment/' + id, {fields: 'vote'}, function(json) {
+                success(json.vote);
+            });
+        });
     }
 });
 

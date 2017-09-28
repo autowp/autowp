@@ -25,6 +25,7 @@ class Module implements
             __DIR__ . '/config/module.config.php',
             __DIR__ . '/config/module.config.db.php',
             __DIR__ . '/config/module.config.api.php',
+            __DIR__ . '/config/module.config.api.filter.php',
             __DIR__ . '/config/module.config.session.php',
             __DIR__ . '/config/module.config.cache.php',
             __DIR__ . '/config/module.config.console.php',
