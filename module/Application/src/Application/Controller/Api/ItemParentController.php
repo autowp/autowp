@@ -110,6 +110,8 @@ class ItemParentController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        $user = $this->user()->get();
+
         $this->listInputFilter->setData($this->params()->fromQuery());
 
         if (! $this->listInputFilter->isValid()) {
@@ -194,8 +196,8 @@ class ItemParentController extends AbstractRestfulController
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => $data['fields']
-            //'user_id'  => $user ? $user['id'] : null
+            'fields'   => $data['fields'],
+            'user_id'  => $user ? $user['id'] : null
         ]);
 
         $items = [];
@@ -211,6 +213,7 @@ class ItemParentController extends AbstractRestfulController
 
     public function itemAction()
     {
+        $user = $this->user()->get();
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -233,8 +236,8 @@ class ItemParentController extends AbstractRestfulController
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => $data['fields']
-            //'user_id'  => $user ? $user['id'] : null
+            'fields'   => $data['fields'],
+            'user_id'  => $user ? $user['id'] : null
         ]);
 
         return new JsonModel($this->hydrator->extract($row));

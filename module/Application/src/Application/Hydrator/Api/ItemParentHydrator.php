@@ -79,8 +79,10 @@ class ItemParentHydrator extends RestHydrator
     {
         $this->userId = $userId;
 
-        $this->getStrategy('content')->setUser($user);
-        $this->getStrategy('replies')->setUser($user);
+        $this->getStrategy('item')->setUserId($userId);
+        $this->getStrategy('parent')->setUserId($userId);
+        $this->getStrategy('duplicate_parent')->setUserId($userId);
+        $this->getStrategy('duplicate_child')->setUserId($userId);
 
         return $this;
     }
