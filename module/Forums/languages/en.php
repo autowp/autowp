@@ -1,12 +1,7 @@
 <?php
 
 return [
-    'forums/go-to-theme-%1$s' => 'Go to forum "%1$s"',
-    'forums/go-to-theme' => 'Go to forum …',
-    'forums/subforums' => 'Subforums',
-    'forums/last-message-in-topic-%1$s' => 'Last message in topic «%1$s»',
     'forums/go-to-last-message' => 'Go to last message',
-    'forums/create-new-topic' => 'Create new topic',
     'forums/theme/topics' => 'Topics',
     'forums/theme/author' => 'Author',
     'forums/theme/last-message' => 'Last message',
@@ -39,8 +34,4 @@ return [
 Если Вы уже зарегистрированны на сайте, то Вам необходимо осуществить вход на сайт.
 
 Если Вы ещё не зарегистрированы, сделайте это сейчас [на странице регистрации](/ng/signup).',
-    'forums/topic/open' => 'open',
-    'forums/topic/close' => 'close',
-    'forums/topic/delete' => 'delete',
-    'forums/topic/move' => 'move',
 ];

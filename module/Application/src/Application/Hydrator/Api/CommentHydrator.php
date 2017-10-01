@@ -26,8 +26,6 @@ class CommentHydrator extends RestHydrator
      */
     private $picture;
 
-    private $hydratorManager;
-
     /**
      * @var int|null
      */
@@ -56,7 +54,6 @@ class CommentHydrator extends RestHydrator
     {
         parent::__construct();
 
-        $this->hydratorManager = $serviceManager->get('HydratorManager');
         $this->comments = $serviceManager->get(\Application\Comments::class);
         $this->router = $serviceManager->get('HttpRouter');
 
@@ -77,6 +74,9 @@ class CommentHydrator extends RestHydrator
 
         $strategy = new Strategy\Comments($serviceManager);
         $this->addStrategy('replies', $strategy);
+
+        $strategy = new Strategy\User($serviceManager);
+        $this->addStrategy('user', $strategy);
     }
 
     /**
@@ -111,7 +111,7 @@ class CommentHydrator extends RestHydrator
     {
         $this->userId = $userId;
 
-        //$this->getStrategy('content')->setUser($user);
+        $this->getStrategy('user')->setUserId($userId);
         //$this->getStrategy('replies')->setUser($user);
 
         return $this;
@@ -146,8 +146,7 @@ class CommentHydrator extends RestHydrator
             if ($object['author_id']) {
                 $userRow = $this->userModel->getRow((int) $object['author_id']);
                 if ($userRow) {
-                    $userHydrator = $this->hydratorManager->get(UserHydrator::class);
-                    $user = $userHydrator->extract($userRow);
+                    $user = $this->extractValue('user', $userRow);
                 }
             }
 

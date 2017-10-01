@@ -1,12 +1,7 @@
 <?php
 
 return [
-    'forums/go-to-theme-%1$s' => 'Accédez à la rubrique "%1$s"',
-    'forums/go-to-theme' => 'Accédez à la rubrique …',
-    'forums/subforums' => 'Sous-forums',
-    'forums/last-message-in-topic-%1$s' => 'Dernier message dans le sujet «%1$s»',
     'forums/go-to-last-message' => 'Aller au dernier message',
-    'forums/create-new-topic' => 'Créer un nouveau sujet',
     'forums/theme/topics' => 'Sujets',
     'forums/theme/author' => 'Auteur',
     'forums/theme/last-message' => 'Dernier message',
@@ -39,8 +34,4 @@ return [
 Si vous êtes déjà inscrit sur le site, vous devez vous connecter sur le site.
 
 Si vous n'êtes pas enregistré sur le site, vous [pouvez le faire](/ng/signup) maintenant.",
-    'forums/topic/open' => 'créer',
-    'forums/topic/close' => 'fermer',
-    'forums/topic/delete' => 'retirer',
-    'forums/topic/move' => 'déplacer',
 ];

@@ -33,14 +33,6 @@ return array_replace(include 'root.php', [
         one {{count} comment}
         other {{count} comments}
     }',
-    '%1$s messages'      => [
-        '%1$s message',
-        '%1$s messages',
-    ],
-    '%1$s topics'      => [
-        '%1$s sujet',
-        '%1$s sujets',
-    ],
 
     'year' => 'Year',
     'month' => 'Month',
@@ -525,7 +517,7 @@ Bonne chance.',
     'picture/moderators-about-this-picture' => 'L\'opinion des modérateurs',
     'picture/all-images-have-owners' => 'Toutes les images ont propriétaires.',
     'picture/if-you-found-error' => 'Si vous pensez que utilisateurs du site s\'est trompé en affichant cette image dans cette section, ce serait bien si vous avez écrit à ce sujet dans les commentaires et ont indiqué à l\'erreur.',
-    'picture/where-to-talk' => 'Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur <a href="/forums/">notre forum</a>',
+    'picture/where-to-talk' => 'Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur <a href="/ng/forums/">notre forum</a>',
     'picture/other-languages' => 'In other languages',
     'picture/picture-suggested-to-replace' => 'Picture suggested to replace',
     'picture/that-engine-is-mounted-to-vehicle' => 'That engine is mounted to vehicle',
@@ -768,7 +760,7 @@ Une partie des \"verts\" sont les modérateurs.
 
 ### Dialogue et retour d'information.
 
-Si vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/forums/), demander personnellement via la messagerie, ou écrire dans le \"[Retour d'information](/ng/feedback)\" de l'administration du site.
+Si vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/ng/forums/), demander personnellement via la messagerie, ou écrire dans le \"[Retour d'information](/ng/feedback)\" de l'administration du site.
 
 Si vous avez des questions concernant la publicité, échange de lien ou de promouvoir votre produit par d'autres moyens, ils ont tous une réponse: on ne place pas la publicité.
 

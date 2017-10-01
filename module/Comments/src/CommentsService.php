@@ -723,7 +723,7 @@ class CommentsService
 
             foreach ($rows as $row) {
                 $result[$row['item_id']] = [
-                    'messages' => $row['messages']
+                    'messages' => (int)$row['messages']
                 ];
             }
         }
@@ -768,7 +768,7 @@ class CommentsService
         $statement->execute([$itemId, $typeId, $lastUpdate, $messagesCount]);
     }
 
-    private function getMessagesCountFromTimestamp($typeId, $itemId, $timestamp)
+    private function getMessagesCountFromTimestamp($typeId, $itemId, $timestamp): int
     {
         $countRow = $this->messageTable->select(function (Sql\Select $select) use ($itemId, $typeId, $timestamp) {
             $select

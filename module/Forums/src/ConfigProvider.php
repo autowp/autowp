@@ -37,18 +37,11 @@ class ConfigProvider
                     'options' => [
                         'route'    => '/forums',
                         'defaults' => [
-                            'controller' => Controller\FrontendController::class,
-                            'action'     => 'index',
+                            'controller' => Controller\FrontendController::class
                         ],
                     ],
-                    'may_terminate' => true,
+                    'may_terminate' => false,
                     'child_routes'  => [
-                        'index' => [
-                            'type' => Segment::class,
-                            'options' => [
-                                'route' => '/index[/:theme_id][/page:page]',
-                            ]
-                        ],
                         'topic' => [
                             'type' => Segment::class,
                             'options' => [

@@ -1138,6 +1138,7 @@ CREATE TABLE `forums_theme_parent` (
 --
 
 /*!40000 ALTER TABLE `forums_theme_parent` DISABLE KEYS */;
+insert into forums_theme_parent values (1, 1, 0);
 /*!40000 ALTER TABLE `forums_theme_parent` ENABLE KEYS */;
 
 --

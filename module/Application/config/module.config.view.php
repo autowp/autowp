@@ -18,7 +18,6 @@ return [
             'error/404'               => __DIR__ . '/../view/error/404.phtml',
             'error/index'             => __DIR__ . '/../view/error/index.phtml',
 
-            'autowp/forums/frontend/index'        => __DIR__ . '/../view/forums/index.phtml',
             'autowp/forums/frontend/move-message' => __DIR__ . '/../view/forums/move-message.phtml',
             'autowp/forums/frontend/move'         => __DIR__ . '/../view/forums/move.phtml',
             'autowp/forums/frontend/new'          => __DIR__ . '/../view/forums/new.phtml',

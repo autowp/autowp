@@ -223,16 +223,8 @@
         "%1$s комментариев"
     ],
     "ng/%1$s-comments": "{count, plural, one {{count} комментарий} few {{count} комментария} many {{count} комментариев} other {{count} комментариев}}",
-    "%1$s messages": [
-        "%1$s сообщение",
-        "%1$s сообщения",
-        "%1$s сообщений"
-    ],
-    "%1$s topics": [
-        "%1$s тема",
-        "%1$s темы",
-        "%1$s тем"
-    ],
+    "{count} messages": "{count, plural, one {{count} сообщение} few {{count} сообщения} many {{count} сообщений} other {{count} сообщений}}",
+    "{topics} topics and {messages} messages": "{topics, plural, one {{topics} тема} few {{topics} темы} many {{topics} тем} other {{topics} тем}} и {messages, plural, one {{messages} сообщение} few {{messages} сообщения} many {{messages} сообщений} other {{messages} сообщений}}",
     "year": "Год",
     "month": "Месяц",
     "contributor": "составитель",
@@ -615,7 +607,7 @@
     "picture/moderators-about-this-picture": "Модераторы об этом фото",
     "picture/all-images-have-owners": "Все изображения являются чьей-либо собственностью.",
     "picture/if-you-found-error": "Если вы считаете, что пользователи сайта ошиблись, разместив данную картинку в этом разделе, то было бы здорово, если бы вы написали об этом в комментариях и указали на ошибку.",
-    "picture/where-to-talk": "Поделиться своей радостью, обсудить наболевшее и просто поболтать об автомобилях и не только вы можете на нашем <a href=\"/forums/\" title=\"Перейти в форум\">форуме</a>",
+    "picture/where-to-talk": "Поделиться своей радостью, обсудить наболевшее и просто поболтать об автомобилях и не только вы можете на нашем <a href=\"/ng/forums/\" title=\"Перейти в форум\">форуме</a>",
     "picture/other-languages": "На других языках",
     "picture/picture-suggested-to-replace": "Фото предложено на замену",
     "picture/that-engine-is-mounted-to-vehicle": "Такой двигатель устанавливается на автомобиль",
@@ -788,7 +780,7 @@
     "car-type-rp/moto": "Мото",
     "car-type-rp/tractor": "Тракторов",
     "car-type-rp/tracked": "Гусеничных платформ",
-    "about/text": "### Наши люди\nСвоим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.\n\nКто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.\n\nНас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:\n\n%users%\n\n#### \"Цветовая дифференциация штанов\"\n\nТак завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из \"зеленых\", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что \"зеленые\" - это самые отзывчивые и заинтересованные в жизни проекта люди.\n\nНекоторая часть \"зеленых\" наделена модераторскими функциями.\n\n### Диалог и обратная связь\n\nЕсли у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в \"[обратную связь](/ng/feedback)\" администрации сайта.\n\nЕсли у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами, все они имеют единственный ответ: мы не размещаем рекламу.\n\n### Цифры\n\nТак сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:\n\n* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных\n* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений\n\n### Разработка\n\nРазработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))\n\nПеревод сайта на французский язык: %fr-translator%\n\nПеревод сайта на китайский язык: %zh-translator%\n\nСайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других \"умных словах\".\n\nИсходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.\n\n%github%\n\n[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)\n[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)\n[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)\n\n### Поддержать проект\n\nВы можете поддержать наш проект [финансово](/donate) или [морально](/ng/feedback).\nПринять участие в [переводе сайта](https://github.com/autowp/autowp/tree/master/module/Application/language) на другие языки.\n",
+    "about/text": "### Наши люди\nСвоим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.\n\nКто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.\n\nНас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:\n\n%users%\n\n#### \"Цветовая дифференциация штанов\"\n\nТак завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из \"зеленых\", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что \"зеленые\" - это самые отзывчивые и заинтересованные в жизни проекта люди.\n\nНекоторая часть \"зеленых\" наделена модераторскими функциями.\n\n### Диалог и обратная связь\n\nЕсли у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/ng/forums/), задать лично через систему обмена сообщениями или написать в \"[обратную связь](/ng/feedback)\" администрации сайта.\n\nЕсли у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами, все они имеют единственный ответ: мы не размещаем рекламу.\n\n### Цифры\n\nТак сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:\n\n* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных\n* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений\n\n### Разработка\n\nРазработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))\n\nПеревод сайта на французский язык: %fr-translator%\n\nПеревод сайта на китайский язык: %zh-translator%\n\nСайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других \"умных словах\".\n\nИсходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.\n\n%github%\n\n[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)\n[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)\n[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)\n\n### Поддержать проект\n\nВы можете поддержать наш проект [финансово](/donate) или [морально](/ng/feedback).\nПринять участие в [переводе сайта](https://github.com/autowp/autowp/tree/master/module/Application/language) на другие языки.\n",
     "page/1/name": "Главная страница",
     "page/2/name": "Главное меню",
     "page/10/name": "Бренд",
@@ -1981,5 +1973,19 @@
     "moder/statistics/brand-logos": "Логотипов брендов",
     "moder/statistics/from-years": "Годы начала выпуска автомобилей",
     "moder/statistics/from-and-to-years": "Годы начала и окончания выпуска автомобилей",
-    "moder/statistics/from-and-to-years-and-months": "Годы и месяцы начала и окончания выпуска автомобилей"
+    "moder/statistics/from-and-to-years-and-months": "Годы и месяцы начала и окончания выпуска автомобилей",
+    
+    "forums/go-to-theme-name": "Перейти в форум \"{theme_name}\"",
+    "forums/go-to-theme": "Зайти в форум …",
+    "forums/subforums": "Подфорумы",
+    "forums/last-message-in-topic-{topic_name}": "Последнее сообщение в теме «{topic_name}»",
+    "forums/go-to-last-message": "Перейти к последнему сообщению",
+    "forums/create-new-topic": "Создать новую тему",
+    "forums/theme/topics": "Топики",
+    "forums/theme/author": "Автор",
+    "forums/theme/last-message": "Последнее сообщение",
+    "forums/topic/open": "открыть",
+    "forums/topic/close": "закрыть",
+    "forums/topic/delete": "удалить",
+    "forums/topic/move": "переместить"
 }

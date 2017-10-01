@@ -2,26 +2,17 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
+use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
-use Application\Test\AbstractHttpControllerTestCase;
 
 use Autowp\Forums\Controller\FrontendController;
-use Zend\Http\Header\Cookie;
-use Zend\Json\Json;
+
+use Application\Controller\Api\ForumController;
+use Application\Test\AbstractHttpControllerTestCase;
 
 class ForumsControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
-
-    public function testIndex()
-    {
-        $this->dispatch('https://www.autowp.ru/forums', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums');
-        $this->assertActionName('index');
-    }
 
     public function testTopic()
     {
@@ -96,32 +87,26 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         // close
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/forums/close', Request::METHOD_POST, [
-            'topic_id' => $topicId
+        $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
+            'status' => 'closed'
         ]);
 
         $this->assertResponseStatusCode(200);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums/close');
-        $this->assertActionName('close');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-        $this->assertTrue($json['ok']);
+        $this->assertControllerName(ForumController::class);
+        $this->assertMatchedRouteName('api/forum/topic/item/put');
+        $this->assertActionName('put-topic');
 
         // open
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/forums/open', Request::METHOD_POST, [
-            'topic_id' => $topicId
+        $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
+            'status' => 'normal'
         ]);
 
         $this->assertResponseStatusCode(200);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums/open');
-        $this->assertActionName('open');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-        $this->assertTrue($json['ok']);
+        $this->assertControllerName(ForumController::class);
+        $this->assertMatchedRouteName('api/forum/topic/item/put');
+        $this->assertActionName('put-topic');
 
         // subscribes
         $this->reset();
@@ -150,16 +135,13 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         // delete topic
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/forums/delete', Request::METHOD_POST, [
-            'topic_id' => $topicId
+        $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
+            'status' => 'deleted'
         ]);
 
         $this->assertResponseStatusCode(200);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums/delete');
-        $this->assertActionName('delete');
-
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-        $this->assertTrue($json['ok']);
+        $this->assertControllerName(ForumController::class);
+        $this->assertMatchedRouteName('api/forum/topic/item/put');
+        $this->assertActionName('put-topic');
     }
 }

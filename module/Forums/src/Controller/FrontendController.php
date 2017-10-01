@@ -6,7 +6,6 @@ use DateTime;
 
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
 
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
@@ -56,86 +55,14 @@ class FrontendController extends AbstractActionController
         $this->userModel = $userModel;
     }
 
-    private function prepareThemeList(&$themes)
-    {
-        foreach ($themes as &$theme) {
-            if ($theme['lastMessage']) {
-                $theme['lastMessage'] = array_replace($theme['lastMessage'], [
-                    'message-url' => $this->topicMessageUrl($theme['lastMessage']['id']),
-                    'url'         => $this->topicUrl($theme['lastTopic']['id'])
-                ]);
-            }
-
-            foreach ($theme['subthemes'] as &$subtheme) {
-                $subtheme['url'] = $this->themeUrl($subtheme['id']);
-            }
-
-            $theme['url'] = $this->themeUrl($theme['id']);
-        }
-    }
-
-    public function indexAction()
-    {
-        $user = $this->user()->get();
-        $userId = $user ? $user['id'] : null;
-
-        $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
-        $isModearator = $this->user()->inheritsRole('moder');
-
-        $data = $this->model->getThemePage(
-            $this->params('theme_id'),
-            $this->params('page'),
-            $userId,
-            $isModearator
-        );
-
-        if (! $data) {
-            return $this->notFoundAction();
-        }
-
-        foreach ($data['topics'] as &$topic) {
-            $topic['author'] = $this->userModel->getRow($topic['authorId']);
-
-            $topic['url'] = $this->topicUrl($topic['id']);
-
-            if ($topic['lastMessage']) {
-                $topic['lastMessage']['url'] = $this->topicMessageUrl($topic['lastMessage']['id']);
-            }
-        }
-        unset($topic);
-
-        $this->prepareThemeList($data['themes']);
-
-        $newTopicUrl = null;
-        if ($data['theme']) {
-            $newTopicUrl = $this->url()->fromRoute('forums/new', [
-                'theme_id' => $data['theme']['id']
-            ]);
-        }
-
-        return array_replace($data, [
-            'forumAdmin'  => $forumAdmin,
-            'newTopicUrl' => $newTopicUrl,
-            'openUrl' => $this->url()->fromRoute('forums/open', [
-                'action' => 'open'
-            ]),
-            'closeUrl' => $this->url()->fromRoute('forums/close', [
-                'action' => 'close'
-            ]),
-            'deleteUrl' => $this->url()->fromRoute('forums/delete', [
-                'action' => 'delete'
-            ]),
-        ]);
-    }
-
     public function topicAction()
     {
         $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
-        $isModearator = $this->user()->inheritsRole('moder');
+        $isModerator = $this->user()->inheritsRole('moder');
 
         $topic = $this->model->getTopic((int)$this->params('topic_id'), [
             'status'      => [Forums::STATUS_NORMAL, Forums::STATUS_CLOSED],
-            'isModerator' => $isModearator
+            'isModerator' => $isModerator
         ]);
 
         if (! $topic) {
@@ -165,7 +92,7 @@ class FrontendController extends AbstractActionController
                         $values['topic_id'] = $topic['id'];
                         $values['user_id'] = $user['id'];
                         $values['ip'] = $request->getServer('REMOTE_ADDR');
-                        $values['resolve'] = $isModearator && $values['parent_id'] && $values['resolve'];
+                        $values['resolve'] = $isModerator && $values['parent_id'] && $values['resolve'];
                         $messageId = $this->model->addMessage($values);
 
                         $this->userModel->getTable()->update([
@@ -216,7 +143,7 @@ class FrontendController extends AbstractActionController
             $topic['id'],
             $user ? $user['id'] : null,
             $this->params('page'),
-            $isModearator
+            $isModerator
         );
 
         if (! $data) {
@@ -248,11 +175,9 @@ class FrontendController extends AbstractActionController
         ]);
     }
 
-    private function themeUrl($themeId)
+    private function themeUrl(int $themeId)
     {
-        return $this->url()->fromRoute('forums/index', [
-            'theme_id' => $themeId
-        ]);
+        return '/ng/forums/'. $themeId;
     }
 
     private function topicUrl($topicId, $page = null)
@@ -395,43 +320,6 @@ class FrontendController extends AbstractActionController
         }
 
         return $callback();
-    }
-
-
-    public function openAction()
-    {
-        return $this->authorizedForumModer(function () {
-
-            $this->model->open($this->params()->fromPost('topic_id'));
-
-            return new JsonModel([
-                'ok' => true
-            ]);
-        });
-    }
-
-    public function closeAction()
-    {
-        return $this->authorizedForumModer(function () {
-
-            $this->model->close($this->params()->fromPost('topic_id'));
-
-            return new JsonModel([
-                'ok' => true
-            ]);
-        });
-    }
-
-    public function deleteAction()
-    {
-        return $this->authorizedForumModer(function () {
-
-            $this->model->delete($this->params()->fromPost('topic_id'));
-
-            return new JsonModel([
-                'ok' => true
-            ]);
-        });
     }
 
     public function moveAction()

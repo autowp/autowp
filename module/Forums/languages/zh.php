@@ -1,12 +1,7 @@
 <?php
 
 return [
-    'forums/go-to-theme-%1$s' => '前往主题 "%1$s"',
-    'forums/go-to-theme' => '前往主题…',
-    'forums/subforums' => '分论坛',
-    'forums/last-message-in-topic-%1$s' => '最新回复 «%1$s»',
     'forums/go-to-last-message' => '前往最新消息',
-    'forums/create-new-topic' => '创建新主题',
     'forums/theme/topics' => '主题',
     'forums/theme/author' => '作者',
     'forums/theme/last-message' => '最新回复',
@@ -39,8 +34,4 @@ return [
 如果您已经注册，您必须登录才能进行操作。
 
 如果您还未注册，现在就可以到[注册页面](/ng/signup)注册。',
-    'forums/topic/open' => '打开',
-    'forums/topic/close' => '关闭',
-    'forums/topic/delete' => '删除',
-    'forums/topic/move' => '移动',
 ];

@@ -33,14 +33,6 @@ return array_replace(include 'root.php', [
         one {{count} comment}
         other {{count} comments}
     }',
-    '%1$s messages'      => [
-        '%1$s message',
-        '%1$s messages',
-    ],
-    '%1$s topics'      => [
-        '%1$s topic',
-        '%1$s topics',
-    ],
 
     'year' => 'Year',
     'month' => 'Month',
@@ -526,7 +518,7 @@ Good luck.',
     'picture/moderators-about-this-picture' => 'Moderators about this picture',
     'picture/all-images-have-owners' => 'All images have owners.',
     'picture/if-you-found-error' => 'If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.',
-    'picture/where-to-talk' => 'Discuss anything and just talk about cars and not only can you on <a href="/forums/">the forum</a>',
+    'picture/where-to-talk' => 'Discuss anything and just talk about cars and not only can you on <a href="/ng/forums/">the forum</a>',
     'picture/other-languages' => 'In other languages',
     'picture/picture-suggested-to-replace' => 'Picture suggested to replace',
     'picture/that-engine-is-mounted-to-vehicle' => 'That engine is mounted to vehicle',
@@ -769,7 +761,7 @@ We will try not to disappoint you.',
 
 ### Feedback
 
-Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/ng/feedback)" администрации сайта.
+Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/ng/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/ng/feedback)" администрации сайта.
 
 Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами, все они имеют единственный ответ: мы не размещаем рекламу.
 

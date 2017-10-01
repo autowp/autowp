@@ -219,14 +219,8 @@
         "%1$s comments"
     ],
     "ng/%1$s-comments": "{count, plural, one {{count} comment} other {{count} comments}}",
-    "%1$s messages": [
-        "%1$s message",
-        "%1$s messages"
-    ],
-    "%1$s topics": [
-        "%1$s topic",
-        "%1$s topics"
-    ],
+    "{count} messages": "{count, plural, one {{count} message} other {{count} messages}}",
+    "{topics} topics and {messages} messages": "{topics, plural, one {{topics} topic} other {{topics} topics}} and {messages, plural, one {{messages} message} other {{messages} messages}}",
     "year": "Year",
     "month": "Month",
     "contributor": "contributor",
@@ -604,7 +598,7 @@
     "picture/moderators-about-this-picture": "Moderators about this picture",
     "picture/all-images-have-owners": "All images have owners.",
     "picture/if-you-found-error": "If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.",
-    "picture/where-to-talk": "Discuss anything and just talk about cars and not only can you on <a href=\"/forums/\">the forum</a>",
+    "picture/where-to-talk": "Discuss anything and just talk about cars and not only can you on <a href=\"/ng/forums/\">the forum</a>",
     "picture/other-languages": "In other languages",
     "picture/picture-suggested-to-replace": "Picture suggested to replace",
     "picture/that-engine-is-mounted-to-vehicle": "That engine is mounted to vehicle",
@@ -777,7 +771,7 @@
     "car-type-rp/moto": "Moto",
     "car-type-rp/tractor": "Tractor",
     "car-type-rp/tracked": "Tracked platform",
-    "about/text": "### People\nСвоим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.\n\nКто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.\n\nНас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:\n\n%users%\n\n#### \"Цветовая дифференциация штанов\"\n\nТак завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из \"зеленых\", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что \"зеленые\" - это самые отзывчивые и заинтересованные в жизни проекта люди.\n\nНекоторая часть \"зеленых\" наделена модераторскими функциями.\n\n### Feedback\n\nЕсли у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в \"[обратную связь](/ng/feedback)\" администрации сайта.\n\nЕсли у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами, все они имеют единственный ответ: мы не размещаем рекламу.\n\n### Numbers\n\nТак сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:\n\n* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных\n* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений\n\n### Development\n\nРазработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))\n\nFrench site translation: %fr-translator%\n\nChinese site translation: %zh-translator%\n\nСайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других \"умных словах\".\n\nИсходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.\n\n%github%\n\n[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)\n[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)\n[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)\n\n### Поддержать проект\n\nYou can support our project by [finances](/donate) or [moral](/ng/feedback).\nTake part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.",
+    "about/text": "### People\nСвоим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.\n\nКто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.\n\nНас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:\n\n%users%\n\n#### \"Цветовая дифференциация штанов\"\n\nТак завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из \"зеленых\", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что \"зеленые\" - это самые отзывчивые и заинтересованные в жизни проекта люди.\n\nНекоторая часть \"зеленых\" наделена модераторскими функциями.\n\n### Feedback\n\nЕсли у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/ng/forums/), задать лично через систему обмена сообщениями или написать в \"[обратную связь](/ng/feedback)\" администрации сайта.\n\nЕсли у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами, все они имеют единственный ответ: мы не размещаем рекламу.\n\n### Numbers\n\nТак сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:\n\n* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных\n* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений\n\n### Development\n\nРазработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))\n\nFrench site translation: %fr-translator%\n\nChinese site translation: %zh-translator%\n\nСайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других \"умных словах\".\n\nИсходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.\n\n%github%\n\n[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)\n[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)\n[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)\n\n### Поддержать проект\n\nYou can support our project by [finances](/donate) or [moral](/ng/feedback).\nTake part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.",
     "page/1/name": "Index page",
     "page/2/name": "Main menu",
     "page/10/name": "Brand",
@@ -1983,5 +1977,19 @@
     "moder/statistics/brand-logos": "Brand logotypes",
     "moder/statistics/from-years": "Years of begin production",
     "moder/statistics/from-and-to-years": "Years of begin and end production",
-    "moder/statistics/from-and-to-years-and-months": "Years and months of begin and end production"
+    "moder/statistics/from-and-to-years-and-months": "Years and months of begin and end production",
+    
+    "forums/go-to-theme-name": "Go to forum \"{theme_name}\"",
+    "forums/go-to-theme": "Go to forum …",
+    "forums/subforums": "Subforums",
+    "forums/last-message-in-topic-{topic_name}": "Last message in topic «{topic_name}»",
+    "forums/go-to-last-message": "Go to last message",
+    "forums/create-new-topic": "Create new topic",
+    "forums/theme/topics": "Topics",
+    "forums/theme/author": "Author",
+    "forums/theme/last-message": "Last message",
+    "forums/topic/open": "open",
+    "forums/topic/close": "close",
+    "forums/topic/delete": "delete",
+    "forums/topic/move": "move"
 }

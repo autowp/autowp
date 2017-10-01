@@ -6,6 +6,8 @@ use Autowp\Comments\CommentsService;
 use Autowp\Message\MessageService;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 use Autowp\User\Model\User;
+use Zend\InputFilter\InputFilter;
+use Autowp\Forums\Forums;
 
 return [
     'input_filter_specs' => [
@@ -318,6 +320,69 @@ return [
                 'required'   => true,
                 'filters'  => [
                     ['name' => 'StringTrim']
+                ]
+            ]
+        ],
+        'api_forum_theme_list' => [
+            'theme_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['description', 'themes', 'last_topic', 'last_message', 'topics']]
+                    ]
+                ]
+            ],
+        ],
+        'api_forum_theme_get' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['description', 'themes', 'last_topic', 'last_message', 'topics']]
+                    ]
+                ]
+            ],
+            'topics' => [
+                'type' => InputFilter::class,
+                'page' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ]
+            ]
+        ],
+        'api_forum_topic_put' => [
+            'status' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                Forums::STATUS_NORMAL,
+                                Forums::STATUS_CLOSED,
+                                Forums::STATUS_DELETED
+                            ]
+                        ]
+                    ]
                 ]
             ]
         ],

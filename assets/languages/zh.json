@@ -214,12 +214,8 @@
         "%1$s 个评论"
     ],
     "ng/%1$s-comments": "{count, plural, other {{count} 个评论}}",
-    "%1$s messages": [
-        "%1$s 个站内信"
-    ],
-    "%1$s topics": [
-        "%1$s 个主题"
-    ],
+    "{count} messages": "{count, plural, other {{count} 个站内信}}",
+    "{topics} topics and {messages} messages": "{topics} 个主题}, {messages} 个站内信",
     "year": "年",
     "month": "月",
     "contributor": "贡献者",
@@ -592,7 +588,7 @@
     "picture/moderators-about-this-picture": "相关管理员",
     "picture/all-images-have-owners": "任何图片都有权益人。",
     "picture/if-you-found-error": "如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。",
-    "picture/where-to-talk": "前往<a href=\"/forums/\">论坛</a>可以讨论任何车型的任何话题。",
+    "picture/where-to-talk": "前往<a href=\"/ng/forums/\">论坛</a>可以讨论任何车型的任何话题。",
     "picture/other-languages": "其它语言翻译",
     "picture/picture-suggested-to-replace": "图片被建议更换",
     "picture/that-engine-is-mounted-to-vehicle": "配备此发动机的车辆有",
@@ -765,7 +761,7 @@
     "car-type-rp/moto": "摩托车",
     "car-type-rp/tractor": "拖拉机",
     "car-type-rp/tracked": "履带底盘",
-    "about/text": "### 我们的团队\n来到这里投入时间和知识的人们是本网站存在的根基。\n\n我们当中既有人添加图片，也有人帮助修改错误。有的人钟爱某一品牌，也有人喜爱所有车型。不仅有人一步步充实网站，更有人贡献出自己稀有的图片收藏。\n\n在这个庞大的群体中，每个人都与众不同，这里是一些主要成员：\n\n%users%\n\n#### \"不同颜色的用户名\"\n\n首先，我们当中一些人被一种特殊的颜色标记着———绿色，这是一个特殊的标签，当你看到绿色用户名时，可以向他们任何一位咨询关于网站的问题，因为绿色代表着本站最重要、最热情的一群人。\n\n绿色用户名往往意味着管理员身份。\n\n### 意见反馈\n\n如果您有任何意见、建议或其他的想法，可以到[论坛](/forums/)联系他们, 选择通过站内信或写“[意见反馈](/ng/feedback)”为网站管理提建议。\n\n如果您有关于广告、交换链接或推广产品的问题，很抱歉：我们不设置广告。\n\n### 资源\n\n对于庞大的图片数量我们不能免俗地产生一种自豪感，并且想把这些数字公布出来，下面只是其中一部分:\n\n* 线上收录了超过%total-pictures%张图片、%total-vehicles%款车型，数据总量超过%total-size%。\n* 逾%total-users%名用户发表了超过%total-comments%条评论。\n\n### 开发\n\n网站的发展和技术支持主要来自%developer%([首要贡献者](https://github.com/autowp/autowp/graphs/contributors))\n\n法语页面建设者: %fr-translator%\n\n中文页面建设者: %zh-translator%\n\n技术支持：[Zend Framework](http://framework.zend.com/)、[jQuery](http://jquery.com/)、[Twitter bootstrap](http://getbootstrap.com/)，还有许多优秀的计算机语言。\n\n网站源代码向所有人开放，每个人都有机会影响网站的性质和质量。\n\n%github%\n\n[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)\n[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)\n[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)\n\n### 支持我们\n\n您可以通过[捐助](/donate) 或[反馈意见](/ng/feedback)支持我们网站\n欲添加更多语言请参与 [翻译网站](https://github.com/autowp/autowp/tree/master/module/Application/language) 。",
+    "about/text": "### 我们的团队\n来到这里投入时间和知识的人们是本网站存在的根基。\n\n我们当中既有人添加图片，也有人帮助修改错误。有的人钟爱某一品牌，也有人喜爱所有车型。不仅有人一步步充实网站，更有人贡献出自己稀有的图片收藏。\n\n在这个庞大的群体中，每个人都与众不同，这里是一些主要成员：\n\n%users%\n\n#### \"不同颜色的用户名\"\n\n首先，我们当中一些人被一种特殊的颜色标记着———绿色，这是一个特殊的标签，当你看到绿色用户名时，可以向他们任何一位咨询关于网站的问题，因为绿色代表着本站最重要、最热情的一群人。\n\n绿色用户名往往意味着管理员身份。\n\n### 意见反馈\n\n如果您有任何意见、建议或其他的想法，可以到[论坛](/ng/forums/)联系他们, 选择通过站内信或写“[意见反馈](/ng/feedback)”为网站管理提建议。\n\n如果您有关于广告、交换链接或推广产品的问题，很抱歉：我们不设置广告。\n\n### 资源\n\n对于庞大的图片数量我们不能免俗地产生一种自豪感，并且想把这些数字公布出来，下面只是其中一部分:\n\n* 线上收录了超过%total-pictures%张图片、%total-vehicles%款车型，数据总量超过%total-size%。\n* 逾%total-users%名用户发表了超过%total-comments%条评论。\n\n### 开发\n\n网站的发展和技术支持主要来自%developer%([首要贡献者](https://github.com/autowp/autowp/graphs/contributors))\n\n法语页面建设者: %fr-translator%\n\n中文页面建设者: %zh-translator%\n\n技术支持：[Zend Framework](http://framework.zend.com/)、[jQuery](http://jquery.com/)、[Twitter bootstrap](http://getbootstrap.com/)，还有许多优秀的计算机语言。\n\n网站源代码向所有人开放，每个人都有机会影响网站的性质和质量。\n\n%github%\n\n[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)\n[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)\n[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)\n\n### 支持我们\n\n您可以通过[捐助](/donate) 或[反馈意见](/ng/feedback)支持我们网站\n欲添加更多语言请参与 [翻译网站](https://github.com/autowp/autowp/tree/master/module/Application/language) 。",
     "page/1/name": "主页",
     "page/2/name": "主目录",
     "page/10/name": "品牌",
@@ -1953,5 +1949,19 @@
     "moder/statistics/brand-logos": "商标",
     "moder/statistics/from-years": "投产年份",
     "moder/statistics/from-and-to-years": "停产年份",
-    "moder/statistics/from-and-to-years-and-months": "投产及停产年月"
+    "moder/statistics/from-and-to-years-and-months": "投产及停产年月",
+    
+    "forums/go-to-theme-name": "前往主题 \"{theme_name}\"",
+    "forums/go-to-theme": "前往主题…",
+    "forums/subforums": "分论坛",
+    "forums/last-message-in-topic-{topic_name}": "最新回复 «{topic_name}»",
+    "forums/go-to-last-message": "前往最新消息",
+    "forums/create-new-topic": "创建新主题",
+    "forums/theme/topics": "主题",
+    "forums/theme/author": "作者",
+    "forums/theme/last-message": "最新回复",
+    "forums/topic/open": "打开",
+    "forums/topic/close": "关闭",
+    "forums/topic/delete": "删除",
+    "forums/topic/move": "移动"
 }

@@ -27,12 +27,6 @@ return array_replace(include 'root.php', [
     'ng/%1$s-comments' => '{count, plural,
         other {{count} 个评论}
     }',
-    '%1$s messages'      => [
-        '%1$s 个站内信',
-    ],
-    '%1$s topics'      => [
-        '%1$s 个主题',
-    ],
 
     'year' => '年',
     'month' => '月',
@@ -508,7 +502,7 @@ return array_replace(include 'root.php', [
     'picture/moderators-about-this-picture' => '相关管理员',
     'picture/all-images-have-owners' => '任何图片都有权益人。',
     'picture/if-you-found-error' => '如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。',
-    'picture/where-to-talk' => '前往<a href="/forums/">论坛</a>可以讨论任何车型的任何话题。',
+    'picture/where-to-talk' => '前往<a href="/ng/forums/">论坛</a>可以讨论任何车型的任何话题。',
     'picture/other-languages' => '其它语言翻译',
     'picture/picture-suggested-to-replace' => '图片被建议更换',
     'picture/that-engine-is-mounted-to-vehicle' => '配备此发动机的车辆有',
@@ -744,7 +738,7 @@ return array_replace(include 'root.php', [
 
 ### 意见反馈
 
-如果您有任何意见、建议或其他的想法，可以到[论坛](/forums/)联系他们, 选择通过站内信或写“[意见反馈](/ng/feedback)”为网站管理提建议。
+如果您有任何意见、建议或其他的想法，可以到[论坛](/ng/forums/)联系他们, 选择通过站内信或写“[意见反馈](/ng/feedback)”为网站管理提建议。
 
 如果您有关于广告、交换链接或推广产品的问题，很抱歉：我们不设置广告。
 

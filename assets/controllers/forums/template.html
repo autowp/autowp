@@ -1,0 +1,99 @@
+<div class="row" ng-repeat="theme in ctrl.themes">
+    <div class="col-md-6">
+        <div class="well">
+            <p>
+                <i class="fa fa-th-list"></i> 
+                <strong>
+                    <a ui-sref="forums({theme_id: theme.id})" ui-sref-opts="{reload: true}" translate-attr="{title: 'forums/go-to-theme-name'}" translate-values="{theme_name: theme.name}" ng-bind="theme.name"></a>
+                </strong>
+            </p>
+            <p ng-bind="theme.description" ng-if="theme.description"></p>
+            <p translate-values="{topics: theme.topics_count, messages: theme.messages_count}" translate>{topics} topics and {messages} messages</p>
+            <div ng-if="theme.subthemes.length > 0">
+                <translate>forums/subforums</translate>
+                <a ng-href="{{subtheme.url}}" ng-repeat="subtheme in theme.subthemes" ng-bind="subtheme.name|translate"></a>
+            </div>
+            <p ng-if="!theme.subthemes">
+                <a ui-sref="forums({theme_id: theme.id})" ui-sref-opts="{reload: true}" translate>forums/go-to-theme</a>
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6" ng-if="theme.last_topic">
+        <div class="well transparent">
+            <div ng-if="theme.last_message">
+                <p>
+                    <i class="fa fa-comment"></i>
+                    <a ng-href="/forums/topic/{{theme.last_topic.id}}" translate-values="{topic_name: theme.last_topic.name}" translate>forums/last-message-in-topic-{topic_name}</a>
+                </p>
+                <p>
+                    <autowp-past-time-indicator date="theme.last_message.datetime"></autowp-past-time-indicator>
+                    <autowp-user user="theme.last_message.user" ng-if="theme.last_message.user"></autowp-user>
+                    <a ng-href="/forums/topic-message/message_id/{{theme.last_message.id}}" translate-attr="{title :'forums/go-to-last-message'}"><i class="fa fa-share"></i></a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-if="ctrl.theme && !ctrl.theme.disable_topics">
+
+    <a ng-href="/forums/new/theme_id/{{ctrl.theme.id}}" class="btn btn-info">
+        <i class="fa fa-comment"></i>
+        <translate>forums/create-new-topic</translate>
+    </a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th translate>forums/theme/topics</th>
+                <th translate>forums/theme/author</th>
+                <th translate>forums/theme/last-message</th>
+                <th ng-if="ctrl.forum_admin"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="topic in ctrl.topics.items">
+                <td>
+                    <span class="fa fa-lock" ng-if="topic.status == 'closed'"></span>
+                    <a ng-href="/forums/topic/{{topic.id}}" ng-bind="topic.name"></a>
+                    <span class="badge">
+                        {{topic.old_messages + (topic.new_messages > 0 ? '+' + topic.new_messages : '')}}
+                    </span>
+                </td>
+                <td>
+                    <autowp-past-time-indicator date="topic.add_datetime"></autowp-past-time-indicator>
+                    <br ng-if-end />
+                    <autowp-user user="topic.author" ng-if="topic.author"></autowp-user>
+                </td>
+                <td>
+                    <div ng-if="topic.last_message">
+                        <small ng-if-start="topic.last_message.datetime">
+                            <autowp-past-time-indicator date="topic.last_message.datetime"></autowp-past-time-indicator>
+                        </small>
+                        <br ng-if-end />
+                        <autowp-user user="topic.last_message.user" ng-if="topic.last_message.user"></autowp-user>
+                        <a ng-href="/forums/topic-message/message_id/{{topic.last_message.id}}" translate-attr="{title: 'forums/go-to-last-message'}"><i class="fa fa-share"></i></a>
+                    </div>
+                    <span ng-if="!topic.last_message">&#x2014;</span>
+                </td>
+                <td ng-if="ctrl.forumAdmin">
+                    <div class="btn-group">
+                        <button translate-attr="{title: 'forums/topic/open'}" class="btn btn-xs btn-warning open" ng-click="ctrl.openTopic(topic)" ng-if="topic.status == 'closed'">
+                            <i class="fa fa-check-circle"></i>
+                        </button>
+                        <button translate-attr="{title: 'forums/topic/close'}" class="btn btn-xs btn-warning close-topic" ng-click="ctrl.closeTopic(topic)" ng-if="topic.status != 'closed'">
+                            <i class="fa fa-times-circle"></i>
+                        </button>
+                        <a ng-href="/forums/move/{{topic.id}}" class="btn btn-default btn-xs" translate-attr="{title: 'forums/topic/move'}"><i class="fa fa-share"></i></a>
+                        <button translate-attr="{title: 'forums/topic/delete'}" class="btn btn-xs btn-danger delete" ng-click="ctrl.deleteTopic(topic)">
+                            <i class="fa fa-ban"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <autowp-paginator data="ctrl.topics.paginator" ng-if="ctrl.topics.paginator"></autowp-paginator>
+</div>
+
+<p class="text-right small" ng-if="ctrl.theme" translate translate-values="{topics: ctrl.theme.topics_count, messages: ctrl.theme.messages_count}">{topics} topics and {messages} messages</p>

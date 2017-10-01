@@ -219,14 +219,8 @@
         "%1$s commentaires"
     ],
     "ng/%1$s-comments": "{count, plural, one {{count} comment} other {{count} comments}}",
-    "%1$s messages": [
-        "%1$s message",
-        "%1$s messages"
-    ],
-    "%1$s topics": [
-        "%1$s sujet",
-        "%1$s sujets"
-    ],
+    "{count} messages": "{count, plural, one {{count} message} other {{count} messages}}",
+    "{topics} topics and {messages} messages": "{topics, plural, one {{topics} sujet} other {{topics} sujets}} et {messages, plural, one {{messages} message} other {{messages} messages}}",
     "year": "Year",
     "month": "Month",
     "contributor": "contributeur",
@@ -603,7 +597,7 @@
     "picture/moderators-about-this-picture": "L'opinion des modérateurs",
     "picture/all-images-have-owners": "Toutes les images ont propriétaires.",
     "picture/if-you-found-error": "Si vous pensez que utilisateurs du site s'est trompé en affichant cette image dans cette section, ce serait bien si vous avez écrit à ce sujet dans les commentaires et ont indiqué à l'erreur.",
-    "picture/where-to-talk": "Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur <a href=\"/forums/\">notre forum</a>",
+    "picture/where-to-talk": "Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur <a href=\"/ng/forums/\">notre forum</a>",
     "picture/other-languages": "In other languages",
     "picture/picture-suggested-to-replace": "Picture suggested to replace",
     "picture/that-engine-is-mounted-to-vehicle": "That engine is mounted to vehicle",
@@ -776,7 +770,7 @@
     "car-type-rp/moto": "Moto",
     "car-type-rp/tractor": "Tracteur",
     "car-type-rp/tracked": "Plateforme à chenilles",
-    "about/text": "### Notre gens\nSon existence de notre projet est obligé de les gens qui viennent ici et ont contribué leur temps et leur connaissances.\n\nQuelqu'un ajoute matériaux, et quelqu'un aide à trouver des erreurs dans les existants. Quelqu'un qui se specialize dans une marque particulière, mais quelqu'un a le temps pour tout. Quelqu'un remplit le site étape par étape sans beaucoup d'attention, mais quelqu'un qui recueille ovation avec rares, mais brûlants photos.\n\nNous sommes nombreux, nous sommes différents, et c'est très bien. Voici quelques-uns d'entre nous:\n\n%users%\n\n#### \"La différenciation de la couleur des utilisateurs\"\n\nDonc, il est arrivé que nous mettons en évidence certains de nos gens d'une couleur spéciale – vert, mais pas seulement - c'est une etiquette spéciale. Vous savez, si vous voyez une personne de «vert», vous pouvez toujours l'attraper et demander quoi que ce soit autour de notre projet, car les “verts” sont les plus sensibles et intéressés gens par la vie de projet.\n\nUne partie des \"verts\" sont les modérateurs.\n\n### Dialogue et retour d'information.\n\nSi vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/forums/), demander personnellement via la messagerie, ou écrire dans le \"[Retour d'information](/ng/feedback)\" de l'administration du site.\n\nSi vous avez des questions concernant la publicité, échange de lien ou de promouvoir votre produit par d'autres moyens, ils ont tous une réponse: on ne place pas la publicité.\n\n### Nombres\n\nC'est ainsi, que nous aimons le nombre élevé de vanité amuse, ainsi que de leur spectacle. À votre attention sont présentés quelques-unes:\n\n* sur le site il y a plus de %total-pictures% images, %total-vehicles% véhicules, ce qui représente environ %total-size% de données\n* il y a environ %total-users% membres, qui ont écrit plus de %total-comments% messages.\n\n### Développement\n\nDéveloppement et maintenance du projet est réalisée principalement par %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))\n\nLa traduction du site en français: %fr-translator%\n\nLa traduction du site en chinois: %zh-translator%\n\nLe site propulsé par [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), ainsi que de nombreux autres.\n\nUne partie du code source du site est ouverte et un cours de communication supplémentaire, que tout le monde a eu l'occasion d'influencer la nature et la qualité du projet.\n\n%github%\n\n[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)\n[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)\n[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)\n\n### Soutenir le projet\n\nVous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/ng/feedback).\nTake part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.",
+    "about/text": "### Notre gens\nSon existence de notre projet est obligé de les gens qui viennent ici et ont contribué leur temps et leur connaissances.\n\nQuelqu'un ajoute matériaux, et quelqu'un aide à trouver des erreurs dans les existants. Quelqu'un qui se specialize dans une marque particulière, mais quelqu'un a le temps pour tout. Quelqu'un remplit le site étape par étape sans beaucoup d'attention, mais quelqu'un qui recueille ovation avec rares, mais brûlants photos.\n\nNous sommes nombreux, nous sommes différents, et c'est très bien. Voici quelques-uns d'entre nous:\n\n%users%\n\n#### \"La différenciation de la couleur des utilisateurs\"\n\nDonc, il est arrivé que nous mettons en évidence certains de nos gens d'une couleur spéciale – vert, mais pas seulement - c'est une etiquette spéciale. Vous savez, si vous voyez une personne de «vert», vous pouvez toujours l'attraper et demander quoi que ce soit autour de notre projet, car les “verts” sont les plus sensibles et intéressés gens par la vie de projet.\n\nUne partie des \"verts\" sont les modérateurs.\n\n### Dialogue et retour d'information.\n\nSi vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/ng/forums/), demander personnellement via la messagerie, ou écrire dans le \"[Retour d'information](/ng/feedback)\" de l'administration du site.\n\nSi vous avez des questions concernant la publicité, échange de lien ou de promouvoir votre produit par d'autres moyens, ils ont tous une réponse: on ne place pas la publicité.\n\n### Nombres\n\nC'est ainsi, que nous aimons le nombre élevé de vanité amuse, ainsi que de leur spectacle. À votre attention sont présentés quelques-unes:\n\n* sur le site il y a plus de %total-pictures% images, %total-vehicles% véhicules, ce qui représente environ %total-size% de données\n* il y a environ %total-users% membres, qui ont écrit plus de %total-comments% messages.\n\n### Développement\n\nDéveloppement et maintenance du projet est réalisée principalement par %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))\n\nLa traduction du site en français: %fr-translator%\n\nLa traduction du site en chinois: %zh-translator%\n\nLe site propulsé par [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), ainsi que de nombreux autres.\n\nUne partie du code source du site est ouverte et un cours de communication supplémentaire, que tout le monde a eu l'occasion d'influencer la nature et la qualité du projet.\n\n%github%\n\n[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)\n[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)\n[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)\n\n### Soutenir le projet\n\nVous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/ng/feedback).\nTake part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.",
     "page/1/name": "Page d'accueil",
     "page/2/name": "Main menu",
     "page/10/name": "Marque",
@@ -1971,5 +1965,19 @@
     "moder/statistics/brand-logos": "Brand logotypes",
     "moder/statistics/from-years": "Years of begin production",
     "moder/statistics/from-and-to-years": "Years of begin and end production",
-    "moder/statistics/from-and-to-years-and-months": "Years and months of begin and end production"
+    "moder/statistics/from-and-to-years-and-months": "Years and months of begin and end production",
+
+    "forums/go-to-theme-name": "Accédez à la rubrique \"{theme_name}\"",
+    "forums/go-to-theme": "Accédez à la rubrique …",
+    "forums/subforums": "Sous-forums",
+    "forums/last-message-in-topic-{topic_name}": "Dernier message dans le sujet «{topic_name}»",
+    "forums/go-to-last-message": "Aller au dernier message",
+    "forums/create-new-topic": "Créer un nouveau sujet",
+    "forums/theme/topics": "Sujets",
+    "forums/theme/author": "Auteur",
+    "forums/theme/last-message": "Dernier message",
+    "forums/topic/open": "créer",
+    "forums/topic/close": "fermer",
+    "forums/topic/delete": "retirer",
+    "forums/topic/move": "déplacer"
 }

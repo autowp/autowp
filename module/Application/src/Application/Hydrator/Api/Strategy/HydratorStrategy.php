@@ -7,6 +7,11 @@ use Zend\Hydrator\Strategy\StrategyInterface;
 
 use Application\Hydrator\Api\Content as Hydrator;
 
+/**
+ * @SuppressWarnings(PHPMD.NumberOfChildren)
+ * @author dmitry
+ *
+ */
 abstract class HydratorStrategy implements StrategyInterface
 {
     /**

@@ -12,8 +12,15 @@ class ForumControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $hydrators = $container->get('HydratorManager');
+        $filters = $container->get('InputFilterManager');
         return new ForumController(
-            $container->get(\Autowp\Forums\Forums::class)
+            $container->get(\Autowp\Forums\Forums::class),
+            $container->get(\Autowp\User\Model\User::class),
+            $hydrators->get(\Application\Hydrator\Api\ForumThemeHydrator::class),
+            $filters->get('api_forum_theme_list'),
+            $filters->get('api_forum_theme_get'),
+            $filters->get('api_forum_topic_put')
         );
     }
 }

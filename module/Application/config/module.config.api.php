@@ -13,6 +13,7 @@ return [
     'hydrators' => [
         'factories' => [
             Hydrator\Api\CommentHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ForumThemeHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\IpHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
@@ -431,6 +432,69 @@ return [
                                     ],
                                 ],
                             ],
+                            'themes' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/themes'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'get-themes'
+                                            ],
+                                        ],
+                                    ],
+                                    'item' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/:id'
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'get' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'get-theme'
+                                                    ],
+                                                ],
+                                            ],
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'topic' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/topic'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'item' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/:id'
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'put' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'put',
+                                                    'defaults' => [
+                                                        'action' => 'put-topic'
+                                                    ],
+                                                ],
+                                            ],
+                                        ]
+                                    ]
+                                ]
+                            ]
                         ]
                     ],
                     'hotlinks' => [
