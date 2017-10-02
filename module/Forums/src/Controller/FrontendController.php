@@ -5,48 +5,19 @@ namespace Autowp\Forums\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\Forums\Forums;
-use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
-
-use Application\Comments;
 
 class FrontendController extends AbstractActionController
 {
-    /**
-     * @var MessageService
-     */
-    private $message;
-
-    /**
-     * @var Comments
-     */
-    private $comments;
-
     /**
      * @var Forums
      */
     private $model;
 
-    /**
-     * @var User
-     */
-    private $userModel;
-
     public function __construct(
-        Forums $model,
-        MessageService $message,
-        Comments $comments,
-        User $userModel
+        Forums $model
     ) {
         $this->model = $model;
-        $this->message = $message;
-        $this->comments = $comments;
-        $this->userModel = $userModel;
-    }
-
-    private function themeUrl(int $themeId)
-    {
-        return '/ng/forums/'. $themeId;
     }
 
     private function topicUrl($topicId, $page = null)
@@ -88,29 +59,6 @@ class FrontendController extends AbstractActionController
         }
 
         return $callback();
-    }
-
-    public function moveAction()
-    {
-        return $this->authorizedForumModer(function () {
-            $topic = $this->model->getTopic($this->params('topic_id'));
-            if (! $topic) {
-                return $this->notFoundAction();
-            }
-
-            $theme = $this->model->getTheme($this->params()->fromPost('theme_id'));
-
-            if ($theme) {
-                $this->model->moveTopic($topic['id'], $theme['id']);
-
-                return $this->redirect()->toUrl($this->themeUrl($theme['id']));
-            }
-
-            return [
-                'themes' => $this->model->getThemes(),
-                'topic'  => $topic
-            ];
-        });
     }
 
     public function moveMessageAction()

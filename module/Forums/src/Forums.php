@@ -331,10 +331,10 @@ class Forums
         return $id;
     }
 
-    public function getTheme($themeId)
+    public function getTheme(int $themeId)
     {
         $theme = $this->themeTable->select([
-            'id = ?' => (int)$themeId
+            'id = ?' => $themeId
         ])->current();
         if (! $theme) {
             return false;
@@ -416,17 +416,17 @@ class Forums
         return true;
     }
 
-    public function moveTopic($topicId, $themeId)
+    public function moveTopic(int $topicId, int $themeId)
     {
         $topic = $this->topicTable->select([
-            'id = ?' => (int)$topicId
+            'id = ?' => $topicId
         ])->current();
         if (! $topic) {
             return false;
         }
 
         $theme = $this->themeTable->select([
-            'id = ?' => (int)$themeId
+            'id = ?' => $themeId
         ])->current();
         if (! $theme) {
             return false;

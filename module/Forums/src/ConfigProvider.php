@@ -49,15 +49,6 @@ class ConfigProvider
                                 ],
                             ]
                         ],
-                        'move' => [
-                            'type' => Segment::class,
-                            'options' => [
-                                'route' => '/move/:topic_id',
-                                'defaults' => [
-                                    'action' => 'move',
-                                ]
-                            ]
-                        ],
                         'move-message' => [
                             'type' => Segment::class,
                             'options' => [

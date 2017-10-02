@@ -2,6 +2,8 @@
 
 namespace Application\Controller\Api;
 
+use DateTime;
+
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -306,7 +308,7 @@ class ForumController extends AbstractRestfulController
             }
         }
 
-        if (array_key_exists('subscription', $values) && $forumAdmin) {
+        if (array_key_exists('subscription', $values)) {
             if ($values['subscription']) {
                 if ($this->forums->canSubscribe($row['id'], $user['id'])) {
                     $this->forums->subscribe($row['id'], $user['id']);
@@ -315,6 +317,14 @@ class ForumController extends AbstractRestfulController
                 if ($this->forums->canUnSubscribe($row['id'], $user['id'])) {
                     $this->forums->unsubscribe($row['id'], $user['id']);
                 }
+            }
+        }
+
+        if (array_key_exists('theme_id', $values) && $forumAdmin) {
+            $theme = $this->forums->getTheme($values['theme_id']);
+
+            if ($theme) {
+                $this->forums->moveTopic($row['id'], $theme['id']);
             }
         }
 

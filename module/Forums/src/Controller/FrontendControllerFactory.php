@@ -13,10 +13,7 @@ class FrontendControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new FrontendController(
-            $container->get(\Autowp\Forums\Forums::class),
-            $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Application\Comments::class),
-            $container->get(\Autowp\User\Model\User::class)
+            $container->get(\Autowp\Forums\Forums::class)
         );
     }
 }

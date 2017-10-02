@@ -5,6 +5,7 @@ import notify from 'notify';
 import ACL_SERVICE_NAME from 'services/acl';
 
 import './new-topic';
+import './move-topic';
 import './subscriptions';
 import './topic';
 

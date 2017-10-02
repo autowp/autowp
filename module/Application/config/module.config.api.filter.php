@@ -547,7 +547,16 @@ return [
                 'validators' => [
                     ['name' => 'Digits']
                 ]
-            ]
+            ],
+            'theme_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
         ],
         'api_ip_item' => [
             'fields' => [

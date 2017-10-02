@@ -84,7 +84,7 @@
                         <button translate-attr="{title: 'forums/topic/close'}" class="btn btn-xs btn-warning close-topic" ng-click="ctrl.closeTopic(topic)" ng-if="topic.status != 'closed'">
                             <i class="fa fa-times-circle"></i>
                         </button>
-                        <a ng-href="/forums/move/{{topic.id}}" class="btn btn-default btn-xs" translate-attr="{title: 'forums/topic/move'}"><i class="fa fa-share"></i></a>
+                        <a ui-sref="forums-move-topic({topic_id: topic.id})" class="btn btn-default btn-xs" translate-attr="{title: 'forums/topic/move'}"><i class="fa fa-share"></i></a>
                         <button translate-attr="{title: 'forums/topic/delete'}" class="btn btn-xs btn-danger delete" ng-click="ctrl.deleteTopic(topic)">
                             <i class="fa fa-ban"></i>
                         </button>
