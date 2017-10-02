@@ -2,9 +2,12 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
@@ -29,6 +32,11 @@ class ForumController extends AbstractRestfulController
     private $themeHydrator;
 
     /**
+     * @var RestHydrator
+     */
+    private $topicHydrator;
+
+    /**
      * @var InputFilter
      */
     private $themeListInputFilter;
@@ -41,22 +49,38 @@ class ForumController extends AbstractRestfulController
     /**
      * @var InputFilter
      */
+    private $topicGetInputFilter;
+
+    /**
+     * @var InputFilter
+     */
     private $topicPutInputFilter;
+
+    /**
+     * @var InputFilter
+     */
+    private $topicPostInputFilter;
 
     public function __construct(
         Forums $forums,
         User $userModel,
         RestHydrator $themeHydrator,
+        RestHydrator $topicHydrator,
         InputFilter $themeListInputFilter,
         InputFilter $themeInputFilter,
-        InputFilter $topicPutInputFilter
+        InputFilter $topicGetInputFilter,
+        InputFilter $topicPutInputFilter,
+        InputFilter $topicPostInputFilter
     ) {
         $this->forums = $forums;
         $this->userModel = $userModel;
         $this->themeHydrator = $themeHydrator;
+        $this->topicHydrator = $topicHydrator;
         $this->themeListInputFilter = $themeListInputFilter;
         $this->themeInputFilter = $themeInputFilter;
+        $this->topicGetInputFilter = $topicGetInputFilter;
         $this->topicPutInputFilter = $topicPutInputFilter;
+        $this->topicPostInputFilter = $topicPostInputFilter;
     }
 
     public function userSummaryAction()
@@ -208,5 +232,117 @@ class ForumController extends AbstractRestfulController
         }
 
         return $this->getResponse()->setStatusCode(200);
+    }
+
+    private function needWait()
+    {
+        $user = $this->user()->get();
+        if ($user) {
+            $nextMessageTime = $this->userModel->getNextMessageTime($user['id']);
+            if ($nextMessageTime) {
+                return $nextMessageTime > new DateTime();
+            }
+        }
+
+        return false;
+    }
+
+    public function postTopicAction()
+    {
+        $user = $this->user()->get();
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        $request = $this->getRequest();
+        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
+            $data = $this->jsonDecode($request->getContent());
+        } else {
+            $data = $request->getPost()->toArray();
+        }
+
+        $this->topicPostInputFilter->setData($data);
+
+        if (! $this->topicPostInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->topicPostInputFilter);
+        }
+
+        $data = $this->topicPostInputFilter->getValues();
+
+        $theme = $this->forums->getTheme($data['theme_id']);
+
+        if (! $theme || $theme['disable_topics']) {
+            return $this->notFoundAction();
+        }
+
+        $needWait = $this->needWait();
+
+        if ($needWait) {
+            return new ApiProblemResponse(new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                'invalid_params' => [
+                    'text' => [
+                        'invalid' => $this->translate('forums/need-wait-to-post')
+                    ]
+                ]
+            ]));
+        }
+
+        $data['user_id'] = $user['id'];
+        $data['theme_id'] = $theme['id'];
+        $data['ip'] = $request->getServer('REMOTE_ADDR');
+
+        $topicId = $this->forums->addTopic($data);
+
+        $this->userModel->getTable()->update([
+            'forums_topics'     => new Sql\Expression('forums_topics + 1'),
+            'forums_messages'   => new Sql\Expression('forums_messages + 1'),
+            'last_message_time' => new Sql\Expression('NOW()')
+        ], [
+            'id' => $user['id']
+        ]);
+
+        $url = $this->url()->fromRoute('api/forum/topic/item/get', [
+            'id' => $topicId
+        ]);
+        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
+
+        return $this->getResponse()->setStatusCode(201);
+    }
+
+    public function getTopicAction()
+    {
+        $this->topicGetInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->topicGetInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->topicGetInputFilter);
+        }
+
+        $data = $this->topicGetInputFilter->getValues();
+
+        $user = $this->user()->get();
+        $userId = $user ? $user['id'] : null;
+
+        $isModerator = $this->user()->inheritsRole('moder');
+
+        $select = $this->forums->getTopicTable()->getSql()->select();
+        $select->where(['id' => (int)$this->params('id')]);
+
+        if (! $isModerator) {
+            $select->where(['not is_moderator']);
+        }
+
+        $row = $this->forums->getTopicTable()->selectWith($select)->current();
+
+        if (! $row) {
+            return $this->notFoundAction();
+        }
+
+        $this->topicHydrator->setOptions([
+            'language' => $this->language(),
+            'fields'   => $data['fields'],
+            'user_id'  => $userId
+        ]);
+
+        return new JsonModel($this->topicHydrator->extract($row));
     }
 }

@@ -37,7 +37,7 @@
 
 <div ng-if="ctrl.theme && !ctrl.theme.disable_topics">
 
-    <a ng-href="/forums/new/theme_id/{{ctrl.theme.id}}" class="btn btn-info">
+    <a ui-sref="forums-new-topic({theme_id: ctrl.theme.id})" class="btn btn-info">
         <i class="fa fa-comment"></i>
         <translate>forums/create-new-topic</translate>
     </a>

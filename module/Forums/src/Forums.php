@@ -689,4 +689,9 @@ class Forums
     {
         return $this->themeTable;
     }
+
+    public function getTopicTable(): TableGateway
+    {
+        return $this->topicTable;
+    }
 }

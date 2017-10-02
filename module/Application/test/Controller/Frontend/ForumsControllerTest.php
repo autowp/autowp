@@ -26,36 +26,26 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 
     public function testNewIsForbidden()
     {
-        $this->dispatch('https://www.autowp.ru/forums/new/theme_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_POST);
 
         $this->assertResponseStatusCode(403);
-    }
-
-    public function testNew()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/forums/new/theme_id/1', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums/new');
-        $this->assertActionName('new');
     }
 
     public function testCreateTopic()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/forums/new/theme_id/1', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_POST, [
+            'theme_id'            => 1,
             'name'                => 'Test topic',
             'text'                => 'Test topic text',
             'moderator_attention' => 0,
-            'subscribe'           => true
+            'subscribe'           => 1
         ]);
 
-        $this->assertResponseStatusCode(302);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums/new');
-        $this->assertActionName('new');
+        $this->assertResponseStatusCode(201);
+        $this->assertControllerName(ForumController::class);
+        $this->assertMatchedRouteName('api/forum/topic/post');
+        $this->assertActionName('post-topic');
 
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();

@@ -1963,5 +1963,8 @@
     "forums/topic/open": "打开",
     "forums/topic/close": "关闭",
     "forums/topic/delete": "删除",
-    "forums/topic/move": "移动"
+    "forums/topic/move": "移动",
+    "forums/topic/name": "标题",
+    "forums/topic/text": "站内信",
+    "forums/topic/subscribe-to-new-messages": "发送新消息"
 }

@@ -14,6 +14,7 @@ return [
         'factories' => [
             Hydrator\Api\CommentHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ForumThemeHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ForumTopicHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\IpHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
@@ -475,6 +476,15 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
+                                    'post' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'post',
+                                            'defaults' => [
+                                                'action' => 'post-topic'
+                                            ],
+                                        ],
+                                    ],
                                     'item' => [
                                         'type' => 'Segment',
                                         'options' => [
@@ -482,6 +492,15 @@ return [
                                         ],
                                         'may_terminate' => false,
                                         'child_routes' => [
+                                            'get' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'get-topic'
+                                                    ],
+                                                ],
+                                            ],
                                             'put' => [
                                                 'type' => 'Method',
                                                 'options' => [

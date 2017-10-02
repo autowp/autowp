@@ -1979,5 +1979,8 @@
     "forums/topic/open": "créer",
     "forums/topic/close": "fermer",
     "forums/topic/delete": "retirer",
-    "forums/topic/move": "déplacer"
+    "forums/topic/move": "déplacer",
+    "forums/topic/name": "Titre",
+    "forums/topic/text": "Message",
+    "forums/topic/subscribe-to-new-messages": "Abonnez-vous à de nouveaux messages"
 }

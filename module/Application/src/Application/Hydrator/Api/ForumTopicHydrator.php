@@ -100,52 +100,59 @@ class ForumTopicHydrator extends RestHydrator
 
     public function extract($object)
     {
-        if ($this->userId) {
-            $stat = $this->comments->service()->getTopicStatForUser(
-                \Application\Comments::FORUMS_TYPE_ID,
-                $object['id'],
-                $this->userId
-            );
-            $messages = $stat['messages'];
-            $newMessages = $stat['newMessages'];
-        } else {
-            $stat = $this->comments->service()->getTopicStat(
-                \Application\Comments::FORUMS_TYPE_ID,
-                $object['id']
-            );
-            $messages = $stat['messages'];
-            $newMessages = 0;
-        }
+        $result = [
+            'id'           => (int)$object['id'],
+            'name'         => $object['name'],
+            'add_datetime' => $this->extractValue('add_datetime', Row::getDateTimeByColumnType('timestamp', $object['add_datetime'])),
+            'status'       => $object['status']
+        ];
 
-        $oldMessages = $messages - $newMessages;
-
-        $lastMessage = false;
-        if ($messages > 0) {
+        if ($this->filterComposite->filter('last_message')) {
             $lastMessageRow = $this->comments->service()->getLastMessageRow(
                 \Application\Comments::FORUMS_TYPE_ID,
                 $object['id']
             );
+            $lastMessage = false;
             if ($lastMessageRow) {
                 $lastMessage = $lastMessageRow ? $this->extractValue('last_message', $lastMessageRow) : null;
             }
+
+            $result['last_message'] = $lastMessage;
         }
 
-        $author = null;
-        if ($object['author_id']) {
-            $author = $this->userModel->getRow($object['author_id']);
+        if ($this->filterComposite->filter('author')) {
+            $author = null;
+            if ($object['author_id']) {
+                $author = $this->userModel->getRow($object['author_id']);
+            }
+
+            $result['author'] = $author ? $this->extractValue('author', $author) : null;
         }
 
-        $result = [
-            'id'           => (int)$object['id'],
-            'name'         => $object['name'],
-            'messages'     => $messages,
-            'old_messages' => $oldMessages,
-            'new_messages' => $newMessages,
-            'add_datetime' => $this->extractValue('add_datetime', Row::getDateTimeByColumnType('timestamp', $object['add_datetime'])),
-            'author'       => $author ? $this->extractValue('author', $author) : null,
-            'last_message' => $lastMessage,
-            'status'       => $object['status']
-        ];
+        if ($this->filterComposite->filter('messages')) {
+            if ($this->userId) {
+                $stat = $this->comments->service()->getTopicStatForUser(
+                    \Application\Comments::FORUMS_TYPE_ID,
+                    $object['id'],
+                    $this->userId
+                );
+                $messages = $stat['messages'];
+                $newMessages = $stat['newMessages'];
+            } else {
+                $stat = $this->comments->service()->getTopicStat(
+                    \Application\Comments::FORUMS_TYPE_ID,
+                    $object['id']
+                );
+                $messages = $stat['messages'];
+                $newMessages = 0;
+            }
+
+            $oldMessages = $messages - $newMessages;
+
+            $result['messages'] = $messages;
+            $result['old_messages'] = $oldMessages;
+            $result['new_messages'] = $newMessages;
+        }
 
         return $result;
     }

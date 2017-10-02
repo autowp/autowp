@@ -15,8 +15,6 @@ use Application\Comments;
 
 class FrontendController extends AbstractActionController
 {
-    private $newTopicForm;
-
     private $commentForm;
 
     /**
@@ -41,14 +39,12 @@ class FrontendController extends AbstractActionController
 
     public function __construct(
         Forums $model,
-        $newTopicForm,
         $commentForm,
         MessageService $message,
         Comments $comments,
         User $userModel
     ) {
         $this->model = $model;
-        $this->newTopicForm = $newTopicForm;
         $this->commentForm = $commentForm;
         $this->message = $message;
         $this->comments = $comments;
@@ -244,61 +240,6 @@ class FrontendController extends AbstractActionController
         }
 
         return false;
-    }
-
-    public function newAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forbiddenAction();
-        }
-
-        $theme = $this->model->getTheme($this->params('theme_id'));
-
-        if (! $theme || $theme['disable_topics']) {
-            return $this->notFoundAction();
-        }
-
-        $needWait = $this->needWait();
-
-        $user = $this->user()->get();
-        if ($user) {
-            $this->newTopicForm->setAttribute('action', $this->url()->fromRoute('forums/new', [
-                'theme_id' => $theme['id']
-            ]));
-
-            $request = $this->getRequest();
-
-            if ($request->isPost()) {
-                $this->newTopicForm->setData($request->getPost());
-                if ($this->newTopicForm->isValid()) {
-                    if (! $needWait) {
-                        $values = $this->newTopicForm->getData();
-
-                        $values['user_id'] = $user['id'];
-                        $values['theme_id'] = $theme['id'];
-                        $values['ip'] = $request->getServer('REMOTE_ADDR');
-
-                        $topicId = $this->model->addTopic($values);
-
-                        $this->userModel->getTable()->update([
-                            'forums_topics'     => new Sql\Expression('forums_topics + 1'),
-                            'forums_messages'   => new Sql\Expression('forums_messages + 1'),
-                            'last_message_time' => new Sql\Expression('NOW()')
-                        ], [
-                            'id' => $user['id']
-                        ]);
-
-                        return $this->redirect()->toUrl($this->topicUrl($topicId));
-                    }
-                }
-            }
-        }
-
-        return [
-            'formTopicNew' => $this->newTopicForm,
-            'needWait'     => $needWait,
-            'theme'        => $theme
-        ];
     }
 
     public function topicMessageAction()

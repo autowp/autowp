@@ -1987,5 +1987,8 @@
     "forums/topic/open": "открыть",
     "forums/topic/close": "закрыть",
     "forums/topic/delete": "удалить",
-    "forums/topic/move": "переместить"
+    "forums/topic/move": "переместить",
+    "forums/topic/name": "Тема топика",
+    "forums/topic/text": "Сообщение",
+    "forums/topic/subscribe-to-new-messages": "Подписаться на новые сообщения"
 }

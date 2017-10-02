@@ -12,7 +12,6 @@ class ConfigProvider
         return [
             'controllers'  => $this->getControllersConfig(),
             'dependencies' => $this->getDependencyConfig(),
-            'forms'        => $this->getFormsConfig(),
             'router'       => $this->getRouterConfig(),
             'tables'       => $this->getTablesConfig(),
             'translator'   => $this->getTranslatorConfig()
@@ -69,15 +68,6 @@ class ConfigProvider
                                 ],
                             ]
                         ],
-                        'new' => [
-                            'type' => Segment::class,
-                            'options' => [
-                                'route' => '/new/theme_id/:theme_id',
-                                'defaults' => [
-                                    'action' => 'new',
-                                ],
-                            ]
-                        ],
                         'topic-message' => [
                             'type' => Segment::class,
                             'options' => [
@@ -85,33 +75,6 @@ class ConfigProvider
                                 'defaults' => [
                                     'action' => 'topic-message',
                                 ],
-                            ]
-                        ],
-                        'open' => [
-                            'type' => Literal::class,
-                            'options' => [
-                                'route' => '/open',
-                                'defaults' => [
-                                    'action' => 'open',
-                                ]
-                            ]
-                        ],
-                        'close' => [
-                            'type' => Literal::class,
-                            'options' => [
-                                'route' => '/close',
-                                'defaults' => [
-                                    'action' => 'close',
-                                ]
-                            ]
-                        ],
-                        'delete' => [
-                            'type' => Literal::class,
-                            'options' => [
-                                'route' => '/delete',
-                                'defaults' => [
-                                    'action' => 'delete',
-                                ]
                             ]
                         ],
                         'move' => [
@@ -169,97 +132,6 @@ class ConfigProvider
             'factories' => [
                 Forums::class => ForumsFactory::class,
             ]
-        ];
-    }
-
-    public function getFormsConfig(): array
-    {
-        return [
-            'ForumsTopicNewForm' => [
-                'type'     => \Zend\Form\Form::class,
-                'attributes'  => [
-                    'method' => 'post',
-                ],
-                'elements' => [
-                    [
-                        'spec' => [
-                            'type' => 'Text',
-                            'name' => 'name',
-                            'options' => [
-                                'label'     => 'forums/topic/name',
-                            ],
-                            'attributes' => [
-                                'size'      => 80,
-                                'maxlength' => 100,
-                            ]
-                        ],
-                    ],
-                    [
-                        'spec' => [
-                            'type' => 'Textarea',
-                            'name' => 'text',
-                            'options' => [
-                                'label'     => 'forums/topic/text',
-                            ],
-                            'attributes' => [
-                                'cols'      => 140,
-                                'rows'      => 15,
-                                'maxlength' => 1024 * 4
-                            ]
-                        ],
-                    ],
-                    [
-                        'spec' => [
-                            'type' => 'Checkbox',
-                            'name' => 'moderator_attention',
-                            'options' => [
-                                'label' => 'comments/it-requires-attention-of-moderators',
-                            ]
-                        ],
-                    ],
-                    [
-                        'spec' => [
-                            'type' => 'Checkbox',
-                            'name' => 'subscribe',
-                            'options' => [
-                                'label' => 'forums/topic/subscribe-to-new-messages',
-                            ]
-                        ],
-                    ],
-                ],
-                'input_filter' => [
-                    'name' => [
-                        'required'   => true,
-                        'filters'  => [
-                            ['name' => 'StringTrim']
-                        ],
-                        'validators' => [
-                            [
-                                'name' => 'StringLength',
-                                'options' => [
-                                    'min' => 0,
-                                    'max' => 100
-                                ]
-                            ]
-                        ]
-                    ],
-                    'text' => [
-                        'required'   => true,
-                        'filters'  => [
-                            ['name' => 'StringTrim']
-                        ],
-                        'validators' => [
-                            [
-                                'name' => 'StringLength',
-                                'options' => [
-                                    'min' => 0,
-                                    'max' => 1024 * 4
-                                ]
-                            ]
-                        ]
-                    ],
-                ],
-            ],
         ];
     }
 

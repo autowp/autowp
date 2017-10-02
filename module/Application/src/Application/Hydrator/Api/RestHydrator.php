@@ -52,6 +52,12 @@ abstract class RestHydrator extends AbstractHydrator implements HydratorOptionsI
     {
         $this->getFilter('fields')->addFilter('fields', new PropertyFilter(array_keys($fields)));
 
+        foreach ($this->strategies as $strategy) {
+            if ($strategy instanceof HydratorStrategy) {
+                $strategy->setFields([]);
+            }
+        }
+
         foreach ($fields as $name => $value) {
             if (! is_array($value)) {
                 continue;
