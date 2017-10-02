@@ -207,7 +207,10 @@ class DonateController extends AbstractActionController
             'language' => $this->language(),
             'columns'  => ['id', 'name', 'is_group'],
             'order'    => ['ip1.type', 'name', 'item.begin_year', 'item.end_year'],
-            'parent'   => $car['id']
+            'parent'   => [
+                'id'      => $car['id'],
+                'columns' => ['link_type']
+            ]
         ]);
 
         $viewModel = new ViewModel([
@@ -236,7 +239,7 @@ class DonateController extends AbstractActionController
                 ], [], true),
                 'haveChilds' => $this->itemParent->hasChildItems($row['id']),
                 'isGroup'    => $row['is_group'],
-                'type'       => $row['type'],
+                'type'       => $row['link_type'],
                 'loadUrl'    => $this->url()->fromRoute('donate/vod/vehicle-childs/params', [
                     'action'  => 'car-childs',
                     'item_id' => $row['id']
@@ -278,6 +281,12 @@ class DonateController extends AbstractActionController
     public function logAction()
     {
         $data = [
+            [
+                'sum'      => 979.02,
+                'currency' => 'руб.',
+                'date'     => \DateTime::createFromFormat('Y-m-d', '2017-10-02'),
+                'user_id'  => 15603
+            ],
             [
                 'sum'      => 5000,
                 'currency' => 'руб.',
