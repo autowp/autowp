@@ -38,8 +38,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', ACL_SERVICE_NAME,
-        function($scope, $http, $state, Acl) {
+        '$scope', '$http', '$state', ACL_SERVICE_NAME, '$translate',
+        function($scope, $http, $state, Acl, $translate) {
             var ctrl = this;
             
             ctrl.topics = [];
@@ -88,16 +88,30 @@ angular.module(Module)
                     ctrl.themes = response.data.themes;
                     ctrl.topics = response.data.topics;
                     
-                    $scope.pageEnv({
-                        layout: {
-                            blankPage: false,
-                            needRight: true
-                        },
-                        pageId: 43,
-                        args: {
-                            THEME_NAME: ctrl.theme.name,
-                            THEME_ID:   ctrl.theme.id
-                        }
+                    $translate(ctrl.theme.name).then(function(translation) {
+                        $scope.pageEnv({
+                            layout: {
+                                blankPage: false,
+                                needRight: true
+                            },
+                            pageId: 43,
+                            args: {
+                                THEME_NAME: translation,
+                                THEME_ID:   ctrl.theme.id
+                            }
+                        });
+                    }, function() {
+                        $scope.pageEnv({
+                            layout: {
+                                blankPage: false,
+                                needRight: true
+                            },
+                            pageId: 43,
+                            args: {
+                                THEME_NAME: ctrl.theme.name,
+                                THEME_ID:   ctrl.theme.id
+                            }
+                        });
                     });
                     
                 }, function(response) {
