@@ -65,7 +65,7 @@ angular.module(Module)
                         },
                         {
                             pageId: 57,
-                            url: '/forums/subscribes',
+                            url: '/ng/forums/subscriptions',
                             icon: 'bookmark',
                             name: 'page/57/name'
                         },

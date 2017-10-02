@@ -5,6 +5,7 @@ import notify from 'notify';
 import ACL_SERVICE_NAME from 'services/acl';
 
 import './new-topic';
+import './subscriptions';
 
 const CONTROLLER_NAME = 'ForumsController';
 const STATE_NAME = 'forums';
@@ -45,7 +46,6 @@ angular.module(Module)
             ctrl.forumAdmin = false;
             Acl.isAllowed('forums', 'moderate').then(function() {
                 ctrl.forumAdmin = true;
-                console.log(ctrl.forumAdmin);
             }, function() {
                 ctrl.forumAdmin = false;
             });

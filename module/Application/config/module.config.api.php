@@ -485,6 +485,15 @@ return [
                                             ],
                                         ],
                                     ],
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'get-topics'
+                                            ],
+                                        ],
+                                    ],
                                     'item' => [
                                         'type' => 'Segment',
                                         'options' => [

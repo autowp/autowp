@@ -1988,5 +1988,7 @@
     "forums/topic/move": "move",
     "forums/topic/name": "Title",
     "forums/topic/text": "Message",
-    "forums/topic/subscribe-to-new-messages": "Subscribe to new messages"
+    "forums/topic/subscribe-to-new-messages": "Subscribe to new messages",
+    "forums/theme/subscription": "Subscription",
+    "forums/unsubscribe": "Unsubscribe"
 }

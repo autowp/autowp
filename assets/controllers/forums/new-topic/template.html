@@ -25,16 +25,16 @@
             <p ng-repeat="message in ctrl.invalidParams.moderator_attention" ng-bind="message" class="help-block"></p>
         </div>
     </div>
-    <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.subscribe}">
+    <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.subscription}">
         <div class="col-md-2"></div>
         <div class="col-md-10">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="subscribe" value="1" ng-model="ctrl.form.subscribe" />
+                    <input type="checkbox" name="subscription" value="1" ng-model="ctrl.form.subscription" />
                     <translate>forums/topic/subscribe-to-new-messages</translate>
                 </label>
             </div>
-            <p ng-repeat="message in ctrl.invalidParams.subscribe" ng-bind="message" class="help-block"></p>
+            <p ng-repeat="message in ctrl.invalidParams.subscription" ng-bind="message" class="help-block"></p>
         </div>
     </div>
     <div class="row">

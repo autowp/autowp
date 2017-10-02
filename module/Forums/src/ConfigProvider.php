@@ -94,15 +94,6 @@ class ConfigProvider
                                     'action' => 'move-message',
                                 ]
                             ]
-                        ],
-                        'subscribes' => [
-                            'type' => Literal::class,
-                            'options' => [
-                                'route' => '/subscribes',
-                                'defaults' => [
-                                    'action' => 'subscribes',
-                                ]
-                            ]
                         ]
                     ]
                 ]

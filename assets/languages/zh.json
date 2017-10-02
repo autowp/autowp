@@ -1966,5 +1966,7 @@
     "forums/topic/move": "移动",
     "forums/topic/name": "标题",
     "forums/topic/text": "站内信",
-    "forums/topic/subscribe-to-new-messages": "发送新消息"
+    "forums/topic/subscribe-to-new-messages": "发送新消息",
+    "forums/theme/subscription": "订阅",
+    "forums/unsubscribe": "取消订阅"
 }

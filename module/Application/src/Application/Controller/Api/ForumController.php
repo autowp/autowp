@@ -5,6 +5,7 @@ namespace Application\Controller\Api;
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Paginator;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
@@ -49,6 +50,11 @@ class ForumController extends AbstractRestfulController
     /**
      * @var InputFilter
      */
+    private $topicListInputFilter;
+
+    /**
+     * @var InputFilter
+     */
     private $topicGetInputFilter;
 
     /**
@@ -68,6 +74,7 @@ class ForumController extends AbstractRestfulController
         RestHydrator $topicHydrator,
         InputFilter $themeListInputFilter,
         InputFilter $themeInputFilter,
+        InputFilter $topicListInputFilter,
         InputFilter $topicGetInputFilter,
         InputFilter $topicPutInputFilter,
         InputFilter $topicPostInputFilter
@@ -78,6 +85,7 @@ class ForumController extends AbstractRestfulController
         $this->topicHydrator = $topicHydrator;
         $this->themeListInputFilter = $themeListInputFilter;
         $this->themeInputFilter = $themeInputFilter;
+        $this->topicListInputFilter = $topicListInputFilter;
         $this->topicGetInputFilter = $topicGetInputFilter;
         $this->topicPutInputFilter = $topicPutInputFilter;
         $this->topicPostInputFilter = $topicPostInputFilter;
@@ -177,6 +185,76 @@ class ForumController extends AbstractRestfulController
         return new JsonModel($this->themeHydrator->extract($row));
     }
 
+    public function getTopicsAction()
+    {
+        $user = $this->user()->get();
+        $userId = $user ? $user['id'] : null;
+
+        $isModerator = $this->user()->inheritsRole('moder');
+
+        $this->topicListInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->topicListInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->topicListInputFilter);
+        }
+
+        $data = $this->topicListInputFilter->getValues();
+
+        $select = $this->forums->getTopicTable()->getSql()->select();
+        $select
+            ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', [])
+            ->where([
+                'comment_topic.type_id' => \Application\Comments::FORUMS_TYPE_ID,
+            ])
+            ->order('comment_topic.last_update DESC');
+
+        if (! $isModerator) {
+            $select
+                ->join('forums_themes', 'forums_topics.theme_id = forums_themes.id', [])
+                ->where(['not forums_themes.is_moderator']);
+        }
+
+        if ($data['subscription']) {
+            if (! $userId) {
+                return $this->forbiddenAction();
+            }
+            $select
+                ->join(
+                    'comment_topic_subscribe',
+                    'forums_topics.id = comment_topic_subscribe.item_id',
+                    []
+                )
+                ->where([
+                    'comment_topic_subscribe.user_id' => $userId,
+                    'comment_topic_subscribe.type_id' => \Application\Comments::FORUMS_TYPE_ID,
+                ]);
+        }
+
+        $this->topicHydrator->setOptions([
+            'language' => $this->language(),
+            'fields'   => $data['fields'],
+            'user_id'  => $userId
+        ]);
+
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->forums->getTopicTable()->getAdapter())
+        );
+
+        $paginator
+            ->setItemCountPerPage(20)
+            ->setCurrentPageNumber($data['page']);
+
+        $items = [];
+        foreach ($paginator->getCurrentItems() as $row) {
+            $items[] = $this->topicHydrator->extract($row);
+        }
+
+        return new JsonModel([
+            'items'     => $items,
+            'paginator' => $paginator->getPages()
+        ]);
+    }
+
     public function putTopicAction()
     {
         $user = $this->user()->get();
@@ -185,9 +263,6 @@ class ForumController extends AbstractRestfulController
         }
 
         $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
-        if (! $forumAdmin) {
-            return $this->forbiddenAction();
-        }
 
         $row = $this->forums->getTopic((int)$this->params('id'));
         if (! $row) {
@@ -217,7 +292,7 @@ class ForumController extends AbstractRestfulController
 
         $values = $this->topicPutInputFilter->getValues();
 
-        if (array_key_exists('status', $values)) {
+        if (array_key_exists('status', $values) && $forumAdmin) {
             switch ($values['status']) {
                 case Forums::STATUS_CLOSED:
                     $this->forums->close($row['id']);
@@ -228,6 +303,14 @@ class ForumController extends AbstractRestfulController
                 case Forums::STATUS_NORMAL:
                     $this->forums->open($row['id']);
                     break;
+            }
+        }
+
+        if (array_key_exists('subscription', $values) && $forumAdmin) {
+            if ($values['subscription']) {
+                $this->forums->subscribe($row['id'], $user['id']);
+            } else {
+                $this->forums->unsubscribe($row['id'], $user['id']);
             }
         }
 

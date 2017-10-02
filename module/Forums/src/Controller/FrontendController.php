@@ -286,39 +286,6 @@ class FrontendController extends AbstractActionController
         });
     }
 
-    public function subscribesAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
-
-        $topics = $this->model->getSubscribedTopics($user['id']);
-
-        foreach ($topics as &$topic) {
-            $author = $this->userModel->getRow($topic['authorId']);
-            $topic['author'] = $author;
-            $topic['url'] = $this->topicUrl($topic['id']);
-
-            if ($topic['theme']) {
-                $topic['theme']['url'] = $this->themeUrl($topic['theme']['id']);
-            }
-
-            if ($topic['lastMessage']) {
-                $topic['lastMessage']['url'] = $this->topicMessageUrl($topic['lastMessage']['id']);
-            }
-
-            $topic['unsubscribeUrl'] = $this->url()->fromRoute('forums/unsubscribe', [
-                'topic_id' => $topic['id']
-            ]);
-        }
-        unset($topic);
-
-        return [
-            'topics' => $topics
-        ];
-    }
-
     public function moveMessageAction()
     {
         return $this->authorizedForumModer(function () {

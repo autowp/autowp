@@ -366,6 +366,42 @@ return [
                 ]
             ]
         ],
+        'api_forum_topic_list' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['last_message', 'author', 'messages']]
+                    ]
+                ]
+            ],
+            'subscription' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'page' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
+        ],
         'api_forum_topic_get' => [
             'fields' => [
                 'required' => false,
@@ -426,7 +462,7 @@ return [
                     ['name' => 'Digits']
                 ]
             ],
-            'subscribe' => [
+            'subscription' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
@@ -453,6 +489,15 @@ return [
                             ]
                         ]
                     ]
+                ]
+            ],
+            'subscription' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
                 ]
             ]
         ],

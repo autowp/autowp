@@ -322,7 +322,7 @@ class Forums
             'moderatorAttention' => (bool)$values['moderator_attention']
         ]);
 
-        if ($values['subscribe']) {
+        if ($values['subscription']) {
             $this->subscribe($id, $userId);
         }
 
@@ -614,7 +614,7 @@ class Forums
             )
             ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', [])
             ->where([
-                'comment_topic_subscribe.user_id' => (int)$userId,
+                'comment_topic_subscribe.user_id' => $userId,
                 'comment_topic.type_id'           => \Application\Comments::FORUMS_TYPE_ID,
                 'comment_topic_subscribe.type_id' => \Application\Comments::FORUMS_TYPE_ID,
             ])

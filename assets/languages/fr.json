@@ -1982,5 +1982,7 @@
     "forums/topic/move": "déplacer",
     "forums/topic/name": "Titre",
     "forums/topic/text": "Message",
-    "forums/topic/subscribe-to-new-messages": "Abonnez-vous à de nouveaux messages"
+    "forums/topic/subscribe-to-new-messages": "Abonnez-vous à de nouveaux messages",
+    "forums/theme/subscription": "Subscription",
+    "forums/unsubscribe": "Se désabonner"
 }

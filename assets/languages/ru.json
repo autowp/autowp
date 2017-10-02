@@ -1990,5 +1990,7 @@
     "forums/topic/move": "переместить",
     "forums/topic/name": "Тема топика",
     "forums/topic/text": "Сообщение",
-    "forums/topic/subscribe-to-new-messages": "Подписаться на новые сообщения"
+    "forums/topic/subscribe-to-new-messages": "Подписаться на новые сообщения",
+    "forums/theme/subscription": "Подписка",
+    "forums/unsubscribe": "Отписаться"
 }

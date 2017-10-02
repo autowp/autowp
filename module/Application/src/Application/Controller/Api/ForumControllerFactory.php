@@ -21,6 +21,7 @@ class ForumControllerFactory implements FactoryInterface
             $hydrators->get(\Application\Hydrator\Api\ForumTopicHydrator::class),
             $filters->get('api_forum_theme_list'),
             $filters->get('api_forum_theme_get'),
+            $filters->get('api_forum_topic_list'),
             $filters->get('api_forum_topic_get'),
             $filters->get('api_forum_topic_put'),
             $filters->get('api_forum_topic_post')

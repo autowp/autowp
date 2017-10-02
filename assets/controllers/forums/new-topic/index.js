@@ -28,7 +28,7 @@ angular.module(Module)
                 name: '',
                 text: '',
                 moderator_attention: false,
-                subscribe: false
+                subscription: false
             };
             
             $http({
@@ -63,7 +63,7 @@ angular.module(Module)
                         name: ctrl.form.name,
                         text: ctrl.form.text,
                         moderator_attention: ctrl.form.moderator_attention ? 1 : 0,
-                        subscribe: ctrl.form.subscribe ? 1 : 0
+                        subscription: ctrl.form.subscription ? 1 : 0
                     }
                 }).then(function(response) {
                     var location = response.headers('Location');
