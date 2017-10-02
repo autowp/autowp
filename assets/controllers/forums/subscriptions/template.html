@@ -11,7 +11,7 @@
         <tr ng-repeat="topic in ctrl.topics">
             <td>
                 <span class="fa fa-lock" ng-if="topic.status == 'closed'"></span>
-                <a ng-href="/forums/topic/{{topic.id}}" ng-bind="topic.name" ng-if="topic.status != 'deleted'"></a>
+                <a ui-sref="forums-topic({topic_id: topic.id})" ng-bind="topic.name" ng-if="topic.status != 'deleted'"></a>
                 <span ng-bind="topic.name" ng-if="topic.status == 'deleted'"></span>
                 <span class="badge">
                     {{topic.old_messages + (topic.new_messages > 0 ? '+' + topic.new_messages : '')}}

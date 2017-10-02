@@ -68,14 +68,14 @@ angular.module(Module)
                 }).then(function(response) {
                     var location = response.headers('Location');
                     
-                    console.log(location);
-                    
                     $http({
                         url: location,
                         method: 'GET'
                     }).then(function(response) {
-                        console.log(window.location, '/forums/topic/' + response.data.id);
-                        window.location = '/forums/topic/' + response.data.id;
+
+                        $state.go('forums-topic', {
+                            topic_id: response.data.id
+                        });
                         
                     }, function(response) {
                         notify.response(response);

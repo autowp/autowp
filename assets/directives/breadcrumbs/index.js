@@ -5,7 +5,7 @@ import PageServiceName from 'services/page';
 
 function replaceArgs(str, args) {
     angular.forEach(args, function(value, key) {
-        str = str.replace(key, value);
+        str = str.replace(key, ''+value);
     });
     return str;
 }
@@ -33,6 +33,7 @@ angular.module(Module)
                             var args = PageService.getCurrentArgs();
                             PageService.getPath(current).then(function(path) {
                                 angular.forEach(path, function(item) {
+                                    item.url = replaceArgs(item.url, args);
                                     ctrl.items.push(item);
                                     $translate('page/' + item.id + '/name').then(function (translation) {
                                         item.name_translated = replaceArgs(translation, args);

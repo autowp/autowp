@@ -9,6 +9,7 @@ use Autowp\Forums\Controller\FrontendController;
 
 use Application\Controller\Api\ForumController;
 use Application\Test\AbstractHttpControllerTestCase;
+use Application\Controller\Api\CommentController;
 
 class ForumsControllerTest extends AbstractHttpControllerTestCase
 {
@@ -16,12 +17,12 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
 
     public function testTopic()
     {
-        $this->dispatch('https://www.autowp.ru/forums/topic/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/forum/topic/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums/topic');
-        $this->assertActionName('topic');
+        $this->assertControllerName(ForumController::class);
+        $this->assertMatchedRouteName('api/forum/topic/item/get');
+        $this->assertActionName('get-topic');
     }
 
     public function testNewIsForbidden()
@@ -57,22 +58,26 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         // unsubscribe
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/forums/unsubscribe/topic_id/' . $topicId, Request::METHOD_POST);
+        $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
+            'subscription' => 0
+        ]);
 
-        $this->assertResponseStatusCode(302);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums/unsubscribe');
-        $this->assertActionName('unsubscribe');
+        $this->assertResponseStatusCode(200);
+        $this->assertControllerName(ForumController::class);
+        $this->assertMatchedRouteName('api/forum/topic/item/put');
+        $this->assertActionName('put-topic');
 
         // subscribe
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/forums/subscribe/topic_id/' . $topicId, Request::METHOD_POST);
+        $this->dispatch('https://www.autowp.ru/api/forum/topic/' . $topicId, Request::METHOD_PUT, [
+            'subscription' => 1
+        ]);
 
-        $this->assertResponseStatusCode(302);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums/subscribe');
-        $this->assertActionName('subscribe');
+        $this->assertResponseStatusCode(200);
+        $this->assertControllerName(ForumController::class);
+        $this->assertMatchedRouteName('api/forum/topic/item/put');
+        $this->assertActionName('put-topic');
 
         // close
         $this->reset();
@@ -101,26 +106,30 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         // subscribes
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/forums/subscribes', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_GET, [
+            'subscription' => 1
+        ]);
 
         $this->assertResponseStatusCode(200);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums/subscribes');
-        $this->assertActionName('subscribes');
+        $this->assertControllerName(ForumController::class);
+        $this->assertMatchedRouteName('api/forum/topic/get');
+        $this->assertActionName('get-topics');
 
         // post message
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/forums/topic/' . $topicId, Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/api/comment', Request::METHOD_POST, [
+            'item_id'             => $topicId,
+            'type_id'             => 5,
             'message'             => 'Test message',
             'moderator_attention' => 0,
             'parent_id'           => null
         ]);
 
-        $this->assertResponseStatusCode(302);
-        $this->assertControllerName(FrontendController::class);
-        $this->assertMatchedRouteName('forums/topic');
-        $this->assertActionName('topic');
+        $this->assertResponseStatusCode(201);
+        $this->assertControllerName(CommentController::class);
+        $this->assertMatchedRouteName('api/comment/post');
+        $this->assertActionName('post');
 
         // delete topic
         $this->reset();

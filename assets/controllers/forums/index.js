@@ -6,6 +6,7 @@ import ACL_SERVICE_NAME from 'services/acl';
 
 import './new-topic';
 import './subscriptions';
+import './topic';
 
 const CONTROLLER_NAME = 'ForumsController';
 const STATE_NAME = 'forums';

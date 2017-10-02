@@ -4,7 +4,7 @@
             <p>
                 <i class="fa fa-th-list"></i> 
                 <strong>
-                    <a ui-sref="forums({theme_id: theme.id})" ui-sref-opts="{reload: true}" translate-attr="{title: 'forums/go-to-theme-name'}" translate-values="{theme_name: theme.name}" ng-bind="theme.name"></a>
+                    <a ui-sref="forums({theme_id: theme.id})" ui-sref-opts="{reload: true}" ng-bind="theme.name|translate"></a>
                 </strong>
             </p>
             <p ng-bind="theme.description" ng-if="theme.description"></p>
@@ -23,7 +23,7 @@
             <div ng-if="theme.last_message">
                 <p>
                     <i class="fa fa-comment"></i>
-                    <a ng-href="/forums/topic/{{theme.last_topic.id}}" translate-values="{topic_name: theme.last_topic.name}" translate>forums/last-message-in-topic-{topic_name}</a>
+                    <a ui-sref="forums-topic({topic_id: theme.last_topic.id})" translate-values="{topic_name: theme.last_topic.name}" translate>forums/last-message-in-topic-{topic_name}</a>
                 </p>
                 <p>
                     <autowp-past-time-indicator date="theme.last_message.datetime"></autowp-past-time-indicator>
@@ -55,7 +55,7 @@
             <tr ng-repeat="topic in ctrl.topics.items">
                 <td>
                     <span class="fa fa-lock" ng-if="topic.status == 'closed'"></span>
-                    <a ng-href="/forums/topic/{{topic.id}}" ng-bind="topic.name"></a>
+                    <a ui-sref="forums-topic({topic_id: topic.id})" ng-bind="topic.name"></a>
                     <span class="badge">
                         {{topic.old_messages + (topic.new_messages > 0 ? '+' + topic.new_messages : '')}}
                     </span>

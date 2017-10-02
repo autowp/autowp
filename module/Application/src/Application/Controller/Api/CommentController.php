@@ -13,6 +13,7 @@ use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
+use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Autowp\Votings\Votings;
@@ -81,6 +82,11 @@ class CommentController extends AbstractRestfulController
     private $articleTable;
 
     /**
+     * @var Forums
+     */
+    private $forums;
+
+    /**
      * @var InputFilter
      */
     private $listInputFilter;
@@ -115,7 +121,8 @@ class CommentController extends AbstractRestfulController
         Picture $picture,
         Item $item,
         Votings $votings,
-        TableGateway $articleTable
+        TableGateway $articleTable,
+        Forums $forums
     ) {
         $this->comments = $comments;
         $this->hydrator = $hydrator;
@@ -132,6 +139,7 @@ class CommentController extends AbstractRestfulController
         $this->item = $item;
         $this->votings = $votings;
         $this->articleTable = $articleTable;
+        $this->forums = $forums;
     }
 
     public function subscribeAction()
@@ -247,8 +255,8 @@ class CommentController extends AbstractRestfulController
         $paginator = $this->comments->service()->getMessagesPaginator($options);
 
         $paginator
-            ->setItemCountPerPage(50)
-            ->setCurrentPageNumber($this->params()->fromQuery('page'));
+            ->setItemCountPerPage($values['limit'] ? $values['limit'] : 500)
+            ->setCurrentPageNumber($values['page']);
 
         $this->hydrator->setOptions([
             'fields'   => $values['fields'],
@@ -259,6 +267,10 @@ class CommentController extends AbstractRestfulController
         $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $comments[] = $this->hydrator->extract($commentRow);
+        }
+
+        if ($user && $values['item_id'] && $values['type_id']) {
+            $this->comments->service()->markSubscriptionAwaiting($values['type_id'], $values['item_id'], $user['id']);
         }
 
         return new JsonModel([
@@ -340,13 +352,18 @@ class CommentController extends AbstractRestfulController
                 $object = $this->articleTable->select(['id' => $itemId])->current();
                 break;
 
+            case \Application\Comments::FORUMS_TYPE_ID:
+                $object = $this->forums->getTopicTable()->select(['id' => $itemId])->current();
+                break;
+
             default:
-                throw new Exception('Unknown type_id');
+                throw new \Exception('Unknown type_id');
         }
 
         if (! $object) {
             return $this->notFoundAction();
         }
+
 
         $moderatorAttention = false;
         if ($this->user()->isAllowed('comment', 'moderator-attention')) {
@@ -382,6 +399,15 @@ class CommentController extends AbstractRestfulController
             if ($data['parent_id'] && $data['resolve']) {
                 $this->comments->service()->completeMessage($data['parent_id']);
             }
+        }
+
+        if ($typeId == \Application\Comments::FORUMS_TYPE_ID) {
+            $this->userModel->getTable()->update([
+                'forums_messages'   => new Sql\Expression('forums_messages + 1'),
+                'last_message_time' => new Sql\Expression('NOW()')
+            ], [
+                'id' => $currentUser['id']
+            ]);
         }
 
         if ($data['parent_id']) {
@@ -521,7 +547,8 @@ class CommentController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'fields'   => $values['fields'],
             'language' => $this->language(),
-            'user_id'  => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null,
+            'limit'    => $values['limit']
         ]);
 
         return new JsonModel($this->hydrator->extract($row));

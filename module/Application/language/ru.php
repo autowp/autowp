@@ -2027,5 +2027,8 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
     'moder/statistics/brand-logos' => 'Логотипов брендов',
     'moder/statistics/from-years' => 'Годы начала выпуска автомобилей',
     'moder/statistics/from-and-to-years' => 'Годы начала и окончания выпуска автомобилей',
-    'moder/statistics/from-and-to-years-and-months' => 'Годы и месяцы начала и окончания выпуска автомобилей'
+    'moder/statistics/from-and-to-years-and-months' => 'Годы и месяцы начала и окончания выпуска автомобилей',
+
+    'forums/topic/text' => 'Сообщение',
+    'forums/need-wait-to-post' => 'Для добавления нового сообщения вам необходимо подождать некоторое время',
 ]);

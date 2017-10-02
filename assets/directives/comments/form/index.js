@@ -38,11 +38,13 @@ angular.module(Module)
                                 moderator_attention: ctrl.form.moderator_attention ? 1 : 0,
                                 message: ctrl.form.message
                             }
-                        }).then(function() {
+                        }).then(function(response) {
                             ctrl.form.message = '';
                             ctrl.form.moderator_attention = false;
+                            
+                            var location = response.headers('Location');
 
-                            $scope.onSent();
+                            $scope.onSent(location);
                         }, function(response) {
                             if (response.status == 400) {
                                 ctrl.invalidParams = response.data.invalid_params;

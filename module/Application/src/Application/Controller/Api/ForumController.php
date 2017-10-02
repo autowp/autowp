@@ -308,9 +308,13 @@ class ForumController extends AbstractRestfulController
 
         if (array_key_exists('subscription', $values) && $forumAdmin) {
             if ($values['subscription']) {
-                $this->forums->subscribe($row['id'], $user['id']);
+                if ($this->forums->canSubscribe($row['id'], $user['id'])) {
+                    $this->forums->subscribe($row['id'], $user['id']);
+                }
             } else {
-                $this->forums->unsubscribe($row['id'], $user['id']);
+                if ($this->forums->canUnSubscribe($row['id'], $user['id'])) {
+                    $this->forums->unsubscribe($row['id'], $user['id']);
+                }
             }
         }
 
@@ -408,10 +412,12 @@ class ForumController extends AbstractRestfulController
         $isModerator = $this->user()->inheritsRole('moder');
 
         $select = $this->forums->getTopicTable()->getSql()->select();
-        $select->where(['id' => (int)$this->params('id')]);
+        $select->where(['forums_topics.id' => (int)$this->params('id')]);
 
         if (! $isModerator) {
-            $select->where(['not is_moderator']);
+            $select
+                ->join('forums_themes', 'forums_topics.theme_id = forums_themes.id', [])
+                ->where(['not forums_themes.is_moderator']);
         }
 
         $row = $this->forums->getTopicTable()->selectWith($select)->current();

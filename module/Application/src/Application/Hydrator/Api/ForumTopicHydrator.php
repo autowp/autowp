@@ -2,12 +2,14 @@
 
 namespace Application\Hydrator\Api;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 
 use Application\Comments;
+use Autowp\Forums\Forums;
 
 class ForumTopicHydrator extends RestHydrator
 {
@@ -28,6 +30,21 @@ class ForumTopicHydrator extends RestHydrator
 
     private $acl;
 
+    /**
+     * @var TableGateway
+     */
+    private $themeTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $topicTable;
+
+    /**
+     * @var Forums
+     */
+    private $forums;
+
     public function __construct($serviceManager)
     {
         parent::__construct();
@@ -44,6 +61,8 @@ class ForumTopicHydrator extends RestHydrator
         $this->themeTable = $tables->get('forums_themes');
         $this->topicTable = $tables->get('forums_topics');
 
+        $this->forums = $serviceManager->get(Forums::class);
+
         $strategy = new Strategy\ForumThemes($serviceManager);
         $this->addStrategy('themes', $strategy);
 
@@ -58,6 +77,9 @@ class ForumTopicHydrator extends RestHydrator
 
         $strategy = new Strategy\Comment($serviceManager);
         $this->addStrategy('last_message', $strategy);
+
+        $strategy = new Strategy\ForumTheme($serviceManager);
+        $this->addStrategy('theme', $strategy);
     }
 
     /**
@@ -92,6 +114,7 @@ class ForumTopicHydrator extends RestHydrator
     {
         $this->userId = $userId;
 
+        $this->getStrategy('theme')->setUserId($userId);
         $this->getStrategy('themes')->setUserId($userId);
         $this->getStrategy('last_message')->setUserId($userId);
 
@@ -104,7 +127,8 @@ class ForumTopicHydrator extends RestHydrator
             'id'           => (int)$object['id'],
             'name'         => $object['name'],
             'add_datetime' => $this->extractValue('add_datetime', Row::getDateTimeByColumnType('timestamp', $object['add_datetime'])),
-            'status'       => $object['status']
+            'status'       => $object['status'],
+            'theme_id'     => (int)$object['theme_id']
         ];
 
         if ($this->filterComposite->filter('last_message')) {
@@ -152,6 +176,20 @@ class ForumTopicHydrator extends RestHydrator
             $result['messages'] = $messages;
             $result['old_messages'] = $oldMessages;
             $result['new_messages'] = $newMessages;
+        }
+
+        if ($this->filterComposite->filter('theme')) {
+            $row = $this->themeTable->select(['id' => (int)$object['theme_id']])->current();
+            $result['theme'] = $this->extractValue('theme', $row);
+        }
+
+        if ($this->filterComposite->filter('subscription')) {
+            $subscribed = false;
+            if ($this->userId) {
+                $subscribed = $this->forums->userSubscribed($object['id'], $this->userId);
+            }
+
+            $result['subscription'] = $subscribed;
         }
 
         return $result;

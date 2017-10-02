@@ -2014,5 +2014,8 @@ Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [th
     'moder/statistics/brand-logos' => 'Brand logotypes',
     'moder/statistics/from-years' => 'Years of begin production',
     'moder/statistics/from-and-to-years' => 'Years of begin and end production',
-    'moder/statistics/from-and-to-years-and-months' => 'Years and months of begin and end production'
+    'moder/statistics/from-and-to-years-and-months' => 'Years and months of begin and end production',
+
+    'forums/topic/text' => 'Message',
+    'forums/need-wait-to-post' => 'Для добавления нового сообщения вам необходимо подождать некоторое время'
 ]);

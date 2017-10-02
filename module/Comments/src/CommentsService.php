@@ -1244,25 +1244,25 @@ class CommentsService
         return $ids;
     }
 
-    public function markSubscriptionSent($typeId, $itemId, $userId)
+    public function markSubscriptionSent(int $typeId, int $itemId, int $userId)
     {
         $this->topicSubscribeTable->update([
             'sent' => 1
         ], [
-            'type_id' => (int)$typeId,
-            'item_id' => (int)$itemId,
-            'user_id' => (int)$userId,
+            'type_id' => $typeId,
+            'item_id' => $itemId,
+            'user_id' => $userId,
         ]);
     }
 
-    public function markSubscriptionAwaiting($typeId, $itemId, $userId)
+    public function markSubscriptionAwaiting(int $typeId, int $itemId, int $userId)
     {
         $this->topicSubscribeTable->update([
             'sent' => 0
         ], [
-            'type_id' => (int)$typeId,
-            'item_id' => (int)$itemId,
-            'user_id' => (int)$userId,
+            'type_id' => $typeId,
+            'item_id' => $itemId,
+            'user_id' => $userId,
         ]);
     }
 

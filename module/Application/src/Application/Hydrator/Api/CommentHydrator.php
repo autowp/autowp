@@ -50,6 +50,11 @@ class CommentHydrator extends RestHydrator
 
     private $acl;
 
+    /**
+     * @var int
+     */
+    private $limit;
+
     public function __construct($serviceManager)
     {
         parent::__construct();
@@ -98,6 +103,10 @@ class CommentHydrator extends RestHydrator
 
         if (isset($options['user_id'])) {
             $this->setUserId($options['user_id']);
+        }
+
+        if (isset($options['limit'])) {
+            $this->limit = (int)$options['limit'];
         }
 
         return $this;
@@ -206,27 +215,27 @@ class CommentHydrator extends RestHydrator
                         switch ($picture['status']) {
                             case Picture::STATUS_ACCEPTED:
                                 $status = [
-                                'class' => 'success',
-                                'name'  => 'moder/picture/acceptance/accepted'
-                                    ];
+                                    'class' => 'success',
+                                    'name'  => 'moder/picture/acceptance/accepted'
+                                ];
                                 break;
                             case Picture::STATUS_INBOX:
                                 $status = [
-                                'class' => 'warning',
-                                'name'  => 'moder/picture/acceptance/inbox'
-                                    ];
+                                    'class' => 'warning',
+                                    'name'  => 'moder/picture/acceptance/inbox'
+                                ];
                                 break;
                             case Picture::STATUS_REMOVED:
                                 $status = [
-                                'class' => 'danger',
-                                'name'  => 'moder/picture/acceptance/removed'
-                                    ];
+                                    'class' => 'danger',
+                                    'name'  => 'moder/picture/acceptance/removed'
+                                ];
                                 break;
                             case Picture::STATUS_REMOVING:
                                 $status = [
-                                'class' => 'danger',
-                                'name'  => 'moder/picture/acceptance/removing'
-                                    ];
+                                    'class' => 'danger',
+                                    'name'  => 'moder/picture/acceptance/removing'
+                                ];
                                 break;
                         }
                     }
@@ -234,6 +243,9 @@ class CommentHydrator extends RestHydrator
 
                 $result['status'] = $status;
             }
+        }
+        if ($this->filterComposite->filter('page') && $this->limit > 0) {
+            $result['page'] = $this->comments->service()->getMessagePage($object, $this->limit);
         }
 
         return $result;

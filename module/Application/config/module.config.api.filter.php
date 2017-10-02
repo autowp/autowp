@@ -138,7 +138,39 @@ return [
                         ]
                     ]
                 ]
-            ]
+            ],
+            'limit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 500
+                        ]
+                    ]
+                ]
+            ],
+            'page' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
         ],
         'api_comments_get_public' => [
             'moderator_attention' => [
@@ -279,12 +311,28 @@ return [
             ]
         ],
         'api_comments_item_get' => [
+            'limit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 500
+                        ]
+                    ]
+                ]
+            ],
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['preview', 'text_html', 'user', 'url', 'replies', 'datetime', 'vote', 'user_vote', 'is_new', 'status']]
+                        'options' => ['fields' => ['preview', 'text_html', 'user', 'url', 'replies', 'datetime', 'vote', 'user_vote', 'is_new', 'status', 'page']]
                     ]
                 ]
             ],
@@ -372,7 +420,7 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_message', 'author', 'messages']]
+                        'options' => ['fields' => ['last_message', 'author', 'messages', 'theme', 'subscription']]
                     ]
                 ]
             ],
@@ -408,7 +456,7 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_message', 'author', 'messages']]
+                        'options' => ['fields' => ['last_message', 'author', 'messages', 'theme', 'subscription']]
                     ]
                 ]
             ]

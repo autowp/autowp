@@ -30,7 +30,8 @@ class CommentControllerFactory implements FactoryInterface
             $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\Item::class),
             $container->get(\Autowp\Votings\Votings::class),
-            $tables->get('articles')
+            $tables->get('articles'),
+            $container->get(\Autowp\Forums\Forums::class)
         );
     }
 }

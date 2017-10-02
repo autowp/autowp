@@ -1979,5 +1979,8 @@ Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [th
     'moder/statistics/brand-logos' => '商标',
     'moder/statistics/from-years' => '投产年份',
     'moder/statistics/from-and-to-years' => '停产年份',
-    'moder/statistics/from-and-to-years-and-months' => '投产及停产年月'
+    'moder/statistics/from-and-to-years-and-months' => '投产及停产年月',
+
+    'forums/topic/text' => '站内信',
+    'forums/need-wait-to-post' => '，您需要等待一段时间后才能添加新的消息'
 ]);

@@ -14,7 +14,6 @@ class ConfigProvider
             'dependencies' => $this->getDependencyConfig(),
             'router'       => $this->getRouterConfig(),
             'tables'       => $this->getTablesConfig(),
-            'translator'   => $this->getTranslatorConfig()
         ];
     }
 
@@ -41,33 +40,6 @@ class ConfigProvider
                     ],
                     'may_terminate' => false,
                     'child_routes'  => [
-                        'topic' => [
-                            'type' => Segment::class,
-                            'options' => [
-                                'route' => '/topic/:topic_id[/page:page]',
-                                'defaults' => [
-                                    'action' => 'topic',
-                                ],
-                            ]
-                        ],
-                        'subscribe' => [
-                            'type' => Segment::class,
-                            'options' => [
-                                'route' => '/subscribe/topic_id/:topic_id',
-                                'defaults' => [
-                                    'action' => 'subscribe',
-                                ],
-                            ]
-                        ],
-                        'unsubscribe' => [
-                            'type' => Segment::class,
-                            'options' => [
-                                'route' => '/unsubscribe/topic_id/:topic_id',
-                                'defaults' => [
-                                    'action' => 'unsubscribe',
-                                ],
-                            ]
-                        ],
                         'topic-message' => [
                             'type' => Segment::class,
                             'options' => [
@@ -97,19 +69,6 @@ class ConfigProvider
                         ]
                     ]
                 ]
-            ]
-        ];
-    }
-
-    public function getTranslatorConfig(): array
-    {
-        return [
-            'translation_file_patterns' => [
-                [
-                    'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
-                    'base_dir' => Resources::getBasePath(),
-                    'pattern'  => Resources::getPattern()
-                ],
             ]
         ];
     }
