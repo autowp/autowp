@@ -182,13 +182,11 @@ class Comments
                 break;
 
             case self::FORUMS_TYPE_ID:
-                $url = $this->router->assemble([
-                    'message_id' => $message['id']
-                ], [
-                    'name'            => 'forums/topic-message',
+                $url = $this->router->assemble([], [
+                    'name'            => 'ng',
                     'force_canonical' => $canonical,
                     'uri'             => $uri
-                ]);
+                ]) . 'forums/message/' . $message['id'];
                 break;
 
             default:

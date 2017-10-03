@@ -29,7 +29,7 @@
                     </small>
                     <br ng-if-end />
                     <autowp-user user="topic.last_message.user" ng-if="topic.last_message.user"></autowp-user>
-                    <a ng-href="/forums/topic-message/message_id/{{topic.last_message.id}}" translate-attr="{title: 'forums/go-to-last-message'}"><i class="fa fa-share"></i></a>
+                    <a ui-sref="forums-message({nessage_id: topic.last_message.id})" translate-attr="{title: 'forums/go-to-last-message'}"><i class="fa fa-share"></i></a>
                 </div>
                 <span ng-if="!topic.last_message">&#x2014;</span>
             </td>

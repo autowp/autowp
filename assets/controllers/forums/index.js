@@ -2,8 +2,11 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
-import ACL_SERVICE_NAME from 'services/acl';
 
+import ACL_SERVICE_NAME from 'services/acl';
+import FORUM_SERVICE_NAME from 'services/forum';
+
+import './message';
 import './move-message';
 import './move-topic';
 import './new-topic';
@@ -40,11 +43,12 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', ACL_SERVICE_NAME, '$translate',
-        function($scope, $http, $state, Acl, $translate) {
+        '$scope', '$http', '$state', ACL_SERVICE_NAME, '$translate', FORUM_SERVICE_NAME,
+        function($scope, $http, $state, Acl, $translate, Forum) {
             var ctrl = this;
             
             ctrl.topics = [];
+            ctrl.limit = Forum.getLimit();
             
             ctrl.forumAdmin = false;
             Acl.isAllowed('forums', 'moderate').then(function() {

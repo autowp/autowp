@@ -138,7 +138,9 @@ class CommentHydrator extends RestHydrator
 
         $result = [
             'id'      => (int)$object['id'],
-            'deleted' => (bool) $object['deleted']
+            'deleted' => (bool) $object['deleted'],
+            'item_id' => (int)$object['item_id'],
+            'type_id' => (int)$object['type_id'],
         ];
 
         if ($this->filterComposite->filter('is_new')) {

@@ -3,6 +3,8 @@ import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
 
+import FORUM_SERVICE_NAME from 'services/forum';
+
 const CONTROLLER_NAME = 'ForumsMoveMessageController';
 const STATE_NAME = 'forums-move-message';
 
@@ -31,8 +33,6 @@ angular.module(Module)
             });
             
             var ctrl = this;
-            
-            ctrl.limit = 20;
             
             ctrl.message_id = $state.params.message_id;
             ctrl.themes = [];
@@ -76,20 +76,8 @@ angular.module(Module)
                     }
                 }).then(function(response) {
                     
-                    $http({
-                        method: 'GET',
-                        url: '/api/comment/' + ctrl.message_id,
-                        params: {
-                            fields: 'page',
-                            limit: ctrl.limit
-                        }
-                    }).then(function(response) {
-                        
-                        $state.go('forums-topic', {
-                            topic_id: topic.id,
-                            page: response.data.page
-                        });
-                        
+                    Forum.getMessageStateParams(ctrl.message_id).then(function(params) {
+                        $state.go('forums-topic', params);
                     }, function(response) {
                         notify.response(response);
                     });

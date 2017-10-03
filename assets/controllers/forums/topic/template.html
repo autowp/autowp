@@ -1,5 +1,5 @@
 <section class="forum-topic-page comments">
-    <autowp-comments item-id="ctrl.topic.id" type-id="5" user="user" ng-if="ctrl.topic" limit="20" page="ctrl.page"></autowp-comments>
+    <autowp-comments item-id="ctrl.topic.id" type-id="5" user="user" ng-if="ctrl.topic" limit="ctrl.limit" page="ctrl.page"></autowp-comments>
 
     <div class="text-right" ng-if="user" style="margin-bottom:10px">
         <button class="btn btn-link subscription" ng-if="!ctrl.topic.subscription" ng-click="ctrl.subscribe()">
