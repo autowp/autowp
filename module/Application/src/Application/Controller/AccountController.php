@@ -21,7 +21,6 @@ use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
 
-use Application\Controller\LoginController;
 use Application\Model\Item;
 use Application\Model\Picture;
 use Application\Model\UserAccount;
@@ -163,9 +162,7 @@ class AccountController extends AbstractActionController
 
     private function forwardToLogin()
     {
-        return $this->forward()->dispatch(LoginController::class, [
-            'action' => 'index'
-        ]);
+        return $this->redirect()->toUrl('/ng/login');
     }
 
     public function sidebar()

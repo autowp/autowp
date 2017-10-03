@@ -9,8 +9,8 @@ use Autowp\User\Model\User;
 use Application\Controller\AccountController;
 use Application\Controller\Api\RestorePasswordController;
 use Application\Controller\Api\UserController;
-use Application\Controller\LoginController;
 use Application\Test\AbstractHttpControllerTestCase;
+use Application\Controller\Api\LoginController;
 
 class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 {
@@ -124,7 +124,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\Api\LoginController::class);
+        $this->assertControllerName(LoginController::class);
         $this->assertMatchedRouteName('api/login/login');
         $this->assertActionName('login');
     }

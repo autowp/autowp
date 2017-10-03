@@ -5,8 +5,6 @@ namespace ApplicationTest\Controller\Frontend;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
-use Autowp\Forums\Controller\FrontendController;
-
 use Application\Controller\Api\ForumController;
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\CommentController;

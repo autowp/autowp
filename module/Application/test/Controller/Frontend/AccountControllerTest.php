@@ -9,8 +9,8 @@ use Zend\Json\Json;
 use Autowp\User\Model\User;
 
 use Application\Controller\AccountController;
+use Application\Controller\Api\LoginController;
 use Application\Controller\Api\UserController;
-use Application\Controller\LoginController;
 use Application\Controller\UsersController;
 use Application\Test\AbstractHttpControllerTestCase;
 
@@ -159,7 +159,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\Api\LoginController::class);
+        $this->assertControllerName(LoginController::class);
         $this->assertMatchedRouteName('api/login/login');
         $this->assertActionName('login');
 
