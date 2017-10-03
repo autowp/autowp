@@ -3,6 +3,8 @@ import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
 
+import FORUM_SERVICE_NAME from 'services/forum';
+
 const CONTROLLER_NAME = 'ForumsTopicController';
 const STATE_NAME = 'forums-topic';
 
@@ -19,11 +21,12 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$translate',
-        function($scope, $http, $state, $translate) {
+        '$scope', '$http', '$state', '$translate', FORUM_SERVICE_NAME,
+        function($scope, $http, $state, $translate, Forum) {
             var ctrl = this;
             
             ctrl.page = $state.params.page;
+            ctrl.limit = Forum.getLimit();
             
             $http({
                 url: '/api/forum/topic/' + $state.params.topic_id,

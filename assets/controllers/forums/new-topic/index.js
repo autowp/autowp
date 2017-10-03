@@ -55,6 +55,8 @@ angular.module(Module)
             });
 
             ctrl.submit = function(id) {
+                ctrl.invalidParams = {};
+                
                 $http({
                     method: 'POST',
                     url: '/api/forum/topic',

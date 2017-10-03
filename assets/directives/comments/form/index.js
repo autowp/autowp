@@ -28,6 +28,8 @@ angular.module(Module)
                     ctrl.invalidParams = {};
 
                     ctrl.sendMessage = function() {
+                        ctrl.invalidParams = {};
+                        
                         $http({
                             method: 'POST',
                             url: '/api/comment',

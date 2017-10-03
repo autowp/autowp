@@ -28,7 +28,7 @@
                 <p>
                     <autowp-past-time-indicator date="theme.last_message.datetime"></autowp-past-time-indicator>
                     <autowp-user user="theme.last_message.user" ng-if="theme.last_message.user"></autowp-user>
-                    <a ng-href="forums-message({nessage_id: theme.last_message.id})" translate-attr="{title :'forums/go-to-last-message'}"><i class="fa fa-share"></i></a>
+                    <a ui-sref="forums-message({message_id: theme.last_message.id})" translate-attr="{title :'forums/go-to-last-message'}"><i class="fa fa-share"></i></a>
                 </p>
             </div>
         </div>
@@ -72,7 +72,7 @@
                         </small>
                         <br ng-if-end />
                         <autowp-user user="topic.last_message.user" ng-if="topic.last_message.user"></autowp-user>
-                        <a ng-href="forums-message({nessage_id: topic.last_message.id})" translate-attr="{title: 'forums/go-to-last-message'}"><i class="fa fa-share"></i></a>
+                        <a ui-sref="forums-message({message_id: topic.last_message.id})" translate-attr="{title: 'forums/go-to-last-message'}"><i class="fa fa-share"></i></a>
                     </div>
                     <span ng-if="!topic.last_message">&#x2014;</span>
                 </td>

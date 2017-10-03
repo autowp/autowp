@@ -77,7 +77,7 @@ class UserText extends AbstractHtmlElement
 
             $text = mb_substr($text, $linkPos + $matchLength);
         }
-        if ($text) {
+        if (strlen($text) > 0) {
             $out[] = $this->preparePlainText($text);
         }
 
