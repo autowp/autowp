@@ -4,8 +4,9 @@ import template from './template.html';
 import notify from 'notify';
 import ACL_SERVICE_NAME from 'services/acl';
 
-import './new-topic';
+
 import './move-topic';
+import './new-topic';
 import './subscriptions';
 import './topic';
 
@@ -80,7 +81,7 @@ angular.module(Module)
                     url: '/api/forum/themes/' + $state.params.theme_id,
                     method: 'GET',
                     params: {
-                        fields: 'themes.last_message,themes.last_topic,themes.description,topics.author,topics.messages,topics.last_message.datetime,topics.last_message.user',
+                        fields: 'themes.last_message.user,themes.last_message.datetime,themes.last_topic,themes.description,topics.author,topics.messages,topics.last_message.datetime,topics.last_message.user',
                         'topics[page]': $state.params.page
                     }
                 }).then(function(response) {
