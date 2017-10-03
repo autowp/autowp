@@ -4,7 +4,7 @@ import template from './template.html';
 import notify from 'notify';
 import ACL_SERVICE_NAME from 'services/acl';
 
-
+import './move-message';
 import './move-topic';
 import './new-topic';
 import './subscriptions';

@@ -308,6 +308,12 @@ return [
                 'filters'  => [
                     ['name' => 'Digits']
                 ],
+            ],
+            'item_id' => [
+                'required'   => false,
+                'filters'  => [
+                    ['name' => 'Digits']
+                ],
             ]
         ],
         'api_comments_item_get' => [
@@ -447,6 +453,15 @@ return [
                             'inclusive' => true
                         ]
                     ]
+                ]
+            ],
+            'theme_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
                 ]
             ],
         ],

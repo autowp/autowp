@@ -216,6 +216,10 @@ class ForumController extends AbstractRestfulController
                 ->where(['not forums_themes.is_moderator']);
         }
 
+        if ($data['theme_id']) {
+            $select->where(['forums_topics.theme_id' => (int)$data['theme_id']]);
+        }
+
         if ($data['subscription']) {
             if (! $userId) {
                 return $this->forbiddenAction();

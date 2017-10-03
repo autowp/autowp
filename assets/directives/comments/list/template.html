@@ -49,7 +49,7 @@
                 {{'comments/message/restore'|translate}}
             </a>
 
-            <a href="#" class="btn btn-default btn-xs pull-right" ng-if="ctrl.canMoveMessage">
+            <a ui-sref="forums-move-message({message_id: message.id})" class="btn btn-default btn-xs pull-right" ng-if="typeId == 5 && ctrl.canMoveMessage">
                 <i class="fa fa-arrows"></i>
                 {{'comments/message/move'|translate}}
             </a>

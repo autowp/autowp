@@ -48,15 +48,6 @@ class ConfigProvider
                                     'action' => 'topic-message',
                                 ],
                             ]
-                        ],
-                        'move-message' => [
-                            'type' => Segment::class,
-                            'options' => [
-                                'route' => '/move-message/:id',
-                                'defaults' => [
-                                    'action' => 'move-message',
-                                ]
-                            ]
                         ]
                     ]
                 ]

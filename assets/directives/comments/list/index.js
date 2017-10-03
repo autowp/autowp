@@ -27,11 +27,18 @@ angular.module(Module)
                     ctrl.canRemoveComments = false;
                     ctrl.canMoveMessage = false;
                     ctrl.showReply = false;
+                    ctrl.canMoveMessage = false;
                     
                     Acl.isAllowed('comment', 'remove').then(function(allowed) {
                         ctrl.canRemoveComments = allowed;
                     }, function() {
                         ctrl.canRemoveComments = false;
+                    });
+                    
+                    Acl.isAllowed('forums', 'moderate').then(function(allowed) {
+                        ctrl.canMoveMessage = allowed;
+                    }, function() {
+                        ctrl.canMoveMessage = false;
                     });
                     
                     ctrl.vote = function(message, value) {

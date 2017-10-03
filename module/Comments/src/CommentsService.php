@@ -581,15 +581,12 @@ class CommentsService
         }
     }
 
-    public function moveMessage($id, $newTypeId, $newItemId)
+    public function moveMessage(int $id, int $newTypeId, int $newItemId)
     {
         $messageRow = $this->getMessageRow($id);
         if (! $messageRow) {
             return false;
         }
-
-        $newTypeId = (int)$newTypeId;
-        $newItemId = (int)$newItemId;
 
         $oldTypeId = $messageRow['type_id'];
         $oldItemId = $messageRow['item_id'];
