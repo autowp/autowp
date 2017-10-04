@@ -76,18 +76,6 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
     }
 
-    public function testEmail()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/account/email', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(AccountController::class);
-        $this->assertMatchedRouteName('account/email');
-        $this->assertActionName('email');
-    }
-
     public function testAccess()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

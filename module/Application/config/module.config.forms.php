@@ -31,41 +31,6 @@ return [
         ]
     ],
     'forms' => [
-        'AccountEmailForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'Text',
-                        'name' => 'email',
-                        'options' => [
-                            'label'        => 'E-mail',
-                            'maxlength'    => 255,
-                            'size'         => 80,
-                            'autocomplete' => 'email',
-                        ]
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'email' => [
-                    'required'   => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        [
-                            'name'                   => 'EmailAddress',
-                            'break_chain_on_failure' => true
-                        ],
-                        ['name' => Validator\User\EmailNotExists::class]
-                    ]
-                ],
-            ],
-        ],
         'ChangePasswordForm' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [

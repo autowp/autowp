@@ -491,12 +491,6 @@ return array_replace(include 'root.php', [
 
     'account/specs/conflicts/my-value/none' => 'нет',
 
-    'account/email/your-current-email:' => 'Ваш текущий адрес e-mail: ',
-    'account/email/your-dont-enter-email' => 'Вы не указали адрес e-mail',
-    'account/email/text' => 'На этой странице вы можете изменить свой адрес электронной почты (e-mail)
-
-На новый адрес будет выслано письмо с инструкциями по его подтверждению',
-
     'account/accounts/add' => 'Добавить учётную запись',
     'account/accounts/remove' => 'Удалить',
     'account/accounts/removed' => 'Учётная запись удалена',

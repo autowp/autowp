@@ -3,6 +3,7 @@ import Module from 'app.module';
 import template from './template.html';
 
 import './contacts';
+import './email';
 import './messages';
 import './sidebar';
 import './profile';

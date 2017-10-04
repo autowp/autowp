@@ -334,6 +334,10 @@ class UserController extends AbstractRestfulController
             ]);
         }
 
+        if (array_key_exists('email', $values)) {
+            $this->userService->changeEmailStart($user, $values['email'], $this->language());
+        }
+
         return $this->getResponse()->setStatusCode(200);
     }
 

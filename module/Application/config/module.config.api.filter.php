@@ -2199,7 +2199,7 @@ return [
                 ]
             ],
             'language' => [
-                'required' => false,
+                'required' => true,
                 'validators' => [
                     [
                         'name' => 'InArray',
@@ -2210,7 +2210,7 @@ return [
                 ]
             ],
             'timezone' => [
-                'required' => false,
+                'required' => true,
                 'validators' => [
                     [
                         'name' => 'InArray',
@@ -2218,6 +2218,19 @@ return [
                             'haystack' => []
                         ]
                     ]
+                ]
+            ],
+            'email' => [
+                'required'   => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'                   => 'EmailAddress',
+                        'break_chain_on_failure' => true
+                    ],
+                    ['name' => Validator\User\EmailNotExists::class]
                 ]
             ],
         ],

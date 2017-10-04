@@ -18,7 +18,6 @@ class AccountControllerFactory implements FactoryInterface
         $tables = $container->get('TableManager');
         return new Controller(
             $container->get(\Application\Service\UsersService::class),
-            $container->get('AccountEmailForm'),
             $container->get('ChangePasswordForm'),
             $container->get('DeleteUserForm'),
             $container->get('ExternalLoginServiceManager'),

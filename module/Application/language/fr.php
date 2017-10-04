@@ -475,12 +475,6 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
 
     'account/specs/conflicts/my-value/none' => 'non',
 
-    'account/email/your-current-email:' => 'Votre adresse e-mail actuelle: ',
-    'account/email/your-dont-enter-email' => "Vous n'avez pas entré une adresse e-mail",
-    'account/email/text' => 'Sur cette page vous pouvez changer votre adresse e-mail.
-
-Message avec des instructions enverra à la nouvelle adresse e-mail pour le confirmer.',
-
     'account/accounts/add' => 'Ajouter un compte',
     'account/accounts/remove' => 'Supprimer',
     'account/accounts/removed' => 'Compte supprimé',

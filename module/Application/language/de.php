@@ -474,12 +474,6 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
 
     'account/specs/conflicts/my-value/none' => 'none',
 
-    'account/email/your-current-email:' => 'Your current e-mail address: ',
-    'account/email/your-dont-enter-email' => 'You don\'t input e-mail address',
-    'account/email/text' => 'On this page you can change your e-mail address.
-
-Message with instructions to confirm will sent to new address.',
-
     'account/accounts/add' => 'Add account',
     'account/accounts/remove' => 'Remove',
     'account/accounts/removed' => 'Account removed',

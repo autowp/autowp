@@ -460,12 +460,6 @@ return array_replace(include 'root.php', [
 
     'account/specs/conflicts/my-value/none' => '暂无',
 
-    'account/email/your-current-email:' => '您当前的电子邮件地址：',
-    'account/email/your-dont-enter-email' => '您没有输入电子邮件地址',
-    'account/email/text' => '您可以在本页修改您的电子邮件地址。
-
-确认邮件已发送到您的新电子邮箱地址。',
-
     'account/accounts/add' => '添加帐户',
     'account/accounts/remove' => '取消',
     'account/accounts/removed' => '取消账户',

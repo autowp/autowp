@@ -39,7 +39,7 @@ angular.module(Module)
                         },
                         {
                             pageId: 55,
-                            url: '/account/email',
+                            url: $state.href('account-email', {}, {inherit: false}),
                             icon: 'envelope-o',
                             name: 'page/55/name'
                         },

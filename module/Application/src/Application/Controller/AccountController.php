@@ -34,11 +34,6 @@ class AccountController extends AbstractActionController
     /**
      * @var Form
      */
-    private $emailForm;
-
-    /**
-     * @var Form
-     */
     private $changePasswordForm;
 
     /**
@@ -103,7 +98,6 @@ class AccountController extends AbstractActionController
 
     public function __construct(
         UsersService $service,
-        Form $emailForm,
         Form $changePasswordForm,
         Form $deleteUserForm,
         ExternalLoginServices $externalLoginServices,
@@ -120,7 +114,6 @@ class AccountController extends AbstractActionController
     ) {
 
         $this->service = $service;
-        $this->emailForm = $emailForm;
         $this->changePasswordForm = $changePasswordForm;
         $this->deleteUserForm = $deleteUserForm;
         $this->externalLoginServices = $externalLoginServices;
@@ -289,40 +282,6 @@ class AccountController extends AbstractActionController
 
     public function removeAccountFailedAction()
     {
-    }
-
-    public function emailAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forwardToLogin();
-        }
-
-        $request = $this->getRequest();
-
-        $this->emailForm->setAttribute('action', $this->url()->fromRoute('account/email'));
-        $this->emailForm->setData([
-            'email' => $user['e_mail']
-        ]);
-        if ($request->isPost()) {
-            $this->emailForm->setData($this->params()->fromPost());
-            if ($this->emailForm->isValid()) {
-                $values = $this->emailForm->getData();
-
-                $this->service->changeEmailStart($user, $values['email'], $this->language());
-
-                $this->flashMessenger()->addSuccessMessage(
-                    $this->translate('users/change-email/confirmation-message-sent')
-                );
-
-                return $this->redirect()->toRoute();
-            }
-        }
-
-        return [
-            'sidebar' => $this->sidebar(),
-            'form'    => $this->emailForm
-        ];
     }
 
     public function emailcheckAction()
