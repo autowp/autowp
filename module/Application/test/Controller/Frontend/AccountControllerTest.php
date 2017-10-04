@@ -76,18 +76,6 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
     }
 
-    public function testProfile()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/account', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(AccountController::class);
-        $this->assertMatchedRouteName('account');
-        $this->assertActionName('profile');
-    }
-
     public function testEmail()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -172,16 +160,15 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         // rename
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-        $this->dispatch('https://www.autowp.ru/account/profile/profile', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/api/user/me', Request::METHOD_PUT, [
             'name' => $name2
         ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(AccountController::class);
-        $this->assertMatchedRouteName('account/profile');
-        $this->assertActionName('profile');
-
+        $this->assertControllerName(UserController::class);
+        $this->assertMatchedRouteName('api/user/user/put');
+        $this->assertActionName('put');
 
         $user2 = $this->getUser($userId);
         $this->assertEquals($name2, $user2['name']);
