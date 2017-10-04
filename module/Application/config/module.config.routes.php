@@ -62,10 +62,9 @@ return [
                     'route'    => '/account',
                     'defaults' => [
                         'controller' => Controller\AccountController::class,
-                        'action'     => 'profile',
                     ],
                 ],
-                'may_terminate' => true,
+                'may_terminate' => false,
                 'child_routes'  => [
                     'access' => [
                         'type' => Literal::class,
@@ -136,15 +135,6 @@ return [
                             'route'    => '/pictures',
                             'defaults' => [
                                 'action' => 'pictures',
-                            ],
-                        ],
-                    ],
-                    'profile' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route'    => '/profile[/:form]',
-                            'defaults' => [
-                                'action' => 'profile',
                             ],
                         ],
                     ],

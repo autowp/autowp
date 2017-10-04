@@ -443,7 +443,6 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'account/profile/photo' => 'Photo',
     'account/profile/photo/saved' => 'Photo saved',
     'account/profile/photo/deleted' => 'Photo deleted',
-    'account/profile/use-gravatar' => 'Vous pouvez télécharger votre photo ou utiliser le service <a href="http://gravatar.com/">Gravatar</a>',
     'account/profile/photo/delete' => 'Supprimer la photo',
     'account/profile/other' => 'Autre',
     'account/profile/votes-per-day' => 'Votes par jour',

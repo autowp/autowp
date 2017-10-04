@@ -45,6 +45,9 @@ class UserHydrator extends RestHydrator
         $this->addStrategy('image', $strategy);
 
         $strategy = new Strategy\Image($serviceManager);
+        $this->addStrategy('img', $strategy);
+
+        $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('avatar', $strategy);
     }
 
@@ -75,6 +78,8 @@ class UserHydrator extends RestHydrator
     public function extract($object)
     {
         $deleted = (bool)$object['deleted'];
+
+        $isMe = $object['id'] == $this->userId;
 
         if ($deleted) {
             $user = [
@@ -129,7 +134,7 @@ class UserHydrator extends RestHydrator
                 ]);
             }
 
-            $canViewEmail = $object['id'] == $this->userId;
+            $canViewEmail = $isMe;
             if (! $canViewEmail) {
                 $canViewEmail = $this->isModer();
             }
@@ -138,13 +143,19 @@ class UserHydrator extends RestHydrator
                 $user['email'] = $object['e_mail'];
             }
 
-            $canViewLogin = $object['id'] == $this->userId;
+            $canViewLogin = $isMe;
             if (! $canViewLogin) {
                 $canViewLogin = $this->isModer();
             }
 
             if ($canViewLogin && $this->filterComposite->filter('login')) {
                 $user['login'] = $object['login'];
+            }
+
+            if ($this->filterComposite->filter('img')) {
+                $user['img'] = $this->extractValue('img', [
+                    'image' => $object['img']
+                ]);
             }
 
             if ($this->filterComposite->filter('avatar')) {
@@ -160,6 +171,22 @@ class UserHydrator extends RestHydrator
                     md5($object['e_mail']),
                     urlencode('https://www.autowp.ru/_.gif')
                 );
+            }
+
+            if ($isMe && $this->filterComposite->filter('language')) {
+                $user['language'] = $object['language'];
+            }
+
+            if ($isMe && $this->filterComposite->filter('timezone')) {
+                $user['timezone'] = $object['timezone'];
+            }
+
+            if ($isMe && $this->filterComposite->filter('votes_left')) {
+                $user['votes_left'] = (int)$object['votes_left'];
+            }
+
+            if ($isMe && $this->filterComposite->filter('votes_per_day')) {
+                $user['votes_per_day'] = (int)$object['votes_per_day'];
             }
         }
 

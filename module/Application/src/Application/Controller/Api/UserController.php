@@ -4,6 +4,9 @@ namespace Application\Controller\Api;
 
 use DateInterval;
 use DateTime;
+use DateTimeZone;
+use Exception;
+use Imagick;
 
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -16,6 +19,7 @@ use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
+use Autowp\User\Model\UserRename;
 
 use Application\Hydrator\Api\RestHydrator;
 use Application\Service\UsersService;
@@ -31,6 +35,11 @@ class UserController extends AbstractRestfulController
      * @var RestHydrator
      */
     private $hydrator;
+
+    /**
+     * @var InputFilter
+     */
+    private $itemInputFilter;
 
     /**
      * @var InputFilter
@@ -58,6 +67,11 @@ class UserController extends AbstractRestfulController
     private $postInputFilter;
 
     /**
+     * @var InputFilter
+     */
+    private $postPhotoInputFilter;
+
+    /**
      * @var array
      */
     private $recaptcha;
@@ -67,26 +81,44 @@ class UserController extends AbstractRestfulController
      */
     private $captchaEnabled;
 
+    /**
+     * @var UserRename
+     */
+    private $userRename;
+
+    /**
+     * @var array
+     */
+    private $hosts;
+
     public function __construct(
         Acl $acl,
         RestHydrator $hydrator,
+        InputFilter $itemInputFilter,
         InputFilter $listInputFilter,
         InputFilter $postInputFilter,
         InputFilter $putInputFilter,
+        InputFilter $postPhotoInputFilter,
         UsersService $userService,
         User $userModel,
         array $recaptcha,
-        bool $captchaEnabled
+        bool $captchaEnabled,
+        UserRename $userRename,
+        array $hosts
     ) {
         $this->acl = $acl;
         $this->hydrator = $hydrator;
+        $this->itemInputFilter = $itemInputFilter;
         $this->listInputFilter = $listInputFilter;
         $this->postInputFilter = $postInputFilter;
         $this->putInputFilter = $putInputFilter;
+        $this->postPhotoInputFilter = $postPhotoInputFilter;
         $this->userService = $userService;
         $this->userModel = $userModel;
         $this->recaptcha = $recaptcha;
         $this->captchaEnabled = $captchaEnabled;
+        $this->userRename = $userRename;
+        $this->hosts = $hosts;
     }
 
     public function indexAction()
@@ -142,6 +174,14 @@ class UserController extends AbstractRestfulController
 
     public function itemAction()
     {
+        $this->itemInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->itemInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->itemInputFilter);
+        }
+
+        $data = $this->itemInputFilter->getValues();
+
         $user = $this->user()->get();
 
         $id = $this->params('id');
@@ -155,12 +195,12 @@ class UserController extends AbstractRestfulController
 
         $row = $this->userModel->getRow((int)$id);
         if (! $row) {
-            return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
+            return $this->notFoundAction();
         }
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
-            //'fields'   => $data['fields'],
+            'fields'   => $data['fields'],
             'user_id'  => $user ? $user['id'] : null
         ]);
 
@@ -171,11 +211,12 @@ class UserController extends AbstractRestfulController
     {
         $user = $this->user()->get();
 
+        if (! $user) {
+            return new ApiProblemResponse(new ApiProblem(401, 'Not authorized'));
+        }
+
         $id = $this->params('id');
         if ($id == 'me') {
-            if (! $user) {
-                return new ApiProblemResponse(new ApiProblem(401, 'Not authorized'));
-            }
             $id = $user['id'];
         }
 
@@ -196,6 +237,30 @@ class UserController extends AbstractRestfulController
 
         if (! $fields) {
             return new ApiProblemResponse(new ApiProblem(400, 'No fields provided'));
+        }
+
+        if (in_array('language', $fields)) {
+            // preload filter options
+            foreach (array_keys($this->hosts) as $language) {
+                $languages[] = $language;
+            }
+            $validators = $this->putInputFilter->get('language')->getValidatorChain()->getValidators();
+            $validators[0]['instance']->setHaystack($languages);
+        }
+
+        if (in_array('timezone', $fields)) {
+            // preload filter options
+            foreach (DateTimeZone::listAbbreviations() as $group) {
+                foreach ($group as $timeZone) {
+                    $tzId = $timeZone['timezone_id'];
+                    if ($tzId) {
+                        $list[] = $tzId;
+                    }
+                }
+            }
+
+            $validators = $this->putInputFilter->get('timezone')->getValidatorChain()->getValidators();
+            $validators[0]['instance']->setHaystack($list);
         }
 
         $this->putInputFilter->setValidationGroup($fields);
@@ -223,6 +288,50 @@ class UserController extends AbstractRestfulController
                     'users' => $row['id']
                 ]);
             }
+        }
+
+        if (array_key_exists('name', $values)) {
+            if ($user['id'] != $row['id']) {
+                return $this->forbiddenAction();
+            }
+
+            $oldName = $user['name'];
+
+            $this->userModel->getTable()->update([
+                'name' => $values['name']
+            ], [
+                'id' => $user['id']
+            ]);
+
+            $newName = $values['name'];
+
+            if ($oldName != $newName) {
+                $this->userRename->add($user['id'], $oldName, $newName);
+            }
+        }
+
+        if (array_key_exists('language', $values)) {
+            if ($user['id'] != $row['id']) {
+                return $this->forbiddenAction();
+            }
+
+            $this->userModel->getTable()->update([
+                'language' => $values['language']
+            ], [
+                'id' => $row['id']
+            ]);
+        }
+
+        if (array_key_exists('timezone', $values)) {
+            if ($user['id'] != $row['id']) {
+                return $this->forbiddenAction();
+            }
+
+            $this->userModel->getTable()->update([
+                'timezone' => $values['timezone'],
+            ], [
+                'id' => $row['id']
+            ]);
         }
 
         return $this->getResponse()->setStatusCode(200);
@@ -386,5 +495,61 @@ class UserController extends AbstractRestfulController
         return new JsonModel([
             'items' => $result
         ]);
+    }
+
+    public function postPhotoAction()
+    {
+        $user = $this->user()->get();
+
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        $id = $this->params('id');
+        if ($id == 'me') {
+            $id = $user['id'];
+        }
+
+        $row = $this->userModel->getRow((int)$id);
+        if (! $row) {
+            return $this->notFoundAction();
+        }
+
+        $data = $this->getRequest()->getFiles()->toArray();
+
+        $this->postPhotoInputFilter->setData($data);
+        if (! $this->postPhotoInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->postPhotoInputFilter);
+        }
+
+        $values = $this->postPhotoInputFilter->getValues();
+
+        $imageStorage = $this->imageStorage();
+        $imageSampler = $imageStorage->getImageSampler();
+
+        $imagick = new Imagick();
+        if (! $imagick->readImage($values['file']['tmp_name'])) {
+            throw new Exception("Error loading image");
+        }
+        $format = $imageStorage->getFormat('photo');
+        $imageSampler->convertImagick($imagick, $format);
+
+        $newImageId = $imageStorage->addImageFromImagick($imagick, 'user');
+
+        $imagick->clear();
+
+        $oldImageId = $row['img'];
+
+        $this->userModel->getTable()->update([
+            'img' => $newImageId
+        ], [
+            'id' => $row['id']
+        ]);
+
+        if ($oldImageId) {
+            $imageStorage->removeImage($oldImageId);
+        }
+
+        return $this->getResponse()->setStatusCode(201);
     }
 }

@@ -20,10 +20,11 @@ import 'moment/locale/ru.js';
 import 'moment/locale/zh-cn.js';
 import 'moment/locale/de.js';
 import 'angular-recaptcha';
+import 'ng-file-upload';
 
 const MODULE_NAME = 'App';
 
-angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angularTranslate, 'nemLogging', 'btford.markdown', angularSanitize, "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet', 'angularMoment', 'vcRecaptcha'])
+angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angularTranslate, 'nemLogging', 'btford.markdown', angularSanitize, "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet', 'angularMoment', 'vcRecaptcha', 'ngFileUpload'])
     .config(['$urlRouterProvider', '$locationProvider', '$translateProvider', 
         function config($urlRouterProvider, $locationProvider, $translateProvider) {
             $locationProvider.html5Mode(true).hashPrefix('!');

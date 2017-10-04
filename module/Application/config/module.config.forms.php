@@ -3,7 +3,6 @@
 namespace Application;
 
 use Zend\Form\ElementFactory;
-use Zend\Validator as ZendValidator;
 
 return [
     'form_elements' => [
@@ -66,119 +65,6 @@ return [
                     ]
                 ],
             ],
-        ],
-        'AccountProfileForm' => [
-            'type'        => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => Form\Element\UserName::class,
-                        'name' => 'name',
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'name' => [
-                    'required' => true,
-                ]
-            ]
-        ],
-        'AccountSettingsForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'language',
-                        'options' => [
-                            'label' => 'account/profile/language'
-                        ]
-                    ]
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'timezone',
-                        'options' => [
-                            'label' => 'account/profile/timezone'
-                        ]
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'language' => [
-                    'required' => true
-                ],
-                'timezone' => [
-                    'required' => true
-                ]
-            ]
-        ],
-        'AccountPhotoForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method'  => 'post',
-                'enctype' => 'multipart/form-data',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'File',
-                        'name' => 'photo',
-                        'options' => [
-                            'label' => 'account/profile/photo'
-                        ]
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'photo' => [
-                    'required' => true,
-                    'validators' => [
-                        /*[
-                            'name' => ZendValidator\File\Count::class,
-                            'break_chain_on_failure' => true,
-                            'options' => [
-                                'min' => 1,
-                                'max' => 1
-                            ]
-                        ],*/
-                        [
-                            'name' => ZendValidator\File\Size::class,
-                            'break_chain_on_failure' => true,
-                            'options' => [
-                                'max' => 4194304
-                            ]
-                        ],
-                        [
-                            'name' => ZendValidator\File\IsImage::class,
-                            'break_chain_on_failure' => true,
-                        ],
-                        [
-                            'name' => ZendValidator\File\Extension::class,
-                            'break_chain_on_failure' => true,
-                            'options' => [
-                                'extension' => 'jpg,jpeg,jpe,png,gif,bmp'
-                            ]
-                        ],
-                        [
-                            'name' => ZendValidator\File\ImageSize::class,
-                            'break_chain_on_failure' => true,
-                            'options' => [
-                                'minWidth'  => 100,
-                                'minHeight' => 100
-                            ]
-                        ],
-
-                    ]
-                ]
-            ]
         ],
         'ChangePasswordForm' => [
             'type'     => 'Zend\Form\Form',

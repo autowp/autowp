@@ -459,7 +459,6 @@ return array_replace(include 'root.php', [
     'account/profile/photo' => 'Фотография',
     'account/profile/photo/saved' => 'Фотография сохранена',
     'account/profile/photo/deleted' => 'Фотография удалена',
-    'account/profile/use-gravatar' => 'Вы можете загрузить своё фото или использовать сервис <a href="http://gravatar.com/">Gravatar</a>',
     'account/profile/photo/delete' => 'Удалить фото',
     'account/profile/other' => 'Другое',
     'account/profile/votes-per-day' => 'Голосов в день',

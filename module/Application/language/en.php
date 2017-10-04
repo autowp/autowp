@@ -444,7 +444,6 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'account/profile/photo' => 'Photo',
     'account/profile/photo/saved' => 'Photo saved',
     'account/profile/photo/deleted' => 'Photo deleted',
-    'account/profile/use-gravatar' => 'You can upload photo or use <a href="http://gravatar.com/">Gravatar</a>',
     'account/profile/photo/delete' => 'Delete photo',
     'account/profile/other' => 'Other',
     'account/profile/votes-per-day' => 'Votes per day',

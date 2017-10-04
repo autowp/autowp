@@ -19,9 +19,6 @@ class AccountControllerFactory implements FactoryInterface
         return new Controller(
             $container->get(\Application\Service\UsersService::class),
             $container->get('AccountEmailForm'),
-            $container->get('AccountProfileForm'),
-            $container->get('AccountSettingsForm'),
-            $container->get('AccountPhotoForm'),
             $container->get('ChangePasswordForm'),
             $container->get('DeleteUserForm'),
             $container->get('ExternalLoginServiceManager'),

@@ -428,7 +428,6 @@ return array_replace(include 'root.php', [
     'account/profile/photo' => '头像',
     'account/profile/photo/saved' => '已保存图片',
     'account/profile/photo/deleted' => '已删除图片',
-    'account/profile/use-gravatar' => '您可以上传头像或使用<a href="http://gravatar.com/">Gravatar</a>',
     'account/profile/photo/delete' => '删除头像',
     'account/profile/other' => '其它信息',
     'account/profile/votes-per-day' => '可用表决',

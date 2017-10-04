@@ -11,7 +11,7 @@ angular.module(Module)
         return {
             restirct: 'E',
             scope: {
-                
+                user: '<'
             },
             template: template,
             transclude: true,
@@ -20,10 +20,14 @@ angular.module(Module)
                 function($state, MessageService, $http, ForumService, PageService, $scope) {
                     var ctrl = this;
                     
+                    if (! $scope.user) {
+                        return;
+                    }
+                    
                     ctrl.items = [
                         {
                             pageId: 129,
-                            url   : '/account/profile',
+                            url   : $state.href('account-profile', {}, {inherit: false}),
                             icon: 'user',
                             name: 'page/129/name'
                         },
@@ -65,7 +69,7 @@ angular.module(Module)
                         },
                         {
                             pageId: 57,
-                            url: '/ng/forums/subscriptions',
+                            url: $state.href('forums-subscriptions', {}, {inherit: false}),
                             icon: 'bookmark',
                             name: 'page/57/name'
                         },

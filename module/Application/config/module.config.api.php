@@ -51,6 +51,7 @@ return [
             Controller\Api\ItemParentController::class      => Controller\Api\ItemParentControllerFactory::class,
             Controller\Api\ItemParentLanguageController::class => Controller\Api\ItemParentLanguageControllerFactory::class,
             Controller\Api\ItemVehicleTypeController::class => Controller\Api\Service\ItemVehicleTypeControllerFactory::class,
+            Controller\Api\LanguageController::class        => Controller\Api\LanguageControllerFactory::class,
             Controller\Api\LogController::class             => Controller\Api\Service\LogControllerFactory::class,
             Controller\Api\LoginController::class           => Controller\Api\LoginControllerFactory::class,
             Controller\Api\MapController::class             => Controller\Api\MapControllerFactory::class,
@@ -68,8 +69,9 @@ return [
             Controller\Api\RestorePasswordController::class => Controller\Api\RestorePasswordControllerFactory::class,
             Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
             Controller\Api\StatController::class            => Controller\Api\StatControllerFactory::class,
+            Controller\Api\TimezoneController::class        => InvokableFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
-            Controller\Api\UserController::class            => Controller\Api\Service\UserControllerFactory::class,
+            Controller\Api\UserController::class            => Controller\Api\UserControllerFactory::class,
             Controller\Api\VehicleTypesController::class    => Controller\Api\VehicleTypesControllerFactory::class
         ]
     ],
@@ -77,14 +79,14 @@ return [
     'router' => [
         'routes' => [
             'api' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route' => '/api',
                 ],
                 'may_terminate' => false,
                 'child_routes' => [
                     'acl' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/acl',
                             'defaults' => [
@@ -94,7 +96,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'inherit-roles' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/inherit-roles',
                                     'defaults' => [
@@ -103,7 +105,7 @@ return [
                                 ]
                             ],
                             'is-allowed' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/is-allowed',
                                     'defaults' => [
@@ -112,14 +114,14 @@ return [
                                 ]
                             ],
                             'roles' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/roles'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -128,7 +130,7 @@ return [
                                         ]
                                     ],
                                     'post' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'post',
                                             'defaults' => [
@@ -137,14 +139,14 @@ return [
                                         ]
                                     ],
                                     'role' => [
-                                        'type' => Segment::class,
+                                        'type' => 'Segment',
                                         'options' => [
                                             'route' => '/:role',
                                         ],
                                         'may_terminate' => false,
                                         'child_routes' => [
                                             'get' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'get',
                                                     'defaults' => [
@@ -153,7 +155,7 @@ return [
                                                 ]
                                             ],
                                             'parents' => [
-                                                'type' => Literal::class,
+                                                'type' => 'Literal',
                                                 'options' => [
                                                     'route'    => '/parents',
                                                     'defaults' => [
@@ -163,7 +165,7 @@ return [
                                                 'may_terminate' => false,
                                                 'child_routes' => [
                                                     'get' => [
-                                                        'type' => Method::class,
+                                                        'type' => 'Method',
                                                         'options' => [
                                                             'verb' => 'get',
                                                             'defaults' => [
@@ -172,7 +174,7 @@ return [
                                                         ]
                                                     ],
                                                     'post' => [
-                                                        'type' => Method::class,
+                                                        'type' => 'Method',
                                                         'options' => [
                                                             'verb' => 'post',
                                                             'defaults' => [
@@ -187,7 +189,7 @@ return [
                                 ]
                             ],
                             'resources' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/resources',
                                     'defaults' => [
@@ -196,14 +198,14 @@ return [
                                 ]
                             ],
                             'rules' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/rules'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -212,7 +214,7 @@ return [
                                         ]
                                     ],
                                     'post' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'post',
                                             'defaults' => [
@@ -225,7 +227,7 @@ return [
                         ]
                     ],
                     'chart' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/chart',
                             'defaults' => [
@@ -235,7 +237,7 @@ return [
                         'may_terminate' => false,
                         'child_routes'  => [
                             'years' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/parameters',
                                     'defaults' => [
@@ -244,7 +246,7 @@ return [
                                 ],
                             ],
                             'years-data' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/data',
                                     'defaults' => [
@@ -255,7 +257,7 @@ return [
                         ]
                     ],
                     'comment' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/comment',
                             'defaults' => [
@@ -265,7 +267,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'subscribe' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/subscribe/:type_id/:item_id',
                                     'defaults' => [
@@ -373,7 +375,7 @@ return [
                         ]
                     ],
                     'content-language' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/content-language',
                             'defaults' => [
@@ -383,7 +385,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'index' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -394,7 +396,7 @@ return [
                         ]
                     ],
                     'feedback' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/feedback',
                             'defaults' => [
@@ -415,7 +417,7 @@ return [
                         ]
                     ],
                     'forum' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/forum',
                             'defaults' => [
@@ -425,7 +427,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'user-summary' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/user-summary',
                                     'defaults' => [
@@ -526,7 +528,7 @@ return [
                         ]
                     ],
                     'hotlinks' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/hotlinks',
                             'defaults' => [
@@ -536,14 +538,14 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'blacklist' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/blacklist'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'post' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'post',
                                             'defaults' => [
@@ -554,14 +556,14 @@ return [
                                 ]
                             ],
                             'whitelist' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/whitelist'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'post' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'post',
                                             'defaults' => [
@@ -572,14 +574,14 @@ return [
                                 ]
                             ],
                             'hosts' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/hosts'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -588,7 +590,7 @@ return [
                                         ]
                                     ],
                                     'delete' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'delete',
                                             'defaults' => [
@@ -597,7 +599,7 @@ return [
                                         ]
                                     ],
                                     'host' => [
-                                        'type' => Segment::class,
+                                        'type' => 'Segment',
                                         'options' => [
                                             'route' => '/:host',
                                             'defaults' => [
@@ -607,7 +609,7 @@ return [
                                         'may_terminate' => false,
                                         'child_routes' => [
                                             'delete' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'delete',
                                                     'defaults' => [
@@ -622,7 +624,7 @@ return [
                         ]
                     ],
                     'ip' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/ip/:ip',
                             'defaults' => [
@@ -632,7 +634,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'item' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -643,7 +645,7 @@ return [
                         ]
                     ],
                     'item' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/item',
                             'defaults' => [
@@ -653,7 +655,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'list' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -662,7 +664,7 @@ return [
                                 ]
                             ],
                             'post' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'post',
                                     'defaults' => [
@@ -671,7 +673,7 @@ return [
                                 ]
                             ],
                             'alpha' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/alpha',
                                     'defaults' => [
@@ -680,7 +682,7 @@ return [
                                 ]
                             ],
                             'item' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/:id',
                                     'constraints' => [
@@ -690,7 +692,7 @@ return [
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -699,7 +701,7 @@ return [
                                         ]
                                     ],
                                     'put' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'put',
                                             'defaults' => [
@@ -708,7 +710,7 @@ return [
                                         ]
                                     ],
                                     'logo' => [
-                                        'type' => Literal::class,
+                                        'type' => 'Literal',
                                         'options' => [
                                             'route' => '/logo',
                                             'defaults' => [
@@ -718,7 +720,7 @@ return [
                                         'may_terminate' => false,
                                         'child_routes' => [
                                             'get' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'get',
                                                     'defaults' => [
@@ -727,7 +729,7 @@ return [
                                                 ]
                                             ],
                                             'put' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'put',
                                                     'defaults' => [
@@ -738,7 +740,7 @@ return [
                                         ]
                                     ],
                                     'language' => [
-                                        'type' => Literal::class,
+                                        'type' => 'Literal',
                                         'options' => [
                                             'route' => '/language',
                                             'defaults' => [
@@ -748,7 +750,7 @@ return [
                                         'may_terminate' => false,
                                         'child_routes' => [
                                             'index' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'get',
                                                     'defaults' => [
@@ -757,14 +759,14 @@ return [
                                                 ]
                                             ],
                                             'item' => [
-                                                'type' => Segment::class,
+                                                'type' => 'Segment',
                                                 'options' => [
                                                     'route' => '/:language'
                                                 ],
                                                 'may_terminate' => false,
                                                 'child_routes' => [
                                                     'get' => [
-                                                        'type' => Method::class,
+                                                        'type' => 'Method',
                                                         'options' => [
                                                             'verb' => 'get',
                                                             'defaults' => [
@@ -773,7 +775,7 @@ return [
                                                         ]
                                                     ],
                                                     'put' => [
-                                                        'type' => Method::class,
+                                                        'type' => 'Method',
                                                         'options' => [
                                                             'verb' => 'put',
                                                             'defaults' => [
@@ -786,7 +788,7 @@ return [
                                         ]
                                     ],
                                     'tree' => [
-                                        'type' => Literal::class,
+                                        'type' => 'Literal',
                                         'options' => [
                                             'route' => '/tree',
                                             'defaults' => [
@@ -796,7 +798,7 @@ return [
                                         'may_terminate' => false,
                                         'child_routes' => [
                                             'get' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'get',
                                                     'defaults' => [
@@ -811,7 +813,7 @@ return [
                         ]
                     ],
                     'item-link' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/item-link',
                             'defaults' => [
@@ -821,7 +823,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'index' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -830,7 +832,7 @@ return [
                                 ]
                             ],
                             'post' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'post',
                                     'defaults' => [
@@ -839,14 +841,14 @@ return [
                                 ]
                             ],
                             'item' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/:id'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -855,7 +857,7 @@ return [
                                         ]
                                     ],
                                     'put' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'put',
                                             'defaults' => [
@@ -864,7 +866,7 @@ return [
                                         ]
                                     ],
                                     'delete' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'delete',
                                             'defaults' => [
@@ -877,7 +879,7 @@ return [
                         ]
                     ],
                     'item-parent' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/item-parent',
                             'defaults' => [
@@ -887,7 +889,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'list' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
                                     'defaults' => [
@@ -896,14 +898,14 @@ return [
                                 ]
                             ],
                             'item' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/:item_id/:parent_id',
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb'     => 'get',
                                             'defaults' => [
@@ -912,7 +914,7 @@ return [
                                         ]
                                     ],
                                     'put' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb'     => 'put',
                                             'defaults' => [
@@ -921,7 +923,7 @@ return [
                                         ]
                                     ],
                                     'delete' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb'     => 'delete',
                                             'defaults' => [
@@ -930,7 +932,7 @@ return [
                                         ]
                                     ],
                                     'language' => [
-                                        'type' => Literal::class,
+                                        'type' => 'Literal',
                                         'options' => [
                                             'route' => '/language',
                                             'defaults' => [
@@ -940,7 +942,7 @@ return [
                                         'may_terminate' => false,
                                         'child_routes' => [
                                             'index' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'get',
                                                     'defaults' => [
@@ -949,14 +951,14 @@ return [
                                                 ]
                                             ],
                                             'item' => [
-                                                'type' => Segment::class,
+                                                'type' => 'Segment',
                                                 'options' => [
                                                     'route' => '/:language'
                                                 ],
                                                 'may_terminate' => false,
                                                 'child_routes' => [
                                                     'get' => [
-                                                        'type' => Method::class,
+                                                        'type' => 'Method',
                                                         'options' => [
                                                             'verb' => 'get',
                                                             'defaults' => [
@@ -965,7 +967,7 @@ return [
                                                         ]
                                                     ],
                                                     'put' => [
-                                                        'type' => Method::class,
+                                                        'type' => 'Method',
                                                         'options' => [
                                                             'verb' => 'put',
                                                             'defaults' => [
@@ -980,7 +982,7 @@ return [
                                 ]
                             ],
                             'post' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb'     => 'post',
                                     'defaults' => [
@@ -991,7 +993,7 @@ return [
                         ]
                     ],
                     'item-vehicle-type' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/item-vehicle-type',
                             'defaults' => [
@@ -1001,7 +1003,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'index' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
                                     'defaults' => [
@@ -1010,7 +1012,7 @@ return [
                                 ]
                             ],
                             'item' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/:item_id/:vehicle_type_id',
                                     'defaults' => [
@@ -1020,7 +1022,7 @@ return [
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb'     => 'get',
                                             'defaults' => [
@@ -1029,7 +1031,7 @@ return [
                                         ]
                                     ],
                                     'post' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb'     => 'post',
                                             'defaults' => [
@@ -1038,7 +1040,7 @@ return [
                                         ]
                                     ],
                                     'delete' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb'     => 'delete',
                                             'defaults' => [
@@ -1050,8 +1052,29 @@ return [
                             ]
                         ]
                     ],
+                    'language' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/language',
+                            'defaults' => [
+                                'controller' => Controller\Api\LanguageController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'list' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'list'
+                                    ]
+                                ]
+                            ],
+                        ]
+                    ],
                     'log' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/log',
                             'defaults' => [
@@ -1061,7 +1084,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'get' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -1072,7 +1095,7 @@ return [
                         ]
                     ],
                     'login' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/login',
                             'defaults' => [
@@ -1082,14 +1105,14 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'services' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/services'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -1100,7 +1123,7 @@ return [
                                 ]
                             ],
                             'login' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'post',
                                     'defaults' => [
@@ -1109,7 +1132,7 @@ return [
                                 ]
                             ],
                             'logout' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'delete',
                                     'defaults' => [
@@ -1138,7 +1161,7 @@ return [
                         ]
                     ],
                     'map' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/map',
                             'defaults' => [
@@ -1149,7 +1172,7 @@ return [
                         'may_terminate' => false,
                         'child_routes'  => [
                             'data' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/data',
                                     'defaults' => [
@@ -1160,7 +1183,7 @@ return [
                         ]
                     ],
                     'message' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/message',
                             'defaults' => [
@@ -1170,7 +1193,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'get' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -1179,7 +1202,7 @@ return [
                                 ]
                             ],
                             'post' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'post',
                                     'defaults' => [
@@ -1188,7 +1211,7 @@ return [
                                 ]
                             ],
                             'delete' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'delete',
                                     'defaults' => [
@@ -1197,14 +1220,14 @@ return [
                                 ]
                             ],
                             'item' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route'    => '/:id',
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     /*'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -1213,7 +1236,7 @@ return [
                                         ]
                                     ],*/
                                     'delete' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'delete',
                                             'defaults' => [
@@ -1224,7 +1247,7 @@ return [
                                 ]
                             ],
                             'summary' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/summary',
                                     'defaults' => [
@@ -1233,7 +1256,7 @@ return [
                                 ],
                             ],
                             'new' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/new',
                                     'defaults' => [
@@ -1244,7 +1267,7 @@ return [
                         ]
                     ],
                     'page' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/page',
                             'defaults' => [
@@ -1254,7 +1277,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'list' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -1263,7 +1286,7 @@ return [
                                 ]
                             ],
                             'post' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'post',
                                     'defaults' => [
@@ -1272,14 +1295,14 @@ return [
                                 ]
                             ],
                             'item' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/:id'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -1288,7 +1311,7 @@ return [
                                         ]
                                     ],
                                     'put' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'put',
                                             'defaults' => [
@@ -1297,7 +1320,7 @@ return [
                                         ]
                                     ],
                                     'delete' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'delete',
                                             'defaults' => [
@@ -1308,7 +1331,7 @@ return [
                                 ]
                             ],
                             [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/parents',
                                     'defaults' => [
@@ -1319,7 +1342,7 @@ return [
                         ]
                     ],
                     'picture' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/picture',
                             'defaults' => [
@@ -1329,7 +1352,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'index' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -1338,14 +1361,14 @@ return [
                                 ]
                             ],
                             'picture' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/:id'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'accept-replace' => [
-                                        'type' => Literal::class,
+                                        'type' => 'Literal',
                                         'options' => [
                                             'route'    => '/accept-replace',
                                             'defaults' => [
@@ -1354,7 +1377,7 @@ return [
                                         ],
                                     ],
                                     'normalize' => [
-                                        'type' => Literal::class,
+                                        'type' => 'Literal',
                                         'options' => [
                                             'route'    => '/normalize',
                                             'defaults' => [
@@ -1363,7 +1386,7 @@ return [
                                         ],
                                     ],
                                     'flop' => [
-                                        'type' => Literal::class,
+                                        'type' => 'Literal',
                                         'options' => [
                                             'route'    => '/flop',
                                             'defaults' => [
@@ -1372,7 +1395,7 @@ return [
                                         ],
                                     ],
                                     'repair' => [
-                                        'type' => Literal::class,
+                                        'type' => 'Literal',
                                         'options' => [
                                             'route'    => '/repair',
                                             'defaults' => [
@@ -1381,7 +1404,7 @@ return [
                                         ],
                                     ],
                                     'correct-file-names' => [
-                                        'type' => Literal::class,
+                                        'type' => 'Literal',
                                         'options' => [
                                             'route'    => '/correct-file-names',
                                             'defaults' => [
@@ -1390,7 +1413,7 @@ return [
                                         ],
                                     ],
                                     'similar' => [
-                                        'type' => Segment::class,
+                                        'type' => 'Segment',
                                         'options' => [
                                             'route' => '/similar/:similar_picture_id',
                                             'constraints' => [
@@ -1400,7 +1423,7 @@ return [
                                         'may_terminate' => false,
                                         'child_routes' => [
                                             'delete' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'delete',
                                                     'defaults' => [
@@ -1411,7 +1434,7 @@ return [
                                         ]
                                     ],
                                     'item' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -1420,7 +1443,7 @@ return [
                                         ]
                                     ],
                                     'update' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'put',
                                             'defaults' => [
@@ -1431,7 +1454,7 @@ return [
                                 ]
                             ],
                             'random_picture' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/random-picture',
                                     'defaults' => [
@@ -1440,7 +1463,7 @@ return [
                                 ]
                             ],
                             'new-picture' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/new-picture',
                                     'defaults' => [
@@ -1449,7 +1472,7 @@ return [
                                 ]
                             ],
                             'car-of-day-picture' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/car-of-day-picture',
                                     'defaults' => [
@@ -1458,7 +1481,7 @@ return [
                                 ]
                             ],
                             'user-summary' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/user-summary',
                                     'defaults' => [
@@ -1469,7 +1492,7 @@ return [
                         ]
                     ],
                     'picture-moder-vote' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/picture-moder-vote/:id',
                             'constraints' => [
@@ -1481,7 +1504,7 @@ return [
                         ],
                     ],
                     'picture-vote' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/picture-vote/:id',
                             'constraints' => [
@@ -1493,7 +1516,7 @@ return [
                         ],
                     ],
                     'picture-item' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/picture-item',
                             'defaults' => [
@@ -1503,7 +1526,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'get' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb'     => 'get',
                                     'defaults' => [
@@ -1512,14 +1535,14 @@ return [
                                 ]
                             ] ,
                             'item' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/:picture_id/:item_id/:type'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'item' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb'     => 'get',
                                             'defaults' => [
@@ -1528,7 +1551,7 @@ return [
                                         ]
                                     ],
                                     'create' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb'     => 'post',
                                             'defaults' => [
@@ -1537,7 +1560,7 @@ return [
                                         ]
                                     ],
                                     'update' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb'     => 'put',
                                             'defaults' => [
@@ -1546,7 +1569,7 @@ return [
                                         ]
                                     ],
                                     'delete' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb'     => 'delete',
                                             'defaults' => [
@@ -1647,8 +1670,29 @@ return [
                             ]
                         ]
                     ],
+                    'timezone' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/timezone',
+                            'defaults' => [
+                                'controller' => Controller\Api\TimezoneController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'list' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'list'
+                                    ]
+                                ]
+                            ],
+                        ]
+                    ],
                     'traffic' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/traffic',
                             'defaults' => [
@@ -1658,7 +1702,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'list' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -1667,14 +1711,14 @@ return [
                                 ]
                             ],
                             'whitelist' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/whitelist'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'list' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -1683,7 +1727,7 @@ return [
                                         ]
                                     ],
                                     'create' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'post',
                                             'defaults' => [
@@ -1692,14 +1736,14 @@ return [
                                         ]
                                     ],
                                     'item' => [
-                                        'type' => Segment::class,
+                                        'type' => 'Segment',
                                         'options' => [
                                             'route' => '/:ip'
                                         ],
                                         'may_terminate' => false,
                                         'child_routes' => [
                                             'delete' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'delete',
                                                     'defaults' => [
@@ -1712,14 +1756,14 @@ return [
                                 ]
                             ],
                             'blacklist' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/blacklist'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'create' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'post',
                                             'defaults' => [
@@ -1728,14 +1772,14 @@ return [
                                         ]
                                     ],
                                     'item' => [
-                                        'type' => Segment::class,
+                                        'type' => 'Segment',
                                         'options' => [
                                             'route' => '/:ip'
                                         ],
                                         'may_terminate' => false,
                                         'child_routes' => [
                                             'delete' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'delete',
                                                     'defaults' => [
@@ -1750,7 +1794,7 @@ return [
                         ]
                     ],
                     'user' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/user',
                             'defaults' => [
@@ -1760,7 +1804,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'list' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -1769,7 +1813,7 @@ return [
                                 ]
                             ],
                             'post' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'post',
                                     'defaults' => [
@@ -1778,14 +1822,14 @@ return [
                                 ]
                             ],
                             'user' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/:id'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'item' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [
@@ -1794,7 +1838,7 @@ return [
                                         ]
                                     ],
                                     'put' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'put',
                                             'defaults' => [
@@ -1803,14 +1847,14 @@ return [
                                         ]
                                     ],
                                     'photo' => [
-                                        'type' => Literal::class,
+                                        'type' => 'Literal',
                                         'options' => [
                                             'route'    => '/photo',
                                         ],
                                         'may_terminate' => false,
                                         'child_routes' => [
                                             'delete' => [
-                                                'type' => Method::class,
+                                                'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'delete',
                                                     'defaults' => [
@@ -1818,6 +1862,15 @@ return [
                                                     ]
                                                 ]
                                             ],
+                                            'post' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'post',
+                                                    'defaults' => [
+                                                        'action' => 'post-photo'
+                                                    ]
+                                                ]
+                                            ]
                                         ]
                                     ]
                                 ]
@@ -1834,7 +1887,7 @@ return [
                         ]
                     ],
                     'spec' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/spec',
                             'defaults' => [
@@ -1844,7 +1897,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'get' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -1855,7 +1908,7 @@ return [
                         ]
                     ],
                     'stat' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/stat',
                             'defaults' => [
@@ -1865,7 +1918,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'global-summary' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/global-summary',
                                     'defaults' => [
@@ -1876,7 +1929,7 @@ return [
                         ]
                     ],
                     'vehicle-types' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/vehicle-types',
                             'defaults' => [
@@ -1886,7 +1939,7 @@ return [
                         ]
                     ],
                     'perspective' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/perspective',
                             'defaults' => [
@@ -1896,7 +1949,7 @@ return [
                         ]
                     ],
                     'perspective-page' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/perspective-page',
                             'defaults' => [
@@ -1906,7 +1959,7 @@ return [
                         ]
                     ],
                     'picture-moder-vote-template' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/picture-moder-vote-template',
                             'defaults' => [
@@ -1916,7 +1969,7 @@ return [
                         'may_terminate' => false,
                         'child_routes' => [
                             'list' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'get',
                                     'defaults' => [
@@ -1925,7 +1978,7 @@ return [
                                 ]
                             ],
                             'create' => [
-                                'type' => Method::class,
+                                'type' => 'Method',
                                 'options' => [
                                     'verb' => 'post',
                                     'defaults' => [
@@ -1934,14 +1987,14 @@ return [
                                 ]
                             ],
                             'item' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/:id'
                                 ],
                                 'may_terminate' => false,
                                 'child_routes' => [
                                     'delete' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'delete',
                                             'defaults' => [
@@ -1950,7 +2003,7 @@ return [
                                         ]
                                     ],
                                     'get' => [
-                                        'type' => Method::class,
+                                        'type' => 'Method',
                                         'options' => [
                                             'verb' => 'get',
                                             'defaults' => [

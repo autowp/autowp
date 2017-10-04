@@ -2106,6 +2106,17 @@ return [
                 ]
             ]
         ],
+        'api_user_item' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'gravatar', 'timezone', 'language', 'votes_per_day',' votes_left', 'img']]
+                    ]
+                ]
+            ]
+        ],
         'api_user_list' => [
             'limit' => [
                 'required' => false,
@@ -2159,7 +2170,7 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => []]
+                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'gravatar', 'timezone', 'language', 'votes_per_day',' votes_left', 'img']]
                     ]
                 ]
             ]
@@ -2170,7 +2181,45 @@ return [
                 'filters'  => [
                     ['name' => 'StringTrim']
                 ]
-            ]
+            ],
+            'name' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => User::MIN_NAME,
+                            'max' => User::MAX_NAME
+                        ]
+                    ]
+                ]
+            ],
+            'language' => [
+                'required' => false,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => []
+                        ]
+                    ]
+                ]
+            ],
+            'timezone' => [
+                'required' => false,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => []
+                        ]
+                    ]
+                ]
+            ],
         ],
         'api_user_post' => [
             'email' => [
@@ -2237,6 +2286,47 @@ return [
                             'token' => 'password',
                         ],
                     ]
+                ]
+            ]
+        ],
+        'api_user_photo_post' => [
+            'file' => [
+                'required' => true,
+                'validators' => [
+                    /*[
+                     'name' => 'FileCount',
+                     'break_chain_on_failure' => true,
+                     'options' => [
+                     'min' => 1,
+                     'max' => 1
+                     ]
+                     ],*/
+                    [
+                        'name' => 'FileSize',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'max' => 4194304
+                        ]
+                    ],
+                    [
+                        'name' => 'FileIsImage',
+                        'break_chain_on_failure' => true,
+                    ],
+                    [
+                        'name' => 'FileExtension',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'extension' => 'jpg,jpeg,jpe,png,gif,bmp'
+                        ]
+                    ],
+                    [
+                        'name' => 'FileImageSize',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'minWidth'  => 100,
+                            'minHeight' => 100
+                        ]
+                    ],
                 ]
             ]
         ]

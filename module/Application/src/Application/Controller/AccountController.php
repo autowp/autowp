@@ -2,10 +2,7 @@
 
 namespace Application\Controller;
 
-use DateTimeZone;
 use Exception;
-use Imagick;
-use Locale;
 
 use Zend\Authentication\AuthenticationService;
 use Zend\Db\Sql;
@@ -38,21 +35,6 @@ class AccountController extends AbstractActionController
      * @var Form
      */
     private $emailForm;
-
-    /**
-     * @var Form
-     */
-    private $profileForm;
-
-    /**
-     * @var Form
-     */
-    private $settingsForm;
-
-    /**
-     * @var Form
-     */
-    private $photoForm;
 
     /**
      * @var Form
@@ -122,9 +104,6 @@ class AccountController extends AbstractActionController
     public function __construct(
         UsersService $service,
         Form $emailForm,
-        Form $profileForm,
-        Form $settingsForm,
-        Form $photoForm,
         Form $changePasswordForm,
         Form $deleteUserForm,
         ExternalLoginServices $externalLoginServices,
@@ -142,9 +121,6 @@ class AccountController extends AbstractActionController
 
         $this->service = $service;
         $this->emailForm = $emailForm;
-        $this->profileForm = $profileForm;
-        $this->settingsForm = $settingsForm;
-        $this->photoForm = $photoForm;
         $this->changePasswordForm = $changePasswordForm;
         $this->deleteUserForm = $deleteUserForm;
         $this->externalLoginServices = $externalLoginServices;
@@ -313,162 +289,6 @@ class AccountController extends AbstractActionController
 
     public function removeAccountFailedAction()
     {
-    }
-
-    public function profileAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forwardToLogin();
-        }
-
-        $request = $this->getRequest();
-
-        $this->profileForm->setAttribute('action', $this->url()->fromRoute('account/profile', [
-            'form' => 'profile'
-        ]));
-
-        $this->profileForm->setData([
-            'name' => $user['name']
-        ]);
-        if ($request->isPost() && $this->params('form') == 'profile') {
-            $this->profileForm->setData($this->params()->fromPost());
-            if ($this->profileForm->isValid()) {
-                $values = $this->profileForm->getData();
-
-                $oldName = $user['name'];
-
-                $this->userModel->getTable()->update([
-                    'name' => $values['name']
-                ], [
-                    'id' => $user['id']
-                ]);
-
-                $newName = $values['name'];
-
-                if ($oldName != $newName) {
-                    $this->userRename->add($user['id'], $oldName, $newName);
-                }
-
-                $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/saved'));
-
-                return $this->redirect()->toRoute();
-            }
-        }
-
-        if ($request->isPost() && $this->params('form') == 'reset-photo') {
-            $oldImageId = $user['img'];
-            if ($oldImageId) {
-                $this->userModel->getTable()->update([
-                    'img' => null
-                ], [
-                    'id' => $user['id']
-                ]);
-
-                $this->imageStorage()->removeImage($oldImageId);
-            }
-
-            $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/photo/deleted'));
-
-            return $this->redirect()->toRoute();
-        }
-
-        $this->photoForm->setAttribute('action', $this->url()->fromRoute('account/profile', [
-            'form' => 'photo'
-        ]));
-
-        if ($request->isPost() && $this->params('form') == 'photo') {
-            $data = array_merge_recursive(
-                $this->getRequest()->getPost()->toArray(),
-                $this->getRequest()->getFiles()->toArray()
-            );
-            $this->photoForm->setData($data);
-            if ($this->photoForm->isValid()) {
-                $imageStorage = $this->imageStorage();
-                $imageSampler = $imageStorage->getImageSampler();
-
-                $imagick = new Imagick();
-                if (! $imagick->readImage($data['photo']['tmp_name'])) {
-                    throw new Exception("Error loading image");
-                }
-                $format = $imageStorage->getFormat('photo');
-                $imageSampler->convertImagick($imagick, $format);
-
-                $newImageId = $imageStorage->addImageFromImagick($imagick, 'user');
-
-                $imagick->clear();
-
-                $oldImageId = $user['img'];
-
-                $this->userModel->getTable()->update([
-                    'img' => $newImageId
-                ], [
-                    'id' => $user['id']
-                ]);
-
-                if ($oldImageId) {
-                    $imageStorage->removeImage($oldImageId);
-                }
-
-                $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/photo/saved'));
-
-                return $this->redirect()->toRoute('account/profile');
-            }
-        }
-
-        $language = $this->language();
-
-        foreach (DateTimeZone::listAbbreviations() as $group) {
-            foreach ($group as $timeZone) {
-                $tzId = $timeZone['timezone_id'];
-                if ($tzId) {
-                    $list[] = $tzId;
-                }
-            }
-        }
-        sort($list, SORT_STRING);
-        $list = array_combine($list, $list);
-
-        foreach (array_keys($this->hosts) as $language) {
-            $languages[$language] = Locale::getDisplayLanguage($language, $language);
-        }
-
-        $this->settingsForm->setAttribute('action', $this->url()->fromRoute('account/profile', [
-            'form' => 'settings'
-        ]));
-        $this->settingsForm->get('language')->setValueOptions($languages);
-        $this->settingsForm->get('timezone')->setValueOptions($list);
-
-        $this->settingsForm->setData([
-            'timezone' => $user['timezone'],
-            'language' => $user['language']
-        ]);
-
-        if ($request->isPost() && $this->params('form') == 'settings') {
-            $this->settingsForm->setData($this->params()->fromPost());
-            if ($this->settingsForm->isValid()) {
-                $values = $this->settingsForm->getData();
-
-                $this->userModel->getTable()->update([
-                    'timezone' => $values['timezone'],
-                    'language' => $values['language']
-                ], [
-                    'id' => $user['id']
-                ]);
-
-                $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/saved'));
-
-                return $this->redirect()->toRoute();
-            }
-        }
-
-        return [
-            'settingsForm' => $this->settingsForm,
-            'profileForm'  => $this->profileForm,
-            'photoForm'    => $this->photoForm,
-            'sidebar'      => $this->sidebar()
-        ];
     }
 
     public function emailAction()
