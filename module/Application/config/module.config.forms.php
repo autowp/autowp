@@ -7,15 +7,6 @@ use Zend\Form\ElementFactory;
 return [
     'form_elements' => [
         'aliases' => [
-            'itemfullname' => Form\Element\ItemFullName::class,
-            'itemFullName' => Form\Element\ItemFullName::class,
-            'ItemFullName' => Form\Element\ItemFullName::class,
-            'itembody' => Form\Element\ItemBody::class,
-            'itemBody' => Form\Element\ItemBody::class,
-            'ItemBody' => Form\Element\ItemBody::class,
-            'itemname' => Form\Element\ItemName::class,
-            'itemName' => Form\Element\ItemName::class,
-            'ItemName' => Form\Element\ItemName::class,
             'year' => Form\Element\Year::class,
             'Year' => Form\Element\Year::class,
             'userpassword' => Form\Element\UserPassword::class,
@@ -23,9 +14,6 @@ return [
             'UserPassword' => Form\Element\UserPassword::class,
         ],
         'factories' => [
-            Form\Element\ItemFullName::class => ElementFactory::class,
-            Form\Element\ItemBody::class     => ElementFactory::class,
-            Form\Element\ItemName::class     => ElementFactory::class,
             Form\Element\Year::class         => ElementFactory::class,
             Form\Element\UserPassword::class => ElementFactory::class,
         ]
