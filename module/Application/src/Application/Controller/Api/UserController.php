@@ -338,6 +338,49 @@ class UserController extends AbstractRestfulController
             $this->userService->changeEmailStart($user, $values['email'], $this->language());
         }
 
+        if (array_key_exists('password', $values)) {
+            if (! isset($values['password_old'])) {
+                return new ApiProblemResponse(
+                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                        'invalid_params' => [
+                            'password_old' => [
+                                'invalid' => 'Old password is required'
+                            ]
+                        ]
+                    ])
+                );
+            }
+
+            if (! isset($values['password_confirm'])) {
+                return new ApiProblemResponse(
+                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                        'invalid_params' => [
+                            'password_confirm' => [
+                                'invalid' => 'Confirm password is required'
+                            ]
+                        ]
+                    ])
+                );
+            }
+
+            $correct = $this->userService->checkPassword($user['id'], $values['password_old']);
+
+            if (! $correct) {
+                return new ApiProblemResponse(
+                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                        'invalid_params' => [
+                            'password_old' => [
+                                'invalid' => $this->translate('account/access/change-password/current-password-is-incorrect')
+                            ]
+                        ]
+                    ])
+                );
+            }
+
+            $this->userService->setPassword($user, $values['password']);
+        }
+
+
         return $this->getResponse()->setStatusCode(200);
     }
 

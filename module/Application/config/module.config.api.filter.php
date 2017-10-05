@@ -2233,6 +2233,39 @@ return [
                     ['name' => Validator\User\EmailNotExists::class]
                 ]
             ],
+            'password_old' => [
+                'required' => true,
+            ],
+            'password' => [
+                'required' => true,
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => User::MIN_PASSWORD,
+                            'max' => User::MAX_PASSWORD
+                        ]
+                    ]
+                ]
+            ],
+            'password_confirm' => [
+                'required'   => true,
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => User::MIN_PASSWORD,
+                            'max' => User::MAX_PASSWORD
+                        ]
+                    ],
+                    [
+                        'name' => 'Identical',
+                        'options' => [
+                            'token' => 'password',
+                        ],
+                    ]
+                ]
+            ],
         ],
         'api_user_post' => [
             'email' => [

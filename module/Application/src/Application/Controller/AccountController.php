@@ -28,11 +28,6 @@ class AccountController extends AbstractActionController
     /**
      * @var Form
      */
-    private $changePasswordForm;
-
-    /**
-     * @var Form
-     */
     private $deleteUserForm;
 
     /**
@@ -77,7 +72,6 @@ class AccountController extends AbstractActionController
 
     public function __construct(
         UsersService $service,
-        Form $changePasswordForm,
         Form $deleteUserForm,
         array $hosts,
         SpecificationsService $specsService,
@@ -90,7 +84,6 @@ class AccountController extends AbstractActionController
     ) {
 
         $this->service = $service;
-        $this->changePasswordForm = $changePasswordForm;
         $this->deleteUserForm = $deleteUserForm;
         $this->hosts = $hosts;
         $this->specsService = $specsService;
@@ -192,44 +185,6 @@ class AccountController extends AbstractActionController
             'paginator'    => $paginator,
             'picturesData' => $picturesData,
             'sidebar'      => $this->sidebar()
-        ];
-    }
-
-    public function accessAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forwardToLogin();
-        }
-
-        $request = $this->getRequest();
-
-        if ($request->isPost()) {
-            $this->changePasswordForm->setData($this->params()->fromPost());
-            if ($this->changePasswordForm->isValid()) {
-                $values = $this->changePasswordForm->getData();
-
-                $correct = $this->service->checkPassword($user['id'], $values['password_old']);
-
-                if (! $correct) {
-                    $this->changePasswordForm->get('password_old')->setMessages([
-                        $this->translate('account/access/change-password/current-password-is-incorrect')
-                    ]);
-                } else {
-                    $this->service->setPassword($user, $values['password']);
-
-                    $this->flashMessenger()->addSuccessMessage(
-                        $this->translate('account/access/change-password/saved')
-                    );
-
-                    return $this->redirect()->toRoute('account/access');
-                }
-            }
-        }
-
-        return [
-            'sidebar'      => $this->sidebar(),
-            'formPassword' => $this->changePasswordForm
         ];
     }
 

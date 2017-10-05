@@ -45,7 +45,7 @@ angular.module(Module)
                         },
                         {
                             pageId: 133,
-                            url: '/account/access',
+                            url: $state.href('account-access', {}, {inherit: false}),
                             icon: 'lock',
                             name: 'page/133/name'
                         },

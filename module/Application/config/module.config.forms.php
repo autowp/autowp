@@ -31,60 +31,6 @@ return [
         ]
     ],
     'forms' => [
-        'ChangePasswordForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type'    => Form\Element\UserPassword::class,
-                        'name'    => 'password_old',
-                        'options' => [
-                            'label' => 'account/access/change-password/current',
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type'    => Form\Element\UserPassword::class,
-                        'name'    => 'password',
-                        'options' => [
-                            'label' => 'account/access/change-password/new',
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type'    => Form\Element\UserPassword::class,
-                        'name'    => 'password_confirm',
-                        'options' => [
-                            'label' => 'account/access/change-password/new-confirm'
-                        ]
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'password_old' => [
-                    'required' => true,
-                ],
-                'password' => [
-                    'required' => true,
-                ],
-                'password_confirm' => [
-                    'required'   => true,
-                    'validators' => [
-                        [
-                            'name' => 'Identical',
-                            'options' => [
-                                'token' => 'password',
-                            ],
-                        ]
-                    ]
-                ],
-            ],
-        ],
         'DeleteUserForm' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [

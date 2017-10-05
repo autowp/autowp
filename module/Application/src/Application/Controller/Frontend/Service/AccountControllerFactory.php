@@ -17,7 +17,6 @@ class AccountControllerFactory implements FactoryInterface
         $config = $container->get('Config');
         return new Controller(
             $container->get(\Application\Service\UsersService::class),
-            $container->get('ChangePasswordForm'),
             $container->get('DeleteUserForm'),
             $config['hosts'],
             $container->get(\Application\Service\SpecificationsService::class),

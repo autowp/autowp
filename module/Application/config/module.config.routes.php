@@ -66,15 +66,6 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes'  => [
-                    'access' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/access',
-                            'defaults' => [
-                                'action' => 'access',
-                            ],
-                        ],
-                    ],
                     'delete' => [
                         'type' => Literal::class,
                         'options' => [
