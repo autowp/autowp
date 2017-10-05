@@ -70,6 +70,8 @@ angular.module(Module)
                 
             }, function(response) {
                 notify.response(response);
+                
+                $state.go('error-404');
             });
             
             ctrl.subscribe = function() {
