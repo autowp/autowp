@@ -2,11 +2,6 @@
 
 namespace Application;
 
-use Zend\Router\Http\Hostname;
-use Zend\Router\Http\Literal;
-use Zend\Router\Http\Regex;
-use Zend\Router\Http\Segment;
-
 return [
     'route_manager' => [
         'factories' => [
@@ -16,7 +11,7 @@ return [
     'router' => [
         'routes' => [
            'ng' => [
-                'type' => Regex::class,
+                'type' => 'Regex',
                 'options' => [
                     'regex'    => '/ng/(?<path>[/a-zA-Z0-9_-]+)?',
                     'defaults' => [
@@ -37,7 +32,7 @@ return [
                 ]
             ],
             'index' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/',
                     'defaults' => [
@@ -47,7 +42,7 @@ return [
                 ],
             ],
             'about' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/about',
                     'defaults' => [
@@ -57,7 +52,7 @@ return [
                 ],
             ],
             'account' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/account',
                     'defaults' => [
@@ -67,7 +62,7 @@ return [
                 'may_terminate' => false,
                 'child_routes'  => [
                     'emailcheck' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route'    => '/emailcheck/:email_check_code',
                             'defaults' => [
@@ -75,35 +70,8 @@ return [
                             ],
                         ],
                     ],
-                    'not-taken-pictures' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/not-taken-pictures',
-                            'defaults' => [
-                                'action' => 'not-taken-pictures',
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'page' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route'    => '/page:page'
-                                ]
-                            ]
-                        ]
-                    ],
-                    'pictures' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/pictures',
-                            'defaults' => [
-                                'action' => 'pictures',
-                            ],
-                        ],
-                    ],
                     'specs-conflicts' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/specs-conflicts',
                             'defaults' => [
@@ -130,7 +98,7 @@ return [
                 ],
             ],
             'brands' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/brands',
                     'defaults' => [
@@ -141,7 +109,7 @@ return [
                 'may_terminate' => true,
                 'child_routes'  => [
                     'newcars' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route'  => '/newcars/:brand_id',
                             'defaults' => [
@@ -152,7 +120,7 @@ return [
                 ]
             ],
             'cars' => [
-                'type' => Segment::class,
+                'type' => 'Segment',
                 'options' => [
                     'route'    => '/cars/:action',
                     'defaults' => [
@@ -186,7 +154,7 @@ return [
                 ]
             ],
             'category-newcars' => [
-                'type' => Segment::class,
+                'type' => 'Segment',
                 'options' => [
                     'route'  => '/category/newcars/:item_id',
                     'defaults' => [
@@ -196,7 +164,7 @@ return [
                 ]
             ],
             'comments' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/comments',
                     'defaults' => [
@@ -207,7 +175,7 @@ return [
                 'may_terminate' => true,
                 'child_routes'  => [
                     'add' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/add/type_id/:type_id/item_id/:item_id',
                             'defaults' => [
@@ -216,7 +184,7 @@ return [
                         ]
                     ],
                     'delete' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/delete',
                             'defaults' => [
@@ -225,7 +193,7 @@ return [
                         ]
                     ],
                     'restore' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/restore',
                             'defaults' => [
@@ -234,7 +202,7 @@ return [
                         ]
                     ],
                     'vote' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/vote',
                             'defaults' => [
@@ -243,7 +211,7 @@ return [
                         ]
                     ],
                     'votes' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route'    => '/votes',
                             'defaults' => [
@@ -254,7 +222,7 @@ return [
                 ]
             ],
             'cutaway' => [
-                'type' => Segment::class,
+                'type' => 'Segment',
                 'options' => [
                     'route'    => '/cutaway[/page:page]',
                     'defaults' => [
@@ -266,7 +234,7 @@ return [
                 ]
             ],
             'mascots' => [
-                'type' => Segment::class,
+                'type' => 'Segment',
                 'options' => [
                     'route'    => '/mascots[/page:page]',
                     'defaults' => [
@@ -278,7 +246,7 @@ return [
                 ]
             ],
             'top-view' => [
-                'type' => Segment::class,
+                'type' => 'Segment',
                 'options' => [
                     'route'    => '/top-view[/page:page]',
                     'defaults' => [
@@ -290,7 +258,7 @@ return [
                 ]
             ],
             'donate' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/donate',
                     'defaults' => [
@@ -301,7 +269,7 @@ return [
                 'may_terminate' => true,
                 'child_routes'  => [
                     'log' => [
-                        'type'    => Literal::class,
+                        'type'    => 'Literal',
                         'options' => [
                             'route' => '/log',
                             'defaults' => [
@@ -310,7 +278,7 @@ return [
                         ]
                     ],
                     'success' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/success',
                             'defaults' => [
@@ -319,7 +287,7 @@ return [
                         ]
                     ],
                     'vod' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/vod',
                             'defaults' => [
@@ -332,7 +300,7 @@ return [
                                 'type' => Router\Http\WildcardSafe::class
                             ],
                             'success' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/success',
                                     'defaults' => [
@@ -341,7 +309,7 @@ return [
                                 ]
                             ],
                             'select-item' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/vod-select-item',
                                     'defaults' => [
@@ -356,7 +324,7 @@ return [
                                 ]
                             ],
                             'vehicle-childs' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/vehicle-childs',
                                     'defaults' => [
@@ -371,7 +339,7 @@ return [
                                 ]
                             ],
                             'concepts' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/concepts/:brand_id',
                                     'defaults' => [
@@ -390,7 +358,7 @@ return [
                 ]
             ],
             'factories' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/factory',
                     'defaults' => [
@@ -401,7 +369,7 @@ return [
                 'may_terminate' => true,
                 'child_routes'  => [
                     'factory' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/factory/id/:id',
                             'defaults' => [
@@ -410,7 +378,7 @@ return [
                         ]
                     ],
                     'factory-cars' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/factory-cars/id/:id',
                             'defaults' => [
@@ -420,7 +388,7 @@ return [
                         'may_terminate' => true,
                         'child_routes'  => [
                             'page' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/page:page',
                                 ],
@@ -428,7 +396,7 @@ return [
                         ]
                     ],
                     'newcars' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route'  => '/newcars/:item_id',
                             'defaults' => [
@@ -439,7 +407,7 @@ return [
                 ]
             ],
             'inbox' => [
-                'type'    => Segment::class,
+                'type'    => 'Segment',
                 'options' => [
                     'route' => '/inbox[/:brand][/:date][/page:page][/]',
                     'defaults' => [
@@ -449,7 +417,7 @@ return [
                 ]
             ],
             'info' => [
-                'type'    => Literal::class,
+                'type'    => 'Literal',
                 'options' => [
                     'route' => '/info',
                     'defaults' => [
@@ -458,7 +426,7 @@ return [
                 ],
                 'child_routes'  => [
                     'spec' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/spec',
                             'defaults' => [
@@ -467,7 +435,7 @@ return [
                         ]
                     ],
                     'text' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/text/id/:id',
                             'defaults' => [
@@ -477,7 +445,7 @@ return [
                         'may_terminate' => true,
                         'child_routes'  => [
                             'revision' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/revision/:revision',
                                 ]
@@ -487,7 +455,7 @@ return [
                 ]
             ],
             'login' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/login',
                     'defaults' => [
@@ -497,7 +465,7 @@ return [
                 'may_terminate' => false,
                 'child_routes'  => [
                     'callback' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/callback',
                             'defaults' => [
@@ -508,7 +476,7 @@ return [
                 ]
             ],
             'mosts' => [
-                'type' => Segment::class,
+                'type' => 'Segment',
                 'options' => [
                     'route'    => '/mosts[/:most_catname][/:shape_catname][/:years_catname]',
                     'defaults' => [
@@ -518,7 +486,7 @@ return [
                 ]
             ],
             'new' => [
-                'type'    => Segment::class,
+                'type'    => 'Segment',
                 'options' => [
                     'route' => '/new',
                     'defaults' => [
@@ -529,20 +497,20 @@ return [
                 'may_terminate' => true,
                 'child_routes'  => [
                     'date' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/:date',
                         ],
                         'may_terminate' => true,
                         'child_routes'  => [
                             'page' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/page:page',
                                 ],
                             ],
                             'item' => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route'    => '/item/:item_id[/page:page]',
                                     'defaults' => [
@@ -555,7 +523,7 @@ return [
                 ]
             ],
             'persons' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/persons',
                     'defaults' => [
@@ -566,7 +534,7 @@ return [
                 'may_terminate' => false,
                 'child_routes'  => [
                     'person' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/:id',
                             'defaults' => [
@@ -576,7 +544,7 @@ return [
                         'may_terminate' => true,
                         'child_routes' => [
                             'page'    => [
-                                'type' => Segment::class,
+                                'type' => 'Segment',
                                 'options' => [
                                     'route' => '/page:page',
                                 ]
@@ -586,7 +554,7 @@ return [
                 ]
             ],
             'picture' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/picture',
                     'defaults' => [
@@ -596,7 +564,7 @@ return [
                 'may_terminate' => false,
                 'child_routes'  => [
                     'picture' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route'    => '/[:picture_id]',
                             'defaults' => [
@@ -607,7 +575,7 @@ return [
                 ]
             ],
             'rules' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/rules',
                     'defaults' => [
@@ -617,7 +585,7 @@ return [
                 ],
             ],
             'telegram' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/telegram',
                     'defaults' => [
@@ -627,7 +595,7 @@ return [
                 ],
             ],
             'telegram-webhook' => [
-                'type' => Segment::class,
+                'type' => 'Segment',
                 'options' => [
                     'route'    => '/telegram/webhook/token/:token',
                     'defaults' => [
@@ -637,7 +605,7 @@ return [
                 ],
             ],
             'twins' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/twins',
                     'defaults' => [
@@ -648,7 +616,7 @@ return [
                 'may_terminate' => true,
                 'child_routes'  => [
                     'brand' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/:brand_catname[/page:page]',
                             'defaults' => [
@@ -657,7 +625,7 @@ return [
                         ]
                     ],
                     'group' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/group:id',
                             'defaults' => [
@@ -667,7 +635,7 @@ return [
                         'may_terminate' => true,
                         'child_routes'  => [
                             'specifications' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/specifications',
                                     'defaults' => [
@@ -676,7 +644,7 @@ return [
                                 ],
                             ],
                             'pictures' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/pictures',
                                     'defaults' => [
@@ -686,7 +654,7 @@ return [
                                 'may_terminate' => true,
                                 'child_routes'  => [
                                     'picture' => [
-                                        'type' => Segment::class,
+                                        'type' => 'Segment',
                                         'options' => [
                                             'route' => '/:picture_id',
                                             'defaults' => [
@@ -696,7 +664,7 @@ return [
                                         'may_terminate' => true,
                                         'child_routes' => [
                                             'gallery' => [
-                                                'type' => Literal::class,
+                                                'type' => 'Literal',
                                                 'options' => [
                                                     'route' => '/gallery',
                                                     'defaults' => [
@@ -707,7 +675,7 @@ return [
                                         ]
                                     ],
                                     'page'    => [
-                                        'type' => Segment::class,
+                                        'type' => 'Segment',
                                         'options' => [
                                             'route' => '/page:page',
                                         ]
@@ -717,7 +685,7 @@ return [
                         ]
                     ],
                     'page'    => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/page:page',
                         ]
@@ -725,7 +693,7 @@ return [
                 ]
             ],
             'users' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/users',
                     'defaults' => [
@@ -736,7 +704,7 @@ return [
                 'may_terminate' => true,
                 'child_routes'  => [
                     'user' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/:user_id',
                             'defaults' => [
@@ -746,7 +714,7 @@ return [
                         'may_terminate' => true,
                         'child_routes'  => [
                             'pictures' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/pictures',
                                     'defaults' => [
@@ -756,7 +724,7 @@ return [
                                 'may_terminate' => true,
                                 'child_routes'  => [
                                     'brand' => [
-                                        'type' => Segment::class,
+                                        'type' => 'Segment',
                                         'options' => [
                                             'route' => '/:brand_catname[/page:page]',
                                             'defaults' => [
@@ -767,7 +735,7 @@ return [
                                 ]
                             ],
                             'comments' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/comments',
                                     'defaults' => [
@@ -784,7 +752,7 @@ return [
                         ]
                     ],
                     'rating' => [
-                        'type' => Literal::class,
+                        'type' => 'Literal',
                         'options' => [
                             'route' => '/rating',
                             'defaults' => [
@@ -795,7 +763,7 @@ return [
                         'may_terminate' => true,
                         'child_routes'  => [
                             'pictures' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/pictures',
                                     'defaults' => [
@@ -805,7 +773,7 @@ return [
                                 ],
                             ],
                             'likes' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/likes',
                                     'defaults' => [
@@ -815,7 +783,7 @@ return [
                                 ],
                             ],
                             'picture-likes' => [
-                                'type' => Literal::class,
+                                'type' => 'Literal',
                                 'options' => [
                                     'route' => '/picture-likes',
                                     'defaults' => [
@@ -829,7 +797,7 @@ return [
                 ]
             ],
             'votings' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route'    => '/voting',
                     'defaults' => [
@@ -839,7 +807,7 @@ return [
                 'may_terminate' => false,
                 'child_routes'  => [
                     'voting' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route'    => '/voting/id/:id[/filter/:filter]',
                             'defaults' => [
@@ -848,7 +816,7 @@ return [
                         ]
                     ],
                     'voting-variant-votes' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route'    => '/voting-variant-votes/id/:id',
                             'defaults' => [
@@ -857,7 +825,7 @@ return [
                         ]
                     ],
                     'vote' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route'    => '/vote/id/:id',
                             'defaults' => [
@@ -868,7 +836,7 @@ return [
                 ]
             ],
             'upload' => [
-                'type' => Segment::class,
+                'type' => 'Segment',
                 'options' => [
                     'route' => '/upload[/:action]',
                     'defaults' => [
@@ -884,7 +852,7 @@ return [
                 ]
             ],
             /*'widget' => [
-             'type' => Literal::class,
+             'type' => 'Literal',
                 'options' => [
                     'route'    => '/widget',
                     'defaults' => [
@@ -894,7 +862,7 @@ return [
                 'may_terminate' => false,
                 'child_routes'  => [
                     'picture-preview' => [
-                        'type' => Segment::class,
+                        'type' => 'Segment',
                         'options' => [
                             'route' => '/picture-preview/picture_id/:picture_id',
                             'defaults' => [
@@ -905,7 +873,7 @@ return [
                 ]
             ],*/
             'yandex' => [
-                'type' => Literal::class,
+                'type' => 'Literal',
                 'options' => [
                     'route' => '/yandex',
                     'defaults' => [
@@ -915,7 +883,7 @@ return [
                 'may_terminate' => false,
                 'child_routes'  => [
                     'informing' => [
-                        'type'    => Literal::class,
+                        'type'    => 'Literal',
                         'options' => [
                             'route' => '/informing',
                             'defaults' => [

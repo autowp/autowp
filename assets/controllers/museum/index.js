@@ -111,7 +111,8 @@ angular.module(Module)
                         status: 'accepted',
                         item_id: ctrl.item.id,
                         fields: 'owner,thumbnail,votes,views,comments_count,name_html,name_text',
-                        limit: 20
+                        limit: 20,
+                        order: 12
                     }
                 }).then(function(response) {
                     ctrl.pictures = response.data.pictures;

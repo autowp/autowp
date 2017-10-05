@@ -7,6 +7,8 @@ use Zend\InputFilter\InputFilter;
 use Zend\Http\Request;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
@@ -266,10 +268,60 @@ class PictureController extends AbstractRestfulController
 
         $data = $inputFilter->getValues();
 
+        if (! $isModer) {
+            if (! $data['item_id'] && ! $data['owner_id']) {
+                return new ApiProblemResponse(
+                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                        'invalid_params' => [
+                            'item_id' => [
+                                'invalid' => 'item_id or owner_id is required'
+                            ]
+                        ]
+                    ])
+                );
+            }
+        }
+
         $filter = [];
 
         if ($data['item_id']) {
             $filter['item']['ancestor_or_self'] = $data['item_id'];
+        }
+
+        if ($data['owner_id']) {
+            $filter['user'] = $data['owner_id'];
+        }
+
+        $orders = [
+            1 => 'add_date_desc',
+            2 => 'add_date_asc',
+            3 => 'resolution_desc',
+            4 => 'resolution_asc',
+            5 => 'filesize_desc',
+            6 => 'filesize_asc',
+            7 => 'comments',
+            8 => 'views',
+            9 => 'moder_votes',
+            10 => 'similarity',
+            11 => 'removing_date',
+            12 => 'likes',
+            13 => 'dislikes',
+            14 => 'status'
+        ];
+
+        switch ($data['order']) {
+            case 12:
+                $filter['has_likes'] = true;
+                break;
+            case 13:
+                $filter['has_dislikes'] = true;
+                break;
+        }
+
+        if ($data['order']) {
+            $filter['order'] = $orders[$data['order']];
+        } else {
+            $filter['order'] = $orders[1];
         }
 
         if ($isModer) {
@@ -307,10 +359,6 @@ class PictureController extends AbstractRestfulController
                 } elseif ($data['comments'] == '0') {
                     $filter['has_comments'] = false;
                 }
-            }
-
-            if ($data['owner_id']) {
-                $filter['user'] = $data['owner_id'];
             }
 
             if ($data['car_type_id']) {
@@ -361,41 +409,6 @@ class PictureController extends AbstractRestfulController
             if ($data['gps']) {
                 $filter['has_point'] = true;
             }
-
-            $orders = [
-                1 => 'add_date_desc',
-                2 => 'add_date_asc',
-                3 => 'resolution_desc',
-                4 => 'resolution_asc',
-                5 => 'filesize_desc',
-                6 => 'filesize_asc',
-                7 => 'comments',
-                8 => 'views',
-                9 => 'moder_votes',
-                10 => 'similarity',
-                11 => 'removing_date',
-                12 => 'likes',
-                13 => 'dislikes',
-                14 => 'status'
-            ];
-
-            switch ($data['order']) {
-                case 12:
-                    $filter['has_likes'] = true;
-                    break;
-                case 13:
-                    $filter['has_dislikes'] = true;
-                    break;
-            }
-
-            if ($data['order']) {
-                $filter['order'] = $orders[$data['order']];
-            } else {
-                $filter['order'] = $orders[1];
-            }
-        } else {
-            $filter['status'] = Picture::STATUS_ACCEPTED;
-            $filter['order'] = 'likes';
         }
 
         $paginator = $this->picture->getPaginator($filter);

@@ -7,6 +7,7 @@ import './accounts';
 import './contacts';
 import './delete';
 import './email';
+import './inbox-pictures';
 import './messages';
 import './sidebar';
 import './profile';

@@ -77,32 +77,6 @@ class AccountController extends AbstractActionController
         return $this->redirect()->toUrl('/ng/login');
     }
 
-    public function sidebar()
-    {
-        $user = $this->user()->get();
-
-        $picsCount = $this->picture->getCount([
-            'status' => Picture::STATUS_ACCEPTED,
-            'user'   => $user['id']
-        ]);
-
-        $notTakenPicturesCount = $this->picture->getCount([
-            'status' => Picture::STATUS_INBOX,
-            'user'   => $user['id']
-        ]);
-
-        return [
-            'smCount'               => $this->message->getSystemCount($user['id']),
-            'newSmCount'            => $this->message->getNewSystemCount($user['id']),
-            'pmCount'               => $this->message->getInboxCount($user['id']),
-            'newPmCount'            => $this->message->getInboxNewCount($user['id']),
-            'omCount'               => $this->message->getSentCount($user['id']),
-            'notTakenPicturesCount' => $notTakenPicturesCount,
-            'subscribesCount'       => $this->forums->getSubscribedTopicsCount($user['id']),
-            'picsCount'             => $picsCount
-        ];
-    }
-
     public function emailcheckAction()
     {
         $code = $this->params('email_check_code');
@@ -129,40 +103,13 @@ class AccountController extends AbstractActionController
 
         $viewModel->setTemplate($template);
 
-        if ($this->user()->logedIn()) {
+        /*if ($this->user()->logedIn()) {
             $viewModel->setVariables([
                 'sidebar' => $this->sidebar()
             ]);
-        }
+        }*/
 
         return $viewModel;
-    }
-
-    public function notTakenPicturesAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $paginator = $this->picture->getPaginator([
-            'user'   => $this->user()->get()['id'],
-            'status' => Picture::STATUS_INBOX,
-            'order'  => 'add_date_desc'
-        ]);
-
-        $paginator
-            ->setItemCountPerPage(16)
-            ->setCurrentPageNumber($this->params('page'));
-
-        $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
-            'width' => 4
-        ]);
-
-        return [
-            'paginator'    => $paginator,
-            'picturesData' => $picturesData,
-            'sidebar'      => $this->sidebar()
-        ];
     }
 
     public function specsConflictsAction()
@@ -198,7 +145,7 @@ class AccountController extends AbstractActionController
         unset($conflict);
 
         return [
-            'sidebar'   => $this->sidebar(),
+            //'sidebar'   => $this->sidebar(),
             'filter'    => (string)$filter,
             'conflicts' => $conflicts,
             'paginator' => $paginator,

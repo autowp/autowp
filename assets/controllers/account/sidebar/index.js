@@ -63,7 +63,7 @@ angular.module(Module)
                         },
                         {
                             pageId: 94,
-                            url: '/account/not-taken-pictures',
+                            url: $state.href('account-inbox-pictures', {}, {inherit: false}),
                             icon: 'th',
                             name: 'page/94/name'
                         },

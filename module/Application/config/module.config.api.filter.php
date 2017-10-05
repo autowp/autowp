@@ -1769,7 +1769,10 @@ return [
                 'required' => false
             ],
             'order' => [
-                'required' => false
+                'required' => false,
+                'filters' => [
+                    ['name' => 'Digits']
+                ],
             ],
             'similar' => [
                 'required' => false
@@ -1824,7 +1827,16 @@ return [
                 'required' => false
             ],
             'item_id' => [
-                'required' => true,
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'owner_id' => [
+                'required' => false,
                 'filters' => [
                     ['name' => 'StringTrim']
                 ],
@@ -1833,7 +1845,10 @@ return [
                 ]
             ],
             'order' => [
-                'required' => false
+                'required' => false,
+                'filters' => [
+                    ['name' => 'Digits']
+                ],
             ]
         ],
         'api_picture_edit' => [
