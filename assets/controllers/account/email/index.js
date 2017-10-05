@@ -19,8 +19,13 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http',
-        function($scope, $http) {
+        '$scope', '$http', '$state',
+        function($scope, $http, $state) {
+            
+            if (! $scope.user) {
+                $state.go('login');
+                return;
+            }
             
             var ctrl = this;
             

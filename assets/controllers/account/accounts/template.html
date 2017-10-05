@@ -1,0 +1,34 @@
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <div class="well" ng-if="ctrl.accounts.length > 0 && !ctrl.disconnectFailed && !ctrl.connectFailed">
+            <div ng-repeat="account in ctrl.accounts">
+                <p>
+                    <button type="submit" class="btn btn-xs btn-danger" title="{{'account/accounts/remove'|translate}}" ng-if="account.can_remove" style="margin-right:16px" ng-click="ctrl.remove(account)">
+                        <i class="fa fa-times"></i>
+                    </button>
+                    <i class="fa-fw {{account.icon}}"></i>
+                    <a ng-href="{{account.link}}" ng-if="account.link" ng-bind="account.name"></a>
+                    <span ng-bind="account.name" ng-if="!account.link"></span>
+                </p>
+            </div>
+        </div>
+        <div class="well" ng-if="!ctrl.disconnectFailed && !ctrl.connectFailed">
+            <h3 translate>account/accounts/add</h3>
+            <div class="form-group">
+                <select name="service" class="form-control" ng-options="key as value for (key, value) in ctrl.services" ng-model="ctrl.service">
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" translate ng-click="ctrl.start()" ng-disabled="!ctrl.service">submit</button>
+        </div>
+        <div class="well" ng-if="ctrl.disconnectFailed">
+            <div btf-markdown="'account/accounts/disconnect-failed'|translate"></div>
+        </div>
+        
+        <div class="well" ng-if="ctrl.connectFailed">
+            <div btf-markdown="'account/accounts/connect-failed'|translate"></div>
+        </div>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <autowp-account-sidebar user="user"></autowp-account-sidebar>
+    </div>
+</div>

@@ -2,6 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 
+import './accounts';
 import './contacts';
 import './email';
 import './messages';

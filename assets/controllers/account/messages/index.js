@@ -26,6 +26,11 @@ angular.module(Module)
             
             var ctrl = this;
             
+            if (! $scope.user) {
+                $state.go('login');
+                return;
+            }
+            
             ctrl.folder = $state.params.folder || 'inbox';
             var pageId = null;
             var userId = null;

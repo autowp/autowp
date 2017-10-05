@@ -75,30 +75,12 @@ return [
                             ],
                         ],
                     ],
-                    'accounts' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/accounts',
-                            'defaults' => [
-                                'action' => 'accounts',
-                            ],
-                        ],
-                    ],
                     'delete' => [
                         'type' => Literal::class,
                         'options' => [
                             'route'    => '/delete',
                             'defaults' => [
                                 'action' => 'delete',
-                            ],
-                        ],
-                    ],
-                    'email' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/email',
-                            'defaults' => [
-                                'action' => 'email',
                             ],
                         ],
                     ],

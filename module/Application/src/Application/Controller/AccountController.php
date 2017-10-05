@@ -2,16 +2,11 @@
 
 namespace Application\Controller;
 
-use Exception;
-
 use Zend\Authentication\AuthenticationService;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
@@ -20,7 +15,6 @@ use Autowp\User\Model\UserRename;
 
 use Application\Model\Item;
 use Application\Model\Picture;
-use Application\Model\UserAccount;
 use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
 
@@ -40,11 +34,6 @@ class AccountController extends AbstractActionController
      * @var Form
      */
     private $deleteUserForm;
-
-    /**
-     * @var ExternalLoginServices
-     */
-    private $externalLoginServices;
 
     /**
      * @var array
@@ -67,19 +56,9 @@ class AccountController extends AbstractActionController
     private $userRename;
 
     /**
-     * @var UserAccount
-     */
-    private $userAccount;
-
-    /**
      * @var Picture
      */
     private $picture;
-
-    /**
-     * @var TableGateway
-     */
-    private $loginStateTable;
 
     /**
      * @var Item
@@ -100,14 +79,11 @@ class AccountController extends AbstractActionController
         UsersService $service,
         Form $changePasswordForm,
         Form $deleteUserForm,
-        ExternalLoginServices $externalLoginServices,
         array $hosts,
         SpecificationsService $specsService,
         MessageService $message,
         UserRename $userRename,
-        UserAccount $userAccount,
         Picture $picture,
-        TableGateway $loginStateTable,
         Item $item,
         Forums $forums,
         User $userModel
@@ -116,14 +92,11 @@ class AccountController extends AbstractActionController
         $this->service = $service;
         $this->changePasswordForm = $changePasswordForm;
         $this->deleteUserForm = $deleteUserForm;
-        $this->externalLoginServices = $externalLoginServices;
         $this->hosts = $hosts;
         $this->specsService = $specsService;
         $this->message = $message;
         $this->userRename = $userRename;
-        $this->userAccount = $userAccount;
         $this->picture = $picture;
-        $this->loginStateTable = $loginStateTable;
         $this->item = $item;
         $this->forums = $forums;
         $this->userModel = $userModel;
@@ -158,130 +131,6 @@ class AccountController extends AbstractActionController
             'subscribesCount'       => $this->forums->getSubscribedTopicsCount($user['id']),
             'picsCount'             => $picsCount
         ];
-    }
-
-    public function addAccountFailedAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        return [
-            'sidebar' => $this->sidebar()
-        ];
-    }
-
-    /**
-     * @param string $serviceId
-     * @return \Autowp\ExternalLoginService\AbstractService
-     */
-    private function getExternalLoginService($serviceId)
-    {
-        $service = $this->externalLoginServices->get($serviceId);
-
-        if (! $service) {
-            throw new Exception("Service `$serviceId` not found");
-        }
-        return $service;
-    }
-
-    public function accountsAction()
-    {
-        $user = $this->user()->get();
-
-        if (! $user) {
-            return $this->forwardToLogin();
-        }
-
-        $accounts = [];
-        foreach ($this->userAccount->getAccounts($user['id']) as $row) {
-            $accounts[] = array_replace($row, [
-                'canRemove' => $this->canRemoveAccount($row['service_id']),
-                'removeUrl' => $this->url()->fromRoute('account/remove-account', [
-                    'service' => $row['service_id']
-                ])
-            ]);
-        }
-
-        $request = $this->getRequest();
-
-        if ($request->isPost()) {
-            $serviceId = $this->params()->fromPost('type');
-            $service = $this->getExternalLoginService($serviceId);
-
-            $loginUrl = $service->getLoginUrl();
-
-            $this->loginStateTable->insert([
-                'state'    => $service->getState(),
-                'time'     => new Sql\Expression('now()'),
-                'user_id'  => $user['id'],
-                'language' => $this->language(),
-                'service'  => $serviceId,
-                'url'      => $this->url()->fromRoute('account/accounts')
-            ]);
-
-            return $this->redirect()->toUrl($loginUrl);
-        }
-
-        return [
-            'sidebar'  => $this->sidebar(),
-            'accounts' => $accounts,
-            'types'    => [
-                'facebook'    => 'Facebook',
-                'vk'          => 'VK',
-                'google-plus' => 'Google+',
-                'twitter'     => 'Twitter',
-                'github'      => 'Github',
-                'linkedin'    => 'Linkedin'
-            ]
-        ];
-    }
-
-    private function canRemoveAccount(string $serviceId): bool
-    {
-        if (! $this->user()->logedIn()) {
-            return false;
-        }
-
-        if ($this->user()->get()['e_mail']) {
-            return true;
-        }
-
-        $haveAccounts = $this->userAccount->haveAccountsForOtherServices(
-            $this->user()->get()['id'],
-            $serviceId
-        );
-        if ($haveAccounts) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public function removeAccountAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forwardToLogin();
-        }
-
-        $service = (string)$this->params('service');
-
-        if (! $this->canRemoveAccount($service)) {
-            return $this->forward()->dispatch(self::class, [
-                'action' => 'remove-account-failed'
-            ]);
-        }
-
-        $this->userAccount->removeAccount($user['id'], $service);
-
-        $this->flashMessenger()->addSuccessMessage($this->translate('account/accounts/removed'));
-
-        return $this->redirect()->toRoute('account/accounts');
-    }
-
-    public function removeAccountFailedAction()
-    {
     }
 
     public function emailcheckAction()

@@ -51,6 +51,7 @@ class UserAccount
         $result = [];
         foreach ($rows as $row) {
             $result[] = [
+                'id'         => (int)$row['id'],
                 'name'       => $row['name'],
                 'link'       => $row['link'],
                 'icon'       => 'fa fa-' . str_replace('googleplus', 'google-plus', $row['service_id']),
@@ -61,19 +62,18 @@ class UserAccount
         return $result;
     }
 
-    public function haveAccountsForOtherServices(int $userId, string $service): bool
+    public function haveAccountsForOtherServices(int $userId, int $id): bool
     {
         return (bool)$this->table->select([
-            'user_id'         => $userId,
-            'service_id != ?' => $service
+            'user_id' => $userId,
+            'id != ?' => $id
         ])->current();
     }
 
-    public function removeAccount(int $userId, string $service)
+    public function removeAccount(int $id)
     {
         $affected = $this->table->delete([
-            'user_id = ?'    => $userId,
-            'service_id = ?' => $service
+            'id' => $id
         ]);
 
         return $affected > 0;

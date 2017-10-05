@@ -36,6 +36,7 @@ return [
     ],
     'controllers' => [
         'factories' => [
+            Controller\Api\AccountController::class         => Controller\Api\AccountControllerFactory::class,
             Controller\Api\AclController::class             => Controller\Api\Service\AclControllerFactory::class,
             Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
             Controller\Api\CommentController::class         => Controller\Api\CommentControllerFactory::class,
@@ -85,6 +86,63 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes' => [
+                    'account' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/account',
+                            'defaults' => [
+                                'controller' => Controller\Api\AccountController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'get' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ],
+                                ]
+                            ],
+                            'item' => [
+                                'type' => 'Segment',
+                                'options' => [
+                                    'route' => '/:id'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'delete' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'delete',
+                                            'defaults' => [
+                                                'action' => 'delete'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            'start' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/start'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'post' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'post',
+                                            'defaults' => [
+                                                'action' => 'start'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ]
+                        ]
+                    ],
                     'acl' => [
                         'type' => 'Literal',
                         'options' => [
