@@ -33,12 +33,6 @@ return [
             'pastTimeIndicator' => View\Helper\PastTimeIndicator::class,
             'img'               => View\Helper\Img::class,
             'count'             => View\Helper\Count::class,
-            View\Helper\FormElement::class => Form\View\Helper\FormElement::class,
-            'form_element'                 => Form\View\Helper\FormElement::class,
-            'formelement'                  => Form\View\Helper\FormElement::class,
-            'formElement'                  => Form\View\Helper\FormElement::class,
-            'FormElement'                  => Form\View\Helper\FormElement::class,
-            'formpicturemulticheckbox'     => Form\View\Helper\FormPictureMultiCheckbox::class,
             'favicons'                     => View\Helper\Favicons::class,
         ],
         'factories' => [

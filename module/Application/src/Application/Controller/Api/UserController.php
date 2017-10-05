@@ -8,6 +8,7 @@ use DateTimeZone;
 use Exception;
 use Imagick;
 
+use Zend\Authentication\AuthenticationService;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Permissions\Acl\Acl;
@@ -274,6 +275,37 @@ class UserController extends AbstractRestfulController
 
         if (array_key_exists('deleted', $values)) {
             $can = $this->user()->isAllowed('user', 'delete');
+
+            if (! $can) {
+                if (! isset($values['password_old'])) {
+                    return new ApiProblemResponse(
+                        new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                            'invalid_params' => [
+                                'password_old' => [
+                                    'invalid' => 'Old password is required'
+                                ]
+                            ]
+                        ])
+                    );
+                }
+
+                $correct = $this->userService->checkPassword($row['id'], $values['password_old']);
+
+                if (! $correct) {
+                    return new ApiProblemResponse(
+                        new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                            'invalid_params' => [
+                                'password_old' => [
+                                    'invalid' => $this->translate('account/access/self-delete/password-is-incorrect')
+                                ]
+                            ]
+                        ])
+                    );
+                }
+
+                $can = true;
+            }
+
             if (! $can) {
                 return $this->forbiddenAction();
             }
@@ -287,6 +319,12 @@ class UserController extends AbstractRestfulController
                 ), [
                     'users' => $row['id']
                 ]);
+            }
+
+            if ($user['id'] == $row['id']) { // self-delete
+                $auth = new AuthenticationService();
+                $auth->clearIdentity();
+                $this->userService->clearRememberCookie($this->language());
             }
         }
 
@@ -363,7 +401,7 @@ class UserController extends AbstractRestfulController
                 );
             }
 
-            $correct = $this->userService->checkPassword($user['id'], $values['password_old']);
+            $correct = $this->userService->checkPassword($row['id'], $values['password_old']);
 
             if (! $correct) {
                 return new ApiProblemResponse(
@@ -377,7 +415,7 @@ class UserController extends AbstractRestfulController
                 );
             }
 
-            $this->userService->setPassword($user, $values['password']);
+            $this->userService->setPassword($row, $values['password']);
         }
 
 

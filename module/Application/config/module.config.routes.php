@@ -66,15 +66,6 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes'  => [
-                    'delete' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route'    => '/delete',
-                            'defaults' => [
-                                'action' => 'delete',
-                            ],
-                        ],
-                    ],
                     'emailcheck' => [
                         'type' => Segment::class,
                         'options' => [
@@ -108,15 +99,6 @@ return [
                             'route'    => '/pictures',
                             'defaults' => [
                                 'action' => 'pictures',
-                            ],
-                        ],
-                    ],
-                    'remove-account' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route'    => '/remove-account/:service',
-                            'defaults' => [
-                                'action' => 'remove-account',
                             ],
                         ],
                     ],

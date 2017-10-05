@@ -182,7 +182,9 @@ class Comments
                 break;
 
             case self::FORUMS_TYPE_ID:
-                $url = $this->router->assemble([], [
+                $url = $this->router->assemble([
+                    'path' => ''
+                ], [
                     'name'            => 'ng',
                     'force_canonical' => $canonical,
                     'uri'             => $uri

@@ -3,7 +3,6 @@
 namespace Application\Controller;
 
 use Zend\Authentication\AuthenticationService;
-use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -11,7 +10,6 @@ use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
-use Autowp\User\Model\UserRename;
 
 use Application\Model\Item;
 use Application\Model\Picture;
@@ -26,16 +24,6 @@ class AccountController extends AbstractActionController
     private $service;
 
     /**
-     * @var Form
-     */
-    private $deleteUserForm;
-
-    /**
-     * @var array
-     */
-    private $hosts = [];
-
-    /**
      * @var SpecificationsService
      */
     private $specsService = null;
@@ -44,11 +32,6 @@ class AccountController extends AbstractActionController
      * @var MessageService
      */
     private $message;
-
-    /**
-     * @var UserRename
-     */
-    private $userRename;
 
     /**
      * @var Picture
@@ -72,11 +55,8 @@ class AccountController extends AbstractActionController
 
     public function __construct(
         UsersService $service,
-        Form $deleteUserForm,
-        array $hosts,
         SpecificationsService $specsService,
         MessageService $message,
-        UserRename $userRename,
         Picture $picture,
         Item $item,
         Forums $forums,
@@ -84,11 +64,8 @@ class AccountController extends AbstractActionController
     ) {
 
         $this->service = $service;
-        $this->deleteUserForm = $deleteUserForm;
-        $this->hosts = $hosts;
         $this->specsService = $specsService;
         $this->message = $message;
-        $this->userRename = $userRename;
         $this->picture = $picture;
         $this->item = $item;
         $this->forums = $forums;
@@ -185,51 +162,6 @@ class AccountController extends AbstractActionController
             'paginator'    => $paginator,
             'picturesData' => $picturesData,
             'sidebar'      => $this->sidebar()
-        ];
-    }
-
-    public function deleteAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $request = $this->getRequest();
-
-        $this->deleteUserForm->setAttribute('action', $this->url()->fromRoute('account/delete'));
-
-        if ($request->isPost()) {
-            $this->deleteUserForm->setData($this->params()->fromPost());
-            if ($this->deleteUserForm->isValid()) {
-                $values = $this->deleteUserForm->getData();
-
-                $user = $this->user()->get();
-
-                $valid = $this->service->checkPassword($user['id'], $values['password']);
-
-                if (! $valid) {
-                    $this->deleteUserForm->get('password')->setMessages([
-                        $this->translate('account/access/self-delete/password-is-incorrect')
-                    ]);
-                } else {
-                    $this->service->markDeleted($user['id']);
-
-                    $auth = new AuthenticationService();
-                    $auth->clearIdentity();
-                    $this->service->clearRememberCookie($this->language());
-
-                    $viewModel = new ViewModel();
-
-                    $viewModel->setTemplate('application/account/deleted');
-
-                    return $viewModel;
-                }
-            }
-        }
-
-        return [
-            'sidebar' => $this->sidebar(),
-            'form'    => $this->deleteUserForm
         ];
     }
 
