@@ -8,12 +8,11 @@ use Zend\Json\Json;
 
 use Autowp\User\Model\User;
 
-use Application\Controller\AccountController;
+use Application\Controller\Api\AttrController;
 use Application\Controller\Api\LoginController;
 use Application\Controller\Api\UserController;
 use Application\Controller\UsersController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Application\Controller\Api\AttrController;
 
 class AccountControllerTest extends AbstractHttpControllerTestCase
 {
