@@ -12,6 +12,7 @@ use Autowp\User\Model\User;
 return [
     'hydrators' => [
         'factories' => [
+            Hydrator\Api\AttrConflictHydrator::class     => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\CommentHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ForumThemeHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ForumTopicHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
@@ -38,6 +39,7 @@ return [
         'factories' => [
             Controller\Api\AccountController::class         => Controller\Api\AccountControllerFactory::class,
             Controller\Api\AclController::class             => Controller\Api\Service\AclControllerFactory::class,
+            Controller\Api\AttrController::class            => Controller\Api\AttrControllerFactory::class,
             Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
             Controller\Api\CommentController::class         => Controller\Api\CommentControllerFactory::class,
             Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
@@ -282,6 +284,36 @@ return [
                                     ],
                                 ]
                             ],
+                        ]
+                    ],
+                    'attr' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/attr',
+                            'defaults' => [
+                                'controller' => Controller\Api\AttrController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes'  => [
+                            'conflict' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/conflict'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'conflict-index',
+                                            ],
+                                        ],
+                                    ]
+                                ]
+                            ]
                         ]
                     ],
                     'chart' => [

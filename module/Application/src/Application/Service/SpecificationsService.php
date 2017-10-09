@@ -2650,42 +2650,6 @@ class SpecificationsService
 
         $conflicts = [];
         foreach ($paginator->getCurrentItems() as $valueRow) {
-            // other users values
-            $userValueRows = $this->userValueTable->select([
-                'attribute_id' => $valueRow['attribute_id'],
-                'item_id'      => $valueRow['item_id'],
-                'user_id != ?' => $userId
-            ]);
-
-            $values = [];
-            foreach ($userValueRows as $userValueRow) {
-                $values[] = [
-                    'value'  => $this->getUserValueText(
-                        $userValueRow['attribute_id'],
-                        $userValueRow['item_id'],
-                        $userValueRow['user_id'],
-                        $language
-                    ),
-                    'userId' => $userValueRow['user_id']
-                ];
-            }
-
-            // my value
-            $userValueRow = $this->userValueTable->select([
-                'attribute_id' => $valueRow['attribute_id'],
-                'item_id'      => $valueRow['item_id'],
-                'user_id'      => $userId
-            ])->current();
-            $value = null;
-            if ($userValueRow) {
-                $value = $this->getUserValueText(
-                    $userValueRow['attribute_id'],
-                    $userValueRow['item_id'],
-                    $userValueRow['user_id'],
-                    $language
-                );
-            }
-
             $attribute = $this->getAttribute($valueRow['attribute_id']);
 
             $unit = null;
@@ -2701,11 +2665,10 @@ class SpecificationsService
             } while ($cAttr);
 
             $conflicts[] = [
-                'itemId'     => $valueRow['item_id'],
-                'attribute'  => implode(' / ', array_reverse($attributeName)),
-                'unit'       => $unit,
-                'values'     => $values,
-                'value'      => $value
+                'attribute_id' => (int)$valueRow['attribute_id'],
+                'item_id'      => (int)$valueRow['item_id'],
+                'attribute'    => implode(' / ', array_reverse($attributeName)),
+                'unit'         => $unit
             ];
         }
 
@@ -2755,5 +2718,10 @@ class SpecificationsService
         }
 
         return $this->valueWeights[$userId];
+    }
+
+    public function getUserValueTable(): TableGateway
+    {
+        return $this->userValueTable;
     }
 }

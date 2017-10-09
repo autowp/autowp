@@ -10,6 +10,7 @@ import './email';
 import './inbox-pictures';
 import './messages';
 import './sidebar';
+import './specs-conflicts';
 import './profile';
 
 const CONTROLLER_NAME = 'AccountController';

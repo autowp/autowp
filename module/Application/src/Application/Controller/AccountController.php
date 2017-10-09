@@ -11,9 +11,7 @@ use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 
-use Application\Model\Item;
 use Application\Model\Picture;
-use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
 
 class AccountController extends AbstractActionController
@@ -24,11 +22,6 @@ class AccountController extends AbstractActionController
     private $service;
 
     /**
-     * @var SpecificationsService
-     */
-    private $specsService = null;
-
-    /**
      * @var MessageService
      */
     private $message;
@@ -37,11 +30,6 @@ class AccountController extends AbstractActionController
      * @var Picture
      */
     private $picture;
-
-    /**
-     * @var Item
-     */
-    private $item;
 
     /**
      * @var Forums
@@ -55,26 +43,17 @@ class AccountController extends AbstractActionController
 
     public function __construct(
         UsersService $service,
-        SpecificationsService $specsService,
         MessageService $message,
         Picture $picture,
-        Item $item,
         Forums $forums,
         User $userModel
     ) {
 
         $this->service = $service;
-        $this->specsService = $specsService;
         $this->message = $message;
         $this->picture = $picture;
-        $this->item = $item;
         $this->forums = $forums;
         $this->userModel = $userModel;
-    }
-
-    private function forwardToLogin()
-    {
-        return $this->redirect()->toUrl('/ng/login');
     }
 
     public function emailcheckAction()
@@ -110,46 +89,5 @@ class AccountController extends AbstractActionController
         }*/
 
         return $viewModel;
-    }
-
-    public function specsConflictsAction()
-    {
-        if (! $this->user()->logedIn()) {
-            return $this->forwardToLogin();
-        }
-
-        $filter = $this->params('conflict', '0');
-        $page = (int)$this->params('page');
-
-        $userId = $this->user()->get()['id'];
-
-        $language = $this->language();
-
-        $data = $this->specsService->getConflicts($userId, $filter, $page, 50, $language);
-        $conflicts = $data['conflicts'];
-        $paginator = $data['paginator'];
-
-        foreach ($conflicts as &$conflict) {
-            foreach ($conflict['values'] as &$value) {
-                $value['user'] = $this->userModel->getRow((int)$value['userId']);
-            }
-
-            $car = $this->item->getRow(['id' => $conflict['itemId']]);
-            $conflict['object'] = $car ? $this->car()->formatName($car, $language) : null;
-            $conflict['url'] = $this->url()->fromRoute('cars/params', [
-                'action'  => 'car-specifications-editor',
-                'item_id' => $conflict['itemId'],
-                'tab'     => 'spec'
-            ]);
-        }
-        unset($conflict);
-
-        return [
-            //'sidebar'   => $this->sidebar(),
-            'filter'    => (string)$filter,
-            'conflicts' => $conflicts,
-            'paginator' => $paginator,
-            'weight'    => $this->user()->get()['specs_weight']
-        ];
     }
 }

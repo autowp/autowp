@@ -88,8 +88,12 @@
                         <?php } else { ?>
                             <?=$this->escapeHtml($value['value'])?>
                         <?php } ?>
-                        <?=$this->user($value['user'])?>
-                        <span class="date">[<?=$this->escapeHtml($this->humanTime($value['date']))?>]</span>
+                        <?php if ($value['user']) { ?>
+                            <?=$this->user($value['user'])?>
+                        <?php } ?>
+                        <?php if ($value['date']) { ?>
+                            <span class="date">[<?=$this->escapeHtml($this->humanTime($value['date']))?>]</span>
+                        <?php } ?>
                         <br />
                     <?php } ?>
                 <?php } ?>

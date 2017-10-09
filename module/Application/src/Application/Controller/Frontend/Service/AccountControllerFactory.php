@@ -16,10 +16,8 @@ class AccountControllerFactory implements FactoryInterface
     {
         return new Controller(
             $container->get(\Application\Service\UsersService::class),
-            $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Application\Model\Picture::class),
-            $container->get(\Application\Model\Item::class),
             $container->get(\Autowp\Forums\Forums::class),
             $container->get(\Autowp\User\Model\User::class)
         );

@@ -188,6 +188,10 @@ class UserHydrator extends RestHydrator
             if ($isMe && $this->filterComposite->filter('votes_per_day')) {
                 $user['votes_per_day'] = (int)$object['votes_per_day'];
             }
+
+            if ($isMe && $this->filterComposite->filter('specs_weight')) {
+                $user['specs_weight'] = (float)$object['specs_weight'];
+            }
         }
 
         return $user;

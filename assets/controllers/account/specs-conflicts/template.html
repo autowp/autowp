@@ -1,0 +1,57 @@
+<p class="pull-right" ng-if="ctrl.weight !== null">
+    {{'account/specs/weight'|translate}}: {{ctrl.weight.toFixed(2)}}
+</p>
+
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <li ng-class="{active: ctrl.filter == '0'}">
+        <a ui-sref="account-specs-conflicts({filter: 0})" translate>account/specs/conflicts/filter/all</a>
+    </li>
+    <li ng-class="{active: ctrl.filter == '-1'}">
+        <a ui-sref="account-specs-conflicts({filter: -1})" translate>account/specs/conflicts/filter/i-disagree</a>
+    </li>
+    <li ng-class="{active: ctrl.filter == '1'}">
+        <a ui-sref="account-specs-conflicts({filter: 1})" translate>account/specs/conflicts/filter/do-not-agree-with-me</a>
+    </li>
+    <li ng-class="{active: ctrl.filter == 'minus-weight'}">
+        <a ui-sref="account-specs-conflicts({filter: 'minus-weight'})" translate>account/specs/conflicts/filter/errors</a>
+    </li>
+</ul>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th translate>account/specs/conflicts/title/object</th>
+            <th translate>account/specs/conflicts/title/parameter</th>
+            <th translate>account/specs/conflicts/title/my-value</th>
+            <th translate>account/specs/conflicts/title/other-values</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="conflict in ctrl.conflicts">
+            <td ng-bind="conflict.object"></td>
+            <td ng-bind="conflict.attribute"></td>
+            <td>
+                <div ng-repeat="value in conflict.values" ng-if="value.user_id == user.id">
+                    <em ng-if="value.value === null" translate>account/specs/conflicts/my-value/none</em>
+                    <span ng-if="value.value !== null">
+                        {{value.value}}
+                        <span ng-if="conflict.unit">{{conflict.unit.abbr | translate}}</span>
+                    </span>
+                    <a ng-href="{{conflict.url}}"><i class="fa fa-pencil"></i></a>
+                </div>
+            </td>
+            <td>
+                <div ng-repeat="value in conflict.values" ng-if="value.user_id != user.id">
+                    <em ng-if="value.value === null" translate>account/specs/conflicts/my-value/none</em>
+                    <span ng-if="value.value !== null">
+                        {{value.value}}
+                        <span ng-if="conflict.unit">{{conflict.unit.abbr | translate}}</span>
+                    </span>
+                    <autowp-user user="value.user"></autowp-user>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
