@@ -51,42 +51,6 @@ return [
                     ],
                 ],
             ],
-            'account' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/account',
-                    'defaults' => [
-                        'controller' => Controller\AccountController::class,
-                    ],
-                ],
-                'may_terminate' => false,
-                'child_routes'  => [
-                    'emailcheck' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route'    => '/emailcheck/:email_check_code',
-                            'defaults' => [
-                                'action' => 'emailcheck',
-                            ],
-                        ],
-                    ],
-                    'specs-conflicts' => [
-                        'type' => 'Literal',
-                        'options' => [
-                            'route'    => '/specs-conflicts',
-                            'defaults' => [
-                                'action' => 'specs-conflicts',
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
-                ]
-            ],
             'articles' => [
                 'type' => \Application\Router\Http\Articles::class,
                 'options' => [

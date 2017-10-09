@@ -1974,6 +1974,15 @@ return [
                                     ],
                                 ]
                             ],
+                            'emailcheck' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/emailcheck',
+                                    'defaults' => [
+                                        'action' => 'emailcheck',
+                                    ],
+                                ]
+                            ],
                         ]
                     ],
                     'spec' => [

@@ -19,6 +19,7 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\Commons\Db\Table\Row;
+use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
 
@@ -636,5 +637,31 @@ class UserController extends AbstractRestfulController
         }
 
         return $this->getResponse()->setStatusCode(201);
+    }
+
+    public function emailcheckAction()
+    {
+        $request = $this->getRequest();
+        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
+            $data = $this->jsonDecode($request->getContent());
+        } else {
+            $data = $request->getPost()->toArray();
+        }
+
+        $code = isset($data['code']) ? (string)$data['code'] : '';
+        $user = $this->userService->emailChangeFinish($code);
+
+        if (! $user) {
+            return new ApiProblemResponse(new ApiProblem(400, 'Code is invalid'));
+        }
+
+        if (! $this->user()->logedIn()) {
+            $adapter = new IdAuthAdapter($this->userModel);
+            $adapter->setIdentity($user['id']);
+            $auth = new AuthenticationService();
+            $auth->authenticate($adapter);
+        }
+
+        return $this->getResponse()->setStatusCode(200);
     }
 }

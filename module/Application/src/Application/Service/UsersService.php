@@ -227,8 +227,12 @@ class UsersService
      * @param string $code
      * @return boolean|array|\ArrayObject
      */
-    public function emailChangeFinish($code)
+    public function emailChangeFinish(string $code)
     {
+        if (! $code) {
+            return false;
+        }
+
         $user = $this->userModel->getTable()->select([
             'not deleted',
             'email_check_code' => (string)$code,
@@ -261,7 +265,7 @@ class UsersService
             $values = [
                 'email' => $user['email_to_check'],
                 'name'  => $user['name'],
-                'url'   => 'http://'.$hostname.'/account/emailcheck/' . $user['email_check_code']
+                'url'   => 'http://'.$hostname.'/ng/account/emailcheck/' . $user['email_check_code']
             ];
 
             $subject = $this->translator->translate('users/registration/email-confirm-subject');
@@ -298,7 +302,7 @@ class UsersService
             $values = [
                 'email' => $user['email_to_check'],
                 'name'  => $user['name'],
-                'url'   => 'http://'.$hostname.'/account/emailcheck/' . $user['email_check_code']
+                'url'   => 'http://'.$hostname.'/ng/account/emailcheck/' . $user['email_check_code']
             ];
 
             $subject = $this->translator->translate('users/change-email/confirm-subject');

@@ -13,6 +13,7 @@ use Application\Controller\Api\LoginController;
 use Application\Controller\Api\UserController;
 use Application\Controller\UsersController;
 use Application\Test\AbstractHttpControllerTestCase;
+use Application\Controller\Api\AttrController;
 
 class AccountControllerTest extends AbstractHttpControllerTestCase
 {
@@ -49,15 +50,17 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $mailTransport = $this->getApplicationServiceLocator()->get(\Zend\Mail\Transport\TransportInterface::class);
         $message = $mailTransport->getLastMessage();
 
-        preg_match('|http://en.localhost/account/emailcheck/[0-9a-f]+|u', $message->getBody(), $match);
+        preg_match('|http://en.localhost/ng/account/emailcheck/([0-9a-f]+)|u', $message->getBody(), $match);
 
         $this->reset();
-        $this->dispatch($match[0]);
+        $this->dispatch('http://en.localhost/api/user/emailcheck', Request::METHOD_POST, [
+            'code' => $match[1]
+        ]);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(AccountController::class);
-        $this->assertMatchedRouteName('account/emailcheck');
+        $this->assertControllerName(UserController::class);
+        $this->assertMatchedRouteName('api/user/emailcheck');
         $this->assertActionName('emailcheck');
     }
 
@@ -79,13 +82,13 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
     public function testSpecsConflicts()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/account/specs-conflicts', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/attr/conflict?filter=0', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(AccountController::class);
-        $this->assertMatchedRouteName('account/specs-conflicts');
-        $this->assertActionName('specs-conflicts');
+        $this->assertControllerName(AttrController::class);
+        $this->assertMatchedRouteName('api/attr/conflict/get');
+        $this->assertActionName('conflict-index');
     }
 
     public function testProfileRename()

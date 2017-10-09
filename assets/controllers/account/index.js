@@ -7,6 +7,7 @@ import './accounts';
 import './contacts';
 import './delete';
 import './email';
+import './emailcheck';
 import './inbox-pictures';
 import './messages';
 import './sidebar';
@@ -31,7 +32,6 @@ angular.module(Module)
     .controller(CONTROLLER_NAME, [
         '$state', 
         function($state) {
-            console.log('go');
             $state.go('account-profile');
         }
     ]);
