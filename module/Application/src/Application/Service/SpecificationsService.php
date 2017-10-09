@@ -2615,7 +2615,7 @@ class SpecificationsService
         }
     }
 
-    public function getConflicts(int $userId, $filter, int $page, int $perPage, string $language)
+    public function getConflicts(int $userId, $filter, int $page, int $perPage)
     {
         $userId = (int)$userId;
 

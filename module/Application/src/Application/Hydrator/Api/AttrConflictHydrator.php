@@ -99,7 +99,6 @@ class AttrConflictHydrator extends RestHydrator
 
         $item = $this->item->getRow(['id' => $object['item_id']]);
 
-        $itemName = null;
         if ($item) {
             $result['object'] = $this->itemNameFormatter->format(
                 $this->item->getNameData($item, $this->language),
