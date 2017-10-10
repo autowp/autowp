@@ -69,8 +69,6 @@ class AttrController extends AbstractRestfulController
 
         $values = $this->conflictListInputFilter->getValues();
 
-        $language = $this->language();
-
         $data = $this->specsService->getConflicts($user['id'], $values['filter'], (int)$values['page'], 30);
 
         $this->conflictHydrator->setOptions([
@@ -86,8 +84,7 @@ class AttrController extends AbstractRestfulController
 
         return new JsonModel([
             'items'     => $items,
-            'paginator' => $data['paginator']->getPages(),
-            //'weight'    => $this->user()->get()['specs_weight']
+            'paginator' => $data['paginator']->getPages()
         ]);
     }
 }
