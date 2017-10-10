@@ -13,16 +13,16 @@ angular.module(Module)
        
         this.getUser = function(id) {
             
-            if (cache[id]) {
-                resolve(cache[id]);
-                return;
-            }
-            
             if (promises[id]) {
                 return promises[id];
             }
             
             var promise = $q(function(resolve, reject) {
+                
+                if (cache[id]) {
+                    resolve(cache[id]);
+                    return;
+                }
                 
                 $http({
                     url: '/api/user/' + id,
