@@ -71,7 +71,7 @@ class AttrController extends AbstractRestfulController
 
         $language = $this->language();
 
-        $data = $this->specsService->getConflicts($user['id'], $values['filter'], (int)$values['page'], 1, $language);
+        $data = $this->specsService->getConflicts($user['id'], $values['filter'], (int)$values['page'], 30);
 
         $this->conflictHydrator->setOptions([
             'fields'   => $values['fields'],
