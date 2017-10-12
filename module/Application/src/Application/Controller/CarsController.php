@@ -23,11 +23,6 @@ use Application\Model\Picture;
 class CarsController extends AbstractActionController
 {
     /**
-     * @var Form
-     */
-    private $filterForm;
-
-    /**
      * @var HostManager
      */
     private $hostManager;
@@ -84,7 +79,6 @@ class CarsController extends AbstractActionController
 
     public function __construct(
         HostManager $hostManager,
-        Form $filterForm,
         SpecificationsService $specsService,
         MessageService $message,
         UserItemSubscribe $userItemSubscribe,
@@ -98,7 +92,6 @@ class CarsController extends AbstractActionController
     ) {
 
         $this->hostManager = $hostManager;
-        $this->filterForm = $filterForm;
         $this->specsService = $specsService;
         $this->message = $message;
         $this->userItemSubscribe = $userItemSubscribe;
@@ -457,117 +450,6 @@ class CarsController extends AbstractActionController
         $this->specsService->deleteUserValue((int)$this->params('attribute_id'), $itemId, $userId);
 
         return $this->redirect()->toUrl($request->getServer('HTTP_REFERER'));
-    }
-
-    public function attrsChangeLogAction()
-    {
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $this->filterForm->setAttribute('action', $this->url()->fromRoute('cars/params', [
-            'action' => 'attrs-change-log'
-        ], [], true));
-
-        if ($this->getRequest()->isPost()) {
-            $this->filterForm->setData($this->params()->fromPost());
-            if ($this->filterForm->isValid()) {
-                $values = $this->filterForm->getData();
-
-                return $this->redirect()->toRoute('cars/params', [
-                    'user_id' => $values['user_id'] ? $values['user_id'] : null,
-                    'page'    => null
-                ], [], true);
-            }
-        }
-
-        $language = $this->language();
-
-        $select = new Sql\Select($this->userValueTable->getTable());
-
-        $select->order('update_date DESC');
-
-        $this->filterForm->setData($this->params()->fromRoute());
-
-        if ($this->filterForm->isValid()) {
-            $values = $this->filterForm->getData();
-
-            if ($userId = $values['user_id']) {
-                $select->where(['user_id' => $userId]);
-            }
-        }
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new \Zend\Paginator\Adapter\DbSelect($select, $this->userValueTable->getAdapter())
-        );
-
-        $paginator
-            ->setItemCountPerPage(30)
-            ->setPageRange(20)
-            ->setCurrentPageNumber($this->params('page'));
-
-        $items = [];
-
-        $isModerator = $this->user()->inheritsRole('moder');
-
-        foreach ($paginator->getCurrentItems() as $row) {
-            $objectName = null;
-            $editorUrl = null;
-            $moderUrl = null;
-            $path = [];
-
-            $car = $this->itemModel->getRow(['id' => $row['item_id']]);
-            if ($car) {
-                $objectName = $this->car()->formatName($car, $this->language());
-                $editorUrl = $this->url()->fromRoute('cars/params', [
-                    'action'  => 'car-specifications-editor',
-                    'item_id' => $car['id']
-                ]);
-
-                if ($isModerator) {
-                    $moderUrl = '/ng/moder/items/item/' . $car['id'];
-                }
-            }
-
-            $attribute = $this->attributeTable->select(['id' => $row['attribute_id']])->current();
-            if ($attribute) {
-                $parents = [];
-                $parent = $attribute;
-                do {
-                    $parents[] = $parent['name'];
-                    $parent = $this->attributeTable->select(['id' => $parent['parent_id']])->current();
-                } while ($parent);
-
-                $path = array_reverse($parents);
-            }
-
-            $user = $this->userModel->getRow((int)$row['user_id']);
-
-            $items[] = [
-                'date'     => Row::getDateTimeByColumnType('timestamp', $row['update_date']),
-                'user'     => $user,
-                'object'   => [
-                    'name'      => $objectName,
-                    'editorUrl' => $editorUrl,
-                    'moderUrl'  => $moderUrl
-                ],
-                'path'     => $path,
-                'value'    => $this->specsService->getUserValueText(
-                    $attribute['id'],
-                    $row['item_id'],
-                    $user['id'],
-                    $language
-                ),
-                'unit'     => $this->specsService->getUnit($attribute['unit_id'])
-            ];
-        }
-
-        return [
-            'paginator'   => $paginator,
-            'filter'      => $this->filterForm,
-            'items'       => $items,
-            'isModerator' => $isModerator
-        ];
     }
 
     private function userUrl($user, $uri = null)

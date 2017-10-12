@@ -1,0 +1,1 @@
+import './attrs-change-log';

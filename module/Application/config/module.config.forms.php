@@ -11,26 +11,7 @@ return [
             'Year' => Form\Element\Year::class,
         ],
         'factories' => [
-            Form\Element\Year::class         => ElementFactory::class,
+            Form\Element\Year::class => ElementFactory::class,
         ]
-    ],
-    'forms' => [
-        'AttrsLogFilterForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type'    => 'Text',
-                        'name'    => 'user_id',
-                        'options' => [
-                            'label' => 'specifications-editor/log/filter/user-id'
-                        ]
-                    ]
-                ]
-            ]
-        ],
     ]
 ];

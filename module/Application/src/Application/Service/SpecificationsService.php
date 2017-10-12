@@ -2724,4 +2724,9 @@ class SpecificationsService
     {
         return $this->userValueTable;
     }
+
+    public function getAttributeTable(): TableGateway
+    {
+        return $this->attributeTable;
+    }
 }

@@ -17,7 +17,6 @@ class CarsControllerFactory implements FactoryInterface
         $tables = $container->get('TableManager');
         return new Controller(
             $container->get(\Application\HostManager::class),
-            $container->get('AttrsLogFilterForm'),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Application\Model\UserItemSubscribe::class),

@@ -195,33 +195,10 @@
     "page/210/name": "%ITEM_NAME%",
     "page/210/title": "%ITEM_NAME%",
     "page/210/breadcrumbs": "%ITEM_NAME%",
-    "_empty_": {
-        "plural_forms": "nplurals=3; plural=((n%10==1)&&(n%100!=11))?0:(((n%10>=2)&&(n%10<=4)&&((n%100<10)||(n%100>=20)))?1:2)"
-    },
     "test": "тест прошел успешно",
     "and": "и",
-    "%1$s pictures": [
-        "%1$s изображение",
-        "%1$s изображения",
-        "%1$s изображений"
-    ],
     "ng/%1$s-pictures": "{count, plural, one {{count} изображение} few {{count} изображения} many {{count} изображений} other {{count} изображений}}",
-    "%1$s items": [
-        "%1$s единица данных",
-        "%1$s единицы данных",
-        "%1$s единиц данных"
-    ],
     "ng/%1$s-items": "{count, plural, one {{count} единица данных} few {{count} единицы данных} many {{count} единиц данных} other {{count} единиц данных}}",
-    "%1$s vehicles": [
-        "%1$s автомобиль",
-        "%1$s автомобиля",
-        "%1$s автомобилей"
-    ],
-    "%1$s comments": [
-        "%1$s комментарий",
-        "%1$s комментария",
-        "%1$s комментариев"
-    ],
     "ng/%1$s-comments": "{count, plural, one {{count} комментарий} few {{count} комментария} many {{count} комментариев} other {{count} комментариев}}",
     "{count} messages": "{count, plural, one {{count} сообщение} few {{count} сообщения} many {{count} сообщений} other {{count} сообщений}}",
     "{topics} topics and {messages} messages": "{topics, plural, one {{topics} тема} few {{topics} темы} many {{topics} тем} other {{topics} тем}} и {messages, plural, one {{messages} сообщение} few {{messages} сообщения} many {{messages} сообщений} other {{messages} сообщений}}",
@@ -235,11 +212,6 @@
     "layout/meta/keywords": "car, vehicle, auto, avto, автомобиль",
     "layout/brand": "AutoWP.ru",
     "layout/personal-messages": "Личные сообщения",
-    "layout/you-have-%1$s-new-messages": [
-        "У вас %1$s новое сообщение",
-        "У вас %1$s новых сообщения",
-        "У вас %1$s новых сообщений"
-    ],
     "ng-layout/you-have-new-messages": "{messages, plural, one {У вас {messages} новое сообщение} few {У вас {messages} новых сообщения} many {У вас {messages} новых сообщений} other {У вас {messages} новых сообщений}}",
     "layout/search": "Поиск",
     "layout/footer": "Обращаем ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.\n\nАдминистрация сайта не располагает информацией о правомерности публикования этих материалов.\n\nВсе изображения размещены в ознакомительных целях.\n\n[Сообщить о нарушении авторских прав](mailto:autowp@yandex.ru)",
@@ -257,11 +229,6 @@
     "Nm": "Нм",
     "kW": "КВт",
     "hp": "л.с.",
-    "spec/%1$s-gear": [
-        "%1$s передача",
-        "%1$s передачи",
-        "%1$s передач"
-    ],
     "next": "следующая",
     "previous": "предыдущая",
     "index/brands": "Компании",
@@ -285,11 +252,6 @@
     "All new pictures": "все новые картинки",
     "all-link": "все",
     "brands/new-cars-of-brand": "Новые автомобили %s",
-    "brands/more-companies": [
-        "ещё %s компания",
-        "ещё %s компании",
-        "ещё %s компаний"
-    ],
     "brands/pictures:": "изображений: ",
     "item/type/1/name": "ТС",
     "item/type/1/name-plural": "ТС",
@@ -347,16 +309,6 @@
     "picturelist/engine-%s": "Двигатель %s",
     "picturelist/factory": "Завод",
     "present-time-abbr": "н.в.",
-    "category/%s cars": [
-        "%s автомобиль",
-        "%s автомобиля",
-        "%s автомобилей"
-    ],
-    "category/%s new cars": [
-        "%s новый",
-        "%s новых",
-        "%s новых"
-    ],
     "most/fastest": "быстрые",
     "most/fastest/param": "максимальная скорость",
     "most/slowest": "медленные",

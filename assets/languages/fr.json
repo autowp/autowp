@@ -195,9 +195,6 @@
     "page/210/name": "%ITEM_NAME%",
     "page/210/title": "%ITEM_NAME%",
     "page/210/breadcrumbs": "%ITEM_NAME%",
-    "_empty_": {
-        "plural_forms": "nplurals=2; plural=((n==0)||(n==1))?0:1"
-    },
     "test": "test est ok",
     "and": "et",
     "%1$s pictures": [

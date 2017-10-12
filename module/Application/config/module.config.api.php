@@ -12,27 +12,28 @@ use Autowp\User\Model\User;
 return [
     'hydrators' => [
         'factories' => [
-            Hydrator\Api\AttrConflictHydrator::class     => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\CommentHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ForumThemeHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ForumTopicHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\IpHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemHydrator::class             => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemLanguageHydrator::class     => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemLinkHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemParentHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\AttrConflictHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\CommentHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ForumThemeHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ForumTopicHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\IpHydrator::class                 => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemLanguageHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemLinkHydrator::class           => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\ItemParentHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemParentLanguageHydrator::class => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\LogHydrator::class              => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\MessageHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PerspectiveHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PerspectiveGroupHydrator::class => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PerspectivePageHydrator::class  => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PictureHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\PictureItemHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\TrafficHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\SimilarHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\UserHydrator::class             => Hydrator\Api\RestHydratorFactory::class
+            Hydrator\Api\LogHydrator::class                => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\MessageHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PerspectiveHydrator::class        => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PerspectiveGroupHydrator::class   => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PerspectivePageHydrator::class    => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PictureHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\PictureItemHydrator::class        => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\TrafficHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\SimilarHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\UserHydrator::class               => Hydrator\Api\RestHydratorFactory::class
         ]
     ],
     'controllers' => [
@@ -309,6 +310,24 @@ return [
                                             'verb'    => 'get',
                                             'defaults' => [
                                                 'action' => 'conflict-index',
+                                            ],
+                                        ],
+                                    ]
+                                ]
+                            ],
+                            'user-value' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/user-value'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'user-value-index',
                                             ],
                                         ],
                                     ]

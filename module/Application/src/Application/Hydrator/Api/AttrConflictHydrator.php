@@ -115,7 +115,6 @@ class AttrConflictHydrator extends RestHydrator
         ]);
 
         if ($this->filterComposite->filter('values')) {
-
             $userValueTable = $this->specService->getUserValueTable();
 
             // other users values

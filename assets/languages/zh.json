@@ -195,24 +195,9 @@
     "page/210/name": "%ITEM_NAME%",
     "page/210/title": "%ITEM_NAME%",
     "page/210/breadcrumbs": "%ITEM_NAME%",
-    "_empty_": {
-        "plural_forms": "nplurals=1; plural=0"
-    },
     "test": "测试是确定",
     "and": "还有",
-    "%1$s pictures": [
-        "%1$s 张图片"
-    ],
     "ng/%1$s-pictures": "{count, plural, other {{count} 张图片}}",
-    "%1$s items": [
-        "%1$s items"
-    ],
-    "%1$s vehicles": [
-        "%1$s 款车型"
-    ],
-    "%1$s comments": [
-        "%1$s 个评论"
-    ],
     "ng/%1$s-comments": "{count, plural, other {{count} 个评论}}",
     "{count} messages": "{count, plural, other {{count} 个站内信}}",
     "{topics} topics and {messages} messages": "{topics} 个主题}, {messages} 个站内信",
@@ -226,9 +211,6 @@
     "layout/meta/keywords": "汽车",
     "layout/brand": "WheelsAge.org",
     "layout/personal-messages": "站内信",
-    "layout/you-have-%1$s-new-messages": [
-        "你有-%1$s-条未读站内信"
-    ],
     "ng-layout/you-have-new-messages": "{messages, plural, other {你有-{messages}-条未读站内信}}",
     "layout/search": "搜索",
     "layout/footer": "请知悉，autowp服务器中全部素材都是由浏览者添加的。\n\n站长没有这些素材的相关法律信息。\n\n所有图片仅用于传播知识。\n\n[举报侵权行为](mailto:autowp@yandex.ru)",
@@ -246,9 +228,6 @@
     "Nm": "Nm",
     "kW": "kW",
     "hp": "hp",
-    "spec/%1$s-gear": [
-        "%1$s档"
-    ],
     "next": "下一页",
     "previous": "上一页",
     "index/brands": "品牌",
@@ -272,9 +251,6 @@
     "All new pictures": "全部新图片",
     "all-link": "查看全部",
     "brands/new-cars-of-brand": "新品牌%s",
-    "brands/more-companies": [
-        "全部%s个品牌"
-    ],
     "brands/pictures:": "图片: ",
     "item/type/1/name": "车辆",
     "item/type/1/name-plural": "车辆",
@@ -332,12 +308,6 @@
     "picturelist/engine-%s": "%s 发动机",
     "picturelist/factory": "工厂",
     "present-time-abbr": "至今",
-    "category/%s cars": [
-        "共 %s 辆车"
-    ],
-    "category/%s new cars": [
-        "共 %s 辆新车"
-    ],
     "most/fastest": "极速最高",
     "most/fastest/param": "最高时速",
     "most/slowest": "极速最低",

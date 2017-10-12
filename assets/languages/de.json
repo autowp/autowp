@@ -195,29 +195,10 @@
     "page/210/name": "%ITEM_NAME%",
     "page/210/title": "%ITEM_NAME%",
     "page/210/breadcrumbs": "%ITEM_NAME%",
-    "_empty_": {
-        "plural_forms": "nplurals=2; plural=(n==1)?0:1"
-    },
     "test": "test ist ok",
     "and": "and",
-    "%1$s pictures": [
-        "%1$s picture",
-        "%1$s pictures"
-    ],
     "ng/%1$s-pictures": "{count, plural, one {{count} picure} other {{count} pictures}}",
-    "%1$s items": [
-        "%1$s item",
-        "%1$s items"
-    ],
     "ng/%1$s-items": "{count, plural, one {{count} item} {{count} items}}",
-    "%1$s vehicles": [
-        "%1$s vehicle",
-        "%1$s vehicles"
-    ],
-    "%1$s comments": [
-        "%1$s comment",
-        "%1$s comments"
-    ],
     "ng/%1$s-comments": "{count, plural, one {{count} comment} other {{count} comments}}",
     "{count} messages": "{count, plural, one {{count} message} other {{count} messages}}",
     "{topics} topics and {messages} messages": "{topics, plural, one {{topics} topic} other {{topics} topics}} and {messages, plural, one {{messages} message} other {{messages} messages}}",
@@ -231,10 +212,6 @@
     "layout/meta/keywords": "car, vehicle, auto, avto",
     "layout/brand": "WheelsAge.org",
     "layout/personal-messages": "Personal messages",
-    "layout/you-have-%1$s-new-messages": [
-        "You have %1$s new message",
-        "You have %1$s new messages"
-    ],
     "ng-layout/you-have-new-messages": "{messages, plural, one {You have {messages} new message} other {You have {messages} new messages}}",
     "layout/search": "Search",
     "layout/footer": "Please note that all material on this server autowp.ru, added visitors.\n\nThe site administration does not have information on the legality of the publication of these materials.\n\nAll images are posted for educational purposes.\n\n[Report copyright violation](mailto:autowp@yandex.ru)",
@@ -252,10 +229,6 @@
     "Nm": "Nm",
     "kW": "kW",
     "hp": "hp",
-    "spec/%1$s-gear": [
-        "%1$s gear",
-        "%1$s gears"
-    ],
     "next": "next",
     "previous": "previous",
     "index/brands": "Brands",
@@ -279,10 +252,6 @@
     "All new pictures": "All new pictures",
     "all-link": "all",
     "brands/new-cars-of-brand": "New %s cars",
-    "brands/more-companies": [
-        "more %s company",
-        "more %s companies"
-    ],
     "brands/pictures:": "pictures: ",
     "item/type/1/name": "Vehicle",
     "item/type/1/name-plural": "Vehicles",
@@ -340,14 +309,6 @@
     "picturelist/engine-%s": "%s engine",
     "picturelist/factory": "Factory",
     "present-time-abbr": "pr.",
-    "category/%s cars": [
-        "%s car",
-        "%s cars"
-    ],
-    "category/%s new cars": [
-        "%s new",
-        "%s new"
-    ],
     "most/fastest": "fastest",
     "most/fastest/param": "max speed",
     "most/slowest": "slowest",

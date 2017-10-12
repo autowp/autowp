@@ -19,7 +19,9 @@ class AttrControllerFactory implements FactoryInterface
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Autowp\User\Model\User::class),
             $hydrators->get(\Application\Hydrator\Api\AttrConflictHydrator::class),
-            $filters->get('api_attr_conflict_get')
+            $hydrators->get(\Application\Hydrator\Api\AttrUserValueHydrator::class),
+            $filters->get('api_attr_conflict_get'),
+            $filters->get('api_attr_user_value_get')
         );
     }
 }
