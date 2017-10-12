@@ -78,7 +78,7 @@ angular.module(Module)
                         },
                         {
                             pageId: 188,
-                            url: '/account/specs-conflicts',
+                            url: $state.href('account-specs-conflicts', {}, {inherit: false}),
                             icon: 'exclamation-triangle',
                             name: 'page/188/name'
                         },
