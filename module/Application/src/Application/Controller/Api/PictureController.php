@@ -324,23 +324,23 @@ class PictureController extends AbstractRestfulController
             $filter['order'] = $orders[1];
         }
 
-        if ($isModer) {
-            if (strlen($data['status'])) {
-                switch ($data['status']) {
-                    case Picture::STATUS_INBOX:
-                    case Picture::STATUS_ACCEPTED:
-                    case Picture::STATUS_REMOVING:
-                        $filter['status'] = $data['status'];
-                        break;
-                    case 'custom1':
-                        $filter['status'] = [
-                            Picture::STATUS_INBOX,
-                            Picture::STATUS_ACCEPTED
-                        ];
-                        break;
-                }
+        if (strlen($data['status'])) {
+            switch ($data['status']) {
+                case Picture::STATUS_INBOX:
+                case Picture::STATUS_ACCEPTED:
+                case Picture::STATUS_REMOVING:
+                    $filter['status'] = $data['status'];
+                    break;
+                case 'custom1':
+                    $filter['status'] = [
+                    Picture::STATUS_INBOX,
+                    Picture::STATUS_ACCEPTED
+                    ];
+                    break;
             }
+        }
 
+        if ($isModer) {
             if ($data['exact_item_id']) {
                 $filter['item']['id'] = $data['exact_item_id'];
             }
