@@ -35,7 +35,6 @@ angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angular
             $translateProvider.useSanitizeValueStrategy('escape');
             $translateProvider.translations('en', require('./languages/en.json'));
             $translateProvider.translations('zh', require('./languages/zh.json'));
-            $translateProvider.translations('de', require('./languages/de.json'));
             $translateProvider.translations('ru', require('./languages/ru.json'));
             $translateProvider.translations('fr', require('./languages/fr.json'));
             
@@ -53,8 +52,7 @@ angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angular
             ru: 'ru',
             en: 'en',
             fr: 'fr',
-            zh: 'zh-cn',
-            de: 'de'
+            zh: 'zh-cn'
         };
         amMoment.changeLocale(map[lang]);
     }])

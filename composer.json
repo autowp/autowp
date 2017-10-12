@@ -54,7 +54,8 @@
 		"zendframework/zend-filter" : ">=2.7.2",
 		"zendframework/zend-inputfilter" : ">=2.7.4",
 		"league/oauth1-client": "^1.7",
-		"google/recaptcha": "^1.1"
+		"google/recaptcha": "^1.1",
+		"onesky/api-library-php5": "^1.0"
 	},
 	"autoload" : {
 		"psr-4" : {

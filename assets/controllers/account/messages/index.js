@@ -33,19 +33,24 @@ angular.module(Module)
             
             ctrl.folder = $state.params.folder || 'inbox';
             var pageId = null;
+            var pageName = null;
             var userId = null;
             switch (ctrl.folder) {
                 case 'inbox':
                     pageId = 128;
+                    pageName = 'page/128/name';
                     break;
                 case 'sent':
                     pageId = 80;
+                    pageName = 'page/80/name';
                     break;
                 case 'system':
                     pageId = 81;
+                    pageName = 'page/81/name';
                     break;
                 case 'dialog':
                     pageId = 49;
+                    pageName = 'page/49/name';
                     userId = $state.params.user_id;
                     break;
             }
@@ -55,6 +60,7 @@ angular.module(Module)
                     blankPage: false,
                     needRight: false
                 },
+                name: pageName,
                 pageId: pageId
             });
             

@@ -111,6 +111,8 @@ RUN chmod +x zf && \
     crontab ./crontab && \
     go build -o ./goautowp/goautowp ./goautowp/
 
+RUN ./zf oneskyapp download
+
 RUN ./node_modules/.bin/webpack -p
 
 RUN rm -rf ./node_modules/ \

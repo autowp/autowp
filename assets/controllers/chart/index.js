@@ -30,6 +30,8 @@ angular.module(Module)
                     blankPage: false,
                     needRight: false
                 },
+                name: 'page/1/name',
+                title: 'page/1/title',
                 pageId: 1
             });
             

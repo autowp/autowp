@@ -97,6 +97,11 @@ return [
             ],
             [
                 'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
+                'base_dir' => __DIR__ . '/../language/plural',
+                'pattern'  => '%s.php'
+            ],
+            [
+                'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
                 'base_dir' => \Zend\I18n\Translator\Resources::getBasePath(),
                 'pattern'  => \Zend\I18n\Translator\Resources::getPatternForValidator()
             ],
@@ -339,5 +344,11 @@ return [
     'recaptcha' => [
         'publicKey'  => getenv('AUTOWP_RECAPTCHA_PUBLICKEY'),
         'privateKey' => getenv('AUTOWP_RECAPTCHA_PRIVATEKEY')
+    ],
+
+    'oneskyapp' => [
+        'api_key'    => '2a1C12oZU5VIK409AJd0xUfVntGyhLWa',
+        'api_secret' => 'ne5DK1aV71R5YPjryFTdAXRpyCoUkXey',
+        'project_id' => 129670,
     ]
 ];

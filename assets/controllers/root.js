@@ -41,8 +41,15 @@ angular.module(Module).controller(CONTROLLER_NAME, [
             PageService.setCurrent(data.pageId, preparedNameArgs);
             
             if (data.pageId) {
-                var nameKey = 'page/' + data.pageId + '/name';
-                var titleKey = 'page/' + data.pageId + '/title';
+                var nameKey;
+                var titleKey;
+                if (data.name) {
+                    nameKey = data.name;
+                    titleKey = data.title ? data.title : data.name;
+                } else {
+                    nameKey = 'page/' + data.pageId + '/name';
+                    titleKey = 'page/' + data.pageId + '/title';
+                }
                 $translate([nameKey, titleKey]).then(function (translations) {
                     var name = replaceArgs(translations[nameKey], preparedNameArgs);
                     var title = replaceArgs(translations[titleKey], preparedNameArgs);
