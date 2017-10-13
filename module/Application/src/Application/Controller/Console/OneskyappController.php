@@ -41,11 +41,15 @@ class OneskyappController extends AbstractActionController
                 'source_file_name' => 'frontend.json'
             ]);
 
+            $data = Json::decode($response, Json::TYPE_ARRAY);
+
+            $content = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
             $filepath = $fronendDir . '/' . $language . '.json';
 
             print $filepath . "\n";
 
-            file_put_contents($filepath, $response);
+            file_put_contents($filepath, $content);
         }
 
         $backendDir = realpath(__DIR__ . '/../../../../language');
