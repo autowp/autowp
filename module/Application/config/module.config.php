@@ -242,7 +242,7 @@ return [
 
     'pictures_hostname' => getenv('AUTOWP_PICTURES_HOST'),
 
-    'content_languages' => ['ru', 'en', 'it', 'fr', 'zh', 'de', 'es', 'pt'],
+    'content_languages' => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es'],
 
     /*'acl' => [
         'cache'         => 'long',
@@ -348,7 +348,7 @@ return [
 
     'oneskyapp' => [
         'api_key'    => '2a1C12oZU5VIK409AJd0xUfVntGyhLWa',
-        'api_secret' => 'ne5DK1aV71R5YPjryFTdAXRpyCoUkXey',
+        'api_secret' => '',
         'project_id' => 129670,
     ]
 ];
