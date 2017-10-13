@@ -1603,7 +1603,7 @@ CREATE TABLE `language` (
 --
 
 /*!40000 ALTER TABLE `language` DISABLE KEYS */;
-INSERT INTO `language` (`code`) VALUES ('de'),('en'),('es'),('fr'),('it'),('pt'),('ru'),('zh'),('xx');
+INSERT IGNORE INTO `language` (`code`) VALUES ('de'),('en'),('es'),('fr'),('it'),('pt'),('ru'),('zh'),('uk'),('be'),('xx');
 /*!40000 ALTER TABLE `language` ENABLE KEYS */;
 
 --
