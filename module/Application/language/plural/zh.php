@@ -7,12 +7,6 @@ return [
     '%1$s pictures'       => [
         '%1$s 张图片',
     ],
-    '%1$s items'      => [
-        '%1$s items'
-    ],
-    '%1$s vehicles'      => [
-        '%1$s 款车型',
-    ],
     '%1$s comments'      => [
         '%1$s 个评论',
     ],
@@ -37,5 +31,4 @@ return [
     'category/%s new cars'    => [
         '共 %s 辆新车'
     ],
-
 ];

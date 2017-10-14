@@ -48,6 +48,7 @@ return [
             Controller\Api\FeedbackController::class        => Controller\Api\FeedbackControllerFactory::class,
             Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
             Controller\Api\HotlinksController::class        => InvokableFactory::class,
+            Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
             Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class            => Controller\Api\Service\ItemControllerFactory::class,
             Controller\Api\ItemLanguageController::class    => Controller\Api\ItemLanguageControllerFactory::class,
@@ -728,6 +729,27 @@ return [
                                             ],
                                         ]
                                     ],
+                                ]
+                            ],
+                        ]
+                    ],
+                    'inbox' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route' => '/inbox',
+                            'defaults' => [
+                                'controller' => Controller\Api\InboxController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'get' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
                                 ]
                             ],
                         ]

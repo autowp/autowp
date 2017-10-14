@@ -48,7 +48,7 @@ return [
             Controller\DonateController::class          => Controller\Frontend\Service\DonateControllerFactory::class,
             Controller\FactoriesController::class       => Controller\Frontend\Service\FactoriesControllerFactory::class,
             Controller\IndexController::class           => Controller\Frontend\Service\IndexControllerFactory::class,
-            Controller\InboxController::class           => Controller\Frontend\Service\InboxControllerFactory::class,
+            Controller\InboxController::class           => InvokableFactory::class,
             Controller\InfoController::class            => Controller\Frontend\Service\InfoControllerFactory::class,
             Controller\MostsController::class           => Controller\Frontend\Service\MostsControllerFactory::class,
             Controller\NewController::class             => Controller\Frontend\Service\NewControllerFactory::class,
@@ -348,7 +348,7 @@ return [
 
     'oneskyapp' => [
         'api_key'    => '2a1C12oZU5VIK409AJd0xUfVntGyhLWa',
-        'api_secret' => '',
+        'api_secret' => 'a8Aq1BqybKSHZIIkDuhcQRGdrYpHrB4r',
         'project_id' => 129670,
     ]
 ];

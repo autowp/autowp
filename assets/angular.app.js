@@ -20,6 +20,7 @@ import './controllers/cars';
 import './controllers/chart';
 import './controllers/feedback';
 import './controllers/forums';
+import './controllers/inbox';
 import './controllers/log';
 import './controllers/login';
 import './controllers/map';

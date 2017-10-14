@@ -1,11 +1,9 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
-use Application\Controller\InboxController as Controller;
 
 class InboxControllerFactory implements FactoryInterface
 {
@@ -14,9 +12,11 @@ class InboxControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Controller(
+        $filters = $container->get('InputFilterManager');
+        return new InboxController(
             $container->get(\Application\Model\Picture::class),
-            $container->get(\Application\Model\Brand::class)
+            $container->get(\Application\Model\Brand::class),
+            $filters->get('api_inbox_get')
         );
     }
 }

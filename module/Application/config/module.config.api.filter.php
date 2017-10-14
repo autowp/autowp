@@ -684,6 +684,37 @@ return [
                 ]
             ],
         ],
+        'api_inbox_get' => [
+            'brand_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => 'Digits']
+                ]
+            ],
+            'date' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'page' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
+        ],
         'api_ip_item' => [
             'fields' => [
                 'required' => false,
@@ -1855,6 +1886,20 @@ return [
             ],
             'similar' => [
                 'required' => false
+            ],
+            'add_date' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'Date',
+                        'options' => [
+                            'format' => 'Y-m-d'
+                        ]
+                    ]
+                ]
             ]
         ],
         'api_picture_list_public' => [
@@ -1928,6 +1973,20 @@ return [
                 'filters' => [
                     ['name' => 'Digits']
                 ],
+            ],
+            'add_date' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'Date',
+                        'options' => [
+                            'format' => 'Y-m-d'
+                        ]
+                    ]
+                ]
             ]
         ],
         'api_picture_edit' => [

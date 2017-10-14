@@ -1,4 +1,5 @@
 {
+    "inbox/all-brands": "All brands",
     "page/18/name": "%PICTURE_NAME%",
     "page/23/name": "%CATEGORY_NAME%",
     "page/26/name": "%TWINS_GROUP_NAME%",
@@ -864,7 +865,6 @@
     "page/73/title": "Images",
     "page/74/title": "Voitures par ordre alphabétique",
     "page/75/title": "Le journal des événements",
-    "page/76/title": "Attendre la modération",
     "page/79/title": "Entrée",
     "page/83/title": "Déplacer",
     "page/86/title": "Image téléchargée avec succès sur le site",
@@ -928,7 +928,6 @@
     "page/66/breadcrumbs": "Toutes les images",
     "page/74/breadcrumbs": "Voitures par ordre alphabétique",
     "page/75/breadcrumbs": "Le journal des événements",
-    "page/76/breadcrumbs": "Attendre la modération",
     "page/83/breadcrumbs": "Déplacer",
     "page/86/breadcrumbs": "Succès",
     "page/102/breadcrumbs": "Spécifications éditeur",

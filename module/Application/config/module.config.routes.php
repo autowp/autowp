@@ -370,7 +370,7 @@ return [
                     ],
                 ]
             ],
-            'inbox' => [
+            'inbox' => [ // TODO: delete
                 'type'    => 'Segment',
                 'options' => [
                     'route' => '/inbox[/:brand][/:date][/page:page][/]',

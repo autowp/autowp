@@ -2,6 +2,9 @@
 
 namespace Application\Model;
 
+use DateTime;
+use DateTimeZone;
+
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Math\Rand;
@@ -338,6 +341,8 @@ class Picture
             'modification'     => null,
             'log'              => null,
             'group'            => [],
+            'add_date'         => null,
+            'timezone'         => null,
         ];
         $options = array_replace($defaults, $options);
 
@@ -384,6 +389,34 @@ class Picture
             } else {
                 $select->where(['pictures.id != ?' => $value]);
             }
+        }
+
+        if ($options['add_date']) {
+
+            if (! isset($options['timezone'])) {
+                throw new Exception("Timezone not provided");
+            }
+
+            $timezone = new DateTimeZone($options['timezone']);
+            $dbTimezine = new DateTimeZone(MYSQL_TIMEZONE);
+
+            $date = DateTime::createFromFormat('Y-m-d', $options['add_date'], $timezone);
+
+            $start = clone $date;
+            $start->setTime(0, 0, 0);
+            $start->setTimezone($dbTimezine);
+
+            $end = clone $date;
+            $end->setTime(23, 59, 59);
+            $end->setTimezone($dbTimezine);
+
+            $select->where([
+                new Sql\Predicate\Between(
+                    'pictures.add_date',
+                    $start->format(MYSQL_DATETIME_FORMAT),
+                    $end->format(MYSQL_DATETIME_FORMAT)
+                )
+            ]);
         }
 
         if ($options['status'] !== null) {

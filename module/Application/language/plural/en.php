@@ -8,14 +8,6 @@ return [
         '%1$s picture',
         '%1$s pictures',
     ],
-    '%1$s items'      => [
-        '%1$s item',
-        '%1$s items',
-    ],
-    '%1$s vehicles'      => [
-        '%1$s vehicle',
-        '%1$s vehicles',
-    ],
     '%1$s comments'      => [
         '%1$s comment',
         '%1$s comments',

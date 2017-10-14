@@ -4,7 +4,7 @@ namespace ApplicationTest\Frontend\Controller;
 
 use Application\Test\AbstractHttpControllerTestCase;
 
-use Application\Controller\InboxController;
+use Application\Controller\Api\InboxController;
 
 class InboxControllerTest extends AbstractHttpControllerTestCase
 {
@@ -12,12 +12,12 @@ class InboxControllerTest extends AbstractHttpControllerTestCase
 
     public function testIndex()
     {
-        $this->dispatch('https://www.autowp.ru/inbox', 'GET');
+        $this->dispatch('https://www.autowp.ru/api/inbox', 'GET');
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(InboxController::class);
-        $this->assertMatchedRouteName('inbox');
+        $this->assertMatchedRouteName('api/inbox/get');
         $this->assertActionName('index');
     }
 }

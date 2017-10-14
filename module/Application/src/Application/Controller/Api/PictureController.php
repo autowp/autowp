@@ -268,8 +268,20 @@ class PictureController extends AbstractRestfulController
 
         $data = $inputFilter->getValues();
 
+        if ($data['status'] == 'inbox' && ! $user) {
+            return new ApiProblemResponse(
+                new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                    'invalid_params' => [
+                        'item_id' => [
+                            'invalid' => 'inbox not allowed anonymously'
+                        ]
+                    ]
+                ])
+            );
+        }
+
         if (! $isModer) {
-            if (! $data['item_id'] && ! $data['owner_id']) {
+            if (! $data['item_id'] && ! $data['owner_id'] && $data['status'] != 'inbox') {
                 return new ApiProblemResponse(
                     new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
                         'invalid_params' => [
@@ -282,7 +294,9 @@ class PictureController extends AbstractRestfulController
             }
         }
 
-        $filter = [];
+        $filter = [
+            'timezone' => $this->user()->timezone()
+        ];
 
         if ($data['item_id']) {
             $filter['item']['ancestor_or_self'] = $data['item_id'];
@@ -338,6 +352,10 @@ class PictureController extends AbstractRestfulController
                     ];
                     break;
             }
+        }
+
+        if (strlen($data['add_date'])) {
+            $filter['add_date'] = $data['add_date'];
         }
 
         if ($isModer) {
