@@ -347,7 +347,7 @@ return [
 
     'oneskyapp' => [
         'api_key'    => '2a1C12oZU5VIK409AJd0xUfVntGyhLWa',
-        'api_secret' => 'a8Aq1BqybKSHZIIkDuhcQRGdrYpHrB4r',
+        'api_secret' => '',
         'project_id' => 129670,
     ]
 ];

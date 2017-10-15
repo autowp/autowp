@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Api;
 
-use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Paginator;

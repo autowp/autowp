@@ -94,6 +94,8 @@ class PictureItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        $user = $this->user()->get();
+
         $this->listInputFilter->setData($this->params()->fromQuery());
 
         if (! $this->listInputFilter->isValid()) {
@@ -138,7 +140,7 @@ class PictureItemController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
-            //'user_id' => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null
         ]);
 
         $items = [];
