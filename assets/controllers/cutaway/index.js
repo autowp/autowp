@@ -59,7 +59,7 @@ angular.module(Module)
                 params: {
                     status: 'accepted',
                     fields: 'owner,thumbnail,votes,views,comments_count,name_html,name_text',
-                    limit: 16,
+                    limit: 18,
                     page: $state.params.page,
                     perspective_id: 9,
                     order: 15

@@ -122,7 +122,7 @@ angular.module(Module)
                     params: {
                         status: 'inbox',
                         fields: 'owner,thumbnail,votes,views,comments_count,name_html,name_text',
-                        limit: 16,
+                        limit: 18,
                         page: $state.params.page,
                         item_id: ctrl.brand_id,
                         add_date: ctrl.current.date,
