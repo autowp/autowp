@@ -2049,6 +2049,9 @@ return [
                     ]
                 ]
             ],
+            'perspective_id' => [
+                'required' => false
+            ],
         ],
         'api_picture_edit' => [
             'status' => [

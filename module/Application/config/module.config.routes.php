@@ -185,42 +185,6 @@ return [
                     ]
                 ]
             ],
-            'cutaway' => [
-                'type' => 'Segment',
-                'options' => [
-                    'route'    => '/cutaway[/page:page]',
-                    'defaults' => [
-                        'controller'  => Controller\PerspectiveController::class,
-                        'action'      => 'index',
-                        'perspective' => 9,
-                        'page_id'     => 109
-                    ],
-                ]
-            ],
-            'mascots' => [
-                'type' => 'Segment',
-                'options' => [
-                    'route'    => '/mascots[/page:page]',
-                    'defaults' => [
-                        'controller'  => Controller\PerspectiveController::class,
-                        'action'      => 'index',
-                        'perspective' => 23,
-                        'page_id'     => 201
-                    ],
-                ]
-            ],
-            'top-view' => [
-                'type' => 'Segment',
-                'options' => [
-                    'route'    => '/top-view[/page:page]',
-                    'defaults' => [
-                        'controller'  => Controller\PerspectiveController::class,
-                        'action'      => 'index',
-                        'perspective' => 18,
-                        'page_id'     => 201
-                    ],
-                ]
-            ],
             'donate' => [
                 'type' => 'Literal',
                 'options' => [

@@ -320,7 +320,8 @@ class PictureController extends AbstractRestfulController
             11 => 'removing_date',
             12 => 'likes',
             13 => 'dislikes',
-            14 => 'status'
+            14 => 'status',
+            15 => 'accept_datetime_desc'
         ];
 
         switch ($data['order']) {
@@ -362,17 +363,17 @@ class PictureController extends AbstractRestfulController
             $filter['accept_date'] = $data['accept_date'];
         }
 
+        if ($data['perspective_id']) {
+            if ($data['perspective_id'] == 'null') {
+                $filter['item']['perspective_is_null'] = true;
+            } else {
+                $filter['item']['perspective'] = $data['perspective_id'];
+            }
+        }
+
         if ($isModer) {
             if ($data['exact_item_id']) {
                 $filter['item']['id'] = $data['exact_item_id'];
-            }
-
-            if ($data['perspective_id']) {
-                if ($data['perspective_id'] == 'null') {
-                    $filter['item']['perspective_is_null'] = true;
-                } else {
-                    $filter['item']['perspective'] = $data['perspective_id'];
-                }
             }
 
             if (strlen($data['comments'])) {

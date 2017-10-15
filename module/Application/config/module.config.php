@@ -52,7 +52,6 @@ return [
             Controller\InfoController::class            => Controller\Frontend\Service\InfoControllerFactory::class,
             Controller\MostsController::class           => Controller\Frontend\Service\MostsControllerFactory::class,
             Controller\Frontend\PersonsController::class => Controller\Frontend\PersonsControllerFactory::class,
-            Controller\PerspectiveController::class     => Controller\Frontend\PerspectiveControllerFactory::class,
             Controller\PictureController::class         => Controller\Frontend\PictureControllerFactory::class,
             Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
             Controller\RegistrationController::class    => Controller\Frontend\Service\RegistrationControllerFactory::class,

@@ -130,7 +130,7 @@ angular.module(Module)
                     }
                 }).then(function(response) {
                     ctrl.pictures = response.data.pictures;
-                    ctrl.chunks = chunkBy(ctrl.pictures, 4);
+                    ctrl.chunks = chunkBy(ctrl.pictures, 6);
                     ctrl.paginator = response.data.paginator;
                 }, function(response) {
                     notify.response(response);
