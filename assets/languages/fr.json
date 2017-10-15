@@ -1,5 +1,9 @@
 {
+    "page/51/name": "Nouvelles photos",
     "inbox/all-brands": "All brands",
+    "forums/theme/german-cars/description": "Audi, BMW, Mercedes-Benz, Opel, Volkswagen, ...",
+    "forums/theme/italian-cars/description": "Alfa Romeo, Ferrari, Fiat, Lamborghini, Lancia, ...",
+    "forums/theme/british-cars/description": "Aston Martin, Bentley, MG, Rover, ...",
     "page/18/name": "%PICTURE_NAME%",
     "page/23/name": "%CATEGORY_NAME%",
     "page/26/name": "%TWINS_GROUP_NAME%",
@@ -726,7 +730,6 @@
     "page/45/name": "Nouveau sujet",
     "page/48/name": "Page personnelle",
     "page/49/name": "Messages personnels",
-    "page/51/name": "Nouvelles photos",
     "page/52/name": "Enregistrement",
     "page/53/name": "ok",
     "page/54/name": "Confirmez l'adresse e-mail",

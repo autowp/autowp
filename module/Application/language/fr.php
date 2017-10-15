@@ -1,4 +1,12 @@
 <?php return array (
+  'forums/theme/all-other/description' => 'Other topics not included in the above sections',
+  'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
+  'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
+  'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
+  'forums/theme/chinese-cars/description' => 'Chery, Geely, Great Wall, ...',
+  'forums/theme/russian-cars/description' => 'VAZ, GAZ, UAZ, ...',
+  'forums/theme/american-cars/description' => 'Cadillac, Chrysler, Chevrolet, Dodge, Ford, Hummer, Pontiac, ...',
+  'page/51/name' => 'Nouvelles photos',
   'page/18/name' => '%PICTURE_NAME%',
   'page/26/name' => '%TWINS_GROUP_NAME%',
   'page/23/name' => '%CATEGORY_NAME%',

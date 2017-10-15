@@ -3051,3 +3051,15 @@ ALTER TABLE `picture_moder_vote_template`
 alter table pictures add content_count int not null default 0;
 
 update pictures set content_count=(select count(1) from picture_item where picture_id=pictures.id and type=1);
+
+
+update forums_themes set description='forums/theme/all-other/description' where name='forums/theme/all-other';
+update forums_themes set description='forums/theme/german-cars/description' where name='forums/theme/german-cars';
+update forums_themes set description='forums/theme/italian-cars/description' where name='forums/theme/italian-cars';
+update forums_themes set description='forums/theme/french-cars/description' where name='forums/theme/french-cars';
+update forums_themes set description='forums/theme/japan-cars/description' where name='forums/theme/japan-cars';
+update forums_themes set description='forums/theme/korean-cars/description' where name='forums/theme/korean-cars';
+update forums_themes set description='forums/theme/chinese-cars/description' where name='forums/theme/chinese-cars';
+update forums_themes set description='forums/theme/russian-cars/description' where name='forums/theme/russian-cars';
+update forums_themes set description='forums/theme/american-cars/description' where name='forums/theme/american-cars';
+update forums_themes set description='forums/theme/british-cars/description' where name='forums/theme/british-cars';

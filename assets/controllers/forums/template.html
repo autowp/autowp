@@ -7,7 +7,7 @@
                     <a ui-sref="forums({theme_id: theme.id})" ui-sref-opts="{reload: true}" ng-bind="theme.name|translate"></a>
                 </strong>
             </p>
-            <p ng-bind="theme.description" ng-if="theme.description"></p>
+            <p ng-bind="theme.description|translate" ng-if="theme.description"></p>
             <p translate-values="{topics: theme.topics_count, messages: theme.messages_count}" translate>{topics} topics and {messages} messages</p>
             <div ng-if="theme.subthemes.length > 0">
                 <translate>forums/subforums</translate>

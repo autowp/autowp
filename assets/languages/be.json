@@ -1,5 +1,9 @@
 {
+    "page/51/name": "Новыя выявы",
     "inbox/all-brands": "Усе маркі",
+    "forums/theme/german-cars/description": "Audi, BMW, Mercedes-Benz, Opel, Volkswagen, ...",
+    "forums/theme/italian-cars/description": "Alfa Romeo, Ferrari, Fiat, Lamborghini, Lancia, ...",
+    "forums/theme/british-cars/description": "Aston Martin, Bentley, MG, Rover, ...",
     "page/18/name": "%PICTURE_NAME%",
     "page/23/name": "%CATEGORY_NAME%",
     "page/26/name": "%TWINS_GROUP_NAME%",
@@ -726,7 +730,6 @@
     "page/45/name": "Дадаць топік",
     "page/48/name": "Асабісты кабінет",
     "page/49/name": "Асабістыя паведамленні",
-    "page/51/name": "Новыя выявы",
     "page/52/name": "Рэгістрацыя",
     "page/53/name": "ок",
     "page/54/name": "Пацверджанне e-mail",
