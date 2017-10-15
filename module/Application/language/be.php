@@ -1,4 +1,5 @@
 <?php return array (
+  'page/51/name' => 'Новыя выявы',
   'page/18/name' => '%PICTURE_NAME%',
   'page/26/name' => '%TWINS_GROUP_NAME%',
   'page/23/name' => '%CATEGORY_NAME%',
@@ -207,7 +208,7 @@ other {У вас {messages} новых паведамленняў}
   'index/brands' => 'Кампаніі',
   'index/factories' => 'Заводы',
   'index/specifications' => 'Характарыстыкі',
-  'index/twins/description' => 'Вы ведаеце, што Daewoo Matiz мае аж цэлых [шэсць клонаў] (/ twins / group118812)? А ведаеце, што [агульнага ў Lotus і Kia] (/ twins / group118750)? Мы ўпэўненыя, што вам падасца цікавым гэты раздзел.',
+  'index/twins/description' => 'Вы ведаеце, што Daewoo Matiz мае аж цэлых [шэсць клонаў](/twins/group118812)? А ведаеце, што [агульнага ў Lotus і Kia](/twins/group118750)? Мы ўпэўненыя, што вам падасца цікавым гэты раздзел.',
   'index/categories/description' => 'А ці ведаеце вы, якая тэхніка дапамагала ахоўваць правапарадак на вуліцах сусветных гарадоў у розны час? А на якіх аўтамабілях ездзіў Папа Рымскі? Не? Тады вам дакладна ў гэты раздзел.',
   'index/categories/mosts' => 'Хочаце ведаць, які аўтамабіль быў самым хуткім? Хочаце ведаць, колькі важыць самы магутны кар\'ерны самазвал? Заходзьце і пазнаеце.',
   'mosts/fastest/roadster' => 'Самыя хуткія родстары',
@@ -795,7 +796,9 @@ Cваім існаваннем наш праект абавязаны людзя
 
 Пераклад сайта на французскую мову: %fr-translator%
 
-Пераклад сайта на кітайскую мову: %fr-translator%
+Пераклад сайта на кітайскую мову: %zh-translator%
+
+Пераклад сайта на беларускую мову: %be-translator%
 
 Сайт працуе на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/),  а таксама іншых "разумных словах".
 
