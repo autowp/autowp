@@ -58,7 +58,6 @@
   'page/100/title' => '',
   'page/101/title' => '%ATTR_NAME%',
   'page/104/title' => '',
-  'page/109/title' => '',
   'page/119/title' => '',
   'page/120/title' => '',
   'page/124/title' => '',
@@ -802,6 +801,8 @@ La traduction du site en français: %fr-translator%
 
 La traduction du site en chinois: %zh-translator%
 
+La traduction du site en biélorusse: %be-translator%
+
 Le site propulsé par [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), ainsi que de nombreux autres.
 
 Une partie du code source du site est ouverte et un cours de communication supplémentaire, que tout le monde a eu l\'occasion d\'influencer la nature et la qualité du projet.
@@ -841,7 +842,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/42/name' => 'Forums',
   'page/45/name' => 'Nouveau sujet',
   'page/48/name' => 'Page personnelle',
-  'page/51/name' => 'Nouvelles photos',
   'page/52/name' => 'Enregistrement',
   'page/53/name' => 'ok',
   'page/56/name' => 'Changed',
@@ -998,7 +998,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/83/breadcrumbs' => 'Déplacer',
   'page/86/breadcrumbs' => 'Succès',
   'page/102/breadcrumbs' => 'Spécifications éditeur',
-  'page/109/breadcrumbs' => 'Cutaway',
   'page/122/breadcrumbs' => 'Spécifications',
   'page/136/breadcrumbs' => 'À propos',
   'page/141/breadcrumbs' => 'Images de %BRAND_NAME%',
@@ -1020,8 +1019,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/196/breadcrumbs' => 'Donation',
   'page/197/breadcrumbs' => 'Texte d\'histoire',
   'page/201/name' => 'Mascottes',
-  'page/201/title' => 'Mascottes',
-  'page/201/breadcrumbs' => 'Mascottes',
   'page/202/name' => 'Perspectives',
   'page/202/title' => 'Perspectives',
   'page/202/breadcrumbs' => 'Perspectives',

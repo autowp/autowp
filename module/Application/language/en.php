@@ -58,7 +58,6 @@
   'page/100/title' => '',
   'page/101/title' => '%ATTR_NAME%',
   'page/104/title' => '',
-  'page/109/title' => '',
   'page/119/title' => '',
   'page/120/title' => '',
   'page/124/title' => '',
@@ -798,6 +797,8 @@ French site translation: %fr-translator%
 
 Chinese site translation: %zh-translator%
 
+Belarusian site translation: %be-translator%
+
 Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
 
 Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
@@ -837,7 +838,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/42/name' => 'Forums',
   'page/45/name' => 'New topic',
   'page/48/name' => 'Cabinet',
-  'page/51/name' => 'New pictures',
   'page/52/name' => 'Registration',
   'page/53/name' => 'ok',
   'page/56/name' => 'Changed',
@@ -994,7 +994,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/83/breadcrumbs' => 'Move',
   'page/86/breadcrumbs' => 'Success',
   'page/102/breadcrumbs' => 'Specs editors',
-  'page/109/breadcrumbs' => 'Cutaway',
   'page/122/breadcrumbs' => 'Specifications',
   'page/136/breadcrumbs' => 'About us',
   'page/141/breadcrumbs' => '%BRAND_NAME% pictures',
@@ -1016,8 +1015,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/196/breadcrumbs' => 'Donate',
   'page/197/breadcrumbs' => 'Text history',
   'page/201/name' => 'Mascots',
-  'page/201/title' => 'Mascots',
-  'page/201/breadcrumbs' => 'Mascots',
   'page/202/name' => 'Perspectives',
   'page/202/title' => 'Perspectives',
   'page/202/breadcrumbs' => 'Perspectives',

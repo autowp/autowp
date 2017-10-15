@@ -54,7 +54,7 @@ html {
                         )?>
                     <?php } ?>
                 </p>
-                <?php if (in_array($this->language(), ['ru', 'zh', 'fr'])) { ?>
+                <?php if (in_array($this->language(), ['ru', 'zh', 'fr', 'be'])) { ?>
                     <?=$this->markdown($this->translate('index/twins/description'))?>
                 <?php } ?>
             </div>
@@ -73,7 +73,7 @@ html {
                     <?php } ?>
                     …
                 </p>
-                <?php if (in_array($this->language(), ['ru', 'zh', 'fr'])) { ?>
+                <?php if (in_array($this->language(), ['ru', 'zh', 'fr', 'be'])) { ?>
                     <?=$this->markdown($this->translate('index/categories/mosts'))?>
                 <?php } ?>
             </div>

@@ -19,7 +19,7 @@ return [
             'routes' => [
                 'build' => [
                     'options' => [
-                        'route'    => 'build (brands-sprite|translations):action',
+                        'route'    => 'build brands-sprite:action',
                         'defaults' => [
                             'controller' => Controller\Console\BuildController::class,
                         ]

@@ -58,7 +58,6 @@
   'page/100/title' => '',
   'page/101/title' => '%ATTR_NAME%',
   'page/104/title' => '',
-  'page/109/title' => '',
   'page/119/title' => '',
   'page/120/title' => '',
   'page/124/title' => '',
@@ -798,6 +797,8 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 
 Перевод сайта на китайский язык: %zh-translator%
 
+Перевод сайта на белоруский язык: %be-translator%
+
 Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
 
 Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
@@ -838,7 +839,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/42/name' => 'Форумы',
   'page/45/name' => 'Добавить топик',
   'page/48/name' => 'Личный кабинет',
-  'page/51/name' => 'Новые изображения',
   'page/52/name' => 'Регистрация',
   'page/53/name' => 'ok',
   'page/56/name' => 'Изменен',
@@ -995,7 +995,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/83/breadcrumbs' => 'Перемещение',
   'page/86/breadcrumbs' => 'Успех',
   'page/102/breadcrumbs' => 'Редактор характеристик автомобиля',
-  'page/109/breadcrumbs' => 'Cutaway',
   'page/122/breadcrumbs' => 'Технические характеристики',
   'page/136/breadcrumbs' => 'О проекте',
   'page/141/breadcrumbs' => 'Добавленные картинки %BRAND_NAME%',
@@ -1017,8 +1016,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/196/breadcrumbs' => 'Пожертвование',
   'page/197/breadcrumbs' => 'История изменения текста',
   'page/201/name' => 'Маскоты',
-  'page/201/title' => 'Маскоты',
-  'page/201/breadcrumbs' => 'Маскоты',
   'page/202/name' => 'Справка по ракурсам',
   'page/202/title' => 'Справка по ракурсам',
   'page/202/breadcrumbs' => 'Справка по ракурсам',

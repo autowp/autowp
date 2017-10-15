@@ -28,6 +28,7 @@ class TranslatorTest extends AbstractHttpControllerTestCase
             ['test', 'test est ok', 'fr'],
             ['test', 'тест прошел успешно', 'ru'],
             ['test', '测试是确定', 'zh'],
+            ['test', 'тэст прайшоў паспяхова', 'be'],
         ];
     }
 }

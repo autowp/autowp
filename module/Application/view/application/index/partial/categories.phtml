@@ -4,15 +4,15 @@
         $new = $category['new_cars_count'];
         $old = $category['cars_count'] - $new;
         echo $this->htmlA(
-            $category['url'], 
+            $category['url'],
             $category['short_name']
         ) .
-        '&#xa0;' . 
-        '<span class="count">(' . 
+        '&#xa0;' .
+        '<span class="count">(' .
             $old . ($new > 0 ? '<span data-href="'.$this->escapeHtmlAttr($category['new_cars_url']).'" data-toggle="popover" data-container="body" class="popover-handler">+' . $new . '</span>' : '') .
         ')</span> ';
     } ?>
 </p>
-<?php if (in_array($this->language(), ['ru', 'zh', 'fr'])) { ?>
+<?php if (in_array($this->language(), ['ru', 'zh', 'fr', 'be'])) { ?>
     <?=$this->markdown($this->translate('index/categories/description'))?>
 <?php } ?>

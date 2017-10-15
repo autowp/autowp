@@ -6,7 +6,7 @@
         ],
         'pageId' => 136,
     ]);
-    
+
     $users = [];
     foreach ($this->contributors as $user) {
         $users[] = $this->user($user)->__toString();
@@ -24,5 +24,6 @@
         '%developer%'      => $this->user($this->developer)->__toString(),
         '%fr-translator%'  => $this->user($this->frTranslator)->__toString(),
         '%zh-translator%'  => $this->user($this->zhTranslator)->__toString(),
+        '%be-translator%'  => $this->user($this->beTranslator)->__toString(),
     ]))?>
 </div>

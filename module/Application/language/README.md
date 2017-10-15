@@ -12,3 +12,4 @@ Currently available languages:
 * Français - primary contributor [Sbocha](https://github.com/sbocha). [Profile](https://fr.wheelsage.org/users/sbocha) on WheelsAge
 * Русский
 * 中文 - primary contributor [A013AA](https://github.com/A013AA). [Profile](https://zh.wheelsage.org/users/user25155) on WheelsAge
+* Беларуская - primary contributor bad_Q. [Profile](https://be.wheelsage.org/users/bad_q) on WheelsAge

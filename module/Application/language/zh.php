@@ -58,7 +58,6 @@
   'page/100/title' => '',
   'page/101/title' => '%ATTR_NAME%',
   'page/104/title' => '',
-  'page/109/title' => '',
   'page/119/title' => '',
   'page/120/title' => '',
   'page/124/title' => '',
@@ -789,6 +788,9 @@
 
 中文页面建设者: %zh-translator%
 
+Belarusian site translation: %be-translator%
+
+
 技术支持：[Zend Framework](http://framework.zend.com/)、[jQuery](http://jquery.com/)、[Twitter bootstrap](http://getbootstrap.com/)，还有许多优秀的计算机语言。
 
 网站源代码向所有人开放，每个人都有机会影响网站的性质和质量。
@@ -828,7 +830,6 @@
   'page/42/name' => '论坛',
   'page/45/name' => '新主题',
   'page/48/name' => '个人主页',
-  'page/51/name' => '最新添加',
   'page/52/name' => '注册',
   'page/53/name' => '确定',
   'page/56/name' => '已更改',
@@ -985,7 +986,6 @@
   'page/83/breadcrumbs' => '移动',
   'page/86/breadcrumbs' => '成功',
   'page/102/breadcrumbs' => '性能参数编辑器',
-  'page/109/breadcrumbs' => '剖视',
   'page/122/breadcrumbs' => '性能参数',
   'page/136/breadcrumbs' => '关于我们',
   'page/141/breadcrumbs' => '%BRAND_NAME% pictures',
@@ -1007,8 +1007,6 @@
   'page/196/breadcrumbs' => '捐助',
   'page/197/breadcrumbs' => '撰写历史',
   'page/201/name' => '立标',
-  'page/201/title' => '立标',
-  'page/201/breadcrumbs' => '立标',
   'page/202/name' => '剖视',
   'page/202/title' => '剖视',
   'page/202/breadcrumbs' => '剖视',

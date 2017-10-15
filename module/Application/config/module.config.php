@@ -231,12 +231,20 @@ return [
             'flag'     => 'flag-icon flag-icon-cn',
             'cookie'   => $hostCookie,
             'aliases'  => []
+        ],
+        'be' => [
+            'hostname' => 'be.' . $host,
+            'timezone' => 'Asia/Shanghai',
+            'name'     => 'Беларуская',
+            'flag'     => 'flag-icon flag-icon-by',
+            'cookie'   => $hostCookie,
+            'aliases'  => []
         ]
     ],
 
     'hostname_whitelist' => ['www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
         'i.' . $host, 'en.' . $host, 'fr.' . $host, 'ru.' . $host,
-        'zh.' . $host, 'www.' . $host, $host],
+        'zh.' . $host, 'be.' . $host, 'www.' . $host, $host],
 
     'pictures_hostname' => getenv('AUTOWP_PICTURES_HOST'),
 
