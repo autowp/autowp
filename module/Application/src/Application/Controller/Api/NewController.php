@@ -157,7 +157,9 @@ class NewController extends AbstractRestfulController
 
                 $group['total_pictures'] = $this->picture->getCount([
                     'status'      => Picture::STATUS_ACCEPTED,
-                    'item_id'     => $groupData['item_id'],
+                    'item'        => [
+                        'id' => $groupData['item_id']
+                    ],
                     'accept_date' => $values['date'],
                     'timezone'    => $this->user()->timezone()
                 ]);
