@@ -10,7 +10,7 @@ require("styles.less");
 require("flags/flags.js");
 
 var resources = {};
-$.map(['en', 'de', 'fr', 'ru', 'zh'], function(language) {
+$.map(['en', 'fr', 'ru', 'zh'], function(language) {
     resources[language] = {
         translation: require("languages/"+language+".json")
     };

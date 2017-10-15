@@ -4,6 +4,7 @@ namespace Application\Model;
 
 use DateTime;
 use DateTimeZone;
+use Exception;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -342,6 +343,7 @@ class Picture
             'log'              => null,
             'group'            => [],
             'add_date'         => null,
+            'accept_date'      => null,
             'timezone'         => null,
         ];
         $options = array_replace($defaults, $options);
@@ -397,26 +399,15 @@ class Picture
                 throw new Exception("Timezone not provided");
             }
 
-            $timezone = new DateTimeZone($options['timezone']);
-            $dbTimezine = new DateTimeZone(MYSQL_TIMEZONE);
+            $this->setDateFilter($select, 'pictures.add_date', $options['add_date'], $options['timezone']);
+        }
 
-            $date = DateTime::createFromFormat('Y-m-d', $options['add_date'], $timezone);
+        if ($options['accept_date']) {
+            if (! isset($options['timezone'])) {
+                throw new Exception("Timezone not provided");
+            }
 
-            $start = clone $date;
-            $start->setTime(0, 0, 0);
-            $start->setTimezone($dbTimezine);
-
-            $end = clone $date;
-            $end->setTime(23, 59, 59);
-            $end->setTimezone($dbTimezine);
-
-            $select->where([
-                new Sql\Predicate\Between(
-                    'pictures.add_date',
-                    $start->format(MYSQL_DATETIME_FORMAT),
-                    $end->format(MYSQL_DATETIME_FORMAT)
-                )
-            ]);
+            $this->setDateFilter($select, 'pictures.accept_datetime', $options['accept_date'], $options['timezone']);
         }
 
         if ($options['status'] !== null) {
@@ -710,6 +701,30 @@ class Picture
         }
 
         return $select;
+    }
+
+    private function setDateFilter(Sql\Select $select, string $column, string $date, string $timezone)
+    {
+        $timezone = new DateTimeZone($timezone);
+        $dbTimezine = new DateTimeZone(MYSQL_TIMEZONE);
+
+        $date = DateTime::createFromFormat('Y-m-d', $date, $timezone);
+
+        $start = clone $date;
+        $start->setTime(0, 0, 0);
+        $start->setTimezone($dbTimezine);
+
+        $end = clone $date;
+        $end->setTime(23, 59, 59);
+        $end->setTimezone($dbTimezine);
+
+        $select->where([
+            new Sql\Predicate\Between(
+                $column,
+                $start->format(MYSQL_DATETIME_FORMAT),
+                $end->format(MYSQL_DATETIME_FORMAT)
+            )
+        ]);
     }
 
     public function getPaginator(array $options): Paginator\Paginator

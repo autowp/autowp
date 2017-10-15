@@ -2,15 +2,36 @@
 
 namespace Application\Hydrator\Api;
 
+use Autowp\User\Model\User;
+
 use Application\Model\Item;
 use Application\Model\Picture;
 
 class PictureItemHydrator extends RestHydrator
 {
     /**
+     * @var int|null
+     */
+    private $userId = null;
+
+    private $userRole = null;
+
+    /**
      * @var Item
      */
     private $item;
+
+    /**
+     * @var Picture
+     */
+    private $picture;
+
+    private $acl;
+
+    /**
+     * @var User
+     */
+    private $userModel;
 
     public function __construct(
         $serviceManager
@@ -19,6 +40,9 @@ class PictureItemHydrator extends RestHydrator
 
         $this->item = $serviceManager->get(Item::class);
         $this->picture = $serviceManager->get(Picture::class);
+        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+
+        $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
 
         $strategy = new Strategy\Item($serviceManager);
         $this->addStrategy('item', $strategy);
@@ -57,10 +81,12 @@ class PictureItemHydrator extends RestHydrator
      */
     public function setUserId($userId = null)
     {
-        $this->userId = $userId;
+        if ($this->userId != $userId) {
+            $this->userId = $userId;
+            $this->userRole = null;
 
-        $this->getStrategy('item')->setUserId($userId);
-        //$this->getStrategy('replies')->setUser($user);
+            $this->getStrategy('item')->setUserId($userId);
+        }
 
         return $this;
     }
@@ -74,32 +100,54 @@ class PictureItemHydrator extends RestHydrator
             'perspective_id' => (int)$object['perspective_id'],
         ];
 
-        if ($this->filterComposite->filter('item')) {
-            $row = $this->item->getRow(['id' => (int)$object['item_id']]);
-
-            $result['item'] = $row ? $this->extractValue('item', $row) : null;
+        $isModer = false;
+        $role = $this->getUserRole();
+        if ($role) {
+            $isModer = $this->acl->inheritsRole($role, 'moder');
         }
 
-        if ($this->filterComposite->filter('picture')) {
-            $row = $this->picture->getRow(['id' => (int)$object['picture_id']]);
+        if ($isModer) {
 
-            $result['picture'] = $row ? $this->extractValue('picture', $row) : null;
-        }
+            if ($this->filterComposite->filter('item')) {
+                $row = $this->item->getRow(['id' => (int)$object['item_id']]);
 
-        if ($this->filterComposite->filter('area')) {
-            $hasArea = $object['crop_width'] && $object['crop_height'];
-            $result['area'] = null;
-            if ($hasArea) {
-                $result['area'] = [
-                    'left'   => (int)$object['crop_left'],
-                    'top'    => (int)$object['crop_top'],
-                    'width'  => (int)$object['crop_width'],
-                    'height' => (int)$object['crop_height'],
-                ];
+                $result['item'] = $row ? $this->extractValue('item', $row) : null;
+            }
+
+            if ($this->filterComposite->filter('picture')) {
+                $row = $this->picture->getRow(['id' => (int)$object['picture_id']]);
+
+                $result['picture'] = $row ? $this->extractValue('picture', $row) : null;
+            }
+
+            if ($this->filterComposite->filter('area')) {
+                $hasArea = $object['crop_width'] && $object['crop_height'];
+                $result['area'] = null;
+                if ($hasArea) {
+                    $result['area'] = [
+                        'left'   => (int)$object['crop_left'],
+                        'top'    => (int)$object['crop_top'],
+                        'width'  => (int)$object['crop_width'],
+                        'height' => (int)$object['crop_height'],
+                    ];
+                }
             }
         }
 
         return $result;
+    }
+
+    private function getUserRole()
+    {
+        if (! $this->userId) {
+            return null;
+        }
+
+        if (! $this->userRole) {
+            $this->userRole = $this->userModel->getUserRole($this->userId);
+        }
+
+        return $this->userRole;
     }
 
     /**

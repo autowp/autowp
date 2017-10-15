@@ -1,0 +1,7 @@
+<div class="row" ng-repeat="chunk in ctrl.chunks">
+    <div class="col-sm-2" ng-repeat="picture in chunk">
+        <autowp-thumbnail picture="picture"></autowp-thumbnail>
+    </div>
+</div>
+
+<autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>

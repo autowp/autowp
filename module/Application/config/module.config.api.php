@@ -61,6 +61,7 @@ return [
             Controller\Api\LoginController::class           => Controller\Api\LoginControllerFactory::class,
             Controller\Api\MapController::class             => Controller\Api\MapControllerFactory::class,
             Controller\Api\MessageController::class         => Controller\Api\MessageControllerFactory::class,
+            Controller\Api\NewController::class             => Controller\Api\NewControllerFactory::class,
             Controller\Api\PageController::class            => Controller\Api\Service\PageControllerFactory::class,
             Controller\Api\PerspectiveController::class     => Controller\Api\Service\PerspectiveControllerFactory::class,
             Controller\Api\PerspectivePageController::class => Controller\Api\Service\PerspectivePageControllerFactory::class,
@@ -1394,6 +1395,27 @@ return [
                                         'action' => 'new'
                                     ],
                                 ],
+                            ],
+                        ]
+                    ],
+                    'new' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route' => '/new',
+                            'defaults' => [
+                                'controller' => Controller\Api\NewController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'get' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
+                                    ]
+                                ]
                             ],
                         ]
                     ],

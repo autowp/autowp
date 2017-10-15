@@ -25,12 +25,12 @@ html {
         ])?>
 
         <div class="page-header-small">
-            <h3><?=$this->escapeHtml($this->page(51)->name) ?> <small><?=$this->htmlA('/new', $this->translate('all-link'))?></small></h3>
+            <h3><?=$this->escapeHtml($this->page(51)->name) ?> <small><?=$this->htmlA('/ng/new', $this->translate('all-link'))?></small></h3>
         </div>
         <?=$this->partial('application/pictures', $this->newPictures)?>
         <p>
             <span class="fa fa-th"></span>
-            <?=$this->htmlA('/new', $this->translate('All new pictures') . ' …') ?>
+            <?=$this->htmlA('/ng/new', $this->translate('All new pictures') . ' …') ?>
         </p>
     </div>
     <div class="col-md-6">

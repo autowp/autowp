@@ -4,9 +4,6 @@ return [
     '' => [
         'plural_forms' => 'nplurals=1; plural=0'
     ],
-    '%1$s pictures'       => [
-        '%1$s 张图片',
-    ],
     '%1$s comments'      => [
         '%1$s 个评论',
     ],

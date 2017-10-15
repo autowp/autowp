@@ -281,7 +281,7 @@ class PictureController extends AbstractRestfulController
         }
 
         if (! $isModer) {
-            if (! $data['item_id'] && ! $data['owner_id'] && $data['status'] != 'inbox') {
+            if (! $data['item_id'] && ! $data['owner_id'] && !$data['status']) {
                 return new ApiProblemResponse(
                     new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
                         'invalid_params' => [
@@ -358,6 +358,10 @@ class PictureController extends AbstractRestfulController
             $filter['add_date'] = $data['add_date'];
         }
 
+        if (strlen($data['accept_date'])) {
+            $filter['accept_date'] = $data['accept_date'];
+        }
+
         if ($isModer) {
             if ($data['exact_item_id']) {
                 $filter['item']['id'] = $data['exact_item_id'];
@@ -429,6 +433,8 @@ class PictureController extends AbstractRestfulController
             }
         }
 
+        $select = $this->picture->getSelect($filter);
+
         $paginator = $this->picture->getPaginator($filter);
 
         $data['limit'] = $data['limit'] ? $data['limit'] : 1;
@@ -440,7 +446,7 @@ class PictureController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'user_id'  => $user ? $user['id'] : null,
-            'fields'   => $data['fields']
+            'fields'   => $data['fields'],
         ]);
 
         $pictures = [];

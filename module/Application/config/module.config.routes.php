@@ -449,43 +449,6 @@ return [
                     ]
                 ]
             ],
-            'new' => [
-                'type'    => 'Segment',
-                'options' => [
-                    'route' => '/new',
-                    'defaults' => [
-                        'controller' => Controller\NewController::class,
-                        'action'     => 'index'
-                    ]
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'date' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/:date',
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'page' => [
-                                'type' => 'Segment',
-                                'options' => [
-                                    'route' => '/page:page',
-                                ],
-                            ],
-                            'item' => [
-                                'type' => 'Segment',
-                                'options' => [
-                                    'route'    => '/item/:item_id[/page:page]',
-                                    'defaults' => [
-                                        'action' => 'item',
-                                    ],
-                                ],
-                            ],
-                        ]
-                    ],
-                ]
-            ],
             'persons' => [
                 'type' => 'Literal',
                 'options' => [

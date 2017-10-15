@@ -1567,6 +1567,39 @@ return [
                 ]
             ]
         ],
+        'api_new_get' => [
+            'date' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'page' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['pictures', 'item', 'item_pictures']]
+                    ]
+                ]
+            ]
+        ],
         'api_page_post' => [
             'parent_id' => [
                 'required' => false
@@ -1900,7 +1933,21 @@ return [
                         ]
                     ]
                 ]
-            ]
+            ],
+            'accept_date' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'Date',
+                        'options' => [
+                            'format' => 'Y-m-d'
+                        ]
+                    ]
+                ]
+            ],
         ],
         'api_picture_list_public' => [
             'limit' => [
@@ -1987,7 +2034,21 @@ return [
                         ]
                     ]
                 ]
-            ]
+            ],
+            'accept_date' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'Date',
+                        'options' => [
+                            'format' => 'Y-m-d'
+                        ]
+                    ]
+                ]
+            ],
         ],
         'api_picture_edit' => [
             'status' => [

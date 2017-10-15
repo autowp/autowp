@@ -25,6 +25,7 @@ import './controllers/log';
 import './controllers/login';
 import './controllers/map';
 import './controllers/museum';
+import './controllers/new';
 import './controllers/pulse';
 import './controllers/restore-password';
 import './controllers/signup';

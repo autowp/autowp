@@ -90,6 +90,11 @@ class PictureHydrator extends RestHydrator
      */
     private $pictureModerVote;
 
+    /**
+     * @var array
+     */
+    private $itemsOptions = [];
+
     public function __construct(
         $serviceManager
     ) {
@@ -156,6 +161,10 @@ class PictureHydrator extends RestHydrator
 
         if (isset($options['user_id'])) {
             $this->setUserId($options['user_id']);
+        }
+
+        if (isset($options['items']) && is_array($options['items'])) {
+            $this->itemsOptions = $options['items'];
         }
 
         return $this;
@@ -377,7 +386,13 @@ class PictureHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('items')) {
-                $rows = $this->pictureItem->getPictureItemsData($object['id']);
+
+                $typeId = 0;
+                if (isset($this->itemsOptions['type_id'])) {
+                    $typeId = (int) $this->itemsOptions['type_id'];
+                }
+
+                $rows = $this->pictureItem->getPictureItemsData($object['id'], $typeId);
                 $picture['items'] = $this->extractValue('items', $rows);
             }
 

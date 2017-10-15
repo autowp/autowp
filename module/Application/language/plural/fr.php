@@ -4,10 +4,6 @@ return [
     '' => [
         'plural_forms' => 'nplurals=2; plural=((n==0)||(n==1))?0:1'
     ],
-    '%1$s pictures'       => [
-        '%1$s image',
-        '%1$s images',
-    ],
     '%1$s comments'      => [
         '%1$s commentaire',
         '%1$s commentaires',

@@ -100,6 +100,10 @@ angular.module(Module)
                     var pageId = id;
                     var result = [];
                     while(pageId) {
+                        if (! pages[pageId]) {
+                            throw "Page " + pageId + " not found";
+                        }
+                        
                         result.push(pages[pageId]);
                         
                         pageId = pages[pageId].parent_id;
