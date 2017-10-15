@@ -107,7 +107,6 @@ class PictureItemHydrator extends RestHydrator
         }
 
         if ($isModer) {
-
             if ($this->filterComposite->filter('item')) {
                 $row = $this->item->getRow(['id' => (int)$object['item_id']]);
 

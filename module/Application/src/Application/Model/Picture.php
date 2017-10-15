@@ -394,7 +394,6 @@ class Picture
         }
 
         if ($options['add_date']) {
-
             if (! isset($options['timezone'])) {
                 throw new Exception("Timezone not provided");
             }

@@ -386,7 +386,6 @@ class PictureHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('items')) {
-
                 $typeId = 0;
                 if (isset($this->itemsOptions['type_id'])) {
                     $typeId = (int) $this->itemsOptions['type_id'];

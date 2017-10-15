@@ -77,8 +77,6 @@ class NewController extends AbstractRestfulController
 
         $values = $this->inputFilter->getValues();
 
-        $language = $this->language();
-
         $select = $this->picture->getTable()->getSql()->select()
             ->where(['pictures.status' => Picture::STATUS_ACCEPTED]);
 
@@ -163,7 +161,6 @@ class NewController extends AbstractRestfulController
                     'accept_date' => $values['date'],
                     'timezone'    => $this->user()->timezone()
                 ]);
-
             } else {
                 $group['pictures'] = [];
                 foreach ($groupData['pictures'] as $row) {
