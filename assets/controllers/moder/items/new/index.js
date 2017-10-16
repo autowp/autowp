@@ -93,6 +93,7 @@ angular.module(Module)
                         blankPage: false,
                         needRight: false
                     },
+                    name: 'page/163/name',
                     pageId: 163,
                     args: {
                         NEW_ITEM_OF_TYPE: translation

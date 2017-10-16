@@ -30,6 +30,7 @@ import './controllers/museum';
 import './controllers/new';
 import './controllers/pulse';
 import './controllers/restore-password';
+import './controllers/telegram';
 import './controllers/signup';
 import './controllers/top-view';
 import './controllers/moder';

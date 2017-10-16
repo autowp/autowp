@@ -60,6 +60,7 @@ angular.module(Module)
                         blankPage: false,
                         needRight: true
                     },
+                    name: 'page/159/name',
                     pageId: 159,
                     args: {
                         MUSEUM_ID: ctrl.item.id,

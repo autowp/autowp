@@ -151,7 +151,7 @@ class ForumThemeHydrator extends RestHydrator
                 ->limit(1);
 
             $lastTopicRow = $this->topicTable->selectWith($select)->current();
-            //var_dump($lastTopicRow);
+
             $lastMessageRow = null;
             if ($lastTopicRow) {
                 /*$lastTopic = [

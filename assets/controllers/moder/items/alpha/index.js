@@ -35,13 +35,13 @@ angular.module(Module)
             
             ctrl.loading = 0;
             
-            $scope.title = 'page/119/title';
             $scope.pageEnv({
                 layout: {
                     isAdminPage: true,
                     blankPage: false,
                     needRight: false
                 },
+                name: 'page/74/name',
                 pageId: 74
             });
             

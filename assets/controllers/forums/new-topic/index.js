@@ -43,6 +43,7 @@ angular.module(Module)
                         blankPage: false,
                         needRight: true
                     },
+                    name: 'page/45/name',
                     pageId: 45,
                     args: {
                         THEME_NAME: ctrl.theme.name,

@@ -475,16 +475,6 @@ return [
                     ],
                 ],
             ],
-            'telegram' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/telegram',
-                    'defaults' => [
-                        'controller' => Controller\TelegramController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-            ],
             'telegram-webhook' => [
                 'type' => 'Segment',
                 'options' => [

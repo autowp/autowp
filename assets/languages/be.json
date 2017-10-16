@@ -1878,7 +1878,7 @@
     "forums/go-to-theme-name": "Зайсці ў форум \"{theme_name}\"",
     "forums/go-to-theme": "Зайсці ў форум ...",
     "forums/subforums": "Падфорумы",
-    "forums/last-message-in-topic-{topic_name}": "\"Апошняе паведамленне ў тэме «{topic_name}»",
+    "forums/last-message-in-topic-{topic_name}": "Апошняе паведамленне ў тэме «{topic_name}»",
     "forums/go-to-last-message": "Перайсці да апошняга паведамлення",
     "forums/create-new-topic": "Стварыць новую тэму",
     "forums/theme/topics": "Топiкi",

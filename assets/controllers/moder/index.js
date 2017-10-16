@@ -32,6 +32,7 @@ angular.module(Module)
                     blankPage: false,
                     needRight: false
                 },
+                name: 'page/67/name',
                 pageId: 67
             });
         }

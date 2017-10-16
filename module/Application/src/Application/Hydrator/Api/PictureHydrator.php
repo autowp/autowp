@@ -242,13 +242,14 @@ class PictureHydrator extends RestHydrator
             $picture['name_text'] = $this->pictureNameFormatter->format($nameData, $this->language);
         }
 
-        $owner = null;
-        if ($object['owner_id']) {
-            $owner = $this->userModel->getRow((int)$object['owner_id']);
-        }
+        if ($this->filterComposite->filter('owner')) {
 
-        if ($owner && $this->filterComposite->filter('owner')) {
-            $picture['owner'] = $this->extractValue('owner', $owner);
+            $owner = null;
+            if ($object['owner_id']) {
+                $owner = $this->userModel->getRow((int)$object['owner_id']);
+            }
+
+            $picture['owner'] = $owner ? $this->extractValue('owner', $owner) : null;
         }
 
         if ($this->filterComposite->filter('thumbnail')) {

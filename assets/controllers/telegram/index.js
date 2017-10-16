@@ -1,17 +1,16 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import notify from 'notify';
 
-const CONTROLLER_NAME = 'SignupOkController';
-const STATE_NAME = 'signup-ok';
+const CONTROLLER_NAME = 'TelegramController';
+const STATE_NAME = 'telegram';
 
 angular.module(Module)
     .config(['$stateProvider',
         function config($stateProvider) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/signup/ok',
+                url: '/telegram',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: template
@@ -26,8 +25,8 @@ angular.module(Module)
                     blankPage: false,
                     needRight: true
                 },
-                name: 'page/53/name',
-                pageId: 53
+                name: 'page/204/name',
+                pageId: 204
             });
         }
     ]);

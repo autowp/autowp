@@ -100,6 +100,7 @@ angular.module(Module)
                             blankPage: false,
                             needRight: false
                         },
+                        name: 'page/72/name',
                         pageId: 72,
                         args: {
                             PICTURE_ID:   $scope.picture.id,

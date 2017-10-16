@@ -61,6 +61,7 @@ angular.module(Module)
                         blankPage: false,
                         needRight: true
                     },
+                    name: 'page/42/name',
                     pageId: 42
                 });
                 
@@ -98,6 +99,7 @@ angular.module(Module)
                                 blankPage: false,
                                 needRight: true
                             },
+                            name: 'page/43/name',
                             pageId: 43,
                             args: {
                                 THEME_NAME: translation,
@@ -110,6 +112,7 @@ angular.module(Module)
                                 blankPage: false,
                                 needRight: true
                             },
+                            name: 'page/43/name',
                             pageId: 43,
                             args: {
                                 THEME_NAME: ctrl.theme.name,

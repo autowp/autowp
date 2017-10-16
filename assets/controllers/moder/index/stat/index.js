@@ -27,13 +27,13 @@ angular.module(Module)
         '$scope', '$http',
         function($scope, $http) {
             
-            $scope.title = 'page/119/title';
             $scope.pageEnv({
                 layout: {
                     isAdminPage: true,
                     blankPage: false,
                     needRight: false
                 },
+                name: 'page/119/name',
                 pageId: 119
             });
             

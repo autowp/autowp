@@ -67,6 +67,7 @@ angular.module(Module)
                     blankPage: false,
                     needRight: false
                 },
+                name: 'page/73/name',
                 pageId: 73
             });
             

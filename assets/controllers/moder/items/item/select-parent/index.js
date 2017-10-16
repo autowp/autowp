@@ -62,6 +62,7 @@ angular.module(Module)
                             blankPage: false,
                             needRight: false
                         },
+                        name: 'page/144/name',
                         pageId: 144,
                         args: {
                             CAR_ID: ctrl.item.id,
