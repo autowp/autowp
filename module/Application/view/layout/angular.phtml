@@ -1,15 +1,4 @@
 <?php
-    $flash = $this->flashMessenger();
-
-    $flash
-        ->setMessageOpenFormat('<div%s>
- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
-     &times;
- </button>
- <ul><li>')
-        ->setMessageSeparatorString('</li><li>')
-        ->setMessageCloseString('</li></ul></div>');
-
     $this->gulpRev([
         'stylesheets' => [
             'application.css'
@@ -179,10 +168,6 @@ ga('send', 'pageview');
                     <div class="page-header" ng-if="pageName">
                         <h1 ng-bind="pageName"></h1>
                     </div>
-                    <?=$flash->render('error',   ['alert', 'alert-dismissible', 'alert-danger']) ?>
-                    <?=$flash->render('info',    ['alert', 'alert-dismissible', 'alert-info']) ?>
-                    <?=$flash->render('default', ['alert', 'alert-dismissible', 'alert-warning']) ?>
-                    <?=$flash->render('success', ['alert', 'alert-dismissible', 'alert-success']) ?>
 
                     <ui-view></ui-view>
                 </div>
