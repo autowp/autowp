@@ -1,5 +1,4 @@
 <?php return array (
-  'forums/theme/all-other/description' => 'Other topics not included in the above sections',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
@@ -13,7 +12,6 @@
   'page/32/name' => '%ARTICLE_NAME%',
   'page/33/name' => '%CAR_NAME%',
   'page/43/name' => '%THEME_NAME%',
-  'page/44/name' => '%TOPIC_NAME%',
   'page/58/name' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/59/name' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/62/name' => '%USER_NAME%',
@@ -44,20 +42,10 @@
   'page/26/title' => '%TWINS_GROUP_NAME%',
   'page/32/title' => '%ARTICLE_NAME%',
   'page/33/title' => '%CAR_NAME%',
-  'page/43/title' => '%THEME_NAME%',
-  'page/44/title' => '%TOPIC_NAME%',
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/61/title' => '',
   'page/62/title' => '%USER_NAME%',
-  'page/67/title' => '',
-  'page/68/title' => '',
-  'page/69/title' => '',
-  'page/70/title' => '',
-  'page/71/title' => '',
-  'page/72/title' => '%PICTURE_NAME%',
-  'page/77/title' => '',
-  'page/78/title' => '%CAR_NAME%',
   'page/85/title' => '%BRAND_NAME%',
   'page/89/title' => '',
   'page/90/title' => '',
@@ -66,14 +54,11 @@
   'page/100/title' => '',
   'page/101/title' => '%ATTR_NAME%',
   'page/104/title' => '',
-  'page/119/title' => '',
   'page/120/title' => '',
   'page/124/title' => '',
-  'page/135/title' => '',
   'page/140/title' => '%BRAND_TYPE_NAME%',
   'page/142/title' => '%ZONE_NAME%',
   'page/157/title' => '%VOTING_NAME%',
-  'page/159/title' => '%MUSEUM_NAME%',
   'page/165/title' => '%MOST_NAME% %BRAND_NAME%',
   'page/181/title' => '%FACTORY_NAME%',
   'page/183/title' => '%PICTURE_NAME%',
@@ -98,29 +83,13 @@
   'page/29/breadcrumbs' => '',
   'page/32/breadcrumbs' => '%ARTICLE_NAME%',
   'page/33/breadcrumbs' => '%SHORT_CAR_NAME%',
-  'page/42/breadcrumbs' => '',
-  'page/43/breadcrumbs' => '%THEME_NAME%',
-  'page/44/breadcrumbs' => '%TOPIC_NAME%',
   'page/48/breadcrumbs' => '',
-  'page/52/breadcrumbs' => '',
-  'page/53/breadcrumbs' => '',
   'page/56/breadcrumbs' => '',
   'page/57/breadcrumbs' => '',
   'page/58/breadcrumbs' => '%DPBRAND_NAME%',
   'page/59/breadcrumbs' => '%DESIGN_PROJECT_NAME%',
-  'page/60/breadcrumbs' => '',
   'page/61/breadcrumbs' => '',
   'page/62/breadcrumbs' => '%USER_NAME%',
-  'page/67/breadcrumbs' => '',
-  'page/68/breadcrumbs' => '',
-  'page/69/breadcrumbs' => '',
-  'page/70/breadcrumbs' => '',
-  'page/71/breadcrumbs' => '',
-  'page/72/breadcrumbs' => '%PICTURE_NAME%',
-  'page/73/breadcrumbs' => '',
-  'page/78/breadcrumbs' => '%CAR_NAME%',
-  'page/77/breadcrumbs' => '',
-  'page/79/breadcrumbs' => '',
   'page/85/breadcrumbs' => '%BRAND_NAME%',
   'page/87/breadcrumbs' => '',
   'page/89/breadcrumbs' => '',
@@ -133,15 +102,10 @@
   'page/105/breadcrumbs' => '',
   'page/106/breadcrumbs' => '',
   'page/107/breadcrumbs' => '',
-  'page/110/breadcrumbs' => '',
   'page/114/breadcrumbs' => '',
-  'page/117/breadcrumbs' => '',
-  'page/119/breadcrumbs' => '',
   'page/120/breadcrumbs' => '',
   'page/124/breadcrumbs' => '',
   'page/130/breadcrumbs' => '',
-  'page/134/breadcrumbs' => '',
-  'page/135/breadcrumbs' => '',
   'page/138/breadcrumbs' => '%CAR_TYPE_NAME%',
   'page/140/breadcrumbs' => '%BRAND_TYPE_NAME%',
   'page/142/breadcrumbs' => '%ZONE_NAME%',
@@ -150,7 +114,6 @@
   'page/155/breadcrumbs' => '%CAR_TYPE_NAME%',
   'page/156/breadcrumbs' => '%YEAR_NAME%',
   'page/157/breadcrumbs' => '%VOTING_NAME%',
-  'page/159/breadcrumbs' => '%MUSEUM_NAME%',
   'page/165/breadcrumbs' => '%MOST_NAME%',
   'page/166/breadcrumbs' => '%CAR_TYPE_NAME%',
   'page/167/breadcrumbs' => '%YEAR_NAME%',
@@ -164,8 +127,6 @@
   'page/192/breadcrumbs' => '%PICTURE_NAME%',
   'page/193/breadcrumbs' => '%PICTURE_NAME%',
   'page/194/breadcrumbs' => '%PICTURE_NAME%',
-  'page/131/title' => '',
-  'page/131/breadcrumbs' => '',
   'page/209/name' => '%DATE%',
   'page/209/title' => '%DATE%',
   'page/209/breadcrumbs' => '%DATE%',
@@ -835,7 +796,6 @@ Belarusian site translation: %be-translator%
   'page/39/name' => '%BRAND_NAME%的商标',
   'page/40/name' => '%BRAND_NAME%的其它图片',
   'page/41/name' => '未分类图片',
-  'page/42/name' => '论坛',
   'page/45/name' => '新主题',
   'page/48/name' => '个人主页',
   'page/52/name' => '注册',
@@ -853,7 +813,6 @@ Belarusian site translation: %be-translator%
   'page/71/name' => '权限',
   'page/73/name' => '图片',
   'page/74/name' => '按字母排序',
-  'page/75/name' => '操作日志',
   'page/77/name' => '交通',
   'page/79/name' => '登录',
   'page/83/name' => '移动',
@@ -922,46 +881,28 @@ Belarusian site translation: %be-translator%
   'page/39/title' => '%BRAND_NAME%的商标',
   'page/41/title' => '未分类',
   'page/40/title' => '%BRAND_NAME%的其它',
-  'page/42/title' => '论坛',
-  'page/45/title' => '新主题',
   'page/48/title' => '个人主页',
-  'page/52/title' => '注册',
-  'page/53/title' => '确定',
   'page/56/title' => '更改电子邮箱',
   'page/57/title' => '论坛订阅更新',
-  'page/60/title' => '重设密码',
   'page/63/title' => '用户上传的图片',
   'page/66/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%的所有图片',
-  'page/73/title' => '图片',
-  'page/74/title' => '按字母排序',
-  'page/75/title' => '操作日志',
-  'page/79/title' => '登录',
-  'page/83/title' => '移动',
   'page/86/title' => '图片已成功上传',
   'page/87/title' => '更多',
   'page/102/title' => '%CAR_NAME%性能参数编辑器',
   'page/105/title' => '添加评论',
   'page/106/title' => '规定',
   'page/107/title' => '规定',
-  'page/110/title' => '意见反馈',
   'page/114/title' => 'Specifications log',
-  'page/117/title' => '地图',
   'page/122/title' => '技术参数',
   'page/130/title' => '已贡献图片',
-  'page/134/title' => '设定新密码',
   'page/136/title' => '关于我们',
   'page/138/title' => '%BRAND_NAME% %CAR_TYPE_NAME%按推出时间排序',
   'page/141/title' => '%BRAND_NAME%的图片',
-  'page/144/title' => 'Parent selection',
-  'page/148/title' => 'Cropper',
-  'page/149/title' => '移动图片',
   'page/153/title' => '%BRAND_NAME% Twins',
   'page/154/title' => 'Most %MOST_NAME%',
   'page/155/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME%',
-  'page/161/title' => '活跃度',
   'page/156/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME% %YEAR_NAME%',
   'page/162/title' => '所有图片',
-  'page/163/title' => '新增车辆',
   'page/164/title' => '最顶级的',
   'page/166/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME%',
   'page/167/title' => '最顶级的%MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME% %YEAR_NAME%',
@@ -986,25 +927,16 @@ Belarusian site translation: %be-translator%
   'page/39/breadcrumbs' => '商标',
   'page/40/breadcrumbs' => '杂项',
   'page/41/breadcrumbs' => '未分类',
-  'page/45/breadcrumbs' => '新主题',
   'page/63/breadcrumbs' => '用户的图片',
   'page/66/breadcrumbs' => '所有图片',
-  'page/74/breadcrumbs' => '按字母排序',
-  'page/75/breadcrumbs' => '操作日志',
-  'page/83/breadcrumbs' => '移动',
   'page/86/breadcrumbs' => '成功',
   'page/102/breadcrumbs' => '性能参数编辑器',
   'page/122/breadcrumbs' => '性能参数',
   'page/136/breadcrumbs' => '关于我们',
   'page/141/breadcrumbs' => '%BRAND_NAME% pictures',
-  'page/144/breadcrumbs' => 'Parent selection',
   'page/146/breadcrumbs' => 'Twins group selection',
   'page/147/breadcrumbs' => 'Design project selection',
-  'page/148/breadcrumbs' => 'Cropper',
-  'page/161/breadcrumbs' => '动态',
-  'page/149/breadcrumbs' => '移动图片',
   'page/162/breadcrumbs' => '图片',
-  'page/163/breadcrumbs' => '新增车辆',
   'page/164/breadcrumbs' => 'Mosts',
   'page/173/breadcrumbs' => '贡献排行榜',
   'page/174/breadcrumbs' => '性能参数',
@@ -1016,14 +948,8 @@ Belarusian site translation: %be-translator%
   'page/197/breadcrumbs' => '撰写历史',
   'page/201/name' => '立标',
   'page/202/name' => '剖视',
-  'page/202/title' => '剖视',
-  'page/202/breadcrumbs' => '剖视',
   'page/203/name' => '用户',
-  'page/203/breadcrumbs' => '用户',
-  'page/203/title' => '用户',
   'page/204/name' => 'Telegram',
-  'page/204/title' => 'Telegram',
-  'page/204/breadcrumbs' => 'Telegram',
   'page/205/name' => '评论',
   'page/205/title' => '评论',
   'page/205/breadcrumbs' => '评论',
@@ -1034,8 +960,6 @@ Belarusian site translation: %be-translator%
   'page/211/title' => '好友',
   'page/211/breadcrumbs' => '好友',
   'page/212/name' => 'Picture vote templates',
-  'page/212/breadcrumbs' => 'Picture vote templates',
-  'page/212/title' => 'Picture vote templates',
   'moder-menu/title' => '管理员菜单',
   'moder-menu/inbox' => '收件箱',
   'moder/database-id-%s' => '数据库id: %s',
@@ -1826,15 +1750,15 @@ Transmission is not considered',
   'specs/unit/19/name' => 'v伏',
   'specs/unit/20/abbr' => 'm³',
   'specs/unit/20/name' => '立方米',
-  'telegram/info' => '[Telegram](https://telegram.org/) - is primarily a system of instant messaging, like whatsapp or viber.
+  'telegram/info' => '[Telegram](https://telegram.org/) - is primarily a system of instant messaging, like WhatsApp or Viber.
 
 In addition to the messaging and file transfer, there are many other possibilities, which will go to the description of a lot of time.
 
-We only use two of them: a public groups and bots.
+We only use two of them: public groups and bots.
 
 # Public group
 
-There is an public english-language and russian-language groups for all site visitors.
+There are a public English-language and Russian-language groups for all site visitors.
 
 Join them is very simple - just click the link and follow the instructions:
 
@@ -1847,7 +1771,7 @@ To make you WheelsAge surfing more convenient we just created a "bot" for [teleg
 
 The bot name: [@autowp_bot](tg:msg).
 
-In short, bot is a kind of telegram user, which can send you notifications from site as a messages.
+In short, the bot is a kind of telegram user, which can send you notifications from the site as messages.
 
 Learn more about telegram bots: <https://core.telegram.org/bots/faq>
 
@@ -1860,25 +1784,26 @@ Currently supported features:
 
 ### Start: `/start`
 
-By sending this command you will receive list of currently supported commands.
+By sending this command you will receive the list of currently supported commands.
 
-### <a name="messages"></a> Personal messages: `/messages`
+### Personal messages: `/messages`
 
-Send `/messages on` for subscribe to notifications about new personal messages.
+Send `/messages on` for subscribing to notifications about new personal messages.
 
 Send `/messages off` to unsubscribe.
 
-### <a name="new"></a> New pictures: `/new`
+### New pictures: `/new`
 
-Send `/new BMW` for subscribe to new photos of BMW.
+Send `/new BMW` for subscribing to new photos of BMW.
 
 Send `/new BMW` again to unsubscribe.
 
-### <a name="inbox"></a> Inbox: `/inbox`
 
-Authorization by `/me` is requried.
+### Inbox: `/inbox`
 
-Send `/inbox BMW` for subscribe to notifications about new uploads to BMW.
+Authorization by `/me` is required.
+
+Send `/inbox BMW` for subscribing to notifications about new uploads to BMW.
 
 Send `/inbox BMW` again to unsubscribe.
 
@@ -1886,7 +1811,7 @@ Send `/inbox BMW` again to unsubscribe.
 
 This command allows you to associate themselves (telegram user) with an account on our site.
 
-Send `/me` to receive instructions for autorization.
+Send `/me` to receive instructions for authorization.
 
 Send `/me 123456789` to recevice confirmation code.
 
@@ -1894,7 +1819,7 @@ Where 123456789 - is your account number, which you can find on your profile pag
 
 Confirmation code will be sent to you via [the private messaging system](/ng/account/messages?folder=system)
 
-Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish process of association your telegram account with out website user.
+Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish the process of association your telegram account without website user.
 
 Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/ng/account/messages?folder=system)',
   'personal-message-dialog/title' => 'Send personal message',

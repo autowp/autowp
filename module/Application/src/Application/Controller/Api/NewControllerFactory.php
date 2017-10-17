@@ -21,6 +21,7 @@ class NewControllerFactory implements FactoryInterface
             $container->get(\Application\Model\PictureItem::class),
             $filters->get('api_new_get'),
             $hydrators->get(\Application\Hydrator\Api\PictureHydrator::class),
+            $hydrators->get(\Application\Hydrator\Api\PictureHydrator::class),
             $hydrators->get(\Application\Hydrator\Api\ItemHydrator::class)
         );
     }

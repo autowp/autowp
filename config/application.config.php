@@ -12,7 +12,6 @@ return [
         'Zend\\Mail',
         'Zend\\Mvc\\I18n',
         'Zend\\Mvc\\Console',
-        'Zend\\Mvc\\Plugin\\FlashMessenger',
         'Zend\\Router',
         'Zend\\Session',
         'Zend\\Validator',

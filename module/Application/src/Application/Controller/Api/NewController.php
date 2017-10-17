@@ -15,7 +15,7 @@ use Application\Service\DayPictures;
 
 class NewController extends AbstractRestfulController
 {
-    const PER_PAGE = 18;
+    const PER_PAGE = 30;
     const BRAND_ALL = 'all';
 
     /**
@@ -39,6 +39,11 @@ class NewController extends AbstractRestfulController
     private $pictureHydrator;
 
     /**
+     * @var RestHydrator
+     */
+    private $pictureThumbnailHydrator;
+
+    /**
      * @var Item
      */
     private $itemModel;
@@ -54,13 +59,14 @@ class NewController extends AbstractRestfulController
         PictureItem $pictureItem,
         InputFilter $inputFilter,
         RestHydrator $pictureHydrator,
+        RestHydrator $pictureThumbnailHydrator,
         RestHydrator $itemHydrator
     ) {
         $this->picture = $picture;
         $this->inputFilter = $inputFilter;
         $this->pictureItem = $pictureItem;
         $this->pictureHydrator = $pictureHydrator;
-        $this->pictureThumbnailHydrator = clone $pictureHydrator;
+        $this->pictureThumbnailHydrator = $pictureThumbnailHydrator;
         $this->itemModel = $itemModel;
         $this->itemHydrator = $itemHydrator;
     }

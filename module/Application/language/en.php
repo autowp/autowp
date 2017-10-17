@@ -1,5 +1,4 @@
 <?php return array (
-  'forums/theme/all-other/description' => 'Other topics not included in the above sections',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
@@ -13,7 +12,6 @@
   'page/32/name' => '%ARTICLE_NAME%',
   'page/33/name' => '%CAR_NAME%',
   'page/43/name' => '%THEME_NAME%',
-  'page/44/name' => '%TOPIC_NAME%',
   'page/58/name' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/59/name' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/62/name' => '%USER_NAME%',
@@ -44,20 +42,10 @@
   'page/26/title' => '%TWINS_GROUP_NAME%',
   'page/32/title' => '%ARTICLE_NAME%',
   'page/33/title' => '%CAR_NAME%',
-  'page/43/title' => '%THEME_NAME%',
-  'page/44/title' => '%TOPIC_NAME%',
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/61/title' => '',
   'page/62/title' => '%USER_NAME%',
-  'page/67/title' => '',
-  'page/68/title' => '',
-  'page/69/title' => '',
-  'page/70/title' => '',
-  'page/71/title' => '',
-  'page/72/title' => '%PICTURE_NAME%',
-  'page/77/title' => '',
-  'page/78/title' => '%CAR_NAME%',
   'page/85/title' => '%BRAND_NAME%',
   'page/89/title' => '',
   'page/90/title' => '',
@@ -66,14 +54,11 @@
   'page/100/title' => '',
   'page/101/title' => '%ATTR_NAME%',
   'page/104/title' => '',
-  'page/119/title' => '',
   'page/120/title' => '',
   'page/124/title' => '',
-  'page/135/title' => '',
   'page/140/title' => '%BRAND_TYPE_NAME%',
   'page/142/title' => '%ZONE_NAME%',
   'page/157/title' => '%VOTING_NAME%',
-  'page/159/title' => '%MUSEUM_NAME%',
   'page/165/title' => '%MOST_NAME% %BRAND_NAME%',
   'page/181/title' => '%FACTORY_NAME%',
   'page/183/title' => '%PICTURE_NAME%',
@@ -98,29 +83,13 @@
   'page/29/breadcrumbs' => '',
   'page/32/breadcrumbs' => '%ARTICLE_NAME%',
   'page/33/breadcrumbs' => '%SHORT_CAR_NAME%',
-  'page/42/breadcrumbs' => '',
-  'page/43/breadcrumbs' => '%THEME_NAME%',
-  'page/44/breadcrumbs' => '%TOPIC_NAME%',
   'page/48/breadcrumbs' => '',
-  'page/52/breadcrumbs' => '',
-  'page/53/breadcrumbs' => '',
   'page/56/breadcrumbs' => '',
   'page/57/breadcrumbs' => '',
   'page/58/breadcrumbs' => '%DPBRAND_NAME%',
   'page/59/breadcrumbs' => '%DESIGN_PROJECT_NAME%',
-  'page/60/breadcrumbs' => '',
   'page/61/breadcrumbs' => '',
   'page/62/breadcrumbs' => '%USER_NAME%',
-  'page/67/breadcrumbs' => '',
-  'page/68/breadcrumbs' => '',
-  'page/69/breadcrumbs' => '',
-  'page/70/breadcrumbs' => '',
-  'page/71/breadcrumbs' => '',
-  'page/72/breadcrumbs' => '%PICTURE_NAME%',
-  'page/73/breadcrumbs' => '',
-  'page/78/breadcrumbs' => '%CAR_NAME%',
-  'page/77/breadcrumbs' => '',
-  'page/79/breadcrumbs' => '',
   'page/85/breadcrumbs' => '%BRAND_NAME%',
   'page/87/breadcrumbs' => '',
   'page/89/breadcrumbs' => '',
@@ -133,15 +102,10 @@
   'page/105/breadcrumbs' => '',
   'page/106/breadcrumbs' => '',
   'page/107/breadcrumbs' => '',
-  'page/110/breadcrumbs' => '',
   'page/114/breadcrumbs' => '',
-  'page/117/breadcrumbs' => '',
-  'page/119/breadcrumbs' => '',
   'page/120/breadcrumbs' => '',
   'page/124/breadcrumbs' => '',
   'page/130/breadcrumbs' => '',
-  'page/134/breadcrumbs' => '',
-  'page/135/breadcrumbs' => '',
   'page/138/breadcrumbs' => '%CAR_TYPE_NAME%',
   'page/140/breadcrumbs' => '%BRAND_TYPE_NAME%',
   'page/142/breadcrumbs' => '%ZONE_NAME%',
@@ -150,7 +114,6 @@
   'page/155/breadcrumbs' => '%CAR_TYPE_NAME%',
   'page/156/breadcrumbs' => '%YEAR_NAME%',
   'page/157/breadcrumbs' => '%VOTING_NAME%',
-  'page/159/breadcrumbs' => '%MUSEUM_NAME%',
   'page/165/breadcrumbs' => '%MOST_NAME%',
   'page/166/breadcrumbs' => '%CAR_TYPE_NAME%',
   'page/167/breadcrumbs' => '%YEAR_NAME%',
@@ -164,8 +127,6 @@
   'page/192/breadcrumbs' => '%PICTURE_NAME%',
   'page/193/breadcrumbs' => '%PICTURE_NAME%',
   'page/194/breadcrumbs' => '%PICTURE_NAME%',
-  'page/131/title' => '',
-  'page/131/breadcrumbs' => '',
   'page/209/name' => '%DATE%',
   'page/209/title' => '%DATE%',
   'page/209/breadcrumbs' => '%DATE%',
@@ -843,11 +804,10 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/39/name' => '%BRAND_NAME% logotypes',
   'page/40/name' => '%BRAND_NAME% miscellaneous',
   'page/41/name' => 'Unsorted',
-  'page/42/name' => 'Forums',
   'page/45/name' => 'New topic',
   'page/48/name' => 'Cabinet',
   'page/52/name' => 'Registration',
-  'page/53/name' => 'ok',
+  'page/53/name' => 'Successful registration',
   'page/56/name' => 'Changed',
   'page/57/name' => 'Forums subscriptions',
   'page/60/name' => 'Password recovery',
@@ -861,7 +821,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/71/name' => 'Rights',
   'page/73/name' => 'Pictures',
   'page/74/name' => 'Alphabetical vehicles list',
-  'page/75/name' => 'Log of events',
   'page/77/name' => 'Traffic',
   'page/79/name' => 'Sign in',
   'page/83/name' => 'Move',
@@ -930,46 +889,28 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/39/title' => '%BRAND_NAME% logotypes',
   'page/41/title' => 'Unsorted',
   'page/40/title' => '%BRAND_NAME% miscellaneous',
-  'page/42/title' => 'Forums',
-  'page/45/title' => 'New topic',
   'page/48/title' => 'Cabinet',
-  'page/52/title' => 'Registration',
-  'page/53/title' => 'Successful registration',
   'page/56/title' => 'Changing e-mail',
   'page/57/title' => 'Forums subscriptions',
-  'page/60/title' => 'Password recovery',
   'page/63/title' => 'User\'s pictures',
   'page/66/title' => 'All pictures of %BRAND_NAME% %DESIGN_PROJECT_NAME%',
-  'page/73/title' => 'Pictures',
-  'page/74/title' => 'Alphabetical vehicles list',
-  'page/75/title' => 'Log of events',
-  'page/79/title' => 'Sign in',
-  'page/83/title' => 'Move',
   'page/86/title' => 'Image successfully uploaded to the site',
   'page/87/title' => 'More',
   'page/102/title' => 'Specs editors %CAR_NAME%',
   'page/105/title' => 'Add a comment',
   'page/106/title' => 'Rules',
   'page/107/title' => 'Delete votes',
-  'page/110/title' => 'Comments',
   'page/114/title' => 'Log of events',
-  'page/117/title' => 'Map',
   'page/122/title' => 'Specifications',
   'page/130/title' => 'My pictures',
-  'page/134/title' => 'New password',
   'page/136/title' => 'About us',
   'page/138/title' => '%BRAND_NAME% %CAR_TYPE_NAME% in chronological order',
   'page/141/title' => '%BRAND_NAME% pictures',
-  'page/144/title' => 'Parent selection',
-  'page/148/title' => 'Cropper',
-  'page/149/title' => 'Move picture',
   'page/153/title' => '%BRAND_NAME% Twins',
   'page/154/title' => 'Most %MOST_NAME%',
   'page/155/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME%',
-  'page/161/title' => 'Pulse',
   'page/156/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME% %YEAR_NAME%',
   'page/162/title' => 'Pictures',
-  'page/163/title' => 'New vehicle',
   'page/164/title' => 'Mosts',
   'page/166/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME%',
   'page/167/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME% %YEAR_NAME%',
@@ -994,25 +935,16 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/39/breadcrumbs' => 'Logotypes',
   'page/40/breadcrumbs' => 'Miscellaneous',
   'page/41/breadcrumbs' => 'Unsorted',
-  'page/45/breadcrumbs' => 'New topic',
   'page/63/breadcrumbs' => 'User\'s pictures',
   'page/66/breadcrumbs' => 'All pictures',
-  'page/74/breadcrumbs' => 'Alphabetical vehicles list',
-  'page/75/breadcrumbs' => 'Log of events',
-  'page/83/breadcrumbs' => 'Move',
   'page/86/breadcrumbs' => 'Success',
   'page/102/breadcrumbs' => 'Specs editors',
   'page/122/breadcrumbs' => 'Specifications',
   'page/136/breadcrumbs' => 'About us',
   'page/141/breadcrumbs' => '%BRAND_NAME% pictures',
-  'page/144/breadcrumbs' => 'Brand selection',
   'page/146/breadcrumbs' => 'Twins group selection',
   'page/147/breadcrumbs' => 'Design project selection',
-  'page/148/breadcrumbs' => 'Cropper',
-  'page/161/breadcrumbs' => 'Pulse',
-  'page/149/breadcrumbs' => 'Move picture',
   'page/162/breadcrumbs' => 'Pictures',
-  'page/163/breadcrumbs' => 'New vehicle',
   'page/164/breadcrumbs' => 'Mosts',
   'page/173/breadcrumbs' => 'Statistics',
   'page/174/breadcrumbs' => 'Specs',
@@ -1024,14 +956,8 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/197/breadcrumbs' => 'Text history',
   'page/201/name' => 'Mascots',
   'page/202/name' => 'Perspectives',
-  'page/202/title' => 'Perspectives',
-  'page/202/breadcrumbs' => 'Perspectives',
   'page/203/name' => 'Users',
-  'page/203/breadcrumbs' => 'Users',
-  'page/203/title' => 'Users',
   'page/204/name' => 'Telegram',
-  'page/204/title' => 'Telegram',
-  'page/204/breadcrumbs' => 'Telegram',
   'page/205/name' => 'Comments',
   'page/205/title' => 'Comments',
   'page/205/breadcrumbs' => 'Comments',
@@ -1042,8 +968,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/211/title' => 'Contacts',
   'page/211/breadcrumbs' => 'Contacts',
   'page/212/name' => 'Picture vote templates',
-  'page/212/breadcrumbs' => 'Picture vote templates',
-  'page/212/title' => 'Picture vote templates',
   'moder-menu/title' => 'Moderator menu',
   'moder-menu/inbox' => 'Inbox',
   'moder/database-id-%s' => 'Database id: %s',
@@ -1834,15 +1758,15 @@ Transmission is not considered',
   'specs/unit/19/name' => 'volt',
   'specs/unit/20/abbr' => 'm³',
   'specs/unit/20/name' => 'cubic meter',
-  'telegram/info' => '[Telegram](https://telegram.org/) - is primarily a system of instant messaging, like whatsapp or viber.
+  'telegram/info' => '[Telegram](https://telegram.org/) - is primarily a system of instant messaging, like WhatsApp or Viber.
 
 In addition to the messaging and file transfer, there are many other possibilities, which will go to the description of a lot of time.
 
-We only use two of them: a public groups and bots.
+We only use two of them: public groups and bots.
 
 # Public group
 
-There is an public english-language and russian-language groups for all site visitors.
+There are a public English-language and Russian-language groups for all site visitors.
 
 Join them is very simple - just click the link and follow the instructions:
 
@@ -1855,7 +1779,7 @@ To make you WheelsAge surfing more convenient we just created a "bot" for [teleg
 
 The bot name: [@autowp_bot](tg:msg).
 
-In short, bot is a kind of telegram user, which can send you notifications from site as a messages.
+In short, the bot is a kind of telegram user, which can send you notifications from the site as messages.
 
 Learn more about telegram bots: <https://core.telegram.org/bots/faq>
 
@@ -1868,26 +1792,26 @@ Currently supported features:
 
 ### Start: `/start`
 
-By sending this command you will receive list of currently supported commands.
+By sending this command you will receive the list of currently supported commands.
 
-### <a name="messages"></a> Personal messages: `/messages`
+### Personal messages: `/messages`
 
-Send `/messages on` for subscribe to notifications about new personal messages.
+Send `/messages on` for subscribing to notifications about new personal messages.
 
 Send `/messages off` to unsubscribe.
 
-### <a name="new"></a> New pictures: `/new`
+### New pictures: `/new`
 
-Send `/new BMW` for subscribe to new photos of BMW.
+Send `/new BMW` for subscribing to new photos of BMW.
 
 Send `/new BMW` again to unsubscribe.
 
 
-### <a name="inbox"></a> Inbox: `/inbox`
+### Inbox: `/inbox`
 
-Authorization by `/me` is requried.
+Authorization by `/me` is required.
 
-Send `/inbox BMW` for subscribe to notifications about new uploads to BMW.
+Send `/inbox BMW` for subscribing to notifications about new uploads to BMW.
 
 Send `/inbox BMW` again to unsubscribe.
 
@@ -1895,7 +1819,7 @@ Send `/inbox BMW` again to unsubscribe.
 
 This command allows you to associate themselves (telegram user) with an account on our site.
 
-Send `/me` to receive instructions for autorization.
+Send `/me` to receive instructions for authorization.
 
 Send `/me 123456789` to recevice confirmation code.
 
@@ -1903,7 +1827,7 @@ Where 123456789 - is your account number, which you can find on your profile pag
 
 Confirmation code will be sent to you via [the private messaging system](/ng/account/messages?folder=system)
 
-Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish process of association your telegram account with out website user.
+Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish the process of association your telegram account without website user.
 
 Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/ng/account/messages?folder=system)',
   'personal-message-dialog/title' => 'Send personal message',
