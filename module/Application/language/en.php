@@ -1,4 +1,5 @@
 <?php return array (
+  'page/42/name' => 'Forums',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
@@ -730,6 +731,7 @@ We will try not to disappoint you.',
   'car-type-rp/tractor' => 'Tractor',
   'car-type-rp/tracked' => 'Tracked platform',
   'about/text' => '### People
+
 Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
 
 Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
@@ -1209,7 +1211,7 @@ Sincerely, robot www.wheelsage.org
 
 Осуществить это поможет [специальный интерфейс](/account/specs-conflicts/conflict/minus-weight), в котором собраны по крайней мере те ошибки, которые обнаружили посетители сайта.',
   'specifications-editor/admin/date' => 'Date',
-  'specifications-editor/errors-alert' => '**Внимание!** Вроятно, у вас накопилось существенное количество ошибок.
+  'specifications-editor/errors-alert' => '**Attention!** Вроятно, у вас накопилось существенное количество ошибок.
 
 Некоторые из них, обнаруженные другими посетителями, вы можете найти [здесь](/account/specs-conflicts)',
   'specifications-editor/admin/user' => 'User',
@@ -1268,11 +1270,11 @@ Reason: %s',
   'Brand \'%value%\' already exists' => 'Brand \'%value%\' already exists',
   'E-mail \'%value%\' not registered' => 'E-mail \'%value%\' not registered',
   'E-mail \'%value%\' already registered' => 'E-mail \'%value%\' already registered',
-  'specs/attrs/45' => 'название модификации',
-  'specs/attrs/95' => 'года выпуска',
+  'specs/attrs/45' => 'Modification name',
+  'specs/attrs/95' => 'Production years',
   'specs/attrs/95/96' => 'с',
   'specs/attrs/95/97' => 'по',
-  'specs/attrs/95/106' => 'продажи',
+  'specs/attrs/95/106' => 'Sales',
   'specs/attrs/95/106/109' => 'с',
   'specs/attrs/95/106/109/129' => 'год',
   'specs/attrs/95/106/109/130' => 'месяц',

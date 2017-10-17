@@ -1,4 +1,5 @@
 {
+    "page/42/name": "Forums",
     "page/51/name": "Nouvelles photos",
     "inbox/all-brands": "All brands",
     "forums/theme/all-other/description": "Other topics not included in the above sections",
@@ -696,7 +697,6 @@
     "page/39/name": "Logotypes de %BRAND_NAME%",
     "page/40/name": "%BRAND_NAME% varié",
     "page/41/name": "Non triée",
-    "page/42/name": "Forums",
     "page/45/name": "Nouveau sujet",
     "page/48/name": "Page personnelle",
     "page/49/name": "Messages personnels",

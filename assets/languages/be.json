@@ -1,4 +1,5 @@
 {
+    "page/42/name": "Форумы",
     "page/51/name": "Новыя выявы",
     "inbox/all-brands": "Усе маркі",
     "forums/theme/all-other/description": "Іншыя тэмы, якія не ўвайшлі ў вышэйпералічаныя раздзелы",
@@ -696,7 +697,6 @@
     "page/39/name": "Лагатыпы %BRAND_NAME%",
     "page/40/name": "%BRAND_NAME% Рознае",
     "page/41/name": "Несартавана",
-    "page/42/name": "Форумы",
     "page/45/name": "Дадаць топік",
     "page/48/name": "Асабісты кабінет",
     "page/49/name": "Асабістыя паведамленні",

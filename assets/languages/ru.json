@@ -1,4 +1,5 @@
 {
+    "page/42/name": "Форумы",
     "page/51/name": "Новые изображения",
     "inbox/all-brands": "Все марки",
     "forums/theme/all-other/description": "Другие темы, не вошедшие в вышеперечисленные разделы",
@@ -696,7 +697,6 @@
     "page/39/name": "Логотипы %BRAND_NAME%",
     "page/40/name": "%BRAND_NAME% Разное",
     "page/41/name": "Несортировано",
-    "page/42/name": "Форумы",
     "page/45/name": "Добавить топик",
     "page/48/name": "Личный кабинет",
     "page/49/name": "Личные сообщения",
@@ -1005,7 +1005,7 @@
     "moder/vehicle/catalogue/parent-name-placeholder": "Название",
     "moder/vehicle/catalogue/parent-catname-placeholder": "часть URL",
     "moder/vehicle/catalogue/turbo-group-creator": "Турбо объединятор в группы",
-    "moder/vehicle/catalogue/turbo-group-creator/text": "Tool for join few vehicles into sub-model",
+    "moder/vehicle/catalogue/turbo-group-creator/text": "Инструмент для объединения нескольких автомобилей в под-модель",
     "moder/vehicle/catalogue/turbo-group-creator/vehicles": "Автомобили",
     "moder/vehicle/catalogue/add-brand": "Бренд ...",
     "moder/vehicle/catalogue/add-brand-%s": "Бренд %s",

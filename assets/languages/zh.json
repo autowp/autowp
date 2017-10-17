@@ -1,4 +1,5 @@
 {
+    "page/42/name": "论坛",
     "page/51/name": "最新添加",
     "inbox/all-brands": "All brands",
     "forums/theme/all-other/description": "Other topics not included in the above sections",
@@ -696,7 +697,6 @@
     "page/39/name": "%BRAND_NAME%的商标",
     "page/40/name": "%BRAND_NAME%的其它图片",
     "page/41/name": "未分类图片",
-    "page/42/name": "论坛",
     "page/45/name": "新主题",
     "page/48/name": "个人主页",
     "page/49/name": "站内信",

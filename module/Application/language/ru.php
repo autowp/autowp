@@ -1,4 +1,5 @@
 <?php return array (
+  'page/42/name' => 'Форумы',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
