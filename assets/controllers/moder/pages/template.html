@@ -18,7 +18,7 @@
                 <button class="btn btn-default btn-sm" ng-disabled="!page.moveDown" aria-label="move down" ng-click="ctrl.move(page, 'down')"><i class="fa fa-arrow-down"></i></button>
             </td>
             <td ng-bind="page.id"></td>
-            <td style="padding-left:{{page.level * 20}}px" ng-bind="'page/' + page.id + '/name'|translate"></td>
+            <td style="padding-left:{page.level * 20}px" ng-bind="'page/' + page.id + '/name'|translate"></td>
             <td ng-bind="page.breadcrumbs"></td>
             <td>{{page.is_group_node ? 'yes' : 'no'}}</td>
             <td style="white-space:nowrap">
