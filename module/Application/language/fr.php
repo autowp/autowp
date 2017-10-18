@@ -918,7 +918,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/164/title' => 'Les meilleurs',
   'page/166/title' => 'La plupart %MOST_NAME% %CAR_TYPE_NAME% de %BRAND_NAME%',
   'page/167/title' => 'La plupart %MOST_NAME% %CAR_TYPE_NAME% de %BRAND_NAME% de %YEAR_NAME%',
-  'page/173/title' => 'La statistique',
   'page/174/title' => 'Spécifications',
   'page/180/title' => 'Des usines',
   'page/182/title' => 'Produits',
@@ -948,7 +947,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/141/breadcrumbs' => 'Images de %BRAND_NAME%',
   'page/162/breadcrumbs' => 'Toutes les images',
   'page/164/breadcrumbs' => 'Les meilleurs',
-  'page/173/breadcrumbs' => 'La statistique',
   'page/174/breadcrumbs' => 'Spécifications',
   'page/180/breadcrumbs' => 'Des usines',
   'page/182/breadcrumbs' => 'Produits',
@@ -1215,7 +1213,7 @@ Réaliser cela aidera à [une interface spéciale](/account/specs-conflicts/conf
   'specifications-editor/admin/date' => 'Date',
   'specifications-editor/errors-alert' => '**Attention!** Probablement, vous avez accumulé un grand nombre d\'erreurs.
 
-Certains d\'entre eux, trouvés par d\'autres utilisateurs, vous pouvez trouver [ici](/account/specs-conflicts)',
+Certains d\'entre eux, trouvés par d\'autres utilisateurs, vous pouvez trouver [ici](/ng/account/specs-conflicts)',
   'specifications-editor/admin/user' => 'Utilisateur',
   'specifications-editor/admin/parameter' => 'Paramètre',
   'specifications-editor/admin/value' => 'Valueur',

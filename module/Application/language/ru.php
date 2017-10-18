@@ -731,6 +731,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'car-type-rp/tractor' => 'Тракторов',
   'car-type-rp/tracked' => 'Гусеничных платформ',
   'about/text' => '### Наши люди
+
 Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
 
 Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
@@ -808,7 +809,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/45/name' => 'Добавить топик',
   'page/48/name' => 'Личный кабинет',
   'page/52/name' => 'Регистрация',
-  'page/53/name' => 'ok',
+  'page/53/name' => 'Успешная регистрация',
   'page/56/name' => 'Изменен',
   'page/57/name' => 'Подписки в форуме',
   'page/60/name' => 'Восстановление пароля',
@@ -915,7 +916,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/164/title' => 'Самые-самые',
   'page/166/title' => 'Самые %MOST_NAME% среди %CAR_TYPE_NAME% %BRAND_NAME%',
   'page/167/title' => 'Самые %MOST_NAME% среди %CAR_TYPE_NAME% %BRAND_NAME% %YEAR_NAME%',
-  'page/173/title' => 'Статистика',
   'page/174/title' => 'Specs',
   'page/180/title' => 'Заводы',
   'page/182/title' => 'Продукция',
@@ -945,7 +945,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/141/breadcrumbs' => 'Добавленные картинки %BRAND_NAME%',
   'page/162/breadcrumbs' => 'Все изображения',
   'page/164/breadcrumbs' => 'Самые-самые',
-  'page/173/breadcrumbs' => 'Статистика',
   'page/174/breadcrumbs' => 'Specs',
   'page/180/breadcrumbs' => 'Заводы',
   'page/182/breadcrumbs' => 'Продукция',
@@ -1215,7 +1214,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'specifications-editor/admin/date' => 'Дата',
   'specifications-editor/errors-alert' => '**Внимание!** Вроятно, у вас накопилось существенное количество ошибок.
 
-Некоторые из них, обнаруженные другими посетителями, вы можете найти [здесь](/account/specs-conflicts)',
+Некоторые из них, обнаруженные другими посетителями, вы можете найти [здесь](/ng/account/specs-conflicts)',
   'specifications-editor/admin/user' => 'Пользователь',
   'specifications-editor/admin/parameter' => 'Характеристика',
   'specifications-editor/admin/value' => 'Значение',

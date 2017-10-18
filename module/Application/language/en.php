@@ -915,7 +915,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/164/title' => 'Mosts',
   'page/166/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME%',
   'page/167/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME% %YEAR_NAME%',
-  'page/173/title' => 'Statistics',
   'page/174/title' => 'Specs',
   'page/180/title' => 'Factories',
   'page/182/title' => 'Products',
@@ -945,7 +944,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/141/breadcrumbs' => '%BRAND_NAME% pictures',
   'page/162/breadcrumbs' => 'Pictures',
   'page/164/breadcrumbs' => 'Mosts',
-  'page/173/breadcrumbs' => 'Statistics',
   'page/174/breadcrumbs' => 'Specs',
   'page/180/breadcrumbs' => 'Factories',
   'page/182/breadcrumbs' => 'Products',
@@ -1213,7 +1211,7 @@ Sincerely, robot www.wheelsage.org
   'specifications-editor/admin/date' => 'Date',
   'specifications-editor/errors-alert' => '**Attention!** Вроятно, у вас накопилось существенное количество ошибок.
 
-Некоторые из них, обнаруженные другими посетителями, вы можете найти [здесь](/account/specs-conflicts)',
+Некоторые из них, обнаруженные другими посетителями, вы можете найти [здесь](/ng/account/specs-conflicts)',
   'specifications-editor/admin/user' => 'User',
   'specifications-editor/admin/parameter' => 'Parameter',
   'specifications-editor/admin/value' => 'Value',

@@ -1961,7 +1961,7 @@ return [
                         'name'    => 'Between',
                         'options' => [
                             'min' => 1,
-                            'max' => 24
+                            'max' => 30
                         ]
                     ]
                 ]
