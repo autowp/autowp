@@ -33,15 +33,14 @@
             <td><autowp-user user="row.user"></autowp-user></td>
             <td>
                 <div ng-if="row.brands.length > 0">
-                    <a ng-repeat-start="brand in row.brands" href="{{brand.url}}" ng-bind="brand.name"></a>
-                    <span ng-repeat-end>, </span>
+                    <a ng-repeat-start="brand in row.brands" href="{{brand.url}}" ng-bind="brand.name"></a><span ng-repeat-end>, </span>
                     …
                 </div>
                 <small ng-if="row.fans.length > 0">
                     <autowp-user ng-repeat-start="fan in row.fans" user="fan.user"></autowp-user>
                     <span class="badge" ng-bind="(fan.volume > 0 ? '+' : '') + fan.volume"></span>
                     <span ng-repeat-end>, </span>
-                    … 
+                    …
                 </small>
             </td>{{ number_expression | number : fractionSize}}
             <td class="text-right" ng-bind="row.volume | number: 0"></td>

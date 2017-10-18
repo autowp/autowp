@@ -219,8 +219,8 @@ class RatingController extends AbstractActionController
             if ($idx++ < 10) {
                 foreach ($this->picture->getTopOwnerFans($ownerId, 2) as $fanId => $fanVolume) {
                     $fans[] = [
-                        'user_id' => $fanId,
-                        'volume'  => $fanVolume
+                        'user'   => $this->userHydrator->extract($this->userModel->getRow($fanId)),
+                        'volume' => $fanVolume
                     ];
                 }
             }
