@@ -71,6 +71,7 @@ return [
             Controller\Api\PictureModerVoteTemplateController::class => Controller\Api\Service\PictureModerVoteTemplateControllerFactory::class,
             Controller\Api\PictureVoteController::class     => Controller\Api\Service\PictureVoteControllerFactory::class,
             Controller\Api\PulseController::class           => Controller\Api\PulseControllerFactory::class,
+            Controller\Api\RatingController::class          => Controller\Api\RatingControllerFactory::class,
             Controller\Api\RecaptchaController::class       => Controller\Api\RecaptchaControllerFactory::class,
             Controller\Api\RestorePasswordController::class => Controller\Api\RestorePasswordControllerFactory::class,
             Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
@@ -1743,6 +1744,54 @@ return [
                                 'action'     => 'index',
                             ],
                         ],
+                    ],
+                    'rating' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/rating',
+                            'defaults' => [
+                                'controller' => Controller\Api\RatingController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'specs' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/specs',
+                                    'defaults' => [
+                                        'action' => 'specs'
+                                    ],
+                                ],
+                            ],
+                            'pictures' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/pictures',
+                                    'defaults' => [
+                                        'action' => 'pictures'
+                                    ],
+                                ],
+                            ],
+                            'likes' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/likes',
+                                    'defaults' => [
+                                        'action' => 'likes'
+                                    ],
+                                ],
+                            ],
+                            'picture-likes' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/picture-likes',
+                                    'defaults' => [
+                                        'action' => 'picture-likes'
+                                    ],
+                                ],
+                            ],
+                        ]
                     ],
                     'recaptcha' => [
                         'type' => 'Literal',

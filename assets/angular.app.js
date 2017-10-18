@@ -33,6 +33,7 @@ import './controllers/restore-password';
 import './controllers/telegram';
 import './controllers/signup';
 import './controllers/top-view';
+import './controllers/users';
 import './controllers/moder';
 import './controllers/moder/item-parent';
 import './controllers/moder/items';

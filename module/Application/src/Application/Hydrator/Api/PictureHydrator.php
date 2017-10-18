@@ -243,7 +243,6 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('owner')) {
-
             $owner = null;
             if ($object['owner_id']) {
                 $owner = $this->userModel->getRow((int)$object['owner_id']);

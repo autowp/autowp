@@ -88,7 +88,7 @@ html {
 <?php if (count($this->specsCars) > 0) { ?>
     <h4>
         <?=$this->escapeHtml($this->translate('index/specifications'))?>
-        <small><?=$this->htmlA('/users/rating', $this->page(173)->name)?></small>
+        <small><?=$this->htmlA('/ng/users/rating', $this->page(173)->name)?></small>
     </h4>
     <?=$this->partial('application/index/partial/specs-cars', $this->specsCars)?>
 <?php } ?>

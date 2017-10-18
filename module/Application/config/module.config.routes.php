@@ -632,49 +632,6 @@ return [
                             ]
                         ]
                     ],
-                    'rating' => [
-                        'type' => 'Literal',
-                        'options' => [
-                            'route' => '/rating',
-                            'defaults' => [
-                                'action' => 'rating',
-                                'rating' =>  'specs'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'pictures' => [
-                                'type' => 'Literal',
-                                'options' => [
-                                    'route' => '/pictures',
-                                    'defaults' => [
-                                        'action' => 'rating',
-                                        'rating' =>  'pictures'
-                                    ],
-                                ],
-                            ],
-                            'likes' => [
-                                'type' => 'Literal',
-                                'options' => [
-                                    'route' => '/likes',
-                                    'defaults' => [
-                                        'action' => 'rating',
-                                        'rating' =>  'likes'
-                                    ],
-                                ],
-                            ],
-                            'picture-likes' => [
-                                'type' => 'Literal',
-                                'options' => [
-                                    'route' => '/picture-likes',
-                                    'defaults' => [
-                                        'action' => 'rating',
-                                        'rating' =>  'picture-likes'
-                                    ],
-                                ],
-                            ]
-                        ]
-                    ]
                 ]
             ],
             'votings' => [
