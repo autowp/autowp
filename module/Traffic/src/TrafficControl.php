@@ -44,7 +44,7 @@ class TrafficControl
             'time'   => 5 * 24 * 3600
         ],
         [
-            'limit'  => 300,
+            'limit'  => 450,
             'reason' => 'ten limit',
             'group'  => ['hour', 'tenminute'],
             'time'   => 24 * 3600
