@@ -140,9 +140,9 @@ class TrafficControl
         foreach ($rows as $row) {
             $ip = inet_ntop($row['ip']);
 
-            if ($this->inWhiteList($ip)) {
+            /*if ($this->inWhiteList($ip)) {
                 continue;
-            }
+            }*/
 
             print $profile['reason'] . ' ' . $ip . PHP_EOL;
 
