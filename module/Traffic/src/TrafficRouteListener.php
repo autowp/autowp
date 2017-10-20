@@ -59,7 +59,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 return $response;
             }
 
-            if (! $unlimitedTraffic && ! $service->inWhiteList($ip)) {
+            if (! $unlimitedTraffic) { //  && ! $service->inWhiteList($ip)
                 $service->pushHit($ip);
             }
         }
