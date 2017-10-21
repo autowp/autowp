@@ -174,9 +174,9 @@ All images are posted for educational purposes.
   'index/brands' => 'Brands',
   'index/factories' => 'Factories',
   'index/specifications' => 'Specifications',
-  'index/twins/description' => 'Вы знаете, что Daewoo Matiz имеет аж целых [шесть клонов](/twins/group118812)? А знаете, что [общего у Lotus и Kia](/twins/group118750)? Уверены, что вам покажется интересным этот раздел.',
+  'index/twins/description' => 'Do you know that Daewoo Matiz has as many as [six clones](/twins/group118812)? And you know what [common in Lotus and Kia](/twins/group118750)? We are sure that you will find this section interesting.',
   'index/categories/description' => 'А знаете ли вы, какая техника помогала блюсти правопорядок на улицах мировых городов в разное время? А на каких автомобилях ездил Папа Римский? Нет? Тогда вам точно в этот раздел.',
-  'index/categories/mosts' => 'Хотите знать, какой автомобиль был самым быстрым? Хотите знать, сколько весит самый могучий карьерный самосвал? Заходите и узнаете.',
+  'index/categories/mosts' => 'Want to know which car was the fastest? Do you want to know how much the most powerful mining truck weighs? Come and find out.',
   'mosts/fastest/roadster' => 'Most fastest roadsters',
   'mosts/mighty/sedan/today' => 'Most mighty sedans today',
   'mosts/dynamic/universal/2000-09' => 'Most dynamic universals in 2000\'s',
@@ -771,7 +771,7 @@ Belarusian site translation: %be-translator%
 
 Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
 
-Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
+Исходный код сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
 
 %github%
 
@@ -1234,7 +1234,7 @@ Reason: %s',
   'pm/new-picture-%s-vote-%s/delete' => 'New picture delete vote
 %s
 Reason: %s',
-  'pm/user-%s-accept-replace-%s-%s' => '%s accept replacement %s на %s',
+  'pm/user-%s-accept-replace-%s-%s' => '%s accept replacement %s to %s',
   'pm/your-picture-accepted-%s' => 'Your picture was accepted
 %s',
   'pm/user-%s-edited-twins-description-%s-%s' => 'User %s edited twins group description %s ( %s )',
@@ -1256,7 +1256,7 @@ Reason: %s',
   'moder/vehicle/changes/produced/count-%s-%s' => 'produced count from "%s" to "%s"',
   'moder/vehicle/changes/produced/exactly-%s-%s' => 'produced count exactly from "%s" to "%s"',
   'moder/vehicle/changes/is-group-%s-%s' => 'group flag from "%s" to "%s"',
-  'moder/vehicle/changes/car-type-%s-%s' => 'car type from "%s" to "%s"',
+  'moder/vehicle/changes/car-type-%s-%s' => 'vehicle type from "%s" to "%s"',
   'moder/vehicle/changes/model-years/from-%s-%s' => 'start model year from "%s" to "%s"',
   'moder/vehicle/changes/model-years/to-%s-%s' => 'end model year from "%s" to "%s"',
   'moder/vehicle/changes/spec-%s-%s' => 'spec from "%s" to "%s"',

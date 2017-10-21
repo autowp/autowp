@@ -1593,7 +1593,7 @@ DROP TABLE IF EXISTS `language`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `language` (
-  `code` varchar(2) NOT NULL,
+  `code` varchar(5) NOT NULL,
   PRIMARY KEY (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1603,7 +1603,7 @@ CREATE TABLE `language` (
 --
 
 /*!40000 ALTER TABLE `language` DISABLE KEYS */;
-INSERT IGNORE INTO `language` (`code`) VALUES ('de'),('en'),('es'),('fr'),('it'),('pt'),('ru'),('zh'),('uk'),('be'),('xx');
+INSERT IGNORE INTO `language` (`code`) VALUES ('de'),('en'),('es'),('fr'),('it'),('pt'),('ru'),('zh'),('uk'),('be'),('pt-br'),('xx');
 /*!40000 ALTER TABLE `language` ENABLE KEYS */;
 
 --
@@ -2039,29 +2039,6 @@ CREATE TABLE `personal_messages` (
 
 /*!40000 ALTER TABLE `personal_messages` DISABLE KEYS */;
 /*!40000 ALTER TABLE `personal_messages` ENABLE KEYS */;
-
---
--- Table structure for table `perspective_language`
---
-
-DROP TABLE IF EXISTS `perspective_language`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `perspective_language` (
-  `perspective_id` int(11) unsigned NOT NULL,
-  `language` varchar(5) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`perspective_id`,`language`),
-  CONSTRAINT `perspective_language_ibfk_1` FOREIGN KEY (`perspective_id`) REFERENCES `perspectives` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `perspective_language`
---
-
-/*!40000 ALTER TABLE `perspective_language` DISABLE KEYS */;
-/*!40000 ALTER TABLE `perspective_language` ENABLE KEYS */;
 
 --
 -- Table structure for table `perspectives`

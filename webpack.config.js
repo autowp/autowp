@@ -184,7 +184,7 @@ module.exports = {
                 windows: true
             }
         }),
-        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|ru|be|zh-cn|fr/)
+        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|ru|be|zh-cn|fr|pt-br/)
     ].concat(prod ? [
         new CompressionPlugin({
             asset: "[path].gz[query]",

@@ -20,6 +20,7 @@ import 'moment/locale/ru.js';
 import 'moment/locale/zh-cn.js';
 import 'moment/locale/de.js';
 import 'moment/locale/be.js';
+import 'moment/locale/pt-br.js';
 import 'angular-recaptcha';
 import 'ng-file-upload';
 
@@ -39,6 +40,7 @@ angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angular
             $translateProvider.translations('ru', require('./languages/ru.json'));
             $translateProvider.translations('fr', require('./languages/fr.json'));
             $translateProvider.translations('be', require('./languages/be.json'));
+            $translateProvider.translations('pt-br', require('./languages/pt-br.json'));
             
             var lang = document.documentElement.getAttribute('lang');
             
@@ -55,7 +57,8 @@ angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angular
             en: 'en',
             fr: 'fr',
             zh: 'zh-cn',
-            be: 'be'
+            be: 'be',
+            'pt-br': 'pt-br'
         };
         amMoment.changeLocale(map[lang]);
     }])

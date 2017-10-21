@@ -207,8 +207,8 @@
   'item/type/3/name-plural' => 'Категории',
   'item/type/3/new-item' => 'Новая категория',
   'item/type/3/add-sub-item' => 'Додати подкатегорию',
-  'item/type/4/name' => 'Близнюки',
-  'item/type/4/name-plural' => 'Близнюки',
+  'item/type/4/name' => 'Близнецы',
+  'item/type/4/name-plural' => 'Близнецы',
   'item/type/4/new-item' => 'Новая группа близнецов',
   'item/type/4/add-sub-item' => 'Добавить подгруппу близнецов',
   'item/type/5/name' => 'Марка',
@@ -771,7 +771,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 
 Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
 
-Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
+Исходный код сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
 
 %github%
 
@@ -782,8 +782,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 ### Поддержать проект
 
 Вы можете поддержать наш проект [финансово](/donate) или [морально](/ng/feedback).
-Принять участие в [переводе сайта](https://github.com/autowp/autowp/tree/master/module/Application/language) на другие языки.
-',
+Принять участие в [переводе сайта](https://github.com/autowp/autowp/tree/master/module/Application/language) на другие языки.',
   'page/1/name' => 'Главная страница',
   'page/2/name' => 'Главное меню',
   'page/10/name' => 'Бренд',

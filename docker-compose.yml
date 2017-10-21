@@ -50,6 +50,9 @@ web:
     AUTOWP_RECAPTCHA_PUBLICKEY: "public"
     AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
     AUTOWP_GO_LISTEN: ":81"
+    ONESKYAPP_KEY: "2a1C12oZU5VIK409AJd0xUfVntGyhLWa"
+    ONESKYAPP_SECRET: "wVU8NN4wyEW3qWm4uLN3xCEc5q0IF9X1"
+    ONESKYAPP_PROJECT_ID: 129670
   volumes:
   - ./config:/app/config
   - ./data:/app/data

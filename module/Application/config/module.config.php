@@ -194,6 +194,26 @@ return [
     ],
 
     'hosts' => [
+        'en' => [
+            'hostname' => 'en.' . $host,
+            'timezone' => 'Europe/London',
+            'name'     => 'English',
+            'flag'     => 'flag-icon flag-icon-gb',
+            'cookie'   => $hostCookie,
+            'aliases'  => [
+                'en.autowp.ru',
+                $host,
+                'www' . $host
+            ]
+        ],
+        'zh' => [
+            'hostname' => 'zh.' . $host,
+            'timezone' => 'Asia/Shanghai',
+            'name'     => '中文 (beta)',
+            'flag'     => 'flag-icon flag-icon-cn',
+            'cookie'   => $hostCookie,
+            'aliases'  => []
+        ],
         'ru' => [
             'hostname' => getenv('AUTOWP_HOST_RU'),
             'timezone' => 'Europe/Moscow',
@@ -204,17 +224,13 @@ return [
                 'ru.autowp.ru'
             ]
         ],
-        'en' => [
-            'hostname' => 'en.' . $host,
-            'timezone' => 'Europe/London',
-            'name'     => 'English (beta)',
-            'flag'     => 'flag-icon flag-icon-gb',
+        'pt-br' => [
+            'hostname' => 'br.' . $host,
+            'timezone' => 'Brazil/West',
+            'name'     => 'Português brasileiro (beta)',
+            'flag'     => 'flag-icon flag-icon-br',
             'cookie'   => $hostCookie,
-            'aliases'  => [
-                'en.autowp.ru',
-                $host,
-                'www' . $host
-            ]
+            'aliases'  => []
         ],
         'fr' => [
             'hostname' => 'fr.' . $host,
@@ -224,27 +240,19 @@ return [
             'cookie'   => $hostCookie,
             'aliases'  => []
         ],
-        'zh' => [
-            'hostname' => 'zh.' . $host,
-            'timezone' => 'Asia/Shanghai',
-            'name'     => '中文 (beta)',
-            'flag'     => 'flag-icon flag-icon-cn',
-            'cookie'   => $hostCookie,
-            'aliases'  => []
-        ],
         'be' => [
             'hostname' => 'be.' . $host,
-            'timezone' => 'Asia/Shanghai',
+            'timezone' => 'Europe/Minsk',
             'name'     => 'Беларуская',
             'flag'     => 'flag-icon flag-icon-by',
             'cookie'   => $hostCookie,
             'aliases'  => []
-        ]
+        ],
     ],
 
     'hostname_whitelist' => ['www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
         'i.' . $host, 'en.' . $host, 'fr.' . $host, 'ru.' . $host,
-        'zh.' . $host, 'be.' . $host, 'www.' . $host, $host],
+        'zh.' . $host, 'be.' . $host, 'br.' . $host, 'www.' . $host, $host],
 
     'pictures_hostname' => getenv('AUTOWP_PICTURES_HOST'),
 
@@ -353,8 +361,8 @@ return [
     ],
 
     'oneskyapp' => [
-        'api_key'    => '2a1C12oZU5VIK409AJd0xUfVntGyhLWa',
-        'api_secret' => '0Q4xYnv169CiADzK6Ed4IwjS28V8aFg1',
-        'project_id' => 129670,
+        'api_key'    => getenv('ONESKYAPP_KEY'),
+        'api_secret' => getenv('ONESKYAPP_SECRET'),
+        'project_id' => getenv('ONESKYAPP_PROJECT_ID'),
     ]
 ];

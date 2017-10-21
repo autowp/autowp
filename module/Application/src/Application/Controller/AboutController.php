@@ -104,16 +104,17 @@ class AboutController extends AbstractActionController
         $totalComments = round($totalComments, -3);
 
         return [
-            'developer'     => $this->userModel->getRow(1),
-            'frTranslator'  => $this->userModel->getRow(3282),
-            'zhTranslator'  => $this->userModel->getRow(25155),
-            'beTranslator'  => $this->userModel->getRow(15603),
-            'contributors'  => $contributors,
-            'totalPictures' => $totalPictures,
-            'picturesSize'  => $this->picture->getTotalPicturesSize(),
-            'totalUsers'    => $totalUsers,
-            'totalCars'     => $totalCars,
-            'totalComments' => $totalComments
+            'developer'      => $this->userModel->getRow(1),
+            'frTranslator'   => $this->userModel->getRow(3282),
+            'zhTranslator'   => $this->userModel->getRow(25155),
+            'beTranslator'   => $this->userModel->getRow(15603),
+            'ptBrTranslator' => $this->userModel->getRow(17322),
+            'contributors'   => $contributors,
+            'totalPictures'  => $totalPictures,
+            'picturesSize'   => $this->picture->getTotalPicturesSize(),
+            'totalUsers'     => $totalUsers,
+            'totalCars'      => $totalCars,
+            'totalComments'  => $totalComments
         ];
     }
 }
