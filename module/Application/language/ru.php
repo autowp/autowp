@@ -769,6 +769,8 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 
 Перевод сайта на белоруский язык: %be-translator%
 
+Перевод сайта бразильский португальский: %pt-br-translator%
+
 Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
 
 Исходный код сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.

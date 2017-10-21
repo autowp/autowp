@@ -13,3 +13,4 @@ Currently available languages:
 * Русский
 * 中文 - primary contributor [A013AA](https://github.com/A013AA). [Profile](https://zh.wheelsage.org/users/user25155) on WheelsAge
 * Беларуская - primary contributor bad_Q. [Profile](https://be.wheelsage.org/users/bad_q) on WheelsAge
+* Português brasileiro - primary contributor Juliano Scotini. [Profile](https://br.wheelsage.org/users/juliano-scotini) on WheelsAge

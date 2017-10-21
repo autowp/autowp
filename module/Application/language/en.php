@@ -769,6 +769,8 @@ Chinese site translation: %zh-translator%
 
 Belarusian site translation: %be-translator%
 
+Brazilian portuguese site translation: %pt-br-translator%
+
 Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
 
 Исходный код сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
