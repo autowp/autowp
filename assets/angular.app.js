@@ -28,6 +28,7 @@ import './controllers/map';
 import './controllers/mascots';
 import './controllers/museum';
 import './controllers/new';
+import './controllers/persons';
 import './controllers/pulse';
 import './controllers/restore-password';
 import './controllers/telegram';

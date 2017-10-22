@@ -1,6 +1,7 @@
 {
     "page/42/name": "Форумы",
     "page/51/name": "Новые изображения",
+    "page/213/name": "%PERSON_NAME%",
     "inbox/all-brands": "Все марки",
     "forums/theme/all-other/description": "Другие темы, не вошедшие в вышеперечисленные разделы",
     "forums/theme/german-cars/description": "Audi, BMW, Mercedes-Benz, Opel, Volkswagen, ...",

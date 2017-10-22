@@ -1101,9 +1101,7 @@ class Pic extends AbstractPlugin
 
             $authors[] = [
                 'name' => $item['name'],
-                'url'  => $controller->url()->fromRoute('persons/person', [
-                    'id' => $pictureAuthor['item_id']
-                ])
+                'url'  => '/ng/persons/' . $pictureAuthor['item_id']
             ];
         }
 

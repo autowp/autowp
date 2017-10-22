@@ -413,37 +413,6 @@ return [
                     ]
                 ]
             ],
-            'persons' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/persons',
-                    'defaults' => [
-                        'controller' => Controller\Frontend\PersonsController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => false,
-                'child_routes'  => [
-                    'person' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/:id',
-                            'defaults' => [
-                                'action' => 'person',
-                            ]
-                        ],
-                        'may_terminate' => true,
-                        'child_routes' => [
-                            'page'    => [
-                                'type' => 'Segment',
-                                'options' => [
-                                    'route' => '/page:page',
-                                ]
-                            ],
-                        ]
-                    ]
-                ]
-            ],
             'picture' => [
                 'type' => 'Literal',
                 'options' => [

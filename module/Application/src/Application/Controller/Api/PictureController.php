@@ -325,9 +325,6 @@ class PictureController extends AbstractRestfulController
         ];
 
         switch ($data['order']) {
-            case 12:
-                $filter['has_likes'] = true;
-                break;
             case 13:
                 $filter['has_dislikes'] = true;
                 break;
@@ -371,11 +368,15 @@ class PictureController extends AbstractRestfulController
             }
         }
 
-        if ($isModer) {
-            if ($data['exact_item_id']) {
-                $filter['item']['id'] = $data['exact_item_id'];
-            }
+        if ($data['exact_item_id']) {
+            $filter['item']['id'] = $data['exact_item_id'];
+        }
 
+        if ($data['exact_item_link_type']) {
+            $filter['item']['link_type'] = $data['exact_item_link_type'];
+        }
+
+        if ($isModer) {
             if (strlen($data['comments'])) {
                 if ($data['comments'] == '1') {
                     $filter['has_comments'] = true;
