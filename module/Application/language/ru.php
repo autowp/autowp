@@ -1,5 +1,10 @@
 <?php return array (
   'page/42/name' => 'Форумы',
+  'picture/text' => 'Все изображения являются чьей-либо собственностью.
+
+Если вы считаете, что пользователи сайта ошиблись, разместив данную картинку в этом разделе, то было бы здорово, если бы вы написали об этом в комментариях и указали на ошибку.
+
+Поделиться своей радостью, обсудить наболевшее и просто поболтать об автомобилях и не только вы можете на нашем [форуме](/ng/forums/).',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
@@ -518,9 +523,6 @@
   'picture/status/removing' => 'Поставлено в очередь на удаление',
   'picture/propose-image-replacement' => 'Предложить замену картинке',
   'picture/moderators-about-this-picture' => 'Модераторы об этом фото',
-  'picture/all-images-have-owners' => 'Все изображения являются чьей-либо собственностью.',
-  'picture/if-you-found-error' => 'Если вы считаете, что пользователи сайта ошиблись, разместив данную картинку в этом разделе, то было бы здорово, если бы вы написали об этом в комментариях и указали на ошибку.',
-  'picture/where-to-talk' => 'Поделиться своей радостью, обсудить наболевшее и просто поболтать об автомобилях и не только вы можете на нашем <a href="/ng/forums/">форуме</a>',
   'picture/other-languages' => 'На других языках',
   'picture/picture-suggested-to-replace' => 'Фото предложено на замену',
   'picture/that-engine-is-mounted-to-vehicle' => 'Такой двигатель устанавливается на автомобиль',

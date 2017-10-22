@@ -1,5 +1,10 @@
 <?php return array (
   'page/42/name' => 'Forums',
+  'picture/text' => 'All images have owners.
+
+If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
+
+Discuss anything and just talk about cars and not only can you on [the forum](/ng/forums/).',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
@@ -516,9 +521,6 @@ Good luck.',
   'picture/status/removing' => 'Removing',
   'picture/propose-image-replacement' => 'Propose image replacement',
   'picture/moderators-about-this-picture' => 'Moderators about this picture',
-  'picture/all-images-have-owners' => 'All images have owners.',
-  'picture/if-you-found-error' => 'If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.',
-  'picture/where-to-talk' => 'Discuss anything and just talk about cars and not only can you on <a href="/ng/forums/">the forum</a>',
   'picture/other-languages' => 'In other languages',
   'picture/picture-suggested-to-replace' => 'Picture suggested to replace',
   'picture/that-engine-is-mounted-to-vehicle' => 'That engine is mounted to vehicle',

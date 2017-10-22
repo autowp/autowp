@@ -220,9 +220,7 @@
                 ?>
             </li>
         </ul>
-        <p><?=$this->escapeHtml($this->translate('picture/all-images-have-owners'))?></p>
-        <p><?=$this->escapeHtml($this->translate('picture/if-you-found-error'))?></p>
-        <p><?=$this->translate('picture/where-to-talk')?></p>
+        <?=$this->markdown($this->translate('picture/text')) ?>
         <?php
             $list = [];
 

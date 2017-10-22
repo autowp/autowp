@@ -1,5 +1,10 @@
 <?php return array (
   'page/42/name' => 'Форумы',
+  'picture/text' => 'Усе выявы з\'яўляюцца чыёй-небудзь ўласнасцю.
+
+Калі вы лічыце, што карыстальнікі сайта памыліліся, размясціўшы дадзеную карцінку ў гэтым раздзеле, то было б выдатна, калі б вы напісалі пра гэта ў каментарах і паказаўшы памылку.
+
+Падзяліцца сваёй радасцю, абмеркаваць набалелае і проста пабалбатаць аб аўтамабілях і не толькі вы можаце на нашым [форуме](/ng/forums/).',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
@@ -518,9 +523,6 @@ other {У вас {messages} новых паведамленняў}
   'picture/status/removing' => 'Пастаўлена ў чаргу на выдаленне',
   'picture/propose-image-replacement' => 'Прапанаваць замену карцінцы',
   'picture/moderators-about-this-picture' => 'Мадэратары пра гэта фота',
-  'picture/all-images-have-owners' => 'Усе выявы з\'яўляюцца чыёй-небудзь ўласнасцю.',
-  'picture/if-you-found-error' => 'Калі вы лічыце, што карыстальнікі сайта памыліліся, размясціўшы дадзеную карцінку ў гэтым раздзеле, то было б выдатна, калі б вы напісалі пра гэта ў каментарах і паказаўшы памылку.',
-  'picture/where-to-talk' => 'Падзяліцца сваёй радасцю, абмеркаваць набалелае і проста пабалбатаць аб аўтамабілях і не толькі вы можаце на нашым <a href="/ng/forums/">форуме</a>',
   'picture/other-languages' => 'На іншых мовах',
   'picture/picture-suggested-to-replace' => 'Фота прапанавана на замену',
   'picture/that-engine-is-mounted-to-vehicle' => 'Такі рухавік усталёўваецца на аўтамабіль',

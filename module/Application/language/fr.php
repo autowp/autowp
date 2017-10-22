@@ -1,5 +1,10 @@
 <?php return array (
   'page/42/name' => 'Forums',
+  'picture/text' => 'Toutes les images ont propriétaires.
+
+Si vous pensez que utilisateurs du site s\'est trompé en affichant cette image dans cette section, ce serait bien si vous avez écrit à ce sujet dans les commentaires et ont indiqué à l\'erreur.
+
+Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur [notre forum](/ng/forums/).',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
@@ -520,9 +525,6 @@ Bonne chance.',
   'picture/status/removing' => 'Retrait en attente',
   'picture/propose-image-replacement' => 'Propose de remplacer l\'image',
   'picture/moderators-about-this-picture' => 'L\'opinion des modérateurs',
-  'picture/all-images-have-owners' => 'Toutes les images ont propriétaires.',
-  'picture/if-you-found-error' => 'Si vous pensez que utilisateurs du site s\'est trompé en affichant cette image dans cette section, ce serait bien si vous avez écrit à ce sujet dans les commentaires et ont indiqué à l\'erreur.',
-  'picture/where-to-talk' => 'Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur <a href="/ng/forums/">notre forum</a>',
   'picture/other-languages' => 'In other languages',
   'picture/picture-suggested-to-replace' => 'Picture suggested to replace',
   'picture/that-engine-is-mounted-to-vehicle' => 'That engine is mounted to vehicle',

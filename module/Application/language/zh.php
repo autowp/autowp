@@ -1,5 +1,10 @@
 <?php return array (
   'page/42/name' => '论坛',
+  'picture/text' => '任何图片都有权益人。
+
+如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。
+
+前往[论坛](/ng/forums/)可以讨论任何车型的任何话题。',
   'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
@@ -513,9 +518,6 @@
   'picture/status/removing' => '被删除',
   'picture/propose-image-replacement' => '建议替换图片',
   'picture/moderators-about-this-picture' => '相关管理员',
-  'picture/all-images-have-owners' => '任何图片都有权益人。',
-  'picture/if-you-found-error' => '如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。',
-  'picture/where-to-talk' => '前往<a href="/ng/forums/">论坛</a>可以讨论任何车型的任何话题。',
   'picture/other-languages' => '其它语言翻译',
   'picture/picture-suggested-to-replace' => '图片被建议更换',
   'picture/that-engine-is-mounted-to-vehicle' => '配备此发动机的车辆有',
