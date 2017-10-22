@@ -31,6 +31,7 @@ import './controllers/new';
 import './controllers/persons';
 import './controllers/pulse';
 import './controllers/restore-password';
+import './controllers/rules';
 import './controllers/telegram';
 import './controllers/signup';
 import './controllers/top-view';

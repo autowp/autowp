@@ -54,7 +54,6 @@ return [
             Controller\PictureController::class         => Controller\Frontend\PictureControllerFactory::class,
             Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
             Controller\RegistrationController::class    => Controller\Frontend\Service\RegistrationControllerFactory::class,
-            Controller\DocController::class             => InvokableFactory::class,
             Controller\TelegramController::class        => Controller\Frontend\Service\TelegramControllerFactory::class,
             Controller\TwinsController::class           => Controller\Frontend\Service\TwinsControllerFactory::class,
             Controller\UsersController::class           => Controller\Frontend\UsersControllerFactory::class,

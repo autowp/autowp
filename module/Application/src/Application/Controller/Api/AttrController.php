@@ -145,7 +145,7 @@ class AttrController extends AbstractRestfulController
         );
 
         $paginator
-            ->setItemCountPerPage(3)
+            ->setItemCountPerPage(30)
             ->setPageRange(20)
             ->setCurrentPageNumber($values['page']);
 
