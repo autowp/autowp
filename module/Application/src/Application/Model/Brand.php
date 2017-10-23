@@ -238,13 +238,13 @@ class Brand
                 $row['unsortedpictures_count'];*/
 
             $result[$line][$char]['brands'][] = [
-                'id'             => $row['id'],
+                'id'             => (int)$row['id'],
                 'name'           => $name,
                 'catname'        => $row['catname'],
                 'logo_id'        => $row['logo_id'],
-                'totalPictures'  => $row['pictures_count'],
-                'newCars'        => $row['new_cars_count'],
-                'totalCars'      => $row['cars_count']
+                'totalPictures'  => (int)$row['pictures_count'],
+                'newCars'        => (int)$row['new_cars_count'],
+                'totalCars'      => (int)$row['cars_count']
             ];
         }
 

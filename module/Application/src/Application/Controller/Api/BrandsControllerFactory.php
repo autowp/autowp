@@ -1,11 +1,9 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
-use Application\Controller\BrandsController as Controller;
 
 class BrandsControllerFactory implements FactoryInterface
 {
@@ -14,8 +12,9 @@ class BrandsControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Controller(
-            $container->get(\Application\Model\Item::class)
+        return new BrandsController(
+            $container->get('longCache'),
+            $container->get(\Application\Model\Brand::class)
         );
     }
 }

@@ -2,41 +2,47 @@ var $ = require('jquery');
 
 module.exports = {
     apply: function(selector) {
-        $(selector).each(function() {
-            var self = this,
-                loaded = false,
-                over = false;
+        
+        var $doc = $(document);
+        
+        $doc.find(selector).data({
+            loaded: false,
+            over: false
+        });
+        
+        $doc.on('click', selector, function() {
+            e.preventDefault();
+        });
+        
+        $doc.on('mouseover', selector, function() {
+            var $self = $(this);
+            $self.data('over', true);
             
-            $(this)
-                .on('click', function(e) {
-                    e.preventDefault();
-                })
-                .hover(function() {
-                    over = true;
+            if ($self.data('loaded')) {
+                $self.popover('show');
+            } else {
+                $.get($self.data('href'), {}, function(html) {
                     
-                    if (loaded) {
-                        $(this).popover('show');
-                    } else {
-                        $.get($(this).data('href'), {}, function(html) {
-                            
-                            $(self).popover({
-                                trigger: 'manual',
-                                content: html,
-                                html: true,
-                                placement: 'bottom',
-                            });
-                            loaded = true;
-                            if (over) {
-                                $(self).popover('show');
-                            }
-                        });
-                    }
-                }, function() {
-                    over = false;
-                    if (loaded) {
-                        $(this).popover('hide');
+                    $self.popover({
+                        trigger: 'manual',
+                        content: html,
+                        html: true,
+                        placement: 'bottom',
+                    });
+                    $self.data('loaded', true);
+                    if ($self.data('over')) {
+                        $self.popover('show');
                     }
                 });
+            }
+        });
+        
+        $doc.on('mouseout', selector, function() {
+            var $self = $(this);
+            $self.data('over', false);
+            if ($self.data('loaded')) {
+                $self.popover('hide');
+            }
         });
     }
 };

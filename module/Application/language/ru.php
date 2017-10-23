@@ -197,7 +197,7 @@
   'Cars by destination' => 'Автомобили по назначению',
   'All new pictures' => 'все новые картинки',
   'all-link' => 'все',
-  'brands/new-cars-of-brand' => 'Новые автомобили %s',
+  'brands/new-cars-of-brand' => 'Новые автомобили {brand}',
   'brands/pictures:' => 'изображений: ',
   'item/type/1/name' => 'ТС',
   'item/type/1/name-plural' => 'ТС',

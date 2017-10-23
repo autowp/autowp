@@ -192,7 +192,7 @@ Toutes les images sont disponibles à des fins éducatives.
   'Cars by destination' => 'Voitures par destination',
   'All new pictures' => 'toutes les nouvelles images',
   'all-link' => 'tous',
-  'brands/new-cars-of-brand' => 'Nouveaux modèles %s',
+  'brands/new-cars-of-brand' => 'Nouveaux modèles {brand}',
   'brands/pictures:' => 'pictures: ',
   'item/type/1/name' => 'Voiture',
   'item/type/1/name-plural' => 'Voitures',

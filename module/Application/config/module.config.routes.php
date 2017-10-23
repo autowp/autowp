@@ -67,10 +67,9 @@ return [
                     'route'    => '/brands',
                     'defaults' => [
                         'controller' => Controller\BrandsController::class,
-                        'action'     => 'index',
                     ],
                 ],
-                'may_terminate' => true,
+                'may_terminate' => false,
                 'child_routes'  => [
                     'newcars' => [
                         'type' => 'Segment',

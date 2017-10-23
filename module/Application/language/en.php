@@ -195,7 +195,7 @@ All images are posted for educational purposes.
   'Cars by destination' => 'Cars by destination',
   'All new pictures' => 'All new pictures',
   'all-link' => 'all',
-  'brands/new-cars-of-brand' => 'New %s cars',
+  'brands/new-cars-of-brand' => 'New {brand} vehicles',
   'brands/pictures:' => 'pictures: ',
   'item/type/1/name' => 'Vehicle',
   'item/type/1/name-plural' => 'Vehicles',

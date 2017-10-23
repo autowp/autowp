@@ -41,6 +41,7 @@ return [
             Controller\Api\AccountController::class         => Controller\Api\AccountControllerFactory::class,
             Controller\Api\AclController::class             => Controller\Api\Service\AclControllerFactory::class,
             Controller\Api\AttrController::class            => Controller\Api\AttrControllerFactory::class,
+            Controller\Api\BrandsController::class          => Controller\Api\BrandsControllerFactory::class,
             Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
             Controller\Api\CommentController::class         => Controller\Api\CommentControllerFactory::class,
             Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
@@ -333,6 +334,27 @@ return [
                                                 'action' => 'user-value-index',
                                             ],
                                         ],
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'brands' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/brands',
+                            'defaults' => [
+                                'controller' => Controller\Api\BrandsController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes'  => [
+                            'get' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb'    => 'get',
+                                    'defaults' => [
+                                        'action' => 'index'
                                     ]
                                 ]
                             ]

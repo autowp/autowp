@@ -192,7 +192,7 @@
   'Cars by destination' => '按用途分类',
   'All new pictures' => '全部新图片',
   'all-link' => '查看全部',
-  'brands/new-cars-of-brand' => '新品牌%s',
+  'brands/new-cars-of-brand' => '新品牌{brand}',
   'brands/pictures:' => '图片: ',
   'item/type/1/name' => '车辆',
   'item/type/1/name-plural' => '车辆',

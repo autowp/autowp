@@ -197,7 +197,7 @@ other {У вас {messages} новых паведамленняў}
   'Cars by destination' => 'Аўтамабілі па прызначэнні',
   'All new pictures' => 'усе новыя карцінкі',
   'all-link' => 'усе',
-  'brands/new-cars-of-brand' => 'Новыя аўтамабілі %s',
+  'brands/new-cars-of-brand' => 'Новыя аўтамабілі {brand}',
   'brands/pictures:' => 'выяў: ',
   'item/type/1/name' => 'ТС',
   'item/type/1/name-plural' => 'ТС',

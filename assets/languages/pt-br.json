@@ -193,7 +193,7 @@
     "Cars by destination": "Cars by destination",
     "All new pictures": "Todas as novas imagens",
     "all-link": "tudo",
-    "brands/new-cars-of-brand": "Novos veículos %s",
+    "brands/new-cars-of-brand": "Novos veículos {brand}",
     "brands/pictures:": "imagens:",
     "item/type/1/name": "Veículo",
     "item/type/1/name-plural": "Veículos",

@@ -1,6 +1,6 @@
 <h4>
     <?=$this->escapeHtml($this->translate('index/brands'))?>
-    <small><?=$this->htmlA($this->url('brands'), $this->translate('all-link'))?></small>
+    <small><?=$this->htmlA('/ng/brands', $this->translate('all-link'))?></small>
 </h4>
 <?php
     $items = [];
@@ -9,7 +9,7 @@
                     '&#xa0;<span class="count">('.
                         ($brand['cars_count'] - $brand['new_cars_count']).
                         ($brand['new_cars_count'] > 0
-                            ? '<span data-href="'.$this->escapeHtmlAttr($brand['new_cars_url']).'" data-toggle="popover" data-container="body" class="popover-handler" title="'.$this->escapeHtmlAttr(sprintf($this->translate('brands/new-cars-of-brand'), $brand['name'])).'">+'.$brand['new_cars_count'].'</span>'
+                            ? '<span data-href="'.$this->escapeHtmlAttr($brand['new_cars_url']).'" data-toggle="popover" data-container="body" class="popover-handler" title="'.$this->escapeHtmlAttr(str_replace('{brand}', $brand['name'], $this->translate('brands/new-cars-of-brand'))).'">+'.$brand['new_cars_count'].'</span>'
                             : ''
                         ).
                     ')</span>';
@@ -19,7 +19,7 @@
     <?=implode(' ', $items) ?>
     <?php if (($more = $this->totalBrands - count($this->brands)) > 0) { ?>
         …&#xa0;<?=$this->escapeHtml($this->translate('and'))?>&#xa0;<?=$this->htmlA(
-            $this->url('brands'),
+            '/ng/brands',
             sprintf($this->translatePlural('brands/more-companies', 'brands/more-companies', $more), $more)
         )?>
     <?php } ?>
