@@ -1564,28 +1564,6 @@ INSERT INTO `item_type` (`id`, `name`) VALUES
 /*!40000 ALTER TABLE `item_type` ENABLE KEYS */;
 
 --
--- Table structure for table `lang_pages`
---
-
-DROP TABLE IF EXISTS `lang_pages`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `lang_pages` (
-  `page_id` int(10) unsigned NOT NULL,
-  `language_id` int(10) unsigned NOT NULL,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`page_id`,`language_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `lang_pages`
---
-
-/*!40000 ALTER TABLE `lang_pages` DISABLE KEYS */;
-/*!40000 ALTER TABLE `lang_pages` ENABLE KEYS */;
-
---
 -- Table structure for table `language`
 --
 
@@ -1996,7 +1974,8 @@ INSERT INTO `pages` (`id`, `parent_id`, `name`, `title`, `breadcrumbs`, `url`, `
 (119,67,'Статистика','','','/moder/index/stat',0,1,'',0,19,1),(120,68,'Блоки','','','',0,1,'',0,3,1),(122,1,'Specifications','Specifications','Specifications','/spec/',0,0,'',0,1057,1),(123,48,'My accounts','My accounts','My accounts','/profile/accounts/',0,1,'',0,22,0),
 (124,87,'Who is online?','','','/users/online',0,0,'online',0,24,1),
 (128,49,'Inbox','Inbox','','/ng/account/messages',0,1,'',0,17,0),
-(129,48,'Profile','Profile','','/account/profile',0,1,'',0,12,0),(130,48,'My pictures','My pictures','','',0,1,'',0,30,0),(131,67,'Vehicles','Vehicles','Vehicles','/moder/cars',0,1,'',0,26,1),(133,48,'Access','Access Control','','/account/access',0,1,'',0,27,1),(134,60,'New password','New password','','',0,0,'',0,4,0),(135,60,'New password saved','','','',0,1,'',0,5,0),(136,87,'About us','About us','','/about',0,0,'',0,29,1),(137,48,'Account delete','','','/account/delete',0,1,'',0,28,1),(138,14,'%BRAND_NAME% %CAR_TYPE_NAME% in chronological order','%BRAND_NAME% %CAR_TYPE_NAME% in chronological order','%CAR_TYPE_NAME%','/%BRAND_CATNAME%/cars/%CAR_TYPE_CATNAME%/',0,0,'',0,1,0),(140,61,'%BRAND_TYPE_NAME%','%BRAND_TYPE_NAME%','%BRAND_TYPE_NAME%','/brands/%BRAND_TYPE_NAME%',0,0,'',0,1,1),(141,63,'%BRAND_NAME% pictures','%BRAND_NAME% pictures','%BRAND_NAME% pictures','/users/%USER_IDENTITY%/pictures/%BRAND_CATNAME%',0,0,'',0,1,1),(142,100,'%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','/moder/attrs/zone/zone_id/%ZONE_ID%',0,1,'',0,4,1),
+(129,48,'Profile','Profile','','/account/profile',0,1,'',0,12,0),(130,48,'My pictures','My pictures','','',0,1,'',0,30,0),(131,67,'Vehicles','Vehicles','Vehicles','/moder/cars',0,1,'',0,26,1),(133,48,'Access','Access Control','','/account/access',0,1,'',0,27,1),(134,60,'New password','New password','','',0,0,'',0,4,0),(135,60,'New password saved','','','',0,1,'',0,5,0),(136,87,'About us','About us','','/about',0,0,'',0,29,1),(137,48,'Account delete','','','/account/delete',0,1,'',0,28,1),(138,14,'%BRAND_NAME% %CAR_TYPE_NAME% in chronological order','%BRAND_NAME% %CAR_TYPE_NAME% in chronological order','%CAR_TYPE_NAME%','/%BRAND_CATNAME%/cars/%CAR_TYPE_CATNAME%/',0,0,'',0,1,0),
+(141,63,'%BRAND_NAME% pictures','%BRAND_NAME% pictures','%BRAND_NAME% pictures','/users/%USER_IDENTITY%/pictures/%BRAND_CATNAME%',0,0,'',0,1,1),(142,100,'%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','/moder/attrs/zone/zone_id/%ZONE_ID%',0,1,'',0,4,1),
 (144,78,'Parent selection','Parent selection','Parent selection','',0,1,'',0,1,1),
 (148,72,'Cropper','Cropper','Cropper','',0,1,'',0,1,1),(149,72,'Move picture','Move picture','Move picture','',0,1,'',0,12,1),(153,25,'%BRAND_NAME% Twins','%BRAND_NAME% Twins','%BRAND_NAME%','/twins/%BRAND_CATNAME%',0,0,'',0,7,1),(154,21,'%MOST_NAME%','%MOST_NAME%','%MOST_NAME%','/mosts/%MOST_CATNAME%',0,0,'',0,1,1),(155,154,'Most %MOST_NAME% %CAR_TYPE_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME%','%CAR_TYPE_NAME%','/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%',0,0,'',0,1,1),(156,155,'Most %MOST_NAME% %CAR_TYPE_NAME% %YEAR_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME% %YEAR_NAME%','%YEAR_NAME%','/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%/%YEAR_CATNAME%',0,0,'',0,1,1),(157,1,'%VOTING_NAME%','%VOTING_NAME%','%VOTING_NAME%','/voting/voting/id/%VOTING_ID%',0,0,'',0,1022,0),(159,117,'Museum','%MUSEUM_NAME%','%MUSEUM_NAME%','/museums/museum/id/%MUSEUM_ID%',0,0,'',0,1,0),(161,1,'Pulse','Pulse','Pulse','/pulse/',0,0,'',0,1049,0),(162,23,'Pictures','Pictures','','/category/%CATEGORY_CATNAME%/pictures',0,0,'',0,4,0),(163,131,'New vehicle','New vehicle','New vehicle','',0,0,'',0,28,0),(164,10,'Mosts','Mosts','Mosts','/%BRAND_CATNAME%/mosts/',0,0,'',0,919,0),(165,164,'Most %MOST_NAME% %BRAND_NAME%','Most %MOST_NAME% %BRAND_NAME%','%MOST_NAME%','/%BRAND_CATNAME%/mosts/%MOST_CATNAME%',0,0,'',0,1,0),(166,165,'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME%','%CAR_TYPE_NAME%','/%BRAND_CATNAME%/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%',0,0,'',0,1,0),(167,166,'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME% %YEAR_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME% %YEAR_NAME%','%YEAR_NAME%','/%BRAND_CATNAME%/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%/%YEAR_CATNAME%',0,0,'',0,1,0),
 (173,1,'Statistics','Statistics','Statistics','/ng/users/rating',0,0,'',0,1050,0),
