@@ -426,35 +426,6 @@ class CommentsService
         })->current();
     }
 
-    public function getPaginatorByUser($userId, $order)
-    {
-        $select = new Sql\Select($this->messageTable->getTable());
-        $select->where(['author_id = ?' => (int)$userId]);
-
-        switch ($order) {
-            case 'positive':
-                $select->order('vote desc');
-                break;
-            case 'negative':
-                $select->order('vote asc');
-                break;
-            case 'old':
-                $select->order('datetime asc');
-                break;
-            case 'new':
-            default:
-                $select->order('datetime desc');
-                break;
-        }
-
-        return new \Zend\Paginator\Paginator(
-            new \Zend\Paginator\Adapter\DbSelect(
-                $select,
-                $this->messageTable->getAdapter()
-            )
-        );
-    }
-
     /**
      * @param int $type
      * @param int $item

@@ -149,6 +149,10 @@ class UserController extends AbstractRestfulController
             $filter['id'] = $id;
         }
 
+        if ($data['identity']) {
+            $filter['identity'] = $data['identity'];
+        }
+
         $paginator = $this->userModel->getPaginator($filter);
 
         $limit = $data['limit'] ? $data['limit'] : 1;

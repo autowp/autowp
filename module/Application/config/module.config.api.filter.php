@@ -144,6 +144,12 @@ return [
             ],
         ],
         'api_comments_get' => [
+            'user_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits']
+                ]
+            ],
             'user' => [
                 'required' => false,
                 'filters'  => [
@@ -212,7 +218,9 @@ return [
                         'options' => [
                             'haystack' => [
                                 'date_desc',
-                                'date_asc'
+                                'date_asc',
+                                'vote_desc',
+                                'vote_asc'
                             ]
                         ]
                     ]
@@ -252,6 +260,12 @@ return [
             ],
         ],
         'api_comments_get_public' => [
+            'user_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'Digits']
+                ]
+            ],
             'moderator_attention' => [
                 'required' => false,
                 'validators' => [
@@ -274,13 +288,13 @@ return [
                 ]
             ],
             'item_id' => [
-                'required' => true,
+                'required' => false,
                 'filters'  => [
                     ['name' => 'Digits']
                 ]
             ],
             'type_id' => [
-                'required' => true,
+                'required' => false,
                 'filters'  => [
                     ['name' => 'Digits']
                 ]
@@ -314,6 +328,22 @@ return [
                         'options' => [
                             'haystack' => [
                                 'date_asc'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'order' => [
+                'required' => false,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'date_desc',
+                                'date_asc',
+                                'vote_desc',
+                                'vote_asc'
                             ]
                         ]
                     ]
@@ -2388,7 +2418,7 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'gravatar', 'timezone', 'language', 'votes_per_day',' votes_left', 'img', 'specs_weight']]
+                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'gravatar', 'timezone', 'language', 'votes_per_day',' votes_left', 'img', 'specs_weight', 'identity']]
                     ]
                 ]
             ]
@@ -2441,12 +2471,18 @@ return [
                     ['name' => 'Digits'],
                 ]
             ],
+            'identity' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
             'fields' => [
                 'required' => false,
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'gravatar', 'timezone', 'language', 'votes_per_day',' votes_left', 'img', 'specs_weight']]
+                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'gravatar', 'timezone', 'language', 'votes_per_day',' votes_left', 'img', 'specs_weight', 'identity']]
                     ]
                 ]
             ]

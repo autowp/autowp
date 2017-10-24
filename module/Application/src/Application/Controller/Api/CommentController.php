@@ -210,6 +210,26 @@ class CommentController extends AbstractRestfulController
             $options['no_parents'] = $values['no_parents'];
         }
 
+        if ($values['user_id']) {
+            $options['user'] = $values['user_id'];
+        }
+
+        switch ($values['order']) {
+            case 'vote_desc':
+                $options['order'] = ['comment_message.vote DESC', 'comment_message.datetime DESC'];
+                break;
+            case 'vote_asc':
+                $options['order'] = ['comment_message.vote ASC', 'comment_message.datetime DESC'];
+                break;
+            case 'date_desc':
+                $options['order'] = 'comment_message.datetime DESC';
+                break;
+            case 'date_asc':
+            default:
+                $options['order'] = 'comment_message.datetime ASC';
+                break;
+        }
+
         if ($isModer) {
             if ($values['user']) {
                 if (! is_numeric($values['user'])) {
@@ -238,18 +258,18 @@ class CommentController extends AbstractRestfulController
                         ->where(['item_parent_cache.parent_id = ?' => $values['item_id']]);
                 };
             }
-
-            switch ($values['order']) {
-                case 'date_desc':
-                    $options['order'] = 'comment_message.datetime DESC';
-                    break;
-                case 'date_asc':
-                default:
-                    $options['order'] = 'comment_message.datetime ASC';
-                    break;
-            }
         } else {
-            $options['order'] = 'comment_message.datetime ASC';
+            if (! $values['item_id'] && ! $values['user_id']) {
+                return new ApiProblemResponse(
+                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
+                        'invalid_params' => [
+                            'item_id' => [
+                                'invalid' => 'item_id or user_id is required'
+                            ]
+                        ]
+                    ])
+                );
+            }
         }
 
         $paginator = $this->comments->service()->getMessagesPaginator($options);

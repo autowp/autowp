@@ -1,0 +1,15 @@
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <li ng-class="{active: key == ctrl.order}" ng-repeat="(key, name) in ctrl.orders">
+        <a ui-sref=".({order: key, page: null})" ng-bind="name|translate"></a>
+    </li>
+</ul>
+
+<ul>
+    <li ng-repeat="comment in ctrl.comments">
+        <strong ng-if="comment.vote > 0">+{{comment.vote}} <span class="fa fa-thumbs-o-up"></span></strong>
+        <strong ng-if="comment.vote < 0">{{comment.vote}} <span class="fa fa-thumbs-o-down"></span></strong>
+        <a ng-href="{{comment.url}}" ng-bind="comment.preview"></a>
+    </li>
+</ul>
+
+<autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>

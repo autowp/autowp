@@ -128,7 +128,10 @@
         <?php if (count($this->lastComments)) { ?>
             <h2>
                 <?=$this->escapeHtml($this->translate('users/user/recent-comments'))?>
-                <small><?=$this->htmlA($this->url('users/user/comments', [], [], true), $this->translate('all-link'))?></small>
+                <small><?=$this->htmlA(
+                    '/ng/users/' . ($this->currentUser['identity'] ? $this->currentUser['identity'] : 'user' . $this->currentUser['id']) . '/comments',
+                    $this->translate('all-link')
+                )?></small>
             </h2>
             <div class="well">
                 <ul class="comments">

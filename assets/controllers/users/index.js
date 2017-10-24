@@ -1,1 +1,2 @@
 import './rating';
+import './user';

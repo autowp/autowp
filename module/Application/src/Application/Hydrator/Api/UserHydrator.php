@@ -128,6 +128,10 @@ class UserHydrator extends RestHydrator
                 $user['reg_date'] = $this->extractValue('reg_date', $regDate);
             }
 
+            if ($this->filterComposite->filter('identity')) {
+                $user['identity'] = $object['identity'];
+            }
+
             if ($this->filterComposite->filter('image')) {
                 $user['image'] = $this->extractValue('image', [
                     'image'  => $object['img']
