@@ -137,7 +137,7 @@
     "test": "测试是确定",
     "and": "还有",
     "ng/%1$s-pictures": "{count} 张图片",
-    "ng/%1$s-items": "{count} items",
+    "ng/%1$s-items": "{count, plural, one {{count} item} other {{count} items}}",
     "ng/%1$s-comments": "{count} 个评论",
     "{count} messages": "{count} 个站内信",
     "{topics} topics and {messages} messages": "{topics} 个主题}, {messages} 个站内信",

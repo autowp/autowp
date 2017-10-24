@@ -139,7 +139,7 @@
     "ng/%1$s-pictures": "{count, plural, one {{count} выява} few {{count} выяў} many {{count} выяў} other {{count} выяў}}",
     "ng/%1$s-items": "{count, plural, one {{count} адзінка дадзеных} few {{count} адзінкі дадзеных} many {{count} адзінкак дадзеных} other {{count} адзінкак дадзеных}}",
     "ng/%1$s-comments": "{count, plural, one {{count} каментар} few {{count} каментара} many {{count} каментарыяў} other {{count} каментарыяў}}",
-    "{count} messages": "{count, plural, one {{count} выява} few {{count} выявы} many {{count} выяў} other {{count} выяў}}",
+    "{count} messages": "{count, plural, one {{count} паведамленне} few {{count} паведамлення} many {{count} паведамленняў} other {{count} паведамленняў}}",
     "{topics} topics and {messages} messages": "{topics, plural, one {{topics} тэма} few {{topics} тэмы} many {{topics} тэм} other {{topics} тэм}} и {messages, plural, one {{messages} паведамленне} few {{messages} паведамлення} many {{messages} паведамленняў} other {{messages} паведамленняў}}",
     "year": "Год",
     "month": "Месяц",
