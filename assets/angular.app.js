@@ -23,6 +23,7 @@ import './controllers/cutaway';
 import './controllers/feedback';
 import './controllers/forums';
 import './controllers/inbox';
+import './controllers/info';
 import './controllers/log';
 import './controllers/login';
 import './controllers/map';

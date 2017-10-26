@@ -2,8 +2,6 @@
 
 namespace Application\Controller;
 
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\TextStorage;
@@ -14,52 +12,14 @@ class InfoController extends AbstractActionController
     private $textStorage;
 
     /**
-     * @var TableGateway
-     */
-    private $specTable;
-
-    /**
      * @var User
      */
     private $userModel;
 
-    public function __construct(TextStorage\Service $textStorage, TableGateway $specTable, User $userModel)
+    public function __construct(TextStorage\Service $textStorage, User $userModel)
     {
         $this->textStorage = $textStorage;
-        $this->specTable = $specTable;
         $this->userModel = $userModel;
-    }
-
-    private function loadSpecs(int $parentId): array
-    {
-        if ($parentId) {
-            $filter = ['parent_id' => $parentId];
-        } else {
-            $filter = ['parent_id is null'];
-        }
-
-        $select = new Sql\Select($this->specTable->getTable());
-        $select->where($filter)
-            ->order('short_name');
-
-        $result = [];
-        foreach ($this->specTable->selectWith($select) as $row) {
-            $result[] = [
-                'id'         => (int)$row['id'],
-                'short_name' => $row['short_name'],
-                'name'       => $row['name'],
-                'childs'     => $this->loadSpecs($row['id'])
-            ];
-        }
-
-        return $result;
-    }
-
-    public function specAction()
-    {
-        return [
-            'items' => $this->loadSpecs(0)
-        ];
     }
 
     public function textAction()

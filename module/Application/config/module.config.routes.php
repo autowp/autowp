@@ -352,15 +352,6 @@ return [
                     ]
                 ],
                 'child_routes'  => [
-                    'spec' => [
-                        'type' => 'Literal',
-                        'options' => [
-                            'route' => '/spec',
-                            'defaults' => [
-                                'action' => 'spec',
-                            ],
-                        ]
-                    ],
                     'text' => [
                         'type' => 'Segment',
                         'options' => [
