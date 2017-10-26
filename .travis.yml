@@ -15,7 +15,7 @@ before_install:
 script:
   - docker exec -it autowp_test_web sh -c "./install-dev.sh"
   - docker exec -it autowp_test_web sh -c "./composer.phar phpmd"
-  - docker exec -it autowp_test_web sh -c "php -dzend_extension=xdebug.so -dmemory_limit=512M vendor/bin/phpunit --coverage-clover ./logs/clover.xml"
+  - docker exec -it autowp_test_web sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --coverage-clover ./logs/clover.xml"
 
 after_success:
   - docker exec -it autowp_test_web bash -c "./vendor/bin/coveralls -v"
