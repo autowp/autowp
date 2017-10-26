@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-sm-4"><div style="margin-left:{{deep * 40}}px" ng-bind="row.short_name"></div></div>
+    <div class="col-sm-4"><div ng-style="{'margin-left': (deep * 40)+'px'}" ng-bind="row.short_name"></div></div>
     <div class="col-sm-8" ng-bind="row.name"></div>
 </div>
 <autowp-info-spec-row row="row" deep="deep + 1" ng-repeat="row in row.childs"></autowp-info-spec-row>
