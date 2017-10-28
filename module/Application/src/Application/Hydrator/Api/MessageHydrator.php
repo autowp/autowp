@@ -2,9 +2,13 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Zend\Stdlib\ArrayUtils;
 
 use Autowp\User\Model\User;
+
 use Application\View\Helper\UserText;
 
 class MessageHydrator extends RestHydrator
@@ -76,7 +80,7 @@ class MessageHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return MessageHydrator
      */
     public function setUserId($userId = null)
     {

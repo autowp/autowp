@@ -2,7 +2,6 @@
 
 namespace Application\Controller;
 
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -10,8 +9,6 @@ use Zend\Paginator;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
-
-use Application\Model\DbTable\Article;
 
 class ArticlesController extends AbstractActionController
 {

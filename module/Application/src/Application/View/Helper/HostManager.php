@@ -9,7 +9,7 @@ use Application\HostManager as AppHostManager;
 class HostManager extends AbstractHelper
 {
     /**
-     * @var AppHostManger
+     * @var AppHostManager
      */
     private $hostManager = null;
 

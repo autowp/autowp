@@ -19,7 +19,6 @@ use Application\Model\Contact;
 use Application\Model\Picture;
 use Application\Model\UserAccount;
 use Application\Model\UserItemSubscribe;
-use Application\Service\SpecificationsService;
 
 class UsersService
 {
@@ -50,7 +49,7 @@ class UsersService
     private $imageStorage;
 
     /**
-     * @var unknown
+     * @var Comments\CommentsService
      */
     private $comments;
 

@@ -4,8 +4,6 @@ namespace Application\Model;
 
 use Zend\Db\Sql;
 
-use Application\Model\Brand;
-
 class Twins
 {
     /**

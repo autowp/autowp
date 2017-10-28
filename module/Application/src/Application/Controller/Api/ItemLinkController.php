@@ -6,6 +6,8 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\ApiProblemResponse;
 
 use Application\Hydrator\Api\RestHydrator;
 
@@ -107,7 +109,7 @@ class ItemLinkController extends AbstractRestfulController
         }
 
         if (! $fields) {
-            return new ApiProblem(400, 'Invalid request');
+            return new ApiProblemResponse(new ApiProblem(400, 'Invalid request'));
         }
 
         $this->putInputFilter->setValidationGroup($fields);

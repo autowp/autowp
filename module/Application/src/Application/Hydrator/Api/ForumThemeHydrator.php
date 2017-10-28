@@ -2,9 +2,12 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
+use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
@@ -109,7 +112,7 @@ class ForumThemeHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return ForumThemeHydrator
      */
     public function setUserId($userId = null)
     {

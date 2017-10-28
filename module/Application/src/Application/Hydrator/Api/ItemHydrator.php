@@ -2,9 +2,12 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
+use Zend\Stdlib\ArrayUtils;
 
 use Autowp\User\Model\User;
 
@@ -175,7 +178,7 @@ class ItemHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return ItemHydrator
      */
     public function setUserId($userId = null)
     {

@@ -7,12 +7,12 @@ use NumberFormatter;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Form\ElementInterface;
 use Zend\Paginator;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 
-use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Model\ItemParent;
@@ -615,7 +615,7 @@ class SpecificationsService
      * @param int $zoneId
      * @param array|\ArrayObject $user
      * @param array $options
-     * @return AttrsZoneAttributesForm
+     * @return ElementInterface
      */
     private function getForm(int $itemId, int $zoneId, $user, array $options)
     {

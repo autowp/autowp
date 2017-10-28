@@ -4,7 +4,6 @@ namespace Application\Controller\Moder;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Moder\Attribute as AttributeForm;

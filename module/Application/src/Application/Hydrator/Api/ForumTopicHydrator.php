@@ -2,14 +2,17 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Commons\Db\Table\Row;
+use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
 
 use Application\Comments;
-use Autowp\Forums\Forums;
 
 class ForumTopicHydrator extends RestHydrator
 {
@@ -108,7 +111,7 @@ class ForumTopicHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return ForumTopicHydrator
      */
     public function setUserId($userId = null)
     {

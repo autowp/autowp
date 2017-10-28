@@ -13,8 +13,6 @@ use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
-use Application\Model\DbTable\Page;
-
 class PageController extends AbstractRestfulController
 {
     /**

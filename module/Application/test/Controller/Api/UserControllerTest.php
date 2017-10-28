@@ -5,8 +5,6 @@ namespace ApplicationTest\Controller\Api;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
-use Autowp\User\Model\User;
-
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\UserController;
 

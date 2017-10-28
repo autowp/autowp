@@ -2,8 +2,10 @@
 
 namespace Application\View\Helper;
 
+use Zend\View\Exception;
 use Zend\View\Helper\Placeholder\Container\AbstractContainer;
 use Zend\View\Helper\Placeholder\Container\AbstractStandalone;
+use Zend\View\Helper\HeadTitle;
 use Zend\View\Helper\TranslatorAwareTrait;
 
 class PageTitle extends AbstractStandalone

@@ -9,7 +9,6 @@ use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\Message\MessageService;
 
-use Application\Language;
 use Application\Model\Categories;
 
 class MainMenu

@@ -337,52 +337,6 @@ class Pic extends AbstractPlugin
                 }
             }
             unset($row);
-        } elseif ($pictures instanceof \Zend_Db_Table_Select) {
-            $table = $pictures->getTable();
-            $db = $table->getAdapter();
-
-            $select = clone $pictures;
-            $bind = [];
-
-            $select
-                ->reset(\Zend_Db_Select::COLUMNS)
-                ->setIntegrityCheck(false)
-                ->columns([
-                    'pictures.id', 'pictures.identity', 'pictures.name',
-                    'pictures.width', 'pictures.height',
-                    'pictures.crop_left', 'pictures.crop_top',
-                    'pictures.crop_width', 'pictures.crop_height',
-                    'pictures.status', 'pictures.image_id',
-                    'pictures.owner_id'
-                ]);
-
-            $select
-                ->group('pictures.id')
-                ->joinLeft('pictures_moder_votes', 'pictures.id = pictures_moder_votes.picture_id', [
-                    'moder_votes'       => 'sum(if(pictures_moder_votes.vote, 1, -1))',
-                    'moder_votes_count' => 'count(pictures_moder_votes.picture_id)'
-                ]);
-
-
-
-            if (! $options['disableBehaviour']) {
-                $select
-                    ->joinLeft(['pv' => 'picture_view'], 'pictures.id = pv.picture_id', 'views')
-                    ->joinLeft(
-                        ['ct' => 'comment_topic'],
-                        'ct.type_id = :type_id and ct.item_id = pictures.id',
-                        'messages'
-                    );
-
-                $bind['type_id'] = \Application\Comments::PICTURES_TYPE_ID;
-            }
-
-            $rows = $db->fetchAll($select, $bind);
-
-
-            foreach ($rows as $idx => $picture) {
-                $ids[] = (int)$picture['id'];
-            }
         } else {
             throw new Exception(sprintf("Unexpected type of pictures: %s", get_class($pictures)));
         }

@@ -4,8 +4,6 @@ namespace Application\Most\Adapter;
 
 use Zend\Db\Sql;
 
-use Application\Model\DbTable\Attr;
-
 class Acceleration extends AbstractAdapter
 {
     protected $attributes;

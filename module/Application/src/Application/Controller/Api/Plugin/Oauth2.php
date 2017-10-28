@@ -2,10 +2,13 @@
 
 namespace Application\Controller\Api\Plugin;
 
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use OAuth2\Server as OAuth2Server;
-use ZF\OAuth2\Provider\UserId\UserIdProviderInterface;
+use InvalidArgumentException;
+use RuntimeException;
+
 use OAuth2\Request as OAuth2Request;
+use OAuth2\Server as OAuth2Server;
+use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use ZF\OAuth2\Provider\UserId\UserIdProviderInterface;
 
 class Oauth2 extends AbstractPlugin
 {

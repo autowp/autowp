@@ -9,7 +9,6 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Paginator;
 use Zend\View\Model\JsonModel;
 
-use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 
 use Application\Hydrator\Api\RestHydrator;

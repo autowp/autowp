@@ -2,11 +2,15 @@
 
 namespace Application\Controller\Api;
 
+use ArrayObject;
+
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Paginator;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\Message\MessageService;
 

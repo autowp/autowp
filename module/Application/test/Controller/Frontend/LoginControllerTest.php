@@ -4,8 +4,6 @@ namespace ApplicationTest\Controller\Frontend;
 
 use Zend\Http\Request;
 use Zend\Json\Json;
-use Zend\Uri\Http;
-use Zend\Uri\Uri;
 use Zend\Uri\UriFactory;
 
 use Application\Controller\Api\LoginController;

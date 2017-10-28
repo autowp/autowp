@@ -7,8 +7,6 @@ use Zend\EventManager\EventManagerInterface;
 
 use Autowp\Cron;
 
-use Application\CronEvent;
-
  //TODO: extract to zf-components
 
 class Maintenance extends AbstractListenerAggregate

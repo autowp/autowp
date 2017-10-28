@@ -2,7 +2,10 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Zend\Stdlib\ArrayUtils;
 
 class LogHydrator extends RestHydrator
 {
@@ -55,7 +58,7 @@ class LogHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return LogHydrator
      */
     public function setUserId($userId = null)
     {

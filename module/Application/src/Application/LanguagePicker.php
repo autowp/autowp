@@ -2,8 +2,6 @@
 
 namespace Application;
 
-use Application\Language;
-
 class LanguagePicker
 {
     private $request;

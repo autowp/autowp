@@ -2,11 +2,8 @@
 
 namespace Application\Controller;
 
-use DateTime;
-
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Paginator\Paginator;
 
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\User;

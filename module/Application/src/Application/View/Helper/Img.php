@@ -4,8 +4,6 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
 
-use Autowp\Image\Storage;
-
 class Img extends AbstractHtmlElement
 {
     private $attribs;

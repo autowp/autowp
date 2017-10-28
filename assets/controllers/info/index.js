@@ -1,1 +1,2 @@
 import './spec';
+import './text';

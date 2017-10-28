@@ -15,7 +15,6 @@ use Autowp\Image;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 use Application\Model\Item as ItemModel;
-use Application\Model\Perspective;
 
 class Picture
 {

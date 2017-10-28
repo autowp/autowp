@@ -2,13 +2,17 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
+use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Zend\Router\Http\TreeRouteStack;
+use Zend\Stdlib\ArrayUtils;
+
 use Autowp\User\Model\User;
 
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
-use Zend\Router\Http\TreeRouteStack;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 
 class AttrUserValueHydrator extends RestHydrator
 {
@@ -90,7 +94,7 @@ class AttrUserValueHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return AttrUserValueHydrator
      */
     public function setUserId($userId = null)
     {

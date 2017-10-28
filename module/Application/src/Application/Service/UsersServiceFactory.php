@@ -5,8 +5,6 @@ namespace Application\Service;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\Service\UsersService;
-
 class UsersServiceFactory implements FactoryInterface
 {
     /**

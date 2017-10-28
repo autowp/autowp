@@ -6,7 +6,6 @@ use Exception;
 
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
-use Zend\Session\SessionManager;
 
 use Autowp\Cron;
 

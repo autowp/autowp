@@ -2,7 +2,6 @@
 
 namespace Application\Model;
 
-use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 class PictureVote

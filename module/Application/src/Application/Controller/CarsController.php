@@ -2,9 +2,10 @@
 
 namespace Application\Controller;
 
+use Exception;
+
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 

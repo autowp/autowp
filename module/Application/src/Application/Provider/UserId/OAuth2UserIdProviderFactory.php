@@ -6,9 +6,10 @@
 
 namespace Application\Provider\UserId;
 
+use Interop\Container\ContainerInterface;
+use Zend\Authentication\AuthenticationService;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Interop\Container\ContainerInterface;
 
 class OAuth2UserIdProviderFactory implements FactoryInterface
 {

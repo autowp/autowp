@@ -1,17 +1,19 @@
 <?php
 
-namespace Application\Hydrator\Api;
+namespace Application\Controller\Api;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class RestHydratorFactory implements FactoryInterface
+class TextControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new $requestedName($container);
+        return new TextController(
+            $container->get(\Autowp\TextStorage\Service::class)
+        );
     }
 }

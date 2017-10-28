@@ -2,6 +2,10 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
+use Zend\Stdlib\ArrayUtils;
+
 use Application\Model\Picture;
 
 class PreviewPictureHydrator extends RestHydrator

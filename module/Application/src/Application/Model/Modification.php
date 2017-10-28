@@ -7,8 +7,6 @@ use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
-use Application\Model\DbTable\Modification as ModificationTable;
-
 class Modification
 {
     /**

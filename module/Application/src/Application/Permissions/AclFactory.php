@@ -48,7 +48,6 @@ class AclFactory implements FactoryInterface
 
     /**
      * @param ServiceLocatorInterface $controllers
-     * @return OAuth2Plugin
      */
     public function createService(ServiceLocatorInterface $controllers)
     {

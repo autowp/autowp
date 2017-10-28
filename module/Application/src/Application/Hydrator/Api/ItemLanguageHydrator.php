@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api;
 class ItemLanguageHydrator extends RestHydrator
 {
     /**
-     * @var TextStorage
+     * @var \Autowp\TextStorage\Service
      */
     private $textStorage;
 

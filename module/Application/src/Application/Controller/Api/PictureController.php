@@ -4,7 +4,6 @@ namespace Application\Controller\Api;
 
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
-use Zend\Http\Request;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
@@ -13,7 +12,6 @@ use ZF\ApiProblem\ApiProblemResponse;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 
-use Application\Comments;
 use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;

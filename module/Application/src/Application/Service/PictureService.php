@@ -17,7 +17,6 @@ use Application\ExifGPSExtractor;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\UserPicture;
-use Application\Service\TelegramService;
 
 class PictureService
 {

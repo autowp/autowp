@@ -2,6 +2,8 @@
 
 namespace Application\Router\Http;
 
+use Exception;
+
 use Zend\Router\Http\RouteInterface;
 use Zend\Router\Http\RouteMatch;
 use Zend\Stdlib\RequestInterface as Request;

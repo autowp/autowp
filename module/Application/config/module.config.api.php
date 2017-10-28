@@ -2,12 +2,7 @@
 
 namespace Application;
 
-use Zend\Router\Http\Literal;
-use Zend\Router\Http\Method;
-use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
-
-use Autowp\User\Model\User;
 
 return [
     'hydrators' => [
@@ -77,6 +72,7 @@ return [
             Controller\Api\RestorePasswordController::class => Controller\Api\RestorePasswordControllerFactory::class,
             Controller\Api\SpecController::class            => Controller\Api\SpecControllerFactory::class,
             Controller\Api\StatController::class            => Controller\Api\StatControllerFactory::class,
+            Controller\Api\TextController::class            => Controller\Api\TextControllerFactory::class,
             Controller\Api\TimezoneController::class        => InvokableFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
             Controller\Api\UserController::class            => Controller\Api\UserControllerFactory::class,
@@ -1890,6 +1886,36 @@ return [
                                             ]
                                         ],
                                     ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'text' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/text',
+                            'defaults' => [
+                                'controller' => Controller\Api\TextController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'user' => [
+                                'type' => 'Segment',
+                                'options' => [
+                                    'route' => '/:id'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'item' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'item'
+                                            ]
+                                        ]
+                                    ],
                                 ]
                             ]
                         ]

@@ -6,8 +6,6 @@ use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
 
-use Autowp\User\Model\User;
-
 use Application\Controller\Api\AttrController;
 use Application\Controller\Api\LoginController;
 use Application\Controller\Api\UserController;

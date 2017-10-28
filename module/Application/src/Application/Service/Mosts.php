@@ -12,7 +12,6 @@ use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
 use Application\Most;
-use Application\Service\SpecificationsService;
 
 class Mosts
 {

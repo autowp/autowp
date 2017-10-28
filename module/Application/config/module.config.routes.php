@@ -343,35 +343,6 @@ return [
                     ]
                 ]
             ],
-            'info' => [
-                'type'    => 'Literal',
-                'options' => [
-                    'route' => '/info',
-                    'defaults' => [
-                        'controller' => Controller\InfoController::class,
-                    ]
-                ],
-                'child_routes'  => [
-                    'text' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/text/id/:id',
-                            'defaults' => [
-                                'action' => 'text',
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'revision' => [
-                                'type' => 'Segment',
-                                'options' => [
-                                    'route' => '/revision/:revision',
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ],
             'login' => [
                 'type' => 'Literal',
                 'options' => [
@@ -423,16 +394,6 @@ return [
                         ],
                     ],
                 ]
-            ],
-            'rules' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/rules',
-                    'defaults' => [
-                        'controller' => Controller\DocController::class,
-                        'action'     => 'rules',
-                    ],
-                ],
             ],
             'telegram-webhook' => [
                 'type' => 'Segment',

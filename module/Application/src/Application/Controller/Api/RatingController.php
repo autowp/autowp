@@ -10,7 +10,6 @@ use Autowp\User\Model\User;
 
 use Application\Comments;
 use Application\Hydrator\Api\RestHydrator;
-use Application\Model\Brand;
 use Application\Model\Item;
 use Application\Model\Picture;
 

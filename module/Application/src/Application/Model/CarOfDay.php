@@ -8,7 +8,6 @@ use DateTime;
 use Facebook;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Twitter;
-use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Http\Client;
 use Zend\Http\Request;
@@ -17,7 +16,6 @@ use Zend\Json\Json;
 use Autowp\Image;
 
 use Application\ItemNameFormatter;
-use Application\Model\Catalogue;
 use Application\Service\SpecificationsService;
 
 class CarOfDay
@@ -426,7 +424,7 @@ class CarOfDay
             throw new \Exception("Failed to post to vk" . $response->getReasonPhrase());
         }
 
-        $json = \Zend\Json\Json::decode($response->getBody(), \Zend\Json\Json::TYPE_ARRAY);
+        $json = Json::decode($response->getBody(), Json::TYPE_ARRAY);
         if (isset($json['error'])) {
             throw new \Exception("Failed to post to vk" . $json['error']['error_msg']);
         }

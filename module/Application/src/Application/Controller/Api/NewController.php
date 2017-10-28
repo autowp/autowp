@@ -4,7 +4,6 @@ namespace Application\Controller\Api;
 
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\Paginator;
 use Zend\View\Model\JsonModel;
 
 use Application\Hydrator\Api\RestHydrator;

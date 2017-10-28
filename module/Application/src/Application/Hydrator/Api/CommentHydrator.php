@@ -2,8 +2,11 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
@@ -114,7 +117,7 @@ class CommentHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return CommentHydrator
      */
     public function setUserId($userId = null)
     {

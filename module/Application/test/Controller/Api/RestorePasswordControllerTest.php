@@ -4,8 +4,6 @@ namespace ApplicationTest\Api\Controller;
 
 use Zend\Http\Request;
 
-use Autowp\User\Model\User;
-
 use Application\Controller\Api\LoginController;
 use Application\Controller\Api\RestorePasswordController;
 use Application\Controller\Api\UserController;

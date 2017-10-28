@@ -4,9 +4,10 @@ namespace Application\Hydrator\Api;
 
 use DateTime;
 use DateInterval;
+use Traversable;
 
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Permissions\Acl\Acl;
+use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;

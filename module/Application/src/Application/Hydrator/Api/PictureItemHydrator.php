@@ -2,6 +2,10 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
+use Zend\Stdlib\ArrayUtils;
+
 use Autowp\User\Model\User;
 
 use Application\Model\Item;
@@ -77,7 +81,7 @@ class PictureItemHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return PictureItemHydrator
      */
     public function setUserId($userId = null)
     {

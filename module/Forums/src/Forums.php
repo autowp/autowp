@@ -2,13 +2,12 @@
 
 namespace Autowp\Forums;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
-
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
 
 /**
  * @todo Remove \Application\Comments::FORUMS_TYPE_ID

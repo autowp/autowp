@@ -2,7 +2,10 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\User;
@@ -70,7 +73,7 @@ class IpHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return IpHydrator
      */
     public function setUserId($userId = null)
     {

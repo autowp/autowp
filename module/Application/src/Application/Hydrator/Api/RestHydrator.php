@@ -2,7 +2,6 @@
 
 namespace Application\Hydrator\Api;
 
-use Exception;
 use Traversable;
 
 use Zend\Hydrator\AbstractHydrator;

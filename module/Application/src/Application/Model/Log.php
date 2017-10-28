@@ -2,9 +2,6 @@
 
 namespace Application\Model;
 
-use Exception;
-
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;

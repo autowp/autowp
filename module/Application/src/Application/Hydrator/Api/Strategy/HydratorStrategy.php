@@ -5,7 +5,7 @@ namespace Application\Hydrator\Api\Strategy;
 use Interop\Container\ContainerInterface;
 use Zend\Hydrator\Strategy\StrategyInterface;
 
-use Application\Hydrator\Api\Content as Hydrator;
+use Application\Hydrator\Api\RestHydrator;
 
 /**
  * @SuppressWarnings(PHPMD.NumberOfChildren)
@@ -20,7 +20,7 @@ abstract class HydratorStrategy implements StrategyInterface
     protected $serviceManager;
 
     /**
-     * @var Hydrator
+     * @var RestHydrator
      */
     protected $hydrator;
 
@@ -40,7 +40,7 @@ abstract class HydratorStrategy implements StrategyInterface
     }
 
     /**
-     * @return Hydrator
+     * @return RestHydrator
      */
     abstract protected function getHydrator();
 

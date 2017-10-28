@@ -134,7 +134,7 @@ class UserText extends AbstractHtmlElement
                         return $result;
                     }
                 }
-            } catch (\Zend\Http\Exception\Exception\InvalidArgumentException $e) {
+            } catch (\Zend\Http\Exception\InvalidArgumentException $e) {
             }
         }
 

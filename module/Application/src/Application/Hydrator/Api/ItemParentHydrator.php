@@ -2,6 +2,10 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
+use Zend\Stdlib\ArrayUtils;
+
 use Application\Model\Item;
 use Application\Model\ItemParent;
 
@@ -73,7 +77,7 @@ class ItemParentHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return ItemParentHydrator
      */
     public function setUserId($userId = null)
     {

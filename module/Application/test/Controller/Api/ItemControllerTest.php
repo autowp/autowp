@@ -3,7 +3,6 @@
 namespace ApplicationTest\Controller\Api;
 
 use Zend\Http\Header\Cookie;
-use Zend\Http\Headers;
 use Zend\Http\Request;
 use Zend\Json\Json;
 
@@ -13,7 +12,6 @@ use Application\Controller\Api\ItemParentController;
 use Application\Controller\Api\PictureController;
 use Application\Controller\Api\PictureItemController;
 use Application\Controller\UploadController;
-use Application\Controller\Moder\CarsController;
 use Application\Controller\Api\ItemLanguageController;
 use Application\Controller\Api\ItemLinkController;
 

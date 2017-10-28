@@ -2,6 +2,8 @@
 
 namespace Application\Service;
 
+use Exception;
+
 use Telegram\Bot\Api;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -88,7 +90,7 @@ class TelegramService
     }
 
     /**
-     * @return Telegram\Bot\Api
+     * @return Api
      */
     private function getApi()
     {

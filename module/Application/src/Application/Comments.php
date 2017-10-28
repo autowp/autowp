@@ -13,10 +13,8 @@ use Autowp\Comments\CommentsService;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 
-use Application\HostManager;
 use Application\Model\Item;
 use Application\Model\Picture;
-use Application\StringUtils;
 
 class Comments
 {

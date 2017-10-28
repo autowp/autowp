@@ -7,7 +7,7 @@ use Autowp\User\Model\User;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-use Zend\Paginator\Paginator;
+use Zend\Paginator;
 
 class CommentsService
 {
@@ -859,14 +859,14 @@ class CommentsService
 
     /**
      * @param array $options
-     * @return \Zend\Paginator\Paginator
+     * @return Paginator\Paginator
      */
     public function getMessagesPaginator(array $options = [])
     {
         $select = $this->getMessagesSelect($options);
 
-        return new \Zend\Paginator\Paginator(
-            new \Zend\Paginator\Adapter\DbSelect(
+        return new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect(
                 $select,
                 $this->messageTable->getAdapter()
             )
@@ -876,7 +876,7 @@ class CommentsService
     /**
      * @param int $type
      * @param int $item
-     * @return \Zend\Paginator\Paginator
+     * @return Paginator\Paginator
      */
     public function getMessagePaginator($type, $item)
     {
@@ -890,8 +890,8 @@ class CommentsService
             ])
             ->order('datetime');
 
-        return new \Zend\Paginator\Paginator(
-            new \Zend\Paginator\Adapter\DbSelect(
+        return new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect(
                 $select,
                 $this->messageTable->getAdapter()
             )

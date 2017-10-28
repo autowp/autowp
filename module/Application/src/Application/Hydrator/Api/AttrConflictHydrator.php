@@ -2,12 +2,16 @@
 
 namespace Application\Hydrator\Api;
 
+use Traversable;
+
+use Zend\Router\Http\TreeRouteStack;
+use Zend\Stdlib\ArrayUtils;
+
 use Autowp\User\Model\User;
 
 use Application\ItemNameFormatter;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
-use Zend\Router\Http\TreeRouteStack;
 
 class AttrConflictHydrator extends RestHydrator
 {
@@ -80,7 +84,7 @@ class AttrConflictHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return Comment
+     * @return AttrConflictHydrator
      */
     public function setUserId($userId = null)
     {

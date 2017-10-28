@@ -2,7 +2,6 @@
 
 namespace ApplicationTest\Form;
 
-use Zend\Form\Form;
 use Application\Test\AbstractHttpControllerTestCase;
 
 class ModerAttributeListOptionFormTest extends AbstractHttpControllerTestCase

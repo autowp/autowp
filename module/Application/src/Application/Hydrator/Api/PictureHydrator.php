@@ -3,9 +3,10 @@
 namespace Application\Hydrator\Api;
 
 use Exception;
+use Traversable;
 
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Permissions\Acl\Acl;
+use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
