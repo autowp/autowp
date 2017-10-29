@@ -10,17 +10,17 @@
 </p>
 <div class="row">
     <div class="col-md-6">
-        <h3>
+        <h3 ng-if="ctrl.prev.revision">
             Revision {{ctrl.prev.revision}}
             <small ng-if="ctrl.prev.user"><autowp-user user="ctrl.prev.user"></autowp-user></small>
         </h3>
-        <pre ng-bind="ctrl.prev.text"></pre>
+        <pre ng-show="ctrl.prev.revision" ng-bind="ctrl.prev.text"></pre>
     </div>
     <div class="col-md-6">
         <h3>
             Revision {{ctrl.current.revision}}
             <small ng-if="ctrl.current.user"><autowp-user user="ctrl.current.user"></autowp-user></small>
         </h3>
-        <pre class="diff" ng-bind="ctrl.current.text"></pre>
+        <pre class="diff"></pre>
     </div>
 </div>

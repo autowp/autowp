@@ -172,7 +172,7 @@
             <autowp-markdown-edit text="picture.copyrights"></autowp-markdown-edit>
             <button class="btn btn-primary" ng-click="saveCopyrights()" translate>submit</button>
             <p ng-if="picture.copyrights_text_id">
-                <a ng-href="/info/text/id/{{picture.copyrights_text_id}}" translate>moder/markdown/history</a>
+                <a ui-sref="info-text({id: picture.copyrights_text_id})" translate>moder/markdown/history</a>
             </p>
             
             <div class="progress" ng-show="copyrightsLoading">

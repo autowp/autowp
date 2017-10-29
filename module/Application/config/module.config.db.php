@@ -2,8 +2,6 @@
 
 namespace Application;
 
-use PDO;
-
 return [
     'db' => [
         'driver'         => 'Pdo',

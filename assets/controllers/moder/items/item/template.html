@@ -129,7 +129,7 @@
                         <div class="col-md-10">
                             <autowp-markdown-edit save="saveCopyrights" text="language.text"></autowp-markdown-edit>
                             <p ng-if="language.text_id" class="text-right">
-                                <a ng-href="/info/text/id/{{language.text_id}}" translate>moder/markdown/history</a>
+                                <a ui-sref="info-text({id: language.text_id})" translate>moder/markdown/history</a>
                             </p>
                         </div>
                     </div>
@@ -138,7 +138,7 @@
                         <div class="col-md-10">
                             <autowp-markdown-edit save="saveCopyrights" text="language.full_text"></autowp-markdown-edit>
                             <p ng-if="language.full_text_id" class="text-right">
-                                <a ng-href="/info/text/id/{{language.full_text_id}}" translate>moder/markdown/history</a>
+                                <a ui-sref="info-text({id: language.full_text_id})" translate>moder/markdown/history</a>
                             </p>
                         </div>
                     </div>

@@ -64,7 +64,9 @@ angular.module(Module)
                     });
                 }
                 
-                doDiff();
+                if (ctrl.prev.text) {
+                    doDiff();
+                }
                 
             }, function(response) {
                 notify.response(response);
@@ -72,11 +74,7 @@ angular.module(Module)
             
             function doDiff() {
                 
-                var $pre = $('pre');
-                
-                console.log($pre);
-                
-                var diff = JsDiff.diffChars($pre.eq(0).text(), $pre.eq(1).text());
+                var diff = JsDiff.diffChars(ctrl.prev.text, ctrl.current.text);
                 
                 var fragment = document.createDocumentFragment();
                 for (var i=0; i < diff.length; i++) {
@@ -100,8 +98,8 @@ angular.module(Module)
                     fragment.appendChild(node);
                 }
 
-                $pre.eq(1).empty().append(fragment);
-            };
+                $('pre').eq(1).empty().append(fragment);
+            }
         }
     ]);
 
