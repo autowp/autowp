@@ -472,12 +472,10 @@ class PictureController extends AbstractRestfulController
      */
     private function userModerUrl($user, $full = false, $uri = null)
     {
-        return $this->url()->fromRoute('users/user', [
-            'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
-        ], [
+        return $this->url()->fromRoute('ng', ['path' => ''], [
             'force_canonical' => $full,
             'uri'             => $uri
-        ]);
+        ]) . 'users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
     }
 
     private function pictureUrl($picture, $forceCanonical = false, $uri = null)
@@ -1093,12 +1091,10 @@ class PictureController extends AbstractRestfulController
                 $url = $this->pic()->url($picture['identity'], true, $uri);
                 $replaceUrl = $this->pic()->url($replacePicture['identity'], true, $uri);
 
-                $moderUrl = $this->url()->fromRoute('users/user', [
-                    'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
-                ], [
+                $moderUrl = $this->url()->fromRoute('ng', ['path' => ''], [
                     'force_canonical' => true,
                     'uri'             => $uri
-                ]);
+                ]) . 'users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
 
                 $message = sprintf(
                     $this->translate('pm/user-%s-accept-replace-%s-%s', 'default', $recepient['language']),

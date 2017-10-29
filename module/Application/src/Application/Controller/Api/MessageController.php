@@ -79,6 +79,10 @@ class MessageController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        if ($currentUser['id'] == $user['id']) {
+            return $this->forbiddenAction();
+        }
+
         $this->message->send($currentUser['id'], $user['id'], $data['text']);
 
         return $this->getResponse()->setStatusCode(201);

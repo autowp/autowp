@@ -11,6 +11,10 @@ use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
+use Autowp\User\Model\UserRename;
+
+use Application\Model\Picture;
+use Application\Model\UserAccount;
 
 class UserHydrator extends RestHydrator
 {
@@ -30,17 +34,36 @@ class UserHydrator extends RestHydrator
      */
     private $userModel;
 
+    /**
+     * @var UserRename
+     */
+    private $userRename;
+
+    /**
+     * @var UserAccount
+     */
+    private $userAccount;
+
+    /**
+     * @var Picture
+     */
+    private $picture;
+
     public function __construct($serviceManager)
     {
         parent::__construct();
 
         $this->router = $serviceManager->get('HttpRouter');
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
-        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->userModel = $serviceManager->get(User::class);
+        $this->userRename = $serviceManager->get(UserRename::class);
+        $this->userAccount = $serviceManager->get(UserAccount::class);
+        $this->picture = $serviceManager->get(Picture::class);
 
         $strategy = new DateTimeFormatterStrategy();
         $this->addStrategy('last_online', $strategy);
         $this->addStrategy('reg_date', $strategy);
+        $this->addStrategy('rename_date', $strategy);
 
         $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('image', $strategy);
@@ -110,11 +133,7 @@ class UserHydrator extends RestHydrator
                 'id'        => (int)$object['id'],
                 'name'      => $object['name'],
                 'deleted'   => $deleted,
-                'url'       => $this->router->assemble([
-                    'user_id' => $object['identity'] ? $object['identity'] : 'user' . $object['id']
-                ], [
-                    'name' => 'users/user'
-                ]),
+                'url'       => '/ng/users/' . ($object['identity'] ? $object['identity'] : 'user' . $object['id']),
                 'long_away' => $longAway,
                 'green'     => $isGreen
             ];
@@ -170,12 +189,23 @@ class UserHydrator extends RestHydrator
                 ]);
             }
 
-            if ($this->filterComposite->filter('gravatar')) {
+            if ($this->filterComposite->filter('photo')) {
+                $user['photo'] = $this->extractValue('image', [
+                    'image'  => $object['img'],
+                    'format' => 'photo'
+                ]);
+            }
+
+            if ($this->filterComposite->filter('gravatar') && $object['e_mail']) {
                 $user['gravatar'] = sprintf(
                     'https://www.gravatar.com/avatar/%s?s=70&d=%s&r=g',
                     md5($object['e_mail']),
                     urlencode('https://www.autowp.ru/_.gif')
                 );
+            }
+
+            if ($this->filterComposite->filter('gravatar_hash') && $object['e_mail']) {
+                $user['gravatar_hash'] = md5($object['e_mail']);
             }
 
             if ($isMe && $this->filterComposite->filter('language')) {
@@ -196,6 +226,49 @@ class UserHydrator extends RestHydrator
 
             if ($isMe && $this->filterComposite->filter('specs_weight')) {
                 $user['specs_weight'] = (float)$object['specs_weight'];
+            }
+
+            if ($this->filterComposite->filter('renames')) {
+                $user['renames'] = [];
+                foreach ($this->userRename->getRenames($user['id']) as $rename) {
+                    $user['renames'][] = [
+                        'old_name' => $rename['old_name'],
+                        'date'     => $this->extractValue('rename_date', $rename['date'])
+                    ];
+                }
+            }
+
+            if ($this->filterComposite->filter('is_moder')) {
+                $user['is_moder'] = $this->acl->inheritsRole($object['role'], 'moder');
+            }
+
+            if ($this->filterComposite->filter('accounts')) {
+                $user['accounts'] = $this->userAccount->getAccounts($object['id']);
+            }
+
+            if ($this->filterComposite->filter('pictures_added')) {
+                $user['pictures_added'] = (int)$object['pictures_added'];
+            }
+
+            if ($this->filterComposite->filter('pictures_accepted_count')) {
+                $user['pictures_accepted_count'] = $this->picture->getCount([
+                    'user'   => $user['id'],
+                    'status' => Picture::STATUS_ACCEPTED
+                ]);
+            }
+
+            if ($this->filterComposite->filter('last_ip')) {
+                $isGreen = $object['role'] && $this->acl->isAllowed($object['role'], 'user', 'ip');
+
+                $canViewIp = false;
+                $role = $this->getUserRole();
+                if ($role) {
+                    $canViewIp = $this->acl->isAllowed($role, 'user', 'ip');
+                }
+
+                if ($canViewIp) {
+                    $user['last_ip'] = inet_ntop($object['last_ip']);
+                }
             }
         }
 

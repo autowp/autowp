@@ -9,7 +9,6 @@ use Zend\Json\Json;
 use Application\Controller\Api\AttrController;
 use Application\Controller\Api\LoginController;
 use Application\Controller\Api\UserController;
-use Application\Controller\UsersController;
 use Application\Test\AbstractHttpControllerTestCase;
 
 class AccountControllerTest extends AbstractHttpControllerTestCase
@@ -120,7 +119,6 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertNotEmpty($token);
 
-
         // rename
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
@@ -139,11 +137,11 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 
         // request user page
         $this->reset();
-        $this->dispatch('https://www.autowp.ru/users/user' . $userId, Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/user/' . $userId, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(UsersController::class);
-        $this->assertMatchedRouteName('users/user');
+        $this->assertControllerName(UserController::class);
+        $this->assertMatchedRouteName('api/user/user/item');
     }
 }

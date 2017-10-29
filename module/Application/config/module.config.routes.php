@@ -507,12 +507,9 @@ return [
                     'user' => [
                         'type' => 'Segment',
                         'options' => [
-                            'route' => '/:user_id',
-                            'defaults' => [
-                                'action' => 'user',
-                            ],
+                            'route' => '/:user_id'
                         ],
-                        'may_terminate' => true,
+                        'may_terminate' => false,
                         'child_routes'  => [
                             'pictures' => [
                                 'type' => 'Literal',

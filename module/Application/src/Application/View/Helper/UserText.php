@@ -114,20 +114,18 @@ class UserText extends AbstractHtmlElement
         }
 
         if ($hostAllowed) {
+            $result = $this->tryUserLink($uri);
+            if ($result !== false) {
+                return $result;
+            }
+
             try {
                 $request = new Request();
-                $request->setUri($url);
+                $request->setUri($uri);
 
                 $match = $this->router->match($request);
                 if ($match) {
                     $params = $match->getParams();
-
-
-
-                    $result = $this->tryUserLinkParams($params);
-                    if ($result !== false) {
-                        return $result;
-                    }
 
                     $result = $this->tryPictureLinkParams($params);
                     if ($result !== false) {
@@ -141,41 +139,21 @@ class UserText extends AbstractHtmlElement
         return '<a href="'.$this->view->escapeHtmlAttr($url).'">' . $this->view->escapeHtml($url) . '</a>';
     }
 
-    /**
-     * @param array $params
-     * @return boolean
-     */
-    private function tryUserLinkParams(array $params)
+    private function tryUserLink(Uri\Uri $uri)
     {
-        $map = [
-            [
-                'controller' => \Application\Controller\UsersController::class,
-                'action'     => 'user'
-            ]
-        ];
+        $match = preg_match('|^(/ng)?/users/([^/]+)$|isu', $uri->getPath(), $matches);
 
-        $userId = null;
-        $userIdentity = null;
-        foreach ($map as $pattern) {
-            $match = true;
-            foreach ($pattern as $key => $value) {
-                if (! isset($params[$key]) || $params[$key] != $value) {
-                    $match = false;
-                    break;
-                }
-            }
-
-            if ($match && isset($params['user_id'])) {
-                $userId = $params['user_id'];
-                break;
-            }
+        if (! $match) {
+            return false;
         }
 
-        if (preg_match('|user([0-9]+)|isu', $userId, $matches)) {
-            $userId = $matches[1];
-        } else {
-            $userIdentity = $userId;
-            $userId = null;
+        $userId = null;
+        $userIdentity = $matches[2];
+
+        $match = preg_match('|^user([0-9]+)$|isu', $userIdentity, $matches);
+        if ($match) {
+            $userIdentity = null;
+            $userId = (int)$matches[1];
         }
 
         if ($userId) {

@@ -73,24 +73,6 @@ class ConfigProvider
                     ],
                     'may_terminate' => false,
                     'child_routes'  => [
-                        'ban-user' => [
-                            'type' => Segment::class,
-                            'options' => [
-                                'route'  => '/ban-user/user_id/:user_id',
-                                'defaults' => [
-                                    'action' => 'ban-user',
-                                ]
-                            ]
-                        ],
-                        'unban-user' => [
-                            'type' => Segment::class,
-                            'options' => [
-                                'route'  => '/unban-user/user_id/:user_id',
-                                'defaults' => [
-                                    'action' => 'unban-user',
-                                ]
-                            ]
-                        ],
                         'ban-ip' => [
                             'type' => Segment::class,
                             'options' => [

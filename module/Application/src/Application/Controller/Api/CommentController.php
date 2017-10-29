@@ -439,12 +439,10 @@ class CommentController extends AbstractRestfulController
                     $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor['language']);
 
                     $url = $this->comments->getMessageUrl($messageId, true, $uri) . '#msg' . $messageId;
-                    $moderUrl = $this->url()->fromRoute('users/user', [
-                        'user_id' => $currentUser['identity'] ? $currentUser['identity'] : 'user' . $currentUser['id'],
-                    ], [
+                    $moderUrl = $this->url()->fromRoute('ng', ['path' => ''], [
                         'force_canonical' => true,
                         'uri'             => $uri
-                    ]);
+                    ]) . 'users/' . ($currentUser['identity'] ? $currentUser['identity'] : 'user' . $currentUser['id']);
                     $message = sprintf(
                         $this->translate(
                             'pm/user-%s-replies-to-you-%s',

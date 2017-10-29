@@ -13,8 +13,7 @@ class BanControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new BanController(
-            $container->get(\Autowp\Traffic\TrafficControl::class),
-            $container->get(\Autowp\User\Model\User::class)
+            $container->get(\Autowp\Traffic\TrafficControl::class)
         );
     }
 }

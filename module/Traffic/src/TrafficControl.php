@@ -73,7 +73,7 @@ class TrafficControl
      * @param int|null $byUserId
      * @param string $reason
      */
-    public function ban($ip, $seconds, $byUserId, $reason)
+    public function ban(string $ip, int $seconds, $byUserId, $reason)
     {
         $seconds = (int)$seconds;
 
@@ -112,7 +112,7 @@ class TrafficControl
     /**
      * @param string $ip
      */
-    public function unban($ip)
+    public function unban(string $ip)
     {
         $this->bannedTable->delete([
             'ip = INET6_ATON(?)' => $ip

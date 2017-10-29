@@ -2418,7 +2418,7 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'gravatar', 'timezone', 'language', 'votes_per_day',' votes_left', 'img', 'specs_weight', 'identity']]
+                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'photo', 'gravatar', 'renames', 'is_moder', 'accounts', 'pictures_added', 'pictures_accepted_count', 'last_ip', 'timezone', 'language', 'votes_per_day',' votes_left', 'img', 'specs_weight', 'identity', 'gravatar_hash']]
                     ]
                 ]
             ]
@@ -2482,7 +2482,7 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'gravatar', 'timezone', 'language', 'votes_per_day',' votes_left', 'img', 'specs_weight', 'identity']]
+                        'options' => ['fields' => ['last_online', 'reg_date', 'image', 'email', 'login', 'avatar', 'photo', 'gravatar', 'renames', 'is_moder' ,'accounts', 'pictures_added', 'pictures_accepted_count', 'last_ip', 'timezone', 'language', 'votes_per_day',' votes_left', 'img', 'specs_weight', 'identity', 'gravatar_hash']]
                     ]
                 ]
             ]

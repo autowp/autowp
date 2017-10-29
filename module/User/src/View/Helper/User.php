@@ -112,9 +112,10 @@ class User extends AbstractHelper
                        '</span>';
             }
 
-            $url = $this->view->url('users/user', [
-                'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
-            ]);
+            $url = $this->view->url('ng', [
+                'path' => '',
+                'only_return_path' => true,
+            ]) . 'users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
 
             $classes = ['user'];
             $lastOnline = Row::getDateTimeByColumnType('timestamp', $user['last_online']);

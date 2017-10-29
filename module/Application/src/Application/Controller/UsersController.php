@@ -5,61 +5,17 @@ namespace Application\Controller;
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\User;
-use Autowp\User\Model\UserRename;
 
-use Application\Comments;
 use Application\Model\Brand;
-use Application\Model\Contact;
-use Application\Model\Item;
-use Application\Model\Perspective;
 use Application\Model\Picture;
-use Application\Model\UserAccount;
 
 class UsersController extends AbstractActionController
 {
-    private $cache;
-
-    /**
-     * @var TrafficControl
-     */
-    private $trafficControl;
-
-    /**
-     * @var Comments
-     */
-    private $comments;
-
-    /**
-     * @var Contact
-     */
-    private $contact;
-
-    /**
-     * @var UserRename
-     */
-    private $userRename;
-
-    /**
-     * @var Perspective
-     */
-    private $perspective;
-
-    /**
-     * @var UserAccount
-     */
-    private $userAccount;
-
     /**
      * @var Picture
      */
     private $picture;
-
-    /**
-     * @var Item
-     */
-    private $item;
 
     /**
      * @var Brand
@@ -69,27 +25,11 @@ class UsersController extends AbstractActionController
     private $userModel;
 
     public function __construct(
-        $cache,
-        TrafficControl $trafficControl,
-        Comments $comments,
-        Contact $contact,
-        UserRename $userRename,
-        Perspective $perspective,
-        UserAccount $userAccount,
         Picture $picture,
-        Item $item,
         Brand $brand,
         User $userModel
     ) {
-        $this->cache = $cache;
-        $this->trafficControl = $trafficControl;
-        $this->comments = $comments;
-        $this->contact = $contact;
-        $this->userRename = $userRename;
-        $this->perspective = $perspective;
-        $this->userAccount = $userAccount;
         $this->picture = $picture;
-        $this->item = $item;
         $this->brand = $brand;
         $this->userModel = $userModel;
     }
@@ -110,104 +50,6 @@ class UsersController extends AbstractActionController
             'identity'   => $identity,
             'not_deleted' => true
         ]);
-    }
-
-    private function getLastComments($user)
-    {
-        $paginator = $this->comments->service()->getMessagesPaginator([
-            'user'            => $user['id'],
-            'exclude_type'    => \Application\Comments::FORUMS_TYPE_ID,
-            'exclude_deleted' => true,
-            'order'           => 'datetime DESC'
-        ]);
-
-        $paginator->setItemCountPerPage(15);
-
-        $lastComments = [];
-        foreach ($paginator->getCurrentItems() as $row) {
-            $lastComments[] = [
-                'url'     => $this->comments->getMessageRowUrl($row),
-                'message' => $this->comments->getMessagePreview($row['message'])
-            ];
-        }
-
-        return $lastComments;
-    }
-
-    public function userAction()
-    {
-        $user = $this->getUser();
-
-        if (! $user) {
-            return $this->notFoundAction();
-        }
-
-        $picturesExists = $this->picture->getCount([
-            'user'   => $user['id'],
-            'status' => Picture::STATUS_ACCEPTED
-        ]);
-
-        $lastPictureRows = $this->picture->getRows([
-            'user'  => $user['id'],
-            'limit' => 12,
-            'order' => 'add_date_desc'
-        ]);
-
-        $names = $this->picture->getNameData($lastPictureRows, [
-            'language' => $this->language(),
-            'large'    => true
-        ]);
-
-        $lastPictures = [];
-        foreach ($lastPictureRows as $lastPictureRow) {
-            $lastPictures[] = [
-                'url'  => $this->pic()->url($lastPictureRow['identity']),
-                'name' => $names[$lastPictureRow['id']]
-            ];
-        }
-
-        $renames = $this->userRename->getRenames($user['id']);
-
-        $canRemovePhoto = $ban = $canBan = $canViewIp = $canDeleteUser = false;
-        if ($this->user()->logedIn()) {
-            if ($this->user()->get()['id'] != $user['id']) {
-                $canBan = $this->user()->isAllowed('user', 'ban');
-                $canDeleteUser = $this->user()->isAllowed('user', 'delete');
-            }
-            $canRemovePhoto = $this->user()->isAllowed('user', 'ban');
-            $canViewIp = $this->user()->isAllowed('user', 'ip');
-        }
-
-        if ($canBan && $user['last_ip'] !== null) {
-            if ($user['last_ip']) {
-                $ban = $this->trafficControl->getBanInfo(inet_ntop($user['last_ip']));
-                if ($ban) {
-                    $ban['user'] = $this->userModel->getRow((int)$ban['user_id']);
-                }
-            }
-        }
-
-        $currentUser = $this->user()->get();
-        $isMe = $currentUser && ($currentUser['id'] == $user['id']);
-        $inContacts = $currentUser && ! $isMe && $this->contact->exists($currentUser['id'], $user['id']);
-        $canBeInContacts = $currentUser && ! $currentUser['deleted'] && ! $isMe ;
-
-        return [
-            'currentUser'     => $user,
-            'ban'             => $ban,
-            'canBan'          => $canBan,
-            'canRemovePhoto'  => $canRemovePhoto,
-            'canViewIp'       => $canViewIp,
-            'canDeleteUser'   => $canDeleteUser,
-            'accounts'        => $this->userAccount->getAccounts($user['id']),
-            'inContacts'      => $inContacts,
-            'canBeInContacts' => $canBeInContacts,
-            'contactApiUrl'   => sprintf('/api/contacts/%d', $user['id']),
-            'picturesExists'  => $picturesExists,
-            'lastPictures'    => $lastPictures,
-            'lastComments'    => $this->getLastComments($user),
-            'renames'         => $renames
-        ];
     }
 
     public function picturesAction()

@@ -15,15 +15,7 @@ class UsersControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(
-            $container->get('longCache'),
-            $container->get(\Autowp\Traffic\TrafficControl::class),
-            $container->get(\Application\Comments::class),
-            $container->get(\Application\Model\Contact::class),
-            $container->get(\Autowp\User\Model\UserRename::class),
-            $container->get(\Application\Model\Perspective::class),
-            $container->get(\Application\Model\UserAccount::class),
             $container->get(\Application\Model\Picture::class),
-            $container->get(\Application\Model\Item::class),
             $container->get(\Application\Model\Brand::class),
             $container->get(\Autowp\User\Model\User::class)
         );

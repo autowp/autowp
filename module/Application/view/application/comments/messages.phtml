@@ -26,9 +26,7 @@
         <div class="photo">
             <?php if ($comment['author'] && !$comment['author']['deleted']) { ?>
                 <?=$this->htmlA([
-                    'href'  => $this->url('users/user', [
-                        'user_id' => $comment['author']['identity'] ? $comment['author']['identity'] : 'user' . $comment['author']['id']
-                    ]),
+                    'href'  => $this->url('ng', ['path' => '']) . 'users/' . ($comment['author']['identity'] ? $comment['author']['identity'] : 'user' . $comment['author']['id']),
                     'class' => 'photo'
                 ], $this->user($comment['author'])->avatar(), false) ?>
             <?php } ?>

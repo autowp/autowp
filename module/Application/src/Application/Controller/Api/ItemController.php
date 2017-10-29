@@ -1289,12 +1289,10 @@ class ItemController extends AbstractRestfulController
      */
     private function userModerUrl($user, $full = false, $uri = null)
     {
-        return $this->url()->fromRoute('users/user', [
-            'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
-        ], [
+        return $this->url()->fromRoute('ng', ['path' => ''], [
             'force_canonical' => $full,
             'uri'             => $uri
-        ]);
+        ]) . 'users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
     }
 
     /**

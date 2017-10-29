@@ -308,12 +308,12 @@ class Comments
             $url = $this->getMessageUrl($messageId, true, $uri) . '#msg' . $messageId;
 
             $userUrl = $this->router->assemble([
-                'user_id' => $author['identity'] ? $author['identity'] : 'user' . $author['id']
+                'path' => ''
             ], [
-                'name'            => 'users/user',
+                'name'            => 'ng',
                 'force_canonical' => true,
                 'uri'             => $uri
-            ]);
+            ]) . 'users/' . ($author['identity'] ? $author['identity'] : 'user' . $author['id']);
 
             $message = sprintf(
                 $this->translator->translate('pm/user-%s-post-new-message-%s', 'default', $subscriber['language']),

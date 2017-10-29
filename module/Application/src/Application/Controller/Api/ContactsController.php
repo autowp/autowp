@@ -90,6 +90,30 @@ class ContactsController extends AbstractRestfulController
         ]);
     }
 
+    public function getAction()
+    {
+        $id = (int)$this->params('id');
+
+        $currentUser = $this->user()->get();
+        if (! $currentUser) {
+            return $this->notFoundAction();
+        }
+
+        if ($currentUser['id'] == $id) {
+            return $this->notFoundAction();
+        }
+
+        if (! $this->contact->exists($currentUser['id'], $id)) {
+            return $this->notFoundAction();
+        }
+
+        $this->getResponse()->setStatusCode(200);
+
+        return new JsonModel([
+            'contact_user_id' => $id
+        ]);
+    }
+
     public function putAction()
     {
         $id = (int)$this->params('id');
