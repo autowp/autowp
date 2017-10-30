@@ -74,7 +74,7 @@
         <div ng-if="ctrl.comments.length > 0">
             <h2>
                 {{'users/user/recent-comments'|translate}}
-                <small><a ui-sref="users-user-comments" translate>all-link</a></small>
+                <small><a ui-sref="users-user-comments({identity: ctrl.user.identity ? ctrl.user.identity : 'user' + ctrl.user.id})" translate>all-link</a></small>
             </h2>
             <div class="well">
                 <ul class="comments">

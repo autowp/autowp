@@ -135,7 +135,8 @@ class UserHydrator extends RestHydrator
                 'deleted'   => $deleted,
                 'url'       => '/ng/users/' . ($object['identity'] ? $object['identity'] : 'user' . $object['id']),
                 'long_away' => $longAway,
-                'green'     => $isGreen
+                'green'     => $isGreen,
+                'identity'  => $object['identity']
             ];
 
             if ($this->filterComposite->filter('last_online')) {
@@ -146,10 +147,6 @@ class UserHydrator extends RestHydrator
             if ($this->filterComposite->filter('reg_date')) {
                 $regDate = Row::getDateTimeByColumnType('timestamp', $object['reg_date']);
                 $user['reg_date'] = $this->extractValue('reg_date', $regDate);
-            }
-
-            if ($this->filterComposite->filter('identity')) {
-                $user['identity'] = $object['identity'];
             }
 
             if ($this->filterComposite->filter('image')) {

@@ -2,7 +2,7 @@ var $ = require("jquery");
 var i18next = require('i18next');
 
 module.exports = {
-    showDialog: function(userId, message, sentCallback, cancelCallback) {
+    showDialog: function(MessageService, userId, message, sentCallback, cancelCallback) {
         
         var self = this;
         
@@ -65,36 +65,18 @@ module.exports = {
                 $btnCancel.prop("disabled", 1);
                 $textarea.prop("disabled", 1);
                 
-                if (self.MessageService) {
+                MessageService.send(userId, text).then(function() {
+                    $textarea.val('');
                     
-                    self.MessageService.send(userId, text).then(function() {
-                        $textarea.val('');
-                        
-                        $btnSend.button('reset').button('complete').addClass('btn-success disabled').prop("disabled", 1);
-                        
-                        $textarea.prop("disabled", 0);
-                        $btnCancel.prop("disabled", 0);
-                        
-                        if (sentCallback) {
-                            sentCallback();
-                        }
-                    });
+                    $btnSend.button('reset').button('complete').addClass('btn-success disabled').prop("disabled", 1);
                     
-                } else {
-                
-                    self.sendMessage(userId, text, function() {
-                        $textarea.val('');
-                        
-                        $btnSend.button('reset').button('complete').addClass('btn-success disabled').prop("disabled", 1);
-                        
-                        $textarea.prop("disabled", 0);
-                        $btnCancel.prop("disabled", 0);
-                        
-                        if (sentCallback) {
-                            sentCallback();
-                        }
-                    });
-                }
+                    $textarea.prop("disabled", 0);
+                    $btnCancel.prop("disabled", 0);
+                    
+                    if (sentCallback) {
+                        sentCallback();
+                    }
+                });
             }
         });
     },

@@ -173,8 +173,7 @@ angular.module(Module)
             }
 
             ctrl.openMessageForm = function() {
-                MessageDialog.MessageService = MessageService;
-                MessageDialog.showDialog(ctrl.user.id);
+                MessageDialog.showDialog(MessageService, ctrl.user.id);
             };
             
             ctrl.toggleInContacts = function() {

@@ -125,8 +125,7 @@ angular.module(Module)
             };
             
             ctrl.openMessageForm = function(userId) {
-                MessageDialog.MessageService = MessageService;
-                MessageDialog.showDialog(userId, null, function() {
+                MessageDialog.showDialog(MessageService, userId, null, function() {
                     switch (ctrl.folder) {
                         case 'sent':
                         case 'dialog':

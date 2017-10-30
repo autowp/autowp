@@ -25,14 +25,6 @@ var doc = document;
 $(function() {
     Navbar.init();
     
-    $(doc.body).on('click', '[data-trigger=show-pm-dialog]', function(e) {
-        e.preventDefault();
-        var userId = $(this).data('userId');
-        require(['message'], function(Message) {
-            Message.showDialog(userId);
-        });
-    });
-    
     $('a.picture-hover-preview').each(function() {
         var href = $(this).attr('href');
         var element = null;

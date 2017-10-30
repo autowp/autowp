@@ -5,7 +5,7 @@
                 <ul class="media-list">
                     <li class="media" ng-repeat="user in chunk">
                         <div class="media-left media-middle">
-                            <a ng-href="{{user.url}}" ng-if="!user.deleted" class="photo">
+                            <a ui-sref="users-user({identity: user.identity ? user.identity : 'user' + user.id})" ng-if="!user.deleted" class="photo">
                                 <img ng-src="{{user.avatar.src}}" ng-if="user.avatar" />
                                 <img ng-src="{{user.gravatar}}" ng-if="user.gravatar && ! user.avatar" />
                             </a>

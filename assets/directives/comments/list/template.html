@@ -5,7 +5,7 @@
         <span ng-if="!message.user" translate>comments/author/anonymous</span>
     </div>
     <div class="photo">
-        <a ng-href="{{message.user.url}}" class="photo" ng-if="message.user && !message.user.deleted">
+        <a ui-sref="users-user({identity: message.user.identity ? message.user.identity : 'user' + message.user.id})" class="photo" ng-if="message.user && !message.user.deleted">
             <img ng-src="{{message.user.avatar.src}}" ng-if="message.user.avatar" />
             <img ng-src="{{message.user.gravatar}}" ng-if="message.user.gravatar && ! message.user.avatar" />
         </a>
