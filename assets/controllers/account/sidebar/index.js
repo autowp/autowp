@@ -57,7 +57,7 @@ angular.module(Module)
                         },
                         {
                             pageId: 130,
-                            url: '#',
+                            url: $state.href('users-user-pictures', {identity: $scope.user.identity ? $scope.user.identity : 'uder' + $scope.user.id}, {inherit: false}),
                             icon: 'th',
                             name: 'page/130/name'
                         },
@@ -136,7 +136,6 @@ angular.module(Module)
                     }).then(function(response) {
                         ctrl.items[6].count = response.data.inboxCount;
                         ctrl.items[5].count = response.data.acceptedCount;
-                        ctrl.items[5].url = response.data.url;
                     }, function(response) {
                         notify.response(response);
                     });

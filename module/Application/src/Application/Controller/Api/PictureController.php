@@ -1139,10 +1139,7 @@ class PictureController extends AbstractRestfulController
 
         return new JsonModel([
             'inboxCount'    => $inboxCount,
-            'acceptedCount' => $acceptedCount,
-            'url'           => $this->url()->fromRoute('users/user/pictures', [
-                'user_id' => $user['identity'] ? $user['identity'] : 'user' . $user['id']
-            ])
+            'acceptedCount' => $acceptedCount
         ]);
     }
 }

@@ -441,6 +441,10 @@ class ItemHydrator extends RestHydrator
                 ]);
             }
 
+            if ($this->filterComposite->filter('current_pictures_count')) {
+                $result['current_pictures_count'] = isset($object['current_pictures_count']) ? (int)$object['current_pictures_count'] : null;
+            }
+
             if ($this->filterComposite->filter('specifications_count')) {
                 $result['specifications_count'] = $this->specificationsService->getSpecsCount($object['id']);
             }
@@ -480,6 +484,10 @@ class ItemHydrator extends RestHydrator
             if ($this->filterComposite->filter('name_default')) {
                 $name = $this->itemModel->getLanguageName($object['id'], 'xx');
                 $result['name_default'] = $nameData['name'] == $name ? null : $name;
+            }
+
+            if ($this->filterComposite->filter('name_only')) {
+                $result['name_only'] = $this->itemModel->getName($object['id'], $this->language);
             }
 
             if ($this->filterComposite->filter('name_html')) {

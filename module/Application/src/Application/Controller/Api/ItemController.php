@@ -520,6 +520,28 @@ class ItemController extends AbstractRestfulController
             $select->where([new Sql\Predicate\In('item.item_type_id', $allowedItemTypes)]);
         }
 
+        if ($data['descendant_pictures']) {
+            $group = true;
+
+            $columns = [];
+            if (isset($data['fields']['current_pictures_count'])) {
+                $columns['current_pictures_count'] = new Sql\Expression('COUNT(distinct pictures.id)');
+            }
+
+            $select
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
+                ->join('pictures', 'picture_item.picture_id = pictures.id', $columns);
+
+            if ($data['descendant_pictures']['status']) {
+                $select->where(['pictures.status' => $data['descendant_pictures']['status']]);
+            }
+
+            if ($data['descendant_pictures']['owner_id']) {
+                $select->where(['pictures.owner_id' => $data['descendant_pictures']['owner_id']]);
+            }
+        }
+
         if ($group) {
             $select->group('item.id');
         }

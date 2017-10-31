@@ -493,49 +493,6 @@ return [
                     ],
                 ]
             ],
-            'users' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/users',
-                    'defaults' => [
-                        'controller' => Controller\UsersController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'user' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/:user_id'
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'pictures' => [
-                                'type' => 'Literal',
-                                'options' => [
-                                    'route' => '/pictures',
-                                    'defaults' => [
-                                        'action' => 'pictures',
-                                    ],
-                                ],
-                                'may_terminate' => true,
-                                'child_routes'  => [
-                                    'brand' => [
-                                        'type' => 'Segment',
-                                        'options' => [
-                                            'route' => '/:brand_catname[/page:page]',
-                                            'defaults' => [
-                                                'action' => 'brandpictures',
-                                            ],
-                                        ],
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                ]
-            ],
             'votings' => [
                 'type' => 'Literal',
                 'options' => [

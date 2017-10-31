@@ -2,12 +2,13 @@
 
 namespace Application;
 
-use Autowp\Comments\CommentsService;
-use Autowp\Message\MessageService;
-use Autowp\ZFComponents\Filter\SingleSpaces;
-use Autowp\User\Model\User;
 use Zend\InputFilter\InputFilter;
+
+use Autowp\Comments\CommentsService;
 use Autowp\Forums\Forums;
+use Autowp\Message\MessageService;
+use Autowp\User\Model\User;
+use Autowp\ZFComponents\Filter\SingleSpaces;
 
 return [
     'input_filter_specs' => [
@@ -872,13 +873,14 @@ return [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => ['childs_count', 'name_html',
-                            'name_text', 'name_default', 'description',
+                            'name_text', 'name_default', 'name_only', 'description',
                             'has_text', 'brands', 'upload_url',
                             'spec_editor_url', 'specs_url', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
                             'preview_pictures', 'design', 'engine_vehicles',
                             'catname', 'is_concept', 'spec_id', 'begin_year',
-                            'end_year', 'body', 'lat', 'lng']]
+                            'end_year', 'body', 'lat', 'lng',
+                            'pictures_count', 'current_pictures_count']]
                     ]
                 ]
             ],
@@ -1015,6 +1017,21 @@ return [
                 'validators' => [
                     ['name' => 'Digits']
                 ]
+            ],
+            'descendant_pictures' => [
+                'type' => InputFilter::class,
+                'status' => [
+                    'required' => false
+                ],
+                'owner_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits']
+                    ]
+                ],
             ]
         ],
         'api_item_item' => [
@@ -1024,13 +1041,14 @@ return [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => ['childs_count', 'name_html',
-                            'name_text', 'name_default', 'description',
+                            'name_text', 'name_default', 'name_only', 'description',
                             'has_text', 'brands', 'upload_url',
                             'spec_editor_url', 'specs_url', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
                             'preview_pictures', 'design', 'engine_vehicles',
                             'catname', 'is_concept', 'spec_id', 'begin_year',
-                            'end_year', 'body']]
+                            'end_year', 'body', 'lat', 'lng',
+                            'pictures_count', 'current_pictures_count']]
                     ]
                 ]
             ],

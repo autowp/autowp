@@ -1,0 +1,9 @@
+<div class="brand-icons">
+    <div ng-repeat="brand in ctrl.brands">
+        <a ui-sref="users-user-pictures-brand({identity: ctrl.identity, brand: brand.catname})" class="brandicon brandicon-{{brand.catname.replace('.', '_')}}"></a>
+        <h4>
+            <a ui-sref="users-user-pictures-brand({identity: ctrl.identity, brand: brand.catname})" ng-bind="brand.name_only"></a>
+            <small>({{brand.current_pictures_count}})</small>
+        </h4>
+    </div>
+</div>

@@ -54,7 +54,6 @@ return [
             Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
             Controller\TelegramController::class        => Controller\Frontend\Service\TelegramControllerFactory::class,
             Controller\TwinsController::class           => Controller\Frontend\Service\TwinsControllerFactory::class,
-            Controller\UsersController::class           => Controller\Frontend\UsersControllerFactory::class,
             Controller\UploadController::class          => Controller\Frontend\Service\UploadControllerFactory::class,
             Controller\VotingController::class          => Controller\Frontend\Service\VotingControllerFactory::class,
             Controller\Frontend\YandexController::class => Controller\Frontend\Service\YandexControllerFactory::class,

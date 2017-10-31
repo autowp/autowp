@@ -8,6 +8,7 @@ import MessageServiceName from 'services/message';
 import ACL_SERVICE_NAME from 'services/acl';
 
 import './comments';
+import './pictures';
 
 const CONTROLLER_NAME = 'UsersUserController';
 const STATE_NAME = 'users-user';
