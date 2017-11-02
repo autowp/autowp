@@ -119,7 +119,7 @@ class MessageController extends AbstractRestfulController
                 $messages = $this->message->getDialogbox(
                     $user['id'],
                     (int)$params['user_id'],
-                    (int)$this->params('page')
+                    (int)$params['page']
                 );
                 break;
         }
