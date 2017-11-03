@@ -533,11 +533,11 @@ class ItemController extends AbstractRestfulController
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
                 ->join('pictures', 'picture_item.picture_id = pictures.id', $columns);
 
-            if ($data['descendant_pictures']['status']) {
+            if (isset($data['descendant_pictures']['status']) && $data['descendant_pictures']['status']) {
                 $select->where(['pictures.status' => $data['descendant_pictures']['status']]);
             }
 
-            if ($data['descendant_pictures']['owner_id']) {
+            if (isset($data['descendant_pictures']['owner_id']) && $data['descendant_pictures']['owner_id']) {
                 $select->where(['pictures.owner_id' => $data['descendant_pictures']['owner_id']]);
             }
         }
