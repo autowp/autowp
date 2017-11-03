@@ -92,6 +92,7 @@ angular.module(Module)
                 ctrl.isMe = $scope.user && ($scope.user.id == ctrl.user.id);
                 ctrl.canBeInContacts = $scope.user && ! ctrl.user.deleted && ! ctrl.isMe ;
                 ctrl.inContacts = false;
+                
                 if ($scope.user && ! ctrl.isMe) {
                     Contacts.isInContacts(ctrl.user.id).then(function(inContacts) {
                         ctrl.inContacts = inContacts;
@@ -99,6 +100,13 @@ angular.module(Module)
                         notify.response(response);
                     });
                 }
+                
+                ctrl.canDeleteUser = false;
+                Acl.isAllowed('user', 'delete').then(function() {
+                    ctrl.canDeleteUser = true;
+                }, function() {
+                    ctrl.canDeleteUser = false;
+                });
                 
                 $http({
                     method: 'GET',
