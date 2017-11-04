@@ -146,7 +146,7 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
 
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
 
-        $this->assertNotEmpty($json['items']);
+        $this->assertNotEmpty($json['items'], 'Failed to found random brand');
 
         return $json['items'][0];
     }
