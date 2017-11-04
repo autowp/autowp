@@ -181,6 +181,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
         $this->assertArrayHasKey('status', $json);
+        $this->assertTrue($json['status']);
         $this->assertArrayHasKey('url', $json);
         $this->assertArrayHasKey('name', $json);
         $this->assertArrayHasKey('page', $json);
@@ -199,6 +200,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
         $this->assertArrayHasKey('status', $json);
+        $this->assertTrue($json['status']);
         $this->assertArrayHasKey('url', $json);
         $this->assertArrayHasKey('name', $json);
         $this->assertArrayHasKey('page', $json);
@@ -238,6 +240,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
         $this->assertArrayHasKey('status', $json);
+        $this->assertTrue($json['status']);
         $this->assertArrayHasKey('url', $json);
         $this->assertArrayHasKey('name', $json);
         $this->assertArrayHasKey('page', $json);
