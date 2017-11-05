@@ -1943,6 +1943,22 @@ class SpecificationsService
         return (bool) $this->valueTable->selectWith($select)->current();
     }
 
+    public function updateAllActualValues()
+    {
+        $attributes = $this->getAttributes();
+
+        $select = $this->userValueTable->getSql()->select();
+        $select->columns(['item_id'])
+            ->quantifier($select::QUANTIFIER_DISTINCT);
+
+        foreach ($this->userValueTable->selectWith($select) as $row) {
+            foreach ($attributes as $attribute) {
+                if ($attribute['typeId']) {
+                    $this->updateAttributeActualValue($attribute, $row['item_id']);
+                }
+            }
+        }
+    }
 
     public function updateActualValues(int $itemId)
     {

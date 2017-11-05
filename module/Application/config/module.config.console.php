@@ -59,7 +59,7 @@ return [
                 ],
                 'specs' => [
                     'options' => [
-                        'route'    => 'specs (refresh-conflict-flags|refresh-users-stat):action',
+                        'route'    => 'specs (refresh-conflict-flags|refresh-users-stat|refresh-actual-values):action',
                         'defaults' => [
                             'controller' => Controller\Console\SpecsController::class,
                         ]

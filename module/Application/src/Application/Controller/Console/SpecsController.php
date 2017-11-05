@@ -49,4 +49,11 @@ class SpecsController extends AbstractActionController
 
         return "done\n";
     }
+
+    public function refreshActualValuesAction()
+    {
+        $this->specsService->updateAllActualValues();
+
+        return "done\n";
+    }
 }
