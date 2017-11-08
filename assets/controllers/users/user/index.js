@@ -62,6 +62,12 @@ angular.module(Module)
             }
             
             function init() {
+                
+                if (ctrl.user.deleted) {
+                    $state.go('error-404');
+                    return;
+                }
+            
                 $scope.pageEnv({
                     layout: {
                         blankPage: false,
@@ -123,20 +129,22 @@ angular.module(Module)
                     notify.response(response);
                 });
  
-                $http({
-                    method: 'GET',
-                    url: '/api/comment',
-                    params: {
-                        user_id: ctrl.user.id,
-                        limit: 15,
-                        order: 'date_desc',
-                        fields: 'preview,url'
-                    }
-                }).then(function(response) {
-                    ctrl.comments = response.data.items;
-                }, function(response) {
-                    notify.response(response);
-                });
+                if (! ctrl.user.deleted) {
+                    $http({
+                        method: 'GET',
+                        url: '/api/comment',
+                        params: {
+                            user_id: ctrl.user.id,
+                            limit: 15,
+                            order: 'date_desc',
+                            fields: 'preview,url'
+                        }
+                    }).then(function(response) {
+                        ctrl.comments = response.data.items;
+                    }, function(response) {
+                        notify.response(response);
+                    });
+                }
                 
                 if (ctrl.user.last_ip) {
                     loadBan(ctrl.user.last_ip);
@@ -173,6 +181,7 @@ angular.module(Module)
                 }).then(function(response) {
                     if (response.data.items.length <= 0) {
                         $state.go('error-404');
+                        return;
                     }
                     ctrl.user = response.data.items[0];
                     init();
