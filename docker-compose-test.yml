@@ -84,6 +84,12 @@ mysql:
   container_name: autowp_test_mysql
   restart: always
   environment:
-  - "MYSQL_ROOT_PASSWORD=password"
+    MYSQL_ROOT_PASSWORD: password
+    MYSQL_DATABASE: autowp_test
+    MYSQL_USER: autowp_test 
+    MYSQL_PASSWORD: test
+  volumes:
+  - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+  - "./mysql.conf.d:/etc/mysql/conf.d"
   expose:
   - "3306"

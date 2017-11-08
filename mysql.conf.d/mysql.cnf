@@ -1,7 +1,7 @@
 [mysqld]
 explicit_defaults_for_timestamp
 
-default-time-zone='UTC'
+;default-time-zone='UTC'
 
 tmp_table_size=2G
 max_heap_table_size=2G

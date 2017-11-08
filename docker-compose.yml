@@ -61,12 +61,12 @@ web:
   - ./module:/app/module
   - ./public_html:/app/public_html
   - ./vendor:/app/vendor
-  - ./goautowp:/app/goautowp
+  #- ./goautowp:/app/goautowp
   ports:
   - "80:80"
   links:
   - memcached
-  - mysql
+  - mysql:5.7
   
 memcached:
   image: memcached
@@ -74,14 +74,18 @@ memcached:
   restart: always
   expose:
   - "11211"
-  
+
 mysql:
-  image: mysql
+  image: mysql:5.7
   container_name: autowp_test_mysql
   restart: always
   environment:
-  - "MYSQL_ROOT_PASSWORD=password"
+  - MYSQL_ROOT_PASSWORD=password
+  - MYSQL_DATABASE=autowp_test
+  - MYSQL_USER=autowp_test 
+  - MYSQL_PASSWORD=test
   volumes:
+  - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
   - "./mysql:/var/lib/mysql"
   - "./mysql.conf.d:/etc/mysql/conf.d"
   expose:

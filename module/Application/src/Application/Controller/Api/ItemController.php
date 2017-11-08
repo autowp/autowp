@@ -520,7 +520,7 @@ class ItemController extends AbstractRestfulController
             $select->where([new Sql\Predicate\In('item.item_type_id', $allowedItemTypes)]);
         }
 
-        if ($data['descendant_pictures']) {
+        if ($data['descendant_pictures'] && ($data['descendant_pictures']['status'] || $data['descendant_pictures']['owner_id'])) {
             $group = true;
 
             $columns = [];

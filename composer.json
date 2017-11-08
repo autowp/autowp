@@ -1,111 +1,111 @@
 {
-    "name" : "autowp/autowp.ru",
-    "description" : "AutoWP.ru, the website",
-    "license" : "MIT",
-    "authors" : [{
-            "name" : "Dmitry Pereslegin",
-            "email" : "dmitry@pereslegin.ru"
-        }
-    ],
-    "require" : {
-        "php" : "^7.0",
-        "ext-curl" : "*",
-        "ext-exif" : "*",
-        "ext-imagick" : "*",
-        "ext-pdo" : "*",
-        "ext-pdo_mysql" : "*",
-        "ext-memcached" : "*",
-        "ext-mbstring" : "*",
-        "ext-json" : "*",
-        "ext-intl" : "*",
-        "ext-gd" : "*",
-        "ext-fileinfo" : "*",
-        "irazasyed/telegram-bot-sdk" : "dev-master",
-        "phayes/geophp" : "^1.2",
-        "michelf/php-markdown" : "^1.6",
-        "autowp/external-login-service" : ">=1.2.2",
-        "autowp/textstorage" : "^2.0.2",
-        "autowp/zf-components" : "^1.1.4",
-        "zendframework/zend-authentication" : "^2.5",
-        "zendframework/zend-cache" : ">=2.7",
-        "zendframework/zend-captcha" : "^2.7",
-        "zendframework/zend-db" : "^2.8",
-        "zendframework/zend-file" : ">=2.7",
-        "zendframework/zend-form" : ">=2.10.2",
-        "zendframework/zend-i18n" : ">=2.7.4",
-        "zendframework/zend-i18n-resources" : ">=2.5.2",
-        "zendframework/zend-log" : "^2.9.2",
-        "zendframework/zend-mail" : ">=2.8.0",
-        "zendframework/zend-mvc" : ">=3.1.0",
-        "zendframework/zend-mvc-console" : ">=1.1.11",
-        "zendframework/zend-mvc-i18n" : ">=1.0",
-        "zendframework/zend-paginator" : ">=2.7",
-        "zendframework/zend-permissions-acl" : ">=2.6",
-        "zendframework/zend-session" : "^2.8.0",
-        "zendframework/zend-uri" : ">=2.5.2",
-        "zendframework/zend-view" : ">=2.9.0",
-        "zfcampus/zf-oauth2" : "^1.4.0",
-        "autowp/image" : "^2.0.5",
-        "jenssegers/imagehash" : "^0.4.1",
-        "facebook/graph-sdk" : "^5.4",
-        "zendframework/zend-hydrator" : "^2.2.1",
-        "autowp/cron" : "^0.1.1",
-        "zendframework/zend-filter" : ">=2.7.2",
-        "zendframework/zend-inputfilter" : ">=2.7.4",
-        "league/oauth1-client": "^1.7",
-        "google/recaptcha": "^1.1"
-    },
-    "autoload" : {
-        "psr-4" : {
-            "Autowp\\Comments\\" : "module/Comments/src",
-            "Autowp\\Commons\\" : "module/Commons/src",
-            "Autowp\\Forums\\" : "module/Forums/src",
-            "Autowp\\Message\\" : "module/Message/src",
-            "Autowp\\Traffic\\" : "module/Traffic/src",
-            "Autowp\\User\\" : "module/User/src",
-            "Autowp\\Votings\\" : "module/Votings/src",
-            "Application\\" : "module/Application/src/Application"
-        }
-    },
-    "require-dev" : {
-        "phpunit/PHPUnit" : "^6.1.3",
-        "zendframework/zend-test" : "^3.1",
-        "satooshi/php-coveralls" : "^1.0",
-        "codeclimate/php-test-reporter" : "^0.4",
-        "zendframework/zend-coding-standard" : "~1.0.0",
-        "phpmd/phpmd" : "^2.6",
-        "onesky/api-library-php5": "^1.0"
-    },
-    "autoload-dev" : {
-        "psr-4" : {
-            "AutowpTest\\" : "test/"
-        }
-    },
-    "repositories" : [{
-            "type" : "git",
-            "url" : "https://github.com/irazasyed/telegram-bot-sdk"
-        }, {
-            "type" : "git",
-            "url" : "https://github.com/autowp/oauth2-vkontakte"
-        }
-    ],
-    "suggest" : {
-        "ext-geos" : "Allows map module"
-    },
-    "scripts" : {
-        "check" : [
-            "@cs-check",
-            "@test"
-        ],
-        "cs-check" : "phpcs --encoding=utf-8",
-        "cs-fix" : "phpcbf --encoding=utf-8",
-        "test" : "phpunit --colors=always",
-        "phpmd" : "phpmd config,module,public_html text ruleset.xml --suffixes php,phtml"
-    },
-    "homepage" : "http://wheelsage.org/",
-    "support" : {
-        "email" : "dmitry@pereslegin.ru",
-        "source" : "https://github.com/autowp/autowp"
-    },
-    "minimum-stability" : "RC"
+	"name" : "autowp/autowp.ru",
+	"description" : "AutoWP.ru, the website",
+	"license" : "MIT",
+	"authors" : [{
+			"name" : "Dmitry Pereslegin",
+			"email" : "dmitry@pereslegin.ru"
+		}
+	],
+	"require" : {
+		"php" : "^7.0",
+		"ext-curl" : "*",
+		"ext-exif" : "*",
+		"ext-imagick" : "*",
+		"ext-pdo" : "*",
+		"ext-pdo_mysql" : "*",
+		"ext-memcached" : "*",
+		"ext-mbstring" : "*",
+		"ext-json" : "*",
+		"ext-intl" : "*",
+		"ext-gd" : "*",
+		"ext-fileinfo" : "*",
+		"irazasyed/telegram-bot-sdk" : "dev-master",
+		"phayes/geophp" : "^1.2",
+		"michelf/php-markdown" : "^1.6",
+		"autowp/external-login-service" : ">=1.2.2",
+		"autowp/textstorage" : "^2.0.2",
+		"autowp/zf-components" : "^1.1.4",
+		"zendframework/zend-authentication" : "^2.5",
+		"zendframework/zend-cache" : ">=2.7",
+		"zendframework/zend-captcha" : "^2.7",
+		"zendframework/zend-db" : "^2.8",
+		"zendframework/zend-file" : ">=2.7",
+		"zendframework/zend-form" : ">=2.10.2",
+		"zendframework/zend-i18n" : ">=2.7.4",
+		"zendframework/zend-i18n-resources" : ">=2.5.2",
+		"zendframework/zend-log" : "^2.9.2",
+		"zendframework/zend-mail" : ">=2.8.0",
+		"zendframework/zend-mvc" : ">=3.1.0",
+		"zendframework/zend-mvc-console" : ">=1.1.11",
+		"zendframework/zend-mvc-i18n" : ">=1.0",
+		"zendframework/zend-paginator" : ">=2.7",
+		"zendframework/zend-permissions-acl" : ">=2.6",
+		"zendframework/zend-session" : "^2.8.0",
+		"zendframework/zend-uri" : ">=2.5.2",
+		"zendframework/zend-view" : ">=2.9.0",
+		"zfcampus/zf-oauth2" : "^1.4.0",
+		"autowp/image" : "^2.0.5",
+		"jenssegers/imagehash" : "^0.4.1",
+		"facebook/graph-sdk" : "^5.4",
+		"zendframework/zend-hydrator" : "^2.2.1",
+		"autowp/cron" : "^0.1.1",
+		"zendframework/zend-filter" : ">=2.7.2",
+		"zendframework/zend-inputfilter" : ">=2.7.4",
+		"league/oauth1-client" : "^1.7",
+		"google/recaptcha" : "^1.1"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Autowp\\Comments\\" : "module/Comments/src",
+			"Autowp\\Commons\\" : "module/Commons/src",
+			"Autowp\\Forums\\" : "module/Forums/src",
+			"Autowp\\Message\\" : "module/Message/src",
+			"Autowp\\Traffic\\" : "module/Traffic/src",
+			"Autowp\\User\\" : "module/User/src",
+			"Autowp\\Votings\\" : "module/Votings/src",
+			"Application\\" : "module/Application/src/Application"
+		}
+	},
+	"require-dev" : {
+		"phpunit/PHPUnit" : "^6.1.3",
+		"zendframework/zend-test" : "^3.1",
+		"satooshi/php-coveralls" : "^1.0",
+		"codeclimate/php-test-reporter" : "^0.4",
+		"zendframework/zend-coding-standard" : "~1.0.0",
+		"phpmd/phpmd" : "^2.6",
+		"onesky/api-library-php5" : "^1.0"
+	},
+	"autoload-dev" : {
+		"psr-4" : {
+			"AutowpTest\\" : "test/"
+		}
+	},
+	"repositories" : [{
+			"type" : "git",
+			"url" : "https://github.com/irazasyed/telegram-bot-sdk"
+		}, {
+			"type" : "git",
+			"url" : "https://github.com/autowp/oauth2-vkontakte"
+		}
+	],
+	"suggest" : {
+		"ext-geos" : "Allows map module"
+	},
+	"scripts" : {
+		"check" : [
+			"@cs-check",
+			"@test"
+		],
+		"cs-check" : "phpcs --encoding=utf-8",
+		"cs-fix" : "phpcbf --encoding=utf-8",
+		"test" : "phpunit --colors=always",
+		"phpmd" : "phpmd config,module,public_html text ruleset.xml --suffixes php,phtml"
+	},
+	"homepage" : "http://wheelsage.org/",
+	"support" : {
+		"email" : "dmitry@pereslegin.ru",
+		"source" : "https://github.com/autowp/autowp"
+	},
+	"minimum-stability" : "RC"
 }
