@@ -3,10 +3,10 @@ explicit_defaults_for_timestamp
 
 ;default-time-zone='UTC'
 
-tmp_table_size=2G
-max_heap_table_size=2G
+tmp_table_size=256M
+max_heap_table_size=256M
 
-query_cache_limit   = 2G
-query_cache_size    = 2G
+query_cache_limit   = 256M
+query_cache_size    = 256M
 
-innodb_buffer_pool_size=20G
+innodb_buffer_pool_size=256M
