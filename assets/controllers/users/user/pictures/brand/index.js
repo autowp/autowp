@@ -79,6 +79,7 @@ angular.module(Module)
                             limit: 30,
                             page: $state.params.page,
                             item_id: ctrl.brand.id,
+                            owner_id: ctrl.user.id,
                             order: 1
                         }
                     }).then(function(response) {
