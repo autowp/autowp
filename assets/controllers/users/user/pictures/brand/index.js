@@ -37,6 +37,11 @@ angular.module(Module)
             
             function init() {
                 
+                if (ctrl.user.deleted) {
+                    $state.go('error-404');
+                    return;
+                }
+                
                 ctrl.identity = ctrl.user.identity ? ctrl.user.identity : 'user' + ctrl.user.id;
                 
                 $http({
@@ -45,7 +50,7 @@ angular.module(Module)
                     params: {
                         type_id: 5,
                         limit: 1,
-                        catname: $state.params.name,
+                        catname: $state.params.brand,
                         fields: 'name_only,catname'
                     }
                 }).then(function(response) {
