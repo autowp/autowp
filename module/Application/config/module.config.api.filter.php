@@ -758,6 +758,12 @@ return [
             ],
         ],
         'api_item_list' => [
+            'catname' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
             'last_item' => [
                 'required' => false,
                 'filters'  => [
