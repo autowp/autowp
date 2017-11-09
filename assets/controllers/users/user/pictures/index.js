@@ -18,15 +18,7 @@ angular.module(Module)
                 url: '/users/:identity/pictures',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template,
-                params: {
-                    order: {
-                        replace: true,
-                        value: '',
-                        reload: true,
-                        squash: true
-                    }
-                }
+                template: template
             });
         }
     ])

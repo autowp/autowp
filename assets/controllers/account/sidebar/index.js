@@ -57,7 +57,7 @@ angular.module(Module)
                         },
                         {
                             pageId: 130,
-                            url: $state.href('users-user-pictures', {identity: $scope.user.identity ? $scope.user.identity : 'uder' + $scope.user.id}, {inherit: false}),
+                            url: $state.href('users-user-pictures', {identity: $scope.user.identity ? $scope.user.identity : 'user' + $scope.user.id}, {inherit: false}),
                             icon: 'th',
                             name: 'page/130/name'
                         },
