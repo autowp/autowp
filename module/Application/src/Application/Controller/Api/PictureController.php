@@ -949,7 +949,7 @@ class PictureController extends AbstractRestfulController
 
         if ($row['image_id']) {
             $this->imageStorage()->changeImageName($row['image_id'], [
-                'pattern' => $this->picture->getFileNamePattern($row)
+                'pattern' => $this->picture->getFileNamePattern($row['id'])
             ]);
         }
 

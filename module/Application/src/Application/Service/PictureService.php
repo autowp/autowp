@@ -194,7 +194,7 @@ class PictureService
 
         // rename file to new
         $this->imageStorage->changeImageName($imageId, [
-            'pattern' => $this->picture->getFileNamePattern($picture)
+            'pattern' => $this->picture->getFileNamePattern($picture['id'])
         ]);
 
         // add comment

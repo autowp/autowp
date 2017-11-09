@@ -813,7 +813,7 @@ class Picture
         return $this->table;
     }
 
-    public function getFileNamePattern($row): string
+    public function getFileNamePattern(int $pictureId): string
     {
         $result = rand(1, 9999);
 
@@ -822,7 +822,7 @@ class Picture
         $select = new Sql\Select($this->itemTable->getTable());
         $select
             ->join('picture_item', 'item.id = picture_item.item_id', [])
-            ->where(['picture_item.picture_id' => $row['id']])
+            ->where(['picture_item.picture_id' => $pictureId])
             ->limit(1);
 
         $cars = [];
@@ -837,7 +837,7 @@ class Picture
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', [])
                 ->where([
                     'item.item_type_id'       => ItemModel::BRAND,
-                    'picture_item.picture_id' => $row['id']
+                    'picture_item.picture_id' => $pictureId
                 ]);
 
             $brands = $this->itemTable->selectWith($select);

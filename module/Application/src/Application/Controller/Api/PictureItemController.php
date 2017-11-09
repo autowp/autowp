@@ -226,7 +226,7 @@ class PictureItemController extends AbstractRestfulController
 
             if ($picture['image_id']) {
                 $this->imageStorage()->changeImageName($picture['image_id'], [
-                    'pattern' => $this->picture->getFileNamePattern($picture)
+                    'pattern' => $this->picture->getFileNamePattern($picture['id'])
                 ]);
             }
         }
@@ -266,6 +266,12 @@ class PictureItemController extends AbstractRestfulController
         $this->pictureItem->setProperties($picture['id'], $item['id'], PictureItem::PICTURE_CONTENT, [
             'perspective' => $perspectiveId ? $perspectiveId : null
         ]);
+
+        if ($picture['image_id']) {
+            $this->imageStorage()->changeImageName($picture['image_id'], [
+                'pattern' => $this->picture->getFileNamePattern($picture['id'])
+            ]);
+        }
 
         $namespace = new \Zend\Session\Container('Moder_Car');
         $namespace->lastCarId = $item['id'];

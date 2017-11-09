@@ -17,7 +17,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $row = $table->getRow([]);
 
-        $pattern = $table->getFileNamePattern($row);
+        $pattern = $table->getFileNamePattern($row['id']);
 
         $this->assertNotEmpty($pattern);
     }
