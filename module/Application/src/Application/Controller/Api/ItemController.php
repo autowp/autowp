@@ -182,6 +182,10 @@ class ItemController extends AbstractRestfulController
             $select->where(['item.item_type_id' => $data['type_id']]);
         }
 
+        if ($data['catname']) {
+            $select->where(['item.catname' => (string)$data['catname']]);
+        }
+
         if ($isModer) {
             if ($data['last_item']) {
                 $namespace = new \Zend\Session\Container('Moder_Car');
@@ -383,10 +387,6 @@ class ItemController extends AbstractRestfulController
 
             if ($data['engine_id']) {
                 $select->where(['item.engine_item_id' => (int)$data['engine_id']]);
-            }
-
-            if ($data['catname']) {
-                $select->where(['item.catname' => (string)$data['catname']]);
             }
 
             if ($data['is_group']) {
