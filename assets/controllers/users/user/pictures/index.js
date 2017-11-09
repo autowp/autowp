@@ -51,7 +51,7 @@ angular.module(Module)
                     params: {
                         type_id: 5,
                         limit: 500,
-                        //order: ctrl.order,
+                        order: 'name_nat',
                         fields: 'name_only,catname,current_pictures_count',
                         'descendant_pictures[status]': 'accepted',
                         'descendant_pictures[owner_id]': ctrl.user.id

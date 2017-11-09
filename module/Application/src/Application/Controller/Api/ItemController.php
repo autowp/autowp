@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api;
 
+use Collator;
 use Exception;
 
 use Zend\Db\Sql;
@@ -105,6 +106,8 @@ class ItemController extends AbstractRestfulController
      */
     private $inputFilterManager;
 
+    private $collators = [];
+
     public function __construct(
         RestHydrator $hydrator,
         Image $logoHydrator,
@@ -135,6 +138,40 @@ class ItemController extends AbstractRestfulController
         $this->itemModel = $itemModel;
         $this->vehicleType = $vehicleType;
         $this->inputFilterManager = $inputFilterManager;
+    }
+
+    private function getCollator($language)
+    {
+        if (! isset($this->collators[$language])) {
+            $this->collators[$language] = new Collator($language);
+        }
+
+        return $this->collators[$language];
+    }
+
+    private function compareName($a, $b, $language)
+    {
+        $coll = $this->getCollator($language);
+        switch ($language) {
+            case 'zh':
+                $aIsHan = (bool)preg_match("/^\p{Han}/u", $a);
+                $bIsHan = (bool)preg_match("/^\p{Han}/u", $b);
+
+                if ($aIsHan && ! $bIsHan) {
+                    return -1;
+                }
+
+                if ($bIsHan && ! $aIsHan) {
+                    return 1;
+                }
+
+                return $coll->compare($a, $b);
+                break;
+
+            default:
+                return $coll->compare($a, $b);
+                break;
+        }
     }
 
     public function indexAction()
@@ -218,6 +255,9 @@ class ItemController extends AbstractRestfulController
                     }
                     $select->order([new Sql\Expression('length(item_language.name)'), 'item_language.name']);
                     $group = true;
+                    break;
+                case 'name_nat':
+                    $select->order(['item.name']);
                     break;
                 default:
                     $select->order([
@@ -577,8 +617,25 @@ class ItemController extends AbstractRestfulController
             'user_id'  => $user ? $user['id'] : null
         ]);
 
-        $items = [];
+        $rows = [];
         foreach ($paginator->getCurrentItems() as $row) {
+            $rows[] = $row;
+        }
+
+        if ($data['order'] == 'name_nat') {
+            $language = $this->language();
+            usort($rows, function ($a, $b) use ($language) {
+
+                if ($a['position'] != $b['position']) {
+                    return ($a['position'] < $b['position']) ? -1 : 1;
+                }
+
+                return $this->compareName($a['name'], $b['name'], $language);
+            });
+        }
+
+        $items = [];
+        foreach ($rows as $row) {
             $items[] = $this->hydrator->extract($row);
         }
 
