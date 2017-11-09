@@ -139,9 +139,7 @@ class ItemController extends AbstractRestfulController
 
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
+        $isModer = $this->user()->inheritsRole('moder');
 
         $user = $this->user()->get();
 
@@ -157,372 +155,6 @@ class ItemController extends AbstractRestfulController
 
         $group = false;
         $itemLanguageJoined = false;
-
-        if ($data['last_item']) {
-            $namespace = new \Zend\Session\Container('Moder_Car');
-            $itemId = isset($namespace->lastCarId) ? (int)$namespace->lastCarId : 0;
-            $select->where(['item.id' => $itemId]);
-        }
-
-        switch ($data['order']) {
-            case 'id_asc':
-                $select->order('item.id ASC');
-                break;
-            case 'id_desc':
-                $select->order('item.id DESC');
-                break;
-            case 'childs_count':
-                $group = true;
-                $select
-                    ->join('item_parent', 'item_parent.parent_id = item.id', [
-                        'childs_count' => new Sql\Expression('count(item_parent.item_id)')
-                    ])
-                    ->order('childs_count desc');
-                break;
-            case 'age':
-                $select->order($this->catalogue()->itemOrdering());
-                break;
-            case 'name_length_desc':
-                if (! $itemLanguageJoined) {
-                    $itemLanguageJoined = true;
-                    $select->join('item_language', 'item.id = item_language.item_id', []);
-                }
-                $select->order([new Sql\Expression('length(item_language.name)'), 'item_language.name']);
-                $group = true;
-                break;
-            default:
-                $select->order([
-                    'item.name',
-                    'item.body',
-                    'item.spec_id',
-                    'item.begin_order_cache',
-                    'item.end_order_cache'
-                ]);
-                break;
-        }
-
-        if ($data['name']) {
-            if (! $itemLanguageJoined) {
-                $itemLanguageJoined = true;
-                $select->join('item_language', 'item.id = item_language.item_id', []);
-            }
-            $select->where(['item_language.name like ?' => $data['name']]);
-
-            $group = true;
-        }
-
-        if ($data['name_exclude']) {
-            $select
-                ->join(['ile' => 'item_language'], 'item.id = ile.item_id', [])
-                ->where(['ile.name not like ?' => $data['name_exclude']]);
-        }
-
-        $id = (int)$this->params()->fromQuery('id');
-        if ($id) {
-            $select->where(['item.id' => $id]);
-        }
-
-        if ($data['descendant']) {
-            $group = true;
-            $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-                ->where(['item_parent_cache.item_id' => $data['descendant']]);
-        }
-
-        if ($data['type_id']) {
-            $select->where(['item.item_type_id' => $data['type_id']]);
-        }
-
-        if ($data['vehicle_type_id']) {
-            if ($data['vehicle_type_id'] == 'empty') {
-                $select
-                    ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [], $select::JOIN_LEFT)
-                    ->where(['vehicle_vehicle_type.vehicle_id is null']);
-            } else {
-                $select
-                    ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
-                    ->where(['vehicle_vehicle_type.vehicle_type_id' => $data['vehicle_type_id']]);
-            }
-        }
-
-        if ($data['vehicle_childs_type_id']) {
-            $group = true;
-            $select
-                ->join(
-                    ['cpc_childs' => 'item_parent_cache'],
-                    'item.id = cpc_childs.parent_id',
-                    []
-                )
-                ->join(
-                    ['vvt_child' => 'vehicle_vehicle_type'],
-                    'cpc_childs.item_id = vvt_child.vehicle_id',
-                    []
-                )
-                ->join('car_types_parents', 'vvt_child.vehicle_type_id = car_types_parents.id', [])
-                ->where(['car_types_parents.parent_id' => $data['vehicle_childs_type_id']]);
-        }
-
-        if ($data['spec']) {
-            $select->where(['item.spec_id' => $data['spec']]);
-        }
-
-        if ($data['ancestor_id']) {
-            $select
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
-                ->where([
-                    'item_parent_cache.parent_id' => $data['parent_id'],
-                    'item_parent_cache.item_id <> item_parent_cache.parent_id'
-                ]);
-        }
-
-        if ($data['from_year']) {
-            $select->where(['item.begin_year' => $data['from_year']]);
-        }
-
-        if ($data['to_year']) {
-            $select->where(['item.end_year' => $data['to_year']]);
-        }
-
-        if ($data['parent_id']) {
-            $select
-                ->join('item_parent', 'item.id = item_parent.item_id', [])
-                ->where(['item_parent.parent_id' => $data['parent_id']]);
-        }
-
-        if ($data['no_parent']) {
-            $select
-                ->join(
-                    ['np_ip' => 'item_parent'],
-                    'item.id = np_ip.item_id',
-                    [],
-                    $select::JOIN_LEFT
-                )
-                ->where(['np_ip.item_id IS NULL']);
-        }
-
-        if ($data['text']) {
-            if (! $itemLanguageJoined) {
-                $itemLanguageJoined = true;
-                $select->join('item_language', 'item.id = item_language.item_id', []);
-            }
-            $select
-                ->join('textstorage_text', 'item_language.text_id = textstorage_text.id', [])
-                ->where(['textstorage_text.text like ?' => '%' . $data['text'] . '%']);
-
-            $group = true;
-        }
-
-        if ($data['suggestions_to']) {
-            $subSelect = new Sql\Select('item');
-            $subSelect->columns(['id'])
-                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
-                ->where([
-                    'item.item_type_id'         => Item::BRAND,
-                    'item_parent_cache.item_id' => $data['suggestions_to']
-                ]);
-
-            $select
-                ->join(['ils' => 'item_language'], 'item.id = ils.item_id', [])
-                ->join(['ils2' => 'item_language'], new Sql\Expression('INSTR(ils.name, ils2.name)'), [])
-                ->where([
-                    'item.item_type_id' => Item::BRAND,
-                    'ils2.item_id'      => $data['suggestions_to'],
-                    new Sql\Predicate\In('item.id', $subSelect)
-                ]);
-
-            $group = true;
-        }
-
-        if ($data['have_childs_of_type']) {
-            $select
-                ->join(['ipc3' => 'item_parent_cache'], 'item.id = ipc3.parent_id', [])
-                ->join(['child' => 'item'], 'ipc3.item_id = child.id', [])
-                ->where(['child.item_type_id' => (int)$data['have_childs_of_type']]);
-
-            $group = true;
-        }
-
-        if ($data['have_common_childs_with']) {
-            $select
-                ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', [])
-                ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', [])
-                ->where(['ipc2.parent_id' => (int)$data['have_common_childs_with']]);
-
-            $group = true;
-        }
-
-        if ($data['have_childs_with_parent_of_type']) {
-            $select
-                ->join(['ipc4' => 'item_parent_cache'], 'item.id = ipc4.parent_id', [])
-                ->join(['ip5' => 'item_parent'], 'ipc4.item_id = ip5.item_id', [])
-                ->join(['child2' => 'item'], 'ip5.parent_id = child2.id', [])
-                ->where(['child2.item_type_id' => (int)$data['have_childs_with_parent_of_type']]);
-
-            $group = true;
-        }
-
-        if ($data['engine_id']) {
-            $select->where(['item.engine_item_id' => (int)$data['engine_id']]);
-        }
-
-        if ($data['catname']) {
-            $select->where(['item.catname' => (string)$data['catname']]);
-        }
-
-        if ($data['is_group']) {
-            $select->where(['item.is_group']);
-        }
-
-        if ($data['autocomplete']) {
-            $query = $data['autocomplete'];
-
-            $beginYear = false;
-            $endYear = false;
-            $today = false;
-            $body = false;
-
-            $pattern = "|^" .
-                "(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?" .
-                "$|isu";
-
-            if (preg_match($pattern, $query, $match)) {
-                $query = trim($match[5]);
-                $body = isset($match[7]) ? trim($match[7]) : null;
-                $beginYear = isset($match[9]) ? (int)$match[9] : null;
-                $endYear = isset($match[11]) ? $match[11] : null;
-                $beginModelYear = isset($match[2]) ? (int)$match[2] : null;
-                $endModelYear = isset($match[4]) ? $match[4] : null;
-
-                if ($endYear == 'н.в.') {
-                    $today = true;
-                    $endYear = false;
-                } else {
-                    $eyLength = strlen($endYear);
-                    if ($eyLength) {
-                        if ($eyLength == 2) {
-                            $endYear = $beginYear - $beginYear % 100 + $endYear;
-                        } else {
-                            $endYear = (int)$endYear;
-                        }
-                    } else {
-                        $endYear = false;
-                    }
-                }
-
-                if ($endModelYear == 'н.в.') {
-                    $today = true;
-                    $endModelYear = false;
-                } else {
-                    $eyLength = strlen($endModelYear);
-                    if ($eyLength) {
-                        if ($eyLength == 2) {
-                            $endModelYear = $beginModelYear - $beginModelYear % 100 + $endModelYear;
-                        } else {
-                            $endModelYear = (int)$endModelYear;
-                        }
-                    } else {
-                        $endModelYear = false;
-                    }
-                }
-            }
-
-            $specId = null;
-            if ($query) {
-                $specRow = $this->specTable->select([
-                    new Sql\Predicate\Expression('INSTR(?, short_name)', $query)
-                ])->current();
-
-                if ($specRow) {
-                    $specId = $specRow['id'];
-                    $query = trim(str_replace($specRow['short_name'], '', $query));
-                }
-            }
-
-            if (! $itemLanguageJoined) {
-                $itemLanguageJoined = true;
-                $select->join('item_language', 'item.id = item_language.item_id', []);
-            }
-
-            $select->where(['item_language.name like ?' => $query . '%']);
-
-            if ($specId) {
-                $select->where(['spec_id' => $specId]);
-            }
-
-            if ($beginYear) {
-                $select->where(['item.begin_year' => $beginYear]);
-            }
-            if ($today) {
-                $select->where(['item.today']);
-            } elseif ($endYear) {
-                $select->where(['item.end_year' => $endYear]);
-            }
-            if ($body) {
-                $select->where(['item.body like ?' => $body . '%']);
-            }
-
-            if ($beginModelYear) {
-                $select->where(['item.begin_model_year' => $beginModelYear]);
-            }
-
-            if ($endModelYear) {
-                $select->where(['item.end_model_year' => $endModelYear]);
-            }
-
-            $group = true;
-        }
-
-        if ($data['exclude_self_and_childs']) {
-            $select
-                ->join(
-                    ['esac' => 'item_parent_cache'],
-                    new Sql\Expression(
-                        'item.id = esac.item_id and esac.parent_id = ?',
-                        [$data['exclude_self_and_childs']]
-                    ),
-                    [],
-                    $select::JOIN_LEFT
-                )
-                ->where(['esac.item_id is null']);
-        }
-
-        if ($data['parent_types_of']) {
-            $typeId = $data['parent_types_of'];
-
-            $allowedItemTypes = [0];
-            switch ($typeId) {
-                case Item::VEHICLE:
-                    $allowedItemTypes = [
-                        Item::VEHICLE,
-                        Item::CATEGORY,
-                        Item::TWINS,
-                        Item::BRAND,
-                        Item::FACTORY
-                    ];
-                    break;
-                case Item::ENGINE:
-                    $allowedItemTypes = [
-                        Item::ENGINE,
-                        Item::CATEGORY,
-                        Item::TWINS,
-                        Item::BRAND,
-                        Item::FACTORY
-                    ];
-                    break;
-                case Item::BRAND:
-                    $allowedItemTypes = [
-                        Item::CATEGORY,
-                        Item::BRAND
-                    ];
-                    break;
-                case Item::CATEGORY:
-                    $allowedItemTypes = [
-                        Item::CATEGORY
-                    ];
-                    break;
-            }
-
-            $select->where([new Sql\Predicate\In('item.item_type_id', $allowedItemTypes)]);
-        }
 
         if ($data['descendant_pictures'] && ($data['descendant_pictures']['status'] || $data['descendant_pictures']['owner_id'])) {
             $group = true;
@@ -543,6 +175,374 @@ class ItemController extends AbstractRestfulController
 
             if (isset($data['descendant_pictures']['owner_id']) && $data['descendant_pictures']['owner_id']) {
                 $select->where(['pictures.owner_id' => $data['descendant_pictures']['owner_id']]);
+            }
+        }
+
+        if ($data['type_id']) {
+            $select->where(['item.item_type_id' => $data['type_id']]);
+        }
+
+        if ($isModer) {
+            if ($data['last_item']) {
+                $namespace = new \Zend\Session\Container('Moder_Car');
+                $itemId = isset($namespace->lastCarId) ? (int)$namespace->lastCarId : 0;
+                $select->where(['item.id' => $itemId]);
+            }
+
+            switch ($data['order']) {
+                case 'id_asc':
+                    $select->order('item.id ASC');
+                    break;
+                case 'id_desc':
+                    $select->order('item.id DESC');
+                    break;
+                case 'childs_count':
+                    $group = true;
+                    $select
+                        ->join('item_parent', 'item_parent.parent_id = item.id', [
+                            'childs_count' => new Sql\Expression('count(item_parent.item_id)')
+                        ])
+                        ->order('childs_count desc');
+                    break;
+                case 'age':
+                    $select->order($this->catalogue()->itemOrdering());
+                    break;
+                case 'name_length_desc':
+                    if (! $itemLanguageJoined) {
+                        $itemLanguageJoined = true;
+                        $select->join('item_language', 'item.id = item_language.item_id', []);
+                    }
+                    $select->order([new Sql\Expression('length(item_language.name)'), 'item_language.name']);
+                    $group = true;
+                    break;
+                default:
+                    $select->order([
+                        'item.name',
+                        'item.body',
+                        'item.spec_id',
+                        'item.begin_order_cache',
+                        'item.end_order_cache'
+                    ]);
+                    break;
+            }
+
+            if ($data['name']) {
+                if (! $itemLanguageJoined) {
+                    $itemLanguageJoined = true;
+                    $select->join('item_language', 'item.id = item_language.item_id', []);
+                }
+                $select->where(['item_language.name like ?' => $data['name']]);
+
+                $group = true;
+            }
+
+            if ($data['name_exclude']) {
+                $select
+                    ->join(['ile' => 'item_language'], 'item.id = ile.item_id', [])
+                    ->where(['ile.name not like ?' => $data['name_exclude']]);
+            }
+
+            $id = (int)$this->params()->fromQuery('id');
+            if ($id) {
+                $select->where(['item.id' => $id]);
+            }
+
+            if ($data['descendant']) {
+                $group = true;
+                $select->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                    ->where(['item_parent_cache.item_id' => $data['descendant']]);
+            }
+
+            if ($data['vehicle_type_id']) {
+                if ($data['vehicle_type_id'] == 'empty') {
+                    $select
+                        ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [], $select::JOIN_LEFT)
+                        ->where(['vehicle_vehicle_type.vehicle_id is null']);
+                } else {
+                    $select
+                        ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [])
+                        ->where(['vehicle_vehicle_type.vehicle_type_id' => $data['vehicle_type_id']]);
+                }
+            }
+
+            if ($data['vehicle_childs_type_id']) {
+                $group = true;
+                $select
+                    ->join(
+                        ['cpc_childs' => 'item_parent_cache'],
+                        'item.id = cpc_childs.parent_id',
+                        []
+                    )
+                    ->join(
+                        ['vvt_child' => 'vehicle_vehicle_type'],
+                        'cpc_childs.item_id = vvt_child.vehicle_id',
+                        []
+                    )
+                    ->join('car_types_parents', 'vvt_child.vehicle_type_id = car_types_parents.id', [])
+                    ->where(['car_types_parents.parent_id' => $data['vehicle_childs_type_id']]);
+            }
+
+            if ($data['spec']) {
+                $select->where(['item.spec_id' => $data['spec']]);
+            }
+
+            if ($data['ancestor_id']) {
+                $select
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
+                    ->where([
+                        'item_parent_cache.parent_id' => $data['parent_id'],
+                        'item_parent_cache.item_id <> item_parent_cache.parent_id'
+                    ]);
+            }
+
+            if ($data['from_year']) {
+                $select->where(['item.begin_year' => $data['from_year']]);
+            }
+
+            if ($data['to_year']) {
+                $select->where(['item.end_year' => $data['to_year']]);
+            }
+
+            if ($data['parent_id']) {
+                $select
+                    ->join('item_parent', 'item.id = item_parent.item_id', [])
+                    ->where(['item_parent.parent_id' => $data['parent_id']]);
+            }
+
+            if ($data['no_parent']) {
+                $select
+                    ->join(
+                        ['np_ip' => 'item_parent'],
+                        'item.id = np_ip.item_id',
+                        [],
+                        $select::JOIN_LEFT
+                    )
+                    ->where(['np_ip.item_id IS NULL']);
+            }
+
+            if ($data['text']) {
+                if (! $itemLanguageJoined) {
+                    $itemLanguageJoined = true;
+                    $select->join('item_language', 'item.id = item_language.item_id', []);
+                }
+                $select
+                    ->join('textstorage_text', 'item_language.text_id = textstorage_text.id', [])
+                    ->where(['textstorage_text.text like ?' => '%' . $data['text'] . '%']);
+
+                $group = true;
+            }
+
+            if ($data['suggestions_to']) {
+                $subSelect = new Sql\Select('item');
+                $subSelect->columns(['id'])
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
+                    ->where([
+                        'item.item_type_id'         => Item::BRAND,
+                        'item_parent_cache.item_id' => $data['suggestions_to']
+                    ]);
+
+                $select
+                    ->join(['ils' => 'item_language'], 'item.id = ils.item_id', [])
+                    ->join(['ils2' => 'item_language'], new Sql\Expression('INSTR(ils.name, ils2.name)'), [])
+                    ->where([
+                        'item.item_type_id' => Item::BRAND,
+                        'ils2.item_id'      => $data['suggestions_to'],
+                        new Sql\Predicate\In('item.id', $subSelect)
+                    ]);
+
+                $group = true;
+            }
+
+            if ($data['have_childs_of_type']) {
+                $select
+                    ->join(['ipc3' => 'item_parent_cache'], 'item.id = ipc3.parent_id', [])
+                    ->join(['child' => 'item'], 'ipc3.item_id = child.id', [])
+                    ->where(['child.item_type_id' => (int)$data['have_childs_of_type']]);
+
+                $group = true;
+            }
+
+            if ($data['have_common_childs_with']) {
+                $select
+                    ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', [])
+                    ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', [])
+                    ->where(['ipc2.parent_id' => (int)$data['have_common_childs_with']]);
+
+                $group = true;
+            }
+
+            if ($data['have_childs_with_parent_of_type']) {
+                $select
+                    ->join(['ipc4' => 'item_parent_cache'], 'item.id = ipc4.parent_id', [])
+                    ->join(['ip5' => 'item_parent'], 'ipc4.item_id = ip5.item_id', [])
+                    ->join(['child2' => 'item'], 'ip5.parent_id = child2.id', [])
+                    ->where(['child2.item_type_id' => (int)$data['have_childs_with_parent_of_type']]);
+
+                $group = true;
+            }
+
+            if ($data['engine_id']) {
+                $select->where(['item.engine_item_id' => (int)$data['engine_id']]);
+            }
+
+            if ($data['catname']) {
+                $select->where(['item.catname' => (string)$data['catname']]);
+            }
+
+            if ($data['is_group']) {
+                $select->where(['item.is_group']);
+            }
+
+            if ($data['autocomplete']) {
+                $query = $data['autocomplete'];
+
+                $beginYear = false;
+                $endYear = false;
+                $today = false;
+                $body = false;
+
+                $pattern = "|^" .
+                    "(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?" .
+                    "$|isu";
+
+                if (preg_match($pattern, $query, $match)) {
+                    $query = trim($match[5]);
+                    $body = isset($match[7]) ? trim($match[7]) : null;
+                    $beginYear = isset($match[9]) ? (int)$match[9] : null;
+                    $endYear = isset($match[11]) ? $match[11] : null;
+                    $beginModelYear = isset($match[2]) ? (int)$match[2] : null;
+                    $endModelYear = isset($match[4]) ? $match[4] : null;
+
+                    if ($endYear == 'н.в.') {
+                        $today = true;
+                        $endYear = false;
+                    } else {
+                        $eyLength = strlen($endYear);
+                        if ($eyLength) {
+                            if ($eyLength == 2) {
+                                $endYear = $beginYear - $beginYear % 100 + $endYear;
+                            } else {
+                                $endYear = (int)$endYear;
+                            }
+                        } else {
+                            $endYear = false;
+                        }
+                    }
+
+                    if ($endModelYear == 'н.в.') {
+                        $today = true;
+                        $endModelYear = false;
+                    } else {
+                        $eyLength = strlen($endModelYear);
+                        if ($eyLength) {
+                            if ($eyLength == 2) {
+                                $endModelYear = $beginModelYear - $beginModelYear % 100 + $endModelYear;
+                            } else {
+                                $endModelYear = (int)$endModelYear;
+                            }
+                        } else {
+                            $endModelYear = false;
+                        }
+                    }
+                }
+
+                $specId = null;
+                if ($query) {
+                    $specRow = $this->specTable->select([
+                        new Sql\Predicate\Expression('INSTR(?, short_name)', $query)
+                    ])->current();
+
+                    if ($specRow) {
+                        $specId = $specRow['id'];
+                        $query = trim(str_replace($specRow['short_name'], '', $query));
+                    }
+                }
+
+                if (! $itemLanguageJoined) {
+                    $itemLanguageJoined = true;
+                    $select->join('item_language', 'item.id = item_language.item_id', []);
+                }
+
+                $select->where(['item_language.name like ?' => $query . '%']);
+
+                if ($specId) {
+                    $select->where(['spec_id' => $specId]);
+                }
+
+                if ($beginYear) {
+                    $select->where(['item.begin_year' => $beginYear]);
+                }
+                if ($today) {
+                    $select->where(['item.today']);
+                } elseif ($endYear) {
+                    $select->where(['item.end_year' => $endYear]);
+                }
+                if ($body) {
+                    $select->where(['item.body like ?' => $body . '%']);
+                }
+
+                if ($beginModelYear) {
+                    $select->where(['item.begin_model_year' => $beginModelYear]);
+                }
+
+                if ($endModelYear) {
+                    $select->where(['item.end_model_year' => $endModelYear]);
+                }
+
+                $group = true;
+            }
+
+            if ($data['exclude_self_and_childs']) {
+                $select
+                    ->join(
+                        ['esac' => 'item_parent_cache'],
+                        new Sql\Expression(
+                            'item.id = esac.item_id and esac.parent_id = ?',
+                            [$data['exclude_self_and_childs']]
+                        ),
+                        [],
+                        $select::JOIN_LEFT
+                    )
+                    ->where(['esac.item_id is null']);
+            }
+
+            if ($data['parent_types_of']) {
+                $typeId = $data['parent_types_of'];
+
+                $allowedItemTypes = [0];
+                switch ($typeId) {
+                    case Item::VEHICLE:
+                        $allowedItemTypes = [
+                            Item::VEHICLE,
+                            Item::CATEGORY,
+                            Item::TWINS,
+                            Item::BRAND,
+                            Item::FACTORY
+                        ];
+                        break;
+                    case Item::ENGINE:
+                        $allowedItemTypes = [
+                            Item::ENGINE,
+                            Item::CATEGORY,
+                            Item::TWINS,
+                            Item::BRAND,
+                            Item::FACTORY
+                        ];
+                        break;
+                    case Item::BRAND:
+                        $allowedItemTypes = [
+                            Item::CATEGORY,
+                            Item::BRAND
+                        ];
+                        break;
+                    case Item::CATEGORY:
+                        $allowedItemTypes = [
+                            Item::CATEGORY
+                        ];
+                        break;
+                }
+
+                $select->where([new Sql\Predicate\In('item.item_type_id', $allowedItemTypes)]);
             }
         }
 
