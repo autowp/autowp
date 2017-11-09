@@ -1,4 +1,4 @@
-import angular from 'angular';
+import * as angular from "angular";
 import Module from 'app.module';
 
 const SERVICE_NAME = 'ForumService';
@@ -6,21 +6,21 @@ const SERVICE_NAME = 'ForumService';
 const LIMIT = 20;
 
 angular.module(Module)
-    .service(SERVICE_NAME, ['$q', '$http', function($q, $http) {
+    .service(SERVICE_NAME, ['$q', '$http', function($q: ng.IQService, $http: ng.IHttpService) {
         
         var perspectives = null;
-        var promise = null;
+        var promise: ng.IPromise<any> = null;
 
         this.getUserSummary = function() {
             if (promise) {
                 return promise;
             }
-            promise = $q(function(resolve, reject) {
+            promise = $q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<any>) {
                 
                 $http({
                     method: 'GET',
                     url: '/api/forum/user-summary'
-                }).then(function(response) {
+                }).then(function(response: ng.IHttpResponse<any>) {
                     resolve(response.data);
                 }, function(response) {
                     reject(response);
@@ -30,11 +30,11 @@ angular.module(Module)
             return promise;
         };
         
-        this.getLimit = function() {
+        this.getLimit = function(): number {
             return LIMIT;
         };
         
-        this.getMessageStateParams = function(message_id) {
+        this.getMessageStateParams = function(message_id: number) {
             
             return $q(function(resolve, reject) {
             
@@ -45,7 +45,7 @@ angular.module(Module)
                         fields: 'page',
                         limit: LIMIT
                     }
-                }).then(function(response) {
+                }).then(function(response: ng.IHttpResponse<any>) {
                     
                     resolve({
                         topic_id: response.data.item_id,

@@ -4,4 +4,5 @@
   <fixed facet="php.component"/>
   <installed facet="php.core.component" version="1"/>
   <installed facet="php.component" version="7"/>
+  <installed facet="webclipse.typescript" version="1.0"/>
 </faceted-project>

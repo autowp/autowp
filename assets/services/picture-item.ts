@@ -1,14 +1,12 @@
-import angular from 'angular';
+import * as angular from "angular";
 import Module from 'app.module';
 
 const SERVICE_NAME = 'PictureItemService';
 
 angular.module(Module)
-    .service(SERVICE_NAME, ['$http', function($http) {
+    .service(SERVICE_NAME, ['$http', function($http: ng.IHttpService) {
         
-        var perspectives = null;
-        
-        this.setPerspective = function(pictureId, itemId, type, perspectiveId) {
+        this.setPerspective = function(pictureId: number, itemId: number, type: number, perspectiveId: number): ng.IPromise<any> {
             return $http({
                 method: 'PUT',
                 url: '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
@@ -18,7 +16,7 @@ angular.module(Module)
             });
         };
         
-        this.setArea = function(pictureId, itemId, type, area) {
+        this.setArea = function(pictureId: number, itemId: number, type: number, area: any): ng.IPromise<any> {
             return $http({
                 method: 'PUT',
                 url: '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
@@ -28,7 +26,7 @@ angular.module(Module)
             });
         };
         
-        this.create = function(pictureId, itemId, type, data) {
+        this.create = function(pictureId: number, itemId: number, type: number, data: any): ng.IPromise<any> {
             return $http({
                 method: 'POST',
                 url: '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
@@ -36,14 +34,14 @@ angular.module(Module)
             });
         };
         
-        this.remove = function(pictureId, itemId, type) {
+        this.remove = function(pictureId: number, itemId: number, type: number): ng.IPromise<any> {
             return $http({
                 method: 'DELETE',
                 url: '/api/picture-item/' + pictureId + '/' + itemId + '/' + type
             });
         };
         
-        this.changeItem = function(pictureId, type, srcItemId, dstItemId) {
+        this.changeItem = function(pictureId: number, type: number, srcItemId: number, dstItemId: number): ng.IPromise<any> {
             return $http({
                 method: 'PUT',
                 url: '/api/picture-item/' + pictureId + '/' + srcItemId + '/' + type,
@@ -53,7 +51,7 @@ angular.module(Module)
             });
         };
         
-        this.get = function(pictureId, itemId, type, params) {
+        this.get = function(pictureId: number, itemId: number, type: number, params: any): ng.IPromise<any> {
             return $http({
                 method: 'GET',
                 url: '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,

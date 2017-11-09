@@ -1,24 +1,24 @@
-import angular from 'angular';
+import * as angular from "angular";
 import Module from 'app.module';
 
 const SERVICE_NAME = 'PictureModerVoteTemplateService';
 
 angular.module(Module)
-    .service(SERVICE_NAME, ['$q', '$http', function($q, $http) {
+    .service(SERVICE_NAME, ['$q', '$http', function($q: ng.IQService, $http: ng.IHttpService) {
         
-        var templates = null;
+        var templates: any[] = null;
         
-        this.getTemplates = function() {
-            return $q(function(resolve, reject) {
+        this.getTemplates = function(): ng.IPromise<any> {
+            return $q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
                 if (templates === null) {
                     $http({
                         method: 'GET',
                         url: '/api/picture-moder-vote-template'
-                    }).then(function(response) {
+                    }).then(function(response: ng.IHttpResponse<any>) {
                         templates = response.data.items;
                         resolve(templates);
                     }, function() {
-                        reject(null);
+                        reject();
                     });
                 } else {
                     resolve(templates);
@@ -26,12 +26,12 @@ angular.module(Module)
             });
         };
         
-        this.deleteTemplate = function(id) {
-            return $q(function(resolve, reject) {
+        this.deleteTemplate = function(id: number): ng.IPromise<void> {
+            return $q(function(resolve: ng.IQResolveReject<void>, reject: ng.IQResolveReject<void>) {
                 $http({
                     method: 'DELETE',
                     url: '/api/picture-moder-vote-template/' + id
-                }).then(function(response) {
+                }).then(function() {
                     if (templates) {
                         for (var i=0; i<templates.length; i++) {
                             if (templates[i].id == id) {
@@ -47,8 +47,8 @@ angular.module(Module)
             });
         };
         
-        this.createTemplate = function(template) {
-            return $q(function(resolve, reject) {
+        this.createTemplate = function(template: any): ng.IPromise<any> {
+            return $q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
                 $http({
                     method: 'POST',
                     url: '/api/picture-moder-vote-template',
@@ -59,7 +59,7 @@ angular.module(Module)
                     $http({
                         method: 'GET',
                         url: location
-                    }).then(function(response) {
+                    }).then(function(response: ng.IHttpResponse<any>) {
                         templates.push(response.data);
                         resolve(response.data);
                     }, function() {

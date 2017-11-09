@@ -29,7 +29,8 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                loader: 'awesome-typescript-loader'
+                use: 'ts-loader',
+                exclude: /node_modules|vendor/
             },
             { test: /ui-leaflet/, use: {
                 loader: 'imports-loader',

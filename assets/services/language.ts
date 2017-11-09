@@ -1,4 +1,4 @@
-import angular from 'angular';
+import * as angular from "angular";
 import Module from 'app.module';
 
 const SERVICE_NAME = 'LanguageService';

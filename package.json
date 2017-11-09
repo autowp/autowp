@@ -3,7 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "description": "WheelsAge",
-  "devDependencies": {},
+  "devDependencies": {
+    "ts-loader": "^2.3.7",
+    "typescript": "^2.6.1"
+  },
   "jshintConfig": {
     "strict": true,
     "curly": true,
@@ -32,6 +35,7 @@
     }
   },
   "dependencies": {
+    "@types/angular": "^1.6.39",
     "@uirouter/angularjs": "^1.0.3",
     "angular": "^1.6.3",
     "angular-animate": "^1.6.3",

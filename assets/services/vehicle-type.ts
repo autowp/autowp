@@ -1,30 +1,30 @@
-import angular from 'angular';
+import * as angular from "angular";
 import Module from 'app.module';
 
 const SERVICE_NAME = 'VehicleTypeService';
 
 angular.module(Module)
-    .service(SERVICE_NAME, ['$q', '$http', '$translate', function($q, $http, $translate) {
+    .service(SERVICE_NAME, ['$q', '$http', '$translate', function($q: ng.IQService, $http: ng.IHttpService, $translate: any) {
         
-        var types = null;
+        var types: any[] = null;
         var service = this;
         
-        function collectNames(types) {
-            var result = [];
-            walkTypes(types, function(type) {
+        function collectNames(types: any[]): string[] {
+            var result: string[] = [];
+            walkTypes(types, function(type: any) {
                 result.push(type.name);
             });
             return result;
         }
         
-        function applyTranslations(types, translations) {
-            walkTypes(types, function(type) {
+        function applyTranslations(types: any[], translations: any) {
+            walkTypes(types, function(type: any) {
                 type.nameTranslated = translations[type.name];
             });
         }
         
-        function walkTypes(types, callback) {
-            angular.forEach(types, function(type) {
+        function walkTypes(types: any[], callback: (type: any) => void) {
+            angular.forEach(types, function(type: any) {
                 callback(type);
                 walkTypes(type.childs, callback);
             });
@@ -36,14 +36,14 @@ angular.module(Module)
                     $http({
                         method: 'GET',
                         url: '/api/vehicle-types'
-                    }).then(function(response) {
+                    }).then(function(response: ng.IHttpResponse<any>) {
                         types = response.data.items;
                         var names = collectNames(types);
                         
-                        $translate(names).then(function (translations) {
+                        $translate(names).then(function (translations: any) {
                             applyTranslations(types, translations);
                             resolve(types);
-                        }, function (translationIds) {
+                        }, function () {
                             reject(null);
                         });
                     }, function() {
@@ -55,16 +55,16 @@ angular.module(Module)
             });
         };
         
-        this.getTypesById = function(ids) {
-            return $q(function(resolve, reject) {
+        this.getTypesById = function(ids: number[]) {
+            return $q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
                 
                 if (ids.length <= 0) {
                     resolve([]);
                     return;
                 }
                 
-                service.getTypes().then(function(types) {
-                    var result = [];
+                service.getTypes().then(function(types: any[]) {
+                    var result: any[] = [];
                     walkTypes(types, function(type) {
                         if (ids.includes(type.id)) {
                             result.push(type);
@@ -72,7 +72,7 @@ angular.module(Module)
                     });
                     resolve(result);
                 }, function() {
-                    reject(null);
+                    reject();
                 });
             });
         };
