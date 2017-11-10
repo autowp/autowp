@@ -89,7 +89,6 @@
     "sprintf-js": "^1.x",
     "style-loader": "^0.x",
     "svg-inline-loader": "^0.x",
-    "ts-loader": "^2.1.0",
     "ui-leaflet": "git+https://github.com/autowp/ui-leaflet.git#leaflet-1.X",
     "url-loader": "^0.x",
     "webpack": "^3.x",
