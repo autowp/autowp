@@ -3,10 +3,6 @@
   "private": true,
   "version": "0.1.0",
   "description": "WheelsAge",
-  "devDependencies": {
-    "ts-loader": "^2.3.7",
-    "typescript": "^2.6.1"
-  },
   "jshintConfig": {
     "strict": true,
     "curly": true,
@@ -97,7 +93,9 @@
     "ui-leaflet": "git+https://github.com/autowp/ui-leaflet.git#leaflet-1.X",
     "url-loader": "^0.x",
     "webpack": "^3.x",
-    "webpack-manifest-plugin": "^1.x"
+    "webpack-manifest-plugin": "^1.x",
+    "ts-loader": "^2.3.7",
+    "typescript": "^2.6.1"
   },
   "scripts": {
     "start": "node_modules/.bin/webpack --progress --colors -p --config webpack.config.js",
