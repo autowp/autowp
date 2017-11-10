@@ -3,7 +3,7 @@ import Module from 'app.module';
 import template from './template.html';
 import SPEC_SERVICE from 'services/spec';
 import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
-import PERSPECTIVE_SERVICE from 'services/perspective';
+import { PerspectiveService } from 'services/perspective';
 import MODER_VOTE_TEMPLATE_SERVICE from 'services/picture-moder-vote-template';
 import MODER_VOTE_SERVICE from 'services/picture-moder-vote';
 import ACL_SERVICE_NAME from 'services/acl';
@@ -48,7 +48,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$q', '$element', PERSPECTIVE_SERVICE, MODER_VOTE_SERVICE, MODER_VOTE_TEMPLATE_SERVICE, VEHICLE_TYPE_SERVICE, SPEC_SERVICE,
+        '$scope', '$http', '$state', '$q', '$element', 'PerspectiveService', MODER_VOTE_SERVICE, MODER_VOTE_TEMPLATE_SERVICE, VEHICLE_TYPE_SERVICE, SPEC_SERVICE,
         function($scope, $http, $state, $q, $element, PerspectiveService, ModerVoteService, ModerVoteTemplateService, VehicleTypeService, SpecService) {
             
             $scope.pageEnv({
