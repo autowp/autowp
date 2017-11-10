@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "noStrictGenericChecks": true,
     "outDir": "./dist/",
     "noImplicitAny": true,
     "module": "es6",
@@ -8,8 +9,10 @@
     "allowJs": true,
     "lib": ["es5", "es6", "dom", "es2016"]
   },
-    "exclude": [
-        "node_modules",
-        "vendor"
-    ]
+  "exclude": [
+    "node_modules",
+    "vendor",
+    "module",
+    "public_html"
+  ]
 }

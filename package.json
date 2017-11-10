@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@types/angular": "^1.6.39",
+    "@types/left-pad": "^1.1.2",
     "@uirouter/angularjs": "^1.0.3",
     "angular": "^1.6.3",
     "angular-animate": "^1.6.3",
@@ -74,6 +75,7 @@
     "json-loader": "^0.x",
     "leaflet": "^1.x",
     "leaflet-webgl-heatmap": "^0.2.7",
+    "left-pad": "^1.1.3",
     "less": "^2.x",
     "less-loader": "^4.x",
     "markdown": "^0.x",
@@ -81,7 +83,6 @@
     "moment-timezone": "^0.5.13",
     "ng-file-upload": "^12.2.13",
     "ng-tags-input": "^3.2.0",
-    "pad": "^1.1.0",
     "raphael": "^2.x",
     "requirejs": "^2.x",
     "scriptjs": "^2.x",
@@ -89,12 +90,12 @@
     "sprintf-js": "^1.x",
     "style-loader": "^0.x",
     "svg-inline-loader": "^0.x",
+    "ts-loader": "^2.3.7",
+    "typescript": "^2.6.1",
     "ui-leaflet": "git+https://github.com/autowp/ui-leaflet.git#leaflet-1.X",
     "url-loader": "^0.x",
     "webpack": "^3.x",
-    "webpack-manifest-plugin": "^1.x",
-    "ts-loader": "^2.3.7",
-    "typescript": "^2.6.1"
+    "webpack-manifest-plugin": "^1.x"
   },
   "scripts": {
     "start": "node_modules/.bin/webpack --progress --colors -p --config webpack.config.js",
