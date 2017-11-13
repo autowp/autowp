@@ -15,7 +15,7 @@ export class AclService {
         private $http: ng.IHttpService
     ){}
   
-    public inheritsRole = function(role: string, rejectError: any): ng.IPromise<boolean> {
+    public inheritsRole = function(role: string, rejectError?: any): ng.IPromise<boolean> {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<boolean>, reject: ng.IQResolveReject<any>) {
           
@@ -49,7 +49,7 @@ export class AclService {
         });
     };
     
-    public isAllowed = function(resource: string, privilege: string, rejectError: any): ng.IPromise<boolean> {
+    public isAllowed = function(resource: string, privilege: string, rejectError?: any): ng.IPromise<boolean> {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<boolean>, reject: ng.IQResolveReject<any>) {
             

@@ -27,7 +27,7 @@ class AutowpPictureModerVoteDirective implements ng.IDirective {
     };
     template = require('./template.html');
 
-    constructor(private ModerVoteService: any, private ModerVoteTemplateService: any) {
+    constructor(private ModerVoteService: PictureModerVoteService, private ModerVoteTemplateService: PictureModerVoteTemplateService) {
     }
 
     link = (scope: IPictureModerVoteDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {

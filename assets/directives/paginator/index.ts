@@ -15,7 +15,7 @@ class AutowpPaginatorDirective implements ng.IDirective {
     };
     template = require('./template.html');
 
-    constructor(private $timeout: ng.ITimeoutService) {
+    constructor() {
     }
 
     link = (scope: IPaginatorDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
@@ -26,8 +26,8 @@ class AutowpPaginatorDirective implements ng.IDirective {
     }
 
     static factory(): ng.IDirectiveFactory {
-        const directive = ($timeout: ng.ITimeoutService) => new AutowpPaginatorDirective($timeout);
-        directive.$inject = ['$timeout'];
+        const directive = () => new AutowpPaginatorDirective();
+        directive.$inject = [];
         return directive;
     }
 }
