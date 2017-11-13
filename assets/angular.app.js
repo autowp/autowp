@@ -5,11 +5,11 @@ import './directives/comments/list';
 import './directives/item';
 import './directives/item-meta-form';
 import './directives/markdown-edit';
-import './directives/paginator';
+import './directives/paginator/index';
 import './directives/past-time-indicator';
 import './directives/picture-moder-vote';
 import './directives/thumbnail';  
-import './directives/user';
+import './directives/user/index';
 
 
 import './controllers/root';

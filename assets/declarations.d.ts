@@ -1,3 +1,3 @@
-declare function require(params:string): any;
+//declare function require(params:string): any;
 
 //export as namespace autowp;

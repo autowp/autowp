@@ -1,5 +1,5 @@
 import * as angular from "angular";
-import Module from 'app.module';
+import Module from '../../app.module';
 
 let leftPad = require('left-pad');
 
@@ -13,7 +13,7 @@ class AutowpPaginatorDirective implements ng.IDirective {
     scope = {
         data: '='
     };
-    template = require('./paginator.html');
+    template = require('./template.html');
 
     constructor(private $timeout: ng.ITimeoutService) {
     }
