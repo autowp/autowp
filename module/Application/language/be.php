@@ -49,7 +49,6 @@
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/61/title' => '',
-  'page/62/title' => '%USER_NAME%',
   'page/85/title' => '%BRAND_NAME%',
   'page/89/title' => '',
   'page/90/title' => '',
@@ -92,7 +91,6 @@
   'page/58/breadcrumbs' => '%DPBRAND_NAME%',
   'page/59/breadcrumbs' => '%DESIGN_PROJECT_NAME%',
   'page/61/breadcrumbs' => '',
-  'page/62/breadcrumbs' => '%USER_NAME%',
   'page/85/breadcrumbs' => '%BRAND_NAME%',
   'page/87/breadcrumbs' => '',
   'page/89/breadcrumbs' => '',
@@ -507,7 +505,7 @@ other {У вас {messages} новых паведамленняў}
 Жадаем вам поспехаў.',
   'feedback/name' => 'Ваша імя',
   'feedback/message' => 'Паведамленне',
-  'feedback/donate-text' => 'Калі вы прыйшлі сюды, каб выказаць словы падтрымкі, ёсць магчымасць [выказаць яе ў цвёрдай валюце](/donate)',
+  'feedback/donate-text' => 'Калі вы прыйшлі сюды, каб выказаць словы падтрымкі, ёсць магчымасць [выказаць яе ў цвёрдай валюце](/ng/donate)',
   'feedback/sent' => 'Ваша паведамленне адпраўлена',
   'map/museums-and-factories' => 'музеі і заводы',
   'picture/image-specifications' => 'Характарыстыкі выявы',
@@ -619,7 +617,7 @@ E-mail: %2$s
 
 Для гэтага выконвайце інструкцыі ніжэй.
 
-Мы будзем рады, калі вы захочаце [здзейсніць бескарыслівае ахвяраванне](/ахвяраваць) на адвольную суму.',
+Мы будзем рады, калі вы захочаце [здзейсніць бескарыслівае ахвяраванне](/ng/donate) на адвольную суму.',
   'donate/vod/select-date' => '1. Выберыце дату',
   'donate/vod/date-busy' => 'занята',
   'donate/vod/select-item' => '2. Абярыце аўтамабіль',
@@ -767,6 +765,8 @@ Cваім існаваннем наш праект абавязаны людзя
 
 Пераклад сайта на беларускую мову: %be-translator%
 
+Brazilian portuguese site translation: %pt-br-translator%
+
 Сайт працуе на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/),  а таксама іншых "разумных словах".
 
 Код сайта з\'яўляецца адкрытым, каб кожны жадаючы меў магчымасць уплываць на сутнасць і якасць праекта.
@@ -779,7 +779,7 @@ Cваім існаваннем наш праект абавязаны людзя
 
 ### Падтрымаць праект
 
-Вы можаце падтрымаць наш праект [фінансава](/donate) або [маральна](/ng/feedback).
+Вы можаце падтрымаць наш праект [фінансава](/ng/donate) або [маральна](/ng/feedback).
 Прыняць удзел у [перакладзе сайта](https://github.com/autowp/autowp/tree/master/module/Application/language) на іншыя мовы.
 ',
   'page/1/name' => 'Галоўная старонка',
@@ -891,7 +891,6 @@ Cваім існаваннем наш праект абавязаны людзя
   'page/48/title' => 'Асабісты кабінет',
   'page/56/title' => 'Змена адрасу e-mail',
   'page/57/title' => 'Падпіскі ў форуме',
-  'page/63/title' => 'Дададзеныя карцінкі',
   'page/66/title' => 'Усе карцінкі %BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/86/title' => 'Карцінка паспяхова запампавана на сайт',
   'page/87/title' => 'Яшчэ',
@@ -903,7 +902,6 @@ Cваім існаваннем наш праект абавязаны людзя
   'page/130/title' => 'Мае карцінкі',
   'page/136/title' => 'Аб праекце',
   'page/138/title' => '%CAR_TYPE_NAME% %BRAND_NAME% ў храналагічным парадку',
-  'page/141/title' => 'Дададзеныя карцінкі %BRAND_NAME%',
   'page/153/title' => 'Двайняты %BRAND_NAME%',
   'page/154/title' => 'Самыя %MOST_NAME%',
   'page/155/title' => 'Самыя %MOST_NAME% сярод %CAR_TYPE_NAME%',
@@ -917,7 +915,6 @@ Cваім існаваннем наш праект абавязаны людзя
   'page/186/title' => 'Усе выявы',
   'page/189/title' => 'Занадта шмат канфліктаў',
   'page/196/title' => 'Ахвяраванне',
-  'page/197/title' => 'Гісторыя змены тэксту',
   'page/14/breadcrumbs' => 'У храналагічным парадку',
   'page/15/breadcrumbs' => 'Апошнія карцінкі',
   'page/19/breadcrumbs' => 'Вытворцы',
@@ -931,13 +928,11 @@ Cваім існаваннем наш праект абавязаны людзя
   'page/39/breadcrumbs' => 'Лагатыпы',
   'page/40/breadcrumbs' => 'Рознае',
   'page/41/breadcrumbs' => 'Несартавана',
-  'page/63/breadcrumbs' => 'Дададзеныя карцінкі',
   'page/66/breadcrumbs' => 'Усе карцінкі',
   'page/86/breadcrumbs' => 'Поспех',
   'page/102/breadcrumbs' => 'Рэдактар характарыстык аўтамабіля',
   'page/122/breadcrumbs' => 'Тэхнічныя характарыстыкі',
   'page/136/breadcrumbs' => 'Аб праекце',
-  'page/141/breadcrumbs' => 'Дададзеныя карцінкі %BRAND_NAME%',
   'page/162/breadcrumbs' => 'Усе выявы',
   'page/164/breadcrumbs' => 'Самыя-самыя',
   'page/180/breadcrumbs' => 'Заводы',
@@ -945,7 +940,6 @@ Cваім існаваннем наш праект абавязаны людзя
   'page/186/breadcrumbs' => 'Усе выявы',
   'page/189/breadcrumbs' => 'Занадта шмат канфліктаў',
   'page/196/breadcrumbs' => 'Ахвяраванне',
-  'page/197/breadcrumbs' => 'Гісторыя змены тэксту',
   'page/201/name' => 'Маскоты',
   'page/202/name' => 'Даведка па ракурсам',
   'page/203/name' => 'Карыстальнікі',

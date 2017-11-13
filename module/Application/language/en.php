@@ -49,7 +49,6 @@ Discuss anything and just talk about cars and not only can you on [the forum](/n
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/61/title' => '',
-  'page/62/title' => '%USER_NAME%',
   'page/85/title' => '%BRAND_NAME%',
   'page/89/title' => '',
   'page/90/title' => '',
@@ -92,7 +91,6 @@ Discuss anything and just talk about cars and not only can you on [the forum](/n
   'page/58/breadcrumbs' => '%DPBRAND_NAME%',
   'page/59/breadcrumbs' => '%DESIGN_PROJECT_NAME%',
   'page/61/breadcrumbs' => '',
-  'page/62/breadcrumbs' => '%USER_NAME%',
   'page/85/breadcrumbs' => '%BRAND_NAME%',
   'page/87/breadcrumbs' => '',
   'page/89/breadcrumbs' => '',
@@ -505,7 +503,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
 Good luck.',
   'feedback/name' => 'Your name',
   'feedback/message' => 'Message',
-  'feedback/donate-text' => 'If you have come here to express words of support, it is possible to [express it in hard currency](/donate)',
+  'feedback/donate-text' => 'If you have come here to express words of support, it is possible to [express it in hard currency](/ng/donate)',
   'feedback/sent' => 'Your message was sent',
   'map/museums-and-factories' => 'Museums and factories',
   'picture/image-specifications' => 'Image specifications',
@@ -619,7 +617,7 @@ We will try not to disappoint you.',
 
 Follow the instructions below.
 
-We will be happy if you want to [perform selfless donation](/donate) to an arbitrary amount.',
+We will be happy if you want to [perform selfless donation](/ng/donate) to an arbitrary amount.',
   'donate/vod/select-date' => '1. Choose a date',
   'donate/vod/date-busy' => 'busy',
   'donate/vod/select-item' => '2. Choose vehicle',
@@ -781,7 +779,7 @@ Brazilian portuguese site translation: %pt-br-translator%
 
 ### Поддержать проект
 
-You can support our project by [finances](/donate) or [moral](/ng/feedback).
+You can support our project by [finances](/ng/donate) or [moral](/ng/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.',
   'page/1/name' => 'Index page',
   'page/2/name' => 'Main menu',
@@ -892,7 +890,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/48/title' => 'Cabinet',
   'page/56/title' => 'Changing e-mail',
   'page/57/title' => 'Forums subscriptions',
-  'page/63/title' => 'User\'s pictures',
   'page/66/title' => 'All pictures of %BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/86/title' => 'Image successfully uploaded to the site',
   'page/87/title' => 'More',
@@ -904,7 +901,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/130/title' => 'My pictures',
   'page/136/title' => 'About us',
   'page/138/title' => '%BRAND_NAME% %CAR_TYPE_NAME% in chronological order',
-  'page/141/title' => '%BRAND_NAME% pictures',
   'page/153/title' => '%BRAND_NAME% Twins',
   'page/154/title' => 'Most %MOST_NAME%',
   'page/155/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME%',
@@ -918,7 +914,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/186/title' => 'Pictures',
   'page/189/title' => 'Too many conflicts',
   'page/196/title' => 'Donate',
-  'page/197/title' => 'Text history',
   'page/14/breadcrumbs' => 'In chronological order',
   'page/15/breadcrumbs' => 'Last pictures',
   'page/19/breadcrumbs' => 'Brands',
@@ -932,13 +927,11 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/39/breadcrumbs' => 'Logotypes',
   'page/40/breadcrumbs' => 'Miscellaneous',
   'page/41/breadcrumbs' => 'Unsorted',
-  'page/63/breadcrumbs' => 'User\'s pictures',
   'page/66/breadcrumbs' => 'All pictures',
   'page/86/breadcrumbs' => 'Success',
   'page/102/breadcrumbs' => 'Specs editors',
   'page/122/breadcrumbs' => 'Specifications',
   'page/136/breadcrumbs' => 'About us',
-  'page/141/breadcrumbs' => '%BRAND_NAME% pictures',
   'page/162/breadcrumbs' => 'Pictures',
   'page/164/breadcrumbs' => 'Mosts',
   'page/180/breadcrumbs' => 'Factories',
@@ -946,7 +939,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/186/breadcrumbs' => 'Pictures',
   'page/189/breadcrumbs' => 'Too many conflicts',
   'page/196/breadcrumbs' => 'Donate',
-  'page/197/breadcrumbs' => 'Text history',
   'page/201/name' => 'Mascots',
   'page/202/name' => 'Perspectives',
   'page/203/name' => 'Users',

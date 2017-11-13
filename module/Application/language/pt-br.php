@@ -49,7 +49,6 @@ Você pode discutir sobre carros ou outros assuntos do site em [nosso fórum](/n
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/61/title' => '',
-  'page/62/title' => '%USER_NAME%',
   'page/85/title' => '%BRAND_NAME%',
   'page/89/title' => '',
   'page/90/title' => '',
@@ -92,7 +91,6 @@ Você pode discutir sobre carros ou outros assuntos do site em [nosso fórum](/n
   'page/58/breadcrumbs' => '%DPBRAND_NAME%',
   'page/59/breadcrumbs' => '%DESIGN_PROJECT_NAME%',
   'page/61/breadcrumbs' => '',
-  'page/62/breadcrumbs' => '%USER_NAME%',
   'page/85/breadcrumbs' => '%BRAND_NAME%',
   'page/87/breadcrumbs' => '',
   'page/89/breadcrumbs' => '',
@@ -504,7 +502,7 @@ Este processo é irreversível, então pense cautelosamente para não tomar deci
   'account/deleted/text' => 'Conta removida.',
   'feedback/name' => 'Seu nome',
   'feedback/message' => 'Mensagem',
-  'feedback/donate-text' => 'Se você deseja expressar sua mensagem de suporte a nós, saiba que você também pode nos [fazer uma doação](/donate)',
+  'feedback/donate-text' => 'Se você deseja expressar sua mensagem de suporte a nós, saiba que você também pode nos [fazer uma doação](/ng/donate)',
   'feedback/sent' => 'Sua mensagem foi enviada',
   'map/museums-and-factories' => 'Museus e fábricas',
   'picture/image-specifications' => 'Especificações da imagem',
@@ -618,7 +616,7 @@ Faremos o possível para não lhe desapontar.',
 
 Siga as instruções abaixo.
 
-Ficaremos felizes se você desejar [fazer uma doação](/donate) de qualquer valor.',
+Ficaremos felizes se você desejar [fazer uma doação](/ng/donate) de qualquer valor.',
   'donate/vod/select-date' => '1. Escolha uma data',
   'donate/vod/date-busy' => 'ocupado',
   'donate/vod/select-item' => '2. Escolha um veículo',
@@ -779,7 +777,7 @@ O código-fonte do site está aberto. Assim, todos que desejam têm a oportunida
 
 ### Você também pode ajudar
 
-Você pode contribuir para este site de forma [financeira](/donate) ou [moral](/ng/feedback).
+Você pode contribuir para este site de forma [financeira](/ng/donate) ou [moral](/ng/feedback).
 Ajude-nos a [traduzir este site](https://github.com/autowp/autowp/tree/master/module/Application/language) para outros idiomas.',
   'page/1/name' => 'Página inicial',
   'page/2/name' => 'Menu principal',
@@ -890,7 +888,6 @@ Ajude-nos a [traduzir este site](https://github.com/autowp/autowp/tree/master/mo
   'page/48/title' => 'Perfil',
   'page/56/title' => 'Alterar e-mail',
   'page/57/title' => 'Inscrições nos fóruns',
-  'page/63/title' => 'Imagens do usuário',
   'page/66/title' => 'Todas as imagens de %BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/86/title' => 'Imagem carregada com sucesso',
   'page/87/title' => 'Mais',
@@ -902,7 +899,6 @@ Ajude-nos a [traduzir este site](https://github.com/autowp/autowp/tree/master/mo
   'page/130/title' => 'Minhas imagens',
   'page/136/title' => 'Sobre nós',
   'page/138/title' => '%BRAND_NAME% %CAR_TYPE_NAME% em ordem cronológica',
-  'page/141/title' => 'Imagens %BRAND_NAME%',
   'page/153/title' => 'Gêmeos %BRAND_NAME%',
   'page/154/title' => 'Most %MOST_NAME%',
   'page/155/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME%',
@@ -916,7 +912,6 @@ Ajude-nos a [traduzir este site](https://github.com/autowp/autowp/tree/master/mo
   'page/186/title' => 'Imagens',
   'page/189/title' => 'Muitos conflitos',
   'page/196/title' => 'Fazer uma doação',
-  'page/197/title' => 'Histórico do texto',
   'page/14/breadcrumbs' => 'Em ordem cronológica',
   'page/15/breadcrumbs' => 'Últimas imagens',
   'page/19/breadcrumbs' => 'Marcas',
@@ -930,13 +925,11 @@ Ajude-nos a [traduzir este site](https://github.com/autowp/autowp/tree/master/mo
   'page/39/breadcrumbs' => 'Logotipos',
   'page/40/breadcrumbs' => 'Diversos',
   'page/41/breadcrumbs' => 'Não classificados',
-  'page/63/breadcrumbs' => 'Imagens do usuário',
   'page/66/breadcrumbs' => 'Todas as imagens',
   'page/86/breadcrumbs' => 'Sucesso',
   'page/102/breadcrumbs' => 'Editores de especificações',
   'page/122/breadcrumbs' => 'Especificações',
   'page/136/breadcrumbs' => 'Sobre nós',
-  'page/141/breadcrumbs' => 'Imagens %BRAND_NAME%',
   'page/162/breadcrumbs' => 'Imagens',
   'page/164/breadcrumbs' => 'Mosts',
   'page/180/breadcrumbs' => 'Fábricas',
@@ -944,7 +937,6 @@ Ajude-nos a [traduzir este site](https://github.com/autowp/autowp/tree/master/mo
   'page/186/breadcrumbs' => 'Imagens',
   'page/189/breadcrumbs' => 'Muitos conflitos',
   'page/196/breadcrumbs' => 'Fazer uma doação',
-  'page/197/breadcrumbs' => 'Histórico do texto',
   'page/201/name' => 'Mascotes',
   'page/202/name' => 'Perspectivas',
   'page/203/name' => 'Usuários',

@@ -189,11 +189,10 @@ return [
                 'options' => [
                     'route'    => '/donate',
                     'defaults' => [
-                        'controller' => Controller\DonateController::class,
-                        'action'     => 'index',
+                        'controller' => Controller\DonateController::class
                     ],
                 ],
-                'may_terminate' => true,
+                'may_terminate' => false,
                 'child_routes'  => [
                     'log' => [
                         'type'    => 'Literal',

@@ -49,7 +49,6 @@
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/61/title' => '',
-  'page/62/title' => '%USER_NAME%',
   'page/85/title' => '%BRAND_NAME%',
   'page/89/title' => '',
   'page/90/title' => '',
@@ -92,7 +91,6 @@
   'page/58/breadcrumbs' => '%DPBRAND_NAME%',
   'page/59/breadcrumbs' => '%DESIGN_PROJECT_NAME%',
   'page/61/breadcrumbs' => '',
-  'page/62/breadcrumbs' => '%USER_NAME%',
   'page/85/breadcrumbs' => '%BRAND_NAME%',
   'page/87/breadcrumbs' => '',
   'page/89/breadcrumbs' => '',
@@ -507,7 +505,7 @@
 Желаем вам удачи.',
   'feedback/name' => 'Ваше имя',
   'feedback/message' => 'Сообщение',
-  'feedback/donate-text' => 'Если вы пришли сюда, чтобы высказать слова поддержки, есть возможность [выразить её в твердой валюте](/donate)',
+  'feedback/donate-text' => 'Если вы пришли сюда, чтобы высказать слова поддержки, есть возможность [выразить её в твердой валюте](/ng/donate)',
   'feedback/sent' => 'Ваше сообщение отправлено',
   'map/museums-and-factories' => 'музеи и заводы',
   'picture/image-specifications' => 'Характеристики изображения',
@@ -619,7 +617,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 
 Для этого следуйте инструкциям ниже.
 
-Мы будем рады, если вы захотите [совершить бескорыстное пожертвование](/donate) на произвольную сумму.',
+Мы будем рады, если вы захотите [совершить бескорыстное пожертвование](/ng/donate) на произвольную сумму.',
   'donate/vod/select-date' => '1. Выберите дату',
   'donate/vod/date-busy' => 'занято',
   'donate/vod/select-item' => '2. Выберите автомобиль',
@@ -781,7 +779,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
 
 ### Поддержать проект
 
-Вы можете поддержать наш проект [финансово](/donate) или [морально](/ng/feedback).
+Вы можете поддержать наш проект [финансово](/ng/donate) или [морально](/ng/feedback).
 Принять участие в [переводе сайта](https://github.com/autowp/autowp/tree/master/module/Application/language) на другие языки.',
   'page/1/name' => 'Главная страница',
   'page/2/name' => 'Главное меню',
@@ -892,7 +890,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/48/title' => 'Личный кабинет',
   'page/56/title' => 'Изменение адреса e-mail',
   'page/57/title' => 'Подписки в форуме',
-  'page/63/title' => 'Добавленные картинки',
   'page/66/title' => 'Все картинки %BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/86/title' => 'Картинка успешно загружена на сайт',
   'page/87/title' => 'Ещё',
@@ -904,7 +901,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/130/title' => 'Мои картинки',
   'page/136/title' => 'О проекте',
   'page/138/title' => '%CAR_TYPE_NAME% %BRAND_NAME% в хронологическом порядке',
-  'page/141/title' => 'Добавленные картинки %BRAND_NAME%',
   'page/153/title' => 'Близнецы %BRAND_NAME%',
   'page/154/title' => 'Самые %MOST_NAME%',
   'page/155/title' => 'Самые %MOST_NAME% среди %CAR_TYPE_NAME%',
@@ -918,7 +914,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/186/title' => 'Все изображения',
   'page/189/title' => 'Слишком много конфликтов',
   'page/196/title' => 'Пожертвование',
-  'page/197/title' => 'История изменения текста',
   'page/14/breadcrumbs' => 'В хронологическом порядке',
   'page/15/breadcrumbs' => 'Последние картинки',
   'page/19/breadcrumbs' => 'Производители',
@@ -932,13 +927,11 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/39/breadcrumbs' => 'Логотипы',
   'page/40/breadcrumbs' => 'Разное',
   'page/41/breadcrumbs' => 'Несортировано',
-  'page/63/breadcrumbs' => 'Добавленные картинки',
   'page/66/breadcrumbs' => 'Все картинки',
   'page/86/breadcrumbs' => 'Успех',
   'page/102/breadcrumbs' => 'Редактор характеристик автомобиля',
   'page/122/breadcrumbs' => 'Технические характеристики',
   'page/136/breadcrumbs' => 'О проекте',
-  'page/141/breadcrumbs' => 'Добавленные картинки %BRAND_NAME%',
   'page/162/breadcrumbs' => 'Все изображения',
   'page/164/breadcrumbs' => 'Самые-самые',
   'page/180/breadcrumbs' => 'Заводы',
@@ -946,7 +939,6 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'page/186/breadcrumbs' => 'Все изображения',
   'page/189/breadcrumbs' => 'Слишком много конфликтов',
   'page/196/breadcrumbs' => 'Пожертвование',
-  'page/197/breadcrumbs' => 'История изменения текста',
   'page/201/name' => 'Маскоты',
   'page/202/name' => 'Справка по ракурсам',
   'page/203/name' => 'Пользователи',

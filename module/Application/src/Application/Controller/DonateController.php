@@ -48,10 +48,6 @@ class DonateController extends AbstractActionController
         $this->brand = $brand;
     }
 
-    public function indexAction()
-    {
-    }
-
     public function successAction()
     {
     }

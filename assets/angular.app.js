@@ -20,6 +20,7 @@ import './controllers/brands';
 import './controllers/cars';
 import './controllers/chart';
 import './controllers/cutaway';
+import './controllers/donate';
 import './controllers/feedback';
 import './controllers/forums';
 import './controllers/inbox';

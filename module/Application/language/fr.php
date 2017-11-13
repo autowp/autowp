@@ -49,7 +49,6 @@ Partagez votre joie, discuter urgente et simplement bavarder sur les automobil
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/61/title' => '',
-  'page/62/title' => '%USER_NAME%',
   'page/85/title' => '%BRAND_NAME%',
   'page/89/title' => '',
   'page/90/title' => '',
@@ -92,7 +91,6 @@ Partagez votre joie, discuter urgente et simplement bavarder sur les automobil
   'page/58/breadcrumbs' => '%DPBRAND_NAME%',
   'page/59/breadcrumbs' => '%DESIGN_PROJECT_NAME%',
   'page/61/breadcrumbs' => '',
-  'page/62/breadcrumbs' => '%USER_NAME%',
   'page/85/breadcrumbs' => '%BRAND_NAME%',
   'page/87/breadcrumbs' => '',
   'page/89/breadcrumbs' => '',
@@ -509,7 +507,7 @@ Ce processus est irréversible, alors réfléchissez bien et ne prenez pas de d�
 Bonne chance.',
   'feedback/name' => 'Votre nom',
   'feedback/message' => 'Message',
-  'feedback/donate-text' => 'Si vous êtes venu ici pour exprimer des mots de soutien, il est possible [de l\'exprimer en devises](/donate)',
+  'feedback/donate-text' => 'Si vous êtes venu ici pour exprimer des mots de soutien, il est possible [de l\'exprimer en devises](/ng/donate)',
   'feedback/sent' => 'Your message was sent',
   'map/museums-and-factories' => 'Les musées et les usines',
   'picture/image-specifications' => 'Caractéristiques de l\'image',
@@ -623,7 +621,7 @@ Allons essayer de ne pas vous décevoir.',
 
 Follow the instructions below.
 
-We will be happy if you want to [perform selfless donation](/donate) to an arbitrary amount.',
+We will be happy if you want to [perform selfless donation](/ng/donate) to an arbitrary amount.',
   'donate/vod/select-date' => '1. Choose a date',
   'donate/vod/date-busy' => 'busy',
   'donate/vod/select-item' => '2. Choose vehicle',
@@ -771,6 +769,8 @@ La traduction du site en chinois: %zh-translator%
 
 La traduction du site en biélorusse: %be-translator%
 
+Brazilian portuguese site translation: %pt-br-translator%
+
 Le site propulsé par [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), ainsi que de nombreux autres.
 
 Une partie du code source du site est ouverte et un cours de communication supplémentaire, que tout le monde a eu l\'occasion d\'influencer la nature et la qualité du projet.
@@ -783,7 +783,7 @@ Une partie du code source du site est ouverte et un cours de communication suppl
 
 ### Soutenir le projet
 
-Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/ng/feedback).
+Vous pouvez soutenir notre projet [financièrement](/ng/donate) ou [moralement](/ng/feedback).
 Take part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.',
   'page/1/name' => 'Page d\'accueil',
   'page/2/name' => 'Main menu',
@@ -894,7 +894,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/48/title' => 'Page personnelle',
   'page/56/title' => 'Changing e-mail',
   'page/57/title' => 'Abonnement aux forums',
-  'page/63/title' => 'Utilisateurs images',
   'page/66/title' => 'Toutes les images de %BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/86/title' => 'Image téléchargée avec succès sur le site',
   'page/87/title' => 'Plus',
@@ -906,7 +905,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/130/title' => 'Mes images',
   'page/136/title' => 'À propos',
   'page/138/title' => '%BRAND_NAME% %CAR_TYPE_NAME% dans l\'ordre chronologique',
-  'page/141/title' => 'Images de %BRAND_NAME%',
   'page/153/title' => '%BRAND_NAME% jumeaux',
   'page/154/title' => 'La plupart %MOST_NAME%',
   'page/155/title' => 'La plupart %MOST_NAME% %CAR_TYPE_NAME%',
@@ -920,7 +918,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/186/title' => 'Toutes les images',
   'page/189/title' => 'Faible poids',
   'page/196/title' => 'Donation',
-  'page/197/title' => 'Texte d\'histoire',
   'page/14/breadcrumbs' => 'Dans l\'ordre chronologique',
   'page/15/breadcrumbs' => 'Les dernières photos',
   'page/19/breadcrumbs' => 'Marques',
@@ -934,13 +931,11 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/39/breadcrumbs' => 'Logotypes',
   'page/40/breadcrumbs' => 'Varié',
   'page/41/breadcrumbs' => 'Non trié',
-  'page/63/breadcrumbs' => 'Utilisateurs images',
   'page/66/breadcrumbs' => 'Toutes les images',
   'page/86/breadcrumbs' => 'Succès',
   'page/102/breadcrumbs' => 'Spécifications éditeur',
   'page/122/breadcrumbs' => 'Spécifications',
   'page/136/breadcrumbs' => 'À propos',
-  'page/141/breadcrumbs' => 'Images de %BRAND_NAME%',
   'page/162/breadcrumbs' => 'Toutes les images',
   'page/164/breadcrumbs' => 'Les meilleurs',
   'page/180/breadcrumbs' => 'Des usines',
@@ -948,7 +943,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/186/breadcrumbs' => 'Toutes les images',
   'page/189/breadcrumbs' => 'Faible poids',
   'page/196/breadcrumbs' => 'Donation',
-  'page/197/breadcrumbs' => 'Texte d\'histoire',
   'page/201/name' => 'Mascottes',
   'page/202/name' => 'Perspectives',
   'page/203/name' => 'Utilisateurs',

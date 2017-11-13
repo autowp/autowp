@@ -49,7 +49,6 @@
   'page/59/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%',
   'page/58/title' => '%BRAND_NAME% %DPBRAND_NAME%',
   'page/61/title' => '',
-  'page/62/title' => '%USER_NAME%',
   'page/85/title' => '%BRAND_NAME%',
   'page/89/title' => '',
   'page/90/title' => '',
@@ -92,7 +91,6 @@
   'page/58/breadcrumbs' => '%DPBRAND_NAME%',
   'page/59/breadcrumbs' => '%DESIGN_PROJECT_NAME%',
   'page/61/breadcrumbs' => '',
-  'page/62/breadcrumbs' => '%USER_NAME%',
   'page/85/breadcrumbs' => '%BRAND_NAME%',
   'page/87/breadcrumbs' => '',
   'page/89/breadcrumbs' => '',
@@ -502,7 +500,7 @@
 祝您幸福。',
   'feedback/name' => '标题',
   'feedback/message' => '内容',
-  'feedback/donate-text' => '如果您希望表达自己的支持，您可以通过[捐款支持](/donate)',
+  'feedback/donate-text' => '如果您希望表达自己的支持，您可以通过[捐款支持](/ng/donate)',
   'feedback/sent' => '您的信息已发送',
   'map/museums-and-factories' => '工厂及博物馆',
   'picture/image-specifications' => '图像参数',
@@ -611,7 +609,7 @@
   'donate/comment-hint' => '您的建议',
   'donate/success-text' => '感谢您的支持。 
 我们尽己所能让您满意。',
-  'donate/vod/text' => '我们可以做出一点微小的工作作为回报-您有机会钦定下一个“今日之车”，无论您做出任意数额的[无条件捐助](/donate) 我们都会很高兴。',
+  'donate/vod/text' => '我们可以做出一点微小的工作作为回报-您有机会钦定下一个“今日之车”，无论您做出任意数额的[无条件捐助](/ng/donate) 我们都会很高兴。',
   'donate/vod/select-date' => '1. 选择日期',
   'donate/vod/date-busy' => '日期已有安排',
   'donate/vod/select-item' => '2. 选择车型',
@@ -757,6 +755,7 @@
 
 Belarusian site translation: %be-translator%
 
+Brazilian portuguese site translation: %pt-br-translator%
 
 技术支持：[Zend Framework](http://framework.zend.com/)、[jQuery](http://jquery.com/)、[Twitter bootstrap](http://getbootstrap.com/)，还有许多优秀的计算机语言。
 
@@ -881,7 +880,6 @@ Belarusian site translation: %be-translator%
   'page/48/title' => '个人主页',
   'page/56/title' => '更改电子邮箱',
   'page/57/title' => '论坛订阅更新',
-  'page/63/title' => '用户上传的图片',
   'page/66/title' => '%BRAND_NAME% %DESIGN_PROJECT_NAME%的所有图片',
   'page/86/title' => '图片已成功上传',
   'page/87/title' => '更多',
@@ -893,7 +891,6 @@ Belarusian site translation: %be-translator%
   'page/130/title' => '已贡献图片',
   'page/136/title' => '关于我们',
   'page/138/title' => '%BRAND_NAME% %CAR_TYPE_NAME%按推出时间排序',
-  'page/141/title' => '%BRAND_NAME%的图片',
   'page/153/title' => '%BRAND_NAME% Twins',
   'page/154/title' => 'Most %MOST_NAME%',
   'page/155/title' => 'Most %MOST_NAME% %CAR_TYPE_NAME%',
@@ -907,7 +904,6 @@ Belarusian site translation: %be-translator%
   'page/186/title' => '所有图片',
   'page/189/title' => '争议',
   'page/196/title' => '捐助',
-  'page/197/title' => '历史标题',
   'page/14/breadcrumbs' => '按推出时间排序',
   'page/15/breadcrumbs' => '最新图片',
   'page/19/breadcrumbs' => '品牌',
@@ -921,13 +917,11 @@ Belarusian site translation: %be-translator%
   'page/39/breadcrumbs' => '商标',
   'page/40/breadcrumbs' => '杂项',
   'page/41/breadcrumbs' => '未分类',
-  'page/63/breadcrumbs' => '用户的图片',
   'page/66/breadcrumbs' => '所有图片',
   'page/86/breadcrumbs' => '成功',
   'page/102/breadcrumbs' => '性能参数编辑器',
   'page/122/breadcrumbs' => '性能参数',
   'page/136/breadcrumbs' => '关于我们',
-  'page/141/breadcrumbs' => '%BRAND_NAME% pictures',
   'page/162/breadcrumbs' => '图片',
   'page/164/breadcrumbs' => 'Mosts',
   'page/180/breadcrumbs' => '工厂',
@@ -935,7 +929,6 @@ Belarusian site translation: %be-translator%
   'page/186/breadcrumbs' => '图片',
   'page/189/breadcrumbs' => 'Low weight',
   'page/196/breadcrumbs' => '捐助',
-  'page/197/breadcrumbs' => '撰写历史',
   'page/201/name' => '立标',
   'page/202/name' => '剖视',
   'page/203/name' => '用户',

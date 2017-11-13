@@ -1,3 +1,4 @@
-//declare function require(params:string): any;
-
-//export as namespace autowp;
+export interface IAutowpControllerScope extends ng.IScope
+{
+    pageEnv: (data: any) => void;
+}
