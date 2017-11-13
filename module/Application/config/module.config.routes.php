@@ -194,15 +194,6 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes'  => [
-                    'log' => [
-                        'type'    => 'Literal',
-                        'options' => [
-                            'route' => '/log',
-                            'defaults' => [
-                                'action' => 'log',
-                            ]
-                        ]
-                    ],
                     'success' => [
                         'type' => 'Literal',
                         'options' => [
