@@ -1,7 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import ACL_SERVICE_NAME from 'services/acl';
+import { AclService } from 'services/acl';
 
 const CONTROLLER_NAME = 'ModerPagesEditController';
 const STATE_NAME = 'moder-pages-edit';
@@ -16,7 +16,7 @@ angular.module(Module)
                 controllerAs: 'ctrl',
                 template: template,
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.inheritsRole('pages-moder', 'unauthorized');
                     }]
                 }
@@ -24,7 +24,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', ACL_SERVICE_NAME,
+        '$scope', '$http', '$state', 'AclService',
         function($scope, $http, $state, Acl) {
             $scope.pageEnv({
                 layout: {

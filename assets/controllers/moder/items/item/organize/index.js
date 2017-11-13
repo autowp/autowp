@@ -1,11 +1,11 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import ACL_SERVICE_NAME from 'services/acl';
-import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
-import SPEC_SERVICE from 'services/spec';
-import CONTENT_LANGUAGE_SERVICE from 'services/content-language';
-import ITEM_SERVICE from 'services/item';
+import { AclService } from 'services/acl';
+import { VehicleTypeService } from 'services/vehicle-type';
+import { SpecService } from 'services/spec';
+import { ContentLanguageService } from 'services/content-language';
+import { ItemService } from 'services/item';
 
 const STATE_NAME = 'moder-items-item-organize';
 const CONTROLLER_NAME = 'ModerItemsItemOrganizeController';
@@ -20,7 +20,7 @@ angular.module(Module)
                 controllerAs: 'ctrl',
                 template: template,
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.isAllowed('car', 'move', 'unauthorized');
                     }]
                 }
@@ -28,7 +28,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$rootScope', '$http', '$state', '$translate', '$q', '$element', SPEC_SERVICE, VEHICLE_TYPE_SERVICE, ACL_SERVICE_NAME, CONTENT_LANGUAGE_SERVICE, ITEM_SERVICE,
+        '$scope', '$rootScope', '$http', '$state', '$translate', '$q', '$element', 'SpecService', 'VehicleTypeService', 'AclService', 'ContentLanguageService', 'ItemService',
         function($scope, $rootScope, $http, $state, $translate, $q, $element, SpecService, VehicleTypeService, Acl, ContentLanguage, ItemService) {
             
             var ctrl = this;

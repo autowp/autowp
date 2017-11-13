@@ -2,10 +2,10 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
-import CONTACTS_SERVICE_NAME from 'services/contacts';
+import { ContactsService } from 'services/contacts';
 import MessageDialog from 'message';
-import MessageServiceName from 'services/message';
-import ACL_SERVICE_NAME from 'services/acl';
+import { MessageService } from 'services/message';
+import { AclService } from 'services/acl';
 
 import './comments';
 import './pictures';
@@ -26,7 +26,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', CONTACTS_SERVICE_NAME, MessageServiceName, ACL_SERVICE_NAME,
+        '$scope', '$http', '$state', 'ContactsService', 'MessageService', 'AclService',
         function($scope, $http, $state, Contacts, MessageService, Acl) {
             
             var ctrl = this;

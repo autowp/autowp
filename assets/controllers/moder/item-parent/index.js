@@ -1,8 +1,8 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import ACL_SERVICE_NAME from 'services/acl';
-import CONTENT_LANGUAGE_SERVICE from 'services/content-language';
+import { AclService } from 'services/acl';
+import { ContentLanguageService } from 'services/content-language';
 
 const STATE_NAME = 'moder-item-parent';
 const CONTROLLER_NAME = 'ModerItemParentController';
@@ -20,7 +20,7 @@ angular.module(Module)
                     tab: { dynamic: true }
                 },
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.isAllowed('car', 'move', 'unauthorized');
                     }]
                 }
@@ -28,7 +28,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$translate', '$q', ACL_SERVICE_NAME, CONTENT_LANGUAGE_SERVICE,
+        '$scope', '$http', '$state', '$translate', '$q', 'AclService', 'ContentLanguageService',
         function($scope, $http, $state, $translate, $q, Acl, ContentLanguage) {
             
             var ctrl = this;

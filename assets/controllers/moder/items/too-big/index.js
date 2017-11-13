@@ -1,7 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import ACL_SERVICE_NAME from 'services/acl';
+import { AclService } from 'services/acl';
 
 const STATE_NAME = 'moder-items-too-big';
 const CONTROLLER_NAME = 'ModerItemsTooBigController';
@@ -16,7 +16,7 @@ angular.module(Module)
                 controllerAs: 'ctrl',
                 template: template,
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
                     }]
                 }

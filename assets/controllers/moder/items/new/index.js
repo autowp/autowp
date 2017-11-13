@@ -1,10 +1,10 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import ACL_SERVICE_NAME from 'services/acl';
-import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
-import SPEC_SERVICE from 'services/spec';
-import ITEM_SERVICE from 'services/item';
+import { AclService } from 'services/acl';
+import { VehicleTypeService } from 'services/vehicle-type';
+import { SpecService } from 'services/spec';
+import { ItemService } from 'services/item';
 var sprintf = require("sprintf-js").sprintf;
 import notify from 'notify';
 
@@ -33,7 +33,7 @@ angular.module(Module)
                 controllerAs: 'ctrl',
                 template: template,
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.isAllowed('car', 'add', 'unauthorized');
                     }]
                 }
@@ -41,7 +41,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$translate', '$q', SPEC_SERVICE, VEHICLE_TYPE_SERVICE, ITEM_SERVICE,
+        '$scope', '$http', '$state', '$translate', '$q', 'SpecService', 'VehicleTypeService', 'ItemService',
         function($scope, $http, $state, $translate, $q, SpecService, VehicleTypeService, ItemService) {
             
             var ctrl = this;

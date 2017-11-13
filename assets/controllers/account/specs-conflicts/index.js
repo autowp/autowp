@@ -2,7 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
-import USER_SERVICE_NAME from 'services/user';
+import { UserService } from 'services/user';
 
 const CONTROLLER_NAME = 'AccountSpecsConflictsController';
 const STATE_NAME = 'account-specs-conflicts';
@@ -20,7 +20,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', USER_SERVICE_NAME,
+        '$scope', '$http', '$state', 'UserService',
         function($scope, $http, $state, UserService) {
             
             if (! $scope.user) {

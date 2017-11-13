@@ -5,8 +5,8 @@ var $ = require("jquery");
 require('jcrop-0.9.12/css/jquery.Jcrop.css');
 require('jcrop-0.9.12/js/jquery.Jcrop');
 var sprintf = require("sprintf-js").sprintf;
-import PICTURE_ITEM_SERVICE from 'services/picture-item';
-import ACL_SERVICE_NAME from 'services/acl';
+import { PictureItemService } from 'services/picture-item';
+import { AclService } from 'services/acl';
 
 const CONTROLLER_NAME = 'ModerPicturesItemAreaController';
 const STATE_NAME = 'moder-pictures-item-area';
@@ -21,7 +21,7 @@ angular.module(Module)
                 controllerAs: 'ctrl',
                 template: template,
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
                     }]
                 }
@@ -29,7 +29,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME,
-        ['$scope', '$element', '$http', '$state', '$q', PICTURE_ITEM_SERVICE,
+        ['$scope', '$element', '$http', '$state', '$q', 'PictureItemService',
             function($scope, $element, $http, $state, $q, PictureItemService) {
             
                 $scope.pageEnv({

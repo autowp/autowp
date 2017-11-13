@@ -2,7 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
-import ACL_SERVICE_NAME from 'services/acl';
+import { AclService } from 'services/acl';
 
 const CONTROLLER_NAME = 'ForumsNewTopicController';
 const STATE_NAME = 'forums-new-topic';
@@ -20,7 +20,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', ACL_SERVICE_NAME,
+        '$scope', '$http', '$state', 'AclService',
         function($scope, $http, $state, Acl) {
             var ctrl = this;
             

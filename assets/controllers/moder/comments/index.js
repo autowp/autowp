@@ -1,7 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import ACL_SERVICE_NAME from 'services/acl';
+import { AclService } from 'services/acl';
 import "corejs-typeahead";
 import $ from 'jquery';
 import notify from 'notify';
@@ -25,7 +25,7 @@ angular.module(Module)
                     page: { dynamic: true }
                 },
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
                     }]
                 }

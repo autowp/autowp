@@ -1,7 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import ACL_SERVICE_NAME from 'services/acl';
+import { AclService } from 'services/acl';
 
 var $ = require("jquery");
 require('jcrop-0.9.12/css/jquery.Jcrop.css');
@@ -21,7 +21,7 @@ angular.module(Module)
                 controllerAs: 'ctrl',
                 template: template,
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
                     }]
                 }

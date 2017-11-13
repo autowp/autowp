@@ -4,47 +4,52 @@ import notify from 'notify';
 
 const SERVICE_NAME = 'UserService';
 
-angular.module(Module)
-    .service(SERVICE_NAME, ['$q', '$http', function($q: ng.IQService, $http: ng.IHttpService) {
+export class UserService {
+    static $inject = ['$q', '$http'];
+    private cache: Map<number, any> = new Map<number, any>();
+    private promises: Map<number, ng.IPromise<any>> = new Map<number, ng.IPromise<any>>();
+  
+    constructor(
+        private $q: ng.IQService,
+        private $http: ng.IHttpService
+    ){}
+  
+    public getUser(id: number): ng.IPromise<any> {
         
-        var service = this;
+        if (this.promises.has(id)) {
+            return this.promises.get(id);
+        }
       
-        let cache: Map<number, any> = new Map<number, any>();
-        let promises: Map<number, ng.IPromise<any>> = new Map<number, ng.IPromise<any>>();
-       
-        this.getUser = function(id: number): ng.IPromise<any> {
+        var self = this;
+        
+        var promise = this.$q(function(resolve: ng.IQResolveReject<string>, reject: ng.IQResolveReject<void>) {
             
-            if (promises.has(id)) {
-                return promises.get(id);
+            if (self.cache.has(id)) {
+                resolve(self.cache.get(id));
+                return;
             }
             
-            var promise = $q(function(resolve: ng.IQResolveReject<string>, reject: ng.IQResolveReject<void>) {
+            self.$http({
+                url: '/api/user/' + id,
+                method: 'GET'
+            }).then(function(response: ng.IHttpResponse<any>) {
+                self.cache.set(id, response.data);
                 
-                if (cache.has(id)) {
-                    resolve(cache.get(id));
-                    return;
-                }
+                resolve(self.cache.get(id));
                 
-                $http({
-                    url: '/api/user/' + id,
-                    method: 'GET'
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    cache.set(id, response.data);
-                    
-                    resolve(cache.get(id));
-                    
-                    promises.delete(id);
-                    
-                }, function(response) {
-                    notify.response(response);
-                    reject();
-                });
+                self.promises.delete(id);
+                
+            }, function(response) {
+                notify.response(response);
+                reject();
             });
-            
-            promises.set(id, promise);
-            
-            return promise;
-        };
-    }]);
+        });
+        
+        this.promises.set(id, promise);
+        
+        return promise;
+    };
+};
 
-export default SERVICE_NAME;
+angular.module(Module).service(SERVICE_NAME, UserService);
+

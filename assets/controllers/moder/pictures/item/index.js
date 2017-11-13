@@ -2,8 +2,8 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import { PerspectiveService } from 'services/perspective';
-import PICTURE_ITEM_SERVICE from 'services/picture-item';
-import ACL_SERVICE_NAME from 'services/acl';
+import { PictureItemService } from 'services/picture-item';
+import { AclService } from 'services/acl';
 import './crop';
 import './move';
 import './area';
@@ -22,7 +22,7 @@ angular.module(Module)
                 controllerAs: 'ctrl',
                 template: template,
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
                     }]
                 }
@@ -30,7 +30,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$q', '$translate', '$element', 'PerspectiveService', PICTURE_ITEM_SERVICE,
+        '$scope', '$http', '$state', '$q', '$translate', '$element', 'PerspectiveService', 'PictureItemService',
         function($scope, $http, $state, $q, $translate, $element, PerspectiveService, PictureItemService) {
             
             var that = this;

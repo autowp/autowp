@@ -1,12 +1,12 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import SPEC_SERVICE from 'services/spec';
-import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
+import { SpecService } from 'services/spec';
+import { VehicleTypeService } from 'services/vehicle-type';
 import { PerspectiveService } from 'services/perspective';
-import MODER_VOTE_TEMPLATE_SERVICE from 'services/picture-moder-vote-template';
-import MODER_VOTE_SERVICE from 'services/picture-moder-vote';
-import ACL_SERVICE_NAME from 'services/acl';
+import { PictureModerVoteTemplateService } from 'services/picture-moder-vote-template';
+import { PictureModerVoteService } from 'services/picture-moder-vote';
+import { AclService } from 'services/acl';
 import "corejs-typeahead";
 import $ from 'jquery';
 import "./new";
@@ -40,7 +40,7 @@ angular.module(Module)
                     page: { dynamic: true }
                 },
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
                     }]
                 }
@@ -48,7 +48,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$q', '$element', 'PerspectiveService', MODER_VOTE_SERVICE, MODER_VOTE_TEMPLATE_SERVICE, VEHICLE_TYPE_SERVICE, SPEC_SERVICE,
+        '$scope', '$http', '$state', '$q', '$element', 'PerspectiveService', 'PictureModerVoteService', 'PictureModerVoteTemplateService', 'VehicleTypeService', 'SpecService',
         function($scope, $http, $state, $q, $element, PerspectiveService, ModerVoteService, ModerVoteTemplateService, VehicleTypeService, SpecService) {
             
             $scope.pageEnv({

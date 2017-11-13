@@ -2,7 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
-import USER_SERVICE_NAME from 'services/user';
+import { UserService } from 'services/user';
 import $ from 'jquery';
 
 var JsDiff = require('diff');
@@ -23,7 +23,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', USER_SERVICE_NAME,
+        '$scope', '$http', '$state', 'UserService',
         function($scope, $http, $state, UserService) {
             
             var ctrl = this;

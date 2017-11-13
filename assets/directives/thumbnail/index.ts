@@ -1,7 +1,7 @@
 import * as angular from "angular";
 import Module from 'app.module';
 import { PerspectiveService } from 'services/perspective';
-import PICTURE_ITEM_SERVICE from 'services/picture-item';
+import { PictureItemService } from 'services/picture-item';
 import './styles.less';
 
 interface IThumbnailDirectiveScope extends ng.IScope {
@@ -22,7 +22,7 @@ class AutowpThumbnailDirective implements ng.IDirective {
         isModer: '='
     };
 
-    constructor(private $timeout: ng.ITimeoutService, private perspectiveService: PerspectiveService, private pictureItemService: any) {
+    constructor(private $timeout: ng.ITimeoutService, private perspectiveService: PerspectiveService, private pictureItemService: PictureItemService) {
     }
 
     link = (scope: IThumbnailDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
@@ -61,7 +61,7 @@ class AutowpThumbnailDirective implements ng.IDirective {
 
     static factory(): ng.IDirectiveFactory {
         const directive = ($timeout: ng.ITimeoutService, PerspectiveService: PerspectiveService, PictureItemService: any) => new AutowpThumbnailDirective($timeout, PerspectiveService, PictureItemService);
-        directive.$inject = ['$timeout', 'PerspectiveService', PICTURE_ITEM_SERVICE];
+        directive.$inject = ['$timeout', 'PerspectiveService', 'PictureItemService'];
         return directive;
     }
 }

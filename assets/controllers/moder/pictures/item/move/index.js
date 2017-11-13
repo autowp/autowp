@@ -2,8 +2,8 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import './item'; // directive
-import PICTURE_ITEM_SERVICE from 'services/picture-item';
-import ACL_SERVICE_NAME from 'services/acl';
+import { PictureItemService } from 'services/picture-item';
+import { AclService } from 'services/acl';
 import notify from 'notify';
 
 const CONTROLLER_NAME = 'ModerPicturesItemMoveController';
@@ -28,7 +28,7 @@ angular.module(Module)
                 controllerAs: 'ctrl',
                 template: template,
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
                     }]
                 }
@@ -36,7 +36,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$q', PICTURE_ITEM_SERVICE,
+        '$scope', '$http', '$state', '$q', 'PictureItemService',
         function($scope, $http, $state, $q, PictureItemService) {
             
             var ctrl = this;

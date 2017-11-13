@@ -2,7 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import './styles.less';
-import ACL_SERVICE_NAME from 'services/acl';
+import { AclService } from 'services/acl';
 
 angular.module(Module)
     .directive('autowpNewItem', function() {
@@ -17,7 +17,7 @@ angular.module(Module)
             template: template,
             transclude: true,
             controllerAs: 'ctrl',
-            controller: [ACL_SERVICE_NAME, '$scope',
+            controller: ['AclService', '$scope',
                 function(Acl, $scope) {
                     var ctrl = this;
                     

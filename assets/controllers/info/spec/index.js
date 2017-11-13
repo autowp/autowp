@@ -2,7 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
-import SPEC_SERVICE_NAME from 'services/spec';
+import { SpecService } from 'services/spec';
 
 import './row';
 
@@ -22,7 +22,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', SPEC_SERVICE_NAME,
+        '$scope', 'SpecService',
         function($scope, SpecService) {
             
             var ctrl = this;

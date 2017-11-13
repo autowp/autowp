@@ -1,10 +1,10 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import MessageServiceName from 'services/message';
-import ForumServiceName from 'services/forum';
+import { MessageService } from 'services/message';
+import { ForumService } from 'services/forum';
 import notify from 'notify';
-import PageServiceName from 'services/page';
+import { PageService } from 'services/page';
 
 angular.module(Module)
     .directive('autowpAccountSidebar', function() {
@@ -16,7 +16,7 @@ angular.module(Module)
             template: template,
             transclude: true,
             controllerAs: 'ctrl',
-            controller: [ '$state', MessageServiceName, '$http', ForumServiceName, PageServiceName, '$scope',
+            controller: [ '$state', 'MessageService', '$http', 'ForumService', 'PageService', '$scope',
                 function($state, MessageService, $http, ForumService, PageService, $scope) {
                     var ctrl = this;
                     

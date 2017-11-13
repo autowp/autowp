@@ -1,7 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import ACL_SERVICE_NAME from 'services/acl';
+import { AclService } from 'services/acl';
 import notify from 'notify';
 
 const CONTROLLER_NAME = 'ModerHotlinksController';
@@ -17,7 +17,7 @@ angular.module(Module)
                 controllerAs: 'ctrl',
                 template: template,
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.isAllowed('hotlinks', 'view', 'unauthorized');
                     }]
                 }
@@ -25,7 +25,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', ACL_SERVICE_NAME,
+        '$scope', '$http', 'AclService',
         function($scope, $http, Acl) {
             $scope.pageEnv({
                 layout: {

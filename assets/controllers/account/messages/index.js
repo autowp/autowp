@@ -2,7 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
-import MessageServiceName from 'services/message';
+import { MessageService } from 'services/message';
 import MessageDialog from 'message';
 
 const CONTROLLER_NAME = 'AccountMessagesController';
@@ -21,7 +21,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$rootScope', '$http', '$state', MessageServiceName, 
+        '$scope', '$rootScope', '$http', '$state', 'MessageService', 
         function($scope, $rootScope, $http, $state, MessageService) {
             
             var ctrl = this;

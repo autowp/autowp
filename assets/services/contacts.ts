@@ -3,45 +3,49 @@ import Module from 'app.module';
 
 const SERVICE_NAME = 'ContactsService';
 
-angular.module(Module)
-    .service(SERVICE_NAME, ['$q', '$http', function($q: ng.IQService, $http: ng.IHttpService) {
-
-        this.deleteMessage = function(id: number): ng.IPromise<void> {
-            var self = this;
-            
-            return $q(function(resolve: ng.IQResolveReject<void>, reject: ng.IQResolveReject<any>) {
-                
-                $http({
-                    method: 'DELETE',
-                    url: '/api/message/' + id
-                }).then(function() {
-                    
-                    self.trigger('deleted');
-                    
-                    resolve();
-                }, function(response: any) {
-                    reject(response);
-                });
-            });
-        };
+export class ContactsService {
+    static $inject = ['$q', '$http'];
+    private hostnames: Map<string, string> = new Map<string, string>();
+  
+    constructor(
+        private $q: ng.IQService,
+        private $http: ng.IHttpService
+    ){}
+  
+    public deleteMessage(id: number): ng.IPromise<void> {
+        var self = this;
         
-        this.isInContacts = function(userId: number): ng.IPromise<boolean> {
-            return $q(function(resolve, reject) {
-                
-                $http({
-                    method: 'GET',
-                    url: '/api/contacts/' + userId
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    resolve(true);
-                }, function(response) {
-                    if (response.status == 404) {
-                        resolve(false);
-                    } else {
-                    	reject(response);
-                    }
-                });
+        return this.$q(function(resolve: ng.IQResolveReject<void>, reject: ng.IQResolveReject<any>) {
+            
+            self.$http({
+                method: 'DELETE',
+                url: '/api/message/' + id
+            }).then(function() {
+                resolve();
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
             });
-        };
-    }]);
+        });
+    };
+    
+    public isInContacts(userId: number): ng.IPromise<boolean> {
+        var self = this;
+        return this.$q(function(resolve, reject) {
+            
+            self.$http({
+                method: 'GET',
+                url: '/api/contacts/' + userId
+            }).then(function(response: ng.IHttpResponse<any>) {
+                resolve(true);
+            }, function(response: ng.IHttpResponse<any>) {
+                if (response.status == 404) {
+                    resolve(false);
+                } else {
+                  reject(response);
+                }
+            });
+        });
+    };
+};
 
-export default SERVICE_NAME;
+angular.module(Module).service(SERVICE_NAME, ContactsService);

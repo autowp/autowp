@@ -2,8 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
-
-import ACL_SERVICE_NAME from 'services/acl';
+import { AclService } from 'services/acl';
 
 import './message';
 import './move-message';
@@ -42,7 +41,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', ACL_SERVICE_NAME, '$translate',
+        '$scope', '$http', '$state', 'AclService', '$translate',
         function($scope, $http, $state, Acl, $translate) {
             var ctrl = this;
             

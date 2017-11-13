@@ -2,7 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
-import ACL_SERVICE_NAME from 'services/acl';
+import { AclService } from 'services/acl';
 
 var $ = require("jquery");
 var leaflet = require("leaflet-bundle");
@@ -32,7 +32,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', ACL_SERVICE_NAME,
+        '$scope', '$http', '$state', 'AclService',
         function($scope, $http, $state, Acl) {
             
             var ctrl = this;

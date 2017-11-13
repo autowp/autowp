@@ -1,8 +1,8 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import MODER_VOTE_TEMPLATE_SERVICE from 'services/picture-moder-vote-template';
-import ACL_SERVICE_NAME from 'services/acl';
+import { PictureModerVoteTemplateService } from 'services/picture-moder-vote-template';
+import { AclService } from 'services/acl';
 
 const CONTROLLER_NAME = 'ModerPictureVoteTemplatesController';
 const STATE_NAME = 'moder-picture-vote-templates';
@@ -17,7 +17,7 @@ angular.module(Module)
                 controllerAs: 'ctrl',
                 template: template,
                 resolve: {
-                    access: [ACL_SERVICE_NAME, function (Acl) {
+                    access: ['AclService', function (Acl) {
                         return Acl.inheritsRole('moder', 'unauthorized');
                     }]
                 }
@@ -25,7 +25,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', MODER_VOTE_TEMPLATE_SERVICE,
+        '$scope', '$http', 'PictureModerVoteTemplateService',
         function($scope, $http, VoteTemplateService) {
             $scope.pageEnv({
                 layout: {

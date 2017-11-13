@@ -1,7 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import PageServiceName from 'services/page';
+import { PageService } from 'services/page';
 
 function replaceArgs(str, args) {
     angular.forEach(args, function(value, key) {
@@ -20,7 +20,7 @@ angular.module(Module)
             template: template,
             transclude: true,
             controllerAs: 'ctrl',
-            controller: [PageServiceName, '$scope', '$translate',
+            controller: ['PageService', '$scope', '$translate',
                 function(PageService, $scope, $translate) {
                     var ctrl = this;
                     

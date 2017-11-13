@@ -1,7 +1,7 @@
 import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
-import ACL_SERVICE_NAME from 'services/acl';
+import { AclService } from 'services/acl';
 import notify from 'notify';
 import $ from 'jquery';
 
@@ -20,7 +20,7 @@ angular.module(Module)
             template: template,
             transclude: true,
             controllerAs: 'ctrl',
-            controller: [ACL_SERVICE_NAME, '$http',
+            controller: ['AclService', '$http',
                 function(Acl, $http) {
                     var ctrl = this;
                     

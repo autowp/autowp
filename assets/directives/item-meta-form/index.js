@@ -2,9 +2,9 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import './styles.less';
-import VEHICLE_TYPE_SERVICE from 'services/vehicle-type';
-import SPEC_SERVICE from 'services/spec';
-import LANGUAGE_SERVICE_NAME from 'services/language';
+import { VehicleTypeService } from 'services/vehicle-type';
+import { SpecService } from 'services/spec';
+import { LanguageService } from 'services/language';
 var sprintf = require("sprintf-js").sprintf;
 
 function toPlain(options, deep) {
@@ -34,7 +34,7 @@ angular.module(Module)
             template: template,
             transclude: true,
             controllerAs: 'ctrl',
-            controller: ['$scope', '$q', SPEC_SERVICE, VEHICLE_TYPE_SERVICE, LANGUAGE_SERVICE_NAME, 'leafletData',
+            controller: ['$scope', '$q', 'SpecService', 'VehicleTypeService', 'LanguageService', 'leafletData',
                 function($scope, $q, SpecService, VehicleTypeService, LanguageService, leafletData) {
                     var ctrl = this;
                     

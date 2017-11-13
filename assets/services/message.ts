@@ -5,117 +5,126 @@ const SERVICE_NAME = 'MessageService';
 
 interface messageCallbackType { (): void }
 
-angular.module(Module)
-    .service(SERVICE_NAME, ['$q', '$http', function($q: ng.IQService, $http: ng.IHttpService) {
+export class MessageService {
+    static $inject = ['$q', '$http'];
+    private perspectives: any = null;
+    private promise: ng.IPromise<any[]> = null;
+  
+    private handlers: { [key: string]: messageCallbackType[] } = {
+        sent: [],
+        deleted: []
+    };
+  
+    constructor(
+        private $q: ng.IQService,
+        private $http: ng.IHttpService
+    ){}
+  
+    public clearFolder(folder: string): ng.IPromise<void> {
+        var self = this;
         
-        var perspectives = null;
-        var promise = null;
-      
-        let handlers: { [key: string]: messageCallbackType[] } = {
-            sent: [],
-            deleted: []
-        };
-        
-        this.clearFolder = function(folder: string): ng.IPromise<void> {
-            var self = this;
+        return this.$q(function(resolve: ng.IQResolveReject<void>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
             
-            return $q(function(resolve: ng.IQResolveReject<void>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
-                
-                $http({
-                    method: 'DELETE',
-                    url: '/api/message',
-                    params: {
-                        folder: folder
-                    }
-                }).then(function() {
-                    
-                    self.trigger('deleted');
-                    
-                    resolve();
-                }, function(response) {
-                    reject(response);
-                });
-            });
-        };
-        
-        this.deleteMessage = function(id: number): ng.IPromise<void> {
-            var self = this;
-            
-            return $q(function(resolve: ng.IQResolveReject<void>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
-                
-                $http({
-                    method: 'DELETE',
-                    url: '/api/message/' + id
-                }).then(function() {
-                    
-                    self.trigger('deleted');
-                    
-                    resolve();
-                }, function(response) {
-                    reject(response);
-                });
-            });
-        };
-        
-        this.getSummary = function(): ng.IPromise<any> {
-            return $q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
-                
-                $http({
-                    method: 'GET',
-                    url: '/api/message/summary'
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    resolve(response.data);
-                }, function(response) {
-                    reject(response);
-                });
-            });
-        };
-        
-        this.getNewCount = function(): ng.IPromise<number> {
-            return $q(function(resolve: ng.IQResolveReject<number>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
-                
-                $http({
-                    method: 'GET',
-                    url: '/api/message/new'
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    resolve(response.data.count);
-                }, function(response) {
-                    reject(response);
-                });
-            });
-        };
-        
-        this.send = function(userId: number, text: string): ng.IPromise<any> {
-            var self = this;
-            
-            return $http({
-                method: 'POST',
+            self.$http({
+                method: 'DELETE',
                 url: '/api/message',
-                data: {
-                    user_id: userId,
-                    text: text
+                params: {
+                    folder: folder
                 }
             }).then(function() {
-                self.trigger('sent');
+                
+                self.trigger('deleted');
+                
+                resolve();
+            }, function(response) {
+                reject(response);
             });
-        };
+        });
+    };
+    
+    public deleteMessage(id: number): ng.IPromise<void> {
+        var self = this;
         
-        this.bind = function(event: string, handler: messageCallbackType) {
-            handlers[event].push(handler);
-        };
+        return this.$q(function(resolve: ng.IQResolveReject<void>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
+            
+            self.$http({
+                method: 'DELETE',
+                url: '/api/message/' + id
+            }).then(function() {
+                
+                self.trigger('deleted');
+                
+                resolve();
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
+            });
+        });
+    };
+    
+    public getSummary(): ng.IPromise<any> {
+        var self = this;
         
-        this.unbind = function(event: string, handler: messageCallbackType) {
-            var index = handlers[event].indexOf(handler);
-            if (index !== -1) {
-                handlers[event].splice(index, 1);
+        return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
+            
+            self.$http({
+                method: 'GET',
+                url: '/api/message/summary'
+            }).then(function(response: ng.IHttpResponse<any>) {
+                resolve(response.data);
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
+            });
+        });
+    };
+    
+    public getNewCount(): ng.IPromise<number> {
+        var self = this;
+      
+        return this.$q(function(resolve: ng.IQResolveReject<number>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
+            
+            self.$http({
+                method: 'GET',
+                url: '/api/message/new'
+            }).then(function(response: ng.IHttpResponse<any>) {
+                resolve(response.data.count);
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
+            });
+        });
+    };
+    
+    public send(userId: number, text: string): ng.IPromise<any> {
+        var self = this;
+        
+        return this.$http({
+            method: 'POST',
+            url: '/api/message',
+            data: {
+                user_id: userId,
+                text: text
             }
-        };
-        
-        this.trigger = function(event: string) {
-            angular.forEach(handlers[event], function(handler) {
-                handler();
-            });
-        };
-    }]);
+        }).then(function() {
+            self.trigger('sent');
+        });
+    };
+    
+    public bind(event: string, handler: messageCallbackType) {
+        this.handlers[event].push(handler);
+    };
+    
+    public unbind(event: string, handler: messageCallbackType) {
+        var index = this.handlers[event].indexOf(handler);
+        if (index !== -1) {
+            this.handlers[event].splice(index, 1);
+        }
+    };
+    
+    public trigger(event: string) {
+        angular.forEach(this.handlers[event], function(handler) {
+            handler();
+        });
+    };
+};
 
-export default SERVICE_NAME;
+angular.module(Module).service(SERVICE_NAME, MessageService);
+

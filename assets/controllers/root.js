@@ -1,14 +1,14 @@
 import angular from 'angular';
 import Module from 'app.module';
-import PageServiceName from 'services/page';
-import MessageServiceName from 'services/message';
+import { PageService } from 'services/page';
+import { MessageService } from 'services/message';
 import 'directives/breadcrumbs';
 import notify from 'notify';
 
 const CONTROLLER_NAME = 'RootController';
 
 angular.module(Module).controller(CONTROLLER_NAME, [
-    '$scope', '$http', '$location', '$translate', '$rootScope', '$state', PageServiceName, MessageServiceName,
+    '$scope', '$http', '$location', '$translate', '$rootScope', '$state', 'PageService', 'MessageService',
     function($scope, $http, $location,  $translate, $rootScope, $state, PageService, MessageService) {
         var that = this;
         

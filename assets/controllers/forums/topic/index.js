@@ -2,8 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
-
-import FORUM_SERVICE_NAME from 'services/forum';
+import { ForumService } from 'services/forum';
 
 const CONTROLLER_NAME = 'ForumsTopicController';
 const STATE_NAME = 'forums-topic';
@@ -21,7 +20,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', '$translate', FORUM_SERVICE_NAME,
+        '$scope', '$http', '$state', '$translate', 'ForumService',
         function($scope, $http, $state, $translate, Forum) {
             var ctrl = this;
             

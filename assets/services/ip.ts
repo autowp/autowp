@@ -3,34 +3,38 @@ import Module from 'app.module';
 
 const SERVICE_NAME = 'IpService';
 
-angular.module(Module)
-    .service(SERVICE_NAME, ['$q', '$http', function($q: ng.IQService, $http: ng.IHttpService) {
-        
-        let hostnames: Map<string, string> = new Map<string, string>();
-        
-        this.getHostByAddr = function(ip: string): ng.IPromise<string> {
-            return $q(function(resolve: ng.IQResolveReject<string>, reject: ng.IQResolveReject<any>) {
-              
-                if (hostnames.has(ip)) {
-                    resolve(hostnames.get(ip));
-                    return;
+export class IpService {
+    static $inject = ['$q', '$http'];
+    private hostnames: Map<string, string> = new Map<string, string>();
+  
+    constructor(
+        private $q: ng.IQService,
+        private $http: ng.IHttpService
+    ){}
+  
+    public getHostByAddr = function(ip: string): ng.IPromise<string> {
+        var self = this;
+        return this.$q(function(resolve: ng.IQResolveReject<string>, reject: ng.IQResolveReject<any>) {
+          
+            if (self.hostnames.has(ip)) {
+                resolve(self.hostnames.get(ip));
+                return;
+            }
+          
+            self.$http({
+                method: 'GET',
+                url: '/api/ip/' + ip,
+                params: {
+                    fields: 'hostname'
                 }
-              
-                $http({
-                    method: 'GET',
-                    url: '/api/ip/' + ip,
-                    params: {
-                        fields: 'hostname'
-                    }
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    hostnames.set(ip, response.data.hostname);
-                    resolve(response.data.hostname);
-                }, function(response: any) {
-                    reject(response);
-                });
+            }).then(function(response: ng.IHttpResponse<any>) {
+                self.hostnames.set(ip, response.data.hostname);
+                resolve(response.data.hostname);
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
             });
-        };
-        
-    }]);
+        });
+    };
+};
 
-export default SERVICE_NAME;
+angular.module(Module).service(SERVICE_NAME, IpService);
