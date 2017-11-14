@@ -9,28 +9,32 @@ function replaceArgs(str: string, args: any) {
     return str;
 }
 
+interface IAutowpBreadcrumbsDirectiveScope extends ng.IScope {
+    items: any[];
+}
+
+
 class AutowpBreadcrumbsDirective implements ng.IDirective {
     restrict = 'E';
     scope = {};
     template = require('./template.html');
-    items: any[] = [];
 
     constructor(private PageService: PageService, private $translate: any) {
     }
 
-    link = (scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
+    link = (scope: IAutowpBreadcrumbsDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
       
         var self = this;
         
         var handler = function() {
             var current = self.PageService.getCurrent();
-            self.items = [];
+            scope.items = [];
             if (current) {
                 var args = self.PageService.getCurrentArgs();
                 self.PageService.getPath(current).then(function(path: any) {
                     angular.forEach(path, function(item: any) {
                         item.url = replaceArgs(item.url, args);
-                        self.items.push(item);
+                        scope.items.push(item);
                         self.$translate('page/' + item.id + '/name').then(function (translation: string) {
                             item.name_translated = replaceArgs(translation, args);
                         });
