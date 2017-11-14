@@ -15,9 +15,9 @@ export class ContentLanguageService {
     public getList() {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
-            if (! self.cache) {
+            if (self.cache) {
                 resolve(self.cache);
-              return;
+                return;
             }
 
             self.$http({
