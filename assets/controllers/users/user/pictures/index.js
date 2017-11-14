@@ -58,6 +58,9 @@ angular.module(Module)
                     }
                 }).then(function(response) {
                     ctrl.brands = response.data.items;
+                    angular.forEach(ctrl.brands, function(item) {
+                        item.cssClass = item.catname.replace(/\./g, '_');
+                    });
                 }, function(response) {
                     notify.response(response);
                 });

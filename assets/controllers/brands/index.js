@@ -41,6 +41,13 @@ angular.module(Module)
                 url: '/api/brands'
             }).then(function(response) {
                 ctrl.items = response.data.items;
+                angular.forEach(ctrl.items, function(line) {
+                    angular.forEach(line, function(info) {
+                        angular.forEach(info.brands, function(item) {
+                            item.cssClass = item.catname.replace(/\./g, '_');
+                        });
+                    });
+                });
                 BrandPopover.apply('.popover-handler');
             }, function(response) {
                 notify.response(response);

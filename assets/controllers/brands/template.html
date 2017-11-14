@@ -6,7 +6,7 @@
     <h2 id="char{{info.id}}" ng-repeat-start="info in line">→ {{info.char}}</h2>
     <div class="brand-icons" ng-repeat-end>
         <div ng-repeat="brand in info.brands">
-            <a ng-href="{{brand.url}}" class="brandicon brandicon-{{brand.catname.replace(/\./g, '_')}}"></a>
+            <a ng-href="{{brand.url}}" class="brandicon brandicon-{{brand.cssClass}}"></a>
             <h4>
                 <a ng-href="{{brand.url}}" ng-bind="brand.name"></a>
                 <small>({{brand.totalCars - brand.newCars}}<span 
