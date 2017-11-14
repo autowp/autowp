@@ -3,12 +3,12 @@ import Module from 'app.module';
 
 const SERVICE_NAME = 'AclService';
 
-type StringBooleanMap = Map<string, boolean>;
-
 export class AclService {
     static $inject = ['$q', '$http'];
-    private isAllowedCache: Map<string, StringBooleanMap> = new Map<string, StringBooleanMap>();
-    private cache: StringBooleanMap = new Map<string, boolean>();
+    private isAllowedCache: Map<string, boolean> = new Map<string, boolean>();
+    private isAllowedPromises: Map<string, ng.IPromise<boolean>> = new Map<string, ng.IPromise<boolean>>();
+    private inheritsRoleCache: Map<string, boolean> = new Map<string, boolean>();
+    private inheritsRolePromises: Map<string, ng.IPromise<boolean>> = new Map<string, ng.IPromise<boolean>>();
   
     constructor(
         private $q: ng.IQService,
@@ -17,10 +17,16 @@ export class AclService {
   
     public inheritsRole(role: string, rejectError?: any): ng.IPromise<boolean> {
         var self = this;
-        return this.$q(function(resolve: ng.IQResolveReject<boolean>, reject: ng.IQResolveReject<any>) {
+      
+        var promise = this.isAllowedPromises.get(role);
+        if (promise) {
+            return promise;
+        }
+      
+        promise = this.$q(function(resolve: ng.IQResolveReject<boolean>, reject: ng.IQResolveReject<any>) {
           
-            if (self.cache.has(role)) {
-                if (self.cache.get(role)) {
+            if (self.inheritsRoleCache.has(role)) {
+                if (self.inheritsRoleCache.get(role)) {
                     resolve(true);
                 } else {
                     reject(rejectError);
@@ -36,40 +42,46 @@ export class AclService {
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
                 let value = response.data[role];
-                self.cache.set(role, value);
+                self.inheritsRoleCache.set(role, value);
+                self.isAllowedPromises.delete(role);
                 if (value) {
                     resolve(true);
                 } else {
                     reject(rejectError);
                 }
             }, function() {
-                self.cache.set(role, false);
+                self.inheritsRoleCache.set(role, false);
+                self.isAllowedPromises.delete(role);
                 reject(rejectError);
             });
         });
+      
+        this.isAllowedPromises.set(role, promise);
+      
+        return promise;
     };
     
     public isAllowed(resource: string, privilege: string, rejectError?: any): ng.IPromise<boolean> {
         var self = this;
-        return this.$q(function(resolve: ng.IQResolveReject<boolean>, reject: ng.IQResolveReject<any>) {
-          
-            var resourcePrivileges = self.isAllowedCache.get(resource);
+      
+        var key = resource + '.' + privilege;
+      
+        var promise = this.inheritsRolePromises.get(key);
+        if (promise) {
+            return promise;
+        }
+      
+        promise = this.$q(function(resolve: ng.IQResolveReject<boolean>, reject: ng.IQResolveReject<any>) {
             
-            var hasCache = resourcePrivileges !== undefined && resourcePrivileges.has(privilege);
-          
-            if (hasCache) {
-                if (resourcePrivileges !== undefined && resourcePrivileges.get(privilege)) {
+            if (self.isAllowedCache.has(key)) {
+                if (self.isAllowedCache.get(key)) {
                     resolve(true);
                 } else {
                     reject(rejectError);
                 }
                 return;
             }
-          
-            if (! self.isAllowedCache.has(resource)) {
-                self.isAllowedCache.set(resource, new Map<string, boolean>());
-            }
-          
+
             self.$http({
                 method: 'GET',
                 url: '/api/acl/is-allowed',
@@ -79,22 +91,24 @@ export class AclService {
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
                 
-                if (resourcePrivileges !== undefined) {
-                    resourcePrivileges.set(privilege, response.data.result);
-                }
+                self.isAllowedCache.set(key, response.data.result);
+                self.isAllowedPromises.delete(key);
                 if (response.data.result) {
                     resolve(true);
                 } else {
                     reject(rejectError);
                 }
             }, function() {
-                if (resourcePrivileges !== undefined) {
-                    resourcePrivileges.set(privilege, false);
-                }
+                self.isAllowedCache.set(key, false);
+                self.isAllowedPromises.delete(key);
                 resolve(false);
             });
            
         });
+      
+        this.inheritsRolePromises.set(key, promise);
+      
+        return promise;
     };
     
 };
