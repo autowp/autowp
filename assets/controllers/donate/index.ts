@@ -43,7 +43,7 @@ export class DonateController {
                 'button-text'               : '01',
                 'comment'                   : 'on',
                 'hint'                      : translations['donate/comment-hint'],
-                'successURL'                : 'https://' + window.location.host + '/donate/success',
+                'successURL'                : 'https://' + window.location.host + '/ng/donate/success',
             }));
         });
     }
