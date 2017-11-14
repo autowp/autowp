@@ -224,8 +224,8 @@ angular.module(Module)
                 }*/
 
                 ctrl.metaLoading++;
-                Acl.isAllowed('car', 'edit_meta').then(function() {
-                    ctrl.canEditMeta = true;
+                Acl.isAllowed('car', 'edit_meta').then(function(allow) {
+                    ctrl.canEditMeta = !!allow;
                     ctrl.metaLoading--;
                 }, function() {
                     ctrl.canEditMeta = false;
@@ -377,8 +377,8 @@ angular.module(Module)
             }
             
             function initLogoTab() {
-                Acl.isAllowed('brand', 'logo').then(function() {
-                    ctrl.canLogo = true;
+                Acl.isAllowed('brand', 'logo').then(function(allow) {
+                    ctrl.canLogo = !!allow;
                 }, function() {
                     ctrl.canLogo = false;
                 });
@@ -466,14 +466,14 @@ angular.module(Module)
                 });
             }
             
-            Acl.isAllowed('specifications', 'edit').then(function() {
-                ctrl.canEditSpecifications = true;
+            Acl.isAllowed('specifications', 'edit').then(function(allow) {
+                ctrl.canEditSpecifications = !!allow;
             }, function() {
                 ctrl.canEditSpecifications = false;
             });
             
-            Acl.isAllowed('car', 'move').then(function() {
-                ctrl.canMove = true;
+            Acl.isAllowed('car', 'move').then(function(allow) {
+                ctrl.canMove = !!allow;
             }, function() {
                 ctrl.canMove = false;
             });

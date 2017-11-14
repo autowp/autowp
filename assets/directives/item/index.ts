@@ -57,8 +57,8 @@ class AutowpItemDirective implements ng.IDirective {
         var self = this;
         
         this.is_moder = false;
-        this.AclService.inheritsRole('moder').then(function() {
-            self.is_moder = true;
+        this.AclService.inheritsRole('moder').then(function(inherits) {
+            self.is_moder = !!inherits;
         }, function() {
             self.is_moder = false;
         });

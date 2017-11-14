@@ -82,15 +82,15 @@ angular.module(Module)
                 });
                 
                 ctrl.canViewIp = false;
-                Acl.isAllowed('user', 'ip').then(function() {
-                    ctrl.canViewIp = true;
+                Acl.isAllowed('user', 'ip').then(function(allow) {
+                    ctrl.canViewIp = !!allow;
                 }, function() {
                     ctrl.canViewIp = false;
                 });
                 
                 ctrl.canBan = false;
-                Acl.isAllowed('user', 'ban').then(function() {
-                    ctrl.canBan = true;
+                Acl.isAllowed('user', 'ban').then(function(allow) {
+                    ctrl.canBan = !!allow;
                 }, function() {
                     ctrl.canBan = false;
                 });
@@ -108,8 +108,8 @@ angular.module(Module)
                 }
                 
                 ctrl.canDeleteUser = false;
-                Acl.isAllowed('user', 'delete').then(function() {
-                    ctrl.canDeleteUser = true;
+                Acl.isAllowed('user', 'delete').then(function(allow) {
+                    ctrl.canDeleteUser = !!allow;
                 }, function() {
                     ctrl.canDeleteUser = false;
                 });

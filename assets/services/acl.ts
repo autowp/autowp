@@ -25,11 +25,12 @@ export class AclService {
       
         promise = this.$q(function(resolve: ng.IQResolveReject<boolean>, reject: ng.IQResolveReject<any>) {
           
-            if (self.inheritsRoleCache.has(role)) {
-                if (self.inheritsRoleCache.get(role)) {
-                    resolve(true);
-                } else {
+            var isInherits = self.inheritsRoleCache.get(role);
+            if (isInherits !== undefined) {
+                if (rejectError && !isInherits) {
                     reject(rejectError);
+                } else {
+                    resolve(isInherits);
                 }
                 return;
             }
@@ -41,18 +42,26 @@ export class AclService {
                     roles: role
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
-                let value = response.data[role];
-                self.inheritsRoleCache.set(role, value);
+                let isInherits = response.data[role];
+                self.inheritsRoleCache.set(role, isInherits);
                 self.isAllowedPromises.delete(role);
-                if (value) {
-                    resolve(true);
-                } else {
+                if (rejectError && !isInherits) {
                     reject(rejectError);
+                } else {
+                    resolve(isInherits);
                 }
-            }, function() {
-                self.inheritsRoleCache.set(role, false);
-                self.isAllowedPromises.delete(role);
-                reject(rejectError);
+            }, function(response: ng.IHttpResponse<any>) {
+                if (response.status == 403) {
+                    self.inheritsRoleCache.set(role, false);
+                    self.isAllowedPromises.delete(role);
+                    if (rejectError) {
+                        reject(rejectError);
+                    } else {
+                        resolve(false);
+                    }
+                } else {
+                    reject(response);
+                }
             });
         });
       
@@ -73,11 +82,12 @@ export class AclService {
       
         promise = this.$q(function(resolve: ng.IQResolveReject<boolean>, reject: ng.IQResolveReject<any>) {
             
-            if (self.isAllowedCache.has(key)) {
-                if (self.isAllowedCache.get(key)) {
-                    resolve(true);
-                } else {
+            var isAllowed = self.isAllowedCache.get(key);
+            if (isAllowed !== undefined) {
+                if (rejectError && !isAllowed) {
                     reject(rejectError);
+                } else {
+                    resolve(isAllowed);
                 }
                 return;
             }
@@ -90,18 +100,28 @@ export class AclService {
                     privilege: privilege
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
+              
+                let isAllowed = response.data.result;
                 
-                self.isAllowedCache.set(key, response.data.result);
+                self.isAllowedCache.set(key, isAllowed);
                 self.isAllowedPromises.delete(key);
-                if (response.data.result) {
-                    resolve(true);
-                } else {
+                if (rejectError && !isAllowed) {
                     reject(rejectError);
+                } else {
+                    resolve(isAllowed);
                 }
-            }, function() {
-                self.isAllowedCache.set(key, false);
+            }, function(response: ng.IHttpResponse<any>) {
                 self.isAllowedPromises.delete(key);
-                resolve(false);
+                if (response.status == 403) {
+                    self.isAllowedCache.set(key, false);
+                    if (rejectError) {
+                        reject(rejectError);
+                    } else {
+                        resolve(false);
+                    }
+                } else {
+                  reject(response);
+                }
             });
            
         });

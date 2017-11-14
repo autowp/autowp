@@ -52,8 +52,8 @@ angular.module(Module)
                     };
                     
                     ctrl.is_moder = false;
-                    Acl.inheritsRole('moder').then(function() {
-                        ctrl.is_moder = true;
+                    Acl.inheritsRole('moder').then(function(isModer) {
+                        ctrl.is_moder = isModer;
                     }, function() {
                         ctrl.is_moder = false;
                     });

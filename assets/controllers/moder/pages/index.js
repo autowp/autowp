@@ -42,8 +42,8 @@ angular.module(Module)
             ctrl.items = [];
             
             ctrl.canManage = false;
-            Acl.isAllowed('hotlinks', 'manage').then(function() {
-                ctrl.canManage = true;
+            Acl.isAllowed('hotlinks', 'manage').then(function(allow) {
+                ctrl.canManage = !!allow;
             }, function() {
                 ctrl.canManage = false;
             });

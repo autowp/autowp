@@ -48,8 +48,8 @@ angular.module(Module)
             ctrl.topics = [];
             
             ctrl.forumAdmin = false;
-            Acl.isAllowed('forums', 'moderate').then(function() {
-                ctrl.forumAdmin = true;
+            Acl.isAllowed('forums', 'moderate').then(function(allow) {
+                ctrl.forumAdmin = !!allow;
             }, function() {
                 ctrl.forumAdmin = false;
             });
