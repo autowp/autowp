@@ -50,6 +50,7 @@ class DonateController extends AbstractActionController
 
     public function successAction()
     {
+        return $this->redirect()->toUrl('/ng/donate/success');
     }
 
     public function vodAction()

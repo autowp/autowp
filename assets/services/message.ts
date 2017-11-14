@@ -8,7 +8,7 @@ interface messageCallbackType { (): void }
 export class MessageService {
     static $inject = ['$q', '$http'];
     private perspectives: any = null;
-    private promise: ng.IPromise<any[]> = null;
+    private promise: ng.IPromise<any[]> | null = null;
   
     private handlers: { [key: string]: messageCallbackType[] } = {
         sent: [],

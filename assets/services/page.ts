@@ -21,7 +21,7 @@ export class PageService {
         private $http: ng.IHttpService
     ){}
   
-    public setCurrent = function(id: number, newArgs: any) {
+    public setCurrent(id: number, newArgs: any) {
         if (this.current != id || !angular.equals(this.args, newArgs)) {
             this.current = id;
             this.args = newArgs;
@@ -29,15 +29,15 @@ export class PageService {
         }
     };
     
-    public getCurrent = function(): number {
+    public getCurrent(): number {
         return this.current;
     };
     
-    public getCurrentArgs = function(): any {
+    public getCurrentArgs(): any {
         return this.args;
     };
     
-    public isActive = function(id: number): ng.IPromise<boolean> {
+    public isActive(id: number): ng.IPromise<boolean> {
         return this.isDescendant(this.current, id);
     };
     
@@ -85,7 +85,7 @@ export class PageService {
         return promise;
     }
     
-    public isDescendant = function(id: number, parentId: number): ng.IPromise<boolean> {
+    public isDescendant(id: number, parentId: number): ng.IPromise<boolean> {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
             self.loadTree(id).then(function() {
@@ -103,7 +103,7 @@ export class PageService {
         });
     };
     
-    public getPath = function(id: number) {
+    public getPath(id: number) {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
             self.loadTree(id).then(function() {
@@ -127,18 +127,18 @@ export class PageService {
         });
     };
     
-    public bind = function(event: string, handler: pageCallbackType) {
+    public bind(event: string, handler: pageCallbackType) {
         this.handlers[event].push(handler);
     };
     
-    public unbind = function(event: string, handler: pageCallbackType) {
+    public unbind(event: string, handler: pageCallbackType) {
         var index = this.handlers[event].indexOf(handler);
         if (index !== -1) {
             this.handlers[event].splice(index, 1);
         }
     };
     
-    public trigger = function(event: string) {
+    public trigger(event: string) {
         angular.forEach(this.handlers[event], function(handler) {
             handler();
         });

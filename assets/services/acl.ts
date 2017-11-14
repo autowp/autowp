@@ -15,7 +15,7 @@ export class AclService {
         private $http: ng.IHttpService
     ){}
   
-    public inheritsRole = function(role: string, rejectError?: any): ng.IPromise<boolean> {
+    public inheritsRole(role: string, rejectError?: any): ng.IPromise<boolean> {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<boolean>, reject: ng.IQResolveReject<any>) {
           
@@ -49,14 +49,16 @@ export class AclService {
         });
     };
     
-    public isAllowed = function(resource: string, privilege: string, rejectError?: any): ng.IPromise<boolean> {
+    public isAllowed(resource: string, privilege: string, rejectError?: any): ng.IPromise<boolean> {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<boolean>, reject: ng.IQResolveReject<any>) {
+          
+            var resourcePrivileges = self.isAllowedCache.get(resource);
             
-            var hasCache = self.isAllowedCache.has(resource) && self.isAllowedCache.get(resource).has(privilege);
+            var hasCache = resourcePrivileges !== undefined && resourcePrivileges.has(privilege);
           
             if (hasCache) {
-                if (self.isAllowedCache.get(resource).get(privilege)) {
+                if (resourcePrivileges !== undefined && resourcePrivileges.get(privilege)) {
                     resolve(true);
                 } else {
                     reject(rejectError);
@@ -67,7 +69,7 @@ export class AclService {
             if (! self.isAllowedCache.has(resource)) {
                 self.isAllowedCache.set(resource, new Map<string, boolean>());
             }
-            
+          
             self.$http({
                 method: 'GET',
                 url: '/api/acl/is-allowed',
@@ -76,14 +78,19 @@ export class AclService {
                     privilege: privilege
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
-                self.isAllowedCache.get(resource).set(privilege, response.data.result);
+                
+                if (resourcePrivileges !== undefined) {
+                    resourcePrivileges.set(privilege, response.data.result);
+                }
                 if (response.data.result) {
                     resolve(true);
                 } else {
                     reject(rejectError);
                 }
             }, function() {
-                self.isAllowedCache.get(resource).set(privilege, false);
+                if (resourcePrivileges !== undefined) {
+                    resourcePrivileges.set(privilege, false);
+                }
                 resolve(false);
             });
            

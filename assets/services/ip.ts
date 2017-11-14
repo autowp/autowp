@@ -12,12 +12,13 @@ export class IpService {
         private $http: ng.IHttpService
     ){}
   
-    public getHostByAddr = function(ip: string): ng.IPromise<string> {
+    public getHostByAddr(ip: string): ng.IPromise<string> {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<string>, reject: ng.IQResolveReject<any>) {
           
-            if (self.hostnames.has(ip)) {
-                resolve(self.hostnames.get(ip));
+            var hostname = self.hostnames.get(ip)
+            if (hostname !== undefined) {
+                resolve(hostname);
                 return;
             }
           

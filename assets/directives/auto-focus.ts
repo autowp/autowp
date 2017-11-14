@@ -1,17 +1,13 @@
 import * as angular from "angular";
 import Module from 'app.module';
 
-interface IAutoFocusDirectiveScope extends ng.IScope {
-    $timeout: ng.ITimeoutService;
-}
-
 class AutoFocusDirective implements ng.IDirective {
     restrict = 'AC';
 
     constructor(private $timeout: ng.ITimeoutService) {
     }
 
-    link = (scope: IAutoFocusDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
+    link = (scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
         this.$timeout(function() {
             element[0].focus();
         }, 0);

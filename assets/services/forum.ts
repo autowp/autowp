@@ -7,7 +7,7 @@ const LIMIT = 20;
 
 export class ForumService {
     static $inject = ['$q', '$http'];
-    private promise: ng.IPromise<any> = null;
+    private promise: ng.IPromise<any> | null = null;
   
     constructor(
         private $q: ng.IQService,

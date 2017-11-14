@@ -16,8 +16,9 @@ export class UserService {
   
     public getUser(id: number): ng.IPromise<any> {
         
-        if (this.promises.has(id)) {
-            return this.promises.get(id);
+        let oldPromise = this.promises.get(id);
+        if (oldPromise !== undefined) {
+            return oldPromise;
         }
       
         var self = this;

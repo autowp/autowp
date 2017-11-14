@@ -17,8 +17,10 @@ class AutowpUserDirective implements ng.IDirective {
     constructor() {
     }
 
-    link = (scope: IUserDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
-    }
+    link = (
+        scope: IUserDirectiveScope, 
+        element: JQLite, 
+        attrs: ng.IAttributes): void => { }
 
     static factory(): ng.IDirectiveFactory {
         const directive = () => new AutowpUserDirective();

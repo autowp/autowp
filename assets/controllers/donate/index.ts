@@ -3,6 +3,7 @@ import Module from 'app.module';
 import { IAutowpControllerScope } from 'declarations.d.ts';
 
 import './log';
+import './success';
 
 const CONTROLLER_NAME = 'DonateController';
 const STATE_NAME = 'donate';

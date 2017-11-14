@@ -5,7 +5,8 @@ const SERVICE_NAME = 'SpecService';
 
 export class SpecService {
     static $inject = ['$q', '$http'];
-    private types: any[] = null;
+    private types: any[];
+    private typesInitialized: boolean = false;
   
     constructor(
         private $q: ng.IQService,
@@ -15,7 +16,7 @@ export class SpecService {
     public getSpecs(): ng.IPromise<any> {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
-            if (self.types !== null) {
+            if (self.typesInitialized) {
                 resolve(self.types);
                 return;
             }
@@ -24,6 +25,7 @@ export class SpecService {
                 url: '/go-api/spec'
             }).then(function(response: ng.IHttpResponse<any>) {
                 self.types = response.data.items;
+                self.typesInitialized = true;
                 resolve(self.types);
             }, function() {
                 reject();
@@ -39,7 +41,7 @@ export class SpecService {
                 if (spec) {
                     resolve(spec);
                 } else {
-                    reject(null);
+                    reject();
                 }
             }, reject);
         });

@@ -5,7 +5,8 @@ const SERVICE_NAME = 'PictureModerVoteTemplateService';
 
 export class PictureModerVoteTemplateService {
     static $inject = ['$q', '$http'];
-    private templates: any[] = null;
+    private templates: any[];
+    private templatesInitialized: boolean = false;
   
     constructor(
         private $q: ng.IQService,
@@ -15,19 +16,21 @@ export class PictureModerVoteTemplateService {
     public getTemplates(): ng.IPromise<any[]> {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
-            if (self.templates === null) {
-                self.$http({
-                    method: 'GET',
-                    url: '/api/picture-moder-vote-template'
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    self.templates = response.data.items;
-                    resolve(self.templates);
-                }, function() {
-                    reject();
-                });
-            } else {
+            if (self.templatesInitialized) {
                 resolve(self.templates);
+                return;
             }
+          
+            self.$http({
+                method: 'GET',
+                url: '/api/picture-moder-vote-template'
+            }).then(function(response: ng.IHttpResponse<any>) {
+                self.templates = response.data.items;
+                self.templatesInitialized = true;
+                resolve(self.templates);
+            }, function() {
+                reject();
+            });
         });
     };
   
@@ -70,7 +73,7 @@ export class PictureModerVoteTemplateService {
                     self.templates.push(response.data);
                     resolve(response.data);
                 }, function() {
-                    reject(null);
+                    reject();
                 });
             }, function() {
                 reject();

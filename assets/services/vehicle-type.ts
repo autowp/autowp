@@ -5,7 +5,8 @@ const SERVICE_NAME = 'VehicleTypeService';
 
 export class VehicleTypeService {
     static $inject = ['$q', '$http', '$translate'];
-    private types: any[] = null;
+    private types: any[];
+    private typesInititalized: boolean = false;
   
     constructor(
         private $q: ng.IQService,
@@ -38,26 +39,27 @@ export class VehicleTypeService {
     public getTypes() {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
-            if (self.types === null) {
-                self.$http({
-                    method: 'GET',
-                    url: '/api/vehicle-types'
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    self.types = response.data.items;
-                    var names = self.collectNames(self.types);
-                    
-                    self.$translate(names).then(function (translations: any) {
-                        self.applyTranslations(self.types, translations);
-                        resolve(self.types);
-                    }, function () {
-                        reject();
-                    });
-                }, function() {
+            if (self.typesInititalized) {
+                resolve(self.types);
+                return;
+            }
+            self.$http({
+                method: 'GET',
+                url: '/api/vehicle-types'
+            }).then(function(response: ng.IHttpResponse<any>) {
+                self.types = response.data.items;
+                var names = self.collectNames(self.types);
+                
+                self.$translate(names).then(function (translations: any) {
+                    self.applyTranslations(self.types, translations);
+                    self.typesInititalized = true;
+                    resolve(self.types);
+                }, function () {
                     reject();
                 });
-            } else {
-                resolve(self.types);
-            }
+            }, function() {
+                reject();
+            });
         });
     };
     
