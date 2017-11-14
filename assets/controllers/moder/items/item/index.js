@@ -371,7 +371,6 @@ angular.module(Module)
                         });
                     });
                     ctrl.languagesLoading--;
-                    console.log('ctrl.languagesLoading--');
                 }, function() {
                     ctrl.languagesLoading--;
                 });
