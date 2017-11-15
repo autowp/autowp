@@ -10,7 +10,7 @@ const CONTROLLER_NAME = 'MostsController';
 const STATE_NAME = 'mosts';
 
 class MostsController {
-    static $inject = ['$scope', '$http', '$state', 'MostsService', '$translate'];
+    static $inject = ['$scope', '$http', '$state', 'MostsService', '$translate', '$timeout'];
     public items: any[];
     public years: any[];
     public ratings: any[];
@@ -26,7 +26,8 @@ class MostsController {
         private $http: ng.IHttpService,
         private $state: any,
         private MostsService: MostsService,
-        private $translate: ng.translate.ITranslateService
+        private $translate: ng.translate.ITranslateService,
+        private $timeout: ng.ITimeoutService
     ) {
         this.ratingCatname = this.$state.params.rating_catname;
         this.typeCatname = this.$state.params.type_catname;
@@ -81,15 +82,19 @@ class MostsController {
                     });
                 }
             } else {
-                console.log('zzz');
                 self.$translate(ratingName).then(function (translation: string) {
-                    console.log(translation);
                     self.initPageEnv(154, {
                         MOST_CATNAME: self.ratingCatname,
                         MOST_NAME: translation
                     });
                 });
             }
+          
+            self.$timeout(function() {
+                $('small.unit').tooltip({
+                    placement: 'bottom'
+                });
+            });
           
             self.loading--;
           
@@ -113,10 +118,6 @@ class MostsController {
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
             self.loading--;
-        });
-      
-        $('small.unit').tooltip({
-            placement: 'bottom'
         });
     }
   
