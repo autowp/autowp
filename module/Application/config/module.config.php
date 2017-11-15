@@ -49,7 +49,6 @@ return [
             Controller\FactoriesController::class       => Controller\Frontend\Service\FactoriesControllerFactory::class,
             Controller\IndexController::class           => Controller\Frontend\Service\IndexControllerFactory::class,
             Controller\InboxController::class           => InvokableFactory::class,
-            Controller\MostsController::class           => Controller\Frontend\Service\MostsControllerFactory::class,
             Controller\PictureController::class         => Controller\Frontend\PictureControllerFactory::class,
             Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,
             Controller\TelegramController::class        => Controller\Frontend\Service\TelegramControllerFactory::class,

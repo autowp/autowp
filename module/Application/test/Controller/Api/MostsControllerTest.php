@@ -1,11 +1,11 @@
 <?php
 
-namespace ApplicationTest\Controller\Frontend;
+namespace ApplicationTest\Controller\Api;
 
 use Zend\Http\Request;
 use Application\Test\AbstractHttpControllerTestCase;
 
-use Application\Controller\MostsController;
+use Application\Controller\Api\MostsController;
 
 class MostsControllerTest extends AbstractHttpControllerTestCase
 {
@@ -13,23 +13,26 @@ class MostsControllerTest extends AbstractHttpControllerTestCase
 
     public function testIndex()
     {
-        $this->dispatch('https://www.autowp.ru/mosts', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/mosts/menu', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(MostsController::class);
-        $this->assertMatchedRouteName('mosts');
-        $this->assertActionName('index');
+        $this->assertMatchedRouteName('api/mosts/menu/get');
+        $this->assertActionName('get-menu');
     }
 
     public function testVehicleType()
     {
-        $this->dispatch('https://www.autowp.ru/mosts/fastest/car', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/mosts/items', Request::METHOD_GET, [
+            'rating_catname' => 'fastest',
+            'type_catname'   => 'car'
+        ]);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(MostsController::class);
-        $this->assertMatchedRouteName('mosts');
-        $this->assertActionName('index');
+        $this->assertMatchedRouteName('api/mosts/items/get');
+        $this->assertActionName('get-items');
     }
 }

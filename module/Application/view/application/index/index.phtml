@@ -64,7 +64,7 @@ html {
 
         <div class="row">
             <div class="col-md-6">
-                <h4><?=$this->escapeHtml($this->page(21)->name) ?> <small><?=$this->htmlA('/mosts', $this->translate('all-link'))?></small></h4>
+                <h4><?=$this->escapeHtml($this->page(21)->name) ?> <small><?=$this->htmlA('/ng/mosts', $this->translate('all-link'))?></small></h4>
                 <p>
                     <?php foreach ($this->mosts as $url => $name) { ?>
                         <?=$this->htmlA($url, $this->translate($name)) ?>,

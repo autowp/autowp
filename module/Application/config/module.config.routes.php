@@ -354,16 +354,6 @@ return [
                     ]
                 ]
             ],
-            'mosts' => [
-                'type' => 'Segment',
-                'options' => [
-                    'route'    => '/mosts[/:most_catname][/:shape_catname][/:years_catname]',
-                    'defaults' => [
-                        'controller' => Controller\MostsController::class,
-                        'action'     => 'index'
-                    ]
-                ]
-            ],
             'picture' => [
                 'type' => 'Literal',
                 'options' => [

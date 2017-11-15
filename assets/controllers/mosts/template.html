@@ -57,7 +57,7 @@
                 <h3>
                     <span ng-if="item.value_html" ng-bind-html="item.value_html"></span>
                     <span ng-if="!item.value_html && item.value_text" ng-bind-html="item.value_text"></span>
-                    <small class="unit" translate-attr="{title: item.unit.name|translate}" ng-if="item.unit" ng-bind="item.unit.abbr | translate"></small>
+                    <small class="unit" translate-attr="{title: item.unit.name}" ng-if="item.unit" ng-bind="item.unit.abbr | translate"></small>
                 </h3>
             </div>
         </div>
