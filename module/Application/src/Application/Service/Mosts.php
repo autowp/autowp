@@ -478,7 +478,7 @@ class Mosts
         return $this->perspectiveGroups;
     }
 
-    private function getCarTypes(int $brandId)
+    public function getCarTypes(int $brandId)
     {
         $carTypes = [];
         foreach ($this->vehicleType->getRows(0, $brandId) as $row) {
@@ -616,6 +616,7 @@ class Mosts
         foreach ($data['cars'] as &$car) {
             $car['pictures'] = $this->getOrientedPictureList($car['car']['id'], $g);
         }
+        unset($car);
 
         return $data;
     }
@@ -759,36 +760,98 @@ class Mosts
             'carTypes' => $sidebarCarTypes
         ];
 
-        $yearsMenu = [];
-        foreach ($years as $id => $year) {
-            $yearsMenu[] = [
-                'active' => ! is_null($yearId) && ($id == $yearId),
-                'name'   => $year['name'],
-                'params' => [
-                    'most_catname'  => $cMost['catName'],
-                    'shape_catname' => $carTypeCatname ? $carTypeCatname : 'car',
-                    'years_catname' => $year['folder']
-                ]
-            ];
-        }
-        $yearsMenu[] = [
-            'active' => is_null($yearId),
-            'name'   => 'mosts/period/all-time',
-            'params' => [
-                'most_catname'  => $cMost['catName'],
-                'shape_catname' => $carTypeCatname ? $carTypeCatname : null,
-                'years_catname' => null
-            ]
-        ];
+
 
         return [
             'carList'  => $data,
             'carType'  => $carTypeData,
-            'years'    => $yearsMenu,
             'cYear'    => $cYear,
             'yearId'   => $yearId,
             'cMost'    => $cMost,
             'sidebar'  => $sidebar
         ];
+    }
+
+    public function getYearsMenu(): array
+    {
+        $yearsMenu = [];
+        foreach ($this->getYears() as $year) {
+            $yearsMenu[] = [
+                'name'    => $year['name'],
+                'catname' => $year['folder']
+            ];
+        }
+        $yearsMenu[] = [
+            'name'    => 'mosts/period/all-time',
+            'catname' => null
+        ];
+
+        return $yearsMenu;
+    }
+
+    public function getRatingsMenu(): array
+    {
+        $result = [];
+        foreach ($this->getRatings() as $most) {
+            $result[] = [
+                'name'    => 'most/' . $most['catName'],
+                'catname' => $most['catName']
+            ];
+        }
+
+        return $result;
+    }
+
+    public function getItems(array $options)
+    {
+        $defaults = [
+            'language' => null,
+            'most'     => null,
+            'years'    => null,
+            'carType'  => null,
+            'brandId'  => null
+        ];
+
+        $options = array_replace($defaults, $options);
+
+        $language = $options['language'];
+        if (! $language) {
+            throw new Exception('Language not provided');
+        }
+
+        $mostCatname = $options['most'];
+        $yearsCatname = $options['years'];
+        $carTypeCatname = $options['carType'];
+        $brandId = (int)$options['brandId'];
+
+        $ratings = $this->getRatings();
+
+        $mostId = 0;
+        foreach ($ratings as $id => $most) {
+            if ($mostCatname == $most['catName']) {
+                $mostId = $id;
+                break;
+            }
+        }
+
+        $carType = null;
+        if ($carTypeCatname) {
+            $carType = $this->vehicleType->getRowByCatname($carTypeCatname);
+        }
+
+        $years = $this->getYears();
+
+        $yearId = null;
+        foreach ($years as $id => $year) {
+            if ($yearsCatname == $year['folder']) {
+                $yearId = $id;
+                break;
+            }
+        }
+
+        $cMost = $ratings[$mostId];
+        $cYear = is_null($yearId) ? null : $years[$yearId];
+
+        return $this->getCarsData($cMost, $carType ? $carType['id'] : 0, $cYear, $brandId, $language);
     }
 }

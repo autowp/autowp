@@ -57,6 +57,7 @@ return [
             Controller\Api\LoginController::class           => Controller\Api\LoginControllerFactory::class,
             Controller\Api\MapController::class             => Controller\Api\MapControllerFactory::class,
             Controller\Api\MessageController::class         => Controller\Api\MessageControllerFactory::class,
+            Controller\Api\MostsController::class           => Controller\Api\MostsControllerFactory::class,
             Controller\Api\NewController::class             => Controller\Api\NewControllerFactory::class,
             Controller\Api\PageController::class            => Controller\Api\Service\PageControllerFactory::class,
             Controller\Api\PerspectiveController::class     => Controller\Api\Service\PerspectiveControllerFactory::class,
@@ -1424,6 +1425,54 @@ return [
                                     ],
                                 ],
                             ],
+                        ]
+                    ],
+                    'mosts' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route' => '/mosts',
+                            'defaults' => [
+                                'controller' => Controller\Api\MostsController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'menu' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/menu'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'get-menu'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'items' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/items'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'get-items'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
                         ]
                     ],
                     'new' => [

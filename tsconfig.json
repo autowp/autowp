@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "noStrictGenericChecks": true,
+    "noStrictGenericChecks": false,
     "outDir": "./dist/",
     "module": "es6",
     "target": "es5",

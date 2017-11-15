@@ -30,6 +30,7 @@ import './controllers/login';
 import './controllers/map';
 import './controllers/mascots';
 import './controllers/museum';
+import './controllers/mosts';
 import './controllers/new';
 import './controllers/persons';
 import './controllers/pulse';

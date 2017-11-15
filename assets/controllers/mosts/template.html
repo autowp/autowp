@@ -1,0 +1,61 @@
+<div class="row">
+    <div class="col-sm-4">
+        <div class="well">
+            <ul class="nav nav-pills nav-stacked">
+                <li class="nav-header">
+                    <h3 translate>mosts/sidebar/mostly…</h3>
+                </li>
+                <li ng-repeat="rating in ctrl.ratings" ng-class="{active: rating.catname == ctrl.ratingCatname}">
+                    <a ui-sref=".({rating_catname: rating.catname})" ng-bind="rating.name|translate"></a>
+                </li>
+                <li class="nav-header">
+                    <h3 translate>mosts/sidebar/between…</h3>
+                </li>
+                <li ng-repeat="type in ctrl.vehilceTypes" ng-class="{active: type.catname == ctrl.typeCatname}">
+                    <a ui-sref=".({type_catname: type.catname})" ng-bind="type.name|translate"></a>
+                    <ul class="nav nav-pills nav-stacked" ng-if="type.childs.length > 0">
+                        <li ng-repeat="child in type.childs" ng-class="{active: child.catname == ctrl.typeCatname}">
+                            <a ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: child.catname})" ng-bind="child.name|translate"></a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-sm-8">
+        <ul class="nav nav-pills">
+            <li ng-repeat="year in ctrl.years" ng-class="{active: year.catname ? year.catname == ctrl.yearsCatname : !ctrl.yearsCatname}">
+                <a ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: ctrl.typeCatname, years_catname: year.catname})" ng-bind="year.name|translate"></a>
+            </li>
+        </ul>
+        
+        <div class="row" ng-repeat-start="item in ctrl.items">
+            <div class="col-md-9">
+                <h3 ng-bind-html="item.item.name_html"></h3>
+            </div>
+            <div class="col-md-3">
+                <h3 ng-bind="'most/' + ctrl.ratingCatname + '/param' | translate" ng-if="$first"></h3>
+            </div>
+        </div>
+        <div class="row" ng-repeat-end>
+            <div class="col-md-9">
+                <div class="row thumbnails">
+                    <div class="col-md-4" ng-repeat="picture in item.pictures">
+                        <a ng-href="{{picture.url}}" class="thumbnail" ng-if="picture">
+                            <img ng-src="{{picture.src}}" alt="{{picture.name}}" title="{{picture.name}}" />
+                        </a>
+                        <span ng-if="!picture">&#xa0;</span>
+                    </div>
+                </div>
+                <div ng-if="item.item.description" btf-markdown="item.item.description|translate"></div>
+            </div>
+            <div class="col-md-3">
+                <h3>
+                    <span ng-if="item.value_html" ng-bind-html="item.value_html"></span>
+                    <span ng-if="!item.value_html && item.value_text" ng-bind-html="item.value_text"></span>
+                    <small class="unit" translate-attr="{title: item.unit.name|translate}" ng-if="item.unit" ng-bind="item.unit.abbr | translate"></small>
+                </h3>
+            </div>
+        </div>
+    </div>
+</div>
