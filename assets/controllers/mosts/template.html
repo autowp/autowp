@@ -29,6 +29,10 @@
             </li>
         </ul>
         
+        <span ng-show="ctrl.loading > 0">
+            <i class="fa fa-spinner fa-spin fa-fw"></i>
+        </span>
+        
         <div class="row" ng-repeat-start="item in ctrl.items">
             <div class="col-md-9">
                 <h3 ng-bind-html="item.item.name_html"></h3>

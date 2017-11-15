@@ -760,11 +760,32 @@ class Mosts
             'carTypes' => $sidebarCarTypes
         ];
 
-
+        $yearsMenu = [];
+        foreach ($years as $id => $year) {
+            $yearsMenu[] = [
+                'active' => ! is_null($yearId) && ($id == $yearId),
+                'name'   => $year['name'],
+                'params' => [
+                    'most_catname'  => $cMost['catName'],
+                    'shape_catname' => $carTypeCatname ? $carTypeCatname : 'car',
+                    'years_catname' => $year['folder']
+                ]
+            ];
+        }
+        $yearsMenu[] = [
+            'active' => is_null($yearId),
+            'name'   => 'mosts/period/all-time',
+            'params' => [
+                'most_catname'  => $cMost['catName'],
+                'shape_catname' => $carTypeCatname ? $carTypeCatname : null,
+                'years_catname' => null
+            ]
+        ];
 
         return [
             'carList'  => $data,
             'carType'  => $carTypeData,
+            'years'    => $yearsMenu,
             'cYear'    => $cYear,
             'yearId'   => $yearId,
             'cMost'    => $cMost,
