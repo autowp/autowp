@@ -58,9 +58,9 @@ class MostsController extends AbstractActionController
         $user = $this->user()->get();
 
         $language = $this->language();
-        $yearsCatname = $this->params()->fromQuery('years_catname');
-        $carTypeCatname = $this->params()->fromQuery('type_catname');
-        $mostCatname = $this->params()->fromQuery('most_catname');
+        $yearsCatname = (string)$this->params()->fromQuery('years_catname');
+        $carTypeCatname = (string)$this->params()->fromQuery('type_catname');
+        $mostCatname = (string)$this->params()->fromQuery('rating_catname');
 
         $list = $this->mosts->getItems([
             'language' => $language,
