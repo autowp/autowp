@@ -8,20 +8,21 @@ interface IAutowpItemDirectiveScope extends ng.IScope {
     item: any;
 }
 
-class AutowpItemDirective implements ng.IDirective {
-    restrict = 'E';
-    scope = {
-        item: '=',
-        disableTitle: '=',
-        disableDescription: '=',
-        disableDetailsLink: '='
-    };
-    template = require('./template.html');
-    public is_moder: boolean;
+class AutowpItemController {
 
-    constructor(private AclService: AclService) {
+    public is_moder: boolean = false;
+
+    static $inject = ['$scope', 'AclService'];
+    constructor(protected $scope: IAutowpItemDirectiveScope, private AclService: AclService) {
+        var self = this;
+        
+        this.AclService.inheritsRole('moder').then(function(inherits) {
+            self.is_moder = !!inherits;
+        }, function() {
+            self.is_moder = false;
+        });
     }
-  
+
     public havePhoto(item: any) {
         var found = false;
         angular.forEach(item.preview_pictures, function(picture: any) {
@@ -51,21 +52,23 @@ class AutowpItemDirective implements ng.IDirective {
         
         return classes;
     };
+}
 
-    link = (scope: IAutowpItemDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
-      
-        var self = this;
-        
-        this.is_moder = false;
-        this.AclService.inheritsRole('moder').then(function(inherits) {
-            self.is_moder = !!inherits;
-        }, function() {
-            self.is_moder = false;
-        });
-    }
+class AutowpItemDirective implements ng.IDirective {
+    public controllerAs = 'ctrl';
+    public restrict = 'E';
+    public scope = {
+        item: '=',
+        disableTitle: '=',
+        disableDescription: '=',
+        disableDetailsLink: '='
+    };
+    public template = require('./template.html');
+    public controller = AutowpItemController;
+    public bindToController: true;
 
     static factory(): ng.IDirectiveFactory {
-        const directive = (AclService: AclService) => new AutowpItemDirective(AclService);
+        const directive = () => new AutowpItemDirective();
         directive.$inject = ['AclService'];
         return directive;
     }
