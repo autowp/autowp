@@ -4,6 +4,7 @@ import { IAutowpControllerScope } from 'declarations.d.ts';
 
 import './log';
 import './success';
+//import './vod';
 
 const CONTROLLER_NAME = 'DonateController';
 const STATE_NAME = 'donate';
@@ -21,7 +22,7 @@ export class DonateController {
         this.$scope.pageEnv({
             layout: {
                 blankPage: false,
-                needRight: false
+                needRight: true
             },
             name: 'page/196/name',
             pageId: 196

@@ -1,0 +1,110 @@
+<?php
+$dateFormatter = new IntlDateFormatter($this->language(), IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+?>
+<div btf-markdown="'donate/vod/text'|translate"></div>
+
+<h1 translate>donate/vod/select-date</h1>
+<div class="well">
+    <ul>
+        <li ng-repeat="date in ctrl.dates">
+            <span ng-if="date.free">
+                <span ng-if="date.value == ctrl.selectedDate">
+                    <strong ng-bind="date.name"></strong>
+                    <span class="fa fa-check"></span>
+                </span>
+                <span ng-if="date.value != ctrl.selectedDate">
+                    <a href="#" ng-click="ctrl.selectDate(date.value)" ng-bind="date.name"></a>
+                </span>
+            </span>
+            
+            <span ng-if="!date.free">
+                <span class="muted" ng-bind="date.name"></span> 
+                ({{'donate/vod/date-busy'|translate}})
+            </span>
+        </li>
+    </ul>
+</div>
+
+<h1 translate>donate/vod/select-item</h1>
+<div class="well">
+
+    <div btf-markdown="'donate/vod/select-item-text'|translate"></div>
+
+    <p ng-if="ctrl.selectedItem">
+        {{'donate/vod/select-item/selection:'|translate}}
+        <strong><?=$this->car()->htmlTitle($this->selectedItemNameData, $this->language()) ?></strong>
+    </p>
+
+    <?=$this->htmlA([
+        'href'  => $this->url('donate/vod/select-item/params', [
+            'date' => $this->selectedDate ? $this->selectedDate : null
+        ]),
+        'class' => 'btn btn-primary btn-lg'
+    ], $this->translate('donate/vod/select-item/select'))?>
+</div>
+
+<h1 translate>donate/vod/preview</h1>
+
+<div class="well">
+    <div class="form-group">
+        <div class="btn-group">
+            <a ui-sref=".({anonymous: '1'})" class="btn btn-default" ng-class="{active: ctrl.anonymous}" translate>donate/vod/anonymous</a>
+            <a ui-sref=".({anonymous: '0'})" class="btn btn-default" ng-class="{active: !ctrl.anonymous, disabled: !ctrl.userId}" translate>donate/vod/with-name</a>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-if="ctrl.itemOfDay"><div class="col-sm-9">
+    <?=$this->partial('application/index/partial/item-of-day', [
+        'itemOfDay' => $this->itemOfDay
+    ])?>
+</div></div>
+
+<h1 translate>donate/vod/make-donation</h1>
+
+<div class="well">
+    <form method="post" action="https://money.yandex.ru/quickpay/confirm.xml">
+        <div ng-if="ctrl.selectedDate && ctrl.selectedItem">
+            <input type="hidden" ng-repeat="(key, value) in ctrl.formParams" name="{{key}}" value="{{value}}" />
+            <div class="form-group">
+                <textarea name="comment" translate-attr="{placeholder: 'donate/vod/message'}" class="form-control" maxlength="200"></textarea>
+            </div>
+        </div>
+        <p>
+            {{'donate/vod/price:'|translate}}
+            <strong>{{ctrl.sum}}{{'donate/vod/price/currency'|translate}}</strong>
+            (<?=$this->escapeHtml(sprintf($this->translate('donate/vod/price-aroud'), round($this->sum / 59.70, 2)))?>)
+        </p>
+        <?php if ($this->selectedDate && $this->selectedItem) { ?>
+            <div class="form-group">
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-default active">
+                        <input type="radio" name="paymentType" value="AC" autocomplete="off" checked>
+                        <span class="fa fa-credit-card"></span>
+                        {{'donate/vod/method/credit-card'|translate}}
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="radio" name="paymentType" value="MC" autocomplete="off">
+                        <span class="fa fa-mobile"></span>
+                        {{'donate/vod/method/mobile'|translate}}
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="radio" name="paymentType" value="PC" autocomplete="off">
+                        {{'donate/vod/method/yandex.money'|translate}}
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" translate>donate/vod/send</button>
+        <?php } else { ?>
+            <button class="btn btn-default" disabled>
+                <span class="fa fa-credit-card"></span>
+                {{'donate/vod/method/credit-card'|translate}}
+            </button>
+            <button class="btn btn-default" disabled>
+                <span class="fa fa-mobile"></span>
+                {{'donate/vod/method/mobile'|translate}}
+            </button>
+            <button class="btn btn-default" disabled translate>donate/vod/method/yandex.money</button>
+        <?php } ?>
+    </form>
+</div>

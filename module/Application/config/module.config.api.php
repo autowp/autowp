@@ -41,6 +41,7 @@ return [
             Controller\Api\CommentController::class         => Controller\Api\CommentControllerFactory::class,
             Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
             Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
+            Controller\Api\DonateController::class          => Controller\Api\DonateControllerFactory::class,
             Controller\Api\FeedbackController::class        => Controller\Api\FeedbackControllerFactory::class,
             Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
             Controller\Api\HotlinksController::class        => InvokableFactory::class,
@@ -533,6 +534,36 @@ return [
                                     ]
                                 ]
                             ],
+                        ]
+                    ],
+                    'donate' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/donate',
+                            'defaults' => [
+                                'controller' => Controller\Api\DonateController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'vod' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/vod',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'get-vod'
+                                            ],
+                                        ],
+                                    ],
+                                ]
+                            ]
                         ]
                     ],
                     'feedback' => [
