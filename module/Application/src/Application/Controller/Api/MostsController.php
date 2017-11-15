@@ -3,7 +3,6 @@
 namespace Application\Controller\Api;
 
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 
 use Autowp\TextStorage;
@@ -96,6 +95,14 @@ class MostsController extends AbstractActionController
             'user_id'  => $user ? $user['id'] : null
         ]);
 
+        $unit = null;
+        if (isset($list['unit'])) {
+            $unit = [
+                'abbr' => $list['unit']['abbr'],
+                'name' => $list['unit']['name'],
+            ];
+        }
+
         $idx = 0;
         $result = [];
         foreach ($list['cars'] as $car) {
@@ -129,14 +136,6 @@ class MostsController extends AbstractActionController
                 } else {
                     $pictures[] = null;
                 }
-            }
-
-            $unit = null;
-            if (isset($car['unit'])) {
-                $unit = [
-                    'abbr' => $car['unit']['abbr'],
-                    'name' => $car['unit']['name'],
-                ];
             }
 
             $result[] = [

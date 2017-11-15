@@ -35,8 +35,12 @@ class AutowpBreadcrumbsDirective implements ng.IDirective {
                     angular.forEach(path, function(item: any) {
                         item.url = replaceArgs(item.url, args);
                         scope.items.push(item);
-                        self.$translate('page/' + item.id + '/name').then(function (translation: string) {
+                        self.$translate('page/' + item.id + '/breadcrumbs').then(function (translation: string) {
                             item.name_translated = replaceArgs(translation, args);
+                        }, function() {
+                            self.$translate('page/' + item.id + '/name').then(function (translation: string) {
+                                item.name_translated = replaceArgs(translation, args);
+                            });
                         });
                     });
                 });

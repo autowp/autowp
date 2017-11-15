@@ -16,9 +16,10 @@ class MostsController {
     public ratings: any[];
     public vehilceTypes: any[];
     public loading: number;
-    private ratingCatname: string;
-    private typeCatname: string;
-    private yearsCatname: string;
+    public ratingCatname: string;
+    public typeCatname: string;
+    public yearsCatname: string;
+    public defaultTypeCatname: string;
   
     constructor(
         private $scope: IAutowpControllerScope,
@@ -39,12 +40,10 @@ class MostsController {
             self.ratings = data.ratings;
             self.vehilceTypes = data.vehilce_types;
           
+            self.defaultTypeCatname = self.vehilceTypes[0].catname;
+          
             if (! self.ratingCatname) {
                 self.ratingCatname = self.ratings[0].catname;
-            }
-          
-            if (! self.typeCatname) {
-                self.typeCatname = self.vehilceTypes[0].catname;
             }
           
             var ratingName = 'most/' + self.ratingCatname;
@@ -82,7 +81,9 @@ class MostsController {
                     });
                 }
             } else {
+                console.log('zzz');
                 self.$translate(ratingName).then(function (translation: string) {
+                    console.log(translation);
                     self.initPageEnv(154, {
                         MOST_CATNAME: self.ratingCatname,
                         MOST_NAME: translation

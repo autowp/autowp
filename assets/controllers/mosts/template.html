@@ -12,7 +12,7 @@
                     <h3 translate>mosts/sidebar/between…</h3>
                 </li>
                 <li ng-repeat="type in ctrl.vehilceTypes" ng-class="{active: type.catname == ctrl.typeCatname}">
-                    <a ui-sref=".({type_catname: type.catname})" ng-bind="type.name|translate"></a>
+                    <a ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: type.catname})" ng-bind="type.name|translate"></a>
                     <ul class="nav nav-pills nav-stacked" ng-if="type.childs.length > 0">
                         <li ng-repeat="child in type.childs" ng-class="{active: child.catname == ctrl.typeCatname}">
                             <a ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: child.catname})" ng-bind="child.name|translate"></a>
@@ -23,9 +23,9 @@
         </div>
     </div>
     <div class="col-sm-8">
-        <ul class="nav nav-pills">
+        <ul class="nav nav-pills" ng-if="ctrl.defaultTypeCatname">
             <li ng-repeat="year in ctrl.years" ng-class="{active: year.catname ? year.catname == ctrl.yearsCatname : !ctrl.yearsCatname}">
-                <a ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: ctrl.typeCatname, years_catname: year.catname})" ng-bind="year.name|translate"></a>
+                <a ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: ctrl.typeCatname || ctrl.defaultTypeCatname, years_catname: year.catname})" ng-bind="year.name|translate"></a>
             </li>
         </ul>
         
@@ -44,7 +44,7 @@
         <div class="row" ng-repeat-end>
             <div class="col-md-9">
                 <div class="row thumbnails">
-                    <div class="col-md-4" ng-repeat="picture in item.pictures">
+                    <div class="col-md-4" ng-repeat="picture in item.pictures track by $index">
                         <a ng-href="{{picture.url}}" class="thumbnail" ng-if="picture">
                             <img ng-src="{{picture.src}}" alt="{{picture.name}}" title="{{picture.name}}" />
                         </a>
