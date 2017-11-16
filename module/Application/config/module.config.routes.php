@@ -184,46 +184,14 @@ return [
                     ]
                 ]
             ],
-            'donate' => [
+            'donate-success' => [
                 'type' => 'Literal',
                 'options' => [
-                    'route'    => '/donate',
+                    'route'    => '/donate/success',
                     'defaults' => [
-                        'controller' => Controller\DonateController::class
+                        'controller' => Controller\DonateController::class,
+                        'action'     => 'success',
                     ],
-                ],
-                'may_terminate' => false,
-                'child_routes'  => [
-                    'success' => [
-                        'type' => 'Literal',
-                        'options' => [
-                            'route' => '/success',
-                            'defaults' => [
-                                'action' => 'success',
-                            ],
-                        ]
-                    ],
-                    'vod' => [
-                        'type' => 'Literal',
-                        'options' => [
-                            'route' => '/vod',
-                            'defaults' => [
-                                'action' => 'vod',
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'success' => [
-                                'type' => 'Literal',
-                                'options' => [
-                                    'route' => '/success',
-                                    'defaults' => [
-                                        'action' => 'vod-success',
-                                    ],
-                                ]
-                            ]
-                        ]
-                    ]
                 ]
             ],
             'factories' => [

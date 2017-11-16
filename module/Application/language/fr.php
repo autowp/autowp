@@ -609,7 +609,7 @@ Avec un don, vous pouvez nous envoyer  quelques lignes sur l\'endroit où vous s
 
 Nous ne recueillons pas d\'informations sur les donateurs, mais, si vous insistez, nous pouvons noter votre contribution.
 
-In addition we can offer in return to [choose the next vehicle of the day](/donate/vod)',
+In addition we can offer in return to [choose the next vehicle of the day](/ng/donate/vod)',
   'donate/target' => 'Sur le site',
   'donate/project' => 'WheelsAge.org',
   'donate/comment-hint' => 'Votre souhait',

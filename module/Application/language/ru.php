@@ -605,7 +605,7 @@ E-mail: %2$s
 
 Мы не собираем информацию о жертвователях, но, если вы настаиваете, мы можем отметить ваш взнос.
 
-In addition we can offer in return to [choose the next vehicle of the day](/donate/vod)',
+В знак благодарности мы предоставляем возможность [выбрать следующий автомобиль дня](/ng/donate/vod)',
   'donate/target' => 'На работу сайта',
   'donate/project' => 'AutoWP.ru',
   'donate/comment-hint' => 'Ваши пожелания',

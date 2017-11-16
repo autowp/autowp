@@ -559,7 +559,7 @@
     "users/change-email/confirmation-message-sent": "验证邮件已发送到您的电子邮箱",
     "user/add-to-contacts": "添加到好友",
     "user/remove-from-contacts": "从好友中删除",
-    "donate/text": "尽管我们始终努力坚持非盈利运营，但百科网站终归需要金钱去维持。\n\n网站发展和技术支持总是需要花费。\n\n如果您希望资助我们每日的工作，可以通过PayPal或Yandex.Money进行捐助。\n\n在捐助的同时可以告诉我们您对网站的愿景。\n\n原则上我们进行不记名捐助，但如果您要求，我们会标记您的贡献。\n\n我们还可以让您[钦定今日之车](/donate/vod)做为回报",
+    "donate/text": "尽管我们始终努力坚持非盈利运营，但百科网站终归需要金钱去维持。\n\n网站发展和技术支持总是需要花费。\n\n如果您希望资助我们每日的工作，可以通过PayPal或Yandex.Money进行捐助。\n\n在捐助的同时可以告诉我们您对网站的愿景。\n\n原则上我们进行不记名捐助，但如果您要求，我们会标记您的贡献。\n\n我们还可以让您[钦定今日之车](/ng/donate/vod)做为回报",
     "donate/target": "为了维持网站运营",
     "donate/project": "WheelsAge.org",
     "donate/comment-hint": "您的建议",

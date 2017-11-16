@@ -602,7 +602,7 @@
 
 原则上我们进行不记名捐助，但如果您要求，我们会标记您的贡献。
 
-我们还可以让您[钦定今日之车](/donate/vod)做为回报',
+我们还可以让您[钦定今日之车](/ng/donate/vod)做为回报',
   'donate/target' => '为了维持网站运营',
   'donate/project' => 'WheelsAge.org',
   'donate/comment-hint' => '您的建议',

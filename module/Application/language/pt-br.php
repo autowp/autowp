@@ -604,7 +604,7 @@ Através de sua doação em dinheiro, você também estará contribuindo para o 
 
 Nós não coletamos informações sobre doadores, porém, se for de seu desejo, nós podemos marcar sua contribuição.
 
-Ou ainda, podemos lhe oferecer a opção de [escolher o próximo veículo do dia](/donate/vod)',
+Ou ainda, podemos lhe oferecer a opção de [escolher o próximo veículo do dia](/ng/donate/vod)',
   'donate/target' => 'For website work',
   'donate/project' => 'WheelsAge.org',
   'donate/comment-hint' => 'Seu desejo',

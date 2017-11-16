@@ -79,9 +79,7 @@
 
             <?php if ($this->itemOfDay['links']) { ?> &#xa0; <?php } ?>
             <span class="fa fa-trophy"></span>
-            <?=$this->htmlA([
-                'href'  => $this->url('donate/vod')
-            ], $this->translate('donate/vod/wants-to-select?'))?>
+            <?=$this->htmlA('/ng/donate/vod', $this->translate('donate/vod/wants-to-select?'))?>
         </p>
     <?php } ?>
 <?php } ?>

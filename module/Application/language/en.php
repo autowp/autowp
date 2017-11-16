@@ -595,17 +595,17 @@ Sincerely, Robot %1$s
   'users/change-email/confirmation-message-sent' => 'E-mail with confirmation code was sent',
   'user/add-to-contacts' => 'Add to contacts',
   'user/remove-from-contacts' => 'Remove from contacts',
-  'donate/text' => 'Despite the fact that we always try to work as non-comercial project, it is absolutely impossible to support encyclopedia without money.
+  'donate/text' => 'Despite the fact that we always try to work as non-commercial project, it is absolutely impossible to support encyclopedia without money.
 
 Support and site development requires a permanent costs.
 
 If you want to help to our everyday work, you can send us some money through PayPal or Yandex.Money.
 
-With a money donation you can send us your vision about the future of the encyclopedia and the way it must move and we\'ll be much more obligated and grateful to your words.
+With a money donation you can send us your vision about the future of the encyclopedia and the way it must move and we\'ll be much more obligated and grateful for your words.
 
-We do not collect information about our donators, however if you wish, we can mark your contribution.
+We do not collect information about our donators, however, if you wish, we can mark your contribution.
 
-In addition we can offer in return to [choose the next vehicle of the day](/donate/vod)',
+In addition, we can offer in return to [choose the next vehicle of the day](/ng/donate/vod)',
   'donate/target' => 'For website work',
   'donate/project' => 'WheelsAge.org',
   'donate/comment-hint' => 'Your wish',
