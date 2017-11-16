@@ -627,7 +627,7 @@
   'donate/vod/order-target' => '订单%s',
   'donate/vod/price:' => '金额:',
   'donate/vod/price/currency' => ' 卢布',
-  'donate/vod/price-aroud' => '约合$%s',
+  'donate/vod/price-aroud' => '约合{price}',
   'donate/vod/method/credit-card' => '信用卡',
   'donate/vod/method/yandex.money' => 'Yandex.Money',
   'donate/vod/method/mobile' => '手机运营商账户',

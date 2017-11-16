@@ -1,0 +1,28 @@
+<span ng-show="ctrl.loading > 0">
+    <i class="fa fa-spinner fa-spin fa-fw fa-5x"></i>
+</span>
+
+<div class="select-in-brand" ng-if="ctrl.brand">
+    <div style="margin: 5px 0" ng-if="ctrl.vehicles.length > 0">
+        <autowp-donate-vod-select-item item="item" select-item="ctrl.selectItem" ng-repeat="item in ctrl.vehicles"></autowp-donate-vod-select-item>
+    </div>
+
+    <div style="margin: 5px 0" ng-if="ctrl.concepts.length > 0">
+        <a href="#" class="arrow" ng-click="ctrl.conceptsExpanded = !ctrl.conceptsExpanded">
+            <i class="fa fa-plus-circle"></i>
+            <translate>upload/select/concepts</translate>
+        </a>
+        <div style="margin:0 0 4px 18px;" ng-show="ctrl.conceptsExpanded">
+            <autowp-donate-vod-select-item item="item" select-item="ctrl.selectItem" ng-repeat="item in ctrl.concepts"></autowp-donate-vod-select-item>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-if="!ctrl.brand">
+    <div class="col-md-2" ng-repeat="chunk in ctrl.brands">
+        <a ui-sref=".({brand_id: brand.id})" ng-bind="brand.name_only" ng-repeat-start="brand in chunk"></a>
+        <br ng-repeat-end />
+    </div>
+</div>
+
+<autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>

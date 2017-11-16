@@ -4,6 +4,7 @@ import './directives/comments/form';
 import './directives/comments/list';
 import './directives/item';
 import './directives/item-meta-form';
+import './directives/item-of-day';
 import './directives/markdown-edit';
 import './directives/paginator/index';
 import './directives/past-time-indicator';

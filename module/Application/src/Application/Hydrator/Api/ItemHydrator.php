@@ -12,6 +12,7 @@ use Zend\Stdlib\ArrayUtils;
 use Autowp\User\Model\User;
 
 use Application\ItemNameFormatter;
+use Application\Model\CarOfDay;
 use Application\Model\Catalogue;
 use Application\Model\ItemParent;
 use Application\Model\Item;
@@ -101,6 +102,11 @@ class ItemHydrator extends RestHydrator
      */
     private $userModel;
 
+    /**
+     * @var CarOfDay
+     */
+    private $carOfDay;
+
     public function __construct(
         $serviceManager
     ) {
@@ -132,6 +138,8 @@ class ItemHydrator extends RestHydrator
         $this->picHelper = $serviceManager->get('ControllerPluginManager')->get('pic');
 
         $this->specsService = $serviceManager->get(SpecificationsService::class);
+
+        $this->carOfDay = $serviceManager->get(CarOfDay::class);
 
         $strategy = new Strategy\Items($serviceManager);
         $this->addStrategy('brands', $strategy);
@@ -314,6 +322,10 @@ class ItemHydrator extends RestHydrator
             $result['current_pictures_count'] = isset($object['current_pictures_count']) ? (int)$object['current_pictures_count'] : null;
         }
 
+        if ($this->filterComposite->filter('is_compiles_item_of_day')) {
+            $result['is_compiles_item_of_day'] = $this->carOfDay->isComplies($object['id']);
+        }
+
         if ($isModer) {
             if ($this->filterComposite->filter('body')) {
                 $result['body'] = (string)$object['body'];
@@ -430,6 +442,11 @@ class ItemHydrator extends RestHydrator
 
                 $result['preview_pictures'] = $this->extractValue('preview_pictures', $pictures);
             }
+
+            if ($this->filterComposite->filter('item_of_day_pictures')) {
+                $result['item_of_day_pictures'] = $this->carOfDay->getItemOfDayPictures($object['id'], $this->language);
+            }
+
 
             if ($showTotalPictures) {
                 $result['total_pictures'] = $totalPictures;

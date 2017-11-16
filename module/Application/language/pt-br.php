@@ -634,7 +634,7 @@ Ficaremos felizes se você desejar [fazer uma doação](/ng/donate) de qualquer 
   'donate/vod/order-target' => 'Ordenar %s',
   'donate/vod/price:' => 'Preço:',
   'donate/vod/price/currency' => ' rublos russos',
-  'donate/vod/price-aroud' => 'aproximadamente US$%s',
+  'donate/vod/price-aroud' => 'aproximadamente {price}',
   'donate/vod/method/credit-card' => 'Cartão de crédito',
   'donate/vod/method/yandex.money' => 'Yandex.Money',
   'donate/vod/method/mobile' => 'Transação via celular',

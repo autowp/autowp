@@ -635,7 +635,7 @@ In addition we can offer in return to [choose the next vehicle of the day](/dona
   'donate/vod/order-target' => 'Order %s',
   'donate/vod/price:' => 'Сумма:',
   'donate/vod/price/currency' => 'руб.',
-  'donate/vod/price-aroud' => 'примерно $%s',
+  'donate/vod/price-aroud' => 'примерно {price}',
   'donate/vod/method/credit-card' => 'Банковская карта',
   'donate/vod/method/yandex.money' => 'Яндекс.Деньги',
   'donate/vod/method/mobile' => 'Счёт мобильного оператора',

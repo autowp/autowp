@@ -886,7 +886,8 @@ return [
                             'preview_pictures', 'design', 'engine_vehicles',
                             'catname', 'is_concept', 'spec_id', 'begin_year',
                             'end_year', 'body', 'lat', 'lng',
-                            'pictures_count', 'current_pictures_count']]
+                            'pictures_count', 'current_pictures_count',
+                            'is_compiles_item_of_day', 'item_of_day_pictures']]
                     ]
                 ]
             ],
@@ -1055,7 +1056,8 @@ return [
                             'preview_pictures', 'design', 'engine_vehicles',
                             'catname', 'is_concept', 'spec_id', 'begin_year',
                             'end_year', 'body', 'lat', 'lng',
-                            'pictures_count', 'current_pictures_count']]
+                            'pictures_count', 'current_pictures_count',
+                            'is_compiles_item_of_day', 'item_of_day_pictures']]
                     ]
                 ]
             ],

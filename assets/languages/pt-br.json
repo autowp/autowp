@@ -580,7 +580,7 @@
     "donate/vod/message": "Seus desejos",
     "donate/vod/price:": "Preço:",
     "donate/vod/price/currency": " rublos russos",
-    "donate/vod/price-aroud": "aproximadamente US$%s",
+    "donate/vod/price-aroud": "aproximadamente {price}",
     "donate/vod/method/credit-card": "Cartão de crédito",
     "donate/vod/method/mobile": "Transação via celular",
     "donate/vod/method/yandex.money": "Yandex.Money",

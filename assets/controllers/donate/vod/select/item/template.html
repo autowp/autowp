@@ -1,0 +1,22 @@
+<div ng-if="!item.item.childs_count">
+    <span class="text-muted" ng-if="item.type_id == 1" translate>catalogue/related</span>
+    <span class="text-muted" ng-if="item.type_id == 2" translate>catalogue/sport</span>
+    <a ng-if="item.item.is_compiles_item_of_day" href="#" ng-click="selectItem(item.item_id)" ng-bind-html="item.item.name_html"></a>
+    <span ng-if="!item.item.is_compiles_item_of_day" class="text-muted" ng-bind-html="item.item.name_html"></span>
+</div>
+<div ng-if="item.item.childs_count">
+    <span class="text-muted" ng-if="item.type_id == 1" translate>catalogue/related</span>
+    <span class="text-muted" ng-if="item.type_id == 2" translate>catalogue/sport</span>
+    <a href="" class="arrow" ng-click="ctrl.toggleItem()">
+        <i class="fa fa-plus-circle" ng-show="!item.expanded"></i>
+        <i class="fa fa-minus-circle" ng-show="item.expanded"></i>
+        <span ng-bind-html="item.item.name_html"></span>
+    </a>
+    <a href="#" ng-click="selectItem(item.item_id)" ng-if="item.item.is_compiles_item_of_day">[выбрать]</a>
+    <div style="margin:0 0 4px 18px;" ng-show="item.expanded">
+        <autowp-donate-vod-select-item item="child" select-item="selectItem" ng-repeat="child in ctrl.childs"></autowp-donate-vod-select-item>
+        <span ng-show="ctrl.loading">
+            <i class="fa fa-spinner fa-spin fa-fw"></i>
+        </span>
+    </div>
+</div>

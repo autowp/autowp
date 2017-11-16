@@ -3,10 +3,10 @@ import Module from 'app.module';
 import { IAutowpControllerScope } from 'declarations.d.ts';
 import { UserService } from 'services/user';
 
-const CONTROLLER_NAME = 'DonateSuccessController';
-const STATE_NAME = 'donate-success';
+const CONTROLLER_NAME = 'DonateVodSuccessController';
+const STATE_NAME = 'donate-vod-success';
 
-export class DonateSuccessController {
+export class DonateVodSuccessController {
     static $inject = ['$scope'];
   
     constructor(
@@ -24,12 +24,12 @@ export class DonateSuccessController {
 };
 
 angular.module(Module)
-    .controller(CONTROLLER_NAME, DonateSuccessController)
+    .controller(CONTROLLER_NAME, DonateVodSuccessController)
     .config(['$stateProvider',
         function config($stateProvider: any) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/donate/success',
+                url: '/donate/vod/success',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require('./template.html')

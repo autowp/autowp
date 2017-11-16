@@ -580,7 +580,7 @@
     "donate/vod/message": "Вашы пажаданні",
     "donate/vod/price:": "Сума:",
     "donate/vod/price/currency": "руб.",
-    "donate/vod/price-aroud": "прыкладна $%s",
+    "donate/vod/price-aroud": "прыкладна {price}",
     "donate/vod/method/credit-card": "Банкаўская картка",
     "donate/vod/method/mobile": "Рахунак мабільнага аператара",
     "donate/vod/method/yandex.money": "Yandex.Money",

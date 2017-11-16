@@ -635,7 +635,7 @@ E-mail: %2$s
   'donate/vod/order-target' => 'Заказ %s',
   'donate/vod/price:' => 'Сума:',
   'donate/vod/price/currency' => 'руб.',
-  'donate/vod/price-aroud' => 'прыкладна $%s',
+  'donate/vod/price-aroud' => 'прыкладна {price}',
   'donate/vod/method/credit-card' => 'Банкаўская картка',
   'donate/vod/method/yandex.money' => 'Yandex.Money',
   'donate/vod/method/mobile' => 'Рахунак мабільнага аператара',

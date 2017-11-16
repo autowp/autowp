@@ -4,7 +4,7 @@ import { IAutowpControllerScope } from 'declarations.d.ts';
 
 import './log';
 import './success';
-//import './vod';
+import './vod';
 
 const CONTROLLER_NAME = 'DonateController';
 const STATE_NAME = 'donate';

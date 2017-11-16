@@ -16,6 +16,7 @@ use Zend\Json\Json;
 use Autowp\Image;
 
 use Application\ItemNameFormatter;
+use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
 
 class CarOfDay
@@ -74,6 +75,11 @@ class CarOfDay
      */
     private $twins;
 
+    /**
+     * @var PictureNameFormatter
+     */
+    private $pictureNameFormatter;
+
     public function __construct(
         TableGateway $table,
         ItemNameFormatter $itemNameFormatter,
@@ -86,7 +92,8 @@ class CarOfDay
         Perspective $perspective,
         ItemParent $itemParent,
         Picture $picture,
-        Twins $twins
+        Twins $twins,
+        PictureNameFormatter $pictureNameFormatter
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
         $this->imageStorage = $imageStorage;
@@ -99,6 +106,7 @@ class CarOfDay
         $this->itemParent = $itemParent;
         $this->picture = $picture;
         $this->twins = $twins;
+        $this->pictureNameFormatter = $pictureNameFormatter;
 
         $this->table = $table;
     }
@@ -462,13 +470,13 @@ class CarOfDay
         return $result;
     }
 
-    public function getItemOfDay($itemId, $userId, $language)
+    public function getItemOfDayPictures(int $itemId, string $language): array
     {
         $carOfDay = $this->itemModel->getRow([
             'id' => (int)$itemId
         ]);
 
-        $carOfDayPictures = $this->getOrientedPictureList($carOfDay);
+        $carOfDayPictures = $this->getOrientedPictureList($itemId);
 
         // images
         $formatRequests = [];
@@ -500,7 +508,7 @@ class CarOfDay
             'toBrand'      => false
         ]);
 
-        $carOfDayPicturesData = [];
+        $result = [];
         foreach ($carOfDayPictures as $idx => $row) {
             if ($row) {
                 $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
@@ -532,39 +540,50 @@ class CarOfDay
                 }
 
                 /*if (! $url) {
-                    foreach ($categoryPaths as $path) {
-                        $url = $this->router->assemble([
-                            'action'           => 'category-picture',
-                            'category_catname' => $path['category_catname'],
-                            'item_id'          => $path['item_id'],
-                            'path'             => $path['path'],
-                            'picture_id'       => $row['identity']
-                        ], [
-                            'name' => 'categories'
-                        ]);
-                    }
-                }*/
+                 foreach ($categoryPaths as $path) {
+                 $url = $this->router->assemble([
+                 'action'           => 'category-picture',
+                 'category_catname' => $path['category_catname'],
+                 'item_id'          => $path['item_id'],
+                 'path'             => $path['path'],
+                 'picture_id'       => $row['identity']
+                 ], [
+                 'name' => 'categories'
+                 ]);
+                 }
+                 }*/
 
-                $carOfDayPicturesData[] = [
+                $result[] = [
                     'src'  => isset($imagesInfo[$format][$idx])
                         ? $imagesInfo[$format][$idx]->getSrc()
                         : null,
-                    'name' => isset($names[$row['id']]) ? $names[$row['id']] : null,
+                    'name' => isset($names[$row['id']])
+                        ? $this->pictureNameFormatter->format($names[$row['id']], $language)
+                        : null,
                     'url'  => $url
                 ];
             }
         }
 
+        return $result;
+    }
+
+    public function getItemOfDay(int $itemId, $userId, string $language)
+    {
+        $carOfDay = $this->itemModel->getRow([
+            'id' => (int)$itemId
+        ]);
+
         return [
             'itemTypeId' => $carOfDay['item_type_id'],
             'name'       => $this->itemModel->getNameData($carOfDay, $language),
-            'pictures'   => $carOfDayPicturesData,
+            'pictures'   => $this->getItemOfDayPictures($itemId, $language),
             'links'      => $this->carLinks($carOfDay, $language),
             'userId'     => $userId
         ];
     }
 
-    private function getOrientedPictureList($car)
+    private function getOrientedPictureList(int $itemId)
     {
         $perspectivesGroupIds = $this->perspective->getPageGroupIds(6);
 
@@ -579,7 +598,7 @@ class CarOfDay
                 'id_exclude' => $usedIds,
                 'status'     => Picture::STATUS_ACCEPTED,
                 'item'       => [
-                    'ancestor_or_self' => $car['id']
+                    'ancestor_or_self' => $itemId
                 ]
             ]);
 
@@ -635,7 +654,7 @@ class CarOfDay
                 'id_exclude' => $usedIds,
                 'status'     => Picture::STATUS_ACCEPTED,
                 'item'       => [
-                    'ancestor_or_self' => $car['id']
+                    'ancestor_or_self' => $itemId
                 ],
                 'limit'      => count($left)
             ]);

@@ -639,7 +639,7 @@ We will be happy if you want to [perform selfless donation](/ng/donate) to an ar
   'donate/vod/order-target' => 'Order %s',
   'donate/vod/price:' => 'Price:',
   'donate/vod/price/currency' => ' rubles',
-  'donate/vod/price-aroud' => 'about $%s',
+  'donate/vod/price-aroud' => 'about {price}',
   'donate/vod/method/credit-card' => 'Credit card',
   'donate/vod/method/yandex.money' => 'Yandex.Money',
   'donate/vod/method/mobile' => 'Mobile operator account',

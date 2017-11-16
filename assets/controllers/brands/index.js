@@ -22,7 +22,7 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state',
+        '$scope', '$http',
         function($scope, $http) {
             
             var ctrl = this;

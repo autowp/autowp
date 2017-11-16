@@ -1,0 +1,38 @@
+<h2>
+    <span ng-bind-html="item.name_html"></span>
+    <small>
+        <translate ng-if="item.item_type_id == 1">car-of-day</translate>
+        <translate ng-if="item.item_type_id != 1">theme-of-day</translate>
+        <span ng-if="user">
+            <span style="white-space:nowrap">by <autowp-user user="user"></autowp-user></span>
+        </span>
+    </small>
+</h2>
+
+<div class="row thumbnails" ng-if="item.item_of_day_pictures">
+    <div class="col-sm-8">
+        <a ng-href="{{picture.url}}" class="thumbnail" ng-repeat="picture in item.item_of_day_pictures.slice(0, 1)" ng-if="picture">
+            <img ng-src="{{picture.src}}" alt="{{picture.name_text}}" title="{{picture.name_text}}" />
+        </a>
+    </div>
+    <div class="col-sm-4">
+        <a ng-href="{{picture.url}}" class="thumbnail" ng-if="picture" ng-repeat="picture in item.item_of_day_pictures.slice(1, 3)">
+            <img ng-src="{{picture.src}}" alt="{{picture.name_text}}" title="{{picture.name_text}}" />
+        </a>
+    </div>
+</div>
+<div class="row thumbnails" ng-if="item.item_of_day_pictures">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-sm-4" ng-repeat="picture in item.item_of_day_pictures.slice(3)" ng-if="picture">
+                <a ng-href="{{picture.url}}" class="thumbnail">
+                    <img ng-src="{{picture.src}}" alt="{{picture.name_text}}" title="{{picture.name_text}}" />
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+    <span class="fa fa-trophy"></span>
+    <a ui-sref="donate-vod" translate>donate/vod/wants-to-select?</a>
+</p>

@@ -25,7 +25,8 @@ class CarOfDayFactory implements FactoryInterface
             $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\ItemParent::class),
             $container->get(\Application\Model\Picture::class),
-            $container->get(\Application\Model\Twins::class)
+            $container->get(\Application\Model\Twins::class),
+            $container->get(\Application\PictureNameFormatter::class)
         );
     }
 }

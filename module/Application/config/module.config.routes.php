@@ -52,7 +52,7 @@ return [
                 ],
             ],
             'articles' => [
-                'type' => \Application\Router\Http\Articles::class,
+                'type' => Router\Http\Articles::class,
                 'options' => [
                     'route'    => '/articles',
                     'defaults' => [
@@ -98,7 +98,7 @@ return [
                 ]
             ],
             'catalogue' => [
-                'type' => \Application\Router\Http\Catalogue::class,
+                'type' => Router\Http\Catalogue::class,
                 'options' => [
                     'defaults' => [
                         'controller' => Controller\CatalogueController::class,
@@ -213,60 +213,12 @@ return [
                         ],
                         'may_terminate' => true,
                         'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ],
                             'success' => [
                                 'type' => 'Literal',
                                 'options' => [
                                     'route' => '/success',
                                     'defaults' => [
                                         'action' => 'vod-success',
-                                    ],
-                                ]
-                            ],
-                            'select-item' => [
-                                'type' => 'Literal',
-                                'options' => [
-                                    'route' => '/vod-select-item',
-                                    'defaults' => [
-                                        'action' => 'vod-select-item',
-                                    ],
-                                ],
-                                'may_terminate' => true,
-                                'child_routes'  => [
-                                    'params' => [
-                                        'type' => Router\Http\WildcardSafe::class
-                                    ],
-                                ]
-                            ],
-                            'vehicle-childs' => [
-                                'type' => 'Literal',
-                                'options' => [
-                                    'route' => '/vehicle-childs',
-                                    'defaults' => [
-                                        'action' => 'vehicle-childs',
-                                    ],
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'params' => [
-                                        'type' => Router\Http\WildcardSafe::class
-                                    ],
-                                ]
-                            ],
-                            'concepts' => [
-                                'type' => 'Segment',
-                                'options' => [
-                                    'route' => '/concepts/:brand_id',
-                                    'defaults' => [
-                                        'action' => 'concepts',
-                                    ],
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'params' => [
-                                        'type' => Router\Http\WildcardSafe::class
                                     ],
                                 ]
                             ]
