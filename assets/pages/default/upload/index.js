@@ -175,7 +175,7 @@ module.exports = {
                 e.preventDefault();
                 
                 if (!cropDialog) {
-                    cropDialog = new CropDialog({
+                    cropDialog = new CropDialog.CropDialog({
                         sourceUrl: picture.src,
                         crop: {
                             x: 0, 

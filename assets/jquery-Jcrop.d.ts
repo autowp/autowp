@@ -1,0 +1,4 @@
+
+interface JQueryStatic {
+    Jcrop: any;
+}

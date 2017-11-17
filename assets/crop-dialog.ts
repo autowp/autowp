@@ -1,16 +1,31 @@
-var $ = require("jquery");
+import * as $ from 'jquery';
+import * as i18next from 'i18next';
+import { sprintf } from "sprintf-js";
 require('jcrop-0.9.12/css/jquery.Jcrop.css');
 require('jcrop-0.9.12/js/jquery.Jcrop');
-var i18next = require('i18next');
-var sprintf = require("sprintf-js").sprintf;
 
-var Dialog = function(options) {
-    this.init(options);
-};
+export interface Crop {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+}
 
-Dialog.prototype = {
-    init: function(options) {
-        
+export class CropDialog {
+    private onSave: (currentCrop: any, callback: () => void) => void;
+    private width: number;
+    private height: number;
+    private sourceUrl: string;
+    private minSize: number[];
+    private $modal: JQuery;
+    private $body: JQuery;
+    private $selection: JQuery;
+    private currentCrop: Crop;
+    private jcrop: any;
+  
+    constructor(
+        private options: any
+    ) {
         var self = this;
         
         this.onSave = options.onSave;
@@ -40,7 +55,7 @@ Dialog.prototype = {
             self.afterHidden();
         });
         
-        this.$modal.find('.btn-primary').on('click', function() {
+        this.$modal.find('.btn-primary').click(function() {
             var $btn = $(this).button('loading');
             self.onSave(self.currentCrop, function() {
                 $btn.button('reset');
@@ -54,8 +69,9 @@ Dialog.prototype = {
         this.$modal.modal({
             show: false
         });
-    },
-    updateSelectionText: function() {
+    }
+  
+    public updateSelectionText() {
         var text = Math.round(this.currentCrop.w) + '×' + Math.round(this.currentCrop.h);
         var pw = 4;
         var ph = pw * this.currentCrop.h / this.currentCrop.w;
@@ -66,11 +82,18 @@ Dialog.prototype = {
                 text, pw+':'+phRound
             )
         );
-    },
-    afterShown: function() {
-        var scale = this.width / this.$body.width(),
-            width = this.width / scale,
-            height = this.height / scale;
+    }
+  
+    public afterShown() {
+        let bodyWidth = this.$body.width();
+      
+        if (! bodyWidth) {
+            bodyWidth = 1;
+        }
+      
+        let scale = this.width / bodyWidth;
+        let width = this.width / scale;
+        let height = this.height / scale;
         
         var self = this;
         
@@ -87,7 +110,7 @@ Dialog.prototype = {
             setTimeout(function() {
 
                 self.jcrop = $.Jcrop($img[0], {
-                    onSelect: function(c) {
+                    onSelect: function(c: Crop) {
                         self.currentCrop = c;
                         self.updateSelectionText();
                     },
@@ -107,20 +130,21 @@ Dialog.prototype = {
             }, 100);
         });
         
-    },
-    afterHidden: function() {
+    }
+  
+    public afterHidden() {
         if (this.jcrop) {
             this.jcrop.destroy();
             this.jcrop = null;
         }
         this.$body.empty();
-    },
-    show: function() {
+    }
+  
+    public show() {
         this.$modal.modal('show');
-    },
-    hide: function() {
+    }
+  
+    public hide() {
         this.$modal.modal('hide');
     }
-};
-
-module.exports = Dialog;
+}
