@@ -11,7 +11,7 @@ export class VehicleTypeService {
     constructor(
         private $q: ng.IQService,
         private $http: ng.IHttpService,
-        private $translate: any
+        private $translate: ng.translate.ITranslateService
     ){}
   
     private collectNames(types: any[]): string[] {

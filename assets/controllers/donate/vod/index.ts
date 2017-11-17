@@ -35,7 +35,7 @@ export class DonateVodController {
   
     constructor(
         private $scope: IAutowpControllerScope,
-        private $translate: any,
+        private $translate: ng.translate.ITranslateService,
         private $http: ng.IHttpService,
         private $state: any
     ) {

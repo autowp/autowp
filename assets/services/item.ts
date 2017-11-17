@@ -9,7 +9,7 @@ export class ItemService {
     constructor(
         private $q: ng.IQService,
         private $http: ng.IHttpService,
-        private $translate: any
+        private $translate: ng.translate.ITranslateService
     ){}
   
     public setItemVehicleTypes(itemId: number, ids: number[]) {

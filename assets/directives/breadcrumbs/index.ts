@@ -19,7 +19,7 @@ class AutowpBreadcrumbsDirective implements ng.IDirective {
     scope = {};
     template = require('./template.html');
 
-    constructor(private PageService: PageService, private $translate: any) {
+    constructor(private PageService: PageService, private $translate: ng.translate.ITranslateService) {
     }
 
     link = (scope: IAutowpBreadcrumbsDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {

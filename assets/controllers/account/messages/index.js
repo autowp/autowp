@@ -3,7 +3,7 @@ import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
 import { MessageService } from 'services/message';
-import MessageDialog from 'message';
+import { MessageDialogService } from 'services/message-dialog';
 
 const CONTROLLER_NAME = 'AccountMessagesController';
 const STATE_NAME = 'account-messages';
@@ -21,8 +21,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$rootScope', '$http', '$state', 'MessageService', 
-        function($scope, $rootScope, $http, $state, MessageService) {
+        '$scope', '$rootScope', '$http', '$state', 'MessageService', 'MessageDialogService',
+        function($scope, $rootScope, $http, $state, MessageService, MessageDialogService) {
             
             var ctrl = this;
             
@@ -125,7 +125,7 @@ angular.module(Module)
             };
             
             ctrl.openMessageForm = function(userId) {
-                MessageDialog.showDialog(MessageService, userId, null, function() {
+                MessageDialogService.showDialog(userId, function() {
                     switch (ctrl.folder) {
                         case 'sent':
                         case 'dialog':

@@ -16,7 +16,7 @@ export class DonateController {
     constructor(
         private $scope: IAutowpControllerScope,
         private $httpParamSerializer: ng.IHttpParamSerializer,
-        private $translate: any,
+        private $translate: ng.translate.ITranslateService,
         private $sce: ng.ISCEService
     ) {
         this.$scope.pageEnv({

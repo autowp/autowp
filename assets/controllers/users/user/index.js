@@ -3,8 +3,7 @@ import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
 import { ContactsService } from 'services/contacts';
-import MessageDialog from 'message';
-import { MessageService } from 'services/message';
+import { MessageDialogService } from 'services/message-dialog';
 import { AclService } from 'services/acl';
 
 import './comments';
@@ -26,8 +25,8 @@ angular.module(Module)
         }
     ])
     .controller(CONTROLLER_NAME, [
-        '$scope', '$http', '$state', 'ContactsService', 'MessageService', 'AclService',
-        function($scope, $http, $state, Contacts, MessageService, Acl) {
+        '$scope', '$http', '$state', 'ContactsService', 'MessageDialogService', 'AclService',
+        function($scope, $http, $state, Contacts, MessageDialogService, Acl) {
             
             var ctrl = this;
             
@@ -191,7 +190,7 @@ angular.module(Module)
             }
 
             ctrl.openMessageForm = function() {
-                MessageDialog.showDialog(MessageService, ctrl.user.id);
+                MessageDialogService.showDialog(ctrl.user.id);
             };
             
             ctrl.toggleInContacts = function() {
