@@ -6,7 +6,7 @@ use Zend\Db\Sql;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
-use Application\Controller\VotingController;
+use Application\Controller\Api\VotingController;
 use Application\Test\AbstractHttpControllerTestCase;
 
 class VotingControllerTest extends AbstractHttpControllerTestCase
@@ -15,12 +15,12 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
 
     public function testVoting()
     {
-        $this->dispatch('https://www.autowp.ru/voting/voting/id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/voting/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(VotingController::class);
-        $this->assertMatchedRouteName('votings/voting');
+        $this->assertMatchedRouteName('api/voting/item/get');
     }
 
     public function testVoteAndGetVotes()
@@ -56,31 +56,33 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
         $variantId = $table->getLastInsertValue();
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/voting/vote/id/' . $id, Request::METHOD_POST, [
-            'variant' => $variantId
+        $this->dispatch('https://www.autowp.ru/api/voting/' . $id, Request::METHOD_PATCH, [
+            'vote' => $variantId
         ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(VotingController::class);
-        $this->assertMatchedRouteName('votings/vote');
+        $this->assertMatchedRouteName('api/voting/item/patch');
 
         // get vote page
         $this->reset();
-        $this->dispatch('https://www.autowp.ru/voting/voting/id/' . $id, Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/voting/' . $id, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(VotingController::class);
-        $this->assertMatchedRouteName('votings/voting');
+        $this->assertMatchedRouteName('api/voting/item/get');
 
         // get votes
         $this->reset();
-        $this->dispatch('https://www.autowp.ru/voting/voting-variant-votes/id/' . $variantId, Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/voting/' . $id . '/variant/' . $variantId . '/vote', Request::METHOD_GET, [
+            'fields' => 'user'
+        ]);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(VotingController::class);
-        $this->assertMatchedRouteName('votings/voting-variant-votes');
+        $this->assertMatchedRouteName('api/voting/item/variant/item/vote/get');
     }
 }

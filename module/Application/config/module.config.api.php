@@ -28,7 +28,8 @@ return [
             Hydrator\Api\PictureItemHydrator::class        => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\TrafficHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\SimilarHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\UserHydrator::class               => Hydrator\Api\RestHydratorFactory::class
+            Hydrator\Api\UserHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\VotingVariantVoteHydrator::class  => Hydrator\Api\RestHydratorFactory::class,
         ]
     ],
     'controllers' => [
@@ -78,7 +79,8 @@ return [
             Controller\Api\TimezoneController::class        => InvokableFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
             Controller\Api\UserController::class            => Controller\Api\UserControllerFactory::class,
-            Controller\Api\VehicleTypesController::class    => Controller\Api\VehicleTypesControllerFactory::class
+            Controller\Api\VehicleTypesController::class    => Controller\Api\VehicleTypesControllerFactory::class,
+            Controller\Api\VotingController::class          => Controller\Api\VotingControllerFactory::class,
         ]
     ],
 
@@ -2359,6 +2361,84 @@ return [
                                             ]
                                         ]
                                     ],
+                                ]
+                            ]
+                        ]
+                    ],
+                    'voting' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/voting',
+                            'defaults' => [
+                                'controller' => Controller\Api\VotingController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes'  => [
+                            'item' => [
+                                'type' => 'Segment',
+                                'options' => [
+                                    'route'    => '/:id',
+                                    'defaults' => [
+                                        'action' => 'voting'
+                                    ],
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'get-item'
+                                            ]
+                                        ]
+                                    ],
+                                    'patch' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'patch',
+                                            'defaults' => [
+                                                'action' => 'patch-item'
+                                            ]
+                                        ]
+                                    ],
+                                    'variant' => [
+                                        'type' => 'Literal',
+                                        'options' => [
+                                            'route' => '/variant',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes'  => [
+                                            'item' => [
+                                                'type' => 'Segment',
+                                                'options' => [
+                                                    'route' => '/:id',
+                                                ],
+                                                'may_terminate' => false,
+                                                'child_routes'  => [
+                                                    'vote' => [
+                                                        'type' => 'Literal',
+                                                        'options' => [
+                                                            'route' => '/vote',
+                                                        ],
+                                                        'may_terminate' => false,
+                                                        'child_routes'  => [
+                                                            'get' => [
+                                                                'type' => 'Method',
+                                                                'options' => [
+                                                                    'verb' => 'get',
+                                                                    'defaults' => [
+                                                                        'action' => 'get-vote-list'
+                                                                    ]
+                                                                ]
+                                                            ],
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]

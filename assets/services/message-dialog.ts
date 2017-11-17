@@ -60,7 +60,7 @@ export class MessageDialogService {
             });
             
             
-            $textarea.bind('change keyup click', function() {
+            $textarea.on('change keyup click', function(this: JQuery) {
                 var val: any = $(this).val();
                 $textarea.parent().removeClass('error');
                 $btnSend.text(translations["personal-message-dialog/send"])

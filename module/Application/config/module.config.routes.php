@@ -393,45 +393,6 @@ return [
                     ],
                 ]
             ],
-            'votings' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/voting',
-                    'defaults' => [
-                        'controller' => Controller\VotingController::class,
-                    ],
-                ],
-                'may_terminate' => false,
-                'child_routes'  => [
-                    'voting' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route'    => '/voting/id/:id[/filter/:filter]',
-                            'defaults' => [
-                                'action' => 'voting'
-                            ],
-                        ]
-                    ],
-                    'voting-variant-votes' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route'    => '/voting-variant-votes/id/:id',
-                            'defaults' => [
-                                'action' => 'voting-variant-votes'
-                            ],
-                        ]
-                    ],
-                    'vote' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route'    => '/vote/id/:id',
-                            'defaults' => [
-                                'action' => 'vote'
-                            ],
-                        ]
-                    ]
-                ]
-            ],
             'upload' => [
                 'type' => 'Segment',
                 'options' => [

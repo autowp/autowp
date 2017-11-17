@@ -27,24 +27,17 @@ class Votings
      */
     private $voteTable;
 
-    /**
-     * @var User
-     */
-    private $userModel;
-
     public function __construct(
         TableGateway $votingTable,
         TableGateway $variantTable,
-        TableGateway $voteTable,
-        User $userModel
+        TableGateway $voteTable
     ) {
         $this->votingTable = $votingTable;
         $this->variantTable = $variantTable;
         $this->voteTable = $voteTable;
-        $this->userModel = $userModel;
     }
 
-    private function canVote($voting, $userId)
+    private function canVote($voting, int $userId)
     {
         if (! $userId) {
             return false;
@@ -82,10 +75,10 @@ class Votings
         return true;
     }
 
-    public function getVoting($id, $filter, $userId)
+    public function getVoting(int $id, int $filter, int $userId)
     {
         $voting = $this->votingTable->select([
-            'id' => (int)$id
+            'id' => $id
         ])->current();
 
         if (! $voting) {
@@ -112,22 +105,22 @@ class Votings
                                 'users.pictures_added > 100'
                             ]);
                     })->current();
-                    $votes = $row['count'];
+                    $votes = (int)$row['count'];
                     break;
 
                 default:
-                    $votes = $vvRow['votes'];
+                    $votes = (int)$vvRow['votes'];
                     break;
             }
 
             $variants[] = [
-                'id'      => $vvRow['id'],
+                'id'      => (int)$vvRow['id'],
                 'name'    => $vvRow['name'],
                 'text'    => $vvRow['text'],
                 'votes'   => $votes,
                 'percent' => 0,
-                'isMax'   => false,
-                'isMin'   => false
+                'is_max'  => false,
+                'is_min'  => false
             ];
 
             if (is_null($maxVotes) || $votes > $maxVotes) {
@@ -146,8 +139,8 @@ class Votings
         foreach ($variants as &$variant) {
             if ($maxVotes > 0) {
                 $variant['percent'] = round(100 * $variant['votes'] / $maxVotes, 2);
-                $variant['isMax'] = $variant['percent'] >= 99;
-                $variant['isMin'] = $variant['percent'] <= $minVotesPercent;
+                $variant['is_max'] = $variant['percent'] >= 99;
+                $variant['is_min'] = $variant['percent'] <= $minVotesPercent;
             }
         }
 
@@ -155,18 +148,15 @@ class Votings
         $endDate   = Row::getDateTimeByColumnType('date', $voting['end_date']);
 
         return [
-            'canVote'  => $this->canVote($voting, $userId),
-            'voting'   => [
-                'id'           => $voting['id'],
-                'name'         => $voting['name'],
-                'text'         => $voting['text'],
-                'multivariant' => $voting['multivariant'],
-                'beginDate'    => $beginDate,
-                'endDate'      => $endDate
-            ],
-            'variants' => $variants,
-            'maxVotes' => $maxVotes,
-            'filter'   => $filter
+            'id'           => (int)$voting['id'],
+            'name'         => $voting['name'],
+            'text'         => $voting['text'],
+            'multivariant' => (bool)$voting['multivariant'],
+            'begin_date'   => $beginDate,
+            'end_date'     => $endDate,
+            'can_vote'     => $this->canVote($voting, $userId),
+            'variants'     => $variants,
+            'max_votes'    => $maxVotes
         ];
     }
 
@@ -180,24 +170,23 @@ class Votings
             return null;
         }
 
-        $select = $this->userModel->getTable()->getSql()->select()
-            ->join('voting_variant_vote', 'users.id = voting_variant_vote.user_id', [])
-            ->where(['voting_variant_vote.voting_variant_id' => $variant['id']]);
+        $select = $this->voteTable->getSql()->select()
+            ->where(['voting_variant_id' => $variant['id']]);
 
-        $users = [];
-        foreach ($this->userModel->getTable()->selectWith($select) as $row) {
-            $users[] = $row;
+        $rows = [];
+        foreach ($this->voteTable->selectWith($select) as $row) {
+            $rows[] = [
+                'user_id' => (int)$row['user_id']
+            ];
         }
 
-        return [
-            'users' => $users
-        ];
+        return $rows;
     }
 
-    public function vote(int $id, int $variantId, int $userId)
+    public function vote(int $id, $variantId, int $userId)
     {
         $voting = $this->votingTable->select([
-            'id' => (int)$id
+            'id' => $id
         ])->current();
 
         if (! $voting) {

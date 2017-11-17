@@ -2714,6 +2714,17 @@ return [
                     ],
                 ]
             ]
+        ],
+        'api_voting_variant_vote_get' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['user']]
+                    ]
+                ]
+            ],
         ]
     ]
 ];

@@ -16,8 +16,7 @@ class VotingsFactory implements FactoryInterface
         return new Votings(
             $tables->get('voting'),
             $tables->get('voting_variant'),
-            $tables->get('voting_variant_vote'),
-            $container->get(\Autowp\User\Model\User::class)
+            $tables->get('voting_variant_vote')
         );
     }
 }

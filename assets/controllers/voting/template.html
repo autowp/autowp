@@ -1,0 +1,58 @@
+<div class="well">
+    <p style="white-space:pre-line" ng-bind="ctrl.voting.text"></p>
+    <hr />
+
+    <form ng-if="ctrl.voting.can_vote" ng-submit="ctrl.vote()">
+        <ul class="unstyled">
+            <li ng-repeat="variant in ctrl.voting.variants">
+                <label class="checkbox inline" ng-if="ctrl.voting.multivariant">
+                    <input type="checkbox" name="variant" ng-model="ctrl.selected[variant.id]" />
+                    {{variant.name|translate}}
+                </label>
+                <label class="radio inline" ng-if="!ctrl.voting.multivariant">
+                    <input type="radio" name="variant" ng-model="ctrl.selected" ng-value="variant.id" />
+                    {{variant.name|translate}}
+                </label>
+
+                <p class="text-info" ng-if="variant.text" ng-bind="variant.text"></p>
+            </li>
+        </ul>
+        <button type="submit" class="btn btn-primary" ng-disabled="!ctrl.isVariantSelected()" translate>votings/do-vote</button>
+    </form>
+
+    <div ng-if="!ctrl.voting.can_vote" ng-repeat="variant in ctrl.voting.variants">
+        <p class="pull-right" ng-if="variant.votes > 0">
+            <a class="who-vote" href="#" translate ng-click="ctrl.showWhoVoted(variant)">votings/who-voted</a>
+        </p>
+        {{variant.name}}
+        <p class="text-info" ng-if="variant.text" ng-bind="variant.text"></p>
+        <div style="clear:both" class="progress">
+            <div ng-class="{'progress-bar-success': variant.is_max, 'progress-bar-danger': variant.is_min}" class="progress-bar" style="width:{{variant.percent}}%">{{variant.votes > 0 ? variant.votes : ''}}</div>
+        </div>
+    </div>
+</div>
+<p class="pull-right" ng-if="ctrl.canVote && ctrl.isModer">
+    <a ui-sref=".({filter: null})" ng-if="ctrl.filter">votings/voting/voters/show-all</a>
+    <a ui-sref=".({filter: 1})" ng-if="!ctrl.filter">votings/voting/voters/show-contributors</a>
+</p>
+
+<p translate-values="{from: (ctrl.voting.begin_date | amDateFormat : 'LL'), to: (ctrl.voting.end_date | amDateFormat : 'LL')}" translate>votings/voting/duration</p>
+
+<autowp-comments item-id="ctrl.voting.id" type-id="3" user="user" ng-if="ctrl.voting"></autowp-comments>
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" data-dismiss="modal" class="close">×</button>
+                <h3 class="modal-title" translate>votings/who-voted</h3>
+            </div>
+            <div class="modal-body">
+                <autowp-user user="vote.user" ng-repeat="vote in ctrl.votes"></autowp-user>
+            </div>
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn btn-default" translate>who-online/close</button>
+            </div>
+        </div>
+    </div>
+</div>
