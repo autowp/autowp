@@ -51,16 +51,6 @@ return [
                     ],
                 ],
             ],
-            'articles' => [
-                'type' => Router\Http\Articles::class,
-                'options' => [
-                    'route'    => '/articles',
-                    'defaults' => [
-                        'controller' => Controller\ArticlesController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-            ],
             'brands' => [
                 'type' => 'Literal',
                 'options' => [

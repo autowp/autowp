@@ -14,6 +14,7 @@ import './directives/user/index';
 
 
 import './controllers/root';
+import './controllers/articles';
 import './controllers/error/403';
 import './controllers/error/404';
 import './controllers/account';

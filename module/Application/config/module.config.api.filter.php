@@ -65,6 +65,55 @@ return [
                 ]
             ]
         ],
+        'api_article_list' => [
+            'catname' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'limit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 500
+                        ]
+                    ]
+                ]
+            ],
+            'page' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['author', 'description']]
+                    ]
+                ]
+            ],
+        ],
         'api_attr_conflict_get' => [
             'filter' => [
                 'required' => true,

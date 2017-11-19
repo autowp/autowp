@@ -7,6 +7,7 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 return [
     'hydrators' => [
         'factories' => [
+            Hydrator\Api\ArticleHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\AttrConflictHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\CommentHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
@@ -36,6 +37,7 @@ return [
         'factories' => [
             Controller\Api\AccountController::class         => Controller\Api\AccountControllerFactory::class,
             Controller\Api\AclController::class             => Controller\Api\Service\AclControllerFactory::class,
+            Controller\Api\ArticleController::class         => Controller\Api\ArticleControllerFactory::class,
             Controller\Api\AttrController::class            => Controller\Api\AttrControllerFactory::class,
             Controller\Api\BrandsController::class          => Controller\Api\BrandsControllerFactory::class,
             Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
@@ -289,6 +291,27 @@ return [
                                     ],
                                 ]
                             ],
+                        ]
+                    ],
+                    'article' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/article',
+                            'defaults' => [
+                                'controller' => Controller\Api\ArticleController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes'  => [
+                            'get' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb'    => 'get',
+                                    'defaults' => [
+                                        'action' => 'index',
+                                    ],
+                                ],
+                            ]
                         ]
                     ],
                     'attr' => [

@@ -1,0 +1,21 @@
+<div class="well">
+    <ul class="articleList">
+        <li ng-repeat="article in ctrl.articles">
+            <a ui-sref="articles-article({catname: article.catname})" ng-if="article.preview_url">
+                <img src="{{article.preview_url}}" style="float:left;margin:0 10px 4px 0" />
+            </a>
+
+            <p><a ui-sref="articles-article({catname: article.catname})" ng-bind="article.name"></a></p>
+            <p>
+                {{article.description}}
+                <a ui-sref="articles-article({catname: article.catname})" translate>carlist/details</a>
+            </p>
+            <p>
+                <autowp-user ng-if="article.author" user="article.author"></autowp-user>
+                <span class="date" ng-if="article.date" am-time-ago="article.date"></span>
+            </p>
+        </li>
+    </ul>
+
+    <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
+</div>

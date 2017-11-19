@@ -1,26 +1,26 @@
-import angular from 'angular';
+import * as angular from 'angular';
 import Module from 'app.module';
-import template from './template.html';
 import notify from 'notify';
+import { IAutowpControllerScope } from 'declarations.d.ts';
 
 const CONTROLLER_NAME = 'AccountAccessController';
 const STATE_NAME = 'account-access';
 
 angular.module(Module)
     .config(['$stateProvider',
-        function config($stateProvider) {
+        function config($stateProvider: any) {
             $stateProvider.state( {
                 name: STATE_NAME,
                 url: '/account/access',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: require('./template.html')
             });
         }
     ])
     .controller(CONTROLLER_NAME, [
         '$scope', '$http', '$state', '$translate',
-        function($scope, $http, $state, $translate) {
+        function($scope: IAutowpControllerScope, $http: ng.IHttpService, $state: any, $translate: ng.translate.ITranslateService) {
             
             if (! $scope.user) {
                 $state.go('login');
