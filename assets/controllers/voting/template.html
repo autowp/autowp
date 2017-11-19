@@ -27,7 +27,7 @@
         {{variant.name}}
         <p class="text-info" ng-if="variant.text" ng-bind="variant.text"></p>
         <div style="clear:both" class="progress">
-            <div ng-class="{'progress-bar-success': variant.is_max, 'progress-bar-danger': variant.is_min}" class="progress-bar" style="width:{{variant.percent}}%">{{variant.votes > 0 ? variant.votes : ''}}</div>
+            <div ng-class="{'progress-bar-success': variant.is_max, 'progress-bar-danger': variant.is_min}" class="progress-bar" ng-style="{width: variant.percent+'%'}">{{variant.votes > 0 ? variant.votes : ''}}</div>
         </div>
     </div>
 </div>
