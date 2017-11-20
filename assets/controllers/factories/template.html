@@ -1,0 +1,47 @@
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <li class="active">
+        <a ui-sref="." ng-bind-html="ctrl.factory.name_html"></a>
+    </li>
+    <li><a ui-sref="factory-items({id: ctrl.factory.id})" translate>factories/factory-items</a></li>
+    <li ng-if="isModer">
+        <a ui-sref="moder-items-item({id: ctrl.factory.id})">
+            <i class="fa fa-cog"></i>
+            <translate>moder/edit-object</translate>
+        </a>
+    </li>
+</ul>
+
+<div id="google-map" style="height:300px;margin:0 0 40px;width:100%" ng-if="ctrl.factory.lng && ctrl.factory.lat"></div>
+
+<div class="well" ng-if="ctrl.factory.description" btf-markdown="ctrl.factory.description|translate"></div>
+
+<div ng-if="ctrl.pictures.length > 0">
+    <h3 translate>factories/factory/pictures</h3>
+    <div class="row" ng-repeat="chunk in ctrl.pictures">
+        <div class="col-sm-3" ng-repeat="picture in chunk">
+            <autowp-thumbnail picture="picture"></autowp-thumbnail>
+        </div>
+    </div>
+</div>
+
+<div ng-if="ctrl.carPictures.length > 0">
+    <h3 translate>factories/factory-items</h3>
+    <?php
+        $items = $this->carPictures;
+    ?>
+    <?php while ($currentItems = array_splice($items, 0, 4)) { ?>
+        <div class="row">
+            <div class="picture-preview col-md-3" ng-repeat="item in currentItems">
+                <div class="thumbnail">
+                    <a ng-href="{{item.url}}">
+                        <img ng-src="{{item.src}}" alt="" title="{{item.name}}" />
+                    </a>
+                    <div class="name">
+                        <p><a ng-href="{{item.url}}" ng-bind="item.name"></a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php } ?>
+    <p><a ui-sref="factory-items({id: ctrl.factory.id})" translate>carlist/details</a></p>
+</div>

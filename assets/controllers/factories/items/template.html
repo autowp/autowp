@@ -1,0 +1,16 @@
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <li>
+        <a ui-sref="." ng-bind-html="ctrl.factory.name_html"></a>
+    </li>
+    <li class="active"><a ui-sref="factory-items({id: ctrl.factory.id})" translate>factories/factory-items</a></li>
+    <li ng-if="isModer">
+        <a ui-sref="moder-items-item({id: ctrl.factory.id})">
+            <i class="fa fa-cog"></i>
+            <translate>moder/edit-object</translate>
+        </a>
+    </li>
+</ul>
+
+<?=$this->partial('application/cars', $this->carsData)?>
+
+<autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>

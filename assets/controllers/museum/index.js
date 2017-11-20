@@ -53,6 +53,7 @@ angular.module(Module)
                 
                 if (ctrl.item.item_type_id != 7) {
                     $state.go('error-404');
+                    return;
                 }
             
                 $scope.pageEnv({
