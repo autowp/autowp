@@ -936,7 +936,8 @@ return [
                             'catname', 'is_concept', 'spec_id', 'begin_year',
                             'end_year', 'body', 'lat', 'lng',
                             'pictures_count', 'current_pictures_count',
-                            'is_compiles_item_of_day', 'item_of_day_pictures']]
+                            'is_compiles_item_of_day', 'item_of_day_pictures',
+                            'related_group_pictures']]
                     ]
                 ]
             ],
@@ -1089,6 +1090,15 @@ return [
                         ['name' => 'Digits']
                     ]
                 ],
+            ],
+            'related_groups_of' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
             ]
         ],
         'api_item_item' => [
@@ -1106,7 +1116,8 @@ return [
                             'catname', 'is_concept', 'spec_id', 'begin_year',
                             'end_year', 'body', 'lat', 'lng',
                             'pictures_count', 'current_pictures_count',
-                            'is_compiles_item_of_day', 'item_of_day_pictures']]
+                            'is_compiles_item_of_day', 'item_of_day_pictures',
+                            'related_group_pictures']]
                     ]
                 ]
             ],

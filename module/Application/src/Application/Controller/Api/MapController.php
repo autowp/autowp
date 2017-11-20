@@ -103,9 +103,7 @@ class MapController extends AbstractActionController
                 $url = null;
                 switch ($item['item_type_id']) {
                     case Item::FACTORY:
-                        $url = $this->url()->fromRoute('factories/factory', [
-                            'id' => $item['id']
-                        ]);
+                        $url = '/ng/factories/' . $item['id'];
                         break;
 
                     case Item::MUSEUM:

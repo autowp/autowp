@@ -366,9 +366,7 @@
 
             foreach ($this->factories as $factory) {
                 if ($factory) {
-                    $list[] = $this->htmlA($this->url('factories/factory', [
-                        'id' => $factory['id']
-                    ]), $this->translate('picture/factory-details'));
+                    $list[] = $this->htmlA('/ng/factories/' . $factory['id'], $this->translate('picture/factory-details'));
                 }
                 if (count($factory['items']) > 0) {
                     if (count($factory['items']) == 1)
@@ -383,9 +381,7 @@
 
                         if ($factory['itemsMore']) {
                             $a[] = ' ' . $this->escapeHtml($this->translate('picture/on-that-factory-produced-vehicles/and')) .
-                                   ' ' . $this->htmlA($this->url('factories/factory-cars', [
-                                'id' => $factory['id']
-                            ]), $this->translate('picture/on-that-factory-produced-vehicles/and-other'));
+                                   ' ' . $this->htmlA('/ng/factories/' . $factory['id'] . '/items', $this->translate('picture/on-that-factory-produced-vehicles/and-other'));
                         }
 
                         $list[] = $this->escapeHtml($this->translate('picture/on-that-factory-produced-vehicles:')) .

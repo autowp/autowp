@@ -22,6 +22,7 @@ export class FactoryController {
     static $inject = ['$scope', '$http', '$state'];
     public factory: any;
     public pictures: any[];
+    public relatedPictures: any[];
   
     constructor(
         private $scope: autowp.IControllerScope,
@@ -35,11 +36,13 @@ export class FactoryController {
             method: 'GET',
             url: '/api/item/' + this.$state.params.id,
             params: {
-                fields: ['name_text', 'name_html', 'lat', 'lng', 'description'].join(',')
+                fields: ['name_text', 'name_html', 'lat', 'lng', 'description', 'related_group_pictures'].join(',')
             }
         }).then(function(response: ng.IHttpResponse<any>) {
             
             self.factory = response.data;
+            
+            self.relatedPictures = chunkBy(self.factory.related_group_pictures, 4);
             
             if (self.factory.item_type_id != 6) {
                 self.$state.go('error-404');

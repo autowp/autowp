@@ -377,9 +377,7 @@ class CatalogueController extends AbstractActionController
         foreach ($rows as $idx => $row) {
             $factories[] = [
                 'name' => $row['name'], // TODO: formatter
-                'url'  => $this->url()->fromRoute('factories/factory', [
-                    'id' => $row['id']
-                ]),
+                'url'  => '/ng/factories/' . $row['id'],
                 'src'  => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null
             ];
         }

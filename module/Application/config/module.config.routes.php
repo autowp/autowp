@@ -195,33 +195,6 @@ return [
                 ],
                 'may_terminate' => true,
                 'child_routes'  => [
-                    'factory' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/factory/id/:id',
-                            'defaults' => [
-                                'action' => 'factory',
-                            ],
-                        ]
-                    ],
-                    'factory-cars' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/factory-cars/id/:id',
-                            'defaults' => [
-                                'action' => 'factory-cars',
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'page' => [
-                                'type' => 'Segment',
-                                'options' => [
-                                    'route' => '/page:page',
-                                ],
-                            ]
-                        ]
-                    ],
                     'newcars' => [
                         'type' => 'Segment',
                         'options' => [

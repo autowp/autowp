@@ -7,7 +7,6 @@ use Zend\Http\Header\Cookie;
 
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;
-use Application\Controller\FactoriesController;
 use Application\Test\AbstractHttpControllerTestCase;
 
 class FactoryControllerTest extends AbstractHttpControllerTestCase
@@ -71,12 +70,14 @@ class FactoryControllerTest extends AbstractHttpControllerTestCase
         $this->addItemParent($vehcileId, $factoryId);
 
         $this->reset();
-        $this->dispatch('https://www.autowp.ru/factory/factory/id/' . $factoryId, Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/api/item/' . $factoryId, Request::METHOD_GET, [
+            'fields' => 'related_group_pictures'
+        ]);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(FactoriesController::class);
-        $this->assertMatchedRouteName('factories/factory');
-        $this->assertActionName('factory');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/item/get');
+        $this->assertActionName('item');
     }
 }

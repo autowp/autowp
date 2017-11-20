@@ -154,12 +154,12 @@ class Comments
 
             case self::VOTINGS_TYPE_ID:
                 $url = $this->router->assemble([
-                    'id' => $message['item_id']
+                    'path' => ''
                 ], [
-                    'name'            => 'votings/voting',
+                    'name'            => 'ng',
                     'force_canonical' => $canonical,
                     'uri'             => $uri
-                ]);
+                ]) . 'voting/' . $message['item_id'];
                 break;
 
             case self::ARTICLES_TYPE_ID:

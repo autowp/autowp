@@ -180,9 +180,7 @@ class IndexController extends AbstractActionController
                     'name'      => $item['name'],
                     'count'     => $item['count'],
                     'new_count' => $item['new_count'],
-                    'url'       => $this->url()->fromRoute('factories/factory', [
-                        'id' => $item['id']
-                    ]),
+                    'url'       => '/ng/factories/' . $item['id'],
                     'new_url'   => $this->url()->fromRoute('factories/newcars', [
                         'item_id' => $item['id']
                     ])

@@ -9,6 +9,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Stdlib\ArrayUtils;
 
+use Autowp\Image\StorageInterface;
 use Autowp\User\Model\User;
 
 use Application\ItemNameFormatter;
@@ -107,6 +108,11 @@ class ItemHydrator extends RestHydrator
      */
     private $carOfDay;
 
+    /**
+     * @var StorageInterface
+     */
+    private $imageStorage;
+
     public function __construct(
         $serviceManager
     ) {
@@ -140,6 +146,8 @@ class ItemHydrator extends RestHydrator
         $this->specsService = $serviceManager->get(SpecificationsService::class);
 
         $this->carOfDay = $serviceManager->get(CarOfDay::class);
+
+        $this->imageStorage = $serviceManager->get(StorageInterface::class);
 
         $strategy = new Strategy\Items($serviceManager);
         $this->addStrategy('brands', $strategy);
@@ -392,6 +400,66 @@ class ItemHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('full_name')) {
                 $result['full_name'] = $object['full_name'];
+            }
+
+            if ($this->filterComposite->filter('related_group_pictures')) {
+                $carPictures = [];
+                $groups = $this->itemModel->getRelatedCarGroups($object['id']);
+                if (count($groups) > 0) {
+                    $cars = $this->itemModel->getRows([
+                        'id'    => array_keys($groups),
+                        'order' => $this->catalogue->itemOrdering()
+                    ]);
+
+                    foreach ($cars as $car) {
+                        $ancestor = count($groups[$car['id']]) > 1
+                            ? $groups[$car['id']]
+                            : $car['id'];
+
+                        $pictureRow = $this->picture->getRow([
+                            'status' => Picture::STATUS_ACCEPTED,
+                            'item'   => [
+                                'ancestor_or_self' => [
+                                    'id' => $ancestor
+                                ]
+                            ],
+                            'order'  => 'ancestor_stock_front_first'
+                        ]);
+
+                        $src = null;
+                        if ($pictureRow) {
+                            $request = $this->catalogue->getPictureFormatRequest($pictureRow);
+                            $imagesInfo = $this->imageStorage->getFormatedImage($request, 'picture-thumb');
+                            $src = $imagesInfo->getSrc();
+                        }
+
+                        $cataloguePaths = $this->catalogue->getCataloguePaths($car['id'], [
+                            'breakOnFirst' => true
+                        ]);
+
+                        $url = null;
+                        foreach ($cataloguePaths as $cataloguePath) {
+                            $url = $this->router->assemble([
+                                'controller'    => 'catalogue',
+                                'action'        => 'brand-item',
+                                'brand_catname' => $cataloguePath['brand_catname'],
+                                'car_catname'   => $cataloguePath['car_catname'],
+                                'path'          => $cataloguePath['path']
+                            ], [
+                                'name' => 'catalogue'
+                            ]);
+                            break;
+                        }
+
+                        $carPictures[] = [
+                            'name' => $this->itemNameFormatter->format($car, $this->language),
+                            'src'  => $src,
+                            'url'  => $url
+                        ];
+                    }
+                }
+
+                $result['related_group_pictures'] = $carPictures;
             }
 
             $totalPictures = null;
@@ -685,12 +753,7 @@ class ItemHydrator extends RestHydrator
     {
         if ($item['item_type_id'] == Item::FACTORY) {
             return [
-                $this->router->assemble([
-                    'action' => 'factory',
-                    'id'     => $item['id'],
-                ], [
-                    'name' => 'factories/factory'
-                ])
+                '/ng/factories/' . $item['id']
             ];
         }
 

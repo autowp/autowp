@@ -223,6 +223,14 @@ class ItemController extends AbstractRestfulController
             $select->where(['item.catname' => (string)$data['catname']]);
         }
 
+        if ($data['related_groups_of']) {
+            $groups = $this->itemModel->getRelatedCarGroups((int)$data['related_groups_of']);
+            if (! $groups) {
+                $groups = [0 => 0];
+            }
+            $select->where([new Sql\Predicate\In('item.id', array_keys($groups))]);
+        }
+
         if ($isModer) {
             if ($data['last_item']) {
                 $namespace = new \Zend\Session\Container('Moder_Car');

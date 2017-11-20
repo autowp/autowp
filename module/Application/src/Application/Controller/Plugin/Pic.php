@@ -503,11 +503,7 @@ class Pic extends AbstractPlugin
                 foreach ($factoryRows as $factoryRow) {
                     $factories[] = [
                         'name' => $factoryRow['name'], // TODO: formatter
-                        'url'  => $this->httpRouter->assemble([
-                            'id' => $factoryRow['id']
-                        ], [
-                            'name' => 'factories/factory'
-                        ])
+                        'url'  => '/ng/factories/' . $factoryRow['id']
                     ];
                 }
 

@@ -1,6 +1,6 @@
 <ul class="nav nav-pills" style="margin-bottom:10px">
     <li>
-        <a ui-sref="." ng-bind-html="ctrl.factory.name_html"></a>
+        <a ui-sref="factory({id: ctrl.factory.id})" ng-bind-html="ctrl.factory.name_html"></a>
     </li>
     <li class="active"><a ui-sref="factory-items({id: ctrl.factory.id})" translate>factories/factory-items</a></li>
     <li ng-if="isModer">
@@ -11,6 +11,6 @@
     </li>
 </ul>
 
-<?=$this->partial('application/cars', $this->carsData)?>
+<autowp-item item="item" ng-repeat="item in ctrl.items"></autowp-item>
 
 <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
