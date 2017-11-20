@@ -4,7 +4,7 @@ import Module from '../../app.module';
 let leftPad = require('left-pad');
 
 interface IPaginatorDirectiveScope extends ng.IScope {
-    data: any;
+    data: autowp.IPaginator;
     padd: (page: number) => string;
 }
 

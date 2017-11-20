@@ -11,10 +11,10 @@ export class DonateVodSelectController {
     static $inject = ['$scope', '$translate', '$http', '$state'];
     public page: number;
     public brands: any[];
-    public paginator: any;
+    public paginator: autowp.IPaginator;
     public brand: any;
     public vehicles: any[];
-    public vehicles_paginator: any;
+    public vehicles_paginator: autowp.IPaginator;
     public concepts: any[];
     public selectItem: (itemId: number) => void;
     private date: string;
@@ -53,7 +53,7 @@ export class DonateVodSelectController {
                         limit: 500,
                         page: 1
                     }
-                }).then(function(response: ng.IHttpResponse<any>) {
+                }).then(function(response: ng.IHttpResponse<autowp.IPaginatedCollection<any>>) {
                     self.vehicles = response.data.items;
                     self.vehicles_paginator = response.data.paginator;
                     self.loading--;
@@ -99,7 +99,7 @@ export class DonateVodSelectController {
                     fields: 'name_only',
                     page: this.page
                 }
-            }).then(function(response: ng.IHttpResponse<any>) {
+            }).then(function(response: ng.IHttpResponse<autowp.IPaginatedCollection<any>>) {
                 self.brands = self.chunk(response.data.items, 6);
                 self.paginator = response.data.paginator;
                 self.loading--;

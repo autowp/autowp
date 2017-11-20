@@ -11,7 +11,7 @@ const STATE_NAME = 'articles';
 export class ArticlesController {
     static $inject = ['$scope', '$http', '$state'];
     public articles: any[];
-    public paginator: any;
+    public paginator: autowp.IPaginator;
   
     constructor(
         private $scope: autowp.IControllerScope,
@@ -37,7 +37,7 @@ export class ArticlesController {
                 limit: 10,
                 fields: 'description,author'
             }
-        }).then(function(response: ng.IHttpResponse<any>) {
+        }).then(function(response: ng.IHttpResponse<autowp.IPaginatedCollection<any>>) {
             self.articles = response.data.items;
             self.paginator = response.data.paginator;
         }, function(response: ng.IHttpResponse<any>) {
