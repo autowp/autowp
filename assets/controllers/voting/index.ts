@@ -141,4 +141,4 @@ angular.module(Module)
                 template: require('./template.html')
             });
         }
-    ])
+    ]);
