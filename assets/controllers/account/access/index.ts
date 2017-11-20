@@ -1,7 +1,6 @@
 import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
-import { IAutowpControllerScope } from 'declarations.d.ts';
 
 const CONTROLLER_NAME = 'AccountAccessController';
 const STATE_NAME = 'account-access';
@@ -12,7 +11,7 @@ export class AccountAccessController {
     public form: any;
   
     constructor(
-        private $scope: IAutowpControllerScope,
+        private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
         private $state: any,
         private $translate: ng.translate.ITranslateService

@@ -2,7 +2,6 @@ import * as angular from "angular";
 import Module from 'app.module';
 import { MostsService } from 'services/mosts';
 require('services/mosts');
-import { IAutowpControllerScope } from 'declarations.d.ts';
 import notify from 'notify';
 var $ = require('jquery');
 
@@ -22,7 +21,7 @@ class MostsController {
     public defaultTypeCatname: string;
   
     constructor(
-        private $scope: IAutowpControllerScope,
+        private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
         private $state: any,
         private MostsService: MostsService,

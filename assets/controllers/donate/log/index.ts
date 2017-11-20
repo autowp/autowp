@@ -1,6 +1,5 @@
 import * as angular from "angular";
 import Module from 'app.module';
-import { IAutowpControllerScope } from 'declarations.d.ts';
 import { UserService } from 'services/user';
 
 const CONTROLLER_NAME = 'DonateLogController';
@@ -11,7 +10,7 @@ export class DonateLogController {
     public items: any[]; 
   
     constructor(
-        private $scope: IAutowpControllerScope,
+        private $scope: autowp.IControllerScope,
         private UserService: UserService
     ) {
         this.$scope.pageEnv({

@@ -1,7 +1,6 @@
 import * as angular from "angular";
 import Module from 'app.module';
 import * as $ from 'jquery';
-import { IAutowpControllerScope } from 'declarations.d.ts';
 import notify from 'notify';
 
 const CONTROLLER_NAME = 'VotingController';
@@ -15,7 +14,7 @@ export class VotingController {
     public votes: any[];
   
     constructor(
-        private $scope: IAutowpControllerScope,
+        private $scope: autowp.IControllerScope,
         private $state: any,
         private $http: ng.IHttpService,
         private $translate: ng.translate.ITranslateService,

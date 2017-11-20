@@ -1,6 +1,5 @@
 import * as angular from "angular";
 import Module from 'app.module';
-import { IAutowpControllerScope } from 'declarations.d.ts';
 import notify from 'notify';
 
 import './item';
@@ -23,7 +22,7 @@ export class DonateVodSelectController {
     public loading: number = 0;
   
     constructor(
-        private $scope: IAutowpControllerScope,
+        private $scope: autowp.IControllerScope,
         private $translate: ng.translate.ITranslateService,
         private $http: ng.IHttpService,
         private $state: any

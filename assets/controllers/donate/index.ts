@@ -1,6 +1,5 @@
 import * as angular from "angular";
 import Module from 'app.module';
-import { IAutowpControllerScope } from 'declarations.d.ts';
 
 import './log';
 import './success';
@@ -14,7 +13,7 @@ export class DonateController {
     public frameUrl: string; 
   
     constructor(
-        private $scope: IAutowpControllerScope,
+        private $scope: autowp.IControllerScope,
         private $httpParamSerializer: ng.IHttpParamSerializer,
         private $translate: ng.translate.ITranslateService,
         private $sce: ng.ISCEService

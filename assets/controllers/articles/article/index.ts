@@ -1,6 +1,5 @@
 import * as angular from "angular";
 import Module from 'app.module';
-import { IAutowpControllerScope } from 'declarations.d.ts';
 import notify from 'notify';
 
 const CONTROLLER_NAME = 'ArticlesArticleController';
@@ -11,7 +10,7 @@ export class ArticlesArticleController {
     public article: any;
   
     constructor(
-        private $scope: IAutowpControllerScope,
+        private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
         private $state: any
     ) {

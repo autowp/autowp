@@ -1,7 +1,6 @@
 import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
-import { IAutowpControllerScope, IAutowpRootControllerScope } from 'declarations.d.ts';
 
 import './ok';
 
@@ -19,8 +18,8 @@ export class LoginController {
     public invalidParams: any;
   
     constructor(
-        private $scope: IAutowpControllerScope,
-        private $rootScope: IAutowpRootControllerScope,
+        private $scope: autowp.IControllerScope,
+        private $rootScope: autowp.IRootControllerScope,
         private $http: ng.IHttpService,
         private $state: any
     ) {

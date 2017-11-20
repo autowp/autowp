@@ -1,6 +1,5 @@
 import * as angular from "angular";
 import Module from 'app.module';
-import { IAutowpControllerScope } from 'declarations.d.ts';
 import { UserService } from 'services/user';
 require('services/user');
 import notify from 'notify';
@@ -34,7 +33,7 @@ export class DonateVodController {
     private itemId: number;
   
     constructor(
-        private $scope: IAutowpControllerScope,
+        private $scope: autowp.IControllerScope,
         private $translate: ng.translate.ITranslateService,
         private $http: ng.IHttpService,
         private $state: any

@@ -16,5 +16,9 @@
     "vendor",
     "module",
     "public_html"
+  ],
+  "files": [
+    "assets/autowp.d.ts",
+    "assets/jquery-Jcrop.d.ts"
   ]
 }
