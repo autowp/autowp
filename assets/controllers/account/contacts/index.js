@@ -2,6 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
+import { chunkBy } from 'chunk';
 
 const CONTROLLER_NAME = 'AccountContactsController';
 const STATE_NAME = 'account-contacts';
@@ -48,7 +49,7 @@ angular.module(Module)
                 }
             }).then(function(response) {
                 ctrl.items = response.data.items;
-                ctrl.chunks = ctrl.chunkBy(ctrl.items, 2);
+                ctrl.chunks = chunkBy(ctrl.items, 2);
             }, function(response) {
                 notify.response(response);
             });
@@ -64,23 +65,10 @@ angular.module(Module)
                             break;
                         }
                     }
-                    ctrl.chunks = ctrl.chunkBy(ctrl.items, 2);
+                    ctrl.chunks = chunkBy(ctrl.items, 2);
                 }, function(response) {
                     notify.response(response);
                 });
-            };
-
-            ctrl.chunkBy = function(arr, count) {
-                if (! arr) {
-                    return [];
-                }
-                var newArr = [];
-                var size = Math.ceil(count);
-                for (var i=0; i<arr.length; i+=size) {
-                    newArr.push(arr.slice(i, i+size));
-                }
-
-                return newArr;
             };
         }
     ]);

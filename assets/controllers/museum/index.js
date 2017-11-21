@@ -3,21 +3,13 @@ import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
 import { AclService } from 'services/acl';
+import { chunkBy } from 'chunk';
 
 var $ = require("jquery");
 var leaflet = require("leaflet-bundle");
 
 const CONTROLLER_NAME = 'MuseumController';
 const STATE_NAME = 'museum';
-
-function chunkBy(arr, count) {
-    var newArr = [];
-    var size = Math.ceil(count);
-    for (var i=0; i<arr.length; i+=size) {
-        newArr.push(arr.slice(i, i+size));
-    }
-    return newArr;
-}
 
 angular.module(Module)
     .config(['$stateProvider',

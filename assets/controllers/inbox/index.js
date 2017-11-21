@@ -2,18 +2,10 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
+import { chunkBy } from 'chunk';
 
 const CONTROLLER_NAME = 'InboxController';
 const STATE_NAME = 'inbox';
-
-function chunkBy(arr, count) {
-    var newArr = [];
-    var size = Math.ceil(count);
-    for (var i=0; i<arr.length; i+=size) {
-        newArr.push(arr.slice(i, i+size));
-    }
-    return newArr;
-}
 
 const ALL_BRANDS = 'all';
 

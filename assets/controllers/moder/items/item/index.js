@@ -6,6 +6,7 @@ import { VehicleTypeService } from 'services/vehicle-type';
 import { SpecService } from 'services/spec';
 import { ContentLanguageService } from 'services/content-language';
 import { ItemService } from 'services/item';
+import { chunkBy } from 'chunk';
 var $ = require('jquery');
 require('corejs-typeahead');
 import './tree';
@@ -26,15 +27,6 @@ function toPlain(options, deep) {
         });
     });
     return result;
-}
-
-function chunkBy(arr, count) {
-    var newArr = [];
-    var size = Math.ceil(count);
-    for (var i=0; i<arr.length; i+=size) {
-        newArr.push(arr.slice(i, i+size));
-    }
-    return newArr;
 }
 
 angular.module(Module)

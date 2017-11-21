@@ -3,6 +3,7 @@ import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
 import moment from 'moment';
+import { chunkBy } from 'chunk';
 
 const CONTROLLER_NAME = 'NewItemController';
 const STATE_NAME = 'new-item';
@@ -81,20 +82,11 @@ angular.module(Module)
                     page: $state.params.page
                 }
             }).then(function(response) {
-                ctrl.chunks = ctrl.chunkBy(response.data.pictures, 6);
+                ctrl.chunks = chunkBy(response.data.pictures, 6);
                 ctrl.paginator = response.data.paginator;
             }, function(response) {
                 notify.response(response);
             });
-            
-            ctrl.chunkBy = function(arr, count) {
-                var newArr = [];
-                var size = Math.ceil(count);
-                for (var i=0; i<arr.length; i+=size) {
-                    newArr.push(arr.slice(i, i+size));
-                }
-                return newArr;
-            };
         }
     ]);
 

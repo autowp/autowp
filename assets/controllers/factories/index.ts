@@ -2,21 +2,13 @@ import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
 import * as $ from "jquery";
+import { chunkBy } from 'chunk';
 var leaflet = require("leaflet-bundle");
 
 import './items';
 
 const CONTROLLER_NAME = 'FactoryController';
 const STATE_NAME = 'factory';
-
-function chunkBy(arr: any[], count: number): any[] {
-    var newArr = [];
-    var size = Math.ceil(count);
-    for (var i=0; i<arr.length; i+=size) {
-        newArr.push(arr.slice(i, i+size));
-    }
-    return newArr;
-}
 
 export class FactoryController {
     static $inject = ['$scope', '$http', '$state'];

@@ -5,6 +5,7 @@ import { AclService } from 'services/acl';
 import { VehicleTypeService } from 'services/vehicle-type';
 import { SpecService } from 'services/spec';
 import { ContentLanguageService } from 'services/content-language';
+import { chunkBy } from 'chunk';
 import './tree';
 import './tree-item';
 import 'directives/auto-focus';
@@ -235,19 +236,6 @@ angular.module(Module)
                         tab: 'catalogue'
                     });
                 });
-            };
-            
-            ctrl.chunkBy = function(arr, count) {
-                if (! arr) {
-                    return [];
-                }
-                var newArr = [];
-                var size = Math.ceil(count);
-                for (var i=0; i<arr.length; i+=size) {
-                    newArr.push(arr.slice(i, i+size));
-                }
-
-                return newArr;
             };
             
             ctrl.chunk = function(arr, count) {

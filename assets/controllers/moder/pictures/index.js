@@ -6,20 +6,12 @@ import { PerspectiveService } from 'services/perspective';
 import { PictureModerVoteTemplateService } from 'services/picture-moder-vote-template';
 import { PictureModerVoteService } from 'services/picture-moder-vote';
 import { AclService } from 'services/acl';
+import { chunkBy } from 'chunk';
 import "corejs-typeahead";
 import $ from 'jquery';
 
 const CONTROLLER_NAME = 'ModerPicturesController';
 const STATE_NAME = 'moder-pictures';
-
-function chunkBy(arr, count) {
-    var newArr = [];
-    var size = Math.ceil(count);
-    for (var i=0; i<arr.length; i+=size) {
-        newArr.push(arr.slice(i, i+size));
-    }
-    return newArr;
-}
 
 angular.module(Module)
     .config(['$stateProvider',

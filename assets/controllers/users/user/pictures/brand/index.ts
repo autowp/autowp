@@ -1,18 +1,10 @@
 import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
+import { chunkBy } from 'chunk';
 
 const CONTROLLER_NAME = 'UsersUserPicturesBrandController';
 const STATE_NAME = 'users-user-pictures-brand';
-
-function chunkBy(arr: any[], count: number): any[] {
-    var newArr = [];
-    var size = Math.ceil(count);
-    for (var i=0; i<arr.length; i+=size) {
-        newArr.push(arr.slice(i, i+size));
-    }
-    return newArr;
-}
 
 export class UsersUserPicturesBrandController {
     static $inject = ['$scope', '$state', '$http'];

@@ -2,6 +2,7 @@ import angular from 'angular';
 import Module from 'app.module';
 import template from './template.html';
 import notify from 'notify';
+import { chunkBy } from 'chunk';
 
 import './item';
 import './list-item';
@@ -85,7 +86,7 @@ angular.module(Module)
                             repackedGroup = group;
                             break;
                         case 'pictures':
-                            repackedGroup.chunks = ctrl.chunkBy(group.pictures, 6);
+                            repackedGroup.chunks = chunkBy(group.pictures, 6);
                             break;
                     }
                     
@@ -108,15 +109,6 @@ angular.module(Module)
             }, function(response) {
                 notify.response(response);
             });
-            
-            ctrl.chunkBy = function(arr, count) {
-                var newArr = [];
-                var size = Math.ceil(count);
-                for (var i=0; i<arr.length; i+=size) {
-                    newArr.push(arr.slice(i, i+size));
-                }
-                return newArr;
-            };
         }
     ]);
 

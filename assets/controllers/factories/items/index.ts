@@ -1,18 +1,10 @@
 import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
+import { chunkBy } from 'chunk';
 
 const CONTROLLER_NAME = 'FactoryItemsController';
 const STATE_NAME = 'factory-items';
-
-function chunkBy(arr: any[], count: number): any[] {
-    var newArr = [];
-    var size = Math.ceil(count);
-    for (var i=0; i<arr.length; i+=size) {
-        newArr.push(arr.slice(i, i+size));
-    }
-    return newArr;
-}
 
 export class FactoryItemsController {
     static $inject = ['$scope', '$http', '$state'];
