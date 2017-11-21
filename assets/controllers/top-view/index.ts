@@ -6,7 +6,7 @@ import { chunkBy } from 'chunk';
 const CONTROLLER_NAME = 'TopViewController';
 const STATE_NAME = 'top-view';
 
-export class UsersUserController {
+export class TopViewController {
     static $inject = ['$scope', '$http', '$state'];
     public chunks: any[] = [];
     public paginator: autowp.IPaginator;
@@ -48,7 +48,7 @@ export class UsersUserController {
 };
 
 angular.module(Module)
-    .controller(CONTROLLER_NAME, UsersUserController)
+    .controller(CONTROLLER_NAME, TopViewController)
     .config(['$stateProvider',
         function config($stateProvider: any) {
             $stateProvider.state( {
