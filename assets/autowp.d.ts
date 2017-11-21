@@ -4,12 +4,13 @@ declare namespace autowp {
     {
         user: any;
         pageEnv: (data: any) => void;
+        getUser: () => any;
+        setUser: (user: any) => void;
     }
     
     export interface IRootControllerScope extends autowp.IControllerScope
     {
-        getUser: () => any;
-        setUser: (user: any) => void;
+        
     }
   
     export interface IPaginator

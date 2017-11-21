@@ -1,6 +1,5 @@
-import angular from 'angular';
+import * as angular from 'angular';
 import Module from 'app.module';
-import template from './template.html';
 
 import './access';
 import './accounts';
@@ -17,23 +16,27 @@ import './profile';
 const CONTROLLER_NAME = 'AccountController';
 const STATE_NAME = 'account';
 
+export class AccountController {
+    static $inject = ['$state'];
+  
+    constructor(
+        private $state: any
+    ) {
+        this.$state.go('account-profile');
+    }
+}
+
 angular.module(Module)
+    .controller(CONTROLLER_NAME, AccountController)
     .config(['$stateProvider',
-        function config($stateProvider) {
+        function config($stateProvider: any) {
             $stateProvider.state( {
                 name: STATE_NAME,
                 url: '/account',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: require('./template.html')
             });
-        }
-    ])
-    .controller(CONTROLLER_NAME, [
-        '$state', 
-        function($state) {
-            $state.go('account-profile');
         }
     ]);
 
-export default CONTROLLER_NAME;
