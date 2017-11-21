@@ -1,6 +1,5 @@
-import angular from 'angular';
+import * as angular from 'angular';
 import Module from 'app.module';
-import template from './template.html';
 import notify from 'notify';
 import { ForumService } from 'services/forum';
 
@@ -9,24 +8,22 @@ const STATE_NAME = 'forums-message';
 
 angular.module(Module)
     .config(['$stateProvider',
-        function config($stateProvider) {
+        function config($stateProvider: any) {
             $stateProvider.state( {
                 name: STATE_NAME,
                 url: '/forums/message/:message_id',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
-                template: template
+                template: require('./template.html')
             });
         }
     ])
     .controller(CONTROLLER_NAME, [
         '$state', 'ForumService',
-        function($state, Forum) {
-            var ctrl = this;
-            
-            Forum.getMessageStateParams($state.params.message_id).then(function(params) {
+        function($state: any, Forum) {
+            Forum.getMessageStateParams($state.params.message_id).then(function(params: any) {
                 $state.go('forums-topic', params);
-            }, function(response) {
+            }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
         }
