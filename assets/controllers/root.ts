@@ -1,4 +1,4 @@
-import angular from 'angular';
+import * as angular from 'angular';
 import Module from 'app.module';
 import { PageService } from 'services/page';
 import { MessageService } from 'services/message';
@@ -7,15 +7,38 @@ import notify from 'notify';
 
 const CONTROLLER_NAME = 'RootController';
 
-angular.module(Module).controller(CONTROLLER_NAME, [
-    '$scope', '$http', '$location', '$translate', '$rootScope', '$state', 'PageService', 'MessageService',
-    function($scope, $http, $location,  $translate, $rootScope, $state, PageService, MessageService) {
-        var that = this;
+function replaceArgs(str: string, args: any): string {
+    angular.forEach(args, function(value: string, key: string) {
+        str = str.replace(key, value);
+    });
+    return str;
+}
+
+declare global {
+    interface Window { opt: any; }
+}
+
+export class RootController {
+    static $inject = ['$scope', '$http', '$location', '$translate', '$rootScope', '$state', 'PageService', 'MessageService'];
+    
+    
+
+    constructor(
+        private $scope: autowp.IRootControllerScope,  
+        private $http: ng.IHttpService,
+        private $location: ng.ILocationService,
+        private $translate: ng.translate.ITranslateService,
+        private $rootScope: autowp.IRootControllerScope,  
+        private $state: any,
+        private PageService: PageService,
+        private MessageService: MessageService
+    ) {
+        let opt = window.opt;
         
         $scope.languages = opt.languages;
         $scope.path = $location.path();
         
-        setSidebars(false);
+        this.setSidebars(false);
         
         $scope.user = opt.user;
         $scope.isModer = opt.isModer;
@@ -26,14 +49,16 @@ angular.module(Module).controller(CONTROLLER_NAME, [
         $scope.pageName = null;
         $scope.title = 'WheelsAge';
         $scope.pageId = null;
+        
+        var self = this;
         $scope.pageEnv = function(data) {
-            setSidebars(data.layout.needRight);
+            self.setSidebars(data.layout.needRight);
             $scope.isAdminPage = data.layout.isAdminPage;
             
             var args = data.args ? data.args : {};
-            var preparedUrlArgs = {};
-            var preparedNameArgs = {};
-            angular.forEach(args, function(value, key) {
+            var preparedUrlArgs: any = {};
+            var preparedNameArgs: any = {};
+            angular.forEach(args, function(value: string, key: string) {
                 preparedUrlArgs['%' + key + '%'] = encodeURIComponent(value);
                 preparedNameArgs['%' + key + '%'] = value;
             });
@@ -41,8 +66,8 @@ angular.module(Module).controller(CONTROLLER_NAME, [
             PageService.setCurrent(data.pageId, preparedNameArgs);
             
             if (data.pageId) {
-                var nameKey;
-                var titleKey;
+                var nameKey: string;
+                var titleKey: string;
                 if (data.name) {
                     nameKey = data.name;
                     titleKey = data.title ? data.title : data.name;
@@ -50,7 +75,7 @@ angular.module(Module).controller(CONTROLLER_NAME, [
                     nameKey = 'page/' + data.pageId + '/name';
                     titleKey = 'page/' + data.pageId + '/title';
                 }
-                $translate([nameKey, titleKey]).then(function (translations) {
+                $translate([nameKey, titleKey]).then(function (translations: any) {
                     var name = replaceArgs(translations[nameKey], preparedNameArgs);
                     var title = replaceArgs(translations[titleKey], preparedNameArgs);
                     $scope.pageName = name;
@@ -65,23 +90,9 @@ angular.module(Module).controller(CONTROLLER_NAME, [
             }
         };
         
-        $scope.isSecondaryMenuItems = function(page) {
+        $scope.isSecondaryMenuItems = function(page: any): boolean {
             return [25, 117, 42].indexOf(+page.id) !== -1;
         };
-        
-        function setSidebars(right) {
-            $scope.needRight = right;
-            
-            $scope.spanRight = right ? 4 : 0;
-            $scope.spanCenter = 12 - $scope.spanRight;
-        }
-        
-        function replaceArgs(str, args) {
-            angular.forEach(args, function(value, key) {
-                str = str.replace(key, value);
-            });
-            return str;
-        }
         
         $rootScope.$on('$stateChangeSuccess', function() {
             document.body.scrollTop = document.documentElement.scrollTop = 0;
@@ -149,7 +160,7 @@ angular.module(Module).controller(CONTROLLER_NAME, [
                     notify.response(response);
                 });
             } else {
-                $scope.newPersonalMessages = null;
+                $scope.newPersonalMessages = 0;
             }
         };
         
@@ -167,6 +178,14 @@ angular.module(Module).controller(CONTROLLER_NAME, [
             return $scope.user;
         };
     }
-]);
+    
+    private setSidebars(right: boolean) {
+        this.$scope.needRight = right;
+        
+        this.$scope.spanRight = right ? 4 : 0;
+        this.$scope.spanCenter = 12 - this.$scope.spanRight;
+    }
+}
 
-export default CONTROLLER_NAME;
+angular.module(Module).controller(CONTROLLER_NAME, RootController);
+
