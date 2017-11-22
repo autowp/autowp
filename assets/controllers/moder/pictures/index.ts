@@ -159,7 +159,7 @@ export class ModerPicturesController {
                 self.owner_id = item.id;
                 self.load();
             })
-            .on('change blur', function(ev: any, item: any) {
+            .bind('change blur', function(ev: any, item: any) {
                 var curValue = $(this).val();
                 if (userIdLastValue && !curValue) {
                     self.owner_id = null;
@@ -210,7 +210,7 @@ export class ModerPicturesController {
                 self.item_id = item.id;
                 self.load();
             })
-            .on('change blur', function(ev: any, item: any) {
+            .bind('change blur', function(ev: any, item: any) {
                 var curValue = $(this).val();
                 if (itemIdLastValue && !curValue) {
                     self.item_id = null;

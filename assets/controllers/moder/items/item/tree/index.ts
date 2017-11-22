@@ -1,6 +1,5 @@
-import angular from 'angular';
+import * as angular from 'angular';
 import Module from 'app.module';
-import template from './template.html';
 
 angular.module(Module)
     .directive('autowpModerItemTree', function() {
@@ -9,7 +8,7 @@ angular.module(Module)
             scope: {
                 item: '='
             },
-            template: template,
+            template: require('./template.html'),
             transclude: true,
             controllerAs: 'ctrl',
             controller: [ 

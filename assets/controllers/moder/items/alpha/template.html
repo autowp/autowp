@@ -1,21 +1,21 @@
 <div class="well">
-    <div class="btn-group" ng-repeat="group in groups">
+    <div class="btn-group" ng-repeat="group in ctrl.groups">
         <button ng-repeat="char in group"
             class="btn btn-default" 
             ng-bind="char" 
-            ng-click="selectChar(char)"
+            ng-click="ctrl.selectChar(char)"
         ></button>
     </div>
 </div>
 
-<div ng-show="items">
+<div ng-show="ctrl.items">
     <div class="well">
         <span ng-show="ctrl.loading > 0">
             <i class="fa fa-spinner fa-spin fa-fw"></i>
         </span>
-        <div ng-repeat="item in items">
+        <div ng-repeat="item in ctrl.items">
             <a ui-sref="moder-items-item({id: item.id})" ng-bind-html="item.name_html"></a>
         </div>
-        <autowp-paginator data="paginator" ng-if="paginator"></autowp-paginator>
+        <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
     </div>
 </div>

@@ -81,12 +81,12 @@ export class ModerCommentsController {
                     
                 }
             })
-            .on('typeahead:select', function(ev, item) {
+            .on('typeahead:select', function(ev: any, item: any) {
                 userIdLastValue = item.name;
                 self.user = item.id;
                 self.load();
             })
-            .on('change blur', function(ev, item) {
+            .bind('change blur', function(ev: any, item: any) {
                 var curValue = $(this).val();
                 if (userIdLastValue && !curValue) {
                     self.user = null;
@@ -99,6 +99,19 @@ export class ModerCommentsController {
         $itemIdElement.val(this.pictures_of_item_id ? '#' + this.pictures_of_item_id : '');
         var itemIdLastValue = $itemIdElement.val();
         $itemIdElement
+            .on('typeahead:select', function(ev: any, item: any) {
+                itemIdLastValue = item.name_text;
+                self.pictures_of_item_id = item.id;
+                self.load();
+            })
+            .bind('change blur', function(ev: any, item: any) {
+                var curValue = $(this).val();
+                if (itemIdLastValue && !curValue) {
+                    self.pictures_of_item_id = null;
+                    self.load();
+                }
+                itemIdLastValue = curValue;
+            })
             .typeahead({ }, {
                 display: function(item: any) {
                     return item.name_text;
@@ -131,19 +144,6 @@ export class ModerCommentsController {
                     });
                     
                 }
-            })
-            .on('typeahead:select', function(ev, item) {
-                itemIdLastValue = item.name_text;
-                self.pictures_of_item_id = item.id;
-                self.load();
-            })
-            .on('change blur', function(ev, item) {
-                var curValue = $(this).val();
-                if (itemIdLastValue && !curValue) {
-                    self.pictures_of_item_id = null;
-                    self.load();
-                }
-                itemIdLastValue = curValue;
             });
         
         this.load();
