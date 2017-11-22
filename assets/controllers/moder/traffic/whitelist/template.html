@@ -8,18 +8,15 @@
 </ul>
 <table class="table table-striped table-condensed">
     <tbody>
-        <tr ng-repeat="item in items">
+        <tr ng-repeat="item in ctrl.items">
             <td ng-bind="item.ip"></td>
             <td ng-bind="item.hostname"></td>
             <td ng-bind="item.description"></td>
             <td><a ng-href="http://nic.ru/whois/?query={{item.whois_url}}">whois</a></td>
             <td>
-                <form class="form-inline" style="margin:0" method="post" action="<?=$this->escapeHtmlAttr($this->deleteUrl)?>">
-                    <input type="hidden" name="ip" value="<?=$this->escapeHtmlAttr($row['ip'])?>" />
-                    <button class="btn btn-danger" ng-click="deleteItem(item)" style="margin:0" aria-label="Delete">
-                        <i class="fa fa-times"></i>
-                    </button>
-                </form>
+                <button class="btn btn-danger" ng-click="ctrl.deleteItem(item)" style="margin:0" aria-label="Delete">
+                    <i class="fa fa-times"></i>
+                </button>
             </td>
         </tr>
     </tbody>

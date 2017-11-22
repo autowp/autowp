@@ -7,7 +7,7 @@
     </li>
 </ul>
 
-<div class="row" ng-repeat="item in items">
+<div class="row" ng-repeat="item in ctrl.items">
     <div class="col-sm-2">
         <h3 ng-bind="item.count"></h3>
     </div>
@@ -29,9 +29,9 @@
             </span>
         </div>
         <div>
-            <button ng-if="item.ban" class="btn btn-default" ng-click="removeFromBlacklist(item.ip)">{{'ban/unban'|translate}}</button>
-            <button class="btn btn-danger" ng-if="!item.ban" ng-click="addToBlacklist(item.ip)">{{'ban/ban'|translate}}</button>
-            <button ng-if="!item.whitelist" class="btn btn-success" ng-click="addToWhitelist(item.ip)">Whitelist</button>
+            <button ng-if="item.ban" class="btn btn-default" ng-click="ctrl.removeFromBlacklist(item.ip)">{{'ban/unban'|translate}}</button>
+            <button class="btn btn-danger" ng-if="!item.ban" ng-click="ctrl.addToBlacklist(item.ip)">{{'ban/ban'|translate}}</button>
+            <button ng-if="!item.whitelist" class="btn btn-success" ng-click="ctrl.addToWhitelist(item.ip)">Whitelist</button>
         </div>
     </div>
 </div>

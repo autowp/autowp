@@ -16,7 +16,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="user in users">
+        <tr ng-repeat="user in ctrl.users">
             <td ng-bind="user.id"></td>
             <td>
                 <img ng-src="{{user.image.src}}" ng-if="user.image" style="max-width:300px;max-height:300px" />
@@ -34,4 +34,4 @@
     </tbody>
 </table>
 
-<autowp-paginator data="paginator" ng-if="paginator"></autowp-paginator>
+<autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
