@@ -1,5 +1,5 @@
 <ul>
-    <li style="margin-bottom:20px" ng-repeat="item in items">
+    <li style="margin-bottom:20px" ng-repeat="item in ctrl.items">
         <h3 ng-bind="item.name | translate"></h3>
         <p>{{item.value}} / {{item.total}}</p>
         <div class="progress">
