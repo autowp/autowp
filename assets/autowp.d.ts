@@ -10,7 +10,7 @@ declare namespace autowp {
     
     export interface IRootControllerScope extends autowp.IControllerScope
     {
-        
+        refreshNewMessagesCount: () => void;
     }
   
     export interface IPaginator
