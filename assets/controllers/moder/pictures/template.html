@@ -27,7 +27,7 @@
         <form class="well form-vertical">
             <div class="form-group">
                 <label translate>moder/picture/filter/status</label>
-                <select name="status" class="form-control" ng-model="status" ng-change="ctrl.load()">
+                <select name="status" class="form-control" ng-model="ctrl.status" ng-change="ctrl.load()">
                     <option value="">{{'moder/picture/filter/status/any'|translate}}</option>
                     <option value="inbox">{{'moder/picture/filter/status/inbox'|translate}}</option>
                     <option value="accepted">{{'moder/picture/filter/status/accepted'|translate}}</option>
@@ -37,17 +37,17 @@
             </div>
             <div class="form-group">
                 <label translate>moder/picture/filter/vehicle-type</label>
-                <select name="car_type_id" class="form-control" ng-model="car_type_id" ng-change="ctrl.load()">
+                <select name="car_type_id" class="form-control" ng-model="ctrl.car_type_id" ng-change="ctrl.load()">
                     <option value="">Any</option>
-                    <option value="{{item.id}}" ng-repeat="item in vehicleTypeOptions">{{'...'.repeat(item.deep)}}{{item.name|translate}}</option>
+                    <option value="{{item.id}}" ng-repeat="item in ctrl.vehicleTypeOptions">{{'...'.repeat(item.deep)}}{{item.name|translate}}</option>
                 </select>
             </div>
             <div class="form-group">
                 <label translate>moder/pictures/filter/perspective</label>
-                <select name="perspective_id" class="form-control" ng-model="perspective_id" ng-change="ctrl.load()">
+                <select name="perspective_id" class="form-control" ng-model="ctrl.perspective_id" ng-change="ctrl.load()">
                     <option value="" translate>moder/pictures/filter/perspective/any</option>
                     <option value="null" translate>moder/pictures/filter/perspective/empty</option>
-                    <option value="{{item.id}}" ng-repeat="item in perspectiveOptions">{{item.name|translate}}</option>
+                    <option value="{{item.id}}" ng-repeat="item in ctrl.perspectiveOptions">{{item.name|translate}}</option>
                 </select>
             </div>
             <div class="form-group">
@@ -56,7 +56,7 @@
             </div>
             <div class="form-group">
                 <label translate>moder/pictures/filter/comments</label>
-                <select name="comments" class="form-control" ng-model="comments" ng-change="ctrl.load()">
+                <select name="comments" class="form-control" ng-model="ctrl.comments" ng-change="ctrl.load()">
                     <option value="" translate>moder/pictures/filter/comments/not-matters</option>
                     <option value="1" translate>moder/pictures/filter/comments/has-comments</option>
                     <option value="0" translate>moder/pictures/filter/comments/has-no-comments</option>
@@ -68,7 +68,7 @@
             </div>
             <div class="form-group">
                 <label translate>moder/pictures/filter/replace</label>
-                <select name="replace" class="form-control" ng-model="replace" ng-change="ctrl.load()">
+                <select name="replace" class="form-control" ng-model="ctrl.replace" ng-change="ctrl.load()">
                     <option value="" translate>moder/pictures/filter/replace/not-matters</option>
                     <option value="1" translate>moder/pictures/filter/replace/replaces</option>
                     <option value="0" translate>moder/pictures/filter/replace/without-replaces</option>
@@ -76,7 +76,7 @@
             </div>
             <div class="form-group">
                 <label translate>moder/pictures/filter/votes</label>
-                <select name="requests" class="form-control" ng-model="requests" ng-change="ctrl.load()">
+                <select name="requests" class="form-control" ng-model="ctrl.requests" ng-change="ctrl.load()">
                     <option value="" translate>moder/pictures/filter/votes/not-matters</option>
                     <option value="0" translate>moder/pictures/filter/votes/none</option>
                     <option value="1" translate>moder/pictures/filter/votes/accept</option>
@@ -86,31 +86,31 @@
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="special_name" value="1" ng-model="special_name" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="special_name" value="1" ng-model="ctrl.special_name" ng-change="ctrl.load()" /> 
                     {{'moder/picture/filter/special-name'|translate}}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="lost" value="1" ng-model="lost" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="lost" value="1" ng-model="ctrl.lost" ng-change="ctrl.load()" /> 
                     {{'moder/picture/filter/not-linked'|translate}}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="gps" value="1" ng-model="gps" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="gps" value="1" ng-model="ctrl.gps" ng-change="ctrl.load()" /> 
                     {{'moder/picture/filter/gps'|translate}}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="similar" value="1" ng-model="similar" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="similar" value="1" ng-model="ctrl.similar" ng-change="ctrl.load()" /> 
                     {{'moder/picture/filter/similar'|translate}}
                 </label>
             </div>
             <div class="form-group">
                 <label translate>moder/picture/filter/order</label>
-                <select name="order" class="form-control" ng-model="order" ng-change="ctrl.load()">
+                <select name="order" class="form-control" ng-model="ctrl.order" ng-change="ctrl.load()">
                     <option value="1" translate>moder/pictures/filter/order/add-date-desc</option>
                     <option value="2" translate>moder/pictures/filter/order/add-date-asc</option>
                     <option value="3" translate>moder/pictures/filter/order/resolution-desc</option>
@@ -139,28 +139,28 @@
     
         <div style="margin-bottom:20px">
             <div class="btn-group">
-                <button ng-disabled="!hasSelectedItem" class="btn btn-success" ng-click="acceptPictures()">
+                <button ng-disabled="!ctrl.hasSelectedItem" class="btn btn-success" ng-click="ctrl.acceptPictures()">
                     {{'moder/picture/acceptance/accept'|translate}}
                 </button>
                 <div class="btn-group">
-                    <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-disabled="!hasSelectedItem">
+                    <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-disabled="!ctrl.hasSelectedItem">
                         {{'moder/picture/acceptance/want-accept'|translate}}
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                        <li ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote > 0">
-                            <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePictures(template.vote, template.name);"></a>
+                        <li ng-repeat="template in ctrl.moderVoteTemplateOptions" ng-if="template.vote > 0">
+                            <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
                         </li>
                     </ul>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-disabled="!hasSelectedItem">
+                    <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-disabled="!ctrl.hasSelectedItem">
                         {{'moder/picture/acceptance/want-delete'|translate}}
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                         <li ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote < 0">
-                            <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePictures(template.vote, template.name);"></a>
+                            <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
                         </li>
                     </ul>
                 </div>
@@ -169,12 +169,12 @@
 
         
         
-        <div class="row" ng-repeat="chunk in chunks">
+        <div class="row" ng-repeat="chunk in ctrl.chunks">
             <div class="col-sm-3" ng-repeat="picture in chunk">
                 <autowp-thumbnail picture="picture" onselect="onPictureSelect" is-moder="isModer"></autowp-thumbnail>
             </div>
         </div>
         
-        <autowp-paginator data="paginator" ng-if="paginator"></autowp-paginator>
+        <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
     </div>
 </div>
