@@ -79,7 +79,7 @@ export class FactoryController {
             }).then(function(response: ng.IHttpResponse<any>) {
                 self.pictures = chunkBy(response.data.pictures, 4);
             }, function(response: ng.IHttpResponse<any>) {
-                notify.response(notify);
+                notify.response(response);
             });
         }, function(response: ng.IHttpResponse<any>) {
             self.$state.go('error-404');

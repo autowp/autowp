@@ -57,7 +57,7 @@ export class AccountAccessController {
             };
             
             self.$translate('account/access/change-password/saved').then(function(translation) {
-                notify({
+                new notify({
                     icon: 'fa fa-check',
                     message: translation
                 }, {

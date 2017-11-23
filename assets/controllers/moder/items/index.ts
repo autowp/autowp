@@ -122,6 +122,19 @@ export class ModerItemsController {
         $itemIdElement.val(this.filter.ancestor_id ? '#' + this.filter.ancestor_id : '');
         var itemIdLastValue = $itemIdElement.val();
         $itemIdElement
+            .on('typeahead:select', function(ev: any, item: any) {
+                itemIdLastValue = item.name_text;
+                self.filter.ancestor_id = item.id;
+                self.load();
+            })
+            .bind('change blur', function(ev: any, item: any) {
+                var curValue = $(this).val();
+                if (itemIdLastValue && !curValue) {
+                    self.filter.ancestor_id = null;
+                    self.load();
+                }
+                itemIdLastValue = curValue;
+            })
             .typeahead({ }, {
                 display: function(item: any) {
                     return item.name_text;
@@ -154,19 +167,6 @@ export class ModerItemsController {
                     });
                     
                 }
-            })
-            .on('typeahead:select', function(ev, item) {
-                itemIdLastValue = item.name_text;
-                self.filter.ancestor_id = item.id;
-                self.load();
-            })
-            .on('change blur', function(ev, item) {
-                var curValue = $(this).val();
-                if (itemIdLastValue && !curValue) {
-                    self.filter.ancestor_id = null;
-                    self.load();
-                }
-                itemIdLastValue = curValue;
             });
     }
     

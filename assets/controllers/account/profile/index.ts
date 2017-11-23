@@ -103,7 +103,7 @@ export class AccountProfileController {
             self.$scope.user.name = self.profile.name;
             
             self.$translate('account/profile/saved').then(function(translation: string) {
-                notify({
+                new notify({
                     icon: 'fa fa-check',
                     message: translation
                 }, {
@@ -133,7 +133,7 @@ export class AccountProfileController {
         }).then(function() {
             
             self.$translate('account/profile/saved').then(function(translation: string) {
-                notify({
+                new notify({
                     icon: 'fa fa-check',
                     message: translation
                 }, {

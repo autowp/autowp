@@ -85,7 +85,7 @@ export class AccountAccountsController {
         }).then(function(response: ng.IHttpResponse<any>) {
             
             self.$translate('account/accounts/removed').then(function(translation: string) {
-                notify({
+                new notify({
                     icon: 'fa fa-check',
                     message: translation
                 }, {

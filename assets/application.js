@@ -7,7 +7,7 @@ require("angular.app");
 require('app.module');
 require("bootstrap/bootstrap");
 require("styles.less");
-require("flags/flags.js");
+require("flags/flags");
 
 var resources = {};
 $.map(['en', 'fr', 'ru', 'zh', 'be', 'pt-br'], function(language) {
