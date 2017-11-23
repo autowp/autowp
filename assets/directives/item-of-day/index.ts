@@ -11,12 +11,9 @@ class AutowpItemOfDayController {
 
     static $inject = ['$scope'];
     constructor(protected $scope: IAutowpItemOfDayDirectiveScope) {
-        var self = this;
-        
-        
+
     }
 
-    
 }
 
 class AutowpItemOfDayDirective implements ng.IDirective {

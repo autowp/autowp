@@ -1,13 +1,13 @@
-import angular from 'angular';
-import angularRouter from '@uirouter/angularjs';
-import angularAnimate from 'angular-animate';
-import angularAria from 'angular-aria';
-import angularMessages from 'angular-messages';
-import angularTranslate from 'angular-translate';
-import angularTranslateInterpolationMessageformat from 'angular-translate-interpolation-messageformat';
-import angularSanitize from 'angular-sanitize';
+import * as angular from 'angular';
+import '@uirouter/angularjs';
+import 'angular-animate';
+import 'angular-aria';
+import 'angular-messages';
+import 'angular-translate';
+import 'angular-translate-interpolation-messageformat';
+import 'angular-sanitize';
 import 'angular-simple-logger';
-import angularMarkdown from 'angular-markdown-directive';
+import 'angular-markdown-directive';
 import 'angular-filesize-filter/angular-filesize-filter';
 import 'ng-tags-input';
 import 'ng-tags-input/build/ng-tags-input.css';
@@ -26,9 +26,9 @@ import 'ng-file-upload';
 
 const MODULE_NAME = 'App';
 
-angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angularTranslate, 'nemLogging', 'btford.markdown', angularSanitize, "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet', 'angularMoment', 'vcRecaptcha', 'ngFileUpload'])
+angular.module(MODULE_NAME, ['ngAnimate', 'ngAria', 'ui.router', 'pascalprecht.translate', 'nemLogging', 'btford.markdown', 'ngSanitize', "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet', 'angularMoment', 'vcRecaptcha', 'ngFileUpload'])
     .config(['$urlRouterProvider', '$locationProvider', '$translateProvider', 
-        function config($urlRouterProvider, $locationProvider, $translateProvider) {
+        function config($urlRouterProvider: any, $locationProvider: ng.ILocationProvider, $translateProvider: any) {
             $locationProvider.html5Mode(true).hashPrefix('!');
     
             //$urlRouterProvider.when('', '/');
@@ -50,17 +50,19 @@ angular.module(MODULE_NAME, [angularAnimate, angularAria, angularRouter, angular
             $translateProvider.use(lang);
         }
     ])
-    .run(['amMoment', function(amMoment) {
+    .run(['amMoment', function(amMoment: any) {
         var lang = document.documentElement.getAttribute('lang');
-        var map = {
-            ru: 'ru',
-            en: 'en',
-            fr: 'fr',
-            zh: 'zh-cn',
-            be: 'be',
-            'pt-br': 'pt-br'
-        };
-        amMoment.changeLocale(map[lang]);
+        if (lang) {
+            var map: any = {
+                ru: 'ru',
+                en: 'en',
+                fr: 'fr',
+                zh: 'zh-cn',
+                be: 'be',
+                'pt-br': 'pt-br'
+            };
+            amMoment.changeLocale(map[lang]);
+        }
     }])
     .constant('amTimeAgoConfig', {
         fullDateThreshold: 2,

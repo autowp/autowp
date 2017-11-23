@@ -68,9 +68,7 @@ class AutowpItemDirective implements ng.IDirective {
     public bindToController: true;
 
     static factory(): ng.IDirectiveFactory {
-        const directive = () => new AutowpItemDirective();
-        directive.$inject = ['AclService'];
-        return directive;
+        return () => new AutowpItemDirective();
     }
 }
 
