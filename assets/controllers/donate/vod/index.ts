@@ -1,7 +1,7 @@
 import * as angular from "angular";
 import Module from 'app.module';
 import { UserService } from 'services/user';
-require('services/user');
+import { ItemService } from 'services/item';
 import notify from 'notify';
 
 import './select';
@@ -22,10 +22,10 @@ interface IVodResponse {
 }
 
 export class DonateVodController {
-    static $inject = ['$scope', '$translate', '$http', '$state'];
+    static $inject = ['$scope', '$translate', '$http', '$state', 'ItemService'];
     private formParams: any;
     private selectedDate: string;
-    private selectedItem: any;
+    private selectedItem: autowp.IItem;
     private anonymous: boolean;
     private userId: number;
     private sum: number;
@@ -36,7 +36,8 @@ export class DonateVodController {
         private $scope: autowp.IControllerScope,
         private $translate: ng.translate.ITranslateService,
         private $http: ng.IHttpService,
-        private $state: any
+        private $state: any,
+        private ItemService: ItemService
     ) {
         this.$scope.pageEnv({
             layout: {
@@ -65,16 +66,11 @@ export class DonateVodController {
         });
       
         if (this.itemId) {
-            this.$http({
-                method: 'GET',
-                url: '/api/item/' + this.itemId,
-                params: {
-                    fields: 'name_html,item_of_day_pictures'
-                }
-            }).then(function(response: ng.IHttpResponse<any>) {
-                self.selectedItem = response.data;
+            this.ItemService.getItem(this.itemId, {
+                fields: 'name_html,item_of_day_pictures'
+            }).then(function(item: autowp.IItem) {
+                self.selectedItem = item;
                 self.updateForm();
-
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });

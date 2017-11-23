@@ -5,6 +5,7 @@ import { VehicleTypeService } from 'services/vehicle-type';
 import { SpecService } from 'services/spec';
 import { ContentLanguageService } from 'services/content-language';
 import { chunk, chunkBy } from 'chunk';
+import { ItemService } from 'services/item';
 import './tree';
 import './tree-item';
 import 'directives/auto-focus';
@@ -13,7 +14,7 @@ const STATE_NAME = 'moder-items-item-select-parent';
 const CONTROLLER_NAME = 'ModerItemsItemSelectParentController';
 
 export class ModerItemsItemSelectParentController {
-    static $inject = ['$scope', '$rootScope', '$http', '$state', '$translate', '$q', '$element', 'SpecService', 'VehicleTypeService', 'AclService', 'ContentLanguageService'];
+    static $inject = ['$scope', '$rootScope', '$http', '$state', '$translate', '$q', '$element', 'SpecService', 'VehicleTypeService', 'AclService', 'ContentLanguageService', 'ItemService'];
     
     public showCatalogueTab: boolean = false;
     public showBrandsTab: boolean = false;
@@ -24,8 +25,8 @@ export class ModerItemsItemSelectParentController {
     public paginator: autowp.IPaginator;
     public page: number;
     public search: string = '';
-    public item: any;
-    public brands: any[];
+    public item: autowp.IItem;
+    public brands: autowp.IItem[];
     public items: any[];
     public categories: any[];
     public factories: any[];
@@ -44,7 +45,8 @@ export class ModerItemsItemSelectParentController {
         private SpecService: SpecService, 
         private VehicleTypeService: VehicleTypeService, 
         private Acl: AclService, 
-        private ContentLanguage: ContentLanguageService
+        private ContentLanguage: ContentLanguageService,
+        private ItemService: ItemService
     ) {
         var self = this;
         
@@ -52,14 +54,10 @@ export class ModerItemsItemSelectParentController {
         
         this.page = $state.params.page;
         
-        this.$http({
-            method: 'GET',
-            url: '/api/item/' + $state.params.id,
-            params: {
-                fields: 'name_text'
-            }
-        }).then(function(response: ng.IHttpResponse<any>) {
-            self.item = response.data;
+        this.ItemService.getItem($state.params.id, {
+            fields: 'name_text'
+        }).then(function(item: autowp.IItem) {
+            self.item = item;
             
             $translate('item/type/'+self.item.item_type_id+'/name').then(function(translation: string) {
                 $scope.pageEnv({

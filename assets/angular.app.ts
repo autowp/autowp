@@ -12,6 +12,24 @@ import './directives/picture-moder-vote';
 import './directives/thumbnail';  
 import './directives/user/index';
 
+import './services/acl';
+import './services/contacts';
+import './services/content-language';
+import './services/forum';
+import './services/ip';
+import './services/item';
+import './services/language';
+import './services/message-dialog';
+import './services/message';
+import './services/mosts';
+import './services/page';
+import './services/perspective';
+import './services/picture-item';
+import './services/picture-moder-vote-template';
+import './services/picture-moder-vote';
+import './services/spec';
+import './services/user';
+import './services/vehicle-type';
 
 import './controllers/root';
 import './controllers/articles';

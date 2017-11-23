@@ -19,7 +19,10 @@ class AutowpBreadcrumbsDirective implements ng.IDirective {
     scope = {};
     template = require('./template.html');
 
-    constructor(private PageService: PageService, private $translate: ng.translate.ITranslateService) {
+    constructor(
+        private PageService: PageService, 
+        private $translate: ng.translate.ITranslateService
+    ) {
     }
 
     link = (scope: IAutowpBreadcrumbsDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
@@ -55,7 +58,7 @@ class AutowpBreadcrumbsDirective implements ng.IDirective {
     }
 
     static factory(): ng.IDirectiveFactory {
-        const directive = (PageService: PageService, $translate: any) => new AutowpBreadcrumbsDirective(PageService, $translate);
+        const directive = (PageService: PageService, $translate: ng.translate.ITranslateService) => new AutowpBreadcrumbsDirective(PageService, $translate);
         directive.$inject = ['PageService', '$translate'];
         return directive;
     }

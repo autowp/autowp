@@ -2,15 +2,16 @@ import * as angular from 'angular';
 import Module from 'app.module';
 import { AclService } from 'services/acl';
 import { ContentLanguageService } from 'services/content-language';
+import { ItemService } from 'services/item';
 
 const STATE_NAME = 'moder-item-parent';
 const CONTROLLER_NAME = 'ModerItemParentController';
 
 export class ModerItemParentController {
-    static $inject = ['$scope', '$http', '$state', '$translate', '$q', 'AclService', 'ContentLanguageService'];
+    static $inject = ['$scope', '$http', '$state', '$translate', '$q', 'AclService', 'ContentLanguageService', 'ItemService'];
     
-    public item: any = null;
-    public parent: any = null;
+    public item: autowp.IItem;
+    public parent: autowp.IItem;
     public itemParent: any;
     public languages: any[] = [];
     public typeOptions = [
@@ -40,7 +41,8 @@ export class ModerItemParentController {
         private $translate: ng.translate.ITranslateService,
         private $q: ng.IQService,
         private Acl: AclService,
-        private ContentLanguage: ContentLanguageService
+        private ContentLanguage: ContentLanguageService,
+        private ItemService: ItemService
     ) {
         var self = this;
 
@@ -52,22 +54,14 @@ export class ModerItemParentController {
         );
         
         this.promises.push(
-            $http({
-                method: 'GET',
-                url: '/api/item/' + $state.params.item_id,
-                params: {
-                    fields: ['name_text', 'name_html'].join(',')
-                }
+            this.ItemService.getItem($state.params.item_id, {
+                fields: ['name_text', 'name_html'].join(',')
             })
         );
         
         this.promises.push(
-            $http({
-                method: 'GET',
-                url: '/api/item/' + $state.params.parent_id,
-                params: {
-                    fields: ['name_text', 'name_html'].join(',')
-                }
+            this.ItemService.getItem($state.params.parent_id, {
+                fields: ['name_text', 'name_html'].join(',')
             })
         );
         
@@ -82,10 +76,10 @@ export class ModerItemParentController {
             })
         );
         
-        $q.all(this.promises).then(function(responses: ng.IHttpResponse<any>[]) {
+        $q.all(this.promises).then(function(responses: any[]) {
             self.itemParent = responses[0].data;
-            self.item = responses[1].data;
-            self.parent = responses[2].data;
+            self.item = responses[1];
+            self.parent = responses[2];
             
             angular.forEach(responses[3], function(language) {
                 self.languages.push({

@@ -14,7 +14,7 @@ const CONTROLLER_NAME = 'ModerItemsItemOrganizePicturesController';
 export class ModerItemsItemOrganizePicturesController {
     static $inject = ['$scope', '$rootScope', '$http', '$state', '$translate', '$q', '$element', 'SpecService', 'VehicleTypeService', 'AclService', 'ContentLanguageService', 'ItemService'];
 
-    public item: any;
+    public item: autowp.IItem;
     public newItem: any = null;
     public hasSelectedPicture: boolean = false;
     public loading: number = 0;
@@ -37,20 +37,15 @@ export class ModerItemsItemOrganizePicturesController {
     ) {
         var self = this;
        
-        
-        this.$http({
-            method: 'GET',
-            url: '/api/item/' + $state.params.id,
-            params: {
-                fields: ['name_text', 'name', 'is_concept', 
-                'name_default', 'body', 'subscription', 'begin_year', 
-                'begin_month', 'end_year', 'end_month', 'today', 
-                'begin_model_year', 'end_model_year', 'produced', 
-                'is_group', 'spec_id', 'full_name', 
-                'catname', 'lat', 'lng'].join(',')
-            }
-        }).then(function(response: ng.IHttpResponse<any>) {
-            self.item = response.data;
+        this.ItemService.getItem($state.params.id, {
+            fields: ['name_text', 'name', 'is_concept', 
+                     'name_default', 'body', 'subscription', 'begin_year', 
+                     'begin_month', 'end_year', 'end_month', 'today', 
+                     'begin_model_year', 'end_model_year', 'produced', 
+                     'is_group', 'spec_id', 'full_name', 
+                     'catname', 'lat', 'lng'].join(',')
+        }).then(function(item: autowp.IItem) {
+            self.item = item;
             self.newItem = angular.copy(self.item);
             self.newItem.is_group = false;
             $translate('item/type/'+self.item.item_type_id+'/name').then(function(translation) {

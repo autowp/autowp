@@ -3,6 +3,10 @@ import Module from 'app.module';
 
 const SERVICE_NAME = 'ItemService';
 
+export interface ItemServiceOptions {
+    fields: string;
+}
+
 export class ItemService {
     static $inject = ['$q', '$http', '$translate'];
   
@@ -48,7 +52,23 @@ export class ItemService {
                 reject(response);
             });
         });
-    };
+    }
+    
+    public getItem(id: number, options?: ItemServiceOptions)
+    {
+        var self = this;
+        return this.$q(function(resolve: ng.IQResolveReject<autowp.IItem>, reject: ng.IQResolveReject<any>) {
+        
+            self.$http({
+                method: 'GET',
+                url: '/api/item/' + id
+            }).then(function(response: ng.IHttpResponse<autowp.IItem>) {
+                resolve(response.data);
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
+            });
+        });
+    }
 };
 
 angular.module(Module).service(SERVICE_NAME, ItemService);

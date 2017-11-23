@@ -2,12 +2,13 @@ import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
 import { chunkBy } from 'chunk';
+import { ItemService } from 'services/item';
 
 const CONTROLLER_NAME = 'PersonsController';
 const STATE_NAME = 'persons';
 
 export class PersonsController {
-    static $inject = ['$scope', '$http', '$state'];
+    static $inject = ['$scope', '$http', '$state', 'ItemService'];
     public links: any[] = [];
     public authorPicturesChunks: any[] = [];
     public authorPicturesPaginator: autowp.IPaginator;
@@ -18,19 +19,16 @@ export class PersonsController {
     constructor(
         private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService, 
-        private $state: any
+        private $state: any,
+        private ItemService: ItemService
     ) {
         var self = this;
+          
+        this.ItemService.getItem(this.$state.params.id, {
+            fields: ['name_text', 'name_html', 'description'].join(',')
+        }).then(function(item: autowp.IItem) {
             
-        this.$http({
-            method: 'GET',
-            url: '/api/item/' + this.$state.params.id,
-            params: {
-                fields: ['name_text', 'name_html', 'description'].join(',')
-            }
-        }).then(function(response: ng.IHttpResponse<any>) {
-            
-            self.item = response.data;
+            self.item = item;
             
             if (self.item.item_type_id != 8) {
                 $state.go('error-404');

@@ -3,6 +3,7 @@ import Module from 'app.module';
 import notify from 'notify';
 import { AclService } from 'services/acl';
 import { chunkBy } from 'chunk';
+import { ItemService } from 'services/item';
 import * as $ from "jquery";
 
 var leaflet = require("leaflet-bundle");
@@ -11,30 +12,27 @@ const CONTROLLER_NAME = 'MuseumController';
 const STATE_NAME = 'museum';
 
 export class MuseumController {
-    static $inject = ['$scope', '$http', '$state', 'AclService'];
+    static $inject = ['$scope', '$http', '$state', 'AclService', 'ItemService'];
 
     public museumModer: boolean = false;
     public links: any[] = [];
     public chunks: any[] = [];
-    public item: any;
+    public item: autowp.IItem;
   
     constructor(
         private $scope: autowp.IControllerScope, 
         private $http: ng.IHttpService, 
         private $state: any,
-        private Acl: AclService
+        private Acl: AclService,
+        private ItemService: ItemService
     ) {
         var self = this;
             
-        this.$http({
-            method: 'GET',
-            url: '/api/item/' + this.$state.params.id,
-            params: {
-                fields: ['name_text', 'lat', 'lng', 'description'].join(',')
-            }
-        }).then(function(response: ng.IHttpResponse<any>) {
-            
-            self.item = response.data;
+        this.ItemService.getItem(this.$state.params.id, {
+            fields: ['name_text', 'lat', 'lng', 'description'].join(',')
+        }).then(function(item: autowp.IItem) {
+        
+            self.item = item;
             
             if (self.item.item_type_id != 7) {
                 self.$state.go('error-404');

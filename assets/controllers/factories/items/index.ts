@@ -2,33 +2,30 @@ import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
 import { chunkBy } from 'chunk';
+import { ItemService } from 'services/item';
 
 const CONTROLLER_NAME = 'FactoryItemsController';
 const STATE_NAME = 'factory-items';
 
 export class FactoryItemsController {
-    static $inject = ['$scope', '$http', '$state'];
-    public factory: any;
+    static $inject = ['$scope', '$http', '$state', 'ItemService'];
+    public factory: autowp.IItem;
     public items: any[];
     public paginator: autowp.IPaginator;
   
     constructor(
         private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
-        private $state: any
+        private $state: any,
+        private ItemService: ItemService
     ) {
       
         var self = this;
       
-        $http({
-            method: 'GET',
-            url: '/api/item/' + this.$state.params.id,
-            params: {
-                fields: ['name_text', 'name_html', 'lat', 'lng', 'description'].join(',')
-            }
-        }).then(function(response: ng.IHttpResponse<any>) {
-            
-            self.factory = response.data;
+        this.ItemService.getItem(this.$state.params.id, {
+            fields: ['name_text', 'name_html', 'lat', 'lng', 'description'].join(',')
+        }).then(function(item: autowp.IItem) {
+            self.factory = item;
             
             if (self.factory.item_type_id != 6) {
                 self.$state.go('error-404');

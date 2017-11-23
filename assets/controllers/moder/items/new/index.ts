@@ -50,7 +50,7 @@ export class ModerItemsNewController {
     
     public loading: number = 0;
     public item: NewItem;
-    public parent: any = null;
+    public parent: autowp.IItem;
     public parentSpec: any = null;
     public invalidParams: any;
 
@@ -96,14 +96,10 @@ export class ModerItemsNewController {
         
         if ($state.params.parent_id) {
             this.loading++;
-            $http({
-                method: 'GET',
-                url: '/api/item/' + $state.params.parent_id,
-                params: {
-                    fields: 'is_concept,name_html,spec_id'
-                }
-            }).then(function(response: ng.IHttpResponse<any>) {
-                self.parent = response.data;
+            this.ItemService.getItem($state.params.parent_id, {
+                fields: 'is_concept,name_html,spec_id'
+            }).then(function(item: autowp.IItem) {
+                self.parent = item;
                 
                 if (self.parent.spec_id) {
                     SpecService.getSpec(self.parent.spec_id).then(function(spec) {

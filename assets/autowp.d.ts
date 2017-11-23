@@ -58,4 +58,39 @@ declare namespace autowp {
         paginator: autowp.IPaginator;
         items: T[];
     }
+    
+    export interface IItem
+    {
+        id: number;
+        item_type_id: number;
+        is_group: boolean;
+        name_text: string;
+        full_name: string;
+        catname: string;
+        body: string;
+        lat: number;
+        lng: number;
+        is_concept: boolean;
+        today: boolean;
+        begin_month: number;
+        begin_year: number;
+        end_month: number;
+        end_year: number;
+        begin_model_year: number;
+        end_model_year: number;
+        produced: number;
+        produced_exactly: boolean;
+        spec_id: number|null;
+        logo: any;
+    
+        engine_vehicles_count: number;
+        pictures_count: number;
+        childs_count: number;
+        parents_count: number;
+        links_count: number;
+        item_language_count: number;
+        subscription: boolean;
+    
+        related_group_pictures: any[];
+    }
 }

@@ -1,6 +1,7 @@
 import * as angular from "angular";
 import Module from 'app.module';
 import notify from 'notify';
+import { ItemService } from 'services/item';
 
 import './item';
 
@@ -8,11 +9,11 @@ const CONTROLLER_NAME = 'DonateVodSelectController';
 const STATE_NAME = 'donate-vod-select';
 
 export class DonateVodSelectController {
-    static $inject = ['$scope', '$translate', '$http', '$state'];
+    static $inject = ['$scope', '$translate', '$http', '$state', 'ItemService'];
     public page: number;
     public brands: any[];
     public paginator: autowp.IPaginator;
-    public brand: any;
+    public brand: autowp.IItem;
     public vehicles: any[];
     public vehicles_paginator: autowp.IPaginator;
     public concepts: any[];
@@ -25,7 +26,8 @@ export class DonateVodSelectController {
         private $scope: autowp.IControllerScope,
         private $translate: ng.translate.ITranslateService,
         private $http: ng.IHttpService,
-        private $state: any
+        private $state: any,
+        private ItemService: ItemService
     ) {
         this.page = this.$state.params.page || 1;
         this.date = this.$state.params.date;
@@ -36,11 +38,9 @@ export class DonateVodSelectController {
       
         if (brandId) {
             this.loading++;
-            this.$http({
-                method: 'GET',
-                url: '/api/item/' + brandId
-            }).then(function(response: ng.IHttpResponse<any>) {
-                self.brand = response.data;
+            
+            this.ItemService.getItem(brandId).then(function(brand: autowp.IItem) {
+                self.brand = brand;
               
                 self.loading++;
                 self.$http({

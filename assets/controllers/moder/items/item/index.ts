@@ -91,21 +91,17 @@ export class ModerItemsItemController {
         var self = this;
         
         this.loading++;
-        this.$http({
-            method: 'GET',
-            url: '/api/item/' + $state.params.id,
-            params: {
-                fields: ['name_text', 'name_html', 'name', 'is_concept', 
-                    'name_default', 'body', 'subscription', 'begin_year', 
-                    'begin_month', 'end_year', 'end_month', 'today', 
-                    'begin_model_year', 'end_model_year', 'produced', 
-                    'is_group', 'spec_id', 'childs_count', 'full_name', 
-                    'catname', 'lat', 'lng', 'pictures_count', 
-                    'specifications_count', 'links_count', 'parents_count', 
-                    'item_language_count', 'engine_vehicles_count', 'logo'].join(',')
-            }
-        }).then(function(response: ng.IHttpResponse<any>) {
-            self.item = response.data;
+        this.ItemService.getItem($state.params.id, {
+            fields: ['name_text', 'name_html', 'name', 'is_concept', 
+                     'name_default', 'body', 'subscription', 'begin_year', 
+                     'begin_month', 'end_year', 'end_month', 'today', 
+                     'begin_model_year', 'end_model_year', 'produced', 
+                     'is_group', 'spec_id', 'childs_count', 'full_name', 
+                     'catname', 'lat', 'lng', 'pictures_count', 
+                     'specifications_count', 'links_count', 'parents_count', 
+                     'item_language_count', 'engine_vehicles_count', 'logo'].join(',')
+        }).then(function(item: autowp.IItem) {
+            self.item = item;
             
             self.specsAllowed = [1, 2].indexOf(self.item.item_type_id) != -1;
             
