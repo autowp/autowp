@@ -3,8 +3,16 @@ import Module from 'app.module';
 
 const SERVICE_NAME = 'ItemService';
 
-export interface ItemServiceOptions {
+export interface GetItemServiceOptions {
     fields: string;
+}
+
+export interface GetItemsServiceOptions {
+    fields: string;
+    type_id: number;
+    parent_id?: number;
+    order: string;
+    limit: number;
 }
 
 export class ItemService {
@@ -54,15 +62,33 @@ export class ItemService {
         });
     }
     
-    public getItem(id: number, options?: ItemServiceOptions)
+    public getItem(id: number, options?: GetItemServiceOptions)
     {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<autowp.IItem>, reject: ng.IQResolveReject<any>) {
         
             self.$http({
                 method: 'GET',
-                url: '/api/item/' + id
+                url: '/api/item/' + id,
+                params: options
             }).then(function(response: ng.IHttpResponse<autowp.IItem>) {
+                resolve(response.data);
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
+            });
+        });
+    }
+    
+    public getItems(options?: GetItemsServiceOptions)
+    {
+        var self = this;
+        return this.$q(function(resolve: ng.IQResolveReject<autowp.GetItemsResult>, reject: ng.IQResolveReject<any>) {
+        
+            self.$http({
+                method: 'GET',
+                url: '/api/item',
+                params: options
+            }).then(function(response: ng.IHttpResponse<autowp.GetItemsResult>) {
                 resolve(response.data);
             }, function(response: ng.IHttpResponse<any>) {
                 reject(response);

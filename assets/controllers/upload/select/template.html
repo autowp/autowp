@@ -1,0 +1,71 @@
+<div ng-if="!ctrl.brand">
+    <div class="row">
+        <div class="col-md-2" ng-repeat="chunk in ctrl.brands">
+            <a ng-repeat-start="brand in chunk" ui-sref="upload-select({brand_id: brand.id})" ng-bind="brand.name_only"></a>
+            <br ng-repeat-end />
+        </div>
+    </div>
+    
+    <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
+</div>
+
+<div class="select-in-brand" ng-if="ctrl.brand">
+    <div style="margin: 5px 0" ng-if="ctrl.vehicles.length > 0">
+        <div ng-repeat="item in ctrl.vehicles">
+            <div class="text-muted" ng-if="item.type">
+                <?php
+                    switch ($car['type']) {
+                            case Application\Model\ItemParent::TYPE_TUNING: print $this->escapeHtml($this->translate('catalogue/related')); break;
+                            case Application\Model\ItemParent::TYPE_SPORT:  print 'Sport'; break;
+                        }
+                    ?>
+            </div>
+            <div ng-if="item.childs_count > 0">
+                <a href="#" class="arrow">
+                    <i class="fa fa-plus-circle"></i>
+                    <span ng-bind-html="item.name_html"></span>
+                </a>
+                <div style="margin:0 0 4px 18px;display:none">
+                    <div ng-if="!item.is_group">
+                        <a href="#" ng-bind-html="item.name_html"></a>
+                    </div>
+                    <div class="loading"><em>Loading ...</em></div>
+                    <a ng-if="item.is_group" translate>upload/select/other-modification</a>
+                </div>
+            </div>
+            
+            <div ng-if="item.childs_count <= 0">
+                <a ui-sref="upload({item_id: item.id})" ng-bind-html="item.name_html"></a>
+                <br />
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="ctrl.engines.length > 0">
+        <h5>item/type/2/name-plural</h5>
+        <div style="margin: 5px 0">
+            <?=$this->partial('application/upload/select-in-brand-items', [
+                'cars' => $this->engines
+            ])?>
+        </div>
+    </div>
+
+    <div style="margin: 5px 0" ng-if="ctrl.haveConcepts">
+        <?=$this->htmlA([
+            'href'      => '#',
+            'class'     => 'arrow',
+            'data-load' => $this->conceptsUrl
+        ], '<i class="fa fa-plus-circle"></i> ' . $this->escapeHtml($this->translate('upload/select/concepts')), false) ?>
+        <div style="margin:0 0 4px 18px;display:none">
+            <div class="loading"><em>Loading ...</em></div>
+        </div>
+    </div>
+
+    <div style="margin: 5px 0">
+        <a ui-sref="upload({item_id: ctrl.brand.id, perspective_id: 22})" translate>upload/select/logo</a>
+        <br />
+        <a ui-sref="upload({item_id: ctrl.brand.id, perspective_id: 25})" translate>upload/select/mixed-long</a>
+        <br />
+        <a ui-sref="upload({item_id: ctrl.brand.id, perspective_id: null})" translate>upload/select/unsorted-long</a>
+    </div>
+</div>

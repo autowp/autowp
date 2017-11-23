@@ -65,6 +65,7 @@ declare namespace autowp {
         item_type_id: number;
         is_group: boolean;
         name_text: string;
+        name_html: string;
         full_name: string;
         catname: string;
         body: string;
@@ -92,5 +93,10 @@ declare namespace autowp {
         subscription: boolean;
     
         related_group_pictures: any[];
+    }
+    
+    export interface GetItemsResult {
+        items: autowp.IItem[];
+        paginator: autowp.IPaginator;
     }
 }

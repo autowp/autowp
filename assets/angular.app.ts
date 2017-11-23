@@ -60,6 +60,7 @@ import './controllers/rules';
 import './controllers/telegram';
 import './controllers/signup';
 import './controllers/top-view';
+import './controllers/upload';
 import './controllers/users';
 import './controllers/voting';
 import './controllers/moder';
