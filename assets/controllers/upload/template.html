@@ -32,6 +32,10 @@
                                 ngf-multiple="true"
                                 translate
                             >Select files</div>
+                            
+                            <div style="margin-top: 10px" ng-if="ctrl.file">
+                                <p ng-repeat="file in ctrl.file" ng-bind="file.name"></p>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -42,29 +46,32 @@
                     </div>
                     <div class="row">
                         <div class="col-md-10 col-md-offset-2">
-                            <button name="submit" class="btn btn-primary" translate>send</button>
+                            <button name="submit" class="btn btn-primary" translate ng-disabled="!ctrl.file">send</button>
                         </div>
                     </div>
                 </fieldset></form>
             </div>
     
             <div class="progress-area">
-                <div class="progress" ng-repeat="progress in ctrl.progress">
+                <div class="progress" ng-repeat="progress in ctrl.progress" ng-if="!progress.success">
                     <div class="progress-bar"
-                        class="fade"
-                        ng-if="!progress.success"
                         ng-style="{width: progress.percentage+'%'}"
-                        ng-class="{'progress-bar-info': !progress.success && !progress.failed, 'progress-bar-success': progress.success}" 
+                        ng-class="{'progress-bar-info': !progress.success && !progress.failed, 'progress-bar-success': progress.success, 'progress-bar-danger': progress.failed}" 
                         role="progressbar" aria-valuenow="{{progress.percentage}}" 
                         aria-valuemin="0" aria-valuemax="100">
                         <span class="file-name" ng-bind="progress.filename"></span> 
                         <span class="percentage" ng-bind="progress.percentage + '%'" ng-if="progress.percentage < 100"></span>
+                        <span ng-repeat="message in progress.invalidParams.file" ng-bind="message"></span>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="pictures"></div>
+        <div class="pictures row">
+            <div class="col-lg-2 col-md-2 col-sm-2" ng-repeat="picture in ctrl.pictures">
+                <autowp-thumbnail picture="picture" is-moder="isModer"></autowp-thumbnail>
+            </div>
+        </div>
     </div>
     
     <div class="well" ng-if="!ctrl.selected">

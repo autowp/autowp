@@ -34,7 +34,8 @@ class PictureControllerFactory implements FactoryInterface
             $container->get(\Application\Model\PictureModerVote::class),
             $container->get(\Application\Model\Item::class),
             $container->get(\Application\Model\Picture::class),
-            $container->get(\Autowp\User\Model\User::class)
+            $container->get(\Autowp\User\Model\User::class),
+            $container->get(\Application\Service\PictureService::class)
         );
     }
 }

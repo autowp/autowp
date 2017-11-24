@@ -13,7 +13,7 @@ use Application\Model\ItemParent;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
-use Application\Service\PictureService;
+
 
 class UploadController extends AbstractActionController
 {
@@ -49,10 +49,7 @@ class UploadController extends AbstractActionController
      */
     private $brand;
 
-    /**
-     * @var PictureService
-     */
-    private $pictureService;
+
 
     public function __construct(
         $partial,
@@ -61,8 +58,7 @@ class UploadController extends AbstractActionController
         ItemParent $itemParent,
         Item $item,
         Brand $brand,
-        Picture $picture,
-        PictureService $pictureService
+        Picture $picture
     ) {
         $this->partial = $partial;
         $this->pictureItem = $pictureItem;
@@ -71,7 +67,7 @@ class UploadController extends AbstractActionController
         $this->item = $item;
         $this->brand = $brand;
         $this->picture = $picture;
-        $this->pictureService = $pictureService;
+
     }
 
     public function onlyRegisteredAction()
