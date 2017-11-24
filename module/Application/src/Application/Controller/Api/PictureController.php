@@ -69,6 +69,11 @@ class PictureController extends AbstractRestfulController
     /**
      * @var InputFilter
      */
+    private $postInputFilter;
+
+    /**
+     * @var InputFilter
+     */
     private $listInputFilter;
 
     /**
@@ -119,6 +124,7 @@ class PictureController extends AbstractRestfulController
         MessageService $message,
         CarOfDay $carOfDay,
         InputFilter $itemInputFilter,
+        InputFilter $postInputFilter,
         InputFilter $listInputFilter,
         InputFilter $publicListInputFilter,
         InputFilter $editInputFilter,
@@ -140,6 +146,7 @@ class PictureController extends AbstractRestfulController
         $this->telegram = $telegram;
         $this->message = $message;
         $this->itemInputFilter = $itemInputFilter;
+        $this->postInputFilter = $postInputFilter;
         $this->listInputFilter = $listInputFilter;
         $this->publicListInputFilter = $publicListInputFilter;
         $this->editInputFilter = $editInputFilter;
@@ -484,6 +491,33 @@ class PictureController extends AbstractRestfulController
             'force_canonical' => $forceCanonical,
             'uri'             => $uri
         ]) . 'ng/moder/pictures/' . $picture['id'];
+    }
+
+    public function postAction()
+    {
+        $user = $this->user()->get();
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        $data = $this->getRequest()->getFiles()->toArray();
+
+        $this->postInputFilter->setData($data);
+        if (! $this->postInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->postInputFilter);
+        }
+
+        $values = $this->postInputFilter->getValues();
+
+        $picture = $this->pictureService->addPictureFromFile(
+            $values['file']['tmp_name'],
+            $user['id'],
+            $this->getRequest()->getServer('REMOTE_ADDR'),
+            [], // $itemIds
+            null, // $perspectiveId
+            null, // $replacePictureId
+            '' // (string)$values['note']
+        );
     }
 
     public function updateAction()

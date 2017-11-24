@@ -2197,6 +2197,36 @@ return [
                 ]
             ],
         ],
+        'api_picture_post' => [
+            'file' => [
+                'required' => true,
+                'validators' => [
+                    [
+                        'name'    => 'FileSize',
+                        'options' => [
+                            'max'           => 1024*1024*10,
+                            'useByteString' => false
+                        ]
+                    ],
+                    ['name' => 'FileIsImage'],
+                    [
+                        'name' => 'FileExtension',
+                        'options' => [
+                            'extension' => 'jpg,jpeg,jpe,png'
+                        ]
+                    ],
+                    [
+                        'name' => 'FileImageSize',
+                        'options' => [
+                            'minWidth'  => 640,
+                            'minHeight' => 360,
+                            'maxWidth'  => 4096,
+                            'maxHeight' => 4096
+                        ]
+                    ]
+                ]
+            ]
+        ],
         'api_picture_edit' => [
             'status' => [
                 'required' => false,

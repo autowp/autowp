@@ -7,21 +7,37 @@
         <div class="well">
             <div btf-markdown="'upload/description'|translate"></div>
             <div style="margin:20px 0">
-                <p style="margin:10px">
-                    <strong ng-bind-html="ctrl.selectionName"></strong>
-                    [<a ui-sref="upload-select" translate>upload/select-another</a>]
-                </p>
-                <form method="post" class="form-horizontal"><fieldset>
+                <form class="form-horizontal" ng-submit="ctrl.submit()"><fieldset>
                     <div class="form-group">
-                        <label class="col-md-2 control-label" for="picture" translate>upload/image-file</label>
+                        <label class="col-md-2 control-label">Selection</label>
+                        <div class="col-md-10" style="padding-top:7px">
+                            <strong ng-bind-html="ctrl.selectionName"></strong>
+                            [<a ui-sref="upload-select" translate>upload/select-another</a>]
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" translate>upload/image-file</label>
                         <div class="col-md-10">
-                            <input type="file" name="picture[]" multiple="multiple" class=" form-control">
+                            <div class="btn btn-default" 
+                                ngf-select 
+                                ng-model="ctrl.file" 
+                                name="file" 
+                                ngf-pattern="'image/*'"
+                                ngf-accept="'image/*'" 
+                                ngf-max-size="10MB" 
+                                ngf-min-height="360" 
+                                ngf-min-width="640"
+                                ngf-max-height="4096"
+                                ngf-max-width="4096"
+                                ngf-multiple="true"
+                                translate
+                            >Select files</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-2 control-label" for="note" translate>upload/note</label>
                         <div class="col-md-10">
-                            <textarea name="note" rows="3" class=" form-control"></textarea>
+                            <textarea name="note" rows="3" class="form-control" ng-bind="ctrl.note"></textarea>
                         </div>
                     </div>
                     <div class="row">
@@ -32,7 +48,20 @@
                 </fieldset></form>
             </div>
     
-            <div class="progress-area"></div>
+            <div class="progress-area">
+                <div class="progress" ng-repeat="progress in ctrl.progress">
+                    <div class="progress-bar"
+                        class="fade"
+                        ng-if="!progress.success"
+                        ng-style="{width: progress.percentage+'%'}"
+                        ng-class="{'progress-bar-info': !progress.success && !progress.failed, 'progress-bar-success': progress.success}" 
+                        role="progressbar" aria-valuenow="{{progress.percentage}}" 
+                        aria-valuemin="0" aria-valuemax="100">
+                        <span class="file-name" ng-bind="progress.filename"></span> 
+                        <span class="percentage" ng-bind="progress.percentage + '%'" ng-if="progress.percentage < 100"></span>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="pictures"></div>

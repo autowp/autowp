@@ -25,6 +25,7 @@ class PictureControllerFactory implements FactoryInterface
             $container->get(\Autowp\Message\MessageService::class),
             $container->get(\Application\Model\CarOfDay::class),
             $filters->get('api_picture_item'),
+            $filters->get('api_picture_post'),
             $filters->get('api_picture_list'),
             $filters->get('api_picture_list_public'),
             $filters->get('api_picture_edit'),

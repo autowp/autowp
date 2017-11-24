@@ -16,7 +16,7 @@ class Upload extends Form implements InputFilterProviderInterface
     /**
      * @var int
      */
-    private $maxFileSize = 20485760; //1024*1024*4;
+    private $maxFileSize = 10485760; //1024*1024*10;
 
     /**
      * @var bool

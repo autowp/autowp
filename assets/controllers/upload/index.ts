@@ -9,17 +9,21 @@ const CONTROLLER_NAME = 'UploadController';
 const STATE_NAME = 'upload';
 
 export class UploadController {
-    static $inject = ['$scope', '$http', '$state', 'ItemService'];
+    static $inject = ['$scope', '$http', '$state', 'ItemService', 'Upload'];
     
     public selected: boolean;
     public selectionName: string;
     private replace: any;
+    public file: any;
+    public note: string;
+    public progress: any[];
   
     constructor(
         private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService, 
         private $state: any,
-        private ItemService: ItemService
+        private ItemService: ItemService,
+        private Upload: ng.angularFileUpload.IUploadService
     ) {
         this.$scope.pageEnv({
             layout: {
@@ -72,6 +76,79 @@ export class UploadController {
         ]),
         'perspectives' => $this->perspectives
         */
+    }
+    
+    public submit()
+    {
+        console.log(this.file);
+        
+        /*var $progress = $('.progress-area');
+        this.$pictures = $('.pictures');
+        
+        $progress.empty();
+
+        $form.hide();
+
+        var xhrs = [];*/
+
+        for (let file of this.file) {
+            
+            var progress = {
+                filename: file.fileName || file.name,
+                percentage: 0,
+                success: false,
+                failed: false
+            };
+            
+            this.Upload.upload({
+                method: 'POST',
+                url: '/api/picture',
+                data: {
+                    file: file, 
+                    note: this.note
+                }
+            }).then(function (response) {
+                console.log('Success ' + response.config.data.file.name + 'uploaded. Response: ' + response.data);
+                
+                progress.percentage = 100;
+                progress.success = true;
+
+                /*if (data) {
+                    $.map(data, function(picture) {
+                        self.insertPicture(picture);
+                    });
+                }*/
+            }, function (response) {
+                console.log('Error status: ' + response.status);
+                
+                progress.percentage = 100;
+                progress.failed = true;
+                
+                /*var errorMessage;
+                if (data.responseJSON) {
+                    var errors = [];
+                    $.map(data.responseJSON, function(field) {
+                        $.map(field, function(error) {
+                            errors.push(error);
+                        });
+                    });
+                    errorMessage = errors.join("\n");
+                } else {
+                    errorMessage = data.statusText;
+                }
+                $bar.find('.percentage').text("Error: " + errorMessage);*/
+            }, function (evt) {
+                progress.percentage = Math.round(100.0 * evt.loaded / evt.total);
+            });
+        }
+
+        /*$.when.apply($, xhrs).then(function() {
+            $form.show();
+            $form[0].reset();
+        }, function() {
+            $form.show();
+            $form[0].reset();
+        });*/
     }
 };
 

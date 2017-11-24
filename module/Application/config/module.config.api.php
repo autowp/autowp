@@ -1646,6 +1646,15 @@ return [
                                     ]
                                 ]
                             ],
+                            'post' => [
+                                'type' => 'Method',
+                                'options' => [
+                                    'verb' => 'post',
+                                    'defaults' => [
+                                        'action' => 'post'
+                                    ]
+                                ]
+                            ],
                             'picture' => [
                                 'type' => 'Segment',
                                 'options' => [
