@@ -21,8 +21,7 @@ class UploadControllerFactory implements FactoryInterface
             $container->get(\Application\Model\ItemParent::class),
             $container->get(\Application\Model\Item::class),
             $container->get(\Application\Model\Brand::class),
-            $container->get(\Application\Model\Picture::class),
-            $container->get(\Application\Service\PictureService::class)
+            $container->get(\Application\Model\Picture::class)
         );
     }
 }
