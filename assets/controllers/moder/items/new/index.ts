@@ -101,9 +101,11 @@ export class ModerItemsNewController {
             }).then(function(item: autowp.IItem) {
                 self.parent = item;
                 
-                if (self.parent.spec_id) {
+                if (self.parent.spec_id && self.parent.spec_id != 'inherited') {
                     SpecService.getSpec(self.parent.spec_id).then(function(spec) {
                         self.parentSpec = spec;
+                    }, function() {
+                        notify.error("Failed to fetch spec: " + self.parent.spec_id);
                     });
                 }
                 self.loading--;
@@ -126,6 +128,8 @@ export class ModerItemsNewController {
                     NEW_ITEM_OF_TYPE: translation
                 }
             });
+        }, function() {
+            console.log('Translate failed');
         });
     }
     
@@ -193,6 +197,8 @@ export class ModerItemsNewController {
                 });
                 
                 self.loading--;
+            }, function(response: ng.IHttpResponse<any>) {
+                notify.response(response);
             });
             
             self.loading--;

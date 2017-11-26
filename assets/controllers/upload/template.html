@@ -30,8 +30,13 @@
                                 ngf-max-height="4096"
                                 ngf-max-width="4096"
                                 ngf-multiple="true"
+                                ngf-drop
                                 translate
                             >Select files</div>
+                            
+                            <div style="margin-top: 10px" ng-if="ctrl.file">
+                                <p ng-repeat="file in ctrl.file" ng-bind="file.name"></p>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">

@@ -22,6 +22,7 @@ use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Model\PictureModerVote;
 use Application\Model\UserPicture;
+use Application\Service\PictureService;
 use Application\Service\TelegramService;
 
 class PictureController extends AbstractRestfulController
@@ -113,6 +114,11 @@ class PictureController extends AbstractRestfulController
      */
     private $userModel;
 
+    /**
+     * @var PictureService
+     */
+    private $pictureService;
+
     public function __construct(
         RestHydrator $hydrator,
         PictureItem $pictureItem,
@@ -133,7 +139,8 @@ class PictureController extends AbstractRestfulController
         PictureModerVote $pictureModerVote,
         Item $item,
         Picture $picture,
-        User $userModel
+        User $userModel,
+        PictureService $pictureService
     ) {
         $this->carOfDay = $carOfDay;
 
@@ -156,6 +163,7 @@ class PictureController extends AbstractRestfulController
         $this->picture = $picture;
         $this->item = $item;
         $this->userModel = $userModel;
+        $this->pictureService = $pictureService;
     }
 
     public function randomPictureAction()
@@ -514,10 +522,17 @@ class PictureController extends AbstractRestfulController
             $user['id'],
             $this->getRequest()->getServer('REMOTE_ADDR'),
             [], // $itemIds
-            null, // $perspectiveId
-            null, // $replacePictureId
+            0, // $perspectiveId
+            0, // $replacePictureId
             '' // (string)$values['note']
         );
+
+        $url = $this->url()->fromRoute('api/picture/picture/item', [
+            'id' => $picture['id']
+        ]);
+        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
+
+        return $this->getResponse()->setStatusCode(201);
     }
 
     public function updateAction()

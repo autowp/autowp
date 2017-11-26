@@ -15,25 +15,26 @@ export class SpecService {
   
     public getSpecs(): ng.IPromise<any> {
         var self = this;
-        return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
+        return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<ng.IHttpResponse<any>>) {
             if (self.typesInitialized) {
                 resolve(self.types);
                 return;
             }
             self.$http({
                 method: 'GET',
-                url: '/go-api/spec'
+                url: '/api/spec'
             }).then(function(response: ng.IHttpResponse<any>) {
                 self.types = response.data.items;
                 self.typesInitialized = true;
                 resolve(self.types);
-            }, function() {
-                reject();
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
             });
         });
     };
     
     public getSpec(id: number): ng.IPromise<any> {
+        console.log('getSpec', id);
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
             self.getSpecs().then(function(types: any[]) {
@@ -43,7 +44,9 @@ export class SpecService {
                 } else {
                     reject();
                 }
-            }, reject);
+            }, function() {
+                reject();
+            });
         });
     };
     

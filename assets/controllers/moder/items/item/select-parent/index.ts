@@ -217,7 +217,7 @@ export class ModerItemsItemSelectParentController {
                     fields: 'item.name_html,item.childs_count',
                     parent_id: parent.id,
                     is_group: true,
-                    order: 'moder_auto'
+                    order: 'type_auto'
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
                 parent.childs = response.data.items;

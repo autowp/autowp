@@ -19,6 +19,7 @@ function toPlain(options: any[], deep: number): any[] {
 }
 
 interface IAAutowpItemMetaFormDirectiveScope extends ng.IScope {
+    submitNotify: Function,
     submit: Function;
     item: any;
 }
@@ -72,6 +73,32 @@ class AutowpItemMetaFormDirectiveController {
     public invalidParams: any = {};
     public specOptions: any[] = [];
     public monthOptions: any[];
+    private isConceptOptions = [
+        {
+            value: false,
+            name: 'moder/vehicle/is-concept/no'
+        },
+        {
+            value: true,
+            name: 'moder/vehicle/is-concept/yes'
+        },
+        {
+            value: 'inherited',
+            name: 'moder/vehicle/is-concept/inherited'
+        }
+    ];
+    public defaultSpecOptions = [
+        {
+            id: null,
+            short_name: '--',
+            deep: 0
+        },
+        {
+            id: 'inherited',
+            short_name: 'inherited',
+            deep: 0
+        }
+    ];
 
     static $inject = ['$scope', '$q', 'SpecService', 'VehicleTypeService', 'LanguageService', 'leafletData'];
     constructor(
@@ -174,59 +201,32 @@ class AutowpItemMetaFormDirectiveController {
     }
         
     public submit() {
-        this.$scope.submit();
+        this.$scope.submitNotify();
     }
         
     public getIsConceptOptions(parent: any) {
-        
-        var isConceptOptions = [
-            {
-                value: false,
-                name: 'moder/vehicle/is-concept/no'
-            },
-            {
-                value: true,
-                name: 'moder/vehicle/is-concept/yes'
-            },
-            {
-                value: 'inherited',
-                name: 'moder/vehicle/is-concept/inherited'
-            }
-        ];
-        
-        isConceptOptions[2].name = parent ? (
+        this.isConceptOptions[2].name = parent ? (
             parent.is_concept ? 
                 'moder/vehicle/is-concept/inherited-yes' : 
                 'moder/vehicle/is-concept/inherited-no'
             ) : 
             'moder/vehicle/is-concept/inherited';
         
-        return isConceptOptions;
+        return this.isConceptOptions;
     }
 
     public getSpecOptions(specOptions: any[]): any[] {
-        var defaultSpecOptions = [
-            {
-                id: null,
-                short_name: '--',
-                deep: 0
-            },
-            {
-                id: 'inherited',
-                short_name: 'inherited',
-                deep: 0
-            }
-        ];
-        return defaultSpecOptions.concat(specOptions);
+        return this.defaultSpecOptions.concat(specOptions);
     }
 }
 
 class AutowpItemMetaFormDirective implements ng.IDirective {
     public controllerAs = 'ctrl';
     public restrict = 'E';
+    public transclude: true;
     public scope = {
         item: '=',
-        submit: '<',
+        submitNotify: '&submit',
         parent: '<',
         invalidParams: '<',
         hideSubmit: '<',

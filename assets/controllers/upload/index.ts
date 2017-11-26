@@ -17,6 +17,7 @@ export class UploadController {
     public file: any;
     public note: string;
     public progress: any[];
+    public pictures: any[];
   
     constructor(
         private $scope: autowp.IControllerScope,
@@ -90,6 +91,8 @@ export class UploadController {
         $form.hide();
 
         var xhrs = [];*/
+        
+        var self = this;
 
         for (let file of this.file) {
             
@@ -113,11 +116,20 @@ export class UploadController {
                 progress.percentage = 100;
                 progress.success = true;
 
-                /*if (data) {
-                    $.map(data, function(picture) {
-                        self.insertPicture(picture);
-                    });
-                }*/
+                let location = response.headers('Location');
+
+                self.$http({
+                    method: 'GET',
+                    url: location,
+                    params: {
+                        fields: 'thumbnail,votes,views,comments_count,perspective_item,name_html,name_text'
+                    }
+                }).then(function(response: ng.IHttpResponse<any>) {
+                    self.insertPicture(response.data);
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
+                });
+                
             }, function (response) {
                 console.log('Error status: ' + response.status);
                 
@@ -149,6 +161,10 @@ export class UploadController {
             $form.show();
             $form[0].reset();
         });*/
+    }
+    
+    public insertPicture(picture: any) {
+        this.pictures.push(picture);
     }
 };
 

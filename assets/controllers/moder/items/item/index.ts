@@ -373,7 +373,7 @@ export class ModerItemsItemController {
                 parent_id: self.item.id,
                 limit: 500,
                 fields: 'name,duplicate_child.name_html,item.name_html,item.name,item.public_urls',
-                order: 'moder_auto'
+                order: 'type_auto'
             }
         }).then(function(response: ng.IHttpResponse<any>) {
             self.childs = response.data.items;
@@ -495,7 +495,7 @@ export class ModerItemsItemController {
         });
         
         if (this.tabs[tab].init) {
-            this.tabs[tab].init();
+            this.tabs[tab].init.call(this);
         }
     }
     

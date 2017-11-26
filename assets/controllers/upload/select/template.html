@@ -11,33 +11,12 @@
 
 <div class="select-in-brand" ng-if="ctrl.brand">
     <div style="margin: 5px 0" ng-if="ctrl.vehicles.length > 0">
+        
         <div ng-repeat="item in ctrl.vehicles">
-            <div class="text-muted" ng-if="item.type">
-                <?php
-                    switch ($car['type']) {
-                            case Application\Model\ItemParent::TYPE_TUNING: print $this->escapeHtml($this->translate('catalogue/related')); break;
-                            case Application\Model\ItemParent::TYPE_SPORT:  print 'Sport'; break;
-                        }
-                    ?>
-            </div>
-            <div ng-if="item.childs_count > 0">
-                <a href="#" class="arrow">
-                    <i class="fa fa-plus-circle"></i>
-                    <span ng-bind-html="item.name_html"></span>
-                </a>
-                <div style="margin:0 0 4px 18px;display:none">
-                    <div ng-if="!item.is_group">
-                        <a href="#" ng-bind-html="item.name_html"></a>
-                    </div>
-                    <div class="loading"><em>Loading ...</em></div>
-                    <a ng-if="item.is_group" translate>upload/select/other-modification</a>
-                </div>
-            </div>
-            
-            <div ng-if="item.childs_count <= 0">
-                <a ui-sref="upload({item_id: item.id})" ng-bind-html="item.name_html"></a>
-                <br />
-            </div>
+        
+            <autowp-upload-select-tree-item item="item" load-childs="ctrl.loadChildCatalogues">
+            </autowp-upload-select-tree-item>
+           
         </div>
     </div>
 

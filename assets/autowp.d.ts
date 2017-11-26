@@ -81,7 +81,7 @@ declare namespace autowp {
         end_model_year: number;
         produced: number;
         produced_exactly: boolean;
-        spec_id: number|null;
+        spec_id: number|string|null;
         logo: any;
     
         engine_vehicles_count: number;

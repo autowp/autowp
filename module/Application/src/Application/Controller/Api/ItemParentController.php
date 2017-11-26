@@ -166,7 +166,7 @@ class ItemParentController extends AbstractRestfulController
                     'item.spec_id',
                 ]);
                 break;
-            case 'moder_auto':
+            case 'type_auto':
                 $select->order([
                     'item_parent.type',
                     'item.begin_order_cache',

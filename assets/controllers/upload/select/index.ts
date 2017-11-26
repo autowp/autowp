@@ -4,6 +4,8 @@ import notify from 'notify';
 import { ItemService } from 'services/item';
 import { chunk } from 'chunk';
 
+import './tree-item';
+
 const CONTROLLER_NAME = 'UploadSelectController';
 const STATE_NAME = 'upload-select';
 
@@ -13,7 +15,9 @@ export class UploadSelectController {
     public brand: autowp.IItem;
     public brands: autowp.IItem[];
     public paginator: autowp.IPaginator;
-    public vehicles: autowp.IItem[];
+    public vehicles: any[];
+    public engines: any[];
+    public loadChildCatalogues: Function;
   
     constructor(
         private $scope: autowp.IControllerScope,
@@ -37,16 +41,18 @@ export class UploadSelectController {
             this.ItemService.getItem(brandId).then(function(item: autowp.IItem) {
                 self.brand = item;
                 
-                self.ItemService.getItems({
-                    type_id: 1,
-                    order: 'name',
-                    limit: 500,
-                    fields: 'name_html,childs_count,is_group',
-                    parent_id: self.brand.id
-                }).then(function(result: autowp.GetItemsResult) {
-                    self.vehicles = result.items;
-                }, function(response: ng.IHttpResponse<any>) {
-                    notify.response(response);
+                self.$http({
+                    method: 'GET',
+                    url: '/api/item-parent',
+                    params: {
+                        limit: 500, 
+                        fields: 'item.name_html,item.childs_count',
+                        parent_id: self.brand.id,
+                        order: 'name'
+                    }
+                }).then(function(response: ng.IHttpResponse<any>) {
+                    self.vehicles = response.data.items;
+                    console.log(self.vehicles);
                 });
                 
             }, function(response: ng.IHttpResponse<any>) {
@@ -76,6 +82,36 @@ export class UploadSelectController {
         ]),
         'perspectives' => $this->perspectives
         */
+        
+        this.loadChildCatalogues = (parent: any) => {
+            console.log(parent);
+            parent.loading = true;
+            this.$http({
+                method: 'GET',
+                url: '/api/item-parent',
+                params: {
+                    limit: 500,
+                    fields: 'item.name_html,item.childs_count',
+                    parent_id: parent.item_id,
+                    order: 'type_auto'
+                }
+            }).then(function(response: ng.IHttpResponse<any>) {
+                parent.item.childs = response.data.items;
+                parent.loading = false;
+            }, function(response: ng.IHttpResponse<any>) {
+                notify.response(response);
+                parent.loading = false;
+            });
+        }
+    }
+    
+    public toggle(item: any)
+    {
+        if (! item.expanded) {
+            item.expanded = true;
+        } else {
+            item.expanded = false;
+        }
     }
 };
 

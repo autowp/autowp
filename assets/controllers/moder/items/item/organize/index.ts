@@ -72,7 +72,7 @@ export class ModerItemsItemOrganizeController {
                 parent_id: $state.params.id,
                 limit: 500,
                 fields: 'item.name_html',
-                order: 'moder_auto'
+                order: 'type_auto'
             }
         }).then(function(response: ng.IHttpResponse<any>) {
             self.childs = response.data.items;
