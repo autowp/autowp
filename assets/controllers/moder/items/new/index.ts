@@ -101,8 +101,10 @@ export class ModerItemsNewController {
             }).then(function(item: autowp.IItem) {
                 self.parent = item;
                 
-                if (self.parent.spec_id && self.parent.spec_id != 'inherited') {
-                    SpecService.getSpec(self.parent.spec_id).then(function(spec) {
+                let specId = self.parent.spec_id;
+                
+                if (specId && Number.isInteger(specId as number)) {
+                    SpecService.getSpec(specId as number).then(function(spec: any) {
                         self.parentSpec = spec;
                     }, function() {
                         notify.error("Failed to fetch spec: " + self.parent.spec_id);

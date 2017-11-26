@@ -117,8 +117,6 @@ export class UploadController {
                     note: this.note
                 }
             }).then(function (response: ng.IHttpResponse<any>) {
-                console.log('Success ' + response.config.data.file.name + 'uploaded. Response: ' + response.data);
-                console.log(progress);
                 progress.percentage = 100;
                 progress.success = true;
                 
@@ -132,17 +130,16 @@ export class UploadController {
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.insertPicture(response.data);
+                    
+                    if (self.note) {
+                        self.postNote(response.data.id, self.note);
+                    }
+                    
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
                 });
-                /*if (data) {
-                    $.map(data, function(picture) {
-                        
-                    });
-                }*/
+                
             }, function (response: ng.IHttpResponse<any>) {
-
-                console.log('Error status: ' + response.status);
                 
                 progress.percentage = 100;
                 progress.failed = true;
@@ -160,6 +157,24 @@ export class UploadController {
             self.file = undefined;
         }, function() {
             self.file = undefined;
+        });
+    }
+    
+    private postNote(id: number, note: string)
+    {
+        this.$http({
+            method: 'POST',
+            url: '/api/comment',
+            data: {
+                type_id: 1,
+                item_id: this.$scope.itemId,
+                parent_id: null,
+                moderator_attention: 0,
+                message: note
+            }
+        }).then(function(response: ng.IHttpResponse<any>) {
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
         });
     }
     
