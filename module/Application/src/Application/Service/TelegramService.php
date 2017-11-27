@@ -138,10 +138,19 @@ class TelegramService
         try {
             $this->getApi()->sendMessage($params);
         } catch (\Exception $e) {
-            if (strpos($e->getMessage(), 'blocked') !== false) {
+
+            $message = $e->getMessage();
+
+            if (strpos($message, 'deactivated') !== false) {
                 $this->unsubscribeChat($params['chat_id']);
                 return;
             }
+
+            if (strpos($message, 'blocked') !== false) {
+                $this->unsubscribeChat($params['chat_id']);
+                return;
+            }
+
             throw $e;
         }
     }
