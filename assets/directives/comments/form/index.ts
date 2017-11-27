@@ -66,7 +66,7 @@ class AutowpCommentsFormDirective implements ng.IDirective {
         onSent: '='
     };
     public template = require('./template.html');
-    public controller = AutowpCommentsFormDirective;
+    public controller = AutowpCommentsFormDirectiveController;
     public bindToController: true;
 
     static factory(): ng.IDirectiveFactory {

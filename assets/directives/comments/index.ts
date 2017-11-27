@@ -16,11 +16,13 @@ class AutowpCommentsDirectiveController {
     public paginator: autowp.IPaginator;
 
     static $inject = ['$scope', '$state', '$http'];
+    
     constructor(
         protected $scope: IAutowpCommentsDirectiveScope, 
         private $state: any,
         private $http: ng.IHttpService
     ) {
+        console.log('load');
         this.load();
        
         var self = this;
@@ -85,7 +87,7 @@ class AutowpCommentsDirective implements ng.IDirective {
         page: '<'
     };
     public template = require('./template.html');
-    public controller = AutowpCommentsDirective;
+    public controller = AutowpCommentsDirectiveController;
     public bindToController: true;
 
     static factory(): ng.IDirectiveFactory {

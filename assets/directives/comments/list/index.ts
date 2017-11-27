@@ -143,7 +143,7 @@ class AutowpCommentsListDirective implements ng.IDirective {
         onSent: '='
     };
     public template = require('./template.html');
-    public controller = AutowpCommentsListDirective;
+    public controller = AutowpCommentsListDirectiveController;
     public bindToController: true;
 
     static factory(): ng.IDirectiveFactory {
