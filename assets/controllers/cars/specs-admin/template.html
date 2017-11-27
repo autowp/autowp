@@ -1,0 +1,35 @@
+<table class="table table-stripped">
+    <thead>
+        <tr>
+            <th translate>specifications-editor/admin/date</th>
+            <th translate>specifications-editor/admin/user</th>
+            <th translate>specifications-editor/admin/parameter</th>
+            <th translate>specifications-editor/admin/value</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="value in ctrl.values">
+            <td am-time="value.date"></td>
+            <td>
+                <autowp-user user="value.user" ng-if="value.user"></autowp-user>
+            </td>
+            <td>
+                <span ng-if="value.attribute" ng-bind="value.attribute.name"></span>
+                <span ng-if="value.unit" ng-bind="value.unit.name"></span>
+            </td>
+            <td>{{value.user_value}} / {{value.value}}</td>
+            <td>
+                <button type="submit" class="btn btn-danger btn-xs" ng-click="ctrl.deleteValue(value)">
+                    <i class="fa fa-times"></i>
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<form action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
+    'action' => 'move'
+], [], true))?>" method="post">
+    <input type="text" name="to_item_id" placeholder="id" />
+    <button type="submit" translate>specifications-editor/admin/move</button>
+</form>
