@@ -49,7 +49,7 @@
         <button type="button" class="btn btn-default btn-sm pull-left" data-toggle="button" aria-pressed="false" ng-click="onPictureSelect($event, picture)" ng-if="onselect">
             <i class="fa fa-check"></i>
         </button>
-        <div style="margin-left:35px;" ng-if="picture.perspective_item">
+        <div ng-style="{'margin-left': onselect ? '35px' : ''}" ng-if="picture.perspective_item">
             <select class="form-control input-sm" ng-model="picture.perspective_item.perspective_id" ng-change="savePerspective()">
                 <option value="">--</option>
                 <option ng-repeat="item in perspectiveOptions" ng-value="{{item.id}}">{{item.name|translate}}</option>

@@ -13,6 +13,7 @@ export interface GetItemsServiceOptions {
     parent_id?: number;
     order: string;
     limit: number;
+    name: string|null;
 }
 
 export class ItemService {
@@ -79,7 +80,7 @@ export class ItemService {
         });
     }
     
-    public getItems(options?: GetItemsServiceOptions)
+    public getItems(options?: GetItemsServiceOptions, timeout?: ng.IPromise<any>)
     {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<autowp.GetItemsResult>, reject: ng.IQResolveReject<any>) {
@@ -87,7 +88,8 @@ export class ItemService {
             self.$http({
                 method: 'GET',
                 url: '/api/item',
-                params: options
+                params: options,
+                timeout: timeout
             }).then(function(response: ng.IHttpResponse<autowp.GetItemsResult>) {
                 resolve(response.data);
             }, function(response: ng.IHttpResponse<any>) {

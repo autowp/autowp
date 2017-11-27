@@ -123,8 +123,7 @@ class PictureService
         string $path,
         int $userId,
         string $remoteAddr,
-        array $itemIds,
-        int $perspectiveId,
+        int $itemId,
         int $replacePictureId,
         string $note
     ) {
@@ -180,12 +179,17 @@ class PictureService
 
         $picture = $this->picture->getRow(['id' => (int)$pictureId]);
 
-        if ($itemIds) {
-            $this->pictureItem->setPictureItems($pictureId, PictureItem::PICTURE_CONTENT, $itemIds);
-            if ($perspectiveId && count($itemIds) == 1) {
-                $this->pictureItem->setProperties($pictureId, $itemIds[0], PictureItem::PICTURE_CONTENT, [
-                    'perspective' => $perspectiveId
-                ]);
+        if ($itemId) {
+            $this->pictureItem->setPictureItems($pictureId, PictureItem::PICTURE_CONTENT, [$itemId]);
+        } elseif ($replacePictureId) {
+            $itemsData = $this->pictureItem->getPictureItemsData($replacePictureId);
+            foreach ($itemsData as $item) {
+                $this->pictureItem->add($pictureId, $item['item_id'], $item['type']);
+                if ($item['perspective_id']) {
+                    $this->pictureItem->setProperties($pictureId, $item['item_id'], $item['type'], [
+                        'perspective' => $item['perspective_id']
+                    ]);
+                }
             }
         }
 

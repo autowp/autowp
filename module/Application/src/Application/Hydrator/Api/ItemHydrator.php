@@ -268,15 +268,6 @@ class ItemHydrator extends RestHydrator
             'item_type_id' => (int)$object['item_type_id']
         ];
 
-        if ($this->filterComposite->filter('upload_url')) {
-            $result['upload_url'] = $this->router->assemble([
-                'action'  => 'index',
-                'item_id' => $object['id']
-            ], [
-                'name' => 'upload/params'
-            ]);
-        }
-
         if ($this->filterComposite->filter('specs_url')) {
             $result['specs_url'] = $listBuilder->getSpecificationsUrl($object);
         }

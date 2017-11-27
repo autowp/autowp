@@ -392,10 +392,11 @@
 
             if ($this->user()->logedIn()) {
                 if (count($this->items) || count($this->engines)) {
-                    $list[] = $this->htmlA($this->url('upload/params', [
-                        'action'  => 'index',
-                        'replace' => $this->picture['identity']
-                    ]), '<i class="fa fa-exchange"></i> ' . $this->escapeHtml($this->translate('picture/propose-image-replacement')), false);
+                    $list[] = $this->htmlA(
+                        '/ng/upload?replace=' . $this->picture['id'],
+                        '<i class="fa fa-exchange"></i> ' . $this->escapeHtml($this->translate('picture/propose-image-replacement')),
+                        false
+                    );
                 }
             }
         ?>

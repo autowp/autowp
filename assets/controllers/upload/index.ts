@@ -2,8 +2,11 @@ import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
 import { ItemService } from 'services/item';
+import { chunkBy } from 'chunk';
 
 import './select';
+
+import { CropDialog } from 'crop-dialog';
 
 const CONTROLLER_NAME = 'UploadController';
 const STATE_NAME = 'upload';
@@ -18,6 +21,9 @@ export class UploadController {
     public note: string;
     public progress: any[] = [];
     public pictures: any[] = [];
+    public picturesChunks: any[] = [];
+    public item: autowp.IItem;
+    public formHidden: boolean = false;
   
     constructor(
         private $scope: autowp.IControllerScope,
@@ -63,189 +69,150 @@ export class UploadController {
                 fields: 'name_html'
             }).then(function(item: autowp.IItem) {
                 self.selected = true;
+                self.item = item;
                 self.selectionName = item.name_html;
             }, function(response: ng.IHttpResponse<any>) {
                 self.$state.go('error-404');
             });
         }
-        
-        /*
-        'cropMsg'      => $this->translate('upload/picture/crop'),
-        'croppedToMsg' => $this->translate('upload/picture/cropped-to'),
-        'cropSaveUrl'  => $this->url(null, [
-            'controller' => 'upload',
-            'action'     => 'crop-save',
-        ]),
-        'perspectives' => $this->perspectives
-        */
     }
     
     public submit()
     {
-        console.log(this.file);
-        
         this.progress = [];
         
-        /*var $progress = $('.progress-area');
-        this.$pictures = $('.pictures');
-        
-        $progress.empty();
-
-        $form.hide();*/
+        this.formHidden = true;
 
         var xhrs: any[] = [];
         
-        let self = this;
-       
-        for (let file of this.file) {
+        if (this.replace) {
             
-            let progress = {
-                filename: file.fileName || file.name,
-                percentage: 0,
-                success: false,
-                failed: false,
-                invalidParams: {}
-            };
+            let promise = this.uploadFile(this.file);
             
-            this.progress.push(progress);
+            xhrs.push(promise);
             
-            var promise = this.Upload.upload({
-                method: 'POST',
-                url: '/api/picture',
-                data: {
-                    file: file, 
-                    note: this.note
-                }
-            }).then(function (response: ng.IHttpResponse<any>) {
-                progress.percentage = 100;
-                progress.success = true;
+        } else {
+            for (let file of this.file) {
                 
-                let location = response.headers('Location');
+                let promise = this.uploadFile(file);
+                
+                xhrs.push(promise);
+            }
+        }
 
+        let self = this;
+        this.$q.all(xhrs).then(function() {
+            self.formHidden = false;
+            self.file = undefined;
+        }, function() {
+            self.formHidden = false;
+            self.file = undefined;
+        });
+    }
+    
+    private uploadFile(file: any)
+    {
+        let progress = {
+            filename: file.fileName || file.name,
+            percentage: 0,
+            success: false,
+            failed: false,
+            invalidParams: {}
+        };
+        
+        this.progress.push(progress);
+        
+        var self = this;
+        
+        var promise = this.Upload.upload({
+            method: 'POST',
+            url: '/api/picture',
+            data: {
+                file: file, 
+                comment: this.note,
+                item_id: this.item ? this.item.id : undefined,
+                replace_picture_id: self.replace ? self.replace.id : undefined
+            }
+        }).then(function (response: ng.IHttpResponse<any>) {
+            progress.percentage = 100;
+            progress.success = true;
+            
+            let location = response.headers('Location');
+
+            self.$http({
+                method: 'GET',
+                url: location,
+                params: {
+                    fields: 'crop,image_gallery_full,thumbnail,votes,views,comments_count,perspective_item,name_html,name_text'
+                }
+            }).then(function(response: ng.IHttpResponse<any>) {
+                self.pictures.push(response.data);
+                self.picturesChunks = chunkBy(self.pictures, 6);
+                
+            }, function(response: ng.IHttpResponse<any>) {
+                notify.response(response);
+            });
+            
+        }, function (response: ng.IHttpResponse<any>) {
+            
+            progress.percentage = 100;
+            progress.failed = true;
+            
+            progress.invalidParams = response.data.invalid_params;
+        }, function (evt) {
+            progress.percentage = Math.round(100.0 * evt.loaded / evt.total);
+        }); 
+        
+        return promise;
+    }
+    
+    public crop(picture: any)
+    {
+        let self = this;
+        let cropDialog = new CropDialog({
+            sourceUrl: picture.image_gallery_full.src,
+            crop: {
+                x: picture.crop ? picture.crop.left : 0, 
+                y: picture.crop ? picture.crop.top : 0, 
+                w: picture.crop ? picture.crop.width : picture.width, 
+                h: picture.crop ? picture.crop.height : picture.height
+            },
+            width: picture.width,
+            height: picture.height,
+            onSave: function(crop: any, callback: Function) {
                 self.$http({
-                    method: 'GET',
-                    url: location,
-                    params: {
-                        fields: 'thumbnail,votes,views,comments_count,perspective_item,name_html,name_text'
+                    method: 'PUT',
+                    url: '/api/picture/' + picture.id,
+                    data: {
+                        crop: {
+                            left: crop.x,
+                            top: crop.y,
+                            width: crop.w,
+                            height: crop.h
+                        }
                     }
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    self.insertPicture(response.data);
+                }).then(function() {
                     
-                    if (self.note) {
-                        self.postNote(response.data.id, self.note);
+                    if (! picture.crop) {
+                        picture.crop = {};
                     }
+                    picture.crop.left = Math.round(crop.x);
+                    picture.crop.top = Math.round(crop.y);
+                    picture.crop.width = Math.round(crop.w);
+                    picture.crop.height = Math.round(crop.h);
                     
+                    picture.thumbnail.src = picture.thumbnail.src + '?' + Math.random();
+                    
+                    cropDialog.hide();
+                    
+                    callback();
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
                 });
-                
-            }, function (response: ng.IHttpResponse<any>) {
-                
-                progress.percentage = 100;
-                progress.failed = true;
-                
-                progress.invalidParams = response.data.invalid_params;
-            }, function (evt) {
-                console.log('progress');
-                progress.percentage = Math.round(100.0 * evt.loaded / evt.total);
-            }); 
-            
-            xhrs.push(promise);
-        }
-
-        this.$q.all(xhrs).then(function() {
-            self.file = undefined;
-        }, function() {
-            self.file = undefined;
-        });
-    }
-    
-    private postNote(id: number, note: string)
-    {
-        this.$http({
-            method: 'POST',
-            url: '/api/comment',
-            data: {
-                type_id: 1,
-                item_id: this.$scope.itemId,
-                parent_id: null,
-                moderator_attention: 0,
-                message: note
             }
-        }).then(function(response: ng.IHttpResponse<any>) {
-        }, function(response: ng.IHttpResponse<any>) {
-            notify.response(response);
         });
-    }
-    
-    public insertPicture(picture: any) {
-        this.pictures.push(picture);
         
-        /*var cropDialog;
-        
-        var $cropBtn = $('<a href="#"></a>')
-            .text(this.cropMsg)
-            .prepend('<i class="fa fa-crop"></i> ')
-            .on('click', function(e) {
-                e.preventDefault();
-                
-                if (!cropDialog) {
-                    cropDialog = new CropDialog.CropDialog({
-                        sourceUrl: picture.src,
-                        crop: {
-                            x: 0, 
-                            y: 0, 
-                            w: picture.width, 
-                            h: picture.height
-                        },
-                        width: picture.width,
-                        height: picture.height,
-                        onSave: function(crop, callback) {
-                            var params = $.extend(crop, {
-                                id: picture.id
-                            });
-                            $.post(self.cropSaveUrl, params, function(json) {
-                                var cropStr = Math.round(crop.w) + '×' +
-                                              Math.round(crop.h) + '+' +
-                                              Math.round(crop.x) + '+' +
-                                              Math.round(crop.y);
-                                
-                                $cropBtn
-                                    .text(self.croppedToMsg.replace('%s', cropStr))
-                                    .prepend('<i class="fa fa-crop"></i> ');
-                                
-                                $picture.find('img').attr('src', json.src + '?' + Math.random());
-                                
-                                cropDialog.hide();
-                                
-                                callback();
-                            });
-                        }
-                    });
-                }
-                
-                cropDialog.show();
-            });
-        
-        $picture.append($cropBtn);
-        
-        if (picture.perspectiveUrl) {
-            var $perspective = $('<select class="form-control input-sm"><option value="">--</option></select>');
-            $.map(this.perspectives, function(perspective) {
-                $perspective.append(
-                    $("<option></option>")
-                        .attr("value", perspective.id).text(perspective.name)
-                );
-            });
-            
-            $perspective.on('change', function(e) {
-                $.post(picture.perspectiveUrl, {perspective_id: $(this).val()});
-            });
-            
-            $picture.append($perspective);
-            
-            $perspective.val(picture.perspectiveId ? picture.perspectiveId : '');
-        }*/
+        cropDialog.show();
     }
 };
 

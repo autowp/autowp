@@ -519,12 +519,7 @@ class Pic extends AbstractPlugin
 
             $uploadUrl = null;
             if ($controller->user()->logedIn()) {
-                $uploadUrl = $this->httpRouter->assemble([
-                    'action'  => 'index',
-                    'item_id' => $item['id']
-                ], [
-                    'name' => 'upload/params'
-                ]);
+                $uploadUrl = '/ng/upload?item_id=' . $item['id'];
             }
 
             // alt names

@@ -34,7 +34,6 @@ export class SpecService {
     };
     
     public getSpec(id: number): ng.IPromise<any> {
-        console.log('getSpec', id);
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
             self.getSpecs().then(function(types: any[]) {

@@ -8,8 +8,8 @@ use Zend\Json\Json;
 
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;
+use Application\Controller\Api\PictureController;
 use Application\Controller\TwinsController;
-use Application\Controller\UploadController;
 use Application\Test\AbstractHttpControllerTestCase;
 
 class TwinsControllerTest extends AbstractHttpControllerTestCase
@@ -52,38 +52,29 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
         $request->getFiles()->fromArray([
-            'picture' => [
-                [
-                    'tmp_name' => $file,
-                    'name'     => $filename,
-                    'error'    => UPLOAD_ERR_OK,
-                    'type'     => 'image/jpeg'
-                ]
+            'file' => [
+                'tmp_name' => $file,
+                'name'     => $filename,
+                'error'    => UPLOAD_ERR_OK,
+                'type'     => 'image/jpeg'
             ]
         ]);
-        $this->dispatch('https://www.autowp.ru/upload/send/type/1/item_id/' . $itemId, Request::METHOD_POST, [], true);
+        $this->dispatch('https://www.autowp.ru/api/picture', Request::METHOD_POST, [
+            'item_id' => $itemId
+        ]);
 
-        $this->assertResponseStatusCode(200);
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(UploadController::class);
-        $this->assertMatchedRouteName('upload/params');
-        $this->assertActionName('send');
+        $this->assertControllerName(PictureController::class);
+        $this->assertMatchedRouteName('api/picture/post');
+        $this->assertActionName('post');
 
-        $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
+        $headers = $this->getResponse()->getHeaders();
+        $uri = $headers->get('Location')->uri();
+        $parts = explode('/', $uri->getPath());
+        $pictureId = $parts[count($parts) - 1];
 
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertInternalType('array', $json);
-        $this->assertNotEmpty($json);
-
-        foreach ($json as $item) {
-            $this->assertArrayHasKey('id', $item);
-            $this->assertArrayHasKey('html', $item);
-            $this->assertArrayHasKey('width', $item);
-            $this->assertArrayHasKey('height', $item);
-        }
-
-        return $json[0]['id'];
+        return $pictureId;
     }
 
     private function createItem($params)

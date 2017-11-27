@@ -8,12 +8,11 @@ use Zend\Json\Json;
 
 use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\ItemController;
+use Application\Controller\Api\ItemLanguageController;
+use Application\Controller\Api\ItemLinkController;
 use Application\Controller\Api\ItemParentController;
 use Application\Controller\Api\PictureController;
 use Application\Controller\Api\PictureItemController;
-use Application\Controller\UploadController;
-use Application\Controller\Api\ItemLanguageController;
-use Application\Controller\Api\ItemLinkController;
 
 class ItemControllerTest extends AbstractHttpControllerTestCase
 {
@@ -157,39 +156,30 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
         $request->getFiles()->fromArray([
-            'picture' => [
-                [
-                    'tmp_name' => $file,
-                    'name'     => $filename,
-                    'error'    => UPLOAD_ERR_OK,
-                    'type'     => 'image/jpeg'
-                ]
+            'file' => [
+                'tmp_name' => $file,
+                'name'     => $filename,
+                'error'    => UPLOAD_ERR_OK,
+                'type'     => 'image/jpeg'
             ]
         ]);
-        $url = 'https://www.autowp.ru/upload/send/type/1/item_id/' . $vehicleId;
-        $this->dispatch($url, Request::METHOD_POST, [], true);
 
-        $this->assertResponseStatusCode(200);
+        $this->dispatch('https://www.autowp.ru/api/picture', Request::METHOD_POST, [
+            'item_id' => $vehicleId
+        ]);
+
+        $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(UploadController::class);
-        $this->assertMatchedRouteName('upload/params');
-        $this->assertActionName('send');
+        $this->assertControllerName(PictureController::class);
+        $this->assertMatchedRouteName('api/picture/post');
+        $this->assertActionName('post');
 
-        $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
+        $headers = $this->getResponse()->getHeaders();
+        $uri = $headers->get('Location')->uri();
+        $parts = explode('/', $uri->getPath());
+        $pictureId = $parts[count($parts) - 1];
 
-        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
-
-        $this->assertInternalType('array', $json);
-        $this->assertNotEmpty($json);
-
-        foreach ($json as $item) {
-            $this->assertArrayHasKey('id', $item);
-            $this->assertArrayHasKey('html', $item);
-            $this->assertArrayHasKey('width', $item);
-            $this->assertArrayHasKey('height', $item);
-        }
-
-        return $json[0]['id'];
+        return $pictureId;
     }
 
     private function setPerspective($pictureId, $itemId, $perspectiveId)
@@ -574,7 +564,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/item', Request::METHOD_GET, [
             'fields' => 'childs_count,name_html,name_text,name_default,description,' .
-                'has_text,brands,upload_url,spec_editor_url,specs_url,categories,' .
+                'has_text,brands,spec_editor_url,specs_url,categories,' .
                 'twins_groups,url,more_pictures_url,preview_pictures,design,'.
                 'engine_vehicles,catname,is_concept,spec_id,begin_year,end_year,body',
             'limit'  => 100

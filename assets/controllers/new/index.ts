@@ -46,7 +46,7 @@ export class NewController {
                 fields: 'pictures.owner,pictures.thumbnail,pictures.votes,pictures.views,pictures.comments_count,pictures.name_html,pictures.name_text,' +
                         'item_pictures.thumbnail,item_pictures.name_html,item_pictures.name_text,' +
                         'item.name_html,item.name_default,item.description,item.produced,' +
-                        'item.design,item.url,item.spec_editor_url,item.specs_url,item.upload_url,' +
+                        'item.design,item.url,item.spec_editor_url,item.specs_url,' +
                         'item.categories.url,item.categories.name_html,item.twins_groups.url'
             }
         }).then(function(response: ng.IHttpResponse<any>) {

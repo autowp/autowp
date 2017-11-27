@@ -119,7 +119,9 @@ class PictureHydrator extends RestHydrator
         $this->perspective = $serviceManager->get(\Application\Model\Perspective::class);
 
         $strategy = new Strategy\Image($serviceManager);
-        $this->addStrategy('picture-thumb', $strategy);
+        $this->addStrategy('image', $strategy);
+        $this->addStrategy('thumbnail', $strategy);
+        $this->addStrategy('image_gallery_full', $strategy);
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('owner', $strategy);
@@ -253,7 +255,7 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('thumbnail')) {
-            $picture['thumbnail'] = $this->extractValue('picture-thumb', [
+            $picture['thumbnail'] = $this->extractValue('thumbnail', [
                 'image'  => Picture::buildFormatRequest((array)$object),
                 'format' => 'picture-thumb'
             ]);
@@ -280,7 +282,20 @@ class PictureHydrator extends RestHydrator
             ];
         }
 
+        if ($this->filterComposite->filter('image_gallery_full')) {
+            $picture['image_gallery_full'] = $this->extractValue('image_gallery_full', [
+                'image'  => Picture::buildFormatRequest((array)$object),
+                'format' => 'picture-gallery-full'
+            ]);
+        }
+
         if ($isModer) {
+            if ($this->filterComposite->filter('image')) {
+                $picture['image'] = $this->extractValue('image', [
+                    'image'  => $object['image_id']
+                ]);
+            }
+
             if ($this->filterComposite->filter('crop')) {
                 if ($cropped) {
                     $picture['crop'] = [
@@ -349,12 +364,6 @@ class PictureHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('moder_voted')) {
                 $picture['moder_voted'] = $this->pictureModerVote->hasVote($object['id'], $this->userId);
-            }
-
-            if ($this->filterComposite->filter('image')) {
-                $picture['image'] = $this->extractValue('picture-thumb', [
-                    'image'  => $object['image_id']
-                ]);
             }
 
             if ($this->filterComposite->filter('similar')) {

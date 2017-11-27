@@ -929,7 +929,7 @@ return [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => ['childs_count', 'name_html',
                             'name_text', 'name_default', 'name_only', 'description',
-                            'has_text', 'brands', 'upload_url',
+                            'has_text', 'brands',
                             'spec_editor_url', 'specs_url', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
                             'preview_pictures', 'design', 'engine_vehicles',
@@ -1109,7 +1109,7 @@ return [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => ['childs_count', 'name_html',
                             'name_text', 'name_default', 'name_only', 'description',
-                            'has_text', 'brands', 'upload_url',
+                            'has_text', 'brands',
                             'spec_editor_url', 'specs_url', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
                             'preview_pictures', 'design', 'engine_vehicles',
@@ -1966,7 +1966,7 @@ return [
                             'moder_votes', 'moder_voted', 'is_last',
                             'accepted_count', 'crop', 'replaceable',
                             'perspective_item', 'siblings', 'ip',
-                            'name_html', 'name_text'
+                            'name_html', 'name_text', 'image_gallery_full'
                         ]]
                     ]
                 ]
@@ -2115,7 +2115,7 @@ return [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => [
                             'owner', 'thumbnail', 'votes',
-                            'comments_count', 'name_html', 'name_text'
+                            'comments_count', 'name_html', 'name_text', 'image_gallery_full'
                         ]]
                     ]
                 ]
@@ -2224,6 +2224,39 @@ return [
                             'maxHeight' => 4096
                         ]
                     ]
+                ]
+            ],
+            'comment' => [
+                'required'   => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => 0,
+                            'max' => CommentsService::MAX_MESSAGE_LENGTH
+                        ]
+                    ]
+                ]
+            ],
+            'item_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ]
+            ],
+            'replace_picture_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
                 ]
             ]
         ],
@@ -2339,7 +2372,7 @@ return [
                             'moder_votes', 'moder_voted', 'is_last',
                             'accepted_count', 'crop', 'replaceable',
                             'perspective_item', 'siblings', 'ip',
-                            'name_html', 'name_text'
+                            'name_html', 'name_text', 'image_gallery_full'
                         ]]
                     ]
                 ]

@@ -300,10 +300,7 @@ class Car extends AbstractPlugin
                 $item['allPicturesUrl'] = $listBuilder->getPicturesUrl($car);
             }
 
-            $item['uploadUrl'] = $controller->url()->fromRoute('upload/params', [
-                'action'  => 'index',
-                'item_id' => $car['id']
-            ]);
+            $item['uploadUrl'] = '/ng/upload?item_id=' . $car['id'];
 
             if (! $disableDetailsLink && ($hasHtml || $childsCount > 0)) {
                 $url = $listBuilder->getDetailsUrl($car);

@@ -23,7 +23,7 @@
 
         <div class="col-md-2 col-sm-2" ng-if="!ctrl.havePhoto() && ctrl.canHavePhoto(item)">
             <div class="thumbnail no-photo" ng-title="{{'carlist/no-photo'|translate}}">
-                <a ng-href="{{item.upload_url}}" title="{{'carlist/no-photo/add'|translate}}" class="fa fa-plus-circle text-success"></a>
+                <a ui-sref="upload({item_id: item.id})" title="{{'carlist/no-photo/add'|translate}}" class="fa fa-plus-circle text-success"></a>
                 <span class="fa fa-camera fa-lg fa-4x" aria-hidden="true"></span>
             </div>
         </div>

@@ -356,22 +356,6 @@ return [
                     ],
                 ]
             ],
-            'upload' => [
-                'type' => 'Segment',
-                'options' => [
-                    'route' => '/upload[/:action]',
-                    'defaults' => [
-                        'controller' => Controller\UploadController::class,
-                        'action'     => 'index'
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'params' => [
-                        'type' => Router\Http\WildcardSafe::class
-                    ]
-                ]
-            ],
             /*'widget' => [
              'type' => 'Literal',
                 'options' => [
