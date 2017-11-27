@@ -2258,6 +2258,15 @@ return [
                 'validators' => [
                     ['name' => 'Digits']
                 ]
+            ],
+            'perspective_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
             ]
         ],
         'api_picture_edit' => [

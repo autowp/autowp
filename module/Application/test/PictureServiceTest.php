@@ -43,6 +43,7 @@ class PictureServiceTest extends AbstractHttpControllerTestCase
             '127.0.0.1',
             $vehicleId,
             0,
+            0,
             ''
         );
 

@@ -522,6 +522,7 @@ class PictureController extends AbstractRestfulController
 
         $itemId = (int)$values['item_id'];
         $replacePictureId = (int)$values['replace_picture_id'];
+        $perspectiveId = (int)$values['perspective_id'];
 
         if (! $itemId && ! $replacePictureId) {
             return new ApiProblemResponse(
@@ -540,6 +541,7 @@ class PictureController extends AbstractRestfulController
             $user['id'],
             $this->getRequest()->getServer('REMOTE_ADDR'),
             $itemId,
+            $perspectiveId,
             $replacePictureId,
             (string)$values['comment']
         );

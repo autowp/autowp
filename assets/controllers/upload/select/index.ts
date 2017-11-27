@@ -51,10 +51,29 @@ export class UploadSelectController {
                         limit: 500, 
                         fields: 'item.name_html,item.childs_count',
                         parent_id: self.brand.id,
-                        order: 'name'
+                        order: 'name',
+                        item_type_id: 1
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.vehicles = response.data.items;
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
+                });
+                
+                self.$http({
+                    method: 'GET',
+                    url: '/api/item-parent',
+                    params: {
+                        limit: 500, 
+                        fields: 'item.name_html,item.childs_count',
+                        parent_id: self.brand.id,
+                        order: 'name',
+                        item_type_id: 2
+                    }
+                }).then(function(response: ng.IHttpResponse<any>) {
+                    self.engines = response.data.items;
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
                 });
                 
             }, function(response: ng.IHttpResponse<any>) {

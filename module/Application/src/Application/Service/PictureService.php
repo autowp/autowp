@@ -124,6 +124,7 @@ class PictureService
         int $userId,
         string $remoteAddr,
         int $itemId,
+        int $perspectiveId,
         int $replacePictureId,
         string $note
     ) {
@@ -181,6 +182,9 @@ class PictureService
 
         if ($itemId) {
             $this->pictureItem->setPictureItems($pictureId, PictureItem::PICTURE_CONTENT, [$itemId]);
+            $this->pictureItem->setProperties($pictureId, $itemId, PictureItem::PICTURE_CONTENT, [
+                'perspective' => $perspectiveId
+            ]);
         } elseif ($replacePictureId) {
             $itemsData = $this->pictureItem->getPictureItemsData($replacePictureId);
             foreach ($itemsData as $item) {

@@ -124,21 +124,28 @@ export class UploadController {
         
         var self = this;
         
+        let itemId = this.item ? this.item.id : undefined;
+        let perspectiveId = self.$state.params.perspective_id;
+        if (!perspectiveId) {
+            perspectiveId = undefined;
+        }
+        
         var promise = this.Upload.upload({
             method: 'POST',
             url: '/api/picture',
             data: {
                 file: file, 
                 comment: this.note,
-                item_id: this.item ? this.item.id : undefined,
-                replace_picture_id: self.replace ? self.replace.id : undefined
+                item_id: itemId,
+                replace_picture_id: self.replace ? self.replace.id : undefined,
+                perspective_id: perspectiveId
             }
         }).then(function (response: ng.IHttpResponse<any>) {
             progress.percentage = 100;
             progress.success = true;
             
             let location = response.headers('Location');
-
+            
             self.$http({
                 method: 'GET',
                 url: location,
@@ -146,7 +153,8 @@ export class UploadController {
                     fields: 'crop,image_gallery_full,thumbnail,votes,views,comments_count,perspective_item,name_html,name_text'
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
-                self.pictures.push(response.data);
+                let picture = response.data;
+                self.pictures.push(picture);
                 self.picturesChunks = chunkBy(self.pictures, 6);
                 
             }, function(response: ng.IHttpResponse<any>) {

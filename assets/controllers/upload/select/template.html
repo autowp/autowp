@@ -24,11 +24,12 @@
     </div>
 
     <div ng-if="ctrl.engines.length > 0">
-        <h5>item/type/2/name-plural</h5>
+        <h5 translate>item/type/2/name-plural</h5>
         <div style="margin: 5px 0">
-            <?=$this->partial('application/upload/select-in-brand-items', [
-                'cars' => $this->engines
-            ])?>
+            <div ng-repeat="item in ctrl.engines">
+                <autowp-upload-select-tree-item item="item" load-childs="ctrl.loadChildCatalogues">
+                </autowp-upload-select-tree-item>
+            </div>
         </div>
     </div>
 
