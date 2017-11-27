@@ -193,15 +193,20 @@ export class UploadController {
                     }
                 }).then(function() {
                     
-                    if (! picture.crop) {
-                        picture.crop = {};
-                    }
-                    picture.crop.left = Math.round(crop.x);
-                    picture.crop.top = Math.round(crop.y);
-                    picture.crop.width = Math.round(crop.w);
-                    picture.crop.height = Math.round(crop.h);
-                    
-                    picture.thumbnail.src = picture.thumbnail.src + '?' + Math.random();
+                    self.$http({
+                        method: 'GET',
+                        url: '/api/picture/' + picture.id,
+                        params: {
+                            fields: 'crop,thumbnail'
+                        }
+                    }).then(function(response: ng.IHttpResponse<any>) {
+                        
+                        picture.crop = response.data.crop;
+                        picture.thumbnail = response.data.thumbnail;
+                        
+                    }, function(response: ng.IHttpResponse<any>) {
+                        notify.response(response);
+                    });
                     
                     cropDialog.hide();
                     
