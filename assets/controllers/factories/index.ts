@@ -12,15 +12,17 @@ const CONTROLLER_NAME = 'FactoryController';
 const STATE_NAME = 'factory';
 
 export class FactoryController {
-    static $inject = ['$scope', '$http', '$state', 'ItemService'];
+    static $inject = ['$scope', '$http', '$state', '$element', 'ItemService'];
     public factory: autowp.IItem;
     public pictures: any[];
     public relatedPictures: any[];
+    private map: any;
   
     constructor(
         private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
         private $state: any,
+        private $element: any,
         private ItemService: ItemService
     ) {
       
@@ -52,19 +54,6 @@ export class FactoryController {
                 }
             });
           
-            if (self.factory.lat && self.factory.lng) {
-                
-                $('#google-map').each(function() {
-                    
-                    var map = leaflet.map(this).setView([self.factory.lat, self.factory.lng], 17);
-                    leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
-                    }).addTo(map);
-                  
-                    leaflet.marker([self.factory.lat, self.factory.lng]).addTo(map);
-                });
-            }
-          
             self.$http({
                 method: 'GET',
                 url: '/api/picture',
@@ -79,6 +68,22 @@ export class FactoryController {
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
+            
+            if (self.factory.lat && self.factory.lng) {
+                $($element[0]).find('.google-map').each(function() {
+                    
+                    self.map = leaflet.map(this).setView([self.factory.lat, self.factory.lng], 17);
+                    leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+                    }).addTo(self.map);
+                  
+                    leaflet.marker([self.factory.lat, self.factory.lng]).addTo(self.map);
+                    setTimeout(function() {
+                        self.map.invalidateSize();
+                    }, 300)
+                });
+            }
+            
         }, function(response: ng.IHttpResponse<any>) {
             self.$state.go('error-404');
         });

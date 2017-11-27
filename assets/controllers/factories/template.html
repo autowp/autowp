@@ -11,7 +11,7 @@
     </li>
 </ul>
 
-<div id="google-map" style="height:300px;margin:0 0 40px;width:100%" ng-if="ctrl.factory.lng && ctrl.factory.lat"></div>
+<div class="google-map" style="height:300px;margin:0 0 40px;width:100%" ng-show="ctrl.factory.lng && ctrl.factory.lat"></div>
 
 <div class="well" ng-if="ctrl.factory.description" btf-markdown="ctrl.factory.description|translate"></div>
 
