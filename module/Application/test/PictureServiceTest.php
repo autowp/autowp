@@ -41,8 +41,7 @@ class PictureServiceTest extends AbstractHttpControllerTestCase
             __DIR__ . '/_files/test.jpg',
             1,
             '127.0.0.1',
-            [$vehicleId],
-            0,
+            $vehicleId,
             0,
             ''
         );
