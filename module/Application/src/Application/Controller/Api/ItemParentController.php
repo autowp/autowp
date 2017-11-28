@@ -110,11 +110,12 @@ class ItemParentController extends AbstractRestfulController
 
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        $user = $this->user()->get();
+        if (! $user) {
             return $this->forbiddenAction();
         }
 
-        $user = $this->user()->get();
+        $isModer = $this->user()->inheritsRole('moder');
 
         $this->listInputFilter->setData($this->params()->fromQuery());
 
@@ -127,31 +128,33 @@ class ItemParentController extends AbstractRestfulController
         $select = new Sql\Select($this->itemParent->getTable()->getTable());
         $select->join('item', 'item_parent.item_id = item.id', []);
 
-        if ($data['ancestor_id']) {
-            $select
-                ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.item_id', [])
-                ->where(['item_parent_cache.parent_id' => $data['ancestor_id']])
-                ->group(['item_parent.item_id', 'item_parent.parent_id']);
-        }
-
         if ($data['item_type_id']) {
             $select->where(['item.item_type_id' => $data['item_type_id']]);
-        }
-
-        if ($data['concept']) {
-            $select->where(['item.is_concept']);
         }
 
         if ($data['parent_id']) {
             $select->where(['item_parent.parent_id' => $data['parent_id']]);
         }
 
-        if ($data['item_id']) {
-            $select->where(['item_parent.item_id' => $data['item_id']]);
-        }
+        if ($isModer) {
+            if ($data['ancestor_id']) {
+                $select
+                ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.item_id', [])
+                ->where(['item_parent_cache.parent_id' => $data['ancestor_id']])
+                ->group(['item_parent.item_id', 'item_parent.parent_id']);
+            }
 
-        if ($data['is_group']) {
-            $select->where(['item.is_group']);
+            if ($data['concept']) {
+                $select->where(['item.is_concept']);
+            }
+
+            if ($data['item_id']) {
+                $select->where(['item_parent.item_id' => $data['item_id']]);
+            }
+
+            if ($data['is_group']) {
+                $select->where(['item.is_group']);
+            }
         }
 
         switch ($data['order']) {

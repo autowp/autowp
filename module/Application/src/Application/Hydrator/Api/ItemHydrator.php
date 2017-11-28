@@ -113,6 +113,11 @@ class ItemHydrator extends RestHydrator
      */
     private $imageStorage;
 
+    /**
+     * @var \Zend\Permissions\Acl\Acl
+     */
+    private $acl;
+
     public function __construct(
         $serviceManager
     ) {
@@ -309,6 +314,13 @@ class ItemHydrator extends RestHydrator
             );
         }
 
+        if ($this->filterComposite->filter('name_html')) {
+            $result['name_html'] = $this->itemNameFormatter->formatHtml(
+                $nameData,
+                $this->language
+            );
+        }
+
         if ($this->filterComposite->filter('name_only')) {
             $result['name_only'] = $this->itemModel->getName($object['id'], $this->language);
         }
@@ -323,6 +335,14 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('is_compiles_item_of_day')) {
             $result['is_compiles_item_of_day'] = $this->carOfDay->isComplies($object['id']);
+        }
+
+        if ($this->filterComposite->filter('childs_count')) {
+            if (isset($object['childs_count'])) {
+                $result['childs_count'] = (int)$object['childs_count'];
+            } else {
+                $result['childs_count'] = $this->itemParent->getChildItemsCount($object['id']);
+            }
         }
 
         if ($isModer) {
@@ -535,14 +555,6 @@ class ItemHydrator extends RestHydrator
                 $result['links_count'] = $this->getCountBySelect($select, $this->linkTable);
             }
 
-            if ($this->filterComposite->filter('childs_count')) {
-                if (isset($object['childs_count'])) {
-                    $result['childs_count'] = (int)$object['childs_count'];
-                } else {
-                    $result['childs_count'] = $this->itemParent->getChildItemsCount($object['id']);
-                }
-            }
-
             if ($this->filterComposite->filter('parents_count')) {
                 $result['parents_count'] = $this->itemParent->getParentItemsCount($object['id']);
             }
@@ -564,13 +576,6 @@ class ItemHydrator extends RestHydrator
             if ($this->filterComposite->filter('name_default')) {
                 $name = $this->itemModel->getLanguageName($object['id'], 'xx');
                 $result['name_default'] = $nameData['name'] == $name ? null : $name;
-            }
-
-            if ($this->filterComposite->filter('name_html')) {
-                $result['name_html'] = $this->itemNameFormatter->formatHtml(
-                    $nameData,
-                    $this->language
-                );
             }
 
             if ($this->filterComposite->filter('brands')) {

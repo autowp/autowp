@@ -289,24 +289,45 @@ class PictureHydrator extends RestHydrator
             ]);
         }
 
+        if ($this->filterComposite->filter('crop')) {
+            if ($cropped) {
+                $picture['crop'] = [
+                    'left'   => (int)$object['crop_left'],
+                    'top'    => (int)$object['crop_top'],
+                    'width'  => (int)$object['crop_width'],
+                    'height' => (int)$object['crop_height'],
+                ];
+            } else {
+                $picture['crop'] = null;
+            }
+        }
+
+        if ($this->filterComposite->filter('perspective_item')) {
+            $itemIds = $this->pictureItem->getPictureItemsByItemType(
+                $object['id'],
+                [Item::VEHICLE, Item::BRAND]
+            );
+
+            $picture['perspective_item'] = null;
+
+            if (count($itemIds) == 1) {
+                $item = $itemIds[0];
+
+                $perspective = $this->pictureItem->getPerspective($object['id'], $item['item_id']);
+
+                $picture['perspective_item'] = [
+                    'item_id'        => (int)$item['item_id'],
+                    'type'           => (int)$item['type'],
+                    'perspective_id' => $perspective ? (int)$perspective : null,
+                ];
+            }
+        }
+
         if ($isModer) {
             if ($this->filterComposite->filter('image')) {
                 $picture['image'] = $this->extractValue('image', [
                     'image'  => $object['image_id']
                 ]);
-            }
-
-            if ($this->filterComposite->filter('crop')) {
-                if ($cropped) {
-                    $picture['crop'] = [
-                        'left'   => (int)$object['crop_left'],
-                        'top'    => (int)$object['crop_top'],
-                        'width'  => (int)$object['crop_width'],
-                        'height' => (int)$object['crop_height'],
-                    ];
-                } else {
-                    $picture['crop'] = null;
-                }
             }
 
             if ($this->filterComposite->filter('iptc')) {
@@ -371,27 +392,6 @@ class PictureHydrator extends RestHydrator
                 $similar = $this->duplicateFinder->findSimilar($object['id']);
                 if ($similar) {
                     $picture['similar'] = $this->extractValue('similar', $similar);
-                }
-            }
-
-            if ($this->filterComposite->filter('perspective_item')) {
-                $itemIds = $this->pictureItem->getPictureItemsByItemType(
-                    $object['id'],
-                    [Item::VEHICLE, Item::BRAND]
-                );
-
-                $picture['perspective_item'] = null;
-
-                if (count($itemIds) == 1) {
-                    $item = $itemIds[0];
-
-                    $perspective = $this->pictureItem->getPerspective($object['id'], $item['item_id']);
-
-                    $picture['perspective_item'] = [
-                        'item_id'        => (int)$item['item_id'],
-                        'type'           => (int)$item['type'],
-                        'perspective_id' => $perspective ? (int)$perspective : null,
-                    ];
                 }
             }
 

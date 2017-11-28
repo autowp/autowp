@@ -6,6 +6,8 @@ use Traversable;
 
 use Zend\Stdlib\ArrayUtils;
 
+use Autowp\User\Model\User;
+
 use Application\Model\Item;
 use Application\Model\ItemParent;
 
@@ -15,6 +17,8 @@ class ItemParentHydrator extends RestHydrator
      * @var int|null
      */
     private $userId = null;
+
+    private $userRole = null;
 
     private $router;
 
@@ -28,6 +32,16 @@ class ItemParentHydrator extends RestHydrator
      */
     private $itemParent;
 
+    /**
+     * @var \Zend\Permissions\Acl\Acl
+     */
+    private $acl;
+
+    /**
+     * @var User
+     */
+    private $userModel;
+
     public function __construct(
         $serviceManager
     ) {
@@ -37,6 +51,9 @@ class ItemParentHydrator extends RestHydrator
         $this->itemParent = $serviceManager->get(ItemParent::class);
 
         $this->item = $serviceManager->get(Item::class);
+
+        $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
+        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $strategy = new Strategy\Item($serviceManager);
         $this->addStrategy('item', $strategy);
@@ -100,53 +117,61 @@ class ItemParentHydrator extends RestHydrator
             'catname'   => $object['catname'],
         ];
 
+        $isModer = false;
+        $role = $this->getUserRole();
+        if ($role) {
+            $isModer = $this->acl->inheritsRole($role, 'moder');
+        }
+
         if ($this->filterComposite->filter('item')) {
             $item = $this->item->getRow(['id' => $object['item_id']]);
             $result['item'] = $item ? $this->extractValue('item', $item) : null;
         }
 
-        if ($this->filterComposite->filter('parent')) {
-            $item = $this->item->getRow(['id' => $object['parent_id']]);
-            $result['parent'] = $item ? $this->extractValue('parent', $item) : null;
-        }
+        if ($isModer) {
+            if ($this->filterComposite->filter('parent')) {
+                $item = $this->item->getRow(['id' => $object['parent_id']]);
+                $result['parent'] = $item ? $this->extractValue('parent', $item) : null;
+            }
 
-        if ($this->filterComposite->filter('name')) {
-            $result['name'] = $this->itemParent->getNamePreferLanguage(
-                $object['parent_id'],
-                $object['item_id'],
-                $this->language
-            );
-        }
+            if ($this->filterComposite->filter('name')) {
+                $result['name'] = $this->itemParent->getNamePreferLanguage(
+                    $object['parent_id'],
+                    $object['item_id'],
+                    $this->language
+                );
+            }
 
-        if ($this->filterComposite->filter('duplicate_parent')) {
-            $duplicateRow = $this->item->getRow([
-                'exclude_id' => $object['parent_id'],
-                'child' => [
-                    'id' => $object['item_id'],
-                    'link_type' => ItemParent::TYPE_DEFAULT
-                ],
-                'ancestor_or_self' => [
-                    'id'         => $object['parent_id'],
-                    'stock_only' => true
-                ]
-            ]);
+            if ($this->filterComposite->filter('duplicate_parent')) {
+                $duplicateRow = $this->item->getRow([
+                    'exclude_id' => $object['parent_id'],
+                    'child' => [
+                        'id' => $object['item_id'],
+                        'link_type' => ItemParent::TYPE_DEFAULT
+                    ],
+                    'ancestor_or_self' => [
+                        'id'         => $object['parent_id'],
+                        'stock_only' => true
+                    ]
+                ]);
 
-            $result['duplicate_parent'] = $duplicateRow
-                ? $this->extractValue('duplicate_parent', $duplicateRow) : null;
-        }
+                $result['duplicate_parent'] = $duplicateRow
+                    ? $this->extractValue('duplicate_parent', $duplicateRow) : null;
+            }
 
-        if ($this->filterComposite->filter('duplicate_child')) {
-            $duplicateRow = $this->item->getRow([
-                'exclude_id' => $object['item_id'],
-                'parent' => [
-                    'id' => $object['parent_id'],
-                    'link_type' => $object['type']
-                ],
-                'descendant_or_self' => $object['item_id']
-            ]);
+            if ($this->filterComposite->filter('duplicate_child')) {
+                $duplicateRow = $this->item->getRow([
+                    'exclude_id' => $object['item_id'],
+                    'parent' => [
+                        'id' => $object['parent_id'],
+                        'link_type' => $object['type']
+                    ],
+                    'descendant_or_self' => $object['item_id']
+                ]);
 
-            $result['duplicate_child'] = $duplicateRow
-                ? $this->extractValue('duplicate_child', $duplicateRow) : null;
+                $result['duplicate_child'] = $duplicateRow
+                    ? $this->extractValue('duplicate_child', $duplicateRow) : null;
+            }
         }
 
         return $result;
@@ -158,5 +183,18 @@ class ItemParentHydrator extends RestHydrator
     public function hydrate(array $data, $object)
     {
         throw new \Exception("Not supported");
+    }
+
+    private function getUserRole()
+    {
+        if (! $this->userId) {
+            return null;
+        }
+
+        if (! $this->userRole) {
+            $this->userRole = $this->userModel->getUserRole($this->userId);
+        }
+
+        return $this->userRole;
     }
 }

@@ -579,12 +579,13 @@ class PictureController extends AbstractRestfulController
         $data = $this->editInputFilter->getValues();
 
         $isModer = $this->user()->inheritsRole('moder');
-        $canCrop = $isModer || ($picture['owner_id'] != $user['id']) && ($picture['status'] != Picture::STATUS_INBOX);
 
         $set = [];
 
-        if ($canCrop && isset($data['crop'])) {
-            if (! $this->user()->isAllowed('picture', 'crop')) {
+        if (isset($data['crop'])) {
+            $canCrop = $this->user()->isAllowed('picture', 'crop') || ($picture['owner_id'] == $user['id']) && ($picture['status'] == Picture::STATUS_INBOX);
+
+            if (! $canCrop) {
                 return $this->forbiddenAction();
             }
 
@@ -875,11 +876,11 @@ class PictureController extends AbstractRestfulController
 
     public function itemAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        $user = $this->user()->get();
+
+        if (! $user) {
             return $this->forbiddenAction();
         }
-
-        $user = $this->user()->get();
 
         $this->itemInputFilter->setData($this->params()->fromQuery());
 

@@ -231,6 +231,16 @@ class ItemController extends AbstractRestfulController
             $select->where([new Sql\Predicate\In('item.id', array_keys($groups))]);
         }
 
+        if ($data['name']) {
+            if (! $itemLanguageJoined) {
+                $itemLanguageJoined = true;
+                $select->join('item_language', 'item.id = item_language.item_id', []);
+            }
+            $select->where(['item_language.name like ?' => $data['name']]);
+
+            $group = true;
+        }
+
         if ($isModer) {
             if ($data['last_item']) {
                 $namespace = new \Zend\Session\Container('Moder_Car');
@@ -276,16 +286,6 @@ class ItemController extends AbstractRestfulController
                         'item.end_order_cache'
                     ]);
                     break;
-            }
-
-            if ($data['name']) {
-                if (! $itemLanguageJoined) {
-                    $itemLanguageJoined = true;
-                    $select->join('item_language', 'item.id = item_language.item_id', []);
-                }
-                $select->where(['item_language.name like ?' => $data['name']]);
-
-                $group = true;
             }
 
             if ($data['name_exclude']) {
