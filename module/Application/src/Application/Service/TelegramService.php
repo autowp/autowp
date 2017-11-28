@@ -138,7 +138,6 @@ class TelegramService
         try {
             $this->getApi()->sendMessage($params);
         } catch (\Exception $e) {
-
             $message = $e->getMessage();
 
             if (strpos($message, 'deactivated') !== false) {

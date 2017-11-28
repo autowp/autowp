@@ -33,6 +33,7 @@ export class ModerItemsItemSelectParentController {
     public doSearch: Function;
     public loadChildCategories: Function;
     public loadChildCatalogues: Function;
+    public select: Function;
 
     constructor(
         private $scope: autowp.IControllerScope, 
@@ -208,8 +209,8 @@ export class ModerItemsItemSelectParentController {
             });
         }
                 
-        this.loadChildCatalogues = (parent: any) => {
-            this.$http({
+        this.loadChildCatalogues = function(parent: any) {
+            self.$http({
                 method: 'GET',
                 url: '/api/item-parent',
                 params: {
@@ -223,10 +224,27 @@ export class ModerItemsItemSelectParentController {
                 parent.childs = response.data.items;
             });
         }
+        
+        this.select = function(parent: any) {
+            self.$http({
+                method: 'POST',
+                url: '/api/item-parent',
+                data: {
+                    item_id: self.item.id,
+                    parent_id: parent.id
+                }
+            }).then(function(response: ng.IHttpResponse<any>) {
+                self.$state.go('moder-items-item', {
+                    id: self.item.id,
+                    tab: 'catalogue'
+                });
+            });
+        };
     }
     
     private loadCatalogueBrands() {
         var self = this;
+
         this.$http({
             method: 'GET',
             url: '/api/item',
@@ -246,6 +264,7 @@ export class ModerItemsItemSelectParentController {
     
     private loadBrands() {
         var self = this;
+
         this.$http({
             method: 'GET',
             url: '/api/item',
@@ -261,25 +280,6 @@ export class ModerItemsItemSelectParentController {
             self.paginator = response.data.paginator;
         });
     }
-    
-    public select(parent: any) {
-        var self = this;
-        this.$http({
-            method: 'POST',
-            url: '/api/item-parent',
-            data: {
-                item_id: this.item.id,
-                parent_id: parent.id
-            }
-        }).then(function(response: ng.IHttpResponse<any>) {
-            self.$state.go('moder-items-item', {
-                id: self.item.id,
-                tab: 'catalogue'
-            });
-        });
-    }
-    
-    
 }
 
 angular.module(Module)
