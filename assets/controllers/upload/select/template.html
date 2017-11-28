@@ -16,6 +16,11 @@
 </div>
 
 <div class="select-in-brand" ng-if="ctrl.brand">
+
+    <span ng-show="ctrl.loading > 0">
+        <i class="fa fa-spinner fa-spin fa-fw fa-4x"></i>
+    </span>
+
     <div style="margin: 5px 0" ng-if="ctrl.vehicles.length > 0">
         
         <div ng-repeat="item in ctrl.vehicles">
@@ -35,16 +40,17 @@
             </div>
         </div>
     </div>
-
-    <div style="margin: 5px 0" ng-if="ctrl.haveConcepts">
-        <?=$this->htmlA([
-            'href'      => '#',
-            'class'     => 'arrow',
-            'data-load' => $this->conceptsUrl
-        ], '<i class="fa fa-plus-circle"></i> ' . $this->escapeHtml($this->translate('upload/select/concepts')), false) ?>
-        <div style="margin:0 0 4px 18px;display:none">
-            <div class="loading"><em>Loading ...</em></div>
-        </div>
+    
+    <div ng-if="ctrl.concepts.length > 0">
+        <i class="fa fa-folder-o" ng-show="!ctrl.conceptsOpen"></i>
+        <i class="fa fa-folder-open-o" ng-show="ctrl.conceptsOpen"></i>
+        <a href="#" ng-click="ctrl.conceptsOpen = !ctrl.conceptsOpen" translate>upload/select/concepts</a>
+        <ul class="list-unstyled" ng-show="ctrl.conceptsOpen">
+            <li ng-repeat="item in ctrl.concepts" style="margin-left:16px">
+                <autowp-upload-select-tree-item item="item" load-childs="ctrl.loadChildCatalogues">
+                </autowp-upload-select-tree-item>
+            </li>
+        </ul>
     </div>
 
     <div style="margin: 5px 0">

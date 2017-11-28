@@ -15,12 +15,14 @@ export class UploadSelectController {
     public brand: autowp.IItem;
     public brands: autowp.IItem[];
     public paginator: autowp.IPaginator;
-    public vehicles: any[];
-    public engines: any[];
+    public vehicles: any[] = [];
+    public engines: any[] = [];
     public loadChildCatalogues: Function;
     public search: string;
     private loadBrandsCanceler: ng.IDeferred<{}> | undefined;
     public loading: number = 0;
+    public concepts: any[] = [];
+    public conceptsOpen: boolean = false;
   
     constructor(
         private $scope: autowp.IControllerScope,
@@ -42,9 +44,12 @@ export class UploadSelectController {
         
         let brandId = parseInt($state.params.brand_id);
         if (brandId) {
+            
+            this.loading++;
             this.ItemService.getItem(brandId).then(function(item: autowp.IItem) {
                 self.brand = item;
                 
+                self.loading++;
                 self.$http({
                     method: 'GET',
                     url: '/api/item-parent',
@@ -52,15 +57,19 @@ export class UploadSelectController {
                         limit: 500, 
                         fields: 'item.name_html,item.childs_count',
                         parent_id: self.brand.id,
+                        exclude_concept: 1,
                         order: 'name',
                         item_type_id: 1
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.vehicles = response.data.items;
+                    self.loading--;
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
+                    self.loading--;
                 });
                 
+                self.loading++;
                 self.$http({
                     method: 'GET',
                     url: '/api/item-parent',
@@ -68,17 +77,42 @@ export class UploadSelectController {
                         limit: 500, 
                         fields: 'item.name_html,item.childs_count',
                         parent_id: self.brand.id,
+                        exclude_concept: 1,
                         order: 'name',
                         item_type_id: 2
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.engines = response.data.items;
+                    self.loading--;
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
+                    self.loading--;
                 });
+                
+                self.loading++;
+                self.$http({
+                    method: 'GET',
+                    url: '/api/item-parent',
+                    params: {
+                        limit: 500, 
+                        fields: 'item.name_html,item.childs_count',
+                        parent_id: self.brand.id,
+                        concept: 1,
+                        order: 'name'
+                    }
+                }).then(function(response: ng.IHttpResponse<any>) {
+                    self.concepts = response.data.items;
+                    self.loading--;
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
+                    self.loading--;
+                });
+                
+                self.loading--;
                 
             }, function(response: ng.IHttpResponse<any>) {
                 self.$state.go('error-404');
+                self.loading--;
             });
         } else {
             

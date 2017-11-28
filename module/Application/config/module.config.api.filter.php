@@ -1312,6 +1312,12 @@ return [
                     ['name' => 'StringTrim']
                 ],
             ],
+            'exclude_concept' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ],
             'item_type_id' => [
                 'required' => false,
                 'filters'  => [

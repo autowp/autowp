@@ -5,17 +5,17 @@
     <span ng-if="item.type_id == 2" translate>catalogue/sport</span>
     <span ng-if="item.type_id == 3" translate>catalogue/design</span>
     <a href="#" class="toggle" ng-click="item.open = !item.open; item.open && loadChilds(item)" ng-bind-html="item.item.name_html"></a>
-    <ul ng-show="item.open">
-        <li ng-show="item.open && !item.childs && item.loading">
+    <ul ng-show="item.open" class="list-unstyled">
+        <li ng-show="item.open && !item.childs && item.loading" style="margin-left:16px">
             <span>
                 <i class="fa fa-spinner fa-spin fa-fw"></i>
             </span>
         </li>
-        <li ng-repeat="child in item.item.childs">
+        <li ng-repeat="child in item.item.childs" style="margin-left:16px">
             <autowp-upload-select-tree-item item="child" load-childs="loadChilds">
             </autowp-upload-select-tree-item>
         </li>
-        <li><a ui-sref="upload({item_id: item.item_id, perspective_id: null})" translate>upload/select/other-modification</a></li>
+        <li style="margin-left:16px"><a ui-sref="upload({item_id: item.item_id, perspective_id: null})" translate>upload/select/other-modification</a></li>
     </ul>
 </div>
 <span ng-if="(!item.item.childs_count || item.item.childs_count <= 0)">
