@@ -241,51 +241,51 @@ class ItemController extends AbstractRestfulController
             $group = true;
         }
 
+        switch ($data['order']) {
+            case 'id_asc':
+                $select->order('item.id ASC');
+                break;
+            case 'id_desc':
+                $select->order('item.id DESC');
+                break;
+            case 'childs_count':
+                $group = true;
+                $select
+                    ->join('item_parent', 'item_parent.parent_id = item.id', [
+                        'childs_count' => new Sql\Expression('count(item_parent.item_id)')
+                    ])
+                    ->order('childs_count desc');
+                break;
+            case 'age':
+                $select->order($this->catalogue()->itemOrdering());
+                break;
+            case 'name_length_desc':
+                if (! $itemLanguageJoined) {
+                    $itemLanguageJoined = true;
+                    $select->join('item_language', 'item.id = item_language.item_id', []);
+                }
+                $select->order([new Sql\Expression('length(item_language.name)'), 'item_language.name']);
+                $group = true;
+                break;
+            case 'name_nat':
+                $select->order(['item.name']);
+                break;
+            default:
+                $select->order([
+                    'item.name',
+                    'item.body',
+                    'item.spec_id',
+                    'item.begin_order_cache',
+                    'item.end_order_cache'
+                ]);
+                break;
+        }
+
         if ($isModer) {
             if ($data['last_item']) {
                 $namespace = new \Zend\Session\Container('Moder_Car');
                 $itemId = isset($namespace->lastCarId) ? (int)$namespace->lastCarId : 0;
                 $select->where(['item.id' => $itemId]);
-            }
-
-            switch ($data['order']) {
-                case 'id_asc':
-                    $select->order('item.id ASC');
-                    break;
-                case 'id_desc':
-                    $select->order('item.id DESC');
-                    break;
-                case 'childs_count':
-                    $group = true;
-                    $select
-                        ->join('item_parent', 'item_parent.parent_id = item.id', [
-                            'childs_count' => new Sql\Expression('count(item_parent.item_id)')
-                        ])
-                        ->order('childs_count desc');
-                    break;
-                case 'age':
-                    $select->order($this->catalogue()->itemOrdering());
-                    break;
-                case 'name_length_desc':
-                    if (! $itemLanguageJoined) {
-                        $itemLanguageJoined = true;
-                        $select->join('item_language', 'item.id = item_language.item_id', []);
-                    }
-                    $select->order([new Sql\Expression('length(item_language.name)'), 'item_language.name']);
-                    $group = true;
-                    break;
-                case 'name_nat':
-                    $select->order(['item.name']);
-                    break;
-                default:
-                    $select->order([
-                        'item.name',
-                        'item.body',
-                        'item.spec_id',
-                        'item.begin_order_cache',
-                        'item.end_order_cache'
-                    ]);
-                    break;
             }
 
             if ($data['name_exclude']) {

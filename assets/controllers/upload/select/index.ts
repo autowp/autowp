@@ -20,6 +20,7 @@ export class UploadSelectController {
     public loadChildCatalogues: Function;
     public search: string;
     private loadBrandsCanceler: ng.IDeferred<{}> | undefined;
+    public loading: number = 0;
   
     constructor(
         private $scope: autowp.IControllerScope,
@@ -107,6 +108,8 @@ export class UploadSelectController {
     
     private loadBrands()
     {
+        this.loading++;
+        
         var self = this;
         
         if (this.loadBrandsCanceler) {
@@ -125,10 +128,12 @@ export class UploadSelectController {
         }, this.loadBrandsCanceler.promise).then(function(result: autowp.GetItemsResult) {
             self.brands = chunk(result.items, 6);
             self.paginator = result.paginator;
+            self.loading--;
         }, function(response: ng.IHttpResponse<any>) {
             if (response.status != -1) {
                 notify.response(response);
             }
+            self.loading--;
         });
     }
     
