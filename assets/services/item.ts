@@ -15,6 +15,7 @@ export interface GetItemsServiceOptions {
     limit: number;
     name?: string|null;
     dateless?: number;
+    page?: number;
 }
 
 export class ItemService {
