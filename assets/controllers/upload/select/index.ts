@@ -187,7 +187,7 @@ angular.module(Module)
         function config($stateProvider: any) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/upload/select?brand_id',
+                url: '/upload/select?brand_id&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require('./template.html')
