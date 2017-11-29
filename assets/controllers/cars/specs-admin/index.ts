@@ -1,8 +1,6 @@
 import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
-import "corejs-typeahead";
-import * as $ from 'jquery';
 
 const CONTROLLER_NAME = 'CarsSpecsAdminController';
 const STATE_NAME = 'cars-specs-admin';

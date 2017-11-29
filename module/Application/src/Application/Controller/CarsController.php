@@ -552,78 +552,7 @@ class CarsController extends AbstractActionController
         return $this->redirect()->toUrl($this->editorUrl($car, 'admin'));
     }
 
-    public function editValueAction()
-    {
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $attrId = (int)$this->params('attr');
-        $itemTypeId = (int)$this->params('item_type');
-        $itemId = (int)$this->params('item');
-
-        $language = $this->language();
-
-        $form = $this->specsService->getEditValueForm($attrId, $itemTypeId, $itemId, $language);
-        if (! $form) {
-            return $this->notFoundAction();
-        }
-
-        $form->setAction($this->url()->fromRoute(null, [], [], true));
-
-        $viewModel = new ViewModel([
-            'form' => $form
-        ]);
-
-        return $viewModel->setTerminal(true);
-    }
-
     public function lowWeightAction()
     {
-    }
-
-    public function datelessAction()
-    {
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $listCars = [];
-
-        $paginator = $this->itemModel->getPaginator([
-            'dateless' => true,
-            'order'    => $this->catalogue()->itemOrdering()
-        ]);
-
-        $paginator
-            ->setItemCountPerPage(20)
-            ->setCurrentPageNumber($this->params('page'));
-
-        foreach ($paginator->getCurrentItems() as $row) {
-            $listCars[] = $row;
-        }
-
-        return [
-            'paginator'     => $paginator,
-            'childListData' => $this->car()->listData($listCars, [
-                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureModel'         => $this->picture,
-                    'itemModel'            => $this->itemModel,
-                    'perspective'          => $this->perspective,
-                    'type'                 => null,
-                    'onlyExactlyPictures'  => false,
-                    'dateSort'             => false,
-                    'disableLargePictures' => false,
-                    'perspectivePageId'    => null,
-                    'onlyChilds'           => []
-                ]),
-                'listBuilder' => new \Application\Model\Item\ListBuilder([
-                    'catalogue'    => $this->catalogue(),
-                    'router'       => $this->getEvent()->getRouter(),
-                    'picHelper'    => $this->getPluginManager()->get('pic'),
-                    'specsService' => $this->specsService
-                ]),
-            ]),
-        ];
     }
 }

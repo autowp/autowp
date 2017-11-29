@@ -241,6 +241,13 @@ class ItemController extends AbstractRestfulController
             $group = true;
         }
 
+        if ($data['dateless']) {
+            $select->where([
+                'item.begin_year is null',
+                'item.begin_model_year is null'
+            ]);
+        }
+
         switch ($data['order']) {
             case 'id_asc':
                 $select->order('item.id ASC');

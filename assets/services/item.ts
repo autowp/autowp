@@ -9,11 +9,12 @@ export interface GetItemServiceOptions {
 
 export interface GetItemsServiceOptions {
     fields: string;
-    type_id: number;
+    type_id?: number;
     parent_id?: number;
     order: string;
     limit: number;
-    name: string|null;
+    name?: string|null;
+    dateless?: number;
 }
 
 export class ItemService {
