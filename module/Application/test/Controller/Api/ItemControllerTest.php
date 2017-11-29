@@ -55,25 +55,24 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         ]);
     }
 
-    private function setEngineToVehicle($engineBrandCatname, $engineId, $vehicleId)
+    private function setEngineToVehicle($engineId, $vehicleId)
     {
         $this->reset();
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch(
-            'https://www.autowp.ru/cars/select-car-engine/item_id/' . $vehicleId,
-            Request::METHOD_POST,
+            'https://www.autowp.ru/api/item/' . $vehicleId,
+            Request::METHOD_PUT,
             [
-                'brand'  => $engineBrandCatname,
-                'engine' => $engineId
+                'engine_id' => $engineId
             ]
         );
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\CarsController::class);
-        $this->assertMatchedRouteName('cars/params');
-        $this->assertActionName('select-car-engine');
+        $this->assertControllerName(\Application\Controller\Api\ItemController::class);
+        $this->assertMatchedRouteName('api/item/item/put');
+        $this->assertActionName('put');
     }
 
     private function getRandomBrand()
@@ -245,7 +244,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $engineId = $this->createEngine();
         $brand = $this->getRandomBrand();
         $this->addItemParent($engineId, $brand['id']);
-        $this->setEngineToVehicle($brand['catname'], $engineId, $vehicleId);
+        $this->setEngineToVehicle($engineId, $vehicleId);
         $pictureId = $this->addPictureToItem($vehicleId);
 
         $this->reset();
@@ -535,8 +534,8 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         ]);
         $this->addItemParent($itemId2, $brand['id']);
 
-        $this->setEngineToVehicle($brand['catname'], $engineId, $itemId1);
-        $this->setEngineToVehicle($brand['catname'], $engineId, $itemId2);
+        $this->setEngineToVehicle($engineId, $itemId1);
+        $this->setEngineToVehicle($engineId, $itemId2);
 
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

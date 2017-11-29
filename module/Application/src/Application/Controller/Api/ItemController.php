@@ -108,6 +108,11 @@ class ItemController extends AbstractRestfulController
 
     private $collators = [];
 
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
     public function __construct(
         RestHydrator $hydrator,
         Image $logoHydrator,
@@ -122,7 +127,8 @@ class ItemController extends AbstractRestfulController
         TableGateway $specTable,
         Item $itemModel,
         VehicleType $vehicleType,
-        InputFilterPluginManager $inputFilterManager
+        InputFilterPluginManager $inputFilterManager,
+        SpecificationsService $specsService
     ) {
         $this->hydrator = $hydrator;
         $this->logoHydrator = $logoHydrator;
@@ -138,6 +144,7 @@ class ItemController extends AbstractRestfulController
         $this->itemModel = $itemModel;
         $this->vehicleType = $vehicleType;
         $this->inputFilterManager = $inputFilterManager;
+        $this->specsService = $specsService;
     }
 
     private function getCollator($language)
@@ -916,6 +923,13 @@ class ItemController extends AbstractRestfulController
                 'required'    => false,
                 'allow_empty' => true
             ],
+            'engine_id' => [
+                'required'    => false,
+                'allow_empty' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ]
         ];
 
         $pointFields = in_array($itemTypeId, [
@@ -928,6 +942,10 @@ class ItemController extends AbstractRestfulController
 
         if ($itemTypeId != Item::BRAND) {
             unset($spec['full_name']);
+        }
+
+        if ($itemTypeId != Item::VEHICLE) {
+            unset($spec['engine_id']);
         }
 
         if (! in_array($itemTypeId, [Item::CATEGORY, Item::BRAND])) {
@@ -1197,6 +1215,8 @@ class ItemController extends AbstractRestfulController
         $values = $inputFilter->getValues();
 
         $set = [];
+        $updateActual = false;
+        $notifyMeta = false;
 
         if (array_key_exists('subscription', $values)) {
             if ($values['subscription']) {
@@ -1207,27 +1227,33 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('name', $values)) {
+            $notifyMeta = true;
             $set['name'] = $values['name'];
             $this->itemModel->setLanguageName($item['id'], 'xx', $values['name']);
         }
 
         if (array_key_exists('full_name', $values)) {
+            $notifyMeta = true;
             $set['full_name'] = $values['full_name'] ? $values['full_name'] : null;
         }
 
         if (array_key_exists('body', $values)) {
+            $notifyMeta = true;
             $set['body'] = (string)$values['body'];
         }
 
         if (array_key_exists('begin_year', $values)) {
+            $notifyMeta = true;
             $set['begin_year'] = $values['begin_year'] ? $values['begin_year'] : null;
         }
 
         if (array_key_exists('begin_month', $values)) {
+            $notifyMeta = true;
             $set['begin_month'] = $values['begin_month'] ? $values['begin_month'] : null;
         }
 
         if (array_key_exists('end_year', $values)) {
+            $notifyMeta = true;
             $endYear = $values['end_year'] ? $values['end_year'] : null;
             $set['end_year'] = $endYear;
 
@@ -1239,10 +1265,12 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('end_month', $values)) {
+            $notifyMeta = true;
             $set['end_month'] = $values['end_month'] ? $values['end_month'] : null;
         }
 
         if (array_key_exists('today', $values)) {
+            $notifyMeta = true;
             if (is_string($values['today'])) {
                 $values['today'] = strlen($values['today']) ? (bool)strlen($values['today']) : null;
             }
@@ -1254,14 +1282,17 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('begin_model_year', $values)) {
+            $notifyMeta = true;
             $set['begin_model_year'] = $values['begin_model_year'] ? $values['begin_model_year'] : null;
         }
 
         if (array_key_exists('end_model_year', $values)) {
+            $notifyMeta = true;
             $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
         }
 
         if (array_key_exists('is_concept', $values)) {
+            $notifyMeta = true;
             $set['is_concept_inherit'] = $values['is_concept'] === 'inherited' ? 1 : 0;
             if (! $set['is_concept_inherit']) {
                 $set['is_concept'] = $values['is_concept'] ? 1 : 0;
@@ -1269,6 +1300,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('catname', $values)) {
+            $notifyMeta = true;
             if (! $values['catname']) {
                 $filter = new \Autowp\ZFComponents\Filter\FilenameSafe();
                 $values['catname'] = $filter->filter($values['name']);
@@ -1278,10 +1310,12 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('produced', $values)) {
+            $notifyMeta = true;
             $set['produced'] = strlen($values['produced']) ? (int)$values['produced'] : null;
         }
 
         if (array_key_exists('produced_exactly', $values)) {
+            $notifyMeta = true;
             $set['produced_exactly'] = $values['produced_exactly'] ? 1 : 0;
         }
 
@@ -1289,6 +1323,7 @@ class ItemController extends AbstractRestfulController
             case Item::VEHICLE:
             case Item::ENGINE:
                 if (array_key_exists('is_group', $values)) {
+                    $notifyMeta = true;
                     $hasChildItems = $this->itemParent->hasChildItems($item['id']);
 
                     if ($hasChildItems) {
@@ -1308,6 +1343,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('spec_id', $values)) {
+            $notifyMeta = true;
             if ($values['spec_id'] === 'inherited') {
                 $set['spec_inherit'] = 1;
             } else {
@@ -1315,6 +1351,127 @@ class ItemController extends AbstractRestfulController
                 $set['spec_id'] = $values['spec_id'] ? (int)$values['spec_id'] : null;
             }
         }
+
+        if (array_key_exists('engine_id', $values)) {
+            if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
+                return $this->forbiddenAction();
+            }
+
+            if (! $this->user()->isAllowed('specifications', 'edit')) {
+                return $this->forbiddenAction();
+            }
+
+            $updateActual = true;
+
+            if ($values['engine_id'] == 'inherited') {
+                $set['engine_inherit'] = 1;
+                $set['engine_item_id'] = null;
+
+                $message = sprintf(
+                    'У автомобиля %s установлено наследование двигателя',
+                    htmlspecialchars($this->car()->formatName($item, 'en'))
+                );
+                $this->log($message, [
+                    'items' => $item['id']
+                ]);
+
+                $user = $this->user()->get();
+
+                foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
+                    if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                        $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
+
+                        $message = sprintf(
+                            $this->translate(
+                                'pm/user-%s-set-inherited-vehicle-engine-%s-%s',
+                                'default',
+                                $subscriber['language']
+                            ),
+                            $this->userUrl($user, $uri),
+                            $this->car()->formatName($item, $subscriber['language']),
+                            $this->carModerUrl($item, $uri)
+                        );
+
+                        $this->message->send(null, $subscriber['id'], $message);
+                    }
+                }
+            } elseif ($values['engine_id'] === null || $values['engine_id'] === '') {
+                $engine = $this->itemModel->getRow(['id' => (int)$item['engine_item_id']]);
+
+                $set['engine_inherit'] = 0;
+                $set['engine_item_id'] = null;
+
+                if ($engine) {
+                    $message = sprintf(
+                        'У автомобиля %s убран двигатель (был %s)',
+                        htmlspecialchars($this->car()->formatName($item, 'en')),
+                        htmlspecialchars($engine['name'])
+                    );
+                    $this->log($message, [
+                        'items' => $item['id']
+                    ]);
+
+                    $user = $this->user()->get();
+
+                    foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
+                        if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                            $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
+
+                            $message = sprintf(
+                                $this->translate(
+                                    'pm/user-%s-canceled-vehicle-engine-%s-%s-%s',
+                                    'default',
+                                    $subscriber['language']
+                                ),
+                                $this->userUrl($user, $uri),
+                                $engine['name'],
+                                $this->car()->formatName($item, $subscriber['language']),
+                                $this->carModerUrl($item, $uri)
+                            );
+
+                            $this->message->send(null, $subscriber['id'], $message);
+                        }
+                    }
+                }
+            } else {
+                $engine = $this->itemModel->getRow([
+                    'id'           => (int)$values['engine_id'],
+                    'item_type_id' => Item::ENGINE
+                ]);
+                if (! $engine) {
+                    return $this->notFoundAction();
+                }
+
+                $set['engine_inherit'] = 0;
+                $set['engine_item_id'] = $values['engine_id'];
+
+                $message = sprintf(
+                    'Автомобилю %s назначен двигатель %s',
+                    htmlspecialchars($this->car()->formatName($item, 'en')),
+                    htmlspecialchars($engine['name'])
+                );
+                $this->log($message, [
+                    'items' => $item['id']
+                ]);
+
+                foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
+                    if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                        $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
+
+                        $message = sprintf(
+                            $this->translate('pm/user-%s-set-vehicle-engine-%s-%s-%s', 'default', $subscriber['language']),
+                            $this->userUrl($user, $uri),
+                            $engine['name'],
+                            $this->car()->formatName($item, $subscriber['language']),
+                            $this->carModerUrl($item, $uri)
+                        );
+
+                        $this->message->send(null, $subscriber['id'], $message);
+                    }
+                }
+            }
+        }
+
 
         if ($set) {
             $this->itemModel->getTable()->update($set, [
@@ -1336,47 +1493,71 @@ class ItemController extends AbstractRestfulController
 
         $this->itemParent->refreshAutoByVehicle($item['id']);
 
-        $this->userItemSubscribe->subscribe($user['id'], $item['id']);
-
-        $newData = $item = $this->itemModel->getRow(['id' => $item['id']]);
-        $htmlChanges = [];
-        foreach ($this->buildChangesMessage($oldData, $newData, 'en') as $line) {
-            $htmlChanges[] = htmlspecialchars($line);
+        if ($updateActual) {
+            $this->specsService->updateActualValues($item['id']);
         }
 
-        $message = sprintf(
-            'Редактирование мета-информации автомобиля %s',
-            htmlspecialchars($this->car()->formatName($item, 'en')).
-            ( count($htmlChanges) ? '<p>'.implode('<br />', $htmlChanges).'</p>' : '')
-        );
-        $this->log($message, [
-            'items' => $item['id']
-        ]);
+        $this->userItemSubscribe->subscribe($user['id'], $item['id']);
 
-        $user = $this->user()->get();
-        foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
-            if ($subscriber && ($subscriber['id'] != $user['id'])) {
-                $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
+        if ($notifyMeta) {
+            $newData = $item = $this->itemModel->getRow(['id' => $item['id']]);
+            $htmlChanges = [];
+            foreach ($this->buildChangesMessage($oldData, $newData, 'en') as $line) {
+                $htmlChanges[] = htmlspecialchars($line);
+            }
 
-                $changes = $this->buildChangesMessage($oldData, $newData, $subscriber['language']);
+            $message = sprintf(
+                'Редактирование мета-информации автомобиля %s',
+                htmlspecialchars($this->car()->formatName($item, 'en')) .
+                ( count($htmlChanges) ? '<p>'.implode('<br />', $htmlChanges).'</p>' : '')
+            );
+            $this->log($message, [
+                'items' => $item['id']
+            ]);
 
-                $message = sprintf(
-                    $this->translate(
-                        'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s',
-                        'default',
-                        $subscriber['language']
-                    ),
-                    $this->userModerUrl($user, true, $uri),
-                    $this->car()->formatName($item, $subscriber['language']),
-                    $this->itemModerUrl($item, true, null, $uri),
-                    ( count($changes) ? implode("\n", $changes) : '')
-                );
+            $user = $this->user()->get();
+            foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
+                if ($subscriber && ($subscriber['id'] != $user['id'])) {
+                    $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
-                $this->message->send(null, $subscriber['id'], $message);
+                    $changes = $this->buildChangesMessage($oldData, $newData, $subscriber['language']);
+
+                    $message = sprintf(
+                        $this->translate(
+                            'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s',
+                            'default',
+                            $subscriber['language']
+                        ),
+                        $this->userModerUrl($user, true, $uri),
+                        $this->car()->formatName($item, $subscriber['language']),
+                        $this->itemModerUrl($item, true, null, $uri),
+                        ( count($changes) ? implode("\n", $changes) : '')
+                    );
+
+                    $this->message->send(null, $subscriber['id'], $message);
+                }
             }
         }
 
         return $this->getResponse()->setStatusCode(200);
+    }
+
+    private function userUrl($user, $uri = null)
+    {
+        return $this->url()->fromRoute('ng', ['path' => ''], [
+            'force_canonical' => true,
+            'uri'             => $uri
+        ]) . 'users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
+    }
+
+    private function carModerUrl($item, $uri = null)
+    {
+        $url = 'moder/items/item/' . $item['id'];
+
+        return $this->url()->fromRoute('ng', ['path' => ''], [
+            'force_canonical' => true,
+            'uri'             => $uri
+        ]) . $url;
     }
 
     /**
@@ -1394,7 +1575,7 @@ class ItemController extends AbstractRestfulController
     }
 
     /**
-     * @param array|\ArrayObject $car
+     * @param array|\ArrayObject $item
      * @return string
      */
     private function itemModerUrl($item, $full = false, $tab = null, $uri = null)

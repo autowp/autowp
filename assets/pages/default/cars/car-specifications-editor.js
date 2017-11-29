@@ -30,6 +30,48 @@ define(
 
                     $(this).removeData('load').removeAttr('data-load');
                 });
+                
+                $('#inherit-car-engine').on('click', function(e) {
+                    e.preventDefault();
+                    
+                    var self = this;
+                    
+                    $.ajax({
+                        method: 'PUT',
+                        url: '/api/item/' + $(this).data('id'),
+                        data: JSON.stringify({
+                            engine_id: 'inherited'
+                        }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function() {
+                            console.log('inherit');
+                            window.location.href = '/cars/car-specifications-editor/item_id/' + $(self).data('id') + '/tab/engine';
+                        }
+                    }).always(function() {
+                    	console.log('inherit');
+                        window.location.href = '/cars/car-specifications-editor/item_id/' + $(self).data('id') + '/tab/engine';
+                    });
+                });
+                
+                $('#dont-inherit-car-engine, #cancel-car-engine').on('click', function(e) {
+                    e.preventDefault();
+                    
+                    var self = this;
+                    
+                    $.ajax({
+                        method: 'PUT',
+                        url: '/api/item/' + $(this).data('id'),
+                        data: JSON.stringify({
+                            engine_id: ''
+                        }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                    }).always(function() {
+                    	console.log('inherit');
+                        window.location.href = '/cars/car-specifications-editor/item_id/' + $(self).data('id') + '/tab/engine';
+                    });
+                });
             }
         };
     }

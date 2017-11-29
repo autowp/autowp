@@ -3,6 +3,7 @@ import Module from 'app.module';
 import notify from 'notify';
 import { ItemService } from 'services/item';
 import { chunk } from 'chunk';
+import './tree-item';
 
 const CONTROLLER_NAME = 'CarsSelectEngineController';
 const STATE_NAME = 'cars-select-engine';
@@ -17,6 +18,9 @@ export class CarsSelectEngineController {
     public search: string;
     public brands: autowp.IItem[];
     public items: any[];
+    public brandId: number;
+    public loadChildCatalogues: Function;
+    public selectEngine: (engineId: number) => void;
   
     constructor(
         private $scope: autowp.IControllerScope, 
@@ -27,7 +31,9 @@ export class CarsSelectEngineController {
     ) {
         let self = this;
         
-        this.ItemService.getItem(this.$state.params.item_id).then(function(item: autowp.IItem) {
+        this.ItemService.getItem(this.$state.params.item_id, {
+            fields: 'name_html'
+        }).then(function(item: autowp.IItem) {
             self.item = item;
             
             self.$scope.pageEnv({
@@ -43,15 +49,15 @@ export class CarsSelectEngineController {
             });
             
             if (self.$state.params.brand_id) {
+                self.brandId = self.$state.params.brand_id;
                 $http({
                     method: 'GET',
                     url: '/api/item-parent',
                     params: {
-                        limit: 100, 
+                        limit: 500, 
                         fields: 'item.name_html,item.childs_count',
                         parent_id: self.$state.params.brand_id,
-                        is_group: true,
-                        type_id: self.item.item_type_id,
+                        item_type_id: 2,
                         page: self.$state.params.page
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
@@ -66,6 +72,41 @@ export class CarsSelectEngineController {
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
+        
+        this.loadChildCatalogues = (parent: any) => {
+            parent.loading = true;
+            this.$http({
+                method: 'GET',
+                url: '/api/item-parent',
+                params: {
+                    limit: 500,
+                    fields: 'item.name_html,item.childs_count',
+                    parent_id: parent.item_id,
+                    item_type_id: 2,
+                    order: 'type_auto'
+                }
+            }).then(function(response: ng.IHttpResponse<any>) {
+                parent.item.childs = response.data.items;
+                parent.loading = false;
+            }, function(response: ng.IHttpResponse<any>) {
+                notify.response(response);
+                parent.loading = false;
+            });
+        };
+        
+        this.selectEngine = (engineId: number) => {
+            self.$http({
+                method: 'PUT',
+                url: '/api/item/' + self.item.id,
+                data: {
+                    engine_id: engineId
+                }
+            }).then(function(response: ng.IHttpResponse<any>) {
+                window.location.href = '/cars/car-specifications-editor/item_id/' + self.item.id + '/tab/engine';
+            }, function(response: ng.IHttpResponse<any>) {
+                notify.response(response);
+            });
+        }
     }
     
     private loadBrands()

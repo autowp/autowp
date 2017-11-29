@@ -78,48 +78,30 @@
                             </em></h6>
                         <?php } ?>
                     <?php } ?>
-                    <form id="select-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
-                        'action'  => 'select-car-engine',
-                        'item_id' => $this->car['id']
-                    ], [], true))?>">
-                        <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('specifications-editor/engine/select-another'))?>" class="btn btn-primary" />
-                    </form>
-                    <form id="select-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
-                        'action'  => 'cancel-car-engine',
-                        'item_id' => $this->car['id']
-                    ], [], true))?>">
-                        <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('specifications-editor/engine/cancel'))?>" class="btn btn-warning" />
-                    </form>
+                    <a href="/ng/cars/select-engine?item_id=<?=$this->car['id']?>" class="btn btn-primary">
+                        <?=$this->escapeHtmlAttr($this->translate('specifications-editor/engine/select-another'))?>
+                    </a>
+                    <button class="btn btn-warning" id="cancel-car-engine" data-id="<?=$this->car['id']?>">
+                        <?=$this->escapeHtml($this->translate('specifications-editor/engine/cancel'))?>
+                    </button>
                     <?php if (!$this->engineInherited) { ?>
-                        <form id="inherit-car-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
-                            'action'  => 'inherit-car-engine',
-                            'item_id' => $this->car['id']
-                        ], [], true))?>">
-                            <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/inherit'))?>" class="btn btn-warning" />
-                        </form>
+                        <button class="btn btn-warning" id="inherit-car-engine" data-id="<?=$this->car['id']?>">
+                            <?=$this->escapeHtml($this->translate('specifications-editor/engine/inherit'))?>
+                        </button>
                     <?php } ?>
                 <?php } else { ?>
                     <p><?=$this->escapeHtml($this->translate('specifications-editor/engine/not-selected'))?></p>
-                    <form id="select-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
-                        'action'  => 'select-car-engine',
-                        'item_id' => $this->car['id']
-                    ], [], true))?>">
-                        <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/select'))?>" class="btn btn-primary" />
-                    </form>
+                    <a href="/ng/cars/select-engine?item_id=<?=$this->car['id']?>" class="btn btn-primary">
+                        <?=$this->escapeHtmlAttr($this->translate('specifications-editor/engine/select'))?>
+                    </a>
                     <?php if (!$this->engineInherited) { ?>
-                        <form id="inherit-car-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
-                            'action'  => 'inherit-car-engine',
-                            'item_id' => $this->car['id']
-                        ], [], true))?>">
-                            <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/inherit'))?>" class="btn btn-warning" />
-                        </form>
+                        <button class="btn btn-warning" id="inherit-car-engine" data-id="<?=$this->car['id']?>">
+                            <?=$this->escapeHtml($this->translate('specifications-editor/engine/inherit'))?>
+                        </button>
                     <?php } else { ?>
-                        <form id="inherit-car-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
-                            'action'  => 'cancel-car-engine',
-                            'item_id' => $this->car['id']
-                        ], [], true))?>">
-                            <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/dont-inherit'))?>" class="btn btn-warning" />
-                        </form>
+                        <button class="btn btn-warning" id="dont-inherit-car-engine" data-id="<?=$this->car['id']?>">
+                            <?=$this->escapeHtml($this->translate('specifications-editor/engine/dont-inherit'))?>
+                        </button>
                     <?php } ?>
                 <?php } ?>
             <?php } else { ?>

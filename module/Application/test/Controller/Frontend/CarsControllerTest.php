@@ -36,15 +36,6 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
     public function testSelectCarEngine()
     {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/cars/select-car-engine/item_id/1', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('cars/params');
-        $this->assertActionName('select-car-engine');
-
         // create engine
         $engineId = $this->createItem([
             'item_type_id' => 2,
@@ -54,37 +45,42 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         // select engine
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/cars/select-car-engine/item_id/1', Request::METHOD_POST, [
-            'engine' => $engineId
+        $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
+            'engine_id' => $engineId
         ]);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('cars/params');
-        $this->assertActionName('select-car-engine');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/item/put');
+        $this->assertActionName('put');
 
         // cancel engine
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/cars/cancel-car-engine/item_id/1/tab/engine', Request::METHOD_POST);
+        $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
+            'engine_id' => '',
+            'foo'       => 'bar' // workaround for zf bug
+        ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('cars/params');
-        $this->assertActionName('cancel-car-engine');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/item/put');
+        $this->assertActionName('put');
 
         // inherit engine
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/cars/inherit-car-engine/item_id/1/tab/engine', Request::METHOD_POST);
+        $this->dispatch('https://www.autowp.ru/api/item/1', Request::METHOD_PUT, [
+            'engine_id' => 'inherited'
+        ]);
 
-        $this->assertResponseStatusCode(302);
+        $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('cars/params');
-        $this->assertActionName('inherit-car-engine');
+        $this->assertControllerName(ItemController::class);
+        $this->assertMatchedRouteName('api/item/item/put');
+        $this->assertActionName('put');
     }
 
     public function testCarsSpecificationsEditor()
