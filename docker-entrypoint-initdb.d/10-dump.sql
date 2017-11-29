@@ -38,7 +38,8 @@ CREATE TABLE `acl_resources` (
 
 /*!40000 ALTER TABLE `acl_resources` DISABLE KEYS */;
 INSERT INTO `acl_resources` (`id`, `name`) 
-VALUES (12,'attrs'),(1,'brand'),(4,'car'),(14,'category'),(6,'comment'),(8,'engine'),(21,'factory'),(10,'forums'),(15,'hotlinks'),(2,'model'),(19,'museums'),(7,'page'),(5,'picture'),(9,'rights'),(17,'specifications'),(18,'status'),(11,'twins'),(13,'user'),(20,'website');
+VALUES (12,'attrs'),(1,'brand'),(4,'car'),(14,'category'),(6,'comment'),(8,'engine'),(21,'factory'),(10,'forums'),(15,'hotlinks'),(2,'model'),(19,'museums'),(7,'page'),(5,'picture'),(9,'rights'),
+(17,'specifications'),(18,'status'),(11,'twins'),(13,'user'),(20,'website');
 /*!40000 ALTER TABLE `acl_resources` ENABLE KEYS */;
 
 --
@@ -67,7 +68,8 @@ INSERT IGNORE INTO `acl_resources_privileges` (`id`, `resource_id`, `name`)
 VALUES (4,4,'add'),(1,4,'edit_meta'),(5,4,'move'),(8,5,'move'),
 (2,11,'edit'),(3,13,'ban'),(7,17,'edit'),(9,17,'edit-engine'),(6,21,'edit'),
 (10,6,'remove'),(11,9,'edit'),(12,10,'moderate'),(13,1,'logo'),(14,15,'view'),
-(15,15,'manage'),(16,5,'crop'),(17,5,'accept'),(18,13,'delete'),(19,13,'ip'),(20,5,'moder_vote');
+(15,15,'manage'),(16,5,'crop'),(17,5,'accept'),(18,13,'delete'),(19,13,'ip'),
+(20,5,'moder_vote'),(21,17,'admin');
 
 
 
@@ -144,7 +146,7 @@ CREATE TABLE `acl_roles_privileges_allowed` (
 
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` DISABLE KEYS */;
 INSERT IGNORE INTO `acl_roles_privileges_allowed` (`role_id`, `privilege_id`) 
-VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9),(5,10),(5,11),(5,12),(5, 13),(5,14),(5,17),(5,18),(5,19),(5,20),(5,16);
+VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9),(5,10),(5,11),(5,12),(5, 13),(5,14),(5,17),(5,18),(5,19),(5,20),(5,16),(5,21);
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` ENABLE KEYS */;
 
 --

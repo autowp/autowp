@@ -12,6 +12,9 @@ export class CarsSpecsAdminController {
   
     public values: any[] = [];
     public paginator: autowp.IPaginator;
+    public move = {
+        item_id: null
+    };
   
     constructor(
         private $scope: autowp.IControllerScope, 
@@ -28,18 +31,65 @@ export class CarsSpecsAdminController {
             pageId: 103
         });
         
+        this.load();
+    }
+    
+    private load()
+    {
         let self = this;
         
         this.$http({
             method: 'GET',
-            url: '/api/user-value',
+            url: '/api/attr/user-value',
             params: {
-                item_id: $state.params.item_id,
-                fields: 'user'
+                item_id: this.$state.params.item_id,
+                fields: 'user,path,unit'
             }
         }).then(function(response: ng.IHttpResponse<any>) {
             
             self.values = response.data.items;
+            self.paginator = response.data.paginator;
+            
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
+        });
+    }
+    
+    public deleteValue(value: any)
+    {
+        let self = this;
+        this.$http({
+            method: 'DELETE',
+            url: '/api/attr/user-value/' + value.attribute_id + '/' + value.item_id + '/' + value.user_id
+        }).then(function(response: ng.IHttpResponse<any>) {
+            
+            for (let i=0; i < self.values.length; i++) {
+                if (self.values[i] === value) {
+                    self.values.splice(i, 1);
+                    break;
+                }
+            }
+            
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
+        });
+    }
+    
+    public moveValues()
+    {
+        let self = this;
+        this.$http({
+            method: 'PATCH',
+            url: '/api/attr/user-value',
+            params: {
+                item_id: this.$state.params.item_id
+            },
+            data: {
+                item_id: this.move.item_id
+            }
+        }).then(function(response: ng.IHttpResponse<any>) {
+            
+            self.load();
             
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);

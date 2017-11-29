@@ -2,14 +2,11 @@
 
 namespace Application\Controller;
 
-use Exception;
-
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Autowp\Commons\Db\Table\Row;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 
@@ -296,161 +293,6 @@ class CarsController extends AbstractActionController
         ]);
 
         return $viewModel->setTerminal(true);
-    }
-
-    public function moveAction()
-    {
-        if (! $this->user()->isAllowed('specifications', 'admin')) {
-            return $this->forward('forbidden', 'error');
-        }
-
-        $itemId = (int)$this->params('item_id');
-
-        $toItemId = (int)$this->params('to_item_id');
-
-        $eUserValueRows = $this->userValueTable->select([
-            'item_id' => $itemId
-        ]);
-
-        foreach ($eUserValueRows as $eUserValueRow) {
-            // check for value in dest
-
-            $srcPrimaryKey = [
-                'item_id'      => $eUserValueRow['item_id'],
-                'attribute_id' => $eUserValueRow['attribute_id'],
-                'user_id'      => $eUserValueRow['user_id']
-            ];
-            $dstPrimaryKey = [
-                'item_id'      => $toItemId,
-                'attribute_id' => $eUserValueRow['attribute_id'],
-                'user_id'      => $eUserValueRow['user_id']
-            ];
-            $set = [
-                'item_id' => $toItemId
-            ];
-
-            $cUserValueRow = $this->userValueTable->select($dstPrimaryKey)->current();
-
-            if ($cUserValueRow) {
-                throw new Exception("Value row already exists");
-            }
-
-            $attrRow = $this->attributeTable->select(['id' => $eUserValueRow['attribute_id']])->current();
-
-            if (! $attrRow) {
-                throw new Exception("Attr not found");
-            }
-
-            $dataTable = $this->specsService->getUserValueDataTable($attrRow['type_id']);
-
-            $eDataRows = [];
-            foreach ($dataTable->select($srcPrimaryKey) as $row) {
-                $eDataRows[] = $row;
-            }
-
-            foreach ($eDataRows as $eDataRow) {
-                // check for data row existance
-                $filter = $dstPrimaryKey;
-                if ($attrRow['multiple']) {
-                    $filter['ordering'] = $eDataRow['ordering'];
-                }
-                $cDataRow = $dataTable->select($filter)->current();
-
-                if ($cDataRow) {
-                    throw new Exception("Data row already exists");
-                }
-            }
-
-            $this->userValueTable->update($set, $srcPrimaryKey);
-
-            foreach ($eDataRows as $eDataRow) {
-                $filter = $srcPrimaryKey;
-                if ($attrRow['multiple']) {
-                    $filter['ordering'] = $eDataRow['ordering'];
-                }
-
-                $dataTable->update($set, $filter);
-            }
-
-            $this->specsService->updateActualValues($toItemId);
-            $this->specsService->updateActualValues($itemId);
-        }
-
-        return $this->redirect()->toRoute('cars/params', [
-            'action' => 'car-specifications-editor'
-        ], [], true);
-    }
-
-    public function specsAdminAction()
-    {
-        if (! $this->user()->isAllowed('specifications', 'admin')) {
-            return $this->forward('forbidden', 'error');
-        }
-
-        $itemId = (int)$this->params('item_id');
-
-        $select = new Sql\Select($this->userValueTable->getTable());
-        $select->where(['item_id' => $itemId])
-            ->order('update_date');
-
-        $rows = $this->userValueTable->selectWith($select);
-
-        $language = $this->language();
-
-        $values = [];
-        foreach ($rows as $row) {
-            $attribute = $this->attributeTable->select(['id' => $row['attribute_id']])->current();
-            $user = $this->userModel->getRow((int)$row['user_id']);
-            $unit = $this->specsService->getUnit($attribute['unit_id']);
-            $date = Row::getDateTimeByColumnType('timestamp', $row['update_date']);
-            $values[] = [
-                'attribute' => $attribute,
-                'unit'      => $unit,
-                'user'      => $user,
-                'value'     => $this->specsService->getActualValueText(
-                    $attribute['id'],
-                    $row['item_id'],
-                    $language
-                ),
-                'userValue' => $this->specsService->getUserValueText(
-                    $attribute['id'],
-                    $row['item_id'],
-                    $user['id'],
-                    $language
-                ),
-                'date'      => $date,
-                'deleteUrl' => $this->url()->fromRoute('cars/params', [
-                    'action'       => 'delete-value',
-                    'attribute_id' => $row['attribute_id'],
-                    'item_id'      => $row['item_id'],
-                    'user_id'      => $row['user_id']
-                ], [], true)
-            ];
-        }
-
-        return [
-            'values' => $values,
-            'itemId' => $itemId,
-        ];
-    }
-
-    public function deleteValueAction()
-    {
-        if (! $this->user()->isAllowed('specifications', 'admin')) {
-            return $this->forward('forbidden', 'error');
-        }
-
-        $request = $this->getRequest();
-        if (! $request->isPost()) {
-            return $this->forward('forbidden', 'error');
-        }
-
-        $itemId = (int)$this->params('item_id');
-        $userId = (int)$this->params('user_id');
-
-        $this->specsService->deleteUserValue((int)$this->params('attribute_id'), $itemId, $userId);
-
-        return $this->redirect()->toUrl($request->getServer('HTTP_REFERER'));
     }
 
     private function userUrl($user, $uri = null)

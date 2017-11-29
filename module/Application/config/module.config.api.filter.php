@@ -167,6 +167,15 @@ return [
                     ['name' => 'Digits']
                 ]
             ],
+            'item_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
             'page' => [
                 'required' => false,
                 'filters'  => [
@@ -188,10 +197,32 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['user', 'item']]
+                        'options' => ['fields' => ['user', 'item', 'path']]
                     ]
                 ]
             ],
+        ],
+        'api_attr_user_value_patch_query' => [
+            'item_id' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ]
+        ],
+        'api_attr_user_value_patch_data' => [
+            'item_id' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ]
         ],
         'api_comments_get' => [
             'user_id' => [

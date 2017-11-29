@@ -357,7 +357,34 @@ return [
                                                 'action' => 'user-value-index',
                                             ],
                                         ],
-                                    ]
+                                    ],
+                                    'patch' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'patch',
+                                            'defaults' => [
+                                                'action' => 'user-value-patch',
+                                            ],
+                                        ],
+                                    ],
+                                    'item' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/:attribute_id/:item_id/:user_id',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes'  => [
+                                            'delete' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'delete',
+                                                    'defaults' => [
+                                                        'action' => 'user-value-item-delete'
+                                                    ],
+                                                ],
+                                            ],
+                                        ]
+                                    ],
                                 ]
                             ]
                         ]

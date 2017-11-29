@@ -10,15 +10,20 @@
     </thead>
     <tbody>
         <tr ng-repeat="value in ctrl.values">
-            <td am-time="value.date"></td>
+            <td>
+                <span am-time-ago="value.update_date"></span>
+            </td>
             <td>
                 <autowp-user user="value.user" ng-if="value.user"></autowp-user>
             </td>
             <td>
-                <span ng-if="value.attribute" ng-bind="value.attribute.name"></span>
+                <span ng-repeat="node in value.path">
+                    <span ng-if="$index"> / </span>
+                    <span ng-bind="node | translate"></span>
+                </span>
                 <span ng-if="value.unit" ng-bind="value.unit.name"></span>
             </td>
-            <td>{{value.user_value}} / {{value.value}}</td>
+            <td>{{value.value}}</td>
             <td>
                 <button type="submit" class="btn btn-danger btn-xs" ng-click="ctrl.deleteValue(value)">
                     <i class="fa fa-times"></i>
@@ -27,7 +32,10 @@
         </tr>
     </tbody>
 </table>
-<form action="" method="post">
-    <input type="text" name="to_item_id" placeholder="id" />
-    <button type="submit" translate>specifications-editor/admin/move</button>
+
+<autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
+
+<form ng-submit="ctrl.moveValues()">
+    <input type="text" name="item_id" placeholder="id" class="form-control" style="max-width:200px" ng-model="ctrl.move.item_id" />
+    <button type="submit" class="btn btn-default" translate>specifications-editor/admin/move</button>
 </form>

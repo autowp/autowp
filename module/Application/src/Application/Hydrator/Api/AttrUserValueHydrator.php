@@ -108,42 +108,41 @@ class AttrUserValueHydrator extends RestHydrator
 
     public function extract($object)
     {
-        /*$editorUrl = $this->url()->fromRoute('cars/params', [
-            'action'  => 'car-specifications-editor',
-            'item_id' => $car['id']
-        ]);
-
-        if ($isModerator) {
-            $moderUrl = '/ng/moder/items/item/' . $car['id'];
-        }*/
-
-        $attributeTable = $this->specService->getAttributeTable();
-
-        $path = [];
-        $attribute = $attributeTable->select(['id' => $object['attribute_id']])->current();
-        if ($attribute) {
-            $parents = [];
-            $parent = $attribute;
-            do {
-                $parents[] = $parent['name'];
-                $parent = $attributeTable->select(['id' => $parent['parent_id']])->current();
-            } while ($parent);
-
-            $path = array_reverse($parents);
-        }
-
         $result = [
-            'update_date' => $this->extractValue('update_date', $object['update_date']),
-            'path'        => $path,
-            'item_id'     => (int)$object['item_id'],
-            'value'       => $this->specService->getUserValueText(
-                $attribute['id'],
+            'update_date'  => $this->extractValue('update_date', $object['update_date']),
+            'item_id'      => (int)$object['item_id'],
+            'attribute_id' => (int)$object['attribute_id'],
+            'user_id'      => (int)$object['user_id'],
+            'value'        => $this->specService->getUserValueText(
+                $object['attribute_id'],
                 $object['item_id'],
                 $object['user_id'],
                 $this->language
             ),
-            'unit'        => $this->specService->getUnit($attribute['unit_id'])
         ];
+
+        if ($this->filterComposite->filter('unit')) {
+            $result['unit'] = $this->specService->getUnit($object['attribute_id']);
+        }
+
+        if ($this->filterComposite->filter('path')) {
+            $attributeTable = $this->specService->getAttributeTable();
+
+            $path = [];
+            $attribute = $attributeTable->select(['id' => $object['attribute_id']])->current();
+            if ($attribute) {
+                $parents = [];
+                $parent = $attribute;
+                do {
+                    $parents[] = $parent['name'];
+                    $parent = $attributeTable->select(['id' => $parent['parent_id']])->current();
+                } while ($parent);
+
+                $path = array_reverse($parents);
+            }
+
+            $result['path'] = $path;
+        }
 
         if ($this->filterComposite->filter('user')) {
             $user = null;

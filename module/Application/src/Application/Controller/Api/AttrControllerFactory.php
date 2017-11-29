@@ -21,7 +21,9 @@ class AttrControllerFactory implements FactoryInterface
             $hydrators->get(\Application\Hydrator\Api\AttrConflictHydrator::class),
             $hydrators->get(\Application\Hydrator\Api\AttrUserValueHydrator::class),
             $filters->get('api_attr_conflict_get'),
-            $filters->get('api_attr_user_value_get')
+            $filters->get('api_attr_user_value_get'),
+            $filters->get('api_attr_user_value_patch_query'),
+            $filters->get('api_attr_user_value_patch_data')
         );
     }
 }
