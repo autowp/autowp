@@ -256,7 +256,7 @@ class CommentController extends AbstractRestfulController
                         ->join('pictures', 'comment_message.item_id = pictures.id', [])
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
-                        ->where(['item_parent_cache.parent_id = ?' => $values['item_id']]);
+                        ->where(['item_parent_cache.parent_id' => $values['pictures_of_item_id']]);
                 };
             }
         } else {
