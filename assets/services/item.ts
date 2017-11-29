@@ -16,6 +16,7 @@ export interface GetItemsServiceOptions {
     name?: string|null;
     dateless?: number;
     page?: number;
+    have_childs_of_type?: number;
 }
 
 export class ItemService {

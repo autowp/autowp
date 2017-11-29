@@ -6,6 +6,7 @@ import { SpecService } from 'services/spec';
 import { ContentLanguageService } from 'services/content-language';
 import { chunk, chunkBy } from 'chunk';
 import { ItemService } from 'services/item';
+import notify from 'notify';
 import './tree';
 import './tree-item';
 import 'directives/auto-focus';
@@ -98,6 +99,8 @@ export class ModerItemsItemSelectParentController {
                     }).then(function(response: ng.IHttpResponse<any>) {
                         self.items = response.data.items;
                         self.paginator = response.data.paginator;
+                    }, function(response: ng.IHttpResponse<any>) {
+                        notify.response(response);
                     });
                 } else {
                     
@@ -135,6 +138,8 @@ export class ModerItemsItemSelectParentController {
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.categories = response.data.items;
                     self.paginator = response.data.paginator;
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
                 });
             }
             
@@ -154,6 +159,8 @@ export class ModerItemsItemSelectParentController {
                     }).then(function(response: ng.IHttpResponse<any>) {
                         self.items = response.data.items;
                         self.paginator = response.data.paginator;
+                    }, function(response: ng.IHttpResponse<any>) {
+                        notify.response(response);
                     });
                 } else {
                     $http({
@@ -169,6 +176,8 @@ export class ModerItemsItemSelectParentController {
                     }).then(function(response: ng.IHttpResponse<any>) {
                         self.brands = chunk(response.data.items, 6);
                         self.paginator = response.data.paginator;
+                    }, function(response: ng.IHttpResponse<any>) {
+                        notify.response(response);
                     });
                 }
             }
@@ -186,6 +195,8 @@ export class ModerItemsItemSelectParentController {
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.factories = response.data.items;
                     self.paginator = response.data.paginator;
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
                 });
             }
             
@@ -206,6 +217,8 @@ export class ModerItemsItemSelectParentController {
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
                 parent.childs = response.data.items;
+            }, function(response: ng.IHttpResponse<any>) {
+                notify.response(response);
             });
         }
                 
@@ -222,6 +235,8 @@ export class ModerItemsItemSelectParentController {
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
                 parent.childs = response.data.items;
+            }, function(response: ng.IHttpResponse<any>) {
+                notify.response(response);
             });
         }
         
@@ -238,6 +253,8 @@ export class ModerItemsItemSelectParentController {
                     id: self.item.id,
                     tab: 'catalogue'
                 });
+            }, function(response: ng.IHttpResponse<any>) {
+                notify.response(response);
             });
         };
     }
@@ -259,6 +276,8 @@ export class ModerItemsItemSelectParentController {
         }).then(function(response: ng.IHttpResponse<any>) {
             self.brands = chunk(response.data.items, 6);
             self.paginator = response.data.paginator;
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
         });
     }
     
@@ -278,6 +297,8 @@ export class ModerItemsItemSelectParentController {
         }).then(function(response: ng.IHttpResponse<any>) {
             self.brands = chunk(response.data.items, 6);
             self.paginator = response.data.paginator;
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
         });
     }
 }
