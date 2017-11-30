@@ -158,7 +158,8 @@ export class UploadSelectController {
             order: 'name',
             limit: 500,
             fields: 'name_only',
-            name: this.search ? '%' + this.search + '%' : null
+            name: this.search ? '%' + this.search + '%' : null,
+            page: this.$state.params.page
         }, this.loadBrandsCanceler.promise).then(function(result: autowp.GetItemsResult) {
             self.brands = chunk(result.items, 6);
             self.paginator = result.paginator;

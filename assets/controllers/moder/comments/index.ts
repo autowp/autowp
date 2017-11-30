@@ -158,6 +158,7 @@ export class ModerCommentsController {
             pictures_of_item_id: this.pictures_of_item_id ? this.pictures_of_item_id : null,
             page: this.page,
             order: 'date_desc',
+            limit: 30,
             fields: 'preview,user,is_new,status,url'
         };
         
