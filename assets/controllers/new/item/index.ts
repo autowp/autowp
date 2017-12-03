@@ -52,6 +52,7 @@ export class NewItemController {
             params: {
                 fields: 'owner,thumbnail,moder_vote,votes,views,comments_count,name_html,name_text',
                 limit: 24,
+                status: 'accepted',
                 accept_date: this.$state.params.date,
                 item_id: this.$state.params.item_id,
                 page: this.$state.params.page
