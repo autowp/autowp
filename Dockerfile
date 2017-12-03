@@ -7,6 +7,7 @@ WORKDIR /app
 EXPOSE 80
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV WAITFORIT_VERSION="v2.1.0"
 
 RUN apk update && apk upgrade && \
     apk add \
@@ -85,6 +86,9 @@ RUN apk update && apk upgrade && \
     && rm -fr phantomjs.tar.gz  /tmp/* \
     && mkdir -p /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/ \
     && ln -s /usr/bin/phantomjs /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs
+    && \
+    curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
+    chmod +x /usr/local/bin/waitforit
 
 RUN go get \
         github.com/gin-gonic/gin \

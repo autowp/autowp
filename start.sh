@@ -15,8 +15,10 @@ mkdir -p /app/logs && chmod 0777 /app/logs
 
 mkdir -p /app/public_html/img
 
-echo "Starting supervisor"
+echo "Waiting for mysql"
 
-./wait-for-it.sh $AUTOWP_DB_HOST:$AUTOWP_DB_PORT
+waitforit -host=$AUTOWP_DB_HOST -port=$AUTOWP_DB_PORT -timeout=60
+
+echo "Starting supervisor"
 
 /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
