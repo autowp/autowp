@@ -58,7 +58,7 @@ RUN apk update && apk upgrade && \
         supervisor \
         tzdata \
     && \
-    apk add nodejs nodejs-npm --update-cache --repository http://dl-3.alpinelinux.org/alpine/v3.6/main/ \
+    apk add nodejs 'nodejs-npm<8' --update-cache --repository http://dl-3.alpinelinux.org/alpine/v3.6/main/ \
     && \
     apk add optipng --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
     && \
