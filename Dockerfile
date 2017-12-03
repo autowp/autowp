@@ -25,8 +25,6 @@ RUN apk update && apk upgrade && \
         logrotate \
         nasm \
         nginx \
-        nodejs \
-        nodejs-npm \
         openssh \
         php7 \
         php7-ctype \
@@ -59,6 +57,8 @@ RUN apk update && apk upgrade && \
         ssmtp \
         supervisor \
         tzdata \
+    && \
+    apk add nodejs nodejs-npm --update-cache --repository http://dl-3.alpinelinux.org/alpine/v3.6/main/ \
     && \
     apk add optipng --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
     && \
