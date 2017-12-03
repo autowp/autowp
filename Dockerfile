@@ -85,7 +85,7 @@ RUN apk update && apk upgrade && \
     && cp /tmp/usr/local/bin/phantomjs /usr/bin/ \
     && rm -fr phantomjs.tar.gz  /tmp/* \
     && mkdir -p /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/ \
-    && ln -s /usr/bin/phantomjs /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs
+    && ln -s /usr/bin/phantomjs /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs \
     && \
     curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
     chmod +x /usr/local/bin/waitforit
