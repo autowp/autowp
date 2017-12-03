@@ -111,7 +111,6 @@ COPY . /app
 
 RUN chmod +x zf && \
     chmod +x start.sh && \
-    chmod +x wait-for-it.sh && \
     crontab ./crontab && \
     go build -o ./goautowp/goautowp ./goautowp/
 
