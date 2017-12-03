@@ -52,8 +52,11 @@
                                 ng-if="ctrl.replace"
                             >upload/select-file</div>
                             
-                            <div style="margin-top: 10px" ng-if="ctrl.file">
+                            <div style="margin-top: 10px" ng-if="ctrl.file && !ctrl.replace">
                                 <p ng-repeat="file in ctrl.file" ng-bind="file.name"></p>
+                            </div>
+                            <div style="margin-top: 10px" ng-if="ctrl.file && ctrl.replace ">
+                                <p ng-bind="ctrl.file.name"></p>
                             </div>
                         </div>
                     </div>
