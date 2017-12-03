@@ -100,8 +100,8 @@ RUN php ./composer.phar install --no-dev --no-progress --no-interaction --no-sug
     php ./composer.phar clearcache
 
 COPY package.json /app/package.json
-RUN npm install --verbose -y --production
-RUN npm cache clean --force
+RUN npm install -y --production && \
+    npm cache clean --force
 
 COPY . /app
 
