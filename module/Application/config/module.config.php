@@ -142,6 +142,7 @@ return [
             Model\UserItemSubscribe::class       => Model\UserItemSubscribeFactory::class,
             Model\VehicleType::class             => Model\VehicleTypeFactory::class,
             PictureNameFormatter::class          => Service\PictureNameFormatterFactory::class,
+            \Rollbar\RollbarLogger::class        => Factory\RollbarLoggerFactory::class,
             Service\Mosts::class                 => Service\MostsFactory::class,
             Service\PictureService::class        => Service\PictureServiceFactory::class,
             Service\SpecificationsService::class => Service\SpecificationsServiceFactory::class,
@@ -355,5 +356,9 @@ return [
         'api_key'    => getenv('ONESKYAPP_KEY'),
         'api_secret' => getenv('ONESKYAPP_SECRET'),
         'project_id' => getenv('ONESKYAPP_PROJECT_ID'),
+    ],
+    'rollbar' => [
+        'access_token' => getenv('ROLLBAR_ACCESS_TOKEN'),
+        'environment'  => getenv('ROLLBAR_ENVIRONMENT')
     ]
 ];

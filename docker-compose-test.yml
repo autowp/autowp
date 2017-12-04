@@ -64,6 +64,8 @@ web:
     AUTOWP_RECAPTCHA_PUBLICKEY: "public"
     AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
     AUTOWP_GO_LISTEN: ":81"
+    ROLLBAR_ACCESS_TOKEN: example
+    ROLLBAR_ENVIRONMENT: development
   volumes:
   - ./config/autoload/local.php:/app/config/autoload/local.php:ro
   - ./module/Application/test/_files/image:/app/public_html/image

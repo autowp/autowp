@@ -183,7 +183,7 @@ class AutowpItemMetaFormDirectiveController {
         
     public loadVehicleTypes(query: string) {
         var self = this;
-        return this.$q(function(resolve, reject) {
+        return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
             self.VehicleTypeService.getTypes().then(function(data: any) {
                 var items = toPlain(data, 0);
                 if (query) {

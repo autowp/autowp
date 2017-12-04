@@ -7,6 +7,7 @@ use Zend\EventManager\EventInterface as Event;
 use Zend\Mail;
 use Zend\ModuleManager\Feature;
 use Zend\Mvc\MvcEvent;
+use Rollbar\RollbarLogger;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
@@ -112,6 +113,12 @@ class Module implements
                 if ($diff > 60) {
                     touch($filePath);
                     $this->sendErrorEmail($exception, $serviceManager);
+
+                    /**
+                     * @var RollbarLogger $logger
+                     */
+                    $logger = $serviceManager->get(RollbarLogger::class);
+                    $logger->error($e);
                 }
             }
         }

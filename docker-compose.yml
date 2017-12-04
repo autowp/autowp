@@ -53,6 +53,8 @@ web:
     ONESKYAPP_KEY: "2a1C12oZU5VIK409AJd0xUfVntGyhLWa"
     ONESKYAPP_SECRET: ""
     ONESKYAPP_PROJECT_ID: 129670
+    ROLLBAR_ACCESS_TOKEN: example
+    ROLLBAR_ENVIRONMENT: development
   volumes:
   - ./config:/app/config
   - ./data:/app/data
