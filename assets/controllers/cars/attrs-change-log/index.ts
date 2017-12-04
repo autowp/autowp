@@ -94,6 +94,7 @@ export class CarsAttrsChangeLogController {
             
         var params = {
             user_id: this.user_id ? this.user_id : null,
+            item_id: this.$state.params.item_id,
             page: this.page,
             fields: ''
         };
@@ -124,7 +125,7 @@ angular.module(Module)
         function config($stateProvider: any) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/cars/attrs-change-log?page&user_id',
+                url: '/cars/attrs-change-log?page&user_id&item_id',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require('./template.html'),
