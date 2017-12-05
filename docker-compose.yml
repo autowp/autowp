@@ -54,6 +54,7 @@ web:
     ONESKYAPP_SECRET: ""
     ONESKYAPP_PROJECT_ID: 129670
     ROLLBAR_ACCESS_TOKEN: example
+    ROLLBAR_CLIENT_ACCESS_TOKEN: example
     ROLLBAR_ENVIRONMENT: development
   volumes:
   - ./config:/app/config

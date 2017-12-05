@@ -365,6 +365,7 @@ return [
         'debounce' => [
             'file'   => __DIR__ . '/../../../data/rollbar-debounce',
             'period' => 60
-        ]
+        ],
+        'client_access_token' => getenv('ROLLBAR_CLIENT_ACCESS_TOKEN')
     ]
 ];

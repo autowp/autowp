@@ -23,12 +23,17 @@ import 'moment/locale/be.js';
 import 'moment/locale/pt-br.js';
 import 'angular-recaptcha';
 import 'ng-file-upload';
+import 'ng-rollbar';
 
 const MODULE_NAME = 'App';
 
-angular.module(MODULE_NAME, ['ngAnimate', 'ngAria', 'ui.router', 'pascalprecht.translate', 'nemLogging', 'btford.markdown', 'ngSanitize', "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet', 'angularMoment', 'vcRecaptcha', 'ngFileUpload'])
-    .config(['$urlRouterProvider', '$locationProvider', '$translateProvider', 
-        function config($urlRouterProvider: any, $locationProvider: ng.ILocationProvider, $translateProvider: any) {
+declare global {
+    interface Window { opt: any; }
+}
+
+angular.module(MODULE_NAME, ['ngAnimate', 'ngAria', 'ui.router', 'pascalprecht.translate', 'nemLogging', 'btford.markdown', 'ngSanitize', "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet', 'angularMoment', 'vcRecaptcha', 'ngFileUpload', 'tandibar/ng-rollbar'])
+    .config(['$urlRouterProvider', '$locationProvider', '$translateProvider', 'RollbarProvider',
+        function config($urlRouterProvider: any, $locationProvider: ng.ILocationProvider, $translateProvider: any, RollbarProvider: any) {
             $locationProvider.html5Mode(true).hashPrefix('!');
     
             //$urlRouterProvider.when('', '/');
@@ -48,6 +53,14 @@ angular.module(MODULE_NAME, ['ngAnimate', 'ngAria', 'ui.router', 'pascalprecht.t
             $translateProvider.fallbackLanguage('en');
             $translateProvider.preferredLanguage(lang);
             $translateProvider.use(lang);
+            
+            RollbarProvider.init({
+                accessToken: window.opt.rollbar.access_token,
+                captureUncaught: true,
+                payload: {
+                    environment: window.opt.rollbar.environment
+                }
+            });
         }
     ])
     .run(['amMoment', function(amMoment: any) {

@@ -13,9 +13,15 @@ class ApiData extends AbstractHelper
      */
     private $userHydrator;
 
-    public function __construct(RestHydrator $userHydrator)
+    /**
+     * @var array
+     */
+    private $rollbar;
+
+    public function __construct(RestHydrator $userHydrator, array $rollbar)
     {
         $this->userHydrator = $userHydrator;
+        $this->rollbar = $rollbar;
     }
 
     public function __invoke()
@@ -62,7 +68,11 @@ class ApiData extends AbstractHelper
             'mainMenu'   => $this->view->mainMenu(true, true),
             'moderMenu'  => $moderMenu,
             'sidebar'    => $this->view->sidebar(true),
-            'user'       => $userData
+            'user'       => $userData,
+            'rollbar'    => [
+                'access_token' => $this->rollbar['client_access_token'],
+                'environment'  => $this->rollbar['logger']['environment'],
+            ]
         ];
     }
 }
