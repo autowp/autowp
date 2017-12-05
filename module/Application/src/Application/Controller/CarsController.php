@@ -2,7 +2,6 @@
 
 namespace Application\Controller;
 
-use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;

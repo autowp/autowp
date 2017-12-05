@@ -142,7 +142,6 @@ return [
             Model\UserItemSubscribe::class       => Model\UserItemSubscribeFactory::class,
             Model\VehicleType::class             => Model\VehicleTypeFactory::class,
             PictureNameFormatter::class          => Service\PictureNameFormatterFactory::class,
-            \Rollbar\RollbarLogger::class        => Factory\RollbarLoggerFactory::class,
             Service\Mosts::class                 => Service\MostsFactory::class,
             Service\PictureService::class        => Service\PictureServiceFactory::class,
             Service\SpecificationsService::class => Service\SpecificationsServiceFactory::class,
@@ -357,8 +356,15 @@ return [
         'api_secret' => getenv('ONESKYAPP_SECRET'),
         'project_id' => getenv('ONESKYAPP_PROJECT_ID'),
     ],
+
     'rollbar' => [
-        'access_token' => getenv('ROLLBAR_ACCESS_TOKEN'),
-        'environment'  => getenv('ROLLBAR_ENVIRONMENT')
+        'logger' => [
+            'access_token' => getenv('ROLLBAR_ACCESS_TOKEN'),
+            'environment'  => getenv('ROLLBAR_ENVIRONMENT')
+        ],
+        'debounce' => [
+            'file'   => __DIR__ . '/../../../data/rollbar-debounce',
+            'period' => 60
+        ]
     ]
 ];
