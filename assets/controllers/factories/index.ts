@@ -14,8 +14,8 @@ const STATE_NAME = 'factory';
 export class FactoryController {
     static $inject = ['$scope', '$http', '$state', '$element', 'ItemService'];
     public factory: autowp.IItem;
-    public pictures: any[];
-    public relatedPictures: any[];
+    public pictures: any[] = [];
+    public relatedPictures: any[] = [];
     private map: any;
   
     constructor(
