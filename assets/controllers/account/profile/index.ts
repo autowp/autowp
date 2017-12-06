@@ -155,7 +155,7 @@ export class AccountProfileController {
         if (file) {
             
             this.photoInvalidParams = {};
-            this.file.progress = 0;
+            file.progress = 0;
             
             file.upload = this.Upload.upload({
                 url: '/api/user/me/photo',
@@ -165,7 +165,7 @@ export class AccountProfileController {
             var self = this;
 
             file.upload.then(function(response: any) {
-                self.file.progress = 0;
+                file.progress = 0;
                 self.$timeout(function() {
                     file.result = response.data;
                     
@@ -190,7 +190,7 @@ export class AccountProfileController {
                         notify.response(response);
                     }
                 }
-                self.file.progress = 0;
+                file.progress = 0;
             }, function (evt: any) {
                 file.progress = Math.min(100, Math.round(100.0 * evt.loaded / evt.total));
             });
