@@ -170,13 +170,12 @@ class Comments
                     throw new Exception("Article `{$message['item_id']}` not found");
                 }
                 $url = $this->router->assemble([
-                    'action'          => 'article',
-                    'article_catname' => $article['catname']
+                    'path' => ''
                 ], [
-                    'name'            => 'articles',
+                    'name'            => 'ng',
                     'force_canonical' => $canonical,
                     'uri'             => $uri
-                ]);
+                ]) . 'articles/' . urlencode($article['catname']);
                 break;
 
             case self::FORUMS_TYPE_ID:
