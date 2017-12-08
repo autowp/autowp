@@ -1070,6 +1070,24 @@ return [
                                             ]
                                         ]
                                     ],
+                                    'specifications' => [
+                                        'type' => 'Literal',
+                                        'options' => [
+                                            'route' => '/specifications',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'post' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'specifications'
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ],
                                 ]
                             ]
                         ]

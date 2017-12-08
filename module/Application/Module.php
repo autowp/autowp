@@ -97,8 +97,10 @@ class Module implements
         $maintenance = new Maintenance();
         $maintenance->attach($serviceManager->get('CronEventManager'));
 
-        $rollbarListener = new \Autowp\ZFComponents\Rollbar\ErrorListener();
-        $rollbarListener->attach($eventManager);
+        if ($config['rollbar']['logger']['access_token']) {
+            $rollbarListener = new \Autowp\ZFComponents\Rollbar\ErrorListener();
+            $rollbarListener->attach($eventManager);
+        }
     }
 
     public function handleError(MvcEvent $e)

@@ -11,6 +11,9 @@
     ]);
 
     $this->layout()->moduleName = 'default/cars/car-specifications-editor';
+    $this->layout()->moduleOptions = [
+        'id' => $this->car['id']
+    ];
 ?>
 
 <ul class="nav nav-pills" style="margin-bottom: 20px">
@@ -47,7 +50,6 @@
                 [
                     'href'          => '#'.$id,
                     'data-toggle'   => 'tab',
-                    'data-load'     => isset($tab['data-load']) ? $tab['data-load'] : null,
                     'data-activate' => $tab['active'] ? '1' : null
                 ],
                 ($tab['icon'] ? '<span class="'.$tab['icon'].'"></span> ' : '') .
@@ -128,7 +130,7 @@
         <div class="tab-pane<?=$this->tabs['admin']['active'] ? ' active' : ''?>" id="admin">
             <p><?=$this->htmlA('/ng/cars/specs-admin?item_id=' . $this->car['id'], 'Admin')?></p>
             <div>
-                <button class="btn btn-default btn-refresh-inheritance" data-id="<?=$this->car['id']?>">Refresh inheritance</button>
+                <button class="btn btn-default btn-refresh-inheritance">Refresh inheritance</button>
             </div>
         </div>
     <?php } ?>

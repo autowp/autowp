@@ -12,23 +12,8 @@ define(
                     $('.' + $(this).attr('id')).removeClass('hover');
                 });
                 
-                $('a[data-toggle="tab"][data-load]').on('show.bs.tab', function (e) {
-                    var $this = $(this),
-                          selector = $this.attr('data-target'),
-                          $target;
-
-                    if (!selector) {
-                        selector = $this.attr('href');
-                        selector = selector && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
-                    }
-
-                    $target = $(selector);
-
-                    $target.load($(this).data('load'), function() {
-                        $target.trigger('tabload');
-                    });
-
-                    $(this).removeData('load').removeAttr('data-load');
+                $('a[data-toggle="tab"][href=\\#result]').on('show.bs.tab', function (e) {
+                    $('#result').load('/api/item/' + options.id + '/specifications');
                 });
                 
                 $('#inherit-car-engine').on('click', function(e) {
@@ -78,9 +63,9 @@ define(
                     
                     $.ajax({
                         method: 'POST',
-                        url: '/api/item/' + $(this).data('id') + '/refresh-inheritance'
+                        url: '/api/item/' + options.id + '/refresh-inheritance'
                     }).always(function() {
-                        window.location.href = '/cars/car-specifications-editor/item_id/' + $(self).data('id') + '/tab/admin';
+                        window.location.href = '/cars/car-specifications-editor/item_id/' + options.id + '/tab/admin';
                     });
                 });
             }

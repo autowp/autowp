@@ -12,6 +12,7 @@ use Zend\InputFilter\InputFilterPluginManager;
 use Zend\Hydrator\Strategy\StrategyInterface;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
@@ -1820,12 +1821,32 @@ class ItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-
-
         $this->itemModel->updateInteritance($item['id']);
 
         $this->specsService->updateActualValues($item['id']);
 
         return $this->getResponse()->setStatusCode(200);
+    }
+
+    public function specificationsAction()
+    {
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        if (! $item) {
+            return $this->notFoundAction();
+        }
+
+        $specs = $this->specsService->specifications([$item], [
+            'language' => $this->language()
+        ]);
+
+        $viewModel = new ViewModel([
+            'specs' => $specs,
+        ]);
+
+        return $viewModel->setTerminal(true);
     }
 }

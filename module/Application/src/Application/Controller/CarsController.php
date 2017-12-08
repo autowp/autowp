@@ -4,7 +4,6 @@ namespace Application\Controller;
 
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
 
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
@@ -218,11 +217,8 @@ class CarsController extends AbstractActionController
                 'count' => 0,
             ],
             'result' => [
-                'icon'      => 'fa fa-table',
-                'title'     => 'specifications-editor/tabs/result',
-                'data-load' => $this->url()->fromRoute('cars/params', [
-                    'action' => 'car-specs'
-                ], [], true),
+                'icon'  => 'fa fa-table',
+                'title' => 'specifications-editor/tabs/result',
                 'count' => 0,
             ],
             'admin' => [
@@ -260,28 +256,6 @@ class CarsController extends AbstractActionController
             'isSpecsAdmin'        => $isSpecsAdmin,
             'service'             => $this->specsService
         ];
-    }
-
-    public function carSpecsAction()
-    {
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $car = $this->itemModel->getRow(['id' => (int)$this->params('item_id')]);
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $specs = $this->specsService->specifications([$car], [
-            'language' => $this->language()
-        ]);
-
-        $viewModel = new ViewModel([
-            'specs' => $specs,
-        ]);
-
-        return $viewModel->setTerminal(true);
     }
 
     private function userUrl($user, $uri = null)
