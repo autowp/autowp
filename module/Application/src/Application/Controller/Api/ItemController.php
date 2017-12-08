@@ -1808,4 +1808,24 @@ class ItemController extends AbstractRestfulController
             'item' => $this->carTreeWalk($item)
         ]);
     }
+
+    public function refreshInheritanceAction()
+    {
+        if (! $this->user()->isAllowed('specifications', 'admin')) {
+            return $this->forbiddenAction();
+        }
+
+        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        if (! $item) {
+            return $this->notFoundAction();
+        }
+
+
+
+        $this->itemModel->updateInteritance($item['id']);
+
+        $this->specsService->updateActualValues($item['id']);
+
+        return $this->getResponse()->setStatusCode(200);
+    }
 }

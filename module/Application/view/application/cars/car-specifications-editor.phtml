@@ -127,11 +127,9 @@
     <?php if ($this->isSpecsAdmin) { ?>
         <div class="tab-pane<?=$this->tabs['admin']['active'] ? ' active' : ''?>" id="admin">
             <p><?=$this->htmlA('/ng/cars/specs-admin?item_id=' . $this->car['id'], 'Admin')?></p>
-            <form action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
-                'action' => 'refresh-inheritance'
-            ], [], true))?>" method="post">
-                <button type="submit" class="btn btn-default">Refresh inheritance</button>
-            </form>
+            <div>
+                <button class="btn btn-default btn-refresh-inheritance" data-id="<?=$this->car['id']?>">Refresh inheritance</button>
+            </div>
         </div>
     <?php } ?>
 </div>

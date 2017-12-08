@@ -49,7 +49,6 @@ define(
                             window.location.href = '/cars/car-specifications-editor/item_id/' + $(self).data('id') + '/tab/engine';
                         }
                     }).always(function() {
-                    	console.log('inherit');
                         window.location.href = '/cars/car-specifications-editor/item_id/' + $(self).data('id') + '/tab/engine';
                     });
                 });
@@ -68,8 +67,20 @@ define(
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                     }).always(function() {
-                    	console.log('inherit');
                         window.location.href = '/cars/car-specifications-editor/item_id/' + $(self).data('id') + '/tab/engine';
+                    });
+                });
+                
+                $('.btn-refresh-inheritance').on('click', function(e) {
+                    e.preventDefault();
+                    
+                    var self = this;
+                    
+                    $.ajax({
+                        method: 'POST',
+                        url: '/api/item/' + $(this).data('id') + '/refresh-inheritance'
+                    }).always(function() {
+                        window.location.href = '/cars/car-specifications-editor/item_id/' + $(self).data('id') + '/tab/admin';
                     });
                 });
             }

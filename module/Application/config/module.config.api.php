@@ -1052,6 +1052,24 @@ return [
                                             ]
                                         ]
                                     ],
+                                    'refresh-inheritance' => [
+                                        'type' => 'Literal',
+                                        'options' => [
+                                            'route' => '/refresh-inheritance',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'post' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'post',
+                                                    'defaults' => [
+                                                        'action' => 'refresh-inheritance'
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ],
                                 ]
                             ]
                         ]

@@ -292,24 +292,6 @@ class CarsController extends AbstractActionController
         ]) . 'users/' . ($user['identity'] ? $user['identity'] : 'user' . $user['id']);
     }
 
-    public function refreshInheritanceAction()
-    {
-        if (! $this->user()->isAllowed('specifications', 'admin')) {
-            return $this->forbiddenAction();
-        }
-
-        $car = $this->itemModel->getRow(['id' => (int)$this->params('item_id')]);
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $this->itemModel->updateInteritance($car['id']);
-
-        $this->specsService->updateActualValues($car['id']);
-
-        return $this->redirect()->toUrl($this->editorUrl($car, 'admin'));
-    }
-
     public function lowWeightAction()
     {
     }
