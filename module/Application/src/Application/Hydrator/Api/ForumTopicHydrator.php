@@ -126,10 +126,12 @@ class ForumTopicHydrator extends RestHydrator
 
     public function extract($object)
     {
+        $date = Row::getDateTimeByColumnType('timestamp', $object['add_datetime']);
+
         $result = [
             'id'           => (int)$object['id'],
             'name'         => $object['name'],
-            'add_datetime' => $this->extractValue('add_datetime', Row::getDateTimeByColumnType('timestamp', $object['add_datetime'])),
+            'add_datetime' => $this->extractValue('add_datetime', $date),
             'status'       => $object['status'],
             'theme_id'     => (int)$object['theme_id']
         ];

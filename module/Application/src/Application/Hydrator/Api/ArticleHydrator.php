@@ -67,13 +67,15 @@ class ArticleHydrator extends RestHydrator
             $previewUrl = \Application\Controller\Api\ArticleController::PREVIEW_CAT_PATH . $object['preview_filename'];
         }
 
+        $date = Row::getDateTimeByColumnType('timestamp', $object['first_enabled_datetime']);
+
         $result = [
             'id'          => (int)$object['id'],
             'author_id'   => (int)$object['author_id'],
             'catname'     => $object['catname'],
             'preview_url' => $previewUrl,
             'name'        => $object['name'],
-            'date'        => $this->extractValue('date', Row::getDateTimeByColumnType('timestamp', $object['first_enabled_datetime'])),
+            'date'        => $this->extractValue('date', $date),
         ];
 
         if ($this->filterComposite->filter('author')) {

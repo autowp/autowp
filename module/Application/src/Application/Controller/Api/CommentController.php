@@ -346,13 +346,21 @@ class CommentController extends AbstractRestfulController
         $typeId = (int)$data['type_id'];
 
         if ($this->needWait()) {
-            return new ApiProblemResponse(new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                'invalid_params' => [
-                    'message' => [
-                        'invalid' => 'Too often'
+            return new ApiProblemResponse(
+                new ApiProblem(
+                    400,
+                    'Data is invalid. Check `detail`.',
+                    null,
+                    'Validation error',
+                    [
+                        'invalid_params' => [
+                            'message' => [
+                                'invalid' => 'Too often'
+                            ]
+                        ]
                     ]
-                ]
-            ]));
+                )
+            );
         }
 
         $object = null;
@@ -505,13 +513,21 @@ class CommentController extends AbstractRestfulController
 
         if (array_key_exists('user_vote', $values)) {
             if ($user['votes_left'] <= 0) {
-                return new ApiProblemResponse(new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                    'invalid_params' => [
-                        'user_vote' => [
-                            'invalid' => $this->translate('comments/vote/no-more-votes')
+                return new ApiProblemResponse(
+                    new ApiProblem(
+                        400,
+                        'Data is invalid. Check `detail`.',
+                        null,
+                        'Validation error',
+                        [
+                            'invalid_params' => [
+                                'user_vote' => [
+                                    'invalid' => $this->translate('comments/vote/no-more-votes')
+                                ]
+                            ]
                         ]
-                    ]
-                ]));
+                    )
+                );
             }
 
             $result = $this->comments->service()->voteMessage(
@@ -520,13 +536,21 @@ class CommentController extends AbstractRestfulController
                 $values['user_vote']
             );
             if (! $result['success']) {
-                return new ApiProblemResponse(new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                    'invalid_params' => [
-                        'user_vote' => [
-                            'invalid' => $result['error']
+                return new ApiProblemResponse(
+                    new ApiProblem(
+                        400,
+                        'Data is invalid. Check `detail`.',
+                        null,
+                        'Validation error',
+                        [
+                            'invalid_params' => [
+                                'user_vote' => [
+                                    'invalid' => $result['error']
+                                ]
+                            ]
                         ]
-                    ]
-                ]));
+                    )
+                );
             }
 
             $this->userModel->decVotes($user['id']);

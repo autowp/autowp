@@ -583,7 +583,8 @@ class PictureController extends AbstractRestfulController
         $set = [];
 
         if (isset($data['crop'])) {
-            $canCrop = $this->user()->isAllowed('picture', 'crop') || ($picture['owner_id'] == $user['id']) && ($picture['status'] == Picture::STATUS_INBOX);
+            $canCrop = $this->user()->isAllowed('picture', 'crop')
+                    || ($picture['owner_id'] == $user['id']) && ($picture['status'] == Picture::STATUS_INBOX);
 
             if (! $canCrop) {
                 return $this->forbiddenAction();

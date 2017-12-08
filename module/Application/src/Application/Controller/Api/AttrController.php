@@ -258,10 +258,13 @@ class AttrController extends AbstractRestfulController
                 $cUserValueRow = $this->userValueTable->select($dstPrimaryKey)->current();
 
                 if ($cUserValueRow) {
-                    throw new Exception("Value row $dstItemId/{$eUserValueRow['attribute_id']}/{$eUserValueRow['user_id']} already exists");
+                    $rowId = implode('/', [$dstItemId, $eUserValueRow['attribute_id'], $eUserValueRow['user_id']]);
+                    throw new Exception("Value row $rowId already exists");
                 }
 
-                $attrRow = $this->specsService->getAttributeTable()->select(['id' => $eUserValueRow['attribute_id']])->current();
+                $attrRow = $this->specsService->getAttributeTable()->select([
+                    'id' => $eUserValueRow['attribute_id']
+                ])->current();
 
                 if (! $attrRow) {
                     throw new Exception("Attr not found");

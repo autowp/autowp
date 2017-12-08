@@ -379,13 +379,21 @@ class ForumController extends AbstractRestfulController
         $needWait = $this->needWait();
 
         if ($needWait) {
-            return new ApiProblemResponse(new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                'invalid_params' => [
-                    'text' => [
-                        'invalid' => $this->translate('forums/need-wait-to-post')
+            return new ApiProblemResponse(
+                new ApiProblem(
+                    400,
+                    'Data is invalid. Check `detail`.',
+                    null,
+                    'Validation error',
+                    [
+                        'invalid_params' => [
+                            'text' => [
+                                'invalid' => $this->translate('forums/need-wait-to-post')
+                            ]
+                        ]
                     ]
-                ]
-            ]));
+                )
+            );
         }
 
         $data['user_id'] = $user['id'];

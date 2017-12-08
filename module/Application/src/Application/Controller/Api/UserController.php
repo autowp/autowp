@@ -413,7 +413,9 @@ class UserController extends AbstractRestfulController
                     new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
                         'invalid_params' => [
                             'password_old' => [
-                                'invalid' => $this->translate('account/access/change-password/current-password-is-incorrect')
+                                'invalid' => $this->translate(
+                                    'account/access/change-password/current-password-is-incorrect'
+                                )
                             ]
                         ]
                     ])

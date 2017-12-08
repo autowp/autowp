@@ -330,7 +330,9 @@ class ItemHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('current_pictures_count')) {
-            $result['current_pictures_count'] = isset($object['current_pictures_count']) ? (int)$object['current_pictures_count'] : null;
+            $result['current_pictures_count'] = isset($object['current_pictures_count'])
+                ? (int)$object['current_pictures_count']
+                : null;
         }
 
         if ($this->filterComposite->filter('is_compiles_item_of_day')) {
@@ -406,7 +408,10 @@ class ItemHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('subscription') && $this->userId) {
-                $result['subscription'] = $this->userItemSubscribe->isSubscribed((int)$this->userId, (int)$object['id']);
+                $result['subscription'] = $this->userItemSubscribe->isSubscribed(
+                    (int)$this->userId,
+                    (int)$object['id']
+                );
             }
 
             if ($this->filterComposite->filter('full_name')) {

@@ -201,7 +201,9 @@ class ItemController extends AbstractRestfulController
         $group = false;
         $itemLanguageJoined = false;
 
-        if ($data['descendant_pictures'] && ($data['descendant_pictures']['status'] || $data['descendant_pictures']['owner_id'])) {
+        $match = $data['descendant_pictures']
+              && ($data['descendant_pictures']['status'] || $data['descendant_pictures']['owner_id']);
+        if ($match) {
             $group = true;
 
             $columns = [];
@@ -323,7 +325,12 @@ class ItemController extends AbstractRestfulController
             if ($data['vehicle_type_id']) {
                 if ($data['vehicle_type_id'] == 'empty') {
                     $select
-                        ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', [], $select::JOIN_LEFT)
+                        ->join(
+                            'vehicle_vehicle_type',
+                            'item.id = vehicle_vehicle_type.vehicle_id',
+                            [],
+                            $select::JOIN_LEFT
+                        )
                         ->where(['vehicle_vehicle_type.vehicle_id is null']);
                 } else {
                     $select
@@ -1460,7 +1467,11 @@ class ItemController extends AbstractRestfulController
                         $uri = $this->hostManager->getUriByLanguage($subscriber['language']);
 
                         $message = sprintf(
-                            $this->translate('pm/user-%s-set-vehicle-engine-%s-%s-%s', 'default', $subscriber['language']),
+                            $this->translate(
+                                'pm/user-%s-set-vehicle-engine-%s-%s-%s',
+                                'default',
+                                $subscriber['language']
+                            ),
                             $this->userUrl($user, $uri),
                             $engine['name'],
                             $this->car()->formatName($item, $subscriber['language']),
