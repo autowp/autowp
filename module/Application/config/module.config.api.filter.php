@@ -2133,7 +2133,7 @@ return [
                         'name'    => 'Between',
                         'options' => [
                             'min' => 1,
-                            'max' => 30
+                            'max' => 32
                         ]
                     ]
                 ]
