@@ -34,7 +34,10 @@ export class FactoryController {
             
             self.factory = item;
             
-            self.relatedPictures = chunkBy(self.factory.related_group_pictures, 4);
+            self.relatedPictures = [];
+            if (self.factory.related_group_pictures) {
+                self.relatedPictures = chunkBy(self.factory.related_group_pictures, 4);
+            }
             
             if (self.factory.item_type_id != 6) {
                 self.$state.go('error-404');
@@ -64,7 +67,10 @@ export class FactoryController {
                     fields: 'owner,thumbnail,votes,views,comments_count,name_html,name_text'
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
-                self.pictures = chunkBy(response.data.pictures, 4);
+                self.pictures = [];
+                if (response.data.pictures) {
+                    self.pictures = chunkBy(response.data.pictures, 4);
+                }
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
