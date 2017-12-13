@@ -273,6 +273,10 @@ class ItemHydrator extends RestHydrator
             'item_type_id' => (int)$object['item_type_id']
         ];
 
+        if ($this->filterComposite->filter('engine_id')) {
+            $result['engine_id'] = $object['engine_item_id'] ? (int) $object['engine_item_id'] : null;
+        }
+
         if ($this->filterComposite->filter('specs_url')) {
             $result['specs_url'] = $listBuilder->getSpecificationsUrl($object);
         }

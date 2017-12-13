@@ -83,6 +83,7 @@ declare namespace autowp {
         produced_exactly: boolean;
         spec_id: number|string|null;
         logo: any;
+        engine_id: number|null,
     
         engine_vehicles_count: number;
         pictures_count: number;
