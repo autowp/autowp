@@ -32,7 +32,7 @@ export class CarsSelectEngineController {
         let self = this;
         
         this.ItemService.getItem(this.$state.params.item_id, {
-            fields: 'name_html'
+            fields: 'name_html,name_text'
         }).then(function(item: autowp.IItem) {
             self.item = item;
             
@@ -44,7 +44,7 @@ export class CarsSelectEngineController {
                 name: 'page/102/name',
                 pageId: 102,
                 args: {
-                     CAR_NAME: self.item.name_html
+                     CAR_NAME: self.item.name_text
                 }
             });
             
