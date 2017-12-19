@@ -16,7 +16,7 @@
 
 
 <?php if ($this->user()->get()['specs_weight'] < 1) { ?>
-    <div class="alert alert-danger" btf-markdown="'specifications-editor/errors-alert'|translate"></div>
+    <div class="alert alert-danger" autowp-markdown="'specifications-editor/errors-alert'|translate"></div>
 <?php } ?>
 
 <ul class="nav nav-tabs" id="myTab">
@@ -31,7 +31,7 @@
 
 <div class="tab-content well">
     <div class="tab-pane" ng-class="{active: ctrl.tab == 'info'}" id="info">
-        <div btf-markdown="'specifications-editor/description'|translate"></div>
+        <div autowp-markdown="'specifications-editor/description'|translate"></div>
     </div>
     <div class="tab-pane" ng-class="{active: ctrl.tab == 'engine'}" id="engine" ng-if="ctrl.item.item_type_id == 1">
         <h2 translate>specifications-editor/engine</h2>

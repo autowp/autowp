@@ -1,0 +1,121 @@
+import * as angular from 'angular';
+import Module from 'app.module';
+import notify from 'notify';
+import * as showdown from 'showdown';
+import * as escapeRegExp from 'lodash.escaperegexp';
+import * as filesize from 'filesize';
+import { UserService } from 'services/user';
+import * as $ from 'jquery';
+
+const CONTROLLER_NAME = 'AboutController';
+const STATE_NAME = 'about';
+
+function replaceAll(str: string, find: string, replace: string): string {
+    return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
+function replacePairs(str: string, pairs: any): string {
+    angular.forEach(pairs, function(value, key) {
+        str = replaceAll(str, key, value);
+    });
+    return str;
+}
+
+export class AboutController {
+    static $inject = ['$scope', '$http', '$translate', '$filter', 'UserService', '$q', '$state'];
+    public html: string = '';
+  
+    constructor(
+        private $scope: autowp.IControllerScope,
+        private $http: ng.IHttpService,
+        private $translate: ng.translate.ITranslateService,
+        private $filter: any,
+        private userService: UserService,
+        private $q: ng.IQService,
+        private $state: any
+    ) {
+        this.$scope.pageEnv({
+            layout: {
+                blankPage: false,
+                needRight: true
+            },
+            name: 'page/136/name',
+            pageId: 136
+        });
+        
+        let self = this;
+        
+        this.$http({
+            url: '/api/about',
+            method: 'GET'
+        }).then(function(response: ng.IHttpResponse<any>) {
+            
+            let promises: ng.IPromise<any>[] = [
+                self.$translate('about/text')
+            ];
+        
+            promises.push(self.userService.getUser(response.data.developer));
+            promises.push(self.userService.getUser(response.data.fr_translator));
+            promises.push(self.userService.getUser(response.data.zh_translator));
+            promises.push(self.userService.getUser(response.data.be_translator));
+            promises.push(self.userService.getUser(response.data.pt_br_translator));
+            
+            
+            self.$q.all(promises).then(function(responses: any[]) {
+                
+                let markdownConverter = new showdown.Converter({});
+                self.html = replacePairs(
+                    markdownConverter.makeHtml(responses[0]), {
+                        //'%users%'            : implode(' ', $users),
+                        '%total-pictures%'   : self.$filter('number')(response.data.total_pictures),
+                        '%total-vehicles%'   : response.data.total_cars,
+                        '%total-size%'       : filesize(response.data.pictures_size),
+                        '%total-users%'      : response.data.total_users,
+                        '%total-comments%'   : response.data.total_comments,
+                        '%github%'           : '<i class="fa fa-github"></i> <a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a>',
+                        '%developer%'        : self.userHtml(responses[1]),
+                        '%fr-translator%'    : self.userHtml(responses[2]),
+                        '%zh-translator%'    : self.userHtml(responses[3]),
+                        '%be-translator%'    : self.userHtml(responses[4]),
+                        '%pt-br-translator%' : self.userHtml(responses[5])
+                    }
+                );
+            });
+            
+            self.$translate('about/text').then(function(translation: string) {
+                
+            });
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
+        });
+    }
+    
+    private userHtml(user: any): string {
+        let span = $('<span class="user" />');
+        span.toggleClass('muted', user.deleted);
+        span.toggleClass('long-away', user.long_away);
+        span.toggleClass('green-man', user.green);
+        let a = $('<a />', {
+            href: this.$state.href('users-user', {identity: user.identity ? user.identity : 'user' + user.id}, {inherit: false}),
+            text: user.name
+        });
+        
+        
+        return '<i class="fa fa-user"></i> ' + (span.append(a))[0].outerHTML;
+    }
+};
+
+angular.module(Module)
+    .controller(CONTROLLER_NAME, AboutController)
+    .config(['$stateProvider',
+        function config($stateProvider: any) {
+            $stateProvider.state( {
+                name: STATE_NAME,
+                url: '/about',
+                controller: CONTROLLER_NAME,
+                controllerAs: 'ctrl',
+                template: require('./template.html')
+            });
+        }
+    ]);
+

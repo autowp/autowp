@@ -20,7 +20,7 @@
 
         <h2 translate>account/profile/photo</h2>
         <div class="well">
-            <div btf-markdown="'account/profile/use-gravatar'|translate"></div>
+            <div autowp-markdown="'account/profile/use-gravatar'|translate"></div>
             <div ng-if="ctrl.photo">
                 <img ng-src="{{ctrl.photo.src}}" />
                 <div class="form-group" ng-class="{'has-error': ctrl.photoInvalidParams.file}">

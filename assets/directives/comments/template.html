@@ -5,5 +5,5 @@
     <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
 
     <autowp-comments-form item-id="itemId" type-id="typeId" on-sent="ctrl.onSent" ng-if="user"></autowp-comments-form>
-    <div ng-if="!user" class="alert alert-block alert-info" btf-markdown="'comments/what-to-do-for-write-comments'|translate"></div>
+    <div ng-if="!user" class="alert alert-block alert-info" autowp-markdown="'comments/what-to-do-for-write-comments'|translate"></div>
 </div>

@@ -41,16 +41,6 @@ return [
                     ],
                 ],
             ],
-            'about' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/about',
-                    'defaults' => [
-                        'controller' => Controller\AboutController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-            ],
             'brands' => [
                 'type' => 'Literal',
                 'options' => [

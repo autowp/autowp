@@ -7,7 +7,6 @@ import 'angular-translate';
 import 'angular-translate-interpolation-messageformat';
 import 'angular-sanitize';
 import 'angular-simple-logger';
-import 'angular-markdown-directive';
 import 'angular-filesize-filter/angular-filesize-filter';
 import 'ng-tags-input';
 import 'ng-tags-input/build/ng-tags-input.css';
@@ -31,7 +30,7 @@ declare global {
     interface Window { opt: any; }
 }
 
-angular.module(MODULE_NAME, ['ngAnimate', 'ngAria', 'ui.router', 'pascalprecht.translate', 'nemLogging', 'btford.markdown', 'ngSanitize', "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet', 'angularMoment', 'vcRecaptcha', 'ngFileUpload', 'tandibar/ng-rollbar'])
+angular.module(MODULE_NAME, ['ngAnimate', 'ngAria', 'ui.router', 'pascalprecht.translate', 'nemLogging', 'ngSanitize', "ngFilesizeFilter", 'ngTagsInput', 'ui-leaflet', 'angularMoment', 'vcRecaptcha', 'ngFileUpload', 'tandibar/ng-rollbar'])
     .config(['$urlRouterProvider', '$locationProvider', '$translateProvider', 'RollbarProvider',
         function config($urlRouterProvider: any, $locationProvider: ng.ILocationProvider, $translateProvider: any, RollbarProvider: any) {
             $locationProvider.html5Mode(true).hashPrefix('!');

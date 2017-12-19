@@ -7,7 +7,7 @@
                     <a ng-href="{{ctrl.email}}" ng-bind="ctrl.email"></a>
                 </p>
                 <p translate ng-if="!ctrl.email">account/email/your-dont-enter-email</p>
-                <div btf-markdown="'account/email/text'|translate"></div>
+                <div autowp-markdown="'account/email/text'|translate"></div>
                 <form method="post" class="form-horizontal" ng-submit="ctrl.submit()"><fieldset>
                     <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.email}">
                         <label class="col-md-2 control-label" for="email">E-mail</label>

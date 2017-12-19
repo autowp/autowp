@@ -1,10 +1,11 @@
 <?php
 
-namespace Application\Controller;
+namespace Application\Controller\Api;
 
 use Zend\Db\Sql;
-use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Permissions\Acl\Acl;
+use Zend\View\Model\JsonModel;
 
 use Autowp\Comments;
 use Autowp\User\Model\User;
@@ -12,7 +13,7 @@ use Autowp\User\Model\User;
 use Application\Model\Item;
 use Application\Model\Picture;
 
-class AboutController extends AbstractActionController
+class AboutController extends AbstractRestfulController
 {
     /**
      * @var Acl
@@ -78,7 +79,7 @@ class AboutController extends AbstractActionController
             ]);
 
             foreach ($greenUsers as $greenUser) {
-                $contributors[$greenUser['id']] = $greenUser;
+                $contributors[] = (int)$greenUser['id'];
             }
         }
 
@@ -89,7 +90,7 @@ class AboutController extends AbstractActionController
         ]);
 
         foreach ($picturesUsers as $greenUser) {
-            $contributors[$greenUser['id']] = $greenUser;
+            $contributors[] = (int)$greenUser['id'];
         }
 
         ksort($contributors, SORT_NUMERIC);
@@ -103,18 +104,18 @@ class AboutController extends AbstractActionController
         $totalComments = $this->comments->getTotalMessagesCount();
         $totalComments = round($totalComments, -3);
 
-        return [
-            'developer'      => $this->userModel->getRow(1),
-            'frTranslator'   => $this->userModel->getRow(3282),
-            'zhTranslator'   => $this->userModel->getRow(25155),
-            'beTranslator'   => $this->userModel->getRow(15603),
-            'ptBrTranslator' => $this->userModel->getRow(17322),
-            'contributors'   => $contributors,
-            'totalPictures'  => $totalPictures,
-            'picturesSize'   => $this->picture->getTotalPicturesSize(),
-            'totalUsers'     => $totalUsers,
-            'totalCars'      => $totalCars,
-            'totalComments'  => $totalComments
-        ];
+        return new JsonModel([
+            'developer'        => 1,
+            'fr_translator'    => 3282,
+            'zh_translator'    => 25155,
+            'be_translator'    => 15603,
+            'pt_br_translator' => 17322,
+            'contributors'     => $contributors,
+            'total_pictures'   => $totalPictures,
+            'pictures_size'    => $this->picture->getTotalPicturesSize(),
+            'total_users'      => $totalUsers,
+            'total_cars'       => $totalCars,
+            'total_comments'   => $totalComments
+        ]);
     }
 }

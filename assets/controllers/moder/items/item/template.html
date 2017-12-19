@@ -90,7 +90,7 @@
         </table>
     </div>
     <div ng-if="ctrl.tabs.logo" class="tab-pane" ng-class="{active: ctrl.tabs.logo.active}">
-        <div ng-if="ctrl.canLogo" btf-markdown="'moder/brands/logo/description'|translate"></div>
+        <div ng-if="ctrl.canLogo" autowp-markdown="'moder/brands/logo/description'|translate"></div>
         <img ng-src="{{ctrl.item.logo.src}}" style="max-width:100%" ng-if="ctrl.item.logo" />
         <div ng-if="ctrl.canLogo">
             <form method="post" ng-submit="ctrl.uploadLogo()">

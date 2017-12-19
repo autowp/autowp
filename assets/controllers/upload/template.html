@@ -1,11 +1,11 @@
 <div class="alert alert-warning" ng-if="!user">
-    <div btf-markdown="'upload/only-registered'|translate"></div>
+    <div autowp-markdown="'upload/only-registered'|translate"></div>
 </div>
 
 <div ng-if="user">
     <div ng-if="ctrl.selected">
         <div class="well">
-            <div btf-markdown="'upload/description'|translate"></div>
+            <div autowp-markdown="'upload/description'|translate"></div>
             <div style="margin:20px 0">
                 <form class="form-horizontal" ng-submit="ctrl.submit()" ng-show="!ctrl.formHidden"><fieldset>
                     <div class="form-group">
@@ -102,7 +102,7 @@
     </div>
     
     <div class="well" ng-if="!ctrl.selected">
-        <div btf-markdown="'upload/description'|translate"></div>
+        <div autowp-markdown="'upload/description'|translate"></div>
         <p style="margin:10px">
             <a ui-sref="upload-select" class="btn btn-primary btn-lg">
                 <i class="fa fa-upload"></i> 

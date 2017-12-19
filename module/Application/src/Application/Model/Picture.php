@@ -1000,12 +1000,12 @@ class Picture
         return self::buildFormatRequest($row);
     }
 
-    public function getTotalPicturesSize()
+    public function getTotalPicturesSize(): int
     {
         $select = $this->table->getSql()->select();
         $select->columns(['sum' => new Sql\Expression('sum(filesize)')]);
         $row = $this->table->selectWith($select)->current();
-        return $row ? $row['sum'] : 0;
+        return $row ? (int)$row['sum'] : 0;
     }
 
     public function cropParametersExists($row)
