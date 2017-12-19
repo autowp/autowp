@@ -59,6 +59,17 @@ declare namespace autowp {
         items: T[];
     }
     
+    export interface IUser
+    {
+        id: number;
+        name: string;
+    }
+    
+    export interface GetUsersResult {
+        items: autowp.IUser[];
+        paginator: autowp.IPaginator;
+    }
+    
     export interface IItem
     {
         id: number;

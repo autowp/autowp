@@ -114,6 +114,39 @@ return [
                 ]
             ],
         ],
+        'api_attr_attribute_get' => [
+            'zone_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ],
+            'page' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['unit', 'childs']]
+                    ]
+                ]
+            ],
+        ],
         'api_attr_conflict_get' => [
             'filter' => [
                 'required' => true,
@@ -2671,9 +2704,6 @@ return [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
-                ],
-                'validators' => [
-                    ['name' => 'Digits'],
                 ]
             ],
             'identity' => [

@@ -144,9 +144,8 @@ class UserController extends AbstractRestfulController
             $filter['search'] = $search . '%';
         }
 
-        $id = (int)$data['id'];
-        if ($id) {
-            $filter['id'] = $id;
+        if ($data['id']) {
+            $filter['id'] = is_array($data['id']) ? $data['id'] : (int) $data['id'];
         }
 
         if ($data['identity']) {
