@@ -88,20 +88,20 @@ export class UserService {
        
         var self = this;
 
-        return this.$q(function(resolve: ng.IQResolveReject<Map<number, autowp.IUser>>, reject: ng.IQResolveReject<void>) {
+        return this.$q(function(resolve: ng.IQResolveReject<Map<number, autowp.IUser>>, reject: ng.IQResolveReject<string>) {
             self.queryUsers(ids).then(function() {
                 let result: Map<number, autowp.IUser> = new Map<number, autowp.IUser>();
                 for (let id of ids) {
                     let user = self.cache.get(id);
                     if (user === undefined) {
-                        reject();
+                        reject("Failed to query user " + id);
                         return;
                     }
                     result.set(id, user);
                 }
                 resolve(result);
             }, function() {
-                reject();
+                reject("Failed to query users " + ids.join(", "));
             });
         });
     }
