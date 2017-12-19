@@ -1491,7 +1491,8 @@ class CatalogueController extends AbstractActionController
                     'path'             => $path,
                     'language'         => $this->language(),
                     'textStorage'      => $this->textStorage,
-                    'hasChildSpecs'    => $hasChildSpecs
+                    'hasChildSpecs'    => $hasChildSpecs,
+                    'type'             => $type
                 ]),
                 'disableDescription' => false
             ]),
