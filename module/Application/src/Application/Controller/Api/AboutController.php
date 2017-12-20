@@ -106,7 +106,7 @@ class AboutController extends AbstractRestfulController
 
         return new JsonModel([
             'developer'        => 1,
-            'fr_translator'    => 13282,
+            'fr_translator'    => 3282,
             'zh_translator'    => 25155,
             'be_translator'    => 15603,
             'pt_br_translator' => 17322,
