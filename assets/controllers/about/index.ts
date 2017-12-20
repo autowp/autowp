@@ -50,53 +50,46 @@ export class AboutController {
             method: 'GET'
         }).then(function(response: ng.IHttpResponse<any>) {
             
-            let promises: ng.IPromise<any>[] = [
-                self.$translate('about/text')
-            ];
-        
-            let ids: number[] = response.data.contributors;
-            ids.push(response.data.developer);
-            ids.push(response.data.fr_translator);
-            ids.push(response.data.zh_translator);
-            ids.push(response.data.be_translator);
-            ids.push(response.data.pt_br_translator);
-        
-            promises.push(self.userService.getUserMap(ids));
-            
-            
-            self.$q.all(promises).then(function(responses: any[]) {
+            self.$translate('about/text').then(function(translation) {
+
+                let ids: number[] = response.data.contributors;
+                ids.push(response.data.developer);
+                ids.push(response.data.fr_translator);
+                ids.push(response.data.zh_translator);
+                ids.push(response.data.be_translator);
+                ids.push(response.data.pt_br_translator);
                 
-                let users: Map<number, autowp.IUser> = responses[1];
-            
-                let contributorsHtml: string[] = [];
-                for (let id of response.data.contributors) {
-                    contributorsHtml.push(self.userHtml(users.get(id)));
-                }
+                self.userService.getUserMap(ids).then(function(users: Map<number, autowp.IUser>) {
                 
-                let markdownConverter = new showdown.Converter({});
-                self.html = replacePairs(
-                    markdownConverter.makeHtml(responses[0]), {
-                        '%users%'            : contributorsHtml.join(' '),
-                        '%total-pictures%'   : self.$filter('number')(response.data.total_pictures),
-                        '%total-vehicles%'   : response.data.total_cars,
-                        '%total-size%'       : filesize(response.data.pictures_size),
-                        '%total-users%'      : response.data.total_users,
-                        '%total-comments%'   : response.data.total_comments,
-                        '%github%'           : '<i class="fa fa-github"></i> <a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a>',
-                        '%developer%'        : self.userHtml(users.get(response.data.developer)),
-                        '%fr-translator%'    : self.userHtml(users.get(response.data.fr_translator)),
-                        '%zh-translator%'    : self.userHtml(users.get(response.data.zh_translator)),
-                        '%be-translator%'    : self.userHtml(users.get(response.data.be_translator)),
-                        '%pt-br-translator%' : self.userHtml(users.get(response.data.pt_br_translator))
+                    let contributorsHtml: string[] = [];
+                    for (let id of response.data.contributors) {
+                        contributorsHtml.push(self.userHtml(users.get(id)));
                     }
-                );
-            }, function() {
-                console.log('reject');
+                    
+                    let markdownConverter = new showdown.Converter({});
+                    self.html = replacePairs(
+                        markdownConverter.makeHtml(translation), {
+                            '%users%'            : contributorsHtml.join(' '),
+                            '%total-pictures%'   : self.$filter('number')(response.data.total_pictures),
+                            '%total-vehicles%'   : response.data.total_cars,
+                            '%total-size%'       : filesize(response.data.pictures_size),
+                            '%total-users%'      : response.data.total_users,
+                            '%total-comments%'   : response.data.total_comments,
+                            '%github%'           : '<i class="fa fa-github"></i> <a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a>',
+                            '%developer%'        : self.userHtml(users.get(response.data.developer)),
+                            '%fr-translator%'    : self.userHtml(users.get(response.data.fr_translator)),
+                            '%zh-translator%'    : self.userHtml(users.get(response.data.zh_translator)),
+                            '%be-translator%'    : self.userHtml(users.get(response.data.be_translator)),
+                            '%pt-br-translator%' : self.userHtml(users.get(response.data.pt_br_translator))
+                        }
+                    );
+                }, function(responses: any) {
+                    console.log('reject', responses);
+                });
+            }, function(responses: any) {
+                console.log('Failed to translate');
             });
-            
-            self.$translate('about/text').then(function(translation: string) {
-                
-            });
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
