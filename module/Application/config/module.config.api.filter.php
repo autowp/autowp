@@ -120,6 +120,9 @@ return [
                 'filters'  => [
                     ['name' => 'StringTrim']
                 ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ]
             ],
             'page' => [
                 'required' => false,
@@ -1001,7 +1004,7 @@ return [
                             'end_year', 'body', 'lat', 'lng',
                             'pictures_count', 'current_pictures_count',
                             'is_compiles_item_of_day', 'item_of_day_pictures',
-                            'related_group_pictures', 'engine_id']]
+                            'related_group_pictures', 'engine_id', 'attr_zone_id']]
                     ]
                 ]
             ],
@@ -1190,7 +1193,7 @@ return [
                             'end_year', 'body', 'lat', 'lng',
                             'pictures_count', 'current_pictures_count',
                             'is_compiles_item_of_day', 'item_of_day_pictures',
-                            'related_group_pictures', 'engine_id']]
+                            'related_group_pictures', 'engine_id', 'attr_zone_id']]
                     ]
                 ]
             ],

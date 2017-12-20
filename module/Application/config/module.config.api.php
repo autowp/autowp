@@ -8,6 +8,7 @@ return [
     'hydrators' => [
         'factories' => [
             Hydrator\Api\ArticleHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\AttrAttributeHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\AttrConflictHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\CommentHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
@@ -335,6 +336,24 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
+                            'attribute' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/attribute'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'attribute-index',
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
                             'conflict' => [
                                 'type' => 'Literal',
                                 'options' => [

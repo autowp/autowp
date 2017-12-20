@@ -95,6 +95,7 @@ declare namespace autowp {
         spec_id: number|string|null;
         logo: any;
         engine_id: number|null,
+        attr_zone_id: number,
     
         engine_vehicles_count: number;
         pictures_count: number;

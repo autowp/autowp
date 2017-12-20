@@ -63,11 +63,80 @@
         </div>
     </div>
     <div class="tab-pane" ng-class="{active: ctrl.tab == 'spec'}" id="spec">
-        <?=$this->partial('application/cars/partial/form', [
-            'form'    => $this->form,
-            'data'    => $this->formData,
-            'service' => $this->service
-        ])?>
+        <form class="spec-editor-form">
+            <p class="alert alert-danger" ng-if="form.getMessages()">
+                <i class="fa fa-exclamation-triangle"></i>
+                {{'specifications-editor/not-save'|translate}}
+            </p>
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th class="col-lg-3 col-sm-3" translate>specifications-editor/parameter</th>
+                        <th class="col-lg-4 col-sm-4" translate>specifications-editor/your-value</th>
+                        <th class="col-lg-2 col-sm-2" translate>specifications-editor/actual-value</th>
+                        <th class="col-lg-3 col-sm-3" translate>specifications-editor/all-values</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="attribute in ctrl.attributes" id="subform-{{attribute.id}}" ng-class="{'subform-header': !!attribute.childs.length, 'has-error': $element.getMessages()}">
+                        <td colspan="4" ng-style="{'padding-left': (attribute.deep * 20) + 'px'}" ng-if="attribute.childs.length">
+                            <h4 ng-bind="attribute.name | translate"></h4>
+                        </td>
+                        <td ng-if="!attribute.childs.length">
+                            <label ng-style="{'padding-left': (attribute.deep * 20) + 'px'}" ng-bind="attribute.name | translate"></label>
+                        </td>
+                        <td ng-if="!attribute.childs.length">
+                            <div ng-class="{'input-group': !!attribute.unit, 'has-error': element.getMessages()}">
+                                <select class="form-control input-sm" ng-if="attribute.type_id == 5">
+                                    <option value="">—</option>
+                                    <option value="-" translate>specifications/no-value-text</option>
+                                    <option value="0" translate>specifications/boolean/false</option>
+                                    <option value="1" translate>specifications/boolean/true</option>
+                                </select>
+                                <input type="text" ng-if="attribute.type_id != 5" class="form-control input-sm" />
+                                <span ng-if="attribute.unit" class="input-group-addon" translate-attrs="{title: attribute.unit.name}" class="unit" ng-bind="attribute.unit.abbr|translate"></span>
+                            </div>
+                            <p class="help-block" ng-repeat="error in $element.getMessages()" ng-bind="error"></p>
+                            <small ng-if="attribute.description" ng-bind="attribute.description|translate"></small>
+                        </td>
+                        <td class="actual" ng-if="!attribute.childs.length">
+                            <?php if (array_key_exists($attrId, $this->actualValues)) { ?>
+                                <?php
+                                    $value = $this->actualValues[$attrId];
+                                ?>
+                                <?php if ($value === null) { ?>
+                                    <em translate>account/specs/conflicts/my-value/none</em>
+                                <?php } else { ?>
+                                    <?=$this->escapeHtml($value)?>
+                                    <span ng-if="attribute.unit" class="unit" translate-attrs="{title: attribute.unit.name}" ng-bind="attribute.unit.abbr|translate"></span>
+                                <?php } ?>
+                            <?php } ?>
+                        </td>
+                        <td ng-if="!attribute.childs.length">
+                            <?php if (isset($this->allValues[$attrId])) { ?>
+                                <?php foreach ($this->allValues[$attrId] as $value) { ?>
+                                    <?php if ($value['value'] === null) { ?>
+                                        <em translate>account/specs/conflicts/my-value/none</em>
+                                    <?php } else { ?>
+                                        <?=$this->escapeHtml($value['value'])?>
+                                    <?php } ?>
+                                    <?php if ($value['user']) { ?>
+                                        <?=$this->user($value['user'])?>
+                                    <?php } ?>
+                                    <?php if ($value['date']) { ?>
+                                        <span class="date">[<?=$this->escapeHtml($this->humanTime($value['date']))?>]</span>
+                                    <?php } ?>
+                                    <br />
+                                <?php } ?>
+                            <?php } ?>
+                        </td>
+                    </tr>
+                    <tr><td>
+                        <button type="submit" class="btn btn-success" translate>specifications-editor/save</button>
+                    </td></tr>
+                </tbody>
+            </table>
+        </form>
     </div>
     <div class="tab-pane" ng-class="{active: ctrl.tab == 'result'}" id="result">
         <div ng-bind-html="ctrl.resultHtml"></div>

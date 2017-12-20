@@ -330,6 +330,7 @@ CREATE TABLE `attrs_units` (
 --
 
 /*!40000 ALTER TABLE `attrs_units` DISABLE KEYS */;
+INSERT INTO `attrs_units` VALUES (1,'specs/unit/1/name','specs/unit/1/abbr'),(2,'specs/unit/2/name','specs/unit/2/abbr'),(3,'specs/unit/3/name','specs/unit/3/abbr'),(4,'specs/unit/4/name','specs/unit/4/abbr'),(5,'specs/unit/5/name','specs/unit/5/abbr'),(6,'specs/unit/6/name','specs/unit/6/abbr'),(7,'specs/unit/7/name','specs/unit/7/abbr'),(8,'specs/unit/8/name','specs/unit/8/abbr'),(9,'specs/unit/9/name','specs/unit/9/abbr'),(10,'specs/unit/10/name','specs/unit/10/abbr'),(11,'specs/unit/11/name','specs/unit/11/abbr'),(12,'specs/unit/12/name','specs/unit/12/abbr'),(13,'specs/unit/13/name','specs/unit/13/abbr'),(14,'specs/unit/14/name','specs/unit/14/abbr'),(15,'specs/unit/15/name','specs/unit/15/abbr'),(16,'specs/unit/16/name','specs/unit/16/abbr'),(17,'specs/unit/17/name','specs/unit/17/abbr'),(18,'specs/unit/18/name','specs/unit/18/abbr'),(19,'specs/unit/19/name','specs/unit/19/abbr'),(20,'specs/unit/20/name','specs/unit/20/abbr');
 /*!40000 ALTER TABLE `attrs_units` ENABLE KEYS */;
 
 --

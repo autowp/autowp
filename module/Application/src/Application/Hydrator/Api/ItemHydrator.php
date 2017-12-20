@@ -21,6 +21,7 @@ use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\UserItemSubscribe;
 use Application\Service\SpecificationsService;
+use Application\Model\VehicleType;
 
 class ItemHydrator extends RestHydrator
 {
@@ -118,6 +119,11 @@ class ItemHydrator extends RestHydrator
      */
     private $acl;
 
+    /**
+     * @var VehicleType
+     */
+    private $vehicleType;
+
     public function __construct(
         $serviceManager
     ) {
@@ -153,6 +159,8 @@ class ItemHydrator extends RestHydrator
         $this->carOfDay = $serviceManager->get(CarOfDay::class);
 
         $this->imageStorage = $serviceManager->get(StorageInterface::class);
+
+        $this->vehicleType = $serviceManager->get(VehicleType::class);
 
         $strategy = new Strategy\Items($serviceManager);
         $this->addStrategy('brands', $strategy);
@@ -680,6 +688,11 @@ class ItemHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('has_text')) {
                 $result['has_text'] = $this->itemModel->hasFullText($object['id']);
+            }
+
+            if ($this->filterComposite->filter('attr_zone_id')) {
+                $vehicleTypeIds = $this->vehicleType->getVehicleTypes($object['id']);
+                $result['attr_zone_id'] = $this->specificationsService->getZoneIdByCarTypeId($object['item_type_id'], $vehicleTypeIds);
             }
         }
 

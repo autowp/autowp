@@ -69,16 +69,28 @@ class AttrController extends AbstractRestfulController
      */
     private $userValuePatchDataFilter;
 
+    /**
+     * @var InputFilter
+     */
+    private $attributeListInputFilter;
+
+    /**
+     * @var InputFilter
+     */
+    private $attributeHydrator;
+
     public function __construct(
         Item $item,
         SpecificationsService $specsService,
         User $userModel,
         RestHydrator $conflictHydrator,
         RestHydrator $userValueHydrator,
+        RestHydrator $attributeHydrator,
         InputFilter $conflictListInputFilter,
         InputFilter $userValueListInputFilter,
         InputFilter $userValuePatchQueryFilter,
-        InputFilter $userValuePatchDataFilter
+        InputFilter $userValuePatchDataFilter,
+        InputFilter $attributeListInputFilter
     ) {
         $this->item = $item;
         $this->specsService = $specsService;
@@ -87,9 +99,11 @@ class AttrController extends AbstractRestfulController
         $this->conflictListInputFilter = $conflictListInputFilter;
         $this->userValueTable = $specsService->getUserValueTable();
         $this->userValueHydrator = $userValueHydrator;
+        $this->attributeHydrator = $attributeHydrator;
         $this->userValueListInputFilter = $userValueListInputFilter;
         $this->userValuePatchQueryFilter = $userValuePatchQueryFilter;
         $this->userValuePatchDataFilter = $userValuePatchDataFilter;
+        $this->attributeListInputFilter = $attributeListInputFilter;
     }
 
     public function conflictIndexAction()
@@ -311,5 +325,47 @@ class AttrController extends AbstractRestfulController
         }
 
         return $this->getResponse()->setStatusCode(200);
+    }
+
+    public function attributeIndexAction()
+    {
+        $user = $this->user()->get();
+
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $this->attributeListInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->attributeListInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->attributeListInputFilter);
+        }
+
+        $values = $this->attributeListInputFilter->getValues();
+
+        $attributes = $this->specsService->getAttributes([
+            'parent'    => 0,
+            'zone'      => $values['zone_id'],
+            'recursive' => true
+        ]);
+
+        $this->attributeHydrator->setOptions([
+            'fields'   => $values['fields'],
+            'language' => $this->language(),
+            'user_id'  => $user ? $user['id'] : null
+        ]);
+
+        $items = [];
+        foreach ($attributes as $row) {
+            $items[] = $this->attributeHydrator->extract($row);
+        }
+
+        return new JsonModel([
+            'items'     => $items
+        ]);
     }
 }

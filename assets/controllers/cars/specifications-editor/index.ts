@@ -8,6 +8,18 @@ import * as $ from 'jquery';
 const CONTROLLER_NAME = 'CarsSpecificationsEditorController';
 const STATE_NAME = 'cars-specifications-editor';
 
+function toPlain(options: any[], deep: number): any[] {
+    var result: any[] = [];
+    angular.forEach(options, function(item) {
+        item.deep = deep;
+        result.push(item);
+        angular.forEach(toPlain(item.childs, deep+1), function(item: any) {
+            result.push(item);
+        });
+    });
+    return result;
+}
+
 export class CarsSpecificationsEditorController {
     static $inject = ['$scope', '$http', '$state', 'ItemService', 'AclService'];
   
@@ -45,6 +57,7 @@ export class CarsSpecificationsEditorController {
               count: 0,
           }
     };
+    public attributes: any[];
   
     constructor(
         private $scope: autowp.IControllerScope, 
@@ -76,7 +89,7 @@ export class CarsSpecificationsEditorController {
         this.tab = this.$state.params.tab ||'info';
         
         this.ItemService.getItem(this.$state.params.item_id, {
-            fields: 'name_html,name_text,engine_id'
+            fields: 'name_html,name_text,engine_id,attr_zone_id'
         }).then(function(item: autowp.IItem) {
             self.item = item;
         
@@ -126,10 +139,25 @@ export class CarsSpecificationsEditorController {
                     $(this).removeClass('hover');
                     $('.' + $(this).attr('id')).removeClass('hover');
                 });
+                
+                self.$http({
+                    method: 'GET',
+                    url: '/api/attr/attribute',
+                    params: {
+                        fields: 'unit,childs.unit',
+                        zone_id: item.attr_zone_id
+                    }
+                }).then(function(response: ng.IHttpResponse<any>) {
+                    self.attributes = toPlain(response.data.items, 0);
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
+                });
             }
             
+            
+            
         }, function(response: ng.IHttpResponse<any>) {
-            notify.response(response);
+            self.$state.go('error-404');
         });
 
     }

@@ -271,7 +271,7 @@ class SpecificationsService
         return isset($this->units[$id]) ? $this->units[$id] : null;
     }
 
-    private function zoneIdByCarTypeId(int $itemTypeId, array $vehicleTypeIds)
+    public function getZoneIdByCarTypeId(int $itemTypeId, array $vehicleTypeIds)
     {
         if ($itemTypeId == Item::ENGINE) {
             return self::ENGINE_ZONE_ID;
@@ -677,7 +677,7 @@ class SpecificationsService
     ) {
         $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
 
-        $zoneId = $this->zoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
+        $zoneId = $this->getZoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
 
         return [
             'form' => $this->getForm($car['id'], $zoneId, $user, $options),
@@ -910,7 +910,7 @@ class SpecificationsService
     ) {
         $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
 
-        $zoneId = $this->zoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
+        $zoneId = $this->getZoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
 
         $attributes = $this->getAttributes([
             'zone'   => $zoneId,
@@ -1274,7 +1274,7 @@ class SpecificationsService
         $zoneIds = [];
         foreach ($cars as $car) {
             $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
-            $zoneId = $this->zoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
+            $zoneId = $this->getZoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
 
             $zoneIds[$zoneId] = true;
         }
