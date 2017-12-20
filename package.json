@@ -101,7 +101,7 @@
     "less-loader": "^4.x",
     "lodash.escaperegexp": "^4.1.2",
     "markdown": "^0.x",
-    "moment": "^2.18.1",
+    "moment": "^2.20.1",
     "moment-timezone": "^0.5.13",
     "ng-file-upload": "^12.2.13",
     "ng-rollbar": "^2.3.8",
