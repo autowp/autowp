@@ -52,7 +52,6 @@ return [
             Controller\TelegramController::class        => Controller\Frontend\Service\TelegramControllerFactory::class,
             Controller\TwinsController::class           => Controller\Frontend\Service\TwinsControllerFactory::class,
             Controller\Frontend\YandexController::class => Controller\Frontend\Service\YandexControllerFactory::class,
-            Controller\WidgetController::class          => Controller\Frontend\WidgetControllerFactory::class,
         ],
     ],
     'controller_plugins' => [

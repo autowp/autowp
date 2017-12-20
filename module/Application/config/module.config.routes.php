@@ -346,27 +346,6 @@ return [
                     ],
                 ]
             ],
-            /*'widget' => [
-             'type' => 'Literal',
-                'options' => [
-                    'route'    => '/widget',
-                    'defaults' => [
-                        'controller' => Controller\WidgetController::class,
-                    ],
-                ],
-                'may_terminate' => false,
-                'child_routes'  => [
-                    'picture-preview' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/picture-preview/picture_id/:picture_id',
-                            'defaults' => [
-                                'action' => 'picture-preview',
-                            ]
-                        ]
-                    ]
-                ]
-            ],*/
             'yandex' => [
                 'type' => 'Literal',
                 'options' => [
