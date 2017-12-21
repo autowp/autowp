@@ -11,6 +11,7 @@ return [
             Hydrator\Api\AttrAttributeHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\AttrConflictHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\AttrUserValueHydrator::class      => Hydrator\Api\RestHydratorFactory::class,
+            Hydrator\Api\AttrValueHydrator::class          => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\CommentHydrator::class            => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ForumThemeHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ForumTopicHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
@@ -367,6 +368,24 @@ return [
                                             'verb'    => 'get',
                                             'defaults' => [
                                                 'action' => 'conflict-index',
+                                            ],
+                                        ],
+                                    ]
+                                ]
+                            ],
+                            'value' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/value'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'value-index',
                                             ],
                                         ],
                                     ]

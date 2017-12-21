@@ -45,6 +45,11 @@ class AttrController extends AbstractRestfulController
     private $userValueHydrator;
 
     /**
+     * @var RestHydrator
+     */
+    private $valueHydrator;
+
+    /**
      * @var InputFilter
      */
     private $conflictListInputFilter;
@@ -79,6 +84,11 @@ class AttrController extends AbstractRestfulController
      */
     private $attributeHydrator;
 
+    /**
+     * @var InputFilter
+     */
+    private $valueListInputFilter;
+
     public function __construct(
         Item $item,
         SpecificationsService $specsService,
@@ -86,11 +96,13 @@ class AttrController extends AbstractRestfulController
         RestHydrator $conflictHydrator,
         RestHydrator $userValueHydrator,
         RestHydrator $attributeHydrator,
+        RestHydrator $valueHydrator,
         InputFilter $conflictListInputFilter,
         InputFilter $userValueListInputFilter,
         InputFilter $userValuePatchQueryFilter,
         InputFilter $userValuePatchDataFilter,
-        InputFilter $attributeListInputFilter
+        InputFilter $attributeListInputFilter,
+        InputFilter $valueListInputFilter
     ) {
         $this->item = $item;
         $this->specsService = $specsService;
@@ -100,10 +112,12 @@ class AttrController extends AbstractRestfulController
         $this->userValueTable = $specsService->getUserValueTable();
         $this->userValueHydrator = $userValueHydrator;
         $this->attributeHydrator = $attributeHydrator;
+        $this->valueHydrator = $valueHydrator;
         $this->userValueListInputFilter = $userValueListInputFilter;
         $this->userValuePatchQueryFilter = $userValuePatchQueryFilter;
         $this->userValuePatchDataFilter = $userValuePatchDataFilter;
         $this->attributeListInputFilter = $attributeListInputFilter;
+        $this->valueListInputFilter = $valueListInputFilter;
     }
 
     public function conflictIndexAction()
@@ -180,6 +194,20 @@ class AttrController extends AbstractRestfulController
             $select->where(['item_id' => $itemId]);
         }
 
+        if ($values['exclude_user_id']) {
+            $select->where(['user_id <> ?' => $values['exclude_user_id']]);
+        }
+
+        if ($values['zone_id']) {
+            $select
+                ->join(
+                    'attrs_zone_attributes',
+                    'attrs_values.attribute_id = attrs_zone_attributes.attribute_id',
+                    []
+                )
+                ->where(['attrs_zone_attributes.zone_id' => $values['zone_id']]);
+        }
+
         $paginator = new Paginator\Paginator(
             new Paginator\Adapter\DbSelect($select, $this->userValueTable->getAdapter())
         );
@@ -191,8 +219,7 @@ class AttrController extends AbstractRestfulController
 
         $this->userValueHydrator->setOptions([
             'fields'   => $values['fields'],
-            'language' => $this->language(),
-            'user_id'  => $user ? $user['id'] : null
+            'language' => $this->language()
         ]);
 
         $items = [];
@@ -365,6 +392,77 @@ class AttrController extends AbstractRestfulController
         }
 
         return new JsonModel([
+            'items'     => $items
+        ]);
+    }
+
+    public function valueIndexAction()
+    {
+        $user = $this->user()->get();
+
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $this->valueListInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->valueListInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->valueListInputFilter);
+        }
+
+        $values = $this->valueListInputFilter->getValues();
+
+        $select = $this->specsService->getValueTable()->getSql()->select();
+
+        $select->order('update_date DESC');
+
+        $itemId = (int)$values['item_id'];
+
+        if (! $itemId) {
+            return $this->forbiddenAction();
+        }
+
+        if ($itemId) {
+            $select->where(['item_id' => $itemId]);
+        }
+
+        if ($values['zone_id']) {
+            $select
+                ->join(
+                    'attrs_zone_attributes',
+                    'attrs_values.attribute_id = attrs_zone_attributes.attribute_id',
+                    []
+                )
+                ->where(['attrs_zone_attributes.zone_id' => $values['zone_id']]);
+        }
+
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->userValueTable->getAdapter())
+        );
+
+        $paginator
+            ->setItemCountPerPage($values['limit'])
+            ->setPageRange(20)
+            ->setCurrentPageNumber($values['page']);
+
+        $this->valueHydrator->setOptions([
+            'fields'   => $values['fields'],
+            'language' => $this->language(),
+            'user_id'  => $user ? $user['id'] : null
+        ]);
+
+        $items = [];
+        foreach ($paginator->getCurrentItems() as $row) {
+            $items[] = $this->valueHydrator->extract($row);
+        }
+
+
+        return new JsonModel([
+            'paginator' => $paginator->getPages(),
             'items'     => $items
         ]);
     }

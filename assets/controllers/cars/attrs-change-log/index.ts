@@ -104,7 +104,7 @@ export class CarsAttrsChangeLogController {
             location: 'replace'
         });
         
-        params.fields = 'user,item.name_html,path,unit';
+        params.fields = 'user,item.name_html,path,unit,value_text';
         
         this.$http({
             method: 'GET',

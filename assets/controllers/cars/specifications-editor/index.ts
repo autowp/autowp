@@ -57,7 +57,10 @@ export class CarsSpecificationsEditorController {
               count: 0,
           }
     };
-    public attributes: any[];
+    public attributes: any[] = [];
+    public values: Map<number, any>;
+    public userValues: Map<number, any>;
+    public currentUserValues: Map<number, any>;
   
     constructor(
         private $scope: autowp.IControllerScope, 
@@ -67,6 +70,10 @@ export class CarsSpecificationsEditorController {
         private acl: AclService
     ) {
         let self = this;
+        
+        this.values = new Map<number, autowp.IUser>();
+        this.userValues = new Map<number, autowp.IUser>();
+        this.currentUserValues = new Map<number, autowp.IUser>();
         
         this.acl.isAllowed('specifications', 'edit-engine').then(function(allow: boolean) {
             self.isAllowedEditEngine = !!allow;
@@ -149,6 +156,65 @@ export class CarsSpecificationsEditorController {
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.attributes = toPlain(response.data.items, 0);
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
+                });
+                
+                self.$http({
+                    method: 'GET',
+                    url: '/api/attr/value',
+                    params: {
+                        item_id: item.id,
+                        zone_id: item.attr_zone_id,
+                        limit: 500,
+                        fields: 'value'
+                    }
+                }).then(function(response: ng.IHttpResponse<any>) {
+                    self.values.clear();
+                    for (let value of response.data.items) {
+                        self.values.set(value.attribute_id, value);
+                    }
+                    
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
+                });
+                
+                self.$http({
+                    method: 'GET',
+                    url: '/api/attr/user-value',
+                    params: {
+                        item_id: item.id,
+                        user_id: self.$scope.user.id,
+                        zone_id: item.attr_zone_id,
+                        limit: 500,
+                        fields: 'value'
+                    }
+                }).then(function(response: ng.IHttpResponse<any>) {
+                    self.currentUserValues.clear();
+                    for (let value of response.data.items) {
+                        self.currentUserValues.set(value.attribute_id, value);
+                    }
+                    
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
+                });
+                
+                self.$http({
+                    method: 'GET',
+                    url: '/api/attr/user-value',
+                    params: {
+                        item_id: item.id,
+                        exclude_user_id: self.$scope.user.id,
+                        zone_id: item.attr_zone_id,
+                        limit: 500,
+                        fields: 'value,user'
+                    }
+                }).then(function(response: ng.IHttpResponse<any>) {
+                    self.userValues.clear();
+                    for (let value of response.data.items) {
+                        self.userValues.set(value.attribute_id, value);
+                    }
+                    
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
                 });

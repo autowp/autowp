@@ -100,35 +100,21 @@
                             <small ng-if="attribute.description" ng-bind="attribute.description|translate"></small>
                         </td>
                         <td class="actual" ng-if="!attribute.childs.length">
-                            <?php if (array_key_exists($attrId, $this->actualValues)) { ?>
-                                <?php
-                                    $value = $this->actualValues[$attrId];
-                                ?>
-                                <?php if ($value === null) { ?>
-                                    <em translate>account/specs/conflicts/my-value/none</em>
-                                <?php } else { ?>
-                                    <?=$this->escapeHtml($value)?>
+                            <div ng-if="ctrl.values.has(attribute.id)">
+                                <em translate ng-if="ctrl.values.get(attribute.id)['value'] === null">account/specs/conflicts/my-value/none</em>
+                                <span ng-if="ctrl.values.get(attribute.id)['value'] !== null">
+                                    {{ctrl.values.get(attribute.id)['value']}}
                                     <span ng-if="attribute.unit" class="unit" translate-attrs="{title: attribute.unit.name}" ng-bind="attribute.unit.abbr|translate"></span>
-                                <?php } ?>
-                            <?php } ?>
+                                </span>
+                            </div>
                         </td>
                         <td ng-if="!attribute.childs.length">
-                            <?php if (isset($this->allValues[$attrId])) { ?>
-                                <?php foreach ($this->allValues[$attrId] as $value) { ?>
-                                    <?php if ($value['value'] === null) { ?>
-                                        <em translate>account/specs/conflicts/my-value/none</em>
-                                    <?php } else { ?>
-                                        <?=$this->escapeHtml($value['value'])?>
-                                    <?php } ?>
-                                    <?php if ($value['user']) { ?>
-                                        <?=$this->user($value['user'])?>
-                                    <?php } ?>
-                                    <?php if ($value['date']) { ?>
-                                        <span class="date">[<?=$this->escapeHtml($this->humanTime($value['date']))?>]</span>
-                                    <?php } ?>
-                                    <br />
-                                <?php } ?>
-                            <?php } ?>
+                            <div ng-repeat="value in ctrl.userValues">
+                                <em translate ng-if="value.value_text === null">account/specs/conflicts/my-value/none</em>
+                                <span ng-if="value.value_text !== null" ng-bind="value.value_text"></span>
+                                <autowp-user user="value.user" ng-if="value.user"></autowp-user>
+                                <span class="date" ng-if="value.update_date">[<span am-time-ago="value.update_date"></span>]</span>
+                            </div>
                         </td>
                     </tr>
                     <tr><td>

@@ -4,7 +4,6 @@ namespace Application\Hydrator\Api;
 
 use Traversable;
 
-use Zend\Router\Http\TreeRouteStack;
 use Zend\Stdlib\ArrayUtils;
 
 use Autowp\User\Model\User;
@@ -35,11 +34,6 @@ class AttrAttributeHydrator extends RestHydrator
      * @var SpecificationsService
      */
     private $specService;
-
-    /**
-     * @var TreeRouteStack
-     */
-    private $router;
 
     public function __construct($serviceManager)
     {

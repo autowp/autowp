@@ -1413,6 +1413,11 @@ class SpecificationsService
         }
     }
 
+    public function getValueTable(): TableGateway
+    {
+        return $this->valueTable;
+    }
+
     public function getValueDataTable(int $type): TableGateway
     {
         switch ($type) {
