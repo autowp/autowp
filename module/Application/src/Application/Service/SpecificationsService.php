@@ -366,6 +366,37 @@ class SpecificationsService
         }
     }
 
+    public function getListOptionsArray(int $attributeId): array
+    {
+        $this->loadListOptions([$attributeId]);
+
+        if (! isset($this->listOptions[$attributeId])) {
+            return [];
+        }
+
+        return $this->getListOptionsArrayRecursive($attributeId, 0);
+    }
+
+    private function getListOptionsArrayRecursive(int $aid, int $parentId)
+    {
+        $result = [];
+        if (isset($this->listOptionsChilds[$aid][$parentId])) {
+            foreach ($this->listOptionsChilds[$aid][$parentId] as $childId) {
+                $result[] = [
+                    'id'   => (int)$childId,
+                    'name' => $this->translator->translate($this->listOptions[$aid][$childId])
+                ];
+                $childOptions = $this->getListOptions($aid, $childId);
+                foreach ($childOptions as &$value) {
+                    $value = '…' . $this->translator->translate($value);
+                }
+                unset($value); // prevent future bugs
+                $result = array_merge($result, $childOptions);
+            }
+        }
+        return $result;
+    }
+
     private function getListsOptions(array $attributeIds)
     {
         $this->loadListOptions($attributeIds);
@@ -385,7 +416,7 @@ class SpecificationsService
         $result = [];
         if (isset($this->listOptionsChilds[$aid][$parentId])) {
             foreach ($this->listOptionsChilds[$aid][$parentId] as $childId) {
-                $result[$childId] = $this->translator->translate($this->listOptions[$aid][$childId]);
+                $result[(int)$childId] = $this->translator->translate($this->listOptions[$aid][$childId]);
                 $childOptions = $this->getListOptions($aid, $childId);
                 foreach ($childOptions as &$value) {
                     $value = '…' . $this->translator->translate($value);

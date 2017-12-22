@@ -21,7 +21,7 @@ function toPlain(options: any[], deep: number): any[] {
 }
 
 export class CarsSpecificationsEditorController {
-    static $inject = ['$scope', '$http', '$state', 'ItemService', 'AclService'];
+    static $inject = ['$scope', '$http', '$state', 'ItemService', 'AclService', '$translate'];
   
     private item: autowp.IItem;
     public isAllowedEditEngine: boolean = false;
@@ -60,20 +60,21 @@ export class CarsSpecificationsEditorController {
     public attributes: any[] = [];
     public values: Map<number, any>;
     public userValues: Map<number, any>;
-    public currentUserValues: Map<number, any>;
+    public currentUserValues: any = {};
+    public loading: number = 0;
   
     constructor(
         private $scope: autowp.IControllerScope, 
         private $http: ng.IHttpService, 
         private $state: any,
         private ItemService: ItemService,
-        private acl: AclService
+        private acl: AclService,
+        private $translate: ng.translate.ITranslateService,
     ) {
         let self = this;
         
         this.values = new Map<number, autowp.IUser>();
         this.userValues = new Map<number, autowp.IUser>();
-        this.currentUserValues = new Map<number, autowp.IUser>();
         
         this.acl.isAllowed('specifications', 'edit-engine').then(function(allow: boolean) {
             self.isAllowedEditEngine = !!allow;
@@ -95,6 +96,7 @@ export class CarsSpecificationsEditorController {
         
         this.tab = this.$state.params.tab ||'info';
         
+        this.loading++;
         this.ItemService.getItem(this.$state.params.item_id, {
             fields: 'name_html,name_text,engine_id,attr_zone_id'
         }).then(function(item: autowp.IItem) {
@@ -116,50 +118,64 @@ export class CarsSpecificationsEditorController {
             
             if (self.tab == 'engine') {
                 if (self.item.engine_id) {
+                    self.loading++;
                     self.ItemService.getItem(self.item.engine_id, {
                         fields: 'name_html,name_text,engine_id'
                     }).then(function(engine: autowp.IItem) {
                         self.engine = engine;
-                        
+                        self.loading--;
                     }, function(response: ng.IHttpResponse<any>) {
                         notify.response(response);
+                        self.loading--;
                     });
                 }
             }
             
             if (self.tab == 'result') {
+                self.loading++;
                 self.$http({
                     method: 'GET',
                     url: '/api/item/' + self.item.id + '/specifications'
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.resultHtml = response.data;
+                    self.loading--;
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
+                    self.loading--;
                 });
             }
             
             if (self.tab == 'spec') {
-                $('.spec-editor-form .subform-header').hover(function() {
-                    $(this).addClass('hover');
-                    $('.' + $(this).attr('id')).addClass('hover');
-                }, function() {
-                    $(this).removeClass('hover');
-                    $('.' + $(this).attr('id')).removeClass('hover');
-                });
-                
+                self.loading++;
                 self.$http({
                     method: 'GET',
                     url: '/api/attr/attribute',
                     params: {
-                        fields: 'unit,childs.unit',
+                        fields: 'unit,options,childs.unit,childs.options',
                         zone_id: item.attr_zone_id
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
-                    self.attributes = toPlain(response.data.items, 0);
+                    self.$translate('specifications/no-value-text').then(function(translation) {
+                        self.attributes = toPlain(response.data.items, 0);
+                        for (let attribute of self.attributes) {
+                            if (attribute.options) {
+                                attribute.options.splice(0, 0, {
+                                    name: '—',
+                                    id: null
+                                }, {
+                                    name: translation,
+                                    id: '-'
+                                })
+                            }
+                        }
+                    });
+                    self.loading--;
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
+                    self.loading--;
                 });
                 
+                self.loading++;
                 self.$http({
                     method: 'GET',
                     url: '/api/attr/value',
@@ -167,18 +183,20 @@ export class CarsSpecificationsEditorController {
                         item_id: item.id,
                         zone_id: item.attr_zone_id,
                         limit: 500,
-                        fields: 'value'
+                        fields: 'value,value_text'
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.values.clear();
                     for (let value of response.data.items) {
                         self.values.set(value.attribute_id, value);
                     }
-                    
+                    self.loading--;
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
+                    self.loading--;
                 });
                 
+                self.loading++;
                 self.$http({
                     method: 'GET',
                     url: '/api/attr/user-value',
@@ -190,40 +208,50 @@ export class CarsSpecificationsEditorController {
                         fields: 'value'
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
-                    self.currentUserValues.clear();
+                    self.currentUserValues = {};
                     for (let value of response.data.items) {
-                        self.currentUserValues.set(value.attribute_id, value);
+                        self.currentUserValues[value.attribute_id] = value;
                     }
-                    
+                    self.loading--;
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
+                    self.loading--;
                 });
                 
+                self.loading++;
                 self.$http({
                     method: 'GET',
                     url: '/api/attr/user-value',
                     params: {
                         item_id: item.id,
-                        exclude_user_id: self.$scope.user.id,
+                        //exclude_user_id: self.$scope.user.id,
                         zone_id: item.attr_zone_id,
                         limit: 500,
-                        fields: 'value,user'
+                        fields: 'value_text,user'
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.userValues.clear();
                     for (let value of response.data.items) {
-                        self.userValues.set(value.attribute_id, value);
+                        let values = self.userValues.get(value.attribute_id);
+                        if (values === undefined) {
+                            self.userValues.set(value.attribute_id, [value]);
+                        } else {
+                            values.push(value);
+                            self.userValues.set(value.attribute_id, values);
+                        }
                     }
-                    
+                    self.loading--;
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
+                    self.loading--;
                 });
             }
             
             
-            
+            self.loading--;
         }, function(response: ng.IHttpResponse<any>) {
             self.$state.go('error-404');
+            self.loading--;
         });
 
     }
@@ -283,6 +311,13 @@ export class CarsSpecificationsEditorController {
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
+    }
+    
+    public saveSpecs()
+    {
+        
+       
+        
     }
 }
 

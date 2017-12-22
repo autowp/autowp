@@ -202,7 +202,7 @@ class AttrController extends AbstractRestfulController
             $select
                 ->join(
                     'attrs_zone_attributes',
-                    'attrs_values.attribute_id = attrs_zone_attributes.attribute_id',
+                    'attrs_user_values.attribute_id = attrs_zone_attributes.attribute_id',
                     []
                 )
                 ->where(['attrs_zone_attributes.zone_id' => $values['zone_id']]);

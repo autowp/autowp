@@ -30,6 +30,9 @@
 </ul>
 
 <div class="tab-content well">
+    <span ng-show="ctrl.loading > 0">
+        <i class="fa fa-spinner fa-spin fa-fw fa-4x"></i>
+    </span>
     <div class="tab-pane" ng-class="{active: ctrl.tab == 'info'}" id="info">
         <div autowp-markdown="'specifications-editor/description'|translate"></div>
     </div>
@@ -63,7 +66,7 @@
         </div>
     </div>
     <div class="tab-pane" ng-class="{active: ctrl.tab == 'spec'}" id="spec">
-        <form class="spec-editor-form">
+        <form class="spec-editor-form" ng-submit="ctrl.saveSpecs()">
             <p class="alert alert-danger" ng-if="form.getMessages()">
                 <i class="fa fa-exclamation-triangle"></i>
                 {{'specifications-editor/not-save'|translate}}
@@ -87,13 +90,19 @@
                         </td>
                         <td ng-if="!attribute.childs.length">
                             <div ng-class="{'input-group': !!attribute.unit, 'has-error': element.getMessages()}">
-                                <select class="form-control input-sm" ng-if="attribute.type_id == 5">
+                                <select class="form-control input-sm" ng-if="attribute.type_id == 5" ng-model="ctrl.currentUserValues[attribute.id].value">
                                     <option value="">—</option>
                                     <option value="-" translate>specifications/no-value-text</option>
                                     <option value="0" translate>specifications/boolean/false</option>
                                     <option value="1" translate>specifications/boolean/true</option>
                                 </select>
-                                <input type="text" ng-if="attribute.type_id != 5" class="form-control input-sm" />
+                                {{ctrl.currentUserValues[attribute.id]}}
+                                <select class="form-control input-sm" 
+                                    ng-if="attribute.type_id == 6 || attribute.type_id == 7" 
+                                    ng-options="item.id as item.name for item in attribute.options" 
+                                    ng-model="ctrl.currentUserValues[attribute.id].value">
+                                </select>
+                                <input type="text" ng-if="attribute.type_id != 5 && attribute.type_id != 6 && attribute.type_id != 7" class="form-control input-sm" ng-model="ctrl.currentUserValues[attribute.id].value" />
                                 <span ng-if="attribute.unit" class="input-group-addon" translate-attrs="{title: attribute.unit.name}" class="unit" ng-bind="attribute.unit.abbr|translate"></span>
                             </div>
                             <p class="help-block" ng-repeat="error in $element.getMessages()" ng-bind="error"></p>
@@ -103,13 +112,13 @@
                             <div ng-if="ctrl.values.has(attribute.id)">
                                 <em translate ng-if="ctrl.values.get(attribute.id)['value'] === null">account/specs/conflicts/my-value/none</em>
                                 <span ng-if="ctrl.values.get(attribute.id)['value'] !== null">
-                                    {{ctrl.values.get(attribute.id)['value']}}
+                                    {{ctrl.values.get(attribute.id)['value_text']}}
                                     <span ng-if="attribute.unit" class="unit" translate-attrs="{title: attribute.unit.name}" ng-bind="attribute.unit.abbr|translate"></span>
                                 </span>
                             </div>
                         </td>
                         <td ng-if="!attribute.childs.length">
-                            <div ng-repeat="value in ctrl.userValues">
+                            <div ng-repeat="value in ctrl.userValues.get(attribute.id)">
                                 <em translate ng-if="value.value_text === null">account/specs/conflicts/my-value/none</em>
                                 <span ng-if="value.value_text !== null" ng-bind="value.value_text"></span>
                                 <autowp-user user="value.user" ng-if="value.user"></autowp-user>

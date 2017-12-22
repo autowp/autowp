@@ -53,13 +53,15 @@ angular.module(MODULE_NAME, ['ngAnimate', 'ngAria', 'ui.router', 'pascalprecht.t
             $translateProvider.preferredLanguage(lang);
             $translateProvider.use(lang);
             
-            RollbarProvider.init({
-                accessToken: window.opt.rollbar.access_token,
-                captureUncaught: true,
-                payload: {
-                    environment: window.opt.rollbar.environment
-                }
-            });
+            if (window.opt.rollbar.access_token) {
+                RollbarProvider.init({
+                    accessToken: window.opt.rollbar.access_token,
+                    captureUncaught: true,
+                    payload: {
+                        environment: window.opt.rollbar.environment
+                    }
+                });
+            }
         }
     ])
     .run(['amMoment', function(amMoment: any) {

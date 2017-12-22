@@ -4,7 +4,6 @@ namespace Application\Hydrator\Api;
 
 use Traversable;
 
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Stdlib\ArrayUtils;
 
 use Autowp\User\Model\User;

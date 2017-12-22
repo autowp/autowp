@@ -100,6 +100,12 @@ class AttrAttributeHydrator extends RestHydrator
             $result['unit'] = $this->specService->getUnit($object['unitId']);
         }
 
+        if ($this->filterComposite->filter('options')) {
+            if (in_array($object['typeId'], [6, 7])) {
+                $result['options'] = $this->specService->getListOptionsArray($object['id']);
+            }
+        }
+
         if (isset($object['childs'])) {
             $result['childs'] = $this->extractValue('childs', $object['childs']);
         }

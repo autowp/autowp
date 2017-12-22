@@ -145,7 +145,7 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['unit', 'childs']]
+                        'options' => ['fields' => ['unit', 'childs', 'options']]
                     ]
                 ]
             ],
