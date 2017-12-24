@@ -1,0 +1,16 @@
+<div ng-class="{'input-group': !!unit, 'has-error': element.getMessages()}">
+    <select class="form-control input-sm" ng-if="typeId == 5" ng-model="value">
+        <option value="">—</option>
+        <option value="-" translate>specifications/no-value-text</option>
+        <option value="0" translate>specifications/boolean/false</option>
+        <option value="1" translate>specifications/boolean/true</option>
+    </select>
+    <select class="form-control input-sm" 
+        ng-if="typeId == 6 || typeId == 7" 
+        ng-options="item.id as item.name for item in options" 
+        ng-model="value"
+        multiple>
+    </select>
+    <input type="text" ng-if="typeId != 5 && typeId != 6 && typeId != 7" class="form-control input-sm" ng-model="value" />
+    <span ng-if="unit" class="input-group-addon" translate-attrs="{title: unit.name}" class="unit" ng-bind="unit.abbr|translate"></span>
+</div>

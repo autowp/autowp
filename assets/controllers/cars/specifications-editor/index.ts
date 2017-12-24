@@ -5,6 +5,8 @@ import { ItemService } from 'services/item';
 import { AclService } from 'services/acl';
 import * as $ from 'jquery';
 
+import './input';
+
 const CONTROLLER_NAME = 'CarsSpecificationsEditorController';
 const STATE_NAME = 'cars-specifications-editor';
 
@@ -196,27 +198,7 @@ export class CarsSpecificationsEditorController {
                     self.loading--;
                 });
                 
-                self.loading++;
-                self.$http({
-                    method: 'GET',
-                    url: '/api/attr/user-value',
-                    params: {
-                        item_id: item.id,
-                        user_id: self.$scope.user.id,
-                        zone_id: item.attr_zone_id,
-                        limit: 500,
-                        fields: 'value'
-                    }
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    self.currentUserValues = {};
-                    for (let value of response.data.items) {
-                        self.currentUserValues[value.attribute_id] = value;
-                    }
-                    self.loading--;
-                }, function(response: ng.IHttpResponse<any>) {
-                    notify.response(response);
-                    self.loading--;
-                });
+                self.loadValues();
                 
                 self.loading++;
                 self.$http({
@@ -315,9 +297,60 @@ export class CarsSpecificationsEditorController {
     
     public saveSpecs()
     {
-        
+        let items = [];
+        for (let attribute_id in this.currentUserValues) {
+            if (this.currentUserValues.hasOwnProperty(attribute_id)) {
+                items.push({
+                    item_id: this.item.id,
+                    attribute_id: attribute_id,
+                    user_id: this.$scope.user.id,
+                    value: this.currentUserValues[attribute_id].value
+                });
+            }
+        }
        
+        let self = this;
+        this.loading++;
+        this.$http({
+            method: 'PATCH',
+            url: '/api/attr/user-value',
+            data: {
+                items: items
+            }
+        }).then(function(response: ng.IHttpResponse<any>) {
+            self.loadValues();
+            self.loading--;
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
+            self.loading--;
+        });
+    }
+    
+    private loadValues()
+    {
+        let self = this;
         
+        this.loading++;
+        this.$http({
+            method: 'GET',
+            url: '/api/attr/user-value',
+            params: {
+                item_id: self.item.id,
+                user_id: self.$scope.user.id,
+                zone_id: self.item.attr_zone_id,
+                limit: 500,
+                fields: 'value'
+            }
+        }).then(function(response: ng.IHttpResponse<any>) {
+            self.currentUserValues = {};
+            for (let value of response.data.items) {
+                self.currentUserValues[value.attribute_id] = value;
+            }
+            self.loading--;
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
+            self.loading--;
+        });
     }
 }
 

@@ -9,6 +9,7 @@ use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Autowp\ZFComponents\Filter\SingleSpaces;
+use Zend\InputFilter\CollectionInputFilter;
 
 return [
     'input_filter_specs' => [
@@ -258,7 +259,7 @@ return [
         ],
         'api_attr_user_value_patch_query' => [
             'item_id' => [
-                'required' => true,
+                'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
                 ],
@@ -269,13 +270,49 @@ return [
         ],
         'api_attr_user_value_patch_data' => [
             'item_id' => [
-                'required' => true,
+                'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
                 ],
                 'validators' => [
                     ['name' => 'Digits']
                 ]
+            ],
+            'items' => [
+                'type' => CollectionInputFilter::class,
+                'required' => false,
+                'input_filter' => [
+                    'user_id'  => [
+                        'required'   => true,
+                        'filters'  => [
+                            ['name' => 'StringTrim']
+                        ],
+                        'validators' => [
+                            ['name' => 'Digits']
+                        ]
+                    ],
+                    'attribute_id'  => [
+                        'required'   => true,
+                        'filters'  => [
+                            ['name' => 'StringTrim']
+                        ],
+                        'validators' => [
+                            ['name' => 'Digits']
+                        ]
+                    ],
+                    'item_id'  => [
+                        'required'   => true,
+                        'filters'  => [
+                            ['name' => 'StringTrim']
+                        ],
+                        'validators' => [
+                            ['name' => 'Digits']
+                        ]
+                    ],
+                    'value'  => [
+                        'required'   => false
+                    ],
+                ],
             ]
         ],
         'api_attr_value_get' => [

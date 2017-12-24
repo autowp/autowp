@@ -386,9 +386,9 @@ class SpecificationsService
                     'id'   => (int)$childId,
                     'name' => $this->translator->translate($this->listOptions[$aid][$childId])
                 ];
-                $childOptions = $this->getListOptions($aid, $childId);
+                $childOptions = $this->getListOptionsArrayRecursive($aid, $childId);
                 foreach ($childOptions as &$value) {
-                    $value = '…' . $this->translator->translate($value);
+                    $value['name'] = '… ' . $this->translator->translate($value['name']);
                 }
                 unset($value); // prevent future bugs
                 $result = array_merge($result, $childOptions);

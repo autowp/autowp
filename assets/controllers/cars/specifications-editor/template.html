@@ -89,22 +89,13 @@
                             <label ng-style="{'padding-left': (attribute.deep * 20) + 'px'}" ng-bind="attribute.name | translate"></label>
                         </td>
                         <td ng-if="!attribute.childs.length">
-                            <div ng-class="{'input-group': !!attribute.unit, 'has-error': element.getMessages()}">
-                                <select class="form-control input-sm" ng-if="attribute.type_id == 5" ng-model="ctrl.currentUserValues[attribute.id].value">
-                                    <option value="">—</option>
-                                    <option value="-" translate>specifications/no-value-text</option>
-                                    <option value="0" translate>specifications/boolean/false</option>
-                                    <option value="1" translate>specifications/boolean/true</option>
-                                </select>
-                                {{ctrl.currentUserValues[attribute.id]}}
-                                <select class="form-control input-sm" 
-                                    ng-if="attribute.type_id == 6 || attribute.type_id == 7" 
-                                    ng-options="item.id as item.name for item in attribute.options" 
-                                    ng-model="ctrl.currentUserValues[attribute.id].value">
-                                </select>
-                                <input type="text" ng-if="attribute.type_id != 5 && attribute.type_id != 6 && attribute.type_id != 7" class="form-control input-sm" ng-model="ctrl.currentUserValues[attribute.id].value" />
-                                <span ng-if="attribute.unit" class="input-group-addon" translate-attrs="{title: attribute.unit.name}" class="unit" ng-bind="attribute.unit.abbr|translate"></span>
-                            </div>
+                            {{ctrl.currentUserValues[attribute.id]}}
+                            <autowp-specifications-editor-input type-id="attribute.type_id" 
+                                unit="attribute.unit"
+                                options="attribute.options"
+                                multiple="attribute.is_multiple"
+                                value="ctrl.currentUserValues[attribute.id].value">
+                            </autowp-specifications-editor-input>
                             <p class="help-block" ng-repeat="error in $element.getMessages()" ng-bind="error"></p>
                             <small ng-if="attribute.description" ng-bind="attribute.description|translate"></small>
                         </td>
