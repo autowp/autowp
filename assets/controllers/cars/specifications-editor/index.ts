@@ -5,8 +5,6 @@ import { ItemService } from 'services/item';
 import { AclService } from 'services/acl';
 import * as $ from 'jquery';
 
-import './input';
-
 const CONTROLLER_NAME = 'CarsSpecificationsEditorController';
 const STATE_NAME = 'cars-specifications-editor';
 
@@ -171,57 +169,58 @@ export class CarsSpecificationsEditorController {
                             }
                         }
                     });
-                    self.loading--;
-                }, function(response: ng.IHttpResponse<any>) {
-                    notify.response(response);
-                    self.loading--;
-                });
-                
-                self.loading++;
-                self.$http({
-                    method: 'GET',
-                    url: '/api/attr/value',
-                    params: {
-                        item_id: item.id,
-                        zone_id: item.attr_zone_id,
-                        limit: 500,
-                        fields: 'value,value_text'
-                    }
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    self.values.clear();
-                    for (let value of response.data.items) {
-                        self.values.set(value.attribute_id, value);
-                    }
-                    self.loading--;
-                }, function(response: ng.IHttpResponse<any>) {
-                    notify.response(response);
-                    self.loading--;
-                });
-                
-                self.loadValues();
-                
-                self.loading++;
-                self.$http({
-                    method: 'GET',
-                    url: '/api/attr/user-value',
-                    params: {
-                        item_id: item.id,
-                        //exclude_user_id: self.$scope.user.id,
-                        zone_id: item.attr_zone_id,
-                        limit: 500,
-                        fields: 'value_text,user'
-                    }
-                }).then(function(response: ng.IHttpResponse<any>) {
-                    self.userValues.clear();
-                    for (let value of response.data.items) {
-                        let values = self.userValues.get(value.attribute_id);
-                        if (values === undefined) {
-                            self.userValues.set(value.attribute_id, [value]);
-                        } else {
-                            values.push(value);
-                            self.userValues.set(value.attribute_id, values);
+                    
+                    self.loading++;
+                    self.$http({
+                        method: 'GET',
+                        url: '/api/attr/value',
+                        params: {
+                            item_id: item.id,
+                            zone_id: item.attr_zone_id,
+                            limit: 500,
+                            fields: 'value,value_text'
                         }
-                    }
+                    }).then(function(response: ng.IHttpResponse<any>) {
+                        self.values.clear();
+                        for (let value of response.data.items) {
+                            self.values.set(value.attribute_id, value);
+                        }
+                        self.loading--;
+                    }, function(response: ng.IHttpResponse<any>) {
+                        notify.response(response);
+                        self.loading--;
+                    });
+                    
+                    self.loadValues();
+                    
+                    self.loading++;
+                    self.$http({
+                        method: 'GET',
+                        url: '/api/attr/user-value',
+                        params: {
+                            item_id: item.id,
+                            //exclude_user_id: self.$scope.user.id,
+                            zone_id: item.attr_zone_id,
+                            limit: 500,
+                            fields: 'value_text,user'
+                        }
+                    }).then(function(response: ng.IHttpResponse<any>) {
+                        self.userValues.clear();
+                        for (let value of response.data.items) {
+                            let values = self.userValues.get(value.attribute_id);
+                            if (values === undefined) {
+                                self.userValues.set(value.attribute_id, [value]);
+                            } else {
+                                values.push(value);
+                                self.userValues.set(value.attribute_id, values);
+                            }
+                        }
+                        self.loading--;
+                    }, function(response: ng.IHttpResponse<any>) {
+                        notify.response(response);
+                        self.loading--;
+                    });
+                    
                     self.loading--;
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
@@ -236,6 +235,30 @@ export class CarsSpecificationsEditorController {
             self.loading--;
         });
 
+    }
+    
+    private getAttribute(id: number): any
+    {
+        let self = this;
+        for (let attribute of this.attributes) {
+            if (attribute.id == id) {
+                return attribute;
+            }
+        }
+        
+        return undefined;
+    }
+    
+    private isMultipleAttribute(id: number): boolean
+    {
+        let self = this;
+        for (let attribute of this.attributes) {
+            if (attribute.id == id) {
+                return attribute.is_multiple;
+            }
+        }
+        
+        return false;
     }
     
     public inheritEngine()
@@ -344,13 +367,26 @@ export class CarsSpecificationsEditorController {
         }).then(function(response: ng.IHttpResponse<any>) {
             self.currentUserValues = {};
             for (let value of response.data.items) {
-                self.currentUserValues[value.attribute_id] = value;
+                let attribute = self.getAttribute(value.attribute_id);
+                if (attribute.type_id == 2 || attribute.type_id == 3) {
+                    value.value = +value.value;
+                }
+                if (attribute.is_multiple) {
+                    self.currentUserValues[value.attribute_id] = value instanceof Array ? value : [value];
+                } else {
+                    self.currentUserValues[value.attribute_id] = value;
+                }
             }
             self.loading--;
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
             self.loading--;
         });
+    }
+    
+    public getStep(attribute: any): number
+    {
+        return Math.pow(10, -attribute.precision)
     }
 }
 

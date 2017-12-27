@@ -90,12 +90,39 @@
                         </td>
                         <td ng-if="!attribute.childs.length">
                             {{ctrl.currentUserValues[attribute.id]}}
-                            <autowp-specifications-editor-input type-id="attribute.type_id" 
-                                unit="attribute.unit"
-                                options="attribute.options"
-                                multiple="attribute.is_multiple"
-                                value="ctrl.currentUserValues[attribute.id].value">
-                            </autowp-specifications-editor-input>
+                            <div ng-class="{'input-group': !!attribute.unit, 'has-error': element.getMessages()}">
+                                <select class="form-control input-sm" ng-if="attribute.type_id == 5" ng-model="ctrl.currentUserValues[attribute.id].value">
+                                    <option value="">—</option>
+                                    <option value="-" translate>specifications/no-value-text</option>
+                                    <option value="0" translate>specifications/boolean/false</option>
+                                    <option value="1" translate>specifications/boolean/true</option>
+                                </select>
+                                <select class="form-control input-sm" 
+                                    ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && !attribute.is_multiple" 
+                                    ng-options="item.id as item.name for item in attribute.options"
+                                    ng-model="ctrl.currentUserValues[attribute.id].value">
+                                </select>
+                                <select class="form-control input-sm" 
+                                    ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && attribute.is_multiple" 
+                                    ng-options="item.id as item.name for item in attribute.options"
+                                    ng-model="ctrl.currentUserValues[attribute.id].value"
+                                    multiple>
+                                </select>
+                                <input type="number" 
+                                    ng-if="attribute.type_id == 2" 
+                                    class="form-control input-sm" 
+                                    ng-model="ctrl.currentUserValues[attribute.id].value" />
+                                <input type="number" 
+                                    ng-if="attribute.type_id == 3" 
+                                    class="form-control input-sm" 
+                                    ng-model="ctrl.currentUserValues[attribute.id].value"
+                                    step="{{ctrl.getStep(attribute)}}" />
+                                <input type="text" 
+                                    ng-if="attribute.type_id == 1" 
+                                    class="form-control input-sm" 
+                                    ng-model="ctrl.currentUserValues[attribute.id].value" />
+                                <span ng-if="attribute.unit" class="input-group-addon" translate-attrs="{title: attribute.unit.name}" class="unit" ng-bind="attribute.unit.abbr|translate"></span>
+                            </div>
                             <p class="help-block" ng-repeat="error in $element.getMessages()" ng-bind="error"></p>
                             <small ng-if="attribute.description" ng-bind="attribute.description|translate"></small>
                         </td>
