@@ -155,7 +155,7 @@ export class CarsSpecificationsEditorController {
                         zone_id: item.attr_zone_id
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
-                    self.$translate('specifications/no-value-text').then(function(translation) {
+                    self.$translate(['specifications/no-value-text', 'specifications/boolean/false', 'specifications/boolean/true']).then(function(translations) {
                         self.attributes = toPlain(response.data.items, 0);
                         for (let attribute of self.attributes) {
                             if (attribute.options) {
@@ -163,9 +163,25 @@ export class CarsSpecificationsEditorController {
                                     name: '—',
                                     id: null
                                 }, {
-                                    name: translation,
+                                    name: translations['specifications/no-value-text'],
                                     id: '-'
                                 })
+                            }
+                            
+                            if (attribute.type_id == 5) {
+                                attribute.options = [{
+                                    name: '—',
+                                    id: null
+                                }, {
+                                    name: translations['specifications/no-value-text'],
+                                    id: '-'
+                                }, {
+                                    name: translations['specifications/boolean/false'],
+                                    id: 0
+                                }, {
+                                    name: translations['specifications/boolean/true'],
+                                    id: 1
+                                }];
                             }
                         }
                     });

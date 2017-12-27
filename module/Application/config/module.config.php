@@ -330,6 +330,9 @@ return [
     ],
 
     'input_filters' => [
+        'factories' => [
+            InputFilter\AttrUserValueCollectionInputFilter::class => InputFilter\AttrUserValueCollectionInputFilterFactory::class
+        ],
         'abstract_factories' => [
             \Zend\InputFilter\InputFilterAbstractServiceFactory::class
         ]

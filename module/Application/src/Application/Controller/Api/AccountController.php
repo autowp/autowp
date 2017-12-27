@@ -121,7 +121,7 @@ class AccountController extends AbstractRestfulController
             'user_id'  => $user['id'],
             'language' => $this->language(),
             'service'  => $serviceId,
-            'url'      => $this->url()->fromRoute('account/accounts')
+            'url'      => '/ng/account/accounts'
         ]);
 
         return new JsonModel([

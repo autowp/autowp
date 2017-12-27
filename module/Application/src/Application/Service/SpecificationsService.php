@@ -19,6 +19,8 @@ use Application\Model\ItemParent;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
 use Application\Spec\Table\Car as CarSpecTable;
+use Zend\InputFilter\Input;
+use Zend\InputFilter\ArrayInput;
 
 class SpecificationsService
 {
@@ -641,153 +643,118 @@ class SpecificationsService
         ];
     }
 
-    /**
-     * @param int $zoneId
-     * @param array $options
-     * @return ElementInterface
-     */
-    public function getInputFilter(int $zoneId, array $options)
+    public function getFilterSpec(int $attributeId)
     {
-        $multioptions = $this->getListsOptions($this->loadZone($zoneId));
+        $filters = [];
+        $validators = [];
 
-        $options = array_replace($options, [
-            'multioptions' => $multioptions,
-        ]);
-
-        $attributes = $this->getAttributes([
-            'parent' => 0,
-            'zone'   => $zoneId
-        ]);
-
-        $formSpec = $this->buildForm($attributes, $zoneId, $options['editOnlyMode'], $multioptions);
-
-        $factory = new \Zend\Form\Factory();
-        $form = $factory->create([
-            'input_filter' => $formSpec['input_filter']
-        ]);
-        $form->prepareElement($form);
-
-        return $form;
-    }
-
-    private function buildInputFilter($attributes, int $zoneId, bool $editOnlyMode, $multioptions)
-    {
-        $inputFilters = [];
-
-        foreach ($attributes as $attribute) {
-            $subAttributes = $this->getAttributes([
-                'parent' => $attribute['id'],
-                'zone'   => $zoneId
-            ]);
-
-            $nodeName = 'attr_' . $attribute['id'];
-
-            if (count($subAttributes)) {
-                $subFormSpec = $this->buildInputFilter($subAttributes, $zoneId, $editOnlyMode, $multioptions);
-                $inputFilters[$nodeName] = array_replace([
-                    'type' => 'Zend\InputFilter\InputFilter'
-                ], $subFormSpec);
-            } else {
-
-                $filters = [];
-                $validators = [];
-
-                $type = null;
-                if ($attribute['typeId']) {
-                    $type = $this->getType($attribute['typeId']);
-                }
-
-                if ($type) {
-                    if ($type['maxlength']) {
-                        $maxlength = $type['maxlength'];
-                    }
-
-                    switch ($type['id']) {
-                        case 1: // string
-                            $filters = [['name' => 'StringTrim']];
-                            if ($maxlength) {
-                                $validators[] = [
-                                    'name'    => 'StringLength',
-                                    'options' => [
-                                        'max' => $type['maxlength']
-                                    ]
-                                ];
-                            }
-                            break;
-
-                        case 2: // int
-                            $filters = [['name' => 'StringTrim']];
-                            $validators = [
-                                [
-                                    'name'    => \Application\Validator\Attrs\IsIntOrNull::class,
-                                    'options' => ['locale' => 'en_US']
-                                ]
-                            ];
-                            break;
-
-                        case 3: // float
-                            $filters = [['name' => 'StringTrim']];
-                            $validators = [
-                                [
-                                    'name'    => \Application\Validator\Attrs\IsFloatOrNull::class,
-                                    'options' => ['locale' => 'en_US']
-                                ]
-                            ];
-                            break;
-
-                        case 4: // textarea
-                            $filters = [['name' => 'StringTrim']];
-                            break;
-
-                        case 5: // checkbox
-                            $validators = [
-                                [
-                                    'name' => 'InArray',
-                                    'options' => [
-                                        'haystack' => [
-                                            '',
-                                            '-',
-                                            '0',
-                                            '1'
-                                        ]
-                                    ]
-                                ]
-                            ];
-                            break;
-
-                        case 6: // select
-                        case 7: // treeselect
-                            $haystack = [
-                                '',
-                                '-',
-                            ];
-                            if (isset($multioptions[$attribute['id']])) {
-                                $haystack = array_merge(
-                                    $haystack,
-                                    array_keys($multioptions[$attribute['id']])
-                                );
-                            }
-                            $validators = [
-                                [
-                                    'name' => 'InArray',
-                                    'options' => [
-                                        'haystack' => $elementOptions
-                                    ]
-                                ]
-                            ];
-                            break;
-                    }
-                }
-
-                $inputFilters[$nodeName] = [
-                    'required'   => false,
-                    'filters'    => $filters,
-                    'validators' => $validators
-                ];
-            }
+        $attribute = $this->getAttribute($attributeId);
+        if (! $attribute) {
+            return null;
         }
 
-        return $inputFilters;
+        $type = null;
+        if ($attribute['typeId']) {
+            $type = $this->getType($attribute['typeId']);
+        }
+
+        if (! $type) {
+            return null;
+        }
+
+        $multioptions = $this->getListsOptions([$attributeId]);
+
+        if ($type['maxlength']) {
+            $maxlength = $type['maxlength'];
+        }
+
+        $inputType = Input::class;
+
+        switch ($type['id']) {
+            case 1: // string
+                $filters = [['name' => 'StringTrim']];
+                if ($maxlength) {
+                    $validators[] = [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'max' => $type['maxlength']
+                        ]
+                    ];
+                }
+                break;
+
+            case 2: // int
+                $filters = [['name' => 'StringTrim']];
+                $validators = [
+                    [
+                        'name'    => \Application\Validator\Attrs\IsIntOrNull::class,
+                        'options' => ['locale' => 'en_US']
+                    ]
+                ];
+                break;
+
+            case 3: // float
+                $filters = [['name' => 'StringTrim']];
+                $validators = [
+                    [
+                        'name'    => \Application\Validator\Attrs\IsFloatOrNull::class,
+                        'options' => ['locale' => 'en_US']
+                    ]
+                ];
+                break;
+
+            case 4: // textarea
+                $filters = [['name' => 'StringTrim']];
+                break;
+
+            case 5: // checkbox
+                $validators = [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                '',
+                                '-',
+                                '0',
+                                '1'
+                            ]
+                        ]
+                    ]
+                ];
+                break;
+
+            case 6: // select
+            case 7: // treeselect
+                $haystack = [
+                    '',
+                    '-',
+                ];
+                if (isset($multioptions[$attribute['id']])) {
+                    $haystack = array_merge(
+                        $haystack,
+                        array_keys($multioptions[$attribute['id']])
+                    );
+                }
+                $validators = [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => $haystack
+                        ]
+                    ]
+                ];
+                if ($attribute['isMultiple']) {
+                    $inputType = ArrayInput::class;
+                }
+                break;
+        }
+
+        return [
+            'type'       => $inputType,
+            'required'   => false,
+            'filters'    => $filters,
+            'validators' => $validators
+        ];
     }
 
     /**

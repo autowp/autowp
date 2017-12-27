@@ -157,6 +157,21 @@ class AttrController extends AbstractRestfulController
 
     public function userValueIndexAction()
     {
+        /*
+        $this->userValuePatchDataFilter->setData([
+            'items' => [
+                ['item_id' => 1, 'attribute_id' => "98", 'user_id' => 3, 'value' => ['28']],
+                ['item_id' => 1, 'attribute_id' => "66", 'user_id' => 3, 'value' => 11],
+                ['item_id' => 1, 'attribute_id' => "82", 'user_id' => 3, 'value' => 330],
+                ['item_id' => 1, 'attribute_id' => "170", 'user_id' => 3, 'value' => "Tyota Motors Mitischi"],
+            ]
+        ]);
+
+        var_dump($this->userValuePatchDataFilter->isValid());
+
+        return $this->inputFilterResponse($this->userValuePatchDataFilter);*/
+
+
         $user = $this->user()->get();
 
         if (! $user) {

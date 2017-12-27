@@ -91,11 +91,10 @@
                         <td ng-if="!attribute.childs.length">
                             {{ctrl.currentUserValues[attribute.id]}}
                             <div ng-class="{'input-group': !!attribute.unit, 'has-error': element.getMessages()}">
-                                <select class="form-control input-sm" ng-if="attribute.type_id == 5" ng-model="ctrl.currentUserValues[attribute.id].value">
-                                    <option value="">—</option>
-                                    <option value="-" translate>specifications/no-value-text</option>
-                                    <option value="0" translate>specifications/boolean/false</option>
-                                    <option value="1" translate>specifications/boolean/true</option>
+                                <select class="form-control input-sm" 
+                                    ng-if="attribute.type_id == 5"
+                                    ng-options="item.id as item.name for item in attribute.options" 
+                                    ng-model="ctrl.currentUserValues[attribute.id].value">
                                 </select>
                                 <select class="form-control input-sm" 
                                     ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && !attribute.is_multiple" 

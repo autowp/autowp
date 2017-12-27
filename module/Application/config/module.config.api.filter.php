@@ -9,7 +9,6 @@ use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 use Autowp\ZFComponents\Filter\SingleSpaces;
-use Zend\InputFilter\CollectionInputFilter;
 
 return [
     'input_filter_specs' => [
@@ -279,40 +278,7 @@ return [
                 ]
             ],
             'items' => [
-                'type' => CollectionInputFilter::class,
-                'required' => false,
-                'input_filter' => [
-                    'user_id'  => [
-                        'required'   => true,
-                        'filters'  => [
-                            ['name' => 'StringTrim']
-                        ],
-                        'validators' => [
-                            ['name' => 'Digits']
-                        ]
-                    ],
-                    'attribute_id'  => [
-                        'required'   => true,
-                        'filters'  => [
-                            ['name' => 'StringTrim']
-                        ],
-                        'validators' => [
-                            ['name' => 'Digits']
-                        ]
-                    ],
-                    'item_id'  => [
-                        'required'   => true,
-                        'filters'  => [
-                            ['name' => 'StringTrim']
-                        ],
-                        'validators' => [
-                            ['name' => 'Digits']
-                        ]
-                    ],
-                    'value'  => [
-                        'required'   => false
-                    ],
-                ],
+                'type' => \Application\InputFilter\AttrUserValueCollectionInputFilter::class
             ]
         ],
         'api_attr_value_get' => [
