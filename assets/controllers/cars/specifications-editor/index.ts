@@ -62,6 +62,8 @@ export class CarsSpecificationsEditorController {
     public userValues: Map<number, any>;
     public currentUserValues: any = {};
     public loading: number = 0;
+    public userValuesLoading: number = 0;
+    public specsWeight: number;
   
     constructor(
         private $scope: autowp.IControllerScope, 
@@ -69,7 +71,7 @@ export class CarsSpecificationsEditorController {
         private $state: any,
         private ItemService: ItemService,
         private acl: AclService,
-        private $translate: ng.translate.ITranslateService,
+        private $translate: ng.translate.ITranslateService
     ) {
         let self = this;
         
@@ -95,6 +97,21 @@ export class CarsSpecificationsEditorController {
         });
         
         this.tab = this.$state.params.tab ||'info';
+        
+        self.loading++;
+        this.$http({
+            url: '/api/user/me',
+            method: 'GET',
+            params: {
+                fields: 'specs_weight'
+            }
+        }).then(function(response: ng.IHttpResponse<autowp.IUser>) {
+            self.specsWeight = response.data.specs_weight
+            self.loading--;
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
+            self.loading--;
+        });
         
         this.loading++;
         this.ItemService.getItem(this.$state.params.item_id, {
@@ -365,6 +382,7 @@ export class CarsSpecificationsEditorController {
         let self = this;
         
         this.loading++;
+        this.userValuesLoading++;
         this.$http({
             method: 'GET',
             url: '/api/attr/user-value',
@@ -376,7 +394,7 @@ export class CarsSpecificationsEditorController {
                 fields: 'value'
             }
         }).then(function(response: ng.IHttpResponse<any>) {
-            self.currentUserValues = {};
+            let currentUserValues: any = {};
             for (let value of response.data.items) {
                 let attribute = self.getAttribute(value.attribute_id);
                 if (attribute.type_id == 2 || attribute.type_id == 3) {
@@ -385,15 +403,19 @@ export class CarsSpecificationsEditorController {
                     }
                 }
                 if (attribute.is_multiple) {
-                    self.currentUserValues[value.attribute_id] = value instanceof Array ? value : [value];
-                } else {
-                    self.currentUserValues[value.attribute_id] = value;
+                    if (! (value.value instanceof Array)) {
+                        value.value = [value.value];
+                    }
                 }
+                currentUserValues[value.attribute_id] = value;
             }
+            self.currentUserValues = currentUserValues;
             self.loading--;
+            self.userValuesLoading--;
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
             self.loading--;
+            self.userValuesLoading--;
         });
     }
     

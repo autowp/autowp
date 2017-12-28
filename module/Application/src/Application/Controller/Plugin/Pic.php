@@ -508,12 +508,7 @@ class Pic extends AbstractPlugin
                 }
 
                 if ($controller->user()->isAllowed('specifications', 'edit')) {
-                    $specsEditUrl = $this->httpRouter->assemble([
-                        'action'  => 'car-specifications-editor',
-                        'item_id' => $item['id']
-                    ], [
-                        'name' => 'cars/params'
-                    ]);
+                    $specsEditUrl = '/ng/cars/specifications-editor?item_id=' . $item['id'];
                 }
             }
 
@@ -705,12 +700,7 @@ class Pic extends AbstractPlugin
 
             $specsEditUrl = null;
             if ($controller->user()->isAllowed('specifications', 'edit')) {
-                $specsEditUrl = $this->httpRouter->assemble([
-                    'action'  => 'car-specifications-editor',
-                    'item_id' => $engineRow['id']
-                ], [
-                    'name' => 'cars/params'
-                ]);
+                $specsEditUrl = '/ng/cars/specifications-editor?item_id=' . $engineRow['id'];
             }
 
             $engines[] = [

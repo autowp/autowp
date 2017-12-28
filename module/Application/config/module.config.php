@@ -153,8 +153,7 @@ return [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
         ],
         'abstract_factories' => [
-            'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
-            //'Zend\Form\FormAbstractServiceFactory',
+            'Zend\Cache\Service\StorageCacheAbstractServiceFactory'
         ]
     ],
 

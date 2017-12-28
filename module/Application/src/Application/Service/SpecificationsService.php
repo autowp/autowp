@@ -7,10 +7,10 @@ use NumberFormatter;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-use Zend\Form\ElementInterface;
+use Zend\InputFilter\Input;
+use Zend\InputFilter\ArrayInput;
 use Zend\Paginator;
 
-use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 
 use Application\ItemNameFormatter;
@@ -19,8 +19,6 @@ use Application\Model\ItemParent;
 use Application\Model\Picture;
 use Application\Model\VehicleType;
 use Application\Spec\Table\Car as CarSpecTable;
-use Zend\InputFilter\Input;
-use Zend\InputFilter\ArrayInput;
 
 class SpecificationsService
 {
@@ -92,11 +90,6 @@ class SpecificationsService
      * @var User
      */
     private $userModel;
-
-    /**
-     * @var array
-     */
-    private $users = [];
 
     private $valueWeights = [];
 
@@ -226,20 +219,6 @@ class SpecificationsService
         $this->valueStringTable = $valueStringTable;
     }
 
-    /**
-     * @param int $userId
-     * @return array
-     */
-    private function getUser(int $userId)
-    {
-        if (! isset($this->users[$userId])) {
-            $userRow = $this->userModel->getRow($userId);
-            $this->users[$userId] = $userRow;
-        }
-
-        return $this->users[$userId];
-    }
-
     private function loadUnits()
     {
         if ($this->units === null) {
@@ -286,58 +265,6 @@ class SpecificationsService
         }
 
         return $zoneId;
-    }
-
-    private function walkTreeR(int $zoneId, callable $callback)
-    {
-        $this->loadAttributes();
-        $this->loadZone($zoneId);
-
-        return $this->walkTreeRStep($zoneId, 0, $callback);
-    }
-
-    private function walkTreeRStep(int $zoneId, int $parent, callable $callback)
-    {
-        $attributes = $this->getAttributes([
-            'parent' => $parent,
-            'zone'   => $zoneId
-        ]);
-
-        $result = [];
-
-        foreach ($attributes as $attribute) {
-            $key = 'attr_' . $attribute['id'];
-            $haveChilds = isset($this->childs[$attribute['id']]);
-            if ($haveChilds) {
-                $result[$key] = $this->walkTreeRStep($zoneId, $attribute['id'], $callback);
-            } else {
-                $result[$key] = $callback($attribute);
-            }
-        }
-
-        return $result;
-    }
-
-    private function walkTreeStep(int $zoneId, int $parent, callable $callback)
-    {
-        $attributes = $this->getAttributes([
-            'parent' => $parent,
-            'zone'   => $zoneId
-        ]);
-
-        $result = [];
-
-        foreach ($attributes as $attribute) {
-            $key = 'attr_' . $attribute['id'];
-            $haveChilds = isset($this->childs[$attribute['id']]);
-            if ($haveChilds) {
-                $result = array_replace($result, $this->walkTreeStep($zoneId, $attribute['id'], $callback));
-            } else {
-                $result[$key] = $callback($attribute);
-            }
-        }
-
-        return $result;
     }
 
     private function loadListOptions(array $attributeIds)
@@ -439,208 +366,6 @@ class SpecificationsService
         }
 
         return $this->translator->translate($this->listOptions[$attributeId][$id], 'default');
-    }
-
-    public function getFormData(int $itemId, int $zoneId, $user, $language)
-    {
-        $zoneUserValues = $this->getZoneUsersValues($zoneId, $itemId);
-
-        // fetch values dates
-        $dates = [];
-        if (count($zoneUserValues)) {
-            $valueDescRows = $this->userValueTable->select([
-                new Sql\Predicate\In('attribute_id', array_keys($zoneUserValues)),
-                'item_id' => $itemId,
-            ]);
-            foreach ($valueDescRows as $valueDescRow) {
-                $date = Row::getDateTimeByColumnType('timestamp', $valueDescRow['update_date']);
-                $dates[$valueDescRow['attribute_id']][$valueDescRow['user_id']] = $date;
-            }
-        }
-
-        $currentUserValues = [];
-        $allValues = [];
-        foreach ($zoneUserValues as $attributeId => $users) {
-            foreach ($users as $userId => $value) {
-                $date = null;
-                if (isset($dates[$attributeId][$userId])) {
-                    $date = $dates[$attributeId][$userId];
-                }
-
-                $attribute = $this->getAttribute($attributeId);
-                if (! $attribute) {
-                    throw new Exception("Attribute `$attributeId` not found");
-                }
-
-                $allValues[$attributeId][] = [
-                    'user'  => $this->getUser($userId),
-                    'value' => $this->valueToText($attribute, $value, $language),
-                    'date'  => $date
-                ];
-
-                if ($userId == $user['id']) {
-                    $currentUserValues[$attributeId] = $value;
-                }
-            }
-        }
-
-        $zoneActualValues = $this->getZoneActualValues($zoneId, $itemId);
-        $actualValues = [];
-        foreach ($zoneActualValues as $attributeId => $value) {
-            $attribute = $this->getAttribute($attributeId);
-            if (! $attribute) {
-                throw new Exception("Attribute `$attributeId` not found");
-            }
-
-            $actualValues[$attributeId] = $this->valueToText($attribute, $value, $language);
-        }
-
-        return [
-            'allValues'          => $allValues,
-            'actualValues'       => $actualValues,
-            'editableAttributes' => array_keys($currentUserValues)
-        ];
-    }
-
-    private function buildForm($attributes, int $zoneId, bool $editOnlyMode, $multioptions)
-    {
-        $elements = [];
-        $inputFilters = [];
-
-        foreach ($attributes as $attribute) {
-            $subAttributes = $this->getAttributes([
-                'parent' => $attribute['id'],
-                'zone'   => $zoneId
-            ]);
-
-            $nodeName = 'attr_' . $attribute['id'];
-            $options = [
-                'label' => $attribute['name'],
-            ];
-            $filters = [];
-            $validators = [];
-            if (count($subAttributes)) {
-                $subFormSpec = $this->buildForm($subAttributes, $zoneId, $editOnlyMode, $multioptions);
-                $elements[] = [
-                    'spec' => [
-                        'name'       => $nodeName,
-                        'type'       => 'Fieldset',
-                        'options'    => $options,
-                        'attributes' => [
-                            'id' => 'subform-' . $attribute['id']
-                        ],
-                        'elements'   => $subFormSpec['elements']
-                    ]
-                ];
-                $inputFilters[$nodeName] = array_replace([
-                    'type' => 'Zend\InputFilter\InputFilter'
-                ], $subFormSpec['input_filter']);
-            } else {
-                $readonly = false;
-                if ($editOnlyMode) {
-                    $readonly = ! in_array($attribute['id'], $editOnlyMode);
-                }
-
-                $attributes = [
-                    'class'     => 'input-sm form-control',
-                    'disabled'  => $readonly ? 'disabled' : null,
-                    'data-unit' => $attribute['unitId'],
-                    'data-desc' => $attribute['description'],
-                    'id'        => 'attr-' . $attribute['id']
-                ];
-
-                $type = null;
-                if ($attribute['typeId']) {
-                    $type = $this->getType($attribute['typeId']);
-                }
-
-                if ($type) {
-                    if ($type['maxlength']) {
-                        $attributes['maxlength'] = $type['maxlength'];
-                    }
-                    if ($type['size']) {
-                        $attributes['size'] = $type['size'];
-                    }
-
-                    switch ($type['id']) {
-                        case 1: // string
-                            $filters = [['name' => 'StringTrim']];
-                            break;
-
-                        case 2: // int
-                            $filters = [['name' => 'StringTrim']];
-                            $validators = [
-                                [
-                                    'name'    => \Application\Validator\Attrs\IsIntOrNull::class,
-                                    'options' => ['locale' => 'en_US']
-                                ]
-                            ];
-                            break;
-
-                        case 3: // float
-                            $filters = [['name' => 'StringTrim']];
-                            $validators = [
-                                [
-                                    'name'    => \Application\Validator\Attrs\IsFloatOrNull::class,
-                                    'options' => ['locale' => 'en_US']
-                                ]
-                            ];
-                            break;
-
-                        case 4: // textarea
-                            $filters = [['name' => 'StringTrim']];
-                            break;
-
-                        case 5: // checkbox
-                            $options['options'] = [
-                                ''  => '—',
-                                '-' => 'specifications/no-value-text',
-                                '0' => 'specifications/boolean/false',
-                                '1' => 'specifications/boolean/true'
-                            ];
-                            break;
-
-                        case 6: // select
-                        case 7: // treeselect
-                            $elementOptions = [
-                                ''  => '—',
-                                '-' => 'specifications/no-value-text',
-                            ];
-                            if (isset($multioptions[$attribute['id']])) {
-                                $elementOptions = array_replace($elementOptions, $multioptions[$attribute['id']]);
-                            }
-                            $options['value_options'] = $elementOptions;
-                            break;
-                    }
-                }
-
-                $elementType = $type['element'];
-                if ($type['element'] == 'select' && $attribute['isMultiple']) {
-                    $elementType = 'Select';
-                    $attributes['multiple'] = true;
-                }
-
-                $elements[] = [
-                    'spec' => [
-                        'name'       => $nodeName,
-                        'type'       => $elementType,
-                        'options'    => $options,
-                        'attributes' => $attributes
-                    ]
-                ];
-
-                $inputFilters[$nodeName] = [
-                    'required'   => false,
-                    'filters'    => $filters,
-                    'validators' => $validators
-                ];
-            }
-        }
-
-        return [
-            'elements'     => $elements,
-            'input_filter' => $inputFilters
-        ];
     }
 
     public function getFilterSpec(int $attributeId)
@@ -757,104 +482,6 @@ class SpecificationsService
         ];
     }
 
-    /**
-     * @param int $itemId
-     * @param int $zoneId
-     * @param array|\ArrayObject $user
-     * @param array $options
-     * @return ElementInterface
-     */
-    private function getForm(int $itemId, int $zoneId, $user, array $options)
-    {
-        $multioptions = $this->getListsOptions($this->loadZone($zoneId));
-
-        $options = array_replace($options, [
-            'multioptions' => $multioptions,
-        ]);
-
-        $attributes = $this->getAttributes([
-            'parent' => 0,
-            'zone'   => $zoneId
-        ]);
-
-        $formSpec = $this->buildForm($attributes, $zoneId, $options['editOnlyMode'], $multioptions);
-
-        $factory = new \Zend\Form\Factory();
-        $form = $factory->create([
-            'type'         => 'Zend\Form\Form',
-            'attributes'   => [
-                'method' => 'post'
-            ],
-            'elements'     => $formSpec['elements'],
-            'input_filter' => $formSpec['input_filter']
-        ]);
-        $form->prepareElement($form);
-
-        $currentUserValues = $this->getZoneUserValues($zoneId, $itemId, $user['id']);
-
-        //$form = new AttrsZoneAttributesForm(null, $options);
-        $formValues = $this->walkTreeR($zoneId, function ($attribute) use ($currentUserValues) {
-            if (array_key_exists($attribute['id'], $currentUserValues)) {
-                $value = $currentUserValues[$attribute['id']];
-                if (is_array($value)) {
-                    foreach ($value as $oneValue) {
-                        if ($oneValue === null) {
-                            return [self::NULL_VALUE_STR];
-                        }
-                    }
-                    return $value;
-                } else {
-                    return $value === null ? self::NULL_VALUE_STR : $value;
-                }
-            } else {
-                return null;
-            }
-        });
-
-        $form->populateValues($formValues);
-
-        return $form;
-    }
-
-    public function getCarForm(
-        $car,
-        $user,
-        array $options,
-        string $language
-    ) {
-        $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
-
-        $zoneId = $this->getZoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
-
-        return [
-            'form' => $this->getForm($car['id'], $zoneId, $user, $options),
-            'data' => $this->getFormData($car['id'], $zoneId, $user, $language)
-        ];
-    }
-
-    private function collectFormData(int $zoneId, $attributes, $values)
-    {
-        $result = [];
-        foreach ($attributes as $attribute) {
-            $id = (int)$attribute['id'];
-            $value = $values['attr_' . $id];
-
-            $subAttributes = $this->getAttributes([
-                'zone'   => $zoneId,
-                'parent' => $id
-            ]);
-
-            if (count($subAttributes)) {
-                $subvalues = $this->collectFormData($zoneId, $subAttributes, $value);
-                $result = array_replace($result, $subvalues);
-            } else {
-                $result[$id] = $value;
-            }
-        }
-
-        return $result;
-    }
-
     private function loadZone(int $id)
     {
         if (isset($this->zoneAttrs[$id])) {
@@ -951,6 +578,9 @@ class SpecificationsService
             $userValueDataTable->delete($userValuePrimaryKey);
 
             if ($value) {
+                if ($value === [null]) {
+                    $value = [];
+                }
 
                 if ($empty) {
                     $value = [null];
@@ -1163,32 +793,6 @@ class SpecificationsService
         }
     }
 
-    public function saveCarAttributes(
-        $car,
-        array $values,
-        $user
-    ) {
-        $vehicleTypeIds = $this->vehicleType->getVehicleTypes($car['id']);
-
-        $zoneId = $this->getZoneIdByCarTypeId($car['item_type_id'], $vehicleTypeIds);
-
-        $attributes = $this->getAttributes([
-            'zone'   => $zoneId,
-            'parent' => 0
-        ]);
-
-        $linearValues = $this->collectFormData($zoneId, $attributes, $values);
-
-        foreach ($linearValues as $attributeId => $value) {
-            $this->setUserValue(
-                $user['id'],
-                $attributeId,
-                $car['id'],
-                $value
-            );
-        }
-    }
-
     private function getEngineAttributeIds(): array
     {
         if ($this->engineAttributes) {
@@ -1354,66 +958,6 @@ class SpecificationsService
         }
 
         return $attributes;
-    }
-
-    public function getActualValueRangeText($attributeId, array $itemId, string $language)
-    {
-        $attribute = $this->getAttribute($attributeId);
-
-        $range = $this->getActualValueRange($attributeId, $itemId);
-        if ($range['min'] !== null) {
-            $range['min'] = $this->valueToText($attribute, $range['min'], $language);
-        }
-        if ($range['max'] !== null) {
-            $range['max'] = $this->valueToText($attribute, $range['max'], $language);
-        }
-
-        if ($attribute['unitId']) {
-            $range['unit'] = $this->getUnit($attribute['unitId']);
-        }
-
-        return $range;
-    }
-
-    public function getActualValueRange(int $attributeId, array $itemId)
-    {
-        if (count($itemId) <= 0) {
-            throw new Exception("Empty set");
-        }
-
-        $attribute = $this->getAttribute($attributeId);
-
-        $numericTypes = [2, 3];
-
-        if (! in_array($attribute['typeId'], $numericTypes)) {
-            throw new Exception("Range only for numeric types");
-        }
-
-
-        $valuesTable = $this->getValueDataTable($attribute['typeId']);
-
-        $filter = [
-            'attribute_id' => $attribute['id'],
-            new Sql\Predicate\In('item_id', $itemId)
-        ];
-
-        $min = $max = null;
-
-        foreach ($valuesTable->selectWith($filter) as $row) {
-            $value = $row['value'];
-            if ($min === null || $value < $min) {
-                $min = $value;
-            }
-
-            if ($max === null || $value > $max) {
-                $max = $value;
-            }
-        }
-
-        return [
-            'min' => $min,
-            'max' => $max
-        ];
     }
 
     public function getActualValue(int $attribute, int $itemId)
@@ -2295,142 +1839,6 @@ class SpecificationsService
         return null;
     }
 
-    /**
-     * @throws Exception
-     */
-    private function getZoneUserValues(int $zoneId, int $itemId, int $userId): array
-    {
-        if (! $itemId) {
-            throw new Exception("item_id not set");
-        }
-
-        $this->loadZone($zoneId);
-
-        $attributes = $this->getAttributes([
-            'zone'   => $zoneId,
-            'parent' => null
-        ]);
-
-        $requests = [];
-
-        foreach ($attributes as $attribute) {
-            $typeId = $attribute['typeId'];
-            $isMultiple = $attribute['isMultiple'] ? 1 : 0;
-            if ($typeId) {
-                if (! isset($requests[$typeId][$isMultiple])) {
-                    $requests[$typeId][$isMultiple] = [];
-                }
-                $requests[$typeId][$isMultiple][] = $attribute['id'];
-            }
-        }
-
-        $values = [];
-        foreach ($requests as $typeId => $multiples) {
-            foreach ($multiples as $isMultiple => $ids) {
-                $valuesTable = $this->getUserValueDataTable($typeId);
-
-                $select = new Sql\Select($valuesTable->getTable());
-
-                $select->columns(['attribute_id', 'value'])
-                    ->where([
-                        new Sql\Predicate\In('attribute_id', $ids),
-                        'item_id' => $itemId,
-                        'user_id' => $userId
-                    ]);
-
-                if ($isMultiple) {
-                    $select->order('ordering');
-                }
-
-                foreach ($valuesTable->selectWith($select) as $row) {
-                    $aid = (int)$row['attribute_id'];
-                    $value = $this->prepareValue($typeId, $row['value']);
-                    if ($isMultiple) {
-                        if (! isset($values[$aid])) {
-                            $values[$aid] = [];
-                        }
-                        $values[$aid][] = $value;
-                    } else {
-                        $values[$aid] = $value;
-                    }
-                }
-            }
-        }
-
-        return $values;
-    }
-
-    /**
-     * @param int $zoneId
-     * @param int $itemId
-     * @param int $userId
-     * @throws Exception
-     * @return array
-     */
-    private function getZoneUsersValues(int $zoneId, int $itemId)
-    {
-        if (! $itemId) {
-            throw new Exception("item_id not set");
-        }
-
-        $this->loadZone($zoneId);
-
-        $attributes = $this->getAttributes([
-            'zone'   => $zoneId,
-            'parent' => null
-        ]);
-
-        $requests = [];
-
-        foreach ($attributes as $attribute) {
-            $typeId = $attribute['typeId'];
-            $isMultiple = $attribute['isMultiple'] ? 1 : 0;
-            if ($typeId) {
-                if (! isset($requests[$typeId][$isMultiple])) {
-                    $requests[$typeId][$isMultiple] = [];
-                }
-                $requests[$typeId][$isMultiple][] = $attribute['id'];
-            }
-        }
-
-        $values = [];
-        foreach ($requests as $typeId => $multiples) {
-            foreach ($multiples as $isMultiple => $ids) {
-                $valuesTable = $this->getUserValueDataTable($typeId);
-
-                $select = new Sql\Select($valuesTable->getTable());
-                $select->columns(['attribute_id', 'user_id', 'value'])
-                    ->where([
-                        new Sql\Predicate\In('attribute_id', $ids),
-                        'item_id' => $itemId
-                    ]);
-
-                if ($isMultiple) {
-                    $select->order('ordering');
-                }
-
-                foreach ($valuesTable->selectWith($select) as $row) {
-                    $aid = (int)$row['attribute_id'];
-                    $uid = (int)$row['user_id'];
-                    $value = $this->prepareValue($typeId, $row['value']);
-                    if (! isset($values[$aid])) {
-                        $values[$aid] = [];
-                    }
-                    if ($isMultiple) {
-                        if (! isset($values[$aid][$uid])) {
-                            $values[$aid][$uid] = [];
-                        }
-                        $values[$aid][$uid][] = $value;
-                    } else {
-                        $values[$aid][$uid] = $value;
-                    }
-                }
-            }
-        }
-
-        return $values;
-    }
-
     public function getUserValue(int $attributeId, int $itemId, int $userId)
     {
         if (! $itemId) {
@@ -2694,65 +2102,6 @@ class SpecificationsService
                         $values[$id][$aid][] = $value;
                     } else {
                         $values[$id][$aid] = $value;
-                    }
-                }
-            }
-        }
-
-        return $values;
-    }
-
-    private function getZoneActualValues(int $zoneId, int $itemId): array
-    {
-        if (! $itemId) {
-            throw new Exception("item_id not set");
-        }
-
-        $this->loadZone($zoneId);
-
-        $attributes = $this->getAttributes([
-            'zone'   => $zoneId,
-            'parent' => null
-        ]);
-
-        $requests = [];
-
-        foreach ($attributes as $attribute) {
-            $typeId = $attribute['typeId'];
-            $isMultiple = $attribute['isMultiple'] ? 1 : 0;
-            if ($typeId) {
-                if (! isset($requests[$typeId][$isMultiple])) {
-                    $requests[$typeId][$isMultiple] = [];
-                }
-                $requests[$typeId][$isMultiple][] = $attribute['id'];
-            }
-        }
-
-        $values = [];
-        foreach ($requests as $typeId => $multiples) {
-            $valueDataTable = $this->getValueDataTable($typeId);
-
-            foreach ($multiples as $isMultiple => $ids) {
-                $select = new Sql\Select($valueDataTable->getTable());
-                $select->where([
-                    new Sql\Predicate\In('attribute_id', $ids),
-                    'item_id' => $itemId
-                ]);
-
-                if ($isMultiple) {
-                    $select->order('ordering');
-                }
-
-                foreach ($valueDataTable->selectWith($select) as $row) {
-                    $aid = (int)$row['attribute_id'];
-                    $value = $this->prepareValue($typeId, $row['value']);
-                    if ($isMultiple) {
-                        if (! isset($values[$aid])) {
-                            $values[$aid] = [];
-                        }
-                        $values[$aid][] = $value;
-                    } else {
-                        $values[$aid] = $value;
                     }
                 }
             }

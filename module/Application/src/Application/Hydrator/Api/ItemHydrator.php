@@ -291,12 +291,7 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('spec_editor_url')) {
             if ($this->isAllowed('specifications', 'edit')) {
-                $result['spec_editor_url'] = $this->router->assemble([
-                    'action'  => 'car-specifications-editor',
-                    'item_id' => $object['id']
-                ], [
-                    'name' => 'cars/params'
-                ]);
+                $result['spec_editor_url'] = '/ng/cars/specifications-editor?item_id=' . $object['id'];
             }
         }
 

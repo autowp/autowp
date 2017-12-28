@@ -62,21 +62,6 @@ return [
                     ]
                 ]
             ],
-            'cars' => [
-                'type' => 'Segment',
-                'options' => [
-                    'route'    => '/cars/:action',
-                    'defaults' => [
-                        'controller' => Controller\CarsController::class,
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'params' => [
-                        'type' => Router\Http\WildcardSafe::class
-                    ]
-                ]
-            ],
             'catalogue' => [
                 'type' => Router\Http\Catalogue::class,
                 'options' => [

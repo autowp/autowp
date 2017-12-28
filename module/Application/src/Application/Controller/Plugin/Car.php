@@ -317,10 +317,7 @@ class Car extends AbstractPlugin
             }
 
             if ($specEditor) {
-                $item['specEditorUrl'] = $controller->url()->fromRoute('cars/params', [
-                    'action'  => 'car-specifications-editor',
-                    'item_id' => $car['id']
-                ]);
+                $item['specEditorUrl'] = '/ng/cars/specifications-editor?item_id=' . $car['id'];
             }
 
             if ($isCarModer) {

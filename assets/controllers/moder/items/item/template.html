@@ -7,7 +7,7 @@
             <p translate="ng/moder/database-id-n" translate-values="{id: ctrl.item.id}"></p>
 
             <p ng-if="ctrl.specsAllowed && ctrl.canEditSpecifications">
-                <a ng-href="/cars/car-specifications-editor/item_id/{{ctrl.item.id}}" translate>carlist/edit-specs</a>
+                <a ui-sref="cars-specifications-editor({item_id: ctrl.item.id})" translate>carlist/edit-specs</a>
                 <span class="badge" ng-if="ctrl.item.specifications_count" ng-bind="ctrl.item.specifications_count"></span>
             </p>
             <p><a ui-sref="log({item_id: ctrl.item.id})" translate>moder/log-of-events</a></p>

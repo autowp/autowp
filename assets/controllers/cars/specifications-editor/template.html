@@ -14,10 +14,7 @@
     </li>
 </ul>
 
-
-<?php if ($this->user()->get()['specs_weight'] < 1) { ?>
-    <div class="alert alert-danger" autowp-markdown="'specifications-editor/errors-alert'|translate"></div>
-<?php } ?>
+<div class="alert alert-danger" ng-if="ctrl.specsWeight < 1" autowp-markdown="'specifications-editor/errors-alert'|translate"></div>
 
 <ul class="nav nav-tabs" id="myTab">
     <li ng-repeat="(id, tab) in ctrl.tabs" ng-class="{active: id == ctrl.tab}">
@@ -89,7 +86,6 @@
                             <label ng-style="{'padding-left': (attribute.deep * 20) + 'px'}" ng-bind="attribute.name | translate"></label>
                         </td>
                         <td ng-if="!attribute.childs.length">
-                            {{ctrl.currentUserValues[attribute.id]}}
                             <div class="input-group" ng-class="{'has-error': element.getMessages()}">
                                 <span class="input-group-addon btn btn-default" 
                                     ng-click="ctrl.currentUserValues[attribute.id].empty = !ctrl.currentUserValues[attribute.id].empty" 
@@ -110,12 +106,12 @@
                                     ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                 >
                                 </select>
-                                <select class="form-control input-sm"
-                                    multiple
+                                <select class="form-control input-sm" 
                                     ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && attribute.is_multiple" 
                                     ng-options="item.id as item.name for item in attribute.options"
-                                    ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
+                                    ng-disabled="ctrl.currentUserValues[attribute.id].empty"
+                                    multiple
                                 >
                                 </select>
                                 <input type="number" 

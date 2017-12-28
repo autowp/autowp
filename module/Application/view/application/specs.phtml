@@ -83,10 +83,7 @@
                 <td></td>
                 <?php foreach ($this->table->getCars() as $car) { ?>
                     <td>
-                        <?=$this->htmlA($this->url('cars/params', [
-                            'action'  => 'car-specifications-editor',
-                            'item_id' => $car['id']
-                        ]), $this->translate('carlist/edit-specs'))?>
+                        <?=$this->htmlA('/ng/cars/specifications-editor?item_id=' . $car['id'], $this->translate('carlist/edit-specs'))?>
                     </td>
                 <?php } ?>
             </tr>
