@@ -926,6 +926,119 @@ class SpecificationsService
         return isset($this->attributes[$id]) ? $this->attributes[$id] : null;
     }
 
+    public function setUserValue2(int $uid, int $attributeId, int $itemId, $value, bool $empty)
+    {
+        $attribute = $this->getAttribute($attributeId);
+        $somethingChanged = false;
+
+        $userValueDataTable = $this->getUserValueDataTable($attribute['typeId']);
+
+        $userValuePrimaryKey = [
+            'attribute_id' => $attribute['id'],
+            'item_id'      => $itemId,
+            'user_id'      => $uid
+        ];
+
+        if ($attribute['isMultiple']) {
+            // remove value descriptiors
+            $this->userValueTable->delete([
+                'attribute_id = ?' => $attribute['id'],
+                'item_id = ?'      => $itemId,
+                'user_id = ?'      => $uid,
+            ]);
+
+            // remove values
+            $userValueDataTable->delete($userValuePrimaryKey);
+
+            if ($value) {
+
+                if ($empty) {
+                    $value = [null];
+                }
+
+                if (count($value)) {
+                    // insert new descriptiors and values
+                    $this->userValueTable->insert(array_replace([
+                        'add_date'     => new Sql\Expression('NOW()'),
+                        'update_date'  => new Sql\Expression('NOW()'),
+                    ], $userValuePrimaryKey));
+                    $ordering = 1;
+
+                    foreach ($value as $oneValue) {
+                        $userValueDataTable->insert(array_replace([
+                            'ordering'     => $ordering,
+                            'value'        => $oneValue
+                        ], $userValuePrimaryKey));
+
+                        $ordering++;
+                    }
+                }
+            }
+
+            $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
+        } else {
+            if (strlen($value) > 0 || $empty) {
+                // insert/update value decsriptor
+                $userValue = $this->userValueTable->select($userValuePrimaryKey)->current();
+
+                // insert update value
+                $userValueData = $userValueDataTable->select($userValuePrimaryKey)->current();
+
+                if ($empty) {
+                    $value = null;
+                }
+
+                if ($userValueData) {
+                    $valueChanged = $value === null
+                        ? $userValueData['value'] !== null
+                        : $userValueData['value'] != $value;
+                } else {
+                    $valueChanged = true;
+                }
+
+                if (! $userValue || $valueChanged) {
+                    if (! $userValue) {
+                        $this->userValueTable->insert(array_replace([
+                            'add_date'    => new Sql\Expression('NOW()'),
+                            'update_date' => new Sql\Expression('NOW()')
+                        ], $userValuePrimaryKey));
+                    } else {
+                        $this->userValueTable->update([
+                            'update_date' => new Sql\Expression('NOW()')
+                        ], $userValuePrimaryKey);
+                    }
+
+                    $set = ['value' => $value];
+
+                    if ($userValueData) {
+                        $userValueDataTable->update($set, $userValuePrimaryKey);
+                    } else {
+                        $userValueDataTable->insert(array_merge($set, $userValuePrimaryKey));
+                    }
+
+                    $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
+                }
+            } else {
+                // delete value descriptor
+                $affected = $this->userValueTable->delete($userValuePrimaryKey);
+                // remove value
+                $affected += $userValueDataTable->delete($userValuePrimaryKey);
+
+                if ($affected > 0) {
+                    $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
+                }
+            }
+        }
+
+        if ($somethingChanged) {
+            $this->propagateInheritance($attribute, $itemId);
+
+            $this->propageteEngine($attribute, $itemId);
+
+            $this->refreshConflictFlag($attribute['id'], $itemId);
+        }
+    }
+
     public function setUserValue(int $uid, int $attributeId, int $itemId, $value)
     {
         $attribute = $this->getAttribute($attributeId);
@@ -2353,6 +2466,56 @@ class SpecificationsService
         }
 
         return $attribute['isMultiple'] ? $values : $values[0];
+    }
+
+    public function getUserValue2(int $attributeId, int $itemId, int $userId): array
+    {
+        if (! $itemId) {
+            throw new Exception("item_id not set");
+        }
+
+        $attribute = $this->getAttribute($attributeId);
+        if (! $attribute) {
+            throw new Exception("attribute not found");
+        }
+
+        $valuesTable = $this->getUserValueDataTable($attribute['typeId']);
+
+        $select = new Sql\Select($valuesTable->getTable());
+        $select->columns(['value'])
+            ->where([
+                'attribute_id' => (int)$attribute['id'],
+                'item_id'      => $itemId,
+                'user_id'      => $userId
+            ]);
+
+        if ($attribute['isMultiple']) {
+            $select->order('ordering');
+        }
+
+        $values = [];
+        foreach ($valuesTable->selectWith($select) as $row) {
+            $values[] = $this->prepareValue($attribute['typeId'], $row['value']);
+        }
+
+        if (count($values) <= 0) {
+            return [
+                'value' => null,
+                'empty' => false
+            ];
+        }
+
+        if ($attribute['isMultiple']) {
+            return [
+                'value' => $values,
+                'empty' => $values === [null]
+            ];
+        }
+
+        return [
+            'value' => $values[0],
+            'empty' => $values[0] === null
+        ];
     }
 
     public function getUserValueText(int $attributeId, int $itemId, int $userId, string $language)

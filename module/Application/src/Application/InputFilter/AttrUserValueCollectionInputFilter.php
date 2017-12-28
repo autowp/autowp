@@ -70,6 +70,13 @@ class AttrUserValueCollectionInputFilter extends InputFilter
                     ['name' => 'Digits']
                 ]
             ],
+            'empty'  => [
+                'required'   => false,
+                'allow_empty' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
             'value'  => $this->specService->getFilterSpec($attributeId),
         ];
 

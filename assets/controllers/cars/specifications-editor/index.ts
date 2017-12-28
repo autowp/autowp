@@ -162,9 +162,6 @@ export class CarsSpecificationsEditorController {
                                 attribute.options.splice(0, 0, {
                                     name: '—',
                                     id: null
-                                }, {
-                                    name: translations['specifications/no-value-text'],
-                                    id: '-'
                                 })
                             }
                             
@@ -172,9 +169,6 @@ export class CarsSpecificationsEditorController {
                                 attribute.options = [{
                                     name: '—',
                                     id: null
-                                }, {
-                                    name: translations['specifications/no-value-text'],
-                                    id: '-'
                                 }, {
                                     name: translations['specifications/boolean/false'],
                                     id: 0
@@ -343,7 +337,8 @@ export class CarsSpecificationsEditorController {
                     item_id: this.item.id,
                     attribute_id: attribute_id,
                     user_id: this.$scope.user.id,
-                    value: this.currentUserValues[attribute_id].value
+                    value: this.currentUserValues[attribute_id].value,
+                    empty: this.currentUserValues[attribute_id].empty
                 });
             }
         }
@@ -385,7 +380,9 @@ export class CarsSpecificationsEditorController {
             for (let value of response.data.items) {
                 let attribute = self.getAttribute(value.attribute_id);
                 if (attribute.type_id == 2 || attribute.type_id == 3) {
-                    value.value = +value.value;
+                    if (value.value !== null) {
+                        value.value = +value.value;
+                    }
                 }
                 if (attribute.is_multiple) {
                     self.currentUserValues[value.attribute_id] = value instanceof Array ? value : [value];

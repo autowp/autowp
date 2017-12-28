@@ -383,11 +383,12 @@ class AttrController extends AbstractRestfulController
                     return $this->forbiddenAction();
                 }
 
-                $this->specsService->setUserValue(
+                $this->specsService->setUserValue2(
                     $item['user_id'],
                     $item['attribute_id'],
                     $item['item_id'],
-                    $item['value']
+                    $item['value'],
+                    (bool)$item['empty']
                 );
             }
         }

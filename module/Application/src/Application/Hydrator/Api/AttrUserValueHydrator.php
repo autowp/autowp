@@ -116,12 +116,14 @@ class AttrUserValueHydrator extends RestHydrator
         ];
 
         if ($this->filterComposite->filter('value')) {
-            $result['value'] = $this->specService->getUserValue(
+            $value = $this->specService->getUserValue2(
                 $object['attribute_id'],
                 $object['item_id'],
                 $object['user_id'],
                 $this->language
             );
+            $result['value'] = $value['value'];
+            $result['empty'] = $value['empty'];
         }
 
         if ($this->filterComposite->filter('value_text')) {
