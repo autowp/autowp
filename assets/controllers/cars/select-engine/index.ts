@@ -102,7 +102,9 @@ export class CarsSelectEngineController {
                     engine_id: engineId
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
-                window.location.href = '/cars/car-specifications-editor/item_id/' + self.item.id + '/tab/engine';
+                self.$state.go('cars-specifications-editor', {
+                    item_id: self.item.id
+                });
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
