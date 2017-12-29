@@ -264,7 +264,9 @@ export class ModerPicturesItemMoveController {
             self.authors = response.data.items;
             self.authors_paginator = response.data.paginator;
         }, function( response: ng.IHttpResponse<any> ) {
-            notify.response( response );
+            if (response.status !== -1) {
+                notify.response( response );
+            }
         } );
     }
     
@@ -293,7 +295,9 @@ export class ModerPicturesItemMoveController {
             self.persons = response.data.items;
             self.persons_paginator = response.data.paginator;
         }, function( response: ng.IHttpResponse<any> ) {
-            notify.response( response );
+            if (response.status !== -1) {
+                notify.response( response );
+            }
         } );
     }
 }
