@@ -226,7 +226,7 @@ export class CarsSpecificationsEditorController {
                         url: '/api/attr/user-value',
                         params: {
                             item_id: item.id,
-                            //exclude_user_id: self.$scope.user.id,
+                            exclude_user_id: self.$scope.user.id,
                             zone_id: item.attr_zone_id,
                             limit: 500,
                             fields: 'value_text,user'

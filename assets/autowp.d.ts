@@ -63,6 +63,7 @@ declare namespace autowp {
     {
         id: number;
         name: string;
+        specs_weight: number;
     }
     
     export interface GetUsersResult {
