@@ -220,33 +220,7 @@ export class CarsSpecificationsEditorController {
                     
                     self.loadValues();
                     
-                    self.loading++;
-                    self.$http({
-                        method: 'GET',
-                        url: '/api/attr/user-value',
-                        params: {
-                            item_id: item.id,
-                            exclude_user_id: self.$scope.user.id,
-                            zone_id: item.attr_zone_id,
-                            limit: 500,
-                            fields: 'value_text,user'
-                        }
-                    }).then(function(response: ng.IHttpResponse<any>) {
-                        self.userValues.clear();
-                        for (let value of response.data.items) {
-                            let values = self.userValues.get(value.attribute_id);
-                            if (values === undefined) {
-                                self.userValues.set(value.attribute_id, [value]);
-                            } else {
-                                values.push(value);
-                                self.userValues.set(value.attribute_id, values);
-                            }
-                        }
-                        self.loading--;
-                    }, function(response: ng.IHttpResponse<any>) {
-                        notify.response(response);
-                        self.loading--;
-                    });
+                    self.loadAllValues();
                     
                     self.loading--;
                 }, function(response: ng.IHttpResponse<any>) {
@@ -370,6 +344,7 @@ export class CarsSpecificationsEditorController {
             }
         }).then(function(response: ng.IHttpResponse<any>) {
             self.loadValues();
+            self.loadAllValues();
             self.loading--;
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
@@ -422,6 +397,39 @@ export class CarsSpecificationsEditorController {
     public getStep(attribute: any): number
     {
         return Math.pow(10, -attribute.precision)
+    }
+    
+    private loadAllValues()
+    {
+        this.loading++;
+        
+        let self = this;
+        this.$http({
+            method: 'GET',
+            url: '/api/attr/user-value',
+            params: {
+                item_id: this.item.id,
+                //exclude_user_id: self.$scope.user.id,
+                zone_id: this.item.attr_zone_id,
+                limit: 500,
+                fields: 'value_text,user'
+            }
+        }).then(function(response: ng.IHttpResponse<any>) {
+            self.userValues.clear();
+            for (let value of response.data.items) {
+                let values = self.userValues.get(value.attribute_id);
+                if (values === undefined) {
+                    self.userValues.set(value.attribute_id, [value]);
+                } else {
+                    values.push(value);
+                    self.userValues.set(value.attribute_id, values);
+                }
+            }
+            self.loading--;
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
+            self.loading--;
+        });
     }
 }
 
