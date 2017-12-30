@@ -399,12 +399,9 @@ export class CarsSpecificationsEditorController {
         return Math.pow(10, -attribute.precision)
     }
     
-    private loadAllValues()
+    private httpUserValues(page: number)
     {
-        this.loading++;
-        
-        let self = this;
-        this.$http({
+        return this.$http({
             method: 'GET',
             url: '/api/attr/user-value',
             params: {
@@ -414,17 +411,42 @@ export class CarsSpecificationsEditorController {
                 limit: 500,
                 fields: 'value_text,user'
             }
-        }).then(function(response: ng.IHttpResponse<any>) {
-            self.userValues.clear();
-            for (let value of response.data.items) {
-                let values = self.userValues.get(value.attribute_id);
-                if (values === undefined) {
-                    self.userValues.set(value.attribute_id, [value]);
-                } else {
-                    values.push(value);
-                    self.userValues.set(value.attribute_id, values);
-                }
+        });
+    }
+    
+    private applyUserValues(items: any[])
+    {
+        for (let value of items) {
+            let values = this.userValues.get(value.attribute_id);
+            if (values === undefined) {
+                this.userValues.set(value.attribute_id, [value]);
+            } else {
+                values.push(value);
+                this.userValues.set(value.attribute_id, values);
             }
+        }
+    }
+    
+    private loadAllValues()
+    {
+        this.loading++;
+        
+        let self = this;
+        this.httpUserValues(1).then(function(response: ng.IHttpResponse<any>) {
+            self.userValues.clear();
+            self.applyUserValues(response.data.items);
+            
+            for (let i=2; i<=response.data.paginator.pageCount; i++) {
+                self.loading++;
+                self.httpUserValues(i).then(function(response: ng.IHttpResponse<any>) {
+                    self.applyUserValues(response.data.items);
+                    self.loading--;
+                }, function(response: ng.IHttpResponse<any>) {
+                    notify.response(response);
+                    self.loading--;
+                });
+            }
+            
             self.loading--;
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);

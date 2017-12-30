@@ -246,6 +246,22 @@ return [
                     ]
                 ]
             ],
+            'limit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                    [
+                        'name'    => 'Between',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 500
+                        ]
+                    ]
+                ]
+            ],
             'fields' => [
                 'required' => false,
                 'filters'  => [
