@@ -415,7 +415,7 @@ class AttrsController extends AbstractActionController
         $result = [];
         foreach ($this->attributeTable->selectWith($select) as $row) {
             $result[] = [
-                'id'              => (int)$row,
+                'id'              => (int)$row['id'],
                 'name'            => $row['name'],
                 'childAttributes' => $this->getZoneAttributesRecursive($zoneId, $row['id']),
                 'moveUpUrl'       => $this->url()->fromRoute('moder/attrs/params', [
