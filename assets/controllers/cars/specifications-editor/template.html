@@ -17,7 +17,7 @@
 <div class="alert alert-danger" ng-if="ctrl.specsWeight < 1" autowp-markdown="'specifications-editor/errors-alert'|translate"></div>
 
 <ul class="nav nav-tabs" id="myTab">
-    <li ng-repeat="(id, tab) in ctrl.tabs" ng-class="{active: id == ctrl.tab}">
+    <li ng-repeat="(id, tab) in ctrl.tabs" ng-class="{active: id == ctrl.tab}" ng-if="tab.visible">
         <a ui-sref="cars-specifications-editor({tab: id})">
             <span class="{{tab.icon}}" ng-if="tab.icon"></span>
             {{tab.title | translate}}

@@ -31,31 +31,36 @@ export class CarsSpecificationsEditorController {
     public engine: autowp.IItem;
     public tab: string = 'info';
     public tabs = {
-          info: {
-              icon: 'fa fa-info',
-              title: 'specifications-editor/tabs/info',
-              count: 0,
-          },
-          engine: {
-              icon: 'glyphicon glyphicon-align-left',
-              title: 'specifications-editor/tabs/engine',
-              count: 0,
-          },
-          spec: {
-              icon: 'fa fa-car',
-              title: 'specifications-editor/tabs/specs',
-              count: 0,
-          },
-          result: {
-              icon: 'fa fa-table',
-              title: 'specifications-editor/tabs/result',
-              count: 0,
-          },
-          admin: {
-              icon: 'fa fa-cog',
-              title: 'specifications-editor/tabs/admin',
-              count: 0,
-          }
+        info: {
+            icon: 'fa fa-info',
+            title: 'specifications-editor/tabs/info',
+            count: 0,
+            visible: true
+        },
+        engine: {
+            icon: 'glyphicon glyphicon-align-left',
+            title: 'specifications-editor/tabs/engine',
+            count: 0,
+            visible: true
+        },
+        spec: {
+            icon: 'fa fa-car',
+            title: 'specifications-editor/tabs/specs',
+            count: 0,
+            visible: true
+        },
+        result: {
+            icon: 'fa fa-table',
+            title: 'specifications-editor/tabs/result',
+            count: 0,
+            visible: true
+        },
+        admin: {
+            icon: 'fa fa-cog',
+            title: 'specifications-editor/tabs/admin',
+            count: 0,
+            visible: false
+        }
     };
     public attributes: any[] = [];
     public values: Map<number, any>;
@@ -86,6 +91,9 @@ export class CarsSpecificationsEditorController {
         
         this.acl.isAllowed('specifications', 'admin').then(function(allow: boolean) {
             self.isSpecsAdmin = !!allow;
+            if (self.isSpecsAdmin) {
+                self.tabs.admin.visible = true;
+            }
         }, function() {
             self.isSpecsAdmin = false;
         });
