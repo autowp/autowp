@@ -257,7 +257,7 @@ class AttrController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        if (! $this->user()->isAllowed('specifications', 'admin')) {
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
