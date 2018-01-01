@@ -153,7 +153,7 @@ class AttrsController extends AbstractActionController
 
         $formListOption = new AttributeListOptionForm();
         $formListOption->get('parent_id')->setValueOptions(
-            array_merge(
+            array_replace(
                 ['' => '--'],
                 $this->getListOptionsParents($attribute['id'], null)
             )
