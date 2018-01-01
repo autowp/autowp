@@ -1,4 +1,10 @@
 <?php return array (
+  'specs/attrs/wheels/auto-pumping-tires' => 'автоподкачка шин',
+  'specs/attrs/transmission/gearbox/reverse-gears' => 'количество задних передач',
+  'specs/attrs/dynamic/max-reverse-speed' => 'максимальная скорость (назад)',
+  'specs/attrs/22/23/options/common-rail' => 'Common Rail',
+  'specs/attrs/22/23/options/common-rail/mechanical' => 'Common Rail (механический впрыск)',
+  'specs/attrs/22/23/options/common-rail/electronic' => 'Common Rail (электронный впрыск)',
   'page/42/name' => 'Форумы',
   'picture/text' => 'Все изображения являются чьей-либо собственностью.
 

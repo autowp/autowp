@@ -1,4 +1,10 @@
 <?php return array (
+  'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
+  'specs/attrs/transmission/gearbox/reverse-gears' => 'number of reverse gears',
+  'specs/attrs/dynamic/max-reverse-speed' => 'max speed (reverse)',
+  'specs/attrs/22/23/options/common-rail' => 'Common Rail',
+  'specs/attrs/22/23/options/common-rail/mechanical' => 'Common Rail (mechanical injection)',
+  'specs/attrs/22/23/options/common-rail/electronic' => 'Common Rail (electronic injection)',
   'page/42/name' => '论坛',
   'picture/text' => '任何图片都有权益人。
 

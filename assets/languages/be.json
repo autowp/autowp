@@ -1,4 +1,10 @@
 {
+    "specs/attrs/22/23/options/common-rail": "Common Rail",
+    "specs/attrs/22/23/options/common-rail/mechanical": "Common Rail (mechanical injection)",
+    "specs/attrs/22/23/options/common-rail/electronic": "Common Rail (electronic injection)",
+    "specs/attrs/transmission/gearbox/reverse-gears": "number of reverse gears",
+    "specs/attrs/dynamic/max-reverse-speed": "max speed (reverse)",
+    "specs/attrs/wheels/auto-pumping-tires": "Auto pumping tires",
     "upload/select-files": "Select files",
     "upload/select-file": "Select file",
     "page/42/name": "Форумы",

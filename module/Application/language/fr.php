@@ -1,4 +1,10 @@
 <?php return array (
+  'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
+  'specs/attrs/transmission/gearbox/reverse-gears' => 'number of reverse gears',
+  'specs/attrs/dynamic/max-reverse-speed' => 'max speed (reverse)',
+  'specs/attrs/22/23/options/common-rail' => 'Common Rail',
+  'specs/attrs/22/23/options/common-rail/mechanical' => 'Common Rail (injection mécanique)',
+  'specs/attrs/22/23/options/common-rail/electronic' => 'Common Rail (injection électronique)',
   'page/42/name' => 'Forums',
   'picture/text' => 'Toutes les images ont propriétaires.
 
