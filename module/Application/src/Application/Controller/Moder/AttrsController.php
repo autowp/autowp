@@ -146,7 +146,7 @@ class AttrsController extends AbstractActionController
 
         $formAttributeNew = new AttributeForm();
         $formAttributeNew->get('unit_id')->setValueOptions($unitOptions);
-        $formAttributeEdit->get('type_id')->setValueOptions($typeOptions);
+        $formAttributeNew->get('type_id')->setValueOptions($typeOptions);
         $formAttributeNew->setAttribute('action', $this->url()->fromRoute(null, [
             'form' => 'new'
         ], [], true));
