@@ -20,8 +20,7 @@ return [
                         'options' => [
                             'route' => '/attrs[/:action]',
                             'defaults' => [
-                                'controller' => Controller\Moder\AttrsController::class,
-                                'action'     => 'index'
+                                'controller' => Controller\Moder\AttrsController::class
                             ],
                         ],
                         'may_terminate' => true,

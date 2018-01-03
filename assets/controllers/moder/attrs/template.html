@@ -1,0 +1,18 @@
+<div class="row">
+    <div class="col-md-6">
+        <h2 translate>moder/attrs/zones</h2>
+        <div class="well">
+            <ul>
+                <li ng-repeat="zone in ctrl.zones">
+                    <a ng-href="/moder/attrs/zone/zone_id/{{zone.id}}" ng-bind="zone.name"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h2 translate>moder/attrs/attributes</h2>
+        <div class="well">
+            <autowp-moder-attrs-attribute-list attributes="ctrl.attributes" move-up="ctrl.moveUp" move-down="ctrl.moveDown"></autowp-moder-attrs-attribute-list>
+        </div>
+    </div>
+</div>

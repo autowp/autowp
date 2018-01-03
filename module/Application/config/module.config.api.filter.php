@@ -150,6 +150,19 @@ return [
                 ]
             ],
         ],
+        'api_attr_attribute_item_patch' => [
+            'move' => [
+                'required' => false,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => ['up', 'down']
+                        ]
+                    ]
+                ]
+            ]
+        ],
         'api_attr_conflict_get' => [
             'filter' => [
                 'required' => true,

@@ -352,7 +352,25 @@ return [
                                                 'action' => 'attribute-index',
                                             ]
                                         ]
-                                    ]
+                                    ],
+                                    'item' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/:id',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes'  => [
+                                            'patch' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'patch',
+                                                    'defaults' => [
+                                                        'action' => 'attribute-item-patch'
+                                                    ],
+                                                ],
+                                            ],
+                                        ]
+                                    ],
                                 ]
                             ],
                             'conflict' => [
@@ -435,7 +453,25 @@ return [
                                         ]
                                     ],
                                 ]
-                            ]
+                            ],
+                            'zone' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/zone'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'zone-index',
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
                         ]
                     ],
                     'brands' => [

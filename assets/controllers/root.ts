@@ -19,7 +19,7 @@ declare global {
 }
 
 export class RootController {
-    static $inject = ['$scope', '$http', '$location', '$translate', '$rootScope', '$state', 'PageService', 'MessageService'];
+    static $inject = ['$scope', '$http', '$location', '$translate', '$rootScope', '$state', 'PageService', 'MessageService', '$transitions'];
     
     
 
@@ -31,7 +31,8 @@ export class RootController {
         private $rootScope: autowp.IRootControllerScope,  
         private $state: any,
         private PageService: PageService,
-        private MessageService: MessageService
+        private MessageService: MessageService,
+        private $transitions: any
     ) {
         let opt = window.opt;
         
@@ -100,6 +101,14 @@ export class RootController {
         
         $rootScope.$on("$stateChangeError", function (event, toState, toParams, fromState, fromParams, error) {
             switch (error) {
+                case 'unauthorized':
+                    $state.go('error-403');
+                    break;
+            }
+        });
+        
+        $transitions.onError({}, function($transition$: any, a: any, b: any) {
+            switch ($transition$.error().detail) {
                 case 'unauthorized':
                     $state.go('error-403');
                     break;

@@ -14,6 +14,7 @@ class AttrControllerFactory implements FactoryInterface
     {
         $hydrators = $container->get('HydratorManager');
         $filters = $container->get('InputFilterManager');
+        $tables = $container->get('TableManager');
         return new AttrController(
             $container->get(\Application\Model\Item::class),
             $container->get(\Application\Service\SpecificationsService::class),
@@ -27,7 +28,9 @@ class AttrControllerFactory implements FactoryInterface
             $filters->get('api_attr_user_value_patch_query'),
             $filters->get('api_attr_user_value_patch_data'),
             $filters->get('api_attr_attribute_get'),
-            $filters->get('api_attr_value_get')
+            $filters->get('api_attr_value_get'),
+            $filters->get('api_attr_attribute_item_patch'),
+            $tables->get('attrs_zones')
         );
     }
 }

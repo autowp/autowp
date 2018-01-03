@@ -89,6 +89,16 @@ class AttrController extends AbstractRestfulController
      */
     private $valueListInputFilter;
 
+    /**
+     * @var InputFilter
+     */
+    private $attributeItemPatchInputFilter;
+
+    /**
+     * @var TableGateway
+     */
+    private $zoneTable;
+
     public function __construct(
         Item $item,
         SpecificationsService $specsService,
@@ -102,7 +112,9 @@ class AttrController extends AbstractRestfulController
         InputFilter $userValuePatchQueryFilter,
         InputFilter $userValuePatchDataFilter,
         InputFilter $attributeListInputFilter,
-        InputFilter $valueListInputFilter
+        InputFilter $valueListInputFilter,
+        InputFilter $attributeItemPatchInputFilter,
+        TableGateway $zoneTable
     ) {
         $this->item = $item;
         $this->specsService = $specsService;
@@ -118,6 +130,8 @@ class AttrController extends AbstractRestfulController
         $this->userValuePatchDataFilter = $userValuePatchDataFilter;
         $this->attributeListInputFilter = $attributeListInputFilter;
         $this->valueListInputFilter = $valueListInputFilter;
+        $this->attributeItemPatchInputFilter = $attributeItemPatchInputFilter;
+        $this->zoneTable = $zoneTable;
     }
 
     public function conflictIndexAction()
@@ -490,6 +504,102 @@ class AttrController extends AbstractRestfulController
         return new JsonModel([
             'paginator' => $paginator->getPages(),
             'items'     => $items
+        ]);
+    }
+
+    public function zoneIndexAction()
+    {
+        $zones = [];
+        foreach ($this->zoneTable->select([]) as $row) {
+            $zones[] = [
+                'id'   => (int)$row['id'],
+                'name' => $row['name']
+            ];
+        }
+
+        return new JsonModel([
+            'items' => $zones
+        ]);
+    }
+
+    public function attributeItemPatchAction()
+    {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $attributeTable = $this->specsService->getAttributeTable();
+
+        $attribute = $attributeTable->select(['id' => (int)$this->params('id')])->current();
+        if (! $attribute) {
+            return $this->notFoundAction();
+        }
+
+        $this->attributeItemPatchInputFilter->setData($this->processBodyContent($this->getRequest()));
+
+        if (! $this->attributeItemPatchInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->attributeItemPatchInputFilter);
+        }
+
+        $values = $this->attributeItemPatchInputFilter->getValues();
+
+        if (isset($values['move'])) {
+            switch ($values['move']) {
+                case 'up':
+                    $select = new Sql\Select($attributeTable->getTable());
+                    $select->where(['attrs_attributes.position < ?' => $attribute['position']])
+                        ->order('attrs_attributes.position DESC')
+                        ->limit(1);
+                    if ($attribute['parent_id']) {
+                        $select->where(['attrs_attributes.parent_id' => $attribute['parent_id']]);
+                    } else {
+                        $select->where(['attrs_attributes.parent_id IS NULL']);
+                    }
+                    $prev = $attributeTable->selectWith($select)->current();
+
+                    if ($prev) {
+                        $prevPos = $prev['position'];
+                        $pagePos = $attribute['position'];
+
+                        $this->setAttributePosition($prev['id'], 10000);
+                        $this->setAttributePosition($attribute['id'], $prevPos);
+                        $this->setAttributePosition($prev['id'], $pagePos);
+                    }
+                    break;
+
+                case 'down':
+                    $select = new Sql\Select($attributeTable->getTable());
+                    $select->where(['attrs_attributes.position > ?' => $attribute['position']])
+                        ->order('attrs_attributes.position ASC')
+                        ->limit(1);
+                    if ($attribute['parent_id']) {
+                        $select->where(['attrs_attributes.parent_id' => $attribute['parent_id']]);
+                    } else {
+                        $select->where(['attrs_attributes.parent_id IS NULL']);
+                    }
+                    $next = $attributeTable->selectWith($select)->current();
+
+                    if ($next) {
+                        $nextPos = $next['position'];
+                        $pagePos = $attribute['position'];
+
+                        $this->setAttributePosition($next['id'], 10000);
+                        $this->setAttributePosition($attribute['id'], $nextPos);
+                        $this->setAttributePosition($next['id'], $pagePos);
+                    }
+                    break;
+            }
+        }
+
+        return $this->getResponse()->setStatusCode(200);
+    }
+
+    private function setAttributePosition(int $attributeId, int $position)
+    {
+        $this->specsService->getAttributeTable()->update([
+            'position' => $position
+        ], [
+            'id' => $attributeId
         ]);
     }
 }
