@@ -4,7 +4,7 @@
         <select ng-model="ctrl.item.parent_id" name="parent_id" class="form-control">
             <option value="">None</option>
             <option ng-repeat="page in ctrl.pages" value="{{page.id}}">
-                {{'...'.repeat(page.level)}}{{page.name}}
+                {{'...'.repeat(page.level)}}{{'page/'+page.id+'/name' | translate}}
             </option>
         </select>
     </div>
