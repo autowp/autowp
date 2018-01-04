@@ -1,4 +1,6 @@
 <?php return array (
+  'persons/content-persons' => 'Persons on photo',
+  'persons/author-persons' => 'Authors',
   'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'number of reverse gears',
   'specs/attrs/dynamic/max-reverse-speed' => 'max speed (reverse)',

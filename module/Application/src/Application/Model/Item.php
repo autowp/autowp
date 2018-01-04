@@ -1216,7 +1216,8 @@ class Item
         $defaults = [
             'user'   => null,
             'status' => null,
-            'id'     => null
+            'id'     => null,
+            'type'   => null,
         ];
         $options = array_replace($defaults, $options);
 
@@ -1229,6 +1230,10 @@ class Item
 
         if ($options['status']) {
             $select->where(['p1.status' => $options['status']]);
+        }
+
+        if ($options['type']) {
+            $select->where(['pi1.type' => $options['type']]);
         }
 
         if ($options['id']) {

@@ -4,13 +4,10 @@ import notify from 'notify';
 import { chunkBy } from 'chunk';
 import { ItemService } from 'services/item';
 
-import './authors';
-import './person';
+const CONTROLLER_NAME = 'PersonsAuthorsController';
+const STATE_NAME = 'persons-authors';
 
-const CONTROLLER_NAME = 'PersonsController';
-const STATE_NAME = 'persons';
-
-export class PersonsController {
+export class PersonsAuthorsController {
     static $inject = ['$scope', '$http', '$state', 'ItemService'];
     public paginator: autowp.IPaginator;
     public items: autowp.IItem[];
@@ -38,8 +35,8 @@ export class PersonsController {
                      'url,more_pictures_url',
                      'preview_pictures,total_pictures'].join(','),
             'descendant_pictures[status]': 'accepted',
-            'descendant_pictures[type_id]': 1,
-            'preview_pictures[type_id]': 1, 
+            'descendant_pictures[type_id]': 2,
+            'preview_pictures[type_id]': 2,
             order: 'name',
             limit: 10,
             page: this.$state.params.page
@@ -51,16 +48,16 @@ export class PersonsController {
         }, function() {
             $state.go('error-404');
         });
-    } 
+    }
 };
 
 angular.module(Module)
-    .controller(CONTROLLER_NAME, PersonsController)
+    .controller(CONTROLLER_NAME, PersonsAuthorsController)
     .config(['$stateProvider',
         function config($stateProvider: any) {
             $stateProvider.state( { 
                 name: STATE_NAME,
-                url: '/persons?page',
+                url: '/persons/authors?page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require('./template.html')

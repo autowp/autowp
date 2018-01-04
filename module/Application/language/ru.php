@@ -1,4 +1,6 @@
 <?php return array (
+  'persons/content-persons' => 'Persons on photo',
+  'persons/author-persons' => 'Authors',
   'specs/attrs/wheels/auto-pumping-tires' => 'автоподкачка шин',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'количество задних передач',
   'specs/attrs/dynamic/max-reverse-speed' => 'максимальная скорость (назад)',

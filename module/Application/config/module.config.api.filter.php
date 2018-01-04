@@ -1259,6 +1259,24 @@ return [
                 'status' => [
                     'required' => false
                 ],
+                'type_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'InArray',
+                            'options' => [
+                                'haystack' => [
+                                    Model\PictureItem::PICTURE_AUTHOR,
+                                    Model\PictureItem::PICTURE_CONTENT,
+                                    Model\PictureItem::PICTURE_COPYRIGHTS
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
                 'owner_id' => [
                     'required' => false,
                     'filters' => [
@@ -1268,6 +1286,27 @@ return [
                         ['name' => 'Digits']
                     ]
                 ],
+            ],
+            'preview_pictures' => [
+                'type' => InputFilter::class,
+                'type_id' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'InArray',
+                            'options' => [
+                                'haystack' => [
+                                    Model\PictureItem::PICTURE_AUTHOR,
+                                    Model\PictureItem::PICTURE_CONTENT,
+                                    Model\PictureItem::PICTURE_COPYRIGHTS
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ],
             'related_groups_of' => [
                 'required' => false,

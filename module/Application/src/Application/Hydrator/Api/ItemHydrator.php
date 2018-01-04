@@ -124,6 +124,11 @@ class ItemHydrator extends RestHydrator
      */
     private $vehicleType;
 
+    /**
+     * @var array
+     */
+    private $previewPictures = [];
+
     public function __construct(
         $serviceManager
     ) {
@@ -201,6 +206,17 @@ class ItemHydrator extends RestHydrator
         if (isset($options['user_id'])) {
             $this->setUserId($options['user_id']);
         }
+
+        if (isset($options['preview_pictures'])) {
+            $this->setPreviewPictures($options['preview_pictures']);
+        }
+
+        return $this;
+    }
+
+    public function setPreviewPictures(array $options)
+    {
+        $this->previewPictures = $options;
 
         return $this;
     }
@@ -494,6 +510,11 @@ class ItemHydrator extends RestHydrator
             $onlyExactlyPictures = false;
 
             if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
+                $pictureItemTypeId = null;
+                if (isset($this->previewPictures['type_id']) && $this->previewPictures['type_id']) {
+                    $pictureItemTypeId = $this->previewPictures['type_id'];
+                }
+
                 $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
                     'pictureModel'         => $this->picture,
                     'itemModel'            => $this->itemModel,
@@ -503,7 +524,8 @@ class ItemHydrator extends RestHydrator
                     'dateSort'             => false,
                     'disableLargePictures' => false,
                     'perspectivePageId'    => null,
-                    'onlyChilds'           => []
+                    'onlyChilds'           => [],
+                    'pictureItemTypeId'    => $pictureItemTypeId
                 ]);
 
                 $carsTotalPictures = $cFetcher->getTotalPictures([$object['id']], $onlyExactlyPictures);

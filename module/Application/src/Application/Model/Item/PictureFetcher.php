@@ -7,6 +7,7 @@ use Zend\Db\Sql;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\Picture;
+use Application\Model\PictureItem;
 
 abstract class PictureFetcher
 {
@@ -24,6 +25,11 @@ abstract class PictureFetcher
      * @var Item
      */
     protected $itemModel;
+
+    /**
+     * @var int|null
+     */
+    private $pictureItemTypeId;
 
     abstract public function fetch($item, array $options = []);
 
@@ -65,6 +71,13 @@ abstract class PictureFetcher
         return $this;
     }
 
+    public function setPictureItemTypeId($value)
+    {
+        $this->pictureItemTypeId = $value;
+
+        return $this;
+    }
+
     protected function getPictureSelect($itemId, array $options)
     {
         $defaults = [
@@ -94,7 +107,10 @@ abstract class PictureFetcher
                 'pictures.id = picture_item.picture_id',
                 ['perspective_id', 'item_id']
             )
-            ->where(['pictures.status' => Picture::STATUS_ACCEPTED])
+            ->where([
+                'pictures.status'   => Picture::STATUS_ACCEPTED,
+                'picture_item.type' => $this->pictureItemTypeId ? $this->pictureItemTypeId : PictureItem::PICTURE_CONTENT,
+            ])
             ->limit($options['limit']);
 
         $order = [];

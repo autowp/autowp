@@ -78,6 +78,28 @@ html {
                 <?=$this->render('application/index/partial/factories')?>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h4><?=$this->translate('persons/content-persons') ?> <small><?=$this->htmlA('/ng/persons', $this->translate('all-link'))?></small></h4>
+                <p>
+                    <?php foreach ($this->contentPersons as $person) { ?>
+                        <?=$this->htmlA('/ng/persons/' . $person['id'], $person['name']) ?>,
+                    <?php } ?>
+                    …
+                </p>
+            </div>
+
+            <div class="col-md-6">
+                <h4><?=$this->translate('persons/author-persons') ?> <small><?=$this->htmlA('/ng/persons/authors', $this->translate('all-link'))?></small></h4>
+                <p>
+                    <?php foreach ($this->authorPersons as $person) { ?>
+                        <?=$this->htmlA('/ng/persons/' . $person['id'], $person['name']) ?>,
+                    <?php } ?>
+                    …
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -223,6 +223,10 @@ class ItemController extends AbstractRestfulController
             if (isset($data['descendant_pictures']['owner_id']) && $data['descendant_pictures']['owner_id']) {
                 $select->where(['pictures.owner_id' => $data['descendant_pictures']['owner_id']]);
             }
+
+            if (isset($data['descendant_pictures']['type_id']) && $data['descendant_pictures']['type_id']) {
+                $select->where(['picture_item.type' => $data['descendant_pictures']['type_id']]);
+            }
         }
 
         if ($data['type_id']) {
@@ -641,10 +645,16 @@ class ItemController extends AbstractRestfulController
             );
         }
 
+        $previewPictures = [];
+        if (isset($data['preview_pictures']['type_id']) && $data['preview_pictures']['type_id']) {
+            $previewPictures['type_id'] = $data['preview_pictures']['type_id'];
+        }
+
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'fields'   => $data['fields'],
-            'user_id'  => $user ? $user['id'] : null
+            'user_id'  => $user ? $user['id'] : null,
+            'preview_pictures' => $previewPictures
         ]);
 
         $rows = [];

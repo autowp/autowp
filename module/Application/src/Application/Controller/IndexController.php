@@ -15,6 +15,7 @@ use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
+use Application\Model\PictureItem;
 
 class IndexController extends AbstractActionController
 {
@@ -300,6 +301,42 @@ class IndexController extends AbstractActionController
             }
         ]);
 
+        $cacheKey = 'INDEX_PERSONS_CONTENT_' . $language;
+        $contentPersons = $this->cache->getItem($cacheKey, $success);
+        if (! $success) {
+            $contentPersons = $this->item->getRows([
+                'language'     => $language,
+                'columns'      => ['id', 'name'],
+                'limit'        => 5,
+                'item_type_id' => 8,
+                'pictures'     => [
+                    'status' => Picture::STATUS_ACCEPTED,
+                    'type'   => PictureItem::PICTURE_CONTENT
+                ],
+                'order'        => new Sql\Expression('COUNT(pi1.picture_id) desc')
+            ]);
+
+            $this->cache->setItem($cacheKey, $contentPersons);
+        }
+
+        $cacheKey = 'INDEX_PERSONS_AUTHOR_' . $language;
+        $authorPersons = $this->cache->getItem($cacheKey, $success);
+        if (! $success) {
+            $authorPersons = $this->item->getRows([
+                'language'     => $language,
+                'columns'      => ['id', 'name'],
+                'limit'        => 5,
+                'item_type_id' => 8,
+                'pictures'     => [
+                    'status' => Picture::STATUS_ACCEPTED,
+                    'type'   => PictureItem::PICTURE_AUTHOR
+                ],
+                'order'        => new Sql\Expression('COUNT(pi1.picture_id) desc')
+            ]);
+
+            $this->cache->setItem($cacheKey, $authorPersons);
+        }
+
         return [
             'brands'      => $this->brands(),
             'factories'   => $this->factories(),
@@ -313,7 +350,9 @@ class IndexController extends AbstractActionController
                 '/mosts/mighty/sedan/today'        => 'mosts/mighty/sedan/today',
                 '/mosts/dynamic/universal/2000-09' => 'mosts/dynamic/universal/2000-09',
                 '/mosts/heavy/truck'               => 'mosts/heavy/truck'
-            ]
+            ],
+            'contentPersons' => $contentPersons,
+            'authorPersons'  => $authorPersons
         ];
     }
 

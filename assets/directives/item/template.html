@@ -45,6 +45,11 @@
             <i class="fa fa-align-left"></i>
             <a ng-href="{{item.url}}">{{'carlist/details'|translate}}<span ng-if="item.childs_count > 1"> ({{item.childs_count}})</span></a>
         </li>
+        
+        <li ng-if="item.item_type_id == 8">
+            <i class="fa fa-align-left"></i>
+            <a ui-sref="persons-person({id: item.id})">{{'carlist/details'|translate}}</a>
+        </li>
 
         <li ng-if="item.tuning">
             <i class="fa fa-align-left"></i>

@@ -1,0 +1,36 @@
+<p ng-if="isModer">
+    <i class="fa fa-cog"></i>
+    <a ui-sref="moder-items-item({id: ctrl.item.id})" ui-sref-options="{inherit: false}" translate>moder/edit-object</a>
+</p>
+
+<div class="well" ng-if="ctrl.links.length > 0 || ctrl.item.description">
+    <div autowp-markdown="ctrl.item.description"></div>
+
+    <p ng-if="ctrl.links.length > 0">
+        {{'museums/museum/website:'|translate}}
+        <a ng-href="{{link.url}}" ng-repeat-start="link in ctrl.links" ng-bind="link.name ? link.name : link.url"></a>
+        <br ng-repeat-end />
+    </p>
+</div>
+
+<div ng-if="ctrl.authorPicturesChunks.length > 0">
+    <h3 translate>factories/factory/pictures</h3>
+    <div class="row" ng-repeat="chunk in ctrl.authorPicturesChunks">
+        <div class="col-sm-3" ng-repeat="picture in chunk">
+            <autowp-thumbnail picture="picture" is-moder="isModer"></autowp-thumbnail>
+        </div>
+    </div>
+    
+    <autowp-paginator data="ctrl.authorPicturesPaginator" ng-if="ctrl.authorPicturesPaginator"></autowp-paginator>
+</div>
+
+<div ng-if="ctrl.contentPicturesChunks.length > 0">
+    <h3 translate>factories/factory/pictures</h3>
+    <div class="row" ng-repeat="chunk in ctrl.contentPicturesChunks">
+        <div class="col-sm-3" ng-repeat="picture in chunk">
+            <autowp-thumbnail picture="picture" is-moder="isModer"></autowp-thumbnail>
+        </div>
+    </div>
+    
+    <autowp-paginator data="ctrl.contentPicturesPaginator" ng-if="ctrl.contentPicturesPaginator"></autowp-paginator>
+</div>

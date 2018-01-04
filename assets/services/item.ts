@@ -17,7 +17,10 @@ export interface GetItemsServiceOptions {
     dateless?: number;
     page?: number;
     have_childs_of_type?: number;
-}
+    'descendant_pictures[status]'?: string;
+    'descendant_pictures[type_id]'?: number;
+    'preview_pictures[type_id]'?: number;
+} 
 
 export class ItemService {
     static $inject = ['$q', '$http', '$translate'];
