@@ -79,7 +79,7 @@ class AboutController extends AbstractRestfulController
             ]);
 
             foreach ($greenUsers as $greenUser) {
-                $contributors[] = (int)$greenUser['id'];
+                $contributors[(int)$greenUser['id']] = (int)$greenUser['id'];
             }
         }
 
@@ -90,7 +90,7 @@ class AboutController extends AbstractRestfulController
         ]);
 
         foreach ($picturesUsers as $greenUser) {
-            $contributors[] = (int)$greenUser['id'];
+            $contributors[(int)$greenUser['id']] = (int)$greenUser['id'];
         }
 
         ksort($contributors, SORT_NUMERIC);
@@ -110,7 +110,7 @@ class AboutController extends AbstractRestfulController
             'zh_translator'    => 25155,
             'be_translator'    => 15603,
             'pt_br_translator' => 17322,
-            'contributors'     => $contributors,
+            'contributors'     => array_values($contributors),
             'total_pictures'   => $totalPictures,
             'pictures_size'    => $this->picture->getTotalPicturesSize(),
             'total_users'      => $totalUsers,
