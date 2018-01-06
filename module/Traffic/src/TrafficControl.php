@@ -38,7 +38,7 @@ class TrafficControl
             'time'   => 10 * 24 * 3600
         ],
         [
-            'limit'  => 1500,
+            'limit'  => 1800,
             'reason' => 'hourly limit',
             'group'  => ['hour'],
             'time'   => 5 * 24 * 3600
