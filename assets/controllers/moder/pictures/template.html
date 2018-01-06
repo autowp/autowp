@@ -159,7 +159,7 @@
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                        <li ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote < 0">
+                        <li ng-repeat="template in ctrl.moderVoteTemplateOptions" ng-if="template.vote < 0">
                             <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
                         </li>
                     </ul>
