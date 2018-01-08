@@ -180,49 +180,57 @@ class Pic extends AbstractPlugin
 
         $carIds = $this->pictureItem->getPictureItems($row['id'], PictureItem::PICTURE_CONTENT);
         if ($carIds) {
-            $carId = $carIds[0];
-            $paths = $this->catalogue->getCataloguePaths($carId, [
-                'breakOnFirst' => true,
-                'stockFirst'   => true
+            $carIds = $this->itemModel->getIds([
+                'id'           => $carIds,
+                'item_type_id' => [Item::BRAND, Item::VEHICLE]
             ]);
 
-            if (count($paths) > 0) {
-                $path = $paths[0];
+            if ($carIds) {
+                $carId = $carIds[0];
 
-                if ($path['car_catname']) {
-                    $url = $this->httpRouter->assemble([
-                        'action'        => 'brand-item-picture',
-                        'brand_catname' => $path['brand_catname'],
-                        'car_catname'   => $path['car_catname'],
-                        'path'          => $path['path'],
-                        'picture_id'    => $row['identity']
-                    ], [
-                        'name'            => 'catalogue',
-                        'force_canonical' => $options['canonical']
-                    ]);
-                } else {
-                    $perspectiveId = $this->pictureItem->getPerspective($row['id'], $carId);
+                $paths = $this->catalogue->getCataloguePaths($carId, [
+                    'breakOnFirst' => true,
+                    'stockFirst'   => true
+                ]);
 
-                    switch ($perspectiveId) {
-                        case 22:
-                            $action = 'logotypes-picture';
-                            break;
-                        case 25:
-                            $action = 'mixed-picture';
-                            break;
-                        default:
-                            $action = 'other-picture';
-                            break;
+                if (count($paths) > 0) {
+                    $path = $paths[0];
+
+                    if ($path['car_catname']) {
+                        $url = $this->httpRouter->assemble([
+                            'action'        => 'brand-item-picture',
+                            'brand_catname' => $path['brand_catname'],
+                            'car_catname'   => $path['car_catname'],
+                            'path'          => $path['path'],
+                            'picture_id'    => $row['identity']
+                        ], [
+                            'name'            => 'catalogue',
+                            'force_canonical' => $options['canonical']
+                        ]);
+                    } else {
+                        $perspectiveId = $this->pictureItem->getPerspective($row['id'], $carId);
+
+                        switch ($perspectiveId) {
+                            case 22:
+                                $action = 'logotypes-picture';
+                                break;
+                            case 25:
+                                $action = 'mixed-picture';
+                                break;
+                            default:
+                                $action = 'other-picture';
+                                break;
+                        }
+
+                        $url = $this->httpRouter->assemble([
+                            'action'        => $action,
+                            'brand_catname' => $path['brand_catname'],
+                            'picture_id'    => $row['identity']
+                        ], [
+                            'name' => 'catalogue',
+                            'force_canonical' => $options['canonical']
+                        ]);
                     }
-
-                    $url = $this->httpRouter->assemble([
-                        'action'        => $action,
-                        'brand_catname' => $path['brand_catname'],
-                        'picture_id'    => $row['identity']
-                    ], [
-                        'name' => 'catalogue',
-                        'force_canonical' => $options['canonical']
-                    ]);
                 }
             }
         }
