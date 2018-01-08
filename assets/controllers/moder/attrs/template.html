@@ -4,7 +4,7 @@
         <div class="well">
             <ul>
                 <li ng-repeat="zone in ctrl.zones">
-                    <a ng-href="/moder/attrs/zone/zone_id/{{zone.id}}" ng-bind="zone.name"></a>
+                    <a ui-sref="moder-attrs-zone({id: zone.id})" ng-bind="zone.name"></a>
                 </li>
             </ul>
         </div>

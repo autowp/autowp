@@ -472,6 +472,51 @@ return [
                                     ]
                                 ]
                             ],
+                            'zone-attribute' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/zone-attribute'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'zone-attribute-index',
+                                            ]
+                                        ]
+                                    ],
+                                    'post' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'post',
+                                            'defaults' => [
+                                                'action' => 'zone-attribute-post',
+                                            ]
+                                        ]
+                                    ],
+                                    'item' => [
+                                        'type' => 'Segment',
+                                        'options' => [
+                                            'route' => '/:zone_id/:attribute_id',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes'  => [
+                                            'delete' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'delete',
+                                                    'defaults' => [
+                                                        'action' => 'zone-attribute-item-delete'
+                                                    ],
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ]
+                            ],
                         ]
                     ],
                     'brands' => [

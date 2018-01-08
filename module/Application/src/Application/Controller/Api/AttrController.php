@@ -95,9 +95,24 @@ class AttrController extends AbstractRestfulController
     private $attributeItemPatchInputFilter;
 
     /**
+     * @var InputFilter
+     */
+    private $zoneAttributeListInputFilter;
+
+    /**
+     * @var InputFilter
+     */
+    private $zoneAttributePostInputFilter;
+
+    /**
      * @var TableGateway
      */
     private $zoneTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $zoneAttributeTable;
 
     public function __construct(
         Item $item,
@@ -114,7 +129,10 @@ class AttrController extends AbstractRestfulController
         InputFilter $attributeListInputFilter,
         InputFilter $valueListInputFilter,
         InputFilter $attributeItemPatchInputFilter,
-        TableGateway $zoneTable
+        InputFilter $zoneAttributeListInputFilter,
+        InputFilter $zoneAttributePostInputFilter,
+        TableGateway $zoneTable,
+        TableGateway $zoneAttributeTable
     ) {
         $this->item = $item;
         $this->specsService = $specsService;
@@ -131,7 +149,10 @@ class AttrController extends AbstractRestfulController
         $this->attributeListInputFilter = $attributeListInputFilter;
         $this->valueListInputFilter = $valueListInputFilter;
         $this->attributeItemPatchInputFilter = $attributeItemPatchInputFilter;
+        $this->zoneAttributeListInputFilter = $zoneAttributeListInputFilter;
+        $this->zoneAttributePostInputFilter = $zoneAttributePostInputFilter;
         $this->zoneTable = $zoneTable;
+        $this->zoneAttributeTable = $zoneAttributeTable;
     }
 
     public function conflictIndexAction()
@@ -601,5 +622,88 @@ class AttrController extends AbstractRestfulController
         ], [
             'id' => $attributeId
         ]);
+    }
+
+    public function zoneAttributeIndexAction()
+    {
+        $this->zoneAttributeListInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->zoneAttributeListInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->zoneAttributeListInputFilter);
+        }
+
+        $values = $this->zoneAttributeListInputFilter->getValues();
+
+        $select = $this->zoneAttributeTable->getSql()->select();
+
+        $select->where(['zone_id' => (int)$values['zone_id']]);
+
+        $items = [];
+        foreach ($this->zoneAttributeTable->selectWith($select) as $row) {
+            $items[] = [
+                'zone_id'      => (int)$row['zone_id'],
+                'attribute_id' => (int)$row['attribute_id'],
+            ];
+        }
+
+        return new JsonModel([
+            'items' => $items
+        ]);
+    }
+
+    public function zoneAttributePostAction()
+    {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $request = $this->getRequest();
+
+        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
+            $data = $this->jsonDecode($request->getContent());
+        } else {
+            $data = $request->getPost()->toArray();
+        }
+
+        $this->zoneAttributePostInputFilter->setData($data);
+
+        if (! $this->zoneAttributePostInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->zoneAttributePostInputFilter);
+        }
+
+        $values = $this->zoneAttributePostInputFilter->getValues();
+
+        $select = new Sql\Select($this->zoneAttributeTable->getTable());
+        $select->columns(['max' => new Sql\Expression('MAX(position)')])
+            ->where(['zone_id' => $values['zone_id']]);
+
+        $row = $this->zoneAttributeTable->selectWith($select)->current();
+        $maxPosition = $row ? $row['max'] : 0;
+
+
+        $this->zoneAttributeTable->insert([
+            'zone_id'      => $values['zone_id'],
+            'attribute_id' => $values['attribute_id'],
+            'position'     => $maxPosition + 1
+        ]);
+
+        return $this->getResponse()->setStatusCode(201);
+    }
+
+    public function zoneAttributeItemDeleteAction()
+    {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $zoneId = (int)$this->params('zone_id');
+        $attributeId = (int)$this->params('attribute_id');
+
+        $this->zoneAttributeTable->delete([
+            'zone_id'      => $zoneId,
+            'attribute_id' => $attributeId
+        ]);
+
+        return $this->getResponse()->setStatusCode(204);
     }
 }

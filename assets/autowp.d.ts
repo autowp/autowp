@@ -59,6 +59,12 @@ declare namespace autowp {
         items: T[];
     }
     
+    export interface IAttrZone
+    {
+        id: number;
+        name: string;
+    }
+    
     export interface IUser
     {
         id: number;
@@ -112,5 +118,9 @@ declare namespace autowp {
     export interface GetItemsResult {
         items: autowp.IItem[];
         paginator: autowp.IPaginator;
+    }
+    
+    export interface GetZonesResult {
+        items: autowp.IAttrZone[];
     }
 }

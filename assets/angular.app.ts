@@ -14,6 +14,7 @@ import './directives/thumbnail';
 import './directives/user/index';
 
 import './services/acl';
+import './services/attrs';
 import './services/contacts';
 import './services/content-language';
 import './services/forum';

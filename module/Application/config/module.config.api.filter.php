@@ -371,6 +371,37 @@ return [
                 ]
             ],
         ],
+        'api_attr_zone_attribute_get' => [
+            'zone_id' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ]
+        ],
+        'api_attr_zone_attribute_post' => [
+            'zone_id' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'attribute_id' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ]
+        ],
         'api_comments_get' => [
             'user_id' => [
                 'required' => false,

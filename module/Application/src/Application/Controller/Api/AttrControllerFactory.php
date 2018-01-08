@@ -30,7 +30,10 @@ class AttrControllerFactory implements FactoryInterface
             $filters->get('api_attr_attribute_get'),
             $filters->get('api_attr_value_get'),
             $filters->get('api_attr_attribute_item_patch'),
-            $tables->get('attrs_zones')
+            $filters->get('api_attr_zone_attribute_get'),
+            $filters->get('api_attr_zone_attribute_post'),
+            $tables->get('attrs_zones'),
+            $tables->get('attrs_zone_attributes')
         );
     }
 }

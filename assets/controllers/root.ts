@@ -108,6 +108,7 @@ export class RootController {
         });
         
         $transitions.onError({}, function($transition$: any, a: any, b: any) {
+            console.log('123');
             switch ($transition$.error().detail) {
                 case 'unauthorized':
                     $state.go('error-403');

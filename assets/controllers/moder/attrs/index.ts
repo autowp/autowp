@@ -1,15 +1,17 @@
 import * as angular from 'angular';
 import Module from 'app.module';
 import { AclService } from 'services/acl';
+import { AttrsService } from 'services/attrs';
 import notify from 'notify';
 
 import './attribute-list';
+import './zone';
 
 const CONTROLLER_NAME = 'ModerAttrsController';
 const STATE_NAME = 'moder-attrs';
 
 export class ModerAttrsController {
-    static $inject = ['$scope', '$http', '$state'];
+    static $inject = ['$scope', '$http', '$state', 'AttrsService'];
     
     public attributes: any[];
     public zones: any[];
@@ -19,7 +21,8 @@ export class ModerAttrsController {
     constructor(
         private $scope: autowp.IControllerScope, 
         private $http: ng.IHttpService,
-        private $state: any
+        private $state: any,
+        private attrsService: AttrsService
     ) {
 
         this.$scope.pageEnv({
@@ -35,11 +38,8 @@ export class ModerAttrsController {
         
         let self = this;
         
-        this.$http({
-            method: 'GET',
-            url: '/api/attr/zone'
-        }).then(function(response: ng.IHttpResponse<any>) {
-            self.zones = response.data.items;
+        this.attrsService.getZones().then(function(zones: autowp.IAttrZone[]) {
+            self.zones = zones;
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
