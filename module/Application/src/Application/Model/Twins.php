@@ -172,7 +172,8 @@ class Twins
             'id'         => $row['id'],
             'name'       => $row['name'],
             'begin_year' => $row['begin_year'],
-            'end_year'   => $row['end_year']
+            'end_year'   => $row['end_year'],
+            'today'      => $row['today']
         ];
     }
 
