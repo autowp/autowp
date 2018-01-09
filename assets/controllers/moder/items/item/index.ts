@@ -506,7 +506,7 @@ export class ModerItemsItemController {
             method: 'PUT',
             url: '/api/item/' + this.item.id,
             data: {
-                subscription: newValue
+                subscription: newValue ? 1 : 0
             }
         }).then(function() {
             self.item.subscription = newValue;

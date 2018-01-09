@@ -1235,10 +1235,11 @@ class ItemController extends AbstractRestfulController
         $set = [];
         $updateActual = false;
         $notifyMeta = false;
+        $subscribe = false;
 
         if (array_key_exists('subscription', $values)) {
             if ($values['subscription']) {
-                $this->userItemSubscribe->subscribe($user['id'], $item['id']);
+                $subscribe = true;
             } else {
                 $this->userItemSubscribe->unsubscribe($user['id'], $item['id']);
             }
@@ -1246,12 +1247,14 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('name', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $set['name'] = $values['name'];
             $this->itemModel->setLanguageName($item['id'], 'xx', $values['name']);
         }
 
         if (array_key_exists('full_name', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $set['full_name'] = $values['full_name'] ? $values['full_name'] : null;
         }
 
@@ -1262,16 +1265,19 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('begin_year', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $set['begin_year'] = $values['begin_year'] ? $values['begin_year'] : null;
         }
 
         if (array_key_exists('begin_month', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $set['begin_month'] = $values['begin_month'] ? $values['begin_month'] : null;
         }
 
         if (array_key_exists('end_year', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $endYear = $values['end_year'] ? $values['end_year'] : null;
             $set['end_year'] = $endYear;
 
@@ -1284,11 +1290,13 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('end_month', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $set['end_month'] = $values['end_month'] ? $values['end_month'] : null;
         }
 
         if (array_key_exists('today', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             if (is_string($values['today'])) {
                 $values['today'] = strlen($values['today']) ? (bool)strlen($values['today']) : null;
             }
@@ -1301,16 +1309,19 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('begin_model_year', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $set['begin_model_year'] = $values['begin_model_year'] ? $values['begin_model_year'] : null;
         }
 
         if (array_key_exists('end_model_year', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
         }
 
         if (array_key_exists('is_concept', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $set['is_concept_inherit'] = $values['is_concept'] === 'inherited' ? 1 : 0;
             if (! $set['is_concept_inherit']) {
                 $set['is_concept'] = $values['is_concept'] ? 1 : 0;
@@ -1319,6 +1330,7 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('catname', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             if (! $values['catname']) {
                 $filter = new \Autowp\ZFComponents\Filter\FilenameSafe();
                 $values['catname'] = $filter->filter($values['name']);
@@ -1329,11 +1341,13 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('produced', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $set['produced'] = strlen($values['produced']) ? (int)$values['produced'] : null;
         }
 
         if (array_key_exists('produced_exactly', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             $set['produced_exactly'] = $values['produced_exactly'] ? 1 : 0;
         }
 
@@ -1342,6 +1356,7 @@ class ItemController extends AbstractRestfulController
             case Item::ENGINE:
                 if (array_key_exists('is_group', $values)) {
                     $notifyMeta = true;
+                    $subscribe = true;
                     $hasChildItems = $this->itemParent->hasChildItems($item['id']);
 
                     if ($hasChildItems) {
@@ -1362,6 +1377,7 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('spec_id', $values)) {
             $notifyMeta = true;
+            $subscribe = true;
             if ($values['spec_id'] === 'inherited') {
                 $set['spec_inherit'] = 1;
             } else {
@@ -1380,6 +1396,7 @@ class ItemController extends AbstractRestfulController
             }
 
             $updateActual = true;
+            $subscribe = true;
 
             if ($values['engine_id'] == 'inherited') {
                 $set['engine_inherit'] = 1;
@@ -1502,6 +1519,7 @@ class ItemController extends AbstractRestfulController
         }
 
         if (isset($values['lat'], $values['lng'])) {
+            $subscribe = true;
             $point = null;
             if (strlen($values['lat']) && strlen($values['lng'])) {
                 geoPHP::version(); // for autoload classes
@@ -1519,7 +1537,9 @@ class ItemController extends AbstractRestfulController
             $this->specsService->updateActualValues($item['id']);
         }
 
-        $this->userItemSubscribe->subscribe($user['id'], $item['id']);
+        if ($subscribe) {
+            $this->userItemSubscribe->subscribe($user['id'], $item['id']);
+        }
 
         if ($notifyMeta) {
             $newData = $item = $this->itemModel->getRow(['id' => $item['id']]);
