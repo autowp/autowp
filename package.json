@@ -47,7 +47,6 @@
     "@types/i18next": "^8.4.2",
     "@types/jquery": "^3.2.16",
     "@types/leaflet": "^1.2.2",
-    "@types/left-pad": "^1.1.2",
     "@types/less": "0.0.32",
     "@types/ng-file-upload": "^12.2.1",
     "@types/raphael": "^2.1.30",
