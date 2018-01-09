@@ -1124,7 +1124,8 @@ DROP TABLE IF EXISTS `formated_image`;
 CREATE TABLE `formated_image` (
   `image_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `format` varchar(255) NOT NULL,
-  `formated_image_id` int(10) unsigned NOT NULL,
+  `status` INT NOT NULL DEFAULT 0,
+  `formated_image_id` int(10) unsigned NULL,
   PRIMARY KEY (`image_id`,`format`),
   KEY `formated_image_id` (`formated_image_id`,`image_id`) USING BTREE,
   CONSTRAINT `formated_image_ibfk_1` FOREIGN KEY (`formated_image_id`) REFERENCES `image` (`id`)
