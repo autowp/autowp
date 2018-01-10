@@ -20,6 +20,7 @@ import 'moment/locale/zh-cn.js';
 import 'moment/locale/de.js';
 import 'moment/locale/be.js';
 import 'moment/locale/pt-br.js';
+import 'moment/locale/uk.js';
 import 'angular-recaptcha';
 import 'ng-file-upload';
 import 'ng-rollbar';
@@ -44,6 +45,7 @@ angular.module(MODULE_NAME, ['ngAnimate', 'ngAria', 'ui.router', 'pascalprecht.t
             $translateProvider.translations('ru', require('./languages/ru.json'));
             $translateProvider.translations('fr', require('./languages/fr.json'));
             $translateProvider.translations('be', require('./languages/be.json'));
+            $translateProvider.translations('uk', require('./languages/uk.json'));
             $translateProvider.translations('pt-br', require('./languages/pt-br.json'));
             
             var lang = document.documentElement.getAttribute('lang');

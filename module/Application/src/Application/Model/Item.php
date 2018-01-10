@@ -71,7 +71,7 @@ class Item
      */
     private $itemParentLanguageTable;
 
-    private $languagePriority = ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'zh', 'xx'];
+    private $languagePriority = ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'xx'];
 
     public function __construct(
         TableGateway $specTable,

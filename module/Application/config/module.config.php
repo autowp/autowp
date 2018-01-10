@@ -235,15 +235,23 @@ return [
             'cookie'   => $hostCookie,
             'aliases'  => []
         ],
+        'uk' => [
+            'hostname' => 'uk.' . $host,
+            'timezone' => 'Europe/Kiev',
+            'name'     => 'Українська (beta)',
+            'flag'     => 'flag-icon flag-icon-ua',
+            'cookie'   => $hostCookie,
+            'aliases'  => []
+        ],
     ],
 
     'hostname_whitelist' => ['www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
         'i.' . $host, 'en.' . $host, 'fr.' . $host, 'ru.' . $host,
-        'zh.' . $host, 'be.' . $host, 'br.' . $host, 'www.' . $host, $host],
+        'zh.' . $host, 'be.' . $host, 'br.' . $host, 'uk.' . $host, 'www.' . $host, $host],
 
     'pictures_hostname' => getenv('AUTOWP_PICTURES_HOST'),
 
-    'content_languages' => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es'],
+    'content_languages' => ['en', 'ru', 'uk', 'be', 'fr', 'it', 'zh', 'pt', 'de', 'es', 'uk'],
 
     /*'acl' => [
         'cache'         => 'long',

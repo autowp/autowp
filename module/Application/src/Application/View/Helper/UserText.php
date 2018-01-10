@@ -28,6 +28,7 @@ class UserText extends AbstractHtmlElement
         'zh.wheelsage.org',
         'be.wheelsage.org',
         'br.wheelsage.org',
+        'uk.wheelsage.org',
         'wheelsage.org'
     ];
 
