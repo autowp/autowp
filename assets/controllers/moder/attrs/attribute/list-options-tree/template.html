@@ -1,0 +1,6 @@
+<ul ng-if="items.length > 0">
+    <li ng-repeat="item in items">
+        <span ng-bind="item.name"></span>
+        <autowp-moder-attrs-attribute-list-options-tree items="item.childs"></autowp-moder-attrs-attribute-list-options-tree>
+    </li>
+</ul>

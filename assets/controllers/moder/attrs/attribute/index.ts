@@ -4,6 +4,8 @@ import { AclService } from 'services/acl';
 import { AttrsService } from 'services/attrs';
 import notify from 'notify';
 
+import './list-options-tree';
+
 const CONTROLLER_NAME = 'ModerAttrsAttributeController';
 const STATE_NAME = 'moder-attrs-attribute';
 
@@ -13,6 +15,8 @@ export class ModerAttrsAttributeController {
     public attribute: autowp.IAttrAttribute;
     public attributes: any[];
     public loading: number = 0;
+    public addLoading: number = 0;
+    public addListOptionLoading: number = 0;
     
     public typeOptionsDefaults = [{id: null, name: '-'}];
     public typeOptions: any[] = [];
@@ -20,6 +24,17 @@ export class ModerAttrsAttributeController {
     
     public unitOptionsDefaults = [{id: null, name: '-'}];
     public unitOptions: any[] = [];
+    
+    public newAttribute: autowp.IAttrAttribute;
+    
+    public listOptions: any[] = [];
+    
+    public listOptionsDefaults = [{id: null, name: '-'}];
+    public listOptionsOptions: any[] = [];
+    public newListOption: any = {
+        parent_id: null,
+        name: ''
+    };
 
     constructor(
         private $scope: autowp.IControllerScope, 
@@ -99,6 +114,8 @@ export class ModerAttrsAttributeController {
                 notify.response(response);
             });
             
+            self.loadListOptions();
+            
         }, function(response: ng.IHttpResponse<any>) {
             self.$state.go('error-404');
         });
@@ -115,6 +132,97 @@ export class ModerAttrsAttributeController {
             url: '/api/attr/attribute/' + this.attribute.id,
             data: self.attribute
         }).then(function(response: ng.IHttpResponse<any>) {
+            self.loading--;
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
+            self.loading--;
+        });
+    }
+    
+    public addAttribute()
+    {
+        let self = this;
+        
+        let data: any = self.newAttribute;
+        data.parent_id = self.attribute.id;
+        
+        this.addLoading++;
+        this.$http({
+            method: 'POST',
+            url: '/api/attr/attribute',
+            data: data
+        }).then(function(response: ng.IHttpResponse<any>) {
+            
+            let location = response.headers('Location');
+            
+            self.addLoading++;
+            self.$http({
+                method: 'GET',
+                url: location
+            }).then(function(response: ng.IHttpResponse<any>) {
+                
+                self.$state.go('moder-attrs-attribute', {id: response.data.id});
+                
+                self.addLoading--;
+            }, function(response: ng.IHttpResponse<any>) {
+                notify.response(response);
+                self.addLoading--;
+            });
+            
+            self.addLoading--;
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
+            self.addLoading--;
+        });
+    }
+    
+    public addListOption()
+    {
+        this.addListOptionLoading++;
+
+        let self = this;
+        
+        let data: any = self.newListOption;
+        data.attribute_id = self.attribute.id;
+
+        this.$http({
+            method: 'POST',
+            url: '/api/attr/list-option',
+            data: data
+        }).then(function(response: ng.IHttpResponse<any>) {
+            
+            self.newListOption.name = '';
+            
+            self.loadListOptions();
+            
+            self.addListOptionLoading--;
+        }, function(response: ng.IHttpResponse<any>) {
+            notify.response(response);
+            self.addListOptionLoading--;
+        });
+    }
+    
+    public loadListOptions()
+    {
+        this.loading++;
+        
+        let self = this;
+        
+        this.$http({
+            method: 'GET',
+            url: '/api/attr/list-option',
+            params: {
+                attribute_id: self.attribute.id
+            }
+        }).then(function(response: ng.IHttpResponse<any>) {
+            self.listOptions = response.data.items;
+            self.listOptionsOptions = self.listOptionsDefaults;
+            for (let item of self.listOptions) {
+                self.listOptionsOptions.push({
+                    id: item.id,
+                    name: item.name
+                });
+            }
             self.loading--;
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);

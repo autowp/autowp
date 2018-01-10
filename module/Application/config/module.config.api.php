@@ -353,6 +353,15 @@ return [
                                             ]
                                         ]
                                     ],
+                                    'post' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'post',
+                                            'defaults' => [
+                                                'action' => 'attribute-post',
+                                            ]
+                                        ]
+                                    ],
                                     'item' => [
                                         'type' => 'Segment',
                                         'options' => [
@@ -415,6 +424,33 @@ return [
                                                 'action' => 'conflict-index',
                                             ],
                                         ],
+                                    ]
+                                ]
+                            ],
+                            'list-option' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/list-option'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'list-option-index',
+                                            ]
+                                        ]
+                                    ],
+                                    'post' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'post',
+                                            'defaults' => [
+                                                'action' => 'list-option-post',
+                                            ]
+                                        ]
                                     ]
                                 ]
                             ],

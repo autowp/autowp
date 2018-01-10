@@ -4,9 +4,7 @@ import Module from 'app.module';
 class AutowpModerAttrsAttributeListDirective implements ng.IDirective {
     public restrict = 'E';
     public scope = {
-        attributes: '<',
-        moveUp: '<',
-        moveDown: '<'
+        items: '<'
     };
     public template = require('./template.html');
     
@@ -16,6 +14,7 @@ class AutowpModerAttrsAttributeListDirective implements ng.IDirective {
 
     static factory(): ng.IDirectiveFactory {
         const directive = () => new AutowpModerAttrsAttributeListDirective();
+        
         return directive;
     }
     
@@ -24,4 +23,4 @@ class AutowpModerAttrsAttributeListDirective implements ng.IDirective {
     }
 }
 
-angular.module(Module).directive('autowpModerAttrsAttributeList', AutowpModerAttrsAttributeListDirective.factory());
+angular.module(Module).directive('autowpModerAttrsAttributeListOptionsTree', AutowpModerAttrsAttributeListDirective.factory());

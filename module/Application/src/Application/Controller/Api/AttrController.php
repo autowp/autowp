@@ -82,6 +82,11 @@ class AttrController extends AbstractRestfulController
     /**
      * @var InputFilter
      */
+    private $attributePostInputFilter;
+
+    /**
+     * @var InputFilter
+     */
     private $attributeItemGetInputFilter;
 
     /**
@@ -110,6 +115,16 @@ class AttrController extends AbstractRestfulController
     private $zoneAttributePostInputFilter;
 
     /**
+     * @var InputFilter
+     */
+    private $listOptionIndexInputFilter;
+
+    /**
+     * @var InputFilter
+     */
+    private $listOptionPostInputFilter;
+
+    /**
      * @var TableGateway
      */
     private $zoneTable;
@@ -124,6 +139,11 @@ class AttrController extends AbstractRestfulController
      */
     private $typeTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $listOptionTable;
+
     public function __construct(
         Item $item,
         SpecificationsService $specsService,
@@ -137,14 +157,18 @@ class AttrController extends AbstractRestfulController
         InputFilter $userValuePatchQueryFilter,
         InputFilter $userValuePatchDataFilter,
         InputFilter $attributeListInputFilter,
+        InputFilter $attributePostInputFilter,
         InputFilter $attributeItemGetInputFilter,
         InputFilter $valueListInputFilter,
         InputFilter $attributeItemPatchInputFilter,
         InputFilter $zoneAttributeListInputFilter,
         InputFilter $zoneAttributePostInputFilter,
+        InputFilter $listOptionIndexInputFilter,
+        InputFilter $listOptionPostInputFilter,
         TableGateway $zoneTable,
         TableGateway $zoneAttributeTable,
-        TableGateway $typeTable
+        TableGateway $typeTable,
+        TableGateway $listOptionTable
     ) {
         $this->item = $item;
         $this->specsService = $specsService;
@@ -156,6 +180,7 @@ class AttrController extends AbstractRestfulController
         $this->attributeHydrator = $attributeHydrator;
         $this->valueHydrator = $valueHydrator;
         $this->userValueListInputFilter = $userValueListInputFilter;
+        $this->attributePostInputFilter = $attributePostInputFilter;
         $this->userValuePatchQueryFilter = $userValuePatchQueryFilter;
         $this->userValuePatchDataFilter = $userValuePatchDataFilter;
         $this->attributeListInputFilter = $attributeListInputFilter;
@@ -164,9 +189,12 @@ class AttrController extends AbstractRestfulController
         $this->attributeItemPatchInputFilter = $attributeItemPatchInputFilter;
         $this->zoneAttributeListInputFilter = $zoneAttributeListInputFilter;
         $this->zoneAttributePostInputFilter = $zoneAttributePostInputFilter;
+        $this->listOptionIndexInputFilter = $listOptionIndexInputFilter;
+        $this->listOptionPostInputFilter = $listOptionPostInputFilter;
         $this->zoneTable = $zoneTable;
         $this->zoneAttributeTable = $zoneAttributeTable;
         $this->typeTable = $typeTable;
+        $this->listOptionTable = $listOptionTable;
     }
 
     public function conflictIndexAction()
@@ -427,6 +455,62 @@ class AttrController extends AbstractRestfulController
         }
 
         return $this->getResponse()->setStatusCode(200);
+    }
+
+    public function attributePostAction()
+    {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $attributeTable = $this->specsService->getAttributeTable();
+
+        $request = $this->getRequest();
+
+        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
+            $data = $this->jsonDecode($request->getContent());
+        } else {
+            $data = $request->getPost()->toArray();
+        }
+
+        $this->attributePostInputFilter->setData($data);
+
+        if (! $this->attributePostInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->attributePostInputFilter);
+        }
+
+        $values = $this->attributePostInputFilter->getValues();
+
+        $parentId = $values['parent_id'] ? $values['parent_id'] : null;
+
+        $select = $attributeTable->getSql()->select()
+            ->columns(['max' => new Sql\Expression('max(position)')])
+            ->where(['parent_id' => $parentId]);
+
+        $row = $attributeTable->selectWith($select)->current();
+
+        $max = $row ? (int)$row['max'] : 0;
+
+        $set = [
+            'name'        => $values['name'],
+            'parent_id'   => $parentId,
+            'type_id'     => $values['type_id'] ? $values['type_id'] : null,
+            'description' => $values['description'],
+            'unit_id'     => $values['unit_id'] ? $values['unit_id'] : null,
+            'precision'   => strlen($values['precision']) > 0 ? $values['precision'] : null,
+            'position'    => $max + 1
+        ];
+
+        $attributeTable->insert($set);
+
+        $id = $attributeTable->getLastInsertValue();
+
+        $url = $this->url()->fromRoute('api/attr/attribute/item/get', [
+            'id' => $id
+        ]);
+        $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
+
+        return $this->getResponse()->setStatusCode(201);
     }
 
     public function attributeItemGetAction()
@@ -824,5 +908,72 @@ class AttrController extends AbstractRestfulController
         return new JsonModel([
             'items' => array_values($this->specsService->getUnits())
         ]);
+    }
+
+    public function listOptionIndexAction()
+    {
+        $user = $this->user()->get();
+
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $this->listOptionIndexInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->listOptionIndexInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->listOptionIndexInputFilter);
+        }
+
+        $values = $this->listOptionIndexInputFilter->getValues();
+
+        $listOptions = $this->specsService->getListOptionsArray($values['attribute_id']);
+
+        return new JsonModel([
+            'items' => $listOptions
+        ]);
+    }
+
+    public function listOptionPostAction()
+    {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $request = $this->getRequest();
+
+        if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
+            $data = $this->jsonDecode($request->getContent());
+        } else {
+            $data = $request->getPost()->toArray();
+        }
+
+        $this->listOptionPostInputFilter->setData($data);
+
+        if (! $this->listOptionPostInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->listOptionPostInputFilter);
+        }
+
+        $values = $this->listOptionPostInputFilter->getValues();
+
+        $select = $this->listOptionTable->getSql()->select()
+            ->columns(['max' => new Sql\Expression('MAX(position)')])
+            ->where(['attribute_id' => $values['attribute_id']]);
+
+        $row = $this->listOptionTable->selectWith($select)->current();
+        $max = $row ? (int)$row['max'] : 0;
+
+
+        $this->listOptionTable->insert([
+            'name'          => $values['name'],
+            'attribute_id'  => $values['attribute_id'],
+            'parent_id'     => $values['parent_id'] ? $values['parent_id'] : null,
+            'position'      => 1 + $max
+        ]);
+
+        return $this->getResponse()->setStatusCode(201);
     }
 }

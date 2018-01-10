@@ -2,59 +2,7 @@
 
 namespace Application;
 
-use Zend\Router\Http\Literal;
-use Zend\Router\Http\Segment;
-
 return [
-    'router' => [
-        'routes' => [
-            'moder' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/moder'
-                ],
-                'may_terminate' => false,
-                'child_routes' => [
-                    'attrs' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/attrs[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\AttrsController::class
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
-                    'modification' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/modification[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\ModificationController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-        ]
-    ],
-    'controllers' => [
-        'factories' => [
-            Controller\Moder\AttrsController::class => Controller\Moder\Service\AttrsControllerFactory::class,
-        ]
-    ],
     'forms' => [
         'ModerPictureVoteForm2' => [
             'type'     => 'Zend\Form\Form',

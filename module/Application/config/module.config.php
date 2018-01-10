@@ -39,7 +39,6 @@ return [
     'controllers' => [
         'factories' => [
             Controller\BrandsController::class          => Controller\Frontend\Service\BrandsControllerFactory::class,
-            Controller\CarsController::class            => Controller\Frontend\Service\CarsControllerFactory::class,
             Controller\CatalogueController::class       => Controller\Frontend\Service\CatalogueControllerFactory::class,
             Controller\CategoryController::class        => Controller\Frontend\Service\CategoryControllerFactory::class,
             Controller\CommentsController::class        => Controller\Frontend\Service\CommentsControllerFactory::class,
@@ -268,6 +267,7 @@ return [
             'ItemCatnameNotExists' => Validator\Item\CatnameNotExists::class,
         ],
         'factories' => [
+            Validator\Attr\AttributeId::class            => Validator\Attr\AttributeIdFactory::class,
             Validator\Attr\TypeId::class                 => Validator\Attr\TypeIdFactory::class,
             Validator\Attr\UnitId::class                 => Validator\Attr\UnitIdFactory::class,
             Validator\Item\CatnameNotExists::class       => Validator\Item\CatnameNotExistsFactory::class,

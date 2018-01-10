@@ -34,16 +34,27 @@
 
         <h2 translate>moder/attrs/parameters/options-list</h2>
         <div class="well">
-            <?=$this->partial('application/moder/attrs/attribute/options-partial', [
-                'options' => $this->options
-            ]) ?>
+            <autowp-moder-attrs-attribute-list-options-tree items="ctrl.listOptions"></autowp-moder-attrs-attribute-list-options-tree>
         </div>
 
-        <h2 translate>moder/attrs/parameters/options-list/add</h2>
+        <h2>
+            <span translate>moder/attrs/parameters/options-list/add</span>
+            <span ng-show="ctrl.addListOptionLoading > 0">
+                <i class="fa fa-spinner fa-spin fa-fw"></i>
+            </span>
+        </h2>
         <div class="well">
-            <?=$this->partial('application/forms/bootstrap-vertical', [
-                'form' => $this->formListOption
-            ])?>
+            <form class="form-vertical" ng-submit="ctrl.addListOption()"><fieldset>
+                <div class="form-group">
+                    <label for="parent_id" translate>attrs/list-options/parent</label>
+                    <select name="parent_id" class="form-control" ng-model="ctrl.newListOption.parent_id" ng-options="item.id as item.name for item in ctrl.listOptionsOptions"></select>
+                </div>
+                <div class="form-group">
+                    <label for="name" translate>attrs/list-options/name</label>
+                    <input type="text" name="name" class="form-control" ng-model="ctrl.newListOption.name" />
+                </div>
+                <button type="submit" name="submit" class="btn btn-primary" translate>send</button>
+            </fieldset></form>
         </div>
     </div>
     <div class="col-md-6">
@@ -73,11 +84,36 @@
             </div>
         </div>
 
-        <h2 translate>moder/attrs/attribute/add-subattribute</h2>
+        <h2>
+            <span translate>moder/attrs/attribute/add-subattribute</span>
+            <span ng-show="ctrl.addLoading > 0">
+                <i class="fa fa-spinner fa-spin fa-fw"></i>
+            </span>
+        </h2>
         <div class="well">
-            <?=$this->partial('application/forms/bootstrap-vertical', [
-                'form' => $this->formAttributeNew
-            ])?>
+            <form class="form-vertical" ng-submit="ctrl.addAttribute()"><fieldset>
+                <div class="form-group">
+                    <label for="name" translate>attrs/attribute/name</label>
+                    <input type="text" name="name" class="form-control" ng-model="ctrl.newAttribute.name" />
+                </div>
+                <div class="form-group">
+                    <label for="type_id" translate>attrs/attribute/type</label>
+                    <select name="type_id" class="form-control" ng-options="type.id as type.name|translate for type in ctrl.typeOptions" ng-model="ctrl.newAttribute.type_id"></select>
+                </div>
+                <div class="form-group">
+                    <label for="precision" translate>attrs/attribute/precision</label>
+                    <input type="text" name="precision" class="form-control" ng-model="ctrl.newAttribute.precision">
+                </div>
+                <div class="form-group">
+                    <label for="unit_id" translate>attrs/attribute/unit</label>
+                    <select name="unit_id" class="form-control" ng-options="unit.id as unit.name|translate for unit in ctrl.unitOptions" ng-model="ctrl.newAttribute.unit_id"></select>
+                </div>
+                <div class="form-group">
+                    <label for="description" translate>attrs/attribute/description</label>
+                    <textarea name="description" class="form-control" ng-model="ctrl.newAttribute.description"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" translate>send</button>
+            </fieldset></form>
         </div>
     </div>
 </div>

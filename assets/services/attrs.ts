@@ -3,6 +3,10 @@ import Module from 'app.module';
 
 const SERVICE_NAME = 'AttrsService';
 
+export interface GetAttributeServiceOptions {
+    fields: string;
+}
+
 export class AttrsService {
     static $inject = ['$q', '$http', '$translate'];
   
@@ -48,7 +52,7 @@ export class AttrsService {
         });
     }
     
-    public getAttribute(id: number): ng.IPromise<autowp.IAttrAttribute>
+    public getAttribute(id: number, options?: GetAttributeServiceOptions): ng.IPromise<autowp.IAttrAttribute>
     {
         let self = this;
         return this.$q(function(resolve: ng.IQResolveReject<autowp.IAttrAttribute>, reject: ng.IQResolveReject<any>) {

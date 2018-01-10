@@ -114,6 +114,53 @@ return [
                 ]
             ],
         ],
+        'api_attr_list_options_get' => [
+            'attribute_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ]
+            ]
+        ],
+        'api_attr_list_options_post' => [
+            'attribute_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ]
+            ],
+            'parent_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ]
+            ],
+            'name' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => 'SingleSpaces']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => 0,
+                            'max' => 255
+                        ]
+                    ]
+                ]
+            ],
+        ],
         'api_attr_attribute_get' => [
             'zone_id' => [
                 'required' => false,
@@ -161,6 +208,72 @@ return [
                     ]
                 ]
             ],
+        ],
+        'api_attr_attribute_post' => [
+            'parent_id' => [
+                'required' => false,
+                'validators' => [
+                    ['name' => 'Digits'],
+                    ['name' => Validator\Attr\AttributeId::class]
+                ]
+            ],
+            'name' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => 'SingleSpaces']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => 0,
+                            'max' => 255
+                        ]
+                    ]
+                ]
+            ],
+            'type_id' => [
+                'required' => true,
+                'validators' => [
+                    ['name' => 'Digits'],
+                    ['name' => Validator\Attr\TypeId::class]
+                ]
+            ],
+            'precision' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'unit_id' => [
+                'required' => false,
+                'validators' => [
+                    ['name' => 'Digits'],
+                    ['name' => Validator\Attr\UnitId::class]
+                ]
+            ],
+            'description' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => 'SingleSpaces']
+                ]
+            ],
+            'move' => [
+                'required' => false,
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => ['up', 'down']
+                        ]
+                    ]
+                ]
+            ]
         ],
         'api_attr_attribute_item_get' => [
             'fields' => [
