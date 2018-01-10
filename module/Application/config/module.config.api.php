@@ -360,6 +360,15 @@ return [
                                         ],
                                         'may_terminate' => false,
                                         'child_routes'  => [
+                                            'get' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb'    => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'attribute-item-get'
+                                                    ],
+                                                ],
+                                            ],
                                             'patch' => [
                                                 'type' => 'Method',
                                                 'options' => [
@@ -369,6 +378,24 @@ return [
                                                     ],
                                                 ],
                                             ],
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            'attribute-type' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/attribute-type'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'attribute-type-index',
+                                            ]
                                         ]
                                     ],
                                 ]
@@ -452,6 +479,24 @@ return [
                                             ],
                                         ]
                                     ],
+                                ]
+                            ],
+                            'unit' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/unit'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb'    => 'get',
+                                            'defaults' => [
+                                                'action' => 'unit-index',
+                                            ]
+                                        ]
+                                    ]
                                 ]
                             ],
                             'zone' => [

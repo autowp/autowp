@@ -124,6 +124,18 @@ return [
                     ['name' => 'Digits'],
                 ]
             ],
+            'parent_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ]
+            ],
+            'recursive' => [
+                'required' => false
+            ],
             'page' => [
                 'required' => false,
                 'filters'  => [
@@ -150,7 +162,64 @@ return [
                 ]
             ],
         ],
+        'api_attr_attribute_item_get' => [
+            'fields' => [
+                'required' => false,
+                'filters'  => [
+                    [
+                        'name' => Filter\Api\FieldsFilter::class,
+                        'options' => ['fields' => ['unit', 'childs', 'options']]
+                    ]
+                ]
+            ],
+        ],
         'api_attr_attribute_item_patch' => [
+            'name' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => 'SingleSpaces']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => 0,
+                            'max' => 255
+                        ]
+                    ]
+                ]
+            ],
+            'type_id' => [
+                'required' => true,
+                'validators' => [
+                    ['name' => 'Digits'],
+                    ['name' => Validator\Attr\TypeId::class]
+                ]
+            ],
+            'precision' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'unit_id' => [
+                'required' => false,
+                'validators' => [
+                    ['name' => 'Digits'],
+                    ['name' => Validator\Attr\UnitId::class]
+                ]
+            ],
+            'description' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim'],
+                    ['name' => 'SingleSpaces']
+                ]
+            ],
             'move' => [
                 'required' => false,
                 'validators' => [

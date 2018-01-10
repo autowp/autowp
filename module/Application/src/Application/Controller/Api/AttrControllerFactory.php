@@ -28,12 +28,14 @@ class AttrControllerFactory implements FactoryInterface
             $filters->get('api_attr_user_value_patch_query'),
             $filters->get('api_attr_user_value_patch_data'),
             $filters->get('api_attr_attribute_get'),
+            $filters->get('api_attr_attribute_item_get'),
             $filters->get('api_attr_value_get'),
             $filters->get('api_attr_attribute_item_patch'),
             $filters->get('api_attr_zone_attribute_get'),
             $filters->get('api_attr_zone_attribute_post'),
             $tables->get('attrs_zones'),
-            $tables->get('attrs_zone_attributes')
+            $tables->get('attrs_zone_attributes'),
+            $tables->get('attrs_types')
         );
     }
 }

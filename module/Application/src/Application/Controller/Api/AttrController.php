@@ -82,6 +82,11 @@ class AttrController extends AbstractRestfulController
     /**
      * @var InputFilter
      */
+    private $attributeItemGetInputFilter;
+
+    /**
+     * @var InputFilter
+     */
     private $attributeHydrator;
 
     /**
@@ -114,6 +119,11 @@ class AttrController extends AbstractRestfulController
      */
     private $zoneAttributeTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $typeTable;
+
     public function __construct(
         Item $item,
         SpecificationsService $specsService,
@@ -127,12 +137,14 @@ class AttrController extends AbstractRestfulController
         InputFilter $userValuePatchQueryFilter,
         InputFilter $userValuePatchDataFilter,
         InputFilter $attributeListInputFilter,
+        InputFilter $attributeItemGetInputFilter,
         InputFilter $valueListInputFilter,
         InputFilter $attributeItemPatchInputFilter,
         InputFilter $zoneAttributeListInputFilter,
         InputFilter $zoneAttributePostInputFilter,
         TableGateway $zoneTable,
-        TableGateway $zoneAttributeTable
+        TableGateway $zoneAttributeTable,
+        TableGateway $typeTable
     ) {
         $this->item = $item;
         $this->specsService = $specsService;
@@ -147,12 +159,14 @@ class AttrController extends AbstractRestfulController
         $this->userValuePatchQueryFilter = $userValuePatchQueryFilter;
         $this->userValuePatchDataFilter = $userValuePatchDataFilter;
         $this->attributeListInputFilter = $attributeListInputFilter;
+        $this->attributeItemGetInputFilter = $attributeItemGetInputFilter;
         $this->valueListInputFilter = $valueListInputFilter;
         $this->attributeItemPatchInputFilter = $attributeItemPatchInputFilter;
         $this->zoneAttributeListInputFilter = $zoneAttributeListInputFilter;
         $this->zoneAttributePostInputFilter = $zoneAttributePostInputFilter;
         $this->zoneTable = $zoneTable;
         $this->zoneAttributeTable = $zoneAttributeTable;
+        $this->typeTable = $typeTable;
     }
 
     public function conflictIndexAction()
@@ -415,6 +429,41 @@ class AttrController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    public function attributeItemGetAction()
+    {
+        $user = $this->user()->get();
+
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $this->attributeItemGetInputFilter->setData($this->params()->fromQuery());
+
+        if (! $this->attributeItemGetInputFilter->isValid()) {
+            return $this->inputFilterResponse($this->attributeItemGetInputFilter);
+        }
+
+        $values = $this->attributeItemGetInputFilter->getValues();
+
+        $attribute = $this->specsService->getAttribute($this->params('id'));
+
+        if (! $attribute) {
+            return $this->notFoundAction();
+        }
+
+        $this->attributeHydrator->setOptions([
+            'fields'   => $values['fields'],
+            'language' => $this->language(),
+            'user_id'  => $user ? $user['id'] : null
+        ]);
+
+        return new JsonModel($this->attributeHydrator->extract($attribute));
+    }
+
     public function attributeIndexAction()
     {
         $user = $this->user()->get();
@@ -436,9 +485,9 @@ class AttrController extends AbstractRestfulController
         $values = $this->attributeListInputFilter->getValues();
 
         $attributes = $this->specsService->getAttributes([
-            'parent'    => 0,
+            'parent'    => (int) $values['parent_id'],
             'zone'      => $values['zone_id'],
-            'recursive' => true
+            'recursive' => (bool) $values['recursive']
         ]);
 
         $this->attributeHydrator->setOptions([
@@ -563,6 +612,34 @@ class AttrController extends AbstractRestfulController
         }
 
         $values = $this->attributeItemPatchInputFilter->getValues();
+
+        $set = [];
+
+        if (isset($values['name'])) {
+            $set['name'] = $values['name'];
+        }
+
+        if (isset($values['type_id'])) {
+            $set['type_id'] = $values['type_id'] ? $values['type_id'] : null;
+        }
+
+        if (isset($values['description'])) {
+            $set['description'] = $values['description'];
+        }
+
+        if (isset($values['unit_id'])) {
+            $set['unit_id'] = $values['unit_id'] ? $values['unit_id'] : null;
+        }
+
+        if (isset($values['precision'])) {
+            $set['precision'] = strlen($values['precision']) > 0 ? $values['precision'] : null;
+        }
+
+        if ($set) {
+            $attributeTable->update($set, [
+                'id' => $attribute['id']
+            ]);
+        }
 
         if (isset($values['move'])) {
             switch ($values['move']) {
@@ -705,5 +782,47 @@ class AttrController extends AbstractRestfulController
         ]);
 
         return $this->getResponse()->setStatusCode(204);
+    }
+
+    public function attributeTypeIndexAction()
+    {
+        $user = $this->user()->get();
+
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $items = [];
+        foreach ($this->typeTable->select([]) as $type) {
+            $items[] = [
+                'id'   => (int)$type['id'],
+                'name' => $type['name']
+            ];
+        }
+
+        return new JsonModel([
+            'items' => $items
+        ]);
+    }
+
+    public function unitIndexAction()
+    {
+        $user = $this->user()->get();
+
+        if (! $user) {
+            return $this->forbiddenAction();
+        }
+
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        return new JsonModel([
+            'items' => array_values($this->specsService->getUnits())
+        ]);
     }
 }

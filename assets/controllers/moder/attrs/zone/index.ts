@@ -95,7 +95,10 @@ export class ModerAttrsZoneController {
         
         this.$http({
             method: 'GET',
-            url: '/api/attr/attribute'
+            url: '/api/attr/attribute',
+            params: {
+                recursive: 1
+            }
         }).then(function(response: ng.IHttpResponse<any>) {
             self.attributes = response.data.items;
         }, function(response: ng.IHttpResponse<any>) {

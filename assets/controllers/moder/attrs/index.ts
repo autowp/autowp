@@ -4,6 +4,7 @@ import { AclService } from 'services/acl';
 import { AttrsService } from 'services/attrs';
 import notify from 'notify';
 
+import './attribute';
 import './attribute-list';
 import './zone';
 
@@ -81,7 +82,10 @@ export class ModerAttrsController {
         
         this.$http({
             method: 'GET',
-            url: '/api/attr/attribute'
+            url: '/api/attr/attribute',
+            params: {
+                recursive: 1
+            }
         }).then(function(response: ng.IHttpResponse<any>) {
             self.attributes = response.data.items;
         }, function(response: ng.IHttpResponse<any>) {

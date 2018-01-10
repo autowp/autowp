@@ -47,6 +47,54 @@ export class AttrsService {
             });
         });
     }
+    
+    public getAttribute(id: number): ng.IPromise<autowp.IAttrAttribute>
+    {
+        let self = this;
+        return this.$q(function(resolve: ng.IQResolveReject<autowp.IAttrAttribute>, reject: ng.IQResolveReject<any>) {
+            
+            self.$http({
+                method: 'GET',
+                url: '/api/attr/attribute/' + id
+            }).then(function(response: ng.IHttpResponse<autowp.IAttrAttribute>) {
+                resolve(response.data);
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
+            });
+        });
+    }
+    
+    public getAttributeTypes(): ng.IPromise<autowp.IAttrAttributeType[]>
+    {
+        let self = this;
+        return this.$q(function(resolve: ng.IQResolveReject<autowp.IAttrAttributeType[]>, reject: ng.IQResolveReject<any>) {
+        
+            self.$http({
+                method: 'GET',
+                url: '/api/attr/attribute-type'
+            }).then(function(response: ng.IHttpResponse<autowp.GetAttributeTypesResult>) {
+                resolve(response.data.items);
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
+            });
+        });
+    }
+    
+    public getUnits(): ng.IPromise<autowp.IAttrUnit[]>
+    {
+        let self = this;
+        return this.$q(function(resolve: ng.IQResolveReject<autowp.IAttrUnit[]>, reject: ng.IQResolveReject<any>) {
+        
+            self.$http({
+                method: 'GET',
+                url: '/api/attr/unit'
+            }).then(function(response: ng.IHttpResponse<autowp.GetUnitResult>) {
+                resolve(response.data.items);
+            }, function(response: ng.IHttpResponse<any>) {
+                reject(response);
+            });
+        });
+    }
 };
 
 angular.module(Module).service(SERVICE_NAME, AttrsService);

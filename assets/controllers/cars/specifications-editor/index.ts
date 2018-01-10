@@ -177,7 +177,8 @@ export class CarsSpecificationsEditorController {
                     url: '/api/attr/attribute',
                     params: {
                         fields: 'unit,options,childs.unit,childs.options',
-                        zone_id: item.attr_zone_id
+                        zone_id: item.attr_zone_id,
+                        recursive: 1
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
                     self.$translate(['specifications/no-value-text', 'specifications/boolean/false', 'specifications/boolean/true']).then(function(translations) {

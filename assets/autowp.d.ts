@@ -65,6 +65,24 @@ declare namespace autowp {
         name: string;
     }
     
+    export interface IAttrAttribute
+    {
+        id: number;
+        name: string;
+    }
+    
+    export interface IAttrAttributeType
+    {
+        id: number;
+        name: string;
+    }
+    
+    export interface IAttrUnit
+    {
+        id: number;
+        name: string;
+    }
+    
     export interface IUser
     {
         id: number;
@@ -122,5 +140,13 @@ declare namespace autowp {
     
     export interface GetZonesResult {
         items: autowp.IAttrZone[];
+    }
+    
+    export interface GetAttributeTypesResult {
+        items: autowp.IAttrAttributeType[];
+    }
+    
+    export interface GetUnitResult {
+        items: autowp.IAttrUnit[];
     }
 }

@@ -1,0 +1,83 @@
+<div class="row">
+    <div class="col-md-6">
+        <h2>
+            <span translate>moder/attrs/parameters</span>
+            <span ng-show="ctrl.loading > 0">
+                <i class="fa fa-spinner fa-spin fa-fw"></i>
+            </span>
+        </h2>
+        <div class="well">
+            <form class="form-vertical" ng-submit="ctrl.saveAttribute()"><fieldset>
+                <div class="form-group">
+                    <label for="name" translate>attrs/attribute/name</label>
+                    <input type="text" name="name" class="form-control" ng-model="ctrl.attribute.name" />
+                </div>
+                <div class="form-group">
+                    <label for="type_id" translate>attrs/attribute/type</label>
+                    <select name="type_id" class="form-control" ng-options="type.id as type.name|translate for type in ctrl.typeOptions" ng-model="ctrl.attribute.type_id"></select>
+                </div>
+                <div class="form-group">
+                    <label for="precision" translate>attrs/attribute/precision</label>
+                    <input type="text" name="precision" class="form-control" ng-model="ctrl.attribute.precision">
+                </div>
+                <div class="form-group">
+                    <label for="unit_id" translate>attrs/attribute/unit</label>
+                    <select name="unit_id" class="form-control" ng-options="unit.id as unit.name|translate for unit in ctrl.unitOptions" ng-model="ctrl.attribute.unit_id"></select>
+                </div>
+                <div class="form-group">
+                    <label for="description" translate>attrs/attribute/description</label>
+                    <textarea name="description" class="form-control" ng-model="ctrl.attribute.description"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" translate>send</button>
+            </fieldset></form>
+        </div>
+
+        <h2 translate>moder/attrs/parameters/options-list</h2>
+        <div class="well">
+            <?=$this->partial('application/moder/attrs/attribute/options-partial', [
+                'options' => $this->options
+            ]) ?>
+        </div>
+
+        <h2 translate>moder/attrs/parameters/options-list/add</h2>
+        <div class="well">
+            <?=$this->partial('application/forms/bootstrap-vertical', [
+                'form' => $this->formListOption
+            ])?>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div ng-if="ctrl.attributes.length > 0">
+            <h2 translate>moder/attrs/attributes</h2>
+            <div class="well">
+                <table class="table">
+                    <tr>
+                        <th translate>attrs/attribute/name</th>
+                        <th translate>attrs/attribute/type</th>
+                        <th translate>attrs/attribute/unit</th>
+                    </tr>
+                    <tr ng-repeat="attribute in ctrl.attributes">
+                        <td>
+                            <a ui-sref="moder-attrs-attribute({id: attribute.id})" ng-bind="attribute.name|translate"></a>
+                        </td>
+                        <td>
+                            <span ng-if="attribute.type_id" ng-bind="ctrl.typeMap[attribute.type_id]"></span>
+                            <span ng-if="!attribute.type_id">—</span>
+                        </td>
+                        <td>
+                            <span ng-if="attribute.unit" ng-bind="attribute.unit.name|translate"></span>
+                            <span ng-if="!attribute.unit">—</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <h2 translate>moder/attrs/attribute/add-subattribute</h2>
+        <div class="well">
+            <?=$this->partial('application/forms/bootstrap-vertical', [
+                'form' => $this->formAttributeNew
+            ])?>
+        </div>
+    </div>
+</div>

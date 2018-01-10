@@ -268,6 +268,8 @@ return [
             'ItemCatnameNotExists' => Validator\Item\CatnameNotExists::class,
         ],
         'factories' => [
+            Validator\Attr\TypeId::class                 => Validator\Attr\TypeIdFactory::class,
+            Validator\Attr\UnitId::class                 => Validator\Attr\UnitIdFactory::class,
             Validator\Item\CatnameNotExists::class       => Validator\Item\CatnameNotExistsFactory::class,
             Validator\ItemParent\CatnameNotExists::class => Validator\ItemParent\CatnameNotExistsFactory::class,
             Validator\User\EmailExists::class            => Validator\User\EmailExistsFactory::class,

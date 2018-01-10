@@ -546,7 +546,7 @@ class SpecificationsService
      * @param int $id
      * @return NULL|array
      */
-    private function getAttribute(int $id)
+    public function getAttribute(int $id)
     {
         $this->loadAttributes();
 
@@ -943,7 +943,14 @@ class SpecificationsService
                     $attributes[] = $this->attributes[$id];
                 }
             } else {
-                $attributes = $this->attributes;
+                if ($parent !== null) {
+                    $ids = [];
+                    foreach ($this->childs[$parent] as $id) {
+                        $attributes[] = $this->attributes[$id];
+                    }
+                } else {
+                    $attributes = $this->attributes;
+                }
             }
         }
 
