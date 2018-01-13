@@ -24,6 +24,7 @@ declare namespace autowp {
             remember: false
         };
         isSecondaryMenuItems: (page: any) => boolean;
+        disablePageName: boolean;
         title: string|null;
         pageName: string|null;
         isAdminPage: boolean;

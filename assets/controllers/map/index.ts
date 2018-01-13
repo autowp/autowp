@@ -35,6 +35,7 @@ export class MapController {
                 blankPage: false,
                 needRight: false
             },
+            disablePageName: true,
             name: 'page/117/name',
             pageId: 117
         });

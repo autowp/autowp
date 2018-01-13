@@ -165,7 +165,7 @@ ga('send', 'pageview');
             <div class="row">
                 <div class="col-sm-{{spanCenter}}">
                     <autowp-breadcrumbs></autowp-breadcrumbs>
-                    <div class="page-header" ng-if="pageName">
+                    <div class="page-header" ng-if="pageName && !disablePageName">
                         <h1 ng-bind="pageName"></h1>
                     </div>
 

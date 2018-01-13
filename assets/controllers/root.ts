@@ -50,11 +50,15 @@ export class RootController {
         $scope.pageName = null;
         $scope.title = 'WheelsAge';
         $scope.pageId = null;
+        $scope.disablePageName = false;
         
         var self = this;
         $scope.pageEnv = function(data) {
             self.setSidebars(data.layout.needRight);
             $scope.isAdminPage = data.layout.isAdminPage;
+            $scope.disablePageName = !!data.disablePageName;
+            
+            console.log($scope.disablePageName, data);
             
             var args = data.args ? data.args : {};
             var preparedUrlArgs: any = {};
