@@ -2,6 +2,7 @@ import * as angular from "angular";
 import Module from 'app.module';
 import * as $ from 'jquery';
 import { MessageService } from 'services/message';
+import notify from 'notify'
 
 const SERVICE_NAME = 'MessageDialogService';
 
@@ -96,6 +97,8 @@ export class MessageDialogService {
                         if (sentCallback) {
                             sentCallback();
                         }
+                    }, function(response: ng.IHttpResponse<any>) {
+                        notify.response(response);
                     });
                 }
             });
