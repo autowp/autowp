@@ -20,7 +20,7 @@
             <td ng-bind="page.id"></td>
             <td ng-style="{'padding-left': page.level * 20 + 'px'}" ng-bind="'page/' + page.id + '/name'|translate"></td>
             <td ng-bind="page.breadcrumbs"></td>
-            <td>{{page.is_group_node ? 'yes' : 'no'}} {{page.level * 20}}</td>
+            <td>{{page.is_group_node ? 'yes' : 'no'}}</td>
             <td style="white-space:nowrap">
                 <a class="btn btn-success btn-sm" ui-sref="moder-pages-add({parent_id: page.id})" aria-label="add"><i class="fa fa-plus"></i></a>
                 <a class="btn btn-default btn-sm" ui-sref="moder-pages-edit({id: page.id})" aria-label="edit"><i class="fa fa-pencil"></i></a>
