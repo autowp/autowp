@@ -1,41 +1,74 @@
-var $ = require("jquery");
-var filesize = require("filesize");
-require("./gallery.less");
+import * as $ from "jquery";
+import * as filesize from "filesize";
+import "./gallery.less";
 
-var Carousel = function (element, options) {
-    this.$element    = $(element);
-    this.options     = options;
-    this.sliding     = null;
-    this.$active     = null;
-    this.$items      = null;
-    this.onSlide     = options.slide;
+interface Dimension {
+    width: number;
+    height: number;
+}
 
-    this.$element.carousel({
-        interval: false,
-        wrap: false
-    });
-    this.$element.on('keydown.bs.carousel', $.proxy(this.keydown, this));
-};
+interface Bounds {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+}
 
-Carousel.TRANSITION_DURATION = 600;
+class Carousel {
+    
+    private $element: JQuery;
+    private sliding: any = null;
+    private $active: JQuery;
+    private $items: JQuery;
+    private onSlide: Function|null = null;
+    private TRANSITION_DURATION: number = 600;
+    private keypressHandler: (eventObject: JQueryEventObject, ...eventData: any[]) => any;
+    
+    constructor(
+        element: any, 
+        options: any
+    ) {
+        this.$element    = $(element);
+        this.onSlide     = options.slide;
 
-$.extend(Carousel.prototype, {
-    keydown: function (e) {
-        if (/input|textarea/i.test(e.target.tagName)) {
-            return;
-        }
-        switch (e.which) {
-          case 37: this.prev(); break;
-          case 39: this.next(); break;
-          default: return;
-        }
+        this.$element.carousel({
+            interval: 0,
+            wrap: false
+        });
+        
+        let self = this;
+        
+        this.keypressHandler = (event: JQueryEventObject) => {
+            if (/input|textarea/i.test(event.currentTarget.tagName)) {
+                return;
+            }
+            switch (event.which) {
+                case 37: self.prev(); break;
+                case 39: self.next(); break;
+                default: return;
+            }
 
-        e.preventDefault();
-    },
-    getItemIndex: function (item) {
+            event.preventDefault();
+        };
+    }
+    
+    public show() {
+        $(document).on('keydown.bs.carousel', this.keypressHandler);
+    }
+    
+    public hide() {
+        $(document).off('keydown.bs.carousel', this.keypressHandler);
+    }
+    
+    public destroy() {
+        this.hide();
+    }
+
+    private getItemIndex(item: JQuery) {
         return this.$element.find('.item').index(item || this.$active);
-    },
-    getItemForDirection: function (direction, active) {
+    }
+    
+    private getItemForDirection(direction: string, active: JQuery) {
         var $items = this.$element.find('.item');
         var activeIndex = this.getItemIndex(active);
         var willWrap = (direction == 'prev' && activeIndex === 0) ||
@@ -46,8 +79,9 @@ $.extend(Carousel.prototype, {
         var delta = direction == 'prev' ? -1 : 1;
         var itemIndex = (activeIndex + delta) % $items.length;
         return $items.eq(itemIndex);
-    },
-    to: function (pos) {
+    }
+
+    public to(pos: number) {
         //var that        = this;
         var activeIndex = this.getItemIndex(this.$active = this.$element.find('.item.active'));
         
@@ -58,27 +92,32 @@ $.extend(Carousel.prototype, {
         //if (this.sliding)       return this.$element.one('slid.bs.carousel', function () { that.to(pos) }) // yes, "slid"
 
         return this.slide(pos > activeIndex ? 'next' : 'prev', $items.eq(pos));
-    },
-    next: function () {
+    }
+
+    public next() {
         if (this.sliding) return;
         return this.slide('next');
-    },
-    prev: function () {
+    }
+    
+    public prev() {
         if (this.sliding) return;
         return this.slide('prev');
-    },
-    slide: function (type, next) {
+    }
+    
+    private slide(type: string, next: any = null) {
         var $active   = this.$element.find('.item.active');
         var $next     = next || this.getItemForDirection(type, $active);
-        var direction = type == 'next' ? 'left' : 'right';
+        var direction: string = type == 'next' ? 'left' : 'right';
         var that      = this;
 
         if ($next.hasClass('active')) {
             return (this.sliding = false);
         }
 
-        var relatedTarget = $next[0];
-        this.onSlide(relatedTarget, direction);
+        var relatedTarget = $next ? $next[0] : null;
+        if (this.onSlide) {
+            this.onSlide(relatedTarget, direction);
+        }
 
         this.sliding = true;
 
@@ -93,7 +132,7 @@ $.extend(Carousel.prototype, {
                     $active.removeClass(['active', direction].join(' '));
                     that.sliding = false;
                 })
-                .emulateTransitionEnd(Carousel.TRANSITION_DURATION);
+                .emulateTransitionEnd(this.TRANSITION_DURATION);
         } else {
             $active.removeClass('active');
             $next.addClass('active');
@@ -102,28 +141,45 @@ $.extend(Carousel.prototype, {
 
         return this;
     }
-});
+}
 
-var Gallery = function(items) {
-    this.init(items);
-};
+export class Gallery {
+    
+    private MAX_INDICATORS: number = 80;
+    private count: number = 0;
+    private pages: number = 0;
+    private pageStatus: any[] = [];
+    private perPage: number = 10;
+    private current: any;
+    private url: string;
+    
+    private escHandler: (eventObject: JQueryEventObject, ...eventData: any[]) => any;
+    private $e: JQuery;
+    private $carousel: JQuery;
+    private $inner: JQuery;
+    private $indicators: JQuery;
+    private $numbers: JQuery;
+    private carousel: Carousel;
+    private position: number;
+    private indicatorRendered: boolean = false;
+    
+    constructor(items: any) {
+        this.init(items);
+    }
+    
+    public destroy() {
+        this.carousel.destroy();
+    }
 
-Gallery.prototype = {
-    MAX_INDICATORS: 80,
-    init: function(options) {
+    private init(options: any) {
         
         var self = this;
         
-        this.count = 0;
-        this.pages = 0;
         this.current = options.current;
         this.url = options.url;
-        this.pageStatus = [];
-        this.perPage = 10;
         
-        
-        this.escHandler = function(e) {
-            if (e.keyCode == 27) { // esc
+        this.escHandler = (event) => {
+            if (event.keyCode == 27) { // esc
                 self.hide();
             }
         };
@@ -142,7 +198,7 @@ Gallery.prototype = {
         
         this.carousel = new Carousel(this.$carousel[0], {
             wrap: false,
-            slide: function(relatedTarget) {
+            slide: function(relatedTarget: any) {
                 var $item = $(relatedTarget);
                 
                 self.activateItem($item, true);
@@ -160,30 +216,38 @@ Gallery.prototype = {
             }
         });
         
-        $carousel.find('.carousel-control.close').on('click', function(e) {
-            e.preventDefault();
+        $carousel.find('.carousel-control.close').on('click', (event: JQueryEventObject) => {
+            event.preventDefault();
             
             self.hide();
         });
         
-        $carousel.on('click', '.item .details.carousel-control', function(e) {
-            if (this.href == window.location.href) {
+        $carousel.on('click', '.item .details.carousel-control', (event: JQueryEventObject) => {
+            if ($(event.currentTarget).attr('href') == window.location.pathname) {
                 self.hide();
-                e.preventDefault();
+                event.preventDefault();
             }
         });
         
-        $carousel.on('click', '.item .comments.carousel-control', function(e) {
-            if (this.href.replace('#comments', '') == window.location.href.replace('#comments', '')) {
-                self.hide();
-                $('body').scrollTop($("#comments").offset().top);
-                e.preventDefault();
+        $carousel.on('click', '.item .comments.carousel-control', (event: JQueryEventObject) => {
+            let src = window.location.pathname.replace('#comments', '');
+            let href = $(event.currentTarget).attr('href');
+            if (href) {
+                let dst = href.replace('#comments', '');
+                if (src == dst) {
+                    self.hide();
+                    var offset = $("#comments").offset();
+                    if (offset !== undefined) {
+                        $('body').scrollTop(offset.top);
+                    }
+                    event.preventDefault();
+                }
             }
         });
         
-        $carousel.on('click', '.item img, .item .full.carousel-control', function() {
+        $carousel.on('click', '.item img, .item .full.carousel-control', (event: JQueryEventObject) =>  {
             
-            var $item = $(this).closest('.item');
+            var $item = $(event.currentTarget).closest('.item');
             var crop = $item.data('crop');
             if (crop) {
                 var cropMode = !$item.data('cropMode');
@@ -197,10 +261,10 @@ Gallery.prototype = {
             }
         });
         
-        $carousel.on('click', '.carousel-indicators li', function(e) {
-            e.preventDefault();
+        $carousel.on('click', '.carousel-indicators li', (event) => {
+            event.preventDefault();
             
-            var position = $(this).data('target');
+            var position = $(event.currentTarget).data('target');
             
             var page = self.positionPage(position);
             
@@ -209,26 +273,27 @@ Gallery.prototype = {
             });
         });
         
-        $carousel.on('click', '.right.carousel-control', function(e) {
-            e.preventDefault();
+        $carousel.on('click', '.right.carousel-control', (event) => {
+            event.preventDefault();
             
             self.carousel.next();
         });
         
-        $carousel.on('click', '.left.carousel-control', function(e) {
-            e.preventDefault();
+        $carousel.on('click', '.left.carousel-control', (event) => {
+            event.preventDefault();
             
             self.carousel.prev();
         });
         
-        $(window).on('resize', function() {
+        $(window).on('resize', () => {
             self.fixSize(self.$e.find('.item'));
         });
         self.fixSize(this.$e.find('.item'));
         
         this.load(self.current);
-    },
-    renderIndicator: function() {
+    }
+    
+    private renderIndicator() {
         if (this.count < this.MAX_INDICATORS) {
             if (!this.indicatorRendered) {
                 for (var i=0; i<this.count; i++) {
@@ -241,16 +306,18 @@ Gallery.prototype = {
                 this.indicatorRendered = true;
             }
         }
-    },
-    loadSiblingPages: function(index) {
+    }
+    
+    private loadSiblingPages(index: number) {
         var page = this.positionPage(index);
         var prevPage = page > 1 ? page - 1 : 1;
         var nextPage = page < this.pages ? page + 1 : this.pages;
         
         this.load(null, prevPage);
         this.load(null, nextPage);
-    },
-    load: function(pictureId, page, callback) {
+    }
+    
+    private load(pictureId: number|null, page: number = 0, callback: Function|undefined = undefined) {
         var self = this;
         if (page) {
             var loaded = false;
@@ -274,13 +341,14 @@ Gallery.prototype = {
             }
             self.pageStatus[json.page] = 'loaded';
             
-            var $activeItem = null;
+            let $activeItem: JQuery|undefined = undefined;
             
             var offset = self.perPage * (json.page - 1);
-            $.each(json.items, function(idx, item) {
-                var position = offset + idx;
+            for (let idx in json.items) {
+                let item = json.items[idx];
+                var position: number = offset + Number(idx);
                 
-                var active = self.current == item.id;
+                var active: boolean = self.current == item.id;
                 
                 var $item = self.renderItem(item);
                 $item.data('position', position);
@@ -305,12 +373,12 @@ Gallery.prototype = {
                     $activeItem = $item;
                     self.position = position;
                 }
-            });
+            }
             
             self.renderIndicator();
             self.refreshIndicator();
             
-            if ($activeItem) {
+            if ($activeItem !== undefined) {
                 $activeItem.addClass('active');
                 self.activateItem($activeItem, true);
                 self.fixArrows($activeItem);
@@ -322,8 +390,9 @@ Gallery.prototype = {
             
             if (callback) { callback(); }
         });
-    },
-    renderItem: function(item) {
+    }
+    
+    private renderItem(item: any) {
         var $loading = $('<div class="loading-icon"><i class="fa fa-spinner fa-pulse"></i></div>');
         
         var $source = $(
@@ -362,7 +431,7 @@ Gallery.prototype = {
             $comments.append($badge);
         }
         
-        var $caption = $(
+        var $caption: JQuery = $(
             '<div class="carousel-caption">' +
                 '<h3></h3>' +
                 //'<p></p>' +
@@ -372,16 +441,19 @@ Gallery.prototype = {
         $caption.find('h3').html(item.name);
         $caption.find('[data-toggle="tooltip"]').tooltip();
         
-        var areas = [];
+        var areas: JQuery[] = [];
         $.map(item.areas, function(area) {
-            var $area = $('<div class="area"></div>');
+            var $area: JQuery = $('<div class="area"></div>');
             $area.data('area', area.area);
             $area.tooltip({
                 title: area.name,
                 html: true,
-                placement: function(tooptip, node) {
-                    var winCenter = $(window).height() / 2;
-                    var nodeCenter = $(node).offset().top + ($(node).height()) / 2;
+                placement: function(tooptip: any, node: any) {
+                    let winHeight = $(window).height();
+                    let nodeOffset = $(node).offset();
+                    let nodeHeight = $(node).height();
+                    var winCenter = winHeight === undefined ? 0 : winHeight / 2;
+                    var nodeCenter = nodeOffset === undefined || nodeHeight === undefined ? 0 : nodeOffset.top + nodeHeight / 2;
                     
                     return winCenter > nodeCenter ? 'bottom' : 'top';
                 }
@@ -412,8 +484,9 @@ Gallery.prototype = {
         }
         
         return $item;
-    },
-    activateItem: function($item, siblings) {
+    }
+    
+    private activateItem($item: JQuery, siblings: boolean) {
         
         if (!$item.data('activated')) {
         
@@ -440,8 +513,10 @@ Gallery.prototype = {
                 src: full.src,
                 alt: '',
                 'class': 'full'
-            }).on('load', function() {
-                $(this).closest('.item').removeClass('loading');
+            });
+            
+            $img.bind('load', function() {
+                $img.closest('.item').removeClass('loading');
             });
             $item.prepend($img);
             
@@ -460,8 +535,9 @@ Gallery.prototype = {
         }
         
         this.fixSize($item);
-    },
-    fixArrows: function($item) {
+    }
+    
+    private fixArrows($item: JQuery) {
         var $left = this.$e.find('.carousel-control.left');
         var $right = this.$e.find('.carousel-control.right');
         
@@ -469,8 +545,9 @@ Gallery.prototype = {
         
         $left.toggle(pos > 0);
         $right.toggle(pos < this.count-1);
-    },
-    bound: function(container, content) {
+    }
+    
+    private bound(container: Dimension, content: Dimension): Dimension {
         
         var containerRatio = container.width / container.height;
         var contentRatio = content.width / content.height;
@@ -488,22 +565,25 @@ Gallery.prototype = {
             width: width,
             height: height
         };
-    },
-    boundCenter: function(container, content) {
+    }
+    
+    private boundCenter(container: Dimension, content: Dimension): Bounds {
         return {
             left: (container.width - content.width) / 2,
             top: (container.height - content.height) / 2,
             width: content.width,
             height: content.height
         };
-    },
-    maxBounds: function(bounds, maxBounds) {
+    }
+    
+    private maxBounds(bounds: Dimension, maxBounds: Dimension): Dimension {
         if (bounds.height > maxBounds.height || bounds.width > maxBounds.width) {
             return maxBounds;
         }
         return bounds;
-    },
-    areasToBounds: function($item, offsetBounds) {
+    }
+    
+    private areasToBounds($item: JQuery, offsetBounds: Bounds) {
         $item.find('.area').each(function() {
             var area = $(this).data('area');
             $(this).css({
@@ -513,12 +593,13 @@ Gallery.prototype = {
                 height: area.height * offsetBounds.height 
             });
         });
-    },
-    fixSize: function($items) {
-        var w = this.$inner.width();
-        var h = this.$inner.height();
+    }
+    
+    private fixSize($items: JQuery) {
+        var w = this.$inner.width() || 0;
+        var h = this.$inner.height() || 0;
         
-        var cSize = {
+        var cSize: Dimension = {
             width: w,
             height: h
         };
@@ -526,15 +607,15 @@ Gallery.prototype = {
         var self = this;
         
         $items.each(function() {
-            var $item = $(this);
-            var $imgFull = $item.find('img.full');
-            var $imgCrop = $item.find('img.crop');
+            var $item: JQuery = $(this);
+            var $imgFull: JQuery = $item.find('img.full');
+            var $imgCrop: JQuery = $item.find('img.crop');
             var full = $item.data('full');
-            var crop = $item.data('crop');
-            var cropMode = $item.data('cropMode');
+            var crop: any = $item.data('crop');
+            var cropMode: any = $item.data('cropMode');
             
-            var bounds;
-            var offsetBounds;
+            var bounds: Dimension;
+            var offsetBounds: Bounds;
             
             if (crop) {
                 
@@ -548,7 +629,12 @@ Gallery.prototype = {
                     });
                     
                     offsetBounds = self.boundCenter(cSize, bounds);
-                    $imgCrop.css(offsetBounds);
+                    $imgCrop.css({
+                        width: offsetBounds.width,
+                        height: offsetBounds.height,
+                        left: offsetBounds.left,
+                        top: offsetBounds.top
+                    });
                     var fullWidth = bounds.width / crop.crop.width;
                     var fullHeight = bounds.height / crop.crop.height;
                     var imgFullBounds = {
@@ -557,7 +643,12 @@ Gallery.prototype = {
                         width: fullWidth,
                         height: fullHeight
                     };
-                    $imgFull.css(imgFullBounds);
+                    $imgFull.css({
+                        width: imgFullBounds.width,
+                        height: imgFullBounds.height,
+                        left: imgFullBounds.left,
+                        top: imgFullBounds.top
+                    });
                     
                     self.areasToBounds($item, imgFullBounds);
                 } else {
@@ -569,7 +660,12 @@ Gallery.prototype = {
                         height: full.height
                     });
                     offsetBounds = self.boundCenter(cSize, bounds);
-                    $imgFull.css(offsetBounds);
+                    $imgFull.css({
+                        width: offsetBounds.width,
+                        height: offsetBounds.height,
+                        left: offsetBounds.left,
+                        top: offsetBounds.top
+                    });
                     $imgCrop.css({
                         left: offsetBounds.left + crop.crop.left * bounds.width,
                         top: offsetBounds.top + crop.crop.top * bounds.height,
@@ -592,28 +688,40 @@ Gallery.prototype = {
                     height: full.height
                 });
                 offsetBounds = self.boundCenter(cSize, bounds);
-                $imgFull.css(offsetBounds);
+                $imgFull.css({
+                    width: offsetBounds.width,
+                    height: offsetBounds.height,
+                    left: offsetBounds.left,
+                    top: offsetBounds.top
+                });
                 
                 self.areasToBounds($item, offsetBounds);
             }
         });
-    },
-    hide: function() {
+    }
+    
+    private hide() {
         this.$e.hide();
         $(document.body).removeClass('gallery-shown');
         
-        $(document).off('keyup', this.escHandler);
-    },
-    show: function() {
+        this.carousel.hide();
+        
+        $(document).off("keyup", this.escHandler);
+    }
+    
+    private show() {
         $(document.body).addClass('gallery-shown');
         this.$e.show();
         this.fixSize(this.$e.find('.item'));
         
-        $(document).on('keyup', this.escHandler);
+        $(document).on("keyup", this.escHandler);
         
         this.$e.find('a.carousel-control.right').focus();
-    },
-    rewindToPosition: function(position) {
+        
+        this.carousel.show();
+    }
+    
+    private rewindToPosition(position: number) {
         var self = this;
         this.position = position;
         this.refreshIndicator();
@@ -623,28 +731,31 @@ Gallery.prototype = {
                 return false;
             }
         });
-    },
-    rewindToId: function(id) {
+    }
+    
+    private rewindToId(id: number) {
         var self = this;
-        this.$carousel.find('.item').each(function(idx) {
-            if ($(this).data('id') == id) {
-                self.$carousel.carousel(idx);
+        this.$carousel.find('.item').each(function(idx: number) {
+            if ($(this).data().id == id) {
+                self.$carousel.carousel(Number(idx));
                 
                 self.position = $(this).data('position');
                 self.refreshIndicator();
+                self.fixArrows($(this));
                 
                 return false;
             }
         });
-    },
-    positionPage: function(index) {
+    }
+    
+    private positionPage(index: number) {
         return Math.floor(index / this.perPage) + 1;
-    },
-    refreshIndicator: function() {
+    }
+    
+    private refreshIndicator() {
         if (this.count >= this.MAX_INDICATORS) {
             this.$numbers.text(this.position + ' of ' + this.count);
         }
     }
-};
+}
 
-module.exports = Gallery;

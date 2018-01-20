@@ -151,3 +151,7 @@ declare namespace autowp {
         items: autowp.IAttrUnit[];
     }
 }
+
+interface JQuery {
+    carousel(index: number): JQuery;
+}
