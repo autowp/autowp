@@ -42,7 +42,8 @@ class PageEnv extends AbstractHelper
             'pageId'             => null,
             'pageTitle'          => null,
             'args'               => [],
-            'breadcrumbsReplace' => null
+            'breadcrumbsReplace' => null,
+            'encodeUrl'          => true
         ];
 
         $options = array_replace($defaults, $options);
@@ -53,7 +54,7 @@ class PageEnv extends AbstractHelper
         $preparedUrlArgs = [];
         $preparedNameArgs = [];
         foreach ($args as $key => $value) {
-            $preparedUrlArgs['%' . $key . '%'] = urlencode($value);
+            $preparedUrlArgs['%' . $key . '%'] = $options['encodeUrl'] ? urlencode($value) : $value;
             $preparedNameArgs['%' . $key . '%'] = $value;
         }
 

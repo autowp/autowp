@@ -12,11 +12,13 @@
             'CAR_NAME'       => $this->carFullName,
             'SHORT_CAR_NAME' => $this->carShortName,
             'PICTURE_NAME'   => $this->pic()->textTitle($this->picture['name']),
+            'ALL_PICTURES_URL' => $this->allPicturesUrl
         ],
         'breadcrumbsReplace' => [
             'pageId'      => 33,
             'breadcrumbs' => $this->breadcrumbs
-        ]
+        ],
+        'encodeUrl' => false
     ]);
 ?>
 <?=$this->partial('application/picture/picture', $this->picture)?>

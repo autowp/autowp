@@ -802,9 +802,8 @@ class CatalogueController extends AbstractActionController
             ];
 
             foreach ($path as $idx => $pathNode) {
-                $ridx = count($path) - $idx - 1;
-                $nameKey = 'cp_'.$ridx.'_name';
-                $idKey = 'cp_'.$ridx.'_item_id';
+                $nameKey = 'cp_'.$idx.'_name';
+                $idKey = 'cp_'.$idx.'_item_id';
 
                 $breadcrumbName = $currentCar[$nameKey];
                 if (! $breadcrumbName) {
@@ -1670,7 +1669,10 @@ class CatalogueController extends AbstractActionController
                                 'gallery' => $this->galleryType($picture)
                             ], [], true)
                         ]
-                    )
+                    ),
+                    'allPicturesUrl' => $this->url()->fromRoute('catalogue', [
+                        'action' => 'brand-item-pictures'
+                    ], [], true)
                 ];
             });
         });
