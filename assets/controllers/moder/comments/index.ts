@@ -34,7 +34,6 @@ export class ModerCommentsController {
                 needRight: false
             },
             name: 'page/110/name',
-            title: 'page/119/title',
             pageId: 110
         });
         
