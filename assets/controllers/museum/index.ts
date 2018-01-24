@@ -87,7 +87,7 @@ export class MuseumController {
                 url: '/api/picture',
                 params: {
                     status: 'accepted',
-                    item_id: self.item.id,
+                    exact_item_id: self.item.id,
                     fields: 'owner,thumbnail,votes,views,comments_count,name_html,name_text',
                     limit: 20,
                     order: 12

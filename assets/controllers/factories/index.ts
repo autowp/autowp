@@ -62,7 +62,7 @@ export class FactoryController {
                 url: '/api/picture',
                 params: {
                     status: 'accepted',
-                    item_id: self.factory.id,
+                    exact_item_id: self.factory.id,
                     limit: 32,
                     fields: 'owner,thumbnail,votes,views,comments_count,name_html,name_text'
                 }
