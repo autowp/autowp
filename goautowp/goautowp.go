@@ -9,7 +9,7 @@ import _ "github.com/go-sql-driver/mysql"
 import sq "github.com/Masterminds/squirrel"
 
 type perspective struct {
-	Id   int    `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -18,7 +18,7 @@ type perspectiveResult struct {
 }
 
 type spec struct {
-	Id        int    `json:"id"`
+	ID        int    `json:"id"`
 	Name      string `json:"name"`
 	ShortName string `json:"short_name"`
 	Childs    []spec `json:"childs"`
@@ -28,11 +28,11 @@ type specResult struct {
 	Items []spec `json:"items"`
 }
 
-func getSpecs(db *sql.DB, parentId int) []spec {
+func getSpecs(db *sql.DB, parentID int) []spec {
 	sqSelect := sq.Select("id, name, short_name").From("spec").OrderBy("name")
 
-	if parentId != 0 {
-		sqSelect = sqSelect.Where(sq.Eq{"parent_id": parentId})
+	if parentID != 0 {
+		sqSelect = sqSelect.Where(sq.Eq{"parent_id": parentID})
 	} else {
 		sqSelect = sqSelect.Where(sq.Eq{"parent_id": nil})
 	}
@@ -45,11 +45,11 @@ func getSpecs(db *sql.DB, parentId int) []spec {
 	specs := []spec{}
 	for rows.Next() {
 		var r spec
-		err = rows.Scan(&r.Id, &r.Name, &r.ShortName)
+		err = rows.Scan(&r.ID, &r.Name, &r.ShortName)
 		if err != nil {
 			panic(err)
 		}
-		r.Childs = getSpecs(db, r.Id)
+		r.Childs = getSpecs(db, r.ID)
 		specs = append(specs, r)
 	}
 
@@ -67,7 +67,7 @@ func getPerspectives(db *sql.DB) []perspective {
 	perspectives := []perspective{}
 	for rows.Next() {
 		var r perspective
-		err = rows.Scan(&r.Id, &r.Name)
+		err = rows.Scan(&r.ID, &r.Name)
 		if err != nil {
 			panic(err)
 		}
@@ -79,7 +79,7 @@ func getPerspectives(db *sql.DB) []perspective {
 
 func main() {
 
-	var dsn string = fmt.Sprintf("%s:%s@tcp(%s)/%s", os.Getenv("AUTOWP_DB_USERNAME"), os.Getenv("AUTOWP_DB_PASSWORD"), os.Getenv("AUTOWP_DB_HOST"), os.Getenv("AUTOWP_DB_DBNAME"))
+	var dsn = fmt.Sprintf("%s:%s@tcp(%s)/%s", os.Getenv("AUTOWP_DB_USERNAME"), os.Getenv("AUTOWP_DB_PASSWORD"), os.Getenv("AUTOWP_DB_HOST"), os.Getenv("AUTOWP_DB_DBNAME"))
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
@@ -91,13 +91,13 @@ func main() {
 
 	apiGroup := r.Group("/go-api")
 	{
-		var perspectives []perspective = getPerspectives(db)
+		perspectives := getPerspectives(db)
 
 		apiGroup.GET("/perspective", func(c *gin.Context) {
 			c.JSON(200, perspectiveResult{perspectives})
 		})
 
-		var specs []spec = getSpecs(db, 0)
+		specs := getSpecs(db, 0)
 
 		apiGroup.GET("/spec", func(c *gin.Context) {
 
