@@ -178,20 +178,21 @@ class Pic extends AbstractPlugin
 
         $url = null;
 
-        $carIds = $this->pictureItem->getPictureItems($row['id'], PictureItem::PICTURE_CONTENT);
-        if ($carIds) {
-            $carIds = $this->itemModel->getIds([
-                'id'           => $carIds,
-                'item_type_id' => [Item::BRAND, Item::VEHICLE]
+        $itemIds = $this->pictureItem->getPictureItems($row['id'], PictureItem::PICTURE_CONTENT);
+        if ($itemIds) {
+            $itemIds = $this->itemModel->getIds([
+                'id'           => $itemIds,
+                'item_type_id' => [Item::BRAND, Item::VEHICLE, Item::ENGINE]
             ]);
 
-            if ($carIds) {
-                $carId = $carIds[0];
+            if ($itemIds) {
+                $carId = $itemIds[0];
 
                 $paths = $this->catalogue->getCataloguePaths($carId, [
                     'breakOnFirst' => true,
                     'stockFirst'   => true
                 ]);
+
 
                 if (count($paths) > 0) {
                     $path = $paths[0];
