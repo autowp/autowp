@@ -172,7 +172,7 @@ ga('send', 'pageview');
                     <ui-view></ui-view>
                 </div>
                 <div class="col-sm-{{spanRight}}" ng-if="needRight">
-                    <div class="well" ng-if="user">
+                    <div class="card card-body" ng-if="user">
                         <div>
                             <autowp-user user="user"></autowp-user><br />
                             <a ui-sref="account-profile" translate>page/48/name</a><br />
@@ -186,7 +186,7 @@ ga('send', 'pageview');
                     </div>
 
                     <h3 ng-if="!user" translate>login/sign-in</h3>
-                    <div class="well" ng-if="!user">
+                    <div class="card card-body" ng-if="!user">
                         <form ng-submit="doLogin()">
                             <p><input type="text" name="login" placeholder="{{'login/login-or-email'|translate}}" class="form-control" ng-model="loginForm.login" /></p>
                             <p ng-repeat="message in loginInvalidParams.login" ng-bind="message" class="help-block"></p>

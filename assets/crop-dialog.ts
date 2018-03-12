@@ -22,55 +22,55 @@ export class CropDialog {
     private $selection: JQuery;
     private currentCrop: Crop;
     private jcrop: any;
-  
+
     constructor(
         private options: any
     ) {
         var self = this;
-        
+
         this.onSave = options.onSave;
         this.width = options.width;
         this.height = options.height;
         this.sourceUrl = options.sourceUrl;
         this.minSize = options.minSize ? options.minSize : [400, 300];
-        
+
         this.$modal = $(require('./crop-dialog.html'));
-        
+
         this.$modal.find('.modal-title').text(i18next.t("crop-dialog/title"));
         this.$modal.find('.btn-primary').text(i18next.t("crop-dialog/save"));
         this.$modal.find('.btn-close').text(i18next.t("crop-dialog/close"));
         this.$modal.find('.select-all span').text(i18next.t("crop-dialog/select-all"));
-        
+
         this.$body = this.$modal.find('.modal-body');
         this.$selection = this.$modal.find('.selection');
-        
+
         this.jcrop = null;
         this.currentCrop = options.crop;
-        
+
         this.$modal.on('shown.bs.modal', function() {
             self.afterShown();
         });
-        
+
         this.$modal.on('hidden.bs.modal', function() {
             self.afterHidden();
         });
-        
+
         this.$modal.find('.btn-primary').click(function() {
-            var $btn = $(this).button('loading');
+            // var $btn = $(this).button('loading');
             self.onSave(self.currentCrop, function() {
-                $btn.button('reset');
+                // $btn.button('reset');
             });
         });
-        
+
         this.$modal.find('.select-all').on('click', function() {
             self.jcrop.setSelect([0, 0, self.width, self.height]);
         });
-        
+
         this.$modal.modal({
             show: false
         });
     }
-  
+
     public updateSelectionText() {
         var text = Math.round(this.currentCrop.w) + '×' + Math.round(this.currentCrop.h);
         var pw = 4;
@@ -78,25 +78,25 @@ export class CropDialog {
         var phRound = Math.round(ph * 10) / 10;
         this.$selection.text(
             sprintf(
-                i18next.t("crop-dialog/resolution-%s-aspect-%s"), 
+                i18next.t("crop-dialog/resolution-%s-aspect-%s"),
                 text, pw+':'+phRound
             )
         );
     }
-  
+
     public afterShown() {
         let bodyWidth = this.$body.width();
-      
+
         if (! bodyWidth) {
             bodyWidth = 1;
         }
-      
+
         let scale = this.width / bodyWidth;
         let width = this.width / scale;
         let height = this.height / scale;
-        
+
         var self = this;
-        
+
         var $img = $('<img />', {
             src: this.sourceUrl,
             css: {
@@ -105,7 +105,7 @@ export class CropDialog {
             },
             appendTo: this.$body
         }).on('load', function() {
-            
+
             // sometimes Jcrop fails without delay
             setTimeout(function() {
 
@@ -126,12 +126,12 @@ export class CropDialog {
                     trueSize: [self.width, self.height],
                     keySupport: false
                 });
-                
+
             }, 100);
         });
-        
+
     }
-  
+
     public afterHidden() {
         if (this.jcrop) {
             this.jcrop.destroy();
@@ -139,11 +139,11 @@ export class CropDialog {
         }
         this.$body.empty();
     }
-  
+
     public show() {
         this.$modal.modal('show');
     }
-  
+
     public hide() {
         this.$modal.modal('hide');
     }

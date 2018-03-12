@@ -35,6 +35,7 @@
     "@types/angular-sanitize": "^1.3.6",
     "@types/angular-translate": "^2.15.1",
     "@types/autosize": "^3.0.6",
+    "@types/bootstrap": "^4.0.0",
     "@types/bootstrap-notify": "^3.1.32",
     "@types/chart.js": "^2.6.12",
     "@types/compression-webpack-plugin": "^0.3.1",
@@ -104,6 +105,7 @@
     "ng-file-upload": "^12.2.13",
     "ng-rollbar": "^2.3.8",
     "ng-tags-input": "^3.2.0",
+    "popper.js": "^1.14.0",
     "raphael": "^2.x",
     "scriptjs": "^2.x",
     "showdown": "^1.8.5",
@@ -120,5 +122,9 @@
   "scripts": {
     "start": "node_modules/.bin/webpack --progress --colors -p --config webpack.config.js",
     "test": "node_modules/.bin/webpack --progress --colors --config webpack.config.js"
+  },
+  "devDependencies": {
+    "node-sass": "^4.7.2",
+    "sass-loader": "^6.0.7"
   }
 }

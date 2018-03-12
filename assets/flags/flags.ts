@@ -1,1 +1,1 @@
-import "./flags.less";
+import "./flags.scss";

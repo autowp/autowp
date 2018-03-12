@@ -1,8 +1,8 @@
 <div class="row" ng-repeat="theme in ctrl.themes">
     <div class="col-md-6">
-        <div class="well">
+        <div class="card card-body">
             <p>
-                <i class="fa fa-th-list"></i> 
+                <i class="fa fa-th-list"></i>
                 <strong>
                     <a ui-sref="forums({theme_id: theme.id})" ui-sref-opts="{reload: true}" ng-bind="theme.name|translate"></a>
                 </strong>
@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="col-md-6" ng-if="theme.last_topic">
-        <div class="well transparent">
+        <div class="card card-body transparent">
             <div ng-if="theme.last_message">
                 <p>
                     <i class="fa fa-comment"></i>

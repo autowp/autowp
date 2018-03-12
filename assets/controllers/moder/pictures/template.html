@@ -24,7 +24,7 @@
 <div class="row">
     <div class="col-lg-4 col-md-4">
         <h2 translate>moder/pictures/filter</h2>
-        <form class="well form-vertical">
+        <form class="card card-body form-vertical">
             <div class="form-group">
                 <label translate>moder/picture/filter/status</label>
                 <select name="status" class="form-control" ng-model="ctrl.status" ng-change="ctrl.load()">
@@ -86,25 +86,25 @@
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="special_name" value="1" ng-model="ctrl.special_name" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="special_name" value="1" ng-model="ctrl.special_name" ng-change="ctrl.load()" />
                     {{'moder/picture/filter/special-name'|translate}}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="lost" value="1" ng-model="ctrl.lost" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="lost" value="1" ng-model="ctrl.lost" ng-change="ctrl.load()" />
                     {{'moder/picture/filter/not-linked'|translate}}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="gps" value="1" ng-model="ctrl.gps" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="gps" value="1" ng-model="ctrl.gps" ng-change="ctrl.load()" />
                     {{'moder/picture/filter/gps'|translate}}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="similar" value="1" ng-model="ctrl.similar" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="similar" value="1" ng-model="ctrl.similar" ng-change="ctrl.load()" />
                     {{'moder/picture/filter/similar'|translate}}
                 </label>
             </div>
@@ -128,7 +128,7 @@
         </form>
     </div>
     <div class="col-lg-8 col-md-8">
-    
+
         <h2>
             {{'page/73/name'|translate}}
             <span ng-show="ctrl.loading > 0">
@@ -136,7 +136,7 @@
             </span>
             <small ng-if="paginator.totalItemCount" translate="ng/%1$s-pictures" translate-values="{count: paginator.totalItemCount}"></small>
         </h2>
-    
+
         <div style="margin-bottom:20px">
             <div class="btn-group">
                 <button ng-disabled="!ctrl.hasSelectedItem" class="btn btn-success" ng-click="ctrl.acceptPictures()">
@@ -172,7 +172,7 @@
                 <autowp-thumbnail picture="picture" onselect="ctrl.onPictureSelect" is-moder="isModer"></autowp-thumbnail>
             </div>
         </div>
-        
+
         <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
     </div>
 </div>

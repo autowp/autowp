@@ -1,6 +1,6 @@
 import * as angular from 'angular';
 import Module from 'app.module';
-import './styles.less';
+import './styles.scss';
 
 interface IAutowpModerPictureMoveItemDirectiveScope extends ng.IScope {
     loading: boolean;
@@ -21,15 +21,15 @@ class AutowpModerPictureMoveItemDirective implements ng.IDirective {
     }
 
     link = (scope: IAutowpModerPictureMoveItemDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
-        
+
         var self = this;
-        
+
         scope.childs = [];
         scope.loading = false;
-        
+
         scope.toggleItem = function(item: any) {
             item.expanded = !item.expanded;
-            
+
             if (item.expanded) {
                 scope.loading = true;
                 self.$http({
@@ -47,7 +47,7 @@ class AutowpModerPictureMoveItemDirective implements ng.IDirective {
                 });
             }
         };
-        
+
     }
 
     static factory(): ng.IDirectiveFactory {

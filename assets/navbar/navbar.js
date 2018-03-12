@@ -1,4 +1,4 @@
-require("./navbar.less");
+require("./navbar.scss");
 var UsersOnline = require('users-online');
 
 module.exports = {

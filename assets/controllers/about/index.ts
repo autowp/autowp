@@ -16,7 +16,7 @@ function replaceAll(str: string, find: string, replace: string): string {
 
 function replacePairs(str: string, pairs: any): string {
     angular.forEach(pairs, function(value, key) {
-        str = replaceAll(str, key, value);
+        str = replaceAll(str, String(key), value);
     });
     return str;
 }
@@ -24,7 +24,7 @@ function replacePairs(str: string, pairs: any): string {
 export class AboutController {
     static $inject = ['$scope', '$http', '$translate', '$filter', 'UserService', '$q', '$state'];
     public html: string = '';
-  
+
     constructor(
         private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
@@ -42,14 +42,14 @@ export class AboutController {
             name: 'page/136/name',
             pageId: 136
         });
-        
+
         let self = this;
-        
+
         this.$http({
             url: '/api/about',
             method: 'GET'
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             self.$translate('about/text').then(function(translation) {
 
                 let ids: number[] = response.data.contributors;
@@ -58,14 +58,14 @@ export class AboutController {
                 ids.push(response.data.zh_translator);
                 ids.push(response.data.be_translator);
                 ids.push(response.data.pt_br_translator);
-                
+
                 self.userService.getUserMap(ids).then(function(users: Map<number, autowp.IUser>) {
-                
+
                     let contributorsHtml: string[] = [];
                     for (let id of response.data.contributors) {
                         contributorsHtml.push(self.userHtml(users.get(id)));
                     }
-                    
+
                     let markdownConverter = new showdown.Converter({});
                     self.html = replacePairs(
                         markdownConverter.makeHtml(translation), {
@@ -94,7 +94,7 @@ export class AboutController {
             notify.response(response);
         });
     }
-    
+
     private userHtml(user: any): string {
         let span = $('<span class="user" />');
         span.toggleClass('muted', user.deleted);
@@ -104,8 +104,8 @@ export class AboutController {
             href: this.$state.href('users-user', {identity: user.identity ? user.identity : 'user' + user.id}, {inherit: false}),
             text: user.name
         });
-        
-        
+
+
         return '<i class="fa fa-user"></i> ' + (span.append(a))[0].outerHTML;
     }
 };

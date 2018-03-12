@@ -445,7 +445,7 @@
 
 <?php if ($this->user()->inheritsRole('moder')) { ?>
     <h3><?=$this->htmlA('/ng/moder', $this->page(67)->name) ?></h3>
-    <div class="well">
+    <div class="card card-body">
         <div class="row">
             <div class="col-md-6">
                 <?=$this->partial('application/moder/pictures/picture-vote', $this->pictureVote)?>

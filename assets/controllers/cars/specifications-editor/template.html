@@ -26,7 +26,7 @@
     </li>
 </ul>
 
-<div class="tab-content well">
+<div class="tab-content card card-body">
     <span ng-show="ctrl.loading > 0">
         <i class="fa fa-spinner fa-spin fa-fw fa-4x"></i>
     </span>
@@ -87,55 +87,55 @@
                         </td>
                         <td ng-if="!attribute.childs.length">
                             <div class="input-group" ng-class="{'has-error': element.getMessages()}">
-                                <span class="input-group-addon btn btn-secondary" 
-                                    ng-click="ctrl.currentUserValues[attribute.id].empty = !ctrl.currentUserValues[attribute.id].empty" 
+                                <span class="input-group-addon btn btn-secondary"
+                                    ng-click="ctrl.currentUserValues[attribute.id].empty = !ctrl.currentUserValues[attribute.id].empty"
                                     ng-class="{active: attribute.disabled}">
                                     <span class="fa fa-remove"></span>
                                 </span>
-                                <select class="form-control input-sm" 
+                                <select class="form-control input-sm"
                                     ng-if="attribute.type_id == 5"
-                                    ng-options="item.id as item.name for item in attribute.options" 
-                                    ng-model="ctrl.currentUserValues[attribute.id].value"
-                                    ng-disabled="ctrl.currentUserValues[attribute.id].empty"
-                                >
-                                </select>
-                                <select class="form-control input-sm" 
-                                    ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && !attribute.is_multiple" 
                                     ng-options="item.id as item.name for item in attribute.options"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
                                     ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                 >
                                 </select>
-                                <select class="form-control input-sm" 
-                                    ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && attribute.is_multiple" 
+                                <select class="form-control input-sm"
+                                    ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && !attribute.is_multiple"
+                                    ng-options="item.id as item.name for item in attribute.options"
+                                    ng-model="ctrl.currentUserValues[attribute.id].value"
+                                    ng-disabled="ctrl.currentUserValues[attribute.id].empty"
+                                >
+                                </select>
+                                <select class="form-control input-sm"
+                                    ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && attribute.is_multiple"
                                     ng-options="item.id as item.name for item in attribute.options"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
                                     ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                     multiple
                                 >
                                 </select>
-                                <input type="number" 
-                                    ng-if="attribute.type_id == 2" 
-                                    class="form-control input-sm" 
+                                <input type="number"
+                                    ng-if="attribute.type_id == 2"
+                                    class="form-control input-sm"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
                                     ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                     min="-2147483649"
                                     max="2147483648"
                                 />
-                                <input type="number" 
-                                    ng-if="attribute.type_id == 3" 
-                                    class="form-control input-sm" 
+                                <input type="number"
+                                    ng-if="attribute.type_id == 3"
+                                    class="form-control input-sm"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
                                     step="{{ctrl.getStep(attribute)}}"
                                     min="-2147483649"
                                     max="2147483648"
                                     ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                 />
-                                <input type="text" 
-                                    ng-if="attribute.type_id == 1" 
-                                    class="form-control input-sm" 
+                                <input type="text"
+                                    ng-if="attribute.type_id == 1"
+                                    class="form-control input-sm"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
-                                    ng-disabled="ctrl.currentUserValues[attribute.id].empty" 
+                                    ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                 />
                                 <span ng-if="attribute.unit" class="input-group-addon" translate-attrs="{title: attribute.unit.name}" class="unit" ng-bind="attribute.unit.abbr|translate"></span>
                             </div>

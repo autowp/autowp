@@ -17,55 +17,55 @@
 </ul>
 
 <div ng-if="ctrl.show_museums && !src_item && (!ctrl.src_type || ctrl.src_type == 1)">
-    <div class="well">
+    <div class="card card-body">
         <a href="#" ng-repeat-start="item in ctrl.museums" ng-click="ctrl.selectItem(item.id, null, 1)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </div>
-    
+
     <autowp-paginator data="ctrl.museums_paginator" ng-if="ctrl.museums_paginator"></autowp-paginator>
 </div>
 
 <div ng-if="ctrl.show_factories && !src_item && (!ctrl.src_type || ctrl.src_type == 1)">
 
-    <div class="well">
+    <div class="card card-body">
         <a href="#" ng-repeat-start="item in ctrl.factories" ng-click="ctrl.selectItem(item.id, null, 1)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </div>
-    
+
     <autowp-paginator data="ctrl.factories_paginator" ng-if="ctrl.factories_paginator"></autowp-paginator>
 </div>
 
 <div ng-if="ctrl.show_persons && !src_item && (!ctrl.src_type || ctrl.src_type == 1)">
 
-    <div class="well">
+    <div class="card card-body">
         <div style="margin-bottom:20px">
             <input type="text" ng-model="ctrl.search" ng-change="ctrl.doSearch()" class="form-control" placeholder="Type to search ..." auto-focus />
         </div>
         <a href="#" ng-repeat-start="item in ctrl.persons" ng-click="ctrl.selectItem(item.id, null, 1)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </div>
-    
+
     <autowp-paginator data="ctrl.persons_paginator" ng-if="ctrl.persons_paginator"></autowp-paginator>
 </div>
 
 <div ng-if="ctrl.show_authors && !src_item && (!ctrl.src_type || ctrl.src_type == 2)">
 
-    <div class="well">
+    <div class="card card-body">
         <div style="margin-bottom:20px">
             <input type="text" ng-model="ctrl.search" ng-change="ctrl.doSearch()" class="form-control" placeholder="Type to search ..." auto-focus />
         </div>
         <a href="#" ng-repeat-start="item in ctrl.authors" ng-click="ctrl.selectItem(item.id, null, 2)" ng-bind-html="item.name_html"></a>
         <br ng-repeat-end />
     </div>
-    
+
     <autowp-paginator data="ctrl.authors_paginator" ng-if="ctrl.authors_paginator"></autowp-paginator>
 </div>
 
 
 <div ng-if="!ctrl.show_factories && !ctrl.show_museums && !ctrl.show_persons && (!ctrl.src_type || ctrl.src_type == 1)">
     <div ng-if="!ctrl.brand_id">
-    
-        <div class="well">
+
+        <div class="card card-body">
             <div style="margin-bottom:20px">
                 <input type="text" ng-model="ctrl.search" ng-change="ctrl.doSearch()" class="form-control" placeholder="Type to search ..." auto-focus />
             </div>
@@ -76,7 +76,7 @@
                 </div>
             </div>
         </div>
-        
+
         <autowp-paginator data="ctrl.brands_paginator" ng-if="ctrl.brands_paginator"></autowp-paginator>
     </div>
     <div ng-if="ctrl.brand_id">

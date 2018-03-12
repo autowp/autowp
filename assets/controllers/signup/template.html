@@ -1,4 +1,4 @@
-<div class="well">
+<div class="card card-body">
     <p translate>registration/if-you-registered</p>
     <form class="form-horizontal" ng-submit="ctrl.submit()"><fieldset>
         <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.email}">
@@ -30,13 +30,13 @@
             </div>
         </div>
         <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.captcha}" ng-if="ctrl.showCaptcha">
-            <div class="col-md-10 col-md-offset-2">
+            <div class="col-md-10 offset-md-2">
                 <div vc-recaptcha key="ctrl.recaptchaKey" ng-if="ctrl.recaptchaKey" ng-model="ctrl.form.captcha"></div>
                 <p ng-repeat="message in ctrl.invalidParams.captcha" ng-bind="message" class="help-block"></p>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-10 col-md-offset-2">
+            <div class="col-md-10 offset-md-2">
                 <button type="submit" class="btn btn-primary" translate>submit</button>
             </div>
         </div>

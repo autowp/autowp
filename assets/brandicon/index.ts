@@ -1,1 +1,1 @@
-require("./brandicon.less");
+require("./brandicon.scss");

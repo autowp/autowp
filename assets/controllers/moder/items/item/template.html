@@ -3,7 +3,7 @@
         <img ng-if="ctrl.randomPicture.thumbnail" ng-src="ctrl.randomPicture.thumbnail.src" alt="" />
     </div>
     <div class="col-md-5">
-        <div class="well">
+        <div class="card card-body">
             <p translate="ng/moder/database-id-n" translate-values="{id: ctrl.item.id}"></p>
 
             <p ng-if="ctrl.specsAllowed && ctrl.canEditSpecifications">
@@ -14,16 +14,16 @@
         </div>
     </div>
     <div class="col-md-5">
-        <div class="well">
+        <div class="card card-body">
             <p translate>moder/vehicle/subscription/title</p>
             <p class="subscription">
                 <button class="btn" ng-class="{'btn-success': ctrl.item.subscription, 'btn-secondary': !ctrl.item.subscription}" ng-click="ctrl.toggleSubscription()">
                     <span ng-show="ctrl.item.subscription">
-                        <i class="fa fa-check"></i> 
+                        <i class="fa fa-check"></i>
                         {{'moder/vehicle/subscription/subscribed'|translate}}
                     </span>
                     <span ng-show="!ctrl.item.subscription">
-                        <i class="fa fa-times"></i> 
+                        <i class="fa fa-times"></i>
                         {{'moder/vehicle/subscription/not-subscribed'|translate}}
                     </span>
                 </button>
@@ -42,7 +42,7 @@
     </li>
 </ul>
 
-<div class="tab-content well">
+<div class="tab-content card card-body">
     <div class="tab-pane" ng-class="{active: ctrl.tabs.meta.active}">
         <div class="progress" ng-show="ctrl.metaLoading > 0">
             <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
@@ -150,14 +150,14 @@
             </div>
         </form>
     </div>
-    
+
     <div class="tab-pane" ng-class="{active: ctrl.tabs.catalogue.active}">
         <span ng-show="ctrl.catalogueLoading > 0">
             <i class="fa fa-spinner fa-spin fa-fw"></i>
         </span>
         <a ng-if="ctrl.item.is_group && ctrl.canMove && ctrl.item.childs_count > 0"
             ui-sref="moder-items-item-organize({id: ctrl.item.id, item_type_id: ctrl.organizeTypeId})"
-            class="btn btn-secondary" 
+            class="btn btn-secondary"
             translate>moder/vehicle/catalogue/turbo-group-creator</a>
         <table class="table">
             <thead>
@@ -174,7 +174,7 @@
                         <form class="car-add-parent" method="post">
                             <div class="input-group" style="max-width:400px">
                                 <input type="text" name="parent" class="form-control item-autocomplete" placeholder="{{'moder/vehicle/catalogue/select-placeholder'|translate}}" autocomplete="off" />
-                                
+
                                 <div class="input-group-btn" style="white-space:nowrap">
                                     <a class="btn btn-secondary" ui-sref="moder-items-item-select-parent({id: ctrl.item.id})" translate>moder/vehicle/catalogue/select</a>
                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -196,7 +196,7 @@
                                         </li>
                                     </ul>
                                 </div>
-                                
+
                             </div>
                         </form>
                     </td>
@@ -266,7 +266,7 @@
                         </button>
                     </td>
                 </tr>
-    
+
                 <tr ng-if="ctrl.item.is_group && ctrl.canMove && ctrl.item.item_type_id == 5">
                     <td colspan="2">
                         <i class="fa fa-plus"></i>
@@ -334,7 +334,7 @@
     <div ng-if="ctrl.tabs.pictures" class="tab-pane" ng-class="{active: ctrl.tabs.pictures.active}" id="pictures">
         <p class="btn-group" ng-if="ctrl.canUseTurboGroupCreator">
             <a ui-sref="moder-items-item-organize-pictures({id: ctrl.item.id})"
-                class="btn btn-secondary" 
+                class="btn btn-secondary"
                 translate>moder/vehicle/pictures/turbo-group-creator</a>
         </p>
         <div class="row" ng-repeat="chunk in ctrl.picturesChunks">

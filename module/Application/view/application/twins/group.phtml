@@ -31,7 +31,7 @@
 
 <?php if (strlen($this->description)){ ?>
     <h3><?=$this->escapeHtml($this->translate('twins/group/description'))?></h3>
-    <div class="well"><?=$this->markdown($this->description) ?></div>
+    <div class="card card-body"><?=$this->markdown($this->description) ?></div>
 <?php } ?>
 
 <?=$this->comments([

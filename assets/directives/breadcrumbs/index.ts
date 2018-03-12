@@ -4,7 +4,7 @@ import { PageService } from 'services/page';
 
 function replaceArgs(str: string, args: any) {
     angular.forEach(args, function(value, key) {
-        str = str.replace(key, ''+value);
+        str = str.replace(String(key), String(value));
     });
     return str;
 }
@@ -20,15 +20,15 @@ class AutowpBreadcrumbsDirective implements ng.IDirective {
     template = require('./template.html');
 
     constructor(
-        private PageService: PageService, 
+        private PageService: PageService,
         private $translate: ng.translate.ITranslateService
     ) {
     }
 
     link = (scope: IAutowpBreadcrumbsDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
-      
+
         var self = this;
-        
+
         var handler = function() {
             var current = self.PageService.getCurrent();
             scope.items = [];
@@ -49,9 +49,9 @@ class AutowpBreadcrumbsDirective implements ng.IDirective {
                 });
             }
         };
-        
+
         self.PageService.bind('currentChanged', handler);
-        
+
         scope.$on('$destroy', function () {
             self.PageService.unbind('sent', handler);
         });

@@ -1,6 +1,6 @@
 import * as angular from 'angular';
 import Module from 'app.module';
-import './styles.less';
+import './styles.scss';
 import { VehicleTypeService } from 'services/vehicle-type';
 import { SpecService } from 'services/spec';
 import { LanguageService } from 'services/language';
@@ -41,7 +41,7 @@ class AutowpItemMetaFormDirectiveController {
             name: 'moder/vehicle/today/continue'
         }
     ];
-     
+
     public producedOptions = [
         {
             value: false,
@@ -57,7 +57,7 @@ class AutowpItemMetaFormDirectiveController {
         lng: 37.6786422,
         zoom: 8
     };
-    
+
     public markers: any = {};
     public tiles = {
         url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -102,7 +102,7 @@ class AutowpItemMetaFormDirectiveController {
 
     static $inject = ['$scope', '$q', 'SpecService', 'VehicleTypeService', 'LanguageService', 'leafletData'];
     constructor(
-        protected $scope: IAAutowpItemMetaFormDirectiveScope, 
+        protected $scope: IAAutowpItemMetaFormDirectiveScope,
         private $q: ng.IQService,
         private SpecService: SpecService,
         private VehicleTypeService: VehicleTypeService,
@@ -110,7 +110,7 @@ class AutowpItemMetaFormDirectiveController {
         private leafletData: any
     ) {
         var ctrl = this;
-        
+
         if ($scope.item && $scope.item.lat && $scope.item.lng) {
             ctrl.markers.point = {
                 lat: $scope.item ? $scope.item.lat : null,
@@ -118,7 +118,7 @@ class AutowpItemMetaFormDirectiveController {
                 focus: true
             };
         }
-        
+
         $scope.$on('leafletDirectiveMap.click', function(event: any, e: any) {
             var latLng = e.leafletEvent.latlng;
             ctrl.markers.point = {
@@ -129,19 +129,19 @@ class AutowpItemMetaFormDirectiveController {
             $scope.item.lat = latLng.lat;
             $scope.item.lng = latLng.lng;
         });
-        
-        
-        
-        
+
+
+
+
         this.model_year_max = new Date().getFullYear() + 10;
         this.year_max = new Date().getFullYear() + 10;
-        
-        
+
+
         ctrl.monthOptions = [{
             value: null,
             name: '--'
         }];
-        
+
         var date = new Date(Date.UTC(2000, 1, 1, 0, 0, 0, 0));
         for (var i=0; i<12; i++) {
             date.setMonth(i);
@@ -154,16 +154,16 @@ class AutowpItemMetaFormDirectiveController {
                 });
             }
         }
-        
+
         this.loading++;
         var self = this;
         this.SpecService.getSpecs().then(function(types) {
             self.loading--;
             self.specOptions = toPlain(types, 0);
         });
-        
+
     }
-        
+
     public coordsChanged() {
         var lat = parseFloat(this.$scope.item.lat);
         var lng = parseFloat(this.$scope.item.lng);
@@ -180,7 +180,7 @@ class AutowpItemMetaFormDirectiveController {
         this.center.lat = isNaN(lat) ? 0 : lat;
         this.center.lng = isNaN(lng) ? 0 : lng;
     }
-        
+
     public loadVehicleTypes(query: string) {
         var self = this;
         return this.$q(function(resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<void>) {
@@ -199,19 +199,19 @@ class AutowpItemMetaFormDirectiveController {
             });
         });
     }
-        
+
     public submit() {
         this.$scope.submitNotify();
     }
-        
+
     public getIsConceptOptions(parent: any) {
         this.isConceptOptions[2].name = parent ? (
-            parent.is_concept ? 
-                'moder/vehicle/is-concept/inherited-yes' : 
+            parent.is_concept ?
+                'moder/vehicle/is-concept/inherited-yes' :
                 'moder/vehicle/is-concept/inherited-no'
-            ) : 
+            ) :
             'moder/vehicle/is-concept/inherited';
-        
+
         return this.isConceptOptions;
     }
 

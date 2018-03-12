@@ -1,7 +1,7 @@
 <div autowp-markdown="'donate/vod/text'|translate"></div>
 
 <h1 translate>donate/vod/select-date</h1>
-<div class="well">
+<div class="card card-body">
     <ul>
         <li ng-repeat="date in ctrl.dates">
             <span ng-if="date.free">
@@ -13,9 +13,9 @@
                     <a href="#" ng-click="ctrl.selectDate(date.value)" ng-bind="date.name"></a>
                 </span>
             </span>
-            
+
             <span ng-if="!date.free">
-                <span class="muted" ng-bind="date.name"></span> 
+                <span class="muted" ng-bind="date.name"></span>
                 ({{'donate/vod/date-busy'|translate}})
             </span>
         </li>
@@ -23,7 +23,7 @@
 </div>
 
 <h1 translate>donate/vod/select-item</h1>
-<div class="well">
+<div class="card card-body">
 
     <div autowp-markdown="'donate/vod/select-item-text'|translate"></div>
 
@@ -37,7 +37,7 @@
 
 <h1 translate>donate/vod/preview</h1>
 
-<div class="well">
+<div class="card card-body">
     <div class="btn-group">
         <a href="#" class="btn btn-secondary" ng-class="{active: ctrl.anonymous}" ng-click="ctrl.setAnonymous(true)" translate>donate/vod/anonymous</a>
         <a href="#" class="btn btn-secondary" ng-class="{active: !ctrl.anonymous, disabled: !ctrl.userId}" ng-click="ctrl.setAnonymous(false)" translate>donate/vod/with-name</a>
@@ -50,7 +50,7 @@
 
 <h1 translate>donate/vod/make-donation</h1>
 
-<div class="well">
+<div class="card card-body">
     <form method="post" action="https://money.yandex.ru/quickpay/confirm.xml">
         <div ng-if="ctrl.selectedDate && ctrl.selectedItem">
             <input type="hidden" ng-repeat="(key, value) in ctrl.formParams" name="{{key}}" value="{{value}}" />

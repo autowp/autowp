@@ -1,27 +1,27 @@
 var $ = require('jquery');
 
-require('./picture-vote.less');
+require('./picture-vote.scss');
 
 module.exports = function(element) {
     var $element = $(element);
-    
+
     var pictureId = $element.data('id');
-    
+
     var $voteUp = $element.find('.vote-up');
     var $voteDown = $element.find('.vote-down');
-    
+
     $voteUp.on('click', function(e) {
         e.preventDefault();
-        
+
         vote(1);
     });
-    
+
     $voteDown.on('click', function(e) {
         e.preventDefault();
-        
+
         vote(-1);
     });
-    
+
     function vote(value) {
         $.ajax({
             method: 'PUT',
@@ -30,9 +30,9 @@ module.exports = function(element) {
                 value: value
             }
         }).done(function(data) {
-            
+
             ga('send', 'event', 'vote', value > 0 ? 'like' : 'dislike');
-            
+
             $element.find('.positive').text(data.positive).toggleClass('zero', data.positive <= 0);
             $element.find('.negative').text(data.negative).toggleClass('zero', data.negative <= 0);
             $voteUp.toggleClass('fa-thumbs-up', data.value > 0);

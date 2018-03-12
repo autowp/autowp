@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-sm-4">
-        <div class="well">
+        <div class="card card-body">
             <ul class="nav nav-pills nav-stacked">
                 <li class="nav-header">
                     <h3 translate>mosts/sidebar/mostly…</h3>
@@ -28,11 +28,11 @@
                 <a ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: ctrl.typeCatname || ctrl.defaultTypeCatname, years_catname: year.catname})" ng-bind="year.name|translate"></a>
             </li>
         </ul>
-        
+
         <span ng-show="ctrl.loading > 0">
             <i class="fa fa-spinner fa-spin fa-fw"></i>
         </span>
-        
+
         <div class="row" ng-repeat-start="item in ctrl.items">
             <div class="col-md-9">
                 <h3 ng-bind-html="item.item.name_html"></h3>

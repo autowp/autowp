@@ -16,7 +16,7 @@
     </li>
 </ul>
 
-<div class="well" ng-if="ctrl.tab == 'catalogue'">
+<div class="card card-body" ng-if="ctrl.tab == 'catalogue'">
     <input type="text" ng-model="ctrl.search" ng-change="ctrl.doSearch()" class="form-control" placeholder="Type to search ..." auto-focus />
     <table class="table" ng-if="!ctrl.brand_id"><tbody><tr>
         <td style="width:{{100/6}}%" ng-repeat="chunk in ctrl.brands">
@@ -33,7 +33,7 @@
     <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
 </div>
 
-<div class="well" ng-if="ctrl.tab == 'brands'">
+<div class="card card-body" ng-if="ctrl.tab == 'brands'">
     <input type="text" ng-model="ctrl.search" ng-change="ctrl.doSearch()" class="form-control" placeholder="Type to search ..." auto-focus />
     <table class="table"><tbody><tr>
         <td style="width:{{100/6}}%" ng-repeat="chunk in ctrl.brands">
@@ -44,7 +44,7 @@
     <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
 </div>
 
-<div class="well" ng-if="ctrl.tab == 'categories'">
+<div class="card card-body" ng-if="ctrl.tab == 'categories'">
     <ul>
         <li class="car-node" ng-repeat="item in ctrl.categories">
             <autowp-moder-items-item-select-parent-tree-item item="item" select="ctrl.select" load-childs="ctrl.loadChildCategories" disable-item-id="ctrl.item.id">
@@ -54,7 +54,7 @@
     <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
 </div>
 
-<div class="well" ng-if="ctrl.tab == 'twins'">
+<div class="card card-body" ng-if="ctrl.tab == 'twins'">
     <table class="table" ng-if="!ctrl.brand_id"><tbody><tr>
         <td style="width:{{100/6}}%" ng-repeat="chunk in ctrl.brands">
             <a ui-sref=".({brand_id: item.id})" ng-repeat-start="item in chunk" ng-bind-html="item.name_html"></a>
@@ -70,7 +70,7 @@
     <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
 </div>
 
-<div class="well" ng-if="ctrl.tab == 'factories'">
+<div class="card card-body" ng-if="ctrl.tab == 'factories'">
     <ul>
         <li class="car-node" ng-repeat="item in ctrl.factories">
             <autowp-moder-items-item-select-parent-tree-item item="item" select="ctrl.select" disable-item-id="ctrl.item.id">

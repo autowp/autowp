@@ -20,7 +20,7 @@
         <img ng-src="{{ctrl.picture.thumbnail.src}}" ng-if="ctrl.picture.thumbnail" />
     </div>
     <div class="col-md-5">
-        <div class="well">
+        <div class="card card-body">
             <p translate="ng/moder/database-id-n" translate-values="{id: ctrl.picture.id}"></p>
             <p>
                 {{'moder/picture/public-url:'|translate}}
@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="col-md-5">
-        <div class="well">
+        <div class="card card-body">
             <p>{{'moder/picture/resolution:'|translate}}
             <b>{{ctrl.picture.width}}×{{ctrl.picture.height}}</b></p>
             <p ng-if="ctrl.picture.dpi_x || ctrl.picture.dpi_y">
@@ -47,7 +47,7 @@
 </div>
 
 <h3 translate>moder/picture/catalogue</h3>
-<div class="well">
+<div class="card card-body">
     <table class="table" ng-if="ctrl.picture.items.length">
         <thead>
             <tr>
@@ -145,7 +145,7 @@
 <div class="row">
     <div class="col-md-6">
         <h3 translate>moder/picture/settings</h3>
-        <form class="well form-vertical">
+        <form class="card card-body form-vertical">
             <div>
                 <p class="text-danger">Achtung! High Voltage! Ты сюда не ходи!</p>
                 <p class="text-danger">Поле использовать в ИСКЛЮЧИТЕЛЬНЫХ случаях. А лучше вообще никогда не использовать.</p>
@@ -167,7 +167,7 @@
         </form>
 
         <h3 translate>moder/picture/copyrights</h3>
-        <div class="well">
+        <div class="card card-body">
             <div autowp-markdown="'moder/markdown/description'|translate"></div>
             <autowp-markdown-edit text="ctrl.picture.copyrights"></autowp-markdown-edit>
             <button class="btn btn-primary" ng-click="ctrl.saveCopyrights()" translate>submit</button>
@@ -182,17 +182,17 @@
         </div>
 
         <h3 ng-if="ctrl.picture.iptc">IPTC</h3>
-        <div class="well small" style="overflow:auto" ng-if="ctrl.picture.iptc" ng-bind-html="ctrl.picture.iptc"></div>
+        <div class="card card-body small" style="overflow:auto" ng-if="ctrl.picture.iptc" ng-bind-html="ctrl.picture.iptc"></div>
 
         <h3 ng-if="ctrl.picture.exif">EXIF</h3>
-        <div class="well small" style="overflow:auto" ng-if="ctrl.picture.exif" ng-bind-html="ctrl.picture.exif"></div>
+        <div class="card card-body small" style="overflow:auto" ng-if="ctrl.picture.exif" ng-bind-html="ctrl.picture.exif"></div>
 
     </div>
 
     <div class="col-md-6">
 
         <h3 translate ng-if="ctrl.picture.replaceable">moder/picture/replacement</h3>
-        <div class="well" ng-if="ctrl.picture.replaceable"> 
+        <div class="card card-body" ng-if="ctrl.picture.replaceable"> 
             <div>
                 <p>
                     {{'moder/picture/replacement/photo-suggested-to-replace'|translate}}
@@ -216,7 +216,7 @@
 
 
         <h3 translate>moder/picture/acceptance</h3>
-        <div class="well">
+        <div class="card card-body">
             <autowp-user user="ctrl.picture.change_status_user" ng-if="ctrl.picture.change_status_user"></autowp-user>
 
             <div ng-if="ctrl.picture.status == 'inbox'">
@@ -266,7 +266,7 @@
         </div>
 
         <h3 translate ng-if="ctrl.picture.rights.normalize || ctrl.picture.rights.flop || ctrl.picture.rights.crop">moder/picture/edit-and-repair</h3>
-        <div class="well" ng-if="ctrl.picture.rights.normalize || ctrl.picture.rights.flop || ctrl.picture.rights.crop">
+        <div class="card card-body" ng-if="ctrl.picture.rights.normalize || ctrl.picture.rights.flop || ctrl.picture.rights.crop">
             <div>
                 <button class="btn btn-warning" ng-click="ctrl.normalizePicture()" ng-if="ctrl.picture.rights.normalize" ng-disabled="ctrl.repairLoading">
                     <i class="fa fa-signal"></i>
@@ -300,7 +300,7 @@
         </div>
         
         <h3 ng-if="ctrl.picture.similar">Similar picture</h3>
-        <div class="well" ng-if="ctrl.picture.similar">
+        <div class="card card-body" ng-if="ctrl.picture.similar">
             <p class="alert alert-warning" role="alert">
                 <span class="fa fa-file-image-o"></span>
                 <a ui-sref="moder-pictures-item({id: ctrl.picture.similar.picture_id})">
@@ -321,7 +321,7 @@
         </div>
 
         <h3 translate>moder/picture/uploader</h3>
-        <div class="well">
+        <div class="card card-body">
             <autowp-user user="ctrl.picture.owner" ng-if="ctrl.picture.owner"></autowp-user>
             <span ng-if="!ctrl.picture.owner" translate>moder/picture/uploader/unknown</span>
             <div ng-if="ctrl.picture.ip.address">

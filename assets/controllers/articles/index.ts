@@ -3,7 +3,7 @@ import Module from 'app.module';
 import notify from 'notify';
 
 import './article';
-import './styles.less';
+import './styles.scss';
 
 const CONTROLLER_NAME = 'ArticlesController';
 const STATE_NAME = 'articles';
@@ -12,7 +12,7 @@ export class ArticlesController {
     static $inject = ['$scope', '$http', '$state'];
     public articles: any[];
     public paginator: autowp.IPaginator;
-  
+
     constructor(
         private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
@@ -26,9 +26,9 @@ export class ArticlesController {
             name: 'page/31/name',
             pageId: 31
         });
-        
+
         var self = this;
-        
+
         this.$http({
             method: 'GET',
             url: '/api/article',

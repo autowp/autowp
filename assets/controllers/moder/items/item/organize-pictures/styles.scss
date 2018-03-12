@@ -1,0 +1,19 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "../../../../../variables";
+@import "~bootstrap/scss/mixins";
+
+.multicheckbox-pictures {
+    .btn {
+        img {
+            opacity: .5;
+            @include transition(opacity .2s);
+        }
+
+        &.active {
+            img {
+                opacity: 1;
+            }
+        }
+    }
+}
