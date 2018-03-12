@@ -39,8 +39,8 @@
 
 <div class="well">
     <div class="btn-group">
-        <a href="#" class="btn btn-default" ng-class="{active: ctrl.anonymous}" ng-click="ctrl.setAnonymous(true)" translate>donate/vod/anonymous</a>
-        <a href="#" class="btn btn-default" ng-class="{active: !ctrl.anonymous, disabled: !ctrl.userId}" ng-click="ctrl.setAnonymous(false)" translate>donate/vod/with-name</a>
+        <a href="#" class="btn btn-secondary" ng-class="{active: ctrl.anonymous}" ng-click="ctrl.setAnonymous(true)" translate>donate/vod/anonymous</a>
+        <a href="#" class="btn btn-secondary" ng-class="{active: !ctrl.anonymous, disabled: !ctrl.userId}" ng-click="ctrl.setAnonymous(false)" translate>donate/vod/with-name</a>
     </div>
 </div>
 
@@ -66,17 +66,17 @@
         <div ng-if="ctrl.selectedDate && ctrl.selectedItem">
             <div class="form-group">
                 <div class="btn-group" data-toggle="buttons">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-secondary active">
                         <input type="radio" name="paymentType" value="AC" autocomplete="off" checked>
                         <span class="fa fa-credit-card"></span>
                         {{'donate/vod/method/credit-card'|translate}}
                     </label>
-                    <label class="btn btn-default">
+                    <label class="btn btn-secondary">
                         <input type="radio" name="paymentType" value="MC" autocomplete="off">
                         <span class="fa fa-mobile"></span>
                         {{'donate/vod/method/mobile'|translate}}
                     </label>
-                    <label class="btn btn-default">
+                    <label class="btn btn-secondary">
                         <input type="radio" name="paymentType" value="PC" autocomplete="off">
                         {{'donate/vod/method/yandex.money'|translate}}
                     </label>
@@ -85,15 +85,15 @@
             <button type="submit" class="btn btn-primary" translate>donate/vod/send</button>
         </div>
         <div ng-if="!ctrl.selectedDate || !ctrl.selectedItem">
-            <button class="btn btn-default" disabled>
+            <button class="btn btn-secondary" disabled>
                 <span class="fa fa-credit-card"></span>
                 {{'donate/vod/method/credit-card'|translate}}
             </button>
-            <button class="btn btn-default" disabled>
+            <button class="btn btn-secondary" disabled>
                 <span class="fa fa-mobile"></span>
                 {{'donate/vod/method/mobile'|translate}}
             </button>
-            <button class="btn btn-default" disabled translate>donate/vod/method/yandex.money</button>
+            <button class="btn btn-secondary" disabled translate>donate/vod/method/yandex.money</button>
         </div>
     </form>
 </div>

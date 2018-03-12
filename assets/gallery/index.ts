@@ -398,7 +398,7 @@ export class Gallery {
         var $source = $(
             '<a class="download carousel-control" role="button">' +
                 '<i class="fa fa-download"></i>' +
-                '<div class="badge badge-info"></div>' +
+                '<div class="badge badge-pill badge-info"></div>' +
             '</a>'
         ).attr('href', item.sourceUrl);
         
@@ -417,7 +417,7 @@ export class Gallery {
         ).attr('href', item.url + '#comments');
         
         if (item.messages) {
-            var $badge = $('<div class="badge badge-info"></div>');
+            var $badge = $('<div class="badge badge-pill badge-info"></div>');
             if (item.newMessages > 0) {
                 $badge.text(item.messages - item.newMessages);
                 $badge.append(

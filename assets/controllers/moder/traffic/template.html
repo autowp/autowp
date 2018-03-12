@@ -29,7 +29,7 @@
             </span>
         </div>
         <div>
-            <button ng-if="item.ban" class="btn btn-default" ng-click="ctrl.removeFromBlacklist(item.ip)">{{'ban/unban'|translate}}</button>
+            <button ng-if="item.ban" class="btn btn-secondary" ng-click="ctrl.removeFromBlacklist(item.ip)">{{'ban/unban'|translate}}</button>
             <button class="btn btn-danger" ng-if="!item.ban" ng-click="ctrl.addToBlacklist(item.ip)">{{'ban/ban'|translate}}</button>
             <button ng-if="!item.whitelist" class="btn btn-success" ng-click="ctrl.addToWhitelist(item.ip)">Whitelist</button>
         </div>

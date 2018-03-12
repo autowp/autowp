@@ -43,7 +43,7 @@ var Widget = function(element) {
             var $modal = $(require('./picture-moder-vote/modal.html'));
             
             var $btnSend = $modal.find('.btn-send');
-            var $btnCancel = $modal.find('.btn-default');
+            var $btnCancel = $modal.find('.btn-secondary');
             var $checkboxLabel = $modal.find('.checkbox span');
             
             $btnSend.addClass(vote > 0 ? 'btn-success' : 'btn-danger');

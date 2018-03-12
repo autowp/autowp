@@ -31,7 +31,7 @@
         </ul>
     </div>
     
-    <button class="btn btn-default" ng-if="picture.moder_voted" ng-click="cancelVotePicture()">
+    <button class="btn btn-secondary" ng-if="picture.moder_voted" ng-click="cancelVotePicture()">
         {{'moder/picture/acceptance/cancel-vote'|translate}}
     </button>
 </div>
@@ -68,7 +68,7 @@
 	            </div>
             </div>
             <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-default" translate>picture-moder-vote/custom/cancel</button>
+                <button type="button" data-dismiss="modal" class="btn btn-secondary" translate>picture-moder-vote/custom/cancel</button>
                 <button type="button" ng-click="ok()" class="btn btn-primary" ng-class="{'md-warn': vote < 0, 'md-primary': vote > 0}">
                     {{'picture-moder-vote/custom/send'|translate}}
                 </button>

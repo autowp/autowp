@@ -18,7 +18,7 @@
                     <div class="form-group">
                         <label class="col-md-2 control-label" translate>upload/image-file</label>
                         <div class="col-md-10">
-                            <div class="btn btn-default" 
+                            <div class="btn btn-secondary" 
                                 ngf-select 
                                 ng-model="ctrl.file" 
                                 name="file" 
@@ -35,7 +35,7 @@
                                 ng-if="!ctrl.replace"
                             >upload/select-files</div>
                             
-                            <div class="btn btn-default" 
+                            <div class="btn btn-secondary" 
                                 ngf-select 
                                 ng-model="ctrl.file" 
                                 name="file" 
@@ -78,7 +78,7 @@
                 <div class="progress" ng-repeat="progress in ctrl.progress" ng-if="!progress.success">
                     <div class="progress-bar"
                         ng-style="{width: progress.percentage+'%'}"
-                        ng-class="{'progress-bar-info': !progress.success && !progress.failed, 'progress-bar-success': progress.success, 'progress-bar-danger': progress.failed}" 
+                        ng-class="{'bg-info': !progress.success && !progress.failed, 'bg-success': progress.success, 'bg-danger': progress.failed}" 
                         role="progressbar" aria-valuenow="{{progress.percentage}}" 
                         aria-valuemin="0" aria-valuemax="100">
                         <span class="file-name" ng-bind="progress.filename"></span> 

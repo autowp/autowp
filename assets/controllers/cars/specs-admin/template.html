@@ -25,7 +25,7 @@
             </td>
             <td>{{value.value}}</td>
             <td>
-                <button type="submit" class="btn btn-danger btn-xs" ng-click="ctrl.deleteValue(value)">
+                <button type="submit" class="btn btn-danger btn-sm" ng-click="ctrl.deleteValue(value)">
                     <i class="fa fa-times"></i>
                 </button>
             </td>
@@ -37,5 +37,5 @@
 
 <form ng-submit="ctrl.moveValues()">
     <input type="text" name="item_id" placeholder="id" class="form-control" style="max-width:200px" ng-model="ctrl.move.item_id" />
-    <button type="submit" class="btn btn-default" translate>specifications-editor/admin/move</button>
+    <button type="submit" class="btn btn-secondary" translate>specifications-editor/admin/move</button>
 </form>

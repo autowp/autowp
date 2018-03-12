@@ -25,14 +25,14 @@
                     <div class="col-md-9">
                         <?php foreach ($group['modifications'] as $modification) { ?>
                             <?php if ($modification['canDelete']) { ?>
-                                <form action="<?=$this->escapeHtmlAttr($modification['deleteUrl'])?>" method="post" class="pull-left" style="margin-right: 10px">
-                                    <button type="submit" class="btn btn-danger btn-xs"><span class="fa fa-times"></span></button>
+                                <form action="<?=$this->escapeHtmlAttr($modification['deleteUrl'])?>" method="post" class="float-left" style="margin-right: 10px">
+                                    <button type="submit" class="btn btn-danger btn-sm"><span class="fa fa-times"></span></button>
                                 </form>
                             <?php } ?>
                             <p>
                                 <?=$this->htmlA($modification['url'], $modification['name'])?>
                                 <?php if ($modification['count']) { ?>
-                                    <span class="badge"><?=(int)$modification['count']?></span>
+                                    <span class="badge badge-pill"><?=(int)$modification['count']?></span>
                                 <?php } ?>
                                 <?php if ($modification['inherited']) { ?>
                                     <small><em>Inherited from <?=$this->htmlA($modification['inheritedFrom']['url'], $modification['inheritedFrom']['name'])?></em></small>

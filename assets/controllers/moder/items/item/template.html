@@ -8,7 +8,7 @@
 
             <p ng-if="ctrl.specsAllowed && ctrl.canEditSpecifications">
                 <a ui-sref="cars-specifications-editor({item_id: ctrl.item.id})" translate>carlist/edit-specs</a>
-                <span class="badge" ng-if="ctrl.item.specifications_count" ng-bind="ctrl.item.specifications_count"></span>
+                <span class="badge badge-pill" ng-if="ctrl.item.specifications_count" ng-bind="ctrl.item.specifications_count"></span>
             </p>
             <p><a ui-sref="log({item_id: ctrl.item.id})" translate>moder/log-of-events</a></p>
         </div>
@@ -17,7 +17,7 @@
         <div class="well">
             <p translate>moder/vehicle/subscription/title</p>
             <p class="subscription">
-                <button class="btn" ng-class="{'btn-success': ctrl.item.subscription, 'btn-default': !ctrl.item.subscription}" ng-click="ctrl.toggleSubscription()">
+                <button class="btn" ng-class="{'btn-success': ctrl.item.subscription, 'btn-secondary': !ctrl.item.subscription}" ng-click="ctrl.toggleSubscription()">
                     <span ng-show="ctrl.item.subscription">
                         <i class="fa fa-check"></i> 
                         {{'moder/vehicle/subscription/subscribed'|translate}}
@@ -37,7 +37,7 @@
         <a href="#" ng-click="ctrl.setActiveTab(id)">
             <span ng-if="tab.icon" class="{{tab.icon}}"></span>
             <span ng-bind="tab.title|translate"></span>
-            <span class="badge" ng-if="tab.count" ng-bind="tab.count"></span>
+            <span class="badge badge-pill" ng-if="tab.count" ng-bind="tab.count"></span>
         </a>
     </li>
 </ul>
@@ -110,7 +110,7 @@
                 <li ng-class="{active: language.language == ctrl.currentLanguage}" ng-repeat="language in ctrl.itemLanguages">
                     <a href="#" ng-click="ctrl.currentLanguage = language.language">
                         {{language.language.toUpperCase()}}
-                        <span class="badge" ng-show="language.name.length || language.text.length || language.full_text.length">
+                        <span class="badge badge-pill" ng-show="language.name.length || language.text.length || language.full_text.length">
                             {{(language.name.length ? 1 : 0) + (language.text.length ? 1 : 0) + (language.full_text.length ? 1 : 0)}}
                         </span>
                     </a>
@@ -157,7 +157,7 @@
         </span>
         <a ng-if="ctrl.item.is_group && ctrl.canMove && ctrl.item.childs_count > 0"
             ui-sref="moder-items-item-organize({id: ctrl.item.id, item_type_id: ctrl.organizeTypeId})"
-            class="btn btn-default" 
+            class="btn btn-secondary" 
             translate>moder/vehicle/catalogue/turbo-group-creator</a>
         <table class="table">
             <thead>
@@ -176,8 +176,8 @@
                                 <input type="text" name="parent" class="form-control item-autocomplete" placeholder="{{'moder/vehicle/catalogue/select-placeholder'|translate}}" autocomplete="off" />
                                 
                                 <div class="input-group-btn" style="white-space:nowrap">
-                                    <a class="btn btn-default" ui-sref="moder-items-item-select-parent({id: ctrl.item.id})" translate>moder/vehicle/catalogue/select</a>
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <a class="btn btn-secondary" ui-sref="moder-items-item-select-parent({id: ctrl.item.id})" translate>moder/vehicle/catalogue/select</a>
+                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <span class="caret"></span>
                                         <span class="sr-only">Toggle Dropdown</span>
                                     </button>
@@ -334,7 +334,7 @@
     <div ng-if="ctrl.tabs.pictures" class="tab-pane" ng-class="{active: ctrl.tabs.pictures.active}" id="pictures">
         <p class="btn-group" ng-if="ctrl.canUseTurboGroupCreator">
             <a ui-sref="moder-items-item-organize-pictures({id: ctrl.item.id})"
-                class="btn btn-default" 
+                class="btn btn-secondary" 
                 translate>moder/vehicle/pictures/turbo-group-creator</a>
         </p>
         <div class="row" ng-repeat="chunk in ctrl.picturesChunks">

@@ -38,16 +38,16 @@ ga('send', 'pageview');
 
         <div id="moderatorMenuContainer" style="z-index:100" ng-if="moderMenu">
             <div class="btn-group dropup" >
-                <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">
+                <button data-toggle="dropdown" class="btn btn-secondary dropdown-toggle">
                     {{'moder-menu/title'|translate}}
                     <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu pull-right">
+                <ul class="dropdown-menu float-right">
                     <li ng-repeat="item in moderMenu">
                         <a ng-href="{{item.href}}">
                             <i class="fa-fw {{item.icon}}" ng-if="item.icon"></i>
                             {{item.label}}
-                            <span class="badge" ng-if="item.count" ng-bind="item.count"></span>
+                            <span class="badge badge-pill" ng-if="item.count" ng-bind="item.count"></span>
                         </a>
                     </li>
                     <li class="divider"></li>
@@ -95,7 +95,7 @@ ga('send', 'pageview');
                         <li<?=$this->pageEnv()->isOnPath(49) ? ' class="active"' : ''?> ng-if="user">
                             <a ui-sref="account-messages" ui-sref-opts="{inherit:false}">
                                 <i class="fa fa-comment"></i>
-                                <span class="badge" ng-bind="newPersonalMessages" ng-if="newPersonalMessages"></span>
+                                <span class="badge badge-pill" ng-bind="newPersonalMessages" ng-if="newPersonalMessages"></span>
                             </a>
                         </li>
                         <li<?=$this->pageEnv()->isOnPath(79) ? ' class="active"' : ''?> ng-if="!user">
@@ -199,7 +199,7 @@ ga('send', 'pageview');
                                 </label>
                             </div>
                             <div>
-                                <div class="pull-right text-right">
+                                <div class="float-right text-right">
                                     <a href="/ng/signup" translate>login/registration</a><br />
                                     <a href="/ng/restore-password" translate>login/forgot-password?</a>
                                 </div>

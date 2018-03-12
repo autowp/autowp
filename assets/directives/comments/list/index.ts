@@ -113,7 +113,7 @@ class AutowpCommentsListDirectiveController {
             $modal.remove();
         });
         
-        var $btnClose = $modal.find('.btn-default');
+        var $btnClose = $modal.find('.btn-secondary');
         
         $btnClose.button('loading');
         this.$http({

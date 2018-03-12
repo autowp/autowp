@@ -14,7 +14,7 @@
             <?php if ($this->newPersonalMessages > 0) { ?>
                 <?=$this->htmlA([
                     'href'  => '/ng/account/messages',
-                    'class' => 'label label-danger'
+                    'class' => 'badge badge-danger'
                 ], sprintf($this->translatePlural('layout/you-have-%1$s-new-messages', null, $this->newPersonalMessages), $this->newPersonalMessages))?>
             <?php } else { ?>
                 <?=$this->htmlA('/ng/account/messages', $this->translate('layout/personal-messages'))?>
@@ -34,7 +34,7 @@
                 </label>
             </div>
             <div>
-                <div class="pull-right text-right">
+                <div class="float-right text-right">
                     <?=$this->htmlA('/ng/signup', $this->translate('login/registration'))?><br />
                     <?=$this->htmlA('/ng/restore-password', $this->translate('login/forgot-password?'))?>
                 </div>

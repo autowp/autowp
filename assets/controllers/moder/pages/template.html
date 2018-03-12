@@ -14,8 +14,8 @@
     <tbody>
         <tr class="data-row" ng-repeat="page in ctrl.items">
             <td style="white-space:nowrap">
-                <button class="btn btn-default btn-sm" ng-disabled="!page.moveUp" aria-label="move up" ng-click="ctrl.move(page, 'up')"><i class="fa fa-arrow-up"></i></button>
-                <button class="btn btn-default btn-sm" ng-disabled="!page.moveDown" aria-label="move down" ng-click="ctrl.move(page, 'down')"><i class="fa fa-arrow-down"></i></button>
+                <button class="btn btn-secondary btn-sm" ng-disabled="!page.moveUp" aria-label="move up" ng-click="ctrl.move(page, 'up')"><i class="fa fa-arrow-up"></i></button>
+                <button class="btn btn-secondary btn-sm" ng-disabled="!page.moveDown" aria-label="move down" ng-click="ctrl.move(page, 'down')"><i class="fa fa-arrow-down"></i></button>
             </td>
             <td ng-bind="page.id"></td>
             <td ng-style="{'padding-left': page.level * 20 + 'px'}" ng-bind="'page/' + page.id + '/name'|translate"></td>
@@ -23,7 +23,7 @@
             <td>{{page.is_group_node ? 'yes' : 'no'}}</td>
             <td style="white-space:nowrap">
                 <a class="btn btn-success btn-sm" ui-sref="moder-pages-add({parent_id: page.id})" aria-label="add"><i class="fa fa-plus"></i></a>
-                <a class="btn btn-default btn-sm" ui-sref="moder-pages-edit({id: page.id})" aria-label="edit"><i class="fa fa-pencil"></i></a>
+                <a class="btn btn-secondary btn-sm" ui-sref="moder-pages-edit({id: page.id})" aria-label="edit"><i class="fa fa-pencil"></i></a>
                 <button class="btn btn-danger btn-sm" ng-click="ctrl.deletePage($event, page)" aria-label="delete" ng-if="page.childs.length == 0"><i class="fa fa-times"></i></button>
             </td>
         </tr>

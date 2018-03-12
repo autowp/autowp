@@ -46,7 +46,7 @@
 
 <?php if ($this->voteExists) { ?>
     <div data-module="picture-moder-vote" data-url="<?=$this->escapeHtmlAttr($this->voteUrl)?>">
-        <button type="submit" class="btn btn-default btn-cancel-vote">
+        <button type="submit" class="btn btn-secondary btn-cancel-vote">
             <?=$this->escapeHtml($this->translate('moder/picture/acceptance/cancel-vote'))?>
         </button>
     </div>
@@ -71,11 +71,11 @@
 <?php } ?>
 
 <?php if ($this->isLastPicture) { ?>
-    <p><span class="label label-warning">
+    <p><span class="badge badge-warning">
         <?=$this->escapeHtml($this->translate('moder/picture/acceptance/that-is-one-accepted-picture'))?>
     </span></p>
 <?php } elseif ($this->acceptedCount !== null && $this->acceptedCount <= 4) { ?>
-    <p><span class="label label-warning">
+    <p><span class="badge badge-warning">
         <?=$this->escapeHtml(sprintf($this->translate('moder/picture/acceptance/accepted-pictures-is-%s'), $this->acceptedCount))?>
     </span></p>
 <?php } ?>

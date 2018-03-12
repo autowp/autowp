@@ -3,7 +3,7 @@
         <div class="well" ng-if="ctrl.accounts.length > 0 && !ctrl.disconnectFailed && !ctrl.connectFailed">
             <div ng-repeat="account in ctrl.accounts">
                 <p>
-                    <button type="submit" class="btn btn-xs btn-danger" title="{{'account/accounts/remove'|translate}}" ng-if="account.can_remove" style="margin-right:16px" ng-click="ctrl.remove(account)">
+                    <button type="submit" class="btn btn-sm btn-danger" title="{{'account/accounts/remove'|translate}}" ng-if="account.can_remove" style="margin-right:16px" ng-click="ctrl.remove(account)">
                         <i class="fa fa-times"></i>
                     </button>
                     <i class="fa-fw {{account.icon}}"></i>

@@ -21,7 +21,7 @@
         <a ui-sref="cars-specifications-editor({tab: id})">
             <span class="{{tab.icon}}" ng-if="tab.icon"></span>
             {{tab.title | translate}}
-            <span class="badge" ng-if="tab.count" ng-bind="tab.count"></span>
+            <span class="badge badge-pill" ng-if="tab.count" ng-bind="tab.count"></span>
         </a>
     </li>
 </ul>
@@ -87,7 +87,7 @@
                         </td>
                         <td ng-if="!attribute.childs.length">
                             <div class="input-group" ng-class="{'has-error': element.getMessages()}">
-                                <span class="input-group-addon btn btn-default" 
+                                <span class="input-group-addon btn btn-secondary" 
                                     ng-click="ctrl.currentUserValues[attribute.id].empty = !ctrl.currentUserValues[attribute.id].empty" 
                                     ng-class="{active: attribute.disabled}">
                                     <span class="fa fa-remove"></span>
@@ -173,7 +173,7 @@
     <div class="tab-pane" ng-class="{active: ctrl.tab == 'admin'}" id="admin" ng-if="ctrl.isSpecsAdmin">
         <p><a ui-sref="cars-specs-admin({item_id: ctrl.item.id})">Admin</a></p>
         <div>
-            <button class="btn btn-default" ng-click="ctrl.refreshInheritance()">Refresh inheritance</button>
+            <button class="btn btn-secondary" ng-click="ctrl.refreshInheritance()">Refresh inheritance</button>
         </div>
     </div>
 </div>

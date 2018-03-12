@@ -26,8 +26,8 @@
                         <p ng-bind-html="message.text_html"></p>
                     </div>
                     <div>
-                        <span class="label label-info" ng-if="message.is_new" translate>account/personal-message/new</span>
-                        <a href="#" class="pull-right" ng-click="ctrl.deleteMessage(message.id)" ng-if="message.can_delete">
+                        <span class="badge badge-info" ng-if="message.is_new" translate>account/personal-message/new</span>
+                        <a href="#" class="float-right" ng-click="ctrl.deleteMessage(message.id)" ng-if="message.can_delete">
                             <i class="fa fa-trash"></i> {{'account/personal-message/delete'|translate}}
                         </a>
                         <span ng-if="message.can_reply">
