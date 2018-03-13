@@ -13,7 +13,7 @@
                 <span class="fa fa-lock" ng-if="topic.status == 'closed'"></span>
                 <a ui-sref="forums-topic({topic_id: topic.id})" ng-bind="topic.name" ng-if="topic.status != 'deleted'"></a>
                 <span ng-bind="topic.name" ng-if="topic.status == 'deleted'"></span>
-                <span class="badge badge-pill">
+                <span class="badge badge-pill badge-secondary">
                     {{topic.old_messages + (topic.new_messages > 0 ? '+' + topic.new_messages : '')}}
                 </span>
             </td>

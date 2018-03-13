@@ -38,7 +38,7 @@
                 </div>
                 <small ng-if="row.fans.length > 0">
                     <autowp-user ng-repeat-start="fan in row.fans" user="fan.user"></autowp-user>
-                    <span class="badge badge-pill" ng-bind="(fan.volume > 0 ? '+' : '') + fan.volume"></span>
+                    <span class="badge badge-pill badge-secondary" ng-bind="(fan.volume > 0 ? '+' : '') + fan.volume"></span>
                     <span ng-repeat-end>, </span>
                     …
                 </small>

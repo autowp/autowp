@@ -32,7 +32,7 @@
                             <p>
                                 <?=$this->htmlA($modification['url'], $modification['name'])?>
                                 <?php if ($modification['count']) { ?>
-                                    <span class="badge badge-pill"><?=(int)$modification['count']?></span>
+                                    <span class="badge badge-pill badge-secondary"><?=(int)$modification['count']?></span>
                                 <?php } ?>
                                 <?php if ($modification['inherited']) { ?>
                                     <small><em>Inherited from <?=$this->htmlA($modification['inheritedFrom']['url'], $modification['inheritedFrom']['name'])?></em></small>

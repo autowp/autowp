@@ -43,7 +43,7 @@
                             }
                         ?>
                         <li<?=$classes ? ' class="'.implode(' ', $classes).'"' : ''?>><?=$this->htmlA([
-                            'class' => 'nav-link', 
+                            'class' => 'nav-link',
                             'href'  => $page['url']
                         ], $page['name']) ?></li>
                     <?php } ?>
@@ -56,7 +56,7 @@
                         <?=$this->htmlA([
                             'class' => 'nav-link',
                             'href'  => '/ng/account/messages'
-                        ], '<i class="fa fa-comment"></i>' . ($this->pm ? ' <span class="badge badge-pill">'.$this->pm.'</span>' : ''), false)?>
+                        ], '<i class="fa fa-comment"></i>' . ($this->pm ? ' <span class="badge badge-pill badge-secondary">'.$this->pm.'</span>' : ''), false)?>
                     </li>
                 <?php } else { ?>
                     <li class="nav-item<?=$this->pageEnv()->isOnPath(79) ? 'active' : ''?>">

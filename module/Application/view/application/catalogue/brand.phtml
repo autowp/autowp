@@ -73,7 +73,7 @@
                 <?=$this->htmlA('/ng/moder/pictures?' . http_build_query([
                     'status'  => Application\Model\Picture::STATUS_INBOX,
                     'item_id' => $this->brand['id'],
-                ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge badge-pill">' . $this->inboxPictures . '</span>', false)?>
+                ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge badge-pill badge-secondary">' . $this->inboxPictures . '</span>', false)?>
             </li>
         <?php } ?>
         <?php if ($this->requireAttention) { ?>
@@ -87,7 +87,7 @@
                     ]),
                     '<i class="fa fa-comment"></i> ' .
                         $this->escapeHtml($this->translate('catalogue/vehicle/comments')) .
-                        ' <span class="badge badge-pill">'.$this->requireAttention.'</span>',
+                        ' <span class="badge badge-pill badge-secondary">'.$this->requireAttention.'</span>',
                     false
                 )?>
             </li>

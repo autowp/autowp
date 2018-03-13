@@ -8,7 +8,7 @@
 
             <p ng-if="ctrl.specsAllowed && ctrl.canEditSpecifications">
                 <a ui-sref="cars-specifications-editor({item_id: ctrl.item.id})" translate>carlist/edit-specs</a>
-                <span class="badge badge-pill" ng-if="ctrl.item.specifications_count" ng-bind="ctrl.item.specifications_count"></span>
+                <span class="badge badge-pill badge-secondary" ng-if="ctrl.item.specifications_count" ng-bind="ctrl.item.specifications_count"></span>
             </p>
             <p><a ui-sref="log({item_id: ctrl.item.id})" translate>moder/log-of-events</a></p>
         </div>
@@ -37,7 +37,7 @@
         <a href="#" ng-click="ctrl.setActiveTab(id)">
             <span ng-if="tab.icon" class="{{tab.icon}}"></span>
             <span ng-bind="tab.title|translate"></span>
-            <span class="badge badge-pill" ng-if="tab.count" ng-bind="tab.count"></span>
+            <span class="badge badge-pill badge-secondary" ng-if="tab.count" ng-bind="tab.count"></span>
         </a>
     </li>
 </ul>
@@ -110,7 +110,7 @@
                 <li ng-class="{active: language.language == ctrl.currentLanguage}" ng-repeat="language in ctrl.itemLanguages">
                     <a href="#" ng-click="ctrl.currentLanguage = language.language">
                         {{language.language.toUpperCase()}}
-                        <span class="badge badge-pill" ng-show="language.name.length || language.text.length || language.full_text.length">
+                        <span class="badge badge-pill badge-secondary" ng-show="language.name.length || language.text.length || language.full_text.length">
                             {{(language.name.length ? 1 : 0) + (language.text.length ? 1 : 0) + (language.full_text.length ? 1 : 0)}}
                         </span>
                     </a>

@@ -2,7 +2,7 @@
     <ul class="nav nav-pills nav-stacked">
         <li ng-repeat="item in ctrl.items" ng-class="{active: item.active}">
             <a ng-href="{{item.url}}" ng-if="item.url">
-                <span ng-class="{'badge badge-pill': true, 'float-right': true, 'alert-danger': item.newCount > 0}" ng-if="item.count !== undefined">
+                <span ng-class="{'badge badge-pill badge-secondary': true, 'float-right': true, 'alert-danger': item.newCount > 0}" ng-if="item.count !== undefined">
                     <span ng-if="item.count <= 0" translate>count 0</span>
                     <span ng-if="item.count > 0 && item.newCount === undefined">{{item.count}}</span>
                     <span ng-if="item.count > 0 && item.newCount !== undefined && item.newCount <= 0">{{item.count}}</span>
@@ -13,7 +13,7 @@
             </a>
             {{$state.href('account-messages')}}
             <a ng-href="{{$state.href(item.sref, {}, {inherit: false})}}" ng-if="item.sref">
-                <span ng-class="{'badge badge-pill': true, 'float-right': true, 'alert-danger': item.newCount > 0}" ng-if="item.count !== undefined">
+                <span ng-class="{'badge badge-pill badge-secondary': true, 'float-right': true, 'alert-danger': item.newCount > 0}" ng-if="item.count !== undefined">
                     <span ng-if="item.count <= 0" translate>count 0</span>
                     <span ng-if="item.count > 0 && item.newCount === undefined">{{item.count}}</span>
                     <span ng-if="item.count > 0 && item.newCount !== undefined && item.newCount <= 0">{{item.count}}</span>
