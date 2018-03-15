@@ -2,20 +2,18 @@
     {{'account/specs/weight'|translate}}: {{ctrl.weight.toFixed(2)}}
 </p>
 
-<ul class="nav nav-pills" style="margin-bottom:10px">
-    <li ng-class="{active: ctrl.filter == '0'}">
-        <a ui-sref="account-specs-conflicts({filter: 0})" translate>account/specs/conflicts/filter/all</a>
-    </li>
-    <li ng-class="{active: ctrl.filter == '-1'}">
-        <a ui-sref="account-specs-conflicts({filter: -1})" translate>account/specs/conflicts/filter/i-disagree</a>
-    </li>
-    <li ng-class="{active: ctrl.filter == '1'}">
-        <a ui-sref="account-specs-conflicts({filter: 1})" translate>account/specs/conflicts/filter/do-not-agree-with-me</a>
-    </li>
-    <li ng-class="{active: ctrl.filter == 'minus-weight'}">
-        <a ui-sref="account-specs-conflicts({filter: 'minus-weight'})" translate>account/specs/conflicts/filter/errors</a>
-    </li>
-</ul>
+<div class="nav nav-pills" style="margin-bottom:10px">
+
+    <a class="nav-link" ng-class="{active: ctrl.filter == '0'}" ui-sref="account-specs-conflicts({filter: 0})" translate>account/specs/conflicts/filter/all</a>
+
+    <a class="nav-link" ng-class="{active: ctrl.filter == '-1'}" ui-sref="account-specs-conflicts({filter: -1})" translate>account/specs/conflicts/filter/i-disagree</a>
+
+    <a class="nav-link" ng-class="{active: ctrl.filter == '1'}" ui-sref="account-specs-conflicts({filter: 1})" translate>account/specs/conflicts/filter/do-not-agree-with-me</a>
+
+    <a class="nav-link" ng-class="{active: ctrl.filter == 'minus-weight'}" ui-sref="account-specs-conflicts({filter: 'minus-weight'})"
+        translate>account/specs/conflicts/filter/errors</a>
+
+</div>
 
 <table class="table">
     <thead>
@@ -37,7 +35,9 @@
                         {{value.value}}
                         <span ng-if="conflict.unit">{{conflict.unit.abbr | translate}}</span>
                     </span>
-                    <a ng-href="{{conflict.url}}"><i class="fa fa-pencil"></i></a>
+                    <a ng-href="{{conflict.url}}">
+                        <i class="fa fa-pencil"></i>
+                    </a>
                 </div>
             </td>
             <td>

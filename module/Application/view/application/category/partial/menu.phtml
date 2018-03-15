@@ -1,8 +1,11 @@
-<ul class="nav nav-pills nav-stacked">
+<ul class="nav flex-column nav-pills">
     <?php foreach ($this->categories as $category) { ?>
-        <li<?=$category['active'] ? ' class="active"' : '' ?>>
+        <li class="nav-item">
             <?=$this->htmlA(
-                $category['url'],
+                [
+                    'class' => 'nav-link' . ($category['active'] ? ' active' : ''),
+                    'href' => $category['url']
+                ],
                 $this->escapeHtml($category['short_name']) .
                     '&#xa0;<span class="count">('.($category['cars_count'] - $category['new_cars_count']) . ($category['new_cars_count'] > 0 ? '<span>+'.$category['new_cars_count'].'</span>' : '') .')</span>',
                 false

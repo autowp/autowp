@@ -1,11 +1,7 @@
-<ul class="nav nav-pills">
-    <li>
-        <a ui-sref="moder-traffic">Traffic</a>
-    </li>
-    <li class="active">
-        <a ui-sref="moder-traffic-whitelist">Whitelist</a>
-    </li>
-</ul>
+<div class="nav nav-pills">
+    <a class="nav-link" ui-sref="moder-traffic">Traffic</a>
+    <a class="nav-link active" ui-sref="moder-traffic-whitelist">Whitelist</a>
+</div>
 <table class="table table-striped table-condensed">
     <tbody>
         <tr ng-repeat="item in ctrl.items">

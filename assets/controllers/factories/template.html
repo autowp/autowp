@@ -1,15 +1,11 @@
-<ul class="nav nav-pills" style="margin-bottom:10px">
-    <li class="active">
-        <a ui-sref="." ng-bind-html="ctrl.factory.name_html"></a>
-    </li>
-    <li><a ui-sref="factory-items({id: ctrl.factory.id})" translate>factories/factory-items</a></li>
-    <li ng-if="isModer">
-        <a ui-sref="moder-items-item({id: ctrl.factory.id})">
-            <i class="fa fa-cog"></i>
-            <translate>moder/edit-object</translate>
-        </a>
-    </li>
-</ul>
+<div class="nav nav-pills" style="margin-bottom:10px">
+    <a class="nav-link active" ui-sref="." ng-bind-html="ctrl.factory.name_html"></a>
+    <a class="nav-link" ui-sref="factory-items({id: ctrl.factory.id})" translate>factories/factory-items</a>
+    <a class="nav-link" ui-sref="moder-items-item({id: ctrl.factory.id})" ng-if="isModer">
+        <i class="fa fa-cog"></i>
+        <translate>moder/edit-object</translate>
+    </a>
+</div>
 
 <div class="google-map" style="height:300px;margin:0 0 40px;width:100%" ng-show="ctrl.factory.lng && ctrl.factory.lat"></div>
 
@@ -33,10 +29,14 @@
                     <img ng-src="{{item.src}}" alt="" title="{{item.name}}" />
                 </a>
                 <div class="name">
-                    <p><a ng-href="{{item.url}}" ng-bind="item.name"></a></p>
+                    <p>
+                        <a ng-href="{{item.url}}" ng-bind="item.name"></a>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
-    <p><a ui-sref="factory-items({id: ctrl.factory.id})" translate>carlist/details</a></p>
+    <p>
+        <a ui-sref="factory-items({id: ctrl.factory.id})" translate>carlist/details</a>
+    </p>
 </div>

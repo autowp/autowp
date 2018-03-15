@@ -50,8 +50,11 @@
 ?>
 <ul class="nav nav-pills">
     <?php foreach ($this->years as $year) { ?>
-        <li<?=$year['active'] ? ' class="active"' : '' ?>>
-            <?=$this->htmlA($year['url'], $this->translate($year['name'])) ?>
+        <li class="nav-item<?=$year['active'] ? ' active' : '' ?>">
+            <?=$this->htmlA([
+                'class' => 'nav-link',
+                'href'  => $year['url']
+            ], $this->translate($year['name'])) ?>
         </li>
     <?php } ?>
 </ul>

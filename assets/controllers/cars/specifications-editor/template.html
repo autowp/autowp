@@ -1,18 +1,14 @@
-<ul class="nav nav-pills" style="margin-bottom: 20px">
-    <li ng-if="ctrl.isModer">
-        <a ui-sref="moder-items-item({id: ctrl.item.id})">
-            <i class="fa fa-cog"></i>
-            {{'moder/edit-object'|translate}}
-            <span ng-bind-html="ctrl.item.name_html"></span>
-        </a>
-    </li>
-    <li>
-        <a ui-sref="cars-attrs-change-log({item_id: ctrl.item.id})">
-            <i class="fa fa-list"></i>
-            {{'specifications-editor/log'|translate}}
-        </a>
-    </li>
-</ul>
+<div class="nav nav-pills" style="margin-bottom: 20px">
+    <a class="nav-link" ui-sref="moder-items-item({id: ctrl.item.id})" ng-if="ctrl.isModer">
+        <i class="fa fa-cog"></i>
+        {{'moder/edit-object'|translate}}
+        <span ng-bind-html="ctrl.item.name_html"></span>
+    </a>
+    <a class="nav-link" ui-sref="cars-attrs-change-log({item_id: ctrl.item.id})">
+        <i class="fa fa-list"></i>
+        {{'specifications-editor/log'|translate}}
+    </a>
+</div>
 
 <div class="alert alert-danger" ng-if="ctrl.specsWeight < 1" autowp-markdown="'specifications-editor/errors-alert'|translate"></div>
 

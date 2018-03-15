@@ -1,6 +1,6 @@
 <ul class="nav nav-pills" style="margin-bottom:10px">
-    <li ng-class="{active: key == ctrl.order}" ng-repeat="(key, name) in ctrl.orders">
-        <a ui-sref=".({order: key, page: null})" ng-bind="name|translate"></a>
+    <li class="nav-item" ng-repeat="(key, name) in ctrl.orders">
+        <a ng-class="{active: key == ctrl.order}" class="nav-link" ui-sref=".({order: key, page: null})" ng-bind="name|translate"></a>
     </li>
 </ul>
 

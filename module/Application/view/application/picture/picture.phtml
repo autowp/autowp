@@ -55,9 +55,10 @@
     <div class="col-md-6">
         <div class="picture-preview-medium">
             <?=$this->htmlA([
-                'class' => 'thumbnail',
+                'class' => 'd-block rounded mb-4',
                 'href'  => $this->sourceUrl
             ], $this->htmlImg([
+                'class'   => 'rounded',
                 'src'     => $this->previewUrl,
                 'alt'     => $this->pic()->textTitle($this->name),
                 'title'   => $this->pic()->textTitle($this->name),

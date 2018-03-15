@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-sm-8 col-sm-push-4">
+    <div class="col-sm-8 order-2">
         <div class="row" ng-repeat="chunk in ctrl.chunks">
             <div class="col-sm-3" ng-repeat="picture in chunk">
                 <autowp-thumbnail picture="picture" is-moder="isModer"></autowp-thumbnail>
@@ -7,7 +7,7 @@
         </div>
         <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
     </div>
-    <div class="col-sm-4 col-sm-pull-8">
+    <div class="col-sm-4 order-1">
         <autowp-account-sidebar user="user"></autowp-account-sidebar>
     </div>
 </div>

@@ -43,48 +43,66 @@
         </div>
     </div>
     <ul class="nav nav-pills">
-        <li>
-            <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'cars'
-            ], [], true), '<i class="fa fa-road"></i> ' . $this->escapeHtml($this->translate('catalogue/chronological')), false)?>
+        <li class="nav-item">
+            <?=$this->htmlA([
+                'class' => 'nav-link',
+                'href'  => $this->url('catalogue', [
+                    'action' => 'cars'
+                ], [], true)
+            ], '<i class="fa fa-road"></i> ' . $this->escapeHtml($this->translate('catalogue/chronological')), false)?>
         </li>
-        <li>
-            <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'recent'
-            ], [], true), '<i class="fa fa-th"></i> '. $this->escapeHtml($this->translate('catalogue/brand/new-pictures')), false)?>
+        <li class="nav-item">
+            <?=$this->htmlA([
+                'class' => 'nav-link',
+                'href'  => $this->url('catalogue', [
+                    'action' => 'recent'
+                ], [], true)
+            ], '<i class="fa fa-th"></i> '. $this->escapeHtml($this->translate('catalogue/brand/new-pictures')), false)?>
         </li>
         <?php if ($this->haveTwins) { ?>
-            <li>
-                <?=$this->htmlA($this->url('twins/brand', [
-                    'brand_catname' => $this->brand['catname']
-                ]), '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(25)->name), false)?>
+            <li class="nav-item">
+                <?=$this->htmlA([
+                    'class' => 'nav-link',
+                    'href'  => $this->url('twins/brand', [
+                        'brand_catname' => $this->brand['catname']
+                    ])
+                ], '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(25)->name), false)?>
             </li>
         <?php } ?>
         <?php if ($this->mostsActive) { ?>
-            <li>
-                <?=$this->htmlA($this->url('catalogue', [
-                    'action'        => 'brand-mosts',
-                    'brand_catname' => $this->brand['catname']
-                ]), '<i class="fa fa-sort-amount-desc"></i> ' . $this->escapeHtml($this->page(21)->name), false)?>
+            <li class="nav-item">
+                <?=$this->htmlA([
+                    'class' => 'nav-link',
+                    'href'  => $this->url('catalogue', [
+                        'action'        => 'brand-mosts',
+                        'brand_catname' => $this->brand['catname']
+                    ])
+                ], '<i class="fa fa-sort-amount-desc"></i> ' . $this->escapeHtml($this->page(21)->name), false)?>
             </li>
         <?php } ?>
         <?php if ($this->inboxPictures) { ?>
-            <li>
-                <?=$this->htmlA('/ng/moder/pictures?' . http_build_query([
-                    'status'  => Application\Model\Picture::STATUS_INBOX,
-                    'item_id' => $this->brand['id'],
-                ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge badge-pill badge-secondary">' . $this->inboxPictures . '</span>', false)?>
+            <li class="nav-item">
+                <?=$this->htmlA([
+                    'class' => 'nav-link',
+                    'href'  => '/ng/moder/pictures?' . http_build_query([
+                        'status'  => Application\Model\Picture::STATUS_INBOX,
+                        'item_id' => $this->brand['id'],
+                    ])
+                ], '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge badge-pill badge-secondary">' . $this->inboxPictures . '</span>', false)?>
             </li>
         <?php } ?>
         <?php if ($this->requireAttention) { ?>
-            <li>
+            <li class="nav-item">
                 <?=$this->htmlA(
-                    $this->url('ng', ['path' => 'moder/comments'], [
-                        'query' => [
-                            'pictures_of_item_id' => $this->brand['id'],
-                            'moderator_attention' => '1'
-                        ]
-                    ]),
+                    [
+                        'class' => 'nav-link',
+                        'href'  => $this->url('ng', ['path' => 'moder/comments'], [
+                            'query' => [
+                                'pictures_of_item_id' => $this->brand['id'],
+                                'moderator_attention' => '1'
+                            ]
+                        ])
+                    ],
                     '<i class="fa fa-comment"></i> ' .
                         $this->escapeHtml($this->translate('catalogue/vehicle/comments')) .
                         ' <span class="badge badge-pill badge-secondary">'.$this->requireAttention.'</span>',
@@ -93,9 +111,12 @@
             </li>
         <?php } ?>
         <?php if ($this->user()->inheritsRole('moder')) { ?>
-            <li>
+            <li class="nav-item">
                 <?=$this->htmlA(
-                    '/ng/moder/items/item/' . $this->brand['id'],
+                    [
+                        'class' => 'nav-link',
+                        'href'  => '/ng/moder/items/item/' . $this->brand['id']
+                    ],
                     '<i class="fa fa-cog"></i> ' . $this->translate('moder/edit-object'),
                     false
                 ) ?>

@@ -1,20 +1,10 @@
-<ul class="nav nav-pills" style="margin-bottom: 30px" ng-if="!src_item">
-    <li ng-class="{active: !ctrl.show_factories && !show_museums && !ctrl.show_persons}" ng-if="!ctrl.src_type || ctrl.src_type == 1">
-        <a ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: null})" translate>moder/pciture/move/brands</a>
-    </li>
-    <li ng-class="{active: ctrl.show_factories}" ng-if="!ctrl.src_type || ctrl.src_type == 1">
-        <a ui-sref=".({show_factories: 1, show_museums: null, show_persons: null, show_authors: null})" translate>moder/pciture/move/factories</a>
-    </li>
-    <li ng-class="{active: ctrl.show_museums}" ng-if="!ctrl.src_type || ctrl.src_type == 1">
-        <a ui-sref=".({show_factories: null, show_museums: 1, show_persons: null, show_authors: null})" translate>item/type/7/name-plural</a>
-    </li>
-    <li ng-class="{active: ctrl.show_persons}" ng-if="!ctrl.src_type || ctrl.src_type == 1">
-        <a ui-sref=".({show_factories: null, show_museums: null, show_persons: 1, show_authors: null})">{{'item/type/8/name-plural'|translate}} (content)</a>
-    </li>
-    <li ng-class="{active: ctrl.show_authors}" ng-if="!ctrl.src_type || ctrl.src_type == 2">
-        <a ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: 1})">{{'item/type/8/name-plural'|translate}} (author)</a>
-    </li>
-</ul>
+<div class="nav nav-pills" style="margin-bottom: 30px" ng-if="!src_item">
+    <a ng-class="{active: !ctrl.show_factories && !show_museums && !ctrl.show_persons}" ng-if="!ctrl.src_type || ctrl.src_type == 1" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: null})" translate>moder/pciture/move/brands</a>
+    <a ng-class="{active: ctrl.show_factories}" ng-if="!ctrl.src_type || ctrl.src_type == 1" class="nav-link" ui-sref=".({show_factories: 1, show_museums: null, show_persons: null, show_authors: null})" translate>moder/pciture/move/factories</a>
+    <a ng-class="{active: ctrl.show_museums}" ng-if="!ctrl.src_type || ctrl.src_type == 1" class="nav-link" ui-sref=".({show_factories: null, show_museums: 1, show_persons: null, show_authors: null})" translate>item/type/7/name-plural</a>
+    <a ng-class="{active: ctrl.show_persons}" ng-if="!ctrl.src_type || ctrl.src_type == 1" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: 1, show_authors: null})">{{'item/type/8/name-plural'|translate}} (content)</a>
+    <a ng-class="{active: ctrl.show_authors}" ng-if="!ctrl.src_type || ctrl.src_type == 2" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: 1})">{{'item/type/8/name-plural'|translate}} (author)</a>
+</div>
 
 <div ng-if="ctrl.show_museums && !src_item && (!ctrl.src_type || ctrl.src_type == 1)">
     <div class="card card-body">

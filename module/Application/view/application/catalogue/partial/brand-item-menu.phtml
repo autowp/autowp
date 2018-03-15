@@ -1,37 +1,49 @@
 <ul class="nav nav-pills" style="margin-bottom:10px">
     <?php if ($this->stock['count'] > 0) { ?>
-        <li<?=$this->stock['active'] ? ' class="active"' : ''?>>
-            <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'brand-item',
-                'type'   => null,
-                'page'   => 1,
-            ], [], true), '<i class="fa fa-list"></i> ' . $this->escapeHtml($this->title) . ' <span class="badge badge-pill badge-secondary">'.$this->stock['count'].'</span>', false) ?>
+        <li class="nav-item">
+            <?=$this->htmlA([
+                'class' => 'nav-link' . ($this->stock['active'] ? ' active' : ''),
+                'href'  => $this->url('catalogue', [
+                    'action' => 'brand-item',
+                    'type'   => null,
+                    'page'   => 1,
+                ], [], true)
+            ], '<i class="fa fa-list"></i> ' . $this->escapeHtml($this->title) . ' <span class="badge badge-pill badge-secondary">'.$this->stock['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->tuning['count'] > 0) { ?>
-        <li<?=$this->tuning['active'] ? ' class="active"' : ''?>>
-            <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'brand-item',
-                'type'   => 'tuning',
-                'page'   => 1,
-            ], [], true), '<i class="fa fa-list"></i> ' . $this->escapeHtml(sprintf($this->translate('catalogue/related-with-%1$s'), $this->title)) . ' <span class="badge badge-pill badge-secondary">'.$this->tuning['count'].'</span>', false) ?>
+        <li class="nav-item">
+            <?=$this->htmlA([
+                'class' => 'nav-link' . ($this->tuning['active'] ? ' active' : ''),
+                'href'  => $this->url('catalogue', [
+                    'action' => 'brand-item',
+                    'type'   => 'tuning',
+                    'page'   => 1,
+                ], [], true)
+            ], '<i class="fa fa-list"></i> ' . $this->escapeHtml(sprintf($this->translate('catalogue/related-with-%1$s'), $this->title)) . ' <span class="badge badge-pill badge-secondary">'.$this->tuning['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->sport['count'] > 0) { ?>
-        <li<?=$this->sport['active'] ? ' class="active"' : ''?>>
-            <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'brand-item',
-                'type'   => 'sport',
-                'page'   => 1,
-            ], [], true), '<i class="fa fa-list"></i> ' . $this->escapeHtml(sprintf($this->translate('catalogue/sport-of-%1$s'), $this->title)) . ' <span class="badge badge-pill badge-secondary">'.$this->sport['count'].'</span>', false) ?>
+        <li class="nav-item">
+            <?=$this->htmlA([
+                'class' => 'nav-link' . ($this->sport['active'] ? ' active' : ''),
+                'href'  => $this->url('catalogue', [
+                    'action' => 'brand-item',
+                    'type'   => 'sport',
+                    'page'   => 1,
+                ], [], true)
+            ], '<i class="fa fa-list"></i> ' . $this->escapeHtml(sprintf($this->translate('catalogue/sport-of-%1$s'), $this->title)) . ' <span class="badge badge-pill badge-secondary">'.$this->sport['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->pictures['count'] > 0) { ?>
-        <li<?=$this->pictures['active'] ? ' class="active"' : ''?>>
-            <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'brand-item-pictures',
-                'page'   => 1,
-            ], [], true), '<i class="fa fa-th"></i> ' . $this->escapeHtml(sprintf($this->translate('catalogue/all-pictures-of-%1$s'), $this->title)) . ' <span class="badge badge-pill badge-secondary">'.$this->pictures['count'].'</span>', false) ?>
+        <li class="nav-item">
+            <?=$this->htmlA([
+                'class' => 'nav-link' . ($this->pictures['active'] ? ' active' : ''),
+                'href'  => $this->url('catalogue', [
+                    'action' => 'brand-item-pictures',
+                    'page'   => 1,
+                ], [], true)
+            ], '<i class="fa fa-th"></i> ' . $this->escapeHtml(sprintf($this->translate('catalogue/all-pictures-of-%1$s'), $this->title)) . ' <span class="badge badge-pill badge-secondary">'.$this->pictures['count'].'</span>', false) ?>
         </li>
     <?php } ?>
 </ul>

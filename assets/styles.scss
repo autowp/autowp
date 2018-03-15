@@ -29,9 +29,9 @@ body {
     font-weight: inherit;
 }
 
-a.label:visited {
+/*a.label:visited {
     color: $color-white;
-}
+}*/
 
 .page-header-small {
     border-bottom: 1px solid $color-white;
@@ -80,9 +80,9 @@ a {
 }
 
 a {
-    &:visited {
+    /*&:visited {
         color: #574CAD;
-    }
+    }*/
 
     &:hover, &:active {
         .badge {

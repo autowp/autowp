@@ -1,24 +1,33 @@
 <div class="card card-body">
-    <ul class="nav nav-pills nav-stacked">
-        <li class="nav-header">
-            <h3><?=$this->escapeHtml($this->translate('mosts/sidebar/mostly…'))?></h3>
+    <ul class="nav flex-column nav-pills">
+        <li class="nav-item nav-header">
+            <h3 class="nav-link"><?=$this->escapeHtml($this->translate('mosts/sidebar/mostly…'))?></h3>
         </li>
         <?php foreach ($this->sidebar['mosts'] as $most) { ?>
-            <li<?=$most['active'] ? ' class="active"' : '' ?>>
-                <?=$this->htmlA($most['url'], $this->translate($most['name'])) ?>
+            <li class="nav-item">
+                <?=$this->htmlA([
+                    'class' => 'nav-link' . (most['active'] ? ' active' : ''),
+                    'href'  => $most['url']
+                ], $this->translate($most['name'])) ?>
             </li>
         <?php } ?>
-        <li class="nav-header">
-            <h3><?=$this->escapeHtml($this->translate('mosts/sidebar/between…'))?></h3>
+        <li class="nav-item" class="nav-header">
+            <h3 class="nav-link"><?=$this->escapeHtml($this->translate('mosts/sidebar/between…'))?></h3>
         </li>
         <?php foreach ($this->sidebar['carTypes'] as $carType) { ?>
-            <li<?=$carType['active'] ? ' class="active"' : '' ?>>
-                <?=$this->htmlA($carType['url'], $this->translate($carType['name'])) ?>
+            <li class="nav-item">
+                <?=$this->htmlA([
+                    'class' => 'nav-link' . ($carType['active'] ? ' active' : ''),
+                    'href'  => $carType['url']
+                ], $this->translate($carType['name'])) ?>
                 <?php if ($carType['childs']) { ?>
-                    <ul class="nav nav-pills nav-stacked">
+                    <ul class="nav flex-column nav-pills">
                         <?php foreach ($carType['childs'] as $child) { ?>
-                            <li<?=$child['active'] ? ' class="active"' : '' ?>>
-                                <?=$this->htmlA($child['url'], $this->translate($child['name'])) ?>
+                            <li class="nav-item">
+                                <?=$this->htmlA([
+                                    'class' => 'nav-link' . ($child['active'] ? ' active' : ''),
+                                    'href'  => $child['url']
+                                ], $this->translate($child['name'])) ?>
                             </li>
                         <?php } ?>
                     </ul>
