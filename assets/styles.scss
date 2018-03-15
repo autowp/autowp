@@ -72,13 +72,6 @@ a {
     }
 }*/
 
-.thumbnail > a > img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 100%;
-}
-
 a {
     /*&:visited {
         color: #574CAD;
@@ -235,8 +228,6 @@ a {
     }
 }
 
-.thumbnail { background: white }
-
 .avatar, .max-width { max-width: 100% }
 
 .popover-handler { cursor: help }
@@ -285,30 +276,26 @@ img.avatar {
     .nav { margin-bottom: 0; }
 }
 
-.thumbnails .thumbnail {
-    margin-bottom: 20px;
+.no-photo {
+    text-align: center;
+    min-height: 116px;
+    line-height: 116px;
+    opacity: 0.5;
+    background: #fff;
 
-    &.no-photo {
-        text-align: center;
-        min-height: 116px;
-        line-height: 116px;
-        opacity: 0.5;
+    .fa-lg {
+        vertical-align: middle;
+    }
 
-        .fa-lg {
-            vertical-align: middle;
-        }
+    a.text-success {
+        float: right;
+        margin: 5px 5px 0 -17px;
 
-        a.text-success {
-            float: right;
-            margin: 5px 5px 0 -17px;
-
-            &:hover {
-                text-decoration: none;
-            }
+        &:hover {
+            text-decoration: none;
         }
     }
 }
-
 
 .card.card-body.transparent {
     background-color: transparent;
@@ -318,8 +305,6 @@ img.avatar {
 
 .thumbnail-inline {
     display: inline-block;
-    *display: inline;
-    zoom: 1;
     margin-bottom: 0;
 }
 

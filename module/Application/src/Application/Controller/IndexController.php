@@ -206,7 +206,7 @@ class IndexController extends AbstractActionController
         ]);
 
         $newPicturesData = $this->pic()->listData($rows, [
-            'width' => 3
+            'width' => 6
         ]);
 
         // categories

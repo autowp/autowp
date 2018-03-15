@@ -19,7 +19,7 @@ html {
 <?php $this->headStyle()->captureEnd()?>
 */ ?>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
         <?=$this->partial('application/index/partial/item-of-day', [
             'itemOfDay' => $this->carOfDay
         ])?>
@@ -33,7 +33,7 @@ html {
             <?=$this->htmlA('/ng/new', $this->translate('All new pictures') . ' …') ?>
         </p>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-12">
         <?=$this->partial('application/index/partial/brands', $this->brands)?>
 
         <div class="row">

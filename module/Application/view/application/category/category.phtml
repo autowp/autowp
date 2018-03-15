@@ -41,17 +41,18 @@
 
 <?php if ($this->otherItemsCount > 0) { ?>
     <h3><?=$this->escapeHtml($this->otherCategoryName)?></h3>
-    <div class="row thumbnails">
+    <div class="row">
         <?php foreach ($this->otherPictures as $picture) { ?>
             <div class="col-md-3">
                 <?=$this->htmlA([
                     'href'  => $picture['url'],
-                    'class' => 'thumbnail'
+                    'class' => 'd-block rounded mb-4'
                 ], $this->htmlImg([
                     'src'     => $picture['src'],
                     'alt'     => $picture['name'],
                     'title'   => $picture['name'],
-                    'shuffle' => true
+                    'shuffle' => true,
+                    'class'   => 'rounded w-100 border border-light'
                 ]), false)?>
             </div>
         <?php } ?>

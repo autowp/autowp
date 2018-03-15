@@ -117,14 +117,12 @@
     "ui-leaflet": "git+https://github.com/autowp/ui-leaflet.git#leaflet-1.X",
     "url-loader": "^0.x",
     "webpack": "^3.x",
-    "webpack-manifest-plugin": "^1.x"
+    "webpack-manifest-plugin": "^1.x",
+    "node-sass": "^4.7.2",
+    "sass-loader": "^6.0.7"
   },
   "scripts": {
     "start": "node_modules/.bin/webpack --progress --colors -p --config webpack.config.js",
     "test": "node_modules/.bin/webpack --progress --colors --config webpack.config.js"
-  },
-  "devDependencies": {
-    "node-sass": "^4.7.2",
-    "sass-loader": "^6.0.7"
   }
 }

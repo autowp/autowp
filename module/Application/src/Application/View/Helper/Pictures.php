@@ -149,9 +149,7 @@ class Pictures extends AbstractHelper
 
         if ($isModer && $picture['name']) {
             $title = $this->view->escapeHtmlAttr($this->view->translate('picture-preview/special-name'));
-            $escName = '<span style="color:darkgreen" title="'.$title.'">' .
-                              $escName .
-                          '</span>';
+            $escName = '<span style="color:darkgreen" title="'.$title.'">' . $escName . '</span>';
         }
 
         $moderVote = $this->getModerVote($picture['id']);

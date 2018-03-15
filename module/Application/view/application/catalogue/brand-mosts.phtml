@@ -73,19 +73,20 @@
     </div>
     <div class="row">
         <div class="col-md-9">
-            <div class="row thumbnails">
+            <div class="row">
                 <?php foreach ($car['pictures'] as $picture) { ?>
                     <div class="col-md-4">
                         <?php if ($picture) { ?>
                             <?=$this->htmlA([
                                 'href'  => $picture['url'],
-                                'class' => 'thumbnail'
+                                'class' => 'd-block rounded mb-4'
                             ], $this->htmlImg([
                                 'src'     => $picture['src'],
                                 'format'  => 'picture-thumb',
                                 'alt'     => $this->pic()->textTitle($picture['name']),
                                 'title'   => $this->pic()->textTitle($picture['name']),
-                                'shuffle' => true
+                                'shuffle' => true,
+                                'class'   => 'rounded w-100 border border-light'
                             ]), false)?>
                         <?php } else { ?>
                             &#xa0;

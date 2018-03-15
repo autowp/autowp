@@ -29,12 +29,12 @@
                 <h3 ng-bind="'most/' + ctrl.ratingCatname + '/param' | translate" ng-if="$first"></h3>
             </div>
         </div>
-        <div class="row" ng-repeat-end>
+        <div class="row mb-4" ng-repeat-end>
             <div class="col-md-9">
-                <div class="row thumbnails">
+                <div class="row">
                     <div class="col-md-4" ng-repeat="picture in item.pictures track by $index">
-                        <a ng-href="{{picture.url}}" class="thumbnail" ng-if="picture">
-                            <img ng-src="{{picture.src}}" alt="{{picture.name}}" title="{{picture.name}}" />
+                        <a ng-href="{{picture.url}}" class="rounded d-block mb-4" ng-if="picture"> 
+                            <img class="rounded w-100 border border-light" ng-src="{{picture.src}}" alt="{{picture.name}}" title="{{picture.name}}" />
                         </a>
                         <span ng-if="!picture">&#xa0;</span>
                     </div>

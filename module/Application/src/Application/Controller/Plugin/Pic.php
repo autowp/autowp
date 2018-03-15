@@ -271,9 +271,7 @@ class Pic extends AbstractPlugin
 
         if ($options['width']) {
             $width = (int)$options['width'];
-            if (! $colClass) {
-                $colClass = 'col-lg-' . (12 / $width) . ' col-md-' . (12 / $width);
-            }
+            $colClass = 'col';
         }
 
         $controller = $this->getController();

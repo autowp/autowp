@@ -14,15 +14,16 @@
     }
 ?>
 <div class="<?=$this->escapeHtmlAttr(implode(' ', $classes))?>">
-    <div class="thumbnail">
+    <div class="card mb-4">
         <?=$this->htmlA($this->url, $this->htmlImg([
             'src'     => $this->src,
             'alt'     => $this->pic()->textTitle($this->name),
             'title'   => $this->pic()->textTitle($this->name),
-            'shuffle' => true
+            'shuffle' => true,
+            'class'   => 'card-img-top'
         ]), false) ?>
-        <div class="name">
-            <p><?=$this->htmlA($this->url, $this->pic()->htmlTitle($this->name), false)?></p>
+        <div class="card-body">
+            <p class="card-title"><?=$this->htmlA($this->url, $this->pic()->htmlTitle($this->name), false)?></p>
             <?php if (!$this->disableBehaviour) { ?>
                 <?=$this->render('application/picture-behaviour')?>
             <?php } ?>

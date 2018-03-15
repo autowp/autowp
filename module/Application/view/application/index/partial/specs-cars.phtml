@@ -16,19 +16,20 @@
                         <?php } ?>
                     </h3>
 
-                    <div class="row thumbnails">
+                    <div class="row">
                         <?php foreach ($item['pictures'] as $picture) { ?>
                             <div class="col-sm-4">
                                 <?php if ($picture) { ?>
                                     <?=$this->htmlA(
                                         [
                                             'href'  => $picture['url'],
-                                            'class' =>'thumbnail'
+                                            'class' => 'd-block rounded mb-4'
                                         ],
                                         $this->htmlImg([
                                             'src'   => $picture['src'],
                                             'alt'   => $this->pic()->textTitle($picture['name']),
                                             'title' => $this->pic()->textTitle($picture['name']),
+                                            'class' => 'rounded w-100 border border-light'
                                         ]),
                                         false
                                     )?>

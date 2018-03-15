@@ -41,7 +41,7 @@ $singleThumbPart = round(12 / $thumbColumns);
             <h4><?=$this->escapeHtml($item['name'])?></h4>
         <?php } ?>
 
-        <div class="row thumbnails">
+        <div class="row">
             <?php
                 $canHavePhoto = in_array($item['itemTypeId'], [
                     Application\Model\Item::VEHICLE,
@@ -70,12 +70,13 @@ $singleThumbPart = round(12 / $thumbColumns);
                             <?=$this->htmlA(
                                 [
                                     'href'  => $picture['url'],
-                                    'class' => 'thumbnail'
+                                    'class' => 'd-block rounded mb-4'
                                 ],
                                 $this->htmlImg([
                                     'src'   => $picture['src'],
                                     'alt'   => $this->pic()->textTitle($picture['name']),
                                     'title' => $this->pic()->textTitle($picture['name']),
+                                    'class' => 'rounded w-100 border border-light'
                                 ]),
                                 false
                             )?>
@@ -86,7 +87,7 @@ $singleThumbPart = round(12 / $thumbColumns);
                 <?php } ?>
             <?php } elseif ($canHavePhoto) { ?>
                 <div class="col-md-<?=$singleThumbPart?> col-sm-6">
-                    <div class="thumbnail no-photo" title="<?=$this->escapeHtmlAttr($this->translate('carlist/no-photo'))?>">
+                    <div class="no-photo d-block rounded mb-4" title="<?=$this->escapeHtmlAttr($this->translate('carlist/no-photo'))?>">
                         <?=$this->htmlA([
                             'title' => $this->translate('carlist/no-photo/add'),
                             'href'  => $item['uploadUrl'],

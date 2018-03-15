@@ -30,12 +30,13 @@ class InlinePicture extends AbstractHelper
             'format'  => 'picture-thumb',
             'alt'     => $name,
             'title'   => $name,
-            'shuffle' => true
+            'shuffle' => true,
+            'class'  => 'rounded border border-light'
         ]);
 
         return $view->htmlA([
             'href'  => $url,
-            'class' => 'thumbnail thumbnail-inline'
+            'class' => 'd-inline-block rounded'
         ], $imageHtml, false);
     }
 }
