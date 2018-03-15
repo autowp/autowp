@@ -1,5 +1,5 @@
 <?php if ($this->itemOfDay['name']) { ?>
-    <h2>
+    <h2 class="mb-3">
         <?=$this->car()->htmlTitle($this->itemOfDay['name'])?>
         <small>
             <?php if ($this->itemOfDay['itemTypeId'] == Application\Model\Item::VEHICLE) { ?>
@@ -16,61 +16,49 @@
     <?php if ($this->itemOfDay['pictures']) { ?>
         <div class="row">
             <?php foreach ($this->itemOfDay['pictures'] as $idx => $picture) { ?>
-                <?php if ($idx == 0) { ?>
-                    <?php if ($picture) { ?>
-                        <div class="col-sm-8">
-                            <?=$this->htmlA([
-                                'href'  => $picture['url'],
-                                'class' => 'd-block rounded mb-4'
-                            ], $this->htmlImg([
-                                'class' => 'rounded w-100',
-                                'src'   => $picture['src'],
-                                'title' => $picture['name'],
-                                'alt'   => $picture['name'],
-                            ]), false)?>
-                        </div>
-                    <?php } ?>
+                <?php if ($idx == 0 && $picture) { ?>
+                    <div class="col-sm-6">
+                        <?=$this->htmlA([
+                            'href'  => $picture['url'],
+                            'class' => 'd-block rounded mb-4'
+                        ], $this->htmlPicture([
+                            'class' => 'rounded w-100 border border-light',
+                            'title' => $picture['name'],
+                            'alt'   => $picture['name'],
+                        ], [
+                            $picture['thumb'],
+                            $picture['medium']
+                        ]), false)?>
+                    </div>
                 <?php } ?>
             <?php } ?>
-            <div class="col-sm-4">
-                <?php foreach ($this->itemOfDay['pictures'] as $idx => $picture) { ?>
-                    <?php if ($idx == 1 || $idx == 2) { ?>
-                        <?php if ($picture) { ?>
-                            <?=$this->htmlA([
-                                'href'  => $picture['url'],
-                                'class' => 'd-block rounded mb-4'
-                            ], $this->htmlImg([
-                                'class' => 'rounded w-100',
-                                'src'   => $picture['src'],
-                                'title' => $picture['name'],
-                                'alt'   => $picture['name'],
-                            ]), false)?>
-                        <?php } ?>
-                    <?php } ?>
-                <?php } ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="row">
-                    <?php foreach ($this->itemOfDay['pictures'] as $idx => $picture) { ?>
-                        <?php if ($idx > 2) { ?>
-                            <?php if ($picture) { ?>
-                                <div class="col-sm-4">
+            <div class="col-sm-6">
+                <?php for ($row=0; $row<2; $row++) { ?>
+                    <div class="row">
+                        <?php for ($col=0; $col<2; $col++) { ?>
+                            <div class="col">
+                                <?php
+                                    $idx = 1 + $row*2 + $col;
+                                    $picture = $this->itemOfDay['pictures'][$idx];
+
+                                ?>
+                                <?php if ($picture) { ?>
                                     <?=$this->htmlA([
                                         'href'  => $picture['url'],
                                         'class' => 'd-block rounded mb-4'
-                                    ], $this->htmlImg([
-                                        'class' => 'rounded w-100',
-                                        'src'   => $picture['src'],
+                                    ], $this->htmlPicture([
+                                        'class' => 'rounded w-100 border border-light',
                                         'title' => $picture['name'],
                                         'alt'   => $picture['name'],
+                                    ], [
+                                        $picture['thumb'],
+                                        $picture['medium']
                                     ]), false)?>
-                                </div>
-                            <?php } ?>
+                                <?php } ?>
+                            </div>
                         <?php } ?>
-                    <?php } ?>
-                </div>
+                    </div>
+                <?php } ?>
             </div>
         </div>
         <p>

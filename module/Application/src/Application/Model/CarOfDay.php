@@ -482,8 +482,8 @@ class CarOfDay
         $formatRequests = [];
         foreach ($carOfDayPictures as $idx => $picture) {
             if ($picture) {
-                $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
-                $formatRequests[$format][$idx] = $this->picture->getFormatRequest($picture);
+                $formatRequests['picture-thumb'][$idx] = $this->picture->getFormatRequest($picture);
+                $formatRequests['picture-thumb-medium'][$idx] = $this->picture->getFormatRequest($picture);
             }
         }
 
@@ -511,8 +511,6 @@ class CarOfDay
         $result = [];
         foreach ($carOfDayPictures as $idx => $row) {
             if ($row) {
-                $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
-
                 $url = null;
                 foreach ($paths as $path) {
                     switch ($path['type']) {
@@ -553,9 +551,23 @@ class CarOfDay
                  }
                  }*/
 
+                $thumb = isset($imagesInfo['picture-thumb'][$idx]) ? $imagesInfo['picture-thumb'][$idx] : null;
+                $medium = isset($imagesInfo['picture-thumb-medium'][$idx]) ? $imagesInfo['picture-thumb-medium'][$idx] : null;
+
                 $result[] = [
-                    'src'  => isset($imagesInfo[$format][$idx])
-                        ? $imagesInfo[$format][$idx]->getSrc()
+                    'thumb'  => $thumb
+                        ? [
+                            'src'    => $thumb->getSrc(),
+                            'width'  => $thumb->getWidth(),
+                            'height' => $thumb->getHeight()
+                        ]
+                        : null,
+                    'medium'  => $medium
+                        ? [
+                            'src'    => $medium->getSrc(),
+                            'width'  => $medium->getWidth(),
+                            'height' => $medium->getHeight()
+                        ]
                         : null,
                     'name' => isset($names[$row['id']])
                         ? $this->pictureNameFormatter->format($names[$row['id']], $language)
@@ -585,7 +597,7 @@ class CarOfDay
 
     private function getOrientedPictureList(int $itemId)
     {
-        $perspectivesGroupIds = $this->perspective->getPageGroupIds(6);
+        $perspectivesGroupIds = $this->perspective->getPageGroupIds(5);
 
         $pictures = [];
 

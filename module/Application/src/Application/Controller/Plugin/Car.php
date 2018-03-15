@@ -217,7 +217,7 @@ class Car extends AbstractPlugin
             $pictures = $cFetcher->fetch($car, [
                 'totalPictures' => $totalPictures
             ]);
-            $largeFormat = false;
+            $largeFormat = count($pictures) > 4;
             foreach ($pictures as &$picture) {
                 if ($picture) {
                     if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
@@ -226,9 +226,6 @@ class Car extends AbstractPlugin
                         $url = $listBuilder->getPictureUrl($car, $picture['row']);
                     }
                     $picture['url'] = $url;
-                    if ($picture['format'] == 'picture-thumb-medium') {
-                        $largeFormat = true;
-                    }
                 }
             }
             unset($picture);
@@ -363,7 +360,8 @@ class Car extends AbstractPlugin
                 if ($picture) {
                     $row = $picture['row'];
                     $allPictures[] = $row;
-                    $allFormatRequests[$picture['format']][$row['id']] = $catalogue->getPictureFormatRequest($row);
+                    $allFormatRequests['picture-thumb'][$row['id']] = $catalogue->getPictureFormatRequest($row);
+                    $allFormatRequests['picture-thumb-medium'][$row['id']] = $catalogue->getPictureFormatRequest($row);
                 }
             }
         }
@@ -385,10 +383,20 @@ class Car extends AbstractPlugin
             foreach ($item['pictures'] as &$picture) {
                 if ($picture) {
                     $id = $picture['row']['id'];
-                    $format = $picture['format'];
 
                     $picture['name'] = isset($pictureNames[$id]) ? $pictureNames[$id] : null;
-                    $picture['src'] = isset($imagesInfo[$format][$id]) ? $imagesInfo[$format][$id]->getSrc() : null;
+                    $thumb = isset($imagesInfo['picture-thumb'][$id]) ? $imagesInfo['picture-thumb'][$id] : null;
+                    $medium = isset($imagesInfo['picture-thumb-medium'][$id]) ? $imagesInfo['picture-thumb-medium'][$id] : null;
+                    $picture['thumb'] = [
+                        'src'    => $thumb->getSrc(),
+                        'width'  => $thumb->getWidth(),
+                        'height' => $thumb->getHeight()
+                    ];
+                    $picture['medium'] = [
+                        'src'    => $medium->getSrc(),
+                        'width'  => $medium->getWidth(),
+                        'height' => $medium->getHeight()
+                    ];
                     unset($picture['row'], $picture['format']);
                 }
             }

@@ -3,8 +3,8 @@
         <h2 translate>account/profile/personal</h2>
         <div class="card card-body">
             <form method="post" class="form-horizontal" ng-submit="ctrl.sendProfile()"><fieldset>
-                <div class="form-group" ng-class="{'has-error': ctrl.profileInvalidParams.name}">
-                    <label class="col-md-3 control-label" for="name" translate>user/name</label>
+                <div class="form-group row" ng-class="{'has-error': ctrl.profileInvalidParams.name}">
+                    <label class="col-md-3 col-form-label" for="name" translate>user/name</label>
                     <div class="col-md-9">
                         <input type="text" maxlength="50" size="50" name="name" class="form-control" ng-model="ctrl.profile.name" />
                         <p ng-repeat="message in ctrl.profileInvalidParams.name" ng-bind="message" class="help-block"></p>
@@ -23,7 +23,7 @@
             <div autowp-markdown="'account/profile/use-gravatar'|translate"></div>
             <div ng-if="ctrl.photo">
                 <img ng-src="{{ctrl.photo.src}}" />
-                <div class="form-group" ng-class="{'has-error': ctrl.photoInvalidParams.file}">
+                <div class="form-group row" ng-class="{'has-error': ctrl.photoInvalidParams.file}">
                     <button type="submit" class="btn btn-danger" ng-click="ctrl.resetPhoto()">
                         <i class="fa fa-times"></i>
                         <translate>account/profile/photo/delete</translate>
@@ -43,16 +43,16 @@
             <p ng-show="ctrl.votesLeft >= 0"><translate>account/profile/votes-per-day</translate>: {{ctrl.votesPerDay}}</p>
             <p ng-show="ctrl.votesLeft >= 0"><translate>account/profile/votes-left</translate>: {{ctrl.votesLeft}}</p>
             <form method="post" class="form-horizontal" ng-submit="ctrl.sendSettings()"><fieldset>
-                <div class="form-group" ng-class="{'has-error': ctrl.settingsInvalidParams.language}">
-                    <label class="col-md-3 control-label" for="language" translate>account/profile/language</label>
+                <div class="form-group row" ng-class="{'has-error': ctrl.settingsInvalidParams.language}">
+                    <label class="col-md-3 col-form-label" for="language" translate>account/profile/language</label>
                     <div class="col-md-9">
                         <select name="language" class="form-control" ng-options="key as value for (key, value) in ctrl.languages" ng-model="ctrl.settings.language">
                         </select>
                         <p ng-repeat="message in ctrl.settingsInvalidParams.language" ng-bind="message" class="help-block"></p>
                     </div>
                 </div>
-                <div class="form-group" ng-class="{'has-error': ctrl.settingsInvalidParams.timezone}">
-                    <label class="col-md-3 control-label" for="timezone" translate>account/profile/timezone</label>
+                <div class="form-group row" ng-class="{'has-error': ctrl.settingsInvalidParams.timezone}">
+                    <label class="col-md-3 col-form-label" for="timezone" translate>account/profile/timezone</label>
                     <div class="col-md-9">
                         <select name="timezone" class="form-control" ng-options="option for option in ctrl.timezones track by option" ng-model="ctrl.settings.timezone">
                         </select>

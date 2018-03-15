@@ -6,10 +6,6 @@
 
 @import "~font-awesome/css/font-awesome.css";
 
-html {
-    font-size: 14px;
-}
-
 h2 small {
     color: $text-muted;
 }
@@ -17,7 +13,7 @@ h2 small {
 $color-white: #fff;
 
 body {
-    padding-top: 60px;
+    padding-top: 70px;
     height: auto;
 }
 

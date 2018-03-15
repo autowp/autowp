@@ -29,7 +29,7 @@ class IndexController extends AbstractActionController
     /**
      * @var CarOfDay
      */
-    private $carOfDay;
+    private $itemOfDay;
 
     /**
      * @var Item
@@ -64,7 +64,7 @@ class IndexController extends AbstractActionController
     public function __construct(
         $cache,
         SpecificationsService $specsService,
-        CarOfDay $carOfDay,
+        CarOfDay $itemOfDay,
         Categories $categories,
         Perspective $perspective,
         Twins $twins,
@@ -75,7 +75,7 @@ class IndexController extends AbstractActionController
     ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
-        $this->carOfDay = $carOfDay;
+        $this->itemOfDay = $itemOfDay;
         $this->categories = $categories;
         $this->perspective = $perspective;
         $this->twins = $twins;
@@ -120,27 +120,27 @@ class IndexController extends AbstractActionController
         return $brands;
     }
 
-    private function carOfDay()
+    private function itemOfDay()
     {
         $language = $this->language();
         $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
-        $carOfDay = $this->carOfDay->getCurrent();
+        $itemOfDay = $this->itemOfDay->getCurrent();
 
-        $carOfDayInfo = null;
+        $itemOfDayInfo = null;
 
-        if ($carOfDay) {
-            $key = 'CAR_OF_DAY_107_' . $carOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
+        if ($itemOfDay) {
+            $key = 'ITEM_OF_DAY_109_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
 
-            $carOfDayInfo = $this->cache->getItem($key, $success);
+            $itemOfDayInfo = $this->cache->getItem($key, $success);
             if (! $success) {
-                $carOfDayInfo = $this->carOfDay->getItemOfDay($carOfDay['item_id'], $carOfDay['user_id'], $language);
+                $itemOfDayInfo = $this->itemOfDay->getItemOfDay($itemOfDay['item_id'], $itemOfDay['user_id'], $language);
 
-                $this->cache->setItem($key, $carOfDayInfo);
+                $this->cache->setItem($key, $itemOfDayInfo);
             }
         }
 
-        return $carOfDayInfo;
+        return $itemOfDayInfo;
     }
 
     private function factories()
@@ -343,7 +343,7 @@ class IndexController extends AbstractActionController
             'twinsBlock'  => $twinsBlock,
             'categories'  => $categories,
             'newPictures' => $newPicturesData,
-            'carOfDay'    => $this->carOfDay(),
+            'itemOfDay'   => $this->itemOfDay(),
             'specsCars'   => $specsCars,
             'mosts'       => [
                 '/mosts/fastest/roadster'          => 'mosts/fastest/roadster',

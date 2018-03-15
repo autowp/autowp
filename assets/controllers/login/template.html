@@ -16,21 +16,21 @@
     <div class="card card-body">
         <form class="form-horizontal" ng-submit="ctrl.submit()"><fieldset>
             <legend translate>login/sign-in</legend>
-            <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.login}">
-                <label class="col-md-3 control-label" translate>login/login-or-email</label>
+            <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.login}">
+                <label class="col-md-3 col-form-label" translate>login/login-or-email</label>
                 <div class="col-md-9">
                     <input type="text" name="login" class="form-control" ng-model="ctrl.form.login" maxlength="50">
                     <p ng-repeat="message in ctrl.invalidParams.login" ng-bind="message" class="help-block"></p>
                 </div>
             </div>
-            <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.password}">
-                <label class="col-md-3 control-label" translate>user/password</label>
+            <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.password}">
+                <label class="col-md-3 col-form-label" translate>user/password</label>
                 <div class="col-md-9">
                     <input type="password" name="password" class="form-control" ng-model="ctrl.form.password">
                     <p ng-repeat="message in ctrl.invalidParams.password" ng-bind="message" class="help-block"></p>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group row">
                 <div class="offset-md-3 col-md-9">
                     <div class="checkbox">
                         <label>
@@ -40,7 +40,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group row">
                 <div class="col-md-9 offset-md-3">
                     <button type="submit" class="btn btn-primary">
                         <i class="fa fa-sign-in"></i>

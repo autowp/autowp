@@ -2,19 +2,19 @@
     <div class="col-lg-4 col-md-4">
         <h3 class="text-left" ng-if="ctrl.prev.date">
             &#x2190;
-            <a ui-sref=".({date: ctrl.prev.date, page: null})" ng-bind="ctrl.prev.date | amDateFormat: 'LL'"></a>
+            <a ui-sref=".({date: ctrl.prev.date, page: null})" ng-bind="ctrl.prev.date | amDateFormat: 'LL'"></a><br />
             <small>(<span translate="ng/%1$s-pictures" translate-values="{count: ctrl.prev.count}"></span>)</small>
         </h3>
     </div>
     <div class="col-lg-4 col-md-4">
         <h3 class="text-center" ng-if="ctrl.current">
-            <span ng-bind="ctrl.current.date | amDateFormat: 'LL'"></span>
+            <span ng-bind="ctrl.current.date | amDateFormat: 'LL'"></span><br />
             <small>(<span translate="ng/%1$s-pictures" translate-values="{count: ctrl.current.count}"></span>)</small>
         </h3>
     </div>
     <div class="col-lg-4 col-md-4">
         <h3 class="text-right" ng-if="ctrl.next.date">
-            <a ui-sref=".({date: ctrl.next.date, page: null})" ng-bind="ctrl.next.date | amDateFormat: 'LL'"></a>
+            <a ui-sref=".({date: ctrl.next.date, page: null})" ng-bind="ctrl.next.date | amDateFormat: 'LL'"></a><br />
             <small>(<span translate="ng/%1$s-pictures" translate-values="{count: ctrl.next.count}"></span>)</small>
             &#x2192;
         </h3>

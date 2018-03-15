@@ -1,19 +1,19 @@
 <form method="post" class="form-horizontal" ng-if="user" ng-submit="ctrl.submit()"><fieldset>
-    <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.name}">
-        <label class="col-md-2 control-label" for="name" translate>forums/topic/name</label>
+    <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.name}">
+        <label class="col-md-2 col-form-label" for="name" translate>forums/topic/name</label>
         <div class="col-md-10">
             <input type="text" name="name" size="80" maxlength="100" class="form-control" ng-model="ctrl.form.name" />
             <p ng-repeat="message in ctrl.invalidParams.name" ng-bind="message" class="help-block"></p>
         </div>
     </div>
-    <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.text}">
-        <label class="col-md-2 control-label" for="text" translate>forums/topic/text</label>
+    <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.text}">
+        <label class="col-md-2 col-form-label" for="text" translate>forums/topic/text</label>
         <div class="col-md-10">
             <textarea name="text" cols="140" rows="15" maxlength="4096" class="form-control" ng-model="ctrl.form.text"></textarea>
             <p ng-repeat="message in ctrl.invalidParams.text" ng-bind="message" class="help-block"></p>
         </div>
     </div>
-    <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.moderator_attention}">
+    <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.moderator_attention}">
         <div class="col-md-2"></div>
         <div class="col-md-10">
             <div class="checkbox">
@@ -25,7 +25,7 @@
             <p ng-repeat="message in ctrl.invalidParams.moderator_attention" ng-bind="message" class="help-block"></p>
         </div>
     </div>
-    <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.subscription}">
+    <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.subscription}">
         <div class="col-md-2"></div>
         <div class="col-md-10">
             <div class="checkbox">

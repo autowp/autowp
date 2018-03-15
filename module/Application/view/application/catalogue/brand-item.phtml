@@ -129,7 +129,8 @@
                     <?=$this->htmlA([
                         'href'  => $picture['url'],
                         'class' => 'd-block rounded mb-4'
-                    ], $this->htmlImg($picture['src'], [
+                    ], $this->htmlImg([
+                        'src'     => $picture['src'],
                         'format'  => 'picture-thumb',
                         'alt'     => $picture['name'],
                         'title'   => $picture['name'],
@@ -165,7 +166,8 @@
                         <?=$this->htmlA([
                             'href'  => $picture['url'],
                             'class' => 'd-block rounded mb-4'
-                        ], $this->htmlImg($picture['src'], [
+                        ], $this->htmlImg([
+                            'src'     => $picture['src'],
                             'format'  => 'picture-thumb',
                             /*'alt'     => $picture['name'],
                             'title'   => $picture['name'],*/
@@ -182,14 +184,14 @@
         <ul class="list-inline">
 
             <?php if (isset($modification['url']) && $modification['url']) { ?>
-                <li>
+                <li class="list-inline-item">
                     <span class="fa fa-th"></span>
                     <?=$this->htmlA($modification['url'], $this->translate('carlist/all pictures').' ('.$modification['totalPictures'].')')?>
                 </li>
             <?php } ?>
 
             <?php if ($this->isCarModer) { ?>
-                <li>
+                <li class="list-inline-item">
                     <i class="fa fa-cog"></i>
                     <?=$this->htmlA('#' /*$item['moderUrl']*/, $this->translate('moder/edit-object')) ?>
                 </li>

@@ -17,7 +17,7 @@
 
 <div class="row">
     <div class="col-md-2">
-        <img ng-src="{{ctrl.picture.thumbnail.src}}" ng-if="ctrl.picture.thumbnail" />
+        <img ng-src="{{ctrl.picture.thumbnail.src}}" ng-if="ctrl.picture.thumbnail" class="rounded border border-light" />
     </div>
     <div class="col-md-5">
         <div class="card card-body">
@@ -135,7 +135,7 @@
             </a>
         </div>
     </div>
-    
+
     <div class="progress" ng-show="ctrl.pictureItemLoading">
         <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
         </div>
@@ -150,16 +150,16 @@
                 <p class="text-danger">Achtung! High Voltage! Ты сюда не ходи!</p>
                 <p class="text-danger">Поле использовать в ИСКЛЮЧИТЕЛЬНЫХ случаях. А лучше вообще никогда не использовать.</p>
             </div>
-            
+
             <div class="form-group">
                 <label translate>moder/picture/edit/special-name</label>
                 <input type="text" class="form-control" maxlength="255" name="special_name" ng-model="ctrl.picture.special_name" />
             </div>
-            
+
             <div>
                 <button class="btn btn-primary" ng-click="ctrl.saveSpecialName()">{{'submit'|translate}}</button>
             </div>
-            
+
             <div class="progress" ng-show="ctrl.specialNameLoading">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
                 </div>
@@ -174,7 +174,7 @@
             <p ng-if="ctrl.picture.copyrights_text_id">
                 <a ui-sref="info-text({id: ctrl.picture.copyrights_text_id})" translate>moder/markdown/history</a>
             </p>
-            
+
             <div class="progress" ng-show="ctrl.copyrightsLoading">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
                 </div>
@@ -192,7 +192,7 @@
     <div class="col-md-6">
 
         <h3 translate ng-if="ctrl.picture.replaceable">moder/picture/replacement</h3>
-        <div class="card card-body" ng-if="ctrl.picture.replaceable"> 
+        <div class="card card-body" ng-if="ctrl.picture.replaceable">
             <div>
                 <p>
                     {{'moder/picture/replacement/photo-suggested-to-replace'|translate}}
@@ -221,7 +221,7 @@
 
             <div ng-if="ctrl.picture.status == 'inbox'">
                 <p><strong class="badge badge-warning" translate>moder/picture/acceptance/not-accepted</strong></p>
-                
+
                 <button class="btn btn-success" ng-click="ctrl.acceptPicture()" ng-if="ctrl.picture.rights.accept">
                     {{'moder/picture/acceptance/accept'|translate}}
                 </button>
@@ -232,7 +232,7 @@
 
             <div ng-show="ctrl.picture.status == 'accepted'">
                 <p><strong class="badge badge-success" translate>moder/picture/acceptance/accepted</strong></p>
-                
+
                 <button class="btn btn-warning" ng-click="ctrl.unacceptPicture()" ng-if="ctrl.picture.rights.unaccept">
                     {{'moder/picture/acceptance/unaccept'|translate}}
                 </button>
@@ -249,16 +249,16 @@
             <div ng-if="ctrl.picture.status == 'removed'">
                 <p><strong class="badge badge-danger" translate>moder/picture/acceptance/removed</strong></p>
             </div>
-            
+
             <autowp-picture-moder-vote picture="ctrl.picture" change="ctrl.pictureVoted"></autowp-picture-moder-vote>
-            
+
             <p ng-if="ctrl.picture.is_last">
                 <span class="badge badge-warning" translate>moder/picture/acceptance/that-is-one-accepted-picture</span>
             </p>
             <p ng-if="!ctrl.picture.is_last && (ctrl.picture.accepted_count <= 4)">
                 <span class="badge badge-warning" translate="ng/moder/picture/acceptance/accepted-pictures-is-n" translate-values="{count: ctrl.picture.accepted_count}"></span>
             </p>
-            
+
             <div class="progress" ng-show="ctrl.statusLoading">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
                 </div>
@@ -292,13 +292,13 @@
                     {{'moder/picture/edit-and-repair/rebuild-files-names'|translate}}
                 </button>
             </div>
-            
+
             <div class="progress" ng-show="ctrl.repairLoading">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
                 </div>
             </div>
         </div>
-        
+
         <h3 ng-if="ctrl.picture.similar">Similar picture</h3>
         <div class="card card-body" ng-if="ctrl.picture.similar">
             <p class="alert alert-warning" role="alert">
@@ -334,11 +334,11 @@
                     {{ctrl.picture.ip.blacklist.up_to|date}}
                     <span ng-if="ctrl.picture.ip.blacklist.reason" ng-bind="ctrl.picture.ip.blacklist.reason"></span>
                 </p>
-                
+
                 <button ng-if="ctrl.picture.ip.blacklist && ctrl.picture.ip.rights.remove_from_blacklist" class="btn btn-success" ng-click="ctrl.removeFromBlacklist(ctrl.picture.ip.address)">
                     {{'ban/unban'|translate}}
                 </button>
-               
+
                 <form class="form-vertical" ng-if="!ctrl.picture.ip.blacklist && ctrl.picture.ip.rights.add_to_blacklist">
                     <div class="form-group">
                         <label translate>ban/period</label>

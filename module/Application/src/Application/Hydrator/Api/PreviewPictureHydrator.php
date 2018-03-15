@@ -27,7 +27,10 @@ class PreviewPictureHydrator extends RestHydrator
         $this->addStrategy('picture', $strategy);
 
         $strategy = new Strategy\Image($serviceManager);
-        $this->addStrategy('thumbnail', $strategy);
+        $this->addStrategy('thumb', $strategy);
+
+        $strategy = new Strategy\Image($serviceManager);
+        $this->addStrategy('medium', $strategy);
     }
 
     /**
@@ -68,13 +71,18 @@ class PreviewPictureHydrator extends RestHydrator
 
     public function extract($object)
     {
+        $request = $object['row'] ? Picture::buildFormatRequest($object['row']) : null;
+
         return [
             'picture'   => $this->extractValue('picture', $object['row']),
             'url'       => $object['url'],
-            'large'     => $object['format'] == 'picture-thumb-medium',
-            'thumbnail' => $object['row'] ? $this->extractValue('thumbnail', [
-                'image'  => Picture::buildFormatRequest($object['row']),
-                'format' => $object['format']
+            'thumb'     => $request ? $this->extractValue('thumb', [
+                'image'  => $request,
+                'format' => 'picture-thumb'
+            ]) : null,
+            'medium'     => $request ? $this->extractValue('medium', [
+                'image'  => $request,
+                'format' => 'picture-thumb-medium'
             ]) : null
         ];
     }

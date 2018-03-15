@@ -4,8 +4,8 @@
             <div autowp-markdown="'account/delete/text'|translate"></div>
             <hr />
             <form class="form-horizontal" ng-submit="ctrl.submit()"><fieldset>
-                <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.password_old}">
-                    <label class="col-md-2 control-label" for="password_old" translate>user/password</label>
+                <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.password_old}">
+                    <label class="col-md-2 col-form-label" for="password_old" translate>user/password</label>
                     <div class="col-md-10">
                         <input type="password" size="50" maxlength="50" name="password_old" class="form-control" ng-model="ctrl.form.password_old">
                         <p ng-repeat="message in ctrl.invalidParams.password_old" ng-bind="message" class="help-block"></p>

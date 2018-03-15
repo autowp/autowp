@@ -47,7 +47,7 @@ export class NewItemDirectiveController {
     public havePhoto() {
         var found = false;
         angular.forEach(this.$scope.pictures, function(picture: any) {
-            if (picture.thumbnail) {
+            if (picture.thumb) {
                 found = true;
                 return false;
             }

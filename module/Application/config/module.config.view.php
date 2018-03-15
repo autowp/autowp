@@ -33,7 +33,7 @@ return [
             'pastTimeIndicator' => View\Helper\PastTimeIndicator::class,
             'img'               => View\Helper\Img::class,
             'count'             => View\Helper\Count::class,
-            'favicons'                     => View\Helper\Favicons::class,
+            'favicons'          => View\Helper\Favicons::class,
         ],
         'factories' => [
             'apiData'        => View\Helper\Service\ApiDataFactory::class,
@@ -52,6 +52,7 @@ return [
             'pictures'       => View\Helper\Service\PicturesFactory::class,
             'sidebar'        => View\Helper\Service\SidebarFactory::class,
             'userText'       => View\Helper\Service\UserTextFactory::class,
+            'htmlPicture'    => View\Helper\HtmlPictureFactory::class,
         ]
     ],
     'view_helper_config' => [],

@@ -201,7 +201,32 @@ export class ModerItemsItemOrganizePicturesController {
             self.invalidParams = response.data.invalid_params;
             self.loading--;
         });
-    };
+    }
+
+    public srcset(picture) {
+
+        let sources = [];
+        if (picture.thumb) {
+            sources.push(picture.thumb);
+        }
+        if (picture.medium) {
+            sources.push(picture.medium);
+        }
+
+        let parts = [];
+
+        for (const source of sources) {
+            parts.push(source.src + ' ' + source.width + 'w');
+        }
+
+        console.log(picture);
+
+        if (sources.length) {
+            return parts.join(', ');
+        }
+
+        return null;
+    }
 }
 
 angular.module(Module)

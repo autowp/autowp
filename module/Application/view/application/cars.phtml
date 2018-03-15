@@ -60,30 +60,95 @@ $singleThumbPart = round(12 / $thumbColumns);
             ?>
 
             <?php if ($havePhoto) { ?>
-                <?php foreach ($item['pictures'] as $idx => $picture) { ?>
-                    <?php
-                        $col = $item['largeFormat'] && $idx == 0  ? 2*$singleThumbPart : $singleThumbPart;
-                        $colSm = $item['largeFormat'] && $idx == 0  ? 12 : 6;
-                    ?>
-                    <div class="col-md-<?=$col?> col-sm-<?=$colSm?>">
-                        <?php if ($picture) { ?>
-                            <?=$this->htmlA(
-                                [
-                                    'href'  => $picture['url'],
-                                    'class' => 'd-block rounded mb-4'
-                                ],
-                                $this->htmlImg([
-                                    'src'   => $picture['src'],
-                                    'alt'   => $this->pic()->textTitle($picture['name']),
-                                    'title' => $this->pic()->textTitle($picture['name']),
-                                    'class' => 'rounded w-100 border border-light'
-                                ]),
-                                false
-                            )?>
-                        <?php } else { ?>
-                            &#xa0;
-                        <?php } ?>
+                <?php if ($item['largeFormat']) { ?>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <?php foreach ($item['pictures'] as $idx => $picture) { ?>
+                                <?php if ($idx == 0) { ?>
+                                    <?php if ($picture) { ?>
+                                        <?=$this->htmlA(
+                                            [
+                                                'href'  => $picture['url'],
+                                                'class' => 'd-block rounded mb-4'
+                                            ],
+                                            $this->htmlPicture([
+                                                'class' => 'rounded w-100 border border-light',
+                                                'alt'   => $this->pic()->textTitle($picture['name']),
+                                                'title' => $this->pic()->textTitle($picture['name']),
+                                            ], [
+                                                $picture['thumb'],
+                                                $picture['medium']
+                                            ]),
+                                            false
+                                        )?>
+                                    <?php } else { ?>
+                                        &#xa0;
+                                    <?php } ?>
+                                <?php } ?>
+                            <?php } ?>
+                        </div>
+                        <div class="col-md-6">
+                            <?php for ($row=0; $row<2; $row++) { ?>
+                                <div class="row">
+                                    <?php for ($col=0; $col<2; $col++) { ?>
+                                        <div class="col">
+                                            <?php
+                                                $idx = 1 + $row*2 + $col;
+                                                $picture = isset($item['pictures'][$idx]) ? $item['pictures'][$idx] : null;
+                                            ?>
+                                            <?php if ($picture) { ?>
+                                                <?=$this->htmlA(
+                                                    [
+                                                        'href'  => $picture['url'],
+                                                        'class' => 'd-block rounded mb-4'
+                                                    ],
+                                                    $this->htmlPicture([
+                                                        'class' => 'rounded w-100 border border-light',
+                                                        'alt'   => $this->pic()->textTitle($picture['name']),
+                                                        'title' => $this->pic()->textTitle($picture['name']),
+                                                    ], [
+                                                        $picture['thumb'],
+                                                        $picture['medium']
+                                                    ]),
+                                                    false
+                                                )?>
+                                            <?php } else { ?>
+                                                &#xa0;
+                                            <?php } ?>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+                            <?php } ?>
+                        </div>
                     </div>
+                <?php } else { ?>
+                    <?php foreach ($item['pictures'] as $idx => $picture) { ?>
+                        <?php
+                            $col = $singleThumbPart;
+                            $colSm = 12;
+                        ?>
+                        <div class="col-md-<?=$col?> col-sm-12">
+                            <?php if ($picture) { ?>
+                                <?=$this->htmlA(
+                                    [
+                                        'href'  => $picture['url'],
+                                        'class' => 'd-block rounded mb-4'
+                                    ],
+                                    $this->htmlPicture([
+                                        'class' => 'rounded w-100 border border-light',
+                                        'alt'   => $this->pic()->textTitle($picture['name']),
+                                        'title' => $this->pic()->textTitle($picture['name']),
+                                    ], [
+                                        $picture['thumb'],
+                                        $picture['medium']
+                                    ]),
+                                    false
+                                )?>
+                            <?php } else { ?>
+                                &#xa0;
+                            <?php } ?>
+                        </div>
+                    <?php } ?>
                 <?php } ?>
             <?php } elseif ($canHavePhoto) { ?>
                 <div class="col-md-<?=$singleThumbPart?> col-sm-6">
@@ -116,35 +181,35 @@ $singleThumbPart = round(12 / $thumbColumns);
         <ul class="list-inline">
 
             <?php if (!$this->disableDetailsLink && ($item['hasHtml'] || $item['childsCount']) && isset($item['details']['url'])) { ?>
-                <li>
+                <li class="list-inline-item">
                     <i class="fa fa-align-left"></i>
                     <?=$this->htmlA($item['details']['url'], $this->translate('carlist/details') . ( $item['childsCount'] > 1 ? ' (' . $item['childsCount'] . ')' : '')) ?>
                 </li>
             <?php } ?>
 
             <?php if (isset($item['tuning']) && $item['tuning']) { ?>
-                <li>
+                <li class="list-inline-item">
                     <i class="fa fa-align-left"></i>
                     <?=$this->htmlA($item['tuning']['url'], mb_strtolower($this->translate('catalogue/related')) . ' ('.$item['tuning']['count'].')')?>
                 </li>
             <?php } ?>
 
             <?php if (isset($item['sport']) && $item['sport']) { ?>
-                <li>
+                <li class="list-inline-item">
                     <i class="fa fa-align-left"></i>
                     <?=$this->htmlA($item['sport']['url'], mb_strtolower($this->translate('catalogue/sport')) . ' ('.$item['sport']['count'].')')?>
                 </li>
             <?php } ?>
 
             <?php if (isset($item['allPicturesUrl']) && $item['allPicturesUrl']) { ?>
-                <li>
+                <li class="list-inline-item">
                     <span class="fa fa-th"></span>
                     <?=$this->htmlA($item['allPicturesUrl'], $this->translate('carlist/all pictures').' ('.$item['totalPictures'].')')?>
                 </li>
             <?php } ?>
 
             <?php if (count($item['specsLinks']) > 1) { ?>
-                <li>
+                <li class="list-inline-item">
                     <i class="fa fa-list-alt"></i>
                     <?=$this->escapeHtml($this->translate('carlist/specifications'))?>
                     <?php foreach ($item['specsLinks'] as $specLink) { ?>
@@ -153,7 +218,7 @@ $singleThumbPart = round(12 / $thumbColumns);
                 </li>
             <?php } else { ?>
                 <?php foreach ($item['specsLinks'] as $specLink) { ?>
-                    <li>
+                    <li class="list-inline-item">
                         <i class="fa fa-list-alt"></i>
                         <?=$this->htmlA($specLink['url'], $this->translate('carlist/specifications'))?>
                     </li>
@@ -162,7 +227,7 @@ $singleThumbPart = round(12 / $thumbColumns);
 
             <?php if (isset($item['twinsGroups'])) { ?>
                 <?php foreach ($item['twinsGroups'] as $twinsGroup) { ?>
-                    <li>
+                    <li class="list-inline-item">
                         <i class="fa fa-adjust"></i>
                         <?=$this->htmlA([
                             'href'  => $twinsGroup['url'],
@@ -173,21 +238,21 @@ $singleThumbPart = round(12 / $thumbColumns);
             <?php } ?>
 
             <?php foreach ($item['categories'] as $category) { ?>
-                <li>
+                <li class="list-inline-item">
                     <i class="fa fa-tag"></i>
                     <?=$this->htmlA($category['url'], $category['name'])?>
                 </li>
             <?php } ?>
 
             <?php if ($this->isCarModer) { ?>
-                <li>
+                <li class="list-inline-item">
                     <i class="fa fa-cog"></i>
                     <?=$this->htmlA($item['moderUrl'], $this->translate('moder/edit-object')) ?>
                 </li>
             <?php } ?>
 
             <?php if ($this->specEditor) { ?>
-                <li>
+                <li class="list-inline-item">
                     <i class="fa fa-pencil"></i>
                     <?=$this->htmlA($item['specEditorUrl'], $this->translate('carlist/edit-specs')) ?>
                 </li>

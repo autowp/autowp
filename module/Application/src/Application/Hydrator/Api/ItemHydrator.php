@@ -537,7 +537,7 @@ class ItemHydrator extends RestHydrator
                     'totalPictures' => $totalPictures
                 ]);
 
-                $largeFormat = false;
+                $largeFormat = count($pictures) > 4;
                 foreach ($pictures as &$picture) {
                     if ($picture) {
                         if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
@@ -546,9 +546,6 @@ class ItemHydrator extends RestHydrator
                             $url = $listBuilder->getPictureUrl($object, $picture['row']);
                         }
                         $picture['url'] = $url;
-                        if ($picture['format'] == 'picture-thumb-medium') {
-                            $largeFormat = true;
-                        }
                     }
                 }
                 unset($picture);

@@ -26,7 +26,7 @@ class AutowpItemController {
     public havePhoto(item: any) {
         var found = false;
         angular.forEach(item.preview_pictures, function(picture: any) {
-            if (picture.thumbnail) {
+            if (picture.thumb) {
                 found = true;
                 return false;
             }

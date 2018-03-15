@@ -9,8 +9,8 @@
                 <p translate ng-if="!ctrl.email">account/email/your-dont-enter-email</p>
                 <div autowp-markdown="'account/email/text'|translate"></div>
                 <form method="post" class="form-horizontal" ng-submit="ctrl.submit()"><fieldset>
-                    <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.email}">
-                        <label class="col-md-2 control-label" for="email">E-mail</label>
+                    <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.email}">
+                        <label class="col-md-2 col-form-label" for="email">E-mail</label>
                         <div class="col-md-10">
                             <input type="email" name="email" class="form-control" ng-model="ctrl.newEmail" maxlength="255" />
                             <p ng-repeat="message in ctrl.invalidParams.email" ng-bind="message" class="help-block"></p>

@@ -4,19 +4,19 @@
 
 <div ng-if="user">
     <div ng-if="ctrl.selected">
-        <div class="card card-body">
+        <div class="card card-body mb-4">
             <div autowp-markdown="'upload/description'|translate"></div>
             <div style="margin:20px 0">
                 <form class="form-horizontal" ng-submit="ctrl.submit()" ng-show="!ctrl.formHidden"><fieldset>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Selection</label>
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label">Selection</label>
                         <div class="col-md-10" style="padding-top:7px">
                             <strong ng-bind-html="ctrl.selectionName"></strong>
                             [<a ui-sref="upload-select" translate>upload/select-another</a>]
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" translate>upload/image-file</label>
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label" translate>upload/image-file</label>
                         <div class="col-md-10">
                             <div class="btn btn-secondary"
                                 ngf-select
@@ -60,8 +60,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" for="note" translate>upload/note</label>
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label" for="note" translate>upload/note</label>
                         <div class="col-md-10">
                             <textarea name="note" rows="3" class="form-control" ng-model="ctrl.note"></textarea>
                         </div>
@@ -75,7 +75,7 @@
             </div>
 
             <div class="progress-area">
-                <div class="progress" ng-repeat="progress in ctrl.progress" ng-if="!progress.success">
+                <div class="progress mb-2" ng-repeat="progress in ctrl.progress" ng-if="!progress.success">
                     <div class="progress-bar"
                         ng-style="{width: progress.percentage+'%'}"
                         ng-class="{'bg-info': !progress.success && !progress.failed, 'bg-success': progress.success, 'bg-danger': progress.failed}"
