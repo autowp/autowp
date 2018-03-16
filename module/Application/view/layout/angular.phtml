@@ -76,11 +76,9 @@ ga('send', 'pageview');
                                 {{page.name}} <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
-                                <li ng-repeat="category in mainMenu.categories">
-                                    <a ng-href="{{category.url}}">
-                                        {{category.name}}&#xa0;<span class="count">({{category.cars_count - category.new_cars_count}}<span ng-if="category.new_cars_count > 0">+{{category.new_cars_count}}</span>)</span>
-                                    </a>
-                                </li>
+                                <a ng-href="{{category.url}}" class="dropdown-item" ng-repeat="category in mainMenu.categories">
+                                    {{category.name}}&#xa0;<span class="count">({{category.cars_count - category.new_cars_count}}<span ng-if="category.new_cars_count > 0">+{{category.new_cars_count}}</span>)</span>
+                                </a>
                             </ul>
                         </li>
                     </ul>

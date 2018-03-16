@@ -5,20 +5,22 @@
                 <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-accept'))?>
                 <span class="caret"></span>
             </button>
-            <ul class="dropdown-menu">
+            <div class="dropdown-menu">
                 <?php foreach ($this->voteOptions['positive'] as $value) { ?>
-                    <li><?=$this->htmlA([
+                    <?=$this->htmlA([
+                        'class'       => 'dropdown-item',
                         'data-vote'   => 1,
                         'data-reason' => $value,
                         'href'        => '#'
-                    ], $value)?></li>
+                    ], $value)?>
                 <?php } ?>
-                <li role="separator" class="divider"></li>
-                <li><?=$this->htmlA([
+                <div class="dropdown-divider"></div>
+                <?=$this->htmlA([
+                    'class'     => 'dropdown-item',
                     'data-vote' => 1,
                     'href'      => '#'
-                ], $this->translate('moder/picture/acceptance/custom'))?></li>
-            </ul>
+                ], $this->translate('moder/picture/acceptance/custom'))?>
+            </div>
         </div>
 
         <div class="btn-group" role="group">
@@ -26,20 +28,22 @@
                 <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-delete'))?>
                 <span class="caret"></span>
             </button>
-            <ul class="dropdown-menu">
+            <div class="dropdown-menu">
                 <?php foreach ($this->voteOptions['negative'] as $value) { ?>
-                    <li><?=$this->htmlA([
+                    <?=$this->htmlA([
+                        'class'       => 'dropdown-item',
                         'data-vote'   => -1,
                         'data-reason' => $value,
                         'href'        => '#'
-                    ], $value)?></li>
+                    ], $value)?>
                 <?php } ?>
-                <li role="separator" class="divider"></li>
-                <li><?=$this->htmlA([
+                <div class="dropdown-divider"></div>
+                <?=$this->htmlA([
+                    'class'     => 'dropdown-item',
                     'data-vote' => -1,
                     'href'      => '#'
-                ], $this->translate('moder/picture/acceptance/custom'))?></li>
-            </ul>
+                ], $this->translate('moder/picture/acceptance/custom'))?>
+            </div>
         </div>
     </div>
 <?php } ?>

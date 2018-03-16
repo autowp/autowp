@@ -14,8 +14,8 @@
 
     <div class="row">
         <div ng-class="ctrl.thumbnailClasses(picture, $index)" ng-if="ctrl.havePhoto(item)" ng-repeat="picture in item.preview_pictures">
-            <a ng-href="{{picture.url}}" ng-if="picture.thumbnail" class="d-block rounded mb-4">
-                <img ng-src="{{picture.thumbnail.src}}" alt="{{picture.picture.name}}" title="{{picture.picture.name}}" class="rounded w-100 border border-light" />
+            <a ng-href="{{picture.url}}" ng-if="picture.picture.thumbnail" class="d-block rounded mb-4">
+                <img ng-src="{{picture.picture.thumbnail.src}}" ng-srcset="{{picture.picture.thumbnail.srcset}}" alt="{{picture.picture.name}}" title="{{picture.picture.name}}" class="rounded w-100 border border-light" />
             </a>
             <span ng-if="!picture">&#xa0;</span>
         </div>

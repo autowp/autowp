@@ -133,22 +133,18 @@
                         {{'moder/picture/acceptance/want-accept'|translate}}
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                        <li ng-repeat="template in ctrl.moderVoteTemplateOptions" ng-if="template.vote > 0">
-                            <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
-                        </li>
-                    </ul>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <a ng-repeat="template in ctrl.moderVoteTemplateOptions" ng-if="template.vote > 0" class="dropdown-item" ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
+                    </div>
                 </div>
                 <div class="btn-group">
                     <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-disabled="!ctrl.hasSelectedItem">
                         {{'moder/picture/acceptance/want-delete'|translate}}
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                        <li ng-repeat="template in ctrl.moderVoteTemplateOptions" ng-if="template.vote < 0">
-                            <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
-                        </li>
-                    </ul>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <a ng-repeat="template in ctrl.moderVoteTemplateOptions" ng-if="template.vote < 0" class="dropdown-item" ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
+                    </div>
                 </div>
             </div>
         </div>

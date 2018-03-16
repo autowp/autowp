@@ -52,7 +52,6 @@ return [
             'pictures'       => View\Helper\Service\PicturesFactory::class,
             'sidebar'        => View\Helper\Service\SidebarFactory::class,
             'userText'       => View\Helper\Service\UserTextFactory::class,
-            'htmlPicture'    => View\Helper\HtmlPictureFactory::class,
         ]
     ],
     'view_helper_config' => [],

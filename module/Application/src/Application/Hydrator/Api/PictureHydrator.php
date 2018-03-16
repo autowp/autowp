@@ -255,10 +255,7 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('thumbnail')) {
-            $picture['thumbnail'] = $this->extractValue('thumbnail', [
-                'image'  => Picture::buildFormatRequest((array)$object),
-                'format' => 'picture-thumb'
-            ]);
+            $picture['thumbnail'] =  $this->thumbnail((array)$object); 
         }
 
         if ($this->filterComposite->filter('votes')) {
@@ -589,5 +586,38 @@ class PictureHydrator extends RestHydrator
         $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);
 
         return $deleteVotes > $acceptVotes;
+    }
+
+    private function thumbnail($row)
+    {
+        if (!$row) {
+            return null;
+        }
+
+        $formats = ['picture-thumb', 'picture-thumb-medium'];
+
+        $request = Picture::buildFormatRequest($row);
+        $sources = [];
+
+        foreach ($formats as $format) {
+            $thumbInfo = null;
+            try {
+                $thumbInfo = $this->imageStorage->getFormatedImage($request, $format);
+                if ($thumbInfo) {
+                    $sources[] = $thumbInfo->toArray();
+                }
+            } catch (Storage\Exception $e) {
+            }
+        }
+
+        $parts = [];
+        foreach ($sources as $source) {
+            $parts[] = $source['src'] . ' ' . $source['width'] . 'w';
+        }
+
+        return [
+            'src'    => $sources[0]['src'],
+            'srcset' => implode(', ', $parts)
+        ];
     }
 }

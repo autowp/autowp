@@ -71,13 +71,11 @@ $singleThumbPart = round(12 / $thumbColumns);
                                                 'href'  => $picture['url'],
                                                 'class' => 'd-block rounded mb-4'
                                             ],
-                                            $this->htmlPicture([
+                                            $this->htmlImg([
+                                                'src'   => $picture['medium']['src'],
                                                 'class' => 'rounded w-100 border border-light',
                                                 'alt'   => $this->pic()->textTitle($picture['name']),
                                                 'title' => $this->pic()->textTitle($picture['name']),
-                                            ], [
-                                                $picture['thumb'],
-                                                $picture['medium']
                                             ]),
                                             false
                                         )?>
@@ -102,13 +100,11 @@ $singleThumbPart = round(12 / $thumbColumns);
                                                         'href'  => $picture['url'],
                                                         'class' => 'd-block rounded mb-4'
                                                     ],
-                                                    $this->htmlPicture([
+                                                    $this->htmlImg([
+                                                        'src'   => $picture['thumb']['src'],
                                                         'class' => 'rounded w-100 border border-light',
                                                         'alt'   => $this->pic()->textTitle($picture['name']),
                                                         'title' => $this->pic()->textTitle($picture['name']),
-                                                    ], [
-                                                        $picture['thumb'],
-                                                        $picture['medium']
                                                     ]),
                                                     false
                                                 )?>
@@ -134,13 +130,11 @@ $singleThumbPart = round(12 / $thumbColumns);
                                         'href'  => $picture['url'],
                                         'class' => 'd-block rounded mb-4'
                                     ],
-                                    $this->htmlPicture([
+                                    $this->htmlImg([
+                                        'src'   => $picture['thumb']['src'],
                                         'class' => 'rounded w-100 border border-light',
                                         'alt'   => $this->pic()->textTitle($picture['name']),
                                         'title' => $this->pic()->textTitle($picture['name']),
-                                    ], [
-                                        $picture['thumb'],
-                                        $picture['medium']
                                     ]),
                                     false
                                 )?>

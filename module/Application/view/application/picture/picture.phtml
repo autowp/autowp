@@ -295,7 +295,10 @@
                 foreach ($this->items as $item) {
                     if ($item['uploadUrl']) {
                         $uploads[] = $this->htmlA(
-                            $item['uploadUrl'],
+                            [
+                                'href'  => $item['uploadUrl'],
+                                'class' => "dropdown-item"
+                            ],
                             '<i class="fa fa-upload"></i> ' .
                             $this->escapeHtml($this->page(29)->name) . ' ' .
                             $this->car()->htmlTitle($item['name']),
@@ -309,9 +312,7 @@
                         ' . $this->escapeHtml($this->page(29)->name) .'
                         <span class="caret"></span>
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                        <li>' . implode('</li><li>', $uploads) . '</li>
-                    </ul>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenu1">' . implode($uploads) . '</div>
                 </div>';
 
             } else {

@@ -33,7 +33,7 @@ export class PersonsAuthorsController {
             type_id: 8,
             fields: ['name_html,name_default,description,has_text',
                      'url,more_pictures_url',
-                     'preview_pictures,total_pictures'].join(','),
+                     'preview_pictures.picture.thumbnail,total_pictures'].join(','),
             'descendant_pictures[status]': 'accepted',
             'descendant_pictures[type_id]': 2,
             'preview_pictures[type_id]': 2,

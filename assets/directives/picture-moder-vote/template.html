@@ -4,15 +4,11 @@
             {{'moder/picture/acceptance/want-accept'|translate}}
             <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <li ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote > 0">
-                <a href="#" ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePicture(template.vote, template.name);"></a>
-            </li>
-            <li role="separator" class="divider"></li>
-            <li>
-                <a href="#" ng-click="showCustomDialog($event, 1)">{{'moder/picture/acceptance/custom'|translate}}</a>
-            </li>
-        </ul>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <a ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote > 0" class="dropdown-item" href="#" ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePicture(template.vote, template.name);"></a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" ng-click="showCustomDialog($event, 1)">{{'moder/picture/acceptance/custom'|translate}}</a>
+        </div>
     </div>
 
     <div class="btn-group" ng-if="!picture.moder_voted">
@@ -20,15 +16,11 @@
             {{'moder/picture/acceptance/want-delete'|translate}}
             <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <li ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote < 0">
-                <a href="#" ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePicture(template.vote, template.name);"></a>
-            </li>
-            <li role="separator" class="divider"></li>
-            <li>
-                <a href="#" ng-click="showCustomDialog($event, -1)">{{'moder/picture/acceptance/custom'|translate}}</a>
-            </li>
-        </ul>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <a ng-repeat="template in moderVoteTemplateOptions" ng-if="template.vote < 0" href="#" ng-bind="template.name" aria-label="{{template.name}}" ng-click="votePicture(template.vote, template.name);" class="dropdown-item"></a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" ng-click="showCustomDialog($event, -1)">{{'moder/picture/acceptance/custom'|translate}}</a>
+        </div>
     </div>
     
     <button class="btn btn-secondary" ng-if="picture.moder_voted" ng-click="cancelVotePicture()">

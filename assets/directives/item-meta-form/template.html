@@ -69,10 +69,14 @@
     <div class="form-group row" ng-class="{'has-error':invalidParams.begin_model_year || invalidParams.end_model_year}" ng-if="item.item_type_id == 1 || item.item_type_id == 2">
         <label class="col-md-2 col-form-label" translate>moder/vehicle/model-years</label>
         <div class="col-md-10">
-            <fieldset class="form-inline">
-                <input type="number" name="begin_model_year" ng-model="item.begin_model_year" placeholder="{{'moder/vehicle/year/from'|translate}}" style="width: 10%" min="1800" max="{{ctrl.model_year_max}}" class="form-control" maxlength="4" />
-                <input type="number" name="end_model_year" ng-model="item.end_model_year" placeholder="{{'moder/vehicle/year/to'|translate}}" style="width: 10%" min="1800" max="{{ctrl.model_year_max}}" class="form-control" maxlength="4" />
-            </fieldset>
+            <div class="form-row">
+                <div class="form-group col-md-2 col-sm-6">
+                    <input type="number" name="begin_model_year" ng-model="item.begin_model_year" placeholder="{{'moder/vehicle/year/from'|translate}}" min="1800" max="{{ctrl.model_year_max}}" class="form-control" maxlength="4" />
+                </div>
+                <div class="form-group col-md-2 col-sm-6">
+                    <input type="number" name="end_model_year" ng-model="item.end_model_year" placeholder="{{'moder/vehicle/year/to'|translate}}" min="1800" max="{{ctrl.model_year_max}}" class="form-control" maxlength="4" />
+                </div>
+            </div>
             <p ng-repeat="message in invalidParams.begin_model_year" ng-bind="message" class="help-block"></p>
             <p ng-repeat="message in invalidParams.end_model_year" ng-bind="message" class="help-block"></p>
         </div>
@@ -80,16 +84,19 @@
     <div class="form-group row" ng-class="{'has-error':invalidParams.begin_year||invalidParams.begin_month}">
         <label class="col-md-2 col-form-label" translate>moder/vehicle/begin</label>
         <div class="col-md-10">
-            <fieldset class="form-inline">
-                <input type="number" name="begin_year" ng-model="item.begin_year" placeholder="{{'moder/vehicle/year'|translate}}" style="width: 10%" min="1800" max="{{ctrl.year_max}}" class="form-control" maxlength="4" />
-                <select name="begin_month"
-                    ng-model="item.begin_month"
-                    title="{{'moder/vehicle/month'|translate}}"
-                    style="width: 20%"
-                    class="form-control"
-                    ng-options="month.value as month.name for month in ctrl.monthOptions">
-                </select>
-            </fieldset>
+            <div class="form-row">
+                <div class="form-group col-md-2 col-sm-2">
+                    <input type="number" name="begin_year" ng-model="item.begin_year" placeholder="{{'moder/vehicle/year'|translate}}" min="1800" max="{{ctrl.year_max}}" class="form-control" maxlength="4" />
+                </div>
+                <div class="form-group col-md-4 col-sm-7">
+                    <select name="begin_month"
+                        ng-model="item.begin_month"
+                        title="{{'moder/vehicle/month'|translate}}"
+                        class="form-control"
+                        ng-options="month.value as month.name for month in ctrl.monthOptions">
+                    </select>
+                </div>
+            </div>
             <p ng-repeat="message in invalidParams.begin_year" ng-bind="message" class="help-block"></p>
             <p ng-repeat="message in invalidParams.begin_month" ng-bind="message" class="help-block"></p>
         </div>
@@ -97,23 +104,27 @@
     <div class="form-group row" ng-class="{'has-error':invalidParams.end_year||invalidParams.end_month||invalidParams.today}">
         <label class="col-md-2 col-form-label" translate>moder/vehicle/end</label>
         <div class="col-md-10">
-            <fieldset class="form-inline">
-                <input type="number" name="end_year" ng-model="item.end_year" placeholder="{{'moder/vehicle/year'|translate}}" style="width: 10%" min="1800" max="{{ctrl.year_max}}" class="form-control" maxlength="4" />
-                <select name="end_month"
-                    ng-model="item.end_month"
-                    title="{{'moder/vehicle/month'|translate}}"
-                    style="width: 20%"
-                    class="form-control"
-                    ng-options="month.value as month.name for month in ctrl.monthOptions">
-                </select>
-                <select name="today"
-                    ng-model="item.today"
-                    style="width: 20%"
-                    title="{{'moder/vehicle/today'|translate}}"
-                    class="form-control"
-                    ng-options="option.value as option.name|translate for option in ctrl.todayOptions">
-                </select>
-            </fieldset>
+            <div class="form-row">
+                <div class="form-group col-md-2 col-sm-2">
+                    <input type="number" name="end_year" ng-model="item.end_year" placeholder="{{'moder/vehicle/year'|translate}}" min="1800" max="{{ctrl.year_max}}" class="form-control" maxlength="4" />
+                </div>
+                <div class="form-group col-md-4 col-sm-7">
+                    <select name="end_month"
+                        ng-model="item.end_month"
+                        title="{{'moder/vehicle/month'|translate}}"
+                        class="form-control"
+                        ng-options="month.value as month.name for month in ctrl.monthOptions">
+                    </select>
+                </div>
+                <div class="form-group col-md-4 col-sm-3">
+                    <select name="today"
+                        ng-model="item.today"
+                        title="{{'moder/vehicle/today'|translate}}"
+                        class="form-control"
+                        ng-options="option.value as option.name|translate for option in ctrl.todayOptions">
+                    </select>
+                </div>
+            </div>
             <p ng-repeat="message in invalidParams.end_year" ng-bind="message" class="help-block"></p>
             <p ng-repeat="message in invalidParams.end_month" ng-bind="message" class="help-block"></p>
             <p ng-repeat="message in invalidParams.today" ng-bind="message" class="help-block"></p>
@@ -122,15 +133,18 @@
     <div class="form-group row" ng-class="{'has-error':invalidParams.produced_count||invalidParams.produced_exactly}" ng-if="item.item_type_id == 1 || item.item_type_id == 2">
         <label class="col-md-2 col-form-label" translate>moder/item/produced</label>
         <div class="col-md-10">
-            <fieldset class="form-inline">
-                <input type="number" name="produced" ng-model="item.produced" style="width: 10%" min="0" max="100000000" class="form-control" title="{{'moder/item/produced/number'|translate}}" />
-                <select name="produced_exactly"
-                    ng-model="item.produced_exactly"
-                    style="width: 20%"
-                    class="form-control"
-                    ng-options="option.value as option.name|translate for option in ctrl.producedOptions">
-                </select>
-            </fieldset>
+            <div class="form-row">
+                <div class="form-group col-md-2 col-sm-2">
+                    <input type="number" name="produced" ng-model="item.produced" min="0" max="100000000" class="form-control" title="{{'moder/item/produced/number'|translate}}" />
+                </div>
+                <div class="form-group col-md-4 col-sm-4">
+                    <select name="produced_exactly"
+                        ng-model="item.produced_exactly"
+                        class="form-control"
+                        ng-options="option.value as option.name|translate for option in ctrl.producedOptions">
+                    </select>
+                </div>
+            </div>
             <p ng-repeat="message in invalidParams.produced_count" ng-bind="message" class="help-block"></p>
             <p ng-repeat="message in invalidParams.produced_exactly" ng-bind="message" class="help-block"></p>
         </div>

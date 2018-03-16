@@ -16,8 +16,8 @@
 </div>
 
 <div class="row">
-    <div class="col-md-2">
-        <img ng-src="{{ctrl.picture.thumbnail.src}}" ng-if="ctrl.picture.thumbnail" class="rounded border border-light" />
+    <div class="col-md-3">
+        <img ng-src="{{ctrl.picture.thumbnail.src}}" ng-srcset="{{ctrl.picture.thumbnail.srcset}}" ng-if="ctrl.picture.thumbnail" class="rounded border border-light w-100" />
     </div>
     <div class="col-md-5">
         <div class="card card-body">
@@ -33,7 +33,7 @@
             <a ui-sref="log({picture_id: ctrl.picture.id})" translate>moder/log-of-events</a>
         </div>
     </div>
-    <div class="col-md-5">
+    <div class="col-md-4">
         <div class="card card-body">
             <p>{{'moder/picture/resolution:'|translate}}
             <b>{{ctrl.picture.width}}×{{ctrl.picture.height}}</b></p>
@@ -87,22 +87,18 @@
                             <span class="caret"></span>
                             <span class="sr-only">Toggle Dropdown</span>
                         </button>
-                        <ul class="dropdown-menu" ng-if="item.type == 1">
-                            <li ng-if="ctrl.last_item && !ctrl.hasItem(ctrl.last_item.id)">
-                                <a href="" ng-click="ctrl.moveItem(item.type, item.item_id, ctrl.last_item.id)">
-                                    <i class="fa fa-arrow-right"></i>
-                                    {{'moder/picture/catalogue/move-to'|translate}}
-                                    <span ng-bind-html="ctrl.last_item.name_html"></span>
-                                </a>
-                            </li>
-                            <li ng-repeat="brand in item.item.brands">
-                                <a ui-sref="moder-pictures-item-move({id: ctrl.picture.id, src_item_id: item.item_id, src_type: item.type, brand_id: brand.id})">
-                                    <i class="fa fa-arrow-right"></i>
-                                    {{'moder/picture/catalogue/move-to'|translate}}
-                                    <span ng-bind-html="brand.name_html"></span> ...
-                                </a>
-                            </li>
-                        </ul>
+                        <div class="dropdown-menu" ng-if="item.type == 1">
+                            <a class="dropdown-item" href="" ng-click="ctrl.moveItem(item.type, item.item_id, ctrl.last_item.id)" ng-if="ctrl.last_item && !ctrl.hasItem(ctrl.last_item.id)">
+                                <i class="fa fa-arrow-right"></i>
+                                {{'moder/picture/catalogue/move-to'|translate}}
+                                <span ng-bind-html="ctrl.last_item.name_html"></span>
+                            </a>
+                            <a ng-repeat="brand in item.item.brands" class="dropdown-item" ui-sref="moder-pictures-item-move({id: ctrl.picture.id, src_item_id: item.item_id, src_type: item.type, brand_id: brand.id})">
+                                <i class="fa fa-arrow-right"></i>
+                                {{'moder/picture/catalogue/move-to'|translate}}
+                                <span ng-bind-html="brand.name_html"></span> ...
+                            </a>
+                        </div>
                     </div>
                 </td>
                 <td ng-if="ctrl.picture.rights.move">

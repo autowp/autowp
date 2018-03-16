@@ -35,7 +35,7 @@ export class CarsDatelessController {
                 'design,engine_vehicles',
                 'url,spec_editor_url,specs_url,more_pictures_url',
                 'categories.url,categories.name_html,twins_groups.url',
-                'preview_pictures,childs_count,total_pictures'
+                'preview_pictures.picture.thumbnail,childs_count,total_pictures'
             ].join(','),
             order: 'age',
             page: this.$state.params.page,

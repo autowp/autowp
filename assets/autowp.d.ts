@@ -150,6 +150,15 @@ declare namespace autowp {
     export interface GetUnitResult {
         items: autowp.IAttrUnit[];
     }
+
+    export interface IPreviewPicture {
+        picture: any; // IPicture;
+        url: string;
+        thumbnail: {
+            src: string;
+            srcset: string;
+        }
+    }
 }
 
 interface JQuery {
