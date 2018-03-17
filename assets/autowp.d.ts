@@ -159,4 +159,5 @@ declare namespace autowp {
 
 interface JQuery {
     carousel(index: number): JQuery;
+    emulateTransitionEnd(duration: any): any;
 }

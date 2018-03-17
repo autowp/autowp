@@ -71,7 +71,7 @@ const Selector = {
 
 const MILLISECONDS_MULTIPLIER = 1000
 
-function getTransitionDurationFromElement(element) {
+function getTransitionDurationFromElement(element: any) {
     if (!element) {
         return 0;
     }
@@ -98,18 +98,18 @@ function getTransitionDurationFromElement(element) {
  */
 
 class Carousel {
-    private _items = null;
-    private _activeElement = null;
+    private _items: any = null;
+    private _activeElement: any = null;
 
-    private _isSliding = false;
+    private _isSliding: boolean = false;
 
-    private _config;
+    private _config: any;
 
-    private _element;
+    private _element: any;
 
     private _onSlide: Function;
 
-    constructor(element, config, onSlide) {
+    constructor(element: any, config: any, onSlide: any) {
         this._config = this._getConfig(config);
         this._element = $(element)[0];
         this._onSlide = onSlide;
@@ -149,7 +149,7 @@ class Carousel {
         }
     }
 
-    to(index) {
+    to(index: any) {
         this._activeElement = $(this._element).find(Selector.ACTIVE_ITEM)[0];
 
         const activeIndex = this._getItemIndex(this._activeElement);
@@ -178,13 +178,12 @@ class Carousel {
         this._items = null;
         this._config = null;
         this._element = null;
-        this._isSliding = null;
         this._activeElement = null;
     }
 
     // Private
 
-    _getConfig(config) {
+    _getConfig(config: any) {
         config = {
             ...Default,
             ...config
@@ -199,7 +198,7 @@ class Carousel {
         }
     }
 
-    _keydown(event) {
+    _keydown(event: any) {
         if (/input|textarea/i.test(event.target.tagName)) {
             return;
         }
@@ -217,7 +216,7 @@ class Carousel {
         }
     }
 
-    _getItemIndex(element) {
+    _getItemIndex(element: any) {
         this._items = $.makeArray(
             $(element)
                 .parent()
@@ -226,7 +225,7 @@ class Carousel {
         return this._items.indexOf(element);
     }
 
-    _getItemByDirection(direction, activeElement) {
+    _getItemByDirection(direction: string, activeElement: any) {
         const isNextDirection = direction === Direction.NEXT;
         const isPrevDirection = direction === Direction.PREV;
         const activeIndex = this._getItemIndex(activeElement);
@@ -247,7 +246,7 @@ class Carousel {
             : this._items[itemIndex];
     }
 
-    _triggerSlideEvent(relatedTarget, eventDirectionName) {
+    _triggerSlideEvent(relatedTarget: any, eventDirectionName: string) {
         const targetIndex = this._getItemIndex(relatedTarget);
         const fromIndex = this._getItemIndex(
             $(this._element).find(Selector.ACTIVE_ITEM)[0]
@@ -264,7 +263,7 @@ class Carousel {
         return slideEvent;
     }
 
-    _slide(direction, element?) {
+    _slide(direction: string, element?: any) {
         const activeElement = $(this._element).find(Selector.ACTIVE_ITEM)[0];
         const activeElementIndex = this._getItemIndex(activeElement);
         const nextElement =
@@ -273,9 +272,9 @@ class Carousel {
                 this._getItemByDirection(direction, activeElement));
         const nextElementIndex = this._getItemIndex(nextElement);
 
-        let directionalClassName;
-        let orderClassName;
-        let eventDirectionName;
+        let directionalClassName: string;
+        let orderClassName: string;
+        let eventDirectionName: string;
 
         if (direction === Direction.NEXT) {
             directionalClassName = ClassName.LEFT;
@@ -361,134 +360,6 @@ class Carousel {
         }
     }
 }
-
-/*class Carousel {
-
-    private $element: JQuery;
-    private sliding: any = null;
-    private $active: JQuery;
-    private $items: JQuery;
-    private onSlide: Function|null = null;
-    private TRANSITION_DURATION: number = 600;
-    private keypressHandler: (eventObject: JQueryEventObject, ...eventData: any[]) => any;
-
-    constructor(
-        element: any,
-        options: any
-    ) {
-        this.$element    = $(element);
-        this.onSlide     = options.slide;
-
-        this.$element.carousel({
-            interval: 0,
-            wrap: false
-        });
-
-        let self = this;
-
-        this.keypressHandler = (event: JQueryEventObject) => {
-            if (/input|textarea/i.test(event.currentTarget.tagName)) {
-                return;
-            }
-            switch (event.which) {
-                case 37: self.prev(); break;
-                case 39: self.next(); break;
-                default: return;
-            }
-
-            event.preventDefault();
-        };
-    }
-
-    public show() {
-        $(document).on('keydown.bs.carousel', this.keypressHandler);
-    }
-
-    public hide() {
-        $(document).off('keydown.bs.carousel', this.keypressHandler);
-    }
-
-    public destroy() {
-        this.hide();
-    }
-
-    private getItemIndex(item: JQuery) {
-        return this.$element.find('.item').index(item || this.$active);
-    }
-
-    private getItemForDirection(direction: string, active: JQuery) {
-        var $items = this.$element.find('.item');
-        var activeIndex = this.getItemIndex(active);
-        var willWrap = (direction == 'prev' && activeIndex === 0) ||
-                       (direction == 'next' && activeIndex == ($items.length - 1));
-        if (willWrap) {
-            return active;
-        }
-        var delta = direction == 'prev' ? -1 : 1;
-        var itemIndex = (activeIndex + delta) % $items.length;
-        return $items.eq(itemIndex);
-    }
-
-    public to(pos: number) {
-        //var that        = this;
-        var activeIndex = this.getItemIndex(this.$active = this.$element.find('.item.active'));
-
-        var $items = this.$element.find('.item');
-
-        if (pos > ($items.length - 1) || pos < 0) return;
-
-        //if (this.sliding)       return this.$element.one('slid.bs.carousel', function () { that.to(pos) }) // yes, "slid"
-
-        return this.slide(pos > activeIndex ? 'next' : 'prev', $items.eq(pos));
-    }
-
-    public next() {
-        if (this.sliding) return;
-        return this.slide('next');
-    }
-
-    public prev() {
-        if (this.sliding) return;
-        return this.slide('prev');
-    }
-
-    private slide(type: string, next: any = null) {
-        var $active   = this.$element.find('.item.active');
-        var $next     = next || this.getItemForDirection(type, $active);
-        var direction: string = type == 'next' ? 'left' : 'right';
-        var that      = this;
-
-        if ($next.hasClass('active')) {
-            return (this.sliding = false);
-        }
-
-        var relatedTarget = $next ? $next[0] : null;
-        if (this.onSlide) {
-            this.onSlide(relatedTarget, direction);
-        }
-
-        this.sliding = true;
-
-        if (this.$element.hasClass('slide')) {
-            $next.addClass(type);
-            $next[0].offsetWidth; // jshint ignore:line
-            $active.addClass(direction);
-            $next.addClass(direction);
-            $active
-                .one('bsTransitionEnd', function () {
-                    $next.removeClass([type, direction].join(' ')).addClass('active');
-                    $active.removeClass(['active', direction].join(' '));
-                    that.sliding = false;
-                });
-        } else {
-            $active.removeClass('active');
-            $next.addClass('active');
-            this.sliding = false;
-        }
-
-        return this;
-    }
-}*/
 
 export class Gallery {
     private MAX_INDICATORS: number = 30;

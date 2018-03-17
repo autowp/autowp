@@ -8,7 +8,7 @@ const STATE_NAME = 'cutaway';
 export class CutawayController {
     static $inject = ['$scope', '$http', '$state'];
 
-    public chunks: any[] = [];
+    public pictures: any[] = [];
     public paginator: autowp.IPaginator;
 
 
