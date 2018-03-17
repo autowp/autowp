@@ -268,10 +268,11 @@ class Pic extends AbstractPlugin
 
         $colClass = '';
         $width = null;
-
         if ($options['width']) {
             $width = (int)$options['width'];
-            $colClass = 'col';
+            if (! $colClass) {
+                $colClass = 'col-lg-' . (12 / $width) . ' col-md-' . (12 / $width);
+            }
         }
 
         $controller = $this->getController();
@@ -354,7 +355,7 @@ class Pic extends AbstractPlugin
             $requests[$idx] = Picture::buildFormatRequest($picture);
         }
 
-        $imagesInfo = $imageStorage->getFormatedImages($requests, 'picture-thumb');
+        $imagesInfo = $imageStorage->getFormatedImages($requests, 'picture-thumb-medium');
 
         // names
         $names = $this->picture->getNameData($rows, [
@@ -887,7 +888,7 @@ class Pic extends AbstractPlugin
         $image = $imageStorage->getImage($picture['image_id']);
         $sourceUrl = $image ? $image->getSrc() : null;
 
-        $preview = $imageStorage->getFormatedImage($this->picture->getFormatRequest($picture), 'picture-medium');
+        $preview = $imageStorage->getFormatedImage($this->picture->getFormatRequest($picture), 'picture-preview-large');
         $previewUrl = $preview ? $preview->getSrc() : null;
 
         $galleryImage = $imageStorage->getFormatedImage(

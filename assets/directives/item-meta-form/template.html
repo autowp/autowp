@@ -70,10 +70,10 @@
         <label class="col-md-2 col-form-label" translate>moder/vehicle/model-years</label>
         <div class="col-md-10">
             <div class="form-row">
-                <div class="form-group col-md-2 col-sm-6">
+                <div class="form-group col-md-2 col-sm-6 mb-0">
                     <input type="number" name="begin_model_year" ng-model="item.begin_model_year" placeholder="{{'moder/vehicle/year/from'|translate}}" min="1800" max="{{ctrl.model_year_max}}" class="form-control" maxlength="4" />
                 </div>
-                <div class="form-group col-md-2 col-sm-6">
+                <div class="form-group col-md-2 col-sm-6 mb-0">
                     <input type="number" name="end_model_year" ng-model="item.end_model_year" placeholder="{{'moder/vehicle/year/to'|translate}}" min="1800" max="{{ctrl.model_year_max}}" class="form-control" maxlength="4" />
                 </div>
             </div>
@@ -85,10 +85,10 @@
         <label class="col-md-2 col-form-label" translate>moder/vehicle/begin</label>
         <div class="col-md-10">
             <div class="form-row">
-                <div class="form-group col-md-2 col-sm-2">
+                <div class="form-group col-md-2 col-sm-2 mb-0">
                     <input type="number" name="begin_year" ng-model="item.begin_year" placeholder="{{'moder/vehicle/year'|translate}}" min="1800" max="{{ctrl.year_max}}" class="form-control" maxlength="4" />
                 </div>
-                <div class="form-group col-md-4 col-sm-7">
+                <div class="form-group col-md-4 col-sm-7 mb-0">
                     <select name="begin_month"
                         ng-model="item.begin_month"
                         title="{{'moder/vehicle/month'|translate}}"
@@ -105,10 +105,10 @@
         <label class="col-md-2 col-form-label" translate>moder/vehicle/end</label>
         <div class="col-md-10">
             <div class="form-row">
-                <div class="form-group col-md-2 col-sm-2">
+                <div class="form-group col-md-2 col-sm-2 mb-0">
                     <input type="number" name="end_year" ng-model="item.end_year" placeholder="{{'moder/vehicle/year'|translate}}" min="1800" max="{{ctrl.year_max}}" class="form-control" maxlength="4" />
                 </div>
-                <div class="form-group col-md-4 col-sm-7">
+                <div class="form-group col-md-4 col-sm-7 mb-0">
                     <select name="end_month"
                         ng-model="item.end_month"
                         title="{{'moder/vehicle/month'|translate}}"
@@ -116,7 +116,7 @@
                         ng-options="month.value as month.name for month in ctrl.monthOptions">
                     </select>
                 </div>
-                <div class="form-group col-md-4 col-sm-3">
+                <div class="form-group col-md-4 col-sm-3 mb-0">
                     <select name="today"
                         ng-model="item.today"
                         title="{{'moder/vehicle/today'|translate}}"
@@ -134,10 +134,10 @@
         <label class="col-md-2 col-form-label" translate>moder/item/produced</label>
         <div class="col-md-10">
             <div class="form-row">
-                <div class="form-group col-md-2 col-sm-2">
+                <div class="form-group col-md-2 col-sm-2 mb-0">
                     <input type="number" name="produced" ng-model="item.produced" min="0" max="100000000" class="form-control" title="{{'moder/item/produced/number'|translate}}" />
                 </div>
-                <div class="form-group col-md-4 col-sm-4">
+                <div class="form-group col-md-4 col-sm-4 mb-0">
                     <select name="produced_exactly"
                         ng-model="item.produced_exactly"
                         class="form-control"

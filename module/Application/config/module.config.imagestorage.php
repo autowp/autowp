@@ -141,6 +141,12 @@ return [
                 'strip'   => 1,
                 'format'  => 'jpeg'
             ],
+            'picture-preview-large' => [
+                'fitType' => 0,
+                'width'   => 540,
+                'strip'   => 1,
+                'format'  => 'jpeg'
+            ],
             'picture-gallery' => [
                 'fitType'    => 2,
                 'width'      => 1024,

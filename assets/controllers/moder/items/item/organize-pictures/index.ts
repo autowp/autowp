@@ -74,7 +74,7 @@ export class ModerItemsItemOrganizePicturesController {
             params: {
                 item_id: $state.params.id,
                 limit: 500,
-                fields: 'picture.thumbnail,picture.name_text',
+                fields: 'picture.thumb_medium,picture.name_text',
                 order: 'status'
             }
         }).then(function(response: ng.IHttpResponse<any>) {
@@ -201,31 +201,6 @@ export class ModerItemsItemOrganizePicturesController {
             self.invalidParams = response.data.invalid_params;
             self.loading--;
         });
-    }
-
-    public srcset(picture) {
-
-        let sources = [];
-        if (picture.thumb) {
-            sources.push(picture.thumb);
-        }
-        if (picture.medium) {
-            sources.push(picture.medium);
-        }
-
-        let parts = [];
-
-        for (const source of sources) {
-            parts.push(source.src + ' ' + source.width + 'w');
-        }
-
-        console.log(picture);
-
-        if (sources.length) {
-            return parts.join(', ');
-        }
-
-        return null;
     }
 }
 

@@ -482,8 +482,8 @@ class CarOfDay
         $formatRequests = [];
         foreach ($carOfDayPictures as $idx => $picture) {
             if ($picture) {
-                $formatRequests['picture-thumb'][$idx] = $this->picture->getFormatRequest($picture);
-                $formatRequests['picture-thumb-medium'][$idx] = $this->picture->getFormatRequest($picture);
+                $format = $idx == 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
+                $formatRequests[$format][$idx] = $this->picture->getFormatRequest($picture);
             }
         }
 
@@ -551,8 +551,8 @@ class CarOfDay
                  }
                  }*/
 
-                $thumb = isset($imagesInfo['picture-thumb'][$idx]) ? $imagesInfo['picture-thumb'][$idx] : null;
-                $medium = isset($imagesInfo['picture-thumb-medium'][$idx]) ? $imagesInfo['picture-thumb-medium'][$idx] : null;
+                $format = $idx == 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
+                $thumb = isset($imagesInfo[$format][$idx]) ? $imagesInfo[$format][$idx] : null;
 
                 $result[] = [
                     'thumb'  => $thumb
@@ -560,13 +560,6 @@ class CarOfDay
                             'src'    => $thumb->getSrc(),
                             'width'  => $thumb->getWidth(),
                             'height' => $thumb->getHeight()
-                        ]
-                        : null,
-                    'medium'  => $medium
-                        ? [
-                            'src'    => $medium->getSrc(),
-                            'width'  => $medium->getWidth(),
-                            'height' => $medium->getHeight()
                         ]
                         : null,
                     'name' => isset($names[$row['id']])

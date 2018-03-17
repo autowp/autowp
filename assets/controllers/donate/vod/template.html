@@ -1,7 +1,7 @@
 <div autowp-markdown="'donate/vod/text'|translate"></div>
 
 <h1 translate>donate/vod/select-date</h1>
-<div class="card card-body">
+<div class="card card-body mb-4">
     <ul>
         <li ng-repeat="date in ctrl.dates">
             <span ng-if="date.free">
@@ -23,7 +23,7 @@
 </div>
 
 <h1 translate>donate/vod/select-item</h1>
-<div class="card card-body">
+<div class="card card-body mb-4">
 
     <div autowp-markdown="'donate/vod/select-item-text'|translate"></div>
 
@@ -37,20 +37,18 @@
 
 <h1 translate>donate/vod/preview</h1>
 
-<div class="card card-body">
+<div class="card card-body mb-4">
     <div class="btn-group">
         <a href="#" class="btn btn-secondary" ng-class="{active: ctrl.anonymous}" ng-click="ctrl.setAnonymous(true)" translate>donate/vod/anonymous</a>
         <a href="#" class="btn btn-secondary" ng-class="{active: !ctrl.anonymous, disabled: !ctrl.userId}" ng-click="ctrl.setAnonymous(false)" translate>donate/vod/with-name</a>
     </div>
 </div>
 
-<div class="row" ng-if="ctrl.selectedItem"><div class="col-sm-9">
-    <autowp-item-of-day item="ctrl.selectedItem" user="ctrl.anonymous ? null : user"></autowp-item-of-day>
-</div></div>
+<autowp-item-of-day ng-if="ctrl.selectedItem" item="ctrl.selectedItem" user="ctrl.anonymous ? null : user"></autowp-item-of-day>
 
 <h1 translate>donate/vod/make-donation</h1>
 
-<div class="card card-body">
+<div class="card card-body mb-4">
     <form method="post" action="https://money.yandex.ru/quickpay/confirm.xml">
         <div ng-if="ctrl.selectedDate && ctrl.selectedItem">
             <input type="hidden" ng-repeat="(key, value) in ctrl.formParams" name="{{key}}" value="{{value}}" />
@@ -65,7 +63,7 @@
         </p>
         <div ng-if="ctrl.selectedDate && ctrl.selectedItem">
             <div class="form-group">
-                <div class="btn-group" data-toggle="buttons">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
                     <label class="btn btn-secondary active">
                         <input type="radio" name="paymentType" value="AC" autocomplete="off" checked>
                         <span class="fa fa-credit-card"></span>

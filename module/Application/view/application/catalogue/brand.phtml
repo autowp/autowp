@@ -13,7 +13,7 @@
     ]);
 ?>
 
-<header>
+<header class="mb-4">
     <div class="jumbotron brand-hero-unit">
         <?=$this->img($this->brand['logo_id'], [
             'format' => 'logo',
@@ -125,11 +125,33 @@
     </ul>
 </header>
 
-<?php if ($this->topPictures && count($this->topPictures)) { ?>
-    <section>
-        <h2><?=$this->escapeHtml($this->translate('catalogue/brand/popular-images')) ?></h2>
-        <?=$this->partial('application/pictures', $this->topPictures)?>
-    </section>
+<?php foreach ($this->sections as $section) { ?>
+    <?php if (count($section['groups'])) { ?>
+        <div class="card mb-4">
+            <div class="card-body">
+                <?php if ($section['name']) { ?>
+                    <h5 class="card-title">
+                        <?=$this->escapeHtml($this->translate($section['name']))?>
+                    </h5>
+                <?php } ?>
+                <div class="row">
+                    <?php foreach ($section['groups'] as $group) { ?>
+                        <?=$this->htmlA(
+                            [
+                                'href'  => $group['url'],
+                                'class' => 'col-4 nav-link'
+                            ],
+                            $this->escapeHtml($group['name']) . (isset($group['count']) ? ' <span class="badge badge-pill badge-secondary">' . $group['count'] . '</span>' : ''),
+                            false
+                        ) ?>
+                    <?php } ?>
+                </div>
+                <?php if ($section['name'] && $section['url']) { ?>
+                    <?=$this->htmlA($section['url'], $this->translate('carlist/details'))?>
+                <?php } ?>
+            </div>
+        </div>
+    <?php } ?>
 <?php } ?>
 
 <?php if (count($this->factories)) { ?>
@@ -149,6 +171,13 @@
                 </div>
             <?php } ?>
         </div>
+    </section>
+<?php } ?>
+
+<?php if ($this->topPictures && count($this->topPictures)) { ?>
+    <section>
+        <h2><?=$this->escapeHtml($this->translate('catalogue/brand/popular-images')) ?></h2>
+        <?=$this->partial('application/pictures', $this->topPictures)?>
     </section>
 <?php } ?>
 

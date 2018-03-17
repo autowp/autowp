@@ -1,6 +1,6 @@
 <div class="card mb-4" ng-class="{'vote-accept': picture.moder_vote.vote > 0, 'vote-remove': picture.moder_vote.vote < 0, 'vote-neutral': picture.moder_vote.count > 0 && picture.moder_vote.vote == 0}">
-    <a href="{{picture.url}}" ng-if="picture.thumbnail">
-        <img class="card-img-top" ng-src="{{picture.thumbnail.src}}" alt="{{picture.name_text}}" title="{{picture.name_text}}">
+    <a href="{{picture.url}}" ng-if="picture.thumb_medium">
+        <img class="card-img-top" ng-src="{{picture.thumb_medium.src}}" alt="{{picture.name_text}}" title="{{picture.name_text}}">
     </a>
     <div class="card-body">
         <h6 class="card-title"><a href="{{picture.url}}" ng-bind-html="picture.name_html"></a></h6>

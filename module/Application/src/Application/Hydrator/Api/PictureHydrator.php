@@ -120,7 +120,8 @@ class PictureHydrator extends RestHydrator
 
         $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('image', $strategy);
-        $this->addStrategy('thumbnail', $strategy);
+        $this->addStrategy('thumb', $strategy);
+        $this->addStrategy('thumb_medium', $strategy);
         $this->addStrategy('image_gallery_full', $strategy);
 
         $strategy = new Strategy\User($serviceManager);
@@ -254,8 +255,18 @@ class PictureHydrator extends RestHydrator
             $picture['owner'] = $owner ? $this->extractValue('owner', $owner) : null;
         }
 
-        if ($this->filterComposite->filter('thumbnail')) {
-            $picture['thumbnail'] =  $this->thumbnail((array)$object); 
+        if ($this->filterComposite->filter('thumb')) {
+            $picture['thumb'] =  $this->extractValue('thumb', [
+                'image'  => Picture::buildFormatRequest((array)$object),
+                'format' => 'picture-thumb'
+            ]);
+        }
+
+        if ($this->filterComposite->filter('thumb_medium')) {
+            $picture['thumb_medium'] =  $this->extractValue('thumb_medium', [
+                'image'  => Picture::buildFormatRequest((array)$object),
+                'format' => 'picture-thumb-medium'
+            ]);
         }
 
         if ($this->filterComposite->filter('votes')) {
@@ -586,38 +597,5 @@ class PictureHydrator extends RestHydrator
         $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);
 
         return $deleteVotes > $acceptVotes;
-    }
-
-    private function thumbnail($row)
-    {
-        if (!$row) {
-            return null;
-        }
-
-        $formats = ['picture-thumb', 'picture-thumb-medium'];
-
-        $request = Picture::buildFormatRequest($row);
-        $sources = [];
-
-        foreach ($formats as $format) {
-            $thumbInfo = null;
-            try {
-                $thumbInfo = $this->imageStorage->getFormatedImage($request, $format);
-                if ($thumbInfo) {
-                    $sources[] = $thumbInfo->toArray();
-                }
-            } catch (Storage\Exception $e) {
-            }
-        }
-
-        $parts = [];
-        foreach ($sources as $source) {
-            $parts[] = $source['src'] . ' ' . $source['width'] . 'w';
-        }
-
-        return [
-            'src'    => $sources[0]['src'],
-            'srcset' => implode(', ', $parts)
-        ];
     }
 }

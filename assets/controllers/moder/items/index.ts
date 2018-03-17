@@ -45,7 +45,7 @@ var DEFAULT_ORDER = 'id_desc';
 
 export class ModerItemsController {
     static $inject = ['$scope', '$http', '$state', '$q', '$element', 'PerspectiveService', 'PictureModerVoteService', 'PictureModerVoteTemplateService', 'VehicleTypeService', 'SpecService'];
-    
+
     public loading: number = 0;
     public items: any[] = [];
     public paginator: autowp.IPaginator;
@@ -68,7 +68,7 @@ export class ModerItemsController {
     };
 
     constructor(
-        private $scope: autowp.IControllerScope,  
+        private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
         private $state: any,
         private $q: ng.IQService,
@@ -76,7 +76,7 @@ export class ModerItemsController {
         private PerspectiveService: PerspectiveService,
         private PictureModerVoteService: PictureModerVoteService,
         private PictureModerVoteTemplateService: PictureModerVoteTemplateService,
-        private VehicleTypeService: VehicleTypeService, 
+        private VehicleTypeService: VehicleTypeService,
         private SpecService: SpecService
     ) {
         $scope.pageEnv({
@@ -88,7 +88,7 @@ export class ModerItemsController {
             name: 'page/131/name',
             pageId: 131
         });
-        
+
         this.filter = {
             name: $state.params.name || null,
             name_exclude: $state.params.name_exclude || null,
@@ -104,20 +104,20 @@ export class ModerItemsController {
             ancestor_id: $state.params.ancestor_id || null,
         };
 
-        
+
         this.page = $state.params.page;
-        
+
         var self = this;
         VehicleTypeService.getTypes().then(function(types) {
             self.vehicleTypeOptions = toPlain(types, 0);
         });
-        
+
         SpecService.getSpecs().then(function(types) {
             self.specOptions = toPlain(types, 0);
         });
-        
+
         this.load();
-        
+
         var $itemIdElement = $($element[0]).find(':input[name=ancestor_id]');
         $itemIdElement.val(this.filter.ancestor_id ? '#' + this.filter.ancestor_id : '');
         var itemIdLastValue = $itemIdElement.val();
@@ -157,7 +157,7 @@ export class ModerItemsController {
                     } else {
                         params.name = '%' + query + '%';
                     }
-                    
+
                     $http({
                         method: 'GET',
                         url: '/api/item',
@@ -165,11 +165,11 @@ export class ModerItemsController {
                     }).then(function(response: ng.IHttpResponse<any>) {
                         asyncResults(response.data.items);
                     });
-                    
+
                 }
             });
     }
-    
+
     public getStateParams() {
         return {
             name: this.filter.name ? this.filter.name : null,
@@ -187,19 +187,19 @@ export class ModerItemsController {
             page: this.page,
         };
     }
-    
+
     public load() {
         this.loading++;
         this.items = [];
-        
+
         var stateParams = this.getStateParams();
-        
+
         this.$state.go(this.$state.current.name, stateParams, {
             reload: false,
             location: 'replace',
             notify: false
         });
-        
+
         var self = this;
         this.$http({
             method: 'GET',
@@ -223,7 +223,7 @@ export class ModerItemsController {
                     'design,engine_vehicles',
                     'url,spec_editor_url,specs_url,more_pictures_url',
                     'categories.url,categories.name_html,twins_groups.url',
-                    'preview_pictures.picture.thumbnail,childs_count,total_pictures'
+                    'preview_pictures.picture.thumb_medium,childs_count,total_pictures'
                 ].join(','),
                 limit: 10
             }
@@ -247,7 +247,7 @@ angular.module(Module)
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require('./template.html'),
-                params: { 
+                params: {
                     name: { dynamic: true },
                     name_exclude: { dynamic: true },
                     item_type_id: { dynamic: true },

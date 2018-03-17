@@ -61,61 +61,59 @@ $singleThumbPart = round(12 / $thumbColumns);
 
             <?php if ($havePhoto) { ?>
                 <?php if ($item['largeFormat']) { ?>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?php foreach ($item['pictures'] as $idx => $picture) { ?>
-                                <?php if ($idx == 0) { ?>
-                                    <?php if ($picture) { ?>
-                                        <?=$this->htmlA(
-                                            [
-                                                'href'  => $picture['url'],
-                                                'class' => 'd-block rounded mb-4'
-                                            ],
-                                            $this->htmlImg([
-                                                'src'   => $picture['medium']['src'],
-                                                'class' => 'rounded w-100 border border-light',
-                                                'alt'   => $this->pic()->textTitle($picture['name']),
-                                                'title' => $this->pic()->textTitle($picture['name']),
-                                            ]),
-                                            false
-                                        )?>
-                                    <?php } else { ?>
-                                        &#xa0;
-                                    <?php } ?>
+                    <div class="col-md-6">
+                        <?php foreach ($item['pictures'] as $idx => $picture) { ?>
+                            <?php if ($idx == 0) { ?>
+                                <?php if ($picture) { ?>
+                                    <?=$this->htmlA(
+                                        [
+                                            'href'  => $picture['url'],
+                                            'class' => 'd-block rounded mb-4'
+                                        ],
+                                        $this->htmlImg([
+                                            'src'   => $picture['large']['src'],
+                                            'class' => 'rounded w-100 border border-light',
+                                            'alt'   => $this->pic()->textTitle($picture['name']),
+                                            'title' => $this->pic()->textTitle($picture['name']),
+                                        ]),
+                                        false
+                                    )?>
+                                <?php } else { ?>
+                                    &#xa0;
                                 <?php } ?>
                             <?php } ?>
-                        </div>
-                        <div class="col-md-6">
-                            <?php for ($row=0; $row<2; $row++) { ?>
-                                <div class="row">
-                                    <?php for ($col=0; $col<2; $col++) { ?>
-                                        <div class="col">
-                                            <?php
-                                                $idx = 1 + $row*2 + $col;
-                                                $picture = isset($item['pictures'][$idx]) ? $item['pictures'][$idx] : null;
-                                            ?>
-                                            <?php if ($picture) { ?>
-                                                <?=$this->htmlA(
-                                                    [
-                                                        'href'  => $picture['url'],
-                                                        'class' => 'd-block rounded mb-4'
-                                                    ],
-                                                    $this->htmlImg([
-                                                        'src'   => $picture['thumb']['src'],
-                                                        'class' => 'rounded w-100 border border-light',
-                                                        'alt'   => $this->pic()->textTitle($picture['name']),
-                                                        'title' => $this->pic()->textTitle($picture['name']),
-                                                    ]),
-                                                    false
-                                                )?>
-                                            <?php } else { ?>
-                                                &#xa0;
-                                            <?php } ?>
-                                        </div>
-                                    <?php } ?>
-                                </div>
-                            <?php } ?>
-                        </div>
+                        <?php } ?>
+                    </div>
+                    <div class="col-md-6">
+                        <?php for ($row=0; $row<2; $row++) { ?>
+                            <div class="row">
+                                <?php for ($col=0; $col<2; $col++) { ?>
+                                    <div class="col">
+                                        <?php
+                                            $idx = 1 + $row*2 + $col;
+                                            $picture = isset($item['pictures'][$idx]) ? $item['pictures'][$idx] : null;
+                                        ?>
+                                        <?php if ($picture) { ?>
+                                            <?=$this->htmlA(
+                                                [
+                                                    'href'  => $picture['url'],
+                                                    'class' => 'd-block rounded mb-3'
+                                                ],
+                                                $this->htmlImg([
+                                                    'src'   => $picture['medium']['src'],
+                                                    'class' => 'rounded w-100 border border-light',
+                                                    'alt'   => $this->pic()->textTitle($picture['name']),
+                                                    'title' => $this->pic()->textTitle($picture['name']),
+                                                ]),
+                                                false
+                                            )?>
+                                        <?php } else { ?>
+                                            &#xa0;
+                                        <?php } ?>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                        <?php } ?>
                     </div>
                 <?php } else { ?>
                     <?php foreach ($item['pictures'] as $idx => $picture) { ?>
@@ -131,7 +129,7 @@ $singleThumbPart = round(12 / $thumbColumns);
                                         'class' => 'd-block rounded mb-4'
                                     ],
                                     $this->htmlImg([
-                                        'src'   => $picture['thumb']['src'],
+                                        'src'   => $picture['medium']['src'],
                                         'class' => 'rounded w-100 border border-light',
                                         'alt'   => $this->pic()->textTitle($picture['name']),
                                         'title' => $this->pic()->textTitle($picture['name']),

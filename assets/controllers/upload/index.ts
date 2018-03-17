@@ -13,7 +13,7 @@ const STATE_NAME = 'upload';
 
 export class UploadController {
     static $inject = ['$scope', '$http', '$state', '$q', 'ItemService', 'Upload'];
-    
+
     public selected: boolean;
     public selectionName: string;
     private replace: any;
@@ -24,10 +24,10 @@ export class UploadController {
     public picturesChunks: any[] = [];
     public item: autowp.IItem;
     public formHidden: boolean = false;
-  
+
     constructor(
         private $scope: autowp.IControllerScope,
-        private $http: ng.IHttpService, 
+        private $http: ng.IHttpService,
         private $state: any,
         private $q: ng.IQService,
         private ItemService: ItemService,
@@ -41,9 +41,9 @@ export class UploadController {
             name: 'page/29/name',
             pageId: 29
         });
-        
+
         let self = this;
-        
+
         let replace = parseInt($state.params.replace);
         if (replace) {
             this.$http({
@@ -54,15 +54,15 @@ export class UploadController {
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
                 self.replace = response.data;
-                
+
                 self.selected = true;
                 self.selectionName = self.replace.name_html;
-                
+
             }, function(response: ng.IHttpResponse<any>) {
                 self.$state.go('error-404');
             });
         }
-        
+
         let itemId = parseInt($state.params.item_id);
         if (itemId) {
             this.ItemService.getItem(itemId, {
@@ -76,26 +76,26 @@ export class UploadController {
             });
         }
     }
-    
+
     public submit()
     {
         this.progress = [];
-        
+
         this.formHidden = true;
 
         var xhrs: any[] = [];
-        
+
         if (this.replace) {
-            
+
             let promise = this.uploadFile(this.file);
-            
+
             xhrs.push(promise);
-            
+
         } else {
             for (let file of this.file) {
-                
+
                 let promise = this.uploadFile(file);
-                
+
                 xhrs.push(promise);
             }
         }
@@ -109,7 +109,7 @@ export class UploadController {
             self.file = undefined;
         });
     }
-    
+
     private uploadFile(file: any)
     {
         let progress = {
@@ -119,22 +119,22 @@ export class UploadController {
             failed: false,
             invalidParams: {}
         };
-        
+
         this.progress.push(progress);
-        
+
         var self = this;
-        
+
         let itemId = this.item ? this.item.id : undefined;
         let perspectiveId = self.$state.params.perspective_id;
         if (!perspectiveId) {
             perspectiveId = undefined;
         }
-        
+
         var promise = this.Upload.upload({
             method: 'POST',
             url: '/api/picture',
             data: {
-                file: file, 
+                file: file,
                 comment: this.note,
                 item_id: itemId,
                 replace_picture_id: self.replace ? self.replace.id : undefined,
@@ -143,46 +143,46 @@ export class UploadController {
         }).then(function (response: ng.IHttpResponse<any>) {
             progress.percentage = 100;
             progress.success = true;
-            
+
             let location = response.headers('Location');
-            
+
             self.$http({
                 method: 'GET',
                 url: location,
                 params: {
-                    fields: 'crop,image_gallery_full,thumbnail,votes,views,comments_count,perspective_item,name_html,name_text'
+                    fields: 'crop,image_gallery_full,thumb_medium,votes,views,comments_count,perspective_item,name_html,name_text'
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
                 let picture = response.data;
                 self.pictures.push(picture);
                 self.picturesChunks = chunkBy(self.pictures, 6);
-                
+
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
-            
+
         }, function (response: ng.IHttpResponse<any>) {
-            
+
             progress.percentage = 100;
             progress.failed = true;
-            
+
             progress.invalidParams = response.data.invalid_params;
         }, function (evt) {
             progress.percentage = Math.round(100.0 * evt.loaded / evt.total);
-        }); 
-        
+        });
+
         return promise;
     }
-    
+
     public crop(picture: any)
     {
         let self = this;
         let cropDialog = new CropDialog({
             sourceUrl: picture.image_gallery_full.src,
             crop: {
-                x: picture.crop ? picture.crop.left : 0, 
-                y: picture.crop ? picture.crop.top : 0, 
-                w: picture.crop ? picture.crop.width : picture.width, 
+                x: picture.crop ? picture.crop.left : 0,
+                y: picture.crop ? picture.crop.top : 0,
+                w: picture.crop ? picture.crop.width : picture.width,
                 h: picture.crop ? picture.crop.height : picture.height
             },
             width: picture.width,
@@ -200,31 +200,31 @@ export class UploadController {
                         }
                     }
                 }).then(function() {
-                    
+
                     self.$http({
                         method: 'GET',
                         url: '/api/picture/' + picture.id,
                         params: {
-                            fields: 'crop,thumbnail'
+                            fields: 'crop,thumb_medium'
                         }
                     }).then(function(response: ng.IHttpResponse<any>) {
-                        
+
                         picture.crop = response.data.crop;
-                        picture.thumbnail = response.data.thumbnail;
-                        
+                        picture.thumb_medium = response.data.thumb_medium;
+
                     }, function(response: ng.IHttpResponse<any>) {
                         notify.response(response);
                     });
-                    
+
                     cropDialog.hide();
-                    
+
                     callback();
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
                 });
             }
         });
-        
+
         cropDialog.show();
     }
 };

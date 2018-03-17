@@ -253,7 +253,7 @@ export class ModerPicturesController {
             location: 'replace'
         });
 
-        params.fields = 'owner,thumbnail,moder_vote,votes,similar,views,comments_count,perspective_item,name_html,name_text';
+        params.fields = 'owner,thumb_medium,moder_vote,votes,similar,views,comments_count,perspective_item,name_html,name_text';
         params.limit = 18;
 
         var self = this;

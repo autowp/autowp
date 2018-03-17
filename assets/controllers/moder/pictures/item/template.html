@@ -16,10 +16,10 @@
 </div>
 
 <div class="row">
-    <div class="col-md-3">
-        <img ng-src="{{ctrl.picture.thumbnail.src}}" ng-srcset="{{ctrl.picture.thumbnail.srcset}}" ng-if="ctrl.picture.thumbnail" class="rounded border border-light w-100" />
+    <div class="col-md-2">
+        <img ng-src="{{ctrl.picture.thumb.src}}" ng-if="ctrl.picture.thumb" class="rounded border border-light w-100" />
     </div>
-    <div class="col-md-5">
+    <div class="col-md-6">
         <div class="card card-body">
             <p translate="ng/moder/database-id-n" translate-values="{id: ctrl.picture.id}"></p>
             <p>
@@ -305,7 +305,7 @@
             </p>
             <p>
                 <a ui-sref="moder-pictures-item({id: ctrl.picture.similar.picture_id})">
-                    <img ng-if="ctrl.picture.similar.picture.thumbnail" ng-src="{{ctrl.picture.similar.picture.thumbnail.src}}" />
+                    <img ng-if="ctrl.picture.similar.picture.thumb" ng-src="{{ctrl.picture.similar.picture.thumb.src}}" class="rounded border border-light" />
                 </a>
             </p>
             <button ng-click="ctrl.cancelSimilar()" class="btn btn-warning">That is not similar</button>

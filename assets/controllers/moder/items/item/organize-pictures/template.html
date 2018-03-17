@@ -4,9 +4,9 @@
 
 <div class="form-group row" ng-show="ctrl.loading <= 0">
     <label class="col-md-2 col-form-label text-right" translate>moder/vehicle/pictures/turbo-group-creator/pictures</label>
-    <div class="col-md-10 multicheckbox-pictures">
-        <label class="btn btn-secondary" ng-repeat="picture in ctrl.pictures" ng-class="{active: picture.selected}" ng-click="ctrl.pictureSelected(picture)">
-            <img ng-src="{{picture.picture.thumbnail.src}}" ng-srcset="{{ctrl.srcset(picture.picture)}}" alt="" title="{{picture.picture.name_text}}" />
+    <div class="col-md-10 multicheckbox-pictures row">
+        <label class="btn btn-secondary col-md-3" ng-repeat="picture in ctrl.pictures" ng-class="{active: picture.selected}" ng-click="ctrl.pictureSelected(picture)">
+            <img ng-src="{{picture.picture.thumb_medium.src}}" alt="" title="{{picture.picture.name_text}}" class="rounded w-100" />
         </label>
     </div>
 </div>

@@ -130,7 +130,7 @@ class IndexController extends AbstractActionController
         $itemOfDayInfo = null;
 
         if ($itemOfDay) {
-            $key = 'ITEM_OF_DAY_112_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
+            $key = 'ITEM_OF_DAY_113_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
 
             $itemOfDayInfo = $this->cache->getItem($key, $success);
             if (! $success) {
