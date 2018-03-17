@@ -22,7 +22,7 @@
             <a class="dropdown-item" href="#" ng-click="showCustomDialog($event, -1)">{{'moder/picture/acceptance/custom'|translate}}</a>
         </div>
     </div>
-    
+
     <button class="btn btn-secondary" ng-if="picture.moder_voted" ng-click="cancelVotePicture()">
         {{'moder/picture/acceptance/cancel-vote'|translate}}
     </button>
@@ -44,8 +44,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" translate>picture-moder-vote/custom/title</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -54,7 +54,7 @@
                 </div>
                 <div class="checkbox">
 	                <label>
-	                    <input type="checkbox" name="save" ng-model="save" /> 
+	                    <input type="checkbox" name="save" ng-model="save" />
 	                    {{'picture-moder-vote/custom/save'|translate}}
 	                </label>
 	            </div>

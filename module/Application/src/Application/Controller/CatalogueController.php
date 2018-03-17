@@ -213,12 +213,12 @@ class CatalogueController extends AbstractActionController
             }
 
             $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
-                'width' => 4
+                'width' => 6
             ]);
 
-            $this->sidebar()->brand([
+            /*$this->sidebar()->brand([
                 'brand_id' => $brand['id'],
-            ]);
+            ]);*/
 
             return [
                 'paginator'    => $paginator,
@@ -316,9 +316,9 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $this->sidebar()->brand([
+            /*$this->sidebar()->brand([
                 'brand_id' => $brand['id']
-            ]);
+            ]);*/
 
             return [
                 'cartypes'  => $list,

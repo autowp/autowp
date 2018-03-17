@@ -6,7 +6,7 @@
         <?php foreach ($this->sidebar['mosts'] as $most) { ?>
             <li class="nav-item">
                 <?=$this->htmlA([
-                    'class' => 'nav-link' . (most['active'] ? ' active' : ''),
+                    'class' => 'nav-link' . ($most['active'] ? ' active' : ''),
                     'href'  => $most['url']
                 ], $this->translate($most['name'])) ?>
             </li>

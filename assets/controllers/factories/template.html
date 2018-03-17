@@ -13,8 +13,8 @@
 
 <div ng-if="ctrl.pictures.length > 0">
     <h3 translate>factories/factory/pictures</h3>
-    <div class="row" ng-repeat="chunk in ctrl.pictures">
-        <div class="col-sm-3" ng-repeat="picture in chunk">
+    <div class="row">
+        <div class="col-6 col-md-4 col-lg-3 col-xl-2" ng-repeat="picture in ctrl.pictures">
             <autowp-thumbnail picture="picture"></autowp-thumbnail>
         </div>
     </div>
@@ -22,16 +22,14 @@
 
 <div ng-if="ctrl.relatedPictures.length > 0">
     <h3 translate>factories/factory-items</h3>
-    <div class="row" ng-repeat="chunk in ctrl.relatedPictures">
-        <div class="picture-preview col-md-3" ng-repeat="item in chunk">
-            <div class="thumbnail">
+    <div class="row">
+        <div class="col-6 col-md-4 col-lg-3 col-xl-2" ng-repeat="item in ctrl.relatedPictures">
+            <div class="card mb-4">
                 <a ng-href="{{item.url}}">
-                    <img ng-src="{{item.src}}" alt="" title="{{item.name}}" />
+                    <img class="card-img-top" ng-src="{{item.src}}" alt="" title="{{item.name}}" />
                 </a>
-                <div class="name">
-                    <p>
-                        <a ng-href="{{item.url}}" ng-bind="item.name"></a>
-                    </p>
+                <div class="card-body">
+                    <h5 class="card-title"><a ng-href="{{item.url}}" ng-bind="item.name"></a></h5>
                 </div>
             </div>
         </div>

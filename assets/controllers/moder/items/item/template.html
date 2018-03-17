@@ -1,9 +1,9 @@
 <div class="row mb-4">
     <div class="col-md-2">
-        <img ng-if="ctrl.randomPicture.thumbnail" ng-src="ctrl.randomPicture.thumbnail.src" alt="" />
+        <img ng-if="ctrl.randomPicture.thumb_medium" ng-src="{{ctrl.randomPicture.thumb_medium.src}}" alt="" class="mb-4 w-100 rounded border border-light" />
     </div>
     <div class="col-md-5">
-        <div class="card card-body">
+        <div class="card card-body mb-4">
             <p translate="ng/moder/database-id-n" translate-values="{id: ctrl.item.id}"></p>
 
             <p ng-if="ctrl.specsAllowed && ctrl.canEditSpecifications">
@@ -14,7 +14,7 @@
         </div>
     </div>
     <div class="col-md-5">
-        <div class="card card-body">
+        <div class="card card-body mb-4">
             <p translate>moder/vehicle/subscription/title</p>
             <p class="subscription">
                 <button class="btn" ng-class="{'btn-success': ctrl.item.subscription, 'btn-secondary': !ctrl.item.subscription}" ng-click="ctrl.toggleSubscription()">

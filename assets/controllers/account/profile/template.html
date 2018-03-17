@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-sm-8 order-2">
         <h2 translate>account/profile/personal</h2>
-        <div class="card card-body">
+        <div class="card card-body mb-4">
             <form method="post" class="form-horizontal" ng-submit="ctrl.sendProfile()"><fieldset>
                 <div class="form-group row" ng-class="{'has-error': ctrl.profileInvalidParams.name}">
                     <label class="col-md-3 col-form-label" for="name" translate>user/name</label>
@@ -19,7 +19,7 @@
         </div>
 
         <h2 translate>account/profile/photo</h2>
-        <div class="card card-body">
+        <div class="card card-body mb-4">
             <div autowp-markdown="'account/profile/use-gravatar'|translate"></div>
             <div ng-if="ctrl.photo">
                 <img ng-src="{{ctrl.photo.src}}" />
@@ -39,7 +39,7 @@
         </div>
 
         <h2 translate>account/profile/other</h2>
-        <div class="card card-body">
+        <div class="card card-body mb-4">
             <p ng-show="ctrl.votesLeft >= 0"><translate>account/profile/votes-per-day</translate>: {{ctrl.votesPerDay}}</p>
             <p ng-show="ctrl.votesLeft >= 0"><translate>account/profile/votes-left</translate>: {{ctrl.votesLeft}}</p>
             <form method="post" class="form-horizontal" ng-submit="ctrl.sendSettings()"><fieldset>

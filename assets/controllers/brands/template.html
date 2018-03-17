@@ -4,17 +4,17 @@
 
 <div ng-repeat="line in ctrl.items">
     <h2 id="char{{info.id}}" ng-repeat-start="info in line">→ {{info.char}}</h2>
-    <div class="brand-icons" ng-repeat-end>
-        <div ng-repeat="brand in info.brands">
+    <div class="brand-icons row" ng-repeat-end>
+        <div ng-repeat="brand in info.brands" class="col-12 col-sm-6 col-md-4 col-lg-3">
             <a ng-href="{{brand.url}}" class="brandicon brandicon-{{brand.cssClass}}"></a>
             <h4>
                 <a ng-href="{{brand.url}}" ng-bind="brand.name"></a>
-                <small>({{brand.totalCars - brand.newCars}}<span 
-                    ng-if="brand.newCars > 0" 
-                    data-href="{{brand.new_cars_url}}" 
-                    data-toggle="popover" 
-                    data-container="body" 
-                    class="popover-handler" 
+                <small>({{brand.totalCars - brand.newCars}}<span
+                    ng-if="brand.newCars > 0"
+                    data-href="{{brand.new_cars_url}}"
+                    data-toggle="popover"
+                    data-container="body"
+                    class="popover-handler"
                     translate-attr="{title: 'brands/new-cars-of-brand'}"
                     translate-values="{brand: brand.name}"
                     ng-bind="'+' + brand.newCars"></span>)</small>

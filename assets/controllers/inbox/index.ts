@@ -1,7 +1,6 @@
 import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
-import { chunkBy } from 'chunk';
 
 const CONTROLLER_NAME = 'InboxController';
 const STATE_NAME = 'inbox';
@@ -14,22 +13,21 @@ export class InboxController {
     public pictures: any[] = [];
     public paginator: autowp.IPaginator;
     public brand_id: number;
-    public chunks: any[];
     public current: any;
     public prev: any;
     public next: any;
     public brands: any[];
-  
+
     constructor(
-        private $scope: autowp.IControllerScope, 
-        private $http: ng.IHttpService, 
+        private $scope: autowp.IControllerScope,
+        private $http: ng.IHttpService,
         private $state: any
     ) {
         if (! $scope.user) {
             this.$state.go('login');
             return;
         }
-        
+
         if (! this.$state.params.brand) {
             this.$state.go(STATE_NAME, {
                 brand: ALL_BRANDS,
@@ -41,15 +39,15 @@ export class InboxController {
             });
             return;
         }
-        
+
         var self = this;
-        
+
         if (this.$state.params.brand == ALL_BRANDS) {
             this.brand_id = 0;
         } else {
             this.brand_id = this.$state.params.brand ? parseInt(this.$state.params.brand) : 0;
         }
-        
+
         this.$scope.pageEnv({
             layout: {
                 blankPage: false,
@@ -58,7 +56,7 @@ export class InboxController {
             name: 'page/76/name',
             pageId: 76
         });
-        
+
         this.$http({
             method: 'GET',
             url: '/api/inbox',
@@ -73,7 +71,7 @@ export class InboxController {
             self.current = response.data.current;
             self.next = response.data.next;
             self.brands = response.data.brands;
-            
+
             if (self.$state.params.date != self.current.date) {
                 self.$state.go(STATE_NAME, {
                     date: self.current.date,
@@ -85,13 +83,13 @@ export class InboxController {
                 });
                 return;
             }
-            
+
             self.$http({
                 method: 'GET',
                 url: '/api/picture',
                 params: {
                     status: 'inbox',
-                    fields: 'owner,thumbnail,votes,views,comments_count,name_html,name_text',
+                    fields: 'owner,thumb_medium,votes,views,comments_count,name_html,name_text',
                     limit: 30,
                     page: self.$state.params.page,
                     item_id: self.brand_id,
@@ -100,7 +98,6 @@ export class InboxController {
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
                 self.pictures = response.data.pictures;
-                self.chunks = chunkBy(self.pictures, 6);
                 self.paginator = response.data.paginator;
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
@@ -109,7 +106,7 @@ export class InboxController {
             notify.response(response);
         });
     }
-  
+
     public changeBrand() {
         this.$state.go('.', {
             brand: this.brand_id,

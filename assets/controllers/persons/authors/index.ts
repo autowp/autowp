@@ -11,15 +11,15 @@ export class PersonsAuthorsController {
     static $inject = ['$scope', '$http', '$state', 'ItemService'];
     public paginator: autowp.IPaginator;
     public items: autowp.IItem[];
-  
+
     constructor(
         private $scope: autowp.IControllerScope,
-        private $http: ng.IHttpService, 
+        private $http: ng.IHttpService,
         private $state: any,
         private ItemService: ItemService
     ) {
         var self = this;
-        
+
         this.$scope.pageEnv({
             layout: {
                 blankPage: false,
@@ -28,12 +28,12 @@ export class PersonsAuthorsController {
             name: 'page/214/name',
             pageId: 214
         });
-          
+
         this.ItemService.getItems({
             type_id: 8,
             fields: ['name_html,name_default,description,has_text',
                      'url,more_pictures_url',
-                     'preview_pictures.picture.thumbnail,total_pictures'].join(','),
+                     'preview_pictures.picture.thumb_medium,total_pictures'].join(','),
             'descendant_pictures[status]': 'accepted',
             'descendant_pictures[type_id]': 2,
             'preview_pictures[type_id]': 2,
@@ -41,10 +41,10 @@ export class PersonsAuthorsController {
             limit: 10,
             page: this.$state.params.page
         }).then(function(response: autowp.GetItemsResult) {
-            
+
             self.items = response.items;
             self.paginator = response.paginator;
-            
+
         }, function() {
             $state.go('error-404');
         });
@@ -55,7 +55,7 @@ angular.module(Module)
     .controller(CONTROLLER_NAME, PersonsAuthorsController)
     .config(['$stateProvider',
         function config($stateProvider: any) {
-            $stateProvider.state( { 
+            $stateProvider.state( {
                 name: STATE_NAME,
                 url: '/persons/authors?page',
                 controller: CONTROLLER_NAME,

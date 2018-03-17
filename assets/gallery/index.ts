@@ -1,6 +1,9 @@
-import * as $ from "jquery";
-import * as filesize from "filesize";
-import "./gallery.scss";
+import * as $ from 'jquery';
+import * as filesize from 'filesize';
+import './gallery.scss';
+import Util from 'bootstrap/js/src/util';
+
+console.log(Util);
 
 interface Dimension {
     width: number;
@@ -14,7 +17,352 @@ interface Bounds {
     height: number;
 }
 
+/**
+ * ------------------------------------------------------------------------
+ * Constants
+ * ------------------------------------------------------------------------
+ */
+
+const NAME = 'carousel';
+const EVENT_KEY = '.bs.carousel';
+const ARROW_LEFT_KEYCODE = 37; // KeyboardEvent.which value for left arrow key
+const ARROW_RIGHT_KEYCODE = 39; // KeyboardEvent.which value for right arrow key
+
+const Default = {
+    keyboard: true,
+    slide: false
+};
+
+const DefaultType = {
+    keyboard: 'boolean',
+    slide: '(boolean|string)'
+};
+
+const Direction = {
+    NEXT: 'next',
+    PREV: 'prev',
+    LEFT: 'left',
+    RIGHT: 'right'
+};
+
+const Event = {
+    SLIDE: `slide${EVENT_KEY}`,
+    SLID: `slid${EVENT_KEY}`,
+    KEYDOWN: `keydown${EVENT_KEY}`
+};
+
+const ClassName = {
+    CAROUSEL: 'carousel',
+    ACTIVE: 'active',
+    SLIDE: 'slide',
+    RIGHT: 'carousel-item-right',
+    LEFT: 'carousel-item-left',
+    NEXT: 'carousel-item-next',
+    PREV: 'carousel-item-prev',
+    ITEM: 'carousel-item'
+};
+
+const Selector = {
+    ACTIVE: '.active',
+    ACTIVE_ITEM: '.active.carousel-item',
+    ITEM: '.carousel-item',
+    NEXT_PREV: '.carousel-item-next, .carousel-item-prev'
+};
+
+const MILLISECONDS_MULTIPLIER = 1000
+
+function getTransitionDurationFromElement(element) {
+    if (!element) {
+        return 0;
+    }
+
+    // Get transition-duration of the element
+    let transitionDuration = $(element).css('transition-duration');
+    const floatTransitionDuration = parseFloat(transitionDuration);
+
+    // Return 0 if element or transition duration is not found
+    if (!floatTransitionDuration) {
+        return 0;
+    }
+
+    // If multiple durations are defined, take the first
+    transitionDuration = transitionDuration.split(',')[0];
+
+    return parseFloat(transitionDuration) * MILLISECONDS_MULTIPLIER;
+}
+
+/**
+ * ------------------------------------------------------------------------
+ * Class Definition
+ * ------------------------------------------------------------------------
+ */
+
 class Carousel {
+    private _items = null;
+    private _activeElement = null;
+
+    private _isSliding = false;
+
+    private _config;
+
+    private _element;
+
+    private _onSlide: Function;
+
+    constructor(element, config, onSlide) {
+        this._config = this._getConfig(config);
+        this._element = $(element)[0];
+        this._onSlide = onSlide;
+
+        this._addEventListeners();
+    }
+
+    // Getters
+
+    static get Default() {
+        return Default;
+    }
+
+    // Public
+
+    next() {
+        if (!this._isSliding) {
+            this._slide(Direction.NEXT);
+        }
+    }
+
+    nextWhenVisible() {
+        // Don't call next when the page isn't visible
+        // or the carousel or its parent isn't visible
+        if (
+            !document.hidden &&
+            ($(this._element).is(':visible') &&
+                $(this._element).css('visibility') !== 'hidden')
+        ) {
+            this.next();
+        }
+    }
+
+    prev() {
+        if (!this._isSliding) {
+            this._slide(Direction.PREV);
+        }
+    }
+
+    to(index) {
+        this._activeElement = $(this._element).find(Selector.ACTIVE_ITEM)[0];
+
+        const activeIndex = this._getItemIndex(this._activeElement);
+
+        if (index > this._items.length - 1 || index < 0) {
+            return;
+        }
+
+        if (this._isSliding) {
+            $(this._element).one(Event.SLID, () => this.to(index));
+            return;
+        }
+
+        if (activeIndex === index) {
+            return;
+        }
+
+        const direction = index > activeIndex ? Direction.NEXT : Direction.PREV;
+
+        this._slide(direction, this._items[index]);
+    }
+
+    dispose() {
+        $(this._element).off(EVENT_KEY);
+
+        this._items = null;
+        this._config = null;
+        this._element = null;
+        this._isSliding = null;
+        this._activeElement = null;
+    }
+
+    // Private
+
+    _getConfig(config) {
+        config = {
+            ...Default,
+            ...config
+        };
+        Util.typeCheckConfig(NAME, config, DefaultType);
+        return config;
+    }
+
+    _addEventListeners() {
+        if (this._config.keyboard) {
+            $(this._element).on(Event.KEYDOWN, event => this._keydown(event));
+        }
+    }
+
+    _keydown(event) {
+        if (/input|textarea/i.test(event.target.tagName)) {
+            return;
+        }
+
+        switch (event.which) {
+            case ARROW_LEFT_KEYCODE:
+                event.preventDefault();
+                this.prev();
+                break;
+            case ARROW_RIGHT_KEYCODE:
+                event.preventDefault();
+                this.next();
+                break;
+            default:
+        }
+    }
+
+    _getItemIndex(element) {
+        this._items = $.makeArray(
+            $(element)
+                .parent()
+                .find(Selector.ITEM)
+        );
+        return this._items.indexOf(element);
+    }
+
+    _getItemByDirection(direction, activeElement) {
+        const isNextDirection = direction === Direction.NEXT;
+        const isPrevDirection = direction === Direction.PREV;
+        const activeIndex = this._getItemIndex(activeElement);
+        const lastItemIndex = this._items.length - 1;
+        const isGoingToWrap =
+            (isPrevDirection && activeIndex === 0) ||
+            (isNextDirection && activeIndex === lastItemIndex);
+
+        if (isGoingToWrap) {
+            return activeElement;
+        }
+
+        const delta = direction === Direction.PREV ? -1 : 1;
+        const itemIndex = (activeIndex + delta) % this._items.length;
+
+        return itemIndex === -1
+            ? this._items[this._items.length - 1]
+            : this._items[itemIndex];
+    }
+
+    _triggerSlideEvent(relatedTarget, eventDirectionName) {
+        const targetIndex = this._getItemIndex(relatedTarget);
+        const fromIndex = this._getItemIndex(
+            $(this._element).find(Selector.ACTIVE_ITEM)[0]
+        );
+        const slideEvent = $.Event(Event.SLIDE, {
+            relatedTarget,
+            direction: eventDirectionName,
+            from: fromIndex,
+            to: targetIndex
+        });
+
+        $(this._element).trigger(slideEvent);
+
+        return slideEvent;
+    }
+
+    _slide(direction, element?) {
+        const activeElement = $(this._element).find(Selector.ACTIVE_ITEM)[0];
+        const activeElementIndex = this._getItemIndex(activeElement);
+        const nextElement =
+            element ||
+            (activeElement &&
+                this._getItemByDirection(direction, activeElement));
+        const nextElementIndex = this._getItemIndex(nextElement);
+
+        let directionalClassName;
+        let orderClassName;
+        let eventDirectionName;
+
+        if (direction === Direction.NEXT) {
+            directionalClassName = ClassName.LEFT;
+            orderClassName = ClassName.NEXT;
+            eventDirectionName = Direction.LEFT;
+        } else {
+            directionalClassName = ClassName.RIGHT;
+            orderClassName = ClassName.PREV;
+            eventDirectionName = Direction.RIGHT;
+        }
+
+        if (nextElement && $(nextElement).hasClass(ClassName.ACTIVE)) {
+            this._isSliding = false;
+            return;
+        }
+
+        const slideEvent = this._triggerSlideEvent(
+            nextElement,
+            eventDirectionName
+        );
+        if (slideEvent.isDefaultPrevented()) {
+            return;
+        }
+
+        if (!activeElement || !nextElement) {
+            // Some weirdness is happening, so we bail
+            return;
+        }
+
+        if (this._onSlide) {
+            this._onSlide(nextElement, direction);
+        }
+
+        this._isSliding = true;
+
+        const slidEvent = $.Event(Event.SLID, {
+            relatedTarget: nextElement,
+            direction: eventDirectionName,
+            from: activeElementIndex,
+            to: nextElementIndex
+        });
+
+        if (
+            Util.supportsTransitionEnd() &&
+            $(this._element).hasClass(ClassName.SLIDE)
+        ) {
+            $(nextElement).addClass(orderClassName);
+
+            Util.reflow(nextElement);
+
+            $(activeElement).addClass(directionalClassName);
+            $(nextElement).addClass(directionalClassName);
+
+            const transitionDuration = getTransitionDurationFromElement(
+                activeElement
+            );
+
+            $(activeElement)
+                .one(Util.TRANSITION_END, () => {
+                    $(nextElement)
+                        .removeClass(
+                            `${directionalClassName} ${orderClassName}`
+                        )
+                        .addClass(ClassName.ACTIVE);
+
+                    $(activeElement).removeClass(
+                        `${
+                            ClassName.ACTIVE
+                        } ${orderClassName} ${directionalClassName}`
+                    );
+
+                    this._isSliding = false;
+
+                    setTimeout(() => $(this._element).trigger(slidEvent), 0);
+                })
+                .emulateTransitionEnd(transitionDuration);
+        } else {
+            $(activeElement).removeClass(ClassName.ACTIVE);
+            $(nextElement).addClass(ClassName.ACTIVE);
+
+            this._isSliding = false;
+            $(this._element).trigger(slidEvent);
+        }
+    }
+}
+
+/*class Carousel {
 
     private $element: JQuery;
     private sliding: any = null;
@@ -121,7 +469,7 @@ class Carousel {
 
         this.sliding = true;
 
-        if ($.support.transition && this.$element.hasClass('slide')) {
+        if (this.$element.hasClass('slide')) {
             $next.addClass(type);
             $next[0].offsetWidth; // jshint ignore:line
             $active.addClass(direction);
@@ -140,11 +488,10 @@ class Carousel {
 
         return this;
     }
-}
+}*/
 
 export class Gallery {
-
-    private MAX_INDICATORS: number = 80;
+    private MAX_INDICATORS: number = 30;
     private count: number = 0;
     private pages: number = 0;
     private pageStatus: any[] = [];
@@ -152,7 +499,10 @@ export class Gallery {
     private current: any;
     private url: string;
 
-    private escHandler: (eventObject: JQueryEventObject, ...eventData: any[]) => any;
+    private escHandler: (
+        eventObject: JQueryEventObject,
+        ...eventData: any[]
+    ) => any;
     private $e: JQuery;
     private $carousel: JQuery;
     private $inner: JQuery;
@@ -167,100 +517,116 @@ export class Gallery {
     }
 
     public destroy() {
-        this.carousel.destroy();
+        this.carousel.dispose();
     }
 
     private init(options: any) {
-
         var self = this;
 
         this.current = options.current;
         this.url = options.url;
 
-        this.escHandler = (event) => {
-            if (event.keyCode == 27) { // esc
-                self.hide();
+        this.escHandler = event => {
+            if (event.keyCode == 27) {
+                // esc
+                //self.hide();
             }
         };
 
         this.$e = $(require('./gallery.html'));
 
-        var $carousel = this.$e.find('.carousel');
-        this.$carousel = $carousel;
+        this.$carousel = this.$e.find('.carousel');
 
-        this.$inner = $carousel.find('.carousel-inner');
+        this.$inner = this.$carousel.find('.carousel-inner');
 
         this.$e.appendTo(document.body);
 
         this.$indicators = this.$e.find('.carousel-indicators');
         this.$numbers = this.$e.find('.carousel-numbers');
 
-        this.carousel = new Carousel(this.$carousel[0], {
-            wrap: false,
-            slide: function(relatedTarget: any) {
-                var $item = $(relatedTarget);
+        this.carousel = new Carousel(this.$carousel[0], {}, (relatedTarget: any) => {
+            var $item = $(relatedTarget);
 
-                self.activateItem($item, true);
-                self.fixArrows($item);
+            this.activateItem($item, true);
+            this.fixArrows($item);
 
-                var position = $item.data('position');
+            var position = $item.data('position');
 
-                self.position = position;
-                self.refreshIndicator();
+            this.position = position;
+            this.refreshIndicator();
 
-                self.loadSiblingPages(position);
+            this.loadSiblingPages(position);
 
-                self.$indicators.find('li.active').removeClass('active');
-                self.$indicators.find('li').eq(position).addClass('active');
-            }
-        });
+            this.$indicators.find('li.active').removeClass('active');
+            this.$indicators
+                .find('li')
+                .eq(position)
+                .addClass('active');
+        }
+        );
 
-        $carousel.find('.carousel-control.close').on('click', (event: JQueryEventObject) => {
-            event.preventDefault();
-
-            self.hide();
-        });
-
-        $carousel.on('click', '.item .details.carousel-control', (event: JQueryEventObject) => {
-            if ($(event.currentTarget).attr('href') == window.location.pathname) {
-                self.hide();
+        this.$carousel
+            .find('.carousel-control-close')
+            .on('click', (event: JQueryEventObject) => {
                 event.preventDefault();
-            }
-        });
 
-        $carousel.on('click', '.item .comments.carousel-control', (event: JQueryEventObject) => {
-            let src = window.location.pathname.replace('#comments', '');
-            let href = $(event.currentTarget).attr('href');
-            if (href) {
-                let dst = href.replace('#comments', '');
-                if (src == dst) {
+                self.hide();
+            });
+
+        this.$carousel.on(
+            'click',
+            '.item .details.carousel-control',
+            (event: JQueryEventObject) => {
+                if (
+                    $(event.currentTarget).attr('href') ==
+                    window.location.pathname
+                ) {
                     self.hide();
-                    var offset = $("#comments").offset();
-                    if (offset !== undefined) {
-                        $('body').scrollTop(offset.top);
-                    }
                     event.preventDefault();
                 }
             }
-        });
+        );
 
-        $carousel.on('click', '.item img, .item .full.carousel-control', (event: JQueryEventObject) =>  {
-
-            var $item = $(event.currentTarget).closest('.item');
-            var crop = $item.data('crop');
-            if (crop) {
-                var cropMode = !$item.data('cropMode');
-                $item.data('cropMode', cropMode);
-                if (cropMode) {
-                    $item.addClass('crop');
-                } else {
-                    $item.removeClass('crop');
+        this.$carousel.on(
+            'click',
+            '.item .comments.carousel-control',
+            (event: JQueryEventObject) => {
+                let src = window.location.pathname.replace('#comments', '');
+                let href = $(event.currentTarget).attr('href');
+                if (href) {
+                    let dst = href.replace('#comments', '');
+                    if (src == dst) {
+                        self.hide();
+                        var offset = $('#comments').offset();
+                        if (offset !== undefined) {
+                            $('body').scrollTop(offset.top);
+                        }
+                        event.preventDefault();
+                    }
                 }
-                self.fixSize($item);
             }
-        });
+        );
 
-        $carousel.on('click', '.carousel-indicators li', (event) => {
+        this.$carousel.on(
+            'click',
+            '.item img, .item .carousel-control-full',
+            (event: JQueryEventObject) => {
+                var $item = $(event.currentTarget).closest('.item');
+                var crop = $item.data('crop');
+                if (crop) {
+                    var cropMode = !$item.data('cropMode');
+                    $item.data('cropMode', cropMode);
+                    if (cropMode) {
+                        $item.addClass('crop');
+                    } else {
+                        $item.removeClass('crop');
+                    }
+                    self.fixSize($item);
+                }
+            }
+        );
+
+        this.$carousel.on('click', '.carousel-indicators li', event => {
             event.preventDefault();
 
             var position = $(event.currentTarget).data('target');
@@ -272,13 +638,13 @@ export class Gallery {
             });
         });
 
-        $carousel.on('click', '.right.carousel-control', (event) => {
+        this.$carousel.on('click', '.carousel-control-next', event => {
             event.preventDefault();
 
             self.carousel.next();
         });
 
-        $carousel.on('click', '.left.carousel-control', (event) => {
+        this.$carousel.on('click', '.carousel-control-prev', event => {
             event.preventDefault();
 
             self.carousel.prev();
@@ -295,7 +661,7 @@ export class Gallery {
     private renderIndicator() {
         if (this.count < this.MAX_INDICATORS) {
             if (!this.indicatorRendered) {
-                for (var i=0; i<this.count; i++) {
+                for (var i = 0; i < this.count; i++) {
                     $('<li></li>', {
                         'data-target': i,
                         appendTo: this.$indicators
@@ -316,7 +682,11 @@ export class Gallery {
         this.load(null, nextPage);
     }
 
-    private load(pictureId: number|null, page: number = 0, callback: Function|undefined = undefined) {
+    private load(
+        pictureId: number | null,
+        page: number = 0,
+        callback: Function | undefined = undefined
+    ) {
         var self = this;
         if (page) {
             var loaded = false;
@@ -325,13 +695,17 @@ export class Gallery {
                 loaded = true;
             }
             if (loaded) {
-                if (callback) { callback(); }
+                if (callback) {
+                    callback();
+                }
                 return;
             }
 
             self.pageStatus[page] = 'loading';
         }
-        $.getJSON(this.url, {pictureId: pictureId, page: page}, function(json) {
+        $.getJSON(this.url, { pictureId: pictureId, page: page }, function(
+            json
+        ) {
             self.count = json.count;
             self.pages = json.pages;
 
@@ -340,7 +714,7 @@ export class Gallery {
             }
             self.pageStatus[json.page] = 'loaded';
 
-            let $activeItem: JQuery|undefined = undefined;
+            let $activeItem: JQuery | undefined = undefined;
 
             var offset = self.perPage * (json.page - 1);
             for (let idx in json.items) {
@@ -382,23 +756,32 @@ export class Gallery {
                 self.activateItem($activeItem, true);
                 self.fixArrows($activeItem);
 
-                self.$indicators.find('li').eq($activeItem.data('position')).addClass('active');
+                self.$indicators
+                    .find('li')
+                    .eq($activeItem.data('position'))
+                    .addClass('active');
             }
 
-            self.loadSiblingPages(self.$inner.find('.item.active').data('position'));
+            self.loadSiblingPages(
+                self.$inner.find('.item.active').data('position')
+            );
 
-            if (callback) { callback(); }
+            if (callback) {
+                callback();
+            }
         });
     }
 
     private renderItem(item: any) {
-        var $loading = $('<div class="loading-icon"><i class="fa fa-spinner fa-pulse"></i></div>');
+        var $loading = $(
+            '<div class="loading-icon"><i class="fa fa-spinner fa-pulse"></i></div>'
+        );
 
         var $source = $(
             '<a class="download carousel-control" role="button">' +
                 '<i class="fa fa-download"></i>' +
                 '<div class="badge badge-pill badge-info"></div>' +
-            '</a>'
+                '</a>'
         ).attr('href', item.sourceUrl);
 
         $source.find('.badge').text(filesize(item.filesize));
@@ -406,13 +789,13 @@ export class Gallery {
         var $details = $(
             '<a class="details carousel-control" role="button">' +
                 '<i class="fa fa-picture-o"></i>' +
-            '</a>'
+                '</a>'
         ).attr('href', item.url);
 
         var $comments = $(
             '<a class="comments carousel-control" role="button">' +
                 '<i class="fa fa-comment"></i>' +
-            '</a>'
+                '</a>'
         ).attr('href', item.url + '#comments');
 
         if (item.messages) {
@@ -434,7 +817,7 @@ export class Gallery {
             '<div class="carousel-caption">' +
                 '<h3></h3>' +
                 //'<p></p>' +
-            '</div>'
+                '</div>'
         );
 
         $caption.find('h3').html(item.name);
@@ -452,7 +835,10 @@ export class Gallery {
                     let nodeOffset = $(node).offset();
                     let nodeHeight = $(node).height();
                     var winCenter = winHeight === undefined ? 0 : winHeight / 2;
-                    var nodeCenter = nodeOffset === undefined || nodeHeight === undefined ? 0 : nodeOffset.top + nodeHeight / 2;
+                    var nodeCenter =
+                        nodeOffset === undefined || nodeHeight === undefined
+                            ? 0
+                            : nodeOffset.top + nodeHeight / 2;
 
                     return winCenter > nodeCenter ? 'bottom' : 'top';
                 }
@@ -460,7 +846,7 @@ export class Gallery {
             areas.push($area);
         });
 
-        var $item = $('<div class="item loading"></div>')
+        var $item = $('<div class="carousel-item item loading"></div>')
             .data({
                 id: item.id,
                 full: item.full,
@@ -474,21 +860,14 @@ export class Gallery {
             .append($loading);
 
         if (item.crop) {
-            $(
-                '<a class="full carousel-control" role="button">' +
-                    '<i class="fa fa-arrows-alt"></i>' +
-                '</a>'
-            ).appendTo($item);
-
+            $('<span class="carousel-control-full"><i class="fa fa-arrows-alt"></i></span>').appendTo($item);
         }
 
         return $item;
     }
 
     private activateItem($item: JQuery, siblings: boolean) {
-
         if (!$item.data('activated')) {
-
             $item.data('activated', true);
 
             var crop = $item.data('crop');
@@ -503,7 +882,7 @@ export class Gallery {
                 var $imgCrop = $('<img />', {
                     src: crop.src,
                     alt: '',
-                    'class': 'crop'
+                    class: 'crop'
                 });
                 $item.prepend($imgCrop);
             }
@@ -511,15 +890,13 @@ export class Gallery {
             var $img = $('<img />', {
                 src: full.src,
                 alt: '',
-                'class': 'full'
+                class: 'full'
             });
 
             $img.bind('load', function() {
                 $img.closest('.item').removeClass('loading');
             });
             $item.prepend($img);
-
-
         }
 
         if (siblings) {
@@ -537,17 +914,16 @@ export class Gallery {
     }
 
     private fixArrows($item: JQuery) {
-        var $left = this.$e.find('.carousel-control.left');
-        var $right = this.$e.find('.carousel-control.right');
+        var $left = this.$e.find('.carousel-control-prev');
+        var $right = this.$e.find('.carousel-control-next');
 
         var pos = $item.data('position');
 
         $left.toggle(pos > 0);
-        $right.toggle(pos < this.count-1);
+        $right.toggle(pos < this.count - 1);
     }
 
     private bound(container: Dimension, content: Dimension): Dimension {
-
         var containerRatio = container.width / container.height;
         var contentRatio = content.width / content.height;
 
@@ -576,7 +952,10 @@ export class Gallery {
     }
 
     private maxBounds(bounds: Dimension, maxBounds: Dimension): Dimension {
-        if (bounds.height > maxBounds.height || bounds.width > maxBounds.width) {
+        if (
+            bounds.height > maxBounds.height ||
+            bounds.width > maxBounds.width
+        ) {
             return maxBounds;
         }
         return bounds;
@@ -617,15 +996,17 @@ export class Gallery {
             var offsetBounds: Bounds;
 
             if (crop) {
-
                 if (cropMode) {
-                    bounds = self.maxBounds(self.bound(cSize, {
-                        width: crop.width,
-                        height: crop.height
-                    }), {
-                        width: crop.width,
-                        height: crop.height
-                    });
+                    bounds = self.maxBounds(
+                        self.bound(cSize, {
+                            width: crop.width,
+                            height: crop.height
+                        }),
+                        {
+                            width: crop.width,
+                            height: crop.height
+                        }
+                    );
 
                     offsetBounds = self.boundCenter(cSize, bounds);
                     $imgCrop.css({
@@ -651,13 +1032,16 @@ export class Gallery {
 
                     self.areasToBounds($item, imgFullBounds);
                 } else {
-                    bounds = self.maxBounds(self.bound(cSize, {
-                        width: full.width,
-                        height: full.height
-                    }), {
-                        width: full.width,
-                        height: full.height
-                    });
+                    bounds = self.maxBounds(
+                        self.bound(cSize, {
+                            width: full.width,
+                            height: full.height
+                        }),
+                        {
+                            width: full.width,
+                            height: full.height
+                        }
+                    );
                     offsetBounds = self.boundCenter(cSize, bounds);
                     $imgFull.css({
                         width: offsetBounds.width,
@@ -669,23 +1053,25 @@ export class Gallery {
                         left: offsetBounds.left + crop.crop.left * bounds.width,
                         top: offsetBounds.top + crop.crop.top * bounds.height,
                         width: bounds.width * crop.crop.width,
-                        height: bounds.height * crop.crop.height,
+                        height: bounds.height * crop.crop.height
                     });
 
                     self.areasToBounds($item, offsetBounds);
                 }
-
             } else {
                 if (!full) {
-                    throw "Full is undefined";
+                    throw 'Full is undefined';
                 }
-                bounds = self.maxBounds(self.bound(cSize, {
-                    width: full.width,
-                    height: full.height
-                }), {
-                    width: full.width,
-                    height: full.height
-                });
+                bounds = self.maxBounds(
+                    self.bound(cSize, {
+                        width: full.width,
+                        height: full.height
+                    }),
+                    {
+                        width: full.width,
+                        height: full.height
+                    }
+                );
                 offsetBounds = self.boundCenter(cSize, bounds);
                 $imgFull.css({
                     width: offsetBounds.width,
@@ -703,9 +1089,9 @@ export class Gallery {
         this.$e.hide();
         $(document.body).removeClass('gallery-shown');
 
-        this.carousel.hide();
+        // this.carousel.hide();
 
-        $(document).off("keyup", this.escHandler);
+        $(document).off('keyup', this.escHandler);
     }
 
     private show() {
@@ -713,11 +1099,11 @@ export class Gallery {
         this.$e.show();
         this.fixSize(this.$e.find('.item'));
 
-        $(document).on("keyup", this.escHandler);
+        $(document).on('keyup', this.escHandler);
 
-        this.$e.find('a.carousel-control.right').focus();
+        this.$e.find('a.carousel-control-next').focus();
 
-        this.carousel.show();
+        //this.carousel.show();
     }
 
     private rewindToPosition(position: number) {
@@ -753,8 +1139,7 @@ export class Gallery {
 
     private refreshIndicator() {
         if (this.count >= this.MAX_INDICATORS) {
-            this.$numbers.text(this.position + ' of ' + this.count);
+            this.$numbers.text((this.position+1) + ' of ' + this.count);
         }
     }
 }
-

@@ -138,10 +138,10 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('http://www.autowp.ru/api/picture', Request::METHOD_GET, [
-            'fields' => 'owner,thumbnail,add_date,iptc,exif,image,items.item.name_html,' .
+            'fields' => 'owner,thumb_medium,add_date,iptc,exif,image,items.item.name_html,' .
                         'items.item.brands.name_html,special_name,copyrights,' .
                         'change_status_user,rights,moder_votes,moder_voted,' .
-                        'is_last,views,accepted_count,similar.picture.thumbnail,' .
+                        'is_last,views,accepted_count,similar.picture.thumb_medium,' .
                         'replaceable,siblings.name_text,ip.rights,ip.blacklist',
             'limit'  => 100
         ]);

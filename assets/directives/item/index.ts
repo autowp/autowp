@@ -37,21 +37,6 @@ class AutowpItemController {
     public canHavePhoto(item: any) {
         return [1, 2, 5, 6, 7].indexOf(item.item_type_id) != -1;
     };
-
-    public thumbnailClasses(picture: any, $index: number) {
-
-        var thumbColumns = 4;
-        var singleThumbPart = Math.round(12 / thumbColumns);
-
-        var classes: any = {};
-        var col = picture.large && $index === 0  ? 2*singleThumbPart : singleThumbPart;
-        var colSm = picture.large && $index === 0  ? 12 : 6;
-
-        classes['col-md-'+col] = true;
-        classes['col-sm-'+colSm] = true;
-
-        return classes;
-    };
 }
 
 class AutowpItemDirective implements ng.IDirective {

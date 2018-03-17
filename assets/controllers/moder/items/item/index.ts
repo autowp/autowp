@@ -58,6 +58,8 @@ export class ModerItemsItemController {
     public childs: any[] = [];
     public suggestions: any[] = [];
 
+    private randomPicture: any;
+
     public newLink = {
         name: '',
         url: '',
@@ -298,6 +300,24 @@ export class ModerItemsItemController {
                         });
                     }
                 });
+
+
+            self.loading++;
+            $http({
+                method: 'GET',
+                url: '/api/picture',
+                params: {
+                    fields: 'thumb_medium',
+                    limit: 1,
+                    item_id: self.item.id
+                }
+            }).then(function(response: ng.IHttpResponse<any>) {
+                self.randomPicture = response.data.pictures.length > 0 ? response.data.pictures[0] : null;
+                console.log(self.randomPicture);
+                self.loading--;
+            }, function() {
+                self.loading--;
+            });
 
             self.loading--;
         }, function() {

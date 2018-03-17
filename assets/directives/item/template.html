@@ -12,15 +12,35 @@
 
     <h4 ng-bind="item.name_default" ng-if="item.name_default"></h4>
 
-    <div class="row">
-        <div ng-class="ctrl.thumbnailClasses(picture, $index)" ng-if="ctrl.havePhoto(item)" ng-repeat="picture in item.preview_pictures">
+    <div class="row" ng-if="ctrl.havePhoto(item) && item.preview_pictures.length > 4">
+        <div class="col-12 col-lg-6" ng-repeat="picture in item.preview_pictures.slice(0, 1)">
             <a ng-href="{{picture.url}}" ng-if="picture.picture.thumb_medium" class="d-block rounded mb-4">
                 <img ng-src="{{picture.picture.thumb_medium.src}}" alt="{{picture.picture.name}}" title="{{picture.picture.name}}" class="rounded w-100 border border-light" />
             </a>
             <span ng-if="!picture">&#xa0;</span>
         </div>
+        <div class="col-12 col-lg-6">
+            <div class="row">
+                <div class="col-6" ng-repeat="picture in item.preview_pictures.slice(1)">
+                    <a ng-href="{{picture.url}}" ng-if="picture.picture.thumb_medium" class="d-block rounded mb-4">
+                        <img ng-src="{{picture.picture.thumb_medium.src}}" alt="{{picture.picture.name}}" title="{{picture.picture.name}}" class="rounded w-100 border border-light" />
+                    </a>
+                    <span ng-if="!picture">&#xa0;</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-if="ctrl.havePhoto(item) && item.preview_pictures.length &lt;= 4">
+        <div class="col-6 col-lg-3" ng-repeat="picture in item.preview_pictures">
+            <a ng-href="{{picture.url}}" ng-if="picture.picture.thumb_medium" class="d-block rounded mb-4">
+                <img ng-src="{{picture.picture.thumb_medium.src}}" alt="{{picture.picture.name}}" title="{{picture.picture.name}}" class="rounded w-100 border border-light" />
+            </a>
+            <span ng-if="!picture">&#xa0;</span>
+        </div>
+    </div>
 
-        <div class="col-md-3 col-sm-6" ng-if="!ctrl.havePhoto(item) && ctrl.canHavePhoto(item)">
+    <div class="row" ng-if="!ctrl.havePhoto(item) && ctrl.canHavePhoto(item)">
+        <div class="col-6 col-lg-3">
             <div class="no-photo rounded w-100 border border-light mb-4" ng-title="{{'carlist/no-photo'|translate}}">
                 <a ui-sref="upload({item_id: item.id})" title="{{'carlist/no-photo/add'|translate}}" class="fa fa-plus-circle text-success"></a>
                 <span class="fa fa-camera fa-lg fa-4x" aria-hidden="true"></span>

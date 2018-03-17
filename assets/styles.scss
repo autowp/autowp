@@ -6,8 +6,10 @@
 
 @import "~font-awesome/css/font-awesome.css";
 
-h2 small {
-    color: $text-muted;
+h2, h3 {
+    small {
+        color: $text-muted;
+    }
 }
 
 $color-white: #fff;
@@ -412,12 +414,7 @@ span.count {
 
 .brand-icons {
     > div {
-        display: inline-block;
-        width: 25%;
-        margin: 0 0 30px 0;
         min-height: 70px;
-        padding: 0 30px 0 0;
-        vertical-align: top;
     }
 }
 
