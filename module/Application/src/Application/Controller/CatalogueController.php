@@ -205,7 +205,7 @@ class CatalogueController extends AbstractActionController
             ]);
 
             $paginator
-                ->setItemCountPerPage($this->catalogue()->getPicturesPerPage())
+                ->setItemCountPerPage(24)
                 ->setCurrentPageNumber($this->params('page'));
 
             if ($paginator->getTotalItemCount() <= 0) {
