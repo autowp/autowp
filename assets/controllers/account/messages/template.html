@@ -17,8 +17,8 @@
                 </div>
                 <div class="photo">
                      <a ng-href="{{message.author.url}}" ng-if="! message.author.deleted">
-                        <img ng-src="{{message.author.avatar.src}}" ng-if="message.author.avatar" />
-                        <img ng-src="{{message.author.gravatar}}" ng-if="message.author.gravatar && ! message.author.avatar" />
+                        <img ng-src="{{message.author.avatar.src}}" ng-if="message.author.avatar" class="rounded" />
+                        <img ng-src="{{message.author.gravatar}}" ng-if="message.author.gravatar && ! message.author.avatar" class="rounded" />
                      </a>
                 </div>
                 <div class="content">

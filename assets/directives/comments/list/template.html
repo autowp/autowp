@@ -6,8 +6,8 @@
     </div>
     <div class="photo">
         <a ui-sref="users-user({identity: message.user.identity ? message.user.identity : 'user' + message.user.id})" class="photo" ng-if="message.user && !message.user.deleted">
-            <img ng-src="{{message.user.avatar.src}}" ng-if="message.user.avatar" />
-            <img ng-src="{{message.user.gravatar}}" ng-if="message.user.gravatar && ! message.user.avatar" />
+            <img ng-src="{{message.user.avatar.src}}" ng-if="message.user.avatar" class="rounded" />
+            <img ng-src="{{message.user.gravatar}}" ng-if="message.user.gravatar && ! message.user.avatar" class="rounded" />
         </a>
     </div>
     <div class="content">
