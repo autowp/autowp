@@ -17,10 +17,10 @@
 
 <div class="row">
     <div class="col-md-2">
-        <img ng-src="{{ctrl.picture.thumbnail.src}}" ng-if="ctrl.picture.thumbnail" />
+        <img ng-src="{{ctrl.picture.thumb.src}}" ng-if="ctrl.picture.thumb" class="rounded border border-light w-100" />
     </div>
-    <div class="col-md-5">
-        <div class="well">
+    <div class="col-md-6">
+        <div class="card card-body">
             <p translate="ng/moder/database-id-n" translate-values="{id: ctrl.picture.id}"></p>
             <p>
                 {{'moder/picture/public-url:'|translate}}
@@ -33,8 +33,8 @@
             <a ui-sref="log({picture_id: ctrl.picture.id})" translate>moder/log-of-events</a>
         </div>
     </div>
-    <div class="col-md-5">
-        <div class="well">
+    <div class="col-md-4">
+        <div class="card card-body">
             <p>{{'moder/picture/resolution:'|translate}}
             <b>{{ctrl.picture.width}}×{{ctrl.picture.height}}</b></p>
             <p ng-if="ctrl.picture.dpi_x || ctrl.picture.dpi_y">
@@ -47,7 +47,7 @@
 </div>
 
 <h3 translate>moder/picture/catalogue</h3>
-<div class="well">
+<div class="card card-body">
     <table class="table" ng-if="ctrl.picture.items.length">
         <thead>
             <tr>
@@ -72,37 +72,33 @@
                     </select>
                 </td>
                 <td ng-if="ctrl.picture.rights.crop">
-                    <a class="btn btn-default" ng-class="{'btn-success': item.area}" ui-sref="moder-pictures-item-area({id: ctrl.picture.id, item_id: item.item_id, type: item.type})" arial-label="Area" style="margin:0" ng-if="item.type == 1">
+                    <a class="btn btn-secondary" ng-class="{'btn-success': item.area}" ui-sref="moder-pictures-item-area({id: ctrl.picture.id, item_id: item.item_id, type: item.type})" arial-label="Area" style="margin:0" ng-if="item.type == 1">
                         <i class="fa fa-crop"></i>
                         {{'moder/picture/catalogue/pick-item-area'|translate}}
                     </a>
                 </td>
                 <td ng-if="ctrl.picture.rights.move">
                     <div class="btn-group" style="white-space:nowrap">
-                        <a ui-sref="moder-pictures-item-move({id: ctrl.picture.id, src_item_id: item.item_id, src_type: item.type})" class="btn btn-default">
+                        <a ui-sref="moder-pictures-item-move({id: ctrl.picture.id, src_item_id: item.item_id, src_type: item.type})" class="btn btn-secondary">
                             <i class="fa fa-arrow-right"></i>
                             {{'moder/picture/catalogue/move-to'|translate}} ...
                         </a>
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-if="item.type == 1">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-if="item.type == 1">
                             <span class="caret"></span>
                             <span class="sr-only">Toggle Dropdown</span>
                         </button>
-                        <ul class="dropdown-menu" ng-if="item.type == 1">
-                            <li ng-if="ctrl.last_item && !ctrl.hasItem(ctrl.last_item.id)">
-                                <a href="" ng-click="ctrl.moveItem(item.type, item.item_id, ctrl.last_item.id)">
-                                    <i class="fa fa-arrow-right"></i>
-                                    {{'moder/picture/catalogue/move-to'|translate}}
-                                    <span ng-bind-html="ctrl.last_item.name_html"></span>
-                                </a>
-                            </li>
-                            <li ng-repeat="brand in item.item.brands">
-                                <a ui-sref="moder-pictures-item-move({id: ctrl.picture.id, src_item_id: item.item_id, src_type: item.type, brand_id: brand.id})">
-                                    <i class="fa fa-arrow-right"></i>
-                                    {{'moder/picture/catalogue/move-to'|translate}}
-                                    <span ng-bind-html="brand.name_html"></span> ...
-                                </a>
-                            </li>
-                        </ul>
+                        <div class="dropdown-menu" ng-if="item.type == 1">
+                            <a class="dropdown-item" href="" ng-click="ctrl.moveItem(item.type, item.item_id, ctrl.last_item.id)" ng-if="ctrl.last_item && !ctrl.hasItem(ctrl.last_item.id)">
+                                <i class="fa fa-arrow-right"></i>
+                                {{'moder/picture/catalogue/move-to'|translate}}
+                                <span ng-bind-html="ctrl.last_item.name_html"></span>
+                            </a>
+                            <a ng-repeat="brand in item.item.brands" class="dropdown-item" ui-sref="moder-pictures-item-move({id: ctrl.picture.id, src_item_id: item.item_id, src_type: item.type, brand_id: brand.id})">
+                                <i class="fa fa-arrow-right"></i>
+                                {{'moder/picture/catalogue/move-to'|translate}}
+                                <span ng-bind-html="brand.name_html"></span> ...
+                            </a>
+                        </div>
                     </div>
                 </td>
                 <td ng-if="ctrl.picture.rights.move">
@@ -115,14 +111,14 @@
     </table>
     <div ng-if="ctrl.picture.rights.move">
         <div ng-if="ctrl.last_item && !ctrl.hasItem(ctrl.last_item.id)">
-            <button class="btn btn-default" ng-click="ctrl.addItem(ctrl.last_item, 1)">
+            <button class="btn btn-secondary" ng-click="ctrl.addItem(ctrl.last_item, 1)">
                 <i class="fa fa-plus"></i>
                 {{'moder/picture/catalogue/add-to'|translate}} (content)
                 <span ng-bind-html="ctrl.last_item.name_html"></span>
             </button>
         </div>
         <div ng-if="ctrl.last_item && !ctrl.hasItem(ctrl.last_item.id) && ctrl.last_item.item_type_id == 8">
-            <button class="btn btn-default" ng-click="ctrl.addItem(ctrl.last_item, 2)">
+            <button class="btn btn-secondary" ng-click="ctrl.addItem(ctrl.last_item, 2)">
                 <i class="fa fa-plus"></i>
                 {{'moder/picture/catalogue/add-to'|translate}} (author)
                 <span ng-bind-html="ctrl.last_item.name_html"></span>
@@ -135,7 +131,7 @@
             </a>
         </div>
     </div>
-    
+
     <div class="progress" ng-show="ctrl.pictureItemLoading">
         <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
         </div>
@@ -145,21 +141,21 @@
 <div class="row">
     <div class="col-md-6">
         <h3 translate>moder/picture/settings</h3>
-        <form class="well form-vertical">
+        <form class="card card-body form-vertical">
             <div>
                 <p class="text-danger">Achtung! High Voltage! Ты сюда не ходи!</p>
                 <p class="text-danger">Поле использовать в ИСКЛЮЧИТЕЛЬНЫХ случаях. А лучше вообще никогда не использовать.</p>
             </div>
-            
+
             <div class="form-group">
                 <label translate>moder/picture/edit/special-name</label>
                 <input type="text" class="form-control" maxlength="255" name="special_name" ng-model="ctrl.picture.special_name" />
             </div>
-            
+
             <div>
                 <button class="btn btn-primary" ng-click="ctrl.saveSpecialName()">{{'submit'|translate}}</button>
             </div>
-            
+
             <div class="progress" ng-show="ctrl.specialNameLoading">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
                 </div>
@@ -167,14 +163,14 @@
         </form>
 
         <h3 translate>moder/picture/copyrights</h3>
-        <div class="well">
+        <div class="card card-body">
             <div autowp-markdown="'moder/markdown/description'|translate"></div>
             <autowp-markdown-edit text="ctrl.picture.copyrights"></autowp-markdown-edit>
             <button class="btn btn-primary" ng-click="ctrl.saveCopyrights()" translate>submit</button>
             <p ng-if="ctrl.picture.copyrights_text_id">
                 <a ui-sref="info-text({id: ctrl.picture.copyrights_text_id})" translate>moder/markdown/history</a>
             </p>
-            
+
             <div class="progress" ng-show="ctrl.copyrightsLoading">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
                 </div>
@@ -182,17 +178,17 @@
         </div>
 
         <h3 ng-if="ctrl.picture.iptc">IPTC</h3>
-        <div class="well small" style="overflow:auto" ng-if="ctrl.picture.iptc" ng-bind-html="ctrl.picture.iptc"></div>
+        <div class="card card-body small" style="overflow:auto" ng-if="ctrl.picture.iptc" ng-bind-html="ctrl.picture.iptc"></div>
 
         <h3 ng-if="ctrl.picture.exif">EXIF</h3>
-        <div class="well small" style="overflow:auto" ng-if="ctrl.picture.exif" ng-bind-html="ctrl.picture.exif"></div>
+        <div class="card card-body small" style="overflow:auto" ng-if="ctrl.picture.exif" ng-bind-html="ctrl.picture.exif"></div>
 
     </div>
 
     <div class="col-md-6">
 
         <h3 translate ng-if="ctrl.picture.replaceable">moder/picture/replacement</h3>
-        <div class="well" ng-if="ctrl.picture.replaceable"> 
+        <div class="card card-body" ng-if="ctrl.picture.replaceable">
             <div>
                 <p>
                     {{'moder/picture/replacement/photo-suggested-to-replace'|translate}}
@@ -216,12 +212,12 @@
 
 
         <h3 translate>moder/picture/acceptance</h3>
-        <div class="well">
+        <div class="card card-body">
             <autowp-user user="ctrl.picture.change_status_user" ng-if="ctrl.picture.change_status_user"></autowp-user>
 
             <div ng-if="ctrl.picture.status == 'inbox'">
-                <p><strong class="label label-warning" translate>moder/picture/acceptance/not-accepted</strong></p>
-                
+                <p><strong class="badge badge-warning" translate>moder/picture/acceptance/not-accepted</strong></p>
+
                 <button class="btn btn-success" ng-click="ctrl.acceptPicture()" ng-if="ctrl.picture.rights.accept">
                     {{'moder/picture/acceptance/accept'|translate}}
                 </button>
@@ -231,15 +227,15 @@
             </div>
 
             <div ng-show="ctrl.picture.status == 'accepted'">
-                <p><strong class="label label-success" translate>moder/picture/acceptance/accepted</strong></p>
-                
+                <p><strong class="badge badge-success" translate>moder/picture/acceptance/accepted</strong></p>
+
                 <button class="btn btn-warning" ng-click="ctrl.unacceptPicture()" ng-if="ctrl.picture.rights.unaccept">
                     {{'moder/picture/acceptance/unaccept'|translate}}
                 </button>
             </div>
 
             <div ng-if="ctrl.picture.status == 'removing'">
-                <p><strong class="label label-danger" translate>moder/picture/acceptance/in-delete-queue</strong></p>
+                <p><strong class="badge badge-danger" translate>moder/picture/acceptance/in-delete-queue</strong></p>
 
                 <button class="btn btn-warning" ng-click="ctrl.restorePicture()" ng-if="ctrl.picture.rights.restore">
                     {{'moder/picture/acceptance/restore'|translate}}
@@ -247,18 +243,18 @@
             </div>
 
             <div ng-if="ctrl.picture.status == 'removed'">
-                <p><strong class="label label-danger" translate>moder/picture/acceptance/removed</strong></p>
+                <p><strong class="badge badge-danger" translate>moder/picture/acceptance/removed</strong></p>
             </div>
-            
+
             <autowp-picture-moder-vote picture="ctrl.picture" change="ctrl.pictureVoted"></autowp-picture-moder-vote>
-            
+
             <p ng-if="ctrl.picture.is_last">
-                <span class="label label-warning" translate>moder/picture/acceptance/that-is-one-accepted-picture</span>
+                <span class="badge badge-warning" translate>moder/picture/acceptance/that-is-one-accepted-picture</span>
             </p>
             <p ng-if="!ctrl.picture.is_last && (ctrl.picture.accepted_count <= 4)">
-                <span class="label label-warning" translate="ng/moder/picture/acceptance/accepted-pictures-is-n" translate-values="{count: ctrl.picture.accepted_count}"></span>
+                <span class="badge badge-warning" translate="ng/moder/picture/acceptance/accepted-pictures-is-n" translate-values="{count: ctrl.picture.accepted_count}"></span>
             </p>
-            
+
             <div class="progress" ng-show="ctrl.statusLoading">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
                 </div>
@@ -266,7 +262,7 @@
         </div>
 
         <h3 translate ng-if="ctrl.picture.rights.normalize || ctrl.picture.rights.flop || ctrl.picture.rights.crop">moder/picture/edit-and-repair</h3>
-        <div class="well" ng-if="ctrl.picture.rights.normalize || ctrl.picture.rights.flop || ctrl.picture.rights.crop">
+        <div class="card card-body" ng-if="ctrl.picture.rights.normalize || ctrl.picture.rights.flop || ctrl.picture.rights.crop">
             <div>
                 <button class="btn btn-warning" ng-click="ctrl.normalizePicture()" ng-if="ctrl.picture.rights.normalize" ng-disabled="ctrl.repairLoading">
                     <i class="fa fa-signal"></i>
@@ -276,31 +272,31 @@
                     <i class="fa fa-arrows-h"></i>
                     {{'moder/picture/edit-and-repair/flop'|translate}}
                 </button>
-                <button class="btn btn-default" ui-sref="moder-pictures-item-crop({id: ctrl.picture.id})" ng-if="ctrl.picture.rights.crop" ng-disabled="ctrl.repairLoading">
+                <button class="btn btn-secondary" ui-sref="moder-pictures-item-crop({id: ctrl.picture.id})" ng-if="ctrl.picture.rights.crop" ng-disabled="ctrl.repairLoading">
                     <i class="fa fa-crop"></i>
                     {{'moder/picture/edit-and-repair/crop'|translate}}
                 </button>
             </div>
 
             <div>
-                <button class="btn btn-default" ng-click="ctrl.repairPicture()" ng-disabled="ctrl.repairLoading">
+                <button class="btn btn-secondary" ng-click="ctrl.repairPicture()" ng-disabled="ctrl.repairLoading">
                     <i class="fa fa-wrench"></i>
                     {{'moder/picture/edit-and-repair/repair-all-files'|translate}}
                 </button>
-                <button class="btn btn-default" ng-click="ctrl.correctFileNames()" ng-disabled="ctrl.repairLoading">
+                <button class="btn btn-secondary" ng-click="ctrl.correctFileNames()" ng-disabled="ctrl.repairLoading">
                     <i class="fa fa-wrench"></i>
                     {{'moder/picture/edit-and-repair/rebuild-files-names'|translate}}
                 </button>
             </div>
-            
+
             <div class="progress" ng-show="ctrl.repairLoading">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
                 </div>
             </div>
         </div>
-        
+
         <h3 ng-if="ctrl.picture.similar">Similar picture</h3>
-        <div class="well" ng-if="ctrl.picture.similar">
+        <div class="card card-body" ng-if="ctrl.picture.similar">
             <p class="alert alert-warning" role="alert">
                 <span class="fa fa-file-image-o"></span>
                 <a ui-sref="moder-pictures-item({id: ctrl.picture.similar.picture_id})">
@@ -309,7 +305,7 @@
             </p>
             <p>
                 <a ui-sref="moder-pictures-item({id: ctrl.picture.similar.picture_id})">
-                    <img ng-if="ctrl.picture.similar.picture.thumbnail" ng-src="{{ctrl.picture.similar.picture.thumbnail.src}}" />
+                    <img ng-if="ctrl.picture.similar.picture.thumb" ng-src="{{ctrl.picture.similar.picture.thumb.src}}" class="rounded border border-light" />
                 </a>
             </p>
             <button ng-click="ctrl.cancelSimilar()" class="btn btn-warning">That is not similar</button>
@@ -321,7 +317,7 @@
         </div>
 
         <h3 translate>moder/picture/uploader</h3>
-        <div class="well">
+        <div class="card card-body">
             <autowp-user user="ctrl.picture.owner" ng-if="ctrl.picture.owner"></autowp-user>
             <span ng-if="!ctrl.picture.owner" translate>moder/picture/uploader/unknown</span>
             <div ng-if="ctrl.picture.ip.address">
@@ -334,11 +330,11 @@
                     {{ctrl.picture.ip.blacklist.up_to|date}}
                     <span ng-if="ctrl.picture.ip.blacklist.reason" ng-bind="ctrl.picture.ip.blacklist.reason"></span>
                 </p>
-                
+
                 <button ng-if="ctrl.picture.ip.blacklist && ctrl.picture.ip.rights.remove_from_blacklist" class="btn btn-success" ng-click="ctrl.removeFromBlacklist(ctrl.picture.ip.address)">
                     {{'ban/unban'|translate}}
                 </button>
-               
+
                 <form class="form-vertical" ng-if="!ctrl.picture.ip.blacklist && ctrl.picture.ip.rights.add_to_blacklist">
                     <div class="form-group">
                         <label translate>ban/period</label>

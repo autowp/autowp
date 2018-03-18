@@ -80,21 +80,21 @@ ga('send', 'pageview');
         <div class="container">
 
             <div class="row">
-                <div class="col-sm-<?=$spanCenter?> col-sm-push-<?=$spanLeft?>">
+                <div class="col-sm-<?=$spanCenter?> order-2">
                     <?=$this->breadcrumbs() ?>
                     <?=$this->pageTitle() ?>
 
                     <?=$this->layout()->content ?>
                 </div>
                 <?php if ($needLeft) { ?>
-                    <div class="col-sm-<?=$spanLeft?> col-sm-pull-<?=$spanCenter?>">
+                    <div class="col-sm-<?=$spanLeft?> order-1">
                         <?php if (isset($this->sidebar)) { ?>
                             <?=$this->sidebar ?>
                         <?php } ?>
                     </div>
                 <?php } ?>
                 <?php if ($needRight) { ?>
-                    <div class="col-sm-<?=$spanRight?>">
+                    <div class="col-sm-<?=$spanRight?> order-3">
                         <?=$this->sidebar()?>
                     </div>
                 <?php } ?>

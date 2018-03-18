@@ -37,7 +37,7 @@ export class ModerItemsItemController {
     public languagesLoading: number = 0;
     public linksLoading: number = 0;
     public logoLoading: number = 0;
-    
+
     public item: any = null;
     public specsAllowed: boolean = false;
     public canMove: boolean = false;
@@ -45,66 +45,68 @@ export class ModerItemsItemController {
     public picturesChunks: any[] = [];
     public canEditMeta: boolean = false;
     public canLogo: boolean = false;
-    
+
     public canHaveParents: boolean = false;
     public canHaveParentBrand: boolean = false;
-    
+
     public currentLanguage: any = null;
-    
+
     public itemLanguages: any = {};
     public tree: any[] = [];
-    
+
     public parents: any[] = [];
     public childs: any[] = [];
     public suggestions: any[] = [];
-    
+
+    private randomPicture: any;
+
     public newLink = {
         name: '',
         url: '',
         type_id: 'default'
     };
-    
+
     public tabs: any;
-    
+
     public organizeTypeId: number;
     public canUseTurboGroupCreator: boolean = false;
-    
+
     public pictures: any[];
     public engineVehicles: any[];
     public links: any[];
     public invalidParams: any;
 
     constructor(
-        private $scope: autowp.IControllerScope, 
-        private $rootScope: autowp.IRootControllerScope, 
+        private $scope: autowp.IControllerScope,
+        private $rootScope: autowp.IRootControllerScope,
         private $http: ng.IHttpService,
         private $state: any,
         private $translate: ng.translate.ITranslateService,
         private $q: ng.IQService,
         private $element: any,
-        private SpecService: SpecService, 
-        private VehicleTypeService: VehicleTypeService, 
-        private Acl: AclService, 
-        private ContentLanguage: ContentLanguageService, 
+        private SpecService: SpecService,
+        private VehicleTypeService: VehicleTypeService,
+        private Acl: AclService,
+        private ContentLanguage: ContentLanguageService,
         private ItemService: ItemService
     ) {
         var self = this;
-        
+
         this.loading++;
         this.ItemService.getItem($state.params.id, {
-            fields: ['name_text', 'name_html', 'name', 'is_concept', 
-                     'name_default', 'body', 'subscription', 'begin_year', 
-                     'begin_month', 'end_year', 'end_month', 'today', 
-                     'begin_model_year', 'end_model_year', 'produced', 
-                     'is_group', 'spec_id', 'childs_count', 'full_name', 
-                     'catname', 'lat', 'lng', 'pictures_count', 
-                     'specifications_count', 'links_count', 'parents_count', 
+            fields: ['name_text', 'name_html', 'name', 'is_concept',
+                     'name_default', 'body', 'subscription', 'begin_year',
+                     'begin_month', 'end_year', 'end_month', 'today',
+                     'begin_model_year', 'end_model_year', 'produced',
+                     'is_group', 'spec_id', 'childs_count', 'full_name',
+                     'catname', 'lat', 'lng', 'pictures_count',
+                     'specifications_count', 'links_count', 'parents_count',
                      'item_language_count', 'engine_vehicles_count', 'logo'].join(',')
         }).then(function(item: autowp.IItem) {
             self.item = item;
-            
+
             self.specsAllowed = [1, 2].indexOf(self.item.item_type_id) != -1;
-            
+
             $translate('item/type/'+self.item.item_type_id+'/name').then(function(translation) {
                 $scope.pageEnv({
                     layout: {
@@ -120,7 +122,7 @@ export class ModerItemsItemController {
                     }
                 });
             });
-            
+
             self.tabs = {
                 meta: {
                     icon: 'glyphicon glyphicon-pencil',
@@ -200,7 +202,7 @@ export class ModerItemsItemController {
             if ([2, 1].indexOf(self.item.item_type_id) !== -1) {
                 delete self.tabs.factories;
             }
-            
+
             self.setActiveTab($state.params.tab ? $state.params.tab : 'meta');
 
             /*if ($this->user()->get()->id == 1) {
@@ -224,16 +226,16 @@ export class ModerItemsItemController {
             });
             self.canHaveParents = ![4, 6].includes(self.item.item_type_id);
             self.canHaveParentBrand = [1, 2].includes(self.item.item_type_id);
-            
+
             self.organizeTypeId = self.item.item_type_id;
             switch (self.organizeTypeId) {
                 case 5:
                     self.organizeTypeId = 1;
                     break;
             }
-            
+
             self.canUseTurboGroupCreator = [1, 2].indexOf(self.item.item_type_id) !== -1;
-            
+
             if (self.item.item_type_id == 1 || self.item.item_type_id == 4) {
                 self.metaLoading++;
                 $http({
@@ -256,7 +258,7 @@ export class ModerItemsItemController {
                     self.metaLoading--;
                 });
             }
-            
+
             var $input = $($element[0]).find('.item-autocomplete');
             $input
                 .on('typeahead:select', function(ev: any, car: any) {
@@ -271,13 +273,13 @@ export class ModerItemsItemController {
                         suggestion: function(item: any) {
                             var $div = $('<div class="tt-suggestion tt-selectable car"></div>')
                                 .html(item.name_html);
-                            
+
                             if (item.brandicon) {
                                 $div.prepend($('<img />', {
                                     src: item.brandicon.src
                                 }));
                             }
-                            
+
                             return $div[0];
                         }
                     },
@@ -298,19 +300,37 @@ export class ModerItemsItemController {
                         });
                     }
                 });
-            
+
+
+            self.loading++;
+            $http({
+                method: 'GET',
+                url: '/api/picture',
+                params: {
+                    fields: 'thumb_medium',
+                    limit: 1,
+                    item_id: self.item.id
+                }
+            }).then(function(response: ng.IHttpResponse<any>) {
+                self.randomPicture = response.data.pictures.length > 0 ? response.data.pictures[0] : null;
+                console.log(self.randomPicture);
+                self.loading--;
+            }, function() {
+                self.loading--;
+            });
+
             self.loading--;
         }, function() {
             $state.go('error-404');
             self.loading--;
         });
-                
+
         Acl.isAllowed('specifications', 'edit').then(function(allow) {
             self.canEditSpecifications = !!allow;
         }, function() {
             self.canEditSpecifications = false;
         });
-        
+
         Acl.isAllowed('car', 'move').then(function(allow) {
             self.canMove = !!allow;
         }, function() {
@@ -318,20 +338,20 @@ export class ModerItemsItemController {
         });
 
     }
-    
+
     private initItemLanguageTab() {
         // TODO: move to service
         this.languagesLoading++;
         var self = this;
         this.ContentLanguage.getList().then(function(contentLanguages) {
             self.currentLanguage = contentLanguages[0];
-            
+
             angular.forEach(contentLanguages, function(language) {
                 self.itemLanguages[language] = {
                     language: language
                 };
             });
-            
+
             self.$http({
                 method: 'GET',
                 url: '/api/item/' + self.item.id + '/language'
@@ -345,14 +365,14 @@ export class ModerItemsItemController {
             self.languagesLoading--;
         });
     }
-    
+
     private initMetaTab() {
         var self = this;
         setTimeout(function() {
             self.$rootScope.$broadcast('invalidateSize', {});
         }, 100);
     }
-    
+
     private initLogoTab() {
         var self = this;
         this.Acl.isAllowed('brand', 'logo').then(function(allow: boolean) {
@@ -361,9 +381,9 @@ export class ModerItemsItemController {
             self.canLogo = false;
         });
     }
-    
+
     private initCatalogueTab() {
-        
+
         this.catalogueLoading++;
         var self = this;
         this.$http({
@@ -381,7 +401,7 @@ export class ModerItemsItemController {
         }, function() {
             self.catalogueLoading--;
         });
-        
+
         this.catalogueLoading++;
         this.$http({
             method: 'GET',
@@ -397,7 +417,7 @@ export class ModerItemsItemController {
         }, function() {
             self.catalogueLoading--;
         });
-        
+
         this.catalogueLoading++;
         this.$http({
             method: 'GET',
@@ -414,7 +434,7 @@ export class ModerItemsItemController {
             self.catalogueLoading--;
         });
     }
-    
+
     private initTreeTab() {
         var self = this;
         this.$http({
@@ -425,7 +445,7 @@ export class ModerItemsItemController {
         }, function() {
         });
     }
-    
+
     private initPicturesTab() {
         this.loading++;
         var self = this;
@@ -435,7 +455,7 @@ export class ModerItemsItemController {
             params: {
                 exact_item_id: this.item.id,
                 limit: 500,
-                fields: 'owner,thumbnail,moder_vote,votes,similar,comments_count,perspective_item,name_html,name_text,views',
+                fields: 'owner,thumb_medium,moder_vote,votes,similar,comments_count,perspective_item,name_html,name_text,views',
                 order: 14
             }
         }).then(function(response: ng.IHttpResponse<any>) {
@@ -446,7 +466,7 @@ export class ModerItemsItemController {
             self.loading--;
         });
     }
-    
+
     private initVehiclesTab() {
         var self = this;
         this.$http({
@@ -461,7 +481,7 @@ export class ModerItemsItemController {
             self.engineVehicles = response.data.items;
         });
     }
-    
+
     private initLinksTab() {
         this.linksLoading++;
         var self = this;
@@ -478,7 +498,7 @@ export class ModerItemsItemController {
             self.linksLoading--;
         });
     }
-    
+
     public setActiveTab(tab: string) {
         if (! this.tabs[tab]) {
             throw "Unexpected tab: " + tab;
@@ -487,18 +507,18 @@ export class ModerItemsItemController {
             tab.active = false;
         });
         this.tabs[tab].active = true;
-        
+
         this.$state.go(STATE_NAME, {tab: tab}, {
             notify: false,
             reload: false,
             location: 'replace'
         });
-        
+
         if (this.tabs[tab].init) {
             this.tabs[tab].init.call(this);
         }
     }
-    
+
     public toggleSubscription() {
         var newValue = !this.item.subscription;
         var self = this;
@@ -512,10 +532,10 @@ export class ModerItemsItemController {
             self.item.subscription = newValue;
         });
     }
-    
+
     public saveMeta() {
         this.metaLoading++;
-        
+
         var data = {
             item_type_id: this.$state.params.item_type_id,
             name: this.item.name,
@@ -537,37 +557,37 @@ export class ModerItemsItemController {
             lat: this.item.lat,
             lng: this.item.lng
         };
-        
+
         var self = this;
-        
+
         this.$http({
             method: 'PUT',
             url: '/api/item/' + this.item.id,
             data: data
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             self.invalidParams = {};
-            
+
             var promises = [];
-            
+
             var ids: number[] = [];
             angular.forEach(self.item.vehicle_type, function(vehicle_type) {
                 ids.push(vehicle_type.id);
             });
             promises.push(self.ItemService.setItemVehicleTypes(self.item.id, ids));
-            
+
             self.loading++;
             self.$q.all(promises).then(function(results) {
                 self.loading--;
             });
-            
+
             self.metaLoading--;
         }, function(response: ng.IHttpResponse<any>) {
             self.invalidParams = response.data.invalid_params;
             self.metaLoading--;
         });
     }
-    
+
     public saveLanguages() {
         var self = this;
         angular.forEach(this.itemLanguages, function(language) {
@@ -587,7 +607,7 @@ export class ModerItemsItemController {
             });
         });
     }
-    
+
     public deleteParent(parentId: number) {
         this.catalogueLoading++;
         var self = this;
@@ -601,7 +621,7 @@ export class ModerItemsItemController {
             self.catalogueLoading--;
         });
     }
-    
+
     public deleteChild(itemId: number) {
         this.catalogueLoading++;
         var self = this;
@@ -615,7 +635,7 @@ export class ModerItemsItemController {
             self.catalogueLoading--;
         });
     }
-    
+
     public addParent(parentId: number) {
         this.catalogueLoading++;
         var self = this;
@@ -633,12 +653,12 @@ export class ModerItemsItemController {
             self.catalogueLoading--;
         });
     }
-    
+
     public saveLinks() {
-        
+
         var promises: any[] = [];
         var self = this;
-        
+
         if (this.newLink.url) {
             promises.push(
                 this.$http({
@@ -657,7 +677,7 @@ export class ModerItemsItemController {
                 })
             );
         }
-        
+
         angular.forEach(this.links, function(link) {
             if (link.url) {
                 promises.push(
@@ -680,7 +700,7 @@ export class ModerItemsItemController {
                 );
             }
         });
-        
+
         this.linksLoading++;
         this.$q.all(promises).then(function(results) {
             self.initLinksTab();
@@ -689,7 +709,7 @@ export class ModerItemsItemController {
             self.linksLoading--;
         });
     }
-    
+
     public uploadLogo() {
         this.logoLoading++;
         var element = $('#logo-upload') as any;
@@ -700,7 +720,7 @@ export class ModerItemsItemController {
             data: element[0].files[0],
             headers: {'Content-Type': undefined}
         }).then(function (response: ng.IHttpResponse<any>) {
-            
+
             self.logoLoading++;
             self.$http({
                 url: '/api/item/' + self.item.id + '/logo',
@@ -711,7 +731,7 @@ export class ModerItemsItemController {
             }, function() {
                 self.logoLoading--;
             });
-            
+
             self.logoLoading--;
         }, function(response: ng.IHttpResponse<any>) {
             self.logoLoading--;
@@ -729,7 +749,7 @@ angular.module(Module)
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require('./template.html'),
-                params: { 
+                params: {
                     tab: { dynamic: true }
                 },
                 resolve: {

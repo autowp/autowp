@@ -11,6 +11,7 @@ use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\Picture;
+use Application\PictureNameFormatter;
 use Application\Service\Mosts;
 
 class MostsController extends AbstractActionController
@@ -37,13 +38,19 @@ class MostsController extends AbstractActionController
      */
     private $itemHydrator;
 
+    /**
+     * @var PictureNameFormatter
+     */
+    private $pictureNameFormatter;
+
     public function __construct(
         TextStorage\Service $textStorage,
         Item $itemModel,
         Perspective $perspective,
         Mosts $mosts,
         Picture $picture,
-        RestHydrator $itemHydrator
+        RestHydrator $itemHydrator,
+        PictureNameFormatter $pictureNameFormatter
     ) {
         $this->itemHydrator = $itemHydrator;
         $this->textStorage = $textStorage;
@@ -51,6 +58,7 @@ class MostsController extends AbstractActionController
         $this->perspective = $perspective;
         $this->mosts = $mosts;
         $this->picture = $picture;
+        $this->pictureNameFormatter = $pictureNameFormatter;
     }
 
     public function getItemsAction()
@@ -128,7 +136,7 @@ class MostsController extends AbstractActionController
                     }
 
                     $pictures[] = [
-                        'name' => isset($names[$id]) ? $names[$id] : null,
+                        'name' => isset($names[$id]) ? $this->pictureNameFormatter->format($names[$id], $language) : null,
                         'src'  => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
                         'url'  => $url
                     ];

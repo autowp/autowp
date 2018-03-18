@@ -1,4 +1,4 @@
-<form class="well form-vertical" ng-submit="ctrl.save()">
+<form class="card card-body form-vertical" ng-submit="ctrl.save()">
     <div class="form-group">
         <label translate>page/parent</label>
         <select ng-model="ctrl.item.parent_id" name="parent_id" class="form-control">
@@ -27,7 +27,7 @@
     <div class="form-group">
         <div class="checkbox">
             <label>
-                <input type="checkbox" name="is_group_node" ng-model="ctrl.item.is_group_node" /> 
+                <input type="checkbox" name="is_group_node" ng-model="ctrl.item.is_group_node" />
                 {{'page/is_group_node'|translate}}
             </label>
         </div>
@@ -35,7 +35,7 @@
     <div class="form-group">
         <div class="checkbox">
             <label>
-                <input type="checkbox" name="registered_only" ng-model="ctrl.item.registered_only" /> 
+                <input type="checkbox" name="registered_only" ng-model="ctrl.item.registered_only" />
                 {{'page/registered_only'|translate}}
             </label>
         </div>
@@ -43,7 +43,7 @@
     <div class="form-group">
         <div class="checkbox">
             <label>
-                <input type="checkbox" name="guest_only" ng-model="ctrl.item.guest_only" /> 
+                <input type="checkbox" name="guest_only" ng-model="ctrl.item.guest_only" />
                 {{'page/guests_only'|translate}}
             </label>
         </div>

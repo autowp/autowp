@@ -11,5 +11,15 @@
         ]
     ]);
 ?>
-<?=$this->partial('application/pictures', $this->picturesData)?>
+
+<div class="row" data-module="car-list">
+    <?php foreach ($this->picturesData['items'] as $item) { ?>
+        <?=$this->partial('application/picture', array_replace($item, [
+            'isModer'          => $this->picturesData['isModer'],
+            'disableBehaviour' => $this->picturesData['disableBehaviour'],
+            'colClass'         => 'col-6 col-sm-4 col-md-3 col-xl-2'
+        ]))?>
+    <?php } ?>
+</div>
+
 <?=$this->paginationControl($this->paginator) ?>

@@ -1,15 +1,11 @@
-<ul class="nav nav-pills">
-    <li>
-        <a ui-sref=".({vehicle_type_id: 'empty', vehicle_childs_type_id: 19})" ui-sref-opts="{inherit: false, reload: true}">Buses without type</a>
-    </li>
-    <li>
-        <a ui-sref=".({vehicle_type_id: 'empty', vehicle_childs_type_id: 17})" ui-sref-opts="{inherit: false, reload: true}">Truck without type</a>
-    </li>
-</ul>
+<div class="nav nav-pills">
+    <a class="nav-link" ui-sref=".({vehicle_type_id: 'empty', vehicle_childs_type_id: 19})" ui-sref-opts="{inherit: false, reload: true}">Buses without type</a>
+    <a class="nav-link" ui-sref=".({vehicle_type_id: 'empty', vehicle_childs_type_id: 17})" ui-sref-opts="{inherit: false, reload: true}">Truck without type</a>
+</div>
 <div class="row">
     <div class="col-lg-4 col-md-4">
         <h2 translate>moder/items/filter</h2>
-        <form class="well form-vertical">
+        <form class="card card-body form-vertical">
             <div class="form-group">
                 <label translate>moder/items/filter/name</label>
                 <input type="text" name="name" class="form-control" ng-model="ctrl.filter.name" ng-model-options="{debounce:300}" ng-change="ctrl.load()" />
@@ -72,7 +68,7 @@
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="no_parent" value="1" ng-model="ctrl.filter.no_parent" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="no_parent" value="1" ng-model="ctrl.filter.no_parent" ng-change="ctrl.load()" />
                     {{'moder/items/filter/no-parents'|translate}}
                 </label>
             </div>
@@ -94,9 +90,9 @@
             </span>
             <small ng-if="ctrl.paginator.totalItemCount" translate="ng/%1$s-items" translate-values="{count: ctrl.paginator.totalItemCount}"></small>
         </h2>
-        
+
         <autowp-item item="item" ng-repeat="item in ctrl.items"></autowp-item>
-        
+
         <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
     </div>
 </div>

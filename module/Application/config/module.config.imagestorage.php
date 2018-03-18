@@ -127,9 +127,23 @@ return [
                 'format'           => 'jpeg',
                 'proportionalCrop' => 1
             ],
+            'picture-thumb-large' => [
+                'fitType'          => 0,
+                'width'            => 620,
+                'height'           => 464,
+                'strip'            => 1,
+                'format'           => 'jpeg',
+                'proportionalCrop' => 1
+            ],
             'picture-medium' => [
                 'fitType' => 0,
                 'width'   => 350,
+                'strip'   => 1,
+                'format'  => 'jpeg'
+            ],
+            'picture-preview-large' => [
+                'fitType' => 0,
+                'width'   => 540,
                 'strip'   => 1,
                 'format'  => 'jpeg'
             ],

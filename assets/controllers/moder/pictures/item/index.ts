@@ -67,7 +67,7 @@ export class ModerPicturesItemController {
             } );
         } );
 
-        
+
         this.PerspectiveService.getPerspectives().then( function( perspectives: any[] ) {
             self.perspectives = perspectives;
         } );
@@ -83,11 +83,11 @@ export class ModerPicturesItemController {
             method: 'GET',
             url: '/api/picture/' + this.$state.params.id,
             params: {
-                fields: ['owner', 'thumbnail', 'add_date', 'iptc', 'exif', 'image',
+                fields: ['owner', 'thumb', 'add_date', 'iptc', 'exif', 'image',
                     'items.item.name_html', 'items.item.brands.name_html', 'items.area',
                     'special_name', 'copyrights', 'change_status_user',
                     'rights', 'moder_votes', 'moder_voted', 'is_last', 'views',
-                    'accepted_count', 'similar.picture.thumbnail',
+                    'accepted_count', 'similar.picture.thumb',
                     'replaceable', 'siblings.name_text', 'ip.rights', 'ip.blacklist'].join( ',' )
             }
         } ).then( function( response: ng.IHttpResponse<any> ) {

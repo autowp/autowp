@@ -1,37 +1,37 @@
-<div class="row"><div class="col-md-8 col-md-offset-2 login-page">
+<div class="row"><div class="col-md-8 offset-md-2 login-page">
     <ul class="nav nav-tabs">
-        <li class="active">
-            <a href="/login/">
+        <li class="nav-item">
+            <a href="/login/" class="active nav-link">
                 <i class="fa fa-sign-in"></i>
                 {{'login/sign-in'|translate}}
             </a>
         </li>
-        <li>
-            <a href="/ng/signup">
+        <li class="nav-item">
+            <a href="/ng/signup" class="active nav-link">
                 <i class="fa fa-pencil"></i>
                 {{'login/registration'|translate}}
             </a>
         </li>
     </ul>
-    <div class="well">
+    <div class="card card-body">
         <form class="form-horizontal" ng-submit="ctrl.submit()"><fieldset>
             <legend translate>login/sign-in</legend>
-            <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.login}">
-                <label class="col-md-3 control-label" translate>login/login-or-email</label>
+            <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.login}">
+                <label class="col-md-3 col-form-label" translate>login/login-or-email</label>
                 <div class="col-md-9">
                     <input type="text" name="login" class="form-control" ng-model="ctrl.form.login" maxlength="50">
                     <p ng-repeat="message in ctrl.invalidParams.login" ng-bind="message" class="help-block"></p>
                 </div>
             </div>
-            <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.password}">
-                <label class="col-md-3 control-label" translate>user/password</label>
+            <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.password}">
+                <label class="col-md-3 col-form-label" translate>user/password</label>
                 <div class="col-md-9">
                     <input type="password" name="password" class="form-control" ng-model="ctrl.form.password">
                     <p ng-repeat="message in ctrl.invalidParams.password" ng-bind="message" class="help-block"></p>
                 </div>
             </div>
-            <div class="form-group">
-                <div class="col-md-offset-3 col-md-9">
+            <div class="form-group row">
+                <div class="offset-md-3 col-md-9">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" name="remember" value="1" ng-model="ctrl.form.remember">
@@ -40,8 +40,8 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <div class="col-md-9 col-md-offset-3">
+            <div class="form-group row">
+                <div class="col-md-9 offset-md-3">
                     <button type="submit" class="btn btn-primary">
                         <i class="fa fa-sign-in"></i>
                         {{'login/sign-in'|translate}}
@@ -51,9 +51,9 @@
         </fieldset></form>
     </div>
 
-    <div class="row" style="margin-top:50px;margin-bottom:50px"><div class="col-md-9 col-md-offset-3">
+    <div class="row" style="margin-top:50px;margin-bottom:50px"><div class="col-md-9 offset-md-3">
         <p translate>login/sign-in-using-account</p>
-        <a ng-href="#" ng-click="ctrl.start(serviceId)" class="btn btn-default btn-lg" ng-repeat="(serviceId, service) in ctrl.services" title="{{service.name}}">
+        <a ng-href="#" ng-click="ctrl.start(serviceId)" class="btn btn-secondary btn-lg" ng-repeat="(serviceId, service) in ctrl.services" title="{{service.name}}">
             <i class="fa fa-fw fa-2x {{service.icon}}"></i>
         </a>
     </div></div>

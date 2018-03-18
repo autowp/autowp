@@ -1,35 +1,35 @@
 <div class="row">
-    <div class="col-lg-4 col-md-4 col-lg-offset-4 col-md-offset-4">
+    <div class="col-lg-4 col-md-4 offset-lg-4 offset-md-4 mb-4">
         <select name="brand_id" ng-model="ctrl.brand_id" class="form-control" ng-change="ctrl.changeBrand()">
             <option value="" translate>inbox/all-brands</option>
             <option ng-repeat="brand in ctrl.brands" ng-bind="brand.name" ng-value="brand.id"></option>
         </select>
     </div>
 </div>
-<div class="row">
+<div class="row mb-4">
     <div class="col-lg-4 col-md-4">
         <h3 class="text-left" ng-if="ctrl.prev.date">
             &#x2190;
-            <a ui-sref=".({date: ctrl.prev.date, page: null})" ng-bind="ctrl.prev.date | amDateFormat: 'LL'"></a>
+            <a ui-sref=".({date: ctrl.prev.date, page: null})" ng-bind="ctrl.prev.date | amDateFormat: 'LL'"></a><br />
             <small>(<span translate="ng/%1$s-pictures" translate-values="{count: ctrl.prev.count}"></span>)</small>
         </h3>
     </div>
     <div class="col-lg-4 col-md-4">
         <h3 class="text-center">
-            <span ng-bind="ctrl.current.date | amDateFormat: 'LL'"></span>
+            <span ng-bind="ctrl.current.date | amDateFormat: 'LL'"></span><br />
             <small>(<span translate="ng/%1$s-pictures" translate-values="{count: ctrl.current.count}"></span>)</small>
         </h3>
     </div>
     <div class="col-lg-4 col-md-4">
         <h3 class="text-right" ng-if="ctrl.next.date">
-            <a ui-sref=".({date: ctrl.next.date, page: null})" ng-bind="ctrl.next.date | amDateFormat: 'LL'"></a>
+            <a ui-sref=".({date: ctrl.next.date, page: null})" ng-bind="ctrl.next.date | amDateFormat: 'LL'"></a><br />
             <small>(<span translate="ng/%1$s-pictures" translate-values="{count: ctrl.next.count}"></span>)</small>
             &#x2192;
         </h3>
     </div>
 </div>
-<div class="row" ng-repeat="chunk in ctrl.chunks">
-    <div class="col-sm-2" ng-repeat="picture in chunk">
+<div class="row">
+    <div class="col-6 col-md-4 col-lg-3 col-xl-2" ng-repeat="picture in ctrl.pictures">
         <autowp-thumbnail picture="picture"></autowp-thumbnail>
     </div>
 </div>

@@ -18,88 +18,99 @@ html {
 }
 <?php $this->headStyle()->captureEnd()?>
 */ ?>
+
+<?=$this->partial('application/index/partial/item-of-day', [
+    'itemOfDay' => $this->itemOfDay
+])?>
+
+<?=$this->partial('application/index/partial/brands', $this->brands)?>
+
+<div class="page-header-small">
+    <h3><?=$this->escapeHtml($this->page(51)->name) ?> <small><?=$this->htmlA('/ng/new', $this->translate('all-link'))?></small></h3>
+</div>
+<?php
+    $items = $this->newPictures['items'];
+?>
+<?php while ($currentItems = array_splice($items, 0, $this->newPictures['width'])) { ?>
+    <div class="row" data-module="car-list">
+        <?php foreach ($currentItems as $item) { ?>
+            <?=$this->partial('application/picture', array_replace($item, [
+                'isModer'          => $this->newPictures['isModer'],
+                'disableBehaviour' => $this->newPictures['disableBehaviour'],
+                'colClass'         => 'col-6 col-sm-6 col-md-4 col-lg-4 col-xl-2'
+            ]))?>
+        <?php } ?>
+    </div>
+<?php } ?>
+<p>
+    <span class="fa fa-th"></span>
+    <?=$this->htmlA('/ng/new', $this->translate('All new pictures') . ' …') ?>
+</p>
+
+
+
+<div class="row">
+
+    <div class="col-md-6">
+        <h4><?=$this->escapeHtml($this->page(25)->name) ?> <small><?=$this->htmlA('/twins', $this->translate('all-link'))?></small></h4>
+        <p>
+            <?php foreach ($this->twinsBlock['brands'] as $brand) { ?>
+                <?=$this->htmlA($brand['url'], $brand['name']) ?>
+                <span class="count">(<?=$brand['count'] - $brand['new_count'] ?><?php if ($brand['new_count'] > 0) { ?><span>+<?=$brand['new_count'] ?></span><?php } ?>)</span>,
+            <?php } ?>
+            <?php if ($more = $this->twinsBlock['brands_count'] - count($this->twinsBlock['brands'])) { ?>
+                …
+                <?=$this->escapeHtml($this->translate('and'))?>
+                <?=$this->htmlA(
+                    '/twins',
+                    sprintf($this->translatePlural('brands/more-companies', 'brands/more-companies', $more), $more)
+                )?>
+            <?php } ?>
+        </p>
+        <?=$this->markdown($this->translate('index/twins/description'))?>
+    </div>
+
+    <div class="col-md-6">
+        <?=$this->render('application/index/partial/categories')?>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-6">
-        <?=$this->partial('application/index/partial/item-of-day', [
-            'itemOfDay' => $this->carOfDay
-        ])?>
-
-        <div class="page-header-small">
-            <h3><?=$this->escapeHtml($this->page(51)->name) ?> <small><?=$this->htmlA('/ng/new', $this->translate('all-link'))?></small></h3>
-        </div>
-        <?=$this->partial('application/pictures', $this->newPictures)?>
+        <h4><?=$this->escapeHtml($this->page(21)->name) ?> <small><?=$this->htmlA('/ng/mosts', $this->translate('all-link'))?></small></h4>
         <p>
-            <span class="fa fa-th"></span>
-            <?=$this->htmlA('/ng/new', $this->translate('All new pictures') . ' …') ?>
+            <?php foreach ($this->mosts as $url => $name) { ?>
+                <?=$this->htmlA($url, $this->translate($name)) ?>,
+            <?php } ?>
+            …
+        </p>
+        <?=$this->markdown($this->translate('index/categories/mosts'))?>
+    </div>
+
+    <div class="col-md-6">
+        <?=$this->render('application/index/partial/factories')?>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h4><?=$this->translate('persons/content-persons') ?> <small><?=$this->htmlA('/ng/persons', $this->translate('all-link'))?></small></h4>
+        <p>
+            <?php foreach ($this->contentPersons as $person) { ?>
+                <?=$this->htmlA('/ng/persons/' . $person['id'], $person['name']) ?>,
+            <?php } ?>
+            …
         </p>
     </div>
+
     <div class="col-md-6">
-        <?=$this->partial('application/index/partial/brands', $this->brands)?>
-
-        <div class="row">
-
-            <div class="col-md-6">
-                <h4><?=$this->escapeHtml($this->page(25)->name) ?> <small><?=$this->htmlA('/twins', $this->translate('all-link'))?></small></h4>
-                <p>
-                    <?php foreach ($this->twinsBlock['brands'] as $brand) { ?>
-                        <?=$this->htmlA($brand['url'], $brand['name']) ?>
-                        <span class="count">(<?=$brand['count'] - $brand['new_count'] ?><?php if ($brand['new_count'] > 0) { ?><span>+<?=$brand['new_count'] ?></span><?php } ?>)</span>,
-                    <?php } ?>
-                    <?php if ($more = $this->twinsBlock['brands_count'] - count($this->twinsBlock['brands'])) { ?>
-                        …
-                        <?=$this->escapeHtml($this->translate('and'))?>
-                        <?=$this->htmlA(
-                            '/twins',
-                            sprintf($this->translatePlural('brands/more-companies', 'brands/more-companies', $more), $more)
-                        )?>
-                    <?php } ?>
-                </p>
-                <?=$this->markdown($this->translate('index/twins/description'))?>
-            </div>
-
-            <div class="col-md-6">
-                <?=$this->render('application/index/partial/categories')?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <h4><?=$this->escapeHtml($this->page(21)->name) ?> <small><?=$this->htmlA('/ng/mosts', $this->translate('all-link'))?></small></h4>
-                <p>
-                    <?php foreach ($this->mosts as $url => $name) { ?>
-                        <?=$this->htmlA($url, $this->translate($name)) ?>,
-                    <?php } ?>
-                    …
-                </p>
-                <?=$this->markdown($this->translate('index/categories/mosts'))?>
-            </div>
-
-            <div class="col-md-6">
-                <?=$this->render('application/index/partial/factories')?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <h4><?=$this->translate('persons/content-persons') ?> <small><?=$this->htmlA('/ng/persons', $this->translate('all-link'))?></small></h4>
-                <p>
-                    <?php foreach ($this->contentPersons as $person) { ?>
-                        <?=$this->htmlA('/ng/persons/' . $person['id'], $person['name']) ?>,
-                    <?php } ?>
-                    …
-                </p>
-            </div>
-
-            <div class="col-md-6">
-                <h4><?=$this->translate('persons/author-persons') ?> <small><?=$this->htmlA('/ng/persons/authors', $this->translate('all-link'))?></small></h4>
-                <p>
-                    <?php foreach ($this->authorPersons as $person) { ?>
-                        <?=$this->htmlA('/ng/persons/' . $person['id'], $person['name']) ?>,
-                    <?php } ?>
-                    …
-                </p>
-            </div>
-        </div>
+        <h4><?=$this->translate('persons/author-persons') ?> <small><?=$this->htmlA('/ng/persons/authors', $this->translate('all-link'))?></small></h4>
+        <p>
+            <?php foreach ($this->authorPersons as $person) { ?>
+                <?=$this->htmlA('/ng/persons/' . $person['id'], $person['name']) ?>,
+            <?php } ?>
+            …
+        </p>
     </div>
 </div>
 

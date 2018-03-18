@@ -41,9 +41,9 @@ class Breadcrumbs extends AbstractHelper
                 $url = $node['url'];
 
                 if ($url) {
-                    $items[] = '<li>'.$this->view->htmlA(['href' => $url], $name).'</li>';
+                    $items[] = '<li class="breadcrumb-item">'.$this->view->htmlA(['href' => $url], $name).'</li>';
                 } else {
-                    $items[] = '<li>'.$this->view->escapeHtml($name).'</li>';
+                    $items[] = '<li class="breadcrumb-item">'.$this->view->escapeHtml($name).'</li>';
                 }
             }
 
@@ -53,7 +53,7 @@ class Breadcrumbs extends AbstractHelper
                 return '';
             }
 
-            return  '<ul class="breadcrumb">'. implode($items). '</ul>';
+            return  '<nav aria-label="breadcrumb"><ol class="breadcrumb">'. implode($items). '</ol></nav>';
         } catch (Exception $e) {
             print $e->getMessage();
         }

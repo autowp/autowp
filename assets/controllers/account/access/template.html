@@ -1,31 +1,31 @@
 <div class="row">
-    <div class="col-sm-8 col-sm-push-4">
+    <div class="col-sm-8 order-2">
         <h2 translate>account/access/change-password</h2>
-        <div class="well">
+        <div class="card card-body mb-4">
             <form class="form-horizontal" ng-submit="ctrl.submit()"><fieldset>
-                <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.password_old}">
-                    <label class="col-md-2 control-label" for="password_old" translate>account/access/change-password/current</label>
+                <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.password_old}">
+                    <label class="col-md-2 col-form-label" for="password_old" translate>account/access/change-password/current</label>
                     <div class="col-md-10">
                         <input type="password" size="50" maxlength="50" name="password_old" class="form-control" ng-model="ctrl.form.password_old">
                         <p ng-repeat="message in ctrl.invalidParams.password_old" ng-bind="message" class="help-block"></p>
                     </div>
                 </div>
-                <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.password}">
-                    <label class="col-md-2 control-label" for="password" translate>account/access/change-password/new</label>
+                <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.password}">
+                    <label class="col-md-2 col-form-label" for="password" translate>account/access/change-password/new</label>
                     <div class="col-md-10">
                         <input type="password" size="50" maxlength="50" name="password" class="form-control" ng-model="ctrl.form.password">
                         <p ng-repeat="message in ctrl.invalidParams.password" ng-bind="message" class="help-block"></p>
                     </div>
                 </div>
-                <div class="form-group" ng-class="{'has-error': ctrl.invalidParams.password_confirm}">
-                    <label class="col-md-2 control-label" for="password_confirm" translate>account/access/change-password/new-confirm</label>
+                <div class="form-group row" ng-class="{'has-error': ctrl.invalidParams.password_confirm}">
+                    <label class="col-md-2 col-form-label" for="password_confirm" translate>account/access/change-password/new-confirm</label>
                     <div class="col-md-10">
                         <input type="password" size="50" maxlength="50" name="password_confirm" class="form-control" ng-model="ctrl.form.password_confirm">
                         <p ng-repeat="message in ctrl.invalidParams.password_confirm" ng-bind="message" class="help-block"></p>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-10 col-md-offset-2">
+                    <div class="col-md-10 offset-md-2">
                         <button type="submit" class="btn btn-primary" translate>send</button>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
             </a>
         </p>
     </div>
-    <div class="col-sm-4 col-sm-pull-8">
+    <div class="col-sm-4 order-1">
         <autowp-account-sidebar user="user"></autowp-account-sidebar>
     </div>
 </div>

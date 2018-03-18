@@ -2,7 +2,7 @@ import * as angular from "angular";
 import Module from 'app.module';
 import { PerspectiveService } from 'services/perspective';
 import { PictureItemService } from 'services/picture-item';
-import './styles.less';
+import './styles.scss';
 
 interface IThumbnailDirectiveScope extends ng.IScope {
     picture: any;
@@ -26,16 +26,16 @@ class AutowpThumbnailDirective implements ng.IDirective {
     }
 
     link = (scope: IThumbnailDirectiveScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) => {
-      
+
         var self = this;
-      
+
         if (scope.picture.perspective_item) {
             scope.perspectiveOptions = [];
-            
+
             this.perspectiveService.getPerspectives().then(function(perspectives: any[]) {
                 scope.perspectiveOptions = perspectives;
             });
-            
+
             scope.savePerspective = function() {
                 if (scope.picture.perspective_item) {
                     self.pictureItemService.setPerspective(
@@ -47,7 +47,7 @@ class AutowpThumbnailDirective implements ng.IDirective {
                 }
             };
         }
-        
+
         if (scope.onselect) {
             scope.onPictureSelect = function($event: any, picture: any) {
                 var element = $event.currentTarget;

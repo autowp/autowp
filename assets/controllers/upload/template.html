@@ -4,28 +4,28 @@
 
 <div ng-if="user">
     <div ng-if="ctrl.selected">
-        <div class="well">
+        <div class="card card-body mb-4">
             <div autowp-markdown="'upload/description'|translate"></div>
             <div style="margin:20px 0">
                 <form class="form-horizontal" ng-submit="ctrl.submit()" ng-show="!ctrl.formHidden"><fieldset>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Selection</label>
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label">Selection</label>
                         <div class="col-md-10" style="padding-top:7px">
                             <strong ng-bind-html="ctrl.selectionName"></strong>
                             [<a ui-sref="upload-select" translate>upload/select-another</a>]
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" translate>upload/image-file</label>
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label" translate>upload/image-file</label>
                         <div class="col-md-10">
-                            <div class="btn btn-default" 
-                                ngf-select 
-                                ng-model="ctrl.file" 
-                                name="file" 
+                            <div class="btn btn-secondary"
+                                ngf-select
+                                ng-model="ctrl.file"
+                                name="file"
                                 ngf-pattern="'image/*'"
-                                ngf-accept="'image/*'" 
-                                ngf-max-size="50MB" 
-                                ngf-min-height="360" 
+                                ngf-accept="'image/*'"
+                                ngf-max-size="50MB"
+                                ngf-min-height="360"
                                 ngf-min-width="640"
                                 ngf-max-height="4096"
                                 ngf-max-width="4096"
@@ -34,15 +34,15 @@
                                 translate
                                 ng-if="!ctrl.replace"
                             >upload/select-files</div>
-                            
-                            <div class="btn btn-default" 
-                                ngf-select 
-                                ng-model="ctrl.file" 
-                                name="file" 
+
+                            <div class="btn btn-secondary"
+                                ngf-select
+                                ng-model="ctrl.file"
+                                name="file"
                                 ngf-pattern="'image/*'"
-                                ngf-accept="'image/*'" 
-                                ngf-max-size="50MB" 
-                                ngf-min-height="360" 
+                                ngf-accept="'image/*'"
+                                ngf-max-size="50MB"
+                                ngf-min-height="360"
                                 ngf-min-width="640"
                                 ngf-max-height="4096"
                                 ngf-max-width="4096"
@@ -51,7 +51,7 @@
                                 ngf-max-files="1"
                                 ng-if="ctrl.replace"
                             >upload/select-file</div>
-                            
+
                             <div style="margin-top: 10px" ng-if="ctrl.file && !ctrl.replace">
                                 <p ng-repeat="file in ctrl.file" ng-bind="file.name"></p>
                             </div>
@@ -60,52 +60,52 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" for="note" translate>upload/note</label>
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label" for="note" translate>upload/note</label>
                         <div class="col-md-10">
                             <textarea name="note" rows="3" class="form-control" ng-model="ctrl.note"></textarea>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-10 col-md-offset-2">
+                        <div class="col-md-10 offset-md-2">
                             <button name="submit" class="btn btn-primary" translate ng-disabled="!ctrl.file">send</button>
                         </div>
                     </div>
                 </fieldset></form>
             </div>
-    
+
             <div class="progress-area">
-                <div class="progress" ng-repeat="progress in ctrl.progress" ng-if="!progress.success">
+                <div class="progress mb-2" ng-repeat="progress in ctrl.progress" ng-if="!progress.success">
                     <div class="progress-bar"
                         ng-style="{width: progress.percentage+'%'}"
-                        ng-class="{'progress-bar-info': !progress.success && !progress.failed, 'progress-bar-success': progress.success, 'progress-bar-danger': progress.failed}" 
-                        role="progressbar" aria-valuenow="{{progress.percentage}}" 
+                        ng-class="{'bg-info': !progress.success && !progress.failed, 'bg-success': progress.success, 'bg-danger': progress.failed}"
+                        role="progressbar" aria-valuenow="{{progress.percentage}}"
                         aria-valuemin="0" aria-valuemax="100">
-                        <span class="file-name" ng-bind="progress.filename"></span> 
+                        <span class="file-name" ng-bind="progress.filename"></span>
                         <span class="percentage" ng-bind="progress.percentage + '%'" ng-if="progress.percentage < 100"></span>
                         <span ng-repeat="message in progress.invalidParams.file" ng-bind="message"></span>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <div class="pictures row" ng-repeat="chunk in ctrl.picturesChunks">
             <div class="col-lg-2 col-md-2 col-sm-2" ng-repeat="picture in chunk">
                 <autowp-thumbnail picture="picture" is-moder="isModer"></autowp-thumbnail>
                 <p><a href="#" ng-click="ctrl.crop(picture)">
-                    <i class="fa fa-crop"></i> 
+                    <i class="fa fa-crop"></i>
                     <translate ng-if="!picture.crop">upload/picture/crop</translate>
                     <translate ng-if="picture.crop" translate-values="{resolution: picture.crop.width + '×' + picture.crop.height + '+' + picture.crop.left + '+' +picture.crop.top}">upload/picture/cropped-to</translate>
                 </a></p>
             </div>
         </div>
     </div>
-    
-    <div class="well" ng-if="!ctrl.selected">
+
+    <div class="card card-body" ng-if="!ctrl.selected">
         <div autowp-markdown="'upload/description'|translate"></div>
         <p style="margin:10px">
             <a ui-sref="upload-select" class="btn btn-primary btn-lg">
-                <i class="fa fa-upload"></i> 
+                <i class="fa fa-upload"></i>
                 <translate>upload/add-picture</translate>
             </a>
         </p>

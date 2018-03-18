@@ -123,17 +123,19 @@
     <?php if ($this->currentPicturesCount) { ?>
         <h3><?=$this->escapeHtml(sprintf($this->translate('catalogue/other-pictures-of-%1$s'), $this->carFullName)) ?></h3>
 
-        <div class="row thumbnails">
+        <div class="row">
             <?php foreach ($this->currentPictures as $picture) { ?>
                 <div class="col-md-3">
                     <?=$this->htmlA([
                         'href'  => $picture['url'],
-                        'class' => 'thumbnail'
-                    ], $this->htmlImg($picture['src'], [
+                        'class' => 'd-block rounded mb-4'
+                    ], $this->htmlImg([
+                        'src'     => $picture['src'],
                         'format'  => 'picture-thumb',
                         'alt'     => $picture['name'],
                         'title'   => $picture['name'],
-                        'shuffle' => true
+                        'shuffle' => true,
+                        'class'   => 'rounded w-100 border border-light'
                     ]), false)?>
                 </div>
             <?php } ?>
@@ -157,18 +159,20 @@
             <?=$this->car()->htmlTitle(array_replace($this->car, $modification['nameParams']))?>
         </h3>
 
-        <div class="row thumbnails">
+        <div class="row">
             <?php foreach ($modification['pictures'] as $picture) { ?>
                 <div class="col-md-3">
                     <?php if ($picture) { ?>
                         <?=$this->htmlA([
                             'href'  => $picture['url'],
-                            'class' => 'thumbnail'
-                        ], $this->htmlImg($picture['src'], [
+                            'class' => 'd-block rounded mb-4'
+                        ], $this->htmlImg([
+                            'src'     => $picture['src'],
                             'format'  => 'picture-thumb',
                             /*'alt'     => $picture['name'],
                             'title'   => $picture['name'],*/
-                            'shuffle' => true
+                            'shuffle' => true,
+                            'class'   => 'rounded w-100 border border-light'
                         ]), false)?>
                     <?php } else { ?>
                         &nbsp;
@@ -180,14 +184,14 @@
         <ul class="list-inline">
 
             <?php if (isset($modification['url']) && $modification['url']) { ?>
-                <li>
+                <li class="list-inline-item">
                     <span class="fa fa-th"></span>
                     <?=$this->htmlA($modification['url'], $this->translate('carlist/all pictures').' ('.$modification['totalPictures'].')')?>
                 </li>
             <?php } ?>
 
             <?php if ($this->isCarModer) { ?>
-                <li>
+                <li class="list-inline-item">
                     <i class="fa fa-cog"></i>
                     <?=$this->htmlA('#' /*$item['moderUrl']*/, $this->translate('moder/edit-object')) ?>
                 </li>

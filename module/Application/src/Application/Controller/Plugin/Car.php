@@ -217,7 +217,7 @@ class Car extends AbstractPlugin
             $pictures = $cFetcher->fetch($car, [
                 'totalPictures' => $totalPictures
             ]);
-            $largeFormat = false;
+            $largeFormat = count($pictures) > 4;
             foreach ($pictures as &$picture) {
                 if ($picture) {
                     if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
@@ -226,9 +226,6 @@ class Car extends AbstractPlugin
                         $url = $listBuilder->getPictureUrl($car, $picture['row']);
                     }
                     $picture['url'] = $url;
-                    if ($picture['format'] == 'picture-thumb-medium') {
-                        $largeFormat = true;
-                    }
                 }
             }
             unset($picture);
@@ -359,11 +356,14 @@ class Car extends AbstractPlugin
         $allPictures = [];
         $allFormatRequests = [];
         foreach ($items as $item) {
-            foreach ($item['pictures'] as $picture) {
+            foreach ($item['pictures'] as $idx => $picture) {
                 if ($picture) {
                     $row = $picture['row'];
                     $allPictures[] = $row;
-                    $allFormatRequests[$picture['format']][$row['id']] = $catalogue->getPictureFormatRequest($row);
+                    if ($largeFormat && $idx == 0) {
+                        $allFormatRequests['picture-thumb-large'][$row['id']] = $catalogue->getPictureFormatRequest($row);
+                    }
+                    $allFormatRequests['picture-thumb-medium'][$row['id']] = $catalogue->getPictureFormatRequest($row);
                 }
             }
         }
@@ -382,13 +382,27 @@ class Car extends AbstractPlugin
 
         // populate prefetched
         foreach ($items as &$item) {
-            foreach ($item['pictures'] as &$picture) {
+            foreach ($item['pictures'] as $idx => &$picture) {
                 if ($picture) {
                     $id = $picture['row']['id'];
-                    $format = $picture['format'];
 
                     $picture['name'] = isset($pictureNames[$id]) ? $pictureNames[$id] : null;
-                    $picture['src'] = isset($imagesInfo[$format][$id]) ? $imagesInfo[$format][$id]->getSrc() : null;
+
+                    if ($largeFormat && $idx == 0) {
+                        $large = isset($imagesInfo['picture-thumb-large'][$id]) ? $imagesInfo['picture-thumb-large'][$id] : null;
+                        $picture['large'] = [
+                            'src'    => $large->getSrc(),
+                            'width'  => $large->getWidth(),
+                            'height' => $large->getHeight()
+                        ];
+                    } else {
+                        $medium = isset($imagesInfo['picture-thumb-medium'][$id]) ? $imagesInfo['picture-thumb-medium'][$id] : null;
+                        $picture['medium'] = [
+                            'src'    => $medium->getSrc(),
+                            'width'  => $medium->getWidth(),
+                            'height' => $medium->getHeight()
+                        ];
+                    }
                     unset($picture['row'], $picture['format']);
                 }
             }

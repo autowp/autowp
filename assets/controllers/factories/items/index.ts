@@ -12,26 +12,26 @@ export class FactoryItemsController {
     public factory: autowp.IItem;
     public items: any[];
     public paginator: autowp.IPaginator;
-  
+
     constructor(
         private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
         private $state: any,
         private ItemService: ItemService
     ) {
-      
+
         var self = this;
-      
+
         this.ItemService.getItem(this.$state.params.id, {
             fields: ['name_text', 'name_html', 'lat', 'lng', 'description'].join(',')
         }).then(function(item: autowp.IItem) {
             self.factory = item;
-            
+
             if (self.factory.item_type_id != 6) {
                 self.$state.go('error-404');
                 return;
             }
-  
+
             self.$scope.pageEnv({
                 layout: {
                     blankPage: false,
@@ -44,7 +44,7 @@ export class FactoryItemsController {
                     FACTORY_NAME: self.factory.name_text
                 }
             });
-          
+
             self.$http({
                 method: 'GET',
                 url: '/api/item',
@@ -57,7 +57,7 @@ export class FactoryItemsController {
                         'design,engine_vehicles',
                         'url,spec_editor_url,specs_url,more_pictures_url',
                         'categories.url,categories.name_html,twins_groups.url',
-                        'preview_pictures,childs_count,total_pictures'
+                        'preview_pictures.picture.thumb_medium,childs_count,total_pictures'
                     ].join(',')
                 }
             }).then(function(response: ng.IHttpResponse<autowp.IPaginatedCollection<any>>) {
@@ -66,7 +66,7 @@ export class FactoryItemsController {
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             self.$state.go('error-404');
         });

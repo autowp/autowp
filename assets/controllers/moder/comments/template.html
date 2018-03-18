@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-md-4">
         <h2 translate>moder/comments/filter</h2>
-        <form class="well form-vertical">
+        <form class="card card-body form-vertical">
             <div class="form-group">
                 <label translate>moder/comments/filter/user-id</label>
                 <input type="text" name="user_id" class="form-control" />
@@ -29,11 +29,11 @@
             </span>
             <small ng-if="ctrl.paginator.totalItemCount" translate="ng/%1$s-comments" translate-values="{count: ctrl.paginator.totalItemCount}"></small>
         </h2>
-        
+
         <ul class="comments">
             <li ng-repeat="comment in ctrl.comments">
-                <span class="label label-warning" ng-if="comment.is_new" translate>moder/comments/not-readed</span>
-                <span class="label label-{{comment.status.class}}" ng-if="comment.status">{{comment.status.name|translate}}</span>
+                <span class="badge badge-warning" ng-if="comment.is_new" translate>moder/comments/not-readed</span>
+                <span class="badge badge-{{comment.status.class}}" ng-if="comment.status">{{comment.status.name|translate}}</span>
                 <a ng-href="{{comment.url}}" ng-bind="comment.preview"></a>
                 <autowp-user user="comment.user"></autowp-user>
             </li>

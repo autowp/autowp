@@ -1,6 +1,6 @@
 import * as angular from 'angular';
 import Module from 'app.module';
-import './styles.less';
+import './styles.scss';
 import notify from 'notify';
 
 interface IAutowpDonateVodSelectItemDirectiveScope extends ng.IScope {
@@ -14,16 +14,16 @@ class AutowpDonateVodSelectItemController {
 
     static $inject = ['$scope', '$http'];
     constructor(
-        protected $scope: IAutowpDonateVodSelectItemDirectiveScope, 
+        protected $scope: IAutowpDonateVodSelectItemDirectiveScope,
         private $http: ng.IHttpService
     ) {
     }
 
     public toggleItem() {
         var self = this;
-      
+
         this.$scope.item.expanded = !this.$scope.item.expanded;
-        
+
         if (this.$scope.item.expanded) {
             this.loading = true;
             this.$http({

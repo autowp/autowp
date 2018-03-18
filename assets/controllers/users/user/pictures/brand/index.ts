@@ -9,7 +9,7 @@ const STATE_NAME = 'users-user-pictures-brand';
 export class UsersUserPicturesBrandController {
     static $inject = ['$scope', '$state', '$http'];
     public user: any;
-    public chunks: any[];
+    public pictures: any[];
     public paginator: autowp.IPaginator;
     public brand: any;
     public identity: string;
@@ -105,7 +105,7 @@ export class UsersUserPicturesBrandController {
                 url: '/api/picture',
                 params: {
                     status: 'accepted',
-                    fields: 'owner,thumbnail,votes,views,comments_count,name_html,name_text',
+                    fields: 'owner,thumb_medium,votes,views,comments_count,name_html,name_text',
                     limit: 30,
                     page: self.$state.params.page,
                     item_id: self.brand.id,
@@ -113,7 +113,7 @@ export class UsersUserPicturesBrandController {
                     order: 1
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
-                self.chunks = chunkBy(response.data.pictures, 6);
+                self.pictures = response.data.pictures;
                 self.paginator = response.data.paginator;
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);

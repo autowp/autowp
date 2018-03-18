@@ -17,7 +17,7 @@
     <div class="<?=implode(' ', $classes)?>" data-id="<?=(int)$comment['id']?>" id="msg<?=(int)$comment['id']?>">
         <div>
             <?php if ($comment['datetime']) { ?>
-                <div class="pull-right">
+                <div class="float-right">
                     <?=$this->pastTimeIndicator($comment['datetime']);?>
                 </div>
             <?php } ?>
@@ -68,14 +68,14 @@
                 </span>
 
                 <?php if ($this->user()->logedIn() && $deep < 21) { ?>
-                    <button class="btn btn-xs btn-primary reply">
+                    <button class="btn btn-sm btn-primary reply">
                         <i class="fa fa-reply"></i>
                         <?=$this->escapeHtml($this->translate('comments/reply'))?>
                     </button>
                 <?php } ?>
 
                 <?php if ($moderAttention && $isModer) { ?>
-                    <button class="btn btn-xs btn-success resolve">
+                    <button class="btn btn-sm btn-success resolve">
                         <i class="fa fa-reply"></i>
                         <?=$this->escapeHtml($this->translate('comments/reply'))?> &amp; resolve
                     </button>
@@ -84,11 +84,11 @@
                 <?php if ($this->canRemoveComments) { ?>
                     <?=$this->htmlA([
                         'href'  => '#',
-                        'class' => 'btn btn-danger btn-xs pull-right comment-remove-button',
+                        'class' => 'btn btn-danger btn-sm float-right comment-remove-button',
                     ], '<i class="fa fa-trash"></i></span> ' . $this->escapeHtml($this->translate('comments/message/delete')), false) ?>
                     <?=$this->htmlA([
                         'href'  => '#',
-                        'class' => 'btn btn-success btn-xs pull-right comment-restore-button',
+                        'class' => 'btn btn-success btn-sm float-right comment-restore-button',
                     ], '<i class="fa fa-arrow-up"></i> ' . $this->escapeHtml($this->translate('comments/message/restore')), false) ?>
                 <?php } ?>
 
@@ -97,12 +97,12 @@
                         'href'  => $this->url($this->moveMessageRoute, array_replace($this->moveMessageUrl, [
                             'id' => $comment['id']
                         ])),
-                        'class' => 'btn btn-default btn-xs pull-right',
+                        'class' => 'btn btn-secondary btn-sm float-right',
                     ], '<i class="fa fa-arrows"></i> ' . $this->escapeHtml($this->translate('comments/message/move')), false) ?>
                 <?php } ?>
 
                 <?php if ($this->canViewIp && $comment['ip']) { ?>
-                    <i class="pull-right fa fa-eye" data-toggle="tooltip" title="<?=$comment['ip'] ?>" style="margin-right:20px"></i>
+                    <i class="float-right fa fa-eye" data-toggle="tooltip" title="<?=$comment['ip'] ?>" style="margin-right:20px"></i>
                 <?php } ?>
 
                 <?php if ($moderAttention) { ?>

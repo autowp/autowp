@@ -120,7 +120,8 @@ class PictureHydrator extends RestHydrator
 
         $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('image', $strategy);
-        $this->addStrategy('thumbnail', $strategy);
+        $this->addStrategy('thumb', $strategy);
+        $this->addStrategy('thumb_medium', $strategy);
         $this->addStrategy('image_gallery_full', $strategy);
 
         $strategy = new Strategy\User($serviceManager);
@@ -254,10 +255,17 @@ class PictureHydrator extends RestHydrator
             $picture['owner'] = $owner ? $this->extractValue('owner', $owner) : null;
         }
 
-        if ($this->filterComposite->filter('thumbnail')) {
-            $picture['thumbnail'] = $this->extractValue('thumbnail', [
+        if ($this->filterComposite->filter('thumb')) {
+            $picture['thumb'] = $this->extractValue('thumb', [
                 'image'  => Picture::buildFormatRequest((array)$object),
                 'format' => 'picture-thumb'
+            ]);
+        }
+
+        if ($this->filterComposite->filter('thumb_medium')) {
+            $picture['thumb_medium'] = $this->extractValue('thumb_medium', [
+                'image'  => Picture::buildFormatRequest((array)$object),
+                'format' => 'picture-thumb-medium'
             ]);
         }
 

@@ -4,9 +4,9 @@
 
 <div style="margin-bottom:50px">
     <span translate="crop-dialog/resolution-x-aspect-y" translate-values="{resolution: ctrl.resolution, aspect: ctrl.aspect}"></span>
-    <button ng-click="ctrl.selectAll()" class="btn btn-default" translate>crop-dialog/select-all</button>
-    <span class="pull-right">
-        <a ui-sref="moder-pictures-item({id: ctrl.picture.id})" class="btn btn-default" translate>crop-dialog/close</a>
+    <button ng-click="ctrl.selectAll()" class="btn btn-secondary" translate>crop-dialog/select-all</button>
+    <span class="float-right">
+        <a ui-sref="moder-pictures-item({id: ctrl.picture.id})" class="btn btn-secondary" translate>crop-dialog/close</a>
         <button ng-click="ctrl.saveCrop()" class="btn btn-primary" translate>crop-dialog/save</button>
     </span>
 </div>

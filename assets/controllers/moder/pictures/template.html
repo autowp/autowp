@@ -1,30 +1,16 @@
-<ul class="nav nav-pills">
-    <li>
-        <a ui-sref="moder-pictures({order: 1, status: 'inbox'})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/inbox</a>
-    </li>
-    <li>
-        <a ui-sref="moder-pictures({order: 1, status: 'accepted', perspective_id: 'null', type_id: 1})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/missing-perspective</a>
-    </li>
-    <li>
-        <a ui-sref="moder-pictures({order: 11, status: 'removing'})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/delete-queue</a>
-    </li>
-    <li>
-        <a ui-sref="moder-pictures({order: 1, requests: 3, status: 'custom1'})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/votes</a>
-    </li>
-    <li>
-        <a ui-sref="moder-pictures({order: 7, comments: 1})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/comments</a>
-    </li>
-    <li>
-        <a ui-sref="moder-pictures({order: 9, requests: 3, status: 'custom1'})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/new-votes</a>
-    </li>
-    <li>
-        <a ui-sref="moder-pictures({order: 1, status: 'inbox', replace: 1})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/replaces</a>
-    </li>
-</ul>
+<div class="nav nav-pills">
+    <a class="nav-link" ui-sref="moder-pictures({order: 1, status: 'inbox'})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/inbox</a>
+    <a class="nav-link" ui-sref="moder-pictures({order: 1, status: 'accepted', perspective_id: 'null', type_id: 1})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/missing-perspective</a>
+    <a class="nav-link" ui-sref="moder-pictures({order: 11, status: 'removing'})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/delete-queue</a>
+    <a class="nav-link" ui-sref="moder-pictures({order: 1, requests: 3, status: 'custom1'})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/votes</a>
+    <a class="nav-link" ui-sref="moder-pictures({order: 7, comments: 1})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/comments</a>
+    <a class="nav-link" ui-sref="moder-pictures({order: 9, requests: 3, status: 'custom1'})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/new-votes</a>
+    <a class="nav-link" ui-sref="moder-pictures({order: 1, status: 'inbox', replace: 1})" ui-sref-opts="{inherit: false, reload: true}" translate>moder/picture/replaces</a>
+</div>
 <div class="row">
     <div class="col-lg-4 col-md-4">
         <h2 translate>moder/pictures/filter</h2>
-        <form class="well form-vertical">
+        <form class="card card-body form-vertical">
             <div class="form-group">
                 <label translate>moder/picture/filter/status</label>
                 <select name="status" class="form-control" ng-model="ctrl.status" ng-change="ctrl.load()">
@@ -86,25 +72,25 @@
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="special_name" value="1" ng-model="ctrl.special_name" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="special_name" value="1" ng-model="ctrl.special_name" ng-change="ctrl.load()" />
                     {{'moder/picture/filter/special-name'|translate}}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="lost" value="1" ng-model="ctrl.lost" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="lost" value="1" ng-model="ctrl.lost" ng-change="ctrl.load()" />
                     {{'moder/picture/filter/not-linked'|translate}}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="gps" value="1" ng-model="ctrl.gps" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="gps" value="1" ng-model="ctrl.gps" ng-change="ctrl.load()" />
                     {{'moder/picture/filter/gps'|translate}}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="similar" value="1" ng-model="ctrl.similar" ng-change="ctrl.load()" /> 
+                    <input type="checkbox" name="similar" value="1" ng-model="ctrl.similar" ng-change="ctrl.load()" />
                     {{'moder/picture/filter/similar'|translate}}
                 </label>
             </div>
@@ -128,7 +114,7 @@
         </form>
     </div>
     <div class="col-lg-8 col-md-8">
-    
+
         <h2>
             {{'page/73/name'|translate}}
             <span ng-show="ctrl.loading > 0">
@@ -136,7 +122,7 @@
             </span>
             <small ng-if="paginator.totalItemCount" translate="ng/%1$s-pictures" translate-values="{count: paginator.totalItemCount}"></small>
         </h2>
-    
+
         <div style="margin-bottom:20px">
             <div class="btn-group">
                 <button ng-disabled="!ctrl.hasSelectedItem" class="btn btn-success" ng-click="ctrl.acceptPictures()">
@@ -147,32 +133,28 @@
                         {{'moder/picture/acceptance/want-accept'|translate}}
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                        <li ng-repeat="template in ctrl.moderVoteTemplateOptions" ng-if="template.vote > 0">
-                            <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
-                        </li>
-                    </ul>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <a ng-repeat="template in ctrl.moderVoteTemplateOptions" ng-if="template.vote > 0" class="dropdown-item" ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
+                    </div>
                 </div>
                 <div class="btn-group">
                     <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-disabled="!ctrl.hasSelectedItem">
                         {{'moder/picture/acceptance/want-delete'|translate}}
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                        <li ng-repeat="template in ctrl.moderVoteTemplateOptions" ng-if="template.vote < 0">
-                            <a ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
-                        </li>
-                    </ul>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <a ng-repeat="template in ctrl.moderVoteTemplateOptions" ng-if="template.vote < 0" class="dropdown-item" ng-bind="template.name" aria-label="{{template.name}}" ng-click="ctrl.votePictures(template.vote, template.name);"></a>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="row" ng-repeat="chunk in ctrl.chunks">
-            <div class="col-sm-3" ng-repeat="picture in chunk">
+            <div class="col-sm-4" ng-repeat="picture in chunk">
                 <autowp-thumbnail picture="picture" onselect="ctrl.onPictureSelect" is-moder="isModer"></autowp-thumbnail>
             </div>
         </div>
-        
+
         <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
     </div>
 </div>

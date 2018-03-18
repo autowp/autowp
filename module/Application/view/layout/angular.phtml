@@ -38,124 +38,102 @@ ga('send', 'pageview');
 
         <div id="moderatorMenuContainer" style="z-index:100" ng-if="moderMenu">
             <div class="btn-group dropup" >
-                <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">
+                <button data-toggle="dropdown" class="btn btn-secondary dropdown-toggle">
                     {{'moder-menu/title'|translate}}
                     <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu pull-right">
-                    <li ng-repeat="item in moderMenu">
-                        <a ng-href="{{item.href}}">
-                            <i class="fa-fw {{item.icon}}" ng-if="item.icon"></i>
-                            {{item.label}}
-                            <span class="badge" ng-if="item.count" ng-bind="item.count"></span>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li><a ui-sref="moder">
+                <div class="dropdown-menu float-right">
+                    <a ng-href="{{item.href}}" class="dropdown-item" ng-repeat="item in moderMenu">
+                        <i class="fa-fw {{item.icon}}" ng-if="item.icon"></i>
+                        {{item.label}}
+                        <span class="badge badge-pill badge-secondary" ng-if="item.count" ng-bind="item.count"></span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a ui-sref="moder" class="dropdown-item">
                         <i class="fa fa-cog"></i>
                         {{'page/67/name'|translate}}
-                    </a></li>
-                </ul>
+                    </a>
+                </div>
             </div>
         </div>
 
-        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation" ng-if="!blankPage">
+        <div class="navbar fixed-top navbar-expand-md navbar-dark bg-dark" ng-if="!blankPage">
             <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="/" title="{{'page/1/title'|translate}}">
-                        <svg>
-                            <path d="M 25.084186,6.42508 A 23.373101,22.952514 0 0 0 2.3045258,24.36829 l 4.6649949,0.69665 a 18.670109,18.165696 0 0 1 2.2157068,-5.22461 l 8.1363055,5.87817 a 8.7994987,8.2394148 0 0 0 -0.720458,1.77407 c 3.39102,1.47331 6.006412,3.38159 8.53766,5.33717 2.128107,-1.62945 4.12335,-3.67705 8.512342,-5.40515 a 8.7994987,8.2394148 0 0 0 -0.720899,-1.75241 l 8.091717,-5.84614 a 18.670109,18.165696 0 0 1 2.236046,5.25665 l 4.636644,-0.63755 A 23.373101,22.952514 0 0 0 25.084186,6.42508 Z m 0.0279,4.67475 a 18.670109,18.165696 0 0 1 13.156976,5.31682 l -8.46016,6.07776 a 8.7994987,8.2394148 0 0 0 -4.668675,-1.27227 8.7994987,8.2394148 0 0 0 -4.717385,1.30345 l -8.475101,-6.0886 A 18.670109,18.165696 0 0 1 25.112086,11.09983 Z M 0.06,25.71092 0.1719214,32.42839 c 11.5620876,0.30579 19.0486266,4.79308 24.8875546,10.9705 l 0,-8.9e-4 8.91e-4,0.002 4.4e-4,-10e-4 0,6.7e-4 C 30.899734,37.22225 38.386273,32.73517 49.94836,32.42938 l 0.111922,-6.71769 -0.0359,0.063 c -15.908438,1.59268 -20.550853,5.31075 -24.963965,9.39343 l -4.5e-4,0 C 20.646834,31.08557 16.004418,27.36749 0.0959807,25.77482 l -0.0359,-0.063 z" />
-                        </svg>
-                    </a>
-                </div>
-                <div class="collapse navbar-collapse navbar-responsive-collapse">
-                    <ul class="nav navbar-nav">
-                        <?php /* class="<?=$this->pageEnv()->isOnPath($page['id']) ? ' active' : ''?>"*/?>
-                        <li ng-repeat="page in mainMenu.pages" ng-class="{dropdown: page.id == 22, 'hidden-sm': [25, 117, 42].indexOf(+page.id) != -1, 'hidden-md': page.id == 42}">
-                            <a ng-href="{{page.url}}" ng-bind="page.name" ng-if="page.id != 22"></a>
-                            <a href="#" ng-if="page.id == 22" class="dropdown-toggle" data-toggle="dropdown">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand" href="/" title="{{'page/1/title'|translate}}">
+                    <svg>
+                        <path d="M 25.084186,6.42508 A 23.373101,22.952514 0 0 0 2.3045258,24.36829 l 4.6649949,0.69665 a 18.670109,18.165696 0 0 1 2.2157068,-5.22461 l 8.1363055,5.87817 a 8.7994987,8.2394148 0 0 0 -0.720458,1.77407 c 3.39102,1.47331 6.006412,3.38159 8.53766,5.33717 2.128107,-1.62945 4.12335,-3.67705 8.512342,-5.40515 a 8.7994987,8.2394148 0 0 0 -0.720899,-1.75241 l 8.091717,-5.84614 a 18.670109,18.165696 0 0 1 2.236046,5.25665 l 4.636644,-0.63755 A 23.373101,22.952514 0 0 0 25.084186,6.42508 Z m 0.0279,4.67475 a 18.670109,18.165696 0 0 1 13.156976,5.31682 l -8.46016,6.07776 a 8.7994987,8.2394148 0 0 0 -4.668675,-1.27227 8.7994987,8.2394148 0 0 0 -4.717385,1.30345 l -8.475101,-6.0886 A 18.670109,18.165696 0 0 1 25.112086,11.09983 Z M 0.06,25.71092 0.1719214,32.42839 c 11.5620876,0.30579 19.0486266,4.79308 24.8875546,10.9705 l 0,-8.9e-4 8.91e-4,0.002 4.4e-4,-10e-4 0,6.7e-4 C 30.899734,37.22225 38.386273,32.73517 49.94836,32.42938 l 0.111922,-6.71769 -0.0359,0.063 c -15.908438,1.59268 -20.550853,5.31075 -24.963965,9.39343 l -4.5e-4,0 C 20.646834,31.08557 16.004418,27.36749 0.0959807,25.77482 l -0.0359,-0.063 z" />
+                    </svg>
+                </a>
+
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                        <li class="nav-item" ng-repeat="page in mainMenu.pages" ng-class="{dropdown: page.id == 22, 'd-md-none d-lg-block': [25, 117].indexOf(+page.id) != -1, 'd-md-none d-lg-none d-xl-block': page.id == 42}">
+                            <a class="nav-link" ng-href="{{page.url}}" ng-bind="page.name" ng-if="page.id != 22"></a>
+                            <a href="#" ng-if="page.id == 22" class="nav-link dropdown-toggle" data-toggle="dropdown">
                                 {{page.name}} <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
-                                <li ng-repeat="category in mainMenu.categories">
-                                    <a ng-href="{{category.url}}">
-                                        {{category.name}}&#xa0;<span class="count">({{category.cars_count - category.new_cars_count}}<span ng-if="category.new_cars_count > 0">+{{category.new_cars_count}}</span>)</span>
-                                    </a>
-                                </li>
+                                <a ng-href="{{category.url}}" class="dropdown-item" ng-repeat="category in mainMenu.categories">
+                                    {{category.name}}&#xa0;<span class="count">({{category.cars_count - category.new_cars_count}}<span ng-if="category.new_cars_count > 0">+{{category.new_cars_count}}</span>)</span>
+                                </a>
                             </ul>
                         </li>
                     </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li<?=$this->pageEnv()->isOnPath(49) ? ' class="active"' : ''?> ng-if="user">
-                            <a ui-sref="account-messages" ui-sref-opts="{inherit:false}">
-                                <i class="fa fa-comment"></i>
-                                <span class="badge" ng-bind="newPersonalMessages" ng-if="newPersonalMessages"></span>
-                            </a>
-                        </li>
-                        <li<?=$this->pageEnv()->isOnPath(79) ? ' class="active"' : ''?> ng-if="!user">
-                            <a href="/ng/login">
-                                <i class="fa fa-sign-in"></i>
-                                {{'login/sign-in'|translate}}
-                            </a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                {{'page/87/name'|translate}} <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <?php /*if ($this->pageEnv()->isOnPath($page['id'])) {
-                                    $classes[] = 'active';
-                                }*/?>
-                                <li ng-repeat="page in mainMenu.pages | filter: isSecondaryMenuItems" ng-if="(!page.registered_only || user) && (!page.guest_only || !user)">
-                                    <a ng-href="{{page.url}}" ng-bind="page.name" ng-class="{'visible-sm': [25, 117, 42].indexOf(+page.id) !== -1, 'visible-md': page.id == 42}"></a>
-                                </li>
-                                <li class="divider visible-sm visible-md"></li>
-                                <?php /* if ($page['id'] == 90) {?>
-                                    <li class="divider"></li>
-                                <?php } */ ?>
-                                <?php /*=$this->pageEnv()->isOnPath($page['id']) ? 'active' : ''*/?>
-                                <li class="{{page.class}}" ng-repeat="page in mainMenu.secondMenu" ng-if="(!page.registered_only || user) && (!page.guest_only || !user)">
-                                    <a ng-href="{{page.url}}" ng-if="page.url != '/login/logout'">
-                                        <i class="{{page.icon}}" ng-if="page.icon"></i>
-                                        {{page.name}}
-                                    </a>
-                                    <a href="#" ng-if="page.url == '/login/logout'" ng-click="doLogout()">
-                                        <i class="{{page.icon}}" ng-if="page.icon"></i>
-                                        {{page.name}}
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" ng-repeat="language in languages | filter: { active: true }">
-                                <i class="{{language.flag}}"></i>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li ng-class="{active: language.active}" ng-repeat="language in languages">
-                                    <a ng-href="{{language.url + path.substring(1)}}">
-                                        <i class="{{language.flag}}"></i>
-                                        {{language.name}}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://github.com/autowp/autowp/tree/master/module/Application/language" translate>layout/language-contributing</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-
-                    <form action="//www.google.com/search" method="get" class="navbar-form navbar-right">
+                    <form action="//www.google.com/search" method="get" class="form-inline my-2 my-lg-0 mr-4">
                         <input type="hidden" name="ie" value="utf-8" />
                         <input type="hidden" name="domains" value="{{mainMenu.searchHostname}}" />
                         <input type="hidden" name="sitesearch" value="{{mainMenu.searchHostname}}" />
                         <input type="text" class="form-control" placeholder="{{'layout/search'|translate}}" name="q" />
                     </form>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="nav-item<?=$this->pageEnv()->isOnPath(49) ? ' active' : ''?>" ng-if="user">
+                            <a class="nav-link" ui-sref="account-messages" ui-sref-opts="{inherit:false}">
+                                <i class="fa fa-comment"></i>
+                                <span class="badge badge-pill badge-secondary" ng-bind="newPersonalMessages" ng-if="newPersonalMessages"></span>
+                            </a>
+                        </li>
+                        <li class="nav-item<?=$this->pageEnv()->isOnPath(79) ? ' active' : ''?>" ng-if="!user">
+                            <a href="/ng/login" class="nav-link">
+                                <i class="fa fa-sign-in"></i>
+                                {{'login/sign-in'|translate}}
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                                {{'page/87/name'|translate}} <b class="caret"></b>
+                            </a>
+                            <div class="dropdown-menu">
+                                <?php /*if ($this->pageEnv()->isOnPath($page['id'])) {
+                                    $classes[] = 'active';
+                                }*/?>
+                                <a ng-repeat="page in mainMenu.pages | filter: isSecondaryMenuItems" ng-if="(!page.registered_only || user) && (!page.guest_only || !user)" class="dropdown-item" ng-href="{{page.url}}" ng-bind="page.name" ng-class="{'d-block d-sm-block d-md-block d-lg-none': [25, 117].indexOf(+page.id) !== -1, 'd-block d-sm-block d-md-block d-lg-block d-xl-none': page.id == 42}"></a>
+                                <div class="dropdown-divider d-block d-sm-block d-md-block d-lg-block d-xl-none"></div>
+                                <?php /* if ($page['id'] == 90) {?>
+                                    <li class="divider"></li>
+                                <?php } */ ?>
+                                <?php /*=$this->pageEnv()->isOnPath($page['id']) ? 'active' : ''*/?>
+                                <a ng-href="{{page.url}}" ng-if="page.url != '/login/logout'" class="dropdown-item {{page.class}}" ng-repeat="page in mainMenu.secondMenu" ng-if="(!page.registered_only || user) && (!page.guest_only || !user)" ng-click="page.url == '/login/logout' ? doLogout() : true">
+                                    <i class="{{page.icon}}" ng-if="page.icon"></i>
+                                    {{page.name}}
+                                </a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" ng-repeat="language in languages | filter: { active: true }">
+                                <i class="{{language.flag}}"></i>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" ng-href="{{language.url + path.substring(1)}}" ng-class="{active: language.active}" ng-repeat="language in languages">
+                                    <i class="{{language.flag}}"></i>
+                                    {{language.name}}
+                                </a>
+                                <a class="dropdown-item" href="https://github.com/autowp/autowp/tree/master/module/Application/language" translate>layout/language-contributing</a>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -172,7 +150,7 @@ ga('send', 'pageview');
                     <ui-view></ui-view>
                 </div>
                 <div class="col-sm-{{spanRight}}" ng-if="needRight">
-                    <div class="well" ng-if="user">
+                    <div class="card card-body" ng-if="user">
                         <div>
                             <autowp-user user="user"></autowp-user><br />
                             <a ui-sref="account-profile" translate>page/48/name</a><br />
@@ -186,7 +164,7 @@ ga('send', 'pageview');
                     </div>
 
                     <h3 ng-if="!user" translate>login/sign-in</h3>
-                    <div class="well" ng-if="!user">
+                    <div class="card card-body" ng-if="!user">
                         <form ng-submit="doLogin()">
                             <p><input type="text" name="login" placeholder="{{'login/login-or-email'|translate}}" class="form-control" ng-model="loginForm.login" /></p>
                             <p ng-repeat="message in loginInvalidParams.login" ng-bind="message" class="help-block"></p>
@@ -199,7 +177,7 @@ ga('send', 'pageview');
                                 </label>
                             </div>
                             <div>
-                                <div class="pull-right text-right">
+                                <div class="float-right text-right">
                                     <a href="/ng/signup" translate>login/registration</a><br />
                                     <a href="/ng/restore-password" translate>login/forgot-password?</a>
                                 </div>

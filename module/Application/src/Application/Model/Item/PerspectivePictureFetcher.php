@@ -155,11 +155,8 @@ class PerspectivePictureFetcher extends PictureFetcher
         $emptyPictures = 0;
         foreach ($pictures as $idx => $picture) {
             if ($picture) {
-                $format = $useLargeFormat && $idx == 0 ? 'picture-thumb-medium' : 'picture-thumb';
-
                 $result[] = [
-                    'format' => $format,
-                    'row'    => $picture,
+                    'row' => $picture,
                 ];
             } else {
                 $result[] = false;
@@ -190,8 +187,7 @@ class PerspectivePictureFetcher extends PictureFetcher
                 }
                 $pictureRow = $pictureRows[$extraPicIdx++];
                 $result[$idx] = [
-                    'format' => 'picture-thumb',
-                    'row'    => $pictureRow,
+                    'row'           => $pictureRow,
                     'isVehicleHood' => true
                 ];
             }

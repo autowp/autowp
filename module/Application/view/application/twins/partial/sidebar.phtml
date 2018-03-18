@@ -1,8 +1,11 @@
-<div class="well well-sm">
-    <ul class="nav nav-pills nav-stacked">
+<div class="card card-body">
+    <ul class="nav flex-column nav-pills">
         <?php foreach ($this->brands as $brand) { ?>
-            <li<?= $brand['selected'] ? ' class="active"' : ''?>>
-                <?=$this->htmlA($brand['url'], $this->escapeHtml($brand['name']) . ' ' . $this->count($brand['count'], $brand['new_count']), false) ?>
+            <li class="nav-item">
+                <?=$this->htmlA([
+                    'class' => 'nav-link' . ($brand['selected'] ? ' class="active"' : ''),
+                    'href'  => $brand['url']
+                ], $this->escapeHtml($brand['name']) . ' ' . $this->count($brand['count'], $brand['new_count']), false) ?>
             </li>
         <?php } ?>
     </ul>

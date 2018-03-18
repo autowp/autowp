@@ -26,7 +26,7 @@ function toPlain(options: any[], deep: number): any[] {
 
 export class ModerPicturesController {
     static $inject = ['$scope', '$http', '$state', '$q', '$element', 'PerspectiveService', 'PictureModerVoteService', 'PictureModerVoteTemplateService', 'VehicleTypeService'];
-    
+
     public loading: number = 0;
     public onPictureSelect: Function;
     public pictures: any[] = [];
@@ -53,14 +53,14 @@ export class ModerPicturesController {
     public status: any;
 
     constructor(
-        private $scope: autowp.IControllerScope, 
+        private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
         private $state: any,
-        private $q: ng.IQService, 
-        private $element: any, 
-        private PerspectiveService: PerspectiveService, 
-        private ModerVoteService: PictureModerVoteService, 
-        private ModerVoteTemplateService: PictureModerVoteTemplateService, 
+        private $q: ng.IQService,
+        private $element: any,
+        private PerspectiveService: PerspectiveService,
+        private ModerVoteService: PictureModerVoteService,
+        private ModerVoteTemplateService: PictureModerVoteTemplateService,
         private VehicleTypeService: VehicleTypeService
     ) {
         this.$scope.pageEnv({
@@ -72,7 +72,7 @@ export class ModerPicturesController {
             name: 'page/73/name',
             pageId: 73
         });
-        
+
         this.status = this.$state.params.status;
         this.car_type_id = this.$state.params.car_type_id;
         this.perspective_id = this.$state.params.perspective_id;
@@ -86,13 +86,13 @@ export class ModerPicturesController {
         this.gps = this.$state.params.gps ? true : false;
         this.similar = this.$state.params.similar ? true : false;
         this.order = this.$state.params.order || '1';
-        
+
         this.page = this.$state.params.page;
-        
-        
-        
+
+
+
         var self = this;
-        
+
         this.onPictureSelect = function(picture: any, active: boolean) {
             if (active) {
                 self.selected.push(picture.id);
@@ -102,22 +102,22 @@ export class ModerPicturesController {
                     self.selected.splice(index, 1);
                 }
             }
-            
+
             self.hasSelectedItem = self.selected.length > 0;
         };
-        
+
         this.VehicleTypeService.getTypes().then(function(types: any) {
             self.vehicleTypeOptions = toPlain(types, 0);
         });
-        
+
         this.PerspectiveService.getPerspectives().then(function(perspectives: any) {
             self.perspectiveOptions = perspectives;
         });
-        
+
         this.ModerVoteTemplateService.getTemplates().then(function(templates: any) {
             self.moderVoteTemplateOptions = templates;
         });
-        
+
         var $userIdElement = $($element[0]).find(':input[name=owner_id]');
         $userIdElement.val(this.owner_id ? '#' + this.owner_id : '');
         var userIdLastValue = $userIdElement.val();
@@ -143,7 +143,7 @@ export class ModerPicturesController {
                     } else {
                         params.search = query;
                     }
-                    
+
                     $http({
                         method: 'GET',
                         url: '/api/user',
@@ -151,7 +151,7 @@ export class ModerPicturesController {
                     }).then(function(response: ng.IHttpResponse<any>) {
                         asyncResults(response.data.items);
                     });
-                    
+
                 }
             })
             .on('typeahead:select', function(ev: any, item: any) {
@@ -167,7 +167,7 @@ export class ModerPicturesController {
                 }
                 userIdLastValue = curValue;
             });
-        
+
         var $itemIdElement = $($element[0]).find(':input[name=item_id]');
         $itemIdElement.val(this.item_id ? '#' + this.item_id : '');
         var itemIdLastValue = $itemIdElement.val();
@@ -194,7 +194,7 @@ export class ModerPicturesController {
                     } else {
                         params.name = '%' + query + '%';
                     }
-                    
+
                     $http({
                         method: 'GET',
                         url: '/api/item',
@@ -202,7 +202,7 @@ export class ModerPicturesController {
                     }).then(function(response: ng.IHttpResponse<any>) {
                         asyncResults(response.data.items);
                     });
-                    
+
                 }
             })
             .on('typeahead:select', function(ev: any, item: any) {
@@ -218,14 +218,14 @@ export class ModerPicturesController {
                 }
                 itemIdLastValue = curValue;
             });
-        
+
         this.load();
     }
-    
+
     public load() {
         this.loading++;
         this.pictures = [];
-        
+
         this.selected = [];
         this.hasSelectedItem = false;
         var params = {
@@ -246,16 +246,16 @@ export class ModerPicturesController {
             fields: null as null|string,
             limit: null as null|number
         };
-        
+
         this.$state.go(STATE_NAME, params, {
             notify: false,
             reload: false,
             location: 'replace'
         });
-        
-        params.fields = 'owner,thumbnail,moder_vote,votes,similar,views,comments_count,perspective_item,name_html,name_text';
-        params.limit = 24;
-        
+
+        params.fields = 'owner,thumb_medium,moder_vote,votes,similar,views,comments_count,perspective_item,name_html,name_text';
+        params.limit = 18;
+
         var self = this;
         this.$http({
             method: 'GET',
@@ -263,14 +263,14 @@ export class ModerPicturesController {
             params: params
         }).then(function(response: ng.IHttpResponse<any>) {
             self.pictures = response.data.pictures;
-            self.chunks = chunkBy(self.pictures, 4);
+            self.chunks = chunkBy(self.pictures, 3);
             self.paginator = response.data.paginator;
             self.loading--;
         }, function() {
             self.loading--;
         });
     }
-    
+
     public votePictures(vote: number, reason: string) {
         var self = this;
         angular.forEach(this.selected, function(id: number) {
@@ -281,15 +281,15 @@ export class ModerPicturesController {
                     promises.push(q);
                 }
             });
-            
-            self.$q.all(promises).then(function() { 
+
+            self.$q.all(promises).then(function() {
                 self.load();
             });
         });
         this.selected = [];
         this.hasSelectedItem = false;
     };
-    
+
     public acceptPictures() {
         var self = this;
         angular.forEach(this.selected, function(id: number) {
@@ -305,12 +305,12 @@ export class ModerPicturesController {
                     }).then(function(response: ng.IHttpResponse<any>) {
                         picture.status = 'accepted';
                     });
-                    
+
                     promises.push(q);
                 }
             });
-            
-            self.$q.all(promises).then(function() { 
+
+            self.$q.all(promises).then(function() {
                 self.load();
             });
         });
@@ -329,7 +329,7 @@ angular.module(Module)
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require('./template.html'),
-                params: { 
+                params: {
                     status: { dynamic: true },
                     car_type_id: { dynamic: true },
                     perspective_id: { dynamic: true },

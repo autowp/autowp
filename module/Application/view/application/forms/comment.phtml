@@ -25,8 +25,8 @@
     <?php if ($element = $this->form->get('moderator_attention')) { ?>
         <div class="form-group <?=$element->getMessages() ? ' has-error' : ''?>">
             <div class="controls checkbox">
-                <div class="pull-right cancel">
-                    <button class="btn btn-xs btn-warning">
+                <div class="float-right cancel">
+                    <button class="btn btn-sm btn-warning">
                         <?=$this->escapeHtml($this->translate('comments/cancel'))?>
                     </button>
                 </div>

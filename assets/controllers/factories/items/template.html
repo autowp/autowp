@@ -1,14 +1,11 @@
 <ul class="nav nav-pills" style="margin-bottom:10px">
-    <li>
-        <a ui-sref="factory({id: ctrl.factory.id})" ng-bind-html="ctrl.factory.name_html"></a>
-    </li>
-    <li class="active"><a ui-sref="factory-items({id: ctrl.factory.id})" translate>factories/factory-items</a></li>
-    <li ng-if="isModer">
-        <a ui-sref="moder-items-item({id: ctrl.factory.id})">
-            <i class="fa fa-cog"></i>
-            <translate>moder/edit-object</translate>
-        </a>
-    </li>
+
+    <a class="nav-link" ui-sref="factory({id: ctrl.factory.id})" ng-bind-html="ctrl.factory.name_html"></a>
+    <a class="nav-link active" ui-sref="factory-items({id: ctrl.factory.id})" translate>factories/factory-items</a>
+    <a ng-if="isModer" class="nav-link" ui-sref="moder-items-item({id: ctrl.factory.id})">
+        <i class="fa fa-cog"></i>
+        <translate>moder/edit-object</translate>
+    </a>
 </ul>
 
 <autowp-item item="item" ng-repeat="item in ctrl.items"></autowp-item>

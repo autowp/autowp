@@ -16,7 +16,7 @@
         </div>
 
         <p>
-            {{'users/user/type:'|translate}} 
+            {{'users/user/type:'|translate}}
             <strong ng-if="ctrl.user.is_moder" translate>users/user/type/moderator</strong>
             <strong ng-if="!ctrl.user.is_moder" translate>users/user/type/visitor</strong>
         </p>
@@ -44,11 +44,11 @@
         </p>
 
         <h2 translate>users/user/recent-activity</h2>
-        <div class="well">
+        <div class="card card-body mb-4">
             <div ng-if="ctrl.user.pictures_added > 0">
                 <p>{{'users/user/upload-pictures:'|translate}} <strong ng-bind="ctrl.user.pictures_added"></strong></p>
                 <p ng-if="ctrl.user.pictures_accepted_count < ctrl.user.pictures_added">
-                    {{'users/user/pictures-left-on-site:'|translate}} 
+                    {{'users/user/pictures-left-on-site:'|translate}}
                     <strong ng-bind="ctrl.user.pictures_accepted_count"></strong>
                 </p>
 
@@ -62,7 +62,7 @@
 
         <div ng-if="ctrl.pictures.length">
             <h2 translate>users/user/recent-uploads</h2>
-            <div class="well">
+            <div class="card card-body mb-4">
                 <ul>
                     <li ng-repeat="picture in ctrl.pictures">
                         <a ng-href="{{picture.url}}" class="picture-hover-preview" ng-bind-html="picture.name_html"></a>
@@ -76,7 +76,7 @@
                 {{'users/user/recent-comments'|translate}}
                 <small><a ui-sref="users-user-comments({identity: ctrl.user.identity ? ctrl.user.identity : 'user' + ctrl.user.id})" translate>all-link</a></small>
             </h2>
-            <div class="well">
+            <div class="card card-body mb-4">
                 <ul class="comments">
                     <li ng-repeat="comment in ctrl.comments">
                         <a ng-href="{{comment.url}}" ng-bind="comment.preview"></a>
@@ -89,7 +89,7 @@
     </div>
     <div class="col-md-6">
 
-        <div class="well" ng-if="ctrl.canBeInContacts">
+        <div class="card card-body mb-4" ng-if="ctrl.canBeInContacts">
             <button type="submit" class="btn btn-lg btn-contact" ng-class="{'in-contacts': ctrl.inContacts}" ng-click="ctrl.toggleInContacts()">
                 <span class="not-in-contacts">
                     <span class="fa fa-plus-circle"></span>
@@ -104,7 +104,7 @@
 
         <div ng-if="ctrl.canViewIp">
             <h2 translate>users/for-moderators</h2>
-            <div class="well">
+            <div class="card card-body mb-4">
                 <p ng-if="ctrl.canBan && ctrl.user.photo">
                     <button class="btn btn-warning btn-block btn-delete-photo" ng-click="ctrl.deletePhoto()" translate>users/for-moderators/remove-photo</button>
                 </p>

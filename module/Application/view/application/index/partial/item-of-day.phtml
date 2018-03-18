@@ -1,5 +1,5 @@
 <?php if ($this->itemOfDay['name']) { ?>
-    <h2>
+    <h2 class="mb-3">
         <?=$this->car()->htmlTitle($this->itemOfDay['name'])?>
         <small>
             <?php if ($this->itemOfDay['itemTypeId'] == Application\Model\Item::VEHICLE) { ?>
@@ -14,58 +14,41 @@
     </h2>
 
     <?php if ($this->itemOfDay['pictures']) { ?>
-        <div class="row thumbnails">
-            <?php foreach ($this->itemOfDay['pictures'] as $idx => $picture) { ?>
-                <?php if ($idx == 0) { ?>
+        <div class="row">
+            <?php foreach (array_slice($this->itemOfDay['pictures'], 0, 1) as $picture) { ?>
+                <div class="col-12 col-sm-12 col-md-6">
                     <?php if ($picture) { ?>
-                        <div class="col-sm-8">
-                            <?=$this->htmlA([
-                                'href'  => $picture['url'],
-                                'class' => 'thumbnail'
-                            ], $this->htmlImg([
-                                'src'   => $picture['src'],
-                                'title' => $picture['name'],
-                                'alt'   => $picture['name'],
-                            ]), false)?>
-                        </div>
+                        <?=$this->htmlA([
+                            'href'  => $picture['url'],
+                            'class' => 'd-block rounded mb-4'
+                        ], $this->htmlImg([
+                            'src'   => $picture['thumb']['src'],
+                            'class' => 'rounded w-100 border border-light',
+                            'title' => $picture['name'],
+                            'alt'   => $picture['name'],
+                            'sizes' => "auto"
+                        ]), false)?>
                     <?php } ?>
-                <?php } ?>
+                </div>
             <?php } ?>
-            <div class="col-sm-4">
-                <?php foreach ($this->itemOfDay['pictures'] as $idx => $picture) { ?>
-                    <?php if ($idx == 1 || $idx == 2) { ?>
-                        <?php if ($picture) { ?>
-                            <?=$this->htmlA([
-                                'href'  => $picture['url'],
-                                'class' => 'thumbnail'
-                            ], $this->htmlImg([
-                                'src'   => $picture['src'],
-                                'title' => $picture['name'],
-                                'alt'   => $picture['name'],
-                            ]), false)?>
-                        <?php } ?>
-                    <?php } ?>
-                <?php } ?>
-            </div>
-        </div>
-        <div class="row thumbnails">
-            <div class="col-md-12">
+
+            <div class="col-12 col-sm-12 col-md-6">
                 <div class="row">
-                    <?php foreach ($this->itemOfDay['pictures'] as $idx => $picture) { ?>
-                        <?php if ($idx > 2) { ?>
+                    <?php foreach (array_slice($this->itemOfDay['pictures'], 1) as $picture) { ?>
+                        <div class="col-6">
                             <?php if ($picture) { ?>
-                                <div class="col-sm-4">
-                                    <?=$this->htmlA([
-                                        'href'  => $picture['url'],
-                                        'class' => 'thumbnail'
-                                    ], $this->htmlImg([
-                                        'src'   => $picture['src'],
-                                        'title' => $picture['name'],
-                                        'alt'   => $picture['name'],
-                                    ]), false)?>
-                                </div>
+                                <?=$this->htmlA([
+                                    'href'  => $picture['url'],
+                                    'class' => 'd-block rounded mb-3'
+                                ], $this->htmlImg([
+                                    'src'   => $picture['thumb']['src'],
+                                    'class' => 'rounded w-100 border border-light',
+                                    'title' => $picture['name'],
+                                    'alt'   => $picture['name'],
+                                    'style' => 'max-width: 100%;'
+                                ]), false)?>
                             <?php } ?>
-                        <?php } ?>
+                        </div>
                     <?php } ?>
                 </div>
             </div>

@@ -42,9 +42,9 @@ module.exports = {
                   'jshint-loader',
                   {
                       loader: "jshint-loader",
-                      options: { 
-                          camelcase: false, 
-                          emitErrors: false, 
+                      options: {
+                          camelcase: false,
+                          emitErrors: false,
                           failOnHint: false
                       }
                   }
@@ -68,7 +68,7 @@ module.exports = {
                 loader: 'imports-loader',
                 options: {'window.jQuery': 'jquery'}
             }},
-            { 
+            {
                 test: /.html$/,
                 use: {
                     loader: "html-loader"
@@ -77,15 +77,22 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({
-                    fallback: "style-loader", 
+                    fallback: "style-loader",
                     use: "css-loader"
                 })
             },
-            {
+            /*{
                 test: /\.less$/,
                 use: ExtractTextPlugin.extract({
-                    fallback: "style-loader", 
+                    fallback: "style-loader",
                     use: "css-loader!less-loader"
+                })
+            },*/
+            {
+                test: /\.scss$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: "css-loader!sass-loader"
                 })
             },
             //{test: /\.(jpe?g|png|gif|svg)$/i, loader: "file-loader?name=img/[name].[ext]"},
@@ -115,18 +122,18 @@ module.exports = {
                     }
                 ]
             },
-            { 
+            {
                 test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 use: {
                     loader: "url-loader",
                     options: {
-                        name: 'fonts/[hash].[ext]', 
+                        name: 'fonts/[hash].[ext]',
                         limit: 10000,
                         mimetype: 'application/font-woff'
                     }
                 }
             },
-            { 
+            {
                 test: /fontawesome-webfont\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 use: {
                     loader: "file-loader",
@@ -135,7 +142,7 @@ module.exports = {
                     }
                 }
             },
-            { 
+            {
                 test: /glyphicons-halflings-regular\.(ttf|eot|svg)$/,
                 use: {
                     loader: "file-loader",

@@ -13,7 +13,7 @@
     ]);
 ?>
 
-<header>
+<header class="mb-4">
     <div class="jumbotron brand-hero-unit">
         <?=$this->img($this->brand['logo_id'], [
             'format' => 'logo',
@@ -43,59 +43,80 @@
         </div>
     </div>
     <ul class="nav nav-pills">
-        <li>
-            <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'cars'
-            ], [], true), '<i class="fa fa-road"></i> ' . $this->escapeHtml($this->translate('catalogue/chronological')), false)?>
+        <li class="nav-item">
+            <?=$this->htmlA([
+                'class' => 'nav-link',
+                'href'  => $this->url('catalogue', [
+                    'action' => 'cars'
+                ], [], true)
+            ], '<i class="fa fa-road"></i> ' . $this->escapeHtml($this->translate('catalogue/chronological')), false)?>
         </li>
-        <li>
-            <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'recent'
-            ], [], true), '<i class="fa fa-th"></i> '. $this->escapeHtml($this->translate('catalogue/brand/new-pictures')), false)?>
+        <li class="nav-item">
+            <?=$this->htmlA([
+                'class' => 'nav-link',
+                'href'  => $this->url('catalogue', [
+                    'action' => 'recent'
+                ], [], true)
+            ], '<i class="fa fa-th"></i> '. $this->escapeHtml($this->translate('catalogue/brand/new-pictures')), false)?>
         </li>
         <?php if ($this->haveTwins) { ?>
-            <li>
-                <?=$this->htmlA($this->url('twins/brand', [
-                    'brand_catname' => $this->brand['catname']
-                ]), '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(25)->name), false)?>
+            <li class="nav-item">
+                <?=$this->htmlA([
+                    'class' => 'nav-link',
+                    'href'  => $this->url('twins/brand', [
+                        'brand_catname' => $this->brand['catname']
+                    ])
+                ], '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(25)->name), false)?>
             </li>
         <?php } ?>
         <?php if ($this->mostsActive) { ?>
-            <li>
-                <?=$this->htmlA($this->url('catalogue', [
-                    'action'        => 'brand-mosts',
-                    'brand_catname' => $this->brand['catname']
-                ]), '<i class="fa fa-sort-amount-desc"></i> ' . $this->escapeHtml($this->page(21)->name), false)?>
+            <li class="nav-item">
+                <?=$this->htmlA([
+                    'class' => 'nav-link',
+                    'href'  => $this->url('catalogue', [
+                        'action'        => 'brand-mosts',
+                        'brand_catname' => $this->brand['catname']
+                    ])
+                ], '<i class="fa fa-sort-amount-desc"></i> ' . $this->escapeHtml($this->page(21)->name), false)?>
             </li>
         <?php } ?>
         <?php if ($this->inboxPictures) { ?>
-            <li>
-                <?=$this->htmlA('/ng/moder/pictures?' . http_build_query([
-                    'status'  => Application\Model\Picture::STATUS_INBOX,
-                    'item_id' => $this->brand['id'],
-                ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge">' . $this->inboxPictures . '</span>', false)?>
+            <li class="nav-item">
+                <?=$this->htmlA([
+                    'class' => 'nav-link',
+                    'href'  => '/ng/moder/pictures?' . http_build_query([
+                        'status'  => Application\Model\Picture::STATUS_INBOX,
+                        'item_id' => $this->brand['id'],
+                    ])
+                ], '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge badge-pill badge-secondary">' . $this->inboxPictures . '</span>', false)?>
             </li>
         <?php } ?>
         <?php if ($this->requireAttention) { ?>
-            <li>
+            <li class="nav-item">
                 <?=$this->htmlA(
-                    $this->url('ng', ['path' => 'moder/comments'], [
-                        'query' => [
-                            'pictures_of_item_id' => $this->brand['id'],
-                            'moderator_attention' => '1'
-                        ]
-                    ]),
+                    [
+                        'class' => 'nav-link',
+                        'href'  => $this->url('ng', ['path' => 'moder/comments'], [
+                            'query' => [
+                                'pictures_of_item_id' => $this->brand['id'],
+                                'moderator_attention' => '1'
+                            ]
+                        ])
+                    ],
                     '<i class="fa fa-comment"></i> ' .
                         $this->escapeHtml($this->translate('catalogue/vehicle/comments')) .
-                        ' <span class="badge">'.$this->requireAttention.'</span>',
+                        ' <span class="badge badge-pill badge-secondary">'.$this->requireAttention.'</span>',
                     false
                 )?>
             </li>
         <?php } ?>
         <?php if ($this->user()->inheritsRole('moder')) { ?>
-            <li>
+            <li class="nav-item">
                 <?=$this->htmlA(
-                    '/ng/moder/items/item/' . $this->brand['id'],
+                    [
+                        'class' => 'nav-link',
+                        'href'  => '/ng/moder/items/item/' . $this->brand['id']
+                    ],
                     '<i class="fa fa-cog"></i> ' . $this->translate('moder/edit-object'),
                     false
                 ) ?>
@@ -104,11 +125,33 @@
     </ul>
 </header>
 
-<?php if ($this->topPictures && count($this->topPictures)) { ?>
-    <section>
-        <h2><?=$this->escapeHtml($this->translate('catalogue/brand/popular-images')) ?></h2>
-        <?=$this->partial('application/pictures', $this->topPictures)?>
-    </section>
+<?php foreach ($this->sections as $section) { ?>
+    <?php if (count($section['groups'])) { ?>
+        <div class="card mb-4">
+            <div class="card-body">
+                <?php if ($section['name']) { ?>
+                    <h5 class="card-title">
+                        <?=$this->escapeHtml($this->translate($section['name']))?>
+                    </h5>
+                <?php } ?>
+                <div class="row">
+                    <?php foreach ($section['groups'] as $group) { ?>
+                        <?=$this->htmlA(
+                            [
+                                'href'  => $group['url'],
+                                'class' => 'col-4 nav-link'
+                            ],
+                            $this->escapeHtml($group['name']) . (isset($group['count']) ? ' <span class="badge badge-pill badge-secondary">' . $group['count'] . '</span>' : ''),
+                            false
+                        ) ?>
+                    <?php } ?>
+                </div>
+                <?php if ($section['name'] && $section['url']) { ?>
+                    <?=$this->htmlA($section['url'], $this->translate('carlist/details'))?>
+                <?php } ?>
+            </div>
+        </div>
+    <?php } ?>
 <?php } ?>
 
 <?php if (count($this->factories)) { ?>
@@ -118,13 +161,23 @@
             <?php foreach ($this->factories as $factory) { ?>
                 <div class="col-sm-3">
                     <?=$this->htmlA([
-                        'class' => 'thumbnail',
+                        'class' => 'd-block rounded mb-4',
                         'href'  => $factory['url']
-                    ], $this->htmlImg($factory['src']), false)?>
+                    ], $this->htmlImg([
+                        'class' => 'rounded w-100 border border-light',
+                        'href'  => $factory['src']
+                    ]), false)?>
                     <p><?=$this->htmlA($factory['url'], $factory['name'])?></p>
                 </div>
             <?php } ?>
         </div>
+    </section>
+<?php } ?>
+
+<?php if ($this->topPictures && count($this->topPictures)) { ?>
+    <section>
+        <h2><?=$this->escapeHtml($this->translate('catalogue/brand/popular-images')) ?></h2>
+        <?=$this->partial('application/pictures', $this->topPictures)?>
     </section>
 <?php } ?>
 

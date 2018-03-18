@@ -22,7 +22,7 @@
                                             <?php
                                                 $active = in_array($modification['id'], $picture['modificationIds']);
                                             ?>
-                                            <label class="btn btn-default btn-xs<?=$active ? ' active' : ''?>">
+                                            <label class="btn btn-secondary btn-sm<?=$active ? ' active' : ''?>">
                                                 <input type="checkbox" name="picture[<?=(int)$picture['id']?>][]" value="<?=(int)$modification['id']?>" autocomplete="off"<?=$active ? ' checked' : ''?> />
                                                 <?=$this->escapeHtml($modification['name'])?>
                                             </label>

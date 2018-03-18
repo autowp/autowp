@@ -146,7 +146,6 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('index');
 
         $this->assertQuery("h1");
-        $this->assertQuery(".destinations");
     }
 
     public function testCreateCategoryAddItemAndGet()

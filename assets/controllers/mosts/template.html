@@ -1,38 +1,26 @@
 <div class="row">
     <div class="col-sm-4">
-        <div class="well">
-            <ul class="nav nav-pills nav-stacked">
-                <li class="nav-header">
-                    <h3 translate>mosts/sidebar/mostly…</h3>
-                </li>
-                <li ng-repeat="rating in ctrl.ratings" ng-class="{active: rating.catname == ctrl.ratingCatname}">
-                    <a ui-sref=".({rating_catname: rating.catname})" ng-bind="rating.name|translate"></a>
-                </li>
-                <li class="nav-header">
-                    <h3 translate>mosts/sidebar/between…</h3>
-                </li>
-                <li ng-repeat="type in ctrl.vehilceTypes" ng-class="{active: type.catname == ctrl.typeCatname}">
-                    <a ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: type.catname})" ng-bind="type.name|translate"></a>
-                    <ul class="nav nav-pills nav-stacked" ng-if="type.childs.length > 0">
-                        <li ng-repeat="child in type.childs" ng-class="{active: child.catname == ctrl.typeCatname}">
-                            <a ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: child.catname})" ng-bind="child.name|translate"></a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+        <div class="card card-body">
+            <div class="nav flex-column nav-pills">
+                <h3 translate class="nav-header">mosts/sidebar/mostly…</h3>
+                <a ng-repeat="rating in ctrl.ratings" ng-class="{active: rating.catname == ctrl.ratingCatname}" class="nav-link" ui-sref=".({rating_catname: rating.catname})" ng-bind="rating.name|translate"></a>
+                <h3 translate class="nav-header">mosts/sidebar/between…</h3>
+                <a ng-repeat-start="type in ctrl.vehilceTypes" class="nav-link" ng-class="{active: type.catname == ctrl.typeCatname}" ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: type.catname})" ng-bind="type.name|translate"></a>
+                <div class="nav flex-column nav-pills" ng-if="type.childs.length > 0" ng-repeat-end>
+                    <a class="nav-link" ng-repeat="child in type.childs" ng-class="{active: child.catname == ctrl.typeCatname}" class="nav-link" ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: child.catname})" ng-bind="child.name|translate"></a>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-sm-8">
-        <ul class="nav nav-pills" ng-if="ctrl.defaultTypeCatname">
-            <li ng-repeat="year in ctrl.years" ng-class="{active: year.catname ? year.catname == ctrl.yearsCatname : !ctrl.yearsCatname}">
-                <a ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: ctrl.typeCatname || ctrl.defaultTypeCatname, years_catname: year.catname})" ng-bind="year.name|translate"></a>
-            </li>
-        </ul>
-        
+        <div class="nav nav-pills" ng-if="ctrl.defaultTypeCatname">
+            <a class="nav-link" ng-repeat="year in ctrl.years" ng-class="{active: year.catname ? year.catname == ctrl.yearsCatname : !ctrl.yearsCatname}" ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: ctrl.typeCatname || ctrl.defaultTypeCatname, years_catname: year.catname})" ng-bind="year.name|translate"></a>
+        </div>
+
         <span ng-show="ctrl.loading > 0">
             <i class="fa fa-spinner fa-spin fa-fw"></i>
         </span>
-        
+
         <div class="row" ng-repeat-start="item in ctrl.items">
             <div class="col-md-9">
                 <h3 ng-bind-html="item.item.name_html"></h3>
@@ -41,12 +29,12 @@
                 <h3 ng-bind="'most/' + ctrl.ratingCatname + '/param' | translate" ng-if="$first"></h3>
             </div>
         </div>
-        <div class="row" ng-repeat-end>
+        <div class="row mb-4" ng-repeat-end>
             <div class="col-md-9">
-                <div class="row thumbnails">
+                <div class="row">
                     <div class="col-md-4" ng-repeat="picture in item.pictures track by $index">
-                        <a ng-href="{{picture.url}}" class="thumbnail" ng-if="picture">
-                            <img ng-src="{{picture.src}}" alt="{{picture.name}}" title="{{picture.name}}" />
+                        <a ng-href="{{picture.url}}" class="rounded d-block mb-4" ng-if="picture"> 
+                            <img class="rounded w-100 border border-light" ng-src="{{picture.src}}" alt="{{picture.name}}" title="{{picture.name}}" />
                         </a>
                         <span ng-if="!picture">&#xa0;</span>
                     </div>

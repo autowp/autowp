@@ -1,4 +1,4 @@
 <div ng-repeat="theme in ctrl.themes">
-    <button class="btn btn-default" disabled ng-bind="theme.name|translate" ng-if="ctrl.topic.theme_id == theme.id"></button>
-    <button class="btn btn-default" type="submit" name="theme_id" ng-bind="theme.name|translate" ng-if="ctrl.topic.theme_id != theme.id" ng-click="ctrl.selectTheme(theme)"></button>
+    <button class="btn btn-secondary" disabled ng-bind="theme.name|translate" ng-if="ctrl.topic.theme_id == theme.id"></button>
+    <button class="btn btn-secondary" type="submit" name="theme_id" ng-bind="theme.name|translate" ng-if="ctrl.topic.theme_id != theme.id" ng-click="ctrl.selectTheme(theme)"></button>
 </div>

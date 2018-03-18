@@ -1,11 +1,7 @@
-<ul class="nav nav-pills">
-    <li class="active">
-        <a ui-sref="moder-traffic">Traffic</a>
-    </li>
-    <li>
-        <a ui-sref="moder-traffic-whitelist">Whitelist</a>
-    </li>
-</ul>
+<div class="nav nav-pills">
+    <a class="nav-link active" ui-sref="moder-traffic">Traffic</a>
+    <a class="nav-link" ui-sref="moder-traffic-whitelist">Whitelist</a>
+</div>
 
 <div class="row" ng-repeat="item in ctrl.items">
     <div class="col-sm-2">
@@ -29,7 +25,7 @@
             </span>
         </div>
         <div>
-            <button ng-if="item.ban" class="btn btn-default" ng-click="ctrl.removeFromBlacklist(item.ip)">{{'ban/unban'|translate}}</button>
+            <button ng-if="item.ban" class="btn btn-secondary" ng-click="ctrl.removeFromBlacklist(item.ip)">{{'ban/unban'|translate}}</button>
             <button class="btn btn-danger" ng-if="!item.ban" ng-click="ctrl.addToBlacklist(item.ip)">{{'ban/ban'|translate}}</button>
             <button ng-if="!item.whitelist" class="btn btn-success" ng-click="ctrl.addToWhitelist(item.ip)">Whitelist</button>
         </div>

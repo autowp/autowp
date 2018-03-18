@@ -30,9 +30,12 @@
 
 <ul class="nav nav-pills">
     <?php foreach ($this->cartypes as $cartype) { ?>
-        <li<?=$this->cartype && $this->cartype['id'] == $cartype['id'] ? ' class="active"' : '' ?>>
+        <li class="nav-item">
             <?=$this->htmlA(
-                $cartype['url'],
+                [
+                    'class' => 'nav-link' . ($this->cartype && $this->cartype['id'] == $cartype['id'] ? ' active' : '' ),
+                    'href'  => $cartype['url']
+                ],
                 $this->escapeHtml($this->translate($cartype['name'])) . ' <small>('.$cartype['carsCount'].')</small>',
                 false
             ) ?>

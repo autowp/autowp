@@ -1,32 +1,28 @@
-<ul class="nav nav-pills" style="margin-bottom: 20px">
-    <li ng-if="ctrl.isModer">
-        <a ui-sref="moder-items-item({id: ctrl.item.id})">
-            <i class="fa fa-cog"></i>
-            {{'moder/edit-object'|translate}}
-            <span ng-bind-html="ctrl.item.name_html"></span>
-        </a>
-    </li>
-    <li>
-        <a ui-sref="cars-attrs-change-log({item_id: ctrl.item.id})">
-            <i class="fa fa-list"></i>
-            {{'specifications-editor/log'|translate}}
-        </a>
-    </li>
-</ul>
+<div class="nav nav-pills" style="margin-bottom: 20px">
+    <a class="nav-link" ui-sref="moder-items-item({id: ctrl.item.id})" ng-if="ctrl.isModer">
+        <i class="fa fa-cog"></i>
+        {{'moder/edit-object'|translate}}
+        <span ng-bind-html="ctrl.item.name_html"></span>
+    </a>
+    <a class="nav-link" ui-sref="cars-attrs-change-log({item_id: ctrl.item.id})">
+        <i class="fa fa-list"></i>
+        {{'specifications-editor/log'|translate}}
+    </a>
+</div>
 
 <div class="alert alert-danger" ng-if="ctrl.specsWeight < 1" autowp-markdown="'specifications-editor/errors-alert'|translate"></div>
 
 <ul class="nav nav-tabs" id="myTab">
-    <li ng-repeat="(id, tab) in ctrl.tabs" ng-class="{active: id == ctrl.tab}" ng-if="tab.visible">
-        <a ui-sref="cars-specifications-editor({tab: id})">
+    <li ng-repeat="(id, tab) in ctrl.tabs" ng-if="tab.visible" class="nav-item">
+        <a ui-sref="cars-specifications-editor({tab: id})" ng-class="{active: id == ctrl.tab}" class="nav-link">
             <span class="{{tab.icon}}" ng-if="tab.icon"></span>
             {{tab.title | translate}}
-            <span class="badge" ng-if="tab.count" ng-bind="tab.count"></span>
+            <span class="badge badge-pill badge-secondary" ng-if="tab.count" ng-bind="tab.count"></span>
         </a>
     </li>
 </ul>
 
-<div class="tab-content well">
+<div class="tab-content card card-body">
     <span ng-show="ctrl.loading > 0">
         <i class="fa fa-spinner fa-spin fa-fw fa-4x"></i>
     </span>
@@ -87,55 +83,55 @@
                         </td>
                         <td ng-if="!attribute.childs.length">
                             <div class="input-group" ng-class="{'has-error': element.getMessages()}">
-                                <span class="input-group-addon btn btn-default" 
-                                    ng-click="ctrl.currentUserValues[attribute.id].empty = !ctrl.currentUserValues[attribute.id].empty" 
+                                <span class="input-group-addon btn btn-secondary"
+                                    ng-click="ctrl.currentUserValues[attribute.id].empty = !ctrl.currentUserValues[attribute.id].empty"
                                     ng-class="{active: attribute.disabled}">
                                     <span class="fa fa-remove"></span>
                                 </span>
-                                <select class="form-control input-sm" 
+                                <select class="form-control input-sm"
                                     ng-if="attribute.type_id == 5"
-                                    ng-options="item.id as item.name for item in attribute.options" 
-                                    ng-model="ctrl.currentUserValues[attribute.id].value"
-                                    ng-disabled="ctrl.currentUserValues[attribute.id].empty"
-                                >
-                                </select>
-                                <select class="form-control input-sm" 
-                                    ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && !attribute.is_multiple" 
                                     ng-options="item.id as item.name for item in attribute.options"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
                                     ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                 >
                                 </select>
-                                <select class="form-control input-sm" 
-                                    ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && attribute.is_multiple" 
+                                <select class="form-control input-sm"
+                                    ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && !attribute.is_multiple"
+                                    ng-options="item.id as item.name for item in attribute.options"
+                                    ng-model="ctrl.currentUserValues[attribute.id].value"
+                                    ng-disabled="ctrl.currentUserValues[attribute.id].empty"
+                                >
+                                </select>
+                                <select class="form-control input-sm"
+                                    ng-if="(attribute.type_id == 6 || attribute.type_id == 7) && attribute.is_multiple"
                                     ng-options="item.id as item.name for item in attribute.options"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
                                     ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                     multiple
                                 >
                                 </select>
-                                <input type="number" 
-                                    ng-if="attribute.type_id == 2" 
-                                    class="form-control input-sm" 
+                                <input type="number"
+                                    ng-if="attribute.type_id == 2"
+                                    class="form-control input-sm"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
                                     ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                     min="-2147483649"
                                     max="2147483648"
                                 />
-                                <input type="number" 
-                                    ng-if="attribute.type_id == 3" 
-                                    class="form-control input-sm" 
+                                <input type="number"
+                                    ng-if="attribute.type_id == 3"
+                                    class="form-control input-sm"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
                                     step="{{ctrl.getStep(attribute)}}"
                                     min="-2147483649"
                                     max="2147483648"
                                     ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                 />
-                                <input type="text" 
-                                    ng-if="attribute.type_id == 1" 
-                                    class="form-control input-sm" 
+                                <input type="text"
+                                    ng-if="attribute.type_id == 1"
+                                    class="form-control input-sm"
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
-                                    ng-disabled="ctrl.currentUserValues[attribute.id].empty" 
+                                    ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                 />
                                 <span ng-if="attribute.unit" class="input-group-addon" translate-attrs="{title: attribute.unit.name}" class="unit" ng-bind="attribute.unit.abbr|translate"></span>
                             </div>
@@ -173,7 +169,7 @@
     <div class="tab-pane" ng-class="{active: ctrl.tab == 'admin'}" id="admin" ng-if="ctrl.isSpecsAdmin">
         <p><a ui-sref="cars-specs-admin({item_id: ctrl.item.id})">Admin</a></p>
         <div>
-            <button class="btn btn-default" ng-click="ctrl.refreshInheritance()">Refresh inheritance</button>
+            <button class="btn btn-secondary" ng-click="ctrl.refreshInheritance()">Refresh inheritance</button>
         </div>
     </div>
 </div>

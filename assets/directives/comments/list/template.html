@@ -1,6 +1,6 @@
 <div class="message" ng-class="{'moderator-attention': message.moderAttention == 1, deleted: message.deleted}" data-id="<?=(int)$comment['id']?>" id="msg<?=(int)$comment['id']?>" ng-repeat="message in messages">
     <div>
-        <div class="pull-right" ng-if="message.datetime" am-time-ago="message.datetime"></div>
+        <div class="float-right" ng-if="message.datetime" am-time-ago="message.datetime"></div>
         <autowp-user user="message.user" ng-if="message.user"></autowp-user>
         <span ng-if="!message.user" translate>comments/author/anonymous</span>
     </div>
@@ -30,31 +30,31 @@
                 <i class="fa fa-thumbs-o-down" ng-if="!user"></i>
             </span>
 
-            <button class="btn btn-xs btn-primary reply" ng-if="user && deep < 21 && !message.deleted" ng-click="ctrl.reply(message, false)">
+            <button class="btn btn-sm btn-primary reply" ng-if="user && deep < 21 && !message.deleted" ng-click="ctrl.reply(message, false)">
                 <i class="fa fa-reply"></i>
                 {{'comments/reply'|translate}}
             </button>
 
-            <button class="btn btn-xs btn-success resolve" ng-if="moderAttention && isModer" ng-click="ctrl.reply(message, true)">
+            <button class="btn btn-sm btn-success resolve" ng-if="moderAttention && isModer" ng-click="ctrl.reply(message, true)">
                 <i class="fa fa-reply"></i>
                 {{'comments/reply'|translate}} &amp; resolve
             </button>
 
-            <a href="#" class="btn btn-danger btn-xs pull-right comment-remove-button" ng-if="ctrl.canRemoveComments" ng-click="ctrl.setIsDeleted(message, 1)">
+            <a href="#" class="btn btn-danger btn-sm float-right comment-remove-button" ng-if="ctrl.canRemoveComments" ng-click="ctrl.setIsDeleted(message, 1)">
                 <i class="fa fa-trash"></i>
                 {{'comments/message/delete'|translate}}
             </a>
-            <a href="#" class="btn btn-success btn-xs pull-right comment-restore-button" ng-if="ctrl.canRemoveComments" ng-click="ctrl.setIsDeleted(message, 0)">
+            <a href="#" class="btn btn-success btn-sm float-right comment-restore-button" ng-if="ctrl.canRemoveComments" ng-click="ctrl.setIsDeleted(message, 0)">
                 <i class="fa fa-arrow-up"></i>
                 {{'comments/message/restore'|translate}}
             </a>
 
-            <a ui-sref="forums-move-message({message_id: message.id})" class="btn btn-default btn-xs pull-right" ng-if="typeId == 5 && ctrl.canMoveMessage">
+            <a ui-sref="forums-move-message({message_id: message.id})" class="btn btn-secondary btn-sm float-right" ng-if="typeId == 5 && ctrl.canMoveMessage">
                 <i class="fa fa-arrows"></i>
                 {{'comments/message/move'|translate}}
             </a>
 
-            <i class="pull-right fa fa-eye" data-toggle="tooltip" title="{{comment.ip}}" style="margin-right:20px" ng-if="comment.ip"></i>
+            <i class="float-right fa fa-eye" data-toggle="tooltip" title="{{comment.ip}}" style="margin-right:20px" ng-if="comment.ip"></i>
 
             <div class="moderator-attention-sign" ng-if="moderAttention">
                 <i class="fa fa-info-circle"></i>

@@ -2,7 +2,6 @@ import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
 import * as $ from "jquery";
-import { chunkBy } from 'chunk';
 import { ItemService } from 'services/item';
 var leaflet = require("leaflet-bundle");
 
@@ -17,7 +16,7 @@ export class FactoryController {
     public pictures: any[] = [];
     public relatedPictures: any[] = [];
     private map: any;
-  
+
     constructor(
         private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
@@ -25,29 +24,29 @@ export class FactoryController {
         private $element: any,
         private ItemService: ItemService
     ) {
-      
+
         var self = this;
-      
+
         this.ItemService.getItem(this.$state.params.id, {
             fields: ['name_text', 'name_html', 'lat', 'lng', 'description', 'related_group_pictures'].join(',')
         }).then(function(item: autowp.IItem) {
-            
+
             self.factory = item;
-            
+
             self.relatedPictures = [];
             if (self.factory.related_group_pictures) {
-                self.relatedPictures = chunkBy(self.factory.related_group_pictures, 4);
+                self.relatedPictures = self.factory.related_group_pictures;
             }
-            
+
             if (self.factory.item_type_id != 6) {
                 self.$state.go('error-404');
                 return;
             }
-  
+
             self.$scope.pageEnv({
                 layout: {
                     blankPage: false,
-                    needRight: true
+                    needRight: false
                 },
                 name: 'page/181/name',
                 pageId: 181,
@@ -56,7 +55,7 @@ export class FactoryController {
                     FACTORY_NAME: self.factory.name_text
                 }
             });
-          
+
             self.$http({
                 method: 'GET',
                 url: '/api/picture',
@@ -64,32 +63,32 @@ export class FactoryController {
                     status: 'accepted',
                     exact_item_id: self.factory.id,
                     limit: 32,
-                    fields: 'owner,thumbnail,votes,views,comments_count,name_html,name_text'
+                    fields: 'owner,thumb_medium,votes,views,comments_count,name_html,name_text'
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
                 self.pictures = [];
                 if (response.data.pictures) {
-                    self.pictures = chunkBy(response.data.pictures, 4);
+                    self.pictures = response.data.pictures;
                 }
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
-            
+
             if (self.factory.lat && self.factory.lng) {
                 $($element[0]).find('.google-map').each(function() {
-                    
+
                     self.map = leaflet.map(this).setView([self.factory.lat, self.factory.lng], 17);
                     leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
                     }).addTo(self.map);
-                  
+
                     leaflet.marker([self.factory.lat, self.factory.lng]).addTo(self.map);
                     setTimeout(function() {
                         self.map.invalidateSize();
                     }, 300)
                 });
             }
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             self.$state.go('error-404');
         });

@@ -55,9 +55,10 @@
     <div class="col-md-6">
         <div class="picture-preview-medium">
             <?=$this->htmlA([
-                'class' => 'thumbnail',
+                'class' => 'd-block rounded mb-4',
                 'href'  => $this->sourceUrl
             ], $this->htmlImg([
+                'class'   => 'rounded border border-light w-100',
                 'src'     => $this->previewUrl,
                 'alt'     => $this->pic()->textTitle($this->name),
                 'title'   => $this->pic()->textTitle($this->name),
@@ -147,11 +148,11 @@
                 <?php foreach ($this->modifications as $modification) { ?>
                     <?php if ($modification['url']) { ?>
                         <?=$this->htmlA([
-                            'class' => 'label label-primary',
+                            'class' => 'badge badge-primary',
                             'href'  => $modification['url']
                         ], $modification['name'])?>
                     <?php } else { ?>
-                        <span class="label label-primary"><?=$this->escapeHtml($modification['name'])?></span>
+                        <span class="badge badge-primary"><?=$this->escapeHtml($modification['name'])?></span>
                     <?php } ?>
                 <?php } ?>
             </p>
@@ -294,7 +295,10 @@
                 foreach ($this->items as $item) {
                     if ($item['uploadUrl']) {
                         $uploads[] = $this->htmlA(
-                            $item['uploadUrl'],
+                            [
+                                'href'  => $item['uploadUrl'],
+                                'class' => "dropdown-item"
+                            ],
                             '<i class="fa fa-upload"></i> ' .
                             $this->escapeHtml($this->page(29)->name) . ' ' .
                             $this->car()->htmlTitle($item['name']),
@@ -308,9 +312,7 @@
                         ' . $this->escapeHtml($this->page(29)->name) .'
                         <span class="caret"></span>
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                        <li>' . implode('</li><li>', $uploads) . '</li>
-                    </ul>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenu1">' . implode($uploads) . '</div>
                 </div>';
 
             } else {
@@ -445,7 +447,7 @@
 
 <?php if ($this->user()->inheritsRole('moder')) { ?>
     <h3><?=$this->htmlA('/ng/moder', $this->page(67)->name) ?></h3>
-    <div class="well">
+    <div class="card card-body">
         <div class="row">
             <div class="col-md-6">
                 <?=$this->partial('application/moder/pictures/picture-vote', $this->pictureVote)?>

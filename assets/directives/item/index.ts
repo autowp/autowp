@@ -1,6 +1,6 @@
 import * as angular from "angular";
 import Module from 'app.module';
-import './styles.less';
+import './styles.scss';
 import { AclService } from 'services/acl';
 
 
@@ -15,7 +15,7 @@ class AutowpItemController {
     static $inject = ['$scope', 'AclService'];
     constructor(protected $scope: IAutowpItemDirectiveScope, private AclService: AclService) {
         var self = this;
-        
+
         this.AclService.inheritsRole('moder').then(function(inherits) {
             self.is_moder = !!inherits;
         }, function() {
@@ -25,32 +25,17 @@ class AutowpItemController {
 
     public havePhoto(item: any) {
         var found = false;
-        angular.forEach(item.preview_pictures, function(picture: any) {
-            if (picture.thumbnail) {
+        angular.forEach(item.preview_pictures, function(picture: autowp.IPreviewPicture) {
+            if (picture.picture) {
                 found = true;
                 return false;
             }
         });
         return found;
     }
-  
+
     public canHavePhoto(item: any) {
         return [1, 2, 5, 6, 7].indexOf(item.item_type_id) != -1;
-    };
-  
-    public thumbnailClasses(picture: any, $index: number) {
-        
-        var thumbColumns = 4;
-        var singleThumbPart = Math.round(12 / thumbColumns);
-        
-        var classes: any = {};
-        var col = picture.large && $index === 0  ? 2*singleThumbPart : singleThumbPart;
-        var colSm = picture.large && $index === 0  ? 12 : 6;
-        
-        classes['col-md-'+col] = true;
-        classes['col-sm-'+colSm] = true;
-        
-        return classes;
     };
 }
 

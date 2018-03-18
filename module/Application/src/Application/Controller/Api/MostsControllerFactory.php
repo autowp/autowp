@@ -19,7 +19,8 @@ class MostsControllerFactory implements FactoryInterface
             $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Service\Mosts::class),
             $container->get(\Application\Model\Picture::class),
-            $hydrators->get(\Application\Hydrator\Api\ItemHydrator::class)
+            $hydrators->get(\Application\Hydrator\Api\ItemHydrator::class),
+            $container->get(\Application\PictureNameFormatter::class)
         );
     }
 }

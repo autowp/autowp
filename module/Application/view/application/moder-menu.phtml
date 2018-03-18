@@ -1,24 +1,27 @@
 <?php if ($this->items) { ?>
     <div id="moderatorMenuContainer" style="z-index:100">
         <div class="btn-group dropup" >
-            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">
+            <button data-toggle="dropdown" class="btn btn-secondary dropdown-toggle">
                 <?=$this->escapeHtml($this->translate('moder-menu/title'))?>
                 <span class="caret"></span>
             </button>
-            <ul class="dropdown-menu pull-right">
+            <div class="dropdown-menu float-right">
                 <?php foreach ($this->items as $item) { ?>
-                    <li><?=$this->htmlA(
-                        $item['href'],
-                        (isset($item['icon']) ? '<i class="fa-fw '.$item['icon'].'"></i> ' : '') . $this->escapeHtml($item['label']) . (isset($item['count']) ? ' <span class="badge">'.$item['count'].'</span>' : ''),
+                    <?=$this->htmlA(
+                        [
+                            'href' => $item['href'],
+                            'class' => 'dropdown-item'
+                        ],
+                        (isset($item['icon']) ? '<i class="fa-fw '.$item['icon'].'"></i> ' : '') . $this->escapeHtml($item['label']) . (isset($item['count']) ? ' <span class="badge badge-pill badge-secondary">'.$item['count'].'</span>' : ''),
                         false
-                    ) ?></li>
+                    ) ?>
                 <?php } ?>
-                <li class="divider"></li>
-                <li><a href="/ng/moder">
+                <div class="dropdown-divider"></div>
+                <a href="/ng/moder" class="dropdown-item">
                     <i class="fa fa-cog"></i>
                     <?=$this->escapeHtml($this->page(67)->name)?>
-                </a></li>
-            </ul>
+                </a>
+            </div>
         </div>
     </div>
 <?php } ?>

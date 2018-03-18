@@ -20,7 +20,7 @@
         <?php /*<i class="fa fa-file-image-o"></i>*/?>
     </span>
 
-    <span class="pull-right">
+    <span class="float-right">
 
         <span title="<?=$this->escapeHtmlAttr($this->translate('Views'))?>">
             <?=$this->escapeHtml($this->views > 1000 ? round($this->views / 1000) . 'K' : $this->views)?>
@@ -51,7 +51,7 @@
         <?php } ?>
 
         <?php if ($this->votes['positive'] > 0) { ?>
-            <span class="pull-right">
+            <span class="float-right">
                 <?=$this->votes['positive']?>
                 <i class="fa fa-thumbs-up"></i>
             </span>

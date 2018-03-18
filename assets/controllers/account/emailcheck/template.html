@@ -1,11 +1,11 @@
 <div class="row">
-    <div class="col-sm-8 col-sm-push-4">
-        <div class="well">
+    <div class="col-sm-8 order-2">
+        <div class="card card-body">
             <p translate ng-if="ctrl.success">users/registration/email-confirm/success-text</p>
             <p translate ng-if="ctrl.failure">users/registration/email-confirm/token-not-found</p>
         </div>
     </div>
-    <div class="col-sm-4 col-sm-pull-8">
+    <div class="col-sm-4 order-1">
         <autowp-account-sidebar user="user" ng-if="user"></autowp-account-sidebar>
     </div>
 </div>

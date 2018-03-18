@@ -6,7 +6,7 @@ import notify from 'notify';
 require("angular.app");
 require('app.module');
 require("bootstrap/bootstrap");
-require("styles.less");
+require("styles.scss");
 require("flags/flags");
 
 var resources = {};
@@ -24,20 +24,20 @@ i18next.init({
 var doc = document;
 $(function() {
     Navbar.init();
-    
+
     $('a.picture-hover-preview').each(function() {
         var href = $(this).attr('href');
         var element = null;
         var anchor = $(this);
         var loaded = false;
-        
+
         var fadeOutTimer = null;
-        
+
         function over() {
             clearInterval(fadeOutTimer);
             fadeOutTimer = null;
         }
-        
+
         function out() {
             clearInterval(fadeOutTimer);
             fadeOutTimer = null;
@@ -46,7 +46,7 @@ $(function() {
                 clearInterval(fadeOutTimer);
             }, 1500);
         }
-        
+
         $(this).hover(function () {
             over();
             if (!element) {
@@ -57,10 +57,10 @@ $(function() {
                     top: offset.top + anchor.height()
                 });
                 element.hover(over, out);
-                
+
                 $(doc.body).append(element);
             }
-            
+
             if (!loaded) {
                 loaded = true;
                 $.get(href, {preview: 1}, function(html) {
@@ -75,9 +75,9 @@ $(function() {
                 element.show();
             }
         }, out);
-        
+
     });
-    
+
     $('[data-module]').each(function() {
         var element = this;
         var moduleName = $(this).data('module');
@@ -85,7 +85,7 @@ $(function() {
             Module(element);
         });
     });
-    
+
     $('[data-page-module]').each(function() {
         var moduleName = $(this).data('page-module');
         var moduleOptions = $(this).data('page-module-options');
@@ -93,16 +93,16 @@ $(function() {
             Module.init(moduleOptions);
         });
     });
-    
+
     $('footer [data-toggle="tooltip"]').tooltip();
-    
+
     $('form.login').on('submit', function(e) {
         e.preventDefault();
-        
+
         var $form = $(this);
-        
+
         $form.find('.help-block').remove();
-        
+
         $.ajax({
             method: 'POST',
             url: '/api/login',
@@ -112,7 +112,7 @@ $(function() {
                 remember: $form.find(':input[name=remember]').prop('checked') ? 1 : 0
             }
         }).then(function() {
-            window.location = '/ng/login/ok'; 
+            window.location = '/ng/login/ok';
         }, function(response) {
             if (response.status == 400) {
                 $.each(response.responseJSON.invalid_params, function(field, errors) {
@@ -122,21 +122,21 @@ $(function() {
                         $p.insertAfter($input);
                     });
                 });
-                
+
             } else {
                 notify.response(response);
             }
         });
     });
-    
+
     $(document.body).on('click', 'a.logout', function() {
         $.ajax({
             method: 'DELETE',
             url: '/api/login'
         }).then(function() {
-            
+
             window.location = '/ng/login';
-            
+
         }, function(response) {
             notify.response(response);
         });

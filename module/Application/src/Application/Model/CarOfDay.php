@@ -482,7 +482,7 @@ class CarOfDay
         $formatRequests = [];
         foreach ($carOfDayPictures as $idx => $picture) {
             if ($picture) {
-                $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
+                $format = $idx == 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
                 $formatRequests[$format][$idx] = $this->picture->getFormatRequest($picture);
             }
         }
@@ -511,8 +511,6 @@ class CarOfDay
         $result = [];
         foreach ($carOfDayPictures as $idx => $row) {
             if ($row) {
-                $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
-
                 $url = null;
                 foreach ($paths as $path) {
                     switch ($path['type']) {
@@ -553,9 +551,16 @@ class CarOfDay
                  }
                  }*/
 
+                $format = $idx == 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
+                $thumb = isset($imagesInfo[$format][$idx]) ? $imagesInfo[$format][$idx] : null;
+
                 $result[] = [
-                    'src'  => isset($imagesInfo[$format][$idx])
-                        ? $imagesInfo[$format][$idx]->getSrc()
+                    'thumb'  => $thumb
+                        ? [
+                            'src'    => $thumb->getSrc(),
+                            'width'  => $thumb->getWidth(),
+                            'height' => $thumb->getHeight()
+                        ]
                         : null,
                     'name' => isset($names[$row['id']])
                         ? $this->pictureNameFormatter->format($names[$row['id']], $language)
@@ -585,7 +590,7 @@ class CarOfDay
 
     private function getOrientedPictureList(int $itemId)
     {
-        $perspectivesGroupIds = $this->perspective->getPageGroupIds(6);
+        $perspectivesGroupIds = $this->perspective->getPageGroupIds(5);
 
         $pictures = [];
 

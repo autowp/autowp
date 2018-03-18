@@ -339,7 +339,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('other');
 
-        $this->assertQuery(".thumbnail");
+        $this->assertQuery(".card");
     }
 
     /**
@@ -361,7 +361,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('mixed');
 
-        $this->assertQuery(".thumbnail");
+        $this->assertQuery(".card");
     }
 
     /**
@@ -383,7 +383,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('logotypes');
 
-        $this->assertQuery(".thumbnail");
+        $this->assertQuery(".card");
     }
 
     /**
@@ -405,7 +405,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('other-picture');
 
-        $this->assertQuery(".thumbnail");
+        $this->assertQuery(".card");
     }
 
     /**
@@ -428,7 +428,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('mixed-picture');
 
-        $this->assertQuery(".thumbnail");
+        $this->assertQuery(".card");
     }
 
     /**
@@ -451,7 +451,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('logotypes-picture');
 
-        $this->assertQuery(".thumbnail");
+        $this->assertQuery(".card");
     }
 
     /**

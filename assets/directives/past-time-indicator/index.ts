@@ -1,7 +1,7 @@
 import * as angular from "angular";
 import Module from 'app.module';
 
-import './styles.less';
+import './styles.scss';
 
 interface IPastTimeIndicatorDirectiveScope extends ng.IScope {
     past: boolean;

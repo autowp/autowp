@@ -9,7 +9,7 @@ declare namespace autowp {
         doLogout: () => void;
         doLogin: () => void;
     }
-    
+
     export interface IRootControllerScope extends autowp.IControllerScope
     {
         refreshNewMessagesCount: () => void;
@@ -36,7 +36,7 @@ declare namespace autowp {
         languages: any[];
         moderMenu: any[];
     }
-  
+
     export interface IPaginator
     {
         pageCount: number;
@@ -53,49 +53,49 @@ declare namespace autowp {
         firstItemNumber: number;
         lastItemNumber: number;
     }
-  
+
     export interface IPaginatedCollection<T>
     {
         paginator: autowp.IPaginator;
         items: T[];
     }
-    
+
     export interface IAttrZone
     {
         id: number;
         name: string;
     }
-    
+
     export interface IAttrAttribute
     {
         id: number;
         name: string;
     }
-    
+
     export interface IAttrAttributeType
     {
         id: number;
         name: string;
     }
-    
+
     export interface IAttrUnit
     {
         id: number;
         name: string;
     }
-    
+
     export interface IUser
     {
         id: number;
         name: string;
         specs_weight: number;
     }
-    
+
     export interface GetUsersResult {
         items: autowp.IUser[];
         paginator: autowp.IPaginator;
     }
-    
+
     export interface IItem
     {
         id: number;
@@ -122,7 +122,7 @@ declare namespace autowp {
         logo: any;
         engine_id: number|null,
         attr_zone_id: number,
-    
+
         engine_vehicles_count: number;
         pictures_count: number;
         childs_count: number;
@@ -130,28 +130,38 @@ declare namespace autowp {
         links_count: number;
         item_language_count: number;
         subscription: boolean;
-    
+
         related_group_pictures: any[];
     }
-    
+
     export interface GetItemsResult {
         items: autowp.IItem[];
         paginator: autowp.IPaginator;
     }
-    
+
     export interface GetZonesResult {
         items: autowp.IAttrZone[];
     }
-    
+
     export interface GetAttributeTypesResult {
         items: autowp.IAttrAttributeType[];
     }
-    
+
     export interface GetUnitResult {
         items: autowp.IAttrUnit[];
+    }
+
+    export interface IPreviewPicture {
+        picture: any; // IPicture;
+        url: string;
     }
 }
 
 interface JQuery {
     carousel(index: number): JQuery;
+    emulateTransitionEnd(duration: any): any;
+}
+
+interface Window {
+    transition: any;
 }

@@ -1,0 +1,26 @@
+.flag-icon {
+    background-size: contain;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    position: relative;
+    display: inline-block;
+    width: 1.3333333333333em;
+    line-height: 1em;
+    &:before {
+        content: "\00a0";
+    }
+}
+
+@mixin flag-icon($country) {
+    .flag-icon-#{$country} {
+        background-image: url(svg/#{$country}.svg);
+    }
+}
+
+@include flag-icon(gb);
+@include flag-icon(cn);
+@include flag-icon(ru);
+@include flag-icon(fr);
+@include flag-icon(by);
+@include flag-icon(br);
+@include flag-icon(ua);

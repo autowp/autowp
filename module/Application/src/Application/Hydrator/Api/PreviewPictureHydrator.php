@@ -17,17 +17,12 @@ class PreviewPictureHydrator extends RestHydrator
 
     private $userRole = null;
 
-
     public function __construct(
         $serviceManager
     ) {
         parent::__construct();
-
         $strategy = new Strategy\Picture($serviceManager);
         $this->addStrategy('picture', $strategy);
-
-        $strategy = new Strategy\Image($serviceManager);
-        $this->addStrategy('thumbnail', $strategy);
     }
 
     /**
@@ -68,15 +63,15 @@ class PreviewPictureHydrator extends RestHydrator
 
     public function extract($object)
     {
-        return [
-            'picture'   => $this->extractValue('picture', $object['row']),
-            'url'       => $object['url'],
-            'large'     => $object['format'] == 'picture-thumb-medium',
-            'thumbnail' => $object['row'] ? $this->extractValue('thumbnail', [
-                'image'  => Picture::buildFormatRequest($object['row']),
-                'format' => $object['format']
-            ]) : null
+        $result = [
+            'url' => $object['url']
         ];
+
+        if ($this->filterComposite->filter('picture')) {
+            $result['picture'] = $this->extractValue('picture', $object['row']);
+        }
+
+        return $result;
     }
 
     /**

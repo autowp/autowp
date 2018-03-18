@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-md-6">
         <h2 translate>moder/attrs/zones</h2>
-        <div class="well">
+        <div class="card card-body">
             <ul>
                 <li ng-repeat="zone in ctrl.zones">
                     <a ui-sref="moder-attrs-zone({id: zone.id})" ng-bind="zone.name"></a>
@@ -11,7 +11,7 @@
     </div>
     <div class="col-md-6">
         <h2 translate>moder/attrs/attributes</h2>
-        <div class="well">
+        <div class="card card-body">
             <autowp-moder-attrs-attribute-list attributes="ctrl.attributes" move-up="ctrl.moveUp" move-down="ctrl.moveDown"></autowp-moder-attrs-attribute-list>
         </div>
     </div>

@@ -3,7 +3,7 @@
     <a ui-sref="moder-items-item({id: ctrl.item.id})" ui-sref-options="{inherit: false}" translate>moder/edit-object</a>
 </p>
 
-<div class="well" ng-if="ctrl.links.length > 0 || ctrl.item.description">
+<div class="card card-body" ng-if="ctrl.links.length > 0 || ctrl.item.description">
     <div autowp-markdown="ctrl.item.description"></div>
 
     <p ng-if="ctrl.links.length > 0">
@@ -13,24 +13,24 @@
     </p>
 </div>
 
-<div ng-if="ctrl.authorPicturesChunks.length > 0">
+<div ng-if="ctrl.authorPictures.length > 0">
     <h3 translate>factories/factory/pictures</h3>
-    <div class="row" ng-repeat="chunk in ctrl.authorPicturesChunks">
-        <div class="col-sm-3" ng-repeat="picture in chunk">
+    <div class="row">
+        <div class="col-6 col-md-4 col-lg-3 col-xl-2" ng-repeat="picture in ctrl.authorPictures">
             <autowp-thumbnail picture="picture" is-moder="isModer"></autowp-thumbnail>
         </div>
     </div>
-    
+
     <autowp-paginator data="ctrl.authorPicturesPaginator" ng-if="ctrl.authorPicturesPaginator"></autowp-paginator>
 </div>
 
-<div ng-if="ctrl.contentPicturesChunks.length > 0">
+<div ng-if="ctrl.contentPictures.length > 0">
     <h3 translate>factories/factory/pictures</h3>
-    <div class="row" ng-repeat="chunk in ctrl.contentPicturesChunks">
-        <div class="col-sm-3" ng-repeat="picture in chunk">
+    <div class="row">
+        <div class="col-6 col-md-4 col-lg-3 col-xl-2" ng-repeat="picture in ctrl.contentPictures">
             <autowp-thumbnail picture="picture" is-moder="isModer"></autowp-thumbnail>
         </div>
     </div>
-    
+
     <autowp-paginator data="ctrl.contentPicturesPaginator" ng-if="ctrl.contentPicturesPaginator"></autowp-paginator>
 </div>

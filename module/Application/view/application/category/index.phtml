@@ -7,24 +7,25 @@
         'pageId' => 22,
     ]);
 ?>
-<div class="row destinations thumbnails">
+<div class="row">
     <?php foreach ($this->categories as $idx => $category) { ?>
-        <?php if ($idx && ($idx % 6 == 0)) { ?></div><div class="row destinations thumbnails"><?php }?>
+        <?php if ($idx && ($idx % 6 == 0)) { ?></div><div class="row"><?php }?>
         <div class="col-md-2">
-            <div class="thumbnail">
+            <div class="card">
                 <?php if ($picture = $category['top_picture']) { ?>
                     <?php if ($picture['image']) { ?>
                         <?=$this->htmlA(
                             $category['url'],
                             $this->htmlImg($picture['image']->getSrc(), [
-                                'format' => 'picture-thumb'
+                                'format' => 'picture-thumb',
+                                'class'  => 'card-img-top'
                             ]),
                             false
                         ) ?>
                     <?php } ?>
                 <?php } ?>
-                <div class="name">
-                    <h4><?=$this->htmlA([
+                <div class="card-body">
+                    <h4 class="card-title"><?=$this->htmlA([
                         'href'  => $category['url'],
                         'title' => $category['name']
                     ], $category['short_name']) ?></h4>
