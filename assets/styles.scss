@@ -53,28 +53,7 @@ a {
     @include transition(color .2s, background-color .2s);
 }
 
-/*.btn-default:visited { color: $btn-default-color }
-.btn-primary:visited { color: $btn-primary-color }
-.btn-warning:visited { color: $btn-warning-color }
-.btn-danger:visited  { color: $btn-danger-color  }
-.btn-success:visited { color: $btn-success-color }
-.btn-info:visited    { color: $btn-info-color    }*/
-
-/*.label-default,
-.label-danger,
-.label-success,
-.label-warning,
-.label-info {
-    &[href]:visited {
-        color: $label-color;
-    }
-}*/
-
 a {
-    /*&:visited {
-        color: #574CAD;
-    }*/
-
     &:hover, &:active {
         .badge {
             text-decoration: none;

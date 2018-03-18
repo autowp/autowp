@@ -56,7 +56,7 @@ class ItemNameFormatter
         $result = $this->renderer->escapeHtml($item['name']);
 
         if ($item['spec']) {
-            $attrs = ['class="label label-primary"'];
+            $attrs = ['class="badge badge-primary"'];
             if ($item['spec_full']) {
                 $attrs = array_merge($attrs, [
                     'title="' . $this->renderer->escapeHtmlAttr($item['spec_full']) . '"',
