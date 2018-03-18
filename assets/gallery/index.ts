@@ -315,8 +315,8 @@ class Carousel {
             to: nextElementIndex
         });
 
-        if (
-            false && Util.supportsTransitionEnd() &&
+        /*if (
+            Util.supportsTransitionEnd() &&
             $(this._element).hasClass(ClassName.SLIDE)
         ) {
             $(nextElement).addClass(orderClassName);
@@ -349,13 +349,13 @@ class Carousel {
                     setTimeout(() => $(this._element).trigger(slidEvent), 0);
                 })
                 .emulateTransitionEnd(transitionDuration);
-        } else {
+        } else {*/
             $(activeElement).removeClass(ClassName.ACTIVE);
             $(nextElement).addClass(ClassName.ACTIVE);
 
             this._isSliding = false;
             $(this._element).trigger(slidEvent);
-        }
+        // }
     }
 }
 
