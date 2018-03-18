@@ -125,7 +125,7 @@ ga('send', 'pageview');
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" ng-repeat="language in languages | filter: { active: true }">
                                 <i class="{{language.flag}}"></i>
                             </a>
-                            <div class="dropdown-menu">
+                            <div class="dropdown-menu dropdown-menu-right">
                                 <a class="dropdown-item" ng-href="{{language.url + path.substring(1)}}" ng-class="{active: language.active}" ng-repeat="language in languages">
                                     <i class="{{language.flag}}"></i>
                                     {{language.name}}
