@@ -161,3 +161,7 @@ interface JQuery {
     carousel(index: number): JQuery;
     emulateTransitionEnd(duration: any): any;
 }
+
+interface Window {
+    transition: any;
+}

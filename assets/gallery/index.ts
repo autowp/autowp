@@ -1,9 +1,6 @@
 import * as $ from 'jquery';
 import * as filesize from 'filesize';
 import './gallery.scss';
-import Util from 'bootstrap/js/src/util';
-
-console.log(Util);
 
 interface Dimension {
     width: number;
@@ -15,6 +12,46 @@ interface Bounds {
     top: number;
     width: number;
     height: number;
+}
+
+const TRANSITION_END = 'bsTransitionEnd';
+
+function reflow(element: any) {
+    return element.offsetHeight;
+}
+
+function supportsTransitionEnd() {
+    return Boolean(window.transition);
+}
+
+function toType(obj: any) {
+    return {}.toString
+        .call(obj)
+        .match(/\s([a-z]+)/i)[1]
+        .toLowerCase();
+}
+
+function isElement(obj: any) {
+    return (obj[0] || obj).nodeType;
+}
+
+function typeCheckConfig(componentName: string, config: any, configTypes: any) {
+    for (const property in configTypes) {
+        if (Object.prototype.hasOwnProperty.call(configTypes, property)) {
+            const expectedTypes = configTypes[property];
+            const value = config[property];
+            const valueType =
+                value && isElement(value) ? 'element' : toType(value);
+
+            if (!new RegExp(expectedTypes).test(valueType)) {
+                throw new Error(
+                    `${componentName.toUpperCase()}: ` +
+                        `Option "${property}" provided type "${valueType}" ` +
+                        `but expected type "${expectedTypes}".`
+                );
+            }
+        }
+    }
 }
 
 /**
@@ -69,7 +106,7 @@ const Selector = {
     NEXT_PREV: '.carousel-item-next, .carousel-item-prev'
 };
 
-const MILLISECONDS_MULTIPLIER = 1000
+const MILLISECONDS_MULTIPLIER = 1000;
 
 function getTransitionDurationFromElement(element: any) {
     if (!element) {
@@ -188,7 +225,7 @@ class Carousel {
             ...Default,
             ...config
         };
-        Util.typeCheckConfig(NAME, config, DefaultType);
+        typeCheckConfig(NAME, config, DefaultType);
         return config;
     }
 
@@ -318,12 +355,12 @@ class Carousel {
         });
 
         if (
-            Util.supportsTransitionEnd() &&
+            supportsTransitionEnd() &&
             $(this._element).hasClass(ClassName.SLIDE)
         ) {
             $(nextElement).addClass(orderClassName);
 
-            Util.reflow(nextElement);
+            reflow(nextElement);
 
             $(activeElement).addClass(directionalClassName);
             $(nextElement).addClass(directionalClassName);
@@ -333,7 +370,7 @@ class Carousel {
             );
 
             $(activeElement)
-                .one(Util.TRANSITION_END, () => {
+                .one(TRANSITION_END, () => {
                     $(nextElement)
                         .removeClass(
                             `${directionalClassName} ${orderClassName}`
@@ -415,25 +452,28 @@ export class Gallery {
         this.$indicators = this.$e.find('.carousel-indicators');
         this.$numbers = this.$e.find('.carousel-numbers');
 
-        this.carousel = new Carousel(this.$carousel[0], {}, (relatedTarget: any) => {
-            var $item = $(relatedTarget);
+        this.carousel = new Carousel(
+            this.$carousel[0],
+            {},
+            (relatedTarget: any) => {
+                var $item = $(relatedTarget);
 
-            this.activateItem($item, true);
-            this.fixArrows($item);
+                this.activateItem($item, true);
+                this.fixArrows($item);
 
-            var position = $item.data('position');
+                var position = $item.data('position');
 
-            this.position = position;
-            this.refreshIndicator();
+                this.position = position;
+                this.refreshIndicator();
 
-            this.loadSiblingPages(position);
+                this.loadSiblingPages(position);
 
-            this.$indicators.find('li.active').removeClass('active');
-            this.$indicators
-                .find('li')
-                .eq(position)
-                .addClass('active');
-        }
+                this.$indicators.find('li.active').removeClass('active');
+                this.$indicators
+                    .find('li')
+                    .eq(position)
+                    .addClass('active');
+            }
         );
 
         this.$carousel
@@ -731,7 +771,9 @@ export class Gallery {
             .append($loading);
 
         if (item.crop) {
-            $('<span class="carousel-control-full"><i class="fa fa-arrows-alt"></i></span>').appendTo($item);
+            $(
+                '<span class="carousel-control-full"><i class="fa fa-arrows-alt"></i></span>'
+            ).appendTo($item);
         }
 
         return $item;
@@ -1010,7 +1052,7 @@ export class Gallery {
 
     private refreshIndicator() {
         if (this.count >= this.MAX_INDICATORS) {
-            this.$numbers.text((this.position+1) + ' of ' + this.count);
+            this.$numbers.text(this.position + 1 + ' of ' + this.count);
         }
     }
 }
