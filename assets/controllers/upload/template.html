@@ -89,8 +89,8 @@
             </div>
         </div>
 
-        <div class="pictures row" ng-repeat="chunk in ctrl.picturesChunks">
-            <div class="col-lg-2 col-md-2 col-sm-2" ng-repeat="picture in chunk">
+        <div class="pictures row">
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2" ng-repeat="picture in ctrl.pictures">
                 <autowp-thumbnail picture="picture" is-moder="isModer"></autowp-thumbnail>
                 <p><a href="#" ng-click="ctrl.crop(picture)">
                     <i class="fa fa-crop"></i>

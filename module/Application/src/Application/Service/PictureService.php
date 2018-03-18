@@ -242,6 +242,8 @@ class PictureService
         $formatRequest = $this->picture->getFormatRequest($picture);
         $this->imageStorage->getFormatedImage($formatRequest, 'picture-thumb');
         $this->imageStorage->getFormatedImage($formatRequest, 'picture-medium');
+        $this->imageStorage->getFormatedImage($formatRequest, 'picture-thumb-medium');
+        $this->imageStorage->getFormatedImage($formatRequest, 'picture-thumb-large');
         $this->imageStorage->getFormatedImage($formatRequest, 'picture-gallery-full');
 
         // index

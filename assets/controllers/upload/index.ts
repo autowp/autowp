@@ -2,7 +2,6 @@ import * as angular from 'angular';
 import Module from 'app.module';
 import notify from 'notify';
 import { ItemService } from 'services/item';
-import { chunkBy } from 'chunk';
 
 import './select';
 
@@ -21,7 +20,6 @@ export class UploadController {
     public note: string;
     public progress: any[] = [];
     public pictures: any[] = [];
-    public picturesChunks: any[] = [];
     public item: autowp.IItem;
     public formHidden: boolean = false;
 
@@ -155,7 +153,6 @@ export class UploadController {
             }).then(function(response: ng.IHttpResponse<any>) {
                 let picture = response.data;
                 self.pictures.push(picture);
-                self.picturesChunks = chunkBy(self.pictures, 6);
 
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
