@@ -216,10 +216,6 @@ class CatalogueController extends AbstractActionController
                 'width' => 6
             ]);
 
-            /*$this->sidebar()->brand([
-                'brand_id' => $brand['id'],
-            ]);*/
-
             return [
                 'paginator'    => $paginator,
                 'picturesData' => $picturesData,
@@ -245,11 +241,6 @@ class CatalogueController extends AbstractActionController
             if ($paginator->getTotalItemCount() <= 0) {
                 return $this->notFoundAction();
             }
-
-            $this->sidebar()->brand([
-                'brand_id'    => $brand['id'],
-                'is_concepts' => true
-            ]);
 
             return [
                 'paginator' => $paginator,
@@ -315,10 +306,6 @@ class CatalogueController extends AbstractActionController
             if ($paginator->getTotalItemCount() <= 0) {
                 return $this->notFoundAction();
             }
-
-            /*$this->sidebar()->brand([
-                'brand_id' => $brand['id']
-            ]);*/
 
             return [
                 'cartypes'  => $list,
@@ -479,10 +466,6 @@ class CatalogueController extends AbstractActionController
             ]);
 
             $description = $this->itemModel->getTextOfItem($brand['id'], $this->language());
-
-            /*$this->sidebar()->brand([
-                'brand_id' => $brand['id']
-            ]);*/
 
             $inboxPictures = null;
 
@@ -884,11 +867,6 @@ class CatalogueController extends AbstractActionController
                 }
             ]);
 
-            $this->sidebar()->brand([
-                'brand_id' => $brand['id'],
-                'type'     => $type
-            ]);
-
             return [
                 'brand'        => $brand,
                 'paginator'    => $paginator,
@@ -919,11 +897,6 @@ class CatalogueController extends AbstractActionController
             $filter = $this->typePicturesFilter($brand['id'], $type, false);
 
             return $this->pictureAction($filter, function (array $filter, $picture) use ($brand, $type) {
-                $this->sidebar()->brand([
-                    'brand_id' => $brand['id'],
-                    'type'     => $type
-                ]);
-
                 return [
                     'picture'     => array_replace(
                         $this->pic()->picPageData($picture, $filter),
@@ -1154,12 +1127,6 @@ class CatalogueController extends AbstractActionController
             }
 
             $design = $this->itemModel->getDesignInfo($this->router, $currentCar['id'], $language);
-
-            /*$this->sidebar()->brand([
-                'brand_id'    => $brand['id'],
-                'item_id'     => $topItemId,
-                'is_concepts' => $currentCar['is_concept']
-            ]);*/
 
             $result = $callback($currentCar, $breadcrumbs, $brand, $currentCar['brand_item_catname'], $path);
 
@@ -2274,10 +2241,6 @@ class CatalogueController extends AbstractActionController
             if ($paginator->getTotalItemCount() <= 0) {
                 return $this->notFoundAction();
             }
-
-            $this->sidebar()->brand([
-                'brand_id' => $brand['id']
-            ]);
 
             return [
                 'paginator' => $paginator,
