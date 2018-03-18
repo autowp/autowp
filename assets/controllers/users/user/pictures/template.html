@@ -1,5 +1,5 @@
-<div class="brand-icons">
-    <div ng-repeat="brand in ctrl.brands">
+<div class="brand-icons row">
+    <div ng-repeat="brand in ctrl.brands" class="col-12 col-sm-6 col-md-4 col-lg-3">
         <a ui-sref="users-user-pictures-brand({identity: ctrl.identity, brand: brand.catname})" class="brandicon brandicon-{{brand.cssClass}}"></a>
         <h4>
             <a ui-sref="users-user-pictures-brand({identity: ctrl.identity, brand: brand.catname})" ng-bind="brand.name_only"></a>
