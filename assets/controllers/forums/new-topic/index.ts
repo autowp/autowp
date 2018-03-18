@@ -17,26 +17,26 @@ export class ForumsNewTopicController {
     };
     public invalidParams: any;
     public theme: any;
-  
+
     constructor(
-        private $scope: autowp.IControllerScope, 
-        private $http: ng.IHttpService, 
+        private $scope: autowp.IControllerScope,
+        private $http: ng.IHttpService,
         private $state: any,
         private Acl: AclService
     ) {
         var self = this;
-        
+
         this.$http({
             url: '/api/forum/themes/' + this.$state.params.theme_id,
             method: 'GET'
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             self.theme = response.data;
-            
+
             $scope.pageEnv({
                 layout: {
                     blankPage: false,
-                    needRight: true
+                    needRight: false
                 },
                 name: 'page/45/name',
                 pageId: 45,
@@ -45,17 +45,17 @@ export class ForumsNewTopicController {
                     THEME_ID:   self.theme.id
                 }
             });
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             $state.go('error-404');
         });
     }
-  
+
     public submit() {
         this.invalidParams = {};
-      
+
         var self = this;
-        
+
         this.$http({
             method: 'POST',
             url: '/api/forum/topic',
@@ -68,7 +68,7 @@ export class ForumsNewTopicController {
             }
         }).then(function(response: ng.IHttpResponse<any>) {
             var location = response.headers('Location');
-            
+
             self.$http({
                 url: location,
                 method: 'GET'
@@ -77,11 +77,11 @@ export class ForumsNewTopicController {
                 self.$state.go('forums-topic', {
                     topic_id: response.data.id
                 });
-                
+
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             if (response.status == 400) {
                 self.invalidParams = response.data.invalid_params;

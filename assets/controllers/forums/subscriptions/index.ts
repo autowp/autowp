@@ -11,24 +11,24 @@ export class ForumsSubscriptionsController {
 
     public topics: any[] = [];
     public paginator: autowp.IPaginator;
-  
+
     constructor(
-        private $scope: autowp.IControllerScope, 
-        private $http: ng.IHttpService, 
+        private $scope: autowp.IControllerScope,
+        private $http: ng.IHttpService,
         private $state: any,
         private Acl: AclService
     ) {
         var self = this;
-        
+
         this.$scope.pageEnv({
             layout: {
                 blankPage: false,
-                needRight: true
+                needRight: false
             },
             name: 'page/42/name',
             pageId: 42
         });
-        
+
         this.$http({
             url: '/api/forum/topic',
             method: 'GET',
@@ -44,7 +44,7 @@ export class ForumsSubscriptionsController {
             notify.response(response);
         });
     }
-  
+
     public unsubscribe(topic: any) {
         var self = this;
         this.$http({
@@ -54,14 +54,14 @@ export class ForumsSubscriptionsController {
                 subscription: 0
             }
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             for (var i=self.topics.length-1; i>=0; i--) {
                 if (self.topics[i].id == topic.id) {
                     self.topics.splice(i, 1);
                     break;
                 }
             }
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });

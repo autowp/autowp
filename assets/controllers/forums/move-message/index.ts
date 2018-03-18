@@ -13,42 +13,42 @@ export class ForumsMoveMessageController {
     public themes: any[] = [];
     public theme: any = null;
     public topics: any[] = [];
-  
+
     constructor(
-        private $scope: autowp.IControllerScope, 
-        private $http: ng.IHttpService, 
-        private $state: any, 
+        private $scope: autowp.IControllerScope,
+        private $http: ng.IHttpService,
+        private $state: any,
         private Forum: ForumService
     ) {
         this.$scope.pageEnv({
             layout: {
                 blankPage: false,
-                needRight: true
+                needRight: false
             },
             name: 'page/83/name',
             pageId: 83
         });
-        
+
         this.message_id = this.$state.params.message_id;
-      
+
         var self = this;
-        
+
         $http({
             url: '/api/forum/themes',
             method: 'GET'
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             self.themes = response.data.items;
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
     }
-  
+
     public selectTheme(theme: any) {
-      
+
         var self = this;
-      
+
         this.theme = theme;
         this.$http({
             url: '/api/forum/topic',
@@ -57,18 +57,18 @@ export class ForumsMoveMessageController {
                 theme_id: theme.id
             }
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             self.topics = response.data.items;
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
     };
 
     public selectTopic(topic: any) {
-      
+
         var self = this;
-      
+
         this.$http({
             method: 'PUT',
             url: '/api/comment/' + this.message_id,
@@ -76,13 +76,13 @@ export class ForumsMoveMessageController {
                 item_id: topic.id
             }
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             self.Forum.getMessageStateParams(self.message_id).then(function(params: any) {
                 self.$state.go('forums-topic', params);
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });

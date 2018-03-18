@@ -11,50 +11,50 @@ export class ForumsMoveTopicController {
     public message_id: number;
     public themes: any[] = [];
     public topic: any = null;
-  
+
     constructor(
-        private $scope: autowp.IControllerScope, 
-        private $http: ng.IHttpService, 
+        private $scope: autowp.IControllerScope,
+        private $http: ng.IHttpService,
         private $state: any
     ) {
         this.$scope.pageEnv({
             layout: {
                 blankPage: false,
-                needRight: true
+                needRight: false
             },
             name: 'page/83/name',
             pageId: 83
         });
-        
+
         var ctrl = this;
-        
+
         this.$http({
             url: '/api/forum/topic/' + this.$state.params.topic_id,
             method: 'GET'
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             ctrl.topic = response.data;
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             $state.go('error-404');
         });
-        
+
         this.$http({
             url: '/api/forum/themes',
             method: 'GET'
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             ctrl.themes = response.data.items;
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
     }
-  
+
     public selectTheme(theme: any) {
-      
+
         var self = this;
-      
+
         this.$http({
             method: 'PUT',
             url: '/api/forum/topic/' + this.topic.id,
@@ -62,11 +62,11 @@ export class ForumsMoveTopicController {
                 theme_id: theme.id
             }
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             self.$state.go('forums-topic', {
                 topic_id: self.topic.id
             });
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });

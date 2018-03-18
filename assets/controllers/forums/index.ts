@@ -20,32 +20,32 @@ export class ForumsController {
     public forumAdmin: boolean = false;
     public theme: any;
     public themes: any[];
-  
+
     constructor(
-        private $scope: autowp.IControllerScope, 
-        private $http: ng.IHttpService, 
-        private $state: any, 
-        private Acl: AclService, 
+        private $scope: autowp.IControllerScope,
+        private $http: ng.IHttpService,
+        private $state: any,
+        private Acl: AclService,
         private $translate: any
     ) {
         var self = this;
-            
+
         Acl.isAllowed('forums', 'moderate').then(function(allow: boolean) {
             self.forumAdmin = !!allow;
         }, function() {
             self.forumAdmin = false;
         });
-        
+
         if (! $state.params.theme_id) {
             $scope.pageEnv({
                 layout: {
                     blankPage: false,
-                    needRight: true
+                    needRight: false
                 },
                 name: 'page/42/name',
                 pageId: 42
             });
-            
+
             self.$http({
                 url: '/api/forum/themes',
                 method: 'GET',
@@ -58,9 +58,9 @@ export class ForumsController {
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
-            
+
         } else {
-            
+
             self.$http({
                 url: '/api/forum/themes/' + self.$state.params.theme_id,
                 method: 'GET',
@@ -69,16 +69,16 @@ export class ForumsController {
                     'topics[page]': self.$state.params.page
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
-                
+
                 self.theme = response.data;
                 self.themes = response.data.themes;
                 self.topics = response.data.topics;
-                
+
                 self.$translate(self.theme.name).then(function(translation: string) {
                     $scope.pageEnv({
                         layout: {
                             blankPage: false,
-                            needRight: true
+                            needRight: false
                         },
                         name: 'page/43/name',
                         pageId: 43,
@@ -91,7 +91,7 @@ export class ForumsController {
                     $scope.pageEnv({
                         layout: {
                             blankPage: false,
-                            needRight: true
+                            needRight: false
                         },
                         name: 'page/43/name',
                         pageId: 43,
@@ -101,15 +101,15 @@ export class ForumsController {
                         }
                     });
                 });
-                
+
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
-                
+
                 self.$state.go('error-404');
             });
         }
     }
-  
+
     public openTopic(topic: any) {
         this.$http({
             url: '/api/forum/topic/' + topic.id,
@@ -118,14 +118,14 @@ export class ForumsController {
                 status: 'normal'
             }
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             topic.status = 'normal';
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
     }
-    
+
     public closeTopic(topic: any) {
         this.$http({
             url: '/api/forum/topic/' + topic.id,
@@ -134,18 +134,18 @@ export class ForumsController {
                 status: 'closed'
             }
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             topic.status = 'closed';
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
     }
-    
+
     public deleteTopic(topic: any) {
-      
+
         var self = this;
-      
+
         this.$http({
             url: '/api/forum/topic/' + topic.id,
             method: 'PUT',
@@ -153,14 +153,14 @@ export class ForumsController {
                 status: 'deleted'
             }
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             for (var i=self.topics.items.length-1; i>=0; i--) {
                 if (self.topics.items[i].id == topic.id) {
                     self.topics.items.splice(i, 1);
                     break;
                 }
             }
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });

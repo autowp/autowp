@@ -13,19 +13,19 @@ export class ForumsTopicController {
     public paginator: autowp.IPaginator;
     public page: number;
     public limit: number;
-  
+
     constructor(
-        private $scope: autowp.IControllerScope, 
-        private $http: ng.IHttpService, 
-        private $state: any, 
-        private $translate: ng.translate.ITranslateService, 
+        private $scope: autowp.IControllerScope,
+        private $http: ng.IHttpService,
+        private $state: any,
+        private $translate: ng.translate.ITranslateService,
         private Forum: ForumService
     ) {
         var self = this;
-            
+
         this.page = $state.params.page;
         this.limit = Forum.getLimit();
-        
+
         this.$http({
             url: '/api/forum/topic/' + this.$state.params.topic_id,
             method: 'GET',
@@ -35,12 +35,12 @@ export class ForumsTopicController {
             }
         }).then(function(response: ng.IHttpResponse<any>) {
             self.topic = response.data;
-            
+
             self.$translate(self.topic.theme.name).then(function(translation: string) {
                 self.$scope.pageEnv({
                     layout: {
                         blankPage: false,
-                        needRight: true
+                        needRight: false
                     },
                     name: 'page/44/name',
                     pageId: 44,
@@ -55,7 +55,7 @@ export class ForumsTopicController {
                 self.$scope.pageEnv({
                     layout: {
                         blankPage: false,
-                        needRight: true
+                        needRight: false
                     },
                     name: 'page/44/name',
                     pageId: 44,
@@ -67,17 +67,17 @@ export class ForumsTopicController {
                     }
                 });
             });
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
-            
+
             self.$state.go('error-404');
         });
     }
-  
+
     public subscribe() {
         var self = this;
-      
+
         this.$http({
             url: '/api/forum/topic/' + this.topic.id,
             method: 'PUT',
@@ -85,17 +85,17 @@ export class ForumsTopicController {
                 subscription: 1
             }
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             self.topic.subscription = true;
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
     };
-    
+
     public unsubscribe() {
         var self = this;
-      
+
         this.$http({
             url: '/api/forum/topic/' + this.topic.id,
             method: 'PUT',
@@ -103,9 +103,9 @@ export class ForumsTopicController {
                 subscription: 0
             }
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             self.topic.subscription = false;
-            
+
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);
         });
