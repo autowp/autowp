@@ -1,53 +1,49 @@
-<div class="row" ng-init="ctrl.initArrows()">
-    <div class="col-md-6 text-right">
-        <p>
-            <a ui-sref="moder-pictures-item({id: ctrl.picture.siblings.prev.id})" title="{{ctrl.picture.siblings.prev.name_text}}" ng-if="ctrl.picture.siblings.prev" translate>moder/picture/previous</a>
-            <br ng-if="ctrl.picture.siblings.prev" />
-            <a ui-sref="moder-pictures-item({id: ctrl.picture.siblings.prev_new.id})" title="{{ctrl.picture.siblings.prev_new.name_text}}" ng-if="ctrl.picture.siblings.prev_new" translate>moder/picture/previous-new</a>
-        </p>
+<div class="row mb-4" ng-init="ctrl.initArrows()">
+    <div class="col-md-3">
+        <a ui-sref="moder-pictures-item({id: ctrl.picture.siblings.prev_new.id})" title="{{ctrl.picture.siblings.prev_new.name_text}}" ng-if="ctrl.picture.siblings.prev_new" translate>moder/picture/previous-new</a>
     </div>
-    <div class="col-md-6">
-        <p>
-            <a ui-sref="moder-pictures-item({id: ctrl.picture.siblings.next.id})" title="{{ctrl.picture.siblings.next.name_text}}" ng-if="ctrl.picture.siblings.next" translate>moder/picture/next</a>
-            <br ng-if="ctrl.picture.siblings.next" />
-            <a ui-sref="moder-pictures-item({id: ctrl.picture.siblings.next_new.id})" title="{{ctrl.picture.siblings.next_new.name_text}}" ng-if="ctrl.picture.siblings.next_new" translate>moder/picture/next-new</a>
-        </p>
+    <div class="col-md-3 text-right">
+        <a ui-sref="moder-pictures-item({id: ctrl.picture.siblings.prev.id})" title="{{ctrl.picture.siblings.prev.name_text}}" ng-if="ctrl.picture.siblings.prev" translate>moder/picture/previous</a>
+    </div>
+    <div class="col-md-3">
+        <a ui-sref="moder-pictures-item({id: ctrl.picture.siblings.next.id})" title="{{ctrl.picture.siblings.next.name_text}}" ng-if="ctrl.picture.siblings.next" translate>moder/picture/next</a>
+    </div>
+    <div class="col-md-3 text-right">
+        <a ui-sref="moder-pictures-item({id: ctrl.picture.siblings.next_new.id})" title="{{ctrl.picture.siblings.next_new.name_text}}" ng-if="ctrl.picture.siblings.next_new" translate>moder/picture/next-new</a>
     </div>
 </div>
 
-<div class="row">
+<div class="row mb-4">
     <div class="col-md-2">
         <img ng-src="{{ctrl.picture.thumb.src}}" ng-if="ctrl.picture.thumb" class="rounded border border-light w-100" />
     </div>
     <div class="col-md-6">
         <div class="card card-body">
-            <p translate="ng/moder/database-id-n" translate-values="{id: ctrl.picture.id}"></p>
-            <p>
+            <div>
                 {{'moder/picture/public-url:'|translate}}
                 <a ng-href="{{ctrl.picture.url}}" ng-bind="ctrl.picture.url"></a>
-            </p>
-            <p ng-if="ctrl.picture.image" style="overflow: hidden; text-overflow: ellipsis;">
+            </div>
+            <div ng-if="ctrl.picture.image" style="overflow: hidden; text-overflow: ellipsis;">
                 {{'moder/picture/image:'|translate}}
                 <a ng-href="{{ctrl.picture.image.src}}" ng-bind="ctrl.picture.image.src"></a>
-            </p>
+            </div>
             <a ui-sref="log({picture_id: ctrl.picture.id})" translate>moder/log-of-events</a>
         </div>
     </div>
     <div class="col-md-4">
         <div class="card card-body">
-            <p>{{'moder/picture/resolution:'|translate}}
-            <b>{{ctrl.picture.width}}×{{ctrl.picture.height}}</b></p>
-            <p ng-if="ctrl.picture.dpi_x || ctrl.picture.dpi_y">
+            <div translate="ng/moder/database-id-n" translate-values="{id: ctrl.picture.id}"></div>
+            <div>{{'moder/picture/resolution:'|translate}} <b>{{ctrl.picture.width}}×{{ctrl.picture.height}}</b></div>
+            <div ng-if="ctrl.picture.dpi_x || ctrl.picture.dpi_y">
                 DPI: <b>{{ctrl.picture.dpi_x}}×{{ctrl.picture.dpi_y}}</b>
-            </p>
-            <p>{{'moder/picture/filesize:'|translate}} <b ng-bind="ctrl.picture.filesize | filesize"></b></p>
-            <p>{{'moder/picture/upload-date:'|translate}} <b am-time-ago="ctrl.picture.add_date"></b></p>
+            </div>
+            <div>{{'moder/picture/filesize:'|translate}} <b ng-bind="ctrl.picture.filesize | filesize"></b></div>
+            <div>{{'moder/picture/upload-date:'|translate}} <b am-time-ago="ctrl.picture.add_date"></b></div>
         </div>
     </div>
 </div>
 
-<h3 translate>moder/picture/catalogue</h3>
-<div class="card card-body">
+<div class="card card-body mb-4">
     <table class="table" ng-if="ctrl.picture.items.length">
         <thead>
             <tr>
@@ -141,7 +137,7 @@
 <div class="row">
     <div class="col-md-6">
         <h3 translate>moder/picture/settings</h3>
-        <form class="card card-body form-vertical">
+        <form class="card card-body form-vertical mb-4">
             <div>
                 <p class="text-danger">Achtung! High Voltage! Ты сюда не ходи!</p>
                 <p class="text-danger">Поле использовать в ИСКЛЮЧИТЕЛЬНЫХ случаях. А лучше вообще никогда не использовать.</p>
@@ -163,7 +159,7 @@
         </form>
 
         <h3 translate>moder/picture/copyrights</h3>
-        <div class="card card-body">
+        <div class="card card-body mb-4">
             <div autowp-markdown="'moder/markdown/description'|translate"></div>
             <autowp-markdown-edit text="ctrl.picture.copyrights"></autowp-markdown-edit>
             <button class="btn btn-primary" ng-click="ctrl.saveCopyrights()" translate>submit</button>
@@ -178,17 +174,17 @@
         </div>
 
         <h3 ng-if="ctrl.picture.iptc">IPTC</h3>
-        <div class="card card-body small" style="overflow:auto" ng-if="ctrl.picture.iptc" ng-bind-html="ctrl.picture.iptc"></div>
+        <div class="card card-body small mb-4" style="overflow:auto" ng-if="ctrl.picture.iptc" ng-bind-html="ctrl.picture.iptc"></div>
 
         <h3 ng-if="ctrl.picture.exif">EXIF</h3>
-        <div class="card card-body small" style="overflow:auto" ng-if="ctrl.picture.exif" ng-bind-html="ctrl.picture.exif"></div>
+        <div class="card card-body small mb-4" style="overflow:auto" ng-if="ctrl.picture.exif" ng-bind-html="ctrl.picture.exif"></div>
 
     </div>
 
     <div class="col-md-6">
 
         <h3 translate ng-if="ctrl.picture.replaceable">moder/picture/replacement</h3>
-        <div class="card card-body" ng-if="ctrl.picture.replaceable">
+        <div class="card card-body mb-4" ng-if="ctrl.picture.replaceable">
             <div>
                 <p>
                     {{'moder/picture/replacement/photo-suggested-to-replace'|translate}}
@@ -212,7 +208,7 @@
 
 
         <h3 translate>moder/picture/acceptance</h3>
-        <div class="card card-body">
+        <div class="card card-body mb-4">
             <autowp-user user="ctrl.picture.change_status_user" ng-if="ctrl.picture.change_status_user"></autowp-user>
 
             <div ng-if="ctrl.picture.status == 'inbox'">
@@ -262,7 +258,7 @@
         </div>
 
         <h3 translate ng-if="ctrl.picture.rights.normalize || ctrl.picture.rights.flop || ctrl.picture.rights.crop">moder/picture/edit-and-repair</h3>
-        <div class="card card-body" ng-if="ctrl.picture.rights.normalize || ctrl.picture.rights.flop || ctrl.picture.rights.crop">
+        <div class="card card-body mb-4" ng-if="ctrl.picture.rights.normalize || ctrl.picture.rights.flop || ctrl.picture.rights.crop">
             <div>
                 <button class="btn btn-warning" ng-click="ctrl.normalizePicture()" ng-if="ctrl.picture.rights.normalize" ng-disabled="ctrl.repairLoading">
                     <i class="fa fa-signal"></i>
@@ -296,7 +292,7 @@
         </div>
 
         <h3 ng-if="ctrl.picture.similar">Similar picture</h3>
-        <div class="card card-body" ng-if="ctrl.picture.similar">
+        <div class="card card-body mb-4" ng-if="ctrl.picture.similar">
             <p class="alert alert-warning" role="alert">
                 <span class="fa fa-file-image-o"></span>
                 <a ui-sref="moder-pictures-item({id: ctrl.picture.similar.picture_id})">
@@ -317,7 +313,7 @@
         </div>
 
         <h3 translate>moder/picture/uploader</h3>
-        <div class="card card-body">
+        <div class="card card-body mb-4">
             <autowp-user user="ctrl.picture.owner" ng-if="ctrl.picture.owner"></autowp-user>
             <span ng-if="!ctrl.picture.owner" translate>moder/picture/uploader/unknown</span>
             <div ng-if="ctrl.picture.ip.address">
