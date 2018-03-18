@@ -746,17 +746,7 @@ class CatalogueController extends AbstractActionController
                 'car_catname'   => $brandItemRow['brand_item_catname']
             ]);
 
-            $name = $this->itemParent->getNamePreferLanguage(
-                $brandItemRow['brand_id'],
-                $brandItemRow['item_id'],
-                $language
-            );
-
-            if (! $name) {
-                $langName = $this->itemModel->getName($brandItemRow['item_id'], $language);
-
-                $name = $langName ? $langName : $brandItemRow['car_name'];
-            }
+            $name = $this->itemModel->getName($brandItemRow['item_id'], $language);
 
             $groups[] = [
                 'item_id' => $brandItemRow['item_id'],
