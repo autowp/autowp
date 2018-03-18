@@ -1,6 +1,7 @@
 import * as $ from 'jquery';
 import * as filesize from 'filesize';
 import './gallery.scss';
+import { Util } from './util';
 
 interface Dimension {
     width: number;
@@ -12,46 +13,6 @@ interface Bounds {
     top: number;
     width: number;
     height: number;
-}
-
-const TRANSITION_END = 'bsTransitionEnd';
-
-function reflow(element: any) {
-    return element.offsetHeight;
-}
-
-function supportsTransitionEnd() {
-    return Boolean(window.transition);
-}
-
-function toType(obj: any) {
-    return {}.toString
-        .call(obj)
-        .match(/\s([a-z]+)/i)[1]
-        .toLowerCase();
-}
-
-function isElement(obj: any) {
-    return (obj[0] || obj).nodeType;
-}
-
-function typeCheckConfig(componentName: string, config: any, configTypes: any) {
-    for (const property in configTypes) {
-        if (Object.prototype.hasOwnProperty.call(configTypes, property)) {
-            const expectedTypes = configTypes[property];
-            const value = config[property];
-            const valueType =
-                value && isElement(value) ? 'element' : toType(value);
-
-            if (!new RegExp(expectedTypes).test(valueType)) {
-                throw new Error(
-                    `${componentName.toUpperCase()}: ` +
-                        `Option "${property}" provided type "${valueType}" ` +
-                        `but expected type "${expectedTypes}".`
-                );
-            }
-        }
-    }
 }
 
 /**
@@ -225,7 +186,7 @@ class Carousel {
             ...Default,
             ...config
         };
-        typeCheckConfig(NAME, config, DefaultType);
+        Util.typeCheckConfig(NAME, config, DefaultType);
         return config;
     }
 
@@ -355,12 +316,12 @@ class Carousel {
         });
 
         if (
-            supportsTransitionEnd() &&
+            false && Util.supportsTransitionEnd() &&
             $(this._element).hasClass(ClassName.SLIDE)
         ) {
             $(nextElement).addClass(orderClassName);
 
-            reflow(nextElement);
+            Util.reflow(nextElement);
 
             $(activeElement).addClass(directionalClassName);
             $(nextElement).addClass(directionalClassName);
@@ -370,7 +331,7 @@ class Carousel {
             );
 
             $(activeElement)
-                .one(TRANSITION_END, () => {
+                .one(Util.TRANSITION_END, () => {
                     $(nextElement)
                         .removeClass(
                             `${directionalClassName} ${orderClassName}`
