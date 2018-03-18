@@ -30,14 +30,13 @@
                     <?php } ?>
                 </p>
             <?php } else { */ ?>
-                <h1>
-                    <?=$this->escapeHtml($this->brand['name']) ?>
-                    <?php if ( $this->brand['full_name'] && ($this->brand['full_name'] != $this->brand['name']) ) { ?>
-                        <small>(<?=$this->escapeHtml($this->brand['full_name'])?>)</small>
-                    <?php } ?>
-                </h1>
+                <h1 class="display-4"><?=$this->escapeHtml($this->brand['name']) ?></h1>
+                <?php if ( $this->brand['full_name'] && ($this->brand['full_name'] != $this->brand['name']) ) { ?>
+                    <p class="lead">(<?=$this->escapeHtml($this->brand['full_name'])?>)</p>
+                <?php } ?>
             <?php /*}*/ ?>
             <?php if ($this->description) { ?>
+                <hr class="my-4" />
                 <?=$this->markdown($this->description)?>
             <?php } ?>
         </div>
