@@ -51,7 +51,7 @@ class PictureVote extends AbstractPlugin
             return null;
         }
 
-        return $this->picture->isExists([
+        return ! $this->picture->isExists([
             'id_exclude' => $picture['id'],
             'status'     => Picture::STATUS_ACCEPTED,
             'item'       => [
