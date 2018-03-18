@@ -218,11 +218,10 @@ a {
 
 .copyrights {
     background-color: #d1cab8;
-    padding: 10px;
-    border-radius: 3px;
-    box-shadow: 0 0 2px #333;
-    font-size: 11px;
-    line-height: 16px;
+
+    p {
+        margin-bottom: 0.25rem;
+    }
 }
 
 img.avatar {
