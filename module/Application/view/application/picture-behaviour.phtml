@@ -20,41 +20,38 @@
         <?php /*<i class="fa fa-file-image-o"></i>*/?>
     </span>
 
-    <span class="float-right">
+    <br />
 
-        <span title="<?=$this->escapeHtmlAttr($this->translate('Views'))?>">
+    <?php if ($this->views > 0) { ?>
+        <span title="<?=$this->escapeHtmlAttr($this->translate('Views'))?>" class="mr-2">
             <?=$this->escapeHtml($this->views > 1000 ? round($this->views / 1000) . 'K' : $this->views)?>
             <i class="fa fa-eye"></i>
         </span>
+    <?php } ?>
 
-        <span title="<?=$this->escapeHtmlAttr($this->translate('Comments count'))?>">
-            <?php if ($this->newMsgCount > 0) { ?>
-                <?=$this->htmlA(
-                    $this->url. '#comments',
-                    ($this->msgCount > $this->newMsgCount ? $this->msgCount - $this->newMsgCount : '') .
-                    '<span class="text-danger">' . $this->escapeHtml('+'.$this->newMsgCount) .'</span> ' .
-                    '<i class="fa fa-comment text-danger"></i>',
-                    false
-                )?>
-            <?php } elseif ($this->msgCount > 0) { ?>
-                <?=$this->htmlA($this->url. '#comments', $this->msgCount . ' <i class="fa fa-comment"></i>', false)?>
-            <?php } else { ?>
-
-            <?php } ?>
+    <?php if ($this->votes['positive'] > 0) { ?>
+        <span class="mr-2">
+            <?=$this->votes['positive']?>
+            <i class="fa fa-thumbs-up"></i>
         </span>
+    <?php } ?>
+
+    <span title="<?=$this->escapeHtmlAttr($this->translate('Comments count'))?>" class="mr-2">
+        <?php if ($this->newMsgCount > 0) { ?>
+            <?=$this->htmlA(
+                $this->url. '#comments',
+                ($this->msgCount > $this->newMsgCount ? $this->msgCount - $this->newMsgCount : '') .
+                '<span class="text-danger">' . $this->escapeHtml('+'.$this->newMsgCount) .'</span> ' .
+                '<i class="fa fa-comment text-danger"></i>',
+                false
+            )?>
+        <?php } elseif ($this->msgCount > 0) { ?>
+            <?=$this->htmlA($this->url. '#comments', $this->msgCount . ' <i class="fa fa-comment"></i>', false)?>
+        <?php } ?>
     </span>
 
-    <?php if ($this->ownerId || $this->votes['positive'] > 0) { ?>
+    <?php if ($this->ownerId) { ?>
         <br />
-        <?php if ($this->ownerId) { ?>
-            <?=$this->user($this->ownerId)?>
-        <?php } ?>
-
-        <?php if ($this->votes['positive'] > 0) { ?>
-            <span class="float-right">
-                <?=$this->votes['positive']?>
-                <i class="fa fa-thumbs-up"></i>
-            </span>
-        <?php } ?>
+        <?=$this->user($this->ownerId)?>
     <?php } ?>
 </p>

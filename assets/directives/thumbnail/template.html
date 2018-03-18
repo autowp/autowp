@@ -18,31 +18,33 @@
                 <i ng-if="isModer && picture.cropped" class="fa fa-scissors" style="cursor:help" title="{{'picture-preview/crop-desc'|translate}} ({{picture.cropResolution}})"></i>
             </span>
 
-            <span class="float-right">
-                <span title="{{'Views'|translate}}" ng-if="picture.views > 0">
-                    <span ng-if="picture.views >= 1000">{{picture.views/1000 | number:1}}K</span>
-                    <span ng-if="picture.views < 1000">{{picture.views | number:0}}</span>
-                    <i class="fa fa-eye"></i>
-                </span>
+            <br />
 
-                <span title="{{'Comments count'|translate}}" ng-if="picture.comments_count.total > 0">
-                    <a ng-href="{{picture.url}}" ng-if="picture.comments_count.new > 0">
-                        {{picture.comments_count.total > picture.comments_count.new ? picture.comments_count.total - picture.comments_count.new : ''}}<span class="text-danger">+{{picture.comments_count.new}}</span>
-                        <i class="fa fa-comment text-danger"></i>
-                    </a>
-                    <a ng-href="{{picture.url}}" ng-if="picture.comments_count.new == 0">
-                        {{picture.comments_count.total}} <i class="fa fa-comment"></i>
-                    </a>
-                </span>
+            <span title="{{'Views'|translate}}" ng-if="picture.views > 0" class="mr-2">
+                <span ng-if="picture.views >= 1000">{{picture.views/1000 | number:1}}K</span>
+                <span ng-if="picture.views < 1000">{{picture.views | number:0}}</span>
+                <i class="fa fa-eye"></i>
             </span>
 
-            <br ng-if="picture.owner || picture.votes.positive > 0" />
-            <autowp-user user="picture.owner" ng-if="picture.owner"></autowp-user>
-
-            <span class="float-right" ng-if="picture.votes.positive > 0">
+            <span class="mr-2" ng-if="picture.votes.positive > 0">
                 {{picture.votes.positive}}
                 <i class="fa fa-thumbs-up"></i>
             </span>
+
+            <span title="{{'Comments count'|translate}}" ng-if="picture.comments_count.total > 0" class="mr-2">
+                <a ng-href="{{picture.url}}" ng-if="picture.comments_count.new > 0">
+                    {{picture.comments_count.total > picture.comments_count.new ? picture.comments_count.total - picture.comments_count.new : ''}}<span class="text-danger">+{{picture.comments_count.new}}</span>
+                    <i class="fa fa-comment text-danger"></i>
+                </a>
+                <a ng-href="{{picture.url}}" ng-if="picture.comments_count.new == 0">
+                    {{picture.comments_count.total}} <i class="fa fa-comment"></i>
+                </a>
+            </span>
+
+            <br ng-if="picture.owner" />
+            <autowp-user user="picture.owner" ng-if="picture.owner"></autowp-user>
+
+
         </p>
 
         <button type="button" class="btn btn-secondary btn-sm float-left mr-1 mb-2" data-toggle="button" aria-pressed="false" ng-click="onPictureSelect($event, picture)" ng-if="onselect">
