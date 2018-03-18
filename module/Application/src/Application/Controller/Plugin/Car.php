@@ -360,10 +360,11 @@ class Car extends AbstractPlugin
                 if ($picture) {
                     $row = $picture['row'];
                     $allPictures[] = $row;
-                    if ($largeFormat && $idx == 0) {
+                    if ($item['largeFormat'] && $idx == 0) {
                         $allFormatRequests['picture-thumb-large'][$row['id']] = $catalogue->getPictureFormatRequest($row);
+                    } else {
+                        $allFormatRequests['picture-thumb-medium'][$row['id']] = $catalogue->getPictureFormatRequest($row);
                     }
-                    $allFormatRequests['picture-thumb-medium'][$row['id']] = $catalogue->getPictureFormatRequest($row);
                 }
             }
         }
@@ -387,21 +388,20 @@ class Car extends AbstractPlugin
                     $id = $picture['row']['id'];
 
                     $picture['name'] = isset($pictureNames[$id]) ? $pictureNames[$id] : null;
-
-                    if ($largeFormat && $idx == 0) {
+                    if ($item['largeFormat'] && $idx == 0) {
                         $large = isset($imagesInfo['picture-thumb-large'][$id]) ? $imagesInfo['picture-thumb-large'][$id] : null;
-                        $picture['large'] = [
+                        $picture['large'] = $large ? [
                             'src'    => $large->getSrc(),
                             'width'  => $large->getWidth(),
                             'height' => $large->getHeight()
-                        ];
+                        ] : null;
                     } else {
                         $medium = isset($imagesInfo['picture-thumb-medium'][$id]) ? $imagesInfo['picture-thumb-medium'][$id] : null;
-                        $picture['medium'] = [
+                        $picture['medium'] = $medium ? [
                             'src'    => $medium->getSrc(),
                             'width'  => $medium->getWidth(),
                             'height' => $medium->getHeight()
-                        ];
+                        ] : null;
                     }
                     unset($picture['row'], $picture['format']);
                 }
