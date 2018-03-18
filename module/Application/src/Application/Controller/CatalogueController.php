@@ -530,7 +530,6 @@ class CatalogueController extends AbstractActionController
                     'name'   => 'Other',
                     'url'    => null,
                     'groups' => $this->otherGroups(
-                        $language,
                         $brandId,
                         $brandCatname,
                         true
@@ -543,7 +542,6 @@ class CatalogueController extends AbstractActionController
     }
 
     private function otherGroups(
-        string $language,
         int $brandId,
         string $brandCatname,
         bool $conceptsSeparatly
@@ -636,13 +634,6 @@ class CatalogueController extends AbstractActionController
         string $brandCatname,
         bool $conceptsSeparatly
     ) {
-        $cacheKey = implode('_', [
-            'SIDEBAR',
-            $brandId,
-            $language,
-            '50'
-        ]);
-
         $sectionsPresets = [
             'other' => [
                 'name'         => null,

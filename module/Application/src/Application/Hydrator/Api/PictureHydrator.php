@@ -256,14 +256,14 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('thumb')) {
-            $picture['thumb'] =  $this->extractValue('thumb', [
+            $picture['thumb'] = $this->extractValue('thumb', [
                 'image'  => Picture::buildFormatRequest((array)$object),
                 'format' => 'picture-thumb'
             ]);
         }
 
         if ($this->filterComposite->filter('thumb_medium')) {
-            $picture['thumb_medium'] =  $this->extractValue('thumb_medium', [
+            $picture['thumb_medium'] = $this->extractValue('thumb_medium', [
                 'image'  => Picture::buildFormatRequest((array)$object),
                 'format' => 'picture-thumb-medium'
             ]);

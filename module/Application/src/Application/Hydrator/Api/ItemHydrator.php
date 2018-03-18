@@ -537,7 +537,6 @@ class ItemHydrator extends RestHydrator
                     'totalPictures' => $totalPictures
                 ]);
 
-                $largeFormat = count($pictures) > 4;
                 foreach ($pictures as &$picture) {
                     if ($picture) {
                         if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
