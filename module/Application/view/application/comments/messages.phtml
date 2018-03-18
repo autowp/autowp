@@ -70,7 +70,9 @@
                 <?php if ($this->user()->logedIn() && $deep < 21) { ?>
                     <button class="btn btn-sm btn-primary reply">
                         <i class="fa fa-reply"></i>
-                        <?=$this->escapeHtml($this->translate('comments/reply'))?>
+                        <span class="d-none d-md-inline">
+                            <?=$this->escapeHtml($this->translate('comments/reply'))?>
+                        </span>
                     </button>
                 <?php } ?>
 
@@ -85,7 +87,7 @@
                     <?=$this->htmlA([
                         'href'  => '#',
                         'class' => 'btn btn-danger btn-sm float-right comment-remove-button',
-                    ], '<i class="fa fa-trash"></i></span> ' . $this->escapeHtml($this->translate('comments/message/delete')), false) ?>
+                    ], '<i class="fa fa-trash"></i></span> <span class="d-none d-md-inline">' . $this->escapeHtml($this->translate('comments/message/delete')) . '</span>', false) ?>
                     <?=$this->htmlA([
                         'href'  => '#',
                         'class' => 'btn btn-success btn-sm float-right comment-restore-button',

@@ -122,6 +122,9 @@ a {
         .photo {
             width: 70px;
             float: left;
+            @include media-breakpoint-down(sm) {
+                display: none;
+            }
 
             img {
                 max-width: 70px;
@@ -129,9 +132,12 @@ a {
         }
 
         .content {
-            margin-left: 100px;
             min-height: 70px;
             margin-bottom: 20px;
+
+            @include media-breakpoint-up(md) {
+                margin-left: 100px;
+            }
         }
 
         &.deleted {

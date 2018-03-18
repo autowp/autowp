@@ -32,7 +32,7 @@
 
             <button class="btn btn-sm btn-primary reply" ng-if="user && deep < 21 && !message.deleted" ng-click="ctrl.reply(message, false)">
                 <i class="fa fa-reply"></i>
-                {{'comments/reply'|translate}}
+                <span class="d-none d-md-inline">{{'comments/reply'|translate}}</span>
             </button>
 
             <button class="btn btn-sm btn-success resolve" ng-if="moderAttention && isModer" ng-click="ctrl.reply(message, true)">
@@ -42,7 +42,7 @@
 
             <a href="#" class="btn btn-danger btn-sm float-right comment-remove-button" ng-if="ctrl.canRemoveComments" ng-click="ctrl.setIsDeleted(message, 1)">
                 <i class="fa fa-trash"></i>
-                {{'comments/message/delete'|translate}}
+                <span class="d-none d-md-inline">{{'comments/message/delete'|translate}}</span>
             </a>
             <a href="#" class="btn btn-success btn-sm float-right comment-restore-button" ng-if="ctrl.canRemoveComments" ng-click="ctrl.setIsDeleted(message, 0)">
                 <i class="fa fa-arrow-up"></i>
@@ -51,7 +51,7 @@
 
             <a ui-sref="forums-move-message({message_id: message.id})" class="btn btn-secondary btn-sm float-right" ng-if="typeId == 5 && ctrl.canMoveMessage">
                 <i class="fa fa-arrows"></i>
-                {{'comments/message/move'|translate}}
+                <span class="d-none d-md-inline">{{'comments/message/move'|translate}}</span>
             </a>
 
             <i class="float-right fa fa-eye" data-toggle="tooltip" title="{{comment.ip}}" style="margin-right:20px" ng-if="comment.ip"></i>
