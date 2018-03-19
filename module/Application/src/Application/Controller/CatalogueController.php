@@ -379,7 +379,7 @@ class CatalogueController extends AbstractActionController
             }
         }
 
-        $imagesInfo = $this->imageStorage()->getFormatedImages($requests, 'picture-thumb');
+        $imagesInfo = $this->imageStorage()->getFormatedImages($requests, 'picture-thumb-medium');
 
         $factories = [];
         foreach ($rows as $idx => $row) {
