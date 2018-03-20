@@ -423,8 +423,7 @@ class CarOfDay
                 'message'      => $text,
                 'attachments'  => $url,
                 'access_token' => $vkOptions['token'],
-                /*'captcha_sid' => '954673112942',
-                'captcha_key' => 'q2d2due'*/
+                'v'            => '5.73'
             ])
             ->send();
 
