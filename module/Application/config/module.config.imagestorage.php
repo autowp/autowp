@@ -143,7 +143,7 @@ return [
             ],
             'picture-preview-large' => [
                 'fitType' => 0,
-                'width'   => 540,
+                'width'   => 538,
                 'strip'   => 1,
                 'format'  => 'jpeg'
             ],
