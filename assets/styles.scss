@@ -72,21 +72,15 @@ a {
 
 .card {
     &.vote-accept {
-        .thumbnail {
-            box-shadow: 0 0 3px rgba(0,128,0,0.7);
-        }
+        box-shadow: 0 0 3px rgba(0,128,0,0.7);
     }
 
     &.vote-remove {
-        .thumbnail {
-            box-shadow: 0 0 3px rgba(255,0,0,0.7);
-        }
+        box-shadow: 0 0 3px rgba(255,0,0,0.7);
     }
 
     &.vote-neutral {
-        .thumbnail {
-            box-shadow: 0 0 3px rgba(240,173,78,0.7);
-        }
+        box-shadow: 0 0 3px rgba(240,173,78,0.7);
     }
 }
 
