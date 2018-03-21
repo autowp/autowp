@@ -1672,7 +1672,7 @@ class CatalogueController extends AbstractActionController
             foreach ($pPaginator->getCurrentItems() as $pictureRow) {
                 $imageInfo = $imageStorage->getFormatedImage(
                     $this->picture->getFormatRequest($pictureRow),
-                    'picture-thumb'
+                    'picture-thumb-medium'
                 );
 
                 $currentPictures[] = [
