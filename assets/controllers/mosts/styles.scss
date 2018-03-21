@@ -1,0 +1,8 @@
+.mosts-header {
+    .dropdown-toggle {
+        font-size: 2.5rem;
+        &::after {
+            display: none;
+        }
+    }
+}

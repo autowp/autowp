@@ -5,8 +5,22 @@ require('services/mosts');
 import notify from 'notify';
 var $ = require('jquery');
 
+require('./styles.scss');
+
 const CONTROLLER_NAME = 'MostsController';
 const STATE_NAME = 'mosts';
+
+function vehicleTypesToList(vehilceTypes: any[]): any[] {
+    let result: any[] = []
+    for (const item of vehilceTypes) {
+        result.push(item);
+        for (const child of item.childs) {
+            result.push(child);
+        }
+    }
+
+    return result;
+}
 
 class MostsController {
     static $inject = ['$scope', '$http', '$state', 'MostsService', '$translate', '$timeout'];
@@ -19,7 +33,7 @@ class MostsController {
     public typeCatname: string;
     public yearsCatname: string;
     public defaultTypeCatname: string;
-  
+
     constructor(
         private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
@@ -31,35 +45,35 @@ class MostsController {
         this.ratingCatname = this.$state.params.rating_catname;
         this.typeCatname = this.$state.params.type_catname;
         this.yearsCatname = this.$state.params.years_catname;
-      
+
         var self = this;
-      
+
         this.loading++;
         this.MostsService.getMenu().then(function(data: any) {
             self.years = data.years;
             self.ratings = data.ratings;
-            self.vehilceTypes = data.vehilce_types;
-          
+            self.vehilceTypes = vehicleTypesToList(data.vehilce_types);
+
             self.defaultTypeCatname = self.vehilceTypes[0].catname;
-          
+
             if (! self.ratingCatname) {
                 self.ratingCatname = self.ratings[0].catname;
             }
-          
+
             var ratingName = 'most/' + self.ratingCatname;
             if (self.typeCatname) {
-              
+
                 var typeName = self.getVehicleTypeName(self.typeCatname);
 
                 if (self.yearsCatname) {
-                  
+
                     var yearName: string = '';
                     for (let year of self.years) {
                         if (year.catname == self.yearsCatname) {
                             yearName = year.name;
                         }
                     }
-                
+
                     self.$translate([ratingName, typeName, yearName]).then(function (translations: any) {
                         self.initPageEnv(156, {
                             MOST_CATNAME: self.ratingCatname,
@@ -88,20 +102,20 @@ class MostsController {
                     });
                 });
             }
-          
+
             self.$timeout(function() {
                 $('small.unit').tooltip({
                     placement: 'bottom'
                 });
             });
-          
+
             self.loading--;
-          
+
         }, function(response: ng.IHttpResponse<any>) {
             self.loading--;
             notify.response(response);
         });
-      
+
         this.loading++;
         this.$http({
             method: 'GET',
@@ -119,7 +133,7 @@ class MostsController {
             self.loading--;
         });
     }
-  
+
     private getVehicleTypeName(catname: string): string
     {
         var result: string = '';
@@ -128,22 +142,22 @@ class MostsController {
                 result = vehilceType.name;
                 break;
             }
-          
+
             for (const subVehilceType of vehilceType.childs) {
                 if (subVehilceType.catname == catname) {
                     result = subVehilceType.name;
                     break;
                 }
             }
-          
+
             if (result) {
                 break;
             }
         }
-      
+
         return result;
     }
-  
+
     private initPageEnv(pageId: number, args: any)
     {
         this.$scope.pageEnv({
@@ -151,6 +165,7 @@ class MostsController {
                 blankPage: false,
                 needRight: false
             },
+            disablePageName: true,
             name: 'page/' + pageId + '/name',
             pageId: pageId,
             args: args

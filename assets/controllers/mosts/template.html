@@ -1,53 +1,73 @@
-<div class="row">
-    <div class="col-sm-4">
-        <div class="card card-body">
-            <div class="nav flex-column nav-pills">
-                <h3 translate class="nav-header">mosts/sidebar/mostly…</h3>
-                <a ng-repeat="rating in ctrl.ratings" ng-class="{active: rating.catname == ctrl.ratingCatname}" class="nav-link" ui-sref=".({rating_catname: rating.catname})" ng-bind="rating.name|translate"></a>
-                <h3 translate class="nav-header">mosts/sidebar/between…</h3>
-                <a ng-repeat-start="type in ctrl.vehilceTypes" class="nav-link" ng-class="{active: type.catname == ctrl.typeCatname}" ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: type.catname})" ng-bind="type.name|translate"></a>
-                <div class="nav flex-column nav-pills" ng-if="type.childs.length > 0" ng-repeat-end>
-                    <a class="nav-link" ng-repeat="child in type.childs" ng-class="{active: child.catname == ctrl.typeCatname}" class="nav-link" ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: child.catname})" ng-bind="child.name|translate"></a>
-                </div>
-            </div>
+<h1 class="mb-4 mosts-header">
+    <span translate>mosts/most</span>
+    <div class="dropdown d-inline-block">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span ng-repeat="rating in ctrl.ratings" ng-if="rating.catname == ctrl.ratingCatname" ng-bind="rating.name|translate">
+            </span>
+            <i class="fa fa-caret-down" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px;overflow-x: hidden;">
+            <a ng-repeat="rating in ctrl.ratings" ng-class="{active: rating.catname == ctrl.ratingCatname}" class="dropdown-item" ui-sref=".({rating_catname: rating.catname})"
+                ng-bind="rating.name|translate">
+            </a>
         </div>
     </div>
-    <div class="col-sm-8">
-        <div class="nav nav-pills" ng-if="ctrl.defaultTypeCatname">
-            <a class="nav-link" ng-repeat="year in ctrl.years" ng-class="{active: year.catname ? year.catname == ctrl.yearsCatname : !ctrl.yearsCatname}" ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: ctrl.typeCatname || ctrl.defaultTypeCatname, years_catname: year.catname})" ng-bind="year.name|translate"></a>
-        </div>
 
-        <span ng-show="ctrl.loading > 0">
-            <i class="fa fa-spinner fa-spin fa-fw"></i>
-        </span>
+    <div class="dropdown d-inline-block">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span ng-repeat="type in ctrl.vehilceTypes" ng-if="type.catname == ctrl.typeCatname" ng-bind="type.name|translate">
+            </span>
+            <span ng-if="!ctrl.typeCatname" translate>item/type/1/name</span>
+            <i class="fa fa-caret-down" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px;overflow-x: hidden;">
+            <a ng-repeat="type in ctrl.vehilceTypes" class="dropdown-item" ng-class="{active: type.catname == ctrl.typeCatname}" ui-sref=".({rating_catname: ctrl.ratingCatname, type_catname: type.catname})"
+                ng-bind="type.name|translate"></a>
+        </div>
+    </div>
 
-        <div class="row" ng-repeat-start="item in ctrl.items">
-            <div class="col-md-9">
-                <h3 ng-bind-html="item.item.name_html"></h3>
-            </div>
-            <div class="col-md-3">
-                <h3 ng-bind="'most/' + ctrl.ratingCatname + '/param' | translate" ng-if="$first"></h3>
+    <div class="dropdown d-inline-block" ng-if="ctrl.defaultTypeCatname">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span ng-repeat="year in ctrl.years" ng-if="year.catname ? year.catname == ctrl.yearsCatname : !ctrl.yearsCatname" ng-bind="year.name|translate"></span>
+            <i class="fa fa-caret-down" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px;overflow-x: hidden;">
+            <a ng-repeat="year in ctrl.years" ng-class="{active: year.catname ? year.catname == ctrl.yearsCatname : !ctrl.yearsCatname}"
+                class="dropdown-item" ui-sref=".({rating_catname: rating.catname})" ng-bind="year.name|translate">
+            </a>
+        </div>
+    </div>
+</h1>
+
+<span ng-show="ctrl.loading > 0">
+    <i class="fa fa-spinner fa-spin fa-fw"></i>
+</span>
+
+<div class="row" ng-repeat-start="item in ctrl.items">
+    <div class="col-md-9">
+        <h3 ng-bind-html="item.item.name_html"></h3>
+    </div>
+    <div class="col-md-3">
+        <h3 ng-bind="'most/' + ctrl.ratingCatname + '/param' | translate" ng-if="$first"></h3>
+    </div>
+</div>
+<div class="row mb-4" ng-repeat-end>
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-md-4" ng-repeat="picture in item.pictures track by $index">
+                <a ng-href="{{picture.url}}" class="rounded d-block mb-4" ng-if="picture">
+                    <img class="rounded w-100 border border-light" ng-src="{{picture.src}}" alt="{{picture.name}}" title="{{picture.name}}" />
+                </a>
+                <span ng-if="!picture">&#xa0;</span>
             </div>
         </div>
-        <div class="row mb-4" ng-repeat-end>
-            <div class="col-md-9">
-                <div class="row">
-                    <div class="col-md-4" ng-repeat="picture in item.pictures track by $index">
-                        <a ng-href="{{picture.url}}" class="rounded d-block mb-4" ng-if="picture"> 
-                            <img class="rounded w-100 border border-light" ng-src="{{picture.src}}" alt="{{picture.name}}" title="{{picture.name}}" />
-                        </a>
-                        <span ng-if="!picture">&#xa0;</span>
-                    </div>
-                </div>
-                <div ng-if="item.item.description" autowp-markdown="item.item.description|translate"></div>
-            </div>
-            <div class="col-md-3">
-                <h3>
-                    <span ng-if="item.value_html" ng-bind-html="item.value_html"></span>
-                    <span ng-if="!item.value_html && item.value_text" ng-bind-html="item.value_text"></span>
-                    <small class="unit" translate-attr="{title: item.unit.name}" ng-if="item.unit" ng-bind="item.unit.abbr | translate"></small>
-                </h3>
-            </div>
-        </div>
+        <div ng-if="item.item.description" autowp-markdown="item.item.description|translate"></div>
+    </div>
+    <div class="col-md-3">
+        <h3>
+            <span ng-if="item.value_html" ng-bind-html="item.value_html"></span>
+            <span ng-if="!item.value_html && item.value_text" ng-bind-html="item.value_text"></span>
+            <small class="unit" translate-attr="{title: item.unit.name}" ng-if="item.unit" ng-bind="item.unit.abbr | translate"></small>
+        </h3>
     </div>
 </div>

@@ -91,7 +91,7 @@ class MostsController extends AbstractActionController
         }
 
         $imageStorage = $this->imageStorage();
-        $imagesInfo = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb');
+        $imagesInfo = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb-medium');
 
         $names = $this->picture->getNameData($allPictures, [
             'language' => $language
