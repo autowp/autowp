@@ -37,7 +37,7 @@
 
         <li ng-repeat="twinsGroup in item.twins_groups" class="list-inline-item">
             <i class="fa fa-adjust"></i>
-            <a ng-href="{{twinsGroup.url}}" translate>carlist/twins</a>
+            <a ng-href="/twins/group{{twinsGroup.id}}" translate>carlist/twins</a>
         </li>
 
         <li ng-repeat="category in item.categories" class="list-inline-item">

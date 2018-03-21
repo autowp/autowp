@@ -47,7 +47,7 @@ export class NewController {
                         'item_pictures.thumb_medium,item_pictures.name_html,item_pictures.name_text,' +
                         'item.name_html,item.name_default,item.description,item.produced,' +
                         'item.design,item.url,item.spec_editor_url,item.specs_url,' +
-                        'item.categories.url,item.categories.name_html,item.twins_groups.url'
+                        'item.categories.url,item.categories.name_html,item.twins_groups'
             }
         }).then(function(response: ng.IHttpResponse<any>) {
             ctrl.paginator = response.data.paginator;
