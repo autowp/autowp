@@ -1,6 +1,7 @@
 <?php return array (
   'persons/content-persons' => 'Persons on photo',
   'persons/author-persons' => 'Authors',
+  'mosts/most' => 'Самыя',
   'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'number of reverse gears',
   'specs/attrs/dynamic/max-reverse-speed' => 'max speed (reverse)',
@@ -310,7 +311,7 @@ other {У вас {messages} новых паведамленняў}
   'mosts/period/1970-79' => '1970-79ых',
   'mosts/period/1990-99' => '1990-99ых',
   'mosts/period/2000-09' => '2000-09ых',
-  'mosts/period/2010-16' => '2010-16ых',
+  'mosts/period/2010-17' => '2010-17ых',
   'mosts/period/present' => 'нашага часу',
   'mosts/period/all-time' => 'за ўсю гісторыю',
   'upload/image-file' => 'Файл карцінкі',

@@ -1,6 +1,7 @@
 <?php return array (
   'persons/content-persons' => 'Persons on photo',
   'persons/author-persons' => 'Authors',
+  'mosts/most' => '各项之最',
   'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'number of reverse gears',
   'specs/attrs/dynamic/max-reverse-speed' => 'max speed (reverse)',
@@ -305,7 +306,7 @@
   'mosts/period/1970-79' => '1970-79年',
   'mosts/period/1990-99' => '1990-99年',
   'mosts/period/2000-09' => '2000-09年',
-  'mosts/period/2010-16' => '2010-16年',
+  'mosts/period/2010-17' => '2010-17年',
   'mosts/period/present' => '现款车型',
   'mosts/period/all-time' => '所有年份',
   'upload/image-file' => '图片文件',

@@ -1,6 +1,7 @@
 <?php return array (
   'persons/content-persons' => 'Persons on photo',
   'persons/author-persons' => 'Authors',
+  'mosts/most' => 'Most',
   'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'number of reverse gears',
   'specs/attrs/dynamic/max-reverse-speed' => 'max speed (reverse)',
@@ -308,7 +309,7 @@ All images are posted for educational purposes.
   'mosts/period/1970-79' => '1970-79th',
   'mosts/period/1990-99' => '1990-99th',
   'mosts/period/2000-09' => '2000-09th',
-  'mosts/period/2010-16' => '2010-16th',
+  'mosts/period/2010-17' => '2010-17th',
   'mosts/period/present' => 'present time',
   'mosts/period/all-time' => 'all time',
   'upload/image-file' => 'Image file',

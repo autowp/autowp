@@ -1,6 +1,7 @@
 <?php return array (
-  'persons/content-persons' => 'Persons on photo',
-  'persons/author-persons' => 'Authors',
+  'persons/content-persons' => 'Personnes sur la photo',
+  'persons/author-persons' => 'Auteurs',
+  'mosts/most' => 'Le plus',
   'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'number of reverse gears',
   'specs/attrs/dynamic/max-reverse-speed' => 'max speed (reverse)',
@@ -305,7 +306,7 @@ Toutes les images sont disponibles à des fins éducatives.
   'mosts/period/1970-79' => '1970-79',
   'mosts/period/1990-99' => '1990-99',
   'mosts/period/2000-09' => '2000-09',
-  'mosts/period/2010-16' => '2010-16',
+  'mosts/period/2010-17' => '2010-17',
   'mosts/period/present' => 'au présent',
   'mosts/period/all-time' => 'dans l\'histoire',
   'upload/image-file' => 'Fichier d\'image',

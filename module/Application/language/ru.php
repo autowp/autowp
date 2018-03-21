@@ -1,6 +1,7 @@
 <?php return array (
   'persons/content-persons' => 'Персоны на фото',
   'persons/author-persons' => 'Авторы',
+  'mosts/most' => 'Самые',
   'specs/attrs/wheels/auto-pumping-tires' => 'автоподкачка шин',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'количество задних передач',
   'specs/attrs/dynamic/max-reverse-speed' => 'максимальная скорость (назад)',
@@ -310,7 +311,7 @@
   'mosts/period/1970-79' => '1970-79ых',
   'mosts/period/1990-99' => '1990-99ых',
   'mosts/period/2000-09' => '2000-09ых',
-  'mosts/period/2010-16' => '2010-16ых',
+  'mosts/period/2010-17' => '2010-17ых',
   'mosts/period/present' => 'нашего времени',
   'mosts/period/all-time' => 'за всю историю',
   'upload/image-file' => 'Файл картинки',
