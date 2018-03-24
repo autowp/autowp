@@ -313,7 +313,6 @@ export class ModerItemsItemController {
                 }
             }).then(function(response: ng.IHttpResponse<any>) {
                 self.randomPicture = response.data.pictures.length > 0 ? response.data.pictures[0] : null;
-                console.log(self.randomPicture);
                 self.loading--;
             }, function() {
                 self.loading--;

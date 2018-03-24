@@ -482,7 +482,7 @@ class CarOfDay
         foreach ($carOfDayPictures as $idx => $picture) {
             if ($picture) {
                 $format = $idx == 0 ? 'picture-thumb-large' : 'picture-thumb-medium';
-                $formatRequests[$format][$idx] = $this->picture->getFormatRequest($picture);
+                $formatRequests[$format][$idx] = $picture['image_id'];
             }
         }
 

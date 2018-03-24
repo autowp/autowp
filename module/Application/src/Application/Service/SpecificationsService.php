@@ -1156,12 +1156,12 @@ class SpecificationsService
             $topPicture = $this->specPicture($car, $topPerspectives);
             $topPictureRequest = null;
             if ($topPicture) {
-                $topPictureRequest = $this->picture->getFormatRequest($topPicture);
+                $topPictureRequest = $topPicture['image_id'];
             }
             $bottomPicture = $this->specPicture($car, $bottomPerspectives);
             $bottomPictureRequest = null;
             if ($bottomPicture) {
-                $bottomPictureRequest = $this->picture->getFormatRequest($bottomPicture);
+                $bottomPictureRequest = $bottomPicture['image_id'];
             }
 
             $result[] = [

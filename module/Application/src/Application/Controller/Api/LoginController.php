@@ -312,7 +312,7 @@ class LoginController extends AbstractRestfulController
                             throw new Exception("Error loading image");
                         }
                         $format = $this->imageStorage()->getFormat('photo');
-                        $imageSampler->convertImagick($imagick, $format);
+                        $imageSampler->convertImagick($imagick, null, $format);
 
                         $newImageId = $this->imageStorage()->addImageFromImagick($imagick, 'user');
 

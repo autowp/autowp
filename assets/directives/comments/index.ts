@@ -16,17 +16,16 @@ class AutowpCommentsDirectiveController {
     public paginator: autowp.IPaginator;
 
     static $inject = ['$scope', '$state', '$http'];
-    
+
     constructor(
-        protected $scope: IAutowpCommentsDirectiveScope, 
+        protected $scope: IAutowpCommentsDirectiveScope,
         private $state: any,
         private $http: ng.IHttpService
     ) {
-        console.log('load');
         this.load();
-       
+
         var self = this;
-        
+
         this.onSent = function(location: string) {
             if ($scope.limit) {
                 self.$http({
@@ -37,13 +36,13 @@ class AutowpCommentsDirectiveController {
                         limit: $scope.limit
                     }
                 }).then(function(response: ng.IHttpResponse<any>) {
-                    
+
                     if ($scope.page != response.data.page) {
                         $state.go('.', {page: response.data.page}); // , { notify: false }
                     } else {
                         self.load();
                     }
-                    
+
                 }, function(response: ng.IHttpResponse<any>) {
                     notify.response(response);
                 });
@@ -52,7 +51,7 @@ class AutowpCommentsDirectiveController {
             }
         };
     }
-    
+
     public load() {
         var self = this;
         this.$http({

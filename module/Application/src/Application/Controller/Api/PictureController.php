@@ -605,25 +605,17 @@ class PictureController extends AbstractRestfulController
             $height = max(1, $height);
             $height = min($picture['height'], $height);
 
+            $crop = null;
             if ($left > 0 || $top > 0 || $width < $picture['width'] || $height < $picture['height']) {
-                $set = array_replace($set, [
-                    'crop_left'   => $left,
-                    'crop_top'    => $top,
-                    'crop_width'  => $width,
-                    'crop_height' => $height
-                ]);
-            } else {
-                $set = array_replace($set, [
-                    'crop_left'   => null,
-                    'crop_top'    => null,
-                    'crop_width'  => null,
-                    'crop_height' => null
-                ]);
+                $crop = [
+                    'left'   => $left,
+                    'top'    => $top,
+                    'width'  => $width,
+                    'height' => $height
+                ];
             }
 
-            $this->imageStorage()->flush([
-                'image' => $picture['image_id']
-            ]);
+            $this->imageStorage()->setImageCrop($picture['image_id'], $crop);
 
             $this->log(sprintf(
                 'Выделение области на картинке %s',

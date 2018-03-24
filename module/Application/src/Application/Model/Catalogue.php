@@ -7,8 +7,6 @@ use InvalidArgumentException;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
-use Autowp\Image\Storage\Request;
-
 class Catalogue
 {
     private $picturesPerPage = 20;
@@ -199,25 +197,5 @@ class Catalogue
         }
 
         return $result;
-    }
-
-    /**
-     * @return Request
-     */
-    public function getPictureFormatRequest($picture)
-    {
-        $options = [
-            'imageId' => $picture['image_id']
-        ];
-        if (Picture::checkCropParameters($picture)) {
-            $options['crop'] = [
-                'left'   => $picture['crop_left'],
-                'top'    => $picture['crop_top'],
-                'width'  => $picture['crop_width'],
-                'height' => $picture['crop_height']
-            ];
-        }
-
-        return new Request($options);
     }
 }

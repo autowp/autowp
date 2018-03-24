@@ -269,10 +269,6 @@ class Picture
                 case 'name':
                 case 'width':
                 case 'height':
-                case 'crop_left':
-                case 'crop_top':
-                case 'crop_width':
-                case 'crop_height':
                 case 'image_id':
                 case 'filesize':
                     if (is_numeric($key)) {
@@ -991,84 +987,12 @@ class Picture
         return Rand::getString(1, $alpha) . Rand::getString(self::IDENTITY_LENGTH - 1, $alpha . $number);
     }
 
-    public function getFormatRequest($row)
-    {
-        if ($row instanceof \ArrayObject) {
-            $row = (array)$row;
-        }
-
-        return self::buildFormatRequest($row);
-    }
-
     public function getTotalPicturesSize(): int
     {
         $select = $this->table->getSql()->select();
         $select->columns(['sum' => new Sql\Expression('sum(filesize)')]);
         $row = $this->table->selectWith($select)->current();
         return $row ? (int)$row['sum'] : 0;
-    }
-
-    public function cropParametersExists($row)
-    {
-        if ($row instanceof \ArrayObject) {
-            $row = (array)$row;
-        }
-
-        return self::checkCropParameters($row);
-    }
-
-    private static function between($a, $min, $max)
-    {
-        return ($min <= $a) && ($a <= $max);
-    }
-
-    public static function checkCropParameters($options)
-    {
-        // Check existance and correct of crop parameters
-        return ! is_null($options['crop_left']) && ! is_null($options['crop_top']) &&
-               ! is_null($options['crop_width']) && ! is_null($options['crop_height']) &&
-               self::between($options['crop_left'], 0, $options['width']) &&
-               self::between($options['crop_width'], 1, $options['width']) &&
-               self::between($options['crop_top'], 0, $options['height']) &&
-               self::between($options['crop_height'], 1, $options['height']);
-    }
-
-    /**
-     * @param array $options
-     * @return Image\Storage\Request
-     */
-    public static function buildFormatRequest($options)
-    {
-        if ($options instanceof \ArrayAccess) {
-            $options = (array)$options;
-        }
-
-        if (! is_array($options)) {
-            throw new \Exception("array or ArrayAccess expected");
-        }
-
-        $defaults = [
-            'image_id'    => null,
-            'crop_left'   => null,
-            'crop_top'    => null,
-            'crop_width'  => null,
-            'crop_height' => null
-        ];
-        $options = array_replace($defaults, $options);
-
-        $request = [
-            'imageId' => $options['image_id']
-        ];
-        if (self::checkCropParameters($options)) {
-            $request['crop'] = [
-                'left'   => $options['crop_left'],
-                'top'    => $options['crop_top'],
-                'width'  => $options['crop_width'],
-                'height' => $options['crop_height']
-            ];
-        }
-
-        return new Image\Storage\Request($request);
     }
 
     public function getNameData($rows, array $options = [])

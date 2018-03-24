@@ -35,7 +35,7 @@ angular.module(MODULE_NAME, ['ngAnimate', 'ngAria', 'ui.router', 'pascalprecht.t
     .config(['$urlRouterProvider', '$locationProvider', '$translateProvider', 'RollbarProvider',
         function config($urlRouterProvider: any, $locationProvider: ng.ILocationProvider, $translateProvider: any, RollbarProvider: any) {
             $locationProvider.html5Mode(true).hashPrefix('!');
-    
+
             //$urlRouterProvider.when('', '/');
             $urlRouterProvider.otherwise('/');
 
@@ -47,14 +47,14 @@ angular.module(MODULE_NAME, ['ngAnimate', 'ngAria', 'ui.router', 'pascalprecht.t
             $translateProvider.translations('be', require('./languages/be.json'));
             $translateProvider.translations('uk', require('./languages/uk.json'));
             $translateProvider.translations('pt-br', require('./languages/pt-br.json'));
-            
+
             var lang = document.documentElement.getAttribute('lang');
-            
+
             $translateProvider.useMessageFormatInterpolation();
             $translateProvider.fallbackLanguage('en');
             $translateProvider.preferredLanguage(lang);
             $translateProvider.use(lang);
-            
+
             if (window.opt.rollbar.access_token) {
                 RollbarProvider.init({
                     accessToken: window.opt.rollbar.access_token,

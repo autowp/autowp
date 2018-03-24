@@ -467,8 +467,7 @@ class ItemHydrator extends RestHydrator
 
                         $src = null;
                         if ($pictureRow) {
-                            $request = $this->catalogue->getPictureFormatRequest($pictureRow);
-                            $imagesInfo = $this->imageStorage->getFormatedImage($request, 'picture-thumb');
+                            $imagesInfo = $this->imageStorage->getFormatedImage($pictureRow['image_id'], 'picture-thumb');
                             $src = $imagesInfo->getSrc();
                         }
 

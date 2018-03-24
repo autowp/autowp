@@ -26,7 +26,7 @@ class InlinePicture extends AbstractHelper
 
         $name = $view->pic()->name($picture, $this->view->language());
 
-        $imageHtml = $view->img($this->picture->getFormatRequest($picture), [
+        $imageHtml = $view->img($picture['image_id'], [
             'format'  => 'picture-thumb',
             'alt'     => $name,
             'title'   => $name,

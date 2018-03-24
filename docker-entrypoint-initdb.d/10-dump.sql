@@ -37,7 +37,7 @@ CREATE TABLE `acl_resources` (
 --
 
 /*!40000 ALTER TABLE `acl_resources` DISABLE KEYS */;
-INSERT INTO `acl_resources` (`id`, `name`) 
+INSERT INTO `acl_resources` (`id`, `name`)
 VALUES (12,'attrs'),(1,'brand'),(4,'car'),(14,'category'),(6,'comment'),(8,'engine'),(21,'factory'),(10,'forums'),(15,'hotlinks'),(2,'model'),(19,'museums'),(7,'page'),(5,'picture'),(9,'rights'),
 (17,'specifications'),(18,'status'),(11,'twins'),(13,'user'),(20,'website');
 /*!40000 ALTER TABLE `acl_resources` ENABLE KEYS */;
@@ -64,7 +64,7 @@ CREATE TABLE `acl_resources_privileges` (
 --
 
 /*!40000 ALTER TABLE `acl_resources_privileges` DISABLE KEYS */;
-INSERT IGNORE INTO `acl_resources_privileges` (`id`, `resource_id`, `name`) 
+INSERT IGNORE INTO `acl_resources_privileges` (`id`, `resource_id`, `name`)
 VALUES (4,4,'add'),(1,4,'edit_meta'),(5,4,'move'),(8,5,'move'),
 (2,11,'edit'),(3,13,'ban'),(7,17,'edit'),(9,17,'edit-engine'),(6,21,'edit'),
 (10,6,'remove'),(11,9,'edit'),(12,10,'moderate'),(13,1,'logo'),(14,15,'view'),
@@ -145,7 +145,7 @@ CREATE TABLE `acl_roles_privileges_allowed` (
 --
 
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` DISABLE KEYS */;
-INSERT IGNORE INTO `acl_roles_privileges_allowed` (`role_id`, `privilege_id`) 
+INSERT IGNORE INTO `acl_roles_privileges_allowed` (`role_id`, `privilege_id`)
 VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9),(5,10),(5,11),(5,12),(5, 13),(5,14),(5,17),(5,18),(5,19),(5,20),(5,16),(5,21),(5,22);
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` ENABLE KEYS */;
 
@@ -330,7 +330,7 @@ CREATE TABLE `attrs_units` (
 --
 
 /*!40000 ALTER TABLE `attrs_units` DISABLE KEYS */;
-INSERT INTO `attrs_units` VALUES 
+INSERT INTO `attrs_units` VALUES
 (1,'specs/unit/1/name','specs/unit/1/abbr'),
 (2,'specs/unit/2/name','specs/unit/2/abbr'),
 (3,'specs/unit/3/name','specs/unit/3/abbr'),
@@ -862,7 +862,7 @@ CREATE TABLE `car_types_parents` (
 --
 
 /*!40000 ALTER TABLE `car_types_parents` DISABLE KEYS */;
-INSERT INTO `car_types_parents` 
+INSERT INTO `car_types_parents`
 VALUES (1,1,1),(1,29,0),(2,2,1),(2,29,0),(3,3,0),(4,4,1),(4,29,0),(5,5,1),(5,29,0),
 (6,6,1),(6,29,0),(7,7,1),(7,29,0),(8,8,1),(8,29,0),(9,9,0),(10,10,0),(11,11,0),
 (12,12,0),(13,13,1),(13,29,0),(14,14,0),(15,15,0),(16,16,0),(17,17,0),(19,19,0),
@@ -1293,6 +1293,10 @@ CREATE TABLE `image` (
   `height` int(10) unsigned NOT NULL,
   `date_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `dir` varchar(255) NOT NULL,
+  `crop_left` smallint unsigned NOT NULL DEFAULT 0,
+  `crop_top` smallint unsigned NOT NULL DEFAULT 0,
+  `crop_width` smallint unsigned NOT NULL DEFAULT 0,
+  `crop_height` smallint unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `filename` (`filepath`,`dir`),
   KEY `image_dir_id` (`dir`)
@@ -1430,7 +1434,7 @@ CREATE TABLE `item` (
 --
 
 /*!40000 ALTER TABLE `item` DISABLE KEYS */;
-INSERT INTO `item` (`id`, `name`, `begin_year`, `end_year`, `body`, `spec_id`, `spec_inherit`, `produced`, `produced_exactly`, `is_concept`, `pictures_count`, `today`, `add_datetime`, `begin_month`, `end_month`, `begin_order_cache`, `end_order_cache`, `begin_model_year`, `end_model_year`, `_html`, `is_group`, `car_type_inherit`, `is_concept_inherit`, `engine_item_id`, `engine_inherit`, `text_id`, `full_text_id`, `item_type_id`, `catname`, `full_name`, `position`, `logo_id`) 
+INSERT INTO `item` (`id`, `name`, `begin_year`, `end_year`, `body`, `spec_id`, `spec_inherit`, `produced`, `produced_exactly`, `is_concept`, `pictures_count`, `today`, `add_datetime`, `begin_month`, `end_month`, `begin_order_cache`, `end_order_cache`, `begin_model_year`, `end_model_year`, `_html`, `is_group`, `car_type_inherit`, `is_concept_inherit`, `engine_item_id`, `engine_inherit`, `text_id`, `full_text_id`, `item_type_id`, `catname`, `full_name`, `position`, `logo_id`)
 VALUES (1,'test car',1999,NULL,'',NULL,1,100,1,0,0,1,'2016-11-25 18:31:47',2,NULL,NULL,NULL,2000,NULL,NULL,0,0,0,1,1,NULL,NULL,1,NULL,NULL,0,NULL),
 (2,'test concept car',1999,2005,'',NULL,1,233,0,1,0,0,'2016-11-25 18:31:47',6,4,NULL,NULL,1999,2005,NULL,0,0,0,NULL,1,NULL,NULL,1,NULL,NULL,0,NULL),
 (3,'test car 3',1923,1927,'',NULL,1,50752,1,0,0,0,'2016-11-25 18:31:47',6,1,NULL,NULL,1923,1927,NULL,0,0,0,NULL,1,NULL,NULL,1,NULL,NULL,0,NULL),
@@ -2083,7 +2087,7 @@ CREATE TABLE `perspectives` (
 --
 
 /*!40000 ALTER TABLE `perspectives` DISABLE KEYS */;
-INSERT INTO `perspectives` (`id`, `name`, `position`) VALUES 
+INSERT INTO `perspectives` (`id`, `name`, `position`) VALUES
 (1,'perspective/front',1),(2,'perspective/back',9),(3,'perspective/left',5),
 (4,'perspective/right',7),(5,'perspective/interior',14),(6,'perspective/front-panel',11),
 (7,'perspective/3/4-left',3),(8,'perspective/3/4-right',4),(9,'perspective/cutaway',21),
@@ -2799,7 +2803,7 @@ CREATE TABLE `users` (
 --
 
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` (`id`, `login`, `password`, `e_mail`, `name`, `reg_date`, `last_online`, `icq`, `url`, `own_car`, `dream_car`, `forums_topics`, `forums_messages`, `pictures_added`, `e_mail_checked`, `hide_e_mail`, `authority`, `pictures_ratio`, `email_to_check`, `email_check_code`, `role`, `avatar`, `photo`, `messaging_interval`, `last_message_time`, `deleted`, `identity`, `img`, `votes_per_day`, `votes_left`, `timezone`, `specs_volume`, `specs_volume_valid`, `specs_positives`, `specs_negatives`, `specs_weight`, `last_ip`, `language`) 
+INSERT INTO `users` (`id`, `login`, `password`, `e_mail`, `name`, `reg_date`, `last_online`, `icq`, `url`, `own_car`, `dream_car`, `forums_topics`, `forums_messages`, `pictures_added`, `e_mail_checked`, `hide_e_mail`, `authority`, `pictures_ratio`, `email_to_check`, `email_check_code`, `role`, `avatar`, `photo`, `messaging_interval`, `last_message_time`, `deleted`, `identity`, `img`, `votes_per_day`, `votes_left`, `timezone`, `specs_volume`, `specs_volume_valid`, `specs_positives`, `specs_negatives`, `specs_weight`, `last_ip`, `language`)
 VALUES (1,'test','26cc2d23a03a8f07ed1e3d000a244636','test@example.com','tester',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,NULL,NULL,1,1000000,'Europe/Moscow',0,0,NULL,NULL,0,0x7F000001,'ru'),
 (2,NULL,'',NULL,'tester2',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,'identity',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru'),
 (3,'admin','72a4a00d16ecf16d8bef792ef553c2d7',NULL,'admin','2004-11-25 18:31:52','2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'admin',NULL,NULL,0,NULL,0,'admin',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru');
@@ -2909,7 +2913,7 @@ CREATE TABLE `voting_variant` (
 --
 
 /*!40000 ALTER TABLE `voting_variant` DISABLE KEYS */;
-insert into voting_variant(id, voting_id, name, votes, position, text) 
+insert into voting_variant(id, voting_id, name, votes, position, text)
 values (1, 1, "First variant", 0, 1, "First variant text"),
 (2, 1, "Second variant", 0, 2, "Second variant text");
 /*!40000 ALTER TABLE `voting_variant` ENABLE KEYS */;

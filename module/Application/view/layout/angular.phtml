@@ -57,9 +57,9 @@ ga('send', 'pageview');
             </div>
         </div>
 
-        <div class="navbar fixed-top navbar-expand-md navbar-dark bg-dark" ng-if="!blankPage">
+        <div class="navbar navbar-expand-md navbar-dark bg-dark" ng-if="!blankPage">
             <div class="container">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <a class="navbar-brand" href="/" title="{{'page/1/title'|translate}}">
@@ -68,7 +68,7 @@ ga('send', 'pageview');
                     </svg>
                 </a>
 
-                <div class="collapse navbar-collapse">
+                <div class="collapse navbar-collapse" id="navbarToggler">
                     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                         <li class="nav-item" ng-repeat="page in mainMenu.pages" ng-class="{dropdown: page.id == 22, 'd-md-none d-lg-block': [25, 117].indexOf(+page.id) != -1, 'd-md-none d-lg-none d-xl-block': page.id == 42}">
                             <a class="nav-link" ng-href="{{page.url}}" ng-bind="page.name" ng-if="page.id != 22"></a>

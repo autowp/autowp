@@ -117,7 +117,7 @@ class CategoryController extends AbstractActionController
             $image = null;
             if ($picture) {
                 $image = $this->imageStorage()->getFormatedImage(
-                    $this->picture->getFormatRequest($picture),
+                    $picture['image_id'],
                     'picture-thumb'
                 );
             }
@@ -462,7 +462,7 @@ class CategoryController extends AbstractActionController
                 $imageStorage = $this->imageStorage();
                 foreach ($pictureRows as $pictureRow) {
                     $imageInfo = $imageStorage->getFormatedImage(
-                        $this->picture->getFormatRequest($pictureRow),
+                        $pictureRow['image_id'],
                         'picture-thumb'
                     );
 

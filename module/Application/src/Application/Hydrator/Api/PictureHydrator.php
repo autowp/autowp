@@ -203,8 +203,6 @@ class PictureHydrator extends RestHydrator
             $isModer = $this->acl->inheritsRole($role, 'moder');
         }
 
-        $cropped = Picture::checkCropParameters($object);
-
         $picture = [
             'id'             => (int)$object['id'],
             'identity'       => (string)$object['identity'],
@@ -214,14 +212,18 @@ class PictureHydrator extends RestHydrator
                 'name' => 'picture/picture'
             ]),
             'resolution'     => (int)$object['width'] . '×' . (int)$object['height'],
-            'cropped'        => $cropped,
-            'cropResolution' => $cropped ? $object['crop_width'] . '×' . $object['crop_height'] : null,
             'status'         => $object['status'],
             'owner_id'       => $object['owner_id'] ? (int)$object['owner_id'] : null,
             'width'          => (int)$object['width'],
             'height'         => (int)$object['height'],
             'filesize'       => $object['filesize']
         ];
+
+        if ($isModer) {
+            $crop = $this->imageStorage->getImageCrop($object['image_id']);
+            $picture['cropped']         = (bool)$crop;
+            $picture['crop_resolution'] = $crop ? $crop['width'] . '×' . $crop['height'] : null;
+        }
 
         if ($this->filterComposite->filter('views')) {
             $picture['views'] = $this->pictureView->get($object['id']);
@@ -257,14 +259,14 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('thumb')) {
             $picture['thumb'] = $this->extractValue('thumb', [
-                'image'  => Picture::buildFormatRequest((array)$object),
+                'image'  => $object['image_id'],
                 'format' => 'picture-thumb'
             ]);
         }
 
         if ($this->filterComposite->filter('thumb_medium')) {
             $picture['thumb_medium'] = $this->extractValue('thumb_medium', [
-                'image'  => Picture::buildFormatRequest((array)$object),
+                'image'  => $object['image_id'],
                 'format' => 'picture-thumb-medium'
             ]);
         }
@@ -292,21 +294,22 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('image_gallery_full')) {
             $picture['image_gallery_full'] = $this->extractValue('image_gallery_full', [
-                'image'  => Picture::buildFormatRequest((array)$object),
+                'image'  => $object['image_id'],
                 'format' => 'picture-gallery-full'
             ]);
         }
 
         if ($this->filterComposite->filter('crop')) {
-            if ($cropped) {
+            $picture['crop'] = null;
+
+            $crop = $this->imageStorage->getImageCrop($object['image_id']);
+            if ($crop) {
                 $picture['crop'] = [
-                    'left'   => (int)$object['crop_left'],
-                    'top'    => (int)$object['crop_top'],
-                    'width'  => (int)$object['crop_width'],
-                    'height' => (int)$object['crop_height'],
+                    'left'   => (int)$crop['left'],
+                    'top'    => (int)$crop['top'],
+                    'width'  => (int)$crop['width'],
+                    'height' => (int)$crop['height'],
                 ];
-            } else {
-                $picture['crop'] = null;
             }
         }
 

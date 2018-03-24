@@ -98,8 +98,7 @@ abstract class PictureFetcher
         $select
             ->columns([
                 'id', 'name',
-                'image_id', 'crop_left', 'crop_top',
-                'crop_width', 'crop_height', 'width', 'height', 'identity',
+                'image_id', 'width', 'height', 'identity',
                 'status', 'owner_id', 'filesize'
             ])
             ->join(

@@ -621,7 +621,7 @@ class UserController extends AbstractRestfulController
             throw new Exception("Error loading image");
         }
         $format = $imageStorage->getFormat('photo');
-        $imageSampler->convertImagick($imagick, $format);
+        $imageSampler->convertImagick($imagick, null, $format);
 
         $newImageId = $imageStorage->addImageFromImagick($imagick, 'user');
 

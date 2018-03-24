@@ -352,7 +352,7 @@ class Pic extends AbstractPlugin
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = Picture::buildFormatRequest($picture);
+            $requests[$idx] = $picture['image_id'];
         }
 
         $imagesInfo = $imageStorage->getFormatedImages($requests, 'picture-thumb-medium');
@@ -406,17 +406,22 @@ class Pic extends AbstractPlugin
                 $votes = $this->pictureVote->getVote($row['id'], null);
 
                 $item = array_replace($item, [
-                    'resolution'     => (int)$row['width'] . '×' . (int)$row['height'],
-                    'cropped'        => Picture::checkCropParameters($row),
-                    'cropResolution' => $row['crop_width'] . '×' . $row['crop_height'],
-                    'status'         => $row['status'],
-                    'views'          => (int)$row['views'],
-                    'msgCount'       => $msgCount,
-                    'newMsgCount'    => $newMsgCount,
-                    'likes'          => $likes,
-                    'ownerId'        => $row['owner_id'],
-                    'votes'          => $votes
+                    'resolution'      => (int)$row['width'] . '×' . (int)$row['height'],
+                    'status'          => $row['status'],
+                    'views'           => (int)$row['views'],
+                    'msgCount'        => $msgCount,
+                    'newMsgCount'     => $newMsgCount,
+                    'likes'           => $likes,
+                    'ownerId'         => $row['owner_id'],
+                    'votes'           => $votes
                 ]);
+
+                if ($isModer) {
+                    $crop = $imageStorage->getImageCrop($row['image_id']);
+
+                    $item['cropped']         = (bool)$crop;
+                    $item['crop_resolution'] = $crop ? $crop['width'] . '×' . $crop['height'] : null;
+                }
             }
 
 
@@ -888,11 +893,11 @@ class Pic extends AbstractPlugin
         $image = $imageStorage->getImage($picture['image_id']);
         $sourceUrl = $image ? $image->getSrc() : null;
 
-        $preview = $imageStorage->getFormatedImage($this->picture->getFormatRequest($picture), 'picture-preview-large');
+        $preview = $imageStorage->getFormatedImage($picture['image_id'], 'picture-preview-large');
         $previewUrl = $preview ? $preview->getSrc() : null;
 
         $galleryImage = $imageStorage->getFormatedImage(
-            $this->picture->getFormatRequest($picture),
+            $picture['image_id'],
             'picture-gallery'
         );
 
@@ -1178,7 +1183,6 @@ class Pic extends AbstractPlugin
 
         $filter['columns'] = [
             'id', 'identity', 'name', 'width', 'height',
-            'crop_left', 'crop_top', 'crop_width', 'crop_height',
             'image_id', 'filesize', 'messages'
         ];
 
@@ -1194,15 +1198,20 @@ class Pic extends AbstractPlugin
         $ids = [];
         $fullRequests = [];
         $cropRequests = [];
+        $crops = [];
         $imageIds = [];
         foreach ($rows as $idx => $picture) {
-            $request = Picture::buildFormatRequest($picture);
-            $fullRequests[$idx] = $request;
-            if (Picture::checkCropParameters($picture)) {
-                $cropRequests[$idx] = $request;
+            $imageId = (int)$picture['image_id'];
+            $fullRequests[$idx] = $imageId;
+
+            $crop = $imageStorage->getImageCrop($imageId);
+
+            if ($crop) {
+                $cropRequests[$idx] = $imageId;
+                $crops[$idx] = $crop;
             }
             $ids[] = (int)$picture['id'];
-            $imageIds[] = (int)$picture['image_id'];
+            $imageIds[] = (int)$imageId;
         }
 
         // images
@@ -1249,17 +1258,20 @@ class Pic extends AbstractPlugin
 
             $sUrl = $image->getSrc();
 
-            if (Picture::checkCropParameters($row)) {
-                $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
+            $crop = null;
+            if (isset($cropImagesInfo[$idx]) && isset($crops[$idx])) {
+                $crop = $cropImagesInfo[$idx]->toArray();
 
-                $crop['crop'] = [
-                    'left'   => $row['crop_left'] / $image->getWidth(),
-                    'top'    => $row['crop_top'] / $image->getHeight(),
-                    'width'  => $row['crop_width'] / $image->getWidth(),
-                    'height' => $row['crop_height'] / $image->getHeight(),
-                ];
-            } else {
-                $crop = null;
+                $cropInfo = $crops[$idx];
+
+                if ($cropInfo) {
+                    $crop['crop'] = [
+                        'left'   => $cropInfo['left'] / $image->getWidth(),
+                        'top'    => $cropInfo['top'] / $image->getHeight(),
+                        'width'  => $cropInfo['width'] / $image->getWidth(),
+                        'height' => $cropInfo['height'] / $image->getHeight(),
+                    ];
+                }
             }
 
             $full = isset($fullImagesInfo[$idx]) ? $fullImagesInfo[$idx]->toArray() : null;

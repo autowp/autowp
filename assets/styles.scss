@@ -6,6 +6,24 @@
 
 @import "~font-awesome/css/font-awesome.css";
 
+.navbar {
+    margin-bottom: 1rem;
+}
+
+@include media-breakpoint-up(md) {
+    .navbar {
+        position: fixed;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+        top: 0;
+        margin-bottom: 0;
+    }
+    body {
+        padding-top: 70px;
+    }
+}
+
 h2, h3 {
     small {
         color: $text-muted;
@@ -13,11 +31,6 @@ h2, h3 {
 }
 
 $color-white: #fff;
-
-body {
-    padding-top: 70px;
-    height: auto;
-}
 
 .page-header, legend {
     border-bottom-color: $color-white;

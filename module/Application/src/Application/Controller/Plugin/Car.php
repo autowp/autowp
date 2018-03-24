@@ -117,7 +117,6 @@ class Car extends AbstractPlugin
         $specEditor = $userHelper->isAllowed('specifications', 'edit');
         $isCarModer = $userHelper->inheritsRole('cars-moder');
         $language = $controller->language();
-        $catalogue = $controller->catalogue();
 
         $carIds = [];
         foreach ($cars as $car) {
@@ -361,9 +360,9 @@ class Car extends AbstractPlugin
                     $row = $picture['row'];
                     $allPictures[] = $row;
                     if ($item['largeFormat'] && $idx == 0) {
-                        $allFormatRequests['picture-thumb-large'][$row['id']] = $catalogue->getPictureFormatRequest($row);
+                        $allFormatRequests['picture-thumb-large'][$row['id']] = $row['image_id'];
                     } else {
-                        $allFormatRequests['picture-thumb-medium'][$row['id']] = $catalogue->getPictureFormatRequest($row);
+                        $allFormatRequests['picture-thumb-medium'][$row['id']] = $row['image_id'];
                     }
                 }
             }

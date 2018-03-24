@@ -84,7 +84,7 @@ class MostsController extends AbstractActionController
         foreach ($list['cars'] as $car) {
             foreach ($car['pictures'] as $picture) {
                 if ($picture) {
-                    $formatRequests[$idx++] = $this->picture->getFormatRequest($picture);
+                    $formatRequests[$idx++] = $picture['image_id'];
                     $allPictures[] = $picture;
                 }
             }

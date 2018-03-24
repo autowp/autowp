@@ -362,7 +362,7 @@ class CatalogueController extends AbstractActionController
             ]);
 
             if ($pictureRow) {
-                $requests[$idx] = $this->picture->getFormatRequest($pictureRow);
+                $requests[$idx] = $pictureRow['image_id'];
             }
         }
 
@@ -388,7 +388,9 @@ class CatalogueController extends AbstractActionController
 
             $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
-            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_10_' . $language . '_' . $httpsFlag;
+            $isModer = $this->user()->inheritsRole('pictures-moder');
+
+            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_10_' . $language . '_' . $httpsFlag . '_' . (int)$isModer;
             $topPictures = $this->cache->getItem($key, $success);
             if (! $success) {
                 $pictureRows = $this->picture->getRows([
@@ -1378,8 +1380,7 @@ class CatalogueController extends AbstractActionController
 
         return $select->columns(
             [
-                    'id', 'name', 'image_id', 'crop_left', 'crop_top',
-                    'crop_width', 'crop_height', 'width', 'height', 'identity'
+                    'id', 'name', 'image_id', 'width', 'height', 'identity'
                 ]
         )
             ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
@@ -1501,7 +1502,6 @@ class CatalogueController extends AbstractActionController
         $currentCarId = $currentCar['id'];
 
         $imageStorage = $this->imageStorage();
-        $catalogue = $this->catalogue();
 
         $g = $this->perspective->getPageGroupIds(2);
 
@@ -1526,8 +1526,7 @@ class CatalogueController extends AbstractActionController
 
             foreach ($pictureRows as $pictureRow) {
                 if ($pictureRow) {
-                    $request = $catalogue->getPictureFormatRequest($pictureRow['row']);
-                    $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
+                    $imageInfo = $imageStorage->getFormatedImage($pictureRow['image_id'], 'picture-thumb');
 
                     $pictures[] = [
                         'src'  => $imageInfo ? $imageInfo->getSrc() : null,
@@ -1671,7 +1670,7 @@ class CatalogueController extends AbstractActionController
 
             foreach ($pPaginator->getCurrentItems() as $pictureRow) {
                 $imageInfo = $imageStorage->getFormatedImage(
-                    $this->picture->getFormatRequest($pictureRow),
+                    $pictureRow['image_id'],
                     'picture-thumb-medium'
                 );
 
@@ -2164,7 +2163,7 @@ class CatalogueController extends AbstractActionController
             foreach ($data['carList']['cars'] as $car) {
                 foreach ($car['pictures'] as $picture) {
                     if ($picture) {
-                        $formatRequests[$idx++] = $this->picture->getFormatRequest($picture);
+                        $formatRequests[$idx++] = $picture['image_id'];
                         $allPictures[] = $picture;
                     }
                 }

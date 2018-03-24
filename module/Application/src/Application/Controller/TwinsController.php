@@ -289,7 +289,7 @@ class TwinsController extends AbstractActionController
 
                     $key = 'g' . $group['id']. 'p' . $pictureRow['id'];
 
-                    $request = $this->picture->getFormatRequest($pictureRow);
+                    $request = $pictureRow['image_id'];
                     $requests[$key] = $request;
 
                     $url = $this->url()->fromRoute('twins/group/pictures/picture', [
