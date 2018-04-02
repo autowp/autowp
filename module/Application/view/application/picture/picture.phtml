@@ -148,11 +148,11 @@
                 <?php foreach ($this->modifications as $modification) { ?>
                     <?php if ($modification['url']) { ?>
                         <?=$this->htmlA([
-                            'class' => 'badge badge-primary',
+                            'class' => 'badge badge-info',
                             'href'  => $modification['url']
                         ], $modification['name'])?>
                     <?php } else { ?>
-                        <span class="badge badge-primary"><?=$this->escapeHtml($modification['name'])?></span>
+                        <span class="badge badge-info"><?=$this->escapeHtml($modification['name'])?></span>
                     <?php } ?>
                 <?php } ?>
             </p>

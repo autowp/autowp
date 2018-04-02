@@ -3,7 +3,7 @@
     <a ui-sref="moder-items-item({id: ctrl.item.id})" ui-sref-options="{inherit: false}" translate>moder/edit-object</a>
 </p>
 
-<div class="card card-body" ng-if="ctrl.links.length > 0 || ctrl.item.description">
+<div class="card card-body mb-4" ng-if="ctrl.links.length > 0 || ctrl.item.description">
     <div autowp-markdown="ctrl.item.description"></div>
 
     <p ng-if="ctrl.links.length > 0">
