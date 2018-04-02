@@ -67,10 +67,10 @@
             <table class="table table-condensed">
                 <thead>
                     <tr>
-                        <th class="col-lg-3 col-sm-3" translate>specifications-editor/parameter</th>
-                        <th class="col-lg-4 col-sm-4" translate>specifications-editor/your-value</th>
-                        <th class="col-lg-2 col-sm-2" translate>specifications-editor/actual-value</th>
-                        <th class="col-lg-3 col-sm-3" translate>specifications-editor/all-values</th>
+                        <th translate>specifications-editor/parameter</th>
+                        <th translate>specifications-editor/your-value</th>
+                        <th translate>specifications-editor/actual-value</th>
+                        <th translate>specifications-editor/all-values</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -83,11 +83,13 @@
                         </td>
                         <td ng-if="!attribute.childs.length">
                             <div class="input-group" ng-class="{'has-error': element.getMessages()}">
-                                <span class="input-group-addon btn btn-secondary"
-                                    ng-click="ctrl.currentUserValues[attribute.id].empty = !ctrl.currentUserValues[attribute.id].empty"
-                                    ng-class="{active: attribute.disabled}">
-                                    <span class="fa fa-remove"></span>
-                                </span>
+                                <div class="input-group-prepend">
+                                    <button type="button" class="btn btn-secondary"
+                                        ng-click="ctrl.currentUserValues[attribute.id].empty = !ctrl.currentUserValues[attribute.id].empty"
+                                        ng-class="{active: attribute.disabled}">
+                                        <span class="fa fa-remove"></span>
+                                    </button>
+                                </div>
                                 <select class="form-control input-sm"
                                     ng-if="attribute.type_id == 5"
                                     ng-options="item.id as item.name for item in attribute.options"
@@ -133,7 +135,9 @@
                                     ng-model="ctrl.currentUserValues[attribute.id].value"
                                     ng-disabled="ctrl.currentUserValues[attribute.id].empty"
                                 />
-                                <span ng-if="attribute.unit" class="input-group-addon" translate-attrs="{title: attribute.unit.name}" class="unit" ng-bind="attribute.unit.abbr|translate"></span>
+                                <div class="input-group-append" ng-if="attribute.unit">
+                                    <span translate-attrs="{title: attribute.unit.name}" class="unit input-group-text" ng-bind="attribute.unit.abbr|translate"></span>
+                                </div>
                             </div>
                             <p class="help-block" ng-repeat="error in $element.getMessages()" ng-bind="error"></p>
                             <small ng-if="attribute.description" ng-bind="attribute.description|translate"></small>
