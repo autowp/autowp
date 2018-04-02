@@ -67,7 +67,7 @@ export class PersonsPersonController {
                     exact_item_id: self.item.id,
                     exact_item_link_type: 2,
                     fields: 'owner,thumb_medium,votes,views,comments_count,name_html,name_text',
-                    limit: 20,
+                    limit: 24,
                     order: 12,
                     page: $state.params.page
                 }
@@ -86,7 +86,7 @@ export class PersonsPersonController {
                     exact_item_id: self.item.id,
                     exact_item_link_type: 1,
                     fields: 'owner,thumb_medium,votes,views,comments_count,name_html,name_text',
-                    limit: 20,
+                    limit: 24,
                     order: 12,
                     page: $state.params.page
                 }
