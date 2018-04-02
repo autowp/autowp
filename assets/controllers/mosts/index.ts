@@ -83,6 +83,15 @@ class MostsController {
                             YEAR_CATNAME: self.yearsCatname,
                             YEAR_NAME: translations[yearName]
                         });
+                    }, function() {
+                        self.initPageEnv(156, {
+                            MOST_CATNAME: self.ratingCatname,
+                            MOST_NAME: ratingName,
+                            CAR_TYPE_CARNAME: self.typeCatname,
+                            CAR_TYPE_NAME: typeName,
+                            YEAR_CATNAME: self.yearsCatname,
+                            YEAR_NAME: yearName
+                        });
                     });
                 } else {
                     self.$translate([ratingName, typeName]).then(function (translations: any) {
@@ -92,6 +101,13 @@ class MostsController {
                             CAR_TYPE_CARNAME: self.typeCatname,
                             CAR_TYPE_NAME: translations[typeName]
                         });
+                    }, function() {
+                        self.initPageEnv(155, {
+                            MOST_CATNAME: self.ratingCatname,
+                            MOST_NAME: ratingName,
+                            CAR_TYPE_CARNAME: self.typeCatname,
+                            CAR_TYPE_NAME: typeName
+                        });
                     });
                 }
             } else {
@@ -99,6 +115,11 @@ class MostsController {
                     self.initPageEnv(154, {
                         MOST_CATNAME: self.ratingCatname,
                         MOST_NAME: translation
+                    });
+                }, function() {
+                    self.initPageEnv(154, {
+                        MOST_CATNAME: self.ratingCatname,
+                        MOST_NAME: ratingName
                     });
                 });
             }
