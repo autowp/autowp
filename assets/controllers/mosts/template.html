@@ -35,7 +35,7 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px;overflow-x: hidden;">
             <a ng-repeat="year in ctrl.years" ng-class="{active: year.catname ? year.catname == ctrl.yearsCatname : !ctrl.yearsCatname}"
-                class="dropdown-item" ui-sref=".({rating_catname: rating.catname})" ng-bind="year.name|translate">
+                class="dropdown-item" ui-sref=".({rating_catname: rating.catname, type_catname: ctrl.typeCatname ? ctrl.typeCatname : ctrl.defaultTypeCatname, years_catname: year.catname})" ng-bind="year.name|translate">
             </a>
         </div>
     </div>
