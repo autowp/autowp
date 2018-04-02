@@ -8,11 +8,13 @@
         <form class="card card-body form-vertical">
             <div class="form-group">
                 <label translate>moder/items/filter/name</label>
-                <input type="text" name="name" class="form-control" ng-model="ctrl.filter.name" ng-model-options="{debounce:300}" ng-change="ctrl.load()" />
+                <input placeholder="% - any characters" type="text" name="name" class="form-control" ng-model="ctrl.filter.name" ng-model-options="{debounce:300}" ng-change="ctrl.load()"
+                />
             </div>
             <div class="form-group">
                 <label translate>moder/items/filter/name-exclude</label>
-                <input type="text" name="name_exclude" class="form-control" ng-model="ctrl.filter.name_exclude" ng-model-options="{debounce:300}" ng-change="ctrl.load()" />
+                <input placeholder="_ - any single character" type="text" name="name_exclude" class="form-control" ng-model="ctrl.filter.name_exclude" ng-model-options="{debounce:300}"
+                    ng-change="ctrl.load()" />
             </div>
             <div class="form-group">
                 <label translate>moder/items/filter/item-type</label>
@@ -52,11 +54,13 @@
             </div>
             <div class="form-group">
                 <label translate>moder/items/filter/from-year</label>
-                <input type="text" name="from_year" class="form-control" ng-model="ctrl.filter.from_year" ng-model-options="{debounce:300}" ng-change="ctrl.load()" maxlength="4" />
+                <input type="text" name="from_year" class="form-control" ng-model="ctrl.filter.from_year" ng-model-options="{debounce:300}"
+                    ng-change="ctrl.load()" maxlength="4" />
             </div>
             <div class="form-group">
                 <label translate>moder/items/filter/to-year</label>
-                <input type="text" name="to_year" class="form-control" ng-model="ctrl.filter.to_year" ng-model-options="{debounce:300}" ng-change="ctrl.load()" maxlength="4" />
+                <input type="text" name="to_year" class="form-control" ng-model="ctrl.filter.to_year" ng-model-options="{debounce:300}" ng-change="ctrl.load()"
+                    maxlength="4" />
             </div>
             <div class="form-group">
                 <label translate>moder/items/filter/parent</label>
@@ -64,12 +68,12 @@
             </div>
             <div class="form-group">
                 <label translate>moder/items/filter/text</label>
-                <input type="text" name="text" class="form-control" ng-model="ctrl.filter.text" ng-change="ctrl.load()" ng-model-options="{debounce:300}" />
+                <input type="text" name="text" class="form-control" ng-model="ctrl.filter.text" ng-change="ctrl.load()" ng-model-options="{debounce:300}"
+                />
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="no_parent" value="1" ng-model="ctrl.filter.no_parent" ng-change="ctrl.load()" />
-                    {{'moder/items/filter/no-parents'|translate}}
+                    <input type="checkbox" name="no_parent" value="1" ng-model="ctrl.filter.no_parent" ng-change="ctrl.load()" /> {{'moder/items/filter/no-parents'|translate}}
                 </label>
             </div>
             <div class="form-group">
@@ -78,11 +82,22 @@
                     <option value="id_desc">id desc</option>
                     <option value="id_asc">id asc</option>
                     <option value="childs_count">childs count</option>
+                    <option value="name">name</option>
                 </select>
             </div>
         </form>
     </div>
     <div class="col-lg-8 col-md-8">
+
+        <div class="btn-group float-right">
+            <button type="button" class="btn btn-outline-secondary" ng-class="{active: !ctrl.listMode}" ng-click="ctrl.setListModeEnabled(false)">
+                <i class="fa fa-th" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="btn btn-outline-secondary" ng-class="{active: ctrl.listMode}" ng-click="ctrl.setListModeEnabled(true)">
+                <i class="fa fa-align-justify" aria-hidden="true"></i>
+            </button>
+        </div>
+
         <h2>
             {{'page/131/name'|translate}}
             <span ng-show="ctrl.loading > 0">
@@ -91,7 +106,15 @@
             <small ng-if="ctrl.paginator.totalItemCount" translate="ng/%1$s-items" translate-values="{count: ctrl.paginator.totalItemCount}"></small>
         </h2>
 
-        <autowp-item item="item" ng-repeat="item in ctrl.items"></autowp-item>
+        <div ng-if="ctrl.listMode">
+            <div ng-repeat="item in ctrl.items">
+                <a ui-sref="moder-items-item({id: item.id})" ng-bind-html="item.name_html"></a>
+            </div>
+        </div>
+
+        <div ng-if="!ctrl.listMode">
+            <autowp-item item="item" ng-repeat="item in ctrl.items"></autowp-item>
+        </div>
 
         <autowp-paginator data="ctrl.paginator" ng-if="ctrl.paginator"></autowp-paginator>
     </div>

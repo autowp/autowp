@@ -44,6 +44,7 @@ interface IFilter {
 var DEFAULT_ORDER = 'id_desc';
 
 export class ModerItemsController {
+    public listMode: boolean;
     static $inject = ['$scope', '$http', '$state', '$q', '$element', 'PerspectiveService', 'PictureModerVoteService', 'PictureModerVoteTemplateService', 'VehicleTypeService', 'SpecService'];
 
     public loading: number = 0;
@@ -103,7 +104,7 @@ export class ModerItemsController {
             order: $state.params.order || DEFAULT_ORDER,
             ancestor_id: $state.params.ancestor_id || null,
         };
-
+        this.listMode = !!$state.params.list;
 
         this.page = $state.params.page;
 
@@ -155,7 +156,7 @@ export class ModerItemsController {
                     if (query.substring(0, 1) == '#') {
                         params.id = query.substring(1);
                     } else {
-                        params.name = '%' + query + '%';
+                        params.name = query + '%';
                     }
 
                     $http({
@@ -185,6 +186,7 @@ export class ModerItemsController {
             to_year: this.filter.to_year ? this.filter.to_year : null,
             ancestor_id: this.filter.ancestor_id ? this.filter.ancestor_id : null,
             page: this.page,
+            list: this.listMode ? '1' : ''
         };
     }
 
@@ -200,13 +202,26 @@ export class ModerItemsController {
             notify: false
         });
 
+        let fields = 'name_html';
+        let limit = 500;
+        if (! this.listMode) {
+            fields = [
+                'name_html,name_default,description,has_text,produced',
+                'design,engine_vehicles',
+                'url,spec_editor_url,specs_url,more_pictures_url',
+                'categories.url,categories.name_html,twins_groups',
+                'preview_pictures.picture.thumb_medium,childs_count,total_pictures'
+            ].join(',');
+            limit = 10;
+        }
+
         var self = this;
         this.$http({
             method: 'GET',
             url: '/api/item',
             params: {
-                name: this.filter.name ? '%' + this.filter.name + '%' : null,
-                name_exclude: this.filter.name_exclude ? '%' + this.filter.name_exclude + '%' : null,
+                name: this.filter.name ? this.filter.name + '%' : null,
+                name_exclude: this.filter.name_exclude ? this.filter.name_exclude + '%' : null,
                 type_id: this.filter.item_type_id,
                 vehicle_type_id: this.filter.vehicle_type_id,
                 vehicle_childs_type_id: this.filter.vehicle_childs_type_id,
@@ -218,14 +233,8 @@ export class ModerItemsController {
                 to_year: this.filter.to_year ? this.filter.to_year : null,
                 ancestor_id: this.filter.ancestor_id ? this.filter.ancestor_id : null,
                 page: this.page,
-                fields: [
-                    'name_html,name_default,description,has_text,produced',
-                    'design,engine_vehicles',
-                    'url,spec_editor_url,specs_url,more_pictures_url',
-                    'categories.url,categories.name_html,twins_groups',
-                    'preview_pictures.picture.thumb_medium,childs_count,total_pictures'
-                ].join(','),
-                limit: 10
+                fields: fields,
+                limit: limit
             }
         }).then(function(response: ng.IHttpResponse<any>) {
             self.items = response.data.items;
@@ -235,6 +244,14 @@ export class ModerItemsController {
             self.loading--;
         });
     }
+
+    public setListModeEnabled(value: boolean) {
+        this.listMode = value;
+        if (value) {
+            this.filter.order = 'name';
+        }
+        this.load();
+    }
 }
 
 angular.module(Module)
@@ -243,7 +260,7 @@ angular.module(Module)
         function config($stateProvider: any) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/items?name&name_exclude&item_type_id&vehicle_type_id&vehicle_childs_type_id&spec&from_year&to_year&ancestor_id&text&no_parent&order&page',
+                url: '/moder/items?name&name_exclude&item_type_id&vehicle_type_id&vehicle_childs_type_id&spec&from_year&to_year&ancestor_id&text&no_parent&order&page&list',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require('./template.html'),
@@ -260,7 +277,8 @@ angular.module(Module)
                     text: { dynamic: true },
                     no_parent: { dynamic: true },
                     order: { dynamic: true },
-                    page: { dynamic: true }
+                    page: { dynamic: true },
+                    list: { dynamic: true }
                 },
                 resolve: {
                     access: ['AclService', function (Acl: AclService) {
