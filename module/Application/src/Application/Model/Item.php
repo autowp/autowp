@@ -71,7 +71,10 @@ class Item
      */
     private $itemParentLanguageTable;
 
-    private $languagePriority = ['en', 'it', 'fr', 'de', 'es', 'pt', 'ru', 'be', 'uk', 'zh', 'xx'];
+    /**
+     * @var LanguagePriority
+     */
+    private $languagePriority;
 
     public function __construct(
         TableGateway $specTable,
@@ -93,6 +96,8 @@ class Item
         $this->itemParentTable = $itemParentTable;
         $this->itemParentLanguageTable = $itemParentLanguageTable;
         $this->itemParentCacheTable = $itemParentCacheTable;
+
+        $this->languagePriority = new LanguagePriority();
     }
 
     public function getEngineVehiclesGroups(int $engineId, array $options = []): array
@@ -268,13 +273,15 @@ class Item
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
 
+        $orderBy = $this->languagePriority->getOrderByExpression($language, $this->itemLanguageTable->getAdapter());
+
         $select
             ->columns(['text_id'])
             ->where([
                 'item_id' => $id,
                 new Sql\Predicate\IsNotNull('text_id')
             ])
-            ->order([new Sql\Expression('language = ? desc', [$language])]);
+            ->order([new Sql\Expression($orderBy)]);
 
         $rows = $this->itemLanguageTable->selectWith($select);
 
@@ -1251,7 +1258,7 @@ class Item
             $valueType
         );
 
-        $languages = array_merge([$language], $this->languagePriority);
+        $languages = $this->languagePriority->getList($language);
 
         $select = new Sql\Select($this->itemLanguageTable->getTable());
         $select->columns(['name'])
@@ -1287,7 +1294,7 @@ class Item
             Sql\ExpressionInterface::TYPE_IDENTIFIER
         );
 
-        $languages = array_merge([$language], $this->languagePriority);
+        $languages = $this->languagePriority->getList($language);
 
         $select = $this->itemParentLanguageTable->getSql()->select();
         $select->columns(['name'])
@@ -1371,21 +1378,7 @@ class Item
                             throw new \Exception("Language is required for `name` select");
                         }
 
-                        $languages = array_merge([$language], $this->languagePriority);
-
-                        $platform = $this->itemTable->getAdapter()->platform;
-                        $quoted = [];
-                        foreach ($languages as $lang) {
-                            $quoted[] = $platform->quoteValue($lang);
-                        }
-
-                        $subSelect = '
-                            SELECT name
-                            FROM item_language
-                            WHERE item_id = item.id AND length(name) > 0
-                            ORDER BY FIELD(language, '.implode(', ', $quoted).')
-                            LIMIT 1
-                        ';
+                        $subSelect = $this->languagePriority->getSelectItemName($language, $this->itemTable->getAdapter());
 
                         $columns = array_merge($columns, [
                             'begin_year', 'end_year', 'today',

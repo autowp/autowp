@@ -214,7 +214,7 @@ return [
         'pt-br' => [
             'hostname' => 'br.' . $host,
             'timezone' => 'Brazil/West',
-            'name'     => 'Português brasileiro (beta)',
+            'name'     => 'Português brasileiro',
             'flag'     => 'flag-icon flag-icon-br',
             'cookie'   => $hostCookie,
             'aliases'  => []

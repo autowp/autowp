@@ -49,6 +49,11 @@ class Picture
 
     private $perspective;
 
+    /**
+     * @var LanguagePriority
+     */
+    private $languagePriority;
+
     public function __construct(
         TableGateway $table,
         TableGateway $itemTable,
@@ -61,6 +66,8 @@ class Picture
         $this->pictureModerVote = $pictureModerVote;
         $this->pictureItemTable = $pictureItemTable;
         $this->perspective = $perspective;
+
+        $this->languagePriority = new LanguagePriority();
     }
 
     private function applyIdFilter(Sql\Select $select, $value, string $id)
@@ -1021,11 +1028,13 @@ class Picture
 
         $items = [];
         if (count($itemIds)) {
+            $subSelect = $this->languagePriority->getSelectItemName($language, $this->table->getAdapter());
+
             $columns = [
                 'id',
                 'begin_model_year', 'end_model_year',
                 'body',
-                'name' => new Sql\Expression('if(length(item_language.name) > 0, item_language.name, item.name)'),
+                'name' => new Sql\Expression('(' . $subSelect . ')'),
                 'begin_year', 'end_year', 'today',
             ];
             if ($large) {
@@ -1039,16 +1048,7 @@ class Picture
                 ->join('spec', 'item.spec_id = spec.id', [
                     'spec'      => 'short_name',
                     'spec_full' => 'name',
-                ], $select::JOIN_LEFT)
-                ->join(
-                    'item_language',
-                    new Sql\Expression(
-                        'item.id = item_language.item_id and item_language.language = ?',
-                        [$language]
-                    ),
-                    [],
-                    $select::JOIN_LEFT
-                );
+                ], $select::JOIN_LEFT);
 
             foreach ($this->itemTable->selectWith($select) as $row) {
                 $data = [
