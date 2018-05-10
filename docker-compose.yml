@@ -51,7 +51,7 @@ web:
     AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
     AUTOWP_GO_LISTEN: ":81"
     ONESKYAPP_KEY: "2a1C12oZU5VIK409AJd0xUfVntGyhLWa"
-    ONESKYAPP_SECRET: "T2mx1eBAmG5rldM7YFFjTQ6PC1NeA29k"
+    ONESKYAPP_SECRET: ""
     ONESKYAPP_PROJECT_ID: 129670
     ROLLBAR_ACCESS_TOKEN: ""
     ROLLBAR_CLIENT_ACCESS_TOKEN: ""
@@ -64,13 +64,14 @@ web:
   - ./module:/app/module
   - ./public_html:/app/public_html
   - ./vendor:/app/vendor
+  - ./etc/nginx/conf.d:/etc/nginx/conf.d
   #- ./goautowp:/app/goautowp
   ports:
   - "80:80"
   links:
   - memcached
   - mysql:5.7
-  
+
 memcached:
   image: memcached
   container_name: autowp_test_memcached
@@ -85,7 +86,7 @@ mysql:
   environment:
   - MYSQL_ROOT_PASSWORD=password
   - MYSQL_DATABASE=autowp_test
-  - MYSQL_USER=autowp_test 
+  - MYSQL_USER=autowp_test
   - MYSQL_PASSWORD=test
   volumes:
   - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
