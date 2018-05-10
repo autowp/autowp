@@ -23,6 +23,7 @@ export class ModerPicturesItemMoveController {
     public show_factories: boolean;
     public show_persons: boolean;
     public show_authors: boolean;
+    public show_copyrights: boolean;
     public museums_paginator: autowp.IPaginator;
     public factories_paginator: autowp.IPaginator;
     public brands_paginator: autowp.IPaginator;
@@ -35,10 +36,13 @@ export class ModerPicturesItemMoveController {
     public authors: any[] = [];
     private authorsCanceler: any;
     private personsCanceler: any;
+    private copyrightsCanceler: any;
     public persons_paginator: autowp.IPaginator;
     public persons: any[] = [];
     public concepts: any[] = [];
     public brands: any[] = [];
+    public copyrights: any[] = [];
+    public copyrights_paginator: autowp.IPaginator;
 
     constructor(
         private $scope: autowp.IControllerScope,
@@ -67,12 +71,17 @@ export class ModerPicturesItemMoveController {
         this.show_factories = this.$state.params.show_factories;
         this.show_persons = this.$state.params.show_persons;
         this.show_authors = this.$state.params.show_authors;
+        this.show_copyrights = this.$state.params.show_copyrights;
         this.brand_id = this.$state.params.brand_id;
 
         if ( this.src_type == 2 ) {
             this.show_authors = true;
         }
-        
+
+        if ( this.src_type == 3 ) {
+            this.show_copyrights = true;
+        }
+
         if ( this.show_museums ) {
             $http( {
                 method: 'GET',
@@ -126,7 +135,15 @@ export class ModerPicturesItemMoveController {
             this.loadAuthors();
         }
 
-        if ( !this.show_museums && !this.show_factories && !this.show_persons && !this.show_authors ) {
+        if (this.show_copyrights) {
+            this.doSearch = function() {
+                self.loadCopyrights();
+            };
+
+            this.loadCopyrights();
+        }
+
+        if ( !this.show_museums && !this.show_factories && !this.show_persons && !this.show_authors && !this.show_copyrights ) {
             if ( this.brand_id ) {
                 $http( {
                     method: 'GET',
@@ -269,7 +286,7 @@ export class ModerPicturesItemMoveController {
             }
         } );
     }
-    
+
     private loadPersons() {
 
         if ( this.personsCanceler ) {
@@ -300,6 +317,37 @@ export class ModerPicturesItemMoveController {
             }
         } );
     }
+
+    private loadCopyrights() {
+
+        if ( this.copyrightsCanceler ) {
+            this.copyrightsCanceler.resolve();
+            this.copyrightsCanceler = null;
+        }
+
+        this.copyrightsCanceler = this.$q.defer();
+
+        var self = this;
+        this.$http( {
+            method: 'GET',
+            url: '/api/item',
+            params: {
+                type_id: 9,
+                fields: 'name_html',
+                limit: 50,
+                name: self.search ? '%' + self.search + '%' : null,
+                page: self.page
+            },
+            timeout: this.copyrightsCanceler.promise
+        } ).then( function( response: ng.IHttpResponse<any> ) {
+            self.copyrights = response.data.items;
+            self.copyrights_paginator = response.data.paginator;
+        }, function( response: ng.IHttpResponse<any> ) {
+            if (response.status !== -1) {
+                notify.response( response );
+            }
+        } );
+    }
 }
 
 angular.module( Module )
@@ -308,7 +356,7 @@ angular.module( Module )
         function config( $stateProvider: any ) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/pictures/{id}/move?show_museums&show_factories&show_authors&show_persons&brand_id&src_item_id&src_type&page',
+                url: '/moder/pictures/{id}/move?show_museums&show_factories&show_authors&show_persons&show_copyrights&brand_id&src_item_id&src_type&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require( './template.html' ),

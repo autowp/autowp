@@ -2,6 +2,10 @@
   'persons/content-persons' => 'Personnes sur la photo',
   'persons/author-persons' => 'Auteurs',
   'mosts/most' => 'Le plus',
+  'item/type/9/add-sub-item' => 'Add sub copyright block',
+  'item/type/9/name' => 'Copyright block',
+  'item/type/9/new-item' => 'New copyright block',
+  'item/type/9/name-plural' => 'Copyright blocks',
   'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'nombre de marche arrière',
   'specs/attrs/dynamic/max-reverse-speed' => 'vitesse maximale (en marche arrière)',
@@ -1826,7 +1830,6 @@ Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [th
   'page/2/title' => '',
   'page/20/title' => '',
   'page/1/breadcrumbs' => '',
-  'item/type/8/add-sub-item"' => 'Add sub-person',
   'page/178/breadcrumbs' => 'Factory selection',
   'forums/need-wait-to-post' => 'Pour ajouter un nouveau message, vous devez attendre un certain temps',
 );

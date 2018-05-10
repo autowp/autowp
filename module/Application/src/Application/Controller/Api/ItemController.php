@@ -1130,6 +1130,7 @@ class ItemController extends AbstractRestfulController
             case Item::FACTORY:
             case Item::MUSEUM:
             case Item::PERSON:
+            case Item::COPYRIGHT:
                 $set['is_group'] = 1;
                 break;
             default:

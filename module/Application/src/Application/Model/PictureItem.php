@@ -368,14 +368,15 @@ class PictureItem
     public function isAllowedType(int $itemTypeId, int $type): bool
     {
         $allowed = [
-            Item::BRAND    => [self::PICTURE_CONTENT, self::PICTURE_COPYRIGHTS],
-            Item::CATEGORY => [self::PICTURE_CONTENT],
-            Item::ENGINE   => [self::PICTURE_CONTENT],
-            Item::FACTORY  => [self::PICTURE_CONTENT],
-            Item::VEHICLE  => [self::PICTURE_CONTENT],
-            Item::TWINS    => [self::PICTURE_CONTENT],
-            Item::MUSEUM   => [self::PICTURE_CONTENT],
-            Item::PERSON   => [self::PICTURE_CONTENT, self::PICTURE_AUTHOR, self::PICTURE_COPYRIGHTS],
+            Item::BRAND     => [self::PICTURE_CONTENT, self::PICTURE_COPYRIGHTS],
+            Item::CATEGORY  => [self::PICTURE_CONTENT],
+            Item::ENGINE    => [self::PICTURE_CONTENT],
+            Item::FACTORY   => [self::PICTURE_CONTENT],
+            Item::VEHICLE   => [self::PICTURE_CONTENT],
+            Item::TWINS     => [self::PICTURE_CONTENT],
+            Item::MUSEUM    => [self::PICTURE_CONTENT],
+            Item::PERSON    => [self::PICTURE_CONTENT, self::PICTURE_AUTHOR, self::PICTURE_COPYRIGHTS],
+            Item::COPYRIGHT => [self::PICTURE_COPYRIGHTS]
         ];
 
         if (! isset($allowed[$itemTypeId])) {

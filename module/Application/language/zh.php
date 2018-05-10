@@ -2,6 +2,10 @@
   'persons/content-persons' => 'Persons on photo',
   'persons/author-persons' => 'Authors',
   'mosts/most' => '各项之最',
+  'item/type/9/add-sub-item' => 'Add sub copyright block',
+  'item/type/9/name' => 'Copyright block',
+  'item/type/9/new-item' => 'New copyright block',
+  'item/type/9/name-plural' => 'Copyright blocks',
   'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'number of reverse gears',
   'specs/attrs/dynamic/max-reverse-speed' => 'max speed (reverse)',
@@ -14,7 +18,7 @@
 如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。
 
 前往[论坛](/ng/forums/)可以讨论任何车型的任何话题。',
-  'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
+  'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroën, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
   'forums/theme/chinese-cars/description' => 'Chery, Geely, Great Wall, ...',
@@ -1813,7 +1817,6 @@ Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [th
   'page/2/title' => '',
   'page/20/title' => '',
   'page/1/breadcrumbs' => '',
-  'item/type/8/add-sub-item"' => 'Add sub-person',
   'page/178/breadcrumbs' => 'Factory selection',
   'forums/need-wait-to-post' => '，您需要等待一段时间后才能添加新的消息',
 );

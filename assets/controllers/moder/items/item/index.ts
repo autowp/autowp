@@ -195,12 +195,17 @@ export class ModerItemsItemController {
                 delete self.tabs.vehicles;
             }
 
-            if ([2, 1, 5, 6, 7, 8].indexOf(self.item.item_type_id) === -1) {
+            if ([2, 1, 5, 6, 7, 8, 9].indexOf(self.item.item_type_id) === -1) {
                 delete self.tabs.pictures;
             }
 
             if ([2, 1].indexOf(self.item.item_type_id) !== -1) {
                 delete self.tabs.factories;
+            }
+
+            if (self.item.item_type_id == 9) {
+                delete self.tabs.catalogue;
+                delete self.tabs.tree;
             }
 
             self.setActiveTab($state.params.tab ? $state.params.tab : 'meta');

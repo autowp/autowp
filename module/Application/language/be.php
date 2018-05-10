@@ -2,6 +2,10 @@
   'persons/content-persons' => 'Persons on photo',
   'persons/author-persons' => 'Authors',
   'mosts/most' => 'Самыя',
+  'item/type/9/add-sub-item' => 'Add sub copyright block',
+  'item/type/9/name' => 'Copyright block',
+  'item/type/9/new-item' => 'New copyright block',
+  'item/type/9/name-plural' => 'Copyright blocks',
   'specs/attrs/wheels/auto-pumping-tires' => 'Auto pumping tires',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'number of reverse gears',
   'specs/attrs/dynamic/max-reverse-speed' => 'max speed (reverse)',
@@ -14,7 +18,7 @@
 Калі вы лічыце, што карыстальнікі сайта памыліліся, размясціўшы дадзеную карцінку ў гэтым раздзеле, то было б выдатна, калі б вы напісалі пра гэта ў каментарах і паказаўшы памылку.
 
 Падзяліцца сваёй радасцю, абмеркаваць набалелае і проста пабалбатаць аб аўтамабілях і не толькі вы можаце на нашым [форуме](/ng/forums/).',
-  'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroen, Delahaye ...',
+  'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroën, Delahaye ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mazda, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, ...',
   'forums/theme/chinese-cars/description' => 'Chery, Geely, Great Wall, ...',
@@ -1826,7 +1830,6 @@ Brazilian portuguese site translation: %pt-br-translator%
   'page/2/title' => '',
   'page/20/title' => '',
   'page/1/breadcrumbs' => '',
-  'item/type/8/add-sub-item"' => 'Дадаць суб-асобу',
   'page/178/breadcrumbs' => 'Выбар завода',
   'forums/need-wait-to-post' => 'Для напісання новага паведамлення вам неабходна пачакаць некаторы час',
 );

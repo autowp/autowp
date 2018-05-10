@@ -81,7 +81,7 @@
             <p ng-repeat="message in invalidParams.end_model_year" ng-bind="message" class="help-block"></p>
         </div>
     </div>
-    <div class="form-group row" ng-class="{'has-error':invalidParams.begin_year||invalidParams.begin_month}">
+    <div class="form-group row" ng-class="{'has-error':invalidParams.begin_year||invalidParams.begin_month}" ng-if="item.item_type_id != 9">
         <label class="col-md-2 col-form-label" translate>moder/vehicle/begin</label>
         <div class="col-md-10">
             <div class="form-row">
@@ -101,7 +101,7 @@
             <p ng-repeat="message in invalidParams.begin_month" ng-bind="message" class="help-block"></p>
         </div>
     </div>
-    <div class="form-group row" ng-class="{'has-error':invalidParams.end_year||invalidParams.end_month||invalidParams.today}">
+    <div class="form-group row" ng-class="{'has-error':invalidParams.end_year||invalidParams.end_month||invalidParams.today}" ng-if="item.item_type_id != 9">
         <label class="col-md-2 col-form-label" translate>moder/vehicle/end</label>
         <div class="col-md-10">
             <div class="form-row">

@@ -1255,6 +1255,7 @@ return [
                                 Model\Item::FACTORY,
                                 Model\Item::MUSEUM,
                                 Model\Item::PERSON,
+                                Model\Item::COPYRIGHT,
                             ]
                         ]
                     ]

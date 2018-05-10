@@ -1,4 +1,8 @@
 {
+    "item/type/9/add-sub-item": "Add sub copyright block",
+    "item/type/9/name": "Блок копирайтов",
+    "item/type/9/new-item": "Новый блок копирайтов",
+    "item/type/9/name-plural": "Блоки копирайтов",
     "specs/attrs/22/23/options/common-rail": "Common Rail",
     "specs/attrs/22/23/options/common-rail/mechanical": "Common Rail (механический впрыск)",
     "specs/attrs/22/23/options/common-rail/electronic": "Common Rail (электронный впрыск)",

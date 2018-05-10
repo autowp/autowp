@@ -47,7 +47,7 @@ interface NewItem {
 
 export class ModerItemsNewController {
     static $inject = ['$scope', '$http', '$state', '$translate', '$q', 'SpecService', 'VehicleTypeService', 'ItemService'];
-    
+
     public loading: number = 0;
     public item: NewItem;
     public parent: autowp.IItem;
@@ -55,17 +55,17 @@ export class ModerItemsNewController {
     public invalidParams: any;
 
     constructor(
-        private $scope: autowp.IControllerScope, 
+        private $scope: autowp.IControllerScope,
         private $http: ng.IHttpService,
         private $state: any,
-        private $translate: ng.translate.ITranslateService, 
-        private $q: ng.IQService, 
-        private SpecService: SpecService, 
-        private VehicleTypeService: VehicleTypeService, 
+        private $translate: ng.translate.ITranslateService,
+        private $q: ng.IQService,
+        private SpecService: SpecService,
+        private VehicleTypeService: VehicleTypeService,
         private ItemService: ItemService
     ) {
         var self = this;
-        
+
         this.item = {
             produced_exactly: '0',
             is_concept: 'inherited',
@@ -88,21 +88,21 @@ export class ModerItemsNewController {
             lng: undefined,
             vehicle_type: undefined
         };
-        
-        if ([1, 2, 3, 4, 5, 6, 7, 8].indexOf(this.item.item_type_id) == -1) {
+
+        if ([1, 2, 3, 4, 5, 6, 7, 8, 9].indexOf(this.item.item_type_id) == -1) {
             $state.go('error-404');
             return;
         }
-        
+
         if ($state.params.parent_id) {
             this.loading++;
             this.ItemService.getItem($state.params.parent_id, {
                 fields: 'is_concept,name_html,spec_id'
             }).then(function(item: autowp.IItem) {
                 self.parent = item;
-                
+
                 let specId = self.parent.spec_id;
-                
+
                 if (specId && Number.isInteger(specId as number)) {
                     SpecService.getSpec(specId as number).then(function(spec: any) {
                         self.parentSpec = spec;
@@ -134,10 +134,10 @@ export class ModerItemsNewController {
             console.log('Translate failed');
         });
     }
-    
+
     public submit() {
         this.loading++;
-        
+
         var data = {
             item_type_id: this.$state.params.item_type_id,
             name: this.item.name,
@@ -159,37 +159,37 @@ export class ModerItemsNewController {
             lat: this.item.lat,
             lng: this.item.lng
         };
-        
+
         var self = this;
         this.$http({
             method: 'POST',
             url: '/api/item',
             data: data
         }).then(function(response: ng.IHttpResponse<any>) {
-            
+
             var location = response.headers('Location');
-            
+
             self.loading++;
             self.$http({
                 method: 'GET',
                 url: location
             }).then(function(response: ng.IHttpResponse<any>) {
-                
+
                 var promises = [];
-                
+
                 var ids: number[] = [];
                 angular.forEach(self.item.vehicle_type, function(vehicle_type) {
                     ids.push(vehicle_type.id);
                 });
                 promises.push(self.ItemService.setItemVehicleTypes(response.data.id, ids));
-                
+
                 if (self.parent) {
                     promises.push(self.$http.post('/api/item-parent', {
                         parent_id: self.parent.id,
                         item_id: response.data.id
                     }));
                 }
-                
+
                 self.loading++;
                 self.$q.all(promises).then(function(results) {
                     self.$state.go('moder-items-item', {
@@ -197,12 +197,12 @@ export class ModerItemsNewController {
                     });
                     self.loading--;
                 });
-                
+
                 self.loading--;
             }, function(response: ng.IHttpResponse<any>) {
                 notify.response(response);
             });
-            
+
             self.loading--;
         }, function(response: ng.IHttpResponse<any>) {
             notify.response(response);

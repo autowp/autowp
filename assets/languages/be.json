@@ -1,4 +1,8 @@
 {
+    "item/type/9/add-sub-item": "Add sub copyright block",
+    "item/type/9/name": "Copyright block",
+    "item/type/9/new-item": "New copyright block",
+    "item/type/9/name-plural": "Copyright blocks",
     "specs/attrs/22/23/options/common-rail": "Common Rail",
     "specs/attrs/22/23/options/common-rail/mechanical": "Common Rail (mechanical injection)",
     "specs/attrs/22/23/options/common-rail/electronic": "Common Rail (electronic injection)",
@@ -19,7 +23,7 @@
     "forums/theme/all-other/description": "Іншыя тэмы, якія не ўвайшлі ў вышэйпералічаныя раздзелы",
     "forums/theme/german-cars/description": "Audi, BMW, Mercedes-Benz, Opel, Volkswagen, ...",
     "forums/theme/italian-cars/description": "Alfa Romeo, Ferrari, Fiat, Lamborghini, Lancia, ...",
-    "forums/theme/french-cars/description": "Peugeot, Renault, Citroen, Delahaye ...",
+    "forums/theme/french-cars/description": "Peugeot, Renault, Citroën, Delahaye ...",
     "forums/theme/japan-cars/description": "Nissan, Toyota, Honda, Mazda, ...",
     "forums/theme/korean-cars/description": "Kia, Hyundai, ...",
     "forums/theme/chinese-cars/description": "Chery, Geely, Great Wall, ...",
