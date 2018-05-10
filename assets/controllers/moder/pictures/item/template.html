@@ -106,7 +106,7 @@
         </tbody>
     </table>
     <div ng-if="ctrl.picture.rights.move">
-        <div ng-if="ctrl.last_item && !ctrl.hasItem(ctrl.last_item.id)">
+        <div ng-if="ctrl.last_item && !ctrl.hasItem(ctrl.last_item.id) && ctrl.last_item.item_type_id != 9">
             <button class="btn btn-secondary" ng-click="ctrl.addItem(ctrl.last_item, 1)">
                 <i class="fa fa-plus"></i>
                 {{'moder/picture/catalogue/add-to'|translate}} (content)
@@ -117,6 +117,13 @@
             <button class="btn btn-secondary" ng-click="ctrl.addItem(ctrl.last_item, 2)">
                 <i class="fa fa-plus"></i>
                 {{'moder/picture/catalogue/add-to'|translate}} (author)
+                <span ng-bind-html="ctrl.last_item.name_html"></span>
+            </button>
+        </div>
+        <div ng-if="ctrl.last_item && !ctrl.hasItem(ctrl.last_item.id) && ctrl.last_item.item_type_id == 9">
+            <button class="btn btn-secondary" ng-click="ctrl.addItem(ctrl.last_item, 3)">
+                <i class="fa fa-plus"></i>
+                {{'moder/picture/catalogue/add-to'|translate}} (copyrights)
                 <span ng-bind-html="ctrl.last_item.name_html"></span>
             </button>
         </div>

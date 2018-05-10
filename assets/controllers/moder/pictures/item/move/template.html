@@ -4,7 +4,7 @@
     <a ng-class="{active: ctrl.show_museums}" ng-if="!ctrl.src_type || ctrl.src_type == 1" class="nav-link" ui-sref=".({show_factories: null, show_museums: 1, show_persons: null, show_authors: null, show_copyrights: null})" translate>item/type/7/name-plural</a>
     <a ng-class="{active: ctrl.show_persons}" ng-if="!ctrl.src_type || ctrl.src_type == 1" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: 1, show_authors: null, show_copyrights: null})">{{'item/type/8/name-plural'|translate}} (content)</a>
     <a ng-class="{active: ctrl.show_authors}" ng-if="!ctrl.src_type || ctrl.src_type == 2" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: 1, show_copyrights: null})">{{'item/type/8/name-plural'|translate}} (author)</a>
-    <a ng-class="{active: ctrl.show_copyrights}" ng-if="!ctrl.src_type || ctrl.src_type == 2" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: null, show_copyrights: 1})">{{'item/type/9/name-plural'|translate}} (author)</a>
+    <a ng-class="{active: ctrl.show_copyrights}" ng-if="!ctrl.src_type || ctrl.src_type == 2" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: null, show_copyrights: 1})">{{'item/type/9/name-plural'|translate}}</a>
 </div>
 
 <div ng-if="ctrl.show_museums && !src_item && (!ctrl.src_type || ctrl.src_type == 1)">
