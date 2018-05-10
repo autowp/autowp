@@ -1,0 +1,56 @@
+<div class="card card-body">
+  <p style="white-space:pre-line" [textContent]="voting.text"></p>
+  <hr />
+
+  <form *ngIf="voting.can_vote" (submit)="vote()">
+    <ul class="unstyled">
+      <li *ngFor="let variant of voting.variants">
+        <label class="checkbox inline" *ngIf="voting.multivariant">
+          <input type="checkbox" name="variant" [(ngModel)]="selected[variant.id]" /> {{variant.name|translate}}
+        </label>
+        <label class="radio inline" *ngIf="!voting.multivariant">
+          <input type="radio" name="variant" [(ngModel)]="selected" [value]="variant.id" /> {{variant.name|translate}}
+        </label>
+
+        <p class="text-info" *ngIf="variant.text" [textContent]="variant.text"></p>
+      </li>
+    </ul>
+    <button type="submit" class="btn btn-primary" [disabled]="!isVariantSelected()" translate>votings/do-vote</button>
+  </form>
+
+  <ng-container *ngIf="!voting.can_vote">
+    <div *ngFor="let variant of voting.variants">
+      <p class="float-right" *ngIf="variant.votes > 0">
+        <a class="who-vote" href="#" translate (click)="showWhoVoted(variant)">votings/who-voted</a>
+      </p>
+      {{variant.name}}
+      <p class="text-info" *ngIf="variant.text" [textContent]="variant.text"></p>
+      <ngb-progressbar style="clear:both" [type]="variant.is_max ? 'success' : variant.is_min ? 'danger' : 'primary'" [value]="variant.percent">{{variant.votes > 0 ? variant.votes : ''}}</ngb-progressbar>
+    </div>
+  </ng-container>
+</div>
+<p class="float-right" *ngIf="isModer">
+  <a ui-sref=".({filter: null})" *ngIf="filter">votings/voting/voters/show-all</a>
+  <a ui-sref=".({filter: 1})" *ngIf="!filter">votings/voting/voters/show-contributors</a>
+</p>
+
+<p [translateParams]="{from: (voting.begin_date | amDateFormat : 'LL'), to: (voting.end_date | amDateFormat : 'LL')}" translate>votings/voting/duration</p>
+
+<app-comments [itemId]="voting.id" [typeId]="3" [user]="auth.user" *ngIf="voting"></app-comments>
+
+<div class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" translate>votings/who-voted</h3>
+        <button type="button" data-dismiss="modal" class="close">×</button>
+      </div>
+      <div class="modal-body">
+        <app-user [user]="vote.user" *ngFor="let vote of votes"></app-user>
+      </div>
+      <div class="modal-footer">
+        <button data-dismiss="modal" class="btn btn-secondary" translate>who-online/close</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<ul class="nav nav-pills" style="margin-bottom:10px">
+  <li class="nav-item">
+    <a class="nav-link" [ngClass]="{active: rating == 'specs'}" ui-sref=".({rating: 'specs'})" translate>users/rating/specifications</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [ngClass]="{active: rating == 'pictures'}" ui-sref=".({rating: 'pictures'})" translate>users/rating/pictures</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [ngClass]="{active: rating == 'likes'}" ui-sref=".({rating: 'likes'})" translate>users/rating/likes</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [ngClass]="{active: rating == 'picture-likes'}" ui-sref=".({rating: 'picture-likes'})" translate>users/rating/picture-likes</a>
+  </li>
+</ul>
+
+<span [hidden]="loading <= 0">
+  <i class="fa fa-spinner fa-spin fa-fw"></i>
+</span>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th></th>
+      <th></th>
+      <th class="text-right" [textContent]="valueTitle|translate"></th>
+      <th class="text-right" *ngIf="rating == 'specs'" translate>users/rating/specs-volume</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of users; let i = index">
+      <td [textContent]="i + 1"></td>
+      <td>
+        <app-user [user]="row.user"></app-user>
+      </td>
+      <td>
+        <div *ngIf="row.brands.length > 0">
+          <ng-container *ngFor="let brand of row.brands">
+            <a [href]="brand.url" [textContent]="brand.name"></a>
+            <span>, </span>
+          </ng-container>
+          …
+        </div>
+        <small *ngIf="row.fans.length > 0">
+          <ng-container *ngFor="let fan of row.fans">
+            <app-user [user]="fan.user"></app-user>
+            <span class="badge badge-pill badge-secondary" [textContent]="(fan.volume > 0 ? '+' : '') + fan.volume"></span>
+            <span>, </span>
+          </ng-container>
+          …
+        </small>
+      </td>
+      <td class="text-right" [textContent]="row.volume | number: 0"></td>
+      <td class="text-right" [ngClass]="{danger: row.weight < 0.50, warning: row.weight >= 0.50 && row.weight < 1.50}" *ngIf="rating == 'specs'"
+        [textContent]="row.weight | number : 2"></td>
+    </tr>
+  </tbody>
+</table>

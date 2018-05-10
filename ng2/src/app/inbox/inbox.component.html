@@ -1,0 +1,42 @@
+<div class="row">
+  <div class="col-lg-4 col-md-4 offset-lg-4 offset-md-4 mb-4">
+    <select name="brand_id" [(ngModel)]="brand_id" class="form-control" (change)="changeBrand()">
+      <option value="" translate>inbox/all-brands</option>
+      <option *ngFor="let brand of brands" [textContent]="brand.name" [ngValue]="brand.id"></option>
+    </select>
+  </div>
+</div>
+<div class="row mb-4">
+  <div class="col-lg-4 col-md-4">
+    <h3 class="text-left" *ngIf="prev.date">
+      &#x2190;
+      <a ui-sref=".({date: prev.date, page: null})" [textContent]="prev.date | amDateFormat: 'LL'"></a>
+      <br />
+      <small>(
+        <span translate="ng/%1$s-pictures" [translateParams]="{count: prev.count}"></span>)</small>
+    </h3>
+  </div>
+  <div class="col-lg-4 col-md-4">
+    <h3 class="text-center">
+      <span [textContent]="current.date | amDateFormat: 'LL'"></span>
+      <br />
+      <small>(
+        <span translate="ng/%1$s-pictures" [translateParams]="{count: current.count}"></span>)</small>
+    </h3>
+  </div>
+  <div class="col-lg-4 col-md-4">
+    <h3 class="text-right" *ngIf="next.date">
+      <a ui-sref=".({date: next.date, page: null})" [textContent]="next.date | amDateFormat: 'LL'"></a>
+      <br />
+      <small>(
+        <span translate="ng/%1$s-pictures" [translateParams]="{count: next.count}"></span>)</small>
+      &#x2192;
+    </h3>
+  </div>
+</div>
+<div class="row">
+  <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let picture of pictures">
+    <app-thumbnail [picture]="picture"></app-thumbnail>
+  </div>
+</div>
+<app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>

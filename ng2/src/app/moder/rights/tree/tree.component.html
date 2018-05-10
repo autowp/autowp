@@ -1,0 +1,6 @@
+<ul *ngIf="roles.length">
+  <li *ngFor="let role of roles">
+    {{role.name}}
+    <app-moder-rights-tree [roles]="role.childs"></app-moder-rights-tree>
+  </li>
+</ul>

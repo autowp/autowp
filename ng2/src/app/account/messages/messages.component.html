@@ -1,0 +1,57 @@
+<div class="row">
+  <div class="col-lg-8 mb-4 order-2">
+    <div style="margin:0 0 20px;" *ngIf="folder =='sent' && paginator.totalItemCount">
+      <button class="btn btn-danger" (click)="clearFolder('sent')" translate>account/personal-message/delete-all-sent</button>
+    </div>
+
+    <div style="margin:0 0 20px;" *ngIf="folder =='system' && paginator.totalItemCount">
+      <button class="btn btn-danger" (click)="clearFolder('system')" translate>account/personal-message/delete-all-system</button>
+    </div>
+
+    <div class="comments">
+      <div class="message" *ngFor="let message of items">
+        <div>
+          <app-user [user]="message.author" *ngIf="message.author"></app-user>
+          <span translate *ngIf="! message.author">account/personal-message/system-notification</span>
+        </div>
+        <div class="photo">
+          <a [href]="message.author.url" *ngIf="! message.author.deleted">
+            <img [src]="message.author.avatar.src" *ngIf="message.author.avatar" class="rounded" />
+            <img [src]="message.author.gravatar" *ngIf="message.author.gravatar && ! message.author.avatar" class="rounded" />
+          </a>
+        </div>
+        <div class="content">
+          <div class="text">
+            <p [innerHTML]="message.text_html"></p>
+          </div>
+          <div>
+            <span class="badge badge-info" *ngIf="message.is_new" translate>account/personal-message/new</span>
+            <a href="#" class="float-right" (click)="deleteMessage(message.id)" *ngIf="message.can_delete">
+              <i class="fa fa-trash"></i> {{'account/personal-message/delete'|translate}}
+            </a>
+            <span *ngIf="message.can_reply">
+              <i class="fa fa-reply"></i>
+              <a href="#" (click)="openMessageForm(message.author.id)" translate>account/personal-message/reply</a>
+              &nbsp;
+            </span>
+            <span *ngIf="message.all_messages_link && message.dialog_with_user_id">
+              <i class="fa fa-comments-o"></i>
+              <a ui-sref="account-messages({folder: 'dialog', user_id: message.dialog_with_user_id})" ui-sref-options="{inherit: false}"
+                translate>account/personal-message/entire-dialog</a>
+              <small>({{message.dialog_count}})</small>
+              &nbsp;
+            </span>
+            <i class="fa fa-clock-o"></i>
+            <span am-time-ago="message.date"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+
+    <p *ngIf="items.length <= 0">No messages</p>
+  </div>
+  <div class="col-lg-4 mb-4 order-1">
+    <app-account-sidebar></app-account-sidebar>
+  </div>
+</div>

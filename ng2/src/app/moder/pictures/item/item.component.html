@@ -1,0 +1,357 @@
+<div class="row mb-4">
+  <!--  ng-init="initArrows()"-->
+  <div class="col-md-3">
+    <a ui-sref="moder-pictures-item({id: picture.siblings.prev_new.id})" [title]="picture.siblings.prev_new.name_text" *ngIf="picture.siblings.prev_new"
+      translate>moder/picture/previous-new</a>
+  </div>
+  <div class="col-md-3 text-right">
+    <a ui-sref="moder-pictures-item({id: picture.siblings.prev.id})" [title]="picture.siblings.prev.name_text" *ngIf="picture.siblings.prev"
+      translate>moder/picture/previous</a>
+  </div>
+  <div class="col-md-3">
+    <a ui-sref="moder-pictures-item({id: picture.siblings.next.id})" [title]="picture.siblings.next.name_text" *ngIf="picture.siblings.next"
+      translate>moder/picture/next</a>
+  </div>
+  <div class="col-md-3 text-right">
+    <a ui-sref="moder-pictures-item({id: picture.siblings.next_new.id})" [title]="picture.siblings.next_new.name_text" *ngIf="picture.siblings.next_new"
+      translate>moder/picture/next-new</a>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-2">
+    <img [src]="picture.thumb.src" *ngIf="picture.thumb" class="rounded border border-light w-100" />
+  </div>
+  <div class="col-md-6">
+    <div class="card card-body">
+      <div>
+        {{'moder/picture/public-url:'|translate}}
+        <a [href]="picture.url" [textContent]="picture.url"></a>
+      </div>
+      <div *ngIf="picture.image" style="overflow: hidden; text-overflow: ellipsis;">
+        {{'moder/picture/image:'|translate}}
+        <a [href]="picture.image.src" [textContent]="picture.image.src"></a>
+      </div>
+      <a ui-sref="log({picture_id: picture.id})" translate>moder/log-of-events</a>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-body">
+      <div translate="ng/moder/database-id-n" [translateParams]="{id: picture.id}"></div>
+      <div>{{'moder/picture/resolution:'|translate}}
+        <b>{{picture.width}}×{{picture.height}}</b>
+      </div>
+      <div *ngIf="picture.dpi_x || picture.dpi_y">
+        DPI:
+        <b>{{picture.dpi_x}}×{{picture.dpi_y}}</b>
+      </div>
+      <div>{{'moder/picture/filesize:'|translate}}
+        <b [textContent]="picture.filesize | bytes : 1"></b>
+      </div>
+      <div>{{'moder/picture/upload-date:'|translate}}
+        <b am-time-ago="picture.add_date"></b>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card card-body mb-4">
+  <table class="table" *ngIf="picture.items.length">
+    <thead>
+      <tr>
+        <td>Item</td>
+        <td translate>moder/picture/perspective</td>
+        <td *ngIf="picture.rights.crop">Area</td>
+        <td *ngIf="picture.rights.move">Move</td>
+        <td *ngIf="picture.rights.move"></td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of picture.items">
+        <td>
+          <a ui-sref="moder-items-item({id: item.item_id})" [innerHTML]="item.item.name_html"></a>
+        </td>
+        <td>
+          <select class="form-control" [(ngModel)]="item.perspective_id" (change)="savePerspective(item)" style="max-width:10em" *ngIf="item.type == 1">
+            <option value="">--</option>
+            <option *ngFor="let perspective of perspectives" [ngValue]="perspective.id">
+              {{perspective.name | translate}}
+            </option>
+          </select>
+        </td>
+        <td *ngIf="picture.rights.crop">
+          <a class="btn btn-secondary" [ngClass]="{'btn-success': item.area}" ui-sref="moder-pictures-item-area({id: picture.id, item_id: item.item_id, type: item.type})"
+            arial-label="Area" style="margin:0" *ngIf="item.type == 1">
+            <i class="fa fa-crop"></i>
+            {{'moder/picture/catalogue/pick-item-area'|translate}}
+          </a>
+        </td>
+        <td *ngIf="picture.rights.move">
+          <div class="btn-group" style="white-space:nowrap">
+            <a ui-sref="moder-pictures-item-move({id: picture.id, src_item_id: item.item_id, src_type: item.type})" class="btn btn-secondary">
+              <i class="fa fa-arrow-right"></i>
+              {{'moder/picture/catalogue/move-to'|translate}} ...
+            </a>
+            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+              *ngIf="item.type == 1">
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <div class="dropdown-menu" *ngIf="item.type == 1">
+              <a class="dropdown-item" href="" (click)="moveItem(item.type, item.item_id, last_item.id)" *ngIf="last_item && !hasItem(last_item.id)">
+                <i class="fa fa-arrow-right"></i>
+                {{'moder/picture/catalogue/move-to'|translate}}
+                <span [innerHTML]="last_item.name_html"></span>
+              </a>
+              <a *ngFor="let brand of item.item.brands" class="dropdown-item" ui-sref="moder-pictures-item-move({id: picture.id, src_item_id: item.item_id, src_type: item.type, brand_id: brand.id})">
+                <i class="fa fa-arrow-right"></i>
+                {{'moder/picture/catalogue/move-to'|translate}}
+                <span [innerHTML]="brand.name_html"></span> ...
+              </a>
+            </div>
+          </div>
+        </td>
+        <td *ngIf="picture.rights.move">
+          <button class="btn btn-danger" (click)="deletePictureItem(item)" aria-label="Delete" style="margin:0">
+            <span class="fa fa-times"></span>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="picture.rights.move">
+    <div *ngIf="last_item && !hasItem(last_item.id)">
+      <button class="btn btn-secondary" (click)="addItem(last_item, 1)">
+        <i class="fa fa-plus"></i>
+        {{'moder/picture/catalogue/add-to'|translate}} (content)
+        <span [innerHTML]="last_item.name_html"></span>
+      </button>
+    </div>
+    <div *ngIf="last_item && !hasItem(last_item.id) && last_item.item_type_id == 8">
+      <button class="btn btn-secondary" (click)="addItem(last_item, 2)">
+        <i class="fa fa-plus"></i>
+        {{'moder/picture/catalogue/add-to'|translate}} (author)
+        <span [innerHTML]="last_item.name_html"></span>
+      </button>
+    </div>
+    <div>
+      <a class="btn btn-success" ui-sref="moder-pictures-item-move({id: picture.id})">
+        <i class="fa fa-plus"></i>
+        {{'moder/picture/catalogue/add-to'|translate}} ...
+      </a>
+    </div>
+  </div>
+
+  <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="!pictureItemLoading"></ngb-progressbar>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <h3 translate>moder/picture/settings</h3>
+    <form class="card card-body form-vertical mb-4">
+      <div>
+        <p class="text-danger">Achtung! High Voltage! Ты сюда не ходи!</p>
+        <p class="text-danger">Поле использовать в ИСКЛЮЧИТЕЛЬНЫХ случаях. А лучше вообще никогда не использовать.</p>
+      </div>
+
+      <div class="form-group">
+        <label translate>moder/picture/edit/special-name</label>
+        <input type="text" class="form-control" maxlength="255" name="special_name" [(ngModel)]="picture.special_name" />
+      </div>
+
+      <div>
+        <button class="btn btn-primary" (click)="saveSpecialName()">{{'submit'|translate}}</button>
+      </div>
+
+      <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="!specialNameLoading"></ngb-progressbar>
+    </form>
+
+    <h3 translate>moder/picture/copyrights</h3>
+    <div class="card card-body mb-4">
+      <app-markdown [markdown]="'moder/markdown/description'|translate"></app-markdown>
+      <app-markdown-edit text="picture.copyrights"></app-markdown-edit>
+      <button class="btn btn-primary" (click)="saveCopyrights()" translate>submit</button>
+      <p *ngIf="picture.copyrights_text_id">
+        <a ui-sref="info-text({id: picture.copyrights_text_id})" translate>moder/markdown/history</a>
+      </p>
+
+      <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="!copyrightsLoading"></ngb-progressbar>
+    </div>
+
+    <h3 *ngIf="picture.iptc">IPTC</h3>
+    <div class="card card-body small mb-4" style="overflow:auto" *ngIf="picture.iptc" [innerHTML]="picture.iptc"></div>
+
+    <h3 *ngIf="picture.exif">EXIF</h3>
+    <div class="card card-body small mb-4" style="overflow:auto" *ngIf="picture.exif" [innerHTML]="picture.exif"></div>
+
+  </div>
+
+  <div class="col-md-6">
+
+    <h3 translate *ngIf="picture.replaceable">moder/picture/replacement</h3>
+    <div class="card card-body mb-4" *ngIf="picture.replaceable">
+      <div>
+        <p>
+          {{'moder/picture/replacement/photo-suggested-to-replace'|translate}}
+          <a [href]="picture.replaceable.url">{{picture.replaceable.url}}</a>
+        </p>
+        <button class="btn btn-success" *ngIf="picture.rights.accept" (click)="acceptReplace()">
+          <i class="fa fa-exchange"></i>
+          {{'moder/picture/replacement/accept-and-delete-double'|translate}}
+        </button>
+        <button class="btn btn-warning" *ngIf="picture.rights.accept" (click)="cancelReplace()">
+          <i class="fa fa-times"></i>
+          {{'moder/picture/replacement/cancel'|translate}}
+        </button>
+      </div>
+
+      <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="!replaceLoading"></ngb-progressbar>
+    </div>
+
+
+    <h3 translate>moder/picture/acceptance</h3>
+    <div class="card card-body mb-4">
+      <app-user [user]="picture.change_status_user" *ngIf="picture.change_status_user"></app-user>
+
+      <div *ngIf="picture.status == 'inbox'">
+        <p>
+          <strong class="badge badge-warning" translate>moder/picture/acceptance/not-accepted</strong>
+        </p>
+
+        <button class="btn btn-success" (click)="acceptPicture()" *ngIf="picture.rights.accept">
+          {{'moder/picture/acceptance/accept'|translate}}
+        </button>
+        <button class="btn btn-danger" (click)="deletePicture()" *ngIf="picture.rights.delete">
+          {{'moder/picture/acceptance/delete'|translate}}
+        </button>
+      </div>
+
+      <div [hidden]="picture.status != 'accepted'">
+        <p>
+          <strong class="badge badge-success" translate>moder/picture/acceptance/accepted</strong>
+        </p>
+
+        <button class="btn btn-warning" (click)="unacceptPicture()" *ngIf="picture.rights.unaccept">
+          {{'moder/picture/acceptance/unaccept'|translate}}
+        </button>
+      </div>
+
+      <div *ngIf="picture.status == 'removing'">
+        <p>
+          <strong class="badge badge-danger" translate>moder/picture/acceptance/in-delete-queue</strong>
+        </p>
+
+        <button class="btn btn-warning" (click)="restorePicture()" *ngIf="picture.rights.restore">
+          {{'moder/picture/acceptance/restore'|translate}}
+        </button>
+      </div>
+
+      <div *ngIf="picture.status == 'removed'">
+        <p>
+          <strong class="badge badge-danger" translate>moder/picture/acceptance/removed</strong>
+        </p>
+      </div>
+
+      <app-picture-moder-vote [picture]="picture" [change]="pictureVoted"></app-picture-moder-vote>
+
+      <p *ngIf="picture.is_last">
+        <span class="badge badge-warning" translate>moder/picture/acceptance/that-is-one-accepted-picture</span>
+      </p>
+      <p *ngIf="!picture.is_last && (picture.accepted_count <= 4)">
+        <span class="badge badge-warning" translate="ng/moder/picture/acceptance/accepted-pictures-is-n" [translateParams]="{count: picture.accepted_count}"></span>
+      </p>
+
+      <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="!statusLoading"></ngb-progressbar>
+    </div>
+
+    <h3 translate *ngIf="picture.rights.normalize || picture.rights.flop || picture.rights.crop">moder/picture/edit-and-repair</h3>
+    <div class="card card-body mb-4" *ngIf="picture.rights.normalize || picture.rights.flop || picture.rights.crop">
+      <div>
+        <button class="btn btn-warning" (click)="normalizePicture()" *ngIf="picture.rights.normalize" [disabled]="repairLoading">
+          <i class="fa fa-signal"></i>
+          {{'moder/picture/edit-and-repair/normalize'|translate}}
+        </button>
+        <button class="btn btn-warning" (click)="flopPicture()" *ngIf="picture.rights.flop" [disabled]="repairLoading">
+          <i class="fa fa-arrows-h"></i>
+          {{'moder/picture/edit-and-repair/flop'|translate}}
+        </button>
+        <button class="btn btn-secondary" ui-sref="moder-pictures-item-crop({id: picture.id})" *ngIf="picture.rights.crop" [disabled]="repairLoading">
+          <i class="fa fa-crop"></i>
+          {{'moder/picture/edit-and-repair/crop'|translate}}
+        </button>
+      </div>
+
+      <div>
+        <button class="btn btn-secondary" (click)="repairPicture()" [disabled]="repairLoading">
+          <i class="fa fa-wrench"></i>
+          {{'moder/picture/edit-and-repair/repair-all-files'|translate}}
+        </button>
+        <button class="btn btn-secondary" (click)="correctFileNames()" [disabled]="repairLoading">
+          <i class="fa fa-wrench"></i>
+          {{'moder/picture/edit-and-repair/rebuild-files-names'|translate}}
+        </button>
+      </div>
+
+      <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="!repairLoading"></ngb-progressbar>
+    </div>
+
+    <h3 *ngIf="picture.similar">Similar picture</h3>
+    <div class="card card-body mb-4" *ngIf="picture.similar">
+      <p class="alert alert-warning" role="alert">
+        <span class="fa fa-file-image-o"></span>
+        <a ui-sref="moder-pictures-item({id: picture.similar.picture_id})">
+          Similar picture: {{picture.similar.distance}}
+        </a>
+      </p>
+      <p>
+        <a ui-sref="moder-pictures-item({id: picture.similar.picture_id})">
+          <img *ngIf="picture.similar.picture.thumb" [src]="picture.similar.picture.thumb.src" class="rounded border border-light"
+          />
+        </a>
+      </p>
+      <button (click)="cancelSimilar()" class="btn btn-warning">That is not similar</button>
+
+      <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="!similarLoading"></ngb-progressbar>
+    </div>
+
+    <h3 translate>moder/picture/uploader</h3>
+    <div class="card card-body mb-4">
+      <app-user [user]="picture.owner" *ngIf="picture.owner"></app-user>
+      <span *ngIf="!picture.owner" translate>moder/picture/uploader/unknown</span>
+      <div *ngIf="picture.ip.address">
+        {{'moder/picture/uploader/id-address:'|translate}}
+        <b [textContent]="picture.ip.address"></b>
+        <br />
+        <p *ngIf="picture.ip.blacklist">
+          {{'ban/that-address-is-banned'|translate}}
+          <app-user [user]="picture.ip.blacklist.user" *ngIf="picture.ip.blacklist.user"></app-user>
+          {{'ban/until'|translate}} {{picture.ip.blacklist.up_to|date}}
+          <span *ngIf="picture.ip.blacklist.reason" [textContent]="picture.ip.blacklist.reason"></span>
+        </p>
+
+        <button *ngIf="picture.ip.blacklist && picture.ip.rights.remove_from_blacklist" class="btn btn-success" (click)="removeFromBlacklist(picture.ip.address)">
+          {{'ban/unban'|translate}}
+        </button>
+
+        <form class="form-vertical" *ngIf="!picture.ip.blacklist && picture.ip.rights.add_to_blacklist">
+          <div class="form-group">
+            <label translate>ban/period</label>
+            <select [(ngModel)]="banPeriod" class="form-control" required>
+              <option *ngFor="let period of banPeriods" [value]="period.value">
+                {{period.name|translate}}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label translate>ban/reason</label>
+            <input maxlength="50" class="form-control" [(ngModel)]="banReason" />
+          </div>
+          <button class="btn btn-danger" (click)="addToBlacklist(picture.ip.address)">
+            {{'ban/ban'|translate}}
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>

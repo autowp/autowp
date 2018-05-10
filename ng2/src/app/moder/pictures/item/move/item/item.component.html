@@ -1,0 +1,18 @@
+<span class="text-muted" *ngIf="item.type_id == 1" translate>catalogue/related</span>
+<span class="text-muted" *ngIf="item.type_id == 2" translate>catalogue/sport</span>
+<a href="#" *ngIf="!item.item.childs_count" (click)="selectItem(item.item_id, null, 1)" [innerHTML]="item.item.name_html"></a>
+<br *ngIf="!item.item.childs_count" />
+<div *ngIf="item.item.childs_count">
+  <a href="" class="arrow" (click)="toggleItem(item)">
+    <i class="fa fa-plus-circle" [hidden]="item.expanded"></i>
+    <i class="fa fa-minus-circle" [hidden]="!item.expanded"></i>
+    <span [innerHTML]="item.item.name_html"></span>
+  </a>
+  <div style="margin:0 0 4px 18px;" [hidden]="!item.expanded">
+    <app-moder-picture-move-item item="child" [selectItem]="selectItem" *ngFor="let child of childs"></app-moder-picture-move-item>
+    <span [hidden]="!loading">
+      <i class="fa fa-spinner fa-spin fa-fw"></i>
+    </span>
+    <a href="" (click)="selectItem(item.item_id, null, 1)" translate>upload/select/other-modification</a>
+  </div>
+</div>

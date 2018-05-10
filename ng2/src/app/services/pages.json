@@ -1,0 +1,825 @@
+[
+  {
+    "id": 1,
+    "is_group_node": false,
+    "childs": [
+      {
+        "id": 2,
+        "is_group_node": true,
+        "childs": [
+          {
+            "id": 25,
+            "is_group_node": false,
+            "url": "/twins",
+            "name": "page/25/name",
+            "childs": [
+              {
+                "id": 26,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 28,
+                    "is_group_node": false,
+                    "childs": [
+                      {
+                        "id": 183,
+                        "is_group_node": false,
+                        "childs": [],
+                        "url":
+                          "/twins/group%TWINS_GROUP_ID%/pictures/%PICTURE_ID%"
+                      }
+                    ],
+                    "url": "/twins/group%TWINS_GROUP_ID%/pictures"
+                  },
+                  {
+                    "id": 27,
+                    "is_group_node": false,
+                    "childs": [],
+                    "url": "/twins/group%TWINS_GROUP_ID%/specifications"
+                  }
+                ],
+                "url": "/twins/group%TWINS_GROUP_ID%"
+              },
+              {
+                "id": 153,
+                "is_group_node": false,
+                "childs": [],
+                "url": "/twins/%BRAND_CATNAME%"
+              }
+            ]
+          },
+          {
+            "id": 21,
+            "is_group_node": false,
+            "name": "page/21/name",
+            "childs": [
+              {
+                "id": 154,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 155,
+                    "is_group_node": false,
+                    "childs": [
+                      {
+                        "id": 156,
+                        "is_group_node": false,
+                        "childs": [],
+                        "routerLink": ["/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%/%YEAR_CATNAME%"]
+                      }
+                    ],
+                    "routerLink": ["/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%"]
+                  }
+                ],
+                "routerLink": ["/mosts/%MOST_CATNAME%"]
+              }
+            ],
+            "routerLink": ["/mosts"]
+          },
+          {
+            "id": 22,
+            "is_group_node": false,
+            "name": "page/22/name",
+            "childs": [
+              {
+                "id": 23,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 185,
+                    "is_group_node": false,
+                    "childs": [
+                      {
+                        "id": 186,
+                        "is_group_node": false,
+                        "childs": [
+                          {
+                            "id": 187,
+                            "is_group_node": false,
+                            "childs": [],
+                            "url":
+                              "/category/%CATEGORY_CATNAME%/%CAR_ID%/pictures/%PICTURE_ID%"
+                          }
+                        ],
+                        "url": "/category/%CATEGORY_CATNAME%/%CAR_ID%/pictures"
+                      }
+                    ],
+                    "url": "/category/%CATEGORY_CATNAME%/%CAR_ID%"
+                  },
+                  {
+                    "id": 162,
+                    "is_group_node": false,
+                    "childs": [
+                      {
+                        "id": 184,
+                        "is_group_node": false,
+                        "childs": [],
+                        "url":
+                          "/category/%CATEGORY_CATNAME%/pictures/%PICTURE_ID%"
+                      }
+                    ],
+                    "url": "/category/%CATEGORY_CATNAME%/pictures"
+                  }
+                ],
+                "url": "/category/%CATEGORY_CATNAME%"
+              }
+            ],
+            "url": "/category"
+          },
+          {
+            "id": 117,
+            "is_group_node": false,
+            "name": "page/117/name",
+            "childs": [
+              {
+                "id": 159,
+                "is_group_node": false,
+                "childs": [],
+                "url": "/museums/museum/id/%MUSEUM_ID%"
+              },
+              {
+                "id": 181,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 182,
+                    "is_group_node": false,
+                    "childs": [],
+                    "url": "/factory/factory-cars/id/%FACTORY_ID%"
+                  }
+                ],
+                "url": "/factory/factory/id/%FACTORY_ID%"
+              }
+            ],
+            "routerLink": ["/map"]
+          },
+          {
+            "id": 42,
+            "name": "page/42/name",
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 43,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 45,
+                    "is_group_node": false,
+                    "childs": [],
+                    "routerLink": ["/forums/new-topic/%THEME_ID%"]
+                  },
+                  {
+                    "id": 44,
+                    "is_group_node": false,
+                    "childs": [
+                      {
+                        "id": 83,
+                        "is_group_node": false,
+                        "childs": [],
+                        "url": "/forums/topic/move/topic_id/%TOPIC_ID%"
+                      }
+                    ],
+                    "url": "/forums/topic/topic/topic_id/%TOPIC_ID%"
+                  }
+                ],
+                "routerLink": ["/forums/%THEME_ID%"]
+              }
+            ],
+            "routerLink": ["/forums"]
+          }
+        ],
+        "url": ""
+      },
+      {
+        "id": 24,
+        "is_group_node": false,
+        "childs": [],
+        "url": "/limitededitions/"
+      },
+      { "id": 104, "is_group_node": false, "childs": [], "url": "" },
+      { "id": 109, "is_group_node": false, "childs": [], "url": "/cutaway" },
+      {
+        "id": 62,
+        "is_group_node": false,
+        "childs": [
+          {
+            "id": 63,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 141,
+                "is_group_node": false,
+                "childs": [],
+                "routerLink": ["/users/%USER_IDENTITY%/pictures/%BRAND_CATNAME%"]
+              }
+            ],
+            "routerLink": ["/users/%USER_IDENTITY%/pictures"]
+          },
+          {
+            "id": 205,
+            "is_group_node": false,
+            "childs": [],
+            "routerLink": ["/users/%USER_IDENTITY%/comments"]
+          }
+        ],
+        "routerLink": ["/users/%USER_IDENTITY%"]
+      },
+      {
+        "id": 18,
+        "is_group_node": false,
+        "childs": [],
+        "url": "/picture/%PICTURE_ID%"
+      },
+      {
+        "id": 157,
+        "is_group_node": false,
+        "childs": [],
+        "url": "/voting/voting/id/%VOTING_ID%"
+      },
+      {
+        "id": 19,
+        "is_group_node": false,
+        "childs": [
+          { "id": 20, "is_group_node": false, "childs": [], "url": null }
+        ],
+        "url": ""
+      },
+      {
+        "id": 51,
+        "is_group_node": false,
+        "childs": [
+          {
+            "id": 209,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 210,
+                "is_group_node": false,
+                "childs": [],
+                "url": "%ITEM_URL%"
+              }
+            ],
+            "routerLink": ["/new/%DATE_STR%"]
+          }
+        ],
+        "routerLink": ["/new"]
+      },
+      {
+        "id": 60,
+        "is_group_node": false,
+        "childs": [
+          { "id": 134, "is_group_node": false, "childs": [], "url": "" },
+          { "id": 135, "is_group_node": false, "childs": [], "url": "" }
+        ],
+        "url": ""
+      },
+      { "id": 61, "is_group_node": false, "childs": [], "url": "/brands/" },
+      {
+        "id": 67,
+        "is_group_node": false,
+        "childs": [
+          {
+            "id": 68,
+            "is_group_node": false,
+            "childs": [
+              { "id": 69, "is_group_node": false, "childs": [], "url": "" },
+              { "id": 70, "is_group_node": false, "childs": [], "url": "" },
+              { "id": 120, "is_group_node": false, "childs": [], "url": "" }
+            ],
+            "url": "/moder/pages"
+          },
+          {
+            "id": 71,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/moder/rights"
+          },
+          {
+            "id": 74,
+            "is_group_node": false,
+            "childs": [],
+            "routerLink": ["/moder/cars/alpha"]
+          },
+          {
+            "id": 75,
+            "is_group_node": false,
+            "childs": [],
+            "routerLink": ["/log"]
+          },
+          {
+            "id": 77,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/moder/trafic"
+          },
+          { "id": 97, "is_group_node": false, "childs": [], "url": "" },
+          {
+            "id": 100,
+            "is_group_node": false,
+            "childs": [
+              { "id": 101, "is_group_node": false, "childs": [], "url": "" },
+              {
+                "id": 142,
+                "is_group_node": false,
+                "childs": [],
+                "url": "/moder/attrs/zone/zone_id/%ZONE_ID%"
+              }
+            ],
+            "url": "/moder/attrs"
+          },
+          { "id": 107, "is_group_node": false, "childs": [], "url": "" },
+          {
+            "id": 114,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/moder/spec"
+          },
+          {
+            "id": 119,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/moder/index/stat"
+          },
+          {
+            "id": 73,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 72,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 148,
+                    "is_group_node": false,
+                    "childs": [],
+                    "url": ""
+                  },
+                  {
+                    "id": 149,
+                    "is_group_node": false,
+                    "childs": [],
+                    "url": ""
+                  }
+                ],
+                "url": "/moder/pictures/picture/picture_id/%PICTURE_ID%"
+              }
+            ],
+            "url": "/moder/pictures"
+          },
+          {
+            "id": 202,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/moder/perspectives"
+          },
+          {
+            "id": 203,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/moder/users"
+          },
+          {
+            "id": 131,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 78,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 144,
+                    "is_group_node": false,
+                    "childs": [],
+                    "url": ""
+                  },
+                  {
+                    "id": 178,
+                    "is_group_node": false,
+                    "childs": [],
+                    "url": ""
+                  }
+                ],
+                "routerLink": ["/moder/items/item/%CAR_ID%"]
+              },
+              { "id": 163, "is_group_node": false, "childs": [], "url": "" }
+            ],
+            "routerLink": ["/moder/items"]
+          },
+          {
+            "id": 212,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/moder/picture-vote-template"
+          },
+          {
+            "id": 110,
+            "is_group_node": false,
+            "childs": [],
+            "routerLink": ["/moder/comments"]
+          }
+        ],
+        "routerLink": ["/moder"]
+      },
+      { "id": 105, "is_group_node": false, "childs": [], "url": "" },
+      { "id": 106, "is_group_node": false, "childs": [], "url": "/rules" },
+      {
+        "id": 87,
+        "is_group_node": true,
+        "childs": [
+          {
+            "id": 91,
+            "name": "page/91/name",
+            "icon": "fa fa-fw fa fa-pencil",
+            "guest_only": true,
+            "is_group_node": false,
+            "childs": [],
+            "routerLink": ["/signup"]
+          },
+          {
+            "id": 29,
+            "name": "page/29/name",
+            "icon": "fa fa-fw fa-upload",
+            "is_group_node": false,
+            "childs": [
+              { "id": 30, "is_group_node": false, "childs": [], "url": "" }
+            ],
+            "routerLink": ["/upload"]
+          },
+          {
+            "id": 89,
+            "name": "page/89/name",
+            "icon": "fa fa-fw fa-comment",
+            "is_group_node": false,
+            "childs": [
+              { "id": 93, "is_group_node": false, "childs": [], "url": "" }
+            ],
+            "routerLink": ["/feedback"]
+          },
+          {
+            "id": 124,
+            "name": "page/124/name",
+            "icon": "fa fa-fw fa fa-users",
+            "is_group_node": false,
+            "childs": [],
+            "url": "/users/online"
+          },
+          {
+            "id": 211,
+            "name": "page/211/name",
+            "icon": "fa fa-fw fa-address-book",
+            "registered_only": true,
+            "is_group_node": false,
+            "childs": [],
+            "routerLink": ["/account/contacts"]
+          },
+          {
+            "id": 48,
+            "name": "page/48/name",
+            "icon": "fa fa-fw fa-user",
+            "is_group_node": false,
+            "registered_only": true,
+            "routerLink": ["/account"],
+            "childs": [
+              {
+                "id": 129,
+                "is_group_node": false,
+                "childs": [],
+                "routerLink": ["/account/profile"]
+              },
+              { "id": 54, "is_group_node": false, "childs": [], "url": "" },
+              {
+                "id": 123,
+                "is_group_node": false,
+                "childs": [],
+                "routerLink": ["/account/accounts"]
+              },
+              {
+                "id": 49,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 80,
+                    "is_group_node": false,
+                    "childs": [],
+                    "routerLink": ["/account/messages?folder=sent"]
+                  },
+                  {
+                    "id": 128,
+                    "is_group_node": false,
+                    "childs": [],
+                    "routerLink": ["/account/messages"]
+                  },
+                  {
+                    "id": 81,
+                    "is_group_node": false,
+                    "childs": [],
+                    "routerLink": ["/account/messages?folder=system"]
+                  }
+                ],
+                "routerLink": ["/account/messages"]
+              },
+              {
+                "id": 94,
+                "is_group_node": false,
+                "childs": [],
+                "routerLink": ["/account/inbox-pictures"]
+              },
+              {
+                "id": 55,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 56,
+                    "is_group_node": false,
+                    "childs": [],
+                    "url": ""
+                  }
+                ],
+                "routerLink": ["/account/email"]
+              },
+              {
+                "id": 133,
+                "is_group_node": false,
+                "childs": [],
+                "routerLink": ["/account/access"]
+              },
+              {
+                "id": 137,
+                "is_group_node": false,
+                "childs": [],
+                "routerLink": ["/account/delete"]
+              },
+              {
+                "id": 188,
+                "is_group_node": false,
+                "childs": [],
+                "routerLink": ["/account/specs-conflics"]
+              },
+              { "id": 130, "is_group_node": false, "childs": [], "url": "" },
+              {
+                "id": 57,
+                "is_group_node": false,
+                "childs": [],
+                "routerLink": ["/forums/subscriptions"]
+              },
+              {
+                "id": 198,
+                "is_group_node": false,
+                "childs": [],
+                "routerLink": ["/account/contacts"]
+              }
+            ]
+          },
+          {
+            "id": 136,
+            "name": "page/136/name",
+            "icon": "fa fa-fw fa-info",
+            "is_group_node": false,
+            "childs": [],
+            "routerLink": ["/about"]
+          },
+          {
+            "id": 90,
+            "name": "page/90/name",
+            "icon": "fa fa-fw fa-sign-out",
+            "is_group_node": false,
+            "registered_only": true,
+            "childs": [],
+            "routerLink": ["/login/logout"]
+          }
+        ],
+        "url": ""
+      },
+      {
+        "id": 10,
+        "is_group_node": false,
+        "childs": [
+          {
+            "id": 58,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/%BRAND_CATNAME%/%DPBRAND_CATNAME%/"
+          },
+          {
+            "id": 59,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 66,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 193,
+                    "is_group_node": false,
+                    "childs": [],
+                    "url":
+                      "/%BRAND_CATNAME%/%DESIGN_PROJECT_CATNAME%/%PICTURE_ID%"
+                  }
+                ],
+                "url": "/%BRAND_CATNAME%/%DESIGN_PROJECT_CATNAME%/pictures/"
+              }
+            ],
+            "url": "/%BRAND_CATNAME%/%DESIGN_PROJECT_CATNAME%/"
+          },
+          {
+            "id": 33,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 34,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 194,
+                    "is_group_node": false,
+                    "childs": [],
+                    "url":
+                      "/%BRAND_CATNAME%/%CAR_CATNAME%/pictures/%PICTURE_ID%"
+                  }
+                ],
+                "url": "%ALL_PICTURES_URL%"
+              },
+              {
+                "id": 36,
+                "is_group_node": false,
+                "childs": [],
+                "url": "/%BRAND_CATNAME%/%CAR_CATNAME%/specifications/"
+              }
+            ],
+            "url": "/%BRAND_CATNAME%/%CAR_CATNAME%/"
+          },
+          {
+            "id": 14,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 138,
+                "is_group_node": false,
+                "childs": [],
+                "url": "/%BRAND_CATNAME%/cars/%CAR_TYPE_CATNAME%/"
+              }
+            ],
+            "url": "/%BRAND_CATNAME%/cars/"
+          },
+          {
+            "id": 37,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/%BRAND_CATNAME%/concepts/"
+          },
+          {
+            "id": 39,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 192,
+                "is_group_node": false,
+                "childs": [],
+                "url": "/%BRAND_CATNAME%/logotypes/%PICTURE_ID%"
+              }
+            ],
+            "url": "/%BRAND_CATNAME%/logotypes/"
+          },
+          {
+            "id": 40,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 190,
+                "is_group_node": false,
+                "childs": [],
+                "url": "/%BRAND_CATNAME%/mixed/%PICTURE_ID%"
+              }
+            ],
+            "url": "/%BRAND_CATNAME%/mixed/"
+          },
+          {
+            "id": 15,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/%BRAND_CATNAME%/recent/"
+          },
+          {
+            "id": 164,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 165,
+                "is_group_node": false,
+                "childs": [
+                  {
+                    "id": 166,
+                    "is_group_node": false,
+                    "childs": [
+                      {
+                        "id": 167,
+                        "is_group_node": false,
+                        "childs": [],
+                        "url":
+                          "/%BRAND_CATNAME%/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%/%YEAR_CATNAME%"
+                      }
+                    ],
+                    "url":
+                      "/%BRAND_CATNAME%/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%"
+                  }
+                ],
+                "url": "/%BRAND_CATNAME%/mosts/%MOST_CATNAME%"
+              }
+            ],
+            "url": "/%BRAND_CATNAME%/mosts/"
+          },
+          {
+            "id": 41,
+            "is_group_node": false,
+            "childs": [
+              {
+                "id": 191,
+                "is_group_node": false,
+                "childs": [],
+                "url": "/%BRAND_CATNAME%/other/%PICTURE_ID%"
+              }
+            ],
+            "url": "/%BRAND_CATNAME%/other/"
+          },
+          {
+            "id": 208,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/%BRAND_CATNAME%/engines"
+          }
+        ],
+        "url": "/%BRAND_CATNAME%/"
+      },
+      {
+        "id": 31,
+        "is_group_node": false,
+        "childs": [
+          { "id": 32, "is_group_node": false, "childs": [], "url": "" }
+        ],
+        "url": "/articles/"
+      },
+      {
+        "id": 102,
+        "is_group_node": false,
+        "childs": [
+          { "id": 189, "is_group_node": false, "childs": [], "url": "" },
+          {
+            "id": 103,
+            "is_group_node": false,
+            "childs": [],
+            "url": "/moder/index/attrs-change-log"
+          }
+        ],
+        "url": ""
+      },
+      { "id": 161, "is_group_node": false, "childs": [], "url": "/pulse/" },
+      {
+        "id": 173,
+        "is_group_node": false,
+        "childs": [],
+        "routerLink": ["/users/rating"]
+      },
+      {
+        "id": 174,
+        "is_group_node": false,
+        "childs": [],
+        "url": "/info/spec"
+      },
+      { "id": 180, "is_group_node": false, "childs": [], "url": "/factory" },
+      { "id": 76, "is_group_node": false, "childs": [], "url": "" },
+      {
+        "id": 52,
+        "is_group_node": false,
+        "childs": [
+          { "id": 53, "is_group_node": false, "childs": [], "url": "" }
+        ],
+        "routerLink": ["/signup"]
+      },
+      { "id": 122, "is_group_node": false, "childs": [], "url": "/spec/" },
+      { "id": 79, "is_group_node": false, "childs": [], "url": "/ng/login" },
+      { "id": 196, "is_group_node": false, "childs": [], "url": "/donate" },
+      {
+        "id": 197,
+        "is_group_node": false,
+        "childs": [],
+        "url": "/info/text"
+      },
+      { "id": 201, "is_group_node": false, "childs": [], "url": "/mascots" },
+      { "id": 204, "is_group_node": false, "childs": [], "url": "/telegram" },
+      {
+        "id": 214,
+        "is_group_node": false,
+        "childs": [
+          {
+            "id": 213,
+            "is_group_node": false,
+            "childs": [],
+            "routerLink": ["/persons/%PERSON_ID%"]
+          }
+        ],
+        "routerLink": ["/persons"]
+      }
+    ],
+    "url": "/"
+  }
+]

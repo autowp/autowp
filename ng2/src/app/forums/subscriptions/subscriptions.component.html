@@ -1,0 +1,49 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th translate>forums/theme/topics</th>
+      <th translate>forums/theme/author</th>
+      <th translate>forums/theme/last-message</th>
+      <th translate>forums/theme/subscription</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let topic of topics">
+      <td>
+        <span class="fa fa-lock" *ngIf="topic.status == 'closed'"></span>
+        <a ui-sref="forums-topic({topic_id: topic.id})" [textContent]="topic.name" *ngIf="topic.status != 'deleted'"></a>
+        <span [textContent]="topic.name" *ngIf="topic.status == 'deleted'"></span>
+        <span class="badge badge-pill badge-secondary">
+          {{topic.old_messages + (topic.new_messages > 0 ? '+' + topic.new_messages : '')}}
+        </span>
+      </td>
+      <td>
+        <app-past-time-indicator [date]="topic.add_datetime"></app-past-time-indicator>
+        <br />
+        <app-user [user]="topic.author" *ngIf="topic.author"></app-user>
+      </td>
+      <td>
+        <div *ngIf="topic.last_message">
+          <ng-container *ngIf="topic.last_message.datetime">
+            <small>
+              <app-past-time-indicator [date]="topic.last_message.datetime"></app-past-time-indicator>
+            </small>
+            <br />
+          </ng-container>
+          <app-user [user]="topic.last_message.user" *ngIf="topic.last_message.user"></app-user>
+          <a ui-sref="forums-message({message_id: topic.last_message.id})" [title]="'forums/go-to-last-message'|translate">
+            <i class="fa fa-share"></i>
+          </a>
+        </div>
+        <span *ngIf="!topic.last_message">&#x2014;</span>
+      </td>
+      <td>
+        <button class="btn btn-sm btn-warning" (click)="unsubscribe(topic)">
+          {{'forums/unsubscribe'|translate}}
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>

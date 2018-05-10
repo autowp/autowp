@@ -1,0 +1,41 @@
+<span *ngIf="loading > 0">
+  <i class="fa fa-spinner fa-spin fa-fw"></i>
+</span>
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>id</th>
+      <th></th>
+      <th translate>moder/users/login</th>
+      <th>E-mail</th>
+      <th translate>moder/users/name</th>
+      <th translate>moder/users/role</th>
+      <th translate>moder/users/profile</th>
+      <th translate>moder/users/last-visit</th>
+      <th translate>moder/users/registration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let user of users">
+      <td [textContent]="user.id"></td>
+      <td>
+        <img [src]="user.image.src" *ngIf="user.image" style="max-width:300px;max-height:300px" />
+      </td>
+      <td [textContent]="user.login"></td>
+      <td [textContent]="user.email"></td>
+      <td [textContent]="user.name"></td>
+      <td [textContent]="user.role"></td>
+      <td>
+        <app-user [user]="user" *ngIf="user"></app-user>
+      </td>
+      <td>
+        <span *ngIf="user.last_online">{{user.last_online|amTimeAgo}}</span>
+      </td>
+      <td>
+        <span *ngIf="user.reg_date" [title]="user.reg_date | date : 'fullDate'">{{user.reg_date|amTimeAgo}}</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>

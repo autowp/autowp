@@ -1,0 +1,42 @@
+<div class="nav nav-pills" style="margin-bottom:10px">
+  <a class="nav-link active" ui-sref="." [innerHTML]="factory.name_html"></a>
+  <a class="nav-link" ui-sref="factory-items({id: factory.id})" translate>factories/factory-items</a>
+  <a class="nav-link" ui-sref="moder-items-item({id: factory.id})" *ngIf="isModer">
+    <i class="fa fa-cog"></i>
+    {{'moder/edit-object'|translate}}
+  </a>
+</div>
+
+<div class="google-map" style="height:300px;margin:0 0 40px;width:100%" [hidden]="!factory.lng || !factory.lat"></div>
+
+<app-markdown class="card card-body" *ngIf="factory.description" [markdown]="factory.description|translate"></app-markdown>
+
+<div *ngIf="pictures.length > 0">
+  <h3 translate>factories/factory/pictures</h3>
+  <div class="row">
+    <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let picture of pictures">
+      <app-thumbnail [picture]="picture"></app-thumbnail>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="relatedPictures.length > 0">
+  <h3 translate>factories/factory-items</h3>
+  <div class="row">
+    <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let item of relatedPictures">
+      <div class="card mb-4">
+        <a [href]="item.url">
+          <img class="card-img-top" [src]="item.src" alt="" [title]="item.name" />
+        </a>
+        <div class="card-body">
+          <h5 class="card-title">
+            <a [href]="item.url" [textContent]="item.name"></a>
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p>
+    <a ui-sref="factory-items({id: factory.id})" translate>carlist/details</a>
+  </p>
+</div>

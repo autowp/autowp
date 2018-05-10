@@ -1,0 +1,17 @@
+<div class="modal-content" method="post">
+  <div class="modal-header">
+    <h3 class="modal-title" translate>personal-message-dialog/title</h3>
+    <a class="close" (click)="activeModal.dismiss()">×</a>
+  </div>
+  <div class="modal-body">
+    <textarea cols="65" rows="5" name="contents" (keypress)="keypress()" [(ngModel)]="text" class="form-control" [disabled]="sending" [placeholder]="'personal-message-dialog/placeholder'|translate"></textarea>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" translate (click)="send()" [disabled]="sending || text.length <= 0" [ngClass]="sent ? 'btn-success' : 'btn-primary'">
+      <span translate *ngIf="sending">personal-message-dialog/sending</span>
+      <span translate *ngIf="sent">personal-message-dialog/sent</span>
+      <span translate *ngIf="!sending && !sent">personal-message-dialog/send</span>
+    </button>
+    <button class="btn btn-secondary cancel" translate (click)="activeModal.dismiss()" [disabled]="sending">personal-message-dialog/cancel</button>
+  </div>
+</div>

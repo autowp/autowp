@@ -343,7 +343,7 @@ Exigences pour les images ajoutées:
 S\'il vous plaît noter que l\'ajout d\'images modérés. c\'est-à-dire toutes les photos avant d\'ajouter au catalogue seront testés par moderateurs.',
   'upload/only-registered' => 'Seuls les utilisateurs enregistrés peuvent télécharger des images
 
-[Login](/ng/login) or [Enregistrer](/ng/signup)',
+[Login](/ng2/login) or [Enregistrer](/ng/signup)',
   'catalogue/other-pictures-of-%1$s' => 'Autres photos de %1$s',
   'catalogue/all-pictures-of-%1$s' => 'Toutes les images de %1$s',
   'catalogue/brand/logo-of-%s' => '%s logotype',
@@ -384,7 +384,7 @@ S\'il vous plaît noter que l\'ajout d\'images modérés. c\'est-à-dire toutes 
   'factories/factory/pictures' => 'Images',
   'comments/title' => 'Commentaires',
   'comments/reply' => 'répondre',
-  'comments/what-to-do-for-write-comments' => 'Pour pouvoir poster un commentaire, vous devez [créer un compte ou de vous connecter en utilisant le compte des réseaux sociaux](/ng/login)',
+  'comments/what-to-do-for-write-comments' => 'Pour pouvoir poster un commentaire, vous devez [créer un compte ou de vous connecter en utilisant le compte des réseaux sociaux](/ng2/login)',
   'comments/it-requires-attention-of-moderators' => 'Il nécessite une attention des modérateurs',
   'comments/message' => 'Message',
   'comments/form-title' => 'Ajouter un commentaire',

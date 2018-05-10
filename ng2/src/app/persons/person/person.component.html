@@ -1,0 +1,38 @@
+<p *ngIf="isModer">
+  <i class="fa fa-cog"></i>
+  <a ui-sref="moder-items-item({id: item.id})" ui-sref-options="{inherit: false}" translate>moder/edit-object</a>
+</p>
+
+<div class="card card-body mb-4" *ngIf="links.length > 0 || item.description">
+  <app-markdown [markdown]="item.description"></app-markdown>
+
+  <p *ngIf="links.length > 0">
+    {{'museums/museum/website:'|translate}}
+    <ng-container *ngFor="let link of links">
+      <a [href]="link.url" [textContent]="link.name ? link.name : link.url"></a>
+      <br />
+    </ng-container>
+  </p>
+</div>
+
+<div *ngIf="authorPictures.length > 0">
+  <h3 translate>factories/factory/pictures</h3>
+  <div class="row">
+    <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let picture of authorPictures">
+      <app-thumbnail [picture]="picture"></app-thumbnail>
+    </div>
+  </div>
+
+  <app-paginator [data]="authorPicturesPaginator" *ngIf="authorPicturesPaginator"></app-paginator>
+</div>
+
+<div *ngIf="contentPictures.length > 0">
+  <h3 translate>factories/factory/pictures</h3>
+  <div class="row">
+    <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let picture of contentPictures">
+      <app-thumbnail [picture]="picture"></app-thumbnail>
+    </div>
+  </div>
+
+  <app-paginator [data]="contentPicturesPaginator" *ngIf="contentPicturesPaginator"></app-paginator>
+</div>

@@ -344,7 +344,7 @@ Requisitos para as imagens:
 Lembramos a você que a adição de imagens nesse site passa por uma equipe de moderação. Ou seja, todas as imagens adicionadas serão verificadas por nossa equipe antes de serem aceitas no site.',
   'upload/only-registered' => 'Apenas usuários registrados podem adicionar imagens.
 
-[Fazer login](/ng/login) ou [registrar-se](/ng/signup)
+[Fazer login](/ng2/login) ou [registrar-se](/ng/signup)
 ',
   'catalogue/other-pictures-of-%1$s' => 'Outras imagens de %1$s',
   'catalogue/all-pictures-of-%1$s' => 'Todas as imagens de %1$s',
@@ -386,7 +386,7 @@ Lembramos a você que a adição de imagens nesse site passa por uma equipe de m
   'factories/factory/pictures' => 'Imagens',
   'comments/title' => 'Comentários',
   'comments/reply' => 'responder',
-  'comments/what-to-do-for-write-comments' => 'Para postar um comentário você deve [criar uma conta ou utilizar uma conta de rede social já existente](/ng/login)',
+  'comments/what-to-do-for-write-comments' => 'Para postar um comentário você deve [criar uma conta ou utilizar uma conta de rede social já existente](/ng2/login)',
   'comments/it-requires-attention-of-moderators' => 'Requer atenção da equipe de moderação',
   'comments/message' => 'Mensagem',
   'comments/form-title' => 'Adicionar comentário',

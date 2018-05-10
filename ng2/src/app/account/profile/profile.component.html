@@ -1,0 +1,81 @@
+<div class="row">
+  <div class="col-lg-8 mb-4 order-2">
+    <h2 translate>account/profile/personal</h2>
+    <div class="card card-body mb-4">
+      <form method="post" class="form-horizontal" (submit)="sendProfile()">
+        <fieldset>
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="name" translate>user/name</label>
+            <div class="col-md-9">
+              <input type="text" maxlength="50" size="50" name="name" class="form-control" [(ngModel)]="profile.name" [ngClass]="{'is-invalid': profileInvalidParams && profileInvalidParams.name}"
+              />
+              <p *ngFor="let message of profileInvalidParams | invalidParams : 'name'" [textContent]="message" class="invalid-feedback"></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-9 offset-md-3">
+              <button type="submit" class="btn btn-primary" translate>send</button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+
+    <h2 translate>account/profile/photo</h2>
+    <div class="card card-body mb-4">
+      <app-markdown [markdown]="'account/profile/use-gravatar'|translate"></app-markdown>
+      <div *ngIf="photo">
+        <img [src]="photo.src" class="mb-4" />
+        <p *ngFor="let message of photoInvalidParams | invalidParams : 'file'" [textContent]="message" class="invalid-feedback"
+          style="display:block"></p>
+      </div>
+      <input type="file" accept="image/*" style="display:none" #fileInput ng2FileSelect [uploader]="uploader" />
+      <div class="btn-group">
+        <button type="submit" class="btn btn-danger" (click)="resetPhoto()" *ngIf="photo">
+          <i class="fa fa-times"></i>
+          {{'account/profile/photo/delete'|translate}}
+        </button>
+        <button type="button" class="btn btn-primary" translate type="file" (click)="showFileSelectDialog()">account/profile/select-photo</button>
+      </div>
+      <ngb-progressbar type="success" [value]="uploader.progress" [hidden]="uploader.progress <= 0" *ngIf="file"></ngb-progressbar>
+    </div>
+
+    <h2 translate>account/profile/other</h2>
+    <div class="card card-body mb-4">
+      <p [hidden]="votesLeft < 0">
+        {{'account/profile/votes-per-day'|translate}}: {{votesPerDay}}</p>
+      <p [hidden]="votesLeft < 0">
+        {{'account/profile/votes-left'|translate}}: {{votesLeft}}</p>
+      <form method="post" class="form-horizontal" (submit)="sendSettings()">
+        <fieldset>
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="language" translate>account/profile/language</label>
+            <div class="col-md-9">
+              <select name="language" class="form-control" [ngClass]="{'is-invalid': settingsInvalidParams.language}" [(ngModel)]="settings.language">
+                <option *ngFor="let language of languages" [value]="language.value">{{language.name}}</option>
+              </select>
+              <p *ngFor="let message of settingsInvalidParams | invalidParams : 'language'" [textContent]="message" class="invalid-feedback"></p>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="timezone" translate>account/profile/timezone</label>
+            <div class="col-md-9">
+              <select name="timezone" class="form-control" [(ngModel)]="settings.timezone" [ngClass]="{'is-invalid': settingsInvalidParams.timezone}">
+                <option *ngFor="let timezone of timezones" [value]="timezone">{{timezone}}</option>
+              </select>
+              <p *ngFor="let message of settingsInvalidParams | invalidParams : 'timezone'" [textContent]="message" class="invalid-feedback"></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-9 offset-md-3">
+              <button type="submit" class="btn btn-primary" translate>send</button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-4 mb-4 order-1">
+    <app-account-sidebar></app-account-sidebar>
+  </div>
+</div>

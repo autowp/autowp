@@ -1,0 +1,36 @@
+<div class="nav nav-pills">
+  <a class="nav-link active" routerLink="/moder/traffic">Traffic</a>
+  <a class="nav-link" routerLink="/moder/traffic/whitelist">Whitelist</a>
+</div>
+
+<div class="row" *ngFor="let item of items">
+  <div class="col-sm-2">
+    <h3 [textContent]="item.count"></h3>
+  </div>
+  <div class="col-sm-4">
+    <h3>{{item.ip}}
+      <a [href]="item.whois_url">whois</a>
+    </h3>
+    <h4 *ngIf="item.users">
+      <app-user [user]="user" *ngFor="let user of item.users"></app-user>
+    </h4>
+    <p>{{item.hostname ? item.hostname : item.ip}}</p>
+  </div>
+  <div class="col-sm-6">
+    <div *ngIf="item.ban">
+      {{'ban/until'|translate}} {{item.ban.up_to | date : 'fullDate'}}
+      <span *ngIf="item.ban.user">
+        by
+        <app-user [user]="item.ban.user"></app-user>
+        <span *ngIf="item.ban.reason">
+          {{'ban/reason'|translate}} {{item.ban.reason}}
+        </span>
+      </span>
+    </div>
+    <div>
+      <button *ngIf="item.ban" class="btn btn-secondary" (click)="removeFromBlacklist(item.ip)">{{'ban/unban'|translate}}</button>
+      <button class="btn btn-danger" *ngIf="!item.ban" (click)="addToBlacklist(item.ip)">{{'ban/ban'|translate}}</button>
+      <button *ngIf="!item.whitelist" class="btn btn-success" (click)="addToWhitelist(item.ip)">Whitelist</button>
+    </div>
+  </div>
+</div>

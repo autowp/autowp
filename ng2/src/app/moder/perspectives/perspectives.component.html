@@ -1,0 +1,15 @@
+<ul>
+    <li *ngFor="let page of pages">
+        [{{page.id}}] {{page.name}}
+        <table style="margin-bottom:20px"><tr>
+            <td *ngFor="let group of page.groups">
+                [{{group.id}}] {{group.name}}
+                <ul>
+                    <li *ngFor="let perspective of group.perspectives">
+                        [{{perspective.id}}] {{perspective.name | translate}}
+                    </li>
+                </ul>
+            </td>
+        </tr></table>
+    </li>
+</ul>

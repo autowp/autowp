@@ -1,0 +1,30 @@
+<span [hidden]="loading <= 0">
+  <i class="fa fa-spinner fa-spin fa-fw fa-5x"></i>
+</span>
+
+<div class="select-in-brand" *ngIf="brand">
+  <div style="margin: 5px 0" *ngIf="vehicles.length > 0">
+    <app-donate-vod-select-item item="item" select-item="selectItem" *ngFor="let item of vehicles"></app-donate-vod-select-item>
+  </div>
+
+  <div style="margin: 5px 0" *ngIf="concepts.length > 0">
+    <a href="#" class="arrow" (click)="conceptsExpanded = !conceptsExpanded">
+      <i class="fa fa-plus-circle"></i>
+      {{'upload/select/concepts'|translate}}
+    </a>
+    <div style="margin:0 0 4px 18px;" [hidden]="!conceptsExpanded">
+      <app-donate-vod-select-item item="item" select-item="selectItem" *ngFor="let item of concepts"></app-donate-vod-select-item>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="!brand">
+  <div class="col-md-2" *ngFor="let chunk of brands">
+    <ng-container *ngFor="let brand of chunk">
+      <a ui-sref=".({brand_id: brand.id})" [textContent]="brand.name_only"></a>
+      <br />
+    </ng-container>
+  </div>
+</div>
+
+<app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>

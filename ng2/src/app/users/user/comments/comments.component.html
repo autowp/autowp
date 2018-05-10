@@ -1,0 +1,19 @@
+<ul class="nav nav-pills" style="margin-bottom:10px">
+  <li class="nav-item" *ngFor="let corder of orders">
+    <a [ngClass]="{active: corder.value == order}" class="nav-link" ui-sref=".({order: corder.value, page: null})" [textContent]="corder.name|translate"></a>
+  </li>
+</ul>
+
+<ul>
+  <li *ngFor="let comment of comments">
+    <strong *ngIf="comment.vote > 0">+{{comment.vote}}
+      <span class="fa fa-thumbs-o-up"></span>
+    </strong>
+    <strong *ngIf="comment.vote < 0">{{comment.vote}}
+      <span class="fa fa-thumbs-o-down"></span>
+    </strong>
+    <a [href]="comment.url" [textContent]="comment.preview"></a>
+  </li>
+</ul>
+
+<app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>

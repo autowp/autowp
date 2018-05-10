@@ -1,0 +1,84 @@
+import { APIPaginator } from '../../services/api.service';
+import { Injectable, Component, Input } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { APIUser } from '../../services/user';
+import Notify from '../../notify';
+import { Router } from '@angular/router';
+import { CommentService, APIComment } from '../../services/comment';
+
+interface IAutowpCommentsDirectiveScope extends ng.IScope {
+  limit: number;
+  page: number;
+  typeId: number;
+  itemId: number;
+}
+
+@Component({
+  selector: 'app-comments',
+  templateUrl: './comments.component.html'
+})
+@Injectable()
+export class CommentsComponent {
+  public messages: APIComment[] = [];
+  public onSent: Function;
+  public paginator: APIPaginator;
+
+  @Input() itemId: number;
+  @Input() typeId: number;
+  @Input() user: APIUser;
+  @Input() limit: number;
+  @Input() page: number;
+
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private commentService: CommentService
+  ) {
+    this.load();
+
+    this.onSent = (location: string) => {
+      if (this.limit) {
+        this.commentService
+          .getCommentByLocation(location, {
+            fields: 'page',
+            limit: this.limit
+          })
+          .subscribe(
+            response => {
+              if (this.page !== response.page) {
+                this.router.navigate(['.'], {
+                  queryParams: { page: response.page }
+                });
+              } else {
+                this.load();
+              }
+            },
+            response => Notify.response(response)
+          );
+      } else {
+        this.load();
+      }
+    };
+  }
+
+  public load() {
+    this.commentService
+      .getComments({
+        type_id: this.typeId,
+        item_id: this.itemId,
+        no_parents: true,
+        fields:
+          'user.avatar,user.gravatar,replies,text_html,datetime,vote,user_vote',
+        order: 'date_asc',
+        limit: this.limit ? this.limit : null,
+        page: this.page
+      })
+      .subscribe(
+        response => {
+          this.messages = response.items;
+          this.paginator = response.paginator;
+        },
+        response => Notify.response(response)
+      );
+  }
+}

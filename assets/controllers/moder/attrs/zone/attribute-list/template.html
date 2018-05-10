@@ -1,9 +1,0 @@
-<ul ng-if="attributes.length > 0">
-    <li ng-repeat="attribute in attributes">
-        <label>
-            <input type="checkbox" name="attribute_id[]" ng-model="map[attribute.id]" ng-change="change(attribute.id, map[attribute.id])" />
-            {{attribute.name | translate}}
-        </label>
-        <autowp-moder-attrs-zone-attribute-list attributes="attribute.childs" map="map" change="change"></autowp-moder-attrs-zone-attribute-list>
-    </li>
-</ul>

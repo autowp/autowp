@@ -1,0 +1,7 @@
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <app-item [item]="item" *ngFor="let item of items"></app-item>
+
+    <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+  </div>
+</div>

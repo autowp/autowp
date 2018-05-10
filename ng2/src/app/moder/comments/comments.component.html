@@ -1,0 +1,43 @@
+<div class="row">
+  <div class="col-md-4">
+    <h2 translate>moder/comments/filter</h2>
+    <form class="card card-body form-vertical">
+      <div class="form-group">
+        <label translate>moder/comments/filter/user-id</label>
+        <input type="text" name="user_id" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label translate>moder/comments/filter/moderator_attention</label>
+        <select name="moderator_attention" class="form-control" [(ngModel)]="moderator_attention" (change)="load()">
+          <option value="">{{'moder/comments/filter/moderator_attention/not-matters'|translate}}</option>
+          <option value="0">{{'moder/comments/filter/moderator_attention/not-required'|translate}}</option>
+          <option value="1">{{'moder/comments/filter/moderator_attention/required'|translate}}</option>
+          <option value="2">{{'moder/comments/filter/moderator_attention/resolved'|translate}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label translate>moder/comments/filter/vehicle-id</label>
+        <input type="text" name="pictures_of_item_id" class="form-control">
+      </div>
+    </form>
+  </div>
+  <div class="col-md-8">
+    <h2>
+      {{'moder/comments/title'|translate}}
+      <span [hidden]="loading <= 0">
+        <i class="fa fa-spinner fa-spin fa-fw"></i>
+      </span>
+      <small *ngIf="paginator && paginator.totalItemCount" translate="ng/%1$s-comments" [translateParams]="{count: paginator.totalItemCount}"></small>
+    </h2>
+
+    <ul class="comments">
+      <li *ngFor="let comment of comments">
+        <span class="badge badge-warning" *ngIf="comment.is_new" translate>moder/comments/not-readed</span>
+        <span class="badge badge-{{comment.status.class}}" *ngIf="comment.status">{{comment.status.name|translate}}</span>
+        <a [href]="comment.url" [textContent]="comment.preview"></a>
+        <app-user [user]="comment.user"></app-user>
+      </li>
+    </ul>
+    <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+  </div>
+</div>

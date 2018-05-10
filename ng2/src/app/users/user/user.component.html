@@ -1,0 +1,166 @@
+<div class="row" *ngIf="user">
+  <div class="col-md-6">
+
+    <div class="user-photo">
+      <img *ngIf="user.photo" [src]="user.photo.src" alt="" />
+      <img *ngIf="!user.photo && user.gravatar_hash" [src]="'https://www.gravatar.com/avatar/' + user.gravatar_hash + '?s=270&d=https://www.autowp.ru/_.gif&r=g'"
+        alt="" />
+    </div>
+
+    <p>
+      {{'users/user/known-as:'|translate}}
+      <strong>«{{user.name}}»</strong>
+    </p>
+    <div style="color:#666666;margin-left:40px;cursor:help" [title]="rename.date | date:'medium'" *ngFor="let rename of user.renames">
+      {{'users/user/before-known-as:'|translate}}
+      <strong style="color:#666666">«{{rename.old_name}}»</strong>
+    </div>
+
+    <p>
+      {{'users/user/type:'|translate}}
+      <strong *ngIf="user.is_moder" translate>users/user/type/moderator</strong>
+      <strong *ngIf="!user.is_moder" translate>users/user/type/visitor</strong>
+    </p>
+
+    <p *ngIf="user.reg_date">
+      {{'users/user/registration-date'|translate}}:
+      <strong am-time-ago="user.reg_date"></strong>
+    </p>
+    <p>
+      {{'users/user/last-visited'|translate}}:
+      <strong am-time-ago="user.last_online"></strong>
+    </p>
+
+    <p translate [translateParams]="{id: user.id}">ng/moder/database-id-n</p>
+
+    <p *ngIf="user && !isMe">
+      <i class="fa fa-reply"></i>
+      <a href="#" (click)="openMessageForm()" translate>users/user/send-personal-message</a>
+    </p>
+
+    <p *ngFor="let account of user.accounts">
+      <i class="{{account.icon}} fa-fw"></i>
+      <a [href]="account.link" *ngIf="account.link" [textContent]="account.name"></a>
+      <span *ngIf="!account.link" [textContent]="account.name"></span>
+    </p>
+
+    <h2 translate>users/user/recent-activity</h2>
+    <div class="card card-body mb-4">
+      <div *ngIf="user.pictures_added > 0">
+        <p>{{'users/user/upload-pictures:'|translate}}
+          <strong [textContent]="user.pictures_added"></strong>
+        </p>
+        <p *ngIf="user.pictures_accepted_count < user.pictures_added">
+          {{'users/user/pictures-left-on-site:'|translate}}
+          <strong [textContent]="user.pictures_accepted_count"></strong>
+        </p>
+
+        <p>
+          <a ui-sref="users-user-pictures({identity: user.identity ? user.identity : 'user' + user.id})" translate>users/user/uploaded-pictures</a>
+        </p>
+      </div>
+      <p translate *ngIf="user.pictures_added <= 0">users/user/not-upload-pictures</p>
+
+      <p *ngIf="isModer">
+        <a ui-sref="log({user_id: user.id})" translate>users/user/log</a>
+      </p>
+    </div>
+
+
+    <div *ngIf="pictures && pictures.length">
+      <h2 translate>users/user/recent-uploads</h2>
+      <div class="card card-body mb-4">
+        <ul>
+          <li *ngFor="let picture of pictures">
+            <a [href]="picture.url" class="picture-hover-preview" [innerHTML]="picture.name_html"></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div *ngIf="comments && comments.length > 0">
+      <h2>
+        {{'users/user/recent-comments'|translate}}
+        <small>
+          <a ui-sref="users-user-comments({identity: user.identity ? user.identity : 'user' + user.id})" translate>all-link</a>
+        </small>
+      </h2>
+      <div class="card card-body mb-4">
+        <ul class="comments">
+          <li *ngFor="let comment of comments">
+            <a [href]="comment.url" [textContent]="comment.preview"></a>
+          </li>
+          <li>&#xa0;...</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+  <div class="col-md-6">
+
+    <div class="card card-body mb-4" *ngIf="canBeInContacts">
+      <button type="submit" class="btn btn-lg btn-contact" [ngClass]="{'in-contacts': inContacts}" (click)="toggleInContacts()">
+        <span class="not-in-contacts">
+          <span class="fa fa-plus-circle"></span>
+          {{'user/add-to-contacts'|translate}}
+        </span>
+        <span class="in-contacts">
+          <span class="fa fa-minus-circle"></span>
+          {{'user/remove-from-contacts'|translate}}
+        </span>
+      </button>
+    </div>
+
+    <div *ngIf="canViewIp">
+      <h2 translate>users/for-moderators</h2>
+      <div class="card card-body mb-4">
+        <p *ngIf="canBan && user.photo">
+          <button class="btn btn-warning btn-block btn-delete-photo" (click)="deletePhoto()" translate>users/for-moderators/remove-photo</button>
+        </p>
+
+        <p *ngIf="canDeleteUser">
+          <button class="btn btn-danger btn-block btn-delete-user" (click)="deleteUser()" translate>users/for-moderators/remove-user</button>
+        </p>
+
+        <p>
+          {{'users/for-moderators/last-visit-from-ip'|translate}} {{user.last_ip}}
+        </p>
+
+        <div *ngIf="ip && ip.blacklist">
+          <p>
+            {{'ban/that-address-is-banned'|translate}}
+            <app-user *ngIf="ip.blacklist.user" [user]="ip.blacklist.user"></app-user>
+            <span *ngIf="ip.blacklist.up_to">
+              {{'ban/until'|translate}} {{ip.blacklist.up_to|date:'medium'}}
+              <span *ngIf="ip.blacklist.reason">
+                ({{ip.blacklist.reason}})
+              </span>
+            </span>
+          </p>
+
+          <div style="margin:10px 0" *ngIf="canBan">
+            <button class="btn btn-success" translate (click)="removeFromBlacklist()">ban/unban</button>
+          </div>
+        </div>
+
+        <form class="form-vertical" *ngIf="ip && ! ip.blacklist && ip.rights.add_to_blacklist">
+          <div class="form-group">
+            <label translate>ban/period</label>
+            <select [(ngModel)]="banPeriod" name="period" class="form-control" required>
+              <option *ngFor="let period of banPeriods" [value]="period.value">
+                {{period.name|translate}}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label translate>ban/reason</label>
+            <input maxlength="50" class="form-control" [(ngModel)]="banReason" name="reason" />
+          </div>
+          <button class="btn btn-danger" (click)="addToBlacklist(ip.address)" translate>ban/ban</button>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>

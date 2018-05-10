@@ -1,0 +1,101 @@
+<div class="nav nav-pills" style="margin-bottom:10px">
+  <a [ngClass]="{active: tab == 'catalogue'}" *ngIf="showCatalogueTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'catalogue'})"
+    ui-sref-opts="{inherit:false}">
+    <i class="fa fa-list"></i> Catalogue</a>
+  <a [ngClass]="{active: tab == 'brands'}" *ngIf="showBrandsTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'brands'})"
+    ui-sref-opts="{inherit:false}">
+    <i class="fa fa-list"></i> Brands</a>
+  <a [ngClass]="{active: tab == 'categories'}" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'categories'})"
+    ui-sref-opts="{inherit:false}">
+    <i class="fa fa-tag"></i> Categories</a>
+  <a [ngClass]="{active: tab == 'twins'}" *ngIf="showTwinsTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'twins'})"
+    ui-sref-opts="{inherit:false}">
+    <i class="fa fa-adjust"></i> Twins</a>
+  <a [ngClass]="{active: tab == 'factories'}" *ngIf="showFactoriesTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'factories'})"
+    ui-sref-opts="{inherit:false}">
+    <i class="fa fa-cogs"></i> {{'moder/vehicle/tabs/factories'|translate}}</a>
+</div>
+
+<div class="card card-body" *ngIf="tab == 'catalogue'">
+  <input type="text" [(ngModel)]="search" (change)="doSearch()" class="form-control" placeholder="Type to search ..." auto-focus
+  />
+  <table class="table" *ngIf="!brand_id">
+    <tbody>
+      <tr>
+        <td [ngStyle]="'width:' + 100/6 + '%'" *ngFor="let chunk of brands">
+          <ng-container *ngFor="let item of chunk">
+            <a ui-sref=".({brand_id: item.id})" [innerHTML]="item.name_html"></a>
+            <br />
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ul *ngIf="brand_id">
+    <li class="car-node" *ngFor="let item of items">
+      <app-moder-items-item-select-parent-tree [item]="item" [select]="select" [disableItemId]="item.id" [loadChilds]="loadChildCatalogues">
+      </app-moder-items-item-select-parent-tree>
+    </li>
+  </ul>
+  <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+</div>
+
+<div class="card card-body" *ngIf="tab == 'brands'">
+  <input type="text" [(ngModel)]="search" (change)="doSearch()" class="form-control" placeholder="Type to search ..." auto-focus
+  />
+  <table class="table">
+    <tbody>
+      <tr>
+        <td [ngStyle]="{width: 100/6 + '%'}" *ngFor="let chunk of brands">
+          <ng-container *ngFor="let item of chunk">
+            <a href="" (click)="select(item)" [innerHTML]="item.name_html"></a>
+            <br />
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+</div>
+
+<div class="card card-body" *ngIf="tab == 'categories'">
+  <ul>
+    <li class="car-node" *ngFor="let item of categories">
+      <app-moder-items-item-select-parent-tree-item [item]="item" [select]="select" [loadChilds]="loadChildCategories" [disableItemId]="item.id">
+      </app-moder-items-item-select-parent-tree-item>
+    </li>
+  </ul>
+  <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+</div>
+
+<div class="card card-body" *ngIf="tab == 'twins'">
+  <table class="table" *ngIf="!brand_id">
+    <tbody>
+      <tr>
+        <td [ngStyle]="'width:' + 100/6 + '%'" *ngFor="let chunk of brands">
+          <ng-container *ngFor="let item of chunk">
+            <a ui-sref=".({brand_id: item.id})" [innerHTML]="item.name_html"></a>
+            <br />
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ul *ngIf="brand_id">
+    <li class="car-node" *ngFor="let item of items">
+      <app-moder-items-item-select-parent-tree-item [item]="item" [select]="select" [disableItemId]="item.id">
+      </app-moder-items-item-select-parent-tree-item>
+    </li>
+  </ul>
+  <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+</div>
+
+<div class="card card-body" *ngIf="tab == 'factories'">
+  <ul>
+    <li class="car-node" *ngFor="let item of factories">
+      <app-moder-items-item-select-parent-tree-item [item]="item" [select]="select" [disableItemId]="item.id">
+      </app-moder-items-item-select-parent-tree-item>
+    </li>
+  </ul>
+  <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+</div>

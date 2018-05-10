@@ -1,0 +1,36 @@
+<div class="row">
+  <div class="col-lg-8 mb-4 order-2">
+    <div class="card card-body mb-4" *ngIf="accounts.length > 0 && !disconnectFailed && !connectFailed">
+      <div *ngFor="let account of accounts">
+        <p>
+          <button type="submit" class="btn btn-sm btn-danger" [title]="'account/accounts/remove'|translate" *ngIf="account.can_remove"
+            style="margin-right:16px" (click)="remove(account)">
+            <i class="fa fa-times"></i>
+          </button>
+          <i class="fa-fw {{account.icon}}"></i>
+          <a [href]="account.link" *ngIf="account.link" [textContent]="account.name"></a>
+          <span [textContent]="account.name" *ngIf="!account.link"></span>
+        </p>
+      </div>
+    </div>
+    <div class="card card-body" *ngIf="!disconnectFailed && !connectFailed">
+      <h3 translate>account/accounts/add</h3>
+      <div class="form-group">
+        <select name="service" class="form-control" [(ngModel)]="service">
+          <option *ngFor="let service of services" [value]="service.id">{{service.name}}</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" translate (click)="start()" [disabled]="!service">submit</button>
+    </div>
+    <div class="card card-body" *ngIf="disconnectFailed">
+      <app-markdown [markdown]="'account/accounts/disconnect-failed'|translate"></app-markdown>
+    </div>
+
+    <div class="card card-body" *ngIf="connectFailed">
+      <app-markdown [markdown]="'account/accounts/connect-failed'|translate"></app-markdown>
+    </div>
+  </div>
+  <div class="col-lg-4 mb-4 order-1">
+    <app-account-sidebar></app-account-sidebar>
+  </div>
+</div>

@@ -1,0 +1,62 @@
+<div class="car item-list-item">
+  <!--  data-module="car-list" -->
+
+  <h3>
+    <span [innerHTML]="item.name_html"></span>
+    <sup class="design-brand" *ngIf="item.design">{{'ng/carlist/designed by'|translate}}
+      <a [href]="item.design.url" [textContent]="item.design.name"></a>
+    </sup>
+
+    <small *ngIf="item.produced > 1">
+      <span *ngIf="item.produced_exactly" translate="ng/carlist/produced/%1$s" [translateParams]="{count: item.produced}"></span>
+      <span *ngIf="!item.produced_exactly" translate="ng/carlist/produced-about/%1$s" [translateParams]="{count: item.produced}"></span>
+    </small>
+    <small translate *ngIf="item.produced == 1">carlist/produced/one</small>
+  </h3>
+
+  <h4 [textContent]="item.name_default" *ngIf="item.name_default"></h4>
+
+  <div class="row">
+    <div class="col-6 col-sm-4 col-lg-2" *ngFor="let picture of pictures">
+      <a [href]="picture.url" *ngIf="picture.thumb_medium" class="d-block rounded mb-4">
+        <img [src]="picture.thumb_medium.src" [alt]="picture.name" [title]="picture.name" class="rounded w-100 border border-light"
+        />
+      </a>
+      <span *ngIf="!picture">&#xa0;</span>
+    </div>
+  </div>
+
+  <app-markdown class="text" *ngIf="item.description.length" [markdown]="item.description"></app-markdown>
+
+  <ul class="list-inline">
+    <li *ngIf="totalPictures > 6" class="list-inline-item">
+      <span class="fa fa-th"></span>
+      <a ui-sref="new-item({date: date, item_id: item.id, page: null})">{{'carlist/all pictures'|translate}} ({{totalPictures}})</a>
+    </li>
+
+    <li *ngIf="item.specs_url" class="list-inline-item">
+      <i class="fa fa-list-alt"></i>
+      <a [href]="item.specs_url" translate>carlist/specifications</a>
+    </li>
+
+    <li *ngFor="let twinsGroup of item.twins_groups" class="list-inline-item">
+      <i class="fa fa-adjust"></i>
+      <a [href]="'/twins/group' + twinsGroup.id" translate>carlist/twins</a>
+    </li>
+
+    <li *ngFor="let category of item.categories" class="list-inline-item">
+      <i class="fa fa-tag"></i>
+      <a [href]="category.url" [innerHTML]="category.name_html"></a>
+    </li>
+
+    <li *ngIf="is_moder" class="list-inline-item">
+      <i class="fa fa-cog"></i>
+      <a ui-sref="moder-items-item({id: item.id})" translate>moder/edit-object</a>
+    </li>
+
+    <li *ngIf="item.spec_editor_url" class="list-inline-item">
+      <i class="fa fa-pencil"></i>
+      <a [href]="item.spec_editor_url" translate>carlist/edit-specs</a>
+    </li>
+  </ul>
+</div>

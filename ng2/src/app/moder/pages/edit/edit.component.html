@@ -1,0 +1,58 @@
+<form class="card card-body form-vertical" (submit)="save()">
+  <div class="form-group">
+    <label translate>page/parent</label>
+    <select [(ngModel)]="item.parent_id" name="parent_id" class="form-control">
+      <option value="">None</option>
+      <option *ngFor="let page of pages" value="{{page.id}}">
+        {{'...'.repeat(page.level)}}{{'page/'+page.id+'/name' | translate}}
+      </option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label translate>page/name</label>
+    <input [(ngModel)]="item.name" name="name" maxlength="255" class="form-control" />
+  </div>
+  <div class="form-group">
+    <label>Title</label>
+    <input [(ngModel)]="item.title" name="title" maxlength="255" class="form-control" />
+  </div>
+  <div class="form-group">
+    <label>Breadcrumbs</label>
+    <input [(ngModel)]="item.breadcrumbs" name="breadcrumbs" maxlength="255" class="form-control" />
+  </div>
+  <div class="form-group">
+    <label>URL</label>
+    <input [(ngModel)]="item.url" name="url" maxlength="255" class="form-control" />
+  </div>
+  <div class="form-group">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" name="is_group_node" [(ngModel)]="item.is_group_node" /> {{'page/is_group_node'|translate}}
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" name="registered_only" [(ngModel)]="item.registered_only" /> {{'page/registered_only'|translate}}
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" name="guest_only" [(ngModel)]="item.guest_only" /> {{'page/guests_only'|translate}}
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <label translate>page/class</label>
+    <input [(ngModel)]="item.class" name="class" maxlength="255" class="form-control" />
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary" translate>send</button>
+    <span [hidden]="loading <= 0">
+      <i class="fa fa-spinner fa-spin fa-fw fa-3x"></i>
+    </span>
+  </div>
+</form>

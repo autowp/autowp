@@ -677,7 +677,7 @@ return [
                     [
                         'name'    => 'Between',
                         'options' => [
-                            'min' => 1,
+                            'min' => 0,
                             'max' => 500
                         ]
                     ]
@@ -800,7 +800,7 @@ return [
                     [
                         'name'    => 'Between',
                         'options' => [
-                            'min' => 1,
+                            'min' => 0,
                             'max' => 500
                         ]
                     ]
@@ -2376,7 +2376,7 @@ return [
                     [
                         'name'    => 'Between',
                         'options' => [
-                            'min' => 1,
+                            'min' => 0,
                             'max' => 500
                         ]
                     ]
@@ -2531,7 +2531,7 @@ return [
                     [
                         'name'    => 'Between',
                         'options' => [
-                            'min' => 1,
+                            'min' => 0,
                             'max' => 32
                         ]
                     ]

@@ -1,0 +1,17 @@
+<div class="card card-body">
+  <div class="btn-group" *ngFor="let group of groups">
+    <button *ngFor="let char of group" class="btn btn-secondary" [textContent]="char" (click)="selectChar(char)"></button>
+  </div>
+</div>
+
+<div [hidden]="!items">
+  <div class="card card-body">
+    <span [hidden]="loading <= 0">
+      <i class="fa fa-spinner fa-spin fa-fw"></i>
+    </span>
+    <div *ngFor="let item of items">
+      <a ui-sref="moder-items-item({id: item.id})" [innerHTML]="item.name_html"></a>
+    </div>
+    <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+  </div>
+</div>

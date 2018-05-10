@@ -1,0 +1,28 @@
+<div *ngIf="item.item.childs_count > 0">
+  <i class="fa fa-folder-o" [hidden]="item.open"></i>
+  <i class="fa fa-folder-open-o" [hidden]="!item.open"></i>
+  <span *ngIf="item.type_id == 1" translate>catalogue/related</span>
+  <span *ngIf="item.type_id == 2" translate>catalogue/sport</span>
+  <span *ngIf="item.type_id == 3" translate>catalogue/design</span>
+  <a href="#" class="toggle" (click)="item.open = !item.open; item.open && loadChilds(item)" [innerHTML]="item.item.name_html"></a>
+  <ul [hidden]="!item.open" class="list-unstyled">
+    <li [hidden]="!item.open && !item.childs && item.loading" style="margin-left:16px">
+      <span>
+        <i class="fa fa-spinner fa-spin fa-fw"></i>
+      </span>
+    </li>
+    <li *ngFor="let child of item.item.childs" style="margin-left:16px">
+      <app-upload-select-tree-item [item]="child" [loadChilds]="loadChilds">
+      </app-upload-select-tree-item>
+    </li>
+    <li style="margin-left:16px">
+      <a ui-sref="upload({item_id: item.item_id, perspective_id: null})" translate>upload/select/other-modification</a>
+    </li>
+  </ul>
+</div>
+<span *ngIf="(!item.item.childs_count || item.item.childs_count <= 0)">
+  <span *ngIf="item.type_id == 1" translate>catalogue/related</span>
+  <span *ngIf="item.type_id == 2" translate>catalogue/sport</span>
+  <span *ngIf="item.type_id == 3" translate>catalogue/design</span>
+  <a ui-sref="upload({item_id: item.item_id, perspective_id: null})" [innerHTML]="item.item.name_html"></a>
+</span>

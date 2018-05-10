@@ -1,0 +1,21 @@
+<div class="nav nav-pills">
+  <a class="nav-link" routerLink="/moder/traffic">Traffic</a>
+  <a class="nav-link active" routerLink="/moder/traffic/whitelist">Whitelist</a>
+</div>
+<table class="table table-striped table-condensed">
+  <tbody>
+    <tr *ngFor="let item of items">
+      <td [textContent]="item.ip"></td>
+      <td [textContent]="item.hostname"></td>
+      <td [textContent]="item.description"></td>
+      <td>
+        <a [href]="'http://nic.ru/whois/?query=' + item.whois_url">whois</a>
+      </td>
+      <td>
+        <button class="btn btn-danger" (click)="deleteItem(item)" style="margin:0" aria-label="Delete">
+          <i class="fa fa-times"></i>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>

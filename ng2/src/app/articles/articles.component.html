@@ -1,0 +1,23 @@
+<div class="card card-body">
+  <ul class="articleList">
+    <li *ngFor="let article of articles">
+      <a ui-sref="articles-article({catname: article.catname})" *ngIf="article.preview_url">
+        <img src="{{article.preview_url}}" style="float:left;margin:0 10px 4px 0" />
+      </a>
+
+      <p>
+        <a ui-sref="articles-article({catname: article.catname})" [textContent]="article.name"></a>
+      </p>
+      <p>
+        {{article.description}}
+        <a ui-sref="articles-article({catname: article.catname})" translate>carlist/details</a>
+      </p>
+      <p>
+        <app-user *ngIf="article.author" [user]="article.author"></app-user>
+        <span class="date" *ngIf="article.date" am-time-ago="article.date"></span>
+      </p>
+    </li>
+  </ul>
+
+  <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+</div>

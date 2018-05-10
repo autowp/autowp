@@ -1,0 +1,7 @@
+<div class="row">
+  <div class="col-sm-4">
+    <div [ngStyle]="{'margin-left': (deep * 40)+'px'}" [textContent]="row.short_name"></div>
+  </div>
+  <div class="col-sm-8" [textContent]="row.name"></div>
+</div>
+<app-info-spec-row [row]="row" [deep]="deep + 1" *ngFor="let row of row.childs"></app-info-spec-row>

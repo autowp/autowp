@@ -1,0 +1,37 @@
+<h2>
+  <span [innerHtml]="item.name_html"></span>
+  <small>
+    <span translate *ngIf="item.item_type_id == 1">car-of-day</span>
+    <span translate *ngIf="item.item_type_id != 1">theme-of-day</span>
+    <span *ngIf="user">
+      <span style="white-space:nowrap">by
+        <app-user [user]="user"></app-user>
+      </span>
+    </span>
+  </small>
+</h2>
+
+<div class="row mb-4" *ngIf="item.item_of_day_pictures">
+  <div class="col-sm-6">
+    <ng-container *ngFor="let picture of first">
+      <a [href]="picture.url" class="d-block rounded mb-4" *ngIf="picture">
+        <img [src]="picture.thumb.src" [alt]="picture.name_text" [title]="picture.name_text" class="rounded w-100 border border-light"
+        />
+      </a>
+    </ng-container>
+  </div>
+  <div class="col-sm-6">
+    <div class="row">
+      <ng-container *ngFor="let picture of others">
+        <a [href]="picture.url" class="d-block rounded mb-3 col-6" *ngIf="picture">
+          <img [src]="picture.thumb.src" [alt]="picture.name_text" [title]="picture.name_text" class="rounded w-100 border border-light"
+          />
+        </a>
+      </ng-container>
+    </div>
+  </div>
+</div>
+<p>
+  <span class="fa fa-trophy"></span>
+  <a routerLink="/donate/vod" translate>donate/vod/wants-to-select?</a>
+</p>

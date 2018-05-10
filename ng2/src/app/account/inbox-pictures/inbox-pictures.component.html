@@ -1,0 +1,13 @@
+<div class="row">
+  <div class="col-lg-8 mb-4 order-2">
+    <div class="row">
+      <div class="col-12 cols-sm-6 col-md-6 col-lg-4" *ngFor="let picture of pictures">
+        <app-thumbnail [picture]="picture"></app-thumbnail>
+      </div>
+    </div>
+    <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+  </div>
+  <div class="col-lg-4 mb-4 order-1">
+    <app-account-sidebar></app-account-sidebar>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+<ul *ngIf="!theme">
+  <li *ngFor="let theme of themes">
+    <a href="" [textContent]="theme.name|translate" (click)="selectTheme(theme)"></a>
+  </li>
+</ul>
+<div *ngIf="theme">
+  <p *ngFor="let topic of topics">
+    <a href="" [textContent]="topic.name" (click)="selectTopic(topic)"></a>
+  </p>
+</div>

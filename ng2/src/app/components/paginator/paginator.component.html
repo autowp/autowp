@@ -1,0 +1,21 @@
+<div *ngIf="data.pageCount > 1">
+  <p>
+    <a routerLink="." [queryParams]="{page: data.previous}" queryParamsHandling="merge" *ngIf="data.previous">←{{'previous'|translate}}</a>
+    <span *ngIf="!data.previous">←{{'previous'|translate}}</span>
+
+    <a routerLink="." [queryParams]="{page: data.next}" queryParamsHandling="merge" *ngIf="data.next">{{'next'|translate}}→</a>
+    <span *ngIf="!data.next">{{'next'|translate}}→</span>
+  </p>
+  <p>
+    <a routerLink="." [queryParams]="{page: data.first}" queryParamsHandling="merge" *ngIf="data.first < data.firstPageInRange">{{padd(data.first)}}</a>
+    <span *ngIf="data.first < data.firstPageInRange-1">…</span>
+
+    <span *ngFor="let page of pagesInRange()">
+      <a *ngIf="page != data.current" routerLink="." [queryParams]="{page: page}" queryParamsHandling="merge" [textContent]="padd(page)"></a>
+      <strong *ngIf="page == data.current" style="font-size:20px;margin:0 3px" [textContent]="padd(page)"></strong>
+    </span>
+
+    <span *ngIf="data.last > data.lastPageInRange+1">…</span>
+    <a routerLink="." [queryParams]="{page: data.last}" queryParamsHandling="merge" *ngIf="data.last > data.lastPageInRange">{{padd(data.last)}}</a>
+  </p>
+</div>

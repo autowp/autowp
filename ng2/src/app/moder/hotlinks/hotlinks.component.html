@@ -1,0 +1,31 @@
+<button class="btn btn-warning" (click)="clearAll()" *ngIf="canManage">Clear all</button>
+
+<table class="table table-border">
+  <thead>
+    <tr>
+      <th>Host</th>
+      <th>URL</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let host of hosts">
+      <td>
+        <div [textContent]="host.host"></div>
+        <button class="btn btn-warning" (click)="clear(host.host)" *ngIf="canManage">Clear</button>
+        <button class="btn btn-success" (click)="addToWhitelist(host.host)" *ngIf="canManage && !host.whitelisted">Whitelist</button>
+        <button class="btn btn-success" (click)="addToWhitelistAndClear(host.host)" *ngIf="canManage && !host.whitelisted">Whitelist&amp;Clear</button>
+        <button class="btn btn-danger" (click)="addToBlacklist(host.host)" *ngIf="canManage && !host.blacklisted">Blacklist</button>
+      </td>
+      <td>
+        <div *ngFor="let link of host.links">
+          {{link.last_date}}
+          <a [href]="link.url">{{link.url}}</a>
+          <small>({{link.count}})</small>
+          <br /> {{link.accept}}
+        </div>
+      </td>
+      <td [textContent]="host.count"></td>
+    </tr>
+  </tbody>
+</table>

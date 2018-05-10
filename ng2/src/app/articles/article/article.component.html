@@ -1,0 +1,5 @@
+<div class="card card-body">
+  <div class="article clearfix" [innerHTML]="article.html"></div>
+</div>
+
+<app-comments style="text-align:left;margin-bottom:20px;clear:both" [itemId]="article.id" [typeId]="4" [user]="user" *ngIf="article && article.enabled"></app-comments>

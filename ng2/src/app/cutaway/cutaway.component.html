@@ -1,0 +1,6 @@
+<div class="row">
+  <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let picture of pictures">
+    <app-thumbnail [picture]="picture"></app-thumbnail>
+  </div>
+</div>
+<app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>

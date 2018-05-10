@@ -1,0 +1,45 @@
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <div class="card card-body mb-4">
+      <form class="form-horizontal" (submit)="submit()">
+        <fieldset>
+          <legend translate>feedback/title</legend>
+          <div class="form-group row" [ngClass]="{'has-error': invalidParams && invalidParams.name}">
+            <label class="col-md-2 col-form-label" for="name" translate>feedback/name</label>
+            <div class="col-md-10">
+              <input type="text" name="name" maxlength="255" size="80" autocomplete="name" class="form-control" [(ngModel)]="form.name">
+              <p *ngFor="let message of invalidParams.name" [textContent]="message" class="help-block"></p>
+            </div>
+          </div>
+          <div class="form-group row" [ngClass]="{'has-error': invalidParams && invalidParams.email}">
+            <label class="col-md-2 col-form-label" for="email">E-mail</label>
+            <div class="col-md-10">
+              <input type="text" name="email" maxlength="255" size="80" autocomplete="email" class="form-control" [(ngModel)]="form.email">
+              <p *ngFor="let message of invalidParams.email" [textContent]="message" class="help-block"></p>
+            </div>
+          </div>
+          <div class="form-group row" [ngClass]="{'has-error': invalidParams && invalidParams.message}">
+            <label class="col-md-2 col-form-label" for="message" translate>feedback/message</label>
+            <div class="col-md-10">
+              <textarea name="message" cols="80" rows="8" class="form-control" [(ngModel)]="form.message"></textarea>
+              <p *ngFor="let message of invalidParams.message" [textContent]="message" class="help-block"></p>
+            </div>
+          </div>
+          <div class="form-group row" [ngClass]="{'has-error': invalidParams && invalidParams.captcha}" *ngIf="showCaptcha">
+            <div class="col-md-10 offset-md-2">
+              <div vc-recaptcha key="recaptchaKey" *ngIf="recaptchaKey" [(ngModel)]="form.captcha"></div>
+              <p *ngFor="let message of invalidParams.captcha" [textContent]="message" class="help-block"></p>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-md-2"></div>
+            <div class="col-md-10">
+              <button type="submit" class="btn btn-primary" translate>submit</button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <app-markdown [markdown]="'feedback/donate-text'|translate"></app-markdown>
+  </div>
+</div>

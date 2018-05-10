@@ -1,0 +1,28 @@
+<div class="row">
+  <div class="col-lg-8 mb-4 order-2">
+    <div class="row">
+      <div class="col-md-6" *ngFor="let chunk of chunks">
+        <ul class="media-list">
+          <li class="media" *ngFor="let user of chunk">
+            <div class="media-left media-middle">
+              <a ui-sref="users-user({identity: user.identity ? user.identity : 'user' + user.id})" *ngIf="!user.deleted" class="photo">
+                <img [src]="user.avatar.src" *ngIf="user.avatar" class="rounded" />
+                <img [src]="user.gravatar" *ngIf="user.gravatar && ! user.avatar" class="rounded" />
+              </a>
+            </div>
+            <div class="media-body">
+              <a href="#" class="close" (click)="deleteContact(user.id)">&times;</a>
+              <h4 class="media-heading">
+                <app-user [user]="user"></app-user>
+              </h4>
+              <p *ngIf="user.last_online" am-time-ago="user.last_online"></p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 mb-4 order-1">
+    <app-account-sidebar></app-account-sidebar>
+  </div>
+</div>

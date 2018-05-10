@@ -1,0 +1,25 @@
+<div *ngIf="!brandId">
+  <div style="margin-bottom:20px">
+    <input type="text" [(ngModel)]="search" (change)="loadBrands()" class="form-control" placeholder="Type to search ..." auto-focus
+    />
+  </div>
+  <span [hidden]="loading <= 0">
+    <i class="fa fa-spinner fa-spin fa-fw fa-4x"></i>
+  </span>
+  <div class="row">
+    <div class="col-md-2" *ngFor="let chunk of brands">
+      <ng-container *ngFor="let brand of chunk">
+        <a ui-sref="cars-select-engine({brand_id: brand.id})" [textContent]="brand.name_only"></a>
+        <br />
+      </ng-container>
+    </div>
+  </div>
+
+  <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+</div>
+<div *ngIf="brandId">
+  <div *ngFor="let item of items">
+    <app-cars-select-engine-tree-item [item]="item" [selectEngine]="selectEngine" [loadChilds]="loadChildCatalogues">
+    </app-cars-select-engine-tree-item>
+  </div>
+</div>

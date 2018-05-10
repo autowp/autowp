@@ -1,0 +1,415 @@
+<div class="row mb-4">
+  <div class="col-md-2">
+    <img *ngIf="randomPicture.thumb_medium" [src]="randomPicture.thumb_medium.src" alt="" class="mb-4 w-100 rounded border border-light"
+    />
+  </div>
+  <div class="col-md-5">
+    <div class="card card-body mb-4">
+      <p translate="ng/moder/database-id-n" [translateParams]="{id: item.id}"></p>
+
+      <p *ngIf="specsAllowed && canEditSpecifications">
+        <a ui-sref="cars-specifications-editor({item_id: item.id})" translate>carlist/edit-specs</a>
+        <span class="badge badge-pill badge-secondary" *ngIf="item.specifications_count" [textContent]="item.specifications_count"></span>
+      </p>
+      <p>
+        <a ui-sref="log({item_id: item.id})" translate>moder/log-of-events</a>
+      </p>
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div class="card card-body mb-4">
+      <p translate>moder/vehicle/subscription/title</p>
+      <p class="subscription">
+        <button class="btn" [ngClass]="{'btn-success': item.subscription, 'btn-secondary': !item.subscription}" (click)="toggleSubscription()">
+          <span [hidden]="!item.subscription">
+            <i class="fa fa-check"></i>
+            {{'moder/vehicle/subscription/subscribed'|translate}}
+          </span>
+          <span [hidden]="item.subscription">
+            <i class="fa fa-times"></i>
+            {{'moder/vehicle/subscription/not-subscribed'|translate}}
+          </span>
+        </button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<ul class="nav nav-tabs" id="myTab">
+  <li *ngFor="let ctab of tabs" class="nav-item">
+    <a href="#" (click)="setActiveTab(ctab.id)" class="nav-link" [ngClass]="{active: ctab.active}">
+      <span *ngIf="ctab.icon" class="{{ctab.icon}}"></span>
+      <span [textContent]="ctab.title|translate"></span>
+      <span class="badge badge-pill badge-secondary" *ngIf="ctab.count" [textContent]="ctab.count"></span>
+    </a>
+  </li>
+</ul>
+
+<div class="tab-content card card-body">
+  <div class="tab-pane" [ngClass]="{active: tabs.meta.active}">
+    <ngb-progressbar type="success" [striped]="true" [animated]="true" [value]="100" [hidden]="metaLoading <= 0"></ngb-progressbar>
+    <app-item-meta-form *ngIf="canEditMeta" [item]="item" (submit)="saveMeta()" [invalidParams]="invalidParams"></app-item-meta-form>
+
+    <table class="table table-condensed" *ngIf="!canEditMeta">
+      <tr>
+        <td>{{'moder/vehicle/name'|translate}}:</td>
+        <td [innerHTML]="item.name_html"></td>
+      </tr>
+      <tr>
+        <td>{{'moder/vehicle/body'|translate}}:</td>
+        <td [textContent]="item.body"></td>
+      </tr>
+      <tr>
+        <td>{{'moder/vehicle/begin'|translate}}:</td>
+        <td>
+          {{item.begin_year > 0 ? item.begin_year : '????'}} {{item.begin_month > 0 ? item.begin_month : '??'}}
+        </td>
+      </tr>
+      <tr>
+        <td valign="top">{{'moder/vehicle/end'|translate}}:</td>
+        <td>
+          {{item.end_year > 0 ? item.end_year : '????'}} {{item.end_month > 0 ? item.end_month : '??'}}
+          <span *ngIf="item.today === true" translate>moder/vehicle/today/continue</span>
+          <span *ngIf="item.today === false" translate>moder/vehicle/today/ended</span>
+        </td>
+      </tr>
+      <tr>
+        <td>{{'moder/item/produced'|translate}}:</td>
+        <td>
+          {{item.produced}}
+          <span *ngIf="item.produced_exactly" translate>moder/item/produced/exactly</span>
+          <span *ngIf="!item.produced_exactly" translate>moder/item/produced/about</span>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top">{{'moder/vehicle/concept'|translate}}:</td>
+        <td>{{item.is_concept ? 'Yes' : 'No'}}</td>
+      </tr>
+    </table>
+  </div>
+  <div *ngIf="tabs.logo" class="tab-pane" [ngClass]="{active: tabs.logo.active}">
+    <app-markdown *ngIf="canLogo" [markdown]="'moder/brands/logo/description'|translate"></app-markdown>
+    <img [src]="item.logo.src" style="max-width:100%" *ngIf="item.logo" />
+    <div *ngIf="canLogo">
+      <form method="post" (submit)="uploadLogo()">
+        <div class="form-group">
+          <input type="file" name="logo" id="logo-upload" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary" translate>submit</button>
+        <span [hidden]="logoLoading <= 0">
+          <i class="fa fa-spinner fa-spin fa-fw"></i>
+        </span>
+      </form>
+    </div>
+  </div>
+  <div class="tab-pane" [ngClass]="{active: tabs.name.active}">
+    <form method="post" class="form-horizontal" (submit)="saveLanguages()">
+      <ul class="nav nav-tabs" style="margin-bottom:20px">
+        <li *ngFor="let language of itemLanguages" class="nav-item">
+          <a href="#" (click)="currentLanguage = language.language" [ngClass]="{active: language.language == currentLanguage}" class="nav-link">
+            {{language.language.toUpperCase()}}
+            <span class="badge badge-pill badge-secondary" [hidden]="!language.name.length && !language.text.length && !language.full_text.length">
+              {{(language.name.length ? 1 : 0) + (language.text.length ? 1 : 0) + (language.full_text.length ? 1 : 0)}}
+            </span>
+          </a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane" [ngClass]="{active: language.language == currentLanguage}" *ngFor="let language of itemLanguages">
+          <div class="form-group row">
+            <label class="col-md-2 col-form-label" translate>moder/vehicle/name</label>
+            <div class="col-md-10">
+              <input type="text" [(ngModel)]="language.name" name="name" maxlength="255" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-2 col-form-label" translate>moder/item/short-description</label>
+            <div class="col-md-10">
+              <app-markdown-edit [text]="language.text"></app-markdown-edit>
+              <p *ngIf="language.text_id" class="text-right">
+                <a ui-sref="info-text({id: language.text_id})" translate>moder/markdown/history</a>
+              </p>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-2 col-form-label" translate>moder/item/full-description</label>
+            <div class="col-md-10">
+              <app-markdown-edit [text]="language.full_text"></app-markdown-edit>
+              <p *ngIf="language.full_text_id" class="text-right">
+                <a ui-sref="info-text({id: language.full_text_id})" translate>moder/markdown/history</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" translate>submit</button>
+        <span [hidden]="languagesLoading <= 0">
+          <i class="fa fa-spinner fa-spin fa-fw"></i>
+        </span>
+      </div>
+    </form>
+  </div>
+
+  <div class="tab-pane" [ngClass]="{active: tabs.catalogue.active}">
+    <span [hidden]="catalogueLoading <= 0">
+      <i class="fa fa-spinner fa-spin fa-fw"></i>
+    </span>
+    <a *ngIf="item.is_group && canMove && item.childs_count > 0" ui-sref="moder-items-item-organize({id: item.id, item_type_id: organizeTypeId})"
+      class="btn btn-secondary" translate>moder/vehicle/catalogue/turbo-group-creator</a>
+    <table class="table">
+      <thead>
+        <tr>
+          <th translate>moder/vehicle/catalogue/title/name</th>
+          <th translate>moder/vehicle/catalogue/title/link</th>
+          <th translate>moder/vehicle/catalogue/title/public</th>
+          <th translate *ngIf="canMove">moder/vehicle/catalogue/title/remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr [hidden]="!canHaveParents || !canMove">
+          <td colspan="4">
+            <form class="car-add-parent" method="post">
+              <div class="input-group" style="max-width:400px">
+                <input type="text" name="parent" class="form-control item-autocomplete" placeholder="{{'moder/vehicle/catalogue/select-placeholder'|translate}}"
+                  autocomplete="off" />
+
+                <div class="btn-group" style="white-space:nowrap">
+                  <a class="btn btn-secondary" ui-sref="moder-items-item-select-parent({id: item.id})" translate>moder/vehicle/catalogue/select</a>
+                  <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a *ngIf="canHaveParentBrand" class="dropdown-item" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'brands'})">
+                      <i class="fa fa-plus"></i>
+                      {{'moder/vehicle/catalogue/add-brand'|translate}}
+                    </a>
+                    <ng-container *ngIf="canHaveParentBrand">
+                      <a class="dropdown-item" href="#" (click)="addParent(brand.id)" *ngFor="let brand of suggestions">
+                        <i class="fa fa-plus"></i>
+                        <span translate="ng/moder/vehicle/catalogue/add-brand-{brand}" [translateParams]="{brand: brand.name_text}"></span>
+                      </a>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </td>
+        </tr>
+        <tr data-id="{{item.id}}" *ngFor="let item of parents">
+          <td>
+            <i class="fa fa-arrow-up"></i>
+            <a ui-sref="moder-items-item({id: item.parent_id})" [innerHTML]="item.parent.name_html"></a>
+            <div class="text-warning" *ngIf="item.duplicate_parent">
+              <small>
+                {{'moder/vehicle/catalogue/possible-duplicate-parent'|translate}}
+                <a ui-sref="moder-items-item({id: item.duplicate_parent.id})" [innerHTML]="item.duplicate_parent.name_html"></a>
+              </small>
+            </div>
+          </td>
+          <td>
+            <a ui-sref="moder-item-parent({item_id: item.item_id, parent_id: item.parent_id})">
+              {{item.name}}
+              <span class="fa fa-pencil"></span>
+            </a>
+          </td>
+          <td class="urls">
+            <ng-container *ngFor="let url of item.parent.public_urls">
+              <a [href]="url" [textContent]="url"></a>
+              <br />
+            </ng-container>
+          </td>
+          <td *ngIf="canMove">
+            <button type="submit" class="btn btn-sm btn-danger" (click)="deleteParent(item.parent_id)">
+              <i class="fa fa-times"></i>
+            </button>
+          </td>
+        </tr>
+        <tr class="success" data-id="{{item.id}}">
+          <td colspan="2">
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <i class="fa fa-arrow-right"></i>
+            <span [innerHTML]="item.name_html"></span>
+          </td>
+          <td class="urls">
+            <!--ng-container *ngFor="let url of item.parent.publicUrls">
+              <a [href]="url" [textContent]="url"></a>
+              <br />
+            </ng-container-->
+          </td>
+          <td *ngIf="canMove"></td>
+        </tr>
+        <tr data-id="{{item.id}}" *ngFor="let item of childs">
+          <td>
+            <i class="fa fa-arrow-down"></i>
+            <span *ngIf="item.type_id == 1" translate>moder/vehicle/link-type-prefix/related</span>
+            <span *ngIf="item.type_id == 3" translate>moder/vehicle/link-type-prefix/design</span>
+            <span *ngIf="item.type_id == 2" translate>moder/vehicle/link-type-prefix/sport</span>
+            <a ui-sref="moder-items-item({id: item.item_id})" [href]="item.url" [innerHTML]="item.item.name_html"></a>
+            <div *ngIf="item.duplicate_child" class="text-warning">
+              <small>
+                {{'moder/vehicle/catalogue/possible-duplicate-child'|translate}}
+                <a ui-sref="moder-items-item({id: item.duplicate_child.id})" [innerHTML]="item.duplicate_child.name_html"></a>
+              </small>
+            </div>
+          </td>
+          <td>
+            <a ui-sref="moder-item-parent({item_id: item.item_id, parent_id: item.parent_id})">
+              {{item.name}}
+              <span class="fa fa-pencil"></span>
+            </a>
+          </td>
+          <td class="urls">
+            <ng-container *ngFor="let url of item.item.public_urls">
+              <a [href]="url" [textContent]="url"></a>
+              <br />
+            </ng-container>
+          </td>
+          <td *ngIf="canMove">
+            <button class="btn btn-sm btn-danger" (click)="deleteChild(item.item_id)">
+              <i class="fa fa-times"></i>
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="item.is_group && canMove && item.item_type_id == 5">
+          <td colspan="2">
+            <i class="fa fa-plus"></i>
+            <a ui-sref="moder-items-new({item_type_id: 2, parent_id: item.id})" translate>moder/vehicle/catalogue/add-engine</a>
+          </td>
+          <td class="urls"></td>
+          <td></td>
+        </tr>
+        <tr *ngIf="item.is_group && canMove && item.item_type_id == 5">
+          <td colspan="2">
+            <i class="fa fa-plus"></i>
+            <a ui-sref="moder-items-new({item_type_id: 1, parent_id: item.id})" translate>moder/vehicle/catalogue/add-vehicle</a>
+          </td>
+          <td class="urls"></td>
+          <td></td>
+        </tr>
+        <tr *ngIf="item.is_group && canMove && item.item_type_id == 3">
+          <td colspan="2">
+            <i class="fa fa-plus"></i>
+            <a ui-sref="moder-items-new({item_type_id: 3, parent_id: item.id})" translate>moder/vehicle/catalogue/add-category</a>
+          </td>
+          <td class="urls"></td>
+          <td></td>
+        </tr>
+        <tr *ngIf="item.is_group && canMove && item.item_type_id == 3">
+          <td colspan="2">
+            <i class="fa fa-plus"></i>
+            <a ui-sref="moder-items-new({item_type_id: 2, parent_id: item.id})" translate>moder/vehicle/catalogue/add-engine</a>
+          </td>
+          <td class="urls"></td>
+          <td></td>
+        </tr>
+        <tr *ngIf="item.is_group && canMove && item.item_type_id == 3">
+          <td colspan="2">
+            <i class="fa fa-plus"></i>
+            <a ui-sref="moder-items-new({item_type_id: 1, parent_id: item.id})" translate>moder/vehicle/catalogue/add-vehicle</a>
+          </td>
+          <td class="urls"></td>
+          <td></td>
+        </tr>
+        <tr *ngIf="item.is_group && canMove && (![4, 6, 3].includes(item.item_type_id))">
+          <td colspan="2">
+            <i class="fa fa-plus"></i>
+            <a ui-sref="moder-items-new({item_type_id: item.item_type_id, parent_id: item.id})">
+              {{(item.item_type_id == 2 ? 'moder/vehicle/catalogue/add-engine' : 'moder/vehicle/catalogue/add-vehicle') | translate}}
+            </a>
+          </td>
+          <td class="urls"></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="tabs.tree" class="tab-pane" [ngClass]="{active: tabs.tree.active}" id="tree">
+    <div class="tree">
+      <app-moder-items-item-tree [item]="tree"></app-moder-items-item-tree>
+    </div>
+  </div>
+  <div *ngIf="tabs.vehicles" class="tab-pane" [ngClass]="{active: tabs.vehicles.active}" id="vehicles">
+    <h4 translate>moder/engines/engine/vehicles</h4>
+    <ng-container *ngFor="let item of engineVehicles">
+      <a ui-sref="moder-items-item({id: item.id, tab: 'meta'})" [innerHTML]="item.name_html"></a>
+      <br />
+    </ng-container>
+  </div>
+  <div *ngIf="tabs.pictures" class="tab-pane" [ngClass]="{active: tabs.pictures.active}" id="pictures">
+    <p class="btn-group" *ngIf="canUseTurboGroupCreator">
+      <a ui-sref="moder-items-item-organize-pictures({id: item.id})" class="btn btn-secondary" translate>moder/vehicle/pictures/turbo-group-creator</a>
+    </p>
+    <div class="row" *ngFor="let chunk of picturesChunks">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let picture of chunk">
+        <app-thumbnail [picture]="picture"></app-thumbnail>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="tabs.links" class="tab-pane" [ngClass]="{active: tabs.links.active}" id="links">
+    <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="linksLoading <= 0"></ngb-progressbar>
+    <form *ngIf="canEditMeta" method="post" (submit)="saveLinks()">
+      <table class="table table-condensed table-striped">
+        <thead>
+          <tr>
+            <th translate>moder/brands/links/text</th>
+            <th translate>moder/brands/links/address</th>
+            <th translate>moder/brands/links/type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let link of links">
+            <td>
+              <input type="text" name="name" [(ngModel)]="link.name" class="form-control" />
+            </td>
+            <td>
+              <input type="text" name="url" [(ngModel)]="link.url" class="form-control" />
+            </td>
+            <td>
+              <select name="type" [(ngModel)]="link.type_id" class="form-control">
+                <option value="default" translate>moder/brands/links/type/interest-link</option>
+                <option value="official" translate>moder/brands/links/type/official</option>
+                <option value="club" translate>moder/brands/links/type/club</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="text" name="name" [(ngModel)]="newLink.name" class="form-control" />
+            </td>
+            <td>
+              <input type="text" name="url" [(ngModel)]="newLink.url" class="form-control" />
+            </td>
+            <td>
+              <select name="type" [(ngModel)]="newLink.type_id" class="form-control">
+                <option value="default" translate>moder/brands/links/type/interest-link</option>
+                <option value="official" translate>moder/brands/links/type/official</option>
+                <option value="club" translate>moder/brands/links/type/club</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3">
+              <button class="btn btn-primary" type="submit" translate>submit</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+    <table class="table table-condensed table-stripped" *ngIf="!canEditMeta">
+      <tbody>
+        <tr>
+          <th translate>moder/brands/links/text</th>
+          <th translate>moder/brands/links/address</th>
+          <th translate>moder/brands/links/type</th>
+        </tr>
+        <tr *ngFor="let link of links">
+          <td [textContent]="link.name"></td>
+          <td [textContent]="link.url"></td>
+          <td [textContent]="link.type_id"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

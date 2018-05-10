@@ -1,0 +1,36 @@
+<p>
+  <a ui-sref="moder-items-item({id: parent.id, tab: 'catalogue'})" [innerHTML]="parent.name_html"></a>
+  &rarr;
+  <a ui-sref="moder-items-item({id: item.id, tab: 'catalogue'})" [innerHTML]="item.name_html"></a>
+</p>
+
+<form method="post" class="form-horizontal" (submit)="save()">
+  <fieldset>
+    <div class="form-group row">
+      <label class="col-md-2 col-form-label">Catname</label>
+      <div class="col-md-10">
+        <input type="text" name="catname" maxlength="150" [(ngModel)]="itemParent.catname" class="form-control" />
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-md-2 col-form-label" for="type">Type</label>
+      <div class="col-md-10">
+        <select name="type_id" class="form-control" [(ngModel)]="itemParent.type_id">
+          <option *ngFor="let option of typeOptions" [value]="option.value">{{option.name|translate}}</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group row" *ngFor="let language of languages" [ngClass]="{'has-error':language.invalidParams}">
+      <label class="col-md-2 col-form-label">{{language.language.toUpperCase()}} Name</label>
+      <div class="col-md-10">
+        <input type="text" name="name" maxlength="255" class="form-control" [(ngModel)]="language.name" />
+        <p *ngFor="let message of language.invalidParams.name" [textContent]="message" class="help-block"></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-10 offset-md-2">
+        <input type="submit" name="submit" class="btn btn-primary" value="Отправить">
+      </div>
+    </div>
+  </fieldset>
+</form>

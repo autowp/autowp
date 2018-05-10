@@ -275,29 +275,41 @@ class CommentController extends AbstractRestfulController
 
         $paginator = $this->comments->service()->getMessagesPaginator($options);
 
+        if (strlen($values['limit']) > 0) {
+            $limit = (int)$values['limit'];
+            $limit = $limit >= 0 ? $limit : 0;
+        } else {
+            $limit = 1;
+        }
+
         $paginator
-            ->setItemCountPerPage($values['limit'] ? $values['limit'] : 500)
+            ->setItemCountPerPage($limit ? $limit : 500)
             ->setCurrentPageNumber($values['page']);
 
-        $this->hydrator->setOptions([
-            'fields'   => $values['fields'],
-            'language' => $this->language(),
-            'user_id'  => $user ? $user['id'] : null
-        ]);
+        $result = [
+            'paginator' => get_object_vars($paginator->getPages())
+        ];
 
-        $comments = [];
-        foreach ($paginator->getCurrentItems() as $commentRow) {
-            $comments[] = $this->hydrator->extract($commentRow);
+        if ($limit > 0) {
+            $this->hydrator->setOptions([
+                'fields'   => $values['fields'],
+                'language' => $this->language(),
+                'user_id'  => $user ? $user['id'] : null
+            ]);
+
+            $comments = [];
+            foreach ($paginator->getCurrentItems() as $commentRow) {
+                $comments[] = $this->hydrator->extract($commentRow);
+            }
+
+            if ($user && $values['item_id'] && $values['type_id']) {
+                $this->comments->service()->markSubscriptionAwaiting($values['type_id'], $values['item_id'], $user['id']);
+            }
+
+            $result['items'] = $comments;
         }
 
-        if ($user && $values['item_id'] && $values['type_id']) {
-            $this->comments->service()->markSubscriptionAwaiting($values['type_id'], $values['item_id'], $user['id']);
-        }
-
-        return new JsonModel([
-            'paginator' => get_object_vars($paginator->getPages()),
-            'items'     => $comments
-        ]);
+        return new JsonModel($result);
     }
 
     private function nextMessageTime()

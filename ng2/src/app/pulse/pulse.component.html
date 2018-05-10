@@ -1,0 +1,6 @@
+<div id="pulse-graph" style="height:600px;background:#333;margin-bottom:10px"></div>
+<p class="legend">
+  <span [ngStyle]="{color: item.color}" (mouseover)="selectUser(item.id)" (mouseout)="deselectUser()" *ngFor="let item of legend">
+    <app-user [user]="item.user"></app-user>
+  </span>
+</p>

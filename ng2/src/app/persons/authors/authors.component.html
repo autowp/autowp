@@ -1,0 +1,12 @@
+<ul class="nav nav-pills">
+  <li class="nav-item">
+    <a class="nav-link" routerLink="/persons" translate>persons/content-persons</a>
+  </li>
+  <li>
+    <a class="nav-link active" routerLink="/persons/authors" translate>persons/author-persons</a>
+  </li>
+</ul>
+
+<app-item [item]="item" *ngFor="let item of items"></app-item>
+
+<app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>

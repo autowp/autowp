@@ -1,0 +1,3 @@
+<i class="fa fa-clock-o" [hidden]="past"></i>
+<i class="fa fa-calendar" [hidden]="!past"></i>
+<span *ngIf="date" am-time-ago="date"></span>

@@ -1,0 +1,50 @@
+<div class="card card-body">
+  <form class="form-horizontal">
+    <fieldset>
+      <div class="form-group row">
+        <label class="col-md-2 col-form-label" for="user_id" translate>specifications-editor/log/filter/user-id</label>
+        <div class="col-md-10">
+          <input type="text" name="user_id" class="form-control" />
+        </div>
+      </div>
+    </fieldset>
+  </form>
+  <table class="specs-log table table-stripped">
+    <thead>
+      <tr>
+        <th translate>specifications-editor/log/date</th>
+        <th translate>specifications-editor/log/user</th>
+        <th translate>specifications-editor/log/object</th>
+        <th translate>specifications-editor/log/attribute</th>
+        <th translate>specifications-editor/log/value</th>
+        <th translate>specifications-editor/log/editor</th>
+      </tr>
+    </thead>
+    <tr *ngFor="let item of items">
+      <td>
+        <p *ngIf="item.update_date" am-time-ago="item.update_date"></p>
+      </td>
+      <td>
+        <app-user [user]="item.user" *ngIf="item.user"></app-user>
+      </td>
+      <td>
+        <a ui-sref="moder-items-item({id: item.item_id})" *ngIf="isModer" [innerHTML]="item.item.name_html"></a>
+        <span *ngIf="!isModer" [innerHTML]="item.item.name_html"></span>
+      </td>
+      <td class="attribute">
+        <ng-container *ngFor="let node of item.path; let i = index">
+          <span [textContent]="node | translate"></span>
+          <span *ngIf="!i"> / </span>
+        </ng-container>
+      </td>
+      <td style="text-align:center">
+        {{item.value_text}}
+        <span class="unit" *ngIf="item.unit" [textContent]="item.unit.abbr|translate"></span>
+      </td>
+      <td class="link">
+        <a [href]="'/cars/car-specifications-editor/item_id/' + item.item_id" translate>specifications-editor/log/to-editor</a>
+      </td>
+    </tr>
+  </table>
+</div>
+<app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>

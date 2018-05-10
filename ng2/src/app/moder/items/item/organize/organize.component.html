@@ -1,0 +1,24 @@
+<app-markdown [markdown]="'moder/vehicle/catalogue/turbo-group-creator/text'|translate"></app-markdown>
+
+<app-item-meta-form [hidden]="loading > 0" disable-is-group="true" hide-submit="true" item="newItem" submit="saveMeta()"
+  invalid-params="invalidParams" control="control"></app-item-meta-form>
+
+<div class="form-group row" [hidden]="loading > 0">
+  <label class="col-md-2 col-form-label text-right" translate>moder/vehicle/catalogue/turbo-group-creator/vehicles</label>
+  <div class="col-md-10">
+    <div class="checkbox" *ngFor="let child of childs">
+      <label>
+        <input type="checkbox" [(ngModel)]="child.selected" (change)="childSelected()" />
+        <span [innerHTML]="child.item.name_html"></span>
+      </label>
+    </div>
+  </div>
+</div>
+<div class="form-group row">
+  <div class="col-md-10 offset-md-2">
+    <button type="submit" name="submit" class="btn btn-primary" translate (click)="submit()" [disabled]="!hasSelectedChild || loading > 0">submit</button>
+    <span [hidden]="loading <= 0">
+      <i class="fa fa-spinner fa-spin fa-fw"></i>
+    </span>
+  </div>
+</div>

@@ -10,7 +10,7 @@ import './directives/markdown-edit';
 import './directives/paginator/index';
 import './directives/past-time-indicator';
 import './directives/picture-moder-vote';
-import './directives/thumbnail';  
+import './directives/thumbnail';
 import './directives/user/index';
 
 import './services/acl';
@@ -50,7 +50,6 @@ import './controllers/forums';
 import './controllers/inbox';
 import './controllers/info';
 import './controllers/log';
-import './controllers/login';
 import './controllers/map';
 import './controllers/mascots';
 import './controllers/museum';

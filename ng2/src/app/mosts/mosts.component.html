@@ -1,0 +1,84 @@
+<h1 class="mb-4 mosts-header">
+  <span translate>mosts/most</span>
+  <div class="dropdown d-inline-block">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <ng-container *ngFor="let rating of ratings">
+        <span *ngIf="rating.catname == ratingCatname" [textContent]="rating.name|translate">
+        </span>
+      </ng-container>
+      <i class="fa fa-caret-down" aria-hidden="true"></i>
+    </a>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px;overflow-x: hidden;">
+      <a *ngFor="let rating of ratings" [ngClass]="{active: rating.catname == ratingCatname}" class="dropdown-item" ui-sref=".({rating_catname: rating.catname})"
+        [textContent]="rating.name|translate">
+      </a>
+    </div>
+  </div>
+
+  <span translate>mosts/among</span>
+
+  <div class="dropdown d-inline-block">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <ng-container *ngFor="let type of vehilceTypes">
+        <span *ngIf="type.catname == typeCatname" [textContent]="type.name|translate">
+        </span>
+      </ng-container>
+      <span *ngIf="!atname" translate>item/type/1/name</span>
+      <i class="fa fa-caret-down" aria-hidden="true"></i>
+    </a>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px;overflow-x: hidden;">
+      <a *ngFor="let type of vehilceTypes" class="dropdown-item" [ngClass]="{active: type.catname == typeCatname}" ui-sref=".({rating_catname: ratingCatname, type_catname: type.catname})"
+        [textContent]="type.name|translate"></a>
+    </div>
+  </div>
+
+  <div class="dropdown d-inline-block" *ngIf="defaultTypeCatname">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <ng-container *ngFor="let year of years">
+        <span *ngIf="year.catname ? year.catname == yearsCatname : !yearsCatname" [textContent]="year.name|translate"></span>
+      </ng-container>
+      <i class="fa fa-caret-down" aria-hidden="true"></i>
+    </a>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px;overflow-x: hidden;">
+      <a *ngFor="let year of years" [ngClass]="{active: year.catname ? year.catname == yearsCatname : !yearsCatname}" class="dropdown-item"
+        ui-sref=".({rating_catname: rating.catname, type_catname: typeCatname ? typeCatname : defaultTypeCatname, years_catname: year.catname})"
+        [textContent]="year.name|translate">
+      </a>
+    </div>
+  </div>
+</h1>
+
+<span [hidden]="loading <= 0">
+  <i class="fa fa-spinner fa-spin fa-fw"></i>
+</span>
+
+<ng-container *ngFor="let item of items; let i = index">
+  <div class="row">
+    <div class="col-md-9">
+      <h3 [innerHTML]="item.item.name_html"></h3>
+    </div>
+    <div class="col-md-3">
+      <h3 [textContent]="'most/' + ratingCatname + '/param' | translate" *ngIf="i"></h3>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col-md-9">
+      <div class="row">
+        <div class="col-md-4" *ngFor="let picture of item.pictures">
+          <a [href]="picture.url" class="rounded d-block mb-4" *ngIf="picture">
+            <img class="rounded w-100 border border-light" [src]="picture.src" [alt]="picture.name" [title]="picture.name" />
+          </a>
+          <span *ngIf="!picture">&#xa0;</span>
+        </div>
+      </div>
+      <app-markdown *ngIf="item.item.description" [markdown]="item.item.description|translate"></app-markdown>
+    </div>
+    <div class="col-md-3">
+      <h3>
+        <span *ngIf="item.value_html" [innerHTML]="item.value_html"></span>
+        <span *ngIf="!item.value_html && item.value_text" [innerHTML]="item.value_text"></span>
+        <small class="unit" [title]="item.unit.name|translate" *ngIf="item.unit" [textContent]="item.unit.abbr | translate"></small>
+      </h3>
+    </div>
+  </div>
+</ng-container>

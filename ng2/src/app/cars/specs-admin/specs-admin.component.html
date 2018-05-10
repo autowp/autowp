@@ -1,0 +1,42 @@
+<table class="table table-stripped">
+  <thead>
+    <tr>
+      <th translate>specifications-editor/admin/date</th>
+      <th translate>specifications-editor/admin/user</th>
+      <th translate>specifications-editor/admin/parameter</th>
+      <th translate>specifications-editor/admin/value</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let value of values">
+      <td>
+        <span am-time-ago="value.update_date"></span>
+      </td>
+      <td>
+        <app-user [user]="value.user" *ngIf="value.user"></app-user>
+      </td>
+      <td>
+        <span *ngFor="let node of value.path; let i = index">
+          <span *ngIf="i"> / </span>
+          <span [textContent]="node | translate"></span>
+        </span>
+        <span *ngIf="value.unit" [textContent]="value.unit.name"></span>
+      </td>
+      <td>{{value.value}}</td>
+      <td>
+        <button type="submit" class="btn btn-danger btn-sm" (click)="deleteValue(value)">
+          <i class="fa fa-times"></i>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
+
+<form (submit)="moveValues()">
+  <input type="text" name="item_id" placeholder="id" class="form-control" style="max-width:200px" [(ngModel)]="move.item_id"
+  />
+  <button type="submit" class="btn btn-secondary" translate>specifications-editor/admin/move</button>
+</form>

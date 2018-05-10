@@ -1,0 +1,135 @@
+<div class="row">
+  <div class="col-md-6">
+    <h2>
+      <span translate>moder/attrs/parameters</span>
+      <span [hidden]="loading <= 0">
+        <i class="fa fa-spinner fa-spin fa-fw"></i>
+      </span>
+    </h2>
+    <div class="card card-body">
+      <form class="form-vertical" (submit)="saveAttribute()">
+        <fieldset>
+          <div class="form-group">
+            <label for="name" translate>attrs/attribute/name</label>
+            <input type="text" name="name" class="form-control" [(ngModel)]="attribute.name" />
+          </div>
+          <div class="form-group">
+            <label for="type_id" translate>attrs/attribute/type</label>
+            <select name="type_id" class="form-control" [(ngModel)]="attribute.type_id">
+              <option *ngFor="let option of typeOptions" [value]="option.id">{{option.name|translate}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="precision" translate>attrs/attribute/precision</label>
+            <input type="text" name="precision" class="form-control" [(ngModel)]="attribute.precision">
+          </div>
+          <div class="form-group">
+            <label for="unit_id" translate>attrs/attribute/unit</label>
+            <select name="unit_id" class="form-control" [(ngModel)]="attribute.unit_id">
+              <option *ngFor="let option of unitOptions" [value]="option.id">{{option.name|translate}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="description" translate>attrs/attribute/description</label>
+            <textarea name="description" class="form-control" [(ngModel)]="attribute.description"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" translate>send</button>
+        </fieldset>
+      </form>
+    </div>
+
+    <h2 translate>moder/attrs/parameters/options-list</h2>
+    <div class="card card-body">
+      <app-moder-attrs-attribute-list-options-tree [items]="listOptions"></app-moder-attrs-attribute-list-options-tree>
+    </div>
+
+    <h2>
+      <span translate>moder/attrs/parameters/options-list/add</span>
+      <span [hidden]="addListOptionLoading <= 0">
+        <i class="fa fa-spinner fa-spin fa-fw"></i>
+      </span>
+    </h2>
+    <div class="card card-body">
+      <form class="form-vertical" (submit)="addListOption()">
+        <fieldset>
+          <div class="form-group">
+            <label for="parent_id" translate>attrs/list-options/parent</label>
+            <select name="parent_id" class="form-control" [(ngModel)]="newListOption.parent_id">
+              <option *ngFor="let option of listOptionsOptions" [value]="option.id">{{option.name}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="name" translate>attrs/list-options/name</label>
+            <input type="text" name="name" class="form-control" [(ngModel)]="newListOption.name" />
+          </div>
+          <button type="submit" name="submit" class="btn btn-primary" translate>send</button>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div *ngIf="attributes.length > 0">
+      <h2 translate>moder/attrs/attributes</h2>
+      <div class="card card-body">
+        <table class="table">
+          <tr>
+            <th translate>attrs/attribute/name</th>
+            <th translate>attrs/attribute/type</th>
+            <th translate>attrs/attribute/unit</th>
+          </tr>
+          <tr *ngFor="let attribute of attributes">
+            <td>
+              <a ui-sref="moder-attrs-attribute({id: attribute.id})" [textContent]="attribute.name|translate"></a>
+            </td>
+            <td>
+              <span *ngIf="attribute.type_id" [textContent]="typeMap[attribute.type_id]"></span>
+              <span *ngIf="!attribute.type_id">—</span>
+            </td>
+            <td>
+              <span *ngIf="attribute.unit" [textContent]="attribute.unit.name|translate"></span>
+              <span *ngIf="!attribute.unit">—</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <h2>
+      <span translate>moder/attrs/attribute/add-subattribute</span>
+      <span [hidden]="addLoading <= 0">
+        <i class="fa fa-spinner fa-spin fa-fw"></i>
+      </span>
+    </h2>
+    <div class="card card-body">
+      <form class="form-vertical" (submit)="addAttribute()">
+        <fieldset>
+          <div class="form-group">
+            <label for="name" translate>attrs/attribute/name</label>
+            <input type="text" name="name" class="form-control" [(ngModel)]="newAttribute.name" />
+          </div>
+          <div class="form-group">
+            <label for="type_id" translate>attrs/attribute/type</label>
+            <select name="type_id" class="form-control" [(ngModel)]="newAttribute.type_id">
+              <option *ngFor="let option of typeOptions" [value]="option.id">{{option.name|translate}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="precision" translate>attrs/attribute/precision</label>
+            <input type="text" name="precision" class="form-control" [(ngModel)]="newAttribute.precision">
+          </div>
+          <div class="form-group">
+            <label for="unit_id" translate>attrs/attribute/unit</label>
+            <select name="unit_id" class="form-control" [(ngModel)]="newAttribute.unit_id">
+              <option *ngFor="let option of unitOptions" [value]="option.id">{{option.name|translate}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="description" translate>attrs/attribute/description</label>
+            <textarea name="description" class="form-control" [(ngModel)]="newAttribute.description"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" translate>send</button>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>

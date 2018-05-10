@@ -1,0 +1,88 @@
+<div class="alert alert-warning" *ngIf="!user">
+  <app-markdown [markdown]="'upload/only-registered'|translate"></app-markdown>
+</div>
+
+<div *ngIf="auth.user">
+  <div *ngIf="selected">
+    <div class="card card-body mb-4">
+      <app-markdown [markdown]="'upload/description'|translate"></app-markdown>
+      <div style="margin:20px 0">
+        <form class="form-horizontal" (submit)="submit()" [hidden]="formHidden">
+          <fieldset>
+            <div class="form-group row">
+              <label class="col-md-2 col-form-label">Selection</label>
+              <div class="col-md-10" style="padding-top:7px">
+                <strong [innerHTML]="selectionName"></strong>
+                [
+                <a ui-sref="upload-select" translate>upload/select-another</a>]
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-md-2 col-form-label" translate>upload/image-file</label>
+              <div class="col-md-10">
+                <div class="btn btn-secondary" ngf-select [(ngModel)]="file" name="file" ngf-pattern="'image/*'" ngf-accept="'image/*'" ngf-max-size="50MB"
+                  ngf-min-height="360" ngf-min-width="640" ngf-max-height="4096" ngf-max-width="4096" ngf-multiple="true" ngf-drop
+                  translate *ngIf="!replace">upload/select-files</div>
+
+                <div class="btn btn-secondary" ngf-select [(ngModel)]="file" name="file" ngf-pattern="'image/*'" ngf-accept="'image/*'" ngf-max-size="50MB"
+                  ngf-min-height="360" ngf-min-width="640" ngf-max-height="4096" ngf-max-width="4096" ngf-drop translate ngf-max-files="1"
+                  *ngIf="replace">upload/select-file</div>
+
+                <div style="margin-top: 10px" *ngIf="file && !replace">
+                  <p *ngFor="let file of file" [textContent]="file.name"></p>
+                </div>
+                <div style="margin-top: 10px" *ngIf="file && replace ">
+                  <p [textContent]="file.name"></p>
+                </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-md-2 col-form-label" for="note" translate>upload/note</label>
+              <div class="col-md-10">
+                <textarea name="note" rows="3" class="form-control" [(ngModel)]="note"></textarea>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-10 offset-md-2">
+                <button name="submit" class="btn btn-primary" translate [disabled]="!file">send</button>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+
+      <div class="progress-area">
+        <ng-container *ngFor="let progress of progress">
+          <ngb-progressbar class="mb-2" [type]="progress.success ? 'success' : progress.failed ? 'danger' : 'info'" [value]="progress.percentage" *ngIf="!progress.success">
+            <span class="file-name" [textContent]="progress.filename"></span>
+            <span class="percentage" [textContent]="progress.percentage + '%'" *ngIf="progress.percentage < 100"></span>
+            <span *ngFor="let message of progress.invalidParams.file" [textContent]="message"></span>
+          </ngb-progressbar>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="pictures row">
+      <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let picture of pictures">
+        <app-thumbnail [picture]="picture"></app-thumbnail>
+        <p>
+          <a href="#" (click)="crop(picture)">
+            <i class="fa fa-crop"></i>
+            <span *ngIf="!picture.crop" translate>upload/picture/crop</span>
+            <span *ngIf="picture.crop" translate [translateParams]="{resolution: picture.crop.width + '×' + picture.crop.height + '+' + picture.crop.left + '+' +picture.crop.top}">upload/picture/cropped-to</span>
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-body" *ngIf="!selected">
+    <app-markdown [markdown]="'upload/description'|translate"></app-markdown>
+    <p style="margin:10px">
+      <a routerLink="/upload/select" class="btn btn-primary btn-lg">
+        <i class="fa fa-upload"></i>
+        {{'upload/add-picture'|translate}}
+      </a>
+    </p>
+  </div>
+</div>

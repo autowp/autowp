@@ -1,0 +1,75 @@
+<div class="message" [ngClass]="{'moderator-attention': message.moderAttention == 1, deleted: message.deleted}" *ngFor="let message of messages">
+  <div>
+    <div class="float-right" *ngIf="message.datetime" am-time-ago="message.datetime"></div>
+    <app-user [user]="message.user" *ngIf="message.user"></app-user>
+    <span *ngIf="!message.user" translate>comments/author/anonymous</span>
+  </div>
+  <div class="photo">
+    <a ui-sref="users-user({identity: message.user.identity ? message.user.identity : 'user' + message.user.id})" class="photo"
+      *ngIf="message.user && !message.user.deleted">
+      <img [src]="message.user.avatar.src" *ngIf="message.user.avatar" class="rounded" />
+      <img [src]="message.user.gravatar" *ngIf="message.user.gravatar && ! message.user.avatar" class="rounded" />
+    </a>
+  </div>
+  <div class="content">
+
+    <div class="text" *ngIf="canRemoveComments || !message.deleted">
+      <p [innerHtml]="message.text_html"></p>
+    </div>
+
+    <p class="alert alert-warning deleted-message" *ngIf="canRemoveComments || message.deleted" translate>comments/message-deleted-by-admin</p>
+
+    <div>
+      <span class="vote">
+        <a href="#" class="vote-up" [ngClass]="{active: message.user_vote > 0}" *ngIf="user" (click)="vote(message, 1)">
+          <i class="fa fa-thumbs-o-up"></i>
+        </a>
+        <a href="#" class="value" [ngClass]="{zero: message.vote == 0}" *ngIf="user" (click)="showVotes(message)">
+          {{(message.vote > 0 ? '+' : '') + message.vote}}
+        </a>
+        <a href="#" class="vote-down" [ngClass]="{active: message.user_vote > 0}" *ngIf="user" (click)="vote(message, -1)">
+          <i class="fa fa-thumbs-o-down"></i>
+        </a>
+        <i class="fa fa-thumbs-o-up" *ngIf="!user"></i>
+        <span class="value" *ngIf="!user" [textContent]="message.vote" (click)="showVotes(message)"></span>
+        <i class="fa fa-thumbs-o-down" *ngIf="!user"></i>
+      </span>
+
+      <button class="btn btn-sm btn-primary reply" *ngIf="user && deep < 21 && !message.deleted" (click)="reply(message, false)">
+        <i class="fa fa-reply"></i>
+        <span class="d-none d-md-inline">{{'comments/reply'|translate}}</span>
+      </button>
+
+      <button class="btn btn-sm btn-success resolve" *ngIf="message.moder_attention && isModer" (click)="reply(message, true)">
+        <i class="fa fa-reply"></i>
+        {{'comments/reply'|translate}} &amp; resolve
+      </button>
+
+      <a href="#" class="btn btn-danger btn-sm float-right comment-remove-button" *ngIf="canRemoveComments" (click)="setIsDeleted(message, 1)">
+        <i class="fa fa-trash"></i>
+        <span class="d-none d-md-inline">{{'comments/message/delete'|translate}}</span>
+      </a>
+      <a href="#" class="btn btn-success btn-sm float-right comment-restore-button" *ngIf="canRemoveComments" (click)="setIsDeleted(message, 0)">
+        <i class="fa fa-arrow-up"></i>
+        {{'comments/message/restore'|translate}}
+      </a>
+
+      <a ui-sref="forums-move-message({message_id: message.id})" class="btn btn-secondary btn-sm float-right" *ngIf="typeId == 5 && canMoveMessage">
+        <i class="fa fa-arrows"></i>
+        <span class="d-none d-md-inline">{{'comments/message/move'|translate}}</span>
+      </a>
+
+      <i class="float-right fa fa-eye" data-toggle="tooltip" tit[le="comment.ip" style="margin-right:20px" *ngIf="message.ip"></i>
+
+      <div class="moderator-attention-sign" *ngIf="message.moder_attention">
+        <i class="fa fa-info-circle"></i>
+        {{'comments/it-requires-attention-of-moderators'|translate}}
+      </div>
+
+    </div>
+  </div>
+  <div class="replies" *ngIf="deep < 21">
+    <app-comments-list [itemId]="itemId" [typeId]="typeId" [onSent]="onSent" [messages]="message.replies" [user]="user" [deep]="deep+1"></app-comments-list>
+    <app-comments-form [itemId]="itemId" [typeId]="typeId" [onSent]="onSent" [parentId]="message.id" *ngIf="user && message.showReply"></app-comments-form>
+  </div>
+</div>

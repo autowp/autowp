@@ -1,0 +1,13 @@
+<ul class="nav nav-pills" style="margin-bottom:10px">
+
+  <a class="nav-link" ui-sref="factory({id: factory.id})" [innerHTML]="factory.name_html"></a>
+  <a class="nav-link active" ui-sref="factory-items({id: factory.id})" translate>factories/factory-items</a>
+  <a *ngIf="isModer" class="nav-link" ui-sref="moder-items-item({id: factory.id})">
+    <i class="fa fa-cog"></i>
+    {{'moder/edit-object'|translate}}
+  </a>
+</ul>
+
+<app-item [item]="item" *ngFor="let item of items"></app-item>
+
+<app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>

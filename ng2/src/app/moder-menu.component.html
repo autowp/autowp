@@ -1,0 +1,20 @@
+<div id="moderatorMenuContainer" style="z-index:100" *ngIf="items.length > 0">
+  <div class="btn-group" ngbDropdown placement="top-right">
+    <button ngbDropdownToggle class="btn btn-secondary">
+      {{'moder-menu/title'|translate}}
+      <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu-right" ngbDropdownMenu>
+      <a [routerLink]="item.routerLink" [queryParams]="item.queryParams" class="dropdown-item" *ngFor="let item of items">
+        <i class="fa-fw {{item.icon}}" *ngIf="item.icon"></i>
+        {{item.label|translate}}
+        <span class="badge badge-pill badge-secondary" *ngIf="item.count" [textContent]="item.count"></span>
+      </a>
+      <div class="dropdown-divider"></div>
+      <a routerLink="/moder" class="dropdown-item">
+        <i class="fa fa-cog"></i>
+        {{'page/67/name'|translate}}
+      </a>
+    </div>
+  </div>
+</div>

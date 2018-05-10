@@ -342,7 +342,7 @@
 请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。',
   'upload/only-registered' => '只有注册用户才能上传图片
 
-[注册](/ng/login)或[登录](/ng/signup)',
+[注册](/ng2/login)或[登录](/ng/signup)',
   'catalogue/other-pictures-of-%1$s' => '%1$s的其它图片',
   'catalogue/all-pictures-of-%1$s' => '%1$s的所有图片',
   'catalogue/brand/logo-of-%s' => '%s 商标',
@@ -383,7 +383,7 @@
   'factories/factory/pictures' => '图片',
   'comments/title' => '评论',
   'comments/reply' => '回复',
-  'comments/what-to-do-for-write-comments' => '为方便发表评论，您需要[注册账号或用社交网站账号登陆](/ng/login)',
+  'comments/what-to-do-for-write-comments' => '为方便发表评论，您需要[注册账号或用社交网站账号登陆](/ng2/login)',
   'comments/it-requires-attention-of-moderators' => '向管理员发送提示',
   'comments/message' => '站内信',
   'comments/form-title' => '添加评论',
