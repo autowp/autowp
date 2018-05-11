@@ -48,6 +48,7 @@ export class ModerPicturesController {
     private owner_id: any;
     public comments: any;
     private item_id: any;
+    private exclude_item_id: any;
     public perspective_id: any;
     public car_type_id: any;
     public status: any;
@@ -78,6 +79,7 @@ export class ModerPicturesController {
         this.car_type_id = this.$state.params.car_type_id;
         this.perspective_id = this.$state.params.perspective_id;
         this.item_id = this.$state.params.item_id;
+        this.exclude_item_id = this.$state.params.exclude_item_id;
         this.comments = this.$state.params.comments;
         this.owner_id = this.$state.params.owner_id;
         this.replace = this.$state.params.replace;
@@ -221,6 +223,57 @@ export class ModerPicturesController {
                 itemIdLastValue = curValue;
             });
 
+        var $excludeItemIdElement = $($element[0]).find(':input[name=exclude_item_id]');
+        $excludeItemIdElement.val(this.exclude_item_id ? '#' + this.exclude_item_id : '');
+        var excludeItemIdLastValue = $excludeItemIdElement.val();
+        $excludeItemIdElement
+            .typeahead({ }, {
+                display: function(item: any) {
+                    return item.name_text;
+                },
+                templates: {
+                    suggestion: function(item: any) {
+                        return $('<div class="tt-suggestion tt-selectable"></div>')
+                            .html(item.name_html);
+                    }
+                },
+                source: function(query: string, syncResults: Function, asyncResults: Function) {
+                    var params = {
+                        limit: 10,
+                        fields: 'name_text,name_html',
+                        id: '',
+                        name: ''
+                    };
+                    if (query.substring(0, 1) == '#') {
+                        params.id = query.substring(1);
+                    } else {
+                        params.name = '%' + query + '%';
+                    }
+
+                    $http({
+                        method: 'GET',
+                        url: '/api/item',
+                        params: params
+                    }).then(function(response: ng.IHttpResponse<any>) {
+                        asyncResults(response.data.items);
+                    });
+
+                }
+            })
+            .on('typeahead:select', function(ev: any, item: any) {
+                excludeItemIdLastValue = item.name_text;
+                self.exclude_item_id = item.id;
+                self.load();
+            })
+            .bind('change blur', function(ev: any, item: any) {
+                var curValue = $(this).val();
+                if (excludeItemIdLastValue && !curValue) {
+                    self.exclude_item_id = null;
+                    self.load();
+                }
+                excludeItemIdLastValue = curValue;
+            });
+
         this.load();
     }
 
@@ -235,6 +288,7 @@ export class ModerPicturesController {
             car_type_id: this.car_type_id,
             perspective_id: this.perspective_id,
             item_id: this.item_id,
+            exclude_item_id: this.exclude_item_id,
             comments: this.comments,
             owner_id: this.owner_id,
             replace: this.replace,
@@ -328,7 +382,7 @@ angular.module(Module)
         function config($stateProvider: any) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/pictures?status&car_type_id&perspective_id&item_id&comments&owner_id&replace&requests&special_name&lost&gps&similar&order&added_from&page',
+                url: '/moder/pictures?status&car_type_id&perspective_id&item_id&exclude_item_id&comments&owner_id&replace&requests&special_name&lost&gps&similar&order&added_from&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require('./template.html'),

@@ -29,7 +29,7 @@
 		"zendframework/zend-authentication" : "^2.5",
 		"zendframework/zend-cache" : ">=2.7",
 		"zendframework/zend-captcha" : "^2.7",
-		"zendframework/zend-db" : "^2.8",
+		"zendframework/zend-db" : "^2.9.3",
 		"zendframework/zend-file" : ">=2.7",
 		"zendframework/zend-form" : ">=2.10.2",
 		"zendframework/zend-i18n" : ">=2.7.4",

@@ -312,7 +312,7 @@ class PictureController extends AbstractRestfulController
         ];
 
         if ($data['item_id']) {
-            $filter['item']['ancestor_or_self'] = $data['item_id'];
+            $filter['item']['ancestor_or_self']['id'] = $data['item_id'];
         }
 
         if ($data['owner_id']) {
@@ -449,6 +449,10 @@ class PictureController extends AbstractRestfulController
 
             if ($data['added_from']) {
                 $filter['added_from'] = $data['added_from'];
+            }
+
+            if ($data['exclude_item_id']) {
+                $filter['item']['exclude_ancestor_or_self']['id'] = $data['exclude_item_id'];
             }
         }
 

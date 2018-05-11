@@ -2453,6 +2453,15 @@ return [
                     ['name' => 'Digits']
                 ]
             ],
+            'exclude_item_id' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
             'type_id' => [
                 'required' => false
             ],
