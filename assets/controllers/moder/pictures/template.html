@@ -70,6 +70,10 @@
                     <option value="3" translate>moder/pictures/filter/votes/any</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label>Added from (date)</label>
+                <input type="text" name="added_from" class="form-control" placeholder="2010-01-28" ng-model="ctrl.added_from" ng-change="ctrl.load()" />
+            </div>
             <div class="checkbox">
                 <label>
                     <input type="checkbox" name="special_name" value="1" ng-model="ctrl.special_name" ng-change="ctrl.load()" />

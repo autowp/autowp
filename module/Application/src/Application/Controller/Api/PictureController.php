@@ -446,6 +446,10 @@ class PictureController extends AbstractRestfulController
             if ($data['gps']) {
                 $filter['has_point'] = true;
             }
+
+            if ($data['added_from']) {
+                $filter['added_from'] = $data['added_from'];
+            }
         }
 
         $paginator = $this->picture->getPaginator($filter);

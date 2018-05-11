@@ -51,6 +51,7 @@ export class ModerPicturesController {
     public perspective_id: any;
     public car_type_id: any;
     public status: any;
+    public added_from: string;
 
     constructor(
         private $scope: autowp.IControllerScope,
@@ -86,6 +87,7 @@ export class ModerPicturesController {
         this.gps = this.$state.params.gps ? true : false;
         this.similar = this.$state.params.similar ? true : false;
         this.order = this.$state.params.order || '1';
+        this.added_from = this.$state.params.added_from || '';
 
         this.page = this.$state.params.page;
 
@@ -241,6 +243,7 @@ export class ModerPicturesController {
             lost: this.lost ? 1 : null,
             gps: this.gps ? 1 : null,
             similar: this.similar ? 1 : null,
+            added_from: this.added_from ? this.added_from : null,
             order: this.order,
             page: this.page,
             fields: null as null|string,
@@ -325,7 +328,7 @@ angular.module(Module)
         function config($stateProvider: any) {
             $stateProvider.state( {
                 name: STATE_NAME,
-                url: '/moder/pictures?status&car_type_id&perspective_id&item_id&comments&owner_id&replace&requests&special_name&lost&gps&similar&order&page',
+                url: '/moder/pictures?status&car_type_id&perspective_id&item_id&comments&owner_id&replace&requests&special_name&lost&gps&similar&order&added_from&page',
                 controller: CONTROLLER_NAME,
                 controllerAs: 'ctrl',
                 template: require('./template.html'),
@@ -342,6 +345,7 @@ angular.module(Module)
                     lost: { dynamic: true },
                     gps: { dynamic: true },
                     similar: { dynamic: true },
+                    added_from: { dynamic: true },
                     order: { dynamic: true },
                     page: { dynamic: true }
                 },

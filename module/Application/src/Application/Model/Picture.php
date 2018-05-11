@@ -347,6 +347,7 @@ class Picture
             'add_date'         => null,
             'accept_date'      => null,
             'timezone'         => null,
+            'added_from'       => null
         ];
         $options = array_replace($defaults, $options);
 
@@ -409,6 +410,26 @@ class Picture
             }
 
             $this->setDateFilter($select, 'pictures.accept_datetime', $options['accept_date'], $options['timezone']);
+        }
+
+        if ($options['added_from']) {
+            if (! isset($options['timezone'])) {
+                throw new Exception("Timezone not provided");
+            }
+
+            $timezone = new DateTimeZone($options['timezone']);
+            $dbTimezine = new DateTimeZone(MYSQL_TIMEZONE);
+
+            $date = DateTime::createFromFormat('Y-m-d', $options['added_from'], $timezone);
+
+            $start = clone $date;
+            $start->setTime(0, 0, 0);
+            $start->setTimezone($dbTimezine);
+
+
+            $select->where([
+                'pictures.add_date > ?' => $start->format(MYSQL_DATETIME_FORMAT)
+            ]);
         }
 
         if ($options['status'] !== null) {
