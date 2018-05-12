@@ -179,6 +179,7 @@ import { InvalidParamsPipe } from './invalid-params.pipe';
 import { MessageDialogService } from './services/message-dialog';
 import { AttrsService } from './services/attrs';
 import { ModalMessageComponent } from './components/modal-message/modal-message.component';
+import { ModerStatComponent } from './moder/stat/stat.component';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -472,6 +473,10 @@ const appRoutes: Routes = [
         component: ModerRightsComponent
       },
       {
+        path: 'stat',
+        component: ModerStatComponent
+      },
+      {
         path: 'traffic',
         children: [
           {
@@ -748,7 +753,8 @@ const appRoutes: Routes = [
     PictureModerVoteComponent,
     ItemMetaFormComponent,
     InvalidParamsPipe,
-    ModalMessageComponent
+    ModalMessageComponent,
+    ModerStatComponent
   ],
   entryComponents: [ModalMessageComponent],
   imports: [

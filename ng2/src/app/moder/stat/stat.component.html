@@ -1,0 +1,7 @@
+<ul>
+  <li class="mb-3" *ngFor="let item of items">
+    <h3 [textContent]="item.name | translate"></h3>
+    <p>{{item.value}} / {{item.total}}</p>
+    <ngb-progressbar [striped]="true" type="primary" [value]="item.value" [max]="item.total"></ngb-progressbar>
+  </li>
+</ul>
