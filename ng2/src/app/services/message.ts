@@ -138,11 +138,10 @@ export class MessageService {
       user_id: userId,
       text: text
     });
-    subscription.subscribe(() => {
+
+    return subscription.toPromise().then(() => {
       this.trigger('sent');
     });
-
-    return subscription.toPromise();
   }
 
   public bind(event: string, handler: MessageCallbackType) {

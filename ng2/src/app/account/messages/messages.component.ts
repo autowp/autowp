@@ -114,6 +114,8 @@ export class AccountMessagesComponent implements OnInit, OnDestroy {
         Notify.response(response);
       }
     );
+
+    return false;
   }
 
   public clearFolder(folder: string) {

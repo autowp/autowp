@@ -1,10 +1,10 @@
 <div class="row">
   <div class="col-lg-8 mb-4 order-2">
-    <div style="margin:0 0 20px;" *ngIf="folder =='sent' && paginator.totalItemCount">
+    <div style="margin:0 0 20px;" *ngIf="folder =='sent' && paginator && paginator.totalItemCount">
       <button class="btn btn-danger" (click)="clearFolder('sent')" translate>account/personal-message/delete-all-sent</button>
     </div>
 
-    <div style="margin:0 0 20px;" *ngIf="folder =='system' && paginator.totalItemCount">
+    <div style="margin:0 0 20px;" *ngIf="folder =='system' && paginator && paginator.totalItemCount">
       <button class="btn btn-danger" (click)="clearFolder('system')" translate>account/personal-message/delete-all-system</button>
     </div>
 
