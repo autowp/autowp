@@ -32,7 +32,7 @@ class TrafficControl
      */
     private $autobanProfiles = [
         [
-            'limit'  => 3500,
+            'limit'  => 3800,
             'reason' => 'daily limit',
             'group'  => [],
             'time'   => 10 * 24 * 3600
