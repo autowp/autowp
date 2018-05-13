@@ -1,6 +1,7 @@
 import { Component, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ItemService, APIItem } from '../../../services/item';
+import { PageEnvService } from '../../../services/page-env.service';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -13,15 +14,18 @@ export class ModerItemsTooBigComponent {
   public loading = false;
   public items: APIItem[];
 
-  constructor(private http: HttpClient, private itemService: ItemService) {
+  constructor(
+    private http: HttpClient,
+    private itemService: ItemService,
+    private pageEnv: PageEnvService
+  ) {
     this.loading = true;
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            }
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      }
+    });
 
     this.itemService
       .getItems({

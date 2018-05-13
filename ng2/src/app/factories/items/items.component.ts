@@ -6,6 +6,7 @@ import Notify from '../../notify';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ACLService } from '../../services/acl.service';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-factory-items',
@@ -27,7 +28,8 @@ export class FactoryItemsComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private route: ActivatedRoute,
     private router: Router,
-    private acl: ACLService
+    private acl: ACLService,
+    private pageEnv: PageEnvService
   ) {
     this.load();
   }
@@ -72,18 +74,17 @@ export class FactoryItemsComponent implements OnInit, OnDestroy {
             return;
           }
 
-          /*this.$scope.pageEnv({
-          layout: {
-            blankPage: false,
-            needRight: true
-          },
-          name: 'page/182/name',
-          pageId: 182,
-          args: {
-            FACTORY_ID: this.factory.id,
-            FACTORY_NAME: this.factory.name_text
-          }
-        });*/
+          this.pageEnv.set({
+            layout: {
+              needRight: true
+            },
+            name: 'page/182/name',
+            pageId: 182,
+            args: {
+              FACTORY_ID: this.factory.id + '',
+              FACTORY_NAME: this.factory.name_text
+            }
+          });
 
           this.itemService
             .getItems({

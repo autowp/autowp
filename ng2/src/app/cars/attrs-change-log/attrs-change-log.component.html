@@ -22,7 +22,7 @@
     </thead>
     <tr *ngFor="let item of items">
       <td>
-        <p *ngIf="item.update_date" am-time-ago="item.update_date"></p>
+        <p *ngIf="item.update_date" [textContent]="item.update_date | amTimeAgo"></p>
       </td>
       <td>
         <app-user [user]="item.user" *ngIf="item.user"></app-user>

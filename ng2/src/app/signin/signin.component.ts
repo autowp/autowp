@@ -6,6 +6,7 @@ import {
   APILoginStartPostResponse,
   APILoginServices
 } from '../services/api.service';
+import { PageEnvService } from '../services/page-env.service';
 
 interface SignInService {
   id: string;
@@ -27,15 +28,18 @@ export class SignInComponent {
   };
   public invalidParams: any = {};
 
-  constructor(public auth: AuthService, private http: HttpClient) {
-    /*this.$scope.pageEnv({
-          layout: {
-              blankPage: false,
-              needRight: false
-          },
-          name: 'page/79/name',
-          pageId: 79
-      });*/
+  constructor(
+    public auth: AuthService,
+    private http: HttpClient,
+    private pageEnv: PageEnvService
+  ) {
+    this.pageEnv.set({
+      layout: {
+        needRight: false
+      },
+      name: 'page/79/name',
+      pageId: 79
+    });
 
     this.http.get<APILoginServicesGetResponse>('/api/login/services').subscribe(
       response => {

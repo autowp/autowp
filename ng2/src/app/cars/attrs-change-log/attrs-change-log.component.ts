@@ -12,6 +12,7 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ACLService } from '../../services/acl.service';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-cars-attrs-change-log',
@@ -32,16 +33,16 @@ export class CarsAttrsChangeLogComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private attrService: AttrsService,
     private route: ActivatedRoute,
-    private acl: ACLService
+    private acl: ACLService,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/103/name',
       pageId: 103
-    });*/
+    });
   }
 
   ngOnInit(): void {

@@ -7,11 +7,19 @@ import { ItemService, APIItem } from '../../../../services/item';
 import { chunk } from '../../../../chunk';
 import Notify from '../../../../notify';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ItemParentService, APIItemParent } from '../../../../services/item-parent';
+import {
+  ItemParentService,
+  APIItemParent
+} from '../../../../services/item-parent';
+import { PageEnvService } from '../../../../services/page-env.service';
 
 // Acl.inheritsRole( 'moder', 'unauthorized' );
 
-export type PictureItemMoveSelectItem = (itemId: number, perspectiveId: number, type: number) => void;
+export type PictureItemMoveSelectItem = (
+  itemId: number,
+  perspectiveId: number,
+  type: number
+) => void;
 type ModerPicturesItemMoveDoSearch = () => void;
 
 @Component({
@@ -57,19 +65,19 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private router: Router,
     private route: ActivatedRoute,
-    private itemParentService: ItemParentService
+    private itemParentService: ItemParentService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv( {
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/149/name',
-            pageId: 149
-        } );*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/149/name',
+      pageId: 149
+    });
 
     this.selectItem = (itemId: number, perspectiveId: number, type: number) => {
       if (this.src_item_id && this.src_type) {

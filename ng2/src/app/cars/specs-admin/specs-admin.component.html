@@ -11,7 +11,7 @@
   <tbody>
     <tr *ngFor="let value of values">
       <td>
-        <span am-time-ago="value.update_date"></span>
+        <span [textContent]="value.update_date | amTimeAgo"></span>
       </td>
       <td>
         <app-user [user]="value.user" *ngIf="value.user"></app-user>

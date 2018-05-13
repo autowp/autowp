@@ -4,9 +4,14 @@ import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../services/api.service';
 import { VehicleTypeService } from '../../services/vehicle-type';
 import { SpecService } from '../../services/spec';
-import { ItemService, GetItemsServiceOptions, APIItem } from '../../services/item';
+import {
+  ItemService,
+  GetItemsServiceOptions,
+  APIItem
+} from '../../services/item';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { PageEnvService } from '../../services/page-env.service';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -74,19 +79,19 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
     private vehicleTypeService: VehicleTypeService,
     private specService: SpecService,
     private itemService: ItemService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/131/name',
-            pageId: 131
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/131/name',
+      pageId: 131
+    });
 
     this.vehicleTypeService.getTypes().then(types => {
       this.vehicleTypeOptions = toPlain(types, 0);
@@ -158,7 +163,8 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
         name_exclude: params.name_exclude || null,
         item_type_id: parseInt(params.item_type_id, 10) || null,
         vehicle_type_id: params.vehicle_type_id || null,
-        vehicle_childs_type_id: parseInt(params.vehicle_childs_type_id, 10) || null,
+        vehicle_childs_type_id:
+          parseInt(params.vehicle_childs_type_id, 10) || null,
         spec: params.spec || null,
         no_parent: params.no_parent ? true : false,
         text: params.text || null,

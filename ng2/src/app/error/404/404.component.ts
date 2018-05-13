@@ -1,4 +1,5 @@
 import { Component, Injectable } from '@angular/core';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-error-404',
@@ -6,14 +7,13 @@ import { Component, Injectable } from '@angular/core';
 })
 @Injectable()
 export class Error404Component {
-  constructor() {
-    /*this.$scope.pageEnv({
+  constructor(private pageEnv: PageEnvService) {
+    this.pageEnv.set({
       layout: {
         isAdminPage: true,
-        blankPage: false,
         needRight: true
       },
       title: '404 Not Found'
-    });*/
+    });
   }
 }

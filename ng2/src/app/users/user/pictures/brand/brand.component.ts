@@ -7,6 +7,7 @@ import { UserService, APIUser } from '../../../../services/user';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { PictureService, APIPicture } from '../../../../services/picture';
+import { PageEnvService } from '../../../../services/page-env.service';
 
 @Component({
   selector: 'app-users-user-pictures-brand',
@@ -30,7 +31,8 @@ export class UsersUserPicturesBrandComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
-    private pictureService: PictureService
+    private pictureService: PictureService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -109,20 +111,19 @@ export class UsersUserPicturesBrandComponent implements OnInit, OnDestroy {
           }
           this.brand = response.items[0];
 
-          /*this.$scope.pageEnv({
-          layout: {
-            blankPage: false,
-            needRight: false
-          },
-          name: 'page/141/name',
-          pageId: 141,
-          args: {
-            USER_NAME: this.user.name,
-            USER_IDENTITY: this.identity,
-            BRAND_NAME: this.brand.name_only,
-            BRAND_CATNAME: this.brand.catname
-          }
-        });*/
+          this.pageEnv.set({
+            layout: {
+              needRight: false
+            },
+            name: 'page/141/name',
+            pageId: 141,
+            args: {
+              USER_NAME: this.user.name,
+              USER_IDENTITY: this.identity,
+              BRAND_NAME: this.brand.name_only,
+              BRAND_CATNAME: this.brand.catname
+            }
+          });
 
           this.pictureService
             .getPictures({

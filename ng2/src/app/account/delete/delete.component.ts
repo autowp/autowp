@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import Notify from '../../notify';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-account-delete',
@@ -18,16 +19,16 @@ export class AccountDeleteComponent {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private auth: AuthService
+    private auth: AuthService,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/137/name',
       pageId: 137
-    });*/
+    });
   }
 
   public submit() {

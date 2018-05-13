@@ -6,6 +6,7 @@ import {
   APIAttrZone,
   APIAttrAttribute
 } from '../../services/attrs';
+import { PageEnvService } from '../../services/page-env.service';
 
 // Acl.isAllowed('attrs', 'edit', 'unauthorized');
 
@@ -22,16 +23,19 @@ export class ModerAttrsComponent {
   public moveUp: ModerAttrsMoveFunc;
   public moveDown: ModerAttrsMoveFunc;
 
-  constructor(private http: HttpClient, private attrsService: AttrsService) {
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/100/name',
-            pageId: 100
-        });*/
+  constructor(
+    private http: HttpClient,
+    private attrsService: AttrsService,
+    private pageEnv: PageEnvService
+  ) {
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/100/name',
+      pageId: 100
+    });
 
     this.attrsService.getZones().then(
       (zones: APIAttrZone[]) => {

@@ -5,7 +5,11 @@ import Notify from '../../../notify';
 import { chunk } from '../../../chunk';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ItemParentService, APIItemParent } from '../../../services/item-parent';
+import {
+  ItemParentService,
+  APIItemParent
+} from '../../../services/item-parent';
+import { PageEnvService } from '../../../services/page-env.service';
 
 @Component({
   selector: 'app-donate-vod-select',
@@ -30,16 +34,16 @@ export class DonateVodSelectComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private router: Router,
     private route: ActivatedRoute,
-    private itemParentService: ItemParentService
+    private itemParentService: ItemParentService,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/196/name',
       pageId: 196
-    });*/
+    });
 
     this.selectItem = (itemId: number) => {
       this.router.navigate(['/donate/vod'], {

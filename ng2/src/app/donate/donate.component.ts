@@ -1,5 +1,6 @@
 import { Component, Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { PageEnvService } from '../services/page-env.service';
 
 @Component({
   selector: 'app-donate',
@@ -9,15 +10,17 @@ import { TranslateService } from '@ngx-translate/core';
 export class DonateComponent {
   public frameUrl: string;
 
-  constructor(private translate: TranslateService) {
-    /*this.$scope.pageEnv({
+  constructor(
+    private translate: TranslateService,
+    private pageEnv: PageEnvService
+  ) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/196/name',
       pageId: 196
-    });*/
+    });
 
     this.translate
       .get(['donate/target', 'donate/project', 'donate/comment-hint'])

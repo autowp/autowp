@@ -7,6 +7,7 @@ import Notify from '../../notify';
 import { PictureService, APIPicture } from '../../services/picture';
 import { ItemLinkService, APIItemLink } from '../../services/item-link';
 import { APIACL } from '../../services/acl.service';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-persons-person',
@@ -29,7 +30,8 @@ export class PersonsPersonComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private pictureService: PictureService,
     private itemLinkService: ItemLinkService,
-    private acl: APIACL
+    private acl: APIACL,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -51,18 +53,17 @@ export class PersonsPersonComponent implements OnInit, OnDestroy {
               return;
             }
 
-            /*this.$scope.pageEnv({
-          layout: {
-            blankPage: false,
-            needRight: false
-          },
-          name: 'page/213/name',
-          pageId: 213,
-          args: {
-            PERSON_ID: this.item.id,
-            PERSON_NAME: this.item.name_text
-          }
-        });*/
+            this.pageEnv.set({
+              layout: {
+                needRight: false
+              },
+              name: 'page/213/name',
+              pageId: 213,
+              args: {
+                PERSON_ID: this.item.id + '',
+                PERSON_NAME: this.item.name_text
+              }
+            });
 
             this.itemLinkService
               .getItems({

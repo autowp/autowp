@@ -8,6 +8,7 @@ import {
   APIForumTopic,
   APIForumTheme
 } from '../../services/forum';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-forums-move-topic',
@@ -24,18 +25,18 @@ export class ForumsMoveTopicComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute,
-    private forumService: ForumService
+    private forumService: ForumService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*his.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/83/name',
       pageId: 83
-    });*/
+    });
 
     this.forumService.getThemes({}).subscribe(
       response => {

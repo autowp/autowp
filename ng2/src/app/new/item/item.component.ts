@@ -7,6 +7,7 @@ import Notify from '../../notify';
 import { Subscription } from 'rxjs';
 import { PictureService, APIPicture } from '../../services/picture';
 import { ActivatedRoute } from '@angular/router';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-new-item',
@@ -23,7 +24,8 @@ export class NewItemComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private itemService: ItemService,
     private route: ActivatedRoute,
-    private pictureService: PictureService
+    private pictureService: PictureService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -36,19 +38,18 @@ export class NewItemComponent implements OnInit, OnDestroy {
           (item: APIItem) => {
             this.item = item;
 
-            /*this.$scope.pageEnv({
-          layout: {
-            blankPage: false,
-            needRight: false
-          },
-          name: 'page/210/name',
-          pageId: 210,
-          args: {
-            DATE: moment(params.date).format('LL'),
-            DATE_STR: params.date,
-            ITEM_NAME: this.item.name_text
-          }
-        });*/
+            this.pageEnv.set({
+              layout: {
+                needRight: false
+              },
+              name: 'page/210/name',
+              pageId: 210,
+              args: {
+                DATE: moment(params.date).format('LL'),
+                DATE_STR: params.date,
+                ITEM_NAME: this.item.name_text
+              }
+            });
           },
           response => {
             Notify.response(response);

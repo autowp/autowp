@@ -143,7 +143,7 @@
                 <span *ngIf="value.value_text !== null" [textContent]="value.value_text"></span>
                 <app-user [user]="value.user" *ngIf="value.user"></app-user>
                 <span class="date" *ngIf="value.update_date">[
-                  <span am-time-ago="value.update_date"></span>]</span>
+                  <span [textContent]="value.update_date | amTimeAgo"></span>]</span>
               </div>
             </td>
           </tr>

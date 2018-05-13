@@ -2,6 +2,7 @@ import { Component, Injectable } from '@angular/core';
 import * as $ from 'jquery';
 import { HttpClient } from '@angular/common/http';
 import Notify from '../notify';
+import { PageEnvService } from '../services/page-env.service';
 const Raphael = require('raphael');
 
 Raphael.fn.drawGrid = (
@@ -66,15 +67,14 @@ export class PulseComponent {
   public legend: any;
   public grid: any;
 
-  constructor(private http: HttpClient) {
-    /*this.$scope.pageEnv({
+  constructor(private http: HttpClient, private pageEnv: PageEnvService) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/161/name',
       pageId: 161
-    });*/
+    });
 
     this.http.get<APIPulseResponse>('/api/pulse').subscribe(
       response => {

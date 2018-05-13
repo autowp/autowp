@@ -8,6 +8,7 @@ import { UserService } from '../../services/user';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CommentService } from '../../services/comment';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-moder-comments',
@@ -29,17 +30,17 @@ export class ModerCommentsComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private userService: UserService,
     private route: ActivatedRoute,
-    private commentService: CommentService
+    private commentService: CommentService,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/110/name',
-            pageId: 110
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/110/name',
+      pageId: 110
+    });
   }
 
   ngOnInit(): void {
@@ -176,26 +177,28 @@ export class ModerCommentsComponent implements OnInit, OnDestroy {
       location: 'replace'
     });*/
 
-    this.commentService.getComments({
-      user: this.user,
-      moderator_attention: this.moderator_attention,
-      pictures_of_item_id: this.pictures_of_item_id
-        ? this.pictures_of_item_id
-        : 0,
-      page: this.page,
-      order: 'date_desc',
-      limit: 30,
-      fields: 'preview,user,is_new,status,url'
-    }).subscribe(
-      response => {
-        this.comments = response.items;
-        this.paginator = response.paginator;
-        this.loading--;
-      },
-      response => {
-        Notify.response(response);
-        this.loading--;
-      }
-    );
+    this.commentService
+      .getComments({
+        user: this.user,
+        moderator_attention: this.moderator_attention,
+        pictures_of_item_id: this.pictures_of_item_id
+          ? this.pictures_of_item_id
+          : 0,
+        page: this.page,
+        order: 'date_desc',
+        limit: 30,
+        fields: 'preview,user,is_new,status,url'
+      })
+      .subscribe(
+        response => {
+          this.comments = response.items;
+          this.paginator = response.paginator;
+          this.loading--;
+        },
+        response => {
+          Notify.response(response);
+          this.loading--;
+        }
+      );
   }
 }

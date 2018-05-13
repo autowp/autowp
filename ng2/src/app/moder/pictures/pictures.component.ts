@@ -28,6 +28,7 @@ import {
 } from '../../services/picture';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { debounceTime, map, switchMap } from 'rxjs/operators';
+import { PageEnvService } from '../../services/page-env.service';
 
 interface VehicleTypeInPictures {
   name: string;
@@ -270,7 +271,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
           })
         );
       })
-    )
+    );
 
   constructor(
     private http: HttpClient,
@@ -282,19 +283,19 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private route: ActivatedRoute,
     private pictureService: PictureService,
-    private router: Router
+    private router: Router,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/73/name',
-            pageId: 73
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/73/name',
+      pageId: 73
+    });
 
     /*this.ownersDataSource = Observable.create((observer: any) => {
       // Runs on every search

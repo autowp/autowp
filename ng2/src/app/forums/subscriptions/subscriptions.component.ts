@@ -5,6 +5,7 @@ import Notify from '../../notify';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ForumService, APIForumTopic } from '../../services/forum';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-forums-subscriptions',
@@ -19,18 +20,18 @@ export class ForumsSubscriptionsComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private forumService: ForumService
+    private forumService: ForumService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/42/name',
       pageId: 42
-    });*/
+    });
 
     this.querySub = this.route.queryParams.subscribe(params => {
       this.forumService

@@ -11,6 +11,7 @@ import {
   APIAttrConflict,
   APIAttrConflictValue
 } from '../../services/attrs';
+import { PageEnvService } from '../../services/page-env.service';
 
 interface APIAttrConflictValueInList extends APIAttrConflictValue {
   user?: APIUser;
@@ -39,7 +40,8 @@ export class AccountSpecsConflictsComponent implements OnInit, OnDestroy {
     private router: Router,
     public auth: AuthService,
     private route: ActivatedRoute,
-    private attrService: AttrsService
+    private attrService: AttrsService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -47,14 +49,13 @@ export class AccountSpecsConflictsComponent implements OnInit, OnDestroy {
       this.filter = params.filter || '0';
       this.page = params.page;
 
-      /*this.$scope.pageEnv({
-      layout: {
-        blankPage: false,
-        needRight: false
-      },
-      name: 'page/188/name',
-      pageId: 188
-    });*/
+      this.pageEnv.set({
+        layout: {
+          needRight: false
+        },
+        name: 'page/188/name',
+        pageId: 188
+      });
 
       this.http
         .get<APIUser>('/api/user/me', {

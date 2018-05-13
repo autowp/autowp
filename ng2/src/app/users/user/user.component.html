@@ -24,11 +24,11 @@
 
     <p *ngIf="user.reg_date">
       {{'users/user/registration-date'|translate}}:
-      <strong am-time-ago="user.reg_date"></strong>
+      <strong [textContent]="user.reg_date | amTimeAgo"></strong>
     </p>
     <p>
       {{'users/user/last-visited'|translate}}:
-      <strong am-time-ago="user.last_online"></strong>
+      <strong [textContent]="user.last_online | amTimeAgo"></strong>
     </p>
 
     <p translate [translateParams]="{id: user.id}">ng/moder/database-id-n</p>

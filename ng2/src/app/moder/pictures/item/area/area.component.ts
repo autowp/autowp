@@ -8,6 +8,7 @@ import { PictureItemService } from '../../../../services/picture-item';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { PictureService, APIPicture } from '../../../../services/picture';
+import { PageEnvService } from '../../../../services/page-env.service';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -46,19 +47,19 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
     private pictureItemService: PictureItemService,
     private router: Router,
     private route: ActivatedRoute,
-    private pictureService: PictureService
+    private pictureService: PictureService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/148/name',
-            pageId: 148
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/148/name',
+      pageId: 148
+    });
 
     this.routeSub = this.route.params.subscribe(params => {
       this.id = params.id;

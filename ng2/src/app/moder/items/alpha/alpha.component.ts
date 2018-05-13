@@ -4,6 +4,7 @@ import { APIPaginator } from '../../../services/api.service';
 import { ItemService, APIItem } from '../../../services/item';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { PageEnvService } from '../../../services/page-env.service';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -27,26 +28,28 @@ export class ModerItemsAlphaComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private itemService: ItemService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/74/name',
-            pageId: 74
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/74/name',
+      pageId: 74
+    });
   }
 
   ngOnInit(): void {
     this.querySub = this.route.queryParams.subscribe(params => {
       this.page = params.page;
 
-      this.http.get<APIItemAlphaGetResponse>('/api/item/alpha').subscribe(response => {
-        this.groups = response.groups;
-      });
+      this.http
+        .get<APIItemAlphaGetResponse>('/api/item/alpha')
+        .subscribe(response => {
+          this.groups = response.groups;
+        });
 
       if (params.char) {
         this.loadChar(params.char);

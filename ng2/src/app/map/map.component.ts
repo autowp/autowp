@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import Notify from '../notify';
 import { Subscription } from 'rxjs';
 import { APIItem } from '../services/item';
+import { PageEnvService } from '../services/page-env.service';
 
 // require('leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap');
 // require('leaflet-webgl-heatmap/dist/leaflet-webgl-heatmap.min');
@@ -20,19 +21,18 @@ const popupMarkup = require('./popup.html');
 export class MapComponent {
   private dataSub: Subscription;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private pageEnv: PageEnvService) {
     // let map: any = null;
     // let heatmap: any = null;
 
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       disablePageName: true,
       name: 'page/117/name',
       pageId: 117
-    });*/
+    });
 
     let currentPopup: any = null;
 
@@ -44,7 +44,7 @@ export class MapComponent {
 
     $('#google-map').each(() => {
       const defaultZoom = 4;
-/*
+      /*
       map = leaflet.map(this).setView([50, 20], defaultZoom);
       map.on('zoom', () => {
         // console.log('viewreset');

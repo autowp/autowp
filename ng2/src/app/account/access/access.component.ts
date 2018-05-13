@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import Notify from '../../notify';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-account-access',
@@ -10,30 +11,28 @@ import { Router } from '@angular/router';
 })
 @Injectable()
 export class AccountAccessComponent {
-  public invalidParams: any;
-  public form: any;
+  public invalidParams: any = {};
+  public form: any = {
+    password_old: null,
+    password: null,
+    password_confirm: null
+  };
 
   constructor(
     private http: HttpClient,
     private translate: TranslateService,
-    private router: Router
+    private router: Router,
+    private pageEnv: PageEnvService
   ) {
-    this.form = {
-      password_old: null,
-      password: null,
-      password_confirm: null
-    };
 
-    this.invalidParams = {};
 
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/133/name',
       pageId: 133
-    });*/
+    });
   }
 
   public submit() {

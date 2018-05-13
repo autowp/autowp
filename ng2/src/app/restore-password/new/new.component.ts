@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import Notify from '../../notify';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-restore-password-new',
@@ -22,18 +23,18 @@ export class RestorePasswordNewComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/134/name',
       pageId: 134
-    });*/
+    });
     this.routeSub = this.route.params.subscribe(params => {
       this.form.code = params.code;
 

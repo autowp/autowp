@@ -8,7 +8,7 @@
         </strong>
       </p>
       <p [textContent]="theme.description|translate" *ngIf="theme.description"></p>
-      <p [translateParams]="{topics: theme.topics_count, messages: theme.messages_count}" translate="{topics} topics and {messages} messages"></p>
+      <p [translateParams]="{topics: theme.topics_count, messages: theme.messages_count}" translate>{{'{topics} topics and {messages} messages'}}</p>
       <div *ngIf="theme.subthemes && theme.subthemes.length > 0">
         {{'forums/subforums'|translate}}
         <a [href]="subtheme.url" *ngFor="let subtheme of theme.subthemes" [textContent]="subtheme.name|translate"></a>
@@ -23,7 +23,7 @@
       <div *ngIf="theme.last_message">
         <p>
           <i class="fa fa-comment"></i>
-          <a ui-sref="forums-topic({topic_id: theme.last_topic.id})" [translateParams]="{topic_name: theme.last_topic.name}" translate="forums/last-message-in-topic-{topic_name}"></a>
+          <a ui-sref="forums-topic({topic_id: theme.last_topic.id})" [translateParams]="{topic_name: theme.last_topic.name}" translate>{{'forums/last-message-in-topic-{topic_name}'}}</a>
         </p>
         <p>
           <app-past-time-indicator [date]="theme.last_message.datetime"></app-past-time-indicator>
@@ -53,7 +53,7 @@
         <th *ngIf="forumAdmin"></th>
       </tr>
     </thead>
-    <tbody>
+    <tbody *ngIf="theme">
       <tr *ngFor="let topic of theme.topics.items">
         <td>
           <span class="fa fa-lock" *ngIf="topic.status == 'closed'"></span>
@@ -104,4 +104,4 @@
   <app-paginator [data]="theme.topics.paginator" *ngIf="theme.topics.paginator"></app-paginator>
 </div>
 
-<p class="text-right small" *ngIf="theme" translate="{topics} topics and {messages} messages" [translateParams]="{topics: theme.topics_count, messages: theme.messages_count}"></p>
+<p class="text-right small" *ngIf="theme" translate [translateParams]="{topics: theme.topics_count, messages: theme.messages_count}">{{'{topics} topics and {messages} messages'}}</p>

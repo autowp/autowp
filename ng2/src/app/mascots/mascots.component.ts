@@ -5,6 +5,7 @@ import Notify from '../notify';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { PictureService, APIPicture } from '../services/picture';
+import { PageEnvService } from '../services/page-env.service';
 
 @Component({
   selector: 'app-mascots',
@@ -19,18 +20,18 @@ export class MascotsComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private pictureService: PictureService
+    private pictureService: PictureService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/201/name',
       pageId: 201
-    });*/
+    });
 
     this.querySub = this.route.queryParams.subscribe(params => {
       this.pictureService

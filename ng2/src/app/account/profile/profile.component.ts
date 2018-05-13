@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { APIUser } from '../../services/user';
 import { FileUploader, FileItem, ParsedResponseHeaders } from 'ng2-file-upload';
+import { PageEnvService } from '../../services/page-env.service';
 
 export interface APITimezoneGetResponse {
   items: string[];
@@ -51,7 +52,8 @@ export class AccountProfileComponent {
     private translate: TranslateService,
     private http: HttpClient,
     private router: Router,
-    private auth: AuthService
+    private auth: AuthService,
+    private pageEnv: PageEnvService
   ) {
     if (!this.auth.user) {
       // TODO: use guard
@@ -74,19 +76,22 @@ export class AccountProfileComponent {
         );
     };
 
-    this.uploader.onErrorItem = (item: FileItem, response: string, status: number, headers: ParsedResponseHeaders) => {
+    this.uploader.onErrorItem = (
+      item: FileItem,
+      response: string,
+      status: number,
+      headers: ParsedResponseHeaders
+    ) => {
       this.photoInvalidParams = JSON.parse(response).invalid_params;
-      console.log(this.photoInvalidParams);
     };
 
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/129/name',
       pageId: 129
-    });*/
+    });
 
     this.http
       .get<APIUser>('/api/user/me', {

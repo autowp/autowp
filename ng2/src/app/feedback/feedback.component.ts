@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import Notify from '../notify';
 import { Router } from '@angular/router';
 import { ReCaptchaService } from '../services/recaptcha';
+import { PageEnvService } from '../services/page-env.service';
 
 @Component({
   selector: 'app-feedback',
@@ -23,7 +24,8 @@ export class FeedbackComponent {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private reCaptchaService: ReCaptchaService
+    private reCaptchaService: ReCaptchaService,
+    private pageEnv: PageEnvService
   ) {
     this.reCaptchaService.get().subscribe(
       response => {
@@ -35,14 +37,13 @@ export class FeedbackComponent {
       }
     );
 
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/89/name',
       pageId: 89
-    });*/
+    });
   }
 
   public submit() {

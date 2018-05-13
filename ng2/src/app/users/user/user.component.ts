@@ -11,6 +11,7 @@ import { AuthService } from '../../services/auth.service';
 import { PictureService, APIPicture } from '../../services/picture';
 import { CommentService, APIComment } from '../../services/comment';
 import { APIIP } from '../../services/ip';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-users-user',
@@ -52,7 +53,8 @@ export class UsersUserComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private auth: AuthService,
     private pictureService: PictureService,
-    private commentService: CommentService
+    private commentService: CommentService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -111,9 +113,8 @@ export class UsersUserComponent implements OnInit, OnDestroy {
       return;
     }
 
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/62/name',
@@ -124,7 +125,7 @@ export class UsersUserComponent implements OnInit, OnDestroy {
           ? this.user.identity
           : 'user' + this.user.id
       }
-    });*/
+    });
 
     this.acl
       .isAllowed('user', 'ip')

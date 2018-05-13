@@ -1,4 +1,5 @@
 import { Component, Injectable } from '@angular/core';
+import { PageEnvService } from '../../../services/page-env.service';
 
 @Component({
   selector: 'app-donate-vod-success',
@@ -6,14 +7,13 @@ import { Component, Injectable } from '@angular/core';
 })
 @Injectable()
 export class DonateVodSuccessComponent {
-  constructor() {
-    /*this.$scope.pageEnv({
+  constructor(private pageEnv: PageEnvService) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/196/name',
       pageId: 196
-    });*/
+    });
   }
 }

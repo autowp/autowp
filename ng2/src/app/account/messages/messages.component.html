@@ -42,7 +42,7 @@
               &nbsp;
             </span>
             <i class="fa fa-clock-o"></i>
-            <span am-time-ago="message.date"></span>
+            <span [textContent]="message.date | amTimeAgo"></span>
           </div>
         </div>
       </div>

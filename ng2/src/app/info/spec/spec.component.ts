@@ -1,6 +1,7 @@
 import { Component, Injectable } from '@angular/core';
 import Notify from '../../notify';
 import { SpecService, APISpec } from '../../services/spec';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-info-spec',
@@ -10,15 +11,17 @@ import { SpecService, APISpec } from '../../services/spec';
 export class InfoSpecComponent {
   public specs: APISpec[];
 
-  constructor(private specService: SpecService) {
-    /*his.$scope.pageEnv({
+  constructor(
+    private specService: SpecService,
+    private pageEnv: PageEnvService
+  ) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/174/name',
       pageId: 174
-    });*/
+    });
 
     this.specService
       .getSpecs()

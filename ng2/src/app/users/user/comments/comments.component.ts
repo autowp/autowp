@@ -6,6 +6,7 @@ import { UserService, APIUser } from '../../../services/user';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CommentService, APIComment } from '../../../services/comment';
+import { PageEnvService } from '../../../services/page-env.service';
 
 interface Order {
   name: string;
@@ -38,7 +39,8 @@ export class UsersUserCommentsComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
-    private commentService: CommentService
+    private commentService: CommentService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -91,9 +93,8 @@ export class UsersUserCommentsComponent implements OnInit, OnDestroy {
   }
 
   public init() {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/205/name',
@@ -104,7 +105,7 @@ export class UsersUserCommentsComponent implements OnInit, OnDestroy {
           ? this.user.identity
           : 'user' + this.user.id
       }
-    });*/
+    });
 
     this.loading++;
     this.commentService

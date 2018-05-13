@@ -1,4 +1,5 @@
 import { Component, Injectable, AfterViewInit } from '@angular/core';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-moder-index',
@@ -6,15 +7,16 @@ import { Component, Injectable, AfterViewInit } from '@angular/core';
 })
 @Injectable()
 export class ModerIndexComponent implements AfterViewInit {
+  constructor(private pageEnv: PageEnvService) {}
+
   ngAfterViewInit() {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
         isAdminPage: true,
-        blankPage: false,
         needRight: false
       },
       name: 'page/67/name',
       pageId: 67
-    });*/
+    });
   }
 }

@@ -20,6 +20,7 @@ import { APIPicture, PictureService } from '../../../services/picture';
 import { ItemParentService } from '../../../services/item-parent';
 import { ItemLinkService, APIItemLink } from '../../../services/item-link';
 import { ItemLanguageService } from '../../../services/item-language';
+import { PageEnvService } from '../../../services/page-env.service';
 
 // Acl.isAllowed('car', 'edit_meta', 'unauthorized');
 
@@ -169,7 +170,8 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
     private pictureService: PictureService,
     private itemParentService: ItemParentService,
     private itemLinkService: ItemLinkService,
-    private itemLanguageService: ItemLanguageService
+    private itemLanguageService: ItemLanguageService,
+    private pageEnv: PageEnvService
   ) {
     this.loading++;
   }
@@ -292,19 +294,18 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
             this.translate
               .get('item/type/' + this.item.item_type_id + '/name')
               .subscribe(translation => {
-                /*$scope.pageEnv({
-                    layout: {
-                        isAdminPage: true,
-                        blankPage: false,
-                        needRight: false
-                    },
-                    name: 'page/78/name',
-                    pageId: 78,
-                    args: {
-                        CAR_ID: this.item.id,
-                        CAR_NAME: translation + ': ' + this.item.name_text
-                    }
-                });*/
+                this.pageEnv.set({
+                  layout: {
+                    isAdminPage: true,
+                    needRight: false
+                  },
+                  name: 'page/78/name',
+                  pageId: 78,
+                  args: {
+                    CAR_ID: this.item.id + '',
+                    CAR_NAME: translation + ': ' + this.item.name_text
+                  }
+                });
               });
             this.tabs.name.count = this.item.item_language_count;
             this.tabs.logo.count = this.item.logo ? 1 : 0;

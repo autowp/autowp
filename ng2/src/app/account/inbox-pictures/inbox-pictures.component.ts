@@ -10,6 +10,7 @@ import {
   PictureService,
   APIPicture
 } from '../../services/picture';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-account-inbox-pictures',
@@ -26,18 +27,18 @@ export class AccountInboxPicturesComponent implements OnInit, OnDestroy {
     private router: Router,
     private auth: AuthService,
     private route: ActivatedRoute,
-    private pictureService: PictureService
+    private pictureService: PictureService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/94/name',
       pageId: 94
-    });*/
+    });
 
     this.querySub = this.route.queryParams.subscribe(params => {
       this.pictureService

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import Notify from '../notify';
 import { Router } from '@angular/router';
 import { ReCaptchaService } from '../services/recaptcha';
+import { PageEnvService } from '../services/page-env.service';
 
 @Component({
   selector: 'app-restore-password',
@@ -22,7 +23,8 @@ export class RestorePasswordComponent {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private reCaptchaService: ReCaptchaService
+    private reCaptchaService: ReCaptchaService,
+    private pageEnv: PageEnvService
   ) {
     this.reCaptchaService.get().subscribe(
       response => {
@@ -34,14 +36,13 @@ export class RestorePasswordComponent {
       }
     );
 
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/60/name',
       pageId: 60
-    });*/
+    });
   }
 
   public submit() {

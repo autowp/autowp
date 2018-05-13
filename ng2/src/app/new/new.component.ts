@@ -6,6 +6,7 @@ import Notify from '../notify';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { APIPicture } from '../services/picture';
+import { PageEnvService } from '../services/page-env.service';
 
 export interface APINewGroup {
   type: string;
@@ -55,21 +56,21 @@ export class NewComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
     this.routeSub = this.route.params.subscribe(params => {
       this.date = params.date;
 
-      /*$scope.pageEnv({
-      layout: {
-        blankPage: false,
-        needRight: false
-      },
-      name: 'page/51/name',
-      pageId: 51
-    });*/
+      this.pageEnv.set({
+        layout: {
+          needRight: false
+        },
+        name: 'page/51/name',
+        pageId: 51
+      });
 
       this.http
         .get<APINewGetResponse>('/api/new', {

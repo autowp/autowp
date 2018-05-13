@@ -6,6 +6,7 @@ import {
   APIACLRule,
   APIACLResource
 } from '../../services/acl.service';
+import { PageEnvService } from '../../services/page-env.service';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -49,16 +50,19 @@ export class ModerRightsComponent {
     allowed: 0
   };
 
-  constructor(private http: HttpClient, private acl: APIACL) {
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/71/name',
-            pageId: 71
-        });*/
+  constructor(
+    private http: HttpClient,
+    private acl: APIACL,
+    private pageEnv: PageEnvService
+  ) {
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/71/name',
+      pageId: 71
+    });
 
     this.loadRules();
     this.loadResources();

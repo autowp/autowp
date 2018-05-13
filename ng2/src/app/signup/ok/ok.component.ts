@@ -1,4 +1,5 @@
 import { Component, Injectable } from '@angular/core';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-signup-ok',
@@ -6,14 +7,13 @@ import { Component, Injectable } from '@angular/core';
 })
 @Injectable()
 export class SignupOkComponent {
-  constructor() {
-    /*this.$scope.pageEnv({
+  constructor(private pageEnv: PageEnvService) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/53/name',
       pageId: 53
-    });*/
+    });
   }
 }

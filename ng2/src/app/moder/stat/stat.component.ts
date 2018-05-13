@@ -1,6 +1,7 @@
 import { Component, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import Notify from '../../notify';
+import { PageEnvService } from '../../services/page-env.service';
 
 interface StatItem {
   name: string;
@@ -20,16 +21,15 @@ interface APIStatGlobalSummary {
 export class ModerStatComponent {
   public items: StatItem[] = [];
 
-  constructor(private http: HttpClient) {
-    /*this.$scope.pageEnv({
+  constructor(private http: HttpClient, private pageEnv: PageEnvService) {
+    this.pageEnv.set({
       layout: {
         isAdminPage: true,
-        blankPage: false,
         needRight: false
       },
       name: 'page/119/name',
       pageId: 119
-    });*/
+    });
 
     this.http.get<APIStatGlobalSummary>('/api/stat/global-summary').subscribe(
       response => {

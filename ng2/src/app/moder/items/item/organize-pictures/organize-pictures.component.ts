@@ -10,6 +10,7 @@ import {
   APIPictureItem
 } from '../../../../services/picture-item';
 import { APIPicture } from '../../../../services/picture';
+import { PageEnvService } from '../../../../services/page-env.service';
 
 // Acl.isAllowed('car', 'move', 'unauthorized');
 
@@ -39,7 +40,8 @@ export class ModerItemsItemOrganizePicturesComponent
     private itemService: ItemService,
     private router: Router,
     private route: ActivatedRoute,
-    private pictureItemService: PictureItemService
+    private pictureItemService: PictureItemService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -77,19 +79,18 @@ export class ModerItemsItemOrganizePicturesComponent
             this.translate
               .get('item/type/' + this.item.item_type_id + '/name')
               .subscribe(translation => {
-                /*$scope.pageEnv({
-                    layout: {
-                        isAdminPage: true,
-                        blankPage: false,
-                        needRight: false
-                    },
-                    name: 'page/78/name',
-                    pageId: 78,
-                    args: {
-                        CAR_ID: this.item.id,
-                        CAR_NAME: translation + ': ' + this.item.name_text
-                    }
-                });*/
+                this.pageEnv.set({
+                  layout: {
+                    isAdminPage: true,
+                    needRight: false
+                  },
+                  name: 'page/78/name',
+                  pageId: 78,
+                  args: {
+                    CAR_ID: this.item.id + '',
+                    CAR_NAME: translation + ': ' + this.item.name_text
+                  }
+                });
               });
           },
           () => {

@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { APIForumTheme, ForumService } from '../../services/forum';
 import { AuthService } from '../../services/auth.service';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-forums-new-topic',
@@ -25,7 +26,8 @@ export class ForumsNewTopicComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private forumService: ForumService,
-    public auth: AuthService
+    public auth: AuthService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -34,18 +36,17 @@ export class ForumsNewTopicComponent implements OnInit, OnDestroy {
         response => {
           this.theme = response;
 
-          /*$scope.pageEnv({
+          this.pageEnv.set({
             layout: {
-              blankPage: false,
               needRight: false
             },
             name: 'page/45/name',
             pageId: 45,
             args: {
               THEME_NAME: this.theme.name,
-              THEME_ID: this.theme.id
+              THEME_ID: this.theme.id + ''
             }
-          });*/
+          });
         },
         response => {
           this.router.navigate(['/error-404']);

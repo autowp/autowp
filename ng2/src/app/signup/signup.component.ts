@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import Notify from '../notify';
 import { Router } from '@angular/router';
 import { ReCaptchaService } from '../services/recaptcha';
+import { PageEnvService } from '../services/page-env.service';
 
 @Component({
   selector: 'app-signup',
@@ -24,7 +25,8 @@ export class SignupComponent {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private reCaptchaService: ReCaptchaService
+    private reCaptchaService: ReCaptchaService,
+    private pageEnv: PageEnvService
   ) {
     this.reCaptchaService.get().subscribe(
       response => {
@@ -36,14 +38,13 @@ export class SignupComponent {
       }
     );
 
-    /*$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/52/name',
       pageId: 52
-    });*/
+    });
   }
 
   public submit() {

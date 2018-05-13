@@ -9,6 +9,7 @@ import {
   APIForumTopic
 } from '../../services/forum';
 import { Subscription } from 'rxjs';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-forums-move-message',
@@ -26,16 +27,16 @@ export class ForumsMoveMessageComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private forumService: ForumService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/83/name',
       pageId: 83
-    });*/
+    });
   }
 
   ngOnInit(): void {

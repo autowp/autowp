@@ -2,6 +2,7 @@ import { Component, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { IpService } from '../../../services/ip';
 import { Router } from '@angular/router';
+import { PageEnvService } from '../../../services/page-env.service';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -27,32 +28,34 @@ export class ModerTrafficWhitelistComponent {
   constructor(
     private http: HttpClient,
     private ipService: IpService,
-    private router: Router
+    private router: Router,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/77/name',
-            pageId: 77
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/77/name',
+      pageId: 77
+    });
 
-    this.http.get<APITrafficWhitelistGetResponse>('/api/traffic/whitelist').subscribe(
-      response => {
-        this.items = response.items;
+    this.http
+      .get<APITrafficWhitelistGetResponse>('/api/traffic/whitelist')
+      .subscribe(
+        response => {
+          this.items = response.items;
 
-        /*for(const item of $scope.items) {
+          /*for(const item of $scope.items) {
                 ipService.getHostByAddr(item.ip).then((hostname) => {
                     item.hostname = hostname;
                 });
             }*/
-      },
-      () => {
-        this.router.navigate(['/error-404']);
-      }
-    );
+        },
+        () => {
+          this.router.navigate(['/error-404']);
+        }
+      );
   }
 
   public deleteItem(item: APITrafficWhitelistItem) {

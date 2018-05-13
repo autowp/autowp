@@ -7,6 +7,7 @@ import Notify from '../../../notify';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { PageEnvService } from '../../../services/page-env.service';
 
 // Acl.isAllowed('car', 'add', 'unauthorized');
 
@@ -64,7 +65,8 @@ export class ModerItemsNewComponent implements OnInit, OnDestroy {
     private specService: SpecService,
     private itemService: ItemService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -136,18 +138,17 @@ export class ModerItemsNewComponent implements OnInit, OnDestroy {
         .get('item/type/' + params.item_type_id + '/new-item')
         .subscribe(
           (translation: string) => {
-            /*this.$scope.pageEnv({
-                  layout: {
-                      isAdminPage: true,
-                      blankPage: false,
-                      needRight: false
-                  },
-                  name: 'page/163/name',
-                  pageId: 163,
-                  args: {
-                      NEW_ITEM_OF_TYPE: translation
-                  }
-              });*/
+            this.pageEnv.set({
+              layout: {
+                isAdminPage: true,
+                needRight: false
+              },
+              name: 'page/163/name',
+              pageId: 163,
+              args: {
+                NEW_ITEM_OF_TYPE: translation
+              }
+            });
           },
           () => {
             console.log('Translate failed');

@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { PictureService, APIPicture } from '../services/picture';
 import { InboxService } from '../services/inbox';
 import { APIItem } from '../services/item';
+import { PageEnvService } from '../services/page-env.service';
 
 const ALL_BRANDS = 'all';
 
@@ -43,7 +44,8 @@ export class InboxComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private route: ActivatedRoute,
     private pictureService: PictureService,
-    private inboxService: InboxService
+    private inboxService: InboxService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -64,58 +66,52 @@ export class InboxComponent implements OnInit, OnDestroy {
         this.brand_id = params.brand ? parseInt(params.brand, 10) : 0;
       }
 
-      /*this.$scope.pageEnv({
+      this.pageEnv.set({
         layout: {
-          blankPage: false,
           needRight: false
         },
         name: 'page/76/name',
         pageId: 76
-      });*/
+      });
 
-      this.inboxService.get(this.brand_id, params.date, params.page)
-        .subscribe(
-          response => {
-            this.paginator = response.paginator;
-            this.prev = response.prev;
-            this.current = response.current;
-            this.next = response.next;
-            this.brands = response.brands;
+      this.inboxService.get(this.brand_id, params.date, params.page).subscribe(
+        response => {
+          this.paginator = response.paginator;
+          this.prev = response.prev;
+          this.current = response.current;
+          this.next = response.next;
+          this.brands = response.brands;
 
-            if (params.date !== this.current.date) {
-              this.router.navigate([
-                '/inbox',
-                this.brand_id,
-                this.current.date
-              ]);
-              return;
-            }
-
-            this.pictureService
-              .getPictures({
-                status: 'inbox',
-                fields:
-                  'owner,thumb_medium,votes,views,comments_count,name_html,name_text',
-                limit: 30,
-                page: params.page,
-                item_id: this.brand_id,
-                add_date: this.current.date,
-                order: 1
-              })
-              .subscribe(
-                subresponse => {
-                  this.pictures = subresponse.pictures;
-                  this.paginator = subresponse.paginator;
-                },
-                subresponse => {
-                  Notify.response(subresponse);
-                }
-              );
-          },
-          response => {
-            Notify.response(response);
+          if (params.date !== this.current.date) {
+            this.router.navigate(['/inbox', this.brand_id, this.current.date]);
+            return;
           }
-        );
+
+          this.pictureService
+            .getPictures({
+              status: 'inbox',
+              fields:
+                'owner,thumb_medium,votes,views,comments_count,name_html,name_text',
+              limit: 30,
+              page: params.page,
+              item_id: this.brand_id,
+              add_date: this.current.date,
+              order: 1
+            })
+            .subscribe(
+              subresponse => {
+                this.pictures = subresponse.pictures;
+                this.paginator = subresponse.paginator;
+              },
+              subresponse => {
+                Notify.response(subresponse);
+              }
+            );
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
     });
   }
 

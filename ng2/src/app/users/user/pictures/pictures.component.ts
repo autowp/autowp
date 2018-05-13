@@ -6,6 +6,7 @@ import { ItemService, APIItem } from '../../../services/item';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UserService, APIUser } from '../../../services/user';
 import { Subscription } from 'rxjs';
+import { PageEnvService } from '../../../services/page-env.service';
 
 interface APIItemInList extends APIItem {
   cssClass?: string;
@@ -28,7 +29,8 @@ export class UsersUserPicturesComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private router: Router,
     private userService: UserService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -81,9 +83,8 @@ export class UsersUserPicturesComponent implements OnInit, OnDestroy {
       ? this.user.identity
       : 'user' + this.user.id;
 
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/63/name',
@@ -92,7 +93,7 @@ export class UsersUserPicturesComponent implements OnInit, OnDestroy {
         USER_NAME: this.user.name,
         USER_IDENTITY: this.identity
       }
-    });*/
+    });
 
     this.itemService
       .getItems({

@@ -11,6 +11,7 @@ import {
   ItemParentService,
   APIItemParent
 } from '../../../../services/item-parent';
+import { PageEnvService } from '../../../../services/page-env.service';
 
 // Acl.isAllowed('car', 'edit_meta', 'unauthorized');
 
@@ -56,7 +57,8 @@ export class ModerItemsItemSelectParentComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private router: Router,
     private route: ActivatedRoute,
-    private itemParentService: ItemParentService
+    private itemParentService: ItemParentService,
+    private pageEnv: PageEnvService
   ) {
     this.loadChildCategories = (parent: APIItemInSelectParent) => {
       this.itemParentService
@@ -130,19 +132,18 @@ export class ModerItemsItemSelectParentComponent implements OnInit, OnDestroy {
             this.translate
               .get('item/type/' + this.item.item_type_id + '/name')
               .subscribe((translation: string) => {
-                /*$scope.pageEnv({
+                this.pageEnv.set({
                     layout: {
                         isAdminPage: true,
-                        blankPage: false,
                         needRight: false
                     },
                     name: 'page/144/name',
                     pageId: 144,
                     args: {
-                        CAR_ID: this.item.id,
+                        CAR_ID: this.item.id + '',
                         CAR_NAME: translation + ': ' + this.item.name_text
                     }
-                });*/
+                });
               });
 
             this.showCatalogueTab = [1, 2, 5].includes(this.item.item_type_id);

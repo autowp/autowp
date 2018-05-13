@@ -5,6 +5,7 @@ import { UserService, APIUser } from '../../services/user';
 import Notify from '../../notify';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { PageEnvService } from '../../services/page-env.service';
 
 const JsDiff = require('diff');
 
@@ -56,16 +57,16 @@ export class InfoTextComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private userService: UserService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/197/name',
       pageId: 197
-    });*/
+    });
   }
 
   ngOnInit(): void {

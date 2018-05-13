@@ -2,7 +2,7 @@
   <tr *ngFor="let event of items">
     <td>
       <app-user [user]="event.user" *ngIf="event.user"></app-user>
-      <div *ngIf="event.date" am-time-ago="event.date"></div>
+      <div *ngIf="event.date" [textContent]="event.date | amTimeAgo"></div>
     </td>
     <td [innerHTML]="event.desc"></td>
     <td>

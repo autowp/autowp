@@ -11,6 +11,7 @@ import {
   APIVotingVariant
 } from '../services/voting';
 import { AuthService } from '../services/auth.service';
+import { PageEnvService } from '../services/page-env.service';
 
 @Component({
   selector: 'app-voting',
@@ -31,7 +32,8 @@ export class VotingComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private votingService: VotingService,
-    public auth: AuthService
+    public auth: AuthService,
+    private pageEnv: PageEnvService
   ) {}
 
   public load(callback?: () => void) {
@@ -53,18 +55,17 @@ export class VotingComponent implements OnInit, OnDestroy {
     this.routeSub = this.route.params.subscribe(params => {
       this.id = params.id;
       this.load(() => {
-        /*this.$scope.pageEnv({
+        this.pageEnv.set({
           layout: {
-            blankPage: false,
             needRight: true
           },
           name: 'page/157/name',
           pageId: 157,
           args: {
             VOTING_NAME: this.voting.name,
-            VOTING_ID: this.voting.id
+            VOTING_ID: this.voting.id + ''
           }
-        });*/
+        });
       });
     });
   }

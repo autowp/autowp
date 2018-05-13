@@ -9,6 +9,7 @@ import Notify from './notify';
 import { APIUser } from './services/user';
 import { MessageService } from './services/message';
 import { Page, PageService } from './services/page';
+import { PageEnvService } from './services/page-env.service';
 
 function replaceArgs(str: string, args: {[key: string]: string}): string {
   for (const key in args) {
@@ -38,14 +39,6 @@ export class AppComponent implements OnInit {
   public categories = [];
   public moderMenu; // = opt.moderMenu;
   public searchHostname; // = opt.searchHostname;
-  public pageName = null;
-  public title = 'WheelsAge';
-  public pageId = null;
-  public disablePageName = false;
-  public needRight = false;
-  public spanRight = 0;
-  public spanCenter = 12;
-  public isAdminPage = false;
   public loginForm = {
     login: '',
     password: '',
@@ -59,7 +52,8 @@ export class AppComponent implements OnInit {
     private translate: TranslateService,
     private http: HttpClient,
     private pages: PageService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    public pageEnv: PageEnvService
   ) {
     translate.setTranslation('en', require('../languages/en.json'));
     translate.setDefaultLang('en');
@@ -74,8 +68,6 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     // this.updateRights();
 
-    this.setSidebars(false);
-
     this.mainMenuItems = this.pages.getMenu(2);
     this.secondaryMenuItems = this.pages.getMenu(87);
     this.mainInSecondaryItems = [];
@@ -88,51 +80,6 @@ export class AppComponent implements OnInit {
     this.messageService.newMessagesCount.subscribe((value) => {
       this.newPersonalMessages = value;
     });
-  }
-
-  pageEnv(data) {
-    this.setSidebars(data.layout.needRight);
-    this.isAdminPage = data.layout.isAdminPage;
-    this.disablePageName = !!data.disablePageName;
-
-    const args = data.args ? data.args : {};
-    const preparedUrlArgs: {[key: string]: string} = {};
-    const preparedNameArgs: {[key: string]: string} = {};
-    for (const key in args) {
-      if (args.hasOwnProperty(key)) {
-        preparedUrlArgs['%' + key + '%'] = encodeURIComponent(args[key]);
-        preparedNameArgs['%' + key + '%'] = args[key];
-      }
-    }
-
-    // PageService.setCurrent(data.pageId, preparedNameArgs);
-
-    if (data.pageId) {
-      let nameKey: string;
-      let titleKey: string;
-      if (data.name) {
-        nameKey = data.name;
-        titleKey = data.title ? data.title : data.name;
-      } else {
-        nameKey = 'page/' + data.pageId + '/name';
-        titleKey = 'page/' + data.pageId + '/title';
-      }
-      this.translate.get([nameKey, titleKey]).subscribe(
-        (translations: string[]) => {
-          const name = replaceArgs(translations[0], preparedNameArgs);
-          const title = replaceArgs(translations[1], preparedNameArgs);
-          this.pageName = name;
-          this.title = title ? title : name;
-        },
-        () => {
-          this.pageName = nameKey;
-          this.title = titleKey;
-        }
-      );
-    } else {
-      this.pageName = null;
-      this.title = data.title ? data.title : null;
-    }
   }
 
   isSecondaryMenuItem(page: Page): boolean {
@@ -165,7 +112,6 @@ export class AppComponent implements OnInit {
   updateRights() {}
 
   signOut(event) {
-    console.log(event);
     event.preventDefault();
 
     this.auth.signOut().then(
@@ -174,12 +120,5 @@ export class AppComponent implements OnInit {
         console.log(error);
       }
     );
-  }
-
-  private setSidebars(right: boolean) {
-    this.needRight = right;
-
-    this.spanRight = right ? 4 : 0;
-    this.spanCenter = 12 - this.spanRight;
   }
 }

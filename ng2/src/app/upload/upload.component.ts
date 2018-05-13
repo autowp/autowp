@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PictureService, APIPicture } from '../services/picture';
 import { AuthService } from '../services/auth.service';
+import { PageEnvService } from '../services/page-env.service';
 
 interface UploadProgress {
   filename: string;
@@ -41,18 +42,18 @@ export class UploadComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private pictureService: PictureService,
-    public auth: AuthService
+    public auth: AuthService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/29/name',
       pageId: 29
-    });*/
+    });
     this.querySub = this.route.queryParams.subscribe(params => {
       this.perspective_id = params.perspective_id;
       const replace = parseInt(params.replace, 10);

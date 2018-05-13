@@ -10,6 +10,7 @@ export interface APIArticle {
   name: string;
   preview_url: string;
   author: APIUser;
+  catname: string;
 }
 
 export interface APIArticlesGetResponse {

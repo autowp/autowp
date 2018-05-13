@@ -5,6 +5,7 @@ import {
   APIBrandsGetResponse,
   APIBrandsLines
 } from '../services/brands.service';
+import { PageEnvService } from '../services/page-env.service';
 
 // import { BrandPopover } from '../brand-popover';
 
@@ -16,15 +17,14 @@ import {
 export class BrandsComponent {
   public items: APIBrandsLines;
 
-  constructor(private http: HttpClient) {
-    /*this.$scope.pageEnv({
+  constructor(private http: HttpClient, private pageEnv: PageEnvService) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/61/name',
       pageId: 61
-    });*/
+    });
 
     this.http.get<APIBrandsGetResponse>('/api/brands').subscribe(
       response => {

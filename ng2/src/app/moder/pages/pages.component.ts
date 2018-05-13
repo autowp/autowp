@@ -2,6 +2,7 @@ import { Component, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ACLService } from '../../services/acl.service';
 import { PageService, APIPage, APIPageLinearized } from '../../services/page';
+import { PageEnvService } from '../../services/page-env.service';
 
 // Acl.inheritsRole('pages-moder', 'unauthorized');
 
@@ -17,17 +18,17 @@ export class ModerPagesComponent {
   constructor(
     private http: HttpClient,
     private acl: ACLService,
-    private pageService: PageService
+    private pageService: PageService,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/68/name',
-            pageId: 68
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/68/name',
+      pageId: 68
+    });
 
     this.acl.isAllowed('hotlinks', 'manage').then(
       allow => {

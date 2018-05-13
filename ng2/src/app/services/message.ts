@@ -25,6 +25,7 @@ export interface APIMessage {
   dialog_with_user_id: number;
   all_messages_link: boolean;
   dialog_count: number;
+  date: string;
 }
 
 export interface APIMessagesGetResponse {

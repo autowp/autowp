@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PictureService, APIPicture } from '../services/picture';
 import { ItemLinkService, APIItemLink } from '../services/item-link';
+import { PageEnvService } from '../services/page-env.service';
 
 @Component({
   selector: 'app-museum',
@@ -26,7 +27,8 @@ export class MuseumComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private pictureService: PictureService,
-    private itemLinkService: ItemLinkService
+    private itemLinkService: ItemLinkService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -44,18 +46,17 @@ export class MuseumComponent implements OnInit, OnDestroy {
               return;
             }
 
-            /*this.$scope.pageEnv({
-          layout: {
-            blankPage: false,
-            needRight: true
-          },
-          name: 'page/159/name',
-          pageId: 159,
-          args: {
-            MUSEUM_ID: this.item.id,
-            MUSEUM_NAME: this.item.name_text
-          }
-        });*/
+            this.pageEnv.set({
+              layout: {
+                needRight: true
+              },
+              name: 'page/159/name',
+              pageId: 159,
+              args: {
+                MUSEUM_ID: this.item.id + '',
+                MUSEUM_NAME: this.item.name_text
+              }
+            });
 
             this.itemLinkService
               .getItems({

@@ -5,6 +5,7 @@ import Notify from '../notify';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { PictureService, APIPicture } from '../services/picture';
+import { PageEnvService } from '../services/page-env.service';
 
 @Component({
   selector: 'app-cutaway',
@@ -19,16 +20,16 @@ export class CutawayComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private pictureService: PictureService
+    private pictureService: PictureService,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/109/name',
       pageId: 109
-    });*/
+    });
   }
 
   ngOnInit(): void {

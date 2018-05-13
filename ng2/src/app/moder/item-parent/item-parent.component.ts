@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { APIItemParent } from '../../services/item-parent';
+import { PageEnvService } from '../../services/page-env.service';
 
 // return Acl.isAllowed('car', 'move', 'unauthorized');
 
@@ -48,7 +49,8 @@ export class ModerItemParentComponent implements OnInit, OnDestroy {
     private ContentLanguage: ContentLanguageService,
     private itemService: ItemService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -116,19 +118,18 @@ export class ModerItemParentComponent implements OnInit, OnDestroy {
           this.translate
             .get('item/type/' + this.item.item_type_id + '/name')
             .subscribe((translation: string) => {
-              /*this.$scope.pageEnv({
-                    layout: {
-                        isAdminPage: true,
-                        blankPage: false,
-                        needRight: false
-                    },
-                    name: 'page/78/name',
-                    pageId: 78,
-                    args: {
-                        CAR_ID: this.item.id,
-                        CAR_NAME: translation + ': ' + this.item.name_text
-                    }
-                });*/
+              this.pageEnv.set({
+                layout: {
+                  isAdminPage: true,
+                  needRight: false
+                },
+                name: 'page/78/name',
+                pageId: 78,
+                args: {
+                  CAR_ID: this.item.id + '',
+                  CAR_NAME: translation + ': ' + this.item.name_text
+                }
+              });
             });
         },
         () => {

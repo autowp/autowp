@@ -7,6 +7,7 @@ import Notify from '../../notify';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ItemParentService, APIItemParent } from '../../services/item-parent';
+import { PageEnvService } from '../../services/page-env.service';
 
 export interface APIItemInUploadSelect extends APIItem {
   childs?: APIItemParentInUploadSelect[];
@@ -46,18 +47,18 @@ export class UploadSelectComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private route: ActivatedRoute,
     private router: Router,
-    private itemParentService: ItemParentService
+    private itemParentService: ItemParentService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/30/name',
       pageId: 30
-    });*/
+    });
     this.loadChildCatalogues = (parent: APIItemParentInUploadSelect) => {
       parent.loading = true;
       this.itemParentService

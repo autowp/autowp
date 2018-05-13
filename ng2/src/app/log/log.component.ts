@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { APIUser } from '../services/user';
 import { APIItem } from '../services/item';
 import { APIPicture } from '../services/picture';
+import { PageEnvService } from '../services/page-env.service';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -33,15 +34,18 @@ export class LogComponent implements OnInit, OnDestroy {
   public items: APILog[] = [];
   public paginator: APIPaginator;
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) {
-    /*this.$scope.pageEnv({
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
+  ) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/75/name',
       pageId: 75
-    });*/
+    });
   }
 
   ngOnInit(): void {

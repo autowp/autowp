@@ -2,6 +2,7 @@ import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-account-emailcheck',
@@ -13,17 +14,20 @@ export class AccountEmailcheckComponent implements OnInit, OnDestroy {
   public success = false;
   public failure = false;
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) {}
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
+  ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/54/name',
       pageId: 54
-    });*/
+    });
     this.routeSub = this.route.params.subscribe(params => {
       this.http
         .post('/api/user/emailcheck', {

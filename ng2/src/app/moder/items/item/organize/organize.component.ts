@@ -9,6 +9,7 @@ import {
   ItemParentService,
   APIItemParent
 } from '../../../../services/item-parent';
+import { PageEnvService } from '../../../../services/page-env.service';
 
 // Acl.isAllowed('car', 'move', 'unauthorized');
 
@@ -39,7 +40,8 @@ export class ModerItemsItemOrganizeComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private router: Router,
     private route: ActivatedRoute,
-    private itemParentService: ItemParentService
+    private itemParentService: ItemParentService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -76,19 +78,18 @@ export class ModerItemsItemOrganizeComponent implements OnInit, OnDestroy {
             this.translate
               .get('item/type/' + this.item.item_type_id + '/name')
               .subscribe(translation => {
-                /*$scope.pageEnv({
-                    layout: {
-                        isAdminPage: true,
-                        blankPage: false,
-                        needRight: false
-                    },
-                    name: 'page/78/name',
-                    pageId: 78,
-                    args: {
-                        CAR_ID: this.item.id,
-                        CAR_NAME: translation + ': ' + this.item.name_text
-                    }
-                });*/
+                this.pageEnv.set({
+                  layout: {
+                    isAdminPage: true,
+                    needRight: false
+                  },
+                  name: 'page/78/name',
+                  pageId: 78,
+                  args: {
+                    CAR_ID: this.item.id + '',
+                    CAR_NAME: translation + ': ' + this.item.name_text
+                  }
+                });
               });
           },
           () => {

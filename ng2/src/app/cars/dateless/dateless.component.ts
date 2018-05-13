@@ -5,6 +5,7 @@ import { ItemService, APIItem } from '../../services/item';
 import Notify from '../../notify';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-cars-deteless',
@@ -19,16 +20,16 @@ export class CarsDatelessComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private itemService: ItemService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/103/name',
       pageId: 1
-    });*/
+    });
   }
 
   ngOnInit(): void {

@@ -2,6 +2,7 @@ import { Component, Injectable } from '@angular/core';
 import * as $ from 'jquery';
 import { HttpClient } from '@angular/common/http';
 import Notify from '../notify';
+import { PageEnvService } from '../services/page-env.service';
 
 // const ChartJS = require('chart');
 
@@ -33,16 +34,15 @@ export class ChartComponent {
   public parameters: APIChartParameter[] = [];
   private chart: any;
 
-  constructor(private http: HttpClient) {
-    /*this.$scope.pageEnv({
+  constructor(private http: HttpClient, private pageEnv: PageEnvService) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/1/name',
       title: 'page/1/title',
       pageId: 1
-    });*/
+    });
 
     const $chart = $('.chart');
 

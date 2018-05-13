@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { OnInit, OnDestroy, Injectable, Component } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ArticleService, APIArticle } from '../../services/article';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-articles-article',
@@ -16,7 +17,8 @@ export class ArticlesArticleComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private articleService: ArticleService
+    private articleService: ArticleService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -36,18 +38,17 @@ export class ArticlesArticleComponent implements OnInit, OnDestroy {
 
             this.article = response.items[0];
 
-            /*this.$scope.pageEnv({
-          layout: {
-            blankPage: false,
-            needRight: false
-          },
-          name: 'page/32/name',
-          pageId: 32,
-          args: {
-            ARTICLE_NAME: this.article.name,
-            ARTICLE_CATNAME: this.article.catname
-          }
-        });*/
+            this.pageEnv.set({
+              layout: {
+                needRight: false
+              },
+              name: 'page/32/name',
+              pageId: 32,
+              args: {
+                ARTICLE_NAME: this.article.name,
+                ARTICLE_CATNAME: this.article.catname
+              }
+            });
           },
           response => {
             if (response.status === 404) {

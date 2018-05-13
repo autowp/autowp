@@ -12,6 +12,7 @@ import {
   APIForumTopic,
   APIForumTheme
 } from '../services/forum';
+import { PageEnvService } from '../services/page-env.service';
 
 @Component({
   selector: 'app-forums',
@@ -34,7 +35,8 @@ export class ForumsComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private route: ActivatedRoute,
     private router: Router,
-    private forumService: ForumService
+    private forumService: ForumService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -66,14 +68,13 @@ export class ForumsComponent implements OnInit, OnDestroy {
 
   private load() {
     if (!this.theme_id) {
-      /*$scope.pageEnv({
+      this.pageEnv.set({
         layout: {
-          blankPage: false,
           needRight: false
         },
         name: 'page/42/name',
         pageId: 42
-      });*/
+      });
 
       this.forumService
         .getThemes({
@@ -106,32 +107,30 @@ export class ForumsComponent implements OnInit, OnDestroy {
 
             this.translate.get(this.theme.name).subscribe(
               (translation: string) => {
-                /*$scope.pageEnv({
+                this.pageEnv.set({
                   layout: {
-                    blankPage: false,
                     needRight: false
                   },
                   name: 'page/43/name',
                   pageId: 43,
                   args: {
                     THEME_NAME: translation,
-                    THEME_ID: this.theme.id
+                    THEME_ID: this.theme.id + ''
                   }
-                });*/
+                });
               },
               () => {
-                /*$scope.pageEnv({
+                this.pageEnv.set({
                   layout: {
-                    blankPage: false,
                     needRight: false
                   },
                   name: 'page/43/name',
                   pageId: 43,
                   args: {
                     THEME_NAME: this.theme.name,
-                    THEME_ID: this.theme.id
+                    THEME_ID: this.theme.id + ''
                   }
-                });*/
+                });
               }
             );
           },

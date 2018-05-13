@@ -7,6 +7,7 @@ import {
   APIPageLinearized,
   APIPage
 } from '../../../services/page';
+import { PageEnvService } from '../../../services/page-env.service';
 
 // Acl.inheritsRole('pages-moder', 'unauthorized');
 
@@ -25,19 +26,19 @@ export class ModerPagesEditComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
-    private pageService: PageService
+    private pageService: PageService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/70/name',
-            pageId: 70
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/70/name',
+      pageId: 70
+    });
 
     this.pageService.getPages().subscribe(response => {
       this.pages = this.pageService.toPlainArray(response.items, 0);

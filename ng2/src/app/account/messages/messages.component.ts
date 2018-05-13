@@ -5,6 +5,7 @@ import { MessageDialogService } from '../../services/message-dialog';
 import Notify from '../../notify';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-account-messages',
@@ -23,7 +24,8 @@ export class AccountMessagesComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private messageDialogService: MessageDialogService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -53,14 +55,13 @@ export class AccountMessagesComponent implements OnInit, OnDestroy {
           break;
       }
 
-      /*this.$scope.pageEnv({
-      layout: {
-        blankPage: false,
-        needRight: false
-      },
-      name: pageName,
-      pageId: pageId
-    });*/
+      this.pageEnv.set({
+        layout: {
+          needRight: false
+        },
+        name: pageName,
+        pageId: pageId
+      });
 
       this.load();
     });

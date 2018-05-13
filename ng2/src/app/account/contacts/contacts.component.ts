@@ -5,6 +5,7 @@ import Notify from '../../notify';
 import { Router } from '@angular/router';
 import { ContactsService } from '../../services/contacts';
 import { APIUser } from '../../services/user';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-account-contacts',
@@ -18,16 +19,16 @@ export class AccountContactsComponent {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private contactsService: ContactsService
+    private contactsService: ContactsService,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/198/name',
       pageId: 198
-    });*/
+    });
 
     this.contactsService
       .getContacts({

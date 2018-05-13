@@ -16,7 +16,8 @@ import {
   APIAttrValue
 } from '../../services/attrs';
 import { AuthService } from '../../services/auth.service';
-import { Observable ,  Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { PageEnvService } from '../../services/page-env.service';
 
 export interface APIAttrAttributeInSpecEditor extends APIAttrAttribute {
   deep?: number;
@@ -105,7 +106,8 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
     private router: Router,
     private attrsService: AttrsService,
     private auth: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {
     this.values = new Map<number, APIAttrValue>();
     this.userValues = new Map<number, APIAttrUserValue[]>();
@@ -172,17 +174,16 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
           (item: APIItem) => {
             this.item = item;
 
-            /*this.$scope.pageEnv({
-          layout: {
-            blankPage: false,
-            needRight: false
-          },
-          name: 'page/102/name',
-          pageId: 102,
-          args: {
-            CAR_NAME: this.item.name_text
-          }
-        });*/
+            this.pageEnv.set({
+              layout: {
+                needRight: false
+              },
+              name: 'page/102/name',
+              pageId: 102,
+              args: {
+                CAR_NAME: this.item.name_text
+              }
+            });
 
             this.tabs.engine.count = this.item.engine_id ? 1 : 0;
 

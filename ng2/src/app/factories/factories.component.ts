@@ -6,6 +6,7 @@ import Notify from '../notify';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PictureService, APIPicture } from '../services/picture';
+import { PageEnvService } from '../services/page-env.service';
 
 @Component({
   selector: 'app-factories',
@@ -24,7 +25,8 @@ export class FactoryComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private route: ActivatedRoute,
     private router: Router,
-    private pictureService: PictureService
+    private pictureService: PictureService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -54,18 +56,17 @@ export class FactoryComponent implements OnInit, OnDestroy {
               return;
             }
 
-            /*this.$scope.pageEnv({
+            this.pageEnv.set({
               layout: {
-                blankPage: false,
                 needRight: false
               },
               name: 'page/181/name',
               pageId: 181,
               args: {
-                FACTORY_ID: this.factory.id,
+                FACTORY_ID: this.factory.id + '',
                 FACTORY_NAME: this.factory.name_text
               }
-            });*/
+            });
 
             this.pictureService
               .getPictures({

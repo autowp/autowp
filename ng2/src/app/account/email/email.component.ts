@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import Notify from '../../notify';
 import { Router } from '@angular/router';
 import { APIUser } from '../../services/user';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-account-email',
@@ -15,15 +16,18 @@ export class AccountEmailComponent {
   public invalidParams: any;
   public sent = false;
 
-  constructor(private http: HttpClient, private router: Router) {
-    /*this.$scope.pageEnv({
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private pageEnv: PageEnvService
+  ) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/55/name',
       pageId: 55
-    });*/
+    });
     this.http
       .get<APIUser>('/api/user/me', {
         params: {

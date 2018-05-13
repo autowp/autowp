@@ -1,4 +1,5 @@
 import { Component, Injectable } from '@angular/core';
+import { PageEnvService } from '../../../services/page-env.service';
 
 @Component({
   selector: 'app-restore-password-new-ok',
@@ -6,14 +7,13 @@ import { Component, Injectable } from '@angular/core';
 })
 @Injectable()
 export class RestorePasswordNewOkComponent {
-  constructor() {
-    /*this.$scope.pageEnv({
+  constructor(private pageEnv: PageEnvService) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/135/name',
       pageId: 135
-    });*/
+    });
   }
 }

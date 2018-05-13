@@ -87,6 +87,7 @@ export interface APIPicture {
   };
   change_status_user: APIUser;
   ip: APIIP;
+  add_date: string;
 }
 
 export interface APIPictureModerVote {

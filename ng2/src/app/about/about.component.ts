@@ -9,6 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { BytesPipe } from 'ngx-pipes';
+import { PageEnvService } from '../services/page-env.service';
 
 export class APIAbout {
   developer: number;
@@ -51,16 +52,16 @@ export class AboutComponent {
     private userService: UserService,
     private router: Router,
     private decimalPipe: DecimalPipe,
-    private bytesPipe: BytesPipe
+    private bytesPipe: BytesPipe,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/136/name',
       pageId: 136
-    });*/
+    });
 
     this.http.get<APIAbout>('/api/about').subscribe(
       response => {

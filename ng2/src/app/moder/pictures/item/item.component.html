@@ -49,7 +49,7 @@
         <b [textContent]="picture.filesize | bytes : 1"></b>
       </div>
       <div>{{'moder/picture/upload-date:'|translate}}
-        <b am-time-ago="picture.add_date"></b>
+        <b [textContent]="picture.add_date | amTimeAgo"></b>
       </div>
     </div>
   </div>

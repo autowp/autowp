@@ -2,6 +2,7 @@ import { Component, Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { PageService, APIPage } from '../../../services/page';
+import { PageEnvService } from '../../../services/page-env.service';
 
 // Acl.inheritsRole('pages-moder', 'unauthorized');
 
@@ -18,17 +19,17 @@ export class ModerPagesAddComponent {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private pageService: PageService
+    private pageService: PageService,
+    private pageEnv: PageEnvService
   ) {
-    /*$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/69/name',
-            pageId: 69
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/69/name',
+      pageId: 69
+    });
 
     this.pageService.getPages().subscribe(response => {
       this.pages = this.pageService.toPlainArray(response.items, 0);

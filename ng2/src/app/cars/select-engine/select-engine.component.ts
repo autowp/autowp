@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { chunk } from '../../chunk';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ItemParentService, APIItemParent } from '../../services/item-parent';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-cars-select-engine',
@@ -31,7 +32,8 @@ export class CarsSelectEngineComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private router: Router,
     private route: ActivatedRoute,
-    private itemParentService: ItemParentService
+    private itemParentService: ItemParentService,
+    private pageEnv: PageEnvService
   ) {
     this.loadChildCatalogues = (parent: any) => {
       parent.loading = true;
@@ -82,20 +84,19 @@ export class CarsSelectEngineComponent implements OnInit, OnDestroy {
           fields: 'name_html,name_text'
         })
         .subscribe(
-          (item: APIItem) => {
+          item => {
             this.item = item;
 
-            /*this.$scope.pageEnv({
-          layout: {
-            blankPage: false,
-            needRight: false
-          },
-          name: 'page/102/name',
-          pageId: 102,
-          args: {
-            CAR_NAME: this.item.name_text
-          }
-        });*/
+            this.pageEnv.set({
+              layout: {
+                needRight: false
+              },
+              name: 'page/102/name',
+              pageId: 102,
+              args: {
+                CAR_NAME: this.item.name_text
+              }
+            });
 
             if (params.brand_id) {
               this.brandId = params.brand_id;

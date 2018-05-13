@@ -12,6 +12,7 @@ import Notify from '../../../notify';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { PageEnvService } from '../../../services/page-env.service';
 
 @Component({
   selector: 'app-moder-attrs-attribute',
@@ -49,7 +50,8 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
     private attrsService: AttrsService,
     private translate: TranslateService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -73,36 +75,34 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
         (attribute: APIAttrAttribute) => {
           this.attribute = attribute;
 
-          /*this.translate.get(this.attribute.name).subscribe(
+          this.translate.get(this.attribute.name).subscribe(
             (translation: string) => {
-              this.$scope.pageEnv({
-                      layout: {
-                          isAdminPage: true,
-                          blankPage: false,
-                          needRight: false
-                      },
-                      name: 'page/101/name',
-                      pageId: 101,
-                      args: {
-                          ATTR_NAME: translation
-                      }
-                  });
+              this.pageEnv.set({
+                layout: {
+                  isAdminPage: true,
+                  needRight: false
+                },
+                name: 'page/101/name',
+                pageId: 101,
+                args: {
+                  ATTR_NAME: translation
+                }
+              });
             },
             () => {
-              this.$scope.pageEnv({
-                      layout: {
-                          isAdminPage: true,
-                          blankPage: false,
-                          needRight: false
-                      },
-                      name: 'page/101/name',
-                      pageId: 101,
-                      args: {
-                          ATTR_NAME: this.attribute.name
-                      }
-                  });
+              this.pageEnv.set({
+                layout: {
+                  isAdminPage: true,
+                  needRight: false
+                },
+                name: 'page/101/name',
+                pageId: 101,
+                args: {
+                  ATTR_NAME: this.attribute.name
+                }
+              });
             }
-          );*/
+          );
 
           this.attrsService.getAttributeTypes().then(
             (types: APIAttrAttributeType[]) => {

@@ -180,6 +180,7 @@ import { MessageDialogService } from './services/message-dialog';
 import { AttrsService } from './services/attrs';
 import { ModalMessageComponent } from './components/modal-message/modal-message.component';
 import { ModerStatComponent } from './moder/stat/stat.component';
+import { PageEnvService } from './services/page-env.service';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -812,7 +813,8 @@ const appRoutes: Routes = [
     PictureItemService,
     ContactsService,
     MessageDialogService,
-    AttrsService
+    AttrsService,
+    PageEnvService
   ],
   bootstrap: [AppComponent]
 })

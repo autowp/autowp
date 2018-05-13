@@ -5,6 +5,7 @@ import {
   APIHotlinksHost
 } from '../../services/api.service';
 import { ACLService } from '../../services/acl.service';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-moder-hotlinks',
@@ -15,16 +16,19 @@ export class ModerHotlinksComponent {
   public hosts: APIHotlinksHost[] = [];
   public canManage = false;
 
-  constructor(private http: HttpClient, private acl: ACLService) {
-    /*this.$scope.pageEnv({
+  constructor(
+    private http: HttpClient,
+    private acl: ACLService,
+    private pageEnv: PageEnvService
+  ) {
+    this.pageEnv.set({
       layout: {
         isAdminPage: true,
-        blankPage: false,
         needRight: false
       },
       name: 'page/67/name',
       pageId: 67
-    });*/
+    });
 
     this.acl.isAllowed('hotlinks', 'manage').then(
       allow => {

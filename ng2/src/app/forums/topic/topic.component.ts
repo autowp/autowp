@@ -6,6 +6,7 @@ import { ForumService, APIForumTopic } from '../../services/forum';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-forums-topic',
@@ -26,7 +27,8 @@ export class ForumsTopicComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private forumService: ForumService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -60,36 +62,34 @@ export class ForumsTopicComponent implements OnInit, OnDestroy {
 
           this.translate.get(this.topic.theme.name).subscribe(
             (translation: string) => {
-              /*this.$scope.pageEnv({
-              layout: {
-                blankPage: false,
-                needRight: false
-              },
-              name: 'page/44/name',
-              pageId: 44,
-              args: {
-                THEME_NAME: translation,
-                THEME_ID: this.topic.theme_id,
-                TOPIC_NAME: this.topic.name,
-                TOPIC_ID: this.topic.id
-              }
-            });*/
+              this.pageEnv.set({
+                layout: {
+                  needRight: false
+                },
+                name: 'page/44/name',
+                pageId: 44,
+                args: {
+                  THEME_NAME: translation,
+                  THEME_ID: this.topic.theme_id + '',
+                  TOPIC_NAME: this.topic.name,
+                  TOPIC_ID: this.topic.id + ''
+                }
+              });
             },
             () => {
-              /*this.$scope.pageEnv({
-              layout: {
-                blankPage: false,
-                needRight: false
-              },
-              name: 'page/44/name',
-              pageId: 44,
-              args: {
-                THEME_NAME: this.topic.theme.name,
-                THEME_ID: this.topic.theme_id,
-                TOPIC_NAME: this.topic.name,
-                TOPIC_ID: this.topic.id
-              }
-            });*/
+              this.pageEnv.set({
+                layout: {
+                  needRight: false
+                },
+                name: 'page/44/name',
+                pageId: 44,
+                args: {
+                  THEME_NAME: this.topic.theme.name,
+                  THEME_ID: this.topic.theme_id + '',
+                  TOPIC_NAME: this.topic.name,
+                  TOPIC_ID: this.topic.id + ''
+                }
+              });
             }
           );
         },

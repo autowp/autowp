@@ -8,7 +8,7 @@
   </thead>
   <tbody>
     <tr *ngFor="let item of items">
-      <td am-time-ago="item.date"></td>
+      <td [textContent]="item.date | amTimeAgo"></td>
       <td>
         <app-user [user]="item.user" *ngIf="item.user"></app-user>
       </td>

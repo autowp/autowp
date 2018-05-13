@@ -15,6 +15,7 @@ export interface APIVotingVariant {
 
 export interface APIVoting {
   id: number;
+  name: string;
   multivariant: boolean;
   variants: APIVotingVariant[];
   can_vote: boolean;

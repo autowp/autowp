@@ -5,6 +5,7 @@ import Notify from '../../notify';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AttrsService, APIAttrUserValue } from '../../services/attrs';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-cars-specs-admin',
@@ -24,16 +25,16 @@ export class CarsSpecsAdminComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private attrService: AttrsService
+    private attrService: AttrsService,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/103/name',
       pageId: 103
-    });*/
+    });
 
     this.load();
   }

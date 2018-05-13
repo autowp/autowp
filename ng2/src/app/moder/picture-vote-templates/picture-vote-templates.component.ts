@@ -3,6 +3,7 @@ import {
   PictureModerVoteTemplateService,
   APIPictureModerVoteTemplate
 } from '../../services/picture-moder-vote-template';
+import { PageEnvService } from '../../services/page-env.service';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -16,16 +17,18 @@ export class ModerPictureVoteTemplatesComponent {
   public vote = -1;
   public name = '';
 
-  constructor(private VoteTemplateService: PictureModerVoteTemplateService) {
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/212/name',
-            pageId: 212
-        });*/
+  constructor(
+    private VoteTemplateService: PictureModerVoteTemplateService,
+    private pageEnv: PageEnvService
+  ) {
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/212/name',
+      pageId: 212
+    });
 
     this.VoteTemplateService.getTemplates().then(templates => {
       this.templates = templates;

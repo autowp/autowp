@@ -14,7 +14,7 @@
       </p>
       <p>
         <app-user *ngIf="article.author" [user]="article.author"></app-user>
-        <span class="date" *ngIf="article.date" am-time-ago="article.date"></span>
+        <span class="date" *ngIf="article.date" [textContent]="article.date | amTimeAgo"></span>
       </p>
     </li>
   </ul>

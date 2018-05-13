@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { IpService } from '../../services/ip';
 import { Router } from '@angular/router';
 import { APIUser } from '../../services/user';
+import { PageEnvService } from '../../services/page-env.service';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -34,17 +35,17 @@ export class ModerTrafficComponent {
   constructor(
     private http: HttpClient,
     private ipService: IpService,
-    private router: Router
+    private router: Router,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
-            layout: {
-                isAdminPage: true,
-                blankPage: false,
-                needRight: false
-            },
-            name: 'page/77/name',
-            pageId: 77
-        });*/
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/77/name',
+      pageId: 77
+    });
     this.load();
   }
 

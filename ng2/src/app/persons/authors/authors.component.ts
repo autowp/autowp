@@ -3,6 +3,7 @@ import { APIPaginator } from '../../services/api.service';
 import { APIItem, ItemService } from '../../services/item';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-persons-authors',
@@ -17,18 +18,18 @@ export class PersonsAuthorsComponent implements OnInit, OnDestroy {
   constructor(
     private itemService: ItemService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/214/name',
       pageId: 214
-    });*/
+    });
 
     this.querySub = this.route.queryParams.subscribe(params => {
       this.itemService

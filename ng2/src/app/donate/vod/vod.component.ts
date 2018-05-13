@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { DonateService, APIDonateCarOfDayDate } from '../../services/donate';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-donate-vod',
@@ -33,16 +34,16 @@ export class DonateVodComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private route: ActivatedRoute,
     public auth: AuthService,
-    private donateService: DonateService
+    private donateService: DonateService,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/196/name',
       pageId: 196
-    });*/
+    });
   }
 
   ngOnInit(): void {
@@ -104,19 +105,21 @@ export class DonateVodComponent implements OnInit, OnDestroy {
           (this.anonymous ? 0 : this.userId);
 
         this.formParams = [
-          {name: 'receiver', value: '41001161017513'},
-          {name: 'sum', value: this.sum.toString()},
-          {name: 'need-email', value: 'false'},
-          {name: 'need-fio', value: 'false'},
-          {name: 'need-phone', value: 'false'},
-          {name: 'need-address', value: 'false'},
-          {name: 'formcomment', value: translations[0]},
-          {name: 'short-dest', value: translations[0]},
-          {name: 'label', value: label},
-          {name: 'quickpay-form', value: 'donate'},
-          {name: 'targets', value: sprintf(translations[1], label)},
-          {name: 'successURL', value:
-            'https://' + window.location.host + '/ng/donate/vod/success'}
+          { name: 'receiver', value: '41001161017513' },
+          { name: 'sum', value: this.sum.toString() },
+          { name: 'need-email', value: 'false' },
+          { name: 'need-fio', value: 'false' },
+          { name: 'need-phone', value: 'false' },
+          { name: 'need-address', value: 'false' },
+          { name: 'formcomment', value: translations[0] },
+          { name: 'short-dest', value: translations[0] },
+          { name: 'label', value: label },
+          { name: 'quickpay-form', value: 'donate' },
+          { name: 'targets', value: sprintf(translations[1], label) },
+          {
+            name: 'successURL',
+            value: 'https://' + window.location.host + '/ng/donate/vod/success'
+          }
         ];
       });
   }

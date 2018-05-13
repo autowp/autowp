@@ -108,18 +108,18 @@
 <div class="container">
 
   <div class="row">
-    <div class="col-sm-{{spanCenter}}">
-      <!-- <app-breadcrumbs></app-breadcrumbs> -->
-      <div class="page-header" *ngIf="pageName && !disablePageName">
-        <h1 [textContent]="pageName"></h1>
+    <div [ngClass]="'col-sm-' + pageEnv.spanCenter">
+      <app-breadcrumbs></app-breadcrumbs>
+      <div class="page-header" *ngIf="pageEnv.pageName && !pageEnv.disablePageName">
+        <h1 [textContent]="pageEnv.pageName"></h1>
       </div>
 
       <router-outlet></router-outlet>
     </div>
-    <div class="col-sm-{{spanRight}}" *ngIf="needRight">
+    <div [ngClass]="'col-sm-' + pageEnv.spanRight" *ngIf="pageEnv.needRight">
       <div class="card card-body" *ngIf="auth.user">
         <div>
-          <!-- <app-user [user]="user"></app-user> -->
+          <app-user [user]="auth.user"></app-user>
           <br />
           <a routerLink="/account/profile" translate>page/48/name</a>
           <br />

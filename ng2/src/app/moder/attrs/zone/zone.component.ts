@@ -8,6 +8,7 @@ import {
 } from '../../../services/attrs';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { PageEnvService } from '../../../services/page-env.service';
 
 export interface APIAttrZoneAttributesGetResponse {
   items: {
@@ -35,7 +36,8 @@ export class ModerAttrsZoneComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private attrsService: AttrsService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -66,22 +68,21 @@ export class ModerAttrsZoneComponent implements OnInit, OnDestroy {
 
     this.routeSub = this.route.params.subscribe(params => {
       this.attrsService.getZone(params.id).then(
-        (zone: APIAttrZone) => {
+        zone => {
           this.zone = zone;
 
-          /*this.$scope.pageEnv({
-                  layout: {
-                      isAdminPage: true,
-                      blankPage: false,
-                      needRight: false
-                  },
-                  name: 'page/142/name',
-                  pageId: 142,
-                  args: {
-                      ZONE_NAME: this.zone.name,
-                      ZONE_ID: this.zone.id
-                  }
-              });*/
+          this.pageEnv.set({
+            layout: {
+              isAdminPage: true,
+              needRight: false
+            },
+            name: 'page/142/name',
+            pageId: 142,
+            args: {
+              ZONE_NAME: this.zone.name,
+              ZONE_ID: this.zone.id + ''
+            }
+          });
 
           this.loadAttributes();
 

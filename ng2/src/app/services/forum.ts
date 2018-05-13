@@ -41,6 +41,7 @@ export interface APIForumGetThemesOptions {
 
 export interface APIForumTopic {
   id: number;
+  theme_id: number;
   name: string;
   theme: APIForumTheme;
   subscription: boolean;

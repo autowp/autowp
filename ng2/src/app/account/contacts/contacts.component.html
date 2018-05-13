@@ -15,7 +15,7 @@
               <h4 class="media-heading">
                 <app-user [user]="user"></app-user>
               </h4>
-              <p *ngIf="user.last_online" am-time-ago="user.last_online"></p>
+              <p *ngIf="user.last_online" [textContent]="user.last_online | amTimeAgo"></p>
             </div>
           </li>
         </ul>

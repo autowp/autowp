@@ -12,6 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { PictureService, APIPicture } from '../../../services/picture';
 import { APIPerspective } from '../../../services/api.service';
+import { PageEnvService } from '../../../services/page-env.service';
 
 // Acl.inheritsRole( 'moder', 'unauthorized' );
 
@@ -54,7 +55,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private route: ActivatedRoute,
     private router: Router,
-    private pictureService: PictureService
+    private pictureService: PictureService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -72,19 +74,18 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
         this.translate
           .get('moder/picture/picture-n-%s')
           .subscribe(translation => {
-            /*$scope.pageEnv( {
-                      layout: {
-                          isAdminPage: true,
-                          blankPage: false,
-                          needRight: false
-                      },
-                      name: 'page/72/name',
-                      pageId: 72,
-                      args: {
-                          PICTURE_ID: this.picture.id,
-                          PICTURE_NAME: sprintf( translation, this.picture.id )
-                      }
-                  } );*/
+            this.pageEnv.set({
+              layout: {
+                isAdminPage: true,
+                needRight: false
+              },
+              name: 'page/72/name',
+              pageId: 72,
+              args: {
+                PICTURE_ID: this.picture.id + '',
+                PICTURE_NAME: sprintf(translation, this.picture.id)
+              }
+            });
           });
       });
     });

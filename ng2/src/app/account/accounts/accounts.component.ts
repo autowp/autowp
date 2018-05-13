@@ -8,6 +8,7 @@ import {
   APIAccountItemsGetResponse,
   APIAccount
 } from '../../services/account.service';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-account-accounts',
@@ -49,16 +50,16 @@ export class AccountAccountsComponent {
   constructor(
     private http: HttpClient,
     private translate: TranslateService,
-    private router: Router
+    private router: Router,
+    private pageEnv: PageEnvService
   ) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       name: 'page/123/name',
       pageId: 123
-    });*/
+    });
 
     this.load();
   }

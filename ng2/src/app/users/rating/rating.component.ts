@@ -4,6 +4,7 @@ import Notify from '../../notify';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { APIUser } from '../../services/user';
+import { PageEnvService } from '../../services/page-env.service';
 
 export interface APIRatingUser {
   user: APIUser;
@@ -35,17 +36,20 @@ export class UsersRatingComponent implements OnInit, OnDestroy {
   public valueTitle: string;
   public users: APIRatingUser[];
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) {}
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
+  ) {}
 
   ngOnInit(): void {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/173/name',
       pageId: 173
-    });*/
+    });
 
     this.routeSub = this.route.params.subscribe(params => {
       this.rating = params.rating || 'specs-volume';
@@ -66,16 +70,18 @@ export class UsersRatingComponent implements OnInit, OnDestroy {
       }
 
       this.loading++;
-      this.http.get<APIUsersRatingGetResponse>('/api/rating/' + this.rating).subscribe(
-        response => {
-          this.loading--;
-          this.users = response.users;
-        },
-        response => {
-          this.loading--;
-          Notify.response(response);
-        }
-      );
+      this.http
+        .get<APIUsersRatingGetResponse>('/api/rating/' + this.rating)
+        .subscribe(
+          response => {
+            this.loading--;
+            this.users = response.users;
+          },
+          response => {
+            this.loading--;
+            Notify.response(response);
+          }
+        );
     });
   }
 

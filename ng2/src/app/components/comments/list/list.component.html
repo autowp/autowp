@@ -1,6 +1,6 @@
 <div class="message" [ngClass]="{'moderator-attention': message.moderAttention == 1, deleted: message.deleted}" *ngFor="let message of messages">
   <div>
-    <div class="float-right" *ngIf="message.datetime" am-time-ago="message.datetime"></div>
+    <div class="float-right" *ngIf="message.datetime" [textContent]="message.datetime | amTimeAgo"></div>
     <app-user [user]="message.user" *ngIf="message.user"></app-user>
     <span *ngIf="!message.user" translate>comments/author/anonymous</span>
   </div>

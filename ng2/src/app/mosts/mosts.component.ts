@@ -2,10 +2,16 @@ import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import Notify from '../notify';
 import { TranslateService } from '@ngx-translate/core';
-import { MostsService, APIMostsItem, APIMostsMenuRating, APIMostsMenuYear } from '../services/mosts';
+import {
+  MostsService,
+  APIMostsItem,
+  APIMostsMenuRating,
+  APIMostsMenuYear
+} from '../services/mosts';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { APIVehicleType } from '../services/vehicle-type';
+import { PageEnvService } from '../services/page-env.service';
 const $ = require('jquery');
 
 function vehicleTypesToList(vehilceTypes: APIVehicleType[]): APIVehicleType[] {
@@ -42,7 +48,8 @@ export class MostsComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private mostsService: MostsService,
     private translate: TranslateService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -197,15 +204,14 @@ export class MostsComponent implements OnInit, OnDestroy {
   }
 
   private initPageEnv(pageId: number, args: any) {
-    /*this.$scope.pageEnv({
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: false
       },
       disablePageName: true,
       name: 'page/' + pageId + '/name',
       pageId: pageId,
       args: args
-    });*/
+    });
   }
 }

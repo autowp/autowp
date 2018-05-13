@@ -1,5 +1,6 @@
 import { Component, Injectable } from '@angular/core';
 import { UserService, APIUser } from '../../services/user';
+import { PageEnvService } from '../../services/page-env.service';
 
 interface LogItem {
   sum: number;
@@ -17,15 +18,17 @@ interface LogItem {
 export class DonateLogComponent {
   public items: LogItem[];
 
-  constructor(private userService: UserService) {
-    /*this.$scope.pageEnv({
+  constructor(
+    private userService: UserService,
+    private pageEnv: PageEnvService
+  ) {
+    this.pageEnv.set({
       layout: {
-        blankPage: false,
         needRight: true
       },
       name: 'page/196/name',
       pageId: 196
-    });*/
+    });
 
     this.items = require('./data.json');
 
