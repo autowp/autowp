@@ -36,8 +36,7 @@
             </span>
             <span *ngIf="message.all_messages_link && message.dialog_with_user_id">
               <i class="fa fa-comments-o"></i>
-              <a ui-sref="account-messages({folder: 'dialog', user_id: message.dialog_with_user_id})" ui-sref-options="{inherit: false}"
-                translate>account/personal-message/entire-dialog</a>
+              <a routerLink="/account/messages" [queryParams]="{folder: 'dialog', user_id: message.dialog_with_user_id}" translate>account/personal-message/entire-dialog</a>
               <small>({{message.dialog_count}})</small>
               &nbsp;
             </span>

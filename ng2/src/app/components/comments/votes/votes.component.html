@@ -1,0 +1,11 @@
+<div class="modal-content" method="post">
+  <div class="modal-header">
+    <h3 class="modal-title">Votes</h3>
+    <a class="close" (click)="activeModal.dismiss()">×</a>
+  </div>
+  <div class="modal-body" [innerHTML]="html">
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="activeModal.dismiss()">Close</button>
+  </div>
+</div>

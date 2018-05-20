@@ -1,12 +1,20 @@
 import * as $ from 'jquery';
 import { ACLService } from '../../../services/acl.service';
-import { Component, Injectable, Input, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  Injectable,
+  Input,
+  EventEmitter,
+  Output
+} from '@angular/core';
 import Notify from '../../../notify';
 import { HttpClient } from '@angular/common/http';
 import { CommentService, APIComment } from '../../../services/comment';
 import { APIMessage } from '../../../services/message';
 import { APIUser } from '../../../services/user';
 import { AuthService } from '../../../services/auth.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CommentsVotesComponent } from '../votes/votes.component';
 
 export interface APICommentInList extends APIComment {
   showReply: boolean;
@@ -33,7 +41,8 @@ export class CommentsListComponent {
     private acl: ACLService,
     private http: HttpClient,
     private commentService: CommentService,
-    public auth: AuthService
+    public auth: AuthService,
+    private modalService: NgbModal
   ) {
     this.acl
       .isAllowed('comment', 'remove')
@@ -66,24 +75,27 @@ export class CommentsListComponent {
       },
       response => {
         if (response.status === 400) {
-          for (const field of response.data.invalid_params) {
-            for (const iMessage of field) {
-              Notify.custom(
-                {
-                  icon: 'fa fa-exclamation-triangle',
-                  message: iMessage
-                },
-                {
-                  type: 'warning'
-                }
-              );
-            }
-          }
+          Object.entries(response.error.invalid_params).forEach(
+            ([paramKey, param]) =>
+              Object.entries(param).forEach(([messageKey, iMessage]) =>
+                Notify.custom(
+                  {
+                    icon: 'fa fa-exclamation-triangle',
+                    message: iMessage
+                  },
+                  {
+                    type: 'warning'
+                  }
+                )
+              )
+          );
         } else {
           Notify.response(response);
         }
       }
     );
+
+    return false;
   }
 
   public setIsDeleted(message: APIComment, value: boolean) {
@@ -104,25 +116,13 @@ export class CommentsListComponent {
   }
 
   public showVotes(message: APIComment) {
-    /* const $modal = $(require('./votes.html'));
-
-    const $body = $modal.find('.modal-body');
-
-    $modal.modal();
-    $modal.on('hidden.bs.modal', () => {
-      $modal.remove();
+    const modalRef = this.modalService.open(CommentsVotesComponent, {
+      size: 'lg',
+      centered: true
     });
 
-    const $btnClose = $modal.find('.btn-secondary');
-
-    // $btnClose.button('loading');
-    this.commentService.getVotes(message.id).subscribe(
-      response => {
-        $body.html(response);
-        // $btnClose.button('reset');
-      },
-      response => Notify.response(response)
-    );*/
+    modalRef.componentInstance.messageID = message.id;
+    return false;
   }
 
   public onSent(location: string) {

@@ -182,6 +182,7 @@ import { ModerStatComponent } from './moder/stat/stat.component';
 import { PageEnvService } from './services/page-env.service';
 import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.component';
 import { MarkdownComponent } from './components/markdown/markdown.component';
+import { CommentsVotesComponent } from './components/comments/votes/votes.component';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -757,9 +758,13 @@ const appRoutes: Routes = [
     InvalidParamsPipe,
     ModalMessageComponent,
     ModerStatComponent,
-    BreadcrumbsComponent
+    BreadcrumbsComponent,
+    CommentsVotesComponent
   ],
-  entryComponents: [ModalMessageComponent],
+  entryComponents: [
+    ModalMessageComponent,
+    CommentsVotesComponent
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,

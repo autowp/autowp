@@ -32,9 +32,7 @@ export class ModalMessageComponent implements OnInit {
         this.sent = true;
         this.text = '';
 
-        /*if (sentCallback) {
-          sentCallback();
-        }*/
+        this.activeModal.close();
       },
       response => Notify.response(response)
     );

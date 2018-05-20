@@ -55,13 +55,17 @@ export class AccountMessagesComponent implements OnInit, OnDestroy {
           break;
       }
 
-      this.pageEnv.set({
-        layout: {
-          needRight: false
-        },
-        name: pageName,
-        pageId: pageId
-      });
+      setTimeout(
+        () =>
+          this.pageEnv.set({
+            layout: {
+              needRight: false
+            },
+            name: pageName,
+            pageId: pageId
+          }),
+        0
+      );
 
       this.load();
     });
@@ -142,5 +146,6 @@ export class AccountMessagesComponent implements OnInit, OnDestroy {
           break;
       }
     });
+    return false;
   }
 }

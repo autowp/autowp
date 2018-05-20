@@ -1,4 +1,4 @@
-<div class="message" [class.moderator-attention]="message.moderAttention == 1" [class.deleted]="message.deleted" *ngFor="let message of messages">
+<div class="message" [class.moderator-attention]="message.moder_attention" [class.deleted]="message.deleted" *ngFor="let message of messages">
   <div>
     <div class="float-right" *ngIf="message.datetime" [textContent]="message.datetime | amTimeAgo"></div>
     <app-user [user]="message.user" *ngIf="message.user"></app-user>

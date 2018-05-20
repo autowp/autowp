@@ -147,11 +147,12 @@ export class CommentService {
     });
   }
 
-  public getVotes(id: number) {
-    return this.http.get<string>('/comments/votes', {
+  public getVotes(id: number): Observable<string> {
+    return this.http.get('/comments/votes', {
       params: {
         id: id.toString()
-      }
+      },
+      responseType: 'text'
     });
   }
 }

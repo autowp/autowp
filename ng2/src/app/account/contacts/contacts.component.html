@@ -5,7 +5,7 @@
         <ul class="media-list">
           <li class="media" *ngFor="let user of chunk">
             <div class="media-left media-middle">
-              <a ui-sref="users-user({identity: user.identity ? user.identity : 'user' + user.id})" *ngIf="!user.deleted" class="photo">
+              <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]" *ngIf="!user.deleted" class="photo">
                 <img [src]="user.avatar.src" *ngIf="user.avatar" class="rounded" />
                 <img [src]="user.gravatar" *ngIf="user.gravatar && ! user.avatar" class="rounded" />
               </a>

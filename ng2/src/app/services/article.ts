@@ -12,6 +12,7 @@ export interface APIArticle {
   author: APIUser;
   catname: string;
   enabled: boolean;
+  html: string;
 }
 
 export interface APIArticlesGetResponse {

@@ -23,24 +23,23 @@ export class MessageDialogService {
       size: 'lg',
       centered: true
     });
-    /*modalRef.result.then(
+    modalRef.result.then(
       result => {
-        this.closeResult = `Closed with: ${result}`;
+        if (sentCallback) {
+          sentCallback();
+        }
       },
       reason => {
-        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        if (cancelCallback) {
+          cancelCallback();
+        }
       }
-    );*/
+    );
     modalRef.componentInstance.userId = userId;
 
     /*
 
-      $modal.on('hidden.bs.modal', () => {
-        $modal.remove();
-        if (cancelCallback) {
-          cancelCallback();
-        }
-      });
+
       $modal.on('shown.bs.modal', () => {
         $textarea.focus();
       });

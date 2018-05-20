@@ -49,7 +49,7 @@ export class CommentsFormComponent {
         },
         response => {
           if (response.status === 400) {
-            this.invalidParams = response.data.invalid_params;
+            this.invalidParams = response.error.invalid_params;
           } else {
             Notify.response(response);
           }
