@@ -4,31 +4,35 @@
       <form class="form-horizontal" (submit)="submit()">
         <fieldset>
           <legend translate>feedback/title</legend>
-          <div class="form-group row" [class.has-error]="invalidParams && invalidParams.name">
+
+          <div class="form-group row">
             <label class="col-md-2 col-form-label" for="name" translate>feedback/name</label>
             <div class="col-md-10">
-              <input type="text" name="name" maxlength="255" size="80" autocomplete="name" class="form-control" [(ngModel)]="form.name">
-              <p *ngFor="let message of invalidParams.name" [textContent]="message" class="help-block"></p>
+              <input type="text" [class.is-invalid]="invalidParams && invalidParams.name" name="name" maxlength="255" size="80" autocomplete="name"
+                class="form-control" [(ngModel)]="form.name">
+              <p *ngFor="let message of invalidParams | invalidParams : 'name'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>
-          <div class="form-group row" [class.has-error]="invalidParams && invalidParams.email">
+          <div class="form-group row">
             <label class="col-md-2 col-form-label" for="email">E-mail</label>
             <div class="col-md-10">
-              <input type="text" name="email" maxlength="255" size="80" autocomplete="email" class="form-control" [(ngModel)]="form.email">
-              <p *ngFor="let message of invalidParams.email" [textContent]="message" class="help-block"></p>
+              <input type="text" [class.is-invalid]="invalidParams && invalidParams.email" name="email" maxlength="255" size="80" autocomplete="email"
+                class="form-control" [(ngModel)]="form.email">
+              <p *ngFor="let message of invalidParams | invalidParams : 'email'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>
-          <div class="form-group row" [class.has-error]="invalidParams && invalidParams.message">
+          <div class="form-group row">
             <label class="col-md-2 col-form-label" for="message" translate>feedback/message</label>
             <div class="col-md-10">
-              <textarea name="message" cols="80" rows="8" class="form-control" [(ngModel)]="form.message"></textarea>
-              <p *ngFor="let message of invalidParams.message" [textContent]="message" class="help-block"></p>
+              <textarea name="message" [class.is-invalid]="invalidParams && invalidParams.message" cols="80" rows="8" class="form-control"
+                [(ngModel)]="form.message"></textarea>
+              <p *ngFor="let message of invalidParams | invalidParams : 'message'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>
-          <div class="form-group row" [class.has-error]="invalidParams && invalidParams.captcha" *ngIf="showCaptcha">
+          <div class="form-group row" *ngIf="showCaptcha">
             <div class="col-md-10 offset-md-2">
-              <div vc-recaptcha key="recaptchaKey" *ngIf="recaptchaKey" [(ngModel)]="form.captcha"></div>
-              <p *ngFor="let message of invalidParams.captcha" [textContent]="message" class="help-block"></p>
+              <re-captcha [(ngModel)]="form.captcha" name="captcha" required [siteKey]="recaptchaKey" *ngIf="recaptchaKey"></re-captcha>
+              <p *ngFor="let message of invalidParams | invalidParams : 'captcha'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>
           <div class="form-group row">

@@ -1,6 +1,16 @@
-<div id="pulse-graph" style="height:600px;background:#333;margin-bottom:10px"></div>
-<p class="legend">
-  <span [ngStyle]="{color: item.color}" (mouseover)="selectUser(item.id)" (mouseout)="deselectUser()" *ngFor="let item of legend">
-    <app-user [user]="item.user"></app-user>
-  </span>
-</p>
+<div>
+
+  <div class="nav nav-pills mb-4">
+    <a *ngFor="let period of periods" [class.active]="period.active" class="nav-link" href="#" (click)="selectPeriod(period)"
+      [textContent]="period.name"></a>
+  </div>
+
+  <canvas baseChart width="400" height="150" [datasets]="chart.data" [labels]="chart.labels" [options]="chart.options" [legend]="false"
+    [colors]="chart.colors" chartType="bar" *ngIf="chart.data.length"></canvas>
+
+  <p>
+    <span [style.color]="item.color" (mouseover)="selectUser(i)" (mouseout)="deselectUser(i)" *ngFor="let item of legend; let i = index">
+      <app-user [user]="item.user" *ngIf="item.user"></app-user>
+    </span>
+  </p>
+</div>

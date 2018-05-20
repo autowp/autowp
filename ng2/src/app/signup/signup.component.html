@@ -2,38 +2,38 @@
   <p translate>registration/if-you-registered</p>
   <form class="form-horizontal" (submit)="submit()">
     <fieldset>
-      <div class="form-group row" [class.has-error]="invalidParams && invalidParams.email">
+      <div class="form-group row">
         <label class="col-md-2 col-form-label" for="email">E-mail</label>
         <div class="col-md-10">
-          <input type="text" name="email" class=" form-control" [(ngModel)]="form.email">
-          <p *ngFor="let message of invalidParams.email" [textContent]="message" class="help-block"></p>
+          <input type="text" [class.is-invalid]="invalidParams && invalidParams.email" name="email" class=" form-control" [(ngModel)]="form.email">
+          <p *ngFor="let message of invalidParams | invalidParams : 'email'" [textContent]="message" class="invalid-feedback"></p>
         </div>
       </div>
-      <div class="form-group row" [class.has-error]="invalidParams && invalidParams.name">
+      <div class="form-group row">
         <label class="col-md-2 col-form-label" for="name" translate>user/name</label>
         <div class="col-md-10">
-          <input type="text" maxlength="50" size="50" name="name" class=" form-control" [(ngModel)]="form.name">
-          <p *ngFor="let message of invalidParams.name" [textContent]="message" class="help-block"></p>
+          <input type="text" [class.is-invalid]="invalidParams && invalidParams.name" maxlength="50" size="50" name="name" class=" form-control" [(ngModel)]="form.name">
+          <p *ngFor="let message of invalidParams | invalidParams : 'name'" [textContent]="message" class="invalid-feedback"></p>
         </div>
       </div>
-      <div class="form-group row" [class.has-error]="invalidParams && invalidParams.password">
+      <div class="form-group row">
         <label class="col-md-2 col-form-label" for="password" translate>user/password</label>
         <div class="col-md-10">
-          <input type="password" size="50" maxlength="50" name="password" class=" form-control" [(ngModel)]="form.password">
-          <p *ngFor="let message of invalidParams.password" [textContent]="message" class="help-block"></p>
+          <input type="password" [class.is-invalid]="invalidParams && invalidParams.password" size="50" maxlength="50" name="password" class=" form-control" [(ngModel)]="form.password">
+          <p *ngFor="let message of invalidParams | invalidParams : 'password'" [textContent]="message" class="invalid-feedback"></p>
         </div>
       </div>
-      <div class="form-group row" [class.has-error]="invalidParams && invalidParams.password_confirm">
+      <div class="form-group row">
         <label class="col-md-2 col-form-label" for="password_confirm" translate>user/password-confirm</label>
         <div class="col-md-10">
-          <input type="password" size="50" maxlength="50" name="password_confirm" class=" form-control" [(ngModel)]="form.password_confirm">
-          <p *ngFor="let message of invalidParams.password_confirm" [textContent]="message" class="help-block"></p>
+          <input type="password" [class.is-invalid]="invalidParams && invalidParams.password_confirm" size="50" maxlength="50" name="password_confirm" class=" form-control" [(ngModel)]="form.password_confirm">
+          <p *ngFor="let message of invalidParams | invalidParams : 'password_confirm'" [textContent]="message" class="invalid-feedback"></p>
         </div>
       </div>
-      <div class="form-group row" [class.has-error]="invalidParams && invalidParams.captcha" *ngIf="showCaptcha">
+      <div class="form-group row" *ngIf="showCaptcha">
         <div class="col-md-10 offset-md-2">
           <div vc-recaptcha key="recaptchaKey" *ngIf="recaptchaKey" [(ngModel)]="form.captcha"></div>
-          <p *ngFor="let message of invalidParams.captcha" [textContent]="message" class="help-block"></p>
+          <p *ngFor="let message of invalidParams | invalidParams : 'captcha'" [textContent]="message" class="invalid-feedback"></p>
         </div>
       </div>
       <div class="form-group row">

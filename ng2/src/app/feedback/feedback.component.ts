@@ -51,23 +51,19 @@ export class FeedbackComponent {
   }
 
   public submit() {
-    this.http
-      .post('/api/feedback', {
-        data: this.form
-      })
-      .subscribe(
-        () => {
-          this.router.navigate(['feedback/sent']);
-        },
-        response => {
-          if (response.status === 400) {
-            this.invalidParams = response.error.invalid_params;
+    this.http.post<void>('/api/feedback', this.form).subscribe(
+      () => {
+        this.router.navigate(['/feedback/sent']);
+      },
+      response => {
+        if (response.status === 400) {
+          this.invalidParams = response.error.invalid_params;
 
-            this.showCaptcha = response.error.invalid_params.captcha;
-          } else {
-            Notify.response(response);
-          }
+          this.showCaptcha = response.error.invalid_params.captcha;
+        } else {
+          Notify.response(response);
         }
-      );
+      }
+    );
   }
 }

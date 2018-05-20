@@ -127,8 +127,8 @@
         </div>
         <p>
           <i class="fa fa-comment"></i>
-          <a routerLink="/account/messages" class="badge badge-danger" *ngIf="newPersonalMessages" translate="ng-layout/you-have-new-messages"
-            [translateParams]="{ messages: newPersonalMessages }"></a>
+          <a routerLink="/account/messages" class="badge badge-danger" *ngIf="newPersonalMessages" translate
+            [translateParams]="{ messages: newPersonalMessages }">ng-layout/you-have-new-messages</a>
           <a routerLink="/account/messages" translate *ngIf="!newPersonalMessages">layout/personal-messages</a>
         </p>
       </div>
@@ -140,12 +140,12 @@
             <input type="text" name="login" placeholder="{{'login/login-or-email'|translate}}" class="form-control" [(ngModel)]="loginForm.login"
             />
           </p>
-          <p *ngFor="let message of loginInvalidParams.login" [textContent]="message" class="help-block"></p>
+          <p *ngFor="let message of loginInvalidParams | invalidParams : 'login'" [textContent]="message" class="invalid-feedback"></p>
           <p>
             <input type="password" name="password" placeholder="{{'user/password'|translate}}" class="form-control" [(ngModel)]="loginForm.password"
             />
           </p>
-          <p *ngFor="let message of loginInvalidParams.password" [textContent]="message" class="help-block"></p>
+          <p *ngFor="let message of loginInvalidParams | invalidParams : 'password'" [textContent]="message" class="invalid-feedback"></p>
           <div class="checkbox">
             <label>
               <input type="checkbox" value="1" name="remember" [(ngModel)]="loginForm.remember" /> {{'login/remember'|translate}}

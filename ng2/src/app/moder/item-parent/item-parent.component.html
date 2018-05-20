@@ -20,11 +20,11 @@
         </select>
       </div>
     </div>
-    <div class="form-group row" *ngFor="let language of languages" [class.has-error]="language.invalidParams">
+    <div class="form-group row" *ngFor="let language of languages">
       <label class="col-md-2 col-form-label">{{language.language.toUpperCase()}} Name</label>
       <div class="col-md-10">
-        <input type="text" name="name" maxlength="255" class="form-control" [(ngModel)]="language.name" />
-        <p *ngFor="let message of language.invalidParams.name" [textContent]="message" class="help-block"></p>
+        <input type="text" [class.is-invalid]="language.invalidParams" name="name" maxlength="255" class="form-control" [(ngModel)]="language.name" />
+        <p *ngFor="let message of language.invalidParams | invalidParams : 'name'" [textContent]="message" class="invalid-feedback"></p>
       </div>
     </div>
     <div class="row">

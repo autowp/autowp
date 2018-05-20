@@ -14,6 +14,9 @@ import { MomentModule } from 'ngx-moment';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgPipesModule, BytesPipe } from 'ngx-pipes';
 import { FileUploadModule } from 'ng2-file-upload';
+import { ChartsModule } from 'ng2-charts/ng2-charts';
+import { RecaptchaModule } from 'ng-recaptcha';
+import { RecaptchaFormsModule } from 'ng-recaptcha/forms';
 
 import { AppComponent } from './app.component';
 import { IndexComponent } from './index/index.component';
@@ -558,7 +561,7 @@ const appRoutes: Routes = [
       }
     ]
   },
-  { path: 'pules', component: PulseComponent },
+  { path: 'pulse', component: PulseComponent },
   {
     path: 'resore-password',
     children: [
@@ -787,7 +790,10 @@ const appRoutes: Routes = [
     }),
     MomentModule,
     NgPipesModule,
-    FileUploadModule
+    FileUploadModule,
+    ChartsModule,
+    RecaptchaModule.forRoot(),
+    RecaptchaFormsModule
   ],
   providers: [
     APIService,

@@ -4,18 +4,18 @@
       <app-markdown [markdown]="'restore-password/new-password/text'|translate"></app-markdown>
       <form class="form-horizontal" (submit)="submit()">
         <fieldset>
-          <div class="form-group row" [class.has-error]="invalidParams && invalidParams.password">
+          <div class="form-group row">
             <label class="col-md-2 col-form-label" for="password" translate>user/password</label>
             <div class="col-md-10">
-              <input type="password" size="50" maxlength="50" name="password" class="form-control" [(ngModel)]="form.password">
-              <p *ngFor="let message of invalidParams.password" [textContent]="message" class="help-block"></p>
+              <input type="password" [class.is-invalid]="invalidParams && invalidParams.password" size="50" maxlength="50" name="password" class="form-control" [(ngModel)]="form.password">
+              <p *ngFor="let message of invalidParams | invalidParams : 'password'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>
-          <div class="form-group row" [class.has-error]="invalidParams && invalidParams.password_confirm">
+          <div class="form-group row">
             <label class="col-md-2 col-form-label" for="password_confirm" translate>user/password-confirm</label>
             <div class="col-md-10">
-              <input type="password" size="50" maxlength="50" name="password_confirm" class="form-control" [(ngModel)]="form.password_confirm">
-              <p *ngFor="let message of invalidParams.password_confirm" [textContent]="message" class="help-block"></p>
+              <input type="password" [class.is-invalid]="invalidParams && invalidParams.password_confirm" size="50" maxlength="50" name="password_confirm" class="form-control" [(ngModel)]="form.password_confirm">
+              <p *ngFor="let message of invalidParams | invalidParams : 'password_confirm'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>
           <div class="form-group row">

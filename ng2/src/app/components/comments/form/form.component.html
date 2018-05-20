@@ -1,13 +1,13 @@
 <form class="add-message" method="post" (submit)="sendMessage()">
   <fieldset>
     <legend translate>comments/form-title</legend>
-    <div class="form-group" [class.has-error]="invalidParams && invalidParams.message">
+    <div class="form-group">
       <div class="controls">
-        <textarea cols="80" rows="5" name="message" maxlength="16000" class="form-control" [(ngModel)]="form.message"></textarea>
-        <p *ngFor="let message of invalidParams.message" [textContent]="message" class="help-block"></p>
+        <textarea cols="80" rows="5" name="message" maxlength="16000" class="form-control" [(ngModel)]="form.message" [class.is-invalid]="invalidParams && invalidParams.message"></textarea>
+        <p *ngFor="let message of invalidParams | invalidParams : 'message'" [textContent]="message" class="invalid-feedback"></p>
       </div>
     </div>
-    <div class="form-group" [class.has-error]="invalidParams && invalidParams.moderator_attention">
+    <div class="form-group">
       <div class="controls checkbox">
         <div class="float-right cancel">
           <button class="btn btn-sm btn-warning" translate>comments/cancel</button>
