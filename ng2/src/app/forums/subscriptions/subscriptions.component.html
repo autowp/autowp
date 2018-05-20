@@ -11,7 +11,7 @@
     <tr *ngFor="let topic of topics">
       <td>
         <span class="fa fa-lock" *ngIf="topic.status == 'closed'"></span>
-        <a ui-sref="forums-topic({topic_id: topic.id})" [textContent]="topic.name" *ngIf="topic.status != 'deleted'"></a>
+        <a [routerLink]="['/forums/topic', topic.id]" [textContent]="topic.name" *ngIf="topic.status != 'deleted'"></a>
         <span [textContent]="topic.name" *ngIf="topic.status == 'deleted'"></span>
         <span class="badge badge-pill badge-secondary">
           {{topic.old_messages + (topic.new_messages > 0 ? '+' + topic.new_messages : '')}}
@@ -31,7 +31,7 @@
             <br />
           </ng-container>
           <app-user [user]="topic.last_message.user" *ngIf="topic.last_message.user"></app-user>
-          <a ui-sref="forums-message({message_id: topic.last_message.id})" [title]="'forums/go-to-last-message'|translate">
+          <a [routerLink]="['/forums/message', topic.last_message.id]" [title]="'forums/go-to-last-message'|translate">
             <i class="fa fa-share"></i>
           </a>
         </div>

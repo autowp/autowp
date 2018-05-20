@@ -10,8 +10,8 @@ import { APIPaginator } from '../../services/api.service';
 export class PaginatorComponent {
   @Input() data: APIPaginator;
 
-  public pagesInRange() {
-    Object.values(this.data.pagesInRange);
+  public pagesInRange(): number[] {
+    return Object.values(this.data.pagesInRange);
   }
 
   public padd(page: number): string {
