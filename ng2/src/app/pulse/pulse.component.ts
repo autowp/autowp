@@ -68,13 +68,17 @@ export class PulseComponent {
   public grid: any;
 
   constructor(private http: HttpClient, private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/161/name',
-      pageId: 161
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/161/name',
+          pageId: 161
+        }),
+      0
+    );
 
     this.http.get<APIPulseResponse>('/api/pulse').subscribe(
       response => {

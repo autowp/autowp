@@ -288,14 +288,18 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/73/name',
-      pageId: 73
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/73/name',
+          pageId: 73
+        }),
+      0
+    );
 
     /*this.ownersDataSource = Observable.create((observer: any) => {
       // Runs on every search

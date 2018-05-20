@@ -8,12 +8,16 @@ import { PageEnvService } from '../../services/page-env.service';
 @Injectable()
 export class SignupOkComponent {
   constructor(private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/53/name',
-      pageId: 53
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/53/name',
+          pageId: 53
+        }),
+      0
+    );
   }
 }

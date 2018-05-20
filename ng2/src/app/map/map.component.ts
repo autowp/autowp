@@ -25,14 +25,18 @@ export class MapComponent {
     // let map: any = null;
     // let heatmap: any = null;
 
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      disablePageName: true,
-      name: 'page/117/name',
-      pageId: 117
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          disablePageName: true,
+          name: 'page/117/name',
+          pageId: 117
+        }),
+      0
+    );
 
     let currentPopup: any = null;
 

@@ -11,5 +11,5 @@ export class ModerItemsItemSelectParentTreeComponent {
   @Input() item: APIItemParent;
   @Input() select: SelectParentSelect;
   @Input() loadChilds: SelectParentLoadChilds;
-  @Input() disableItemId: number;
+  @Input() disableItemID: number;
 }

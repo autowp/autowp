@@ -21,14 +21,18 @@ export class ModerHotlinksComponent {
     private acl: ACLService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/67/name',
-      pageId: 67
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/67/name',
+          pageId: 67
+        }),
+      0
+    );
 
     this.acl.isAllowed('hotlinks', 'manage').then(
       allow => {

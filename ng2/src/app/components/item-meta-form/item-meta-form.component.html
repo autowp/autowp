@@ -1,13 +1,13 @@
 <form method="post" class="form-horizontal" (submit)="submit()">
   <fieldset>
-    <div class="form-group row" [ngClass]="{'has-error':invalidParams.name}">
+    <div class="form-group row" [class.has-error]="invalidParams.name">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/name</label>
       <div class="col-md-10">
         <input type="text" name="name" [(ngModel)]="item.name" class="form-control" [attr.maxlength]="name_maxlength" />
         <p *ngFor="let message of invalidParams.name" [textContent]="message" class="help-block"></p>
       </div>
     </div>
-    <div class="form-group row" [ngClass]="{'has-error':invalidParams.full_name}" *ngIf="item.item_type_id == 5">
+    <div class="form-group row" [class.has-error]="invalidParams.full_name" *ngIf="item.item_type_id == 5">
       <label class="col-md-2 col-form-label" translate>moder/brands/meta-data/full-name</label>
       <div class="col-md-10">
         <input type="text" name="full_name" [(ngModel)]="item.full_name" class="form-control" [attr.maxlength]="full_name_maxlength"
@@ -15,14 +15,14 @@
         <p *ngFor="let message of invalidParams.full_name" [textContent]="message" class="help-block"></p>
       </div>
     </div>
-    <div class="form-group row" [ngClass]="{'has-error':invalidParams.catname}" *ngIf="item.item_type_id == 5 || item.item_type_id == 3">
+    <div class="form-group row" [class.has-error]="invalidParams.catname" *ngIf="item.item_type_id == 5 || item.item_type_id == 3">
       <label class="col-md-2 col-form-label">Catname</label>
       <div class="col-md-10">
         <input type="text" name="catname" [(ngModel)]="item.catname" class="form-control" />
         <p *ngFor="let message of invalidParams.catname" [textContent]="message" class="help-block"></p>
       </div>
     </div>
-    <div class="form-group row" [ngClass]="{'has-error':invalidParams.body}" *ngIf="item.item_type_id == 1 || item.item_type_id == 2">
+    <div class="form-group row" [class.has-error]="invalidParams.body" *ngIf="item.item_type_id == 1 || item.item_type_id == 2">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/body</label>
       <div class="col-md-10">
         <input type="text" name="body" [(ngModel)]="item.body" style="width: 30%" class="form-control" [attr.maxlength]="body_maxlength"
@@ -30,7 +30,7 @@
         <p *ngFor="let message of invalidParams.body" [textContent]="message" class="help-block"></p>
       </div>
     </div>
-    <div class="form-group row" [ngClass]="{'has-error':invalidParams.spec_id}" *ngIf="item.item_type_id == 1 || item.item_type_id == 2">
+    <div class="form-group row" [class.has-error]="invalidParams.spec_id" *ngIf="item.item_type_id == 1 || item.item_type_id == 2">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/spec</label>
       <div class="col-md-10">
         <select name="spec_id" [(ngModel)]="item.spec_id" style="width: 30%" class="form-control">
@@ -55,7 +55,7 @@
         <div>{{'...'.repeat(data.deep)}}{{data.nameTranslated}}</div>
       </script>
     </div>
-    <div class="form-group row" [ngClass]="{'has-error':invalidParams.begin_model_year || invalidParams.end_model_year}" *ngIf="item.item_type_id == 1 || item.item_type_id == 2">
+    <div class="form-group row" [class.has-error]="invalidParams.begin_model_year || invalidParams.end_model_year" *ngIf="item.item_type_id == 1 || item.item_type_id == 2">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/model-years</label>
       <div class="col-md-10">
         <div class="form-row">
@@ -72,7 +72,7 @@
         <p *ngFor="let message of invalidParams.end_model_year" [textContent]="message" class="help-block"></p>
       </div>
     </div>
-    <div class="form-group row" [ngClass]="{'has-error':invalidParams.begin_year||invalidParams.begin_month}">
+    <div class="form-group row" [class.has-error]="invalidParams.begin_year||invalidParams.begin_month">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/begin</label>
       <div class="col-md-10">
         <div class="form-row">
@@ -90,7 +90,7 @@
         <p *ngFor="let message of invalidParams.begin_month" [textContent]="message" class="help-block"></p>
       </div>
     </div>
-    <div class="form-group row" [ngClass]="{'has-error':invalidParams.end_year||invalidParams.end_month||invalidParams.today}">
+    <div class="form-group row" [class.has-error]="invalidParams.end_year||invalidParams.end_month||invalidParams.today">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/end</label>
       <div class="col-md-10">
         <div class="form-row">
@@ -114,7 +114,7 @@
         <p *ngFor="let message of invalidParams.today" [textContent]="message" class="help-block"></p>
       </div>
     </div>
-    <div class="form-group row" [ngClass]="{'has-error':invalidParams.produced_count||invalidParams.produced_exactly}" *ngIf="item.item_type_id == 1 || item.item_type_id == 2">
+    <div class="form-group row" [class.has-error]="invalidParams.produced_count||invalidParams.produced_exactly" *ngIf="item.item_type_id == 1 || item.item_type_id == 2">
       <label class="col-md-2 col-form-label" translate>moder/item/produced</label>
       <div class="col-md-10">
         <div class="form-row">
@@ -132,7 +132,7 @@
         <p *ngFor="let message of invalidParams.produced_exactly" [textContent]="message" class="help-block"></p>
       </div>
     </div>
-    <div class="form-group row" [ngClass]="{'has-error': invalidParams && invalidParams.is_concept}" *ngIf="item.item_type_id == 1 || item.item_type_id == 2">
+    <div class="form-group row" [class.has-error]="invalidParams && invalidParams.is_concept" *ngIf="item.item_type_id == 1 || item.item_type_id == 2">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/concept</label>
       <div class="col-md-10">
         <select name="is_concept" [(ngModel)]="item.is_concept" style="width: 20%" class="form-control" ng-options="option.value as option.name|translate for option in getIsConceptOptions(parent)">

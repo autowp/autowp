@@ -21,13 +21,17 @@ export class AccountEmailcheckComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/54/name',
-      pageId: 54
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/54/name',
+          pageId: 54
+        }),
+      0
+    );
     this.routeSub = this.route.params.subscribe(params => {
       this.http
         .post('/api/user/emailcheck', {

@@ -4,7 +4,7 @@
       <p>
         <i class="fa fa-th-list"></i>
         <strong>
-          <a ui-sref="forums({theme_id: theme.id})" ui-sref-opts="{reload: true}" [textContent]="theme.name|translate"></a>
+          <a [routerLink]="['/forums', theme.id]" [textContent]="theme.name|translate"></a>
         </strong>
       </p>
       <p [textContent]="theme.description|translate" *ngIf="theme.description"></p>
@@ -14,7 +14,7 @@
         <a [href]="subtheme.url" *ngFor="let subtheme of theme.subthemes" [textContent]="subtheme.name|translate"></a>
       </div>
       <p *ngIf="!theme.subthemes">
-        <a ui-sref="forums({theme_id: theme.id})" ui-sref-opts="{reload: true}" translate>forums/go-to-theme</a>
+        <a [routerLink]="['/forums', theme.id]" translate>forums/go-to-theme</a>
       </p>
     </div>
   </div>
@@ -23,12 +23,12 @@
       <div *ngIf="theme.last_message">
         <p>
           <i class="fa fa-comment"></i>
-          <a ui-sref="forums-topic({topic_id: theme.last_topic.id})" [translateParams]="{topic_name: theme.last_topic.name}" translate>{{'forums/last-message-in-topic-{topic_name}'}}</a>
+          <a [routerLink]="['/forums/topic', theme.last_topic.id]" [translateParams]="{topic_name: theme.last_topic.name}" translate>{{'forums/last-message-in-topic-{topic_name}'}}</a>
         </p>
         <p>
           <app-past-time-indicator [date]="theme.last_message.datetime"></app-past-time-indicator>
           <app-user [user]="theme.last_message.user" *ngIf="theme.last_message.user"></app-user>
-          <a ui-sref="forums-message({message_id: theme.last_message.id})" [title]="'forums/go-to-last-message'|translate">
+          <a [routerLink]="['/forums/message', theme.last_message.id]" [title]="'forums/go-to-last-message'|translate">
             <i class="fa fa-share"></i>
           </a>
         </p>
@@ -39,7 +39,7 @@
 
 <div *ngIf="theme && !theme.disable_topics">
 
-  <a ui-sref="forums-new-topic({theme_id: theme.id})" class="btn btn-info">
+  <a [routerLink]="['/forums/new-topic', theme.id]" class="btn btn-info">
     <i class="fa fa-comment"></i>
     {{'forums/create-new-topic'|translate}}
   </a>
@@ -57,7 +57,7 @@
       <tr *ngFor="let topic of theme.topics.items">
         <td>
           <span class="fa fa-lock" *ngIf="topic.status == 'closed'"></span>
-          <a ui-sref="forums-topic({topic_id: topic.id})" [textContent]="topic.name"></a>
+          <a [routerLink]="['/forums/topic', topic.id]" [textContent]="topic.name"></a>
           <span class="badge badge-pill badge-secondary">
             {{topic.old_messages + (topic.new_messages > 0 ? '+' + topic.new_messages : '')}}
           </span>
@@ -76,7 +76,7 @@
               <br />
             </ng-container>
             <app-user [user]="topic.last_message.user" *ngIf="topic.last_message.user"></app-user>
-            <a ui-sref="forums-message({message_id: topic.last_message.id})" [title]="'forums/go-to-last-message'|translate">
+            <a [routerLink]="['/forums/message', topic.last_message.id]" [title]="'forums/go-to-last-message'|translate">
               <i class="fa fa-share"></i>
             </a>
           </div>
@@ -90,7 +90,7 @@
             <button [title]="'forums/topic/close'|translate" class="btn btn-sm btn-warning close-topic" (click)="closeTopic(topic)" *ngIf="topic.status != 'closed'">
               <i class="fa fa-times-circle"></i>
             </button>
-            <a ui-sref="forums-move-topic({topic_id: topic.id})" class="btn btn-secondary btn-sm" [title]="'forums/topic/move'|translate">
+            <a routerLink="/forums/move-topic" [queryParams]="{topic_id: topic.id}" class="btn btn-secondary btn-sm" [title]="'forums/topic/move'|translate">
               <i class="fa fa-share"></i>
             </a>
             <button [title]="'forums/topic/delete'|translate" class="btn btn-sm btn-danger delete" (click)="deleteTopic(topic)">

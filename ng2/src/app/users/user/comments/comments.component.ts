@@ -93,19 +93,23 @@ export class UsersUserCommentsComponent implements OnInit, OnDestroy {
   }
 
   public init() {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/205/name',
-      pageId: 205,
-      args: {
-        USER_NAME: this.user.name,
-        USER_IDENTITY: this.user.identity
-          ? this.user.identity
-          : 'user' + this.user.id
-      }
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/205/name',
+          pageId: 205,
+          args: {
+            USER_NAME: this.user.name,
+            USER_IDENTITY: this.user.identity
+              ? this.user.identity
+              : 'user' + this.user.id
+          }
+        }),
+      0
+    );
 
     this.loading++;
     this.commentService

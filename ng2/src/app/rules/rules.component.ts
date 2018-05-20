@@ -8,12 +8,16 @@ import { PageEnvService } from '../services/page-env.service';
 @Injectable()
 export class RulesComponent {
   constructor(private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/106/name',
-      pageId: 106
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/106/name',
+          pageId: 106
+        }),
+      0
+    );
   }
 }

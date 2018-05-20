@@ -1,12 +1,11 @@
-<div class="message" [ngClass]="{'moderator-attention': message.moderAttention == 1, deleted: message.deleted}" *ngFor="let message of messages">
+<div class="message" [class.moderator-attention]="message.moderAttention == 1" [class.deleted]="message.deleted" *ngFor="let message of messages">
   <div>
     <div class="float-right" *ngIf="message.datetime" [textContent]="message.datetime | amTimeAgo"></div>
     <app-user [user]="message.user" *ngIf="message.user"></app-user>
     <span *ngIf="!message.user" translate>comments/author/anonymous</span>
   </div>
   <div class="photo">
-    <a ui-sref="users-user({identity: message.user.identity ? message.user.identity : 'user' + message.user.id})" class="photo"
-      *ngIf="message.user && !message.user.deleted">
+    <a [routerLink]="['/users', message.user.identity ? message.user.identity : 'user' + message.user.id]" class="photo" *ngIf="message.user && !message.user.deleted">
       <img [src]="message.user.avatar.src" *ngIf="message.user.avatar" class="rounded" />
       <img [src]="message.user.gravatar" *ngIf="message.user.gravatar && ! message.user.avatar" class="rounded" />
     </a>
@@ -20,22 +19,24 @@
     <p class="alert alert-warning deleted-message" *ngIf="canRemoveComments || message.deleted" translate>comments/message-deleted-by-admin</p>
 
     <div>
-      <span class="vote">
-        <a href="#" class="vote-up" [ngClass]="{active: message.user_vote > 0}" *ngIf="user" (click)="vote(message, 1)">
+      <span class="vote" *ngIf="auth.user && (message.vote !== undefined)">
+        <a href="#" class="vote-up" [class.active]="message.user_vote > 0" (click)="vote(message, 1)">
           <i class="fa fa-thumbs-o-up"></i>
         </a>
-        <a href="#" class="value" [ngClass]="{zero: message.vote == 0}" *ngIf="user" (click)="showVotes(message)">
+        <a href="#" class="value" [class.zero]="message.vote == 0" (click)="showVotes(message)">
           {{(message.vote > 0 ? '+' : '') + message.vote}}
         </a>
-        <a href="#" class="vote-down" [ngClass]="{active: message.user_vote > 0}" *ngIf="user" (click)="vote(message, -1)">
+        <a href="#" class="vote-down" [class.active]="message.user_vote > 0" (click)="vote(message, -1)">
           <i class="fa fa-thumbs-o-down"></i>
         </a>
-        <i class="fa fa-thumbs-o-up" *ngIf="!user"></i>
-        <span class="value" *ngIf="!user" [textContent]="message.vote" (click)="showVotes(message)"></span>
-        <i class="fa fa-thumbs-o-down" *ngIf="!user"></i>
+      </span>
+      <span class="vote" *ngIf="!auth.user && (message.vote !== undefined)">
+        <i class="fa fa-thumbs-o-up"></i>
+        <span class="value" [textContent]="message.vote" (click)="showVotes(message)"></span>
+        <i class="fa fa-thumbs-o-down"></i>
       </span>
 
-      <button class="btn btn-sm btn-primary reply" *ngIf="user && deep < 21 && !message.deleted" (click)="reply(message, false)">
+      <button class="btn btn-sm btn-primary reply" *ngIf="auth.user && deep < 21 && !message.deleted" (click)="reply(message, false)">
         <i class="fa fa-reply"></i>
         <span class="d-none d-md-inline">{{'comments/reply'|translate}}</span>
       </button>
@@ -45,16 +46,17 @@
         {{'comments/reply'|translate}} &amp; resolve
       </button>
 
-      <a href="#" class="btn btn-danger btn-sm float-right comment-remove-button" *ngIf="canRemoveComments" (click)="setIsDeleted(message, 1)">
+      <button class="btn btn-danger btn-sm float-right comment-remove-button" *ngIf="canRemoveComments" (click)="setIsDeleted(message, true)">
         <i class="fa fa-trash"></i>
         <span class="d-none d-md-inline">{{'comments/message/delete'|translate}}</span>
-      </a>
-      <a href="#" class="btn btn-success btn-sm float-right comment-restore-button" *ngIf="canRemoveComments" (click)="setIsDeleted(message, 0)">
+      </button>
+      <button class="btn btn-success btn-sm float-right comment-restore-button" *ngIf="canRemoveComments" (click)="setIsDeleted(message, false)">
         <i class="fa fa-arrow-up"></i>
         {{'comments/message/restore'|translate}}
-      </a>
+      </button>
 
-      <a ui-sref="forums-move-message({message_id: message.id})" class="btn btn-secondary btn-sm float-right" *ngIf="typeId == 5 && canMoveMessage">
+      <a routerLink="/forums/move-message" [queryParams]="{message_id: message.id}" class="btn btn-secondary btn-sm float-right"
+        *ngIf="typeID == 5 && canMoveMessage">
         <i class="fa fa-arrows"></i>
         <span class="d-none d-md-inline">{{'comments/message/move'|translate}}</span>
       </a>
@@ -69,7 +71,7 @@
     </div>
   </div>
   <div class="replies" *ngIf="deep < 21">
-    <app-comments-list [itemId]="itemId" [typeId]="typeId" [onSent]="onSent" [messages]="message.replies" [user]="user" [deep]="deep+1"></app-comments-list>
-    <app-comments-form [itemId]="itemId" [typeId]="typeId" [onSent]="onSent" [parentId]="message.id" *ngIf="user && message.showReply"></app-comments-form>
+    <app-comments-list [itemID]="itemID" [typeID]="typeID" (sent)="onSent($event)" [messages]="message.replies" [deep]="deep+1"></app-comments-list>
+    <app-comments-form [itemID]="itemID" [typeID]="typeID" (sent)="onSent($event)" [parentID]="message.id" *ngIf="auth.user && message.showReply"></app-comments-form>
   </div>
 </div>

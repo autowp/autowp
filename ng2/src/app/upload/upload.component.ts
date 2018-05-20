@@ -47,13 +47,17 @@ export class UploadComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/29/name',
-      pageId: 29
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/29/name',
+          pageId: 29
+        }),
+      0
+    );
     this.querySub = this.route.queryParams.subscribe(params => {
       this.perspective_id = params.perspective_id;
       const replace = parseInt(params.replace, 10);

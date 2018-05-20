@@ -52,13 +52,17 @@ export class UploadSelectComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/30/name',
-      pageId: 30
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/30/name',
+          pageId: 30
+        }),
+      0
+    );
     this.loadChildCatalogues = (parent: APIItemParentInUploadSelect) => {
       parent.loading = true;
       this.itemParentService

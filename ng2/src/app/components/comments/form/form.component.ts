@@ -1,5 +1,5 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Input, Component, Injectable } from '@angular/core';
+import { Input, Component, Injectable, EventEmitter, Output } from '@angular/core';
 import Notify from '../../../notify';
 
 @Component({
@@ -8,10 +8,10 @@ import Notify from '../../../notify';
 })
 @Injectable()
 export class CommentsFormComponent {
-  @Input() parentId: number;
-  @Input() itemId: number;
-  @Input() typeId: number;
-  @Input() onSent: Function;
+  @Input() parentID: number;
+  @Input() itemID: number;
+  @Input() typeID: number;
+  @Output() sent = new EventEmitter<string>();
 
   public invalidParams: any = {};
   public form = {
@@ -28,9 +28,9 @@ export class CommentsFormComponent {
       .post<void>(
         '/api/comment',
         {
-          type_id: this.typeId,
-          item_id: this.itemId,
-          parent_id: this.parentId,
+          type_id: this.typeID,
+          item_id: this.itemID,
+          parent_id: this.parentID,
           moderator_attention: this.form.moderator_attention ? 1 : 0,
           message: this.form.message
         },
@@ -45,7 +45,7 @@ export class CommentsFormComponent {
 
           const location = response.headers.get('Location');
 
-          this.onSent(location);
+          this.sent.emit(location);
         },
         response => {
           if (response.status === 400) {

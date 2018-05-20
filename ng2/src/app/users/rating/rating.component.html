@@ -1,15 +1,15 @@
 <ul class="nav nav-pills" style="margin-bottom:10px">
   <li class="nav-item">
-    <a class="nav-link" [ngClass]="{active: rating == 'specs'}" ui-sref=".({rating: 'specs'})" translate>users/rating/specifications</a>
+    <a class="nav-link" [class.active]="rating == 'specs'" ui-sref=".({rating: 'specs'})" translate>users/rating/specifications</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" [ngClass]="{active: rating == 'pictures'}" ui-sref=".({rating: 'pictures'})" translate>users/rating/pictures</a>
+    <a class="nav-link" [class.active]="rating == 'pictures'" ui-sref=".({rating: 'pictures'})" translate>users/rating/pictures</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" [ngClass]="{active: rating == 'likes'}" ui-sref=".({rating: 'likes'})" translate>users/rating/likes</a>
+    <a class="nav-link" [class.active]="rating == 'likes'" ui-sref=".({rating: 'likes'})" translate>users/rating/likes</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" [ngClass]="{active: rating == 'picture-likes'}" ui-sref=".({rating: 'picture-likes'})" translate>users/rating/picture-likes</a>
+    <a class="nav-link" [class.active]="rating == 'picture-likes'" ui-sref=".({rating: 'picture-likes'})" translate>users/rating/picture-likes</a>
   </li>
 </ul>
 
@@ -51,7 +51,7 @@
         </small>
       </td>
       <td class="text-right" [textContent]="row.volume | number: 0"></td>
-      <td class="text-right" [ngClass]="{danger: row.weight < 0.50, warning: row.weight >= 0.50 && row.weight < 1.50}" *ngIf="rating == 'specs'"
+      <td class="text-right" [class.danger]="row.weight < 0.50" [class.warning]="row.weight >= 0.50 && row.weight < 1.50" *ngIf="rating == 'specs'"
         [textContent]="row.weight | number : 2"></td>
     </tr>
   </tbody>

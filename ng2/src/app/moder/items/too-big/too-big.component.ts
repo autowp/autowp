@@ -20,12 +20,16 @@ export class ModerItemsTooBigComponent {
     private pageEnv: PageEnvService
   ) {
     this.loading = true;
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      }
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          }
+        }),
+      0
+    );
 
     this.itemService
       .getItems({

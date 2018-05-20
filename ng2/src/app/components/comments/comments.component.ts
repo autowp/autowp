@@ -1,10 +1,17 @@
 import { APIPaginator } from '../../services/api.service';
-import { Injectable, Component, Input } from '@angular/core';
+import {
+  Injectable,
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIUser } from '../../services/user';
 import Notify from '../../notify';
 import { Router } from '@angular/router';
 import { CommentService, APIComment } from '../../services/comment';
+import { AuthService } from '../../services/auth.service';
 
 interface IAutowpCommentsDirectiveScope extends ng.IScope {
   limit: number;
@@ -18,54 +25,60 @@ interface IAutowpCommentsDirectiveScope extends ng.IScope {
   templateUrl: './comments.component.html'
 })
 @Injectable()
-export class CommentsComponent {
+export class CommentsComponent implements OnChanges {
   public messages: APIComment[] = [];
-  public onSent: Function;
   public paginator: APIPaginator;
 
-  @Input() itemId: number;
-  @Input() typeId: number;
-  @Input() user: APIUser;
+  @Input() itemID: number;
+  @Input() typeID: number;
   @Input() limit: number;
   @Input() page: number;
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    private commentService: CommentService
-  ) {
-    this.load();
+    private commentService: CommentService,
+    public auth: AuthService
+  ) {}
 
-    this.onSent = (location: string) => {
-      if (this.limit) {
-        this.commentService
-          .getCommentByLocation(location, {
-            fields: 'page',
-            limit: this.limit
-          })
-          .subscribe(
-            response => {
-              if (this.page !== response.page) {
-                this.router.navigate(['.'], {
-                  queryParams: { page: response.page }
-                });
-              } else {
-                this.load();
-              }
-            },
-            response => Notify.response(response)
-          );
-      } else {
-        this.load();
-      }
-    };
+  public onSent(location: string) {
+    if (this.limit) {
+      this.commentService
+        .getCommentByLocation(location, {
+          fields: 'page',
+          limit: this.limit
+        })
+        .subscribe(
+          response => {
+            if (this.page !== response.page) {
+              this.router.navigate([], {
+                queryParams: { page: response.page },
+                queryParamsHandling: 'merge'
+              });
+            } else {
+              this.load();
+            }
+          },
+          response => Notify.response(response)
+        );
+    } else {
+      this.load();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.load();
   }
 
   public load() {
+    if (!this.typeID || !this.itemID) {
+      return;
+    }
+
     this.commentService
       .getComments({
-        type_id: this.typeId,
-        item_id: this.itemId,
+        type_id: this.typeID,
+        item_id: this.itemID,
         no_parents: true,
         fields:
           'user.avatar,user.gravatar,replies,text_html,datetime,vote,user_vote',

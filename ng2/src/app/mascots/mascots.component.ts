@@ -25,13 +25,17 @@ export class MascotsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/201/name',
-      pageId: 201
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/201/name',
+          pageId: 201
+        }),
+      0
+    );
 
     this.querySub = this.route.queryParams.subscribe(params => {
       this.pictureService

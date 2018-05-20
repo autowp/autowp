@@ -55,14 +55,18 @@ export class ModerRightsComponent {
     private acl: APIACL,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/71/name',
-      pageId: 71
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/71/name',
+          pageId: 71
+        }),
+      0
+    );
 
     this.loadRules();
     this.loadResources();

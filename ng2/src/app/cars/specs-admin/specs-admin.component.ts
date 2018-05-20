@@ -28,13 +28,17 @@ export class CarsSpecsAdminComponent implements OnInit, OnDestroy {
     private attrService: AttrsService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/103/name',
-      pageId: 103
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/103/name',
+          pageId: 103
+        }),
+      0
+    );
 
     this.load();
   }

@@ -8,12 +8,16 @@ import { PageEnvService } from '../../services/page-env.service';
 @Injectable()
 export class Error403Component {
   constructor(private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: true
-      },
-      title: '403 Forbidden'
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: true
+          },
+          title: '403 Forbidden'
+        }),
+      0
+    );
   }
 }

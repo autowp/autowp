@@ -21,14 +21,18 @@ export class ModerPictureVoteTemplatesComponent {
     private VoteTemplateService: PictureModerVoteTemplateService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/212/name',
-      pageId: 212
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/212/name',
+          pageId: 212
+        }),
+      0
+    );
 
     this.VoteTemplateService.getTemplates().then(templates => {
       this.templates = templates;

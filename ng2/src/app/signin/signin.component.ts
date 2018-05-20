@@ -33,13 +33,17 @@ export class SignInComponent {
     private http: HttpClient,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/79/name',
-      pageId: 79
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/79/name',
+          pageId: 79
+        }),
+      0
+    );
 
     this.http.get<APILoginServicesGetResponse>('/api/login/services').subscribe(
       response => {

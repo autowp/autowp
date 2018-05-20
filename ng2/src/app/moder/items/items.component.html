@@ -90,10 +90,10 @@
   <div class="col-lg-8 col-md-8">
 
     <div class="btn-group float-right">
-      <button type="button" class="btn btn-outline-secondary" [ngClass]="{active: !listMode}" (click)="setListModeEnabled(false)">
+      <button type="button" class="btn btn-outline-secondary" [class.active]="!listMode" (click)="setListModeEnabled(false)">
         <i class="fa fa-th" aria-hidden="true"></i>
       </button>
-      <button type="button" class="btn btn-outline-secondary" [ngClass]="{active: listMode}" (click)="setListModeEnabled(true)">
+      <button type="button" class="btn btn-outline-secondary" [class.active]="listMode" (click)="setListModeEnabled(true)">
         <i class="fa fa-align-justify" aria-hidden="true"></i>
       </button>
     </div>

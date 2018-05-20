@@ -31,14 +31,18 @@ export class ModerPagesEditComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/70/name',
-      pageId: 70
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/70/name',
+          pageId: 70
+        }),
+      0
+    );
 
     this.pageService.getPages().subscribe(response => {
       this.pages = this.pageService.toPlainArray(response.items, 0);

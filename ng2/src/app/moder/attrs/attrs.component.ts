@@ -28,14 +28,18 @@ export class ModerAttrsComponent {
     private attrsService: AttrsService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/100/name',
-      pageId: 100
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/100/name',
+          pageId: 100
+        }),
+      0
+    );
 
     this.attrsService.getZones().then(
       (zones: APIAttrZone[]) => {

@@ -22,14 +22,18 @@ export class ModerStatComponent {
   public items: StatItem[] = [];
 
   constructor(private http: HttpClient, private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/119/name',
-      pageId: 119
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/119/name',
+          pageId: 119
+        }),
+      0
+    );
 
     this.http.get<APIStatGlobalSummary>('/api/stat/global-summary').subscribe(
       response => {

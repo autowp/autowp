@@ -21,7 +21,7 @@
 
     <div class="collapse navbar-collapse" id="navbarToggler">
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0" *ngIf="mainMenuItems">
-        <li class="nav-item" *ngFor="let page of mainMenuItems" [ngClass]="{dropdown: page.id == 22, 'd-md-none d-lg-block': [25, 117].indexOf(+page.id) != -1, 'd-md-none d-lg-none d-xl-block': page.id == 42}">
+        <li class="nav-item" *ngFor="let page of mainMenuItems" [class.dropdown]="page.id == 22" [ngClass]="{'d-md-none d-lg-block': [25, 117].indexOf(+page.id) != -1, 'd-md-none d-lg-none d-xl-block': page.id == 42}">
           <a class="nav-link" [href]="page.url" [textContent]="page.name | translate" *ngIf="page.id != 22 && !page.routerLink"></a>
           <a class="nav-link" [routerLink]="page.routerLink" [textContent]="page.name | translate" *ngIf="page.id != 22 && page.routerLink"></a>
           <a href="#" *ngIf="page.id == 22" class="nav-link dropdown-toggle" data-toggle="dropdown">
@@ -93,7 +93,7 @@
             <i class="{{language.flag}}"></i>
           </a>
           <div class="dropdown-menu dropdown-menu-right">
-            <a class="dropdown-item" [href]="language.url + path.substring(1)" [ngClass]="{active: language.active}" *ngFor="let language of languages">
+            <a class="dropdown-item" [href]="language.url + path.substring(1)" [class.active]="language.active" *ngFor="let language of languages">
               <i class="{{language.flag}}"></i>
               {{language.name}}
             </a>
@@ -106,17 +106,16 @@
 </div>
 
 <div class="container">
-
   <div class="row">
-    <div [ngClass]="'col-sm-' + pageEnv.spanCenter">
+    <div [ngClass]="'col-sm-' + ((layoutParams$|async).sidebar ? 8 : 12)">
       <app-breadcrumbs></app-breadcrumbs>
-      <div class="page-header" *ngIf="pageEnv.pageName && !pageEnv.disablePageName">
-        <h1 [textContent]="pageEnv.pageName"></h1>
+      <div class="page-header" *ngIf="(layoutParams$|async).name && !(layoutParams$|async).disablePageName">
+        <h1 [textContent]="(layoutParams$|async).name"></h1>
       </div>
 
       <router-outlet></router-outlet>
     </div>
-    <div [ngClass]="'col-sm-' + pageEnv.spanRight" *ngIf="pageEnv.needRight">
+    <div class="col-sm-4" *ngIf="(layoutParams$|async).sidebar">
       <div class="card card-body" *ngIf="auth.user">
         <div>
           <app-user [user]="auth.user"></app-user>

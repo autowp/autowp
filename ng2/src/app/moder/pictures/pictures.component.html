@@ -13,20 +13,20 @@
     <h2 translate>moder/pictures/filter</h2>
     <div class="card card-body">
       <div class="btn-group mb-3" ngbDropdown>
-        <button class="btn btn-block" ngbDropdownToggle [ngClass]="status !== null ? 'btn-primary' : 'btn-outline-secondary'" type="button"
-          id="dropdownMenuButton">
+        <button class="btn btn-block" ngbDropdownToggle [class.btn-primary]="status !== null" [class.btn-outline-secondary]="status === null"
+          type="button" id="dropdownMenuButton">
           {{'moder/picture/filter/status'|translate}}:
           <ng-container *ngFor="let option of statusOptions">
             <ng-container *ngIf="option.value === status">{{option.name|translate}}</ng-container>
           </ng-container>
         </button>
         <div ngbDropdownMenu>
-          <a *ngFor="let option of statusOptions" class="dropdown-item" [ngClass]="{active: option.value === status}" routerLink="."
-            [queryParams]="{status: option.value}" queryParamsHandling="merge">{{option.name|translate}}</a>
+          <a *ngFor="let option of statusOptions" class="dropdown-item" [class.active]="option.value === status" routerLink="." [queryParams]="{status: option.value}"
+            queryParamsHandling="merge">{{option.name|translate}}</a>
         </div>
       </div>
       <div class="btn-group mb-3" ngbDropdown>
-        <button class="btn btn-block" ngbDropdownToggle [ngClass]="vehicleTypeID !== null ? 'btn-primary' : 'btn-outline-secondary'"
+        <button class="btn btn-block" ngbDropdownToggle [class.btn-primary]="vehicleTypeID !== null" [class.btn-outline-secondary]="vehicleTypeID === null"
           type="button" id="dropdownMenuButton">
           {{'moder/picture/filter/vehicle-type'|translate}}:
           <ng-container *ngFor="let option of vehicleTypeOptions">
@@ -34,12 +34,12 @@
           </ng-container>
         </button>
         <div ngbDropdownMenu style="max-height:200px;overflow-y:auto">
-          <a *ngFor="let option of vehicleTypeOptions" class="dropdown-item" [ngClass]="{active: option.value === vehicleTypeID}" routerLink="."
+          <a *ngFor="let option of vehicleTypeOptions" class="dropdown-item" [class.active]="option.value === vehicleTypeID" routerLink="."
             [queryParams]="{vehicle_type_id: option.value}" queryParamsHandling="merge">{{'...'.repeat(option.deep)}}{{option.name|translate}}</a>
         </div>
       </div>
       <div class="btn-group mb-3" ngbDropdown>
-        <button class="btn btn-block" ngbDropdownToggle [ngClass]="perspectiveID !== null ? 'btn-primary' : 'btn-outline-secondary'"
+        <button class="btn btn-block" ngbDropdownToggle [class.btn-primary]="perspectiveID !== null" [class.btn-outline-secondary]="perspectiveID === null"
           type="button" id="dropdownMenuButton">
           {{'moder/pictures/filter/perspective'|translate}}:
           <ng-container *ngFor="let option of perspectiveOptions">
@@ -47,7 +47,7 @@
           </ng-container>
         </button>
         <div ngbDropdownMenu style="max-height:200px;overflow-y:auto">
-          <a *ngFor="let option of perspectiveOptions" class="dropdown-item" [ngClass]="{active: option.value === perspectiveID}" routerLink="."
+          <a *ngFor="let option of perspectiveOptions" class="dropdown-item" [class.active]="option.value === perspectiveID" routerLink="."
             [queryParams]="{perspective_id: option.value}" queryParamsHandling="merge">{{option.name|translate}}</a>
         </div>
       </div>
@@ -57,7 +57,7 @@
       </ng-template>
       <div class="input-group mb-3">
         <input [ngbTypeahead]="itemsDataSource" name="item" [(ngModel)]="itemQuery" [inputFormatter]="itemFormatter" (selectItem)="itemOnSelect($event)"
-          [resultTemplate]="itemTemplate" [placeholder]="'moder/picture/filter/item'|translate" class="form-control" [ngClass]="{'border-primary': itemID}">
+          [resultTemplate]="itemTemplate" [placeholder]="'moder/picture/filter/item'|translate" class="form-control" [class.border-primary]="itemID">
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" type="button" [disabled]="!itemID" (click)="clearItem()">
             <span class="fa fa-close"></span>
@@ -66,22 +66,22 @@
       </div>
 
       <div class="btn-group mb-3" ngbDropdown>
-        <button class="btn btn-block" ngbDropdownToggle [ngClass]="comments !== null ? 'btn-primary' : 'btn-outline-secondary'" type="button"
-          id="dropdownMenuButton">
+        <button class="btn btn-block" ngbDropdownToggle [class.btn-primary]="comments !== null" [class.btn-outline-secondary]="comments === null"
+          type="button" id="dropdownMenuButton">
           {{'moder/pictures/filter/comments'|translate}}:
           <ng-container *ngFor="let option of commentsOptions">
             <ng-container *ngIf="option.value === comments">{{option.name|translate}}</ng-container>
           </ng-container>
         </button>
         <div ngbDropdownMenu>
-          <a *ngFor="let option of commentsOptions" class="dropdown-item" [ngClass]="{active: option.value === comments}" routerLink="."
+          <a *ngFor="let option of commentsOptions" class="dropdown-item" [class.active]="option.value === comments" routerLink="."
             [queryParams]="{comments: option.value}" queryParamsHandling="merge">{{option.name|translate}}</a>
         </div>
       </div>
       <!--
       <div class="input-group mb-3">
         <input [typeahead]="ownersDataSource" [(ngModel)]="ownerQuery" typeaheadOptionField="name" (typeaheadOnSelect)="ownerOnSelect($event)"
-          [typeaheadOptionsLimit]="10" [placeholder]="'moder/picture/filter/owner'|translate" class="form-control" [ngClass]="{'border-primary': ownerID}">
+          [typeaheadOptionsLimit]="10" [placeholder]="'moder/picture/filter/owner'|translate" class="form-control" [class.border-primary]="ownerID">
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" type="button" [disabled]="!ownerID" (click)="clearOwner()">
             <span class="fa fa-close"></span>
@@ -90,21 +90,21 @@
       </div>
 -->
       <div class="btn-group mb-3" ngbDropdown>
-        <button class="btn btn-block" ngbDropdownToggle [ngClass]="replace !== null ? 'btn-primary' : 'btn-outline-secondary'" type="button"
-          id="dropdownMenuButton">
+        <button class="btn btn-block" ngbDropdownToggle [class.btn-primary]="replace !== null" [class.btn-outline-secondary]="replace === null"
+          type="button" id="dropdownMenuButton">
           {{'moder/pictures/filter/replace'|translate}}:
           <ng-container *ngFor="let option of replaceOptions">
             <ng-container *ngIf="option.value === replace">{{option.name|translate}}</ng-container>
           </ng-container>
         </button>
         <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-          <a *ngFor="let option of replaceOptions" class="dropdown-item" [ngClass]="{active: option.value === replace}" routerLink="."
-            [queryParams]="{replace: option.value}" queryParamsHandling="merge">{{option.name|translate}}</a>
+          <a *ngFor="let option of replaceOptions" class="dropdown-item" [class.active]="option.value === replace" routerLink="." [queryParams]="{replace: option.value}"
+            queryParamsHandling="merge">{{option.name|translate}}</a>
         </div>
       </div>
       <div class="btn-group mb-3" ngbDropdown>
-        <button class="btn btn-block" ngbDropdownToggle [ngClass]="requests !== null ? 'btn-primary' : 'btn-outline-secondary'" type="button"
-          id="dropdownMenuButton">
+        <button class="btn btn-block" ngbDropdownToggle [class.btn-primary]="requests !== null" [class.btn-outline-secondary]="requests === null"
+          type="button" id="dropdownMenuButton">
           {{'moder/pictures/filter/votes'|translate}}:
           <ng-container *ngFor="let option of requestsOptions">
             <ng-container *ngIf="option.value === requests">{{option.name|translate}}</ng-container>
@@ -112,29 +112,29 @@
         </button>
         <ul ngbDropdownMenu aria-labelledby="dropdownMenuButton">
           <li role="menuitem" *ngFor="let option of requestsOptions">
-            <a class="dropdown-item" [ngClass]="{active: option.value === requests}" routerLink="." [queryParams]="{requests: option.value}"
+            <a class="dropdown-item" [class.active]="option.value === requests" routerLink="." [queryParams]="{requests: option.value}"
               queryParamsHandling="merge">{{option.name|translate}}</a>
           </li>
         </ul>
       </div>
 
-      <a class="btn mb-3" [ngClass]="specialName ? 'btn-primary' : 'btn-outline-secondary'" routerLink="." [queryParams]="{special_name: specialName ? null : 'true'}"
-        queryParamsHandling="merge">
+      <a class="btn mb-3" [class.btn-primary]="specialName !== null" [class.btn-outline-secondary]="specialName === null" routerLink="."
+        [queryParams]="{special_name: specialName ? null : 'true'}" queryParamsHandling="merge">
         {{'moder/picture/filter/special-name'|translate}}
       </a>
 
-      <a class="btn mb-3" [ngClass]="lost ? 'btn-primary' : 'btn-outline-secondary'" routerLink="." [queryParams]="{lost: lost ? null : 'true'}"
+      <a class="btn mb-3" [class.btn-primary]="lost !== null" [class.btn-outline-secondary]="lost === null" routerLink="." [queryParams]="{lost: lost ? null : 'true'}"
         queryParamsHandling="merge">
         {{'moder/picture/filter/not-linked'|translate}}
       </a>
 
-      <a class="btn mb-3" [ngClass]="gps ? 'btn-primary' : 'btn-outline-secondary'" routerLink="." [queryParams]="{gps: gps ? null : 'true'}"
+      <a class="btn mb-3" [class.btn-primary]="gps !== null" [class.btn-outline-secondary]="gps === null" routerLink="." [queryParams]="{gps: gps ? null : 'true'}"
         queryParamsHandling="merge">
         {{'moder/picture/filter/gps'|translate}}
       </a>
 
-      <a class="btn mb-3" [ngClass]="similar ? 'btn-primary' : 'btn-outline-secondary'" routerLink="." [queryParams]="{similar: similar ? null : 'true'}"
-        queryParamsHandling="merge">
+      <a class="btn mb-3" [class.btn-primary]="similar !== null" [class.btn-outline-secondary]="similar === null" routerLink="."
+        [queryParams]="{similar: similar ? null : 'true'}" queryParamsHandling="merge">
         {{'moder/picture/filter/similar'|translate}}
       </a>
 
@@ -146,8 +146,8 @@
           </ng-container>
         </button>
         <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-          <a *ngFor="let option of orderOptions" class="dropdown-item" [ngClass]="{active: option.value === order}" routerLink="."
-            [queryParams]="{order: option.value}" queryParamsHandling="merge">{{option.name|translate}}</a>
+          <a *ngFor="let option of orderOptions" class="dropdown-item" [class.active]="option.value === order" routerLink="." [queryParams]="{order: option.value}"
+            queryParamsHandling="merge">{{option.name|translate}}</a>
         </div>
       </div>
 

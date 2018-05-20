@@ -37,13 +37,17 @@ export class DonateVodSelectComponent implements OnInit, OnDestroy {
     private itemParentService: ItemParentService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/196/name',
-      pageId: 196
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/196/name',
+          pageId: 196
+        }),
+      0
+    );
 
     this.selectItem = (itemId: number) => {
       this.router.navigate(['/donate/vod'], {

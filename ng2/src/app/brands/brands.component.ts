@@ -18,13 +18,17 @@ export class BrandsComponent {
   public items: APIBrandsLines;
 
   constructor(private http: HttpClient, private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/61/name',
-      pageId: 61
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/61/name',
+          pageId: 61
+        }),
+      0
+    );
 
     this.http.get<APIBrandsGetResponse>('/api/brands').subscribe(
       response => {

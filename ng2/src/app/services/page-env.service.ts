@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
+
+export interface LayoutParams {
+  name: string;
+  isAdminPage: boolean;
+  sidebar: boolean;
+  disablePageName: boolean;
+}
 
 export interface PageEnv {
   pageId?: number;
@@ -26,15 +33,12 @@ function replaceArgs(str: string, args: any): string {
 
 @Injectable()
 export class PageEnvService {
-  public isAdminPage = false;
-  public disablePageName = false;
-  public pageName = '';
-  public needRight = false;
-  public spanRight = 0;
-  public spanCenter = 0;
-  public changes = Observable.create(observer => {
-    observer.next('Hello');
-    observer.next('World');
+  public pageID$ = new BehaviorSubject<number>(0);
+  public layoutParams$ = new BehaviorSubject<LayoutParams>({
+    name: '',
+    isAdminPage: false,
+    sidebar: false,
+    disablePageName: false
   });
 
   public constructor(
@@ -42,18 +46,7 @@ export class PageEnvService {
     private translate: TranslateService
   ) {}
 
-  private setSidebars(right: boolean) {
-    this.needRight = right;
-
-    this.spanRight = right ? 4 : 0;
-    this.spanCenter = 12 - this.spanRight;
-  }
-
   public set(data: PageEnv) {
-    this.setSidebars(data.layout.needRight);
-    this.isAdminPage = data.layout.isAdminPage;
-    this.disablePageName = !!data.disablePageName;
-
     const args = data.args ? data.args : {};
     const preparedUrlArgs: any = {};
     const preparedNameArgs: any = {};
@@ -65,6 +58,7 @@ export class PageEnvService {
       }
     }
 
+    this.pageID$.next(data.pageId);
     // PageService.setCurrent(data.pageId, preparedNameArgs);
 
     if (data.pageId) {
@@ -82,17 +76,33 @@ export class PageEnvService {
         (translations: string[]) => {
           const name = replaceArgs(translations[nameKey], preparedNameArgs);
           const title = replaceArgs(translations[titleKey], preparedNameArgs);
-          this.pageName = name;
+
           this.titleService.setTitle(title ? title : name);
+          this.layoutParams$.next({
+            name: name,
+            isAdminPage: data.layout.isAdminPage,
+            sidebar: data.layout.needRight,
+            disablePageName: data.disablePageName
+          });
         },
         () => {
-          this.pageName = nameKey;
           this.titleService.setTitle(titleKey);
+          this.layoutParams$.next({
+            name: nameKey,
+            isAdminPage: data.layout.isAdminPage,
+            sidebar: data.layout.needRight,
+            disablePageName: data.disablePageName
+          });
         }
       );
     } else {
-      this.pageName = null;
       this.titleService.setTitle(data.title ? data.title : '');
+      this.layoutParams$.next({
+        name: '',
+        isAdminPage: data.layout.isAdminPage,
+        sidebar: data.layout.needRight,
+        disablePageName: data.disablePageName
+      });
     }
   }
 }

@@ -10,13 +10,17 @@ export class ModerIndexComponent implements AfterViewInit {
   constructor(private pageEnv: PageEnvService) {}
 
   ngAfterViewInit() {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/67/name',
-      pageId: 67
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/67/name',
+          pageId: 67
+        }),
+      0
+    );
   }
 }

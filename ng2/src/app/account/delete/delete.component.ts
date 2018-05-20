@@ -22,13 +22,17 @@ export class AccountDeleteComponent {
     private auth: AuthService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/137/name',
-      pageId: 137
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/137/name',
+          pageId: 137
+        }),
+      0
+    );
   }
 
   public submit() {

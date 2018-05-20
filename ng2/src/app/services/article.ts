@@ -11,6 +11,7 @@ export interface APIArticle {
   preview_url: string;
   author: APIUser;
   catname: string;
+  enabled: boolean;
 }
 
 export interface APIArticlesGetResponse {

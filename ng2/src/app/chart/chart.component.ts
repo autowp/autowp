@@ -35,14 +35,18 @@ export class ChartComponent {
   private chart: any;
 
   constructor(private http: HttpClient, private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/1/name',
-      title: 'page/1/title',
-      pageId: 1
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/1/name',
+          title: 'page/1/title',
+          pageId: 1
+        }),
+      0
+    );
 
     const $chart = $('.chart');
 

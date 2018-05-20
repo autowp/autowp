@@ -53,13 +53,17 @@ export class AccountAccountsComponent {
     private router: Router,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/123/name',
-      pageId: 123
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/123/name',
+          pageId: 123
+        }),
+      0
+    );
 
     this.load();
   }

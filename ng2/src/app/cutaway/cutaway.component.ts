@@ -23,13 +23,17 @@ export class CutawayComponent implements OnInit, OnDestroy {
     private pictureService: PictureService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/109/name',
-      pageId: 109
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/109/name',
+          pageId: 109
+        }),
+      0
+    );
   }
 
   ngOnInit(): void {

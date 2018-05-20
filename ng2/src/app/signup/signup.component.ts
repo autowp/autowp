@@ -37,14 +37,17 @@ export class SignupComponent {
         Notify.response(response);
       }
     );
-
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/52/name',
-      pageId: 52
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/52/name',
+          pageId: 52
+        }),
+      0
+    );
   }
 
   public submit() {

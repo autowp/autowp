@@ -22,13 +22,17 @@ export class AccountContactsComponent {
     private contactsService: ContactsService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/198/name',
-      pageId: 198
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/198/name',
+          pageId: 198
+        }),
+      0
+    );
 
     this.contactsService
       .getContacts({

@@ -84,14 +84,18 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/131/name',
-      pageId: 131
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/131/name',
+          pageId: 131
+        }),
+      0
+    );
 
     this.vehicleTypeService.getTypes().then(types => {
       this.vehicleTypeOptions = toPlain(types, 0);

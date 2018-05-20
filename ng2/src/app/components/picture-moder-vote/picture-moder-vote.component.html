@@ -67,7 +67,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" data-dismiss="modal" class="btn btn-secondary" translate>picture-moder-vote/custom/cancel</button>
-        <button type="button" (click)="ok()" class="btn btn-primary" [ngClass]="{'md-warn': vote < 0, 'md-primary': vote > 0}">
+        <button type="button" (click)="ok()" class="btn" [class.btn-warning]="vote < 0" [class.btn-primary]="vote > 0">
           {{'picture-moder-vote/custom/send'|translate}}
         </button>
       </div>

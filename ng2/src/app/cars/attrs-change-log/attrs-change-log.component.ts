@@ -36,13 +36,17 @@ export class CarsAttrsChangeLogComponent implements OnInit, OnDestroy {
     private acl: ACLService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/103/name',
-      pageId: 103
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/103/name',
+          pageId: 103
+        }),
+      0
+    );
   }
 
   ngOnInit(): void {

@@ -55,13 +55,17 @@ export class AboutComponent {
     private bytesPipe: BytesPipe,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/136/name',
-      pageId: 136
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/136/name',
+          pageId: 136
+        }),
+      0
+    );
 
     this.http.get<APIAbout>('/api/about').subscribe(
       response => {
@@ -86,9 +90,13 @@ export class AboutComponent {
                   markdownConverter.makeHtml(translation),
                   {
                     '%users%': contributorsHtml.join(' '),
-                    '%total-pictures%': this.decimalPipe.transform(response.total_pictures),
+                    '%total-pictures%': this.decimalPipe.transform(
+                      response.total_pictures
+                    ),
                     '%total-vehicles%': response.total_cars.toString(),
-                    '%total-size%': bytesPipe.transform(response.pictures_size, 1).toString(),
+                    '%total-size%': bytesPipe
+                      .transform(response.pictures_size, 1)
+                      .toString(),
                     '%total-users%': response.total_users.toString(),
                     '%total-comments%': response.total_comments.toString(),
                     '%github%':
@@ -131,7 +139,12 @@ export class AboutComponent {
     span.toggleClass('long-away', user.long_away);
     span.toggleClass('green-man', user.green);
     const a = $('<a />', {
-      href: this.router.createUrlTree(['/users/user', user.identity ? user.identity : 'user' + user.id]).toString(),
+      href: this.router
+        .createUrlTree([
+          '/users/user',
+          user.identity ? user.identity : 'user' + user.id
+        ])
+        .toString(),
       text: user.name
     });
 

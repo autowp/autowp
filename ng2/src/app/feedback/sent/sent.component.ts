@@ -8,12 +8,16 @@ import { PageEnvService } from '../../services/page-env.service';
 @Injectable()
 export class FeedbackSentComponent {
   constructor(private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/93/name',
-      pageId: 93
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/93/name',
+          pageId: 93
+        }),
+      0
+    );
   }
 }

@@ -23,13 +23,17 @@ export class CarsDatelessComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/103/name',
-      pageId: 1
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/103/name',
+          pageId: 1
+        }),
+      0
+    );
   }
 
   ngOnInit(): void {

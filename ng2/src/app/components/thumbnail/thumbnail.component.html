@@ -1,4 +1,5 @@
-<div class="card mb-4" [ngClass]="{'vote-accept': picture.moder_vote && picture.moder_vote.vote > 0, 'vote-remove': picture.moder_vote && picture.moder_vote.vote < 0, 'vote-neutral': picture.moder_vote && picture.moder_vote.count > 0 && picture.moder_vote.vote == 0}">
+<div class="card mb-4" [class.vote-accept]="picture.moder_vote && picture.moder_vote.vote > 0" [class.vote-remove]="picture.moder_vote && picture.moder_vote.vote < 0"
+  [class.vote-neutral]="picture.moder_vote && picture.moder_vote.count > 0 && picture.moder_vote.vote == 0">
   <a [href]="picture.url" *ngIf="picture.thumb_medium">
     <img class="card-img-top" [src]="picture.thumb_medium.src" [alt]="picture.name_text" [title]="picture.name_text">
   </a>
@@ -50,7 +51,7 @@
       <app-user [user]="picture.owner" *ngIf="picture.owner"></app-user>
     </p>
 
-    <label class="btn btn-sm float-left mr-1 mb-2" [ngClass]="picture.selected ? 'btn-primary' : 'btn-secondary'"
+    <label class="btn btn-sm float-left mr-1 mb-2" [class.btn-primary]="picture.selected" [class.btn-secondary]="!picture.selected"
       (click)="onPictureSelect($event)" *ngIf="selectable">
       <i class="fa fa-check"></i>
     </label>

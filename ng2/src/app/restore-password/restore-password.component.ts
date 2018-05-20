@@ -36,13 +36,17 @@ export class RestorePasswordComponent {
       }
     );
 
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/60/name',
-      pageId: 60
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/60/name',
+          pageId: 60
+        }),
+      0
+    );
   }
 
   public submit() {

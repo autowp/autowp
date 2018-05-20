@@ -14,13 +14,17 @@ export class DonateComponent {
     private translate: TranslateService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/196/name',
-      pageId: 196
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/196/name',
+          pageId: 196
+        }),
+      0
+    );
 
     this.translate
       .get(['donate/target', 'donate/project', 'donate/comment-hint'])

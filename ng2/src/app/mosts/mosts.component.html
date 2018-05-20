@@ -9,7 +9,7 @@
       <i class="fa fa-caret-down" aria-hidden="true"></i>
     </a>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px;overflow-x: hidden;">
-      <a *ngFor="let rating of ratings" [ngClass]="{active: rating.catname == ratingCatname}" class="dropdown-item" ui-sref=".({rating_catname: rating.catname})"
+      <a *ngFor="let rating of ratings" [class.active]="rating.catname == ratingCatname" class="dropdown-item" ui-sref=".({rating_catname: rating.catname})"
         [textContent]="rating.name|translate">
       </a>
     </div>
@@ -27,7 +27,7 @@
       <i class="fa fa-caret-down" aria-hidden="true"></i>
     </a>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px;overflow-x: hidden;">
-      <a *ngFor="let type of vehilceTypes" class="dropdown-item" [ngClass]="{active: type.catname == typeCatname}" ui-sref=".({rating_catname: ratingCatname, type_catname: type.catname})"
+      <a *ngFor="let type of vehilceTypes" class="dropdown-item" [class.active]="type.catname == typeCatname" ui-sref=".({rating_catname: ratingCatname, type_catname: type.catname})"
         [textContent]="type.name|translate"></a>
     </div>
   </div>
@@ -40,7 +40,7 @@
       <i class="fa fa-caret-down" aria-hidden="true"></i>
     </a>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="max-height: 200px;overflow-x: hidden;">
-      <a *ngFor="let year of years" [ngClass]="{active: year.catname ? year.catname == yearsCatname : !yearsCatname}" class="dropdown-item"
+      <a *ngFor="let year of years" [class.active]="year.catname ? year.catname == yearsCatname : !yearsCatname" class="dropdown-item"
         ui-sref=".({rating_catname: rating.catname, type_catname: typeCatname ? typeCatname : defaultTypeCatname, years_catname: year.catname})"
         [textContent]="year.name|translate">
       </a>

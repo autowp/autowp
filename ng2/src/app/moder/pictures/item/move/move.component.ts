@@ -70,14 +70,18 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/149/name',
-      pageId: 149
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/149/name',
+          pageId: 149
+        }),
+      0
+    );
 
     this.selectItem = (itemId: number, perspectiveId: number, type: number) => {
       if (this.src_item_id && this.src_type) {

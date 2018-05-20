@@ -39,8 +39,8 @@
 
 <div class="card card-body mb-4">
   <div class="btn-group">
-    <a href="#" class="btn btn-secondary" [ngClass]="{active: anonymous}" (click)="setAnonymous(true)" translate>donate/vod/anonymous</a>
-    <a href="#" class="btn btn-secondary" [ngClass]="{active: !anonymous, disabled: !userId}" (click)="setAnonymous(false)" translate>donate/vod/with-name</a>
+    <a href="#" class="btn btn-secondary" [class.active]="anonymous" (click)="setAnonymous(true)" translate>donate/vod/anonymous</a>
+    <a href="#" class="btn btn-secondary" [class.active]="!anonymous" [class.disabled]="!userId" (click)="setAnonymous(false)" translate>donate/vod/with-name</a>
   </div>
 </div>
 

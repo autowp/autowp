@@ -52,14 +52,18 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/148/name',
-      pageId: 148
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/148/name',
+          pageId: 148
+        }),
+      0
+    );
 
     this.routeSub = this.route.params.subscribe(params => {
       this.id = params.id;

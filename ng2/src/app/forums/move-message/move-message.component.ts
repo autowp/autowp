@@ -18,9 +18,9 @@ import { PageEnvService } from '../../services/page-env.service';
 @Injectable()
 export class ForumsMoveMessageComponent implements OnInit, OnDestroy {
   private querySub: Subscription;
-  public message_id: number;
+  public messageID: number;
+  public themeID: number;
   public themes: APIForumTheme[] = [];
-  public theme: APIForumTheme = null;
   public topics: APIForumTopic[] = [];
 
   constructor(
@@ -30,59 +30,56 @@ export class ForumsMoveMessageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/83/name',
-      pageId: 83
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/83/name',
+          pageId: 83
+        }),
+      0
+    );
   }
 
   ngOnInit(): void {
     this.querySub = this.route.queryParams.subscribe(params => {
-      this.message_id = params.message_id;
-    });
+      console.log('params', params);
+      this.messageID = parseInt(params.message_id, 10);
+      this.themeID = parseInt(params.theme_id, 10);
 
-    this.load();
+      if (this.themeID) {
+        this.forumService
+          .getTopics({ theme_id: this.themeID })
+          .subscribe(
+            response => (this.topics = response.items),
+            response => Notify.response(response)
+          );
+      } else {
+        this.forumService
+          .getThemes({})
+          .subscribe(
+            response => (this.themes = response.items),
+            response => Notify.response(response)
+          );
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.querySub.unsubscribe();
   }
 
-  private load() {
-    this.forumService.getThemes({}).subscribe(
-      response => {
-        this.themes = response.items;
-      },
-      response => {
-        Notify.response(response);
-      }
-    );
-  }
-
-  public selectTheme(theme: APIForumTheme) {
-    this.theme = theme;
-    this.forumService.getTopics({ theme_id: theme.id }).subscribe(
-      response => {
-        this.topics = response.items;
-      },
-      response => {
-        Notify.response(response);
-      }
-    );
-  }
-
   public selectTopic(topic: APIForumTopic) {
     this.http
-      .put<void>('/api/comment/' + this.message_id, {
+      .put<void>('/api/comment/' + this.messageID, {
         item_id: topic.id
       })
       .subscribe(
         response => {
-          this.forumService.getMessageStateParams(this.message_id).then(
-            (params: MessageStateParams) => {
+          this.forumService.getMessageStateParams(this.messageID).then(
+            params => {
               this.router.navigate(['/forums/topic', params.topic_id], {
                 queryParams: {
                   page: params.page

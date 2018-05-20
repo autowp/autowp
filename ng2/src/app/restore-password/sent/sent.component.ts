@@ -8,12 +8,16 @@ import { PageEnvService } from '../../services/page-env.service';
 @Injectable()
 export class RestorePasswordSentComponent {
   constructor(private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/60/name',
-      pageId: 60
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/60/name',
+          pageId: 60
+        }),
+      0
+    );
   }
 }

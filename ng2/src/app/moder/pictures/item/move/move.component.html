@@ -1,12 +1,12 @@
 <div class="nav nav-pills" style="margin-bottom: 30px" *ngIf="!src_item">
-  <a [ngClass]="{active: !show_factories && !show_museums && !show_persons}" *ngIf="!src_type || src_type == 1" class="nav-link"
+  <a [class.active]="!show_factories && !show_museums && !show_persons" *ngIf="!src_type || src_type == 1" class="nav-link"
     ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: null})" translate>moder/pciture/move/brands</a>
-  <a [ngClass]="{active: show_factories}" *ngIf="!src_type || src_type == 1" class="nav-link" ui-sref=".({show_factories: 1, show_museums: null, show_persons: null, show_authors: null})"
+  <a [class.active]="show_factories" *ngIf="!src_type || src_type == 1" class="nav-link" ui-sref=".({show_factories: 1, show_museums: null, show_persons: null, show_authors: null})"
     translate>moder/pciture/move/factories</a>
-  <a [ngClass]="{active: show_museums}" *ngIf="!src_type || src_type == 1" class="nav-link" ui-sref=".({show_factories: null, show_museums: 1, show_persons: null, show_authors: null})"
+  <a [class.active]="show_museums" *ngIf="!src_type || src_type == 1" class="nav-link" ui-sref=".({show_factories: null, show_museums: 1, show_persons: null, show_authors: null})"
     translate>item/type/7/name-plural</a>
-  <a [ngClass]="{active: show_persons}" *ngIf="!src_type || src_type == 1" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: 1, show_authors: null})">{{'item/type/8/name-plural'|translate}} (content)</a>
-  <a [ngClass]="{active: show_authors}" *ngIf="!src_type || src_type == 2" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: 1})">{{'item/type/8/name-plural'|translate}} (author)</a>
+  <a [class.active]="show_persons" *ngIf="!src_type || src_type == 1" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: 1, show_authors: null})">{{'item/type/8/name-plural'|translate}} (content)</a>
+  <a [class.active]="show_authors" *ngIf="!src_type || src_type == 2" class="nav-link" ui-sref=".({show_factories: null, show_museums: null, show_persons: null, show_authors: 1})">{{'item/type/8/name-plural'|translate}} (author)</a>
 </div>
 
 <div *ngIf="show_museums && !src_item && (!src_type || src_type == 1)">

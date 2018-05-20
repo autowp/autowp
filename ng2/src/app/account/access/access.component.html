@@ -7,21 +7,23 @@
           <div class="form-group row">
             <label class="col-md-2 col-form-label" for="password_old" translate>account/access/change-password/current</label>
             <div class="col-md-10">
-              <input type="password" size="50" maxlength="50" name="password_old" class="form-control" [(ngModel)]="form.password_old" [ngClass]="{'is-invalid': invalidParams && invalidParams.password_old}">
+              <input type="password" size="50" maxlength="50" name="password_old" class="form-control" [(ngModel)]="form.password_old"
+                [class.is-invalid]="invalidParams && invalidParams.password_old">
               <p *ngFor="let message of invalidParams | invalidParams : 'password_old'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>
           <div class="form-group row">
             <label class="col-md-2 col-form-label" for="password" translate>account/access/change-password/new</label>
             <div class="col-md-10">
-              <input type="password" size="50" maxlength="50" name="password" class="form-control" [(ngModel)]="form.password" [ngClass]="{'is-invalid': invalidParams && invalidParams.password}">
+              <input type="password" size="50" maxlength="50" name="password" class="form-control" [(ngModel)]="form.password" [class.is-invalid]="invalidParams && invalidParams.password">
               <p *ngFor="let message of invalidParams | invalidParams : 'password'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>
           <div class="form-group row">
             <label class="col-md-2 col-form-label" for="password_confirm" translate>account/access/change-password/new-confirm</label>
             <div class="col-md-10">
-              <input type="password" size="50" maxlength="50" name="password_confirm" class="form-control" [(ngModel)]="form.password_confirm" [ngClass]="{'is-invalid': invalidParams && invalidParams.password_confirm}">
+              <input type="password" size="50" maxlength="50" name="password_confirm" class="form-control" [(ngModel)]="form.password_confirm"
+                [class.is-invalid]="invalidParams && invalidParams.password_confirm">
               <p *ngFor="let message of invalidParams | invalidParams : 'password_confirm'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>

@@ -11,10 +11,10 @@ export class ModerItemsItemSelectParentTreeItemComponent {
   @Input() item: APIItemInSelectParent;
   @Input() select: SelectParentSelect;
   @Input() loadChilds: SelectParentLoadChilds;
-  @Input() disableItemId: number;
-  @Input() typeId: number;
+  @Input() disableItemID: number;
+  @Input() typeID: number;
 
   public isDisabled(item: APIItemInSelectParent): boolean {
-    return item.id === this.disableItemId;
+    return item.id === this.disableItemID;
   }
 }

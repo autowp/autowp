@@ -32,13 +32,17 @@ export class AccountInboxPicturesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/94/name',
-      pageId: 94
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/94/name',
+          pageId: 94
+        }),
+      0
+    );
 
     this.querySub = this.route.queryParams.subscribe(params => {
       this.pictureService

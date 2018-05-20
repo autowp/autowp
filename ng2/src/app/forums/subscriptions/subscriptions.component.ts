@@ -25,13 +25,17 @@ export class ForumsSubscriptionsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/42/name',
-      pageId: 42
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/42/name',
+          pageId: 42
+        }),
+      0
+    );
 
     this.querySub = this.route.queryParams.subscribe(params => {
       this.forumService

@@ -1,4 +1,4 @@
-<span [ngClass]="{user: true, muted: user.deleted, 'long-away': user.long_away, 'green-man': user.green}">
+<span class="user" [class.muted]="user.deleted" [class.long-away]="user.long_away" [class.green-man]="user.green">
   <i class="fa fa-user"></i>
   <span *ngIf="user.deleted">{{'deleted-user'|translate}}</span>
   <a [routerLink]="['/users', user.identity ? user.identity : 'user' + user.id]" [textContent]="user.name" *ngIf="!user.deleted"></a>

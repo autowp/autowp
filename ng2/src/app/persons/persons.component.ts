@@ -25,13 +25,17 @@ export class PersonsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/214/name',
-      pageId: 214
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/214/name',
+          pageId: 214
+        }),
+      0
+    );
     this.querySub = this.route.queryParams.subscribe(params => {
       this.itemService
         .getItems({

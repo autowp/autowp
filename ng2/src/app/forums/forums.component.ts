@@ -4,8 +4,8 @@ import { APIPaginator } from '../services/api.service';
 import { ACLService } from '../services/acl.service';
 import Notify from '../notify';
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription, Observable, BehaviorSubject, combineLatest } from 'rxjs';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import {
   APIForumThemesGetResponse,
   ForumService,
@@ -13,21 +13,28 @@ import {
   APIForumTheme
 } from '../services/forum';
 import { PageEnvService } from '../services/page-env.service';
+import { debounceTime } from 'rxjs/operators';
+
+interface PageParams {
+  theme_id: number;
+  page: number;
+}
 
 @Component({
   selector: 'app-forums',
-  templateUrl: './forums.component.html'
+  templateUrl: './forums.component.html',
+  styles: ['app-forums {display:block}']
 })
 @Injectable()
 export class ForumsComponent implements OnInit, OnDestroy {
-  private routeSub: Subscription;
-  private querySub: Subscription;
+  private paramsSub: Subscription;
   public paginator: APIPaginator;
   public forumAdmin = false;
   public theme: APIForumTheme;
   public themes: APIForumTheme[];
   private theme_id: number;
   private page: number;
+  private load$ = new BehaviorSubject<boolean>(true);
 
   constructor(
     private http: HttpClient,
@@ -49,98 +56,103 @@ export class ForumsComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.routeSub = this.route.params.subscribe(params => {
-      this.theme_id = params.theme_id;
-      this.load();
-    });
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.page = params.page;
-      this.load();
+    this.load$.pipe(debounceTime(50)).subscribe(() => {
+      if (!this.theme_id) {
+        setTimeout(
+          () =>
+            this.pageEnv.set({
+              layout: {
+                needRight: false
+              },
+              name: 'page/42/name',
+              pageId: 42
+            }),
+          0
+        );
+
+        this.forumService
+          .getThemes({
+            fields:
+              'last_message.datetime,last_message.user,last_topic,description',
+            topics: {
+              page: this.page
+            }
+          })
+          .subscribe(
+            response => {
+              this.themes = response.items;
+            },
+            response => {
+              Notify.response(response);
+            }
+          );
+      } else {
+        this.forumService
+          .getTheme(this.theme_id, {
+            fields:
+              'themes.last_message.user,themes.last_message.datetime,themes.last_topic,' +
+              'themes.description,topics.author,topics.messages,topics.last_message.datetime,topics.last_message.user',
+            topics: { page: this.page }
+          })
+          .subscribe(
+            response => {
+              this.theme = response;
+              this.themes = response.themes;
+
+              this.translate.get(this.theme.name).subscribe(
+                (translation: string) => {
+                  this.pageEnv.set({
+                    layout: {
+                      needRight: false
+                    },
+                    name: 'page/43/name',
+                    pageId: 43,
+                    args: {
+                      THEME_NAME: translation,
+                      THEME_ID: this.theme.id + ''
+                    }
+                  });
+                },
+                () => {
+                  this.pageEnv.set({
+                    layout: {
+                      needRight: false
+                    },
+                    name: 'page/43/name',
+                    pageId: 43,
+                    args: {
+                      THEME_NAME: this.theme.name,
+                      THEME_ID: this.theme.id + ''
+                    }
+                  });
+                }
+              );
+            },
+            response => {
+              Notify.response(response);
+
+              this.router.navigate(['/error-404']);
+            }
+          );
+      }
     });
 
-    this.load();
+    this.paramsSub = combineLatest(
+      this.route.params,
+      this.route.queryParams,
+      (route: Params, query: Params) => ({
+        route,
+        query
+      })
+    ).subscribe(data => {
+      this.theme_id = data.route.theme_id;
+      this.page = data.query.page;
+      this.load$.next(true);
+    });
   }
 
   ngOnDestroy(): void {
-    this.routeSub.unsubscribe();
-    this.querySub.unsubscribe();
-  }
-
-  private load() {
-    if (!this.theme_id) {
-      this.pageEnv.set({
-        layout: {
-          needRight: false
-        },
-        name: 'page/42/name',
-        pageId: 42
-      });
-
-      this.forumService
-        .getThemes({
-          fields:
-            'last_message.datetime,last_message.user,last_topic,description',
-          topics: {
-            page: this.page
-          }
-        })
-        .subscribe(
-          response => {
-            this.themes = response.items;
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
-    } else {
-      this.forumService
-        .getTheme(this.theme_id, {
-          fields:
-            'themes.last_message.user,themes.last_message.datetime,themes.last_topic,' +
-            'themes.description,topics.author,topics.messages,topics.last_message.datetime,topics.last_message.user',
-          topics: { page: this.page }
-        })
-        .subscribe(
-          response => {
-            this.theme = response;
-            this.themes = response.themes;
-
-            this.translate.get(this.theme.name).subscribe(
-              (translation: string) => {
-                this.pageEnv.set({
-                  layout: {
-                    needRight: false
-                  },
-                  name: 'page/43/name',
-                  pageId: 43,
-                  args: {
-                    THEME_NAME: translation,
-                    THEME_ID: this.theme.id + ''
-                  }
-                });
-              },
-              () => {
-                this.pageEnv.set({
-                  layout: {
-                    needRight: false
-                  },
-                  name: 'page/43/name',
-                  pageId: 43,
-                  args: {
-                    THEME_NAME: this.theme.name,
-                    THEME_ID: this.theme.id + ''
-                  }
-                });
-              }
-            );
-          },
-          response => {
-            Notify.response(response);
-
-            this.router.navigate(['/error-404']);
-          }
-        );
-    }
+    this.paramsSub.unsubscribe();
   }
 
   public openTopic(topic: APIForumTopic) {

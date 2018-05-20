@@ -226,7 +226,9 @@ export class ForumService {
     if (options.page) {
       params.page = options.page.toString();
     }
-    return this.http.get<APIForumTopic>(location);
+    return this.http.get<APIForumTopic>(location, {
+      params: params
+    });
   }
 
   public postTopic(

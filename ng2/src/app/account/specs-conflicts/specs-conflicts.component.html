@@ -3,13 +3,13 @@
 </p>
 
 <div class="nav nav-pills" style="margin-bottom:10px">
-  <a class="nav-link" [ngClass]="{active: filter == '0'}" routerLink="." [queryParams]="{filter: 0}" queryParamsHandling="merge"
+  <a class="nav-link" [class.active]="filter == '0'" routerLink="." [queryParams]="{filter: 0}" queryParamsHandling="merge"
     translate>account/specs/conflicts/filter/all</a>
-  <a class="nav-link" [ngClass]="{active: filter == '-1'}" routerLink="." [queryParams]="{filter: -1}" queryParamsHandling="merge"
+  <a class="nav-link" [class.active]="filter == '-1'" routerLink="." [queryParams]="{filter: -1}" queryParamsHandling="merge"
     translate>account/specs/conflicts/filter/i-disagree</a>
-  <a class="nav-link" [ngClass]="{active: filter == '1'}" routerLink="." [queryParams]="{filter: 1}" queryParamsHandling="merge"
+  <a class="nav-link" [class.active]="filter == '1'" routerLink="." [queryParams]="{filter: 1}" queryParamsHandling="merge"
     translate>account/specs/conflicts/filter/do-not-agree-with-me</a>
-  <a class="nav-link" [ngClass]="{active: filter == 'minus-weight'}" routerLink="." [queryParams]="{filter: 'minus-weight'}"
+  <a class="nav-link" [class.active]="filter == 'minus-weight'" routerLink="." [queryParams]="{filter: 'minus-weight'}"
     queryParamsHandling="merge" translate>account/specs/conflicts/filter/errors</a>
 </div>
 

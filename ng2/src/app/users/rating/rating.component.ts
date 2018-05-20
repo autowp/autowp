@@ -43,13 +43,17 @@ export class UsersRatingComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/173/name',
-      pageId: 173
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/173/name',
+          pageId: 173
+        }),
+      0
+    );
 
     this.routeSub = this.route.params.subscribe(params => {
       this.rating = params.rating || 'specs-volume';

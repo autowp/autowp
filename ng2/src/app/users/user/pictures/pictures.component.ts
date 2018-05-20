@@ -83,17 +83,21 @@ export class UsersUserPicturesComponent implements OnInit, OnDestroy {
       ? this.user.identity
       : 'user' + this.user.id;
 
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/63/name',
-      pageId: 63,
-      args: {
-        USER_NAME: this.user.name,
-        USER_IDENTITY: this.identity
-      }
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/63/name',
+          pageId: 63,
+          args: {
+            USER_NAME: this.user.name,
+            USER_IDENTITY: this.identity
+          }
+        }),
+      0
+    );
 
     this.itemService
       .getItems({

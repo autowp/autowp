@@ -31,14 +31,18 @@ export class ModerItemsAlphaComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/74/name',
-      pageId: 74
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/74/name',
+          pageId: 74
+        }),
+      0
+    );
   }
 
   ngOnInit(): void {

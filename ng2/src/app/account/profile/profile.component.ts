@@ -85,13 +85,17 @@ export class AccountProfileComponent {
       this.photoInvalidParams = JSON.parse(response).invalid_params;
     };
 
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/129/name',
-      pageId: 129
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/129/name',
+          pageId: 129
+        }),
+      0
+    );
 
     this.http
       .get<APIUser>('/api/user/me', {

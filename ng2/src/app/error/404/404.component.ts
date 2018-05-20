@@ -8,12 +8,16 @@ import { PageEnvService } from '../../services/page-env.service';
 @Injectable()
 export class Error404Component {
   constructor(private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: true
-      },
-      title: '404 Not Found'
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: true
+          },
+          title: '404 Not Found'
+        }),
+      0
+    );
   }
 }

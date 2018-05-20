@@ -22,13 +22,17 @@ export class ArticlesComponent implements OnInit, OnDestroy {
     private articleService: ArticleService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/31/name',
-      pageId: 31
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/31/name',
+          pageId: 31
+        }),
+      0
+    );
   }
 
   ngOnInit(): void {

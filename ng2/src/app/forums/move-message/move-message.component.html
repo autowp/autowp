@@ -1,10 +1,10 @@
-<ul *ngIf="!theme">
+<ul *ngIf="!themeID">
   <li *ngFor="let theme of themes">
-    <a href="" [textContent]="theme.name|translate" (click)="selectTheme(theme)"></a>
+    <a [routerLink]="['.']" [queryParams]="{theme_id: theme.id}" queryParamsHandling="merge" [textContent]="theme.name|translate"></a>
   </li>
 </ul>
-<div *ngIf="theme">
+<div *ngIf="themeID">
   <p *ngFor="let topic of topics">
-    <a href="" [textContent]="topic.name" (click)="selectTopic(topic)"></a>
+    <button class="btn btn-link" [textContent]="topic.name" (click)="selectTopic(topic)"></button>
   </p>
 </div>

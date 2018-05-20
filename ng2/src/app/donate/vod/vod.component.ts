@@ -37,13 +37,17 @@ export class DonateVodComponent implements OnInit, OnDestroy {
     private donateService: DonateService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/196/name',
-      pageId: 196
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/196/name',
+          pageId: 196
+        }),
+      0
+    );
   }
 
   ngOnInit(): void {

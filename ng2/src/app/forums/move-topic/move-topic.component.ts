@@ -30,13 +30,17 @@ export class ForumsMoveTopicComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/83/name',
-      pageId: 83
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/83/name',
+          pageId: 83
+        }),
+      0
+    );
 
     this.forumService.getThemes({}).subscribe(
       response => {

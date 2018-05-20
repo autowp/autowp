@@ -60,13 +60,17 @@ export class InfoTextComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/197/name',
-      pageId: 197
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/197/name',
+          pageId: 197
+        }),
+      0
+    );
   }
 
   ngOnInit(): void {

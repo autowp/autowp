@@ -33,14 +33,18 @@ export class ModerCommentsComponent implements OnInit, OnDestroy {
     private commentService: CommentService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/110/name',
-      pageId: 110
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/110/name',
+          pageId: 110
+        }),
+      0
+    );
   }
 
   ngOnInit(): void {

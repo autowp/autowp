@@ -36,7 +36,7 @@
 
 <p [translateParams]="{from: (voting.begin_date | amDateFormat : 'LL'), to: (voting.end_date | amDateFormat : 'LL')}" translate>votings/voting/duration</p>
 
-<app-comments [itemId]="voting.id" [typeId]="3" [user]="auth.user" *ngIf="voting"></app-comments>
+<app-comments [itemID]="voting.id" [typeID]="3" *ngIf="voting"></app-comments>
 
 <div class="modal fade">
   <div class="modal-dialog">

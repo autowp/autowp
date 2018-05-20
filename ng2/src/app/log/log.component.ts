@@ -39,13 +39,17 @@ export class LogComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/75/name',
-      pageId: 75
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/75/name',
+          pageId: 75
+        }),
+      0
+    );
   }
 
   ngOnInit(): void {

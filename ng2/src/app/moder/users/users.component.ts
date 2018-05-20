@@ -20,14 +20,18 @@ export class ModerUsersComponent {
     private userService: UserService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/203/name',
-      pageId: 203
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/203/name',
+          pageId: 203
+        }),
+      0
+    );
 
     this.load();
   }

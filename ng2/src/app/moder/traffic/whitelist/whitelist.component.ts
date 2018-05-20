@@ -31,14 +31,18 @@ export class ModerTrafficWhitelistComponent {
     private router: Router,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/77/name',
-      pageId: 77
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/77/name',
+          pageId: 77
+        }),
+      0
+    );
 
     this.http
       .get<APITrafficWhitelistGetResponse>('/api/traffic/whitelist')

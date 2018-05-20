@@ -22,14 +22,18 @@ export class ModerPagesAddComponent {
     private pageService: PageService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        isAdminPage: true,
-        needRight: false
-      },
-      name: 'page/69/name',
-      pageId: 69
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/69/name',
+          pageId: 69
+        }),
+      0
+    );
 
     this.pageService.getPages().subscribe(response => {
       this.pages = this.pageService.toPlainArray(response.items, 0);

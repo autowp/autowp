@@ -1,8 +1,8 @@
 <div class="card card-body">
   <div class="nav flex-column nav-pills">
     <ng-container *ngFor="let item of items">
-      <a class="nav-link" [routerLink]="item.routerLink" [queryParams]="item.routerLinkParams" *ngIf="item.routerLink" [ngClass]="{active: item.active}">
-        <span [ngClass]="{'badge badge-pill badge-secondary': true, 'float-right': true, 'alert-danger': item.newCount > 0}" *ngIf="item.count !== undefined">
+      <a class="nav-link" [routerLink]="item.routerLink" [queryParams]="item.routerLinkParams" *ngIf="item.routerLink" [class.active]="item.active">
+        <span class="badge badge-pill badge-secondary float-right" [class.alert-danger]="item.newCount > 0" *ngIf="item.count !== undefined">
           <span *ngIf="item.count <= 0" translate>count 0</span>
           <span *ngIf="item.count > 0 && item.newCount === undefined">{{item.count}}</span>
           <span *ngIf="item.count > 0 && item.newCount !== undefined && item.newCount <= 0">{{item.count}}</span>

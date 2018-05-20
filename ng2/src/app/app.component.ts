@@ -9,7 +9,8 @@ import Notify from './notify';
 import { APIUser } from './services/user';
 import { MessageService } from './services/message';
 import { Page, PageService } from './services/page';
-import { PageEnvService } from './services/page-env.service';
+import { PageEnvService, LayoutParams } from './services/page-env.service';
+import { Observable } from 'rxjs';
 
 function replaceArgs(str: string, args: {[key: string]: string}): string {
   for (const key in args) {
@@ -26,6 +27,7 @@ function replaceArgs(str: string, args: {[key: string]: string}): string {
   styleUrls: ['./app.component.less']
 })
 export class AppComponent implements OnInit {
+  public layoutParams$: Observable<LayoutParams>;
   public loginInvalidParams: any;
   public languages;
   public path; // = $location.path();
@@ -53,12 +55,14 @@ export class AppComponent implements OnInit {
     private http: HttpClient,
     private pages: PageService,
     private messageService: MessageService,
-    public pageEnv: PageEnvService
+    private pageEnv: PageEnvService
   ) {
     translate.setTranslation('en', require('../languages/en.json'));
     translate.setDefaultLang('en');
 
     translate.use('en');
+
+    this.layoutParams$ = this.pageEnv.layoutParams$.asObservable();
 
     this.auth.loggedIn$.subscribe(() => {
       this.updateRights();

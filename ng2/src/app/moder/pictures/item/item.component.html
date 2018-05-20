@@ -80,7 +80,7 @@
           </select>
         </td>
         <td *ngIf="picture.rights.crop">
-          <a class="btn btn-secondary" [ngClass]="{'btn-success': item.area}" ui-sref="moder-pictures-item-area({id: picture.id, item_id: item.item_id, type: item.type})"
+          <a class="btn btn-secondary" [class.btn-success]="item.area" ui-sref="moder-pictures-item-area({id: picture.id, item_id: item.item_id, type: item.type})"
             arial-label="Area" style="margin:0" *ngIf="item.type == 1">
             <i class="fa fa-crop"></i>
             {{'moder/picture/catalogue/pick-item-area'|translate}}

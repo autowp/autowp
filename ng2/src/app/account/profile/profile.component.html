@@ -7,7 +7,7 @@
           <div class="form-group row">
             <label class="col-md-3 col-form-label" for="name" translate>user/name</label>
             <div class="col-md-9">
-              <input type="text" maxlength="50" size="50" name="name" class="form-control" [(ngModel)]="profile.name" [ngClass]="{'is-invalid': profileInvalidParams && profileInvalidParams.name}"
+              <input type="text" maxlength="50" size="50" name="name" class="form-control" [(ngModel)]="profile.name" [class.is-invalid]="profileInvalidParams && profileInvalidParams.name"
               />
               <p *ngFor="let message of profileInvalidParams | invalidParams : 'name'" [textContent]="message" class="invalid-feedback"></p>
             </div>
@@ -26,8 +26,7 @@
       <app-markdown [markdown]="'account/profile/use-gravatar'|translate"></app-markdown>
       <div *ngIf="photo">
         <img [src]="photo.src" class="mb-4" />
-        <p *ngFor="let message of photoInvalidParams | invalidParams : 'file'" [textContent]="message" class="invalid-feedback"
-          style="display:block"></p>
+        <p *ngFor="let message of photoInvalidParams | invalidParams : 'file'" [textContent]="message" class="invalid-feedback" style="display:block"></p>
       </div>
       <input type="file" accept="image/*" style="display:none" #fileInput ng2FileSelect [uploader]="uploader" />
       <div class="btn-group">
@@ -51,7 +50,7 @@
           <div class="form-group row">
             <label class="col-md-3 col-form-label" for="language" translate>account/profile/language</label>
             <div class="col-md-9">
-              <select name="language" class="form-control" [ngClass]="{'is-invalid': settingsInvalidParams.language}" [(ngModel)]="settings.language">
+              <select name="language" class="form-control" [class.is-invalid]="settingsInvalidParams.language" [(ngModel)]="settings.language">
                 <option *ngFor="let language of languages" [value]="language.value">{{language.name}}</option>
               </select>
               <p *ngFor="let message of settingsInvalidParams | invalidParams : 'language'" [textContent]="message" class="invalid-feedback"></p>
@@ -60,7 +59,7 @@
           <div class="form-group row">
             <label class="col-md-3 col-form-label" for="timezone" translate>account/profile/timezone</label>
             <div class="col-md-9">
-              <select name="timezone" class="form-control" [(ngModel)]="settings.timezone" [ngClass]="{'is-invalid': settingsInvalidParams.timezone}">
+              <select name="timezone" class="form-control" [(ngModel)]="settings.timezone" [class.is-invalid]="settingsInvalidParams.timezone">
                 <option *ngFor="let timezone of timezones" [value]="timezone">{{timezone}}</option>
               </select>
               <p *ngFor="let message of settingsInvalidParams | invalidParams : 'timezone'" [textContent]="message" class="invalid-feedback"></p>

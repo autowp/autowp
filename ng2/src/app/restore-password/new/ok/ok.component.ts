@@ -8,12 +8,16 @@ import { PageEnvService } from '../../../services/page-env.service';
 @Injectable()
 export class RestorePasswordNewOkComponent {
   constructor(private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/135/name',
-      pageId: 135
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/135/name',
+          pageId: 135
+        }),
+      0
+    );
   }
 }

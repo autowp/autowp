@@ -8,7 +8,8 @@
           <div class="form-group row">
             <label class="col-md-2 col-form-label" for="password_old" translate>user/password</label>
             <div class="col-md-10">
-              <input type="password" size="50" maxlength="50" name="password_old" class="form-control" [(ngModel)]="form.password_old" [ngClass]="{'is-invalid': invalidParams && invalidParams.password_old}">
+              <input type="password" size="50" maxlength="50" name="password_old" class="form-control" [(ngModel)]="form.password_old"
+                [class.is-invalid]="invalidParams && invalidParams.password_old">
               <p *ngFor="let message of invalidParams | invalidParams : 'password_old'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>

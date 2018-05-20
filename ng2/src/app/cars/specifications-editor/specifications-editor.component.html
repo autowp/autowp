@@ -15,7 +15,7 @@
 <ul class="nav nav-tabs" id="myTab">
   <ng-container *ngFor="let ctab of tabs">
     <li *ngIf="ctab.visible" class="nav-item">
-      <a ui-sref="cars-specifications-editor({tab: ctab.id})" [ngClass]="{active: ctab.id == tab}" class="nav-link">
+      <a ui-sref="cars-specifications-editor({tab: ctab.id})" [class.active]="ctab.id == tab" class="nav-link">
         <span class="{{ctab.icon}}" *ngIf="ctab.icon"></span>
         {{ctab.title | translate}}
         <span class="badge badge-pill badge-secondary" *ngIf="ctab.count" [textContent]="ctab.count"></span>
@@ -28,10 +28,10 @@
   <span [hidden]="loading <= 0">
     <i class="fa fa-spinner fa-spin fa-fw fa-4x"></i>
   </span>
-  <div class="tab-pane" [ngClass]="{active: tab == 'info'}" id="info">
+  <div class="tab-pane" [class.active]="tab == 'info'" id="info">
     <app-markdown [markdown]="'specifications-editor/description'|translate"></app-markdown>
   </div>
-  <div class="tab-pane" [ngClass]="{active: tab == 'engine'}" id="engine" *ngIf="item.item_type_id == 1">
+  <div class="tab-pane" [class.active]="tab == 'engine'" id="engine" *ngIf="item.item_type_id == 1">
     <h2 translate>specifications-editor/engine</h2>
 
     <div *ngIf="isAllowedEditEngine">
@@ -70,7 +70,7 @@
       </ng-container>
     </div>
   </div>
-  <div class="tab-pane" [ngClass]="{active: tab == 'spec'}" id="spec">
+  <div class="tab-pane" [class.active]="tab == 'spec'" id="spec">
     <form class="spec-editor-form" (submit)="saveSpecs()">
       <p class="alert alert-danger">
         <!--  TODO: *ngIf="form.getMessages()" -->
@@ -87,7 +87,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let attribute of attributes" id="subform-{{attribute.id}}" [ngClass]="{'subform-header': !!attribute.childs.length, 'has-error': $element.getMessages()}">
+          <tr *ngFor="let attribute of attributes" id="subform-{{attribute.id}}" [class.subform-header]="!!attribute.childs.length"
+            [class.has-error]="$element.getMessages()">
             <td colspan="4" [ngStyle]="{'padding-left': (attribute.deep * 20) + 'px'}" *ngIf="attribute.childs.length">
               <h4 [textContent]="attribute.name | translate"></h4>
             </td>
@@ -95,10 +96,10 @@
               <label [ngStyle]="{'padding-left': (attribute.deep * 20) + 'px'}" [textContent]="attribute.name | translate"></label>
             </td>
             <td *ngIf="!attribute.childs.length">
-              <div class="input-group" [ngClass]="{'has-error': element.getMessages()}">
+              <div class="input-group" [class.has-error]="element.getMessages()">
                 <div class="input-group-prepend">
                   <button type="button" class="btn btn-secondary" (click)="currentUserValues[attribute.id].empty = !currentUserValues[attribute.id].empty"
-                    [ngClass]="{active: attribute.disabled}">
+                    [class.active]="attribute.disabled">
                     <span class="fa fa-remove"></span>
                   </button>
                 </div>
@@ -156,10 +157,10 @@
       </table>
     </form>
   </div>
-  <div class="tab-pane" [ngClass]="{active: tab == 'result'}" id="result">
+  <div class="tab-pane" [class.active]="tab == 'result'" id="result">
     <div [innerHTML]="resultHtml"></div>
   </div>
-  <div class="tab-pane" [ngClass]="{active: tab == 'admin'}" id="admin" *ngIf="isSpecsAdmin">
+  <div class="tab-pane" [class.active]="tab == 'admin'" id="admin" *ngIf="isSpecsAdmin">
     <p>
       <a ui-sref="cars-specs-admin({item_id: item.id})">Admin</a>
     </p>

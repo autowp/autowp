@@ -28,13 +28,17 @@ export class RestorePasswordNewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/134/name',
-      pageId: 134
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/134/name',
+          pageId: 134
+        }),
+      0
+    );
     this.routeSub = this.route.params.subscribe(params => {
       this.form.code = params.code;
 

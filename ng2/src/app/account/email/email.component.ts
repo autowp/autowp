@@ -21,13 +21,17 @@ export class AccountEmailComponent {
     private router: Router,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/55/name',
-      pageId: 55
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/55/name',
+          pageId: 55
+        }),
+      0
+    );
     this.http
       .get<APIUser>('/api/user/me', {
         params: {

@@ -23,7 +23,7 @@ interface APIPageInBreadcrumbs extends APIPage {
   templateUrl: './breadcrumbs.component.html'
 })
 @Injectable()
-class BreadcrumbsComponent implements OnInit, OnDestroy {
+export class BreadcrumbsComponent implements OnInit, OnDestroy {
   private sub: Subscription;
   public items: APIPageInBreadcrumbs[] = [];
 
@@ -34,20 +34,20 @@ class BreadcrumbsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.sub = this.pageEnv.changes.subscribe(() => {
-      this.load();
+    this.sub = this.pageEnv.pageID$.subscribe((pageID) => {
+      this.load(pageID);
     });
   }
   ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
 
-  private load() {
-    const current = this.pageService.getCurrent();
+  private load(pageID: number) {
     this.items = [];
-    if (current) {
+    if (pageID) {
       const args = this.pageService.getCurrentArgs();
-      this.pageService.getPath(current).then(path => {
+      this.pageService.getPath(pageID).then(path => {
+        this.items = [];
         for (const item of path) {
           const bItem: APIPageInBreadcrumbs = item;
           bItem.url = replaceArgs(bItem.url, args);

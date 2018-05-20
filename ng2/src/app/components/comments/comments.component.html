@@ -1,9 +1,9 @@
 <div class="comments">
-  <h2 translate *ngIf="messages && typeId != 5">comments/title</h2>
-  <app-comments-list [itemId]="itemId" [typeId]="typeId" [onSent]="onSent" [messages]="messages" [deep]="0" [user]="user" *ngIf="messages"></app-comments-list>
+  <h2 translate *ngIf="messages && typeID != 5">comments/title</h2>
+  <app-comments-list [itemID]="itemID" [typeID]="typeID" (sent)="onSent($event)" [messages]="messages" [deep]="0" *ngIf="messages"></app-comments-list>
 
   <app-paginator [data]="paginator" *ngIf="paginator"></app-paginator>
 
-  <app-comments-form [itemId]="itemId" [typeId]="typeId" [onSent]="onSent" *ngIf="user"></app-comments-form>
+  <app-comments-form [itemID]="itemID" [typeID]="typeID" (sent)="onSent($event)" *ngIf="auth.user"></app-comments-form>
   <app-markdown *ngIf="!user" class="alert alert-block alert-info" [markdown]="'comments/what-to-do-for-write-comments'|translate"></app-markdown>
 </div>

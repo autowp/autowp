@@ -6,7 +6,7 @@
 <div class="form-group row" [hidden]="loading > 0">
   <label class="col-md-2 col-form-label text-right" translate>moder/vehicle/pictures/turbo-group-creator/pictures</label>
   <div class="col-md-10 multicheckbox-pictures row">
-    <label class="btn btn-secondary col-md-3" *ngFor="let picture of pictures" [ngClass]="{active: picture.selected}" (click)="pictureSelected(picture)">
+    <label class="btn btn-secondary col-md-3" *ngFor="let picture of pictures" [class.active]="picture.selected" (click)="pictureSelected(picture)">
       <img [src]="picture.picture.thumb_medium.src" alt="" [title]="picture.picture.name_text" class="rounded w-100" />
     </label>
   </div>

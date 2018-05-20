@@ -37,13 +37,17 @@ export class FeedbackComponent {
       }
     );
 
-    this.pageEnv.set({
-      layout: {
-        needRight: false
-      },
-      name: 'page/89/name',
-      pageId: 89
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/89/name',
+          pageId: 89
+        }),
+      0
+    );
   }
 
   public submit() {

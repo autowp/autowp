@@ -15,13 +15,17 @@ export class InfoSpecComponent {
     private specService: SpecService,
     private pageEnv: PageEnvService
   ) {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/174/name',
-      pageId: 174
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/174/name',
+          pageId: 174
+        }),
+      0
+    );
 
     this.specService
       .getSpecs()

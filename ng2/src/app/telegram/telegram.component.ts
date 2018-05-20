@@ -8,12 +8,16 @@ import { PageEnvService } from '../services/page-env.service';
 @Injectable()
 export class TelegramComponent {
   constructor(private pageEnv: PageEnvService) {
-    this.pageEnv.set({
-      layout: {
-        needRight: true
-      },
-      name: 'page/204/name',
-      pageId: 204
-    });
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: true
+          },
+          name: 'page/204/name',
+          pageId: 204
+        }),
+      0
+    );
   }
 }

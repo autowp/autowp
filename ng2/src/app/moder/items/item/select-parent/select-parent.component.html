@@ -1,17 +1,17 @@
 <div class="nav nav-pills" style="margin-bottom:10px">
-  <a [ngClass]="{active: tab == 'catalogue'}" *ngIf="showCatalogueTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'catalogue'})"
+  <a [class.active]="tab == 'catalogue'" *ngIf="showCatalogueTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'catalogue'})"
     ui-sref-opts="{inherit:false}">
     <i class="fa fa-list"></i> Catalogue</a>
-  <a [ngClass]="{active: tab == 'brands'}" *ngIf="showBrandsTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'brands'})"
+  <a [class.active]="tab == 'brands'" *ngIf="showBrandsTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'brands'})"
     ui-sref-opts="{inherit:false}">
     <i class="fa fa-list"></i> Brands</a>
-  <a [ngClass]="{active: tab == 'categories'}" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'categories'})"
+  <a [class.active]="tab == 'categories'" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'categories'})"
     ui-sref-opts="{inherit:false}">
     <i class="fa fa-tag"></i> Categories</a>
-  <a [ngClass]="{active: tab == 'twins'}" *ngIf="showTwinsTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'twins'})"
+  <a [class.active]="tab == 'twins'" *ngIf="showTwinsTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'twins'})"
     ui-sref-opts="{inherit:false}">
     <i class="fa fa-adjust"></i> Twins</a>
-  <a [ngClass]="{active: tab == 'factories'}" *ngIf="showFactoriesTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'factories'})"
+  <a [class.active]="tab == 'factories'" *ngIf="showFactoriesTab" class="nav-link" ui-sref="moder-items-item-select-parent({id: item.id, tab: 'factories'})"
     ui-sref-opts="{inherit:false}">
     <i class="fa fa-cogs"></i> {{'moder/vehicle/tabs/factories'|translate}}</a>
 </div>
@@ -33,7 +33,7 @@
   </table>
   <ul *ngIf="brand_id">
     <li class="car-node" *ngFor="let item of items">
-      <app-moder-items-item-select-parent-tree [item]="item" [select]="select" [disableItemId]="item.id" [loadChilds]="loadChildCatalogues">
+      <app-moder-items-item-select-parent-tree [item]="item" [select]="select" [disableItemID]="item.id" [loadChilds]="loadChildCatalogues">
       </app-moder-items-item-select-parent-tree>
     </li>
   </ul>
@@ -61,7 +61,7 @@
 <div class="card card-body" *ngIf="tab == 'categories'">
   <ul>
     <li class="car-node" *ngFor="let item of categories">
-      <app-moder-items-item-select-parent-tree-item [item]="item" [select]="select" [loadChilds]="loadChildCategories" [disableItemId]="item.id">
+      <app-moder-items-item-select-parent-tree-item [item]="item" [select]="select" [loadChilds]="loadChildCategories" [disableItemID]="item.id">
       </app-moder-items-item-select-parent-tree-item>
     </li>
   </ul>
@@ -83,7 +83,7 @@
   </table>
   <ul *ngIf="brand_id">
     <li class="car-node" *ngFor="let item of items">
-      <app-moder-items-item-select-parent-tree-item [item]="item" [select]="select" [disableItemId]="item.id">
+      <app-moder-items-item-select-parent-tree-item [item]="item" [select]="select" [disableItemID]="item.id">
       </app-moder-items-item-select-parent-tree-item>
     </li>
   </ul>
@@ -93,7 +93,7 @@
 <div class="card card-body" *ngIf="tab == 'factories'">
   <ul>
     <li class="car-node" *ngFor="let item of factories">
-      <app-moder-items-item-select-parent-tree-item [item]="item" [select]="select" [disableItemId]="item.id">
+      <app-moder-items-item-select-parent-tree-item [item]="item" [select]="select" [disableItemID]="item.id">
       </app-moder-items-item-select-parent-tree-item>
     </li>
   </ul>

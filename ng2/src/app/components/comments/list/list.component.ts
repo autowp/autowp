@@ -1,11 +1,12 @@
 import * as $ from 'jquery';
 import { ACLService } from '../../../services/acl.service';
-import { Component, Injectable, Input } from '@angular/core';
+import { Component, Injectable, Input, EventEmitter, Output } from '@angular/core';
 import Notify from '../../../notify';
 import { HttpClient } from '@angular/common/http';
 import { CommentService, APIComment } from '../../../services/comment';
 import { APIMessage } from '../../../services/message';
 import { APIUser } from '../../../services/user';
+import { AuthService } from '../../../services/auth.service';
 
 export interface APICommentInList extends APIComment {
   showReply: boolean;
@@ -20,19 +21,19 @@ export class CommentsListComponent {
   public canRemoveComments = false;
   public canMoveMessage = false;
 
-  @Input() itemId: number;
-  @Input() typeId: number;
+  @Input() itemID: number;
+  @Input() typeID: number;
   @Input() messages: APICommentInList[];
-  @Input() user: APIUser;
   @Input() deep: number;
-  @Input() onSent: Function;
+  @Output() sent = new EventEmitter<string>();
 
   public isModer: boolean;
 
   constructor(
     private acl: ACLService,
     private http: HttpClient,
-    private commentService: CommentService
+    private commentService: CommentService,
+    public auth: AuthService
   ) {
     this.acl
       .isAllowed('comment', 'remove')
@@ -122,5 +123,9 @@ export class CommentsListComponent {
       },
       response => Notify.response(response)
     );*/
+  }
+
+  public onSent(location: string) {
+    this.sent.emit(location);
   }
 }

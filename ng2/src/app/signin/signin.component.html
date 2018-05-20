@@ -21,14 +21,14 @@
           <div class="form-group row">
             <label class="col-md-3 col-form-label" translate>login/login-or-email</label>
             <div class="col-md-9">
-              <input type="text" name="login" class="form-control" [(ngModel)]="form.login" maxlength="50" [ngClass]="{'is-invalid': invalidParams.login}">
+              <input type="text" name="login" class="form-control" [(ngModel)]="form.login" maxlength="50" [class.is-invalid]="invalidParams.login">
               <p *ngFor="let message of invalidParams | invalidParams : 'login'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>
           <div class="form-group row">
             <label class="col-md-3 col-form-label" translate>user/password</label>
             <div class="col-md-9">
-              <input type="password" name="password" class="form-control" [(ngModel)]="form.password" [ngClass]="{'is-invalid': invalidParams.password}">
+              <input type="password" name="password" class="form-control" [(ngModel)]="form.password" [class.is-invalid]="invalidParams.password">
               <p *ngFor="let message of invalidParams | invalidParams : 'password'" [textContent]="message" class="invalid-feedback"></p>
             </div>
           </div>

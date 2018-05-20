@@ -1,6 +1,6 @@
 <ul class="nav nav-pills" style="margin-bottom:10px">
   <li class="nav-item" *ngFor="let corder of orders">
-    <a [ngClass]="{active: corder.value == order}" class="nav-link" ui-sref=".({order: corder.value, page: null})" [textContent]="corder.name|translate"></a>
+    <a [class.active]="corder.value == order" class="nav-link" ui-sref=".({order: corder.value, page: null})" [textContent]="corder.name|translate"></a>
   </li>
 </ul>
 

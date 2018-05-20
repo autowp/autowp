@@ -20,7 +20,7 @@
     <div class="card card-body mb-4">
       <p translate>moder/vehicle/subscription/title</p>
       <p class="subscription">
-        <button class="btn" [ngClass]="{'btn-success': item.subscription, 'btn-secondary': !item.subscription}" (click)="toggleSubscription()">
+        <button class="btn" [class.btn-success]="item.subscription" [class.btn-secondary]="!item.subscription" (click)="toggleSubscription()">
           <span [hidden]="!item.subscription">
             <i class="fa fa-check"></i>
             {{'moder/vehicle/subscription/subscribed'|translate}}
@@ -37,7 +37,7 @@
 
 <ul class="nav nav-tabs" id="myTab">
   <li *ngFor="let ctab of tabs" class="nav-item">
-    <a href="#" (click)="setActiveTab(ctab.id)" class="nav-link" [ngClass]="{active: ctab.active}">
+    <a href="#" (click)="setActiveTab(ctab.id)" class="nav-link" [class.active]="ctab.active">
       <span *ngIf="ctab.icon" class="{{ctab.icon}}"></span>
       <span [textContent]="ctab.title|translate"></span>
       <span class="badge badge-pill badge-secondary" *ngIf="ctab.count" [textContent]="ctab.count"></span>
@@ -46,7 +46,7 @@
 </ul>
 
 <div class="tab-content card card-body">
-  <div class="tab-pane" [ngClass]="{active: tabs.meta.active}">
+  <div class="tab-pane" [class.active]="tabs.meta.active">
     <ngb-progressbar type="success" [striped]="true" [animated]="true" [value]="100" [hidden]="metaLoading <= 0"></ngb-progressbar>
     <app-item-meta-form *ngIf="canEditMeta" [item]="item" (submit)="saveMeta()" [invalidParams]="invalidParams"></app-item-meta-form>
 
@@ -87,7 +87,7 @@
       </tr>
     </table>
   </div>
-  <div *ngIf="tabs.logo" class="tab-pane" [ngClass]="{active: tabs.logo.active}">
+  <div *ngIf="tabs.logo" class="tab-pane" [class.active]="tabs.logo.active">
     <app-markdown *ngIf="canLogo" [markdown]="'moder/brands/logo/description'|translate"></app-markdown>
     <img [src]="item.logo.src" style="max-width:100%" *ngIf="item.logo" />
     <div *ngIf="canLogo">
@@ -102,11 +102,11 @@
       </form>
     </div>
   </div>
-  <div class="tab-pane" [ngClass]="{active: tabs.name.active}">
+  <div class="tab-pane" [class.active]="tabs.name.active">
     <form method="post" class="form-horizontal" (submit)="saveLanguages()">
       <ul class="nav nav-tabs" style="margin-bottom:20px">
         <li *ngFor="let language of itemLanguages" class="nav-item">
-          <a href="#" (click)="currentLanguage = language.language" [ngClass]="{active: language.language == currentLanguage}" class="nav-link">
+          <a href="#" (click)="currentLanguage = language.language" [class.active]="language.language == currentLanguage" class="nav-link">
             {{language.language.toUpperCase()}}
             <span class="badge badge-pill badge-secondary" [hidden]="!language.name.length && !language.text.length && !language.full_text.length">
               {{(language.name.length ? 1 : 0) + (language.text.length ? 1 : 0) + (language.full_text.length ? 1 : 0)}}
@@ -115,7 +115,7 @@
         </li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane" [ngClass]="{active: language.language == currentLanguage}" *ngFor="let language of itemLanguages">
+        <div class="tab-pane" [class.active]="language.language == currentLanguage" *ngFor="let language of itemLanguages">
           <div class="form-group row">
             <label class="col-md-2 col-form-label" translate>moder/vehicle/name</label>
             <div class="col-md-10">
@@ -149,7 +149,7 @@
     </form>
   </div>
 
-  <div class="tab-pane" [ngClass]="{active: tabs.catalogue.active}">
+  <div class="tab-pane" [class.active]="tabs.catalogue.active">
     <span [hidden]="catalogueLoading <= 0">
       <i class="fa fa-spinner fa-spin fa-fw"></i>
     </span>
@@ -325,19 +325,19 @@
     </table>
   </div>
 
-  <div *ngIf="tabs.tree" class="tab-pane" [ngClass]="{active: tabs.tree.active}" id="tree">
+  <div *ngIf="tabs.tree" class="tab-pane" [class.active]="tabs.tree.active" id="tree">
     <div class="tree">
       <app-moder-items-item-tree [item]="tree"></app-moder-items-item-tree>
     </div>
   </div>
-  <div *ngIf="tabs.vehicles" class="tab-pane" [ngClass]="{active: tabs.vehicles.active}" id="vehicles">
+  <div *ngIf="tabs.vehicles" class="tab-pane" [class.active]="tabs.vehicles.active" id="vehicles">
     <h4 translate>moder/engines/engine/vehicles</h4>
     <ng-container *ngFor="let item of engineVehicles">
       <a ui-sref="moder-items-item({id: item.id, tab: 'meta'})" [innerHTML]="item.name_html"></a>
       <br />
     </ng-container>
   </div>
-  <div *ngIf="tabs.pictures" class="tab-pane" [ngClass]="{active: tabs.pictures.active}" id="pictures">
+  <div *ngIf="tabs.pictures" class="tab-pane" [class.active]="tabs.pictures.active" id="pictures">
     <p class="btn-group" *ngIf="canUseTurboGroupCreator">
       <a ui-sref="moder-items-item-organize-pictures({id: item.id})" class="btn btn-secondary" translate>moder/vehicle/pictures/turbo-group-creator</a>
     </p>
@@ -347,7 +347,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="tabs.links" class="tab-pane" [ngClass]="{active: tabs.links.active}" id="links">
+  <div *ngIf="tabs.links" class="tab-pane" [class.active]="tabs.links.active" id="links">
     <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="linksLoading <= 0"></ngb-progressbar>
     <form *ngIf="canEditMeta" method="post" (submit)="saveLinks()">
       <table class="table table-condensed table-striped">

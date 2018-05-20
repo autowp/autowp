@@ -105,7 +105,7 @@ export class CommentService {
 
   public setIsDeleted(id: number, value: boolean): Observable<void> {
     return this.http.put<void>('/api/comment/' + id, {
-      deleted: value
+      deleted: value ? '1' : '0'
     });
   }
 

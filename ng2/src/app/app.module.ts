@@ -21,7 +21,6 @@ import { PageNotFoundComponent } from './not-found.component';
 import { SignInComponent } from './signin/signin.component';
 import { ModerIndexComponent } from './moder/index/index.component';
 
-import { MarkdownComponent } from './markdown.component';
 import { ModerMenuComponent } from './moder-menu.component';
 import { AuthGuard } from './auth.guard';
 import { ModerPerspectivesComponent } from './moder/perspectives/perspectives.component';
@@ -181,6 +180,8 @@ import { AttrsService } from './services/attrs';
 import { ModalMessageComponent } from './components/modal-message/modal-message.component';
 import { ModerStatComponent } from './moder/stat/stat.component';
 import { PageEnvService } from './services/page-env.service';
+import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.component';
+import { MarkdownComponent } from './components/markdown/markdown.component';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -324,7 +325,7 @@ const appRoutes: Routes = [
         component: ForumsMoveTopicComponent
       },
       {
-        path: 'new-topic',
+        path: 'new-topic/:theme_id',
         component: ForumsNewTopicComponent
       },
       {
@@ -755,7 +756,8 @@ const appRoutes: Routes = [
     ItemMetaFormComponent,
     InvalidParamsPipe,
     ModalMessageComponent,
-    ModerStatComponent
+    ModerStatComponent,
+    BreadcrumbsComponent
   ],
   entryComponents: [ModalMessageComponent],
   imports: [
