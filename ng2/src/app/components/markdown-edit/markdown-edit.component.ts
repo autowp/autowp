@@ -1,4 +1,4 @@
-import { Component, Injectable, Input, AfterViewInit } from '@angular/core';
+import { Component, Injectable, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
 
 interface IMarkdownEditDirectiveScope extends ng.IScope {
   past: boolean;
@@ -7,14 +7,16 @@ interface IMarkdownEditDirectiveScope extends ng.IScope {
 
 @Component({
   selector: 'app-markdown-edit',
-  templateUrl: './markdown-edit.component.html'
+  templateUrl: './markdown-edit.component.html',
 })
 @Injectable()
 export class MarkdownEditComponent {
   @Input() text: string;
-  @Input() save: Function;
-
-  // private past: boolean;
+  @Output() textChange = new EventEmitter();
 
   constructor() {}
+
+  public onChange() {
+    this.textChange.emit(this.text);
+  }
 }

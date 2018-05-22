@@ -1,0 +1,21 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h3 class="modal-title" translate>picture-moder-vote/custom/title</h3>
+    <a class="close" (click)="activeModal.dismiss()">×</a>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label>Reason</label>
+      <input maxlength="50" required name="reason" [(ngModel)]="reason" class="form-control" />
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" name="save" [(ngModel)]="save" /> {{'picture-moder-vote/custom/save'|translate}}
+      </label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" (click)="activeModal.dismiss()" class="btn btn-secondary" translate>picture-moder-vote/custom/cancel</button>
+    <button type="button" (click)="ok()" class="btn" [class.btn-danger]="vote < 0" [class.btn-success]="vote > 0" translate>picture-moder-vote/custom/send</button>
+  </div>
+</div>

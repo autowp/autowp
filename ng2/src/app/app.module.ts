@@ -186,6 +186,7 @@ import { PageEnvService } from './services/page-env.service';
 import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.component';
 import { MarkdownComponent } from './components/markdown/markdown.component';
 import { CommentsVotesComponent } from './components/comments/votes/votes.component';
+import { PictureModerVoteModalComponent } from './components/picture-moder-vote/modal/modal.component';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -448,7 +449,7 @@ const appRoutes: Routes = [
         path: 'pictures',
         children: [
           {
-            path: 'pictures/:id',
+            path: ':id',
             children: [
               {
                 path: 'area',
@@ -762,11 +763,13 @@ const appRoutes: Routes = [
     ModalMessageComponent,
     ModerStatComponent,
     BreadcrumbsComponent,
-    CommentsVotesComponent
+    CommentsVotesComponent,
+    PictureModerVoteModalComponent
   ],
   entryComponents: [
     ModalMessageComponent,
-    CommentsVotesComponent
+    CommentsVotesComponent,
+    PictureModerVoteModalComponent
   ],
   imports: [
     BrowserModule,

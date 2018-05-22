@@ -15,11 +15,12 @@ import { PageEnvService } from '../../../../services/page-env.service';
 
 // Acl.inheritsRole( 'moder', 'unauthorized' );
 
-export type PictureItemMoveSelectItem = (
-  itemId: number,
-  perspectiveId: number,
-  type: number
-) => void;
+export interface PictureItemMoveSelection {
+  itemId: number;
+  perspectiveId: number;
+  type: number;
+}
+
 type ModerPicturesItemMoveDoSearch = () => void;
 
 @Component({
@@ -32,7 +33,6 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
   private querySub: Subscription;
   private id: number;
   public search: string;
-  public selectItem: PictureItemMoveSelectItem;
   public concepts_expanded = false;
   public doSearch: ModerPicturesItemMoveDoSearch;
   private src_item_id: number;
@@ -82,32 +82,6 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
         }),
       0
     );
-
-    this.selectItem = (itemId: number, perspectiveId: number, type: number) => {
-      if (this.src_item_id && this.src_type) {
-        this.pictureItemService
-          .changeItem(this.id, this.src_type, this.src_item_id, itemId)
-          .then(() => {
-            if (Number.isInteger(perspectiveId)) {
-              this.pictureItemService
-                .setPerspective(this.id, this.src_type, itemId, perspectiveId)
-                .then(() => {
-                  this.router.navigate(['/moder/pictures', this.id]);
-                });
-            } else {
-              this.router.navigate(['/moder/pictures', this.id]);
-            }
-          });
-      } else {
-        const data = {
-          perspective_id: perspectiveId ? perspectiveId : null
-        };
-
-        this.pictureItemService.create(this.id, itemId, type, data).then(() => {
-          this.router.navigate(['/moder/pictures', this.id]);
-        });
-      }
-    };
 
     this.routeSub = this.route.params.subscribe(params => {
       this.id = params.id;
@@ -254,6 +228,36 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
     this.querySub.unsubscribe();
   }
 
+  public selectItem(selection: PictureItemMoveSelection) {
+    console.log('selectItem', selection, this.src_item_id, this.src_type);
+    if (this.src_item_id && this.src_type) {
+      this.pictureItemService
+        .changeItem(this.id, this.src_type, this.src_item_id, selection.itemId)
+        .then(() => {
+          if (selection.perspectiveId) {
+            this.pictureItemService
+              .setPerspective(this.id, selection.itemId, this.src_type, selection.perspectiveId)
+              .then(
+                () => this.router.navigate(['/moder/pictures', this.id]),
+                response => Notify.response(response)
+              );
+          } else {
+            this.router.navigate(['/moder/pictures', this.id]);
+          }
+        });
+    } else {
+      const data = {
+        perspective_id: selection.perspectiveId ? selection.perspectiveId : null
+      };
+
+      this.pictureItemService.create(this.id, selection.itemId, selection.type, data).then(() => {
+        this.router.navigate(['/moder/pictures', this.id]);
+      });
+    }
+
+    return false;
+  }
+
   private loadBrands() {
     this.itemService
       .getItems({
@@ -276,6 +280,7 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
 
   public toggleConcepts() {
     this.concepts_expanded = !this.concepts_expanded;
+    return false;
   }
 
   private loadAuthors() {

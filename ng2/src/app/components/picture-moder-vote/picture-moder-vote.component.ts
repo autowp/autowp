@@ -1,8 +1,20 @@
 import * as $ from 'jquery';
 import { APIPicture } from '../../services/picture';
-import { Input, Component, Injectable, OnInit } from '@angular/core';
+import {
+  Input,
+  Component,
+  Injectable,
+  OnInit,
+  EventEmitter,
+  Output
+} from '@angular/core';
 import { PictureModerVoteService } from '../../services/picture-moder-vote';
-import { PictureModerVoteTemplateService, APIPictureModerVoteTemplate } from '../../services/picture-moder-vote-template';
+import {
+  PictureModerVoteTemplateService,
+  APIPictureModerVoteTemplate
+} from '../../services/picture-moder-vote-template';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PictureModerVoteModalComponent } from './modal/modal.component';
 
 @Component({
   selector: 'app-picture-moder-vote',
@@ -11,7 +23,7 @@ import { PictureModerVoteTemplateService, APIPictureModerVoteTemplate } from '..
 @Injectable()
 export class PictureModerVoteComponent implements OnInit {
   @Input() picture: APIPicture;
-  @Input() change: Function;
+  @Output() changed = new EventEmitter();
 
   public moderVoteTemplateOptions: APIPictureModerVoteTemplate[] = [];
   public vote: any = null;
@@ -20,31 +32,25 @@ export class PictureModerVoteComponent implements OnInit {
 
   constructor(
     private ModerVoteService: PictureModerVoteService,
-    private ModerVoteTemplateService: PictureModerVoteTemplateService
+    private ModerVoteTemplateService: PictureModerVoteTemplateService,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
     this.ModerVoteTemplateService.getTemplates().then(templates => {
       this.moderVoteTemplateOptions = templates;
     });
-
-    // const $modal = $(element[0]).find('.modal');
   }
-
 
   votePicture(vote: number, reason: string): void {
     this.ModerVoteService.vote(this.picture.id, vote, reason).then(() => {
-      if (this.change) {
-        this.change();
-      }
+      this.changed.emit();
     });
   }
 
   cancelVotePicture(): void {
     this.ModerVoteService.cancel(this.picture.id).then(() => {
-      if (this.change) {
-        this.change();
-      }
+      this.changed.emit();
     });
   }
 
@@ -56,15 +62,21 @@ export class PictureModerVoteComponent implements OnInit {
       });
     }
 
-    // $modal.modal('hide');
     this.votePicture(this.vote, this.reason);
   }
 
-  showCustomDialog(ev: any, vote: number): void {
+  showCustomDialog(vote: number): void {
     this.vote = vote;
 
-    /*$modal.modal({
-      show: true
-    });*/
+    const modalRef = this.modalService.open(PictureModerVoteModalComponent, {
+      size: 'lg',
+      centered: true
+    });
+
+    modalRef.componentInstance.pictureId = this.picture.id;
+    modalRef.componentInstance.vote = vote;
+    modalRef.componentInstance.voted.subscribe(() => {
+      this.changed.emit();
+    });
   }
 }

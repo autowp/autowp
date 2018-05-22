@@ -118,22 +118,22 @@
         </ul>
       </div>
 
-      <a class="btn mb-3" [class.btn-primary]="specialName !== null" [class.btn-outline-secondary]="specialName === null" routerLink="."
+      <a class="btn mb-3" [class.btn-primary]="specialName" [class.btn-outline-secondary]="!specialName" routerLink="."
         [queryParams]="{special_name: specialName ? null : 'true'}" queryParamsHandling="merge">
         {{'moder/picture/filter/special-name'|translate}}
       </a>
 
-      <a class="btn mb-3" [class.btn-primary]="lost !== null" [class.btn-outline-secondary]="lost === null" routerLink="." [queryParams]="{lost: lost ? null : 'true'}"
+      <a class="btn mb-3" [class.btn-primary]="lost" [class.btn-outline-secondary]="!lost" routerLink="." [queryParams]="{lost: lost ? null : 'true'}"
         queryParamsHandling="merge">
         {{'moder/picture/filter/not-linked'|translate}}
       </a>
 
-      <a class="btn mb-3" [class.btn-primary]="gps !== null" [class.btn-outline-secondary]="gps === null" routerLink="." [queryParams]="{gps: gps ? null : 'true'}"
+      <a class="btn mb-3" [class.btn-primary]="gps" [class.btn-outline-secondary]="!gps" routerLink="." [queryParams]="{gps: gps ? null : 'true'}"
         queryParamsHandling="merge">
         {{'moder/picture/filter/gps'|translate}}
       </a>
 
-      <a class="btn mb-3" [class.btn-primary]="similar !== null" [class.btn-outline-secondary]="similar === null" routerLink="."
+      <a class="btn mb-3" [class.btn-primary]="similar" [class.btn-outline-secondary]="!similar" routerLink="."
         [queryParams]="{similar: similar ? null : 'true'}" queryParamsHandling="merge">
         {{'moder/picture/filter/similar'|translate}}
       </a>

@@ -13,13 +13,6 @@ import { Router } from '@angular/router';
 import { CommentService, APIComment } from '../../services/comment';
 import { AuthService } from '../../services/auth.service';
 
-interface IAutowpCommentsDirectiveScope extends ng.IScope {
-  limit: number;
-  page: number;
-  typeId: number;
-  itemId: number;
-}
-
 @Component({
   selector: 'app-comments',
   templateUrl: './comments.component.html'

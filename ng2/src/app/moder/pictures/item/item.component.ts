@@ -45,7 +45,6 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
   public banPeriod = 1;
   public banReason: string | null = null;
   public perspectives: APIPerspective[] = [];
-  public pictureVoted: Function;
 
   constructor(
     private http: HttpClient,
@@ -60,10 +59,6 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pictureVoted = () => {
-      this.loadPicture();
-    };
-
     this.perspectiveService.getPerspectives().then(perspectives => {
       this.perspectives = perspectives;
     });
@@ -93,6 +88,10 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
+  }
+
+  public pictureVoted() {
+    this.loadPicture();
   }
 
   public loadPicture(callback?: Function) {

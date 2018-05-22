@@ -1,30 +1,27 @@
-<div class="btn-group">
-  <div class="btn-group" *ngIf="!picture.moder_voted">
-    <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+<div class="btn-group mb-3">
+  <div ngbDropdown *ngIf="!picture.moder_voted">
+    <button class="btn btn-success" type="button" ngbDropdownToggle>
       {{'moder/picture/acceptance/want-accept'|translate}}
-      <span class="caret"></span>
     </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <div ngbDropdownMenu>
       <ng-container *ngFor="let template of moderVoteTemplateOptions">
-        <a *ngIf="template.vote > 0" class="dropdown-item" href="#" [textContent]="template.name" (click)="votePicture(template.vote, template.name);"></a>
+        <button class="dropdown-item" *ngIf="template.vote > 0" [textContent]="template.name" (click)="votePicture(template.vote, template.name);"></button>
       </ng-container>
       <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="#" (click)="showCustomDialog($event, 1)">{{'moder/picture/acceptance/custom'|translate}}</a>
+      <button class="dropdown-item" (click)="showCustomDialog(1)">{{'moder/picture/acceptance/custom'|translate}}</button>
     </div>
   </div>
 
-  <div class="btn-group" *ngIf="!picture.moder_voted">
-    <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+  <div ngbDropdown *ngIf="!picture.moder_voted">
+    <button class="btn btn-danger" type="button" ngbDropdownToggle>
       {{'moder/picture/acceptance/want-delete'|translate}}
-      <span class="caret"></span>
     </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <div ngbDropdownMenu>
       <ng-container *ngFor="let template of moderVoteTemplateOptions">
-        <a *ngIf="template.vote < 0" href="#" [textContent]="template.name" (click)="votePicture(template.vote, template.name);"
-          class="dropdown-item"></a>
+        <button class="dropdown-item" *ngIf="template.vote < 0" [textContent]="template.name" (click)="votePicture(template.vote, template.name);"></button>
       </ng-container>
       <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="#" (click)="showCustomDialog($event, -1)">{{'moder/picture/acceptance/custom'|translate}}</a>
+      <button class="dropdown-item" (click)="showCustomDialog(-1)">{{'moder/picture/acceptance/custom'|translate}}</button>
     </div>
   </div>
 
@@ -43,34 +40,4 @@
       <span [ngStyle]="{color:moder_vote.vote > 0 ? 'green' : 'red'}" [textContent]="moder_vote.reason"></span>
     </li>
   </ul>
-</div>
-
-<div class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" translate>picture-moder-vote/custom/title</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Reason</label>
-          <input maxlength="50" required name="reason" [(ngModel)]="reason" class="form-control" />
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" name="save" [(ngModel)]="save" /> {{'picture-moder-vote/custom/save'|translate}}
-          </label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" data-dismiss="modal" class="btn btn-secondary" translate>picture-moder-vote/custom/cancel</button>
-        <button type="button" (click)="ok()" class="btn" [class.btn-warning]="vote < 0" [class.btn-primary]="vote > 0">
-          {{'picture-moder-vote/custom/send'|translate}}
-        </button>
-      </div>
-    </div>
-  </div>
 </div>

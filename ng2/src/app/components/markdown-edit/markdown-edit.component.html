@@ -1,16 +1,14 @@
-<ul class="nav nav-tabs" role="tablist">
-  <li role="presentation" class="nav-item">
-    <a href="#markdown-edit-text" role="tab" data-toggle="tab" translate class="nav-link active">moder/markdown/edit</a>
-  </li>
-  <li role="presentation" class="nav-item">
-    <a href="#markdown-edit-preview" role="tab" data-toggle="tab" translate [class.disabled]="!text.length" class="nav-link">moder/markdown/preview</a>
-  </li>
-</ul>
-<div class="tab-content">
-  <div role="tabpanel" class="tab-pane active" id="markdown-edit-text">
-    <textarea [(ngModel)]="text" class="form-control" maxlength="65536" rows="1" aria-label="Text" autosize></textarea>
-  </div>
-  <div role="tabpanel" class="tab-pane" id="markdown-edit-preview">
-    <app-markdown [markdown]="text"></app-markdown>
-  </div>
-</div>
+<ngb-tabset>
+  <ngb-tab [title]="'moder/markdown/edit'|translate">
+    <ng-template ngbTabContent>
+      <textarea [(ngModel)]="text" class="form-control" maxlength="65536" rows="1" aria-label="Text" autosize (change)="onChange()"></textarea>
+    </ng-template>
+  </ngb-tab>
+  <ngb-tab [title]="'moder/markdown/preview'|translate" [disabled]="!text || !text.length">
+    <ng-template ngbTabContent>
+      <div class="card card-body">
+        <app-markdown [markdown]="text"></app-markdown>
+      </div>
+    </ng-template>
+  </ngb-tab>
+</ngb-tabset>

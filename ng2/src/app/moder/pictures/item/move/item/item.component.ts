@@ -1,9 +1,9 @@
-import { Component, Injectable, Input } from '@angular/core';
+import { Component, Injectable, Input, EventEmitter, Output } from '@angular/core';
 import {
   ItemParentService,
   APIItemParent
 } from '../../../../../services/item-parent';
-import { PictureItemMoveSelectItem } from '../move.component';
+import { PictureItemMoveSelection } from '../move.component';
 
 @Component({
   selector: 'app-moder-picture-move-item',
@@ -12,7 +12,7 @@ import { PictureItemMoveSelectItem } from '../move.component';
 })
 export class ModerPictureMoveItemComponent {
   @Input() item: APIItemParent;
-  @Input() selectItem: PictureItemMoveSelectItem;
+  @Output() selected = new EventEmitter<PictureItemMoveSelection>();
 
   public loading = false;
   public childs: APIItemParent[] = [];
@@ -36,5 +36,12 @@ export class ModerPictureMoveItemComponent {
           this.childs = response.items;
         });
     }
+
+    return false;
+  }
+
+  public selectItem(selection: PictureItemMoveSelection) {
+    this.selected.emit(selection);
+    return false;
   }
 }
