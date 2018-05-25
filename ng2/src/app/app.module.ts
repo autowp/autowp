@@ -187,6 +187,8 @@ import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.compo
 import { MarkdownComponent } from './components/markdown/markdown.component';
 import { CommentsVotesComponent } from './components/comments/votes/votes.component';
 import { PictureModerVoteModalComponent } from './components/picture-moder-vote/modal/modal.component';
+import { ContentLanguageService } from './services/content-language';
+import { LanguageService } from './services/language';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -830,7 +832,9 @@ const appRoutes: Routes = [
     ContactsService,
     MessageDialogService,
     AttrsService,
-    PageEnvService
+    PageEnvService,
+    ContentLanguageService,
+    LanguageService
   ],
   bootstrap: [AppComponent]
 })

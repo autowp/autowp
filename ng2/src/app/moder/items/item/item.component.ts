@@ -19,7 +19,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { APIPicture, PictureService } from '../../../services/picture';
 import { ItemParentService } from '../../../services/item-parent';
 import { ItemLinkService, APIItemLink } from '../../../services/item-link';
-import { ItemLanguageService } from '../../../services/item-language';
+import { ItemLanguageService, APIItemLanguage } from '../../../services/item-language';
 import { PageEnvService } from '../../../services/page-env.service';
 
 // Acl.isAllowed('car', 'edit_meta', 'unauthorized');
@@ -41,8 +41,6 @@ interface APIItemInModerItem extends APIItem {
 
 interface Tab {
   id: string;
-  icon: string;
-  title: string;
   count: number;
   init: Function;
   active?: boolean;
@@ -76,7 +74,7 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
 
   public currentLanguage: any = null;
 
-  public itemLanguages: any = {};
+  public itemLanguages: APIItemLanguage[] = [];
   public tree: APIItemTreeItem;
 
   public parents: any[] = [];
@@ -91,61 +89,45 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
     type_id: 'default'
   };
 
-  public tabs = {
+  public tabs: {[key: string]: Tab} = {
     meta: {
       id: 'meta',
-      icon: 'glyphicon glyphicon-pencil',
-      title: 'moder/vehicle/tabs/meta',
       count: 0,
       init: this.initMetaTab
     },
     name: {
       id: 'name',
-      icon: 'glyphicon glyphicon-align-left',
-      title: 'moder/vehicle/tabs/name',
-      count: this.item.item_language_count,
+      count: 0,
       init: this.initItemLanguageTab
     },
     logo: {
       id: 'logo',
-      icon: 'glyphicon glyphicon-align-left',
-      title: 'brand/logo',
-      count: this.item.logo ? 1 : 0,
+      count: 0,
       init: this.initLogoTab
     },
     catalogue: {
       id: 'catalogue',
-      icon: '',
-      title: 'moder/vehicle/tabs/catalogue',
-      count: this.item.parents_count + this.item.childs_count,
+      count: 0,
       init: this.initCatalogueTab
     },
     vehicles: {
       id: 'vehicles',
-      icon: '',
-      title: 'moder/vehicle/tabs/vehicles',
-      count: this.item.engine_vehicles_count,
+      count: 0,
       init: this.initVehiclesTab
     },
     tree: {
       id: 'tree',
-      icon: 'fa fa-tree',
-      title: 'moder/vehicle/tabs/tree',
       count: 0,
       init: this.initTreeTab
     },
     pictures: {
       id: 'pictures',
-      icon: 'glyphicon glyphicon-th',
-      title: 'moder/vehicle/tabs/pictures',
-      count: this.item.pictures_count,
+      count: 0,
       init: this.initPicturesTab
     },
     links: {
       id: 'links',
-      icon: 'glyphicon glyphicon-globe',
-      title: 'moder/brands/links',
-      count: this.item.links_count,
+      count: 0,
       init: this.initLinksTab
     }
   };
@@ -434,6 +416,10 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
     this.querySub.unsubscribe();
   }
 
+  public getTabs(): Tab[] {
+    return Object.values(this.tabs);
+  }
+
   private initItemLanguageTab() {
     // TODO: move to service
     this.languagesLoading++;
@@ -441,16 +427,23 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
       contentLanguages => {
         this.currentLanguage = contentLanguages[0];
 
+        const languages = new Map<string, APIItemLanguage>();
+
         for (const language of contentLanguages) {
-          this.itemLanguages[language] = {
-            language: language
-          };
+          languages.set(language, {
+            language: language,
+            name: null,
+            text: null,
+            full_text: null
+          });
         }
 
         this.itemLanguageService.getItems(this.item.id).subscribe(response => {
           for (const itemLanguage of response.items) {
-            this.itemLanguages[itemLanguage.language] = itemLanguage;
+            languages.set(itemLanguage.language, itemLanguage);
           }
+
+          this.itemLanguages = Array.from(languages.values());
         });
         this.languagesLoading--;
       },

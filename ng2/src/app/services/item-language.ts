@@ -4,6 +4,9 @@ import { Observable } from 'rxjs';
 
 export interface APIItemLanguage {
   language: string;
+  name: string;
+  text: string;
+  full_text: string;
 }
 
 export interface APIItemLanguageGetResponse {
