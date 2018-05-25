@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { APIItem } from './item';
 
 export interface APIPictureItemAreaPostData {
   left: number;
@@ -33,6 +34,7 @@ export interface APIPictureItem {
   item_id: number;
   type: number;
   perspective_id: number;
+  item: APIItem;
 }
 
 @Injectable()
@@ -74,9 +76,7 @@ export class PictureItemService {
     return this.http
       .post<void>(
         '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
-        {
-          data: data
-        }
+        data
       )
       .toPromise();
   }

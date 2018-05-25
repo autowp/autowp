@@ -1,5 +1,5 @@
 <div class="nav nav-pills" style="margin-bottom: 20px">
-  <a class="nav-link" ui-sref="moder-items-item({id: item.id})" *ngIf="isModer">
+  <a class="nav-link" [routerLink]="['/moder/items/item', item.id]" *ngIf="isModer">
     <i class="fa fa-cog"></i>
     {{'moder/edit-object'|translate}}
     <span [innerHTML]="item.name_html"></span>
@@ -37,7 +37,7 @@
     <div *ngIf="isAllowedEditEngine">
       <div *ngIf="engine">
         <p>
-          <a ui-sref="moder-items-item({id: engine.id})" [innerHTML]="engine.name_html"></a>
+          <a [routerLink]="['/moder/items/item', engine.id]" [innerHTML]="engine.name_html"></a>
         </p>
         <ng-container *ngIf="engineInherited">
           <!--TODO: h6 *ngFor="let car of engineInheritedFrom">

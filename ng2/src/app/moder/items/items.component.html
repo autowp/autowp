@@ -108,7 +108,7 @@
 
     <div *ngIf="listMode">
       <div *ngFor="let item of items">
-        <a ui-sref="moder-items-item({id: item.id})" [innerHTML]="item.name_html"></a>
+        <a [routerLink]="['/moder/items/item', item.id]" [innerHTML]="item.name_html"></a>
       </div>
     </div>
 

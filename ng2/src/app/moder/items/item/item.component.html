@@ -198,11 +198,11 @@
         <tr data-id="{{item.id}}" *ngFor="let item of parents">
           <td>
             <i class="fa fa-arrow-up"></i>
-            <a ui-sref="moder-items-item({id: item.parent_id})" [innerHTML]="item.parent.name_html"></a>
+            <a [routerLink]="['/moder/items/item', item.parent_id]" [innerHTML]="item.parent.name_html"></a>
             <div class="text-warning" *ngIf="item.duplicate_parent">
               <small>
                 {{'moder/vehicle/catalogue/possible-duplicate-parent'|translate}}
-                <a ui-sref="moder-items-item({id: item.duplicate_parent.id})" [innerHTML]="item.duplicate_parent.name_html"></a>
+                <a [routerLink]="['/moder/items/item', item.duplicate_parent.id]" [innerHTML]="item.duplicate_parent.name_html"></a>
               </small>
             </div>
           </td>
@@ -244,11 +244,11 @@
             <span *ngIf="item.type_id == 1" translate>moder/vehicle/link-type-prefix/related</span>
             <span *ngIf="item.type_id == 3" translate>moder/vehicle/link-type-prefix/design</span>
             <span *ngIf="item.type_id == 2" translate>moder/vehicle/link-type-prefix/sport</span>
-            <a ui-sref="moder-items-item({id: item.item_id})" [href]="item.url" [innerHTML]="item.item.name_html"></a>
+            <a [routerLink]="['/moder/items/item', item.item_id]" [innerHTML]="item.item.name_html"></a>
             <div *ngIf="item.duplicate_child" class="text-warning">
               <small>
                 {{'moder/vehicle/catalogue/possible-duplicate-child'|translate}}
-                <a ui-sref="moder-items-item({id: item.duplicate_child.id})" [innerHTML]="item.duplicate_child.name_html"></a>
+                <a [routerLink]="['/moder/items/item', item.duplicate_child.id]" [innerHTML]="item.duplicate_child.name_html"></a>
               </small>
             </div>
           </td>
@@ -333,7 +333,7 @@
   <div *ngIf="tabs.vehicles" class="tab-pane" [class.active]="tabs.vehicles.active" id="vehicles">
     <h4 translate>moder/engines/engine/vehicles</h4>
     <ng-container *ngFor="let item of engineVehicles">
-      <a ui-sref="moder-items-item({id: item.id, tab: 'meta'})" [innerHTML]="item.name_html"></a>
+      <a [routerLink]="['/moder/items/item', item.id]" [queryParams]="{tab: 'meta'}" [innerHTML]="item.name_html"></a>
       <br />
     </ng-container>
   </div>

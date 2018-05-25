@@ -63,6 +63,7 @@ export interface APIItem {
   name_only: string;
   current_pictures_count: number;
   specifications_count: number;
+  brands: APIItem[];
 }
 
 export interface GetItemServiceOptions {

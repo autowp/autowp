@@ -1,6 +1,6 @@
 <p *ngIf="isModer">
   <i class="fa fa-cog"></i>
-  <a ui-sref="moder-items-item({id: item.id})" ui-sref-options="{inherit: false}" translate>moder/edit-object</a>
+  <a [routerLink]="['/moder/items/item', item.id]" translate>moder/edit-object</a>
 </p>
 
 <div class="card card-body mb-4" *ngIf="links.length > 0 || item.description">

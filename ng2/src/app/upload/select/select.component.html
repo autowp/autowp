@@ -9,7 +9,7 @@
   <div class="row">
     <div class="col-md-2" *ngFor="let chunk of brands">
       <ng-container *ngFor="let brand of chunk">
-        <a ui-sref="upload-select({brand_id: brand.id})" [textContent]="brand.name_only"></a>
+        <a routerLink="/upload/select" [queryParams]="{brand_id: brand.id}" [textContent]="brand.name_only"></a>
         <br />
       </ng-container>
     </div>
@@ -57,10 +57,10 @@
   </div>
 
   <div style="margin: 5px 0">
-    <a ui-sref="upload({item_id: brand.id, perspective_id: 22})" translate>upload/select/logo</a>
+    <a routerLink="/upload" [queryParams]="{item_id: brand.id, perspective_id: 22}" translate>upload/select/logo</a>
     <br />
-    <a ui-sref="upload({item_id: brand.id, perspective_id: 25})" translate>upload/select/mixed-long</a>
+    <a routerLink="/upload" [queryParams]="{item_id: brand.id, perspective_id: 25}" translate>upload/select/mixed-long</a>
     <br />
-    <a ui-sref="upload({item_id: brand.id, perspective_id: null})" translate>upload/select/unsorted-long</a>
+    <a routerLink="/upload" [queryParams]="{item_id: brand.id, perspective_id: null}" translate>upload/select/unsorted-long</a>
   </div>
 </div>

@@ -94,22 +94,23 @@
               <i class="fa fa-arrow-right"></i>
               {{'moder/picture/catalogue/move-to'|translate}} ...
             </a>
-            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-              *ngIf="item.type == 1">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu" *ngIf="item.type == 1">
-              <a class="dropdown-item" href="" (click)="moveItem(item.type, item.item_id, last_item.id)" *ngIf="last_item && !hasItem(last_item.id)">
-                <i class="fa fa-arrow-right"></i>
-                {{'moder/picture/catalogue/move-to'|translate}}
-                <span [innerHTML]="last_item.name_html"></span>
-              </a>
-              <a *ngFor="let brand of item.item.brands" class="dropdown-item" [routerLink]="['/moder/pictures', picture.id, 'move']" [queryParams]="{src_item_id: item.item_id, src_type: item.type, brand_id: brand.id}">
-                <i class="fa fa-arrow-right"></i>
-                {{'moder/picture/catalogue/move-to'|translate}}
-                <span [innerHTML]="brand.name_html"></span> ...
-              </a>
+            <div class="btn-group" ngbDropdown role="group" placement="bottom-right">
+              <button class="btn btn-secondary" ngbDropdownToggle *ngIf="item.type == 1">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <div class="dropdown-menu" *ngIf="item.type == 1" ngbDropdownMenu>
+                <button class="dropdown-item" (click)="moveItem(item.type, item.item_id, last_item.id)" *ngIf="last_item && !hasItem(last_item.id)">
+                  <i class="fa fa-arrow-right"></i>
+                  {{'moder/picture/catalogue/move-to'|translate}}
+                  <span [innerHTML]="last_item.name_html"></span>
+                </button>
+                <a *ngFor="let brand of item.item.brands" class="dropdown-item" [routerLink]="['/moder/pictures', picture.id, 'move']" [queryParams]="{src_item_id: item.item_id, src_type: item.type, brand_id: brand.id}">
+                  <i class="fa fa-arrow-right"></i>
+                  {{'moder/picture/catalogue/move-to'|translate}}
+                  <span [innerHTML]="brand.name_html"></span> ...
+                </a>
+              </div>
             </div>
           </div>
         </td>

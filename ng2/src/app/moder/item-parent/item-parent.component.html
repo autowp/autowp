@@ -1,7 +1,7 @@
 <p>
-  <a ui-sref="moder-items-item({id: parent.id, tab: 'catalogue'})" [innerHTML]="parent.name_html"></a>
+  <a [routerLink]="['/moder/items/item', parent.id]" [queryParams]="{tab: 'catalogue'}" [innerHTML]="parent.name_html"></a>
   &rarr;
-  <a ui-sref="moder-items-item({id: item.id, tab: 'catalogue'})" [innerHTML]="item.name_html"></a>
+  <a [routerLink]="['/moder/items/item', item.id]" [queryParams]="{tab: 'catalogue'}" [innerHTML]="item.name_html"></a>
 </p>
 
 <form method="post" class="form-horizontal" (submit)="save()">

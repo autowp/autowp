@@ -48,7 +48,7 @@
   <div class="row" *ngIf="!havePhoto(item) && canHavePhoto(item)">
     <div class="col-6 col-lg-3">
       <div class="no-photo rounded w-100 border border-light mb-4" [title]="'carlist/no-photo'|translate">
-        <a ui-sref="upload({item_id: item.id})" [title]="'carlist/no-photo/add'|translate" class="fa fa-plus-circle text-success"></a>
+        <a routerLink="/upload" [queryParams]="{item_id: item.id}" [title]="'carlist/no-photo/add'|translate" class="fa fa-plus-circle text-success"></a>
         <span class="fa fa-camera fa-lg fa-4x" aria-hidden="true"></span>
       </div>
     </div>
@@ -118,7 +118,7 @@
 
     <li *ngIf="isModer" class="list-inline-item">
       <i class="fa fa-cog"></i>
-      <a ui-sref="moder-items-item({id: item.id})" translate>moder/edit-object</a>
+      <a [routerLink]="['/moder/items/item', item.id]" translate>moder/edit-object</a>
     </li>
 
     <li *ngIf="item.spec_editor_url" class="list-inline-item">

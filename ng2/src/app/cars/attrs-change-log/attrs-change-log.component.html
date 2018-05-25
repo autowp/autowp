@@ -28,7 +28,7 @@
         <app-user [user]="item.user" *ngIf="item.user"></app-user>
       </td>
       <td>
-        <a ui-sref="moder-items-item({id: item.item_id})" *ngIf="isModer" [innerHTML]="item.item.name_html"></a>
+        <a [routerLink]="['/moder/items/item', item.item_id]" *ngIf="isModer" [innerHTML]="item.item.name_html"></a>
         <span *ngIf="!isModer" [innerHTML]="item.item.name_html"></span>
       </td>
       <td class="attribute">
