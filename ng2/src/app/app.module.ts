@@ -17,6 +17,8 @@ import { FileUploadModule } from 'ng2-file-upload';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { RecaptchaFormsModule } from 'ng-recaptcha/forms';
+import { TagInputModule } from 'ngx-chips';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 import { IndexComponent } from './index/index.component';
@@ -798,7 +800,9 @@ const appRoutes: Routes = [
     FileUploadModule,
     ChartsModule,
     RecaptchaModule.forRoot(),
-    RecaptchaFormsModule
+    RecaptchaFormsModule,
+    TagInputModule,
+    BrowserAnimationsModule
   ],
   providers: [
     APIService,

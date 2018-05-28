@@ -7,6 +7,8 @@ export interface APIItemLanguage {
   name: string;
   text: string;
   full_text: string;
+  text_id: number;
+  full_text_id: number;
 }
 
 export interface APIItemLanguageGetResponse {

@@ -56,8 +56,8 @@ export class VehicleTypeService {
           this.translate.get(names).subscribe(
             (translations: any) => {
               const map = {};
-              for (let i = 0; i < names.length; i++) {
-                map[names[i]] = translations[i];
+              for (const name of names) {
+                map[name] = translations[name];
               }
               this.applyTranslations(this.types, map);
               this.typesInititalized = true;

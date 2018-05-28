@@ -8,8 +8,13 @@ import {
 import { SpecService, APISpec } from '../../services/spec';
 import { LanguageService } from '../../services/language';
 import Notify from '../../notify';
+import { Observable, from } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
-function specsToPlain(options: ItemMetaFormAPISpec[], deep: number): ItemMetaFormAPISpec[] {
+function specsToPlain(
+  options: ItemMetaFormAPISpec[],
+  deep: number
+): ItemMetaFormAPISpec[] {
   const result: ItemMetaFormAPISpec[] = [];
   for (const item of options) {
     item.deep = deep;
@@ -21,7 +26,10 @@ function specsToPlain(options: ItemMetaFormAPISpec[], deep: number): ItemMetaFor
   return result;
 }
 
-function vehicleTypesToPlain(options: ItemMetaFormAPIVehicleType[], deep: number): ItemMetaFormAPIVehicleType[] {
+function vehicleTypesToPlain(
+  options: ItemMetaFormAPIVehicleType[],
+  deep: number
+): ItemMetaFormAPIVehicleType[] {
   const result: ItemMetaFormAPIVehicleType[] = [];
   for (const item of options) {
     item.deep = deep;
@@ -132,7 +140,8 @@ export class ItemMetaFormComponent {
   constructor(
     private specService: SpecService,
     private vehicleTypeService: VehicleTypeService,
-    private languageService: LanguageService
+    private languageService: LanguageService,
+    private http: HttpClient
   ) {
     if (this.item && this.item.lat && this.item.lng) {
       this.markers.point = {
@@ -189,6 +198,17 @@ export class ItemMetaFormComponent {
     );
   }
 
+  public matchingFn(value: string, target: APIVehicleType): boolean {
+    const targetValue = target['nameTranslated'].toString();
+    return (
+      targetValue && targetValue.toLowerCase().indexOf(value.toLowerCase()) >= 0
+    );
+  }
+
+  public loadVehicleTypes = (query: string): Observable<APIVehicleType[]> => {
+    return from(this.vehicleTypeService.getTypes());
+  }
+
   public coordsChanged() {
     const lat = this.item.lat;
     const lng = this.item.lng;
@@ -204,29 +224,6 @@ export class ItemMetaFormComponent {
     }
     this.center.lat = isNaN(lat) ? 0 : lat;
     this.center.lng = isNaN(lng) ? 0 : lng;
-  }
-
-  public loadVehicleTypes(query: string): Promise<APIVehicleType[]> {
-    return new Promise<APIVehicleType[]>((resolve, reject) => {
-      this.vehicleTypeService.getTypes().then(
-        data => {
-          const items = vehicleTypesToPlain(data, 0);
-          if (query) {
-            const result = items.filter((item: ItemMetaFormAPIVehicleType) => {
-              return item.nameTranslated
-                .toLowerCase()
-                .includes(query.toLowerCase());
-            });
-            resolve(result);
-          } else {
-            resolve(items);
-          }
-        },
-        () => {
-          reject();
-        }
-      );
-    });
   }
 
   public submit() {

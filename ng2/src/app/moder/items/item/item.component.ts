@@ -1,4 +1,11 @@
-import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Injectable,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  AfterViewInit
+} from '@angular/core';
 import * as $ from 'jquery';
 import { HttpClient } from '@angular/common/http';
 import {
@@ -19,8 +26,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { APIPicture, PictureService } from '../../../services/picture';
 import { ItemParentService } from '../../../services/item-parent';
 import { ItemLinkService, APIItemLink } from '../../../services/item-link';
-import { ItemLanguageService, APIItemLanguage } from '../../../services/item-language';
+import {
+  ItemLanguageService,
+  APIItemLanguage
+} from '../../../services/item-language';
 import { PageEnvService } from '../../../services/page-env.service';
+import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 
 // Acl.isAllowed('car', 'edit_meta', 'unauthorized');
 
@@ -40,10 +51,8 @@ interface APIItemInModerItem extends APIItem {
 }
 
 interface Tab {
-  id: string;
   count: number;
-  init: Function;
-  active?: boolean;
+  initialized?: boolean;
 }
 
 @Component({
@@ -51,7 +60,8 @@ interface Tab {
   templateUrl: './item.component.html'
 })
 @Injectable()
-export class ModerItemsItemComponent implements OnInit, OnDestroy {
+export class ModerItemsItemComponent
+  implements OnInit, OnDestroy, AfterViewInit {
   private querySub: Subscription;
   private routeSub: Subscription;
   public loading = 0;
@@ -89,47 +99,29 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
     type_id: 'default'
   };
 
-  public tabs: {[key: string]: Tab} = {
-    meta: {
-      id: 'meta',
-      count: 0,
-      init: this.initMetaTab
-    },
-    name: {
-      id: 'name',
-      count: 0,
-      init: this.initItemLanguageTab
-    },
-    logo: {
-      id: 'logo',
-      count: 0,
-      init: this.initLogoTab
-    },
-    catalogue: {
-      id: 'catalogue',
-      count: 0,
-      init: this.initCatalogueTab
-    },
-    vehicles: {
-      id: 'vehicles',
-      count: 0,
-      init: this.initVehiclesTab
-    },
-    tree: {
-      id: 'tree',
-      count: 0,
-      init: this.initTreeTab
-    },
-    pictures: {
-      id: 'pictures',
-      count: 0,
-      init: this.initPicturesTab
-    },
-    links: {
-      id: 'links',
-      count: 0,
-      init: this.initLinksTab
-    }
+  public metaTab: Tab = {
+    count: 0
+  };
+  public nameTab: Tab = {
+    count: 0
+  };
+  public logoTab: Tab = {
+    count: 0
+  };
+  public catalogueTab: Tab = {
+    count: 0
+  };
+  public vehiclesTab: Tab = {
+    count: 0
+  };
+  public treeTab: Tab = {
+    count: 0
+  };
+  public picturesTab: Tab = {
+    count: 0
+  };
+  public linksTab: Tab = {
+    count: 0
   };
 
   public organizeTypeId: number;
@@ -139,6 +131,9 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
   public engineVehicles: any[];
   public links: APIItemLink[];
   public invalidParams: any;
+
+  @ViewChild('tabset') tabset: NgbTabset;
+  private activeTab = 'meta';
 
   constructor(
     private http: HttpClient,
@@ -289,34 +284,34 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
                   }
                 });
               });
-            this.tabs.name.count = this.item.item_language_count;
-            this.tabs.logo.count = this.item.logo ? 1 : 0;
-            this.tabs.catalogue.count =
+            this.nameTab.count = this.item.item_language_count;
+            this.logoTab.count = this.item.logo ? 1 : 0;
+            this.catalogueTab.count =
               this.item.parents_count + this.item.childs_count;
-            this.tabs.vehicles.count = this.item.engine_vehicles_count;
-            this.tabs.pictures.count = this.item.pictures_count;
-            this.tabs.links.count = this.item.links_count;
+            this.vehiclesTab.count = this.item.engine_vehicles_count;
+            this.picturesTab.count = this.item.pictures_count;
+            this.linksTab.count = this.item.links_count;
 
             if (this.item.item_type_id === 7) {
-              delete this.tabs.catalogue;
-              delete this.tabs.tree;
+              this.catalogueTab = null;
+               this.treeTab = null;
             }
 
             if ([5, 7, 8].indexOf(this.item.item_type_id) === -1) {
-              delete this.tabs.links;
+               this.linksTab = null;
             }
 
             if (this.item.item_type_id !== 5) {
               //  || ! $this->user()->isAllowed('brand', 'logo')
-              delete this.tabs.logo;
+               this.logoTab = null;
             }
 
             if (this.item.item_type_id !== 2) {
-              delete this.tabs.vehicles;
+               this.vehiclesTab = null;
             }
 
             if ([2, 1, 5, 6, 7, 8].indexOf(this.item.item_type_id) === -1) {
-              delete this.tabs.pictures;
+               this.picturesTab = null;
             }
 
             /*if ($this->user()->get()->id == 1) {
@@ -398,6 +393,10 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
                 }
               );
 
+            if (this.tabset) {
+              // this.tabset.select(this.activeTab);
+            }
+
             this.loading--;
           },
           () => {
@@ -407,7 +406,10 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
         );
     });
     this.querySub = this.route.queryParams.subscribe(params => {
-      this.setActiveTab(params.tab ? params.tab : 'meta');
+      this.activeTab = params.tab ? params.tab : 'meta';
+      if (this.tabset) {
+        // this.tabset.select(this.activeTab);
+      }
     });
   }
 
@@ -416,8 +418,64 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
     this.querySub.unsubscribe();
   }
 
-  public getTabs(): Tab[] {
-    return Object.values(this.tabs);
+  ngAfterViewInit(): void {
+    if (this.tabset) {
+      // this.tabset.select(this.activeTab);
+    }
+  }
+
+  public tabChange(event: NgbTabChangeEvent) {
+
+    switch (event.nextId) {
+      case 'meta':
+        if (!this.metaTab.initialized) {
+          this.metaTab.initialized = true;
+          this.initMetaTab();
+        }
+        break;
+      case 'name':
+        if (!this.nameTab.initialized) {
+          this.nameTab.initialized = true;
+          this.initItemLanguageTab();
+        }
+        break;
+      case 'logo':
+        if (!this.logoTab.initialized) {
+          this.logoTab.initialized = true;
+          this.initLogoTab();
+        }
+        break;
+      case 'catalogue':
+        if (!this.catalogueTab.initialized) {
+          this.catalogueTab.initialized = true;
+          this.initCatalogueTab();
+        }
+        break;
+      case 'vehicles':
+        if (!this.vehiclesTab.initialized) {
+          this.vehiclesTab.initialized = true;
+          this.initVehiclesTab();
+        }
+        break;
+      case 'tree':
+        if (!this.treeTab.initialized) {
+          this.treeTab.initialized = true;
+          this.initTreeTab();
+        }
+        break;
+      case 'pictures':
+        if (!this.picturesTab.initialized) {
+          this.picturesTab.initialized = true;
+          this.initPicturesTab();
+        }
+        break;
+      case 'links':
+        if (!this.linksTab.initialized) {
+          this.linksTab.initialized = true;
+          this.initLinksTab();
+        }
+        break;
+    }
   }
 
   private initItemLanguageTab() {
@@ -434,7 +492,9 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
             language: language,
             name: null,
             text: null,
-            full_text: null
+            full_text: null,
+            text_id: null,
+            full_text_id: null
           });
         }
 
@@ -588,32 +648,6 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
       );
   }
 
-  public setActiveTab(tab: string) {
-    if (!this.tabs[tab]) {
-      throw new Error('Unexpected tab: ' + tab);
-    }
-    for (const id in this.tabs) {
-      if (this.tabs.hasOwnProperty(id)) {
-        this.tabs[id].active = false;
-      }
-    }
-    this.tabs[tab].active = true;
-
-    /*this.$state.go(
-      STATE_NAME,
-      { tab: tab },
-      {
-        notify: false,
-        reload: false,
-        location: 'replace'
-      }
-    );*/
-
-    if (this.tabs[tab].init) {
-      this.tabs[tab].init.call(this);
-    }
-  }
-
   public toggleSubscription() {
     const newValue = !this.item.subscription;
     this.http
@@ -702,7 +736,7 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
   public deleteParent(parentId: number) {
     this.catalogueLoading++;
     this.http
-      .delete('/api/item-parent/' + this.item.id + '/' + parentId)
+      .delete<void>('/api/item-parent/' + this.item.id + '/' + parentId)
       .subscribe(
         () => {
           this.initCatalogueTab();
@@ -717,7 +751,7 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
   public deleteChild(itemId: number) {
     this.catalogueLoading++;
     this.http
-      .delete('/api/item-parent/' + itemId + '/' + this.item.id)
+      .delete<void>('/api/item-parent/' + itemId + '/' + this.item.id)
       .subscribe(
         () => {
           this.initCatalogueTab();
