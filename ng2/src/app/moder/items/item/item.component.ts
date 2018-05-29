@@ -8,10 +8,6 @@ import {
 } from '@angular/core';
 import * as $ from 'jquery';
 import { HttpClient } from '@angular/common/http';
-import {
-  VehicleTypeService,
-  APIVehicleType
-} from '../../../services/vehicle-type';
 import { ACLService } from '../../../services/acl.service';
 import { ContentLanguageService } from '../../../services/content-language';
 import { ItemService, APIItem } from '../../../services/item';
@@ -46,10 +42,6 @@ export interface APIItemTreeGetResponse {
   item: APIItemTreeItem;
 }
 
-interface APIItemInModerItem extends APIItem {
-  vehicle_type?: APIVehicleType[];
-}
-
 interface Tab {
   count: number;
   initialized?: boolean;
@@ -71,7 +63,8 @@ export class ModerItemsItemComponent
   public linksLoading = 0;
   public logoLoading = 0;
 
-  public item: APIItemInModerItem = null;
+  public item: APIItem = null;
+  public vehicleTypeIDs: number[] = [];
   public specsAllowed = false;
   public canMove = false;
   public canEditSpecifications = false;
@@ -138,7 +131,6 @@ export class ModerItemsItemComponent
   constructor(
     private http: HttpClient,
     private translate: TranslateService,
-    private vehicleTypeService: VehicleTypeService,
     private acl: ACLService,
     private contentLanguage: ContentLanguageService,
     private itemService: ItemService,
@@ -294,24 +286,24 @@ export class ModerItemsItemComponent
 
             if (this.item.item_type_id === 7) {
               this.catalogueTab = null;
-               this.treeTab = null;
+              this.treeTab = null;
             }
 
             if ([5, 7, 8].indexOf(this.item.item_type_id) === -1) {
-               this.linksTab = null;
+              this.linksTab = null;
             }
 
             if (this.item.item_type_id !== 5) {
               //  || ! $this->user()->isAllowed('brand', 'logo')
-               this.logoTab = null;
+              this.logoTab = null;
             }
 
             if (this.item.item_type_id !== 2) {
-               this.vehiclesTab = null;
+              this.vehiclesTab = null;
             }
 
             if ([2, 1, 5, 6, 7, 8].indexOf(this.item.item_type_id) === -1) {
-               this.picturesTab = null;
+              this.picturesTab = null;
             }
 
             /*if ($this->user()->get()->id == 1) {
@@ -364,9 +356,8 @@ export class ModerItemsItemComponent
                       ids.push(row.vehicle_type_id);
                     }
 
-                    this.vehicleTypeService.getTypesById(ids).then(types => {
-                      this.item.vehicle_type = types;
-                    });
+                    this.vehicleTypeIDs = ids;
+
                     this.metaLoading--;
                   },
                   () => {
@@ -425,7 +416,6 @@ export class ModerItemsItemComponent
   }
 
   public tabChange(event: NgbTabChangeEvent) {
-
     switch (event.nextId) {
       case 'meta':
         if (!this.metaTab.initialized) {
@@ -660,6 +650,7 @@ export class ModerItemsItemComponent
   }
 
   public saveMeta() {
+    console.log('saveMeta');
     this.metaLoading++;
 
     const data = {
@@ -684,22 +675,10 @@ export class ModerItemsItemComponent
       lng: this.item.lng
     };
 
-    this.http.put<void>('/api/item/' + this.item.id, data).subscribe(
+    const promise = this.http.put<void>('/api/item/' + this.item.id, data).toPromise();
+    promise.then(
       response => {
         this.invalidParams = {};
-
-        const promises = [];
-
-        const ids: number[] = [];
-        for (const vehicle_type of this.item.vehicle_type) {
-          ids.push(vehicle_type.id);
-        }
-        promises.push(this.itemService.setItemVehicleTypes(this.item.id, ids));
-
-        this.loading++;
-        Promise.all(promises).then(results => {
-          this.loading--;
-        });
 
         this.metaLoading--;
       },
@@ -708,6 +687,17 @@ export class ModerItemsItemComponent
         this.metaLoading--;
       }
     );
+
+    const promises = [promise];
+
+    promises.push(
+      this.itemService.setItemVehicleTypes(this.item.id, this.vehicleTypeIDs)
+    );
+
+    this.loading++;
+    Promise.all(promises).then(results => {
+      this.loading--;
+    });
   }
 
   public saveLanguages() {

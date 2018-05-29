@@ -1,5 +1,14 @@
 import { sprintf } from 'sprintf-js';
-import { Component, Injectable, Input } from '@angular/core';
+import {
+  Component,
+  Injectable,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  OnInit,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import { APIItem } from '../../services/item';
 import {
   APIVehicleType,
@@ -10,6 +19,8 @@ import { LanguageService } from '../../services/language';
 import Notify from '../../notify';
 import { Observable, from } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { VehicleTypesModalComponent } from '../vehicle-types-modal/vehicle-types-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 function specsToPlain(
   options: ItemMetaFormAPISpec[],
@@ -55,13 +66,18 @@ interface ItemMetaFormAPISpec extends APISpec {
   styleUrls: ['./styles.scss']
 })
 @Injectable()
-export class ItemMetaFormComponent {
+export class ItemMetaFormComponent implements OnChanges, OnInit {
+
   @Input() item: APIItem;
   @Input() submitNotify: Function;
   @Input() parent: APIItem;
   @Input() invalidParams: any;
   @Input() hideSubmit: boolean;
   @Input() disableIsGroup: boolean;
+  @Input() vehicleTypeIDs: number[] = [];
+  @Output() submit = new EventEmitter();
+
+  public vehicleTypes: APIVehicleType[];
 
   public loading = 0;
   public todayOptions = [
@@ -141,7 +157,8 @@ export class ItemMetaFormComponent {
     private specService: SpecService,
     private vehicleTypeService: VehicleTypeService,
     private languageService: LanguageService,
-    private http: HttpClient
+    private http: HttpClient,
+    private modalService: NgbModal
   ) {
     if (this.item && this.item.lat && this.item.lng) {
       this.markers.point = {
@@ -198,6 +215,16 @@ export class ItemMetaFormComponent {
     );
   }
 
+  ngOnInit(): void {
+    this.loadVehicleTypes();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.vehicleTypeIDs) {
+      this.loadVehicleTypes();
+    }
+  }
+
   public matchingFn(value: string, target: APIVehicleType): boolean {
     const targetValue = target['nameTranslated'].toString();
     return (
@@ -205,8 +232,10 @@ export class ItemMetaFormComponent {
     );
   }
 
-  public loadVehicleTypes = (query: string): Observable<APIVehicleType[]> => {
-    return from(this.vehicleTypeService.getTypes());
+  public loadVehicleTypes(): void {
+    this.vehicleTypeService.getTypesById(this.vehicleTypeIDs).then(types => {
+      this.vehicleTypes = types;
+    });
   }
 
   public coordsChanged() {
@@ -226,8 +255,10 @@ export class ItemMetaFormComponent {
     this.center.lng = isNaN(lng) ? 0 : lng;
   }
 
-  public submit() {
-    this.submitNotify();
+  public doSubmit() {
+    console.log('doSubmit');
+    this.submit.emit();
+    return false;
   }
 
   public getIsConceptOptions(parent: APIItem) {
@@ -242,5 +273,17 @@ export class ItemMetaFormComponent {
 
   public getSpecOptions(specOptions: any[]): any[] {
     return this.defaultSpecOptions.concat(specOptions);
+  }
+
+  public showVehicleTypesModal() {
+    const modalRef = this.modalService.open(VehicleTypesModalComponent, {
+      size: 'lg',
+      centered: true
+    });
+
+    modalRef.componentInstance.ids = this.vehicleTypeIDs;
+    modalRef.componentInstance.changed.subscribe(() => {
+      this.loadVehicleTypes();
+    });
   }
 }

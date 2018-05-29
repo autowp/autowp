@@ -17,7 +17,6 @@ import { FileUploadModule } from 'ng2-file-upload';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { RecaptchaFormsModule } from 'ng-recaptcha/forms';
-import { TagInputModule } from 'ngx-chips';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
@@ -191,6 +190,7 @@ import { CommentsVotesComponent } from './components/comments/votes/votes.compon
 import { PictureModerVoteModalComponent } from './components/picture-moder-vote/modal/modal.component';
 import { ContentLanguageService } from './services/content-language';
 import { LanguageService } from './services/language';
+import { VehicleTypesModalComponent } from './components/vehicle-types-modal/vehicle-types-modal.component';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -768,12 +768,14 @@ const appRoutes: Routes = [
     ModerStatComponent,
     BreadcrumbsComponent,
     CommentsVotesComponent,
-    PictureModerVoteModalComponent
+    PictureModerVoteModalComponent,
+    VehicleTypesModalComponent
   ],
   entryComponents: [
     ModalMessageComponent,
     CommentsVotesComponent,
-    PictureModerVoteModalComponent
+    PictureModerVoteModalComponent,
+    VehicleTypesModalComponent
   ],
   imports: [
     BrowserModule,
@@ -801,7 +803,6 @@ const appRoutes: Routes = [
     ChartsModule,
     RecaptchaModule.forRoot(),
     RecaptchaFormsModule,
-    TagInputModule,
     BrowserAnimationsModule
   ],
   providers: [

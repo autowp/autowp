@@ -47,7 +47,7 @@
     <ng-template ngbTabContent>
       <div class="card card-body" *ngIf="item">
         <ngb-progressbar type="success" [striped]="true" [animated]="true" [value]="100" [hidden]="metaLoading <= 0"></ngb-progressbar>
-        <app-item-meta-form *ngIf="canEditMeta" [item]="item" (submit)="saveMeta()" [invalidParams]="invalidParams"></app-item-meta-form>
+        <app-item-meta-form *ngIf="canEditMeta" [item]="item" (submit)="saveMeta()" [invalidParams]="invalidParams" [(vehicleTypeIDs)]="vehicleTypeIDs"></app-item-meta-form>
 
         <table class="table table-condensed" *ngIf="!canEditMeta">
           <tr>

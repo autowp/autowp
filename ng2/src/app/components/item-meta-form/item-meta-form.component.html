@@ -1,4 +1,4 @@
-<form method="post" class="form-horizontal" (submit)="submit()">
+<form method="post" class="form-horizontal" (submit)="doSubmit()">
   <fieldset>
     <div class="form-group row">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/name</label>
@@ -44,17 +44,10 @@
     </div>
     <div class="form-group row" *ngIf="item.item_type_id == 1 || item.item_type_id == 4">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/type</label>
-      <div class="col-md-10" style="position:relative">
-        <tag-input [(ngModel)]="item.vehicle_type" name="vehicle_type" placeholder="Add" secondaryPlaceholder="Add" [onlyFromAutocomplete]="true" [onTextChangeDebounce]="50" [ripple]="false">
-          <tag-input-dropdown [autocompleteObservable]="loadVehicleTypes" identifyBy="id" displayBy="nameTranslated" [showDropdownIfEmpty]="true"
-            [minimumTextLength]="0" [limitItemsTo]="50"></tag-input-dropdown>
-        </tag-input>
-
-        <!--tags-input [(ngModel)]="item.vehicle_type" replace-spaces-with-dashes="false" add-from-autocomplete-only="true"
-          key-property="id" display-property="name" min-length="0" template="vehicle-type-tag-template">
-          <auto-complete source="loadVehicleTypes($query)" min-length="0" load-on-empty="true" load-on-focus="true" debounce-delay="0"
-            max-results-to-show="50" template="vehicle-type-list-template"></auto-complete>
-        </tags-input-->
+      <div class="col-md-10">
+        {{vehicleTypeIDs|json}}
+        <button class="btn btn-sm btn-info" type="button" *ngFor="let type of vehicleTypes" (click)="showVehicleTypesModal()">{{type.nameTranslated}}</button>
+        <button class="btn btn-sm btn-success" type="button" (click)="showVehicleTypesModal()"><span class="fa fa-plus"></span></button>
       </div>
       <script type="text/ng-template" id="vehicle-type-tag-template">
         <div>{{data.nameTranslated}} <a class="remove-button" (click)="$removeTag()">&#10006;</a></div>

@@ -1,0 +1,13 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h3 class="modal-title" translate>personal-message-dialog/title</h3>
+    <a class="close" (click)="activeModal.dismiss()">×</a>
+  </div>
+  <div class="modal-body">
+    {{ids}}
+    <button class="btn btn-block" (click)="toggle(type.id)" [class.btn-success]="isActive(type.id)" [class.btn-outline-secondary]="!isActive(type.id)" *ngFor="let type of types">{{type.name|translate}}</button>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" (click)="activeModal.close()">Close</button>
+  </div>
+</div>
