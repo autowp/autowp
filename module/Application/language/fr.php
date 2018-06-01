@@ -1,4 +1,7 @@
 <?php return array (
+  'specs/attrs/157/options/euro-6c' => 'Euro 6c',
+  'specs/attrs/157/options/euro-5a' => 'Euro 5a',
+  'specs/attrs/157/options/euro-5b' => 'Euro 5b',
   'persons/content-persons' => 'Personnes sur la photo',
   'persons/author-persons' => 'Auteurs',
   'mosts/most' => 'Le plus',
