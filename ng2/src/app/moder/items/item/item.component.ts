@@ -17,7 +17,7 @@ import {
 } from '../../../services/api.service';
 import { chunkBy } from '../../../chunk';
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable, of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIPicture, PictureService } from '../../../services/picture';
 import { ItemParentService } from '../../../services/item-parent';
@@ -27,7 +27,12 @@ import {
   APIItemLanguage
 } from '../../../services/item-language';
 import { PageEnvService } from '../../../services/page-env.service';
-import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbTabChangeEvent,
+  NgbTabset,
+  NgbTypeaheadSelectItemEvent
+} from '@ng-bootstrap/ng-bootstrap';
+import { debounceTime, switchMap, map } from 'rxjs/operators';
 
 // Acl.isAllowed('car', 'edit_meta', 'unauthorized');
 
@@ -128,6 +133,33 @@ export class ModerItemsItemComponent
   @ViewChild('tabset') tabset: NgbTabset;
   private activeTab = 'meta';
 
+  public itemQuery = '';
+
+  itemsDataSource = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      switchMap(query => {
+        if (query === '') {
+          return of([]);
+        }
+
+        return this.itemService
+          .getItems({
+            autocomplete: query,
+            exclude_self_and_childs: this.item.id,
+            is_group: true,
+            parent_types_of: this.item.item_type_id,
+            fields: 'name_html,brandicon',
+            limit: 15
+          })
+          .pipe(
+            map(response => {
+              return response.items;
+            })
+          );
+      })
+    );
+
   constructor(
     private http: HttpClient,
     private translate: TranslateService,
@@ -141,85 +173,22 @@ export class ModerItemsItemComponent
     private itemLinkService: ItemLinkService,
     private itemLanguageService: ItemLanguageService,
     private pageEnv: PageEnvService
-  ) {
-    this.loading++;
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.acl.isAllowed('specifications', 'edit').then(
-      allow => {
-        this.canEditSpecifications = !!allow;
-      },
-      () => {
-        this.canEditSpecifications = false;
-      }
-    );
+    this.acl
+      .isAllowed('specifications', 'edit')
+      .then(
+        allow => (this.canEditSpecifications = !!allow),
+        () => (this.canEditSpecifications = false)
+      );
 
-    this.acl.isAllowed('car', 'move').then(
-      allow => {
-        this.canMove = !!allow;
-      },
-      () => {
-        this.canMove = false;
-      }
-    );
-
-    /* const $input = $($element[0]).find('.item-autocomplete');
-    $input
-      .on('typeahead:select', (ev: any, car: any) => {
-        this.addParent(car.id);
-        $input.typeahead('val', '');
-      })
-      .typeahead(
-        {},
-        {
-          display: (car: any) => {
-            return car.name;
-          },
-          templates: {
-            suggestion: (sitem: any) => {
-              const $div = $(
-                '<div class="tt-suggestion tt-selectable car"></div>'
-              ).html(sitem.name_html);
-
-              if (sitem.brandicon) {
-                $div.prepend(
-                  $('<img />', {
-                    src: sitem.brandicon.src
-                  })
-                );
-              }
-
-              return $div[0];
-            }
-          },
-          source: (
-            query: string,
-            syncResults: Function,
-            asyncResults: Function
-          ) => {
-            if (!this.item) {
-              syncResults([]);
-              return;
-            }
-
-            this.itemService
-              .getItems({
-                autocomplete: query,
-                exclude_self_and_childs: this.item.id,
-                is_group: true,
-                parent_types_of: this.item.item_type_id,
-                fields: 'name_html,brandicon',
-                limit: 15
-              })
-              .subscribe(response => {
-                asyncResults(response.items);
-              });
-          }
-        }
-      );*/
+    this.acl
+      .isAllowed('car', 'move')
+      .then(allow => (this.canMove = !!allow), () => (this.canMove = false));
 
     this.routeSub = this.route.params.subscribe(params => {
+      this.loading++;
       this.itemService
         .getItem(params.id, {
           fields: [
@@ -255,7 +224,7 @@ export class ModerItemsItemComponent
           ].join(',')
         })
         .subscribe(
-          (item: APIItem) => {
+          item => {
             this.item = item;
 
             this.specsAllowed = [1, 2].indexOf(this.item.item_type_id) !== -1;
@@ -413,6 +382,16 @@ export class ModerItemsItemComponent
     if (this.tabset) {
       // this.tabset.select(this.activeTab);
     }
+  }
+
+  public itemFormatter(x: APIItem) {
+    return x.name_text;
+  }
+
+  public itemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
+    console.log(e);
+    this.addParent(e.item.id);
+    this.itemQuery = '';
   }
 
   public tabChange(event: NgbTabChangeEvent) {
@@ -649,8 +628,8 @@ export class ModerItemsItemComponent
       });
   }
 
-  public saveMeta() {
-    console.log('saveMeta');
+  public saveMeta(e) {
+    console.log('saveMeta', e);
     this.metaLoading++;
 
     const data = {
@@ -675,7 +654,9 @@ export class ModerItemsItemComponent
       lng: this.item.lng
     };
 
-    const promise = this.http.put<void>('/api/item/' + this.item.id, data).toPromise();
+    const promise = this.http
+      .put<void>('/api/item/' + this.item.id, data)
+      .toPromise();
     promise.then(
       response => {
         this.invalidParams = {};
@@ -769,6 +750,8 @@ export class ModerItemsItemComponent
           this.catalogueLoading--;
         }
       );
+
+    return false;
   }
 
   public saveLinks() {

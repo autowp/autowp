@@ -5,8 +5,8 @@ import { ItemService, APIItem } from '../../../../services/item';
 import { chunk } from '../../../../chunk';
 import Notify from '../../../../notify';
 import { TranslateService } from '@ngx-translate/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Subscription, combineLatest } from 'rxjs';
 import {
   ItemParentService,
   APIItemParent
@@ -20,18 +20,13 @@ export interface APIItemInSelectParent extends APIItem {
   open: boolean;
 }
 
-export type SelectParentLoadChilds = (parent: APIItemInSelectParent) => void;
-export type SelectParentSelect = (parent: APIItemInSelectParent) => void;
-export type SelectParentDoSearchFunc = () => void;
-
 @Component({
   selector: 'app-moder-items-item-select-parent',
   templateUrl: './select-parent.component.html'
 })
 @Injectable()
 export class ModerItemsItemSelectParentComponent implements OnInit, OnDestroy {
-  private routeSub: Subscription;
-  private querySub: Subscription;
+  private paramsSub: Subscription;
   public showCatalogueTab = false;
   public showBrandsTab = false;
   public showTwinsTab = false;
@@ -46,10 +41,6 @@ export class ModerItemsItemSelectParentComponent implements OnInit, OnDestroy {
   public items: any[];
   public categories: APIItem[];
   public factories: APIItem[];
-  public doSearch: SelectParentDoSearchFunc;
-  public loadChildCategories: SelectParentLoadChilds;
-  public loadChildCatalogues: SelectParentLoadChilds;
-  public select: SelectParentSelect;
 
   constructor(
     private http: HttpClient,
@@ -59,90 +50,81 @@ export class ModerItemsItemSelectParentComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private itemParentService: ItemParentService,
     private pageEnv: PageEnvService
-  ) {
-    this.loadChildCategories = (parent: APIItemInSelectParent) => {
-      this.itemParentService
-        .getItems({
-          limit: 100,
-          fields: 'item.name_html,item.childs_count',
-          parent_id: parent.id,
-          is_group: true,
-          order: 'categories_first'
-        })
-        .subscribe(
-          response => {
-            parent.childs = response.items;
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
-    };
+  ) {}
 
-    this.loadChildCatalogues = (parent: APIItemInSelectParent) => {
-      this.itemParentService
-        .getItems({
-          limit: 100,
-          fields: 'item.name_html,item.childs_count',
-          parent_id: parent.id,
-          is_group: true,
-          order: 'type_auto'
-        })
-        .subscribe(
-          response => {
-            parent.childs = response.items;
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
-    };
+  public loadChildCategories(parent: APIItemInSelectParent) {
+    this.itemParentService
+      .getItems({
+        limit: 100,
+        fields: 'item.name_html,item.childs_count',
+        parent_id: parent.id,
+        is_group: true,
+        order: 'categories_first'
+      })
+      .subscribe(
+        response => {
+          parent.childs = response.items;
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
+  }
 
-    this.select = (parent: APIItem) => {
-      this.http
-        .post<void>('/api/item-parent', {
-          item_id: this.item.id,
-          parent_id: parent.id
-        })
-        .subscribe(
-          response => {
-            this.router.navigate(['/moder/items/item', this.item.id], {
-              queryParams: {
-                tab: 'catalogue'
-              }
-            });
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
-    };
+  public loadChildCatalogues(parent: APIItemInSelectParent) {
+    this.itemParentService
+      .getItems({
+        limit: 100,
+        fields: 'item.name_html,item.childs_count',
+        parent_id: parent.id,
+        is_group: true,
+        order: 'type_auto'
+      })
+      .subscribe(
+        response => {
+          parent.childs = response.items;
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
   }
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
+    this.paramsSub = combineLatest(
+      this.route.params,
+      this.route.queryParams,
+      (route: Params, query: Params) => ({
+        route,
+        query
+      })
+    ).subscribe(data => {
+      this.tab = data.query.tab || 'catalogue';
+      this.page = data.query.page;
+      this.brand_id = data.query.brand_id;
+
       this.itemService
-        .getItem(params.id, {
+        .getItem(data.route.id, {
           fields: 'name_text'
         })
         .subscribe(
-          (item: APIItem) => {
+          item => {
             this.item = item;
 
             this.translate
               .get('item/type/' + this.item.item_type_id + '/name')
               .subscribe((translation: string) => {
                 this.pageEnv.set({
-                    layout: {
-                        isAdminPage: true,
-                        needRight: false
-                    },
-                    name: 'page/144/name',
-                    pageId: 144,
-                    args: {
-                        CAR_ID: this.item.id + '',
-                        CAR_NAME: translation + ': ' + this.item.name_text
-                    }
+                  layout: {
+                    isAdminPage: true,
+                    needRight: false
+                  },
+                  name: 'page/144/name',
+                  pageId: 144,
+                  args: {
+                    CAR_ID: this.item.id + '',
+                    CAR_NAME: translation + ': ' + this.item.name_text
+                  }
                 });
               });
 
@@ -172,19 +154,11 @@ export class ModerItemsItemSelectParentComponent implements OnInit, OnDestroy {
                     }
                   );
               } else {
-                this.doSearch = () => {
-                  this.loadCatalogueBrands();
-                };
-
                 this.loadCatalogueBrands();
               }
             }
 
             if (this.tab === 'brands') {
-              this.doSearch = () => {
-                this.loadBrands();
-              };
-
               this.loadBrands();
             }
 
@@ -272,19 +246,42 @@ export class ModerItemsItemSelectParentComponent implements OnInit, OnDestroy {
           }
         );
     });
-
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.tab = params.tab || 'catalogue';
-
-      this.page = params.page;
-
-      this.brand_id = params.brand_id;
-    });
   }
 
   ngOnDestroy(): void {
-    this.routeSub.unsubscribe();
-    this.querySub.unsubscribe();
+    this.paramsSub.unsubscribe();
+  }
+
+  public select(parent: APIItem) {
+    this.http
+      .post<void>('/api/item-parent', {
+        item_id: this.item.id,
+        parent_id: parent.id
+      })
+      .subscribe(
+        response => {
+          this.router.navigate(['/moder/items/item', this.item.id], {
+            queryParams: {
+              tab: 'catalogue'
+            }
+          });
+        },
+        response => Notify.response(response)
+      );
+
+    return false;
+  }
+
+  public doSearch() {
+    if (this.tab === 'brands') {
+      this.loadBrands();
+    }
+
+    if (this.tab === 'catalogue') {
+      if (!this.brand_id) {
+        this.loadCatalogueBrands();
+      }
+    }
   }
 
   private loadCatalogueBrands() {

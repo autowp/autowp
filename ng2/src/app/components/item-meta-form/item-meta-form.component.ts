@@ -75,7 +75,7 @@ export class ItemMetaFormComponent implements OnChanges, OnInit {
   @Input() hideSubmit: boolean;
   @Input() disableIsGroup: boolean;
   @Input() vehicleTypeIDs: number[] = [];
-  @Output() submit = new EventEmitter();
+  @Output() submit = new EventEmitter<void>();
 
   public vehicleTypes: APIVehicleType[];
 
@@ -255,8 +255,9 @@ export class ItemMetaFormComponent implements OnChanges, OnInit {
     this.center.lng = isNaN(lng) ? 0 : lng;
   }
 
-  public doSubmit() {
-    console.log('doSubmit');
+  public doSubmit(event) {
+    event.preventDefault();
+    event.stopPropagation();
     this.submit.emit();
     return false;
   }

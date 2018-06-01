@@ -1,4 +1,4 @@
-<form method="post" class="form-horizontal" (submit)="doSubmit()">
+<form method="post" class="form-horizontal" (ngSubmit)="doSubmit($event)">
   <fieldset>
     <div class="form-group row">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/name</label>
@@ -45,7 +45,6 @@
     <div class="form-group row" *ngIf="item.item_type_id == 1 || item.item_type_id == 4">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/type</label>
       <div class="col-md-10">
-        {{vehicleTypeIDs|json}}
         <button class="btn btn-sm btn-info" type="button" *ngFor="let type of vehicleTypes" (click)="showVehicleTypesModal()">{{type.nameTranslated}}</button>
         <button class="btn btn-sm btn-success" type="button" (click)="showVehicleTypesModal()"><span class="fa fa-plus"></span></button>
       </div>

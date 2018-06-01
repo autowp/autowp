@@ -1,6 +1,6 @@
-import { Component, Injectable, Input } from '@angular/core';
+import { Component, Injectable, Input, EventEmitter, Output } from '@angular/core';
 import { APIItem } from '../../../../../services/item';
-import { SelectParentLoadChilds, SelectParentSelect, APIItemInSelectParent } from '../select-parent.component';
+import { APIItemInSelectParent } from '../select-parent.component';
 
 @Component({
   selector: 'app-moder-items-item-select-parent-tree-item',
@@ -9,12 +9,22 @@ import { SelectParentLoadChilds, SelectParentSelect, APIItemInSelectParent } fro
 @Injectable()
 export class ModerItemsItemSelectParentTreeItemComponent {
   @Input() item: APIItemInSelectParent;
-  @Input() select: SelectParentSelect;
-  @Input() loadChilds: SelectParentLoadChilds;
   @Input() disableItemID: number;
   @Input() typeID: number;
+  @Output() select = new EventEmitter<APIItem>();
+  @Output() loadChilds = new EventEmitter<APIItem>();
 
   public isDisabled(item: APIItemInSelectParent): boolean {
     return item.id === this.disableItemID;
+  }
+
+  public onSelect(item: APIItem) {
+    this.select.emit(item);
+    return false;
+  }
+
+  public onLoadChilds(item: APIItem) {
+    this.loadChilds.emit(item);
+    return false;
   }
 }

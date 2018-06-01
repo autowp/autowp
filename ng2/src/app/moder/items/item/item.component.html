@@ -47,7 +47,7 @@
     <ng-template ngbTabContent>
       <div class="card card-body" *ngIf="item">
         <ngb-progressbar type="success" [striped]="true" [animated]="true" [value]="100" [hidden]="metaLoading <= 0"></ngb-progressbar>
-        <app-item-meta-form *ngIf="canEditMeta" [item]="item" (submit)="saveMeta()" [invalidParams]="invalidParams" [(vehicleTypeIDs)]="vehicleTypeIDs"></app-item-meta-form>
+        <app-item-meta-form *ngIf="canEditMeta" [item]="item" (submit)="saveMeta($event)" [invalidParams]="invalidParams" [(vehicleTypeIDs)]="vehicleTypeIDs"></app-item-meta-form>
 
         <table class="table table-condensed" *ngIf="!canEditMeta">
           <tr>
@@ -102,7 +102,8 @@
             <ng-template ngbTabTitle>
               {{language.language.toUpperCase()}}
               <span class="badge badge-pill badge-secondary" *ngIf="language.name || language.text || language.full_text">
-                {{((language.name && language.name.length) ? 1 : 0) + ((language.text && language.text.length) ? 1 : 0) + ((language.full_text && language.full_text.length) ? 1 : 0)}}
+                {{((language.name && language.name.length) ? 1 : 0) + ((language.text && language.text.length) ? 1 : 0) + ((language.full_text
+                && language.full_text.length) ? 1 : 0)}}
               </span>
             </ng-template>
             <ng-template ngbTabContent>
@@ -192,26 +193,29 @@
               <td colspan="4">
                 <form class="car-add-parent" method="post">
                   <div class="input-group" style="max-width:400px">
-                    <input type="text" name="parent" class="form-control item-autocomplete" placeholder="{{'moder/vehicle/catalogue/select-placeholder'|translate}}"
-                      autocomplete="off" />
+                    <ng-template #itemTemplate let-model="item">
+                      <span [innerHTML]="model.name_html"></span>
+                    </ng-template>
+                    <input type="text" name="parent" [ngbTypeahead]="itemsDataSource" class="form-control item-autocomplete" placeholder="{{'moder/vehicle/catalogue/select-placeholder'|translate}}"
+                      autocomplete="off" [(ngModel)]="itemQuery" [inputFormatter]="itemFormatter" (selectItem)="itemOnSelect($event)"
+                      [resultTemplate]="itemTemplate" />
 
-                    <div class="btn-group" style="white-space:nowrap">
+                    <div class="input-group-append" style="white-space:nowrap">
                       <a class="btn btn-secondary" [routerLink]="['/moder/items/item', item.id, 'select-parent']" translate>moder/vehicle/catalogue/select</a>
-                      <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <div class="dropdown-menu">
-                        <a *ngIf="canHaveParentBrand" class="dropdown-item" [routerLink]="['/moder/items/item', item.id, 'select-parent']" [queryParams]="{tab: 'brands'}">
-                          <i class="fa fa-plus"></i>
-                          {{'moder/vehicle/catalogue/add-brand'|translate}}
-                        </a>
-                        <ng-container *ngIf="canHaveParentBrand">
-                          <a class="dropdown-item" href="#" (click)="addParent(brand.id)" *ngFor="let brand of suggestions">
+                      <div ngbDropdown>
+                        <button type="button" ngbDropdownToggle class="btn btn-secondary"></button>
+                        <div ngbDropdownMenu>
+                          <a *ngIf="canHaveParentBrand" class="dropdown-item" [routerLink]="['/moder/items/item', item.id, 'select-parent']" [queryParams]="{tab: 'brands'}">
                             <i class="fa fa-plus"></i>
-                            <span translate [translateParams]="{brand: brand.name_text}">{{'ng/moder/vehicle/catalogue/add-brand-{brand}'}}</span>
+                            {{'moder/vehicle/catalogue/add-brand'|translate}}
                           </a>
-                        </ng-container>
+                          <ng-container *ngIf="canHaveParentBrand">
+                            <a class="dropdown-item" href="#" (click)="addParent(brand.id)" *ngFor="let brand of suggestions">
+                              <i class="fa fa-plus"></i>
+                              <span translate [translateParams]="{brand: brand.name_text}">{{'ng/moder/vehicle/catalogue/add-brand-{brand}'}}</span>
+                            </a>
+                          </ng-container>
+                        </div>
                       </div>
                     </div>
                   </div>
