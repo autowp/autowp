@@ -1,6 +1,6 @@
 <div *ngIf="!brand">
   <div style="margin-bottom:20px">
-    <input type="text" [(ngModel)]="search" class="form-control" placeholder="Type to search ..." auto-focus
+    <input type="text" [(ngModel)]="search" (input)="onSearchInput()" class="form-control" placeholder="Type to search ..." auto-focus
     />
   </div>
   <span [hidden]="loading <= 0">

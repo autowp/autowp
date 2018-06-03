@@ -1,13 +1,20 @@
-import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Injectable,
+  OnInit,
+  OnDestroy,
+  ViewChild
+} from '@angular/core';
 // import { CropDialog } from 'crop-dialog';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 import { APIItem, ItemService } from '../services/item';
 import Notify from '../notify';
-import { Subscription } from 'rxjs';
+import { Subscription, empty, of, forkJoin, Observable, concat } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PictureService, APIPicture } from '../services/picture';
 import { AuthService } from '../services/auth.service';
 import { PageEnvService } from '../services/page-env.service';
+import { switchMap, catchError, map, tap } from 'rxjs/operators';
 
 interface UploadProgress {
   filename: string;
@@ -27,14 +34,15 @@ export class UploadComponent implements OnInit, OnDestroy {
   public selected: boolean;
   public selectionName: string;
   public replace: APIPicture;
-  public file: any;
+  public files: any[];
   public note: string;
   public progress: UploadProgress[] = [];
   public pictures: APIPicture[] = [];
   public item: APIItem;
   public formHidden = false;
   private perspective_id: number;
-  private Upload: any; // TODO: private Upload: ng.angularFileUpload.IUploadService,
+
+  @ViewChild('input') input;
 
   constructor(
     private http: HttpClient,
@@ -103,38 +111,39 @@ export class UploadComponent implements OnInit, OnDestroy {
     this.querySub.unsubscribe();
   }
 
+  public onChange(event: any, input: any) {
+    const files = [].slice.call(event.target.files);
+
+    this.files = files;
+  }
+
   public submit() {
     this.progress = [];
 
     this.formHidden = true;
 
-    const xhrs: any[] = [];
+    const xhrs: Observable<APIPicture>[] = [];
 
-    if (this.replace) {
-      const promise = this.uploadFile(this.file);
-
-      xhrs.push(promise);
-    } else {
-      for (const file of this.file) {
-        const promise = this.uploadFile(file);
-
-        xhrs.push(promise);
-      }
+    for (const file of this.files) {
+      xhrs.push(this.uploadFile(file));
     }
 
-    Promise.all(xhrs).then(
-      () => {
-        this.formHidden = false;
-        this.file = undefined;
+    concat(...xhrs).subscribe(
+      a => {
+        console.log('a', a);
       },
+      undefined,
       () => {
+        this.input.nativeElement.value = '';
         this.formHidden = false;
-        this.file = undefined;
+        this.files = undefined;
       }
     );
+
+    return false;
   }
 
-  private uploadFile(file: any) {
+  private uploadFile(file: any): Observable<APIPicture> {
     const progress = {
       filename: file.fileName || file.name,
       percentage: 0,
@@ -145,55 +154,82 @@ export class UploadComponent implements OnInit, OnDestroy {
 
     this.progress.push(progress);
 
-    const itemId = this.item ? this.item.id : undefined;
-    let perspectiveId = this.perspective_id;
-    if (!perspectiveId) {
-      perspectiveId = undefined;
+    const formData: FormData = new FormData();
+    formData.append('file', file);
+    if (this.note) {
+      formData.append('comment', this.note);
+    }
+    if (this.item) {
+      formData.append('item_id', this.item.id + '');
+    }
+    if (this.replace) {
+      formData.append('replace_picture_id', this.replace.id + '');
+    }
+    if (this.perspective_id) {
+      formData.append('perspective_id', this.perspective_id + '');
     }
 
-    const promise = this.Upload.upload({
-      method: 'POST',
-      url: '/api/picture',
-      data: {
-        file: file,
-        comment: this.note,
-        item_id: itemId,
-        replace_picture_id: this.replace ? this.replace.id : undefined,
-        perspective_id: perspectiveId
-      }
-    }).then(
-      response => {
-        progress.percentage = 100;
-        progress.success = true;
+    return this.http
+      .post('/api/picture', formData, {
+        observe: 'events',
+        reportProgress: true
+      })
+      .pipe(
+        catchError((response, caught) => {
+          progress.percentage = 100;
+          progress.failed = true;
 
-        const location = response.headers('Location');
+          progress.invalidParams = response.error.invalid_params;
 
-        this.pictureService
-          .getPictureByLocation(location, {
-            fields:
-              'crop,image_gallery_full,thumb_medium,votes,views,comments_count,perspective_item,name_html,name_text'
-          })
-          .subscribe(
-            picture => {
-              this.pictures.push(picture);
-            },
-            subresponse => {
-              Notify.response(subresponse);
-            }
-          );
-      },
-      response => {
-        progress.percentage = 100;
-        progress.failed = true;
+          return empty();
+        }),
+        switchMap(event => {
+          if (event.type === HttpEventType.DownloadProgress) {
+            progress.percentage = Math.round(
+              50 + 25 * (event.loaded / event.total)
+            );
+            return empty();
+          }
 
-        progress.invalidParams = response.error.invalid_params;
-      },
+          if (event.type === HttpEventType.UploadProgress) {
+            progress.percentage = Math.round(50 * (event.loaded / event.total));
+            return empty();
+          }
+
+          if (event.type === HttpEventType.Response) {
+            progress.percentage = 75;
+            progress.success = true;
+
+            const location = event.headers.get('Location');
+
+            return this.pictureService
+              .getPictureByLocation(location, {
+                fields:
+                  'crop,image_gallery_full,thumb_medium,votes,views,comments_count,perspective_item,name_html,name_text'
+              })
+              .pipe(
+                tap(picture => {
+                  progress.percentage = 100;
+                  this.pictures.push(picture);
+                }),
+                catchError((response, caught) => {
+                  Notify.response(response);
+
+                  return empty();
+                })
+              );
+          }
+
+          return empty();
+        })
+      );
+
+    /* ,
       evt => {
         progress.percentage = Math.round(100.0 * evt.loaded / evt.total);
       }
-    );
 
-    return promise;
+    return promise;*/
   }
 
   public crop(picture: APIPicture) {

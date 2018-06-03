@@ -20,19 +20,12 @@
             <div class="form-group row">
               <label class="col-md-2 col-form-label" translate>upload/image-file</label>
               <div class="col-md-10">
-                <div class="btn btn-secondary" ngf-select [(ngModel)]="file" name="file" ngf-pattern="'image/*'" ngf-accept="'image/*'" ngf-max-size="50MB"
-                  ngf-min-height="360" ngf-min-width="640" ngf-max-height="4096" ngf-max-width="4096" ngf-multiple="true" ngf-drop
-                  translate *ngIf="!replace">upload/select-files</div>
 
-                <div class="btn btn-secondary" ngf-select [(ngModel)]="file" name="file" ngf-pattern="'image/*'" ngf-accept="'image/*'" ngf-max-size="50MB"
-                  ngf-min-height="360" ngf-min-width="640" ngf-max-height="4096" ngf-max-width="4096" ngf-drop translate ngf-max-files="1"
-                  *ngIf="replace">upload/select-file</div>
+                <input type="file" #input name="file" class="form-control" (change)="onChange($event)" accept="image/*" [multiple]="replace ? null : true"
+                />
 
-                <div style="margin-top: 10px" *ngIf="file && !replace">
+                <div style="margin-top: 10px" *ngIf="files">
                   <p *ngFor="let file of file" [textContent]="file.name"></p>
-                </div>
-                <div style="margin-top: 10px" *ngIf="file && replace ">
-                  <p [textContent]="file.name"></p>
                 </div>
               </div>
             </div>
@@ -44,7 +37,7 @@
             </div>
             <div class="row">
               <div class="col-md-10 offset-md-2">
-                <button name="submit" class="btn btn-primary" translate [disabled]="!file">send</button>
+                <button name="submit" class="btn btn-primary" translate [disabled]="!files">send</button>
               </div>
             </div>
           </fieldset>
@@ -52,11 +45,14 @@
       </div>
 
       <div class="progress-area">
-        <ng-container *ngFor="let progress of progress">
-          <ngb-progressbar class="mb-2" [type]="progress.success ? 'success' : progress.failed ? 'danger' : 'info'" [value]="progress.percentage" *ngIf="!progress.success">
-            <span class="file-name" [textContent]="progress.filename"></span>
-            <span class="percentage" [textContent]="progress.percentage + '%'" *ngIf="progress.percentage < 100"></span>
-            <span *ngFor="let message of progress.invalidParams.file" [textContent]="message"></span>
+        <ng-container *ngFor="let p of progress">
+          <ngb-progressbar class="d-block mb-2" [type]="p.success ? 'success' : p.failed ? 'danger' : 'info'" [value]="p.percentage"
+            *ngIf="!p.success">
+            <div>
+              <span class="d-inline file-name" [textContent]="p.filename">: </span>
+              <span class="d-inline percentage" [textContent]="p.percentage + '% '" *ngIf="p.percentage < 100"></span>
+              <span class="d-inline" *ngFor="let message of p.invalidParams | invalidParams : 'file'" [textContent]="message + ' '"></span>
+            </div>
           </ngb-progressbar>
         </ng-container>
       </div>

@@ -4,8 +4,16 @@ import { APIPaginator } from '../../services/api.service';
 import { ItemService, APIItem, APIItemsGetResponse } from '../../services/item';
 import { chunk } from '../../chunk';
 import Notify from '../../notify';
-import { Subscription, Observable, empty, forkJoin, of } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import {
+  Subscription,
+  Observable,
+  empty,
+  forkJoin,
+  of,
+  BehaviorSubject,
+  combineLatest
+} from 'rxjs';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { ItemParentService, APIItemParent } from '../../services/item-parent';
 import { PageEnvService } from '../../services/page-env.service';
 import {
@@ -13,7 +21,8 @@ import {
   switchMap,
   map,
   catchError,
-  tap
+  tap,
+  debounceTime
 } from 'rxjs/operators';
 
 @Component({
@@ -30,7 +39,8 @@ export class UploadSelectComponent implements OnInit {
   };
   public brands: APIItem[][];
   public paginator: APIPaginator;
-  public search: string;
+  public search = '';
+  public search$ = new BehaviorSubject<string>('');
   public loading = 0;
   public conceptsOpen = false;
 
@@ -42,6 +52,10 @@ export class UploadSelectComponent implements OnInit {
     private itemParentService: ItemParentService,
     private pageEnv: PageEnvService
   ) {}
+
+  public onSearchInput() {
+    this.search$.next(this.search);
+  }
 
   ngOnInit(): void {
     setTimeout(
@@ -56,20 +70,31 @@ export class UploadSelectComponent implements OnInit {
       0
     );
 
-    this.route.queryParams
+    combineLatest(
+      this.search$.pipe(
+        map(value => value.trim()),
+        distinctUntilChanged(),
+        debounceTime(50)
+      ),
+      this.route.queryParams,
+      (search: string, query: Params) => ({
+        search,
+        query
+      })
+    )
       .pipe(
         distinctUntilChanged(),
         tap(() => {
-          this.loading++;
+          this.loading = 1;
           this.brand = null;
         }),
-        switchMap((params, index) => {
-          const brandId = parseInt(params.brand_id, 10);
-          const page = parseInt(params.page, 10);
+        switchMap(params => {
+          const brandId = parseInt(params.query.brand_id, 10);
+          const page = parseInt(params.query.page, 10);
 
           return forkJoin(
             brandId ? this.brandObservable(brandId) : of(null),
-            brandId ? of(null) : this.brandsObservable(page)
+            brandId ? of(null) : this.brandsObservable(page, params.search)
           ).pipe(
             map(data => {
               return {
@@ -79,7 +104,7 @@ export class UploadSelectComponent implements OnInit {
             })
           );
         }),
-        tap(() => this.loading--)
+        tap(() => (this.loading = 0))
       )
       .subscribe(data => {
         console.log('total', data);
@@ -93,14 +118,17 @@ export class UploadSelectComponent implements OnInit {
       });
   }
 
-  private brandsObservable(page: number): Observable<APIItemsGetResponse> {
+  private brandsObservable(
+    page: number,
+    search: string
+  ): Observable<APIItemsGetResponse> {
     return this.itemService
       .getItems({
         type_id: 5,
         order: 'name',
         limit: 500,
         fields: 'name_only',
-        name: this.search ? '%' + this.search + '%' : null,
+        name: search ? '%' + search + '%' : null,
         page: page
       })
       .pipe(
