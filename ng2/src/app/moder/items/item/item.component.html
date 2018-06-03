@@ -35,445 +35,54 @@
   </div>
 </div>
 
+<div class="nav nav-pills" style="margin-bottom:10px" *ngIf="item">
+  <a [class.active]="activeTab == 'meta'" class="nav-link" routerLink="." [queryParams]="{tab: 'meta'}">
+    <span class="glyphicon glyphicon-pencil"></span>
+    <span translate>moder/vehicle/tabs/meta</span>
+    <span class="badge badge-pill badge-secondary" *ngIf="metaTab.count" [textContent]="metaTab.count"></span>
+  </a>
+  <a [class.active]="activeTab == 'name'" class="nav-link" routerLink="." [queryParams]="{tab: 'name'}">
+    <span class="glyphicon glyphicon-align-left"></span>
+    <span translate>moder/vehicle/tabs/name</span>
+    <span class="badge badge-pill badge-secondary" *ngIf="nameTab.count" [textContent]="nameTab.count"></span>
+  </a>
+  <a [class.active]="activeTab == 'logo'" class="nav-link" routerLink="." [queryParams]="{tab: 'logo'}" *ngIf="logoTab.visible">
+    <span class="glyphicon glyphicon-align-left"></span>
+    <span translate>brand/logo</span>
+    <span class="badge badge-pill badge-secondary" *ngIf="logoTab.count" [textContent]="logoTab.count"></span>
+  </a>
+  <a [class.active]="activeTab == 'catalogue'" class="nav-link" routerLink="." [queryParams]="{tab: 'catalogue'}" *ngIf="catalogueTab.visible">
+    <span translate>moder/vehicle/tabs/catalogue</span>
+    <span class="badge badge-pill badge-secondary" *ngIf="catalogueTab.count" [textContent]="catalogueTab.count"></span>
+  </a>
+  <a [class.active]="activeTab == 'vehicles'" class="nav-link" routerLink="." [queryParams]="{tab: 'vehicles'}" *ngIf="vehiclesTab.visible">
+    <span translate>moder/vehicle/tabs/vehicles</span>
+    <span class="badge badge-pill badge-secondary" *ngIf="vehiclesTab.count" [textContent]="vehiclesTab.count"></span>
+  </a>
+  <a [class.active]="activeTab == 'tree'" class="nav-link" routerLink="." [queryParams]="{tab: 'tree'}" *ngIf="treeTab.visible">
+    <span class="fa fa-tree"></span>
+    <span translate>moder/vehicle/tabs/tree</span>
+    <span class="badge badge-pill badge-secondary" *ngIf="treeTab.count" [textContent]="treeTab.count"></span>
+  </a>
+  <a [class.active]="activeTab == 'pictures'" class="nav-link" routerLink="." [queryParams]="{tab: 'pictures'}" *ngIf="picturesTab.visible">
+    <span class="glyphicon glyphicon-th"></span>
+    <span translate>moder/vehicle/tabs/pictures</span>
+    <span class="badge badge-pill badge-secondary" *ngIf="picturesTab.count" [textContent]="picturesTab.count"></span>
+  </a>
+  <a [class.active]="activeTab == 'links'" class="nav-link" routerLink="." [queryParams]="{tab: 'links'}" *ngIf="linksTab.visible">
+    <span class="glyphicon glyphicon-globe"></span>
+    <span translate>moder/brands/links</span>
+    <span class="badge badge-pill badge-secondary" *ngIf="linksTab.count" [textContent]="linksTab.count"></span>
+  </a>
+</div>
 
-
-<ngb-tabset (tabChange)="tabChange($event)" #tabset>
-  <ngb-tab id="meta">
-    <ng-template ngbTabTitle>
-      <span class="glyphicon glyphicon-pencil"></span>
-      <span translate>moder/vehicle/tabs/meta</span>
-      <span class="badge badge-pill badge-secondary" *ngIf="metaTab.count" [textContent]="metaTab.count"></span>
-    </ng-template>
-    <ng-template ngbTabContent>
-      <div class="card card-body" *ngIf="item">
-        <ngb-progressbar type="success" [striped]="true" [animated]="true" [value]="100" [hidden]="metaLoading <= 0"></ngb-progressbar>
-        <app-item-meta-form *ngIf="canEditMeta" [item]="item" (submit)="saveMeta($event)" [invalidParams]="invalidParams" [(vehicleTypeIDs)]="vehicleTypeIDs"></app-item-meta-form>
-
-        <table class="table table-condensed" *ngIf="!canEditMeta">
-          <tr>
-            <td>{{'moder/vehicle/name'|translate}}:</td>
-            <td [innerHTML]="item.name_html"></td>
-          </tr>
-          <tr>
-            <td>{{'moder/vehicle/body'|translate}}:</td>
-            <td [textContent]="item.body"></td>
-          </tr>
-          <tr>
-            <td>{{'moder/vehicle/begin'|translate}}:</td>
-            <td>
-              {{item.begin_year > 0 ? item.begin_year : '????'}} {{item.begin_month > 0 ? item.begin_month : '??'}}
-            </td>
-          </tr>
-          <tr>
-            <td valign="top">{{'moder/vehicle/end'|translate}}:</td>
-            <td>
-              {{item.end_year > 0 ? item.end_year : '????'}} {{item.end_month > 0 ? item.end_month : '??'}}
-              <span *ngIf="item.today === true" translate>moder/vehicle/today/continue</span>
-              <span *ngIf="item.today === false" translate>moder/vehicle/today/ended</span>
-            </td>
-          </tr>
-          <tr>
-            <td>{{'moder/item/produced'|translate}}:</td>
-            <td>
-              {{item.produced}}
-              <span *ngIf="item.produced_exactly" translate>moder/item/produced/exactly</span>
-              <span *ngIf="!item.produced_exactly" translate>moder/item/produced/about</span>
-            </td>
-          </tr>
-          <tr>
-            <td valign="top">{{'moder/vehicle/concept'|translate}}:</td>
-            <td>{{item.is_concept ? 'Yes' : 'No'}}</td>
-          </tr>
-        </table>
-      </div>
-    </ng-template>
-  </ngb-tab>
-
-  <ngb-tab id="name" *ngIf="item">
-    <ng-template ngbTabTitle>
-      <span class="glyphicon glyphicon-align-left"></span>
-      <span translate>moder/vehicle/tabs/name</span>
-      <span class="badge badge-pill badge-secondary" *ngIf="nameTab.count" [textContent]="nameTab.count"></span>
-    </ng-template>
-    <ng-template ngbTabContent>
-      <div class="card card-body">
-        <ngb-tabset>
-          <ngb-tab *ngFor="let language of itemLanguages">
-            <ng-template ngbTabTitle>
-              {{language.language.toUpperCase()}}
-              <span class="badge badge-pill badge-secondary" *ngIf="language.name || language.text || language.full_text">
-                {{((language.name && language.name.length) ? 1 : 0) + ((language.text && language.text.length) ? 1 : 0) + ((language.full_text
-                && language.full_text.length) ? 1 : 0)}}
-              </span>
-            </ng-template>
-            <ng-template ngbTabContent>
-              <div class="form-group row mt-4">
-                <label class="col-md-2 col-form-label" translate>moder/vehicle/name</label>
-                <div class="col-md-10">
-                  <input type="text" [(ngModel)]="language.name" name="name" maxlength="255" class="form-control" />
-                </div>
-              </div>
-              <div class="form-group row">
-                <label class="col-md-2 col-form-label" translate>moder/item/short-description</label>
-                <div class="col-md-10">
-                  <app-markdown-edit [(text)]="language.text"></app-markdown-edit>
-                  <p *ngIf="language.text_id" class="text-right">
-                    <a [routerLink]="['/info/text', language.text_id]" translate>moder/markdown/history</a>
-                  </p>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label class="col-md-2 col-form-label" translate>moder/item/full-description</label>
-                <div class="col-md-10">
-                  <app-markdown-edit [(text)]="language.full_text"></app-markdown-edit>
-                  <p *ngIf="language.full_text_id" class="text-right">
-                    <a [routerLink]="['/info/text', language.full_text_id]" translate>moder/markdown/history</a>
-                  </p>
-                </div>
-              </div>
-            </ng-template>
-          </ngb-tab>
-        </ngb-tabset>
-        <button type="submit" class="btn btn-primary" translate (click)="saveLanguages()">submit</button>
-        <span [hidden]="languagesLoading <= 0">
-          <i class="fa fa-spinner fa-spin fa-fw"></i>
-        </span>
-      </div>
-    </ng-template>
-  </ngb-tab>
-
-  <ngb-tab *ngIf="item && logoTab" id="logo">
-    <ng-template ngbTabTitle>
-      <span class="glyphicon glyphicon-align-left"></span>
-      <span translate>brand/logo</span>
-      <span class="badge badge-pill badge-secondary" *ngIf="logoTab.count" [textContent]="logoTab.count"></span>
-    </ng-template>
-    <ng-template ngbTabContent>
-      <div class="card card-body" *ngIf="item">
-        <app-markdown *ngIf="canLogo" [markdown]="'moder/brands/logo/description'|translate"></app-markdown>
-        <img [src]="item.logo.src" style="max-width:100%" *ngIf="item.logo" />
-        <div *ngIf="canLogo">
-          <form method="post" (submit)="uploadLogo()">
-            <div class="form-group">
-              <input type="file" name="logo" id="logo-upload" class="form-control" />
-            </div>
-            <button type="submit" class="btn btn-primary" translate>submit</button>
-            <span [hidden]="logoLoading <= 0">
-              <i class="fa fa-spinner fa-spin fa-fw"></i>
-            </span>
-          </form>
-        </div>
-      </div>
-    </ng-template>
-  </ngb-tab>
-
-  <ngb-tab *ngIf="item && catalogueTab" id="catalogue">
-    <ng-template ngbTabTitle>
-      <span translate>moder/vehicle/tabs/catalogue</span>
-      <span class="badge badge-pill badge-secondary" *ngIf="catalogueTab.count" [textContent]="catalogueTab.count"></span>
-    </ng-template>
-    <ng-template ngbTabContent>
-      <div class="card card-body" *ngIf="item">
-        <span [hidden]="catalogueLoading <= 0">
-          <i class="fa fa-spinner fa-spin fa-fw"></i>
-        </span>
-        <a *ngIf="item && item.is_group && canMove && item.childs_count > 0" [routerLink]="['/moder/items/item', item.id, 'organize']"
-          [queryParams]="{item_type_id: organizeTypeId}" class="btn btn-secondary" translate>moder/vehicle/catalogue/turbo-group-creator</a>
-        <table class="table">
-          <thead>
-            <tr>
-              <th translate>moder/vehicle/catalogue/title/name</th>
-              <th translate>moder/vehicle/catalogue/title/link</th>
-              <th translate>moder/vehicle/catalogue/title/public</th>
-              <th translate *ngIf="canMove">moder/vehicle/catalogue/title/remove</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr [hidden]="!canHaveParents || !canMove">
-              <td colspan="4">
-                <form class="car-add-parent" method="post">
-                  <div class="input-group" style="max-width:400px">
-                    <ng-template #itemTemplate let-model="item">
-                      <span [innerHTML]="model.name_html"></span>
-                    </ng-template>
-                    <input type="text" name="parent" [ngbTypeahead]="itemsDataSource" class="form-control item-autocomplete" placeholder="{{'moder/vehicle/catalogue/select-placeholder'|translate}}"
-                      autocomplete="off" [(ngModel)]="itemQuery" [inputFormatter]="itemFormatter" (selectItem)="itemOnSelect($event)"
-                      [resultTemplate]="itemTemplate" />
-
-                    <div class="input-group-append" style="white-space:nowrap">
-                      <a class="btn btn-secondary" [routerLink]="['/moder/items/item', item.id, 'select-parent']" translate>moder/vehicle/catalogue/select</a>
-                      <div ngbDropdown>
-                        <button type="button" ngbDropdownToggle class="btn btn-secondary"></button>
-                        <div ngbDropdownMenu>
-                          <a *ngIf="canHaveParentBrand" class="dropdown-item" [routerLink]="['/moder/items/item', item.id, 'select-parent']" [queryParams]="{tab: 'brands'}">
-                            <i class="fa fa-plus"></i>
-                            {{'moder/vehicle/catalogue/add-brand'|translate}}
-                          </a>
-                          <ng-container *ngIf="canHaveParentBrand">
-                            <a class="dropdown-item" href="#" (click)="addParent(brand.id)" *ngFor="let brand of suggestions">
-                              <i class="fa fa-plus"></i>
-                              <span translate [translateParams]="{brand: brand.name_text}">{{'ng/moder/vehicle/catalogue/add-brand-{brand}'}}</span>
-                            </a>
-                          </ng-container>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </td>
-            </tr>
-            <tr data-id="{{item.id}}" *ngFor="let item of parents">
-              <td>
-                <i class="fa fa-arrow-up"></i>
-                <a [routerLink]="['/moder/items/item', item.parent_id]" [innerHTML]="item.parent.name_html"></a>
-                <div class="text-warning" *ngIf="item.duplicate_parent">
-                  <small>
-                    {{'moder/vehicle/catalogue/possible-duplicate-parent'|translate}}
-                    <a [routerLink]="['/moder/items/item', item.duplicate_parent.id]" [innerHTML]="item.duplicate_parent.name_html"></a>
-                  </small>
-                </div>
-              </td>
-              <td>
-                <a [routerLink]="['/moder/item-parent', item.item_id, item.parent_id]">
-                  {{item.name}}
-                  <span class="fa fa-pencil"></span>
-                </a>
-              </td>
-              <td class="urls">
-                <ng-container *ngFor="let url of item.parent.public_urls">
-                  <a [href]="url" [textContent]="url"></a>
-                  <br />
-                </ng-container>
-              </td>
-              <td *ngIf="canMove">
-                <button type="submit" class="btn btn-sm btn-danger" (click)="deleteParent(item.parent_id)">
-                  <i class="fa fa-times"></i>
-                </button>
-              </td>
-            </tr>
-            <tr class="success" data-id="{{item.id}}">
-              <td colspan="2">
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <i class="fa fa-arrow-right"></i>
-                <span [innerHTML]="item.name_html"></span>
-              </td>
-              <td class="urls">
-                <!--ng-container *ngFor="let url of item.parent.publicUrls">
-                    <a [href]="url" [textContent]="url"></a>
-                    <br />
-                  </ng-container-->
-              </td>
-              <td *ngIf="canMove"></td>
-            </tr>
-            <tr data-id="{{item.id}}" *ngFor="let item of childs">
-              <td>
-                <i class="fa fa-arrow-down"></i>
-                <span *ngIf="item.type_id == 1" translate>moder/vehicle/link-type-prefix/related</span>
-                <span *ngIf="item.type_id == 3" translate>moder/vehicle/link-type-prefix/design</span>
-                <span *ngIf="item.type_id == 2" translate>moder/vehicle/link-type-prefix/sport</span>
-                <a [routerLink]="['/moder/items/item', item.item_id]" [innerHTML]="item.item.name_html"></a>
-                <div *ngIf="item.duplicate_child" class="text-warning">
-                  <small>
-                    {{'moder/vehicle/catalogue/possible-duplicate-child'|translate}}
-                    <a [routerLink]="['/moder/items/item', item.duplicate_child.id]" [innerHTML]="item.duplicate_child.name_html"></a>
-                  </small>
-                </div>
-              </td>
-              <td>
-                <a [routerLink]="['moder/item-parent', item.item_id, item.parent_id]">
-                  {{item.name}}
-                  <span class="fa fa-pencil"></span>
-                </a>
-              </td>
-              <td class="urls">
-                <ng-container *ngFor="let url of item.item.public_urls">
-                  <a [href]="url" [textContent]="url"></a>
-                  <br />
-                </ng-container>
-              </td>
-              <td *ngIf="canMove">
-                <button class="btn btn-sm btn-danger" (click)="deleteChild(item.item_id)">
-                  <i class="fa fa-times"></i>
-                </button>
-              </td>
-            </tr>
-
-            <tr *ngIf="item.is_group && canMove && item.item_type_id == 5">
-              <td colspan="2">
-                <i class="fa fa-plus"></i>
-                <a routerLink="/moder/items/new" [queryParams]="{item_type_id: 2, parent_id: item.id}" translate>moder/vehicle/catalogue/add-engine</a>
-              </td>
-              <td class="urls"></td>
-              <td></td>
-            </tr>
-            <tr *ngIf="item.is_group && canMove && item.item_type_id == 5">
-              <td colspan="2">
-                <i class="fa fa-plus"></i>
-                <a routerLink="/moder/items/new" [queryParams]="{item_type_id: 1, parent_id: item.id}" translate>moder/vehicle/catalogue/add-vehicle</a>
-              </td>
-              <td class="urls"></td>
-              <td></td>
-            </tr>
-            <tr *ngIf="item.is_group && canMove && item.item_type_id == 3">
-              <td colspan="2">
-                <i class="fa fa-plus"></i>
-                <a routerLink="/moder/items/new" [queryParams]="{item_type_id: 3, parent_id: item.id}" translate>moder/vehicle/catalogue/add-category</a>
-              </td>
-              <td class="urls"></td>
-              <td></td>
-            </tr>
-            <tr *ngIf="item.is_group && canMove && item.item_type_id == 3">
-              <td colspan="2">
-                <i class="fa fa-plus"></i>
-                <a routerLink="/moder/items/new" [queryParams]="{item_type_id: 2, parent_id: item.id}" translate>moder/vehicle/catalogue/add-engine</a>
-              </td>
-              <td class="urls"></td>
-              <td></td>
-            </tr>
-            <tr *ngIf="item.is_group && canMove && item.item_type_id == 3">
-              <td colspan="2">
-                <i class="fa fa-plus"></i>
-                <a routerLink="/moder/items/new" [queryParams]="{item_type_id: 1, parent_id: item.id}" translate>moder/vehicle/catalogue/add-vehicle</a>
-              </td>
-              <td class="urls"></td>
-              <td></td>
-            </tr>
-            <tr *ngIf="item.is_group && canMove && (![4, 6, 3].includes(item.item_type_id))">
-              <td colspan="2">
-                <i class="fa fa-plus"></i>
-                <a routerLink="/moder/items/new" [queryParams]="{item_type_id: item.item_type_id, parent_id: item.id}">
-                  {{(item.item_type_id == 2 ? 'moder/vehicle/catalogue/add-engine' : 'moder/vehicle/catalogue/add-vehicle') | translate}}
-                </a>
-              </td>
-              <td class="urls"></td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </ng-template>
-  </ngb-tab>
-
-  <ngb-tab *ngIf="item && vehiclesTab" id="vehicles">
-    <ng-template ngbTabTitle>
-      <span translate>moder/vehicle/tabs/vehicles</span>
-      <span class="badge badge-pill badge-secondary" *ngIf="vehiclesTab.count" [textContent]="vehiclesTab.count"></span>
-    </ng-template>
-    <ng-template ngbTabContent>
-      <div class="card card-body">
-        <h4 translate>moder/engines/engine/vehicles</h4>
-        <ng-container *ngFor="let item of engineVehicles">
-          <a [routerLink]="['/moder/items/item', item.id]" [queryParams]="{tab: 'meta'}" [innerHTML]="item.name_html"></a>
-          <br />
-        </ng-container>
-      </div>
-    </ng-template>
-  </ngb-tab>
-
-  <ngb-tab *ngIf="item && treeTab" id="tree">
-    <ng-template ngbTabTitle>
-      <span class="fa fa-tree"></span>
-      <span translate>moder/vehicle/tabs/tree</span>
-      <span class="badge badge-pill badge-secondary" *ngIf="treeTab.count" [textContent]="treeTab.count"></span>
-    </ng-template>
-    <ng-template ngbTabContent>
-      <div class="tree card card-body" *ngIf="tree">
-        <app-moder-items-item-tree [item]="tree"></app-moder-items-item-tree>
-      </div>
-    </ng-template>
-  </ngb-tab>
-
-  <ngb-tab *ngIf="item && picturesTab" id="pictures">
-    <ng-template ngbTabTitle>
-      <span class="glyphicon glyphicon-th"></span>
-      <span translate>moder/vehicle/tabs/pictures</span>
-      <span class="badge badge-pill badge-secondary" *ngIf="picturesTab.count" [textContent]="picturesTab.count"></span>
-    </ng-template>
-    <ng-template ngbTabContent>
-      <p class="btn-group" *ngIf="canUseTurboGroupCreator">
-        <a [routerLink]="['/moder/items/item', item.id, 'organize-pictures']" class="btn btn-secondary" translate>moder/vehicle/pictures/turbo-group-creator</a>
-      </p>
-      <div class="row" *ngFor="let chunk of picturesChunks">
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let picture of chunk">
-          <app-thumbnail [picture]="picture"></app-thumbnail>
-        </div>
-      </div>
-    </ng-template>
-  </ngb-tab>
-
-  <ngb-tab *ngIf="item && linksTab" id="links">
-    <ng-template ngbTabTitle>
-      <span class="glyphicon glyphicon-globe"></span>
-      <span translate>moder/brands/links</span>
-      <span class="badge badge-pill badge-secondary" *ngIf="linksTab.count" [textContent]="linksTab.count"></span>
-    </ng-template>
-    <ng-template ngbTabContent>
-      <div class="card card-body">
-        <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="linksLoading <= 0"></ngb-progressbar>
-        <form *ngIf="canEditMeta" method="post" (submit)="saveLinks()">
-          <table class="table table-condensed table-striped">
-            <thead>
-              <tr>
-                <th translate>moder/brands/links/text</th>
-                <th translate>moder/brands/links/address</th>
-                <th translate>moder/brands/links/type</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let link of links">
-                <td>
-                  <input type="text" name="name" [(ngModel)]="link.name" class="form-control" />
-                </td>
-                <td>
-                  <input type="text" name="url" [(ngModel)]="link.url" class="form-control" />
-                </td>
-                <td>
-                  <select name="type" [(ngModel)]="link.type_id" class="form-control">
-                    <option value="default" translate>moder/brands/links/type/interest-link</option>
-                    <option value="official" translate>moder/brands/links/type/official</option>
-                    <option value="club" translate>moder/brands/links/type/club</option>
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <input type="text" name="name" [(ngModel)]="newLink.name" class="form-control" />
-                </td>
-                <td>
-                  <input type="text" name="url" [(ngModel)]="newLink.url" class="form-control" />
-                </td>
-                <td>
-                  <select name="type" [(ngModel)]="newLink.type_id" class="form-control">
-                    <option value="default" translate>moder/brands/links/type/interest-link</option>
-                    <option value="official" translate>moder/brands/links/type/official</option>
-                    <option value="club" translate>moder/brands/links/type/club</option>
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="3">
-                  <button class="btn btn-primary" type="submit" translate>submit</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </form>
-        <table class="table table-condensed table-stripped" *ngIf="!canEditMeta">
-          <tbody>
-            <tr>
-              <th translate>moder/brands/links/text</th>
-              <th translate>moder/brands/links/address</th>
-              <th translate>moder/brands/links/type</th>
-            </tr>
-            <tr *ngFor="let link of links">
-              <td [textContent]="link.name"></td>
-              <td [textContent]="link.url"></td>
-              <td [textContent]="link.type_id"></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </ng-template>
-  </ngb-tab>
-
-</ngb-tabset>
+<app-moder-items-item-meta [item]="item" *ngIf="metaTab.visible && activeTab == 'meta' && item"></app-moder-items-item-meta>
+<app-moder-items-item-name [item]="item" *ngIf="nameTab.visible && activeTab == 'name' && item"></app-moder-items-item-name>
+<app-moder-items-item-logo [item]="item" *ngIf="logoTab.visible && activeTab == 'logo' && item"></app-moder-items-item-logo>
+<app-moder-items-item-catalogue [item]="item" *ngIf="catalogueTab.visible && activeTab == 'catalogue' && item"></app-moder-items-item-catalogue>
+<app-moder-items-item-vehicles [item]="item" *ngIf="vehiclesTab.visible && activeTab == 'vehicles' && item"></app-moder-items-item-vehicles>
+<div class="tree card card-body" *ngIf="treeTab.visible && activeTab == 'tree' && tree">
+  <app-moder-items-item-tree [item]="tree"></app-moder-items-item-tree>
+</div>
+<app-moder-items-item-pictures [item]="item" *ngIf="picturesTab.visible && activeTab == 'pictures' && item"></app-moder-items-item-pictures>
+<app-moder-items-item-links [item]="item" *ngIf="linksTab.visible && activeTab == 'links' && item"></app-moder-items-item-links>

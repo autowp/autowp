@@ -1,10 +1,10 @@
-<p>
+<p *ngIf="parent && item">
   <a [routerLink]="['/moder/items/item', parent.id]" [queryParams]="{tab: 'catalogue'}" [innerHTML]="parent.name_html"></a>
   &rarr;
   <a [routerLink]="['/moder/items/item', item.id]" [queryParams]="{tab: 'catalogue'}" [innerHTML]="item.name_html"></a>
 </p>
 
-<form method="post" class="form-horizontal" (submit)="save()">
+<form method="post" class="form-horizontal" (submit)="save()" *ngIf="itemParent">
   <fieldset>
     <div class="form-group row">
       <label class="col-md-2 col-form-label">Catname</label>
@@ -23,7 +23,7 @@
     <div class="form-group row" *ngFor="let language of languages">
       <label class="col-md-2 col-form-label">{{language.language.toUpperCase()}} Name</label>
       <div class="col-md-10">
-        <input type="text" [class.is-invalid]="language.invalidParams" name="name" maxlength="255" class="form-control" [(ngModel)]="language.name" />
+        <input type="text" [class.is-invalid]="language.invalidParams" [name]="'name' + language.language" maxlength="255" class="form-control" [(ngModel)]="language.name" />
         <p *ngFor="let message of language.invalidParams | invalidParams : 'name'" [textContent]="message" class="invalid-feedback"></p>
       </div>
     </div>

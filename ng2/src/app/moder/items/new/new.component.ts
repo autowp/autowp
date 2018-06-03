@@ -195,7 +195,7 @@ export class ModerItemsNewComponent implements OnInit, OnDestroy {
           const location = response.headers.get('Location');
 
           this.loading++;
-          this.itemService.getItemByLocation(location).subscribe(
+          this.itemService.getItemByLocation(location, {}).subscribe(
             item => {
               const promises = [];
 

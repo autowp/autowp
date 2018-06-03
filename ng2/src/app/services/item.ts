@@ -64,10 +64,11 @@ export interface APIItem {
   current_pictures_count: number;
   specifications_count: number;
   brands: APIItem[];
+  public_urls?: string[];
 }
 
 export interface GetItemServiceOptions {
-  fields: string;
+  fields?: string;
 }
 
 export interface GetItemsServiceOptions {
@@ -170,10 +171,10 @@ export class ItemService {
 
   public getItemByLocation(
     url: string,
-    options?: GetItemServiceOptions
+    options: GetItemServiceOptions
   ): Observable<APIItem> {
     return this.http.get<APIItem>(url, {
-      params: this.converItemOptions(options)
+      params: this.convertItemOptions(options)
     });
   }
 
@@ -184,10 +185,14 @@ export class ItemService {
     return this.getItemByLocation('/api/item/' + id, options);
   }
 
-  private converItemOptions(
+  private convertItemOptions(
     options: GetItemServiceOptions
   ): { [param: string]: string } {
     const params: { [param: string]: string } = {};
+
+    if (!options) {
+      options = {};
+    }
 
     if (options.fields) {
       params.fields = options.fields;

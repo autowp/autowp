@@ -1,18 +1,18 @@
 <div *ngIf="item.item.childs_count > 0">
-  <i class="fa fa-folder-o" [hidden]="item.open"></i>
-  <i class="fa fa-folder-open-o" [hidden]="!item.open"></i>
+  <i class="fa fa-folder-o" [hidden]="open"></i>
+  <i class="fa fa-folder-open-o" [hidden]="!open"></i>
   <span *ngIf="item.type_id == 1" translate>catalogue/related</span>
   <span *ngIf="item.type_id == 2" translate>catalogue/sport</span>
   <span *ngIf="item.type_id == 3" translate>catalogue/design</span>
-  <a href="#" class="toggle" (click)="item.open = !item.open; item.open && loadChilds(item)" [innerHTML]="item.item.name_html"></a>
-  <ul [hidden]="!item.open" class="list-unstyled">
-    <li [hidden]="!item.open && !item.childs && item.loading" style="margin-left:16px">
+  <a href="#" class="toggle" (click)="open = !open; open && loadChilds()" [innerHTML]="item.item.name_html"></a>
+  <ul [hidden]="!open" class="list-unstyled">
+    <li [hidden]="!loading" style="margin-left:16px">
       <span>
         <i class="fa fa-spinner fa-spin fa-fw"></i>
       </span>
     </li>
-    <li *ngFor="let child of item.item.childs" style="margin-left:16px">
-      <app-upload-select-tree-item [item]="child" [loadChilds]="loadChilds">
+    <li *ngFor="let child of childs" style="margin-left:16px">
+      <app-upload-select-tree-item [item]="child">
       </app-upload-select-tree-item>
     </li>
     <li style="margin-left:16px">

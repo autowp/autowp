@@ -40,8 +40,6 @@ import { AboutComponent } from './about/about.component';
 import { ModerCommentsComponent } from './moder/comments/comments.component';
 import { ModerItemParentComponent } from './moder/item-parent/item-parent.component';
 import { ModerItemsAlphaComponent } from './moder/items/alpha/alpha.component';
-import { ModerItemsItemOrganizeComponent } from './moder/items/item/organize/organize.component';
-import { ModerItemsItemOrganizePicturesComponent } from './moder/items/item/organize-pictures/organize-pictures.component';
 import { ModerItemsItemSelectParentComponent } from './moder/items/item/select-parent/select-parent.component';
 import { ModerItemsItemComponent } from './moder/items/item/item.component';
 import { ModerItemsComponent } from './moder/items/items.component';
@@ -191,6 +189,15 @@ import { PictureModerVoteModalComponent } from './components/picture-moder-vote/
 import { ContentLanguageService } from './services/content-language';
 import { LanguageService } from './services/language';
 import { VehicleTypesModalComponent } from './components/vehicle-types-modal/vehicle-types-modal.component';
+import { ModerItemsItemCatalogueComponent } from './moder/items/item/catalogue/catalogue.component';
+import { ModerItemsItemMetaComponent } from './moder/items/item/meta/meta.component';
+import { ModerItemsItemLinksComponent } from './moder/items/item/links/links.component';
+import { ModerItemsItemNameComponent } from './moder/items/item/name/name.component';
+import { ModerItemsItemLogoComponent } from './moder/items/item/logo/logo.component';
+import { ModerItemsItemPicturesComponent } from './moder/items/item/pictures/pictures.component';
+import { ModerItemsItemVehiclesComponent } from './moder/items/item/vehicles/vehicles.component';
+import { ModerItemsItemOrganizeComponent } from './moder/items/item/catalogue/organize/organize.component';
+import { ModerItemsItemPicturesOrganizeComponent } from './moder/items/item/pictures/organize/organize.component';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -406,7 +413,7 @@ const appRoutes: Routes = [
               },
               {
                 path: 'organize-pictures',
-                component: ModerItemsItemOrganizePicturesComponent
+                component: ModerItemsItemPicturesOrganizeComponent
               },
               {
                 path: 'select-parent',
@@ -722,7 +729,7 @@ const appRoutes: Routes = [
     ModerItemsAlphaComponent,
     ModerItemsItemComponent,
     ModerItemsItemOrganizeComponent,
-    ModerItemsItemOrganizePicturesComponent,
+    ModerItemsItemPicturesOrganizeComponent,
     ModerItemsItemSelectParentComponent,
     ModerPagesComponent,
     ModerPagesAddComponent,
@@ -769,7 +776,14 @@ const appRoutes: Routes = [
     BreadcrumbsComponent,
     CommentsVotesComponent,
     PictureModerVoteModalComponent,
-    VehicleTypesModalComponent
+    VehicleTypesModalComponent,
+    ModerItemsItemCatalogueComponent,
+    ModerItemsItemMetaComponent,
+    ModerItemsItemLinksComponent,
+    ModerItemsItemNameComponent,
+    ModerItemsItemLogoComponent,
+    ModerItemsItemPicturesComponent,
+    ModerItemsItemVehiclesComponent
   ],
   entryComponents: [
     ModalMessageComponent,

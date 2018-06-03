@@ -1,7 +1,7 @@
 <app-markdown [markdown]="'moder/vehicle/pictures/turbo-group-creator'|translate"></app-markdown>
 
-<app-item-meta-form [hidden]="loading > 0" hide-submit="true" item="newItem" submit="saveMeta()" invalid-params="invalidParams"
-  control="control"></app-item-meta-form>
+<app-item-meta-form class="mb-4" [hidden]="loading > 0" [hideSubmit]="true" [(item)]="newItem" (submit)="submit()" [(vehicleTypeIDs)]="vehicleTypeIDs"
+  [invalidParams]="invalidParams"></app-item-meta-form>
 
 <div class="form-group row" [hidden]="loading > 0">
   <label class="col-md-2 col-form-label text-right" translate>moder/vehicle/pictures/turbo-group-creator/pictures</label>

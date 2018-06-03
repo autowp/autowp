@@ -1,4 +1,4 @@
-<form method="post" class="form-horizontal" (ngSubmit)="doSubmit($event)">
+<form method="post" class="form-horizontal" (ngSubmit)="doSubmit($event)" *ngIf="item">
   <fieldset>
     <div class="form-group row">
       <label class="col-md-2 col-form-label" translate>moder/vehicle/name</label>
@@ -46,7 +46,9 @@
       <label class="col-md-2 col-form-label" translate>moder/vehicle/type</label>
       <div class="col-md-10">
         <button class="btn btn-sm btn-info" type="button" *ngFor="let type of vehicleTypes" (click)="showVehicleTypesModal()">{{type.nameTranslated}}</button>
-        <button class="btn btn-sm btn-success" type="button" (click)="showVehicleTypesModal()"><span class="fa fa-plus"></span></button>
+        <button class="btn btn-sm btn-success" type="button" (click)="showVehicleTypesModal()">
+          <span class="fa fa-plus"></span>
+        </button>
       </div>
       <script type="text/ng-template" id="vehicle-type-tag-template">
         <div>{{data.nameTranslated}} <a class="remove-button" (click)="$removeTag()">&#10006;</a></div>
@@ -144,7 +146,8 @@
       <label class="col-md-2 col-form-label" translate>moder/vehicle/concept</label>
       <div class="col-md-10">
         <select name="is_concept" [class.is-invalid]="invalidParams && invalidParams.is_concept" [(ngModel)]="item.is_concept" style="width: 20%"
-          class="form-control" ng-options="option.value as option.name|translate for option in getIsConceptOptions(parent)">
+          class="form-control">
+          <option *ngFor="let option of getIsConceptOptions(parent)" [value]="option.value">{{option.name|translate}}</option>
         </select>
         <p *ngFor="let message of invalidParams | invalidParams : 'is_concept'" [textContent]="message" class="invalid-feedback"></p>
       </div>

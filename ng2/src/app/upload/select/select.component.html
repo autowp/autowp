@@ -1,6 +1,6 @@
 <div *ngIf="!brand">
   <div style="margin-bottom:20px">
-    <input type="text" [(ngModel)]="search" (change)="loadBrands()" class="form-control" placeholder="Type to search ..." auto-focus
+    <input type="text" [(ngModel)]="search" class="form-control" placeholder="Type to search ..." auto-focus
     />
   </div>
   <span [hidden]="loading <= 0">
@@ -24,33 +24,33 @@
     <i class="fa fa-spinner fa-spin fa-fw fa-4x"></i>
   </span>
 
-  <div style="margin: 5px 0" *ngIf="vehicles.length > 0">
+  <div style="margin: 5px 0" *ngIf="brand.vehicles.length > 0">
 
-    <div *ngFor="let item of vehicles">
+    <div *ngFor="let item of brand.vehicles">
 
-      <app-upload-select-tree-item [item]="item" [loadChilds]="loadChildCatalogues">
+      <app-upload-select-tree-item [item]="item">
       </app-upload-select-tree-item>
 
     </div>
   </div>
 
-  <div *ngIf="engines.length > 0">
+  <div *ngIf="brand.engines.length > 0">
     <h5 translate>item/type/2/name-plural</h5>
     <div style="margin: 5px 0">
-      <div *ngFor="let item of engines">
-        <app-upload-select-tree-item [item]="item" [loadChilds]="loadChildCatalogues">
+      <div *ngFor="let item of brand.engines">
+        <app-upload-select-tree-item [item]="item">
         </app-upload-select-tree-item>
       </div>
     </div>
   </div>
 
-  <div *ngIf="concepts.length > 0">
+  <div *ngIf="brand.concepts.length > 0">
     <i class="fa fa-folder-o" [hidden]="conceptsOpen"></i>
     <i class="fa fa-folder-open-o" [hidden]="!conceptsOpen"></i>
     <a href="#" (click)="conceptsOpen = !conceptsOpen" translate>upload/select/concepts</a>
     <ul class="list-unstyled" [hidden]="!conceptsOpen">
-      <li *ngFor="let item of concepts" style="margin-left:16px">
-        <app-upload-select-tree-item [item]="item" [loadChilds]="loadChildCatalogues">
+      <li *ngFor="let item of brand.concepts" style="margin-left:16px">
+        <app-upload-select-tree-item [item]="item">
         </app-upload-select-tree-item>
       </li>
     </ul>

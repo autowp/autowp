@@ -54,16 +54,34 @@ export class LogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.querySub = this.route.queryParams.subscribe(params => {
+
+      const qParams: { [param: string]: string } = {};
+
+      if (params.article_id) {
+        qParams.article_id = params.article_id;
+      }
+
+      if (params.item_id) {
+        qParams.item_id = params.item_id;
+      }
+
+      if (params.picture_id) {
+        qParams.picture_id = params.picture_id;
+      }
+
+      if (params.page) {
+        qParams.page = params.page;
+      }
+
+      if (params.user_id) {
+        qParams.user_id = params.user_id;
+      }
+
+      qParams.fields = 'pictures.name_html,items.name_html,user';
+
       this.http
         .get<APILogGetResponse>('/api/log', {
-          params: {
-            article_id: params.article_id,
-            item_id: params.item_id,
-            picture_id: params.picture_id,
-            page: params.page,
-            user_id: params.user_id,
-            fields: 'pictures.name_html,items.name_html,user'
-          }
+          params: qParams
         })
         .subscribe(
           response => {

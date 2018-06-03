@@ -1,0 +1,43 @@
+<div class="card card-body">
+  <ngb-tabset>
+    <ngb-tab *ngFor="let language of itemLanguages">
+      <ng-template ngbTabTitle>
+        {{language.language.toUpperCase()}}
+        <span class="badge badge-pill badge-secondary" *ngIf="language.name || language.text || language.full_text">
+          {{((language.name && language.name.length) ? 1 : 0) + ((language.text && language.text.length) ? 1 : 0) + ((language.full_text
+          && language.full_text.length) ? 1 : 0)}}
+        </span>
+      </ng-template>
+      <ng-template ngbTabContent>
+        <div class="form-group row mt-4">
+          <label class="col-md-2 col-form-label" translate>moder/vehicle/name</label>
+          <div class="col-md-10">
+            <input type="text" [(ngModel)]="language.name" name="name" maxlength="255" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-2 col-form-label" translate>moder/item/short-description</label>
+          <div class="col-md-10">
+            <app-markdown-edit [(text)]="language.text"></app-markdown-edit>
+            <p *ngIf="language.text_id" class="text-right">
+              <a [routerLink]="['/info/text', language.text_id]" translate>moder/markdown/history</a>
+            </p>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-2 col-form-label" translate>moder/item/full-description</label>
+          <div class="col-md-10">
+            <app-markdown-edit [(text)]="language.full_text"></app-markdown-edit>
+            <p *ngIf="language.full_text_id" class="text-right">
+              <a [routerLink]="['/info/text', language.full_text_id]" translate>moder/markdown/history</a>
+            </p>
+          </div>
+        </div>
+      </ng-template>
+    </ngb-tab>
+  </ngb-tabset>
+  <button type="submit" class="btn btn-primary" translate (click)="saveLanguages()">submit</button>
+  <span [hidden]="loading <= 0">
+    <i class="fa fa-spinner fa-spin fa-fw"></i>
+  </span>
+</div>

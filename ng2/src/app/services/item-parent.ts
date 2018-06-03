@@ -15,6 +15,10 @@ export interface APIItemParent {
   type_id: number;
   item: APIItem;
   expanded?: boolean; // TODO: remove
+  duplicate_parent?: APIItem;
+  duplicate_child?: APIItem;
+  parent?: APIItem;
+  name?: string;
 }
 
 export interface APIItemParentGetItemsOptions {

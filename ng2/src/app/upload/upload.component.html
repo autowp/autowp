@@ -1,4 +1,4 @@
-<div class="alert alert-warning" *ngIf="!user">
+<div class="alert alert-warning" *ngIf="!auth.user">
   <app-markdown [markdown]="'upload/only-registered'|translate"></app-markdown>
 </div>
 

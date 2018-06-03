@@ -1,0 +1,190 @@
+<div class="card card-body" *ngIf="item">
+  <div class="mb-3">
+    <span [hidden]="loading <= 0">
+      <i class="fa fa-spinner fa-spin fa-fw"></i>
+    </span>
+    <a *ngIf="item && item.is_group && canMove && item.childs_count > 0" [routerLink]="['/moder/items/item', item.id, 'organize']"
+      [queryParams]="{item_type_id: organizeTypeId}" class="btn btn-secondary" translate>moder/vehicle/catalogue/turbo-group-creator</a>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th translate>moder/vehicle/catalogue/title/name</th>
+        <th translate>moder/vehicle/catalogue/title/link</th>
+        <th translate>moder/vehicle/catalogue/title/public</th>
+        <th translate *ngIf="canMove">moder/vehicle/catalogue/title/remove</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr [hidden]="!canHaveParents || !canMove">
+        <td colspan="4">
+          <form class="car-add-parent" method="post">
+            <div class="input-group" style="max-width:400px">
+              <ng-template #itemTemplate let-model="result">
+                <span [innerHTML]="model.name_html"></span>
+              </ng-template>
+              <input type="text" name="parent" [ngbTypeahead]="itemsDataSource" class="form-control item-autocomplete" placeholder="{{'moder/vehicle/catalogue/select-placeholder'|translate}}"
+                autocomplete="off" [(ngModel)]="itemQuery" [inputFormatter]="itemFormatter" (selectItem)="itemOnSelect($event)"
+                [resultTemplate]="itemTemplate" />
+
+              <div class="input-group-append" style="white-space:nowrap">
+                <a class="btn btn-secondary" [routerLink]="['/moder/items/item', item.id, 'select-parent']" translate>moder/vehicle/catalogue/select</a>
+                <div ngbDropdown>
+                  <button type="button" ngbDropdownToggle class="btn btn-secondary"></button>
+                  <div ngbDropdownMenu>
+                    <a *ngIf="canHaveParentBrand" class="dropdown-item" [routerLink]="['/moder/items/item', item.id, 'select-parent']" [queryParams]="{tab: 'brands'}">
+                      <i class="fa fa-plus"></i>
+                      {{'moder/vehicle/catalogue/add-brand'|translate}}
+                    </a>
+                    <ng-container *ngIf="canHaveParentBrand">
+                      <a class="dropdown-item" href="#" (click)="addParent(brand.id)" *ngFor="let brand of suggestions">
+                        <i class="fa fa-plus"></i>
+                        <span translate [translateParams]="{brand: brand.name_text}">{{'ng/moder/vehicle/catalogue/add-brand-{brand}'}}</span>
+                      </a>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </td>
+      </tr>
+      <tr [hidden]="parentsLoading <= 0">
+        <td colspan="4">
+          <i class="fa fa-spinner fa-spin fa-fw"></i>
+        </td>
+      </tr>
+      <tr *ngFor="let item of parents">
+        <td>
+          <i class="fa fa-arrow-up"></i>
+          <a [routerLink]="['/moder/items/item', item.parent_id]" [queryParams]="{tab: 'catalogue'}" [innerHTML]="item.parent.name_html"></a>
+          <div class="text-warning" *ngIf="item.duplicate_parent">
+            <small>
+              {{'moder/vehicle/catalogue/possible-duplicate-parent'|translate}}
+              <a [routerLink]="['/moder/items/item', item.duplicate_parent.id]" [innerHTML]="item.duplicate_parent.name_html"></a>
+            </small>
+          </div>
+        </td>
+        <td>
+          <a [routerLink]="['/moder/item-parent', item.item_id, item.parent_id]">
+            {{item.name}}
+            <span class="fa fa-pencil"></span>
+          </a>
+        </td>
+        <td class="urls">
+          <ng-container *ngFor="let url of item.parent.public_urls">
+            <a [href]="url" [textContent]="url"></a>
+            <br />
+          </ng-container>
+        </td>
+        <td *ngIf="canMove">
+          <button type="submit" class="btn btn-sm btn-danger" (click)="deleteParent(item.parent_id)">
+            <i class="fa fa-times"></i>
+          </button>
+        </td>
+      </tr>
+      <tr class="success" data-id="{{item.id}}">
+        <td colspan="2">
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <i class="fa fa-arrow-right"></i>
+          <span [innerHTML]="item.name_html"></span>
+        </td>
+        <td class="urls">
+          <!--ng-container *ngFor="let url of item.parent.publicUrls">
+                <a [href]="url" [textContent]="url"></a>
+                <br />
+              </ng-container-->
+        </td>
+        <td *ngIf="canMove"></td>
+      </tr>
+      <tr [hidden]="childsLoading <= 0">
+        <td colspan="4">
+          <i class="fa fa-spinner fa-spin fa-fw"></i>
+        </td>
+      </tr>
+      <tr *ngFor="let item of childs">
+        <td>
+          <i class="fa fa-arrow-down"></i>
+          <span *ngIf="item.type_id == 1" translate>moder/vehicle/link-type-prefix/related</span>
+          <span *ngIf="item.type_id == 3" translate>moder/vehicle/link-type-prefix/design</span>
+          <span *ngIf="item.type_id == 2" translate>moder/vehicle/link-type-prefix/sport</span>
+          <a [routerLink]="['/moder/items/item', item.item_id]" [queryParams]="{tab: 'catalogue'}" [innerHTML]="item.item.name_html"></a>
+          <div *ngIf="item.duplicate_child" class="text-warning">
+            <small>
+              {{'moder/vehicle/catalogue/possible-duplicate-child'|translate}}
+              <a [routerLink]="['/moder/items/item', item.duplicate_child.id]" [innerHTML]="item.duplicate_child.name_html"></a>
+            </small>
+          </div>
+        </td>
+        <td>
+          <a [routerLink]="['moder/item-parent', item.item_id, item.parent_id]">
+            {{item.name}}
+            <span class="fa fa-pencil"></span>
+          </a>
+        </td>
+        <td class="urls">
+          <ng-container *ngFor="let url of item.item.public_urls">
+            <a [href]="url" [textContent]="url"></a>
+            <br />
+          </ng-container>
+        </td>
+        <td *ngIf="canMove">
+          <button class="btn btn-sm btn-danger" (click)="deleteChild(item.item_id)">
+            <i class="fa fa-times"></i>
+          </button>
+        </td>
+      </tr>
+
+      <tr *ngIf="item.is_group && canMove && item.item_type_id == 5">
+        <td colspan="2">
+          <i class="fa fa-plus"></i>
+          <a routerLink="/moder/items/new" [queryParams]="{item_type_id: 2, parent_id: item.id}" translate>moder/vehicle/catalogue/add-engine</a>
+        </td>
+        <td class="urls"></td>
+        <td></td>
+      </tr>
+      <tr *ngIf="item.is_group && canMove && item.item_type_id == 5">
+        <td colspan="2">
+          <i class="fa fa-plus"></i>
+          <a routerLink="/moder/items/new" [queryParams]="{item_type_id: 1, parent_id: item.id}" translate>moder/vehicle/catalogue/add-vehicle</a>
+        </td>
+        <td class="urls"></td>
+        <td></td>
+      </tr>
+      <tr *ngIf="item.is_group && canMove && item.item_type_id == 3">
+        <td colspan="2">
+          <i class="fa fa-plus"></i>
+          <a routerLink="/moder/items/new" [queryParams]="{item_type_id: 3, parent_id: item.id}" translate>moder/vehicle/catalogue/add-category</a>
+        </td>
+        <td class="urls"></td>
+        <td></td>
+      </tr>
+      <tr *ngIf="item.is_group && canMove && item.item_type_id == 3">
+        <td colspan="2">
+          <i class="fa fa-plus"></i>
+          <a routerLink="/moder/items/new" [queryParams]="{item_type_id: 2, parent_id: item.id}" translate>moder/vehicle/catalogue/add-engine</a>
+        </td>
+        <td class="urls"></td>
+        <td></td>
+      </tr>
+      <tr *ngIf="item.is_group && canMove && item.item_type_id == 3">
+        <td colspan="2">
+          <i class="fa fa-plus"></i>
+          <a routerLink="/moder/items/new" [queryParams]="{item_type_id: 1, parent_id: item.id}" translate>moder/vehicle/catalogue/add-vehicle</a>
+        </td>
+        <td class="urls"></td>
+        <td></td>
+      </tr>
+      <tr *ngIf="item.is_group && canMove && (![4, 6, 3].includes(item.item_type_id))">
+        <td colspan="2">
+          <i class="fa fa-plus"></i>
+          <a routerLink="/moder/items/new" [queryParams]="{item_type_id: item.item_type_id, parent_id: item.id}">
+            {{(item.item_type_id == 2 ? 'moder/vehicle/catalogue/add-engine' : 'moder/vehicle/catalogue/add-vehicle') | translate}}
+          </a>
+        </td>
+        <td class="urls"></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -96,7 +96,8 @@ export class ModerItemParentComponent implements OnInit, OnDestroy {
 
       Promise.all(promises).then(
         (responses: any[]) => {
-          this.itemParent = responses[0].data;
+
+          this.itemParent = responses[0];
           this.item = responses[1];
           this.parent = responses[2];
 
@@ -107,13 +108,15 @@ export class ModerItemParentComponent implements OnInit, OnDestroy {
             });
           }
 
-          for (const languageData of responses[4].data.items) {
+          for (const languageData of responses[4].items) {
             for (const item of this.languages) {
               if (item.language === languageData.language) {
                 item.name = languageData.name;
               }
             }
           }
+
+          console.log(this.languages);
 
           this.translate
             .get('item/type/' + this.item.item_type_id + '/name')

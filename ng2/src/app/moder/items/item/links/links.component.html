@@ -1,0 +1,65 @@
+<div class="card card-body">
+  <ngb-progressbar type="primary" [striped]="true" [animated]="true" [value]="100" [hidden]="loading <= 0"></ngb-progressbar>
+  <form *ngIf="canEditMeta" method="post" (submit)="saveLinks()">
+    <table class="table table-condensed table-striped">
+      <thead>
+        <tr>
+          <th translate>moder/brands/links/text</th>
+          <th translate>moder/brands/links/address</th>
+          <th translate>moder/brands/links/type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let link of links">
+          <td>
+            <input type="text" name="name" [(ngModel)]="link.name" class="form-control" />
+          </td>
+          <td>
+            <input type="text" name="url" [(ngModel)]="link.url" class="form-control" />
+          </td>
+          <td>
+            <select name="type" [(ngModel)]="link.type_id" class="form-control">
+              <option value="default" translate>moder/brands/links/type/interest-link</option>
+              <option value="official" translate>moder/brands/links/type/official</option>
+              <option value="club" translate>moder/brands/links/type/club</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="text" name="name" [(ngModel)]="newLink.name" class="form-control" />
+          </td>
+          <td>
+            <input type="text" name="url" [(ngModel)]="newLink.url" class="form-control" />
+          </td>
+          <td>
+            <select name="type" [(ngModel)]="newLink.type_id" class="form-control">
+              <option value="default" translate>moder/brands/links/type/interest-link</option>
+              <option value="official" translate>moder/brands/links/type/official</option>
+              <option value="club" translate>moder/brands/links/type/club</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3">
+            <button class="btn btn-primary" type="submit" translate>submit</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+  <table class="table table-condensed table-stripped" *ngIf="!canEditMeta">
+    <tbody>
+      <tr>
+        <th translate>moder/brands/links/text</th>
+        <th translate>moder/brands/links/address</th>
+        <th translate>moder/brands/links/type</th>
+      </tr>
+      <tr *ngFor="let link of links">
+        <td [textContent]="link.name"></td>
+        <td [textContent]="link.url"></td>
+        <td [textContent]="link.type_id"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

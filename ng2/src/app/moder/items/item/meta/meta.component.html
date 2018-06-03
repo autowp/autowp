@@ -1,0 +1,41 @@
+<div class="card card-body" *ngIf="item">
+  <ngb-progressbar type="success" [striped]="true" [animated]="true" [value]="100" [hidden]="loading <= 0"></ngb-progressbar>
+  <app-item-meta-form *ngIf="canEditMeta" [item]="item" (submit)="saveMeta($event)" [invalidParams]="invalidParams" [(vehicleTypeIDs)]="vehicleTypeIDs"></app-item-meta-form>
+
+  <table class="table table-condensed" *ngIf="!canEditMeta">
+    <tr>
+      <td>{{'moder/vehicle/name'|translate}}:</td>
+      <td [innerHTML]="item.name_html"></td>
+    </tr>
+    <tr>
+      <td>{{'moder/vehicle/body'|translate}}:</td>
+      <td [textContent]="item.body"></td>
+    </tr>
+    <tr>
+      <td>{{'moder/vehicle/begin'|translate}}:</td>
+      <td>
+        {{item.begin_year > 0 ? item.begin_year : '????'}} {{item.begin_month > 0 ? item.begin_month : '??'}}
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">{{'moder/vehicle/end'|translate}}:</td>
+      <td>
+        {{item.end_year > 0 ? item.end_year : '????'}} {{item.end_month > 0 ? item.end_month : '??'}}
+        <span *ngIf="item.today === true" translate>moder/vehicle/today/continue</span>
+        <span *ngIf="item.today === false" translate>moder/vehicle/today/ended</span>
+      </td>
+    </tr>
+    <tr>
+      <td>{{'moder/item/produced'|translate}}:</td>
+      <td>
+        {{item.produced}}
+        <span *ngIf="item.produced_exactly" translate>moder/item/produced/exactly</span>
+        <span *ngIf="!item.produced_exactly" translate>moder/item/produced/about</span>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">{{'moder/vehicle/concept'|translate}}:</td>
+      <td>{{item.is_concept ? 'Yes' : 'No'}}</td>
+    </tr>
+  </table>
+</div>

@@ -1,15 +1,17 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { ItemService, APIItem } from '../../../../services/item';
-import { ACLService } from '../../../../services/acl.service';
+
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
-  ItemParentService,
-  APIItemParent
-} from '../../../../services/item-parent';
-import { PageEnvService } from '../../../../services/page-env.service';
+  APIItemParent,
+  ItemParentService
+} from '../../../../../services/item-parent';
+import { APIItem, ItemService } from '../../../../../services/item';
+import { ACLService } from '../../../../../services/acl.service';
+import { PageEnvService } from '../../../../../services/page-env.service';
+import { APIItemVehicleTypeGetResponse } from '../../../../../services/api.service';
 
 // Acl.isAllowed('car', 'move', 'unauthorized');
 
@@ -32,6 +34,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit, OnDestroy {
   public loading = 0;
   public childs: APIItemParentInOrganize[];
   public invalidParams: any;
+  public vehicleTypeIDs: number[] = [];
 
   constructor(
     private http: HttpClient,
@@ -72,7 +75,7 @@ export class ModerItemsItemOrganizeComponent implements OnInit, OnDestroy {
           ].join(',')
         })
         .subscribe(
-          (item: APIItem) => {
+          item => {
             this.item = item;
             this.newItem = Object.assign({}, this.item);
             this.translate
@@ -91,6 +94,31 @@ export class ModerItemsItemOrganizeComponent implements OnInit, OnDestroy {
                   }
                 });
               });
+
+            if (this.item.item_type_id === 1 || this.item.item_type_id === 4) {
+              this.loading++;
+              this.http
+                .get<APIItemVehicleTypeGetResponse>('/api/item-vehicle-type', {
+                  params: {
+                    item_id: this.item.id.toString()
+                  }
+                })
+                .subscribe(
+                  response => {
+                    const ids: number[] = [];
+                    for (const row of response.items) {
+                      ids.push(row.vehicle_type_id);
+                    }
+
+                    this.vehicleTypeIDs = ids;
+
+                    this.loading--;
+                  },
+                  () => {
+                    this.loading--;
+                  }
+                );
+            }
           },
           () => {
             this.router.navigate(['/error-404']);
@@ -167,15 +195,11 @@ export class ModerItemsItemOrganizeComponent implements OnInit, OnDestroy {
           const location = response.headers.get('Location');
 
           this.loading++;
-          this.itemService.getItemByLocation(location).subscribe(item => {
+          this.itemService.getItemByLocation(location, {}).subscribe(item => {
             const promises: Promise<any>[] = [];
 
-            const vehicleTypeIds: number[] = [];
-            for (const vehicle_type of this.newItem.vehicle_type) {
-              vehicleTypeIds.push(vehicle_type.id);
-            }
             promises.push(
-              this.itemService.setItemVehicleTypes(item.id, vehicleTypeIds)
+              this.itemService.setItemVehicleTypes(item.id, this.vehicleTypeIDs)
             );
 
             promises.push(

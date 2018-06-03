@@ -1,0 +1,7 @@
+<div class="card card-body">
+  <h4 translate>moder/engines/engine/vehicles</h4>
+  <ng-container *ngFor="let item of engineVehicles">
+    <a [routerLink]="['/moder/items/item', item.id]" [queryParams]="{tab: 'meta'}" [innerHTML]="item.name_html"></a>
+    <br />
+  </ng-container>
+</div>

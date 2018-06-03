@@ -1,46 +1,38 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../services/api.service';
-import { ItemService, APIItem } from '../../services/item';
+import { ItemService, APIItem, APIItemsGetResponse } from '../../services/item';
 import { chunk } from '../../chunk';
 import Notify from '../../notify';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable, empty, forkJoin, of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ItemParentService, APIItemParent } from '../../services/item-parent';
 import { PageEnvService } from '../../services/page-env.service';
-
-export interface APIItemInUploadSelect extends APIItem {
-  childs?: APIItemParentInUploadSelect[];
-}
-
-export interface APIItemParentInUploadSelect extends APIItemParent {
-  loading?: boolean;
-  item: APIItemInUploadSelect;
-}
-
-export type UploadSelectLoadChildFunc = (
-  parent: APIItemParentInUploadSelect
-) => void;
+import {
+  distinctUntilChanged,
+  switchMap,
+  map,
+  catchError,
+  tap
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-upload-select',
   templateUrl: './select.component.html'
 })
 @Injectable()
-export class UploadSelectComponent implements OnInit, OnDestroy {
-  private querySub: Subscription;
-  private loadBrandsCanceler: Subscription;
-  public brand: APIItem;
+export class UploadSelectComponent implements OnInit {
+  public brand: {
+    item: APIItem;
+    vehicles: APIItem[];
+    engines: APIItem[];
+    concepts: APIItem[];
+  };
   public brands: APIItem[][];
   public paginator: APIPaginator;
-  public vehicles: APIItemParent[] = [];
-  public engines: APIItemParent[] = [];
-  public loadChildCatalogues: UploadSelectLoadChildFunc;
   public search: string;
   public loading = 0;
-  public concepts: APIItemParent[] = [];
   public conceptsOpen = false;
-  private page: number;
 
   constructor(
     private http: HttpClient,
@@ -63,151 +55,141 @@ export class UploadSelectComponent implements OnInit, OnDestroy {
         }),
       0
     );
-    this.loadChildCatalogues = (parent: APIItemParentInUploadSelect) => {
-      parent.loading = true;
-      this.itemParentService
-        .getItems({
-          limit: 500,
-          fields: 'item.name_html,item.childs_count',
-          parent_id: parent.item_id,
-          order: 'type_auto'
-        })
-        .subscribe(
-          response => {
-            parent.item.childs = response.items;
-            parent.loading = false;
-          },
-          response => {
-            Notify.response(response);
-            parent.loading = false;
-          }
-        );
-    };
-    this.querySub = this.route.queryParams.subscribe(params => {
-      const brandId = parseInt(params.brand_id, 10);
-      this.page = params.page;
-      if (brandId) {
-        this.loading++;
-        this.itemService.getItem(brandId).subscribe(
-          (item: APIItem) => {
-            this.brand = item;
 
-            this.loading++;
-            this.itemParentService
-              .getItems({
-                limit: 500,
-                fields: 'item.name_html,item.childs_count',
-                parent_id: this.brand.id,
-                exclude_concept: true,
-                order: 'name',
-                item_type_id: 1
-              })
-              .subscribe(
-                response => {
-                  this.vehicles = response.items;
-                  this.loading--;
-                },
-                response => {
-                  Notify.response(response);
-                  this.loading--;
-                }
-              );
+    this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        tap(() => {
+          this.loading++;
+          this.brand = null;
+        }),
+        switchMap((params, index) => {
+          const brandId = parseInt(params.brand_id, 10);
+          const page = parseInt(params.page, 10);
 
-            this.loading++;
-            this.itemParentService
-              .getItems({
-                limit: 500,
-                fields: 'item.name_html,item.childs_count',
-                parent_id: this.brand.id,
-                exclude_concept: true,
-                order: 'name',
-                item_type_id: 2
-              })
-              .subscribe(
-                response => {
-                  this.engines = response.items;
-                  this.loading--;
-                },
-                response => {
-                  Notify.response(response);
-                  this.loading--;
-                }
-              );
-
-            this.loading++;
-            this.itemParentService
-              .getItems({
-                limit: 500,
-                fields: 'item.name_html,item.childs_count',
-                parent_id: this.brand.id,
-                concept: true,
-                order: 'name'
-              })
-              .subscribe(
-                response => {
-                  this.concepts = response.items;
-                  this.loading--;
-                },
-                response => {
-                  Notify.response(response);
-                  this.loading--;
-                }
-              );
-
-            this.loading--;
-          },
-          response => {
-            this.router.navigate(['/error-404']);
-            this.loading--;
-          }
-        );
-      } else {
-        this.loadBrands();
-      }
-    });
+          return forkJoin(
+            brandId ? this.brandObservable(brandId) : of(null),
+            brandId ? of(null) : this.brandsObservable(page)
+          ).pipe(
+            map(data => {
+              return {
+                brand: data[0],
+                brands: data[1]
+              };
+            })
+          );
+        }),
+        tap(() => this.loading--)
+      )
+      .subscribe(data => {
+        console.log('total', data);
+        if (data.brands) {
+          this.brands = chunk(data.brands.items, 6);
+          this.paginator = data.brands.paginator;
+        }
+        if (data.brand) {
+          this.brand = data.brand;
+        }
+      });
   }
 
-  ngOnDestroy(): void {
-    this.querySub.unsubscribe();
-  }
-
-  private loadBrands() {
-    this.loading++;
-
-    if (this.loadBrandsCanceler) {
-      this.loadBrandsCanceler.unsubscribe();
-      this.loadBrandsCanceler = null;
-    }
-
-    this.loadBrandsCanceler = this.itemService
+  private brandsObservable(page: number): Observable<APIItemsGetResponse> {
+    return this.itemService
       .getItems({
         type_id: 5,
         order: 'name',
         limit: 500,
         fields: 'name_only',
         name: this.search ? '%' + this.search + '%' : null,
-        page: this.page
+        page: page
       })
-      .subscribe(
-        result => {
-          this.brands = chunk(result.items, 6);
-          this.paginator = result.paginator;
-          this.loading--;
-        },
-        response => {
-          if (response.status !== -1) {
-            Notify.response(response);
+      .pipe(
+        catchError((err, caught) => {
+          if (err.status !== -1) {
+            Notify.response(err);
           }
-          this.loading--;
-        }
+          return empty();
+        })
       );
   }
 
-  /*public toggle(item: any) {
-    if (!item.expanded) {
-      item.expanded = true;
-    } else {
-      item.expanded = false;
-    }
-  }*/
+  private brandObservable(
+    brandId: number
+  ): Observable<{
+    item: APIItem;
+    vehicles: APIItemParent[];
+    engines: APIItemParent[];
+    concepts: APIItemParent[];
+  }> {
+    return this.itemService.getItem(brandId).pipe(
+      catchError((err, caught) => {
+        this.router.navigate(['/error-404']);
+        return empty();
+      }),
+      switchMap((item, sindex) => {
+        return this.brandItemsObservable(item);
+      })
+    );
+  }
+
+  private brandItemsObservable(item: APIItem) {
+    return forkJoin(
+      this.itemParentService
+        .getItems({
+          limit: 500,
+          fields: 'item.name_html,item.childs_count',
+          parent_id: item.id,
+          exclude_concept: true,
+          order: 'name',
+          item_type_id: 1
+        })
+        .pipe(
+          map(response => response.items),
+          catchError((err, caught) => {
+            Notify.response(err);
+            return empty();
+          })
+        ),
+      this.itemParentService
+        .getItems({
+          limit: 500,
+          fields: 'item.name_html,item.childs_count',
+          parent_id: item.id,
+          exclude_concept: true,
+          order: 'name',
+          item_type_id: 2
+        })
+        .pipe(
+          map(response => response.items),
+          catchError((err, caught) => {
+            Notify.response(err);
+            return empty();
+          })
+        ),
+      this.itemParentService
+        .getItems({
+          limit: 500,
+          fields: 'item.name_html,item.childs_count',
+          parent_id: item.id,
+          concept: true,
+          order: 'name'
+        })
+        .pipe(
+          map(response => response.items),
+          catchError((err, caught) => {
+            Notify.response(err);
+            return empty();
+          })
+        )
+    ).pipe(
+      map(data => {
+        return {
+          item: item,
+          vehicles: data[0],
+          engines: data[1],
+          concepts: data[2]
+        };
+      })
+    );
+  }
 }

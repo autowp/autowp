@@ -1,0 +1,15 @@
+<div class="card card-body" *ngIf="item">
+  <app-markdown *ngIf="canLogo" [markdown]="'moder/brands/logo/description'|translate"></app-markdown>
+  <img [src]="item.logo.src" style="max-width:100%" *ngIf="item.logo" />
+  <div *ngIf="canLogo">
+    <form method="post" (submit)="uploadLogo()">
+      <div class="form-group">
+        <input type="file" name="logo" id="logo-upload" class="form-control" />
+      </div>
+      <button type="submit" class="btn btn-primary" translate>submit</button>
+      <span [hidden]="loading <= 0">
+        <i class="fa fa-spinner fa-spin fa-fw"></i>
+      </span>
+    </form>
+  </div>
+</div>

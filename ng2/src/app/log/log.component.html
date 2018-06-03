@@ -12,7 +12,7 @@
       </div>
       <div *ngFor="let picture of event.pictures">
         Picture:
-        <a ui-sref="moder-pictures-item({id: picture.id})" [innerHTML]="picture.name_html"></a>
+        <a [routerLink]="['/moder/pictures', picture.id]" [innerHTML]="picture.name_html"></a>
       </div>
     </td>
   </tr>

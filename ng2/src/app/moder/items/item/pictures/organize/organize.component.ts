@@ -1,16 +1,16 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { ItemService, APIItem } from '../../../../services/item';
-import Notify from '../../../../notify';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
-  PictureItemService,
-  APIPictureItem
-} from '../../../../services/picture-item';
-import { APIPicture } from '../../../../services/picture';
-import { PageEnvService } from '../../../../services/page-env.service';
+  APIPictureItem,
+  PictureItemService
+} from '../../../../../services/picture-item';
+import { APIItem, ItemService } from '../../../../../services/item';
+import { PageEnvService } from '../../../../../services/page-env.service';
+import Notify from '../../../../../notify';
+import { APIItemVehicleTypeGetResponse } from '../../../../../services/api.service';
 
 // Acl.isAllowed('car', 'move', 'unauthorized');
 
@@ -19,12 +19,12 @@ interface APIPictureItemInOrganizePictures extends APIPictureItem {
 }
 
 @Component({
-  selector: 'app-moder-items-item-organize-pictures',
-  templateUrl: './organize-pictures.component.html',
+  selector: 'app-moder-items-item-pictures-organize',
+  templateUrl: './organize.component.html',
   styleUrls: ['./styles.scss']
 })
 @Injectable()
-export class ModerItemsItemOrganizePicturesComponent
+export class ModerItemsItemPicturesOrganizeComponent
   implements OnInit, OnDestroy {
   private routeSub: Subscription;
   public item: APIItem;
@@ -33,6 +33,7 @@ export class ModerItemsItemOrganizePicturesComponent
   public loading = 0;
   public pictures: APIPictureItemInOrganizePictures[];
   public invalidParams: any;
+  public vehicleTypeIDs: number[] = [];
 
   constructor(
     private http: HttpClient,
@@ -72,7 +73,7 @@ export class ModerItemsItemOrganizePicturesComponent
           ].join(',')
         })
         .subscribe(
-          (item: APIItem) => {
+          item => {
             this.item = item;
             this.newItem = Object.assign({}, this.item);
             this.newItem.is_group = false;
@@ -92,6 +93,31 @@ export class ModerItemsItemOrganizePicturesComponent
                   }
                 });
               });
+
+            if (this.item.item_type_id === 1 || this.item.item_type_id === 4) {
+              this.loading++;
+              this.http
+                .get<APIItemVehicleTypeGetResponse>('/api/item-vehicle-type', {
+                  params: {
+                    item_id: this.item.id.toString()
+                  }
+                })
+                .subscribe(
+                  response => {
+                    const ids: number[] = [];
+                    for (const row of response.items) {
+                      ids.push(row.vehicle_type_id);
+                    }
+
+                    this.vehicleTypeIDs = ids;
+
+                    this.loading--;
+                  },
+                  () => {
+                    this.loading--;
+                  }
+                );
+            }
           },
           () => {
             this.router.navigate(['/error-404']);
@@ -180,16 +206,15 @@ export class ModerItemsItemOrganizePicturesComponent
         const location = responses[0].headers('Location');
 
         this.loading++;
-        this.itemService.getItemByLocation(location).subscribe(
+        this.itemService.getItemByLocation(location, {}).subscribe(
           (response: APIItem) => {
             const subpromises: Promise<any>[] = [];
 
-            const vehicleTypeIds: number[] = [];
-            for (const vehicle_type of this.newItem.vehicle_type) {
-              vehicleTypeIds.push(vehicle_type.id);
-            }
             subpromises.push(
-              this.itemService.setItemVehicleTypes(response.id, vehicleTypeIds)
+              this.itemService.setItemVehicleTypes(
+                response.id,
+                this.vehicleTypeIDs
+              )
             );
 
             subpromises.push(
