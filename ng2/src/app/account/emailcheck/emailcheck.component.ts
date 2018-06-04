@@ -35,7 +35,7 @@ export class AccountEmailcheckComponent implements OnInit, OnDestroy {
     this.routeSub = this.route.params.subscribe(params => {
       this.http
         .post('/api/user/emailcheck', {
-          code: params.code
+          code: params.token
         })
         .subscribe(() => (this.success = true), () => (this.failure = true));
     });

@@ -52,9 +52,7 @@ export class SignupComponent {
 
   public submit() {
     this.http
-      .post<void>('/api/user', {
-        data: this.form
-      })
+      .post<void>('/api/user', this.form)
       .subscribe(
         () => {
           this.router.navigate(['/signup/ok']);

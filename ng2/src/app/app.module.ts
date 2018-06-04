@@ -240,7 +240,10 @@ const appRoutes: Routes = [
         component: AccountEmailComponent,
         canActivate: [AuthGuard]
       },
-      { path: 'emailcheck', component: AccountEmailcheckComponent },
+      {
+        path: 'emailcheck/:token',
+        component: AccountEmailcheckComponent
+      },
       {
         path: 'inbox-pictures',
         component: AccountInboxPicturesComponent,

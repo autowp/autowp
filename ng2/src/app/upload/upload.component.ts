@@ -94,7 +94,7 @@ export class UploadComponent implements OnInit, OnDestroy {
             fields: 'name_html'
           })
           .subscribe(
-            (item: APIItem) => {
+            item => {
               this.selected = true;
               this.item = item;
               this.selectionName = item.name_html;
