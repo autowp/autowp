@@ -1,10 +1,10 @@
-<div class="nav nav-pills" style="margin-bottom: 20px">
+<div class="nav nav-pills" style="margin-bottom: 20px" *ngIf="item">
   <a class="nav-link" [routerLink]="['/moder/items/item', item.id]" *ngIf="isModer">
     <i class="fa fa-cog"></i>
     {{'moder/edit-object'|translate}}
     <span [innerHTML]="item.name_html"></span>
   </a>
-  <a class="nav-link" ui-sref="cars-attrs-change-log({item_id: item.id})">
+  <a class="nav-link" routerLink="/cars/attrs-change-log" [queryParams]="{item_id: item.id}">
     <i class="fa fa-list"></i>
     {{'specifications-editor/log'|translate}}
   </a>
@@ -13,15 +13,37 @@
 <app-markdown class="alert alert-danger" *ngIf="specsWeight < 1" [markdown]="'specifications-editor/errors-alert'|translate"></app-markdown>
 
 <ul class="nav nav-tabs" id="myTab">
-  <ng-container *ngFor="let ctab of tabs">
-    <li *ngIf="ctab.visible" class="nav-item">
-      <a ui-sref="cars-specifications-editor({tab: ctab.id})" [class.active]="ctab.id == tab" class="nav-link">
-        <span class="{{ctab.icon}}" *ngIf="ctab.icon"></span>
-        {{ctab.title | translate}}
-        <span class="badge badge-pill badge-secondary" *ngIf="ctab.count" [textContent]="ctab.count"></span>
-      </a>
-    </li>
-  </ng-container>
+  <li class="nav-item">
+    <a routerLink="/cars/specifications-editor" [queryParams]="{tab: 'info'}" [class.active]="tab == 'info'" class="nav-link">
+      <span class="fa fa-info"></span>
+      {{'specifications-editor/tabs/info' | translate}}
+    </a>
+  </li>
+  <li class="nav-item">
+    <a routerLink="/cars/specifications-editor" [queryParams]="{tab: 'engine'}" [class.active]="tab == 'engine'" class="nav-link">
+      <span class="glyphicon glyphicon-align-left"></span>
+      {{'specifications-editor/tabs/engine' | translate}}
+      <span class="badge badge-pill badge-secondary" *ngIf="enginesCount" [textContent]="enginesCount"></span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a routerLink="/cars/specifications-editor" [queryParams]="{tab: 'spec'}" [class.active]="tab == 'spec'" class="nav-link">
+      <span class="fa fa-car"></span>
+      {{'specifications-editor/tabs/specs' | translate}}
+    </a>
+  </li>
+  <li class="nav-item">
+    <a routerLink="/cars/specifications-editor" [queryParams]="{tab: 'result'}" [class.active]="tab == 'result'" class="nav-link">
+      <span class="fa fa-table"></span>
+      {{'specifications-editor/tabs/result' | translate}}
+    </a>
+  </li>
+  <li *ngIf="this.isSpecsAdmin" class="nav-item">
+    <a routerLink="/cars/specifications-editor" [queryParams]="{tab: 'admin'}" [class.active]="tab == 'admin'" class="nav-link">
+      <span class="fa fa-table"></span>
+      {{'specifications-editor/tabs/admin' | translate}}
+    </a>
+  </li>
 </ul>
 
 <div class="tab-content card card-body">
@@ -31,7 +53,7 @@
   <div class="tab-pane" [class.active]="tab == 'info'" id="info">
     <app-markdown [markdown]="'specifications-editor/description'|translate"></app-markdown>
   </div>
-  <div class="tab-pane" [class.active]="tab == 'engine'" id="engine" *ngIf="item.item_type_id == 1">
+  <div class="tab-pane" [class.active]="tab == 'engine'" id="engine" *ngIf="item && item.item_type_id == 1">
     <h2 translate>specifications-editor/engine</h2>
 
     <div *ngIf="isAllowedEditEngine">
@@ -47,13 +69,13 @@
             </em>
           </h6-->
         </ng-container>
-        <a ui-sref="cars-select-engine({item_id: item.id})" class="btn btn-primary" translate>specifications-editor/engine/select-another</a>
+        <a routerLink="/cars/select-engine" [queryParams]="{item_id: item.id}" class="btn btn-primary" translate>specifications-editor/engine/select-another</a>
         <button class="btn btn-warning" (click)="cancelInheritance()" translate>specifications-editor/engine/cancel</button>
         <button class="btn btn-warning" (click)="inheritEngine()" *ngIf="!engineInherited" translate>specifications-editor/engine/inherit</button>
       </div>
       <div *ngIf="!engine">
         <p translate>specifications-editor/engine/not-selected</p>
-        <a ui-sref="cars-select-engine({item_id: item.id})" class="btn btn-primary" translate>specifications-editor/engine/select</a>
+        <a routerLink="/cars/select-engine" [queryParams]="{item_id: item.id}" class="btn btn-primary" translate>specifications-editor/engine/select</a>
         <button class="btn btn-warning" (click)="inheritEngine()" *ngIf="engineInherited" translate>specifications-editor/engine/inherit</button>
         <button class="btn btn-warning" (click)="cancelInheritance()" *ngIf="!engineInherited" translate>specifications-editor/engine/dont-inherit</button>
       </div>
@@ -70,7 +92,7 @@
       </ng-container>
     </div>
   </div>
-  <div class="tab-pane" [class.active]="tab == 'spec'" id="spec">
+  <div class="tab-pane" [class.active]="tab == 'spec'" id="spec" *ngIf="item">
     <form class="spec-editor-form" (submit)="saveSpecs()">
       <p class="alert alert-danger">
         <!--  TODO: *ngIf="form.getMessages()" -->
@@ -160,9 +182,9 @@
   <div class="tab-pane" [class.active]="tab == 'result'" id="result">
     <div [innerHTML]="resultHtml"></div>
   </div>
-  <div class="tab-pane" [class.active]="tab == 'admin'" id="admin" *ngIf="isSpecsAdmin">
+  <div class="tab-pane" [class.active]="tab == 'admin'" id="admin" *ngIf="item && isSpecsAdmin">
     <p>
-      <a ui-sref="cars-specs-admin({item_id: item.id})">Admin</a>
+      <a routerLink="/cars/specs-admin" [queryParams]="{item_id: item.id}">Admin</a>
     </p>
     <div>
       <button class="btn btn-secondary" (click)="refreshInheritance()">Refresh inheritance</button>

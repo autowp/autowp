@@ -1,6 +1,6 @@
 <div class="card card-body">
   <div class="btn-group" *ngFor="let group of groups">
-    <button *ngFor="let char of group" class="btn btn-secondary" [textContent]="char" (click)="selectChar(char)"></button>
+    <a *ngFor="let c of group" class="btn btn-secondary" [class.active]="c == char" [textContent]="c" routerLink="." [queryParams]="{char: c, page: null}"></a>
   </div>
 </div>
 

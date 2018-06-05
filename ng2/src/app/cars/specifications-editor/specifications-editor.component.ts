@@ -44,6 +44,7 @@ function toPlain(
 })
 @Injectable()
 export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
+  public enginesCount = 0;
   private querySub: Subscription;
   public item: APIItem;
   public isAllowedEditEngine = false;
@@ -53,43 +54,6 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
   public engine: APIItem;
   public engineInherited: boolean;
   public tab = 'info';
-  public tabs = {
-    info: {
-      id: 'info',
-      icon: 'fa fa-info',
-      title: 'specifications-editor/tabs/info',
-      count: 0,
-      visible: true
-    },
-    engine: {
-      id: 'engine',
-      icon: 'glyphicon glyphicon-align-left',
-      title: 'specifications-editor/tabs/engine',
-      count: 0,
-      visible: true
-    },
-    spec: {
-      id: 'spec',
-      icon: 'fa fa-car',
-      title: 'specifications-editor/tabs/specs',
-      count: 0,
-      visible: true
-    },
-    result: {
-      id: 'result',
-      icon: 'fa fa-table',
-      title: 'specifications-editor/tabs/result',
-      count: 0,
-      visible: true
-    },
-    admin: {
-      id: 'admin',
-      icon: 'fa fa-cog',
-      title: 'specifications-editor/tabs/admin',
-      count: 0,
-      visible: false
-    }
-  };
   public attributes: APIAttrAttributeInSpecEditor[] = [];
   public values: Map<number, APIAttrValue>;
   public userValues: Map<number, APIAttrUserValue[]>;
@@ -121,26 +85,19 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.acl.isAllowed('specifications', 'admin').then(
-      (allow: boolean) => {
-        this.isSpecsAdmin = !!allow;
-        if (this.isSpecsAdmin) {
-          this.tabs.admin.visible = true;
-        }
-      },
-      () => {
-        this.isSpecsAdmin = false;
-      }
-    );
+    this.acl
+      .isAllowed('specifications', 'admin')
+      .then(
+        allow => (this.isSpecsAdmin = !!allow),
+        () => (this.isSpecsAdmin = false)
+      );
 
-    this.acl.inheritsRole('moder').then(
-      (inherits: boolean) => {
-        this.isModer = !!inherits;
-      },
-      () => {
-        this.isModer = false;
-      }
-    );
+    this.acl
+      .inheritsRole('moder')
+      .then(
+        inherits => (this.isModer = !!inherits),
+        () => (this.isModer = false)
+      );
 
     this.loading++;
     this.http
@@ -185,7 +142,7 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
               }
             });
 
-            this.tabs.engine.count = this.item.engine_id ? 1 : 0;
+            this.enginesCount = this.item.engine_id ? 1 : 0;
 
             if (this.tab === 'engine') {
               if (this.item.engine_id) {

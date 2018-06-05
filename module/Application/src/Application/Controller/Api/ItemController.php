@@ -718,7 +718,7 @@ class ItemController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'groups' => $groups
+            'groups' => array_values($groups)
         ]);
     }
 
