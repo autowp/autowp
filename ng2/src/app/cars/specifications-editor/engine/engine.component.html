@@ -1,0 +1,37 @@
+<h2 translate>specifications-editor/engine</h2>
+
+<div *ngIf="isAllowedEditEngine">
+  <div *ngIf="engine">
+    <p>
+      <a [routerLink]="['/moder/items/item', engine.id]" [innerHTML]="engine.name_html"></a>
+    </p>
+    <ng-container *ngIf="item.engine_inherit">
+      <!--TODO: h6 *ngFor="let car of engineInheritedFrom">
+            <em>
+              {{'specifications-editor/engine/inherited-from'|translate}}
+              <a [href]="car.url" [innerHTML]="car.name_html"></a>
+            </em>
+          </h6-->
+    </ng-container>
+    <a routerLink="/cars/select-engine" [queryParams]="{item_id: item.id}" class="btn btn-primary" translate>specifications-editor/engine/select-another</a>
+    <button class="btn btn-warning" (click)="cancelInheritance()" translate>specifications-editor/engine/cancel</button>
+    <button class="btn btn-warning" (click)="inheritEngine()" *ngIf="!item.engine_inherit" translate>specifications-editor/engine/inherit</button>
+  </div>
+  <div *ngIf="!engine">
+    <p translate>specifications-editor/engine/not-selected</p>
+    <a routerLink="/cars/select-engine" [queryParams]="{item_id: item.id}" class="btn btn-primary" translate>specifications-editor/engine/select</a>
+    <button class="btn btn-warning" (click)="inheritEngine()" *ngIf="!item.engine_inherit" translate>specifications-editor/engine/inherit</button>
+    <button class="btn btn-warning" (click)="cancelInheritance()" *ngIf="item.engine_inherit" translate>specifications-editor/engine/dont-inherit</button>
+  </div>
+</div>
+<div *ngIf="engine && !isAllowedEditEngine">
+  <p [innerHTML]="engine.name_html"></p>
+  <ng-container *ngIf="item.engine_inherit">
+    <!--TODO: h6 *ngFor="let car of engineInheritedFrom">
+          <em>
+            {{'specifications-editor/engine/inherited-from'|translate}}
+            <span [innerHTML]="car.name_html"></span>
+          </em>
+        </h6-->
+  </ng-container>
+</div>

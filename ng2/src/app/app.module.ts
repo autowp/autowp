@@ -75,7 +75,6 @@ import { ArticlesArticleComponent } from './articles/article/article.component';
 import { BrandsComponent } from './brands/brands.component';
 import { CarsAttrsChangeLogComponent } from './cars/attrs-change-log/attrs-change-log.component';
 import { CarsDatelessComponent } from './cars/dateless/dateless.component';
-import { CarsSelectEngineComponent } from './cars/select-engine/select-engine.component';
 import { CarsSpecificationsEditorComponent } from './cars/specifications-editor/specifications-editor.component';
 import { CarsSpecsAdminComponent } from './cars/specs-admin/specs-admin.component';
 import { ChartComponent } from './chart/chart.component';
@@ -159,7 +158,6 @@ import { CommentsComponent } from './components/comments/comments.component';
 import { CommentsFormComponent } from './components/comments/form/form.component';
 import { MarkdownEditComponent } from './components/markdown-edit/markdown-edit.component';
 import { ItemOfDayComponent } from './components/item-of-day/item-of-day.component';
-import { CarsSelectEngineTreeItemComponent } from './cars/select-engine/tree-item/tree-item.component';
 import { ItemComponent } from './components/item/item.component';
 import { PictureModerVoteComponent } from './components/picture-moder-vote/picture-moder-vote.component';
 import { ItemMetaFormComponent } from './components/item-meta-form/item-meta-form.component';
@@ -198,6 +196,11 @@ import { ModerItemsItemPicturesComponent } from './moder/items/item/pictures/pic
 import { ModerItemsItemVehiclesComponent } from './moder/items/item/vehicles/vehicles.component';
 import { ModerItemsItemOrganizeComponent } from './moder/items/item/catalogue/organize/organize.component';
 import { ModerItemsItemPicturesOrganizeComponent } from './moder/items/item/pictures/organize/organize.component';
+import { CarsSpecificationsEditorEngineComponent } from './cars/specifications-editor/engine/engine.component';
+import { CarsEngineSelectComponent } from './cars/specifications-editor/engine/select/select.component';
+import { CarsSelectEngineTreeItemComponent } from './cars/specifications-editor/engine/select/tree-item/tree-item.component';
+import { CarsSpecificationsEditorResultComponent } from './cars/specifications-editor/result/result.component';
+import { CarsSpecificationsEditorSpecComponent } from './cars/specifications-editor/spec/spec.component';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -288,7 +291,7 @@ const appRoutes: Routes = [
       },
       {
         path: 'select-engine',
-        component: CarsSelectEngineComponent
+        component: CarsEngineSelectComponent
       },
       {
         path: 'specifications-editor',
@@ -661,7 +664,7 @@ const appRoutes: Routes = [
     BrandsComponent,
     CarsAttrsChangeLogComponent,
     CarsDatelessComponent,
-    CarsSelectEngineComponent,
+    CarsEngineSelectComponent,
     CarsSpecificationsEditorComponent,
     CarsSpecsAdminComponent,
     ChartComponent,
@@ -786,7 +789,10 @@ const appRoutes: Routes = [
     ModerItemsItemNameComponent,
     ModerItemsItemLogoComponent,
     ModerItemsItemPicturesComponent,
-    ModerItemsItemVehiclesComponent
+    ModerItemsItemVehiclesComponent,
+    CarsSpecificationsEditorEngineComponent,
+    CarsSpecificationsEditorResultComponent,
+    CarsSpecificationsEditorSpecComponent
   ],
   entryComponents: [
     ModalMessageComponent,

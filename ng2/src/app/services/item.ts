@@ -38,6 +38,7 @@ export interface APIItem {
   spec_id: number | string | null;
   logo: APIImage;
   engine_id: number | null;
+  engine_inherit: boolean | null;
   attr_zone_id: number;
 
   engine_vehicles_count: number;

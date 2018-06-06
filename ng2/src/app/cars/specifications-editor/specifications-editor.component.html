@@ -13,27 +13,31 @@
 <app-markdown class="alert alert-danger" *ngIf="specsWeight < 1" [markdown]="'specifications-editor/errors-alert'|translate"></app-markdown>
 
 <ul class="nav nav-tabs" id="myTab">
-  <li class="nav-item">
-    <a routerLink="/cars/specifications-editor" [queryParams]="{tab: 'info'}" [class.active]="tab == 'info'" class="nav-link">
+  <li class="nav-item" *ngIf="item">
+    <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: item.id, tab: 'info'}" [class.active]="tab == 'info'"
+      class="nav-link">
       <span class="fa fa-info"></span>
       {{'specifications-editor/tabs/info' | translate}}
     </a>
   </li>
-  <li class="nav-item">
-    <a routerLink="/cars/specifications-editor" [queryParams]="{tab: 'engine'}" [class.active]="tab == 'engine'" class="nav-link">
+  <li class="nav-item" *ngIf="item">
+    <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: item.id, tab: 'engine'}" [class.active]="tab == 'engine'"
+      class="nav-link">
       <span class="glyphicon glyphicon-align-left"></span>
       {{'specifications-editor/tabs/engine' | translate}}
       <span class="badge badge-pill badge-secondary" *ngIf="enginesCount" [textContent]="enginesCount"></span>
     </a>
   </li>
-  <li class="nav-item">
-    <a routerLink="/cars/specifications-editor" [queryParams]="{tab: 'spec'}" [class.active]="tab == 'spec'" class="nav-link">
+  <li class="nav-item" *ngIf="item">
+    <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: item.id, tab: 'spec'}" [class.active]="tab == 'spec'"
+      class="nav-link">
       <span class="fa fa-car"></span>
       {{'specifications-editor/tabs/specs' | translate}}
     </a>
   </li>
-  <li class="nav-item">
-    <a routerLink="/cars/specifications-editor" [queryParams]="{tab: 'result'}" [class.active]="tab == 'result'" class="nav-link">
+  <li class="nav-item" *ngIf="item">
+    <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: item.id, tab: 'result'}" [class.active]="tab == 'result'"
+      class="nav-link">
       <span class="fa fa-table"></span>
       {{'specifications-editor/tabs/result' | translate}}
     </a>
@@ -50,139 +54,19 @@
   <span [hidden]="loading <= 0">
     <i class="fa fa-spinner fa-spin fa-fw fa-4x"></i>
   </span>
-  <div class="tab-pane" [class.active]="tab == 'info'" id="info">
+  <div class="tab-pane active" id="info" *ngIf="tab == 'info'">
     <app-markdown [markdown]="'specifications-editor/description'|translate"></app-markdown>
   </div>
-  <div class="tab-pane" [class.active]="tab == 'engine'" id="engine" *ngIf="item && item.item_type_id == 1">
-    <h2 translate>specifications-editor/engine</h2>
-
-    <div *ngIf="isAllowedEditEngine">
-      <div *ngIf="engine">
-        <p>
-          <a [routerLink]="['/moder/items/item', engine.id]" [innerHTML]="engine.name_html"></a>
-        </p>
-        <ng-container *ngIf="engineInherited">
-          <!--TODO: h6 *ngFor="let car of engineInheritedFrom">
-            <em>
-              {{'specifications-editor/engine/inherited-from'|translate}}
-              <a [href]="car.url" [innerHTML]="car.name_html"></a>
-            </em>
-          </h6-->
-        </ng-container>
-        <a routerLink="/cars/select-engine" [queryParams]="{item_id: item.id}" class="btn btn-primary" translate>specifications-editor/engine/select-another</a>
-        <button class="btn btn-warning" (click)="cancelInheritance()" translate>specifications-editor/engine/cancel</button>
-        <button class="btn btn-warning" (click)="inheritEngine()" *ngIf="!engineInherited" translate>specifications-editor/engine/inherit</button>
-      </div>
-      <div *ngIf="!engine">
-        <p translate>specifications-editor/engine/not-selected</p>
-        <a routerLink="/cars/select-engine" [queryParams]="{item_id: item.id}" class="btn btn-primary" translate>specifications-editor/engine/select</a>
-        <button class="btn btn-warning" (click)="inheritEngine()" *ngIf="engineInherited" translate>specifications-editor/engine/inherit</button>
-        <button class="btn btn-warning" (click)="cancelInheritance()" *ngIf="!engineInherited" translate>specifications-editor/engine/dont-inherit</button>
-      </div>
-    </div>
-    <div *ngIf="engine && !isAllowedEditEngine">
-      <p [innerHTML]="engine.name_html"></p>
-      <ng-container *ngIf="engineInherited">
-        <!--TODO: h6 *ngFor="let car of engineInheritedFrom">
-          <em>
-            {{'specifications-editor/engine/inherited-from'|translate}}
-            <span [innerHTML]="car.name_html"></span>
-          </em>
-        </h6-->
-      </ng-container>
-    </div>
+  <div class="tab-pane active" id="engine" *ngIf="tab == 'engine' && item && item.item_type_id == 1">
+    <app-cars-specifications-editor-engine [item]="item" (changed)="onEngineChanged()"></app-cars-specifications-editor-engine>
   </div>
-  <div class="tab-pane" [class.active]="tab == 'spec'" id="spec" *ngIf="item">
-    <form class="spec-editor-form" (submit)="saveSpecs()">
-      <p class="alert alert-danger">
-        <!--  TODO: *ngIf="form.getMessages()" -->
-        <i class="fa fa-exclamation-triangle"></i>
-        {{'specifications-editor/not-save'|translate}}
-      </p>
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th translate>specifications-editor/parameter</th>
-            <th translate>specifications-editor/your-value</th>
-            <th translate>specifications-editor/actual-value</th>
-            <th translate>specifications-editor/all-values</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let attribute of attributes" id="subform-{{attribute.id}}" [class.subform-header]="!!attribute.childs.length"
-            [class.has-error]="$element.getMessages()">
-            <td colspan="4" [ngStyle]="{'padding-left': (attribute.deep * 20) + 'px'}" *ngIf="attribute.childs.length">
-              <h4 [textContent]="attribute.name | translate"></h4>
-            </td>
-            <td *ngIf="!attribute.childs.length">
-              <label [ngStyle]="{'padding-left': (attribute.deep * 20) + 'px'}" [textContent]="attribute.name | translate"></label>
-            </td>
-            <td *ngIf="!attribute.childs.length">
-              <div class="input-group" [class.has-error]="element.getMessages()">
-                <div class="input-group-prepend">
-                  <button type="button" class="btn btn-secondary" (click)="currentUserValues[attribute.id].empty = !currentUserValues[attribute.id].empty"
-                    [class.active]="attribute.disabled">
-                    <span class="fa fa-remove"></span>
-                  </button>
-                </div>
-                <select class="form-control input-sm" *ngIf="attribute.type_id == 5" [(ngModel)]="currentUserValues[attribute.id].value"
-                  [disabled]="currentUserValues[attribute.id].empty">
-                  <option *ngFor="let option of attribute.options" [value]="option.id">{{option.name}}</option>
-                </select>
-                <select class="form-control input-sm" *ngIf="(attribute.type_id == 6 || attribute.type_id == 7) && !attribute.is_multiple"
-                  [(ngModel)]="currentUserValues[attribute.id].value" [disabled]="currentUserValues[attribute.id].empty">
-                  <option *ngFor="let option of attribute.options" [value]="option.id">{{option.name}}</option>
-                </select>
-                <select class="form-control input-sm" *ngIf="(attribute.type_id == 6 || attribute.type_id == 7) && attribute.is_multiple"
-                  [(ngModel)]="currentUserValues[attribute.id].value" [disabled]="currentUserValues[attribute.id].empty" multiple>
-                  <option *ngFor="let option of attribute.options" [value]="option.id">{{option.name}}</option>
-                </select>
-                <input type="number" *ngIf="attribute.type_id == 2" class="form-control input-sm" [(ngModel)]="currentUserValues[attribute.id].value"
-                  [disabled]="currentUserValues[attribute.id].empty" min="-2147483649" max="2147483648" />
-                <input type="number" *ngIf="attribute.type_id == 3" class="form-control input-sm" [(ngModel)]="currentUserValues[attribute.id].value"
-                  step="{{getStep(attribute)}}" min="-2147483649" max="2147483648" [disabled]="currentUserValues[attribute.id].empty"
-                />
-                <input type="text" *ngIf="attribute.type_id == 1" class="form-control input-sm" [(ngModel)]="currentUserValues[attribute.id].value"
-                  [disabled]="currentUserValues[attribute.id].empty" />
-                <div class="input-group-append" *ngIf="attribute.unit">
-                  <span [title]="attribute.unit.name|translate" class="unit input-group-text" [textContent]="attribute.unit.abbr|translate"></span>
-                </div>
-              </div>
-              <!--TODO: p class="help-block" *ngFor="let error of $element.getMessages()" [textContent]="error"></p-->
-              <small *ngIf="attribute.description" [textContent]="attribute.description|translate"></small>
-            </td>
-            <td class="actual" *ngIf="!attribute.childs.length">
-              <div *ngIf="values.has(attribute.id)">
-                <em translate *ngIf="values.get(attribute.id)['value'] === null">account/specs/conflicts/my-value/none</em>
-                <span *ngIf="values.get(attribute.id)['value'] !== null">
-                  {{values.get(attribute.id)['value_text']}}
-                  <span *ngIf="attribute.unit" class="unit" title="attribute.unit.name|translate" [textContent]="attribute.unit.abbr|translate"></span>
-                </span>
-              </div>
-            </td>
-            <td *ngIf="!attribute.childs.length">
-              <div *ngFor="let value of userValues.get(attribute.id)">
-                <em translate *ngIf="value.value_text === null">account/specs/conflicts/my-value/none</em>
-                <span *ngIf="value.value_text !== null" [textContent]="value.value_text"></span>
-                <app-user [user]="value.user" *ngIf="value.user"></app-user>
-                <span class="date" *ngIf="value.update_date">[
-                  <span [textContent]="value.update_date | amTimeAgo"></span>]</span>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <button type="submit" class="btn btn-success" translate>specifications-editor/save</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </form>
+  <div class="tab-pane active" id="spec" *ngIf="tab == 'spec' && item">
+    <app-cars-specifications-editor-spec [item]="item"></app-cars-specifications-editor-spec>
   </div>
-  <div class="tab-pane" [class.active]="tab == 'result'" id="result">
-    <div [innerHTML]="resultHtml"></div>
+  <div class="tab-pane active" id="result" *ngIf="tab == 'result' && item">
+    <app-cars-specifications-editor-result [item]="item"></app-cars-specifications-editor-result>
   </div>
-  <div class="tab-pane" [class.active]="tab == 'admin'" id="admin" *ngIf="item && isSpecsAdmin">
+  <div class="tab-pane active" id="admin" *ngIf="tab == 'admin' && item && isSpecsAdmin">
     <p>
       <a routerLink="/cars/specs-admin" [queryParams]="{item_id: item.id}">Admin</a>
     </p>
