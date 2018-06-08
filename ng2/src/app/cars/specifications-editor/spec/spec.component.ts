@@ -9,10 +9,18 @@ import {
 import { APIItem } from '../../../services/item';
 import { HttpClient } from '@angular/common/http';
 import Notify from '../../../notify';
-import { AttrsService, APIAttrUserValue, APIAttrValue, APIAttrAttribute, APIAttrUserValueGetResponse } from '../../../services/attrs';
+import {
+  AttrsService,
+  APIAttrUserValue,
+  APIAttrValue,
+  APIAttrAttribute,
+  APIAttrUserValueGetResponse,
+  APIAttrAttributesGetResponse
+} from '../../../services/attrs';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
+import { map } from 'rxjs/operators';
 
 export interface APIAttrAttributeInSpecEditor extends APIAttrAttribute {
   deep?: number;
@@ -53,9 +61,7 @@ export class CarsSpecificationsEditorSpecComponent
     private attrsService: AttrsService,
     private translate: TranslateService,
     private auth: AuthService
-  ) {
-
-  }
+  ) {}
 
   ngOnInit(): void {}
 
@@ -67,47 +73,60 @@ export class CarsSpecificationsEditorSpecComponent
 
   private load() {
     this.loading++;
-    this.attrsService
-      .getAttributes({
+    combineLatest(
+      this.attrsService.getAttributes({
         fields: 'unit,options,childs.unit,childs.options',
         zone_id: this.item.attr_zone_id,
         recursive: true
+      }),
+      this.translate.get([
+        'specifications/boolean/false',
+        'specifications/boolean/true'
+      ]),
+      (attributes: APIAttrAttributesGetResponse, translations: string[]) => ({
+        attributes,
+        translations
       })
-      .subscribe(
-        response => {
-          this.translate
-            .get([
-              'specifications/boolean/false',
-              'specifications/boolean/true'
-            ])
-            .subscribe(translations => {
-              this.attributes = toPlain(response.items, 0);
-              for (const attribute of this.attributes) {
-                if (attribute.options) {
-                  attribute.options.splice(0, 0, {
-                    name: '—',
-                    id: null
-                  });
-                }
+    )
+      .pipe(
+        map(data => {
+          const booleanOptions = [
+            {
+              name: '—',
+              id: null
+            },
+            {
+              name: data.translations[1],
+              id: 0
+            },
+            {
+              name: data.translations[2],
+              id: 1
+            }
+          ];
 
-                if (attribute.type_id === 5) {
-                  attribute.options = [
-                    {
-                      name: '—',
-                      id: null
-                    },
-                    {
-                      name: translations[1],
-                      id: 0
-                    },
-                    {
-                      name: translations[2],
-                      id: 1
-                    }
-                  ];
-                }
-              }
-            });
+          const attibutes = toPlain(data.attributes.items, 0);
+          for (const attribute of attibutes) {
+            if (attribute.options) {
+              attribute.options.splice(0, 0, {
+                name: '—',
+                id: null
+              });
+            }
+
+            if (attribute.type_id === 5) {
+              attribute.options = booleanOptions;
+            }
+          }
+
+          return {
+            attributes: attibutes
+          };
+        })
+      )
+      .subscribe(
+        data => {
+          this.attributes = data.attributes;
 
           this.loading++;
           this.attrsService
@@ -131,7 +150,7 @@ export class CarsSpecificationsEditorSpecComponent
               }
             );
 
-          this.loadValues();
+          this.loadUserValues();
 
           this.loadAllValues();
 
@@ -165,7 +184,7 @@ export class CarsSpecificationsEditorSpecComponent
       })
       .subscribe(
         response => {
-          this.loadValues();
+          this.loadUserValues();
           this.loadAllValues();
           this.loading--;
         },
@@ -176,7 +195,7 @@ export class CarsSpecificationsEditorSpecComponent
       );
   }
 
-  private loadValues() {
+  private loadUserValues() {
     this.loading++;
     this.userValuesLoading++;
     this.attrsService
@@ -204,6 +223,25 @@ export class CarsSpecificationsEditorSpecComponent
             }
             currentUserValues[value.attribute_id] = value;
           }
+
+          for (const attr of this.attributes) {
+            if (!currentUserValues.hasOwnProperty(attr.id)) {
+              currentUserValues[attr.id] = {
+                item_id: this.item.id,
+                user_id: this.auth.user.id,
+                attribute_id: attr.id,
+                value: null,
+                empty: true,
+                value_text: '',
+                user: null,
+                update_date: null,
+                item: null,
+                unit: null,
+                path: null
+              };
+            }
+          }
+
           this.currentUserValues = currentUserValues;
           this.loading--;
           this.userValuesLoading--;

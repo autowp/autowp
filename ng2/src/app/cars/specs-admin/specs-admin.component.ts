@@ -2,10 +2,17 @@ import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../services/api.service';
 import Notify from '../../notify';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute, Params } from '@angular/router';
+import { Subscription, of, Subject, combineLatest, BehaviorSubject } from 'rxjs';
 import { AttrsService, APIAttrUserValue } from '../../services/attrs';
 import { PageEnvService } from '../../services/page-env.service';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  catchError,
+  tap
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-cars-specs-admin',
@@ -19,8 +26,9 @@ export class CarsSpecsAdminComponent implements OnInit, OnDestroy {
   public move = {
     item_id: null
   };
+  public move$ = new BehaviorSubject<boolean>(false);
 
-  private item_id = 0;
+  private itemID = 0;
 
   constructor(
     private http: HttpClient,
@@ -39,36 +47,47 @@ export class CarsSpecsAdminComponent implements OnInit, OnDestroy {
         }),
       0
     );
-
-    this.load();
   }
 
   ngOnInit(): void {
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.item_id = params.item_id;
-      this.load();
-    });
+    this.querySub = combineLatest(
+      this.route.queryParams.pipe(
+        debounceTime(10),
+        distinctUntilChanged(),
+        tap(params => (this.itemID = params.item_id))
+      ),
+      this.move$,
+      (query: Params, move: any) => ({
+        query,
+        move
+      })
+    )
+      .pipe(
+        switchMap(params => {
+          return this.attrService.getUserValues({
+            item_id: params.query.item_id,
+            page: params.query.page,
+            fields: 'user,path,unit'
+          });
+        }),
+        catchError((err, caught) => {
+          if (err.status !== -1) {
+            Notify.response(err);
+          }
+          return of({
+            items: [],
+            paginator: null
+          });
+        })
+      )
+      .subscribe(data => {
+        this.values = data.items;
+        this.paginator = data.paginator;
+      });
   }
 
   ngOnDestroy(): void {
     this.querySub.unsubscribe();
-  }
-
-  private load() {
-    this.attrService
-      .getUserValues({
-        item_id: this.item_id,
-        fields: 'user,path,unit'
-      })
-      .subscribe(
-        response => {
-          this.values = response.items;
-          this.paginator = response.paginator;
-        },
-        response => {
-          Notify.response(response);
-        }
-      );
   }
 
   public deleteValue(value: APIAttrUserValue) {
@@ -105,13 +124,13 @@ export class CarsSpecsAdminComponent implements OnInit, OnDestroy {
         },
         {
           params: {
-            item_id: this.item_id.toString()
+            item_id: this.itemID.toString()
           }
         }
       )
       .subscribe(
         response => {
-          this.load();
+          this.move$.next(true);
         },
         response => {
           Notify.response(response);

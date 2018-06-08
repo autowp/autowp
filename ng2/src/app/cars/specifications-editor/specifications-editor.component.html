@@ -42,8 +42,8 @@
       {{'specifications-editor/tabs/result' | translate}}
     </a>
   </li>
-  <li *ngIf="this.isSpecsAdmin" class="nav-item">
-    <a routerLink="/cars/specifications-editor" [queryParams]="{tab: 'admin'}" [class.active]="tab == 'admin'" class="nav-link">
+  <li *ngIf="this.isSpecsAdmin && item" class="nav-item">
+    <a routerLink="/cars/specifications-editor" [queryParams]="{item_id: item.id, tab: 'admin'}" [class.active]="tab == 'admin'" class="nav-link">
       <span class="fa fa-table"></span>
       {{'specifications-editor/tabs/admin' | translate}}
     </a>

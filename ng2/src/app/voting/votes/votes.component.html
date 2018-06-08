@@ -1,0 +1,12 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h3 class="modal-title" translate>votings/who-voted</h3>
+    <a class="close" (click)="activeModal.dismiss()">×</a>
+  </div>
+  <div class="modal-body">
+    <app-user [user]="vote.user" *ngFor="let vote of votes"></app-user>
+  </div>
+  <div class="modal-footer">
+    <button type="button" (click)="activeModal.dismiss()" class="btn btn-secondary" translate>who-online/close</button>
+  </div>
+</div>

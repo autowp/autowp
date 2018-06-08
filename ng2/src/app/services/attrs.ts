@@ -133,6 +133,7 @@ export interface APIAttrAttribute {
   childs: APIAttrAttribute[];
   options: APIAttrListOption[];
   is_multiple: boolean;
+  disabled: boolean;
 }
 
 export interface APIAttrAttributeType {

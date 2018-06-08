@@ -1,4 +1,4 @@
-<div class="card card-body">
+<div class="card card-body mb-4" *ngIf="voting">
   <p style="white-space:pre-line" [textContent]="voting.text"></p>
   <hr />
 
@@ -19,7 +19,7 @@
   </form>
 
   <ng-container *ngIf="!voting.can_vote">
-    <div *ngFor="let variant of voting.variants">
+    <div *ngFor="let variant of voting.variants" class="mb-3">
       <p class="float-right" *ngIf="variant.votes > 0">
         <a class="who-vote" href="#" translate (click)="showWhoVoted(variant)">votings/who-voted</a>
       </p>
@@ -29,28 +29,12 @@
     </div>
   </ng-container>
 </div>
-<p class="float-right" *ngIf="isModer">
-  <a ui-sref=".({filter: null})" *ngIf="filter">votings/voting/voters/show-all</a>
-  <a ui-sref=".({filter: 1})" *ngIf="!filter">votings/voting/voters/show-contributors</a>
-</p>
+<!--<p class="float-right" *ngIf="isModer">
+  <a routerLink="." [queryParams]="{filter: null}" *ngIf="filter" translate>votings/voting/voters/show-all</a>
+  <a routerLink="." [queryParams]="{filter: 1}" *ngIf="!filter" translate>votings/voting/voters/show-contributors</a>
+</p>-->
 
-<p [translateParams]="{from: (voting.begin_date | amDateFormat : 'LL'), to: (voting.end_date | amDateFormat : 'LL')}" translate>votings/voting/duration</p>
+<p *ngIf="voting" [translateParams]="{from: (voting.begin_date | amDateFormat : 'LL'), to: (voting.end_date | amDateFormat : 'LL')}"
+  translate>votings/voting/duration</p>
 
 <app-comments [itemID]="voting.id" [typeID]="3" *ngIf="voting"></app-comments>
-
-<div class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" translate>votings/who-voted</h3>
-        <button type="button" data-dismiss="modal" class="close">×</button>
-      </div>
-      <div class="modal-body">
-        <app-user [user]="vote.user" *ngFor="let vote of votes"></app-user>
-      </div>
-      <div class="modal-footer">
-        <button data-dismiss="modal" class="btn btn-secondary" translate>who-online/close</button>
-      </div>
-    </div>
-  </div>
-</div>

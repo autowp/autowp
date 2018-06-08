@@ -2,8 +2,8 @@ import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import * as $ from 'jquery';
 import { HttpClient } from '@angular/common/http';
 import Notify from '../notify';
-import { Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription, combineLatest } from 'rxjs';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import {
   VotingService,
   APIVotingVariantVote,
@@ -12,6 +12,9 @@ import {
 } from '../services/voting';
 import { AuthService } from '../services/auth.service';
 import { PageEnvService } from '../services/page-env.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { VotingVotesComponent } from './votes/votes.component';
+import { ACLService } from '../services/acl.service';
 
 @Component({
   selector: 'app-voting',
@@ -24,7 +27,6 @@ export class VotingComponent implements OnInit, OnDestroy {
   public voting: APIVoting;
   public filter = false;
   public selected: {};
-  public votes: APIVotingVariantVote[];
   public isModer = false; // TODO: fetch value
 
   constructor(
@@ -33,7 +35,9 @@ export class VotingComponent implements OnInit, OnDestroy {
     private router: Router,
     private votingService: VotingService,
     public auth: AuthService,
-    private pageEnv: PageEnvService
+    private pageEnv: PageEnvService,
+    private modalService: NgbModal,
+    private acl: ACLService
   ) {}
 
   public load(callback?: () => void) {
@@ -52,8 +56,22 @@ export class VotingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
-      this.id = params.id;
+    this.acl
+      .inheritsRole('moder')
+      .then(
+        inherits => (this.isModer = inherits),
+        response => (this.isModer = false)
+      );
+
+    this.routeSub = combineLatest(
+      this.route.params,
+      this.route.queryParams,
+      (params: Params, query: Params) => ({
+        params,
+        query
+      })
+    ).subscribe(data => {
+      this.id = data.params.id;
       this.load(() => {
         this.pageEnv.set({
           layout: {
@@ -107,6 +125,8 @@ export class VotingComponent implements OnInit, OnDestroy {
           Notify.response(response);
         }
       );
+
+    return false;
   }
 
   public isVariantSelected(): boolean {
@@ -127,22 +147,14 @@ export class VotingComponent implements OnInit, OnDestroy {
   }
 
   public showWhoVoted(variant: APIVotingVariant) {
-    this.votes = [];
+    const modalRef = this.modalService.open(VotingVotesComponent, {
+      size: 'lg',
+      centered: true
+    });
 
-    this.votingService
-      .getVariantVotes(this.id, variant.id, {
-        fields: 'user'
-      })
-      .subscribe(
-        response => {
-          this.votes = response.items;
-          /*$(this.$element)
-            .find('.modal')
-            .modal('show');*/
-        },
-        response => {
-          Notify.response(response);
-        }
-      );
+    modalRef.componentInstance.votingID = this.id;
+    modalRef.componentInstance.variantID = variant.id;
+
+    return false;
   }
 }

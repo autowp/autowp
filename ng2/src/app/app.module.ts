@@ -201,6 +201,7 @@ import { CarsEngineSelectComponent } from './cars/specifications-editor/engine/s
 import { CarsSelectEngineTreeItemComponent } from './cars/specifications-editor/engine/select/tree-item/tree-item.component';
 import { CarsSpecificationsEditorResultComponent } from './cars/specifications-editor/result/result.component';
 import { CarsSpecificationsEditorSpecComponent } from './cars/specifications-editor/spec/spec.component';
+import { VotingVotesComponent } from './voting/votes/votes.component';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -792,13 +793,15 @@ const appRoutes: Routes = [
     ModerItemsItemVehiclesComponent,
     CarsSpecificationsEditorEngineComponent,
     CarsSpecificationsEditorResultComponent,
-    CarsSpecificationsEditorSpecComponent
+    CarsSpecificationsEditorSpecComponent,
+    VotingVotesComponent
   ],
   entryComponents: [
     ModalMessageComponent,
     CommentsVotesComponent,
     PictureModerVoteModalComponent,
-    VehicleTypesModalComponent
+    VehicleTypesModalComponent,
+    VotingVotesComponent
   ],
   imports: [
     BrowserModule,
