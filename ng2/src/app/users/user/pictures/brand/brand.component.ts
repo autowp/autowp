@@ -4,10 +4,17 @@ import { APIPaginator } from '../../../../services/api.service';
 import Notify from '../../../../notify';
 import { ItemService, APIItem } from '../../../../services/item';
 import { UserService, APIUser } from '../../../../services/user';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Subscription, combineLatest } from 'rxjs';
 import { PictureService, APIPicture } from '../../../../services/picture';
 import { PageEnvService } from '../../../../services/page-env.service';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  tap,
+  map
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-users-user-pictures-brand',
@@ -16,14 +23,8 @@ import { PageEnvService } from '../../../../services/page-env.service';
 @Injectable()
 export class UsersUserPicturesBrandComponent implements OnInit, OnDestroy {
   private routeSub: Subscription;
-  private querySub: Subscription;
-  public user: APIUser;
   public pictures: APIPicture[];
   public paginator: APIPaginator;
-  public brand: APIItem;
-  public identity: string;
-  private brandCatname: string;
-  private page: number;
 
   constructor(
     private http: HttpClient,
@@ -36,80 +37,42 @@ export class UsersUserPicturesBrandComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
-      const result = params.identity.match(/^user([0-9]+)$/);
-
-      if (result) {
-        this.userService
-          .getUser(result[1], {
-            fields: 'identity'
-          })
-          .then(
-            response => {
-              this.user = response;
-              this.init();
-            },
-            response => {
-              Notify.response(response);
-            }
+    this.routeSub = combineLatest(
+      this.route.params.pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => {
+          return combineLatest(
+            this.userService.getByIdentity(params.identity, {
+              fields: 'identity'
+            }),
+            this.itemService
+              .getItems({
+                type_id: 5,
+                limit: 1,
+                catname: params.brand,
+                fields: 'name_only,catname'
+              })
+              .pipe(
+                map(
+                  response => (response.items.length ? response.items[0] : null)
+                )
+              ),
+            (user: APIUser, brand: APIItem) => ({
+              user,
+              brand
+            })
           );
-      } else {
-        this.userService
-          .get({
-            identity: params.identity,
-            limit: 1,
-            fields: 'identity'
-          })
-          .subscribe(
-            response => {
-              if (response.items.length <= 0) {
-                this.router.navigate(['/error-404']);
-                return;
-              }
-              this.user = response.items[0];
-              this.init();
-            },
-            response => {
-              Notify.response(response);
-            }
-          );
-      }
-    });
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.brandCatname = params.brand;
-      this.page = params.page;
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.routeSub.unsubscribe();
-    this.querySub.unsubscribe();
-  }
-
-  public init() {
-    if (this.user.deleted) {
-      this.router.navigate(['/error-404']);
-      return;
-    }
-
-    this.identity = this.user.identity
-      ? this.user.identity
-      : 'user' + this.user.id;
-
-    this.itemService
-      .getItems({
-        type_id: 5,
-        limit: 1,
-        catname: this.brandCatname,
-        fields: 'name_only,catname'
-      })
-      .subscribe(
-        response => {
-          if (response.items.length <= 0) {
+        }),
+        tap(data => {
+          if (data.user.deleted) {
             this.router.navigate(['/error-404']);
             return;
           }
-          this.brand = response.items[0];
+
+          const identity = data.user.identity
+            ? data.user.identity
+            : 'user' + data.user.id;
 
           this.pageEnv.set({
             layout: {
@@ -118,37 +81,49 @@ export class UsersUserPicturesBrandComponent implements OnInit, OnDestroy {
             name: 'page/141/name',
             pageId: 141,
             args: {
-              USER_NAME: this.user.name,
-              USER_IDENTITY: this.identity,
-              BRAND_NAME: this.brand.name_only,
-              BRAND_CATNAME: this.brand.catname
+              USER_NAME: data.user.name,
+              USER_IDENTITY: identity,
+              BRAND_NAME: data.brand.name_only,
+              BRAND_CATNAME: data.brand.catname
             }
           });
-
-          this.pictureService
-            .getPictures({
-              status: 'accepted',
-              fields:
-                'owner,thumb_medium,votes,views,comments_count,name_html,name_text',
-              limit: 30,
-              page: this.page,
-              item_id: this.brand.id,
-              owner_id: this.user.id,
-              order: 1
-            })
-            .subscribe(
-              subresponse => {
-                this.pictures = subresponse.pictures;
-                this.paginator = subresponse.paginator;
-              },
-              subresponse => {
-                Notify.response(subresponse);
-              }
-            );
-        },
+        })
+      ),
+      this.route.queryParams.pipe(
+        distinctUntilChanged(),
+        debounceTime(30)
+      ),
+      (route, query: Params) => ({
+        route,
+        query
+      })
+    )
+      .pipe(
+        switchMap(data =>
+          this.pictureService.getPictures({
+            status: 'accepted',
+            fields:
+              'owner,thumb_medium,votes,views,comments_count,name_html,name_text',
+            limit: 30,
+            page: data.query.page,
+            item_id: data.route.brand.id,
+            owner_id: data.route.user.id,
+            order: 1
+          })
+        )
+      )
+      .subscribe(
         response => {
-          Notify.response(response);
+          this.pictures = response.pictures;
+          this.paginator = response.paginator;
+        },
+        subresponse => {
+          Notify.response(subresponse);
         }
       );
+  }
+
+  ngOnDestroy(): void {
+    this.routeSub.unsubscribe();
   }
 }

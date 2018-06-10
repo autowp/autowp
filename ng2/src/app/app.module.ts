@@ -621,7 +621,19 @@ const appRoutes: Routes = [
   {
     path: 'users',
     children: [
-      { path: 'rating/:rating', component: UsersRatingComponent },
+      {
+        path: 'rating',
+        children: [
+          {
+            path: ':rating',
+            component: UsersRatingComponent
+          },
+          {
+            path: '',
+            component: UsersRatingComponent
+          }
+        ]
+      },
       {
         path: ':identity',
         children: [

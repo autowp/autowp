@@ -3,10 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../../services/api.service';
 import Notify from '../../../notify';
 import { UserService, APIUser } from '../../../services/user';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Subscription, empty, from, combineLatest } from 'rxjs';
 import { CommentService, APIComment } from '../../../services/comment';
 import { PageEnvService } from '../../../services/page-env.service';
+import {
+  switchMap,
+  distinctUntilChanged,
+  debounceTime,
+  catchError,
+  map,
+  tap
+} from 'rxjs/operators';
 
 interface Order {
   name: string;
@@ -19,7 +27,6 @@ interface Order {
 })
 @Injectable()
 export class UsersUserCommentsComponent implements OnInit, OnDestroy {
-  private routeSub: Subscription;
   private querySub: Subscription;
   public loading = 0;
   public user: APIUser;
@@ -44,92 +51,82 @@ export class UsersUserCommentsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
-      const result = params.identity.match(/^user([0-9]+)$/);
+    this.querySub = combineLatest(
+      this.route.params.pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => {
+          return this.userService.getByIdentity(params.identity, {fields: 'identity'}).pipe(
+            catchError((err, caught) => {
+              Notify.response(err);
+              return empty();
+            })
+          );
+        }),
+        tap(user => {
+          if (!user) {
+            this.router.navigate(['/error-404']);
+            return;
+          }
 
-      if (result) {
-        this.userService
-          .getUser(result[1], {
-            fields: 'identity'
-          })
-          .then(
-            response => {
-              this.user = response;
-              this.init();
-            },
-            response => {
-              Notify.response(response);
-            }
+          setTimeout(
+            () =>
+              this.pageEnv.set({
+                layout: {
+                  needRight: false
+                },
+                name: 'page/205/name',
+                pageId: 205,
+                args: {
+                  USER_NAME: user.name,
+                  USER_IDENTITY: user.identity
+                    ? user.identity
+                    : 'user' + user.id
+                }
+              }),
+            0
           );
-      } else {
-        this.userService
-          .get({
-            identity: params.identity,
-            limit: 1,
-            fields: 'identity'
-          })
-          .subscribe(
-            response => {
-              if (response.items.length <= 0) {
-                this.router.navigate(['/error-404']);
-              }
-              this.user = response.items[0];
-              this.init();
-            },
-            response => {
-              Notify.response(response);
-            }
-          );
-      }
-    });
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.order = params.order || 'date_desc';
-      this.page = params.page;
-    });
+
+          this.user = user;
+        })
+      ),
+      this.route.queryParams.pipe(
+        distinctUntilChanged(),
+        debounceTime(30)
+      ),
+      (user: APIUser, query: Params) => ({
+        user,
+        query
+      })
+    )
+      .pipe(
+        switchMap(data => {
+          this.order = data.query.order || 'date_desc';
+
+          return this.commentService
+            .getComments({
+              user_id: data.user.id,
+              page: data.query.page,
+              limit: 30,
+              order: this.order,
+              fields: 'preview,url,vote'
+            })
+            .pipe(
+              catchError((err, caught) => {
+                Notify.response(err);
+                return empty();
+              }),
+              tap(response => {
+                this.comments = response.items;
+                this.paginator = response.paginator;
+              })
+            );
+        })
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
-    this.routeSub.unsubscribe();
-  }
-
-  public init() {
-    setTimeout(
-      () =>
-        this.pageEnv.set({
-          layout: {
-            needRight: false
-          },
-          name: 'page/205/name',
-          pageId: 205,
-          args: {
-            USER_NAME: this.user.name,
-            USER_IDENTITY: this.user.identity
-              ? this.user.identity
-              : 'user' + this.user.id
-          }
-        }),
-      0
-    );
-
-    this.loading++;
-    this.commentService
-      .getComments({
-        user_id: this.user.id,
-        page: this.page,
-        limit: 30,
-        order: this.order,
-        fields: 'preview,url,vote'
-      })
-      .subscribe(
-        response => {
-          this.comments = response.items;
-          this.paginator = response.paginator;
-          this.loading--;
-        },
-        response => {
-          Notify.response(response);
-          this.loading--;
-        }
-      );
+    this.querySub.unsubscribe();
   }
 }

@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIPaginator, APIImage } from './api.service';
 import Notify from '../notify';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { APIAccount } from './account.service';
+import { map } from 'rxjs/internal/operators/map';
 
 export interface APIGetUserOptions {
   fields?: string;
@@ -232,5 +233,26 @@ export class UserService {
     return this.http.get<APIUserGetResponse>('/api/user', {
       params: this.converUsersOptions(options)
     });
+  }
+
+  public getByIdentity(
+    identity: string,
+    options: APIGetUserOptions
+  ): Observable<APIUser> {
+    const result = identity.match(/^user([0-9]+)$/);
+
+    if (result) {
+      return from<APIUser>(this.getUser(parseInt(result[1], 10), options));
+    }
+
+    const params: APIGetUsersOptions = {
+      identity: identity,
+      limit: 1,
+      fields: options.fields
+    };
+
+    return this.get(params).pipe(
+      map(response => (response.items.length ? response.items[0] : null))
+    );
   }
 }
