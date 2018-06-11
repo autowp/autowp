@@ -1,7 +1,7 @@
-<ul class="nav nav-pills" style="margin-bottom:10px">
+<ul class="nav nav-pills" style="margin-bottom:10px" *ngIf="factory">
 
-  <a class="nav-link" ui-sref="factory({id: factory.id})" [innerHTML]="factory.name_html"></a>
-  <a class="nav-link active" ui-sref="factory-items({id: factory.id})" translate>factories/factory-items</a>
+  <a class="nav-link" [routerLink]="['/factories', factory.id]" [innerHTML]="factory.name_html"></a>
+  <a class="nav-link active" [routerLink]="['/factories', factory.id, 'items']" translate>factories/factory-items</a>
   <a *ngIf="isModer" class="nav-link" [routerLink]="['/moder/items/item', factory.id]">
     <i class="fa fa-cog"></i>
     {{'moder/edit-object'|translate}}

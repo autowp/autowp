@@ -1,11 +1,12 @@
-<p *ngIf="museumModer">
+<p *ngIf="museumModer && item">
   <i class="fa fa-cog"></i>
   <a [routerLink]="['/moder/items/item', item.id]" translate>moder/edit-object</a>
 </p>
 
-<div id="google-map" style="width: 100%; height: 300px; margin: 0 0 40px"></div>
+<div style="width:100%;height:300px" class="mb-4" *ngIf="item && item.lng && item.lat" leaflet [leafletOptions]="options"
+  [leafletLayers]="markers"></div>
 
-<div class="card card-body" *ngIf="links.length > 0 || item.description">
+<div class="card card-body" *ngIf="item && (links.length > 0 || item.description)">
   <app-markdown [markdown]="item.description"></app-markdown>
 
   <p *ngIf="links.length > 0">
@@ -26,4 +27,4 @@
   </div>
 </div>
 
-<app-comments item-id="item.id" type-id="2" user="user" *ngIf="item"></app-comments>
+<app-comments [itemID]="item.id" [typeID]="2" *ngIf="item"></app-comments>

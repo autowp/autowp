@@ -103,7 +103,7 @@
       <span [hidden]="loading <= 0">
         <i class="fa fa-spinner fa-spin fa-fw"></i>
       </span>
-      <small *ngIf="paginator && paginator.totalItemCount" translate="ng/%1$s-items" [translateParams]="{count: paginator.totalItemCount}"></small>
+      <small *ngIf="paginator && paginator.totalItemCount" translate [translateParams]="{count: paginator.totalItemCount}">ng/%1$s-items</small>
     </h2>
 
     <div *ngIf="listMode">

@@ -1,15 +1,16 @@
-<div class="nav nav-pills" style="margin-bottom:10px">
-  <a class="nav-link active" ui-sref="." [innerHTML]="factory.name_html"></a>
-  <a class="nav-link" ui-sref="factory-items({id: factory.id})" translate>factories/factory-items</a>
+<div class="nav nav-pills" style="margin-bottom:10px" *ngIf="factory">
+  <a class="nav-link active" routerLink="." [innerHTML]="factory.name_html"></a>
+  <a class="nav-link" [routerLink]="['/factories', factory.id, 'items']" translate>factories/factory-items</a>
   <a class="nav-link" [routerLink]="['/moder/items/item', factory.id]" *ngIf="isModer">
     <i class="fa fa-cog"></i>
     {{'moder/edit-object'|translate}}
   </a>
 </div>
 
-<div class="google-map" style="height:300px;margin:0 0 40px;width:100%" [hidden]="!factory.lng || !factory.lat"></div>
+<div style="width:100%;height:300px" class="mb-4" *ngIf="factory && factory.lng && factory.lat" leaflet [leafletOptions]="options"
+  [leafletLayers]="markers"></div>
 
-<app-markdown class="card card-body" *ngIf="factory.description" [markdown]="factory.description|translate"></app-markdown>
+<app-markdown class="card card-body" *ngIf="factory && factory.description" [markdown]="factory.description|translate"></app-markdown>
 
 <div *ngIf="pictures.length > 0">
   <h3 translate>factories/factory/pictures</h3>
@@ -37,6 +38,6 @@
     </div>
   </div>
   <p>
-    <a ui-sref="factory-items({id: factory.id})" translate>carlist/details</a>
+    <a [routerLink]="['/factories', factory.id, 'items']" translate>carlist/details</a>
   </p>
 </div>

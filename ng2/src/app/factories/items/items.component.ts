@@ -1,12 +1,18 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../services/api.service';
 import { APIItem, ItemService } from '../../services/item';
 import Notify from '../../notify';
-import { Subscription } from 'rxjs';
+import { Subscription, empty } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ACLService } from '../../services/acl.service';
 import { PageEnvService } from '../../services/page-env.service';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  catchError,
+  tap
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-factory-items',
@@ -15,61 +21,46 @@ import { PageEnvService } from '../../services/page-env.service';
 @Injectable()
 export class FactoryItemsComponent implements OnInit, OnDestroy {
   private routeSub: Subscription;
-  private querySub: Subscription;
   public factory: APIItem;
-  public items: APIItem[];
+  public items: APIItem[] = [];
   public paginator: APIPaginator;
-  private id = 0;
-  private page = 1;
   public isModer = false;
 
   constructor(
-    private http: HttpClient,
     private itemService: ItemService,
     private route: ActivatedRoute,
     private router: Router,
     private acl: ACLService,
     private pageEnv: PageEnvService
-  ) {
-    this.load();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.acl
       .inheritsRole('moder')
       .then(isModer => (this.isModer = isModer), () => (this.isModer = false));
 
-    this.routeSub = this.route.params.subscribe(params => {
-      this.id = params.id;
-      this.load();
-    });
-
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.page = params.page;
-      this.load();
-    });
-  }
-
-  load() {
-    this.factory = null;
-    this.items = [];
-    this.paginator = null;
-
-    if (!this.id) {
-      return;
-    }
-
-    this.itemService
-      .getItem(this.id, {
-        fields: ['name_text', 'name_html', 'lat', 'lng', 'description'].join(
-          ','
-        )
-      })
-      .subscribe(
-        item => {
-          this.factory = item;
-
-          if (this.factory.item_type_id !== 6) {
+    this.routeSub = this.route.params
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params =>
+          this.itemService.getItem(params.id, {
+            fields: [
+              'name_text',
+              'name_html',
+              'lat',
+              'lng',
+              'description'
+            ].join(',')
+          })
+        ),
+        catchError((err, caught) => {
+          Notify.response(err);
+          this.router.navigate(['/error-404']);
+          return empty();
+        }),
+        tap(factory => {
+          if (factory.item_type_id !== 6) {
             this.router.navigate(['/error-404']);
             return;
           }
@@ -81,15 +72,24 @@ export class FactoryItemsComponent implements OnInit, OnDestroy {
             name: 'page/182/name',
             pageId: 182,
             args: {
-              FACTORY_ID: this.factory.id + '',
-              FACTORY_NAME: this.factory.name_text
+              FACTORY_ID: factory.id + '',
+              FACTORY_NAME: factory.name_text
             }
           });
-
-          this.itemService
-            .getItems({
-              related_groups_of: this.factory.id,
-              page: this.page,
+        }),
+        switchMap(
+          factory =>
+            this.route.queryParams.pipe(
+              distinctUntilChanged(),
+              debounceTime(30)
+            ),
+          (factory, params) => ({ factory, params })
+        ),
+        switchMap(
+          data =>
+            this.itemService.getItems({
+              related_groups_of: data.factory.id,
+              page: data.params.page,
               limit: 10,
               fields: [
                 'name_html,name_default,description,has_text,produced',
@@ -98,26 +98,26 @@ export class FactoryItemsComponent implements OnInit, OnDestroy {
                 'categories.url,categories.name_html,twins_groups',
                 'preview_pictures.picture.thumb_medium,childs_count,total_pictures'
               ].join(',')
-            })
-
-            .subscribe(
-              response => {
-                this.items = response.items;
-                this.paginator = response.paginator;
-              },
-              response => {
-                Notify.response(response);
-              }
-            );
-        },
-        response => {
-          this.router.navigate(['/error-404']);
-        }
-      );
+            }),
+          (data, response) => ({
+            factory: data.factory,
+            items: response.items,
+            paginator: response.paginator
+          })
+        ),
+        catchError((err, caught) => {
+          Notify.response(err);
+          return empty();
+        })
+      )
+      .subscribe(data => {
+        this.factory = data.factory;
+        this.items = data.items;
+        this.paginator = data.paginator;
+      });
   }
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
-    this.querySub.unsubscribe();
   }
 }

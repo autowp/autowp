@@ -49,7 +49,7 @@ export interface APIItem {
   item_language_count: number;
   subscription: boolean;
 
-  related_group_pictures: any[];
+  related_group_pictures: APIItemRelatedGroupItem[];
 
   description: string;
   is_compiles_item_of_day: boolean;
@@ -66,6 +66,12 @@ export interface APIItem {
   specifications_count: number;
   brands: APIItem[];
   public_urls?: string[];
+}
+
+export interface APIItemRelatedGroupItem {
+  name: string;
+  src: string;
+  url: string;
 }
 
 export interface GetItemServiceOptions {

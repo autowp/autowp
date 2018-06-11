@@ -1,12 +1,19 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import * as $ from 'jquery';
-import { HttpClient } from '@angular/common/http';
-import { APIItem, ItemService } from '../services/item';
+import { APIItem, ItemService, APIItemRelatedGroupItem } from '../services/item';
 import Notify from '../notify';
-import { Subscription } from 'rxjs';
+import { Subscription, empty } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PictureService, APIPicture } from '../services/picture';
 import { PageEnvService } from '../services/page-env.service';
+import {
+  distinctUntilChanged,
+  debounceTime,
+  switchMap,
+  catchError,
+  tap
+} from 'rxjs/operators';
+import { ACLService } from '../services/acl.service';
+import { tileLayer, latLng, Marker, marker, icon } from 'leaflet';
 
 @Component({
   selector: 'app-factories',
@@ -17,109 +24,109 @@ export class FactoryComponent implements OnInit, OnDestroy {
   private querySub: Subscription;
   public factory: APIItem;
   public pictures: APIPicture[] = [];
-  public relatedPictures: APIPicture[] = [];
-  private map: any;
+  public relatedPictures: APIItemRelatedGroupItem[] = [];
+  public isModer = false;
+
+  public markers: Marker[] = [];
+  public options = {
+    layers: [
+      tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18
+      })
+    ],
+    zoom: 4,
+    center: latLng(50, 20)
+  };
 
   constructor(
-    private http: HttpClient,
     private itemService: ItemService,
     private route: ActivatedRoute,
     private router: Router,
     private pictureService: PictureService,
-    private pageEnv: PageEnvService
+    private pageEnv: PageEnvService,
+    private acl: ACLService
   ) {}
 
   ngOnInit(): void {
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.itemService
-        .getItem(params.id, {
-          fields: [
-            'name_text',
-            'name_html',
-            'lat',
-            'lng',
-            'description',
-            'related_group_pictures'
-          ].join(',')
-        })
-        .subscribe(
-          (item: APIItem) => {
-            this.factory = item;
+    this.acl
+      .inheritsRole('moder')
+      .then(isModer => (this.isModer = isModer), () => (this.isModer = false));
 
-            this.relatedPictures = [];
-            if (this.factory.related_group_pictures) {
-              this.relatedPictures = this.factory.related_group_pictures;
-            }
-
-            if (this.factory.item_type_id !== 6) {
-              this.router.navigate(['/error-404']);
-              return;
-            }
-
-            this.pageEnv.set({
-              layout: {
-                needRight: false
-              },
-              name: 'page/181/name',
-              pageId: 181,
-              args: {
-                FACTORY_ID: this.factory.id + '',
-                FACTORY_NAME: this.factory.name_text
-              }
-            });
-
-            this.pictureService
-              .getPictures({
-                status: 'accepted',
-                exact_item_id: this.factory.id,
-                limit: 32,
-                fields:
-                  'owner,thumb_medium,votes,views,comments_count,name_html,name_text'
-              })
-              .subscribe(
-                response => {
-                  this.pictures = [];
-                  if (response.pictures) {
-                    this.pictures = response.pictures;
-                  }
-                },
-                response => {
-                  Notify.response(response);
-                }
-              );
-
-            if (this.factory.lat && this.factory.lng) {
-              /* $($element[0])
-                .find('.google-map')
-                .each(() => {
-                  this.map = leaflet
-                    .map(this)
-                    .setView([this.factory.lat, this.factory.lng], 17);
-                  leaflet
-                    .tileLayer(
-                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      {
-                        attribution:
-                          'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-                          '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
-                      }
-                    )
-                    .addTo(this.map);
-
-                  leaflet
-                    .marker([this.factory.lat, this.factory.lng])
-                    .addTo(this.map);
-                  setTimeout(() => {
-                    this.map.invalidateSize();
-                  }, 300);
-                });*/
-            }
-          },
-          response => {
+    this.querySub = this.route.params
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params =>
+          this.itemService.getItem(params.id, {
+            fields: [
+              'name_text',
+              'name_html',
+              'lat',
+              'lng',
+              'description',
+              'related_group_pictures'
+            ].join(',')
+          })
+        ),
+        catchError((err, caught) => {
+          Notify.response(err);
+          this.router.navigate(['/error-404']);
+          return empty();
+        }),
+        tap(factory => {
+          if (factory.item_type_id !== 6) {
             this.router.navigate(['/error-404']);
+            return;
           }
-        );
-    });
+        }),
+        switchMap(
+          factory =>
+            this.pictureService.getPictures({
+              status: 'accepted',
+              exact_item_id: factory.id,
+              limit: 32,
+              fields:
+                'owner,thumb_medium,votes,views,comments_count,name_html,name_text'
+            }),
+          (factory, pictures) => ({ factory, pictures })
+        ),
+        catchError((err, caught) => {
+          Notify.response(err);
+          return empty();
+        })
+      )
+      .subscribe(data => {
+        this.factory = data.factory;
+        this.pictures = data.pictures.pictures;
+
+        this.relatedPictures = this.factory.related_group_pictures;
+
+        if (this.factory.lat && this.factory.lng) {
+          this.options.center = latLng([this.factory.lat, this.factory.lng]);
+          this.options.zoom = 17;
+          this.markers.push(
+            marker(this.options.center, {
+              icon: icon({
+                iconSize: [25, 41],
+                iconAnchor: [13, 41],
+                iconUrl: 'assets/marker-icon.png',
+                shadowUrl: 'assets/marker-shadow.png'
+              })
+            })
+          );
+        }
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/181/name',
+          pageId: 181,
+          args: {
+            FACTORY_ID: this.factory.id + '',
+            FACTORY_NAME: this.factory.name_text
+          }
+        });
+      });
   }
 
   ngOnDestroy(): void {
