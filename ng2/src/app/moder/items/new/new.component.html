@@ -7,4 +7,4 @@
   <i class="fa fa-spinner fa-spin fa-fw"></i>
 </span>
 
-<app-item-meta-form item="item" submit="submit()" parent="parent" invalid-params="invalidParams"></app-item-meta-form>
+<app-item-meta-form [item]="item" (submit)="submit()" [parent]="parent" [vehicleTypeIDs]="vehicleTypeIDs" [invalidParams]="invalidParams"></app-item-meta-form>

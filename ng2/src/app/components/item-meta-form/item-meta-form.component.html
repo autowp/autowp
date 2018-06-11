@@ -169,11 +169,11 @@
       <div class="col-md-10">
         <fieldset class="form-inline">
           <input type="text" name="lat" [(ngModel)]="item.lat" maxlength="20" size="20" style="width: 20%" [placeholder]="'latitude'|translate"
-            class="form-control" (change)="coordsChanged()" />
+            class="form-control" (input)="coordsChanged()" />
           <input type="text" name="lng" [(ngModel)]="item.lng" maxlength="20" size="20" style="width: 20%" [placeholder]="'longtitude'|translate"
-            class="form-control" (change)="coordsChanged()" />
+            class="form-control" (input)="coordsChanged()" />
         </fieldset>
-        <!-- leaflet lf-center="center" tiles="tiles" markers="markers" defaults="defaults" width="100%" height="300px"></leaflet -->
+        <div style="width:100%;height:300px" class="mb-4" leaflet [leafletCenter]="center" [leafletOptions]="leafletOptions" [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)"></div>
       </div>
     </div>
 

@@ -103,11 +103,11 @@ class MapController extends AbstractActionController
                 $url = null;
                 switch ($item['item_type_id']) {
                     case Item::FACTORY:
-                        $url = '/ng/factories/' . $item['id'];
+                        $url = ['/factories', $item['id']];
                         break;
 
                     case Item::MUSEUM:
-                        $url = '/ng/museums/' . $item['id'];
+                        $url = ['/museums', $item['id']];
                         break;
                 }
 

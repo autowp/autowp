@@ -7,7 +7,8 @@ import {
   SimpleChanges,
   OnInit,
   Output,
-  EventEmitter
+  EventEmitter,
+  NgZone
 } from '@angular/core';
 import { APIItem } from '../../services/item';
 import {
@@ -21,6 +22,16 @@ import { Observable, from } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { VehicleTypesModalComponent } from '../vehicle-types-modal/vehicle-types-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+  tileLayer,
+  latLng,
+  Map,
+  marker,
+  LatLng,
+  icon,
+  Marker,
+  LeafletMouseEvent
+} from 'leaflet';
 
 function specsToPlain(
   options: ItemMetaFormAPISpec[],
@@ -67,7 +78,6 @@ interface ItemMetaFormAPISpec extends APISpec {
 })
 @Injectable()
 export class ItemMetaFormComponent implements OnChanges, OnInit {
-
   @Input() item: APIItem;
   @Input() submitNotify: Function;
   @Input() parent: APIItem;
@@ -105,20 +115,21 @@ export class ItemMetaFormComponent implements OnChanges, OnInit {
       name: 'moder/item/produced/exactly'
     }
   ];
-  public center = {
-    lat: 55.7423627,
-    lng: 37.6786422,
-    zoom: 8
+
+  public markers: Marker[] = [];
+
+  public center = latLng(55.7423627, 37.6786422);
+
+  public leafletOptions = {
+    layers: [
+      tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18
+      })
+    ],
+    zoom: 8,
+    center: this.center
   };
 
-  public markers: any = {};
-  public tiles = {
-    url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    options: {
-      attribution:
-        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }
-  };
   public name_maxlength = 100; // DbTable\Item::MAX_NAME
   public full_name_maxlength = 255; // BrandModel::MAX_FULLNAME
   public body_maxlength = 20;
@@ -158,26 +169,12 @@ export class ItemMetaFormComponent implements OnChanges, OnInit {
     private vehicleTypeService: VehicleTypeService,
     private languageService: LanguageService,
     private http: HttpClient,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private zone: NgZone
   ) {
     if (this.item && this.item.lat && this.item.lng) {
-      this.markers.point = {
-        lat: this.item ? this.item.lat : null,
-        lng: this.item ? this.item.lng : null,
-        focus: true
-      };
+      this.markers = [this.createMarker(this.item.lat, this.item.lng)];
     }
-
-    /*$scope.$on('leafletDirectiveMap.click', function(event: any, e: any) {
-      const latLng = e.leafletEvent.latlng;
-      this.markers.point = {
-        lat: latLng.lat,
-        lng: latLng.lng,
-        focus: true
-      };
-      this.item.lat = latLng.lat;
-      this.item.lng = latLng.lng;
-    });*/
 
     this.model_year_max = new Date().getFullYear() + 10;
     this.year_max = new Date().getFullYear() + 10;
@@ -223,6 +220,9 @@ export class ItemMetaFormComponent implements OnChanges, OnInit {
     if (changes.vehicleTypeIDs) {
       this.loadVehicleTypes();
     }
+    if (changes.item) {
+      this.coordsChanged();
+    }
   }
 
   public matchingFn(value: string, target: APIVehicleType): boolean {
@@ -241,18 +241,19 @@ export class ItemMetaFormComponent implements OnChanges, OnInit {
   public coordsChanged() {
     const lat = this.item.lat;
     const lng = this.item.lng;
-    if (this.markers.point) {
-      this.markers.point.lat = isNaN(lat) ? 0 : lat;
-      this.markers.point.lng = isNaN(lng) ? 0 : lng;
+
+    const ll = (isNaN(lat) || isNaN(lng)) ? null : latLng([lat, lng]);
+    if (ll) {
+      if (this.markers.length) {
+        this.markers[0].setLatLng(ll);
+      } else {
+        this.markers = [this.createMarker(ll.lat, ll.lng)];
+      }
+      this.center = ll;
+      this.leafletOptions.center = ll;
     } else {
-      this.markers.point = {
-        lat: isNaN(lat) ? 0 : lat,
-        lng: isNaN(lng) ? 0 : lng,
-        focus: true
-      };
+      this.markers = [];
     }
-    this.center.lat = isNaN(lat) ? 0 : lat;
-    this.center.lng = isNaN(lng) ? 0 : lng;
   }
 
   public doSubmit(event) {
@@ -285,6 +286,28 @@ export class ItemMetaFormComponent implements OnChanges, OnInit {
     modalRef.componentInstance.ids = this.vehicleTypeIDs;
     modalRef.componentInstance.changed.subscribe(() => {
       this.loadVehicleTypes();
+    });
+  }
+
+  public onMapReady(lmap: Map) {
+    lmap.on('click', (event: LeafletMouseEvent) => {
+      this.zone.run(() => {
+        const ll: LatLng = event.latlng;
+        this.markers = [this.createMarker(ll.lat, ll.lng)];
+        this.item.lat = ll.lat;
+        this.item.lng = ll.lng;
+      });
+    });
+  }
+
+  private createMarker(lat, lng): Marker {
+    return marker([lat, lng], {
+      icon: icon({
+        iconSize: [25, 41],
+        iconAnchor: [13, 41],
+        iconUrl: 'assets/marker-icon.png',
+        shadowUrl: 'assets/marker-shadow.png'
+      })
     });
   }
 }

@@ -5,7 +5,7 @@ import {
   APIPaginator,
   APIImage
 } from './api.service';
-import { Observable } from 'rxjs';
+import { Observable, from, of } from 'rxjs';
 import { APIPicture } from './picture';
 
 export interface APIItemsGetResponse {
@@ -183,6 +183,9 @@ export class ItemService {
     id: number,
     options?: GetItemServiceOptions
   ): Observable<APIItem> {
+    if (!id) {
+      return of(null as APIItem);
+    }
     return this.getItemByLocation('/api/item/' + id, options);
   }
 

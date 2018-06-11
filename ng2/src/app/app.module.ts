@@ -18,6 +18,7 @@ import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { RecaptchaFormsModule } from 'ng-recaptcha/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 import { AppComponent } from './app.component';
 import { IndexComponent } from './index/index.component';
@@ -202,6 +203,7 @@ import { CarsSelectEngineTreeItemComponent } from './cars/specifications-editor/
 import { CarsSpecificationsEditorResultComponent } from './cars/specifications-editor/result/result.component';
 import { CarsSpecificationsEditorSpecComponent } from './cars/specifications-editor/spec/spec.component';
 import { VotingVotesComponent } from './voting/votes/votes.component';
+import { MapPopupComponent } from './map/popup/popup.component';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -806,14 +808,16 @@ const appRoutes: Routes = [
     CarsSpecificationsEditorEngineComponent,
     CarsSpecificationsEditorResultComponent,
     CarsSpecificationsEditorSpecComponent,
-    VotingVotesComponent
+    VotingVotesComponent,
+    MapPopupComponent
   ],
   entryComponents: [
     ModalMessageComponent,
     CommentsVotesComponent,
     PictureModerVoteModalComponent,
     VehicleTypesModalComponent,
-    VotingVotesComponent
+    VotingVotesComponent,
+    MapPopupComponent
   ],
   imports: [
     BrowserModule,
@@ -841,7 +845,8 @@ const appRoutes: Routes = [
     ChartsModule,
     RecaptchaModule.forRoot(),
     RecaptchaFormsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    LeafletModule.forRoot()
   ],
   providers: [
     APIService,
