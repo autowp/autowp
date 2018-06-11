@@ -37,7 +37,7 @@
   </div>
   <div class="row" *ngIf="havePhoto(item) && item.preview_pictures.length &lt;= 4">
     <div class="col-6 col-lg-3" *ngFor="let picture of item.preview_pictures">
-      <a [href]="picture.url" *ngIf="picture.picture.thumb_medium" class="d-block rounded mb-4">
+      <a [href]="picture.url" *ngIf="picture.picture && picture.picture.thumb_medium" class="d-block rounded mb-4">
         <img [src]="picture.picture.thumb_medium.src" alt="{{picture.picture.name}}" [title]="picture.picture.name" class="rounded w-100 border border-light"
         />
       </a>
@@ -76,7 +76,7 @@
 
     <li *ngIf="item.item_type_id == 8" class="list-inline-item">
       <i class="fa fa-align-left"></i>
-      <a ui-sref="persons-person({id: item.id})">{{'carlist/details'|translate}}</a>
+      <a [routerLink]="['/persons', item.id]">{{'carlist/details'|translate}}</a>
     </li>
 
     <li *ngIf="item.tuning" class="list-inline-item">

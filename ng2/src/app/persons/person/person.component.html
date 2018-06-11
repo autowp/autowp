@@ -1,9 +1,9 @@
-<p *ngIf="isModer">
+<p *ngIf="isModer && item">
   <i class="fa fa-cog"></i>
   <a [routerLink]="['/moder/items/item', item.id]" translate>moder/edit-object</a>
 </p>
 
-<div class="card card-body mb-4" *ngIf="links.length > 0 || item.description">
+<div class="card card-body mb-4" *ngIf="item && (links.length > 0 || item.description)">
   <app-markdown [markdown]="item.description"></app-markdown>
 
   <p *ngIf="links.length > 0">

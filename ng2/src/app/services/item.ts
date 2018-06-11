@@ -66,6 +66,11 @@ export interface APIItem {
   specifications_count: number;
   brands: APIItem[];
   public_urls?: string[];
+
+  preview_pictures: {
+    picture: APIPicture;
+    url: string;
+  }[];
 }
 
 export interface APIItemRelatedGroupItem {

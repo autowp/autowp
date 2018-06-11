@@ -29,15 +29,13 @@ export class ItemComponent {
     );
   }
 
-  public havePhoto(item: any) {
-    let found = false;
+  public havePhoto(item: APIItem) {
     for (const picture of item.preview_pictures) {
       if (picture.picture) {
-        found = true;
-        return false;
+        return true;
       }
     }
-    return found;
+    return false;
   }
 
   public canHavePhoto(item: APIItem) {
