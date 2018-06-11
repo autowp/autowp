@@ -375,7 +375,14 @@ const appRoutes: Routes = [
       }
     ]
   },
-  { path: 'inbox', component: InboxComponent },
+  {
+    path: 'inbox',
+    children: [
+      { path: '', component: InboxComponent },
+      { path: ':brand', component: InboxComponent },
+      { path: ':brand/:date', component: InboxComponent }
+    ]
+  },
   {
     path: 'info',
     children: [

@@ -4,11 +4,17 @@ import { APIPaginator } from '../services/api.service';
 import Notify from '../notify';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { Subscription } from 'rxjs';
+import { Subscription, of, combineLatest, empty } from 'rxjs';
 import { PictureService, APIPicture } from '../services/picture';
-import { InboxService } from '../services/inbox';
+import { InboxService, APIInbox } from '../services/inbox';
 import { APIItem } from '../services/item';
 import { PageEnvService } from '../services/page-env.service';
+import {
+  distinctUntilChanged,
+  debounceTime,
+  switchMap,
+  catchError
+} from 'rxjs/operators';
 
 const ALL_BRANDS = 'all';
 
@@ -23,7 +29,7 @@ export class InboxComponent implements OnInit, OnDestroy {
   private routeSub: Subscription;
   public pictures: APIPicture[] = [];
   public paginator: APIPaginator;
-  public brand_id = 0;
+  public brandID = 0;
   public current: {
     date: string;
     count: number;
@@ -49,77 +55,113 @@ export class InboxComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    if (!this.auth.user) {
-      this.router.navigate(['/signin']);
-      return;
-    }
-
-    this.routeSub = this.route.params.subscribe(params => {
-      if (!params.brand) {
-        this.router.navigate(['/inbox', ALL_BRANDS]);
-        return;
+    this.auth.authenticated.then(loggedIn => {
+      if (!loggedIn) {
+        this.router.navigate(['/signin']);
       }
+    });
 
-      if (params.brand === ALL_BRANDS) {
-        this.brand_id = 0;
-      } else {
-        this.brand_id = params.brand ? parseInt(params.brand, 10) : 0;
-      }
+    setTimeout(
+      () =>
+        this.pageEnv.set({
+          layout: {
+            needRight: false
+          },
+          name: 'page/76/name',
+          pageId: 76
+        }),
+      0
+    );
 
-      this.pageEnv.set({
-        layout: {
-          needRight: false
-        },
-        name: 'page/76/name',
-        pageId: 76
-      });
+    this.routeSub = this.route.params
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(
+          params => {
+            if (!params.brand) {
+              this.router.navigate(['/inbox', ALL_BRANDS]);
+              return empty();
+            }
 
-      this.inboxService.get(this.brand_id, params.date, params.page).subscribe(
-        response => {
-          this.paginator = response.paginator;
-          this.prev = response.prev;
-          this.current = response.current;
-          this.next = response.next;
-          this.brands = response.brands;
+            let brandID = 0;
+            if (params.brand !== ALL_BRANDS) {
+              brandID = params.brand ? parseInt(params.brand, 10) : 0;
+            }
 
-          if (params.date !== this.current.date) {
-            this.router.navigate(['/inbox', this.brand_id, this.current.date]);
-            return;
-          }
+            return combineLatest(
+              this.inboxService.get(brandID, params.date),
+              of(brandID)
+            );
+          },
+          (params, combined) => ({
+            params: params,
+            inbox: combined[0],
+            brandID: combined[1]
+          })
+        ),
+        catchError((err, caught) => {
+          Notify.response(err);
+          return of(null);
+        }),
+        switchMap(
+          data => this.route.queryParams,
+          (data, queryParams) => ({
+            params: data.params,
+            inbox: data.inbox,
+            brandID: data.brandID,
+            queryParams: queryParams
+          })
+        ),
+        switchMap(
+          data => {
+            if (data.params.date !== data.inbox.current.date) {
+              this.router.navigate([
+                '/inbox',
+                data.brandID ? data.brandID : 'all',
+                data.inbox.current.date
+              ]);
+              return of(null);
+            }
 
-          this.pictureService
-            .getPictures({
+            return this.pictureService.getPictures({
               status: 'inbox',
               fields:
                 'owner,thumb_medium,votes,views,comments_count,name_html,name_text',
               limit: 30,
-              page: params.page,
-              item_id: this.brand_id,
-              add_date: this.current.date,
+              page: data.queryParams.page,
+              item_id: data.brandID,
+              add_date: data.inbox.current.date,
               order: 1
-            })
-            .subscribe(
-              subresponse => {
-                this.pictures = subresponse.pictures;
-                this.paginator = subresponse.paginator;
-              },
-              subresponse => {
-                Notify.response(subresponse);
-              }
-            );
-        },
-        response => {
-          Notify.response(response);
-        }
-      );
-    });
+            });
+          },
+          (data, pictures) => ({
+            pictures: pictures,
+            inbox: data.inbox,
+            brandID: data.brandID
+          })
+        )
+      )
+      .subscribe(data => {
+        this.brandID = data.brandID;
+        this.prev = data.inbox.prev;
+        this.current = data.inbox.current;
+        this.next = data.inbox.next;
+        this.brands = data.inbox.brands;
+
+        this.pictures = data.pictures ? data.pictures.pictures : [];
+        this.paginator = data.pictures ? data.pictures.paginator : null;
+      });
   }
 
   ngOnDestroy(): void {
-    this.routeSub.unsubscribe();
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
+      this.routeSub = null;
+    }
   }
 
   public changeBrand() {
-    this.router.navigate(['/inbox', this.brand_id]);
+    this.router.navigate(['/inbox', this.brandID ? this.brandID : 'all']);
   }
 }

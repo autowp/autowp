@@ -17,8 +17,6 @@ export class AuthService {
           resolve();
         },
         error => {
-          console.log('initPromise reject');
-          console.log(error);
           resolve();
         }
       );

@@ -27,14 +27,12 @@ export class InboxService {
 
   public get(
     brand_id: number,
-    date: string,
-    page: number
+    date: string
   ): Observable<APIInbox> {
     return this.http.get<APIInbox>('/api/inbox', {
       params: {
         brand_id: brand_id ? brand_id.toString() : '',
-        date: date,
-        page: page ? page.toString() : '1'
+        date: date
       }
     });
   }
