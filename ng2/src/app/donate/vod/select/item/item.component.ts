@@ -1,9 +1,16 @@
-import { Component, Injectable, Input } from '@angular/core';
+import {
+  Component,
+  Injectable,
+  Input,
+  EventEmitter,
+  Output
+} from '@angular/core';
 import Notify from '../../../../notify';
 import { APIItem } from '../../../../services/item';
-import { ItemParentService, APIItemParent } from '../../../../services/item-parent';
-
-export type DonateVodSelectItemFunc = (id: number) => void;
+import {
+  ItemParentService,
+  APIItemParent
+} from '../../../../services/item-parent';
 
 @Component({
   selector: 'app-donate-vod-select-item',
@@ -15,7 +22,6 @@ export class DonateVodSelectItemComponent {
   public childs: APIItemParent[] = [];
   public loading = false;
   @Input() item: APIItemParent;
-  @Input() selectItem: DonateVodSelectItemFunc;
 
   constructor(private itemParentService: ItemParentService) {}
 
@@ -42,5 +48,7 @@ export class DonateVodSelectItemComponent {
           }
         );
     }
+
+    return false;
   }
 }
