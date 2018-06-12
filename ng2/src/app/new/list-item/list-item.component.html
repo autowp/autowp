@@ -8,8 +8,8 @@
     </sup>
 
     <small *ngIf="item.produced > 1">
-      <span *ngIf="item.produced_exactly" translate="ng/carlist/produced/%1$s" [translateParams]="{count: item.produced}"></span>
-      <span *ngIf="!item.produced_exactly" translate="ng/carlist/produced-about/%1$s" [translateParams]="{count: item.produced}"></span>
+      <span *ngIf="item.produced_exactly" translate [translateParams]="{count: item.produced}">ng/carlist/produced/%1$s</span>
+      <span *ngIf="!item.produced_exactly" translate [translateParams]="{count: item.produced}">ng/carlist/produced-about/%1$s</span>
     </small>
     <small translate *ngIf="item.produced == 1">carlist/produced/one</small>
   </h3>
@@ -19,7 +19,7 @@
   <div class="row">
     <div class="col-6 col-sm-4 col-lg-2" *ngFor="let picture of pictures">
       <a [href]="picture.url" *ngIf="picture.thumb_medium" class="d-block rounded mb-4">
-        <img [src]="picture.thumb_medium.src" [alt]="picture.name" [title]="picture.name" class="rounded w-100 border border-light"
+        <img [src]="picture.thumb_medium.src" [alt]="picture.name_text" [title]="picture.name_text" class="rounded w-100 border border-light"
         />
       </a>
       <span *ngIf="!picture">&#xa0;</span>
@@ -31,7 +31,7 @@
   <ul class="list-inline">
     <li *ngIf="totalPictures > 6" class="list-inline-item">
       <span class="fa fa-th"></span>
-      <a ui-sref="new-item({date: date, item_id: item.id, page: null})">{{'carlist/all pictures'|translate}} ({{totalPictures}})</a>
+      <a [routerLink]="['/new', date, 'item', item.id]">{{'carlist/all pictures'|translate}} ({{totalPictures}})</a>
     </li>
 
     <li *ngIf="item.specs_url" class="list-inline-item">

@@ -7,6 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { APIPicture } from '../services/picture';
 import { PageEnvService } from '../services/page-env.service';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 export interface APINewGroup {
   type: string;
@@ -61,69 +62,85 @@ export class NewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
-      this.date = params.date;
-
-      this.pageEnv.set({
-        layout: {
-          needRight: false
-        },
-        name: 'page/51/name',
-        pageId: 51
-      });
-
-      this.http
-        .get<APINewGetResponse>('/api/new', {
-          params: {
-            date: params.date,
-            page: params.page,
-            fields:
-              'pictures.owner,pictures.thumb_medium,pictures.votes,pictures.views,' +
-              'pictures.comments_count,pictures.name_html,pictures.name_text,' +
-              'item_pictures.thumb_medium,item_pictures.name_html,item_pictures.name_text,' +
-              'item.name_html,item.name_default,item.description,item.produced,' +
-              'item.design,item.url,item.spec_editor_url,item.specs_url,' +
-              'item.categories.url,item.categories.name_html,item.twins_groups'
-          }
-        })
-        .subscribe(
-          response => {
-            this.paginator = response.paginator;
-            this.prev = response.prev;
-            this.current = response.current;
-            this.next = response.next;
-            this.groups = [];
-
-            const repackedGroups: any = [];
-            for (const group of response.groups) {
-              let repackedGroup: any;
-
-              switch (group.type) {
-                case 'item':
-                  repackedGroup = group;
-                  break;
-                case 'pictures':
-                  repackedGroup = {
-                    type: group.type,
-                    chunks: chunkBy(group.pictures, 6)
-                  };
-                  break;
-              }
-
-              repackedGroups.push(repackedGroup);
+    this.routeSub = this.route.params
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(
+          params => {
+            const query: {
+              date?: string;
+              page?: string;
+              fields: string;
+            } = {
+              fields:
+                'pictures.owner,pictures.thumb_medium,pictures.votes,pictures.views,' +
+                'pictures.comments_count,pictures.name_html,pictures.name_text,' +
+                'item_pictures.thumb_medium,item_pictures.name_html,item_pictures.name_text,' +
+                'item.name_html,item.name_default,item.description,item.produced,' +
+                'item.design,item.url,item.spec_editor_url,item.specs_url,' +
+                'item.categories.url,item.categories.name_html,item.twins_groups'
+            };
+            if (params.date) {
+              query.date = params.date;
             }
-            this.groups = repackedGroups;
-
-            if (params.date !== this.current.date) {
-              this.router.navigate(['/new', this.current.date]);
-              return;
+            if (params.page) {
+              query.page = params.page;
             }
+            return this.http.get<APINewGetResponse>('/api/new', {
+              params: query
+            });
           },
-          response => {
-            Notify.response(response);
+          (params, response) => ({ params, response })
+        )
+      )
+      .subscribe(
+        data => {
+          if (data.params.date !== data.response.current.date) {
+            this.router.navigate(['/new', data.response.current.date]);
+            return;
           }
-        );
-    });
+
+          this.date = data.params.date;
+
+          this.pageEnv.set({
+            layout: {
+              needRight: false
+            },
+            name: 'page/51/name',
+            pageId: 51
+          });
+
+          this.paginator = data.response.paginator;
+          this.prev = data.response.prev;
+          this.current = data.response.current;
+          this.next = data.response.next;
+          this.groups = [];
+
+          const repackedGroups: any = [];
+          for (const group of data.response.groups) {
+            let repackedGroup: any;
+
+            switch (group.type) {
+              case 'item':
+                repackedGroup = group;
+                break;
+              case 'pictures':
+                repackedGroup = {
+                  type: group.type,
+                  chunks: chunkBy(group.pictures, 6)
+                };
+                break;
+            }
+
+            repackedGroups.push(repackedGroup);
+          }
+          this.groups = repackedGroups;
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
   }
 
   ngOnDestroy(): void {

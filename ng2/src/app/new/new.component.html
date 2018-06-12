@@ -1,11 +1,11 @@
 <div class="row mb-4">
   <div class="col-lg-4 col-md-4">
-    <h3 class="text-left" *ngIf="prev.date">
+    <h3 class="text-left" *ngIf="prev && prev.date">
       &#x2190;
-      <a ui-sref=".({date: prev.date, page: null})" [textContent]="prev.date | amDateFormat: 'LL'"></a>
+      <a [routerLink]="['/new', prev.date]" [textContent]="prev.date | amDateFormat: 'LL'"></a>
       <br />
       <small>(
-        <span translate="ng/%1$s-pictures" [translateParams]="{count: prev.count}"></span>)</small>
+        <span translate [translateParams]="{count: prev.count}">ng/%1$s-pictures</span>)</small>
     </h3>
   </div>
   <div class="col-lg-4 col-md-4">
@@ -13,15 +13,15 @@
       <span [textContent]="current.date | amDateFormat: 'LL'"></span>
       <br />
       <small>(
-        <span translate="ng/%1$s-pictures" [translateParams]="{count: current.count}"></span>)</small>
+        <span translate [translateParams]="{count: current.count}">ng/%1$s-pictures</span>)</small>
     </h3>
   </div>
   <div class="col-lg-4 col-md-4">
-    <h3 class="text-right" *ngIf="next.date">
-      <a ui-sref=".({date: next.date, page: null})" [textContent]="next.date | amDateFormat: 'LL'"></a>
+    <h3 class="text-right" *ngIf="next && next.date">
+      <a [routerLink]="['/new', next.date]" [textContent]="next.date | amDateFormat: 'LL'"></a>
       <br />
       <small>(
-        <span translate="ng/%1$s-pictures" [translateParams]="{count: next.count}"></span>)</small>
+        <span translate [translateParams]="{count: next.count}">ng/%1$s-pictures</span>)</small>
       &#x2192;
     </h3>
   </div>

@@ -560,8 +560,20 @@ const appRoutes: Routes = [
   },
   { path: 'museums/:id', component: MuseumComponent },
   {
-    path: 'new/:date/:page',
+    path: 'new',
     children: [
+      {
+        path: ':date',
+        component: NewComponent
+      },
+      {
+        path: ':date/:page',
+        component: NewComponent
+      },
+      {
+        path: ':date/item/:item_id',
+        component: NewItemComponent
+      },
       {
         path: ':date/item/:item_id/:page',
         component: NewItemComponent
