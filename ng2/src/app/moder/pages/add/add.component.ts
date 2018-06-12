@@ -1,7 +1,7 @@
 import { Component, Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { PageService, APIPage } from '../../../services/page';
+import { PageService, APIPage, APIPageLinearized } from '../../../services/page';
 import { PageEnvService } from '../../../services/page-env.service';
 
 // Acl.inheritsRole('pages-moder', 'unauthorized');
@@ -14,7 +14,7 @@ import { PageEnvService } from '../../../services/page-env.service';
 export class ModerPagesAddComponent {
   public loading = 0;
   public item: any = {};
-  public pages: APIPage[];
+  public pages: APIPageLinearized[];
 
   constructor(
     private http: HttpClient,
@@ -68,7 +68,11 @@ export class ModerPagesAddComponent {
           this.http.get<APIPage>(response.headers.get('Location')).subscribe(
             page => {
               this.loading--;
-              this.router.navigate(['/moder/pages/edit', page.id]);
+              this.router.navigate(['/moder/pages/edit'], {
+                queryParams: {
+                  id: page.id
+                }
+              });
             },
             () => {
               this.loading--;

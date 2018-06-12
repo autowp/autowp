@@ -48,7 +48,7 @@ export class ModerPagesEditComponent implements OnInit, OnDestroy {
       this.pages = this.pageService.toPlainArray(response.items, 0);
     });
 
-    this.routeSub = this.route.params.subscribe(params => {
+    this.routeSub = this.route.queryParams.subscribe(params => {
       this.pageService.getPage(params.id).subscribe(
         response => (this.item = response),
         () => {
