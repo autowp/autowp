@@ -22,25 +22,54 @@ import { PageEnvService } from '../../../services/page-env.service';
 export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
   private routeSub: Subscription;
   public attribute: APIAttrAttribute;
-  public attributes: APIAttrAttribute[];
+  public attributes: APIAttrAttribute[] = [];
   public loading = 0;
   public addLoading = 0;
   public addListOptionLoading = 0;
 
   public typeOptionsDefaults = [{ id: null, name: '-' }];
-  public typeOptions: any[] = [];
-  public typeMap: any = {};
+  public typeOptions: {
+    id: number;
+    name: string;
+  }[] = [];
+  public typeMap: { [id: number]: string } = {};
 
   public unitOptionsDefaults = [{ id: null, name: '-' }];
-  public unitOptions: any[] = [];
+  public unitOptions: {
+    id: number;
+    name: string;
+  }[] = [];
 
-  public newAttribute: APIAttrAttribute;
+  public defaultAttribute: APIAttrAttribute = {
+    id: null,
+    type_id: null,
+    name: null,
+    description: null,
+    precision: null,
+    unit_id: null,
+    is_multiple: false,
+    parent_id: null
+  };
+
+  public newAttribute: APIAttrAttribute = {
+    id: null,
+    type_id: null,
+    name: null,
+    description: null,
+    precision: null,
+    unit_id: null,
+    is_multiple: false,
+    parent_id: null
+  };
 
   public listOptions: APIAttrListOption[] = [];
 
   public listOptionsDefaults = [{ id: null, name: '-' }];
-  public listOptionsOptions: any[] = [];
-  public newListOption: any = {
+  public listOptionsOptions: {
+    id: number | null;
+    name: string;
+  }[] = [];
+  public newListOption = {
     parent_id: null,
     name: ''
   };
@@ -52,12 +81,14 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private pageEnv: PageEnvService
-  ) {}
+  ) {
+    Object.assign(this.newAttribute, this.defaultAttribute);
+  }
 
   ngOnInit(): void {
     this.attrsService.getUnits().then(
-      (items: APIAttrUnit[]) => {
-        this.unitOptions = this.unitOptionsDefaults;
+      items => {
+        this.unitOptions = this.unitOptionsDefaults.slice(0);
         for (const item of items) {
           this.unitOptions.push({
             id: item.id,
@@ -72,7 +103,7 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
 
     this.routeSub = this.route.params.subscribe(params => {
       this.attrsService.getAttribute(params.id).then(
-        (attribute: APIAttrAttribute) => {
+        attribute => {
           this.attribute = attribute;
 
           this.translate.get(this.attribute.name).subscribe(
@@ -105,8 +136,8 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
           );
 
           this.attrsService.getAttributeTypes().then(
-            (types: APIAttrAttributeType[]) => {
-              this.typeOptions = this.typeOptionsDefaults;
+            types => {
+              this.typeOptions = this.typeOptionsDefaults.slice(0);
               for (const item of types) {
                 this.typeMap[item.id] = item.name;
                 this.typeOptions.push({
@@ -152,10 +183,8 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
 
   public saveAttribute() {
     this.loading++;
-    this.http
-      .patch('/api/attr/attribute/' + this.attribute.id, {
-        data: this.attribute
-      })
+    this.attrsService
+      .updateAttribute(this.attribute.id, this.attribute)
       .subscribe(
         response => {
           this.loading--;
@@ -168,49 +197,45 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
   }
 
   public addAttribute() {
-    const data: any = this.newAttribute;
-    data.parent_id = this.attribute.id;
+    this.newAttribute.parent_id = this.attribute.id;
 
     this.addLoading++;
-    this.http
-      .post<void>('/api/attr/attribute', data, {
-        observe: 'response'
-      })
-      .subscribe(
-        response => {
-          const location = response.headers.get('Location');
+    this.attrsService.createAttribute(this.newAttribute).subscribe(
+      response => {
+        const location = response.headers.get('Location');
 
-          this.addLoading++;
-          this.attrsService.getAttributeByLocation(location).subscribe(
-            subresponse => {
-              this.router.navigate(['/moder/attrs/attribute', subresponse.id]);
+        Object.assign(this.newAttribute, this.defaultAttribute);
 
-              this.addLoading--;
-            },
-            subresponse => {
-              Notify.response(subresponse);
-              this.addLoading--;
-            }
-          );
+        this.addLoading++;
+        this.attrsService.getAttributeByLocation(location).subscribe(
+          subresponse => {
+            this.router.navigate(['/moder/attrs/attribute', subresponse.id]);
 
-          this.addLoading--;
-        },
-        response => {
-          Notify.response(response);
-          this.addLoading--;
-        }
-      );
+            this.addLoading--;
+          },
+          subresponse => {
+            Notify.response(subresponse);
+            this.addLoading--;
+          }
+        );
+
+        this.addLoading--;
+      },
+      response => {
+        Notify.response(response);
+        this.addLoading--;
+      }
+    );
   }
 
   public addListOption() {
     this.addListOptionLoading++;
 
-    const data: any = this.newListOption;
-    data.attribute_id = this.attribute.id;
-
-    this.http
-      .post('/api/attr/list-option', {
-        data: data
+    this.attrsService
+      .createListOption({
+        attribute_id: this.attribute.id,
+        parent_id: this.newListOption.parent_id,
+        name: this.newListOption.name
       })
       .subscribe(
         response => {
@@ -225,6 +250,8 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
           this.addListOptionLoading--;
         }
       );
+
+    return false;
   }
 
   public loadListOptions() {
@@ -236,7 +263,7 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
       .subscribe(
         response => {
           this.listOptions = response.items;
-          this.listOptionsOptions = this.listOptionsDefaults;
+          this.listOptionsOptions = this.listOptionsDefaults.slice(0);
           for (const item of this.listOptions) {
             this.listOptionsOptions.push({
               id: item.id,

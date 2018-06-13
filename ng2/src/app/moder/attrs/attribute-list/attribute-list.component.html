@@ -8,7 +8,7 @@
       <span class="fa fa-arrow-up"></span>
     </a>
     <span style="color:#999999" class="fa fa-arrow-up" *ngIf="i &lt;= 0"></span>
-    <a ui-sref="moder-attrs-attribute({id: attribute.id})" [textContent]="attribute.name | translate"></a>
+    <a [routerLink]="['/moder/attrs/attribute', attribute.id]" [textContent]="attribute.name | translate"></a>
     <app-moder-attrs-attribute-list [attributes]="attribute.childs" (movedUp)="moveUp($event)" (movedDown)="moveDown($event)"></app-moder-attrs-attribute-list>
   </li>
 </ul>

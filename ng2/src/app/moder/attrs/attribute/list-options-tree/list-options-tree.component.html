@@ -1,4 +1,4 @@
-<ul *ngIf="items.length > 0">
+<ul *ngIf="items && items.length > 0">
   <li *ngFor="let item of items">
     <span [textContent]="item.name"></span>
     <app-moder-attrs-attribute-list-options-tree [items]="item.childs"></app-moder-attrs-attribute-list-options-tree>

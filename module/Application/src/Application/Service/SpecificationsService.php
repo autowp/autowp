@@ -528,6 +528,9 @@ class SpecificationsService
                     'precision'   => $row['precision'],
                     'parentId'    => $pid ? $pid : null
                 ];
+                if (! isset($childs[$id])) {
+                    $childs[$id] = [];
+                }
                 if (! isset($childs[$pid])) {
                     $childs[$pid] = [$id];
                 } else {
@@ -913,8 +916,8 @@ class SpecificationsService
             $this->loadZone($zone);
         }
 
+        $attributes = [];
         if ($recursive) {
-            $attributes = [];
             $ids = [];
             if ($zone) {
                 if (isset($this->childs[$parent])) {

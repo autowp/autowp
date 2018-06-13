@@ -6,8 +6,8 @@
         <i class="fa fa-spinner fa-spin fa-fw"></i>
       </span>
     </h2>
-    <div class="card card-body">
-      <form class="form-vertical" (submit)="saveAttribute()">
+    <div class="card card-body mb-4">
+      <form class="form-vertical" (submit)="saveAttribute()" *ngIf="attribute">
         <fieldset>
           <div class="form-group">
             <label for="name" translate>attrs/attribute/name</label>
@@ -16,7 +16,7 @@
           <div class="form-group">
             <label for="type_id" translate>attrs/attribute/type</label>
             <select name="type_id" class="form-control" [(ngModel)]="attribute.type_id">
-              <option *ngFor="let option of typeOptions" [value]="option.id">{{option.name|translate}}</option>
+              <option *ngFor="let option of typeOptions" [ngValue]="option.id">{{option.name|translate}}</option>
             </select>
           </div>
           <div class="form-group">
@@ -26,7 +26,7 @@
           <div class="form-group">
             <label for="unit_id" translate>attrs/attribute/unit</label>
             <select name="unit_id" class="form-control" [(ngModel)]="attribute.unit_id">
-              <option *ngFor="let option of unitOptions" [value]="option.id">{{option.name|translate}}</option>
+              <option *ngFor="let option of unitOptions" [ngValue]="option.id">{{option.name|translate}}</option>
             </select>
           </div>
           <div class="form-group">
@@ -39,7 +39,7 @@
     </div>
 
     <h2 translate>moder/attrs/parameters/options-list</h2>
-    <div class="card card-body">
+    <div class="card card-body mb-4">
       <app-moder-attrs-attribute-list-options-tree [items]="listOptions"></app-moder-attrs-attribute-list-options-tree>
     </div>
 
@@ -49,13 +49,13 @@
         <i class="fa fa-spinner fa-spin fa-fw"></i>
       </span>
     </h2>
-    <div class="card card-body">
+    <div class="card card-body mb-4">
       <form class="form-vertical" (submit)="addListOption()">
         <fieldset>
           <div class="form-group">
             <label for="parent_id" translate>attrs/list-options/parent</label>
             <select name="parent_id" class="form-control" [(ngModel)]="newListOption.parent_id">
-              <option *ngFor="let option of listOptionsOptions" [value]="option.id">{{option.name}}</option>
+              <option *ngFor="let option of listOptionsOptions" [ngValue]="option.id">{{option.name}}</option>
             </select>
           </div>
           <div class="form-group">
@@ -70,7 +70,7 @@
   <div class="col-md-6">
     <div *ngIf="attributes.length > 0">
       <h2 translate>moder/attrs/attributes</h2>
-      <div class="card card-body">
+      <div class="card card-body mb-4">
         <table class="table">
           <tr>
             <th translate>attrs/attribute/name</th>
@@ -79,7 +79,7 @@
           </tr>
           <tr *ngFor="let attribute of attributes">
             <td>
-              <a ui-sref="moder-attrs-attribute({id: attribute.id})" [textContent]="attribute.name|translate"></a>
+              <a [routerLink]="['/moder/attrs/attribute', attribute.id]" [textContent]="attribute.name|translate"></a>
             </td>
             <td>
               <span *ngIf="attribute.type_id" [textContent]="typeMap[attribute.type_id]"></span>
@@ -100,7 +100,7 @@
         <i class="fa fa-spinner fa-spin fa-fw"></i>
       </span>
     </h2>
-    <div class="card card-body">
+    <div class="card card-body mb-4">
       <form class="form-vertical" (submit)="addAttribute()">
         <fieldset>
           <div class="form-group">

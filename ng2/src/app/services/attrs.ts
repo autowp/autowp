@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { APIPaginator } from './api.service';
 import { Observable } from 'rxjs';
 import { APIUser } from './user';
@@ -123,17 +123,18 @@ export interface APIAttrZone {
 }
 
 export interface APIAttrAttribute {
+  parent_id: number|null;
   id: number;
   type_id: number;
   name: string;
   description: string;
   precision: number;
   unit_id: number;
-  unit: APIAttrUnit;
-  childs: APIAttrAttribute[];
-  options: APIAttrListOption[];
+  unit?: APIAttrUnit;
+  childs?: APIAttrAttribute[];
+  options?: APIAttrListOption[];
   is_multiple: boolean;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 export interface APIAttrAttributeType {
@@ -150,6 +151,32 @@ export interface APIAttrUnit {
 export interface GetAttributeServiceOptions {
   fields: string;
 }
+
+export interface APIAttrListOptionPostOptions {
+  attribute_id: number;
+  parent_id?: number;
+  name: string;
+}
+
+export interface APIAttrAttributePatchOptions {
+  type_id?: number;
+  name?: string;
+  description?: string;
+  precision?: number;
+  unit_id?: number;
+  is_multiple?: boolean;
+}
+
+export interface APIAttrAttributePostOptions {
+  parent_id: number;
+  type_id: number;
+  name: string;
+  description: string;
+  precision?: number;
+  unit_id?: number;
+  is_multiple: boolean;
+}
+
 @Injectable()
 export class AttrsService {
   constructor(private http: HttpClient) {}
@@ -343,5 +370,72 @@ export class AttrsService {
         params: params
       }
     );
+  }
+
+  public createListOption(
+    options: APIAttrListOptionPostOptions
+  ): Observable<HttpResponse<void>> {
+    const data: { [param: string]: string } = {
+      attribute_id: options.attribute_id.toString(),
+      name: options.name
+    };
+
+    if (options.parent_id) {
+      data.parent_id = options.parent_id.toString();
+    }
+
+    return this.http.post<void>('/api/attr/list-option', data, {
+      observe: 'response'
+    });
+  }
+
+  public updateAttribute(id: number, options: APIAttrAttributePatchOptions): Observable<void> {
+    const data: { [param: string]: string } = {};
+
+    if (options.hasOwnProperty('description')) {
+      data.description = options.description;
+    }
+
+    if (options.hasOwnProperty('is_multiple')) {
+      data.is_multiple = options.is_multiple ? '1' : '0';
+    }
+
+    if (options.hasOwnProperty('name')) {
+      data.name = options.name;
+    }
+
+    if (options.hasOwnProperty('precision')) {
+      data.precision = options.precision ? options.precision.toString() : '';
+    }
+
+    if (options.hasOwnProperty('type_id')) {
+      data.type_id = options.type_id ? options.type_id.toString() : '';
+    }
+
+    if (options.hasOwnProperty('unit_id')) {
+      data.unit_id = options.unit_id ? options.unit_id.toString() : '';
+    }
+
+    return this.http.patch<void>('/api/attr/attribute/' + id, data);
+  }
+
+  public createAttribute(options: APIAttrAttributePostOptions): Observable<HttpResponse<void>> {
+
+    const data: { [param: string]: any } = {
+      name: options.name,
+      type_id: options.type_id,
+      unit_id: options.unit_id,
+      precision: options.precision,
+      is_multiple: options.is_multiple,
+      description: options.description,
+    };
+
+    if (options.parent_id) {
+      data.parent_id = options.parent_id.toString();
+    }
+
+    return this.http.post<void>('/api/attr/attribute', data, {
+      observe: 'response'
+    });
   }
 }
