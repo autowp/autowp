@@ -42,26 +42,14 @@ export interface APIMostsMenuGetResponse {
 
 @Injectable()
 export class MostsService {
-  private data: APIMostsMenuGetResponse;
+  private menu$: Observable<APIMostsMenuGetResponse>;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.menu$ = this.http.get<APIMostsMenuGetResponse>('/api/mosts/menu');
+  }
 
-  public getMenu(): Promise<APIMostsMenuGetResponse> {
-    return new Promise<APIMostsMenuGetResponse>((resolve, reject) => {
-      if (this.data) {
-        resolve(this.data);
-        return;
-      }
-
-      this.http.get<APIMostsMenuGetResponse>('/api/mosts/menu').subscribe(
-        response => {
-          this.data = response;
-
-          resolve(this.data);
-        },
-        response => reject(response)
-      );
-    });
+  public getMenu(): Observable<APIMostsMenuGetResponse> {
+    return this.menu$;
   }
 
   public getItems(

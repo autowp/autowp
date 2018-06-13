@@ -1,4 +1,3 @@
-import * as $ from 'jquery';
 import { ACLService } from '../../../services/acl.service';
 import {
   Component,

@@ -204,6 +204,7 @@ import { CarsSpecificationsEditorResultComponent } from './cars/specifications-e
 import { CarsSpecificationsEditorSpecComponent } from './cars/specifications-editor/spec/spec.component';
 import { VotingVotesComponent } from './voting/votes/votes.component';
 import { MapPopupComponent } from './map/popup/popup.component';
+import { MostsService } from './services/mosts';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -555,8 +556,25 @@ const appRoutes: Routes = [
     ]
   },
   {
-    path: 'mosts/:rating_catname/:type_catname/:years_catname',
-    component: MostsComponent
+    path: 'mosts',
+    children: [
+      {
+        path: '',
+        component: MostsComponent,
+      },
+      {
+        path: ':rating_catname',
+        component: MostsComponent,
+      },
+      {
+        path: ':rating_catname/:type_catname',
+        component: MostsComponent,
+      },
+      {
+        path: ':rating_catname/:type_catname/:years_catname',
+        component: MostsComponent,
+      }
+    ]
   },
   { path: 'museums/:id', component: MuseumComponent },
   {
@@ -901,7 +919,8 @@ const appRoutes: Routes = [
     AttrsService,
     PageEnvService,
     ContentLanguageService,
-    LanguageService
+    LanguageService,
+    MostsService
   ],
   bootstrap: [AppComponent]
 })

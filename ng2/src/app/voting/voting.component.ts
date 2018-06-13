@@ -1,5 +1,4 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import * as $ from 'jquery';
 import { HttpClient } from '@angular/common/http';
 import Notify from '../notify';
 import { Subscription, combineLatest } from 'rxjs';
@@ -90,9 +89,6 @@ export class VotingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
-    /*$(this.$element)
-      .find('.modal')
-      .modal('hide');*/
   }
 
   public vote() {

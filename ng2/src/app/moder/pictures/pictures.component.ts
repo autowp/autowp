@@ -1,5 +1,4 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import * as $ from 'jquery';
 import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../services/api.service';
 import { PerspectiveService, APIPerspective } from '../../services/perspective';

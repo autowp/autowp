@@ -1,5 +1,4 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import * as $ from 'jquery';
 import { HttpClient } from '@angular/common/http';
 import { UserService, APIUser } from '../../services/user';
 import Notify from '../../notify';

@@ -8,11 +8,16 @@ import {
   APIMostsMenuRating,
   APIMostsMenuYear
 } from '../services/mosts';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { APIVehicleType } from '../services/vehicle-type';
 import { PageEnvService } from '../services/page-env.service';
-const $ = require('jquery');
+import {
+  distinctUntilChanged,
+  debounceTime,
+  tap,
+  switchMap
+} from 'rxjs/operators';
 
 function vehicleTypesToList(vehilceTypes: APIVehicleType[]): APIVehicleType[] {
   const result: APIVehicleType[] = [];
@@ -38,7 +43,7 @@ export class MostsComponent implements OnInit, OnDestroy {
   public years: APIMostsMenuYear[];
   public ratings: APIMostsMenuRating[];
   public vehilceTypes: APIVehicleType[];
-  public loading: number;
+  public loading = 0;
   public ratingCatname: string;
   public typeCatname: string;
   public yearsCatname: string;
@@ -53,17 +58,23 @@ export class MostsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
-      this.ratingCatname = params.rating_catname;
-      this.typeCatname = params.type_catname;
-      this.yearsCatname = params.years_catname;
+    this.routeSub = combineLatest(
+      this.route.params.pipe(
+        distinctUntilChanged(),
+        debounceTime(30)
+      ),
+      this.mostsService.getMenu(),
+      (params, menu) => ({ params, menu })
+    )
+      .pipe(
+        tap(data => {
+          this.ratingCatname = data.params.rating_catname;
+          this.typeCatname = data.params.type_catname;
+          this.yearsCatname = data.params.years_catname;
 
-      this.loading++;
-      this.mostsService.getMenu().then(
-        data => {
-          this.years = data.years;
-          this.ratings = data.ratings;
-          this.vehilceTypes = vehicleTypesToList(data.vehilce_types);
+          this.years = data.menu.years;
+          this.ratings = data.menu.ratings;
+          this.vehilceTypes = vehicleTypesToList(data.menu.vehilce_types);
 
           this.defaultTypeCatname = this.vehilceTypes[0].catname;
 
@@ -71,109 +82,108 @@ export class MostsComponent implements OnInit, OnDestroy {
             this.ratingCatname = this.ratings[0].catname;
           }
 
-          const ratingName = 'most/' + this.ratingCatname;
-          if (this.typeCatname) {
-            const typeName = this.getVehicleTypeName(this.typeCatname);
+          this.setPageEnv(
+            this.ratingCatname,
+            this.typeCatname,
+            this.yearsCatname
+          );
+        }),
+        switchMap(data =>
+          this.mostsService.getItems({
+            rating_catname: this.ratingCatname,
+            type_catname: this.typeCatname,
+            years_catname: this.yearsCatname
+          })
+        )
+      )
+      .subscribe(response => {
+        this.items = response.items;
+      });
 
-            if (this.yearsCatname) {
-              let yearName = '';
-              for (const year of this.years) {
-                if (year.catname === this.yearsCatname) {
-                  yearName = year.name;
-                }
-              }
+    /*
+      setTimeout(() => {
+          $('small.unit').tooltip({
+            placement: 'bottom'
+          });
+        }, 0);
+      */
+  }
 
-              this.translate.get([ratingName, typeName, yearName]).subscribe(
-                (translations: string[]) => {
-                  this.initPageEnv(156, {
-                    MOST_CATNAME: this.ratingCatname,
-                    MOST_NAME: translations[0],
-                    CAR_TYPE_CARNAME: this.typeCatname,
-                    CAR_TYPE_NAME: translations[1],
-                    YEAR_CATNAME: this.yearsCatname,
-                    YEAR_NAME: translations[2]
-                  });
-                },
-                () => {
-                  this.initPageEnv(156, {
-                    MOST_CATNAME: this.ratingCatname,
-                    MOST_NAME: ratingName,
-                    CAR_TYPE_CARNAME: this.typeCatname,
-                    CAR_TYPE_NAME: typeName,
-                    YEAR_CATNAME: this.yearsCatname,
-                    YEAR_NAME: yearName
-                  });
-                }
-              );
-            } else {
-              this.translate.get([ratingName, typeName]).subscribe(
-                (translations: string[]) => {
-                  this.initPageEnv(155, {
-                    MOST_CATNAME: this.ratingCatname,
-                    MOST_NAME: translations[0],
-                    CAR_TYPE_CARNAME: this.typeCatname,
-                    CAR_TYPE_NAME: translations[1]
-                  });
-                },
-                () => {
-                  this.initPageEnv(155, {
-                    MOST_CATNAME: this.ratingCatname,
-                    MOST_NAME: ratingName,
-                    CAR_TYPE_CARNAME: this.typeCatname,
-                    CAR_TYPE_NAME: typeName
-                  });
-                }
-              );
-            }
-          } else {
-            this.translate.get(ratingName).subscribe(
-              (translation: string) => {
-                this.initPageEnv(154, {
-                  MOST_CATNAME: this.ratingCatname,
-                  MOST_NAME: translation
-                });
-              },
-              () => {
-                this.initPageEnv(154, {
-                  MOST_CATNAME: this.ratingCatname,
-                  MOST_NAME: ratingName
-                });
-              }
-            );
+  private setPageEnv(
+    ratingCatname: string,
+    typeCatname: string,
+    yearsCatname: string
+  ) {
+    const ratingName = 'most/' + ratingCatname;
+    if (typeCatname) {
+      const typeName = this.getVehicleTypeName(typeCatname);
+
+      if (yearsCatname) {
+        let yearName = '';
+        for (const year of this.years) {
+          if (year.catname === yearsCatname) {
+            yearName = year.name;
           }
-
-          setTimeout(() => {
-            $('small.unit').tooltip({
-              placement: 'bottom'
-            });
-          }, 0);
-
-          this.loading--;
-        },
-        response => {
-          this.loading--;
-          Notify.response(response);
         }
-      );
 
-      this.loading++;
-      this.mostsService
-        .getItems({
-          rating_catname: this.ratingCatname,
-          type_catname: this.typeCatname,
-          years_catname: this.yearsCatname
-        })
-        .subscribe(
-          response => {
-            this.items = response.items;
-            this.loading--;
+        this.translate.get([ratingName, typeName, yearName]).subscribe(
+          (translations: string[]) => {
+            this.initPageEnv(156, {
+              MOST_CATNAME: ratingCatname,
+              MOST_NAME: translations[0],
+              CAR_TYPE_CARNAME: typeCatname,
+              CAR_TYPE_NAME: translations[1],
+              YEAR_CATNAME: yearsCatname,
+              YEAR_NAME: translations[2]
+            });
           },
-          response => {
-            Notify.response(response);
-            this.loading--;
+          () => {
+            this.initPageEnv(156, {
+              MOST_CATNAME: ratingCatname,
+              MOST_NAME: ratingName,
+              CAR_TYPE_CARNAME: typeCatname,
+              CAR_TYPE_NAME: typeName,
+              YEAR_CATNAME: yearsCatname,
+              YEAR_NAME: yearName
+            });
           }
         );
-    });
+      } else {
+        this.translate.get([ratingName, typeName]).subscribe(
+          (translations: string[]) => {
+            this.initPageEnv(155, {
+              MOST_CATNAME: ratingCatname,
+              MOST_NAME: translations[0],
+              CAR_TYPE_CARNAME: typeCatname,
+              CAR_TYPE_NAME: translations[1]
+            });
+          },
+          () => {
+            this.initPageEnv(155, {
+              MOST_CATNAME: ratingCatname,
+              MOST_NAME: ratingName,
+              CAR_TYPE_CARNAME: typeCatname,
+              CAR_TYPE_NAME: typeName
+            });
+          }
+        );
+      }
+    } else {
+      this.translate.get(ratingName).subscribe(
+        (translation: string) => {
+          this.initPageEnv(154, {
+            MOST_CATNAME: ratingCatname,
+            MOST_NAME: translation
+          });
+        },
+        () => {
+          this.initPageEnv(154, {
+            MOST_CATNAME: ratingCatname,
+            MOST_NAME: ratingName
+          });
+        }
+      );
+    }
   }
 
   ngOnDestroy(): void {

@@ -1,4 +1,3 @@
-import * as $ from 'jquery';
 import { APIPicture } from '../../services/picture';
 import {
   Input,

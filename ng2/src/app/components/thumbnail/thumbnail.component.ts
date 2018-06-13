@@ -9,7 +9,6 @@ import {
 import { APIPicture } from '../../services/picture';
 import { PerspectiveService } from '../../services/perspective';
 import { PictureItemService } from '../../services/picture-item';
-import * as $ from 'jquery';
 import { APIPerspective } from '../../services/api.service';
 import { ACLService } from '../../services/acl.service';
 
