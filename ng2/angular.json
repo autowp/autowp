@@ -19,6 +19,15 @@
             "assets": [
               "src/assets",
               "src/favicon.ico",
+              "src/browserconfig.xml",
+              "src/manifest.json",
+              "src/manifest.webapp",
+              "src/yandex-browser-manifest.json",
+              {
+                "glob": "**/*",
+                "input": "src/favicons",
+                "output": "./favicons/"
+              },
               {
                 "glob": "**/*",
                 "input": "src/languages",
