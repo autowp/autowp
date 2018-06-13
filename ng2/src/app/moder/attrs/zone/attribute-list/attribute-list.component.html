@@ -1,9 +1,9 @@
 <ul *ngIf="attributes.length > 0">
   <li *ngFor="let attribute of attributes">
     <label>
-      <input type="checkbox" name="attribute_id[]" [(ngModel)]="map[attribute.id]" (change)="change(attribute.id, map[attribute.id])"
+      <input type="checkbox" name="attribute_id[]" [(ngModel)]="map[attribute.id]" (change)="change({id: attribute.id, value: map[attribute.id]})"
       /> {{attribute.name | translate}}
     </label>
-    <app-moder-attrs-zone-attribute-list [attributes]="attribute.childs" [map]="map" [change]="change"></app-moder-attrs-zone-attribute-list>
+    <app-moder-attrs-zone-attribute-list [attributes]="attribute.childs" [map]="map" (changed)="change($event)"></app-moder-attrs-zone-attribute-list>
   </li>
 </ul>

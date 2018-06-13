@@ -1,8 +1,7 @@
-import { Component, Injectable, Input } from '@angular/core';
+import { Component, Injectable, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIAttrAttribute } from '../../../../services/attrs';
-import { ModerAttrsZoneChangeFunc } from '../zone.component';
-
+import { APIAttrZoneAttributeChange } from '../zone.component';
 
 @Component({
   selector: 'app-moder-attrs-zone-attribute-list',
@@ -14,5 +13,9 @@ export class ModerAttrsZoneAttributeListComponent  {
   @Input() map: {
     [key: number]: boolean
   };
-  @Input() change: ModerAttrsZoneChangeFunc;
+  @Output() changed = new EventEmitter<APIAttrZoneAttributeChange>();
+
+  public change(change: APIAttrZoneAttributeChange) {
+    this.changed.emit(change);
+  }
 }

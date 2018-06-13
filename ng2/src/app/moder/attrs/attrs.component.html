@@ -4,7 +4,7 @@
     <div class="card card-body">
       <ul>
         <li *ngFor="let zone of zones">
-          <a ui-sref="moder-attrs-zone({id: zone.id})" [textContent]="zone.name"></a>
+          <a [routerLink]="['/moder/attrs/zone', zone.id]" [textContent]="zone.name"></a>
         </li>
       </ul>
     </div>
@@ -12,7 +12,7 @@
   <div class="col-md-6">
     <h2 translate>moder/attrs/attributes</h2>
     <div class="card card-body">
-      <app-moder-attrs-attribute-list [attributes]="attributes" [moveUp]="moveUp" [moveDown]="moveDown"></app-moder-attrs-attribute-list>
+      <app-moder-attrs-attribute-list [attributes]="attributes" (movedUp)="moveUp($event)" (movedDown)="moveDown($event)"></app-moder-attrs-attribute-list>
     </div>
   </div>
 </div>

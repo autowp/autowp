@@ -17,7 +17,10 @@ export interface APIAttrZoneAttributesGetResponse {
   }[];
 }
 
-export type ModerAttrsZoneChangeFunc = (id: number, value: boolean) => void;
+export interface APIAttrZoneAttributeChange {
+  id: number;
+  value: boolean;
+}
 
 @Component({
   selector: 'app-moder-attrs-zone',
@@ -27,11 +30,10 @@ export type ModerAttrsZoneChangeFunc = (id: number, value: boolean) => void;
 export class ModerAttrsZoneComponent implements OnInit, OnDestroy {
   private routeSub: Subscription;
   public zone: APIAttrZone;
-  public attributes: APIAttrAttribute[];
+  public attributes: APIAttrAttribute[] = [];
   public zoneAttribute: {
     [key: number]: boolean;
   } = {};
-  public change: ModerAttrsZoneChangeFunc;
 
   constructor(
     private http: HttpClient,
@@ -41,31 +43,6 @@ export class ModerAttrsZoneComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.change = (id: number, value: boolean) => {
-      if (value) {
-        this.http
-          .post<void>('/api/attr/zone-attribute', {
-            zone_id: this.zone.id,
-            attribute_id: id
-          })
-          .subscribe(
-            response => {},
-            response => {
-              Notify.response(response);
-            }
-          );
-      } else {
-        this.http
-          .delete('/api/attr/zone-attribute/' + this.zone.id + '/' + id)
-          .subscribe(
-            response => {},
-            response => {
-              Notify.response(response);
-            }
-          );
-      }
-    };
-
     this.routeSub = this.route.params.subscribe(params => {
       this.attrsService.getZone(params.id).then(
         zone => {
@@ -108,6 +85,31 @@ export class ModerAttrsZoneComponent implements OnInit, OnDestroy {
         }
       );
     });
+  }
+
+  public change(change: APIAttrZoneAttributeChange) {
+    if (change.value) {
+      this.http
+        .post<void>('/api/attr/zone-attribute', {
+          zone_id: this.zone.id,
+          attribute_id: change.id
+        })
+        .subscribe(
+          response => {},
+          response => {
+            Notify.response(response);
+          }
+        );
+    } else {
+      this.http
+        .delete('/api/attr/zone-attribute/' + this.zone.id + '/' + change.id)
+        .subscribe(
+          response => {},
+          response => {
+            Notify.response(response);
+          }
+        );
+    }
   }
 
   ngOnDestroy(): void {

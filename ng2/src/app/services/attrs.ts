@@ -154,10 +154,13 @@ export interface GetAttributeServiceOptions {
 export class AttrsService {
   constructor(private http: HttpClient) {}
 
-  public getZone(id: number): Promise<APIAttrZone> {
+  public getZone(id: number | string): Promise<APIAttrZone> {
     return new Promise<APIAttrZone>((resolve, reject) => {
+      if (typeof id !== 'number') {
+        id = parseInt(id, 10);
+      }
       this.getZones().then(
-        (zones: APIAttrZone[]) => {
+        zones => {
           for (const zone of zones) {
             if (zone.id === id) {
               resolve(zone);

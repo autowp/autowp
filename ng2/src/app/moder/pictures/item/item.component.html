@@ -1,5 +1,4 @@
 <div class="row mb-4" *ngIf="picture && picture.siblings">
-  <!--  ng-init="initArrows()"-->
   <div class="col-md-3">
     <a [routerLink]="['/moder/pictures', picture.siblings.prev_new.id]" [title]="picture.siblings.prev_new.name_text" *ngIf="picture.siblings.prev_new"
       translate>moder/picture/previous-new</a>

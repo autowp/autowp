@@ -304,7 +304,7 @@ return [
                 ]
             ],
             'type_id' => [
-                'required' => true,
+                'required' => false,
                 'validators' => [
                     ['name' => 'Digits'],
                     ['name' => Validator\Attr\TypeId::class]

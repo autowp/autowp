@@ -1,4 +1,4 @@
 <h2 translate>moder/attrs/attributes</h2>
 <div class="card card-body">
-  <app-moder-attrs-zone-attribute-list [attributes]="attributes" [map]="zoneAttribute" [change]="change"></app-moder-attrs-zone-attribute-list>
+  <app-moder-attrs-zone-attribute-list [attributes]="attributes" [map]="zoneAttribute" (changed)="change($event)"></app-moder-attrs-zone-attribute-list>
 </div>

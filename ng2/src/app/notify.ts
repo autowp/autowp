@@ -34,6 +34,10 @@ class Notify {
   }
 
   public static response(response: HttpResponse<any>) {
+    if (response === undefined) {
+      Notify.error('undefined');
+      return;
+    }
     Notify.error(response.status + ': ' + response.statusText);
   }
 }

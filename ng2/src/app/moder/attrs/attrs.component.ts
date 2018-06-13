@@ -10,7 +10,6 @@ import { PageEnvService } from '../../services/page-env.service';
 
 // Acl.isAllowed('attrs', 'edit', 'unauthorized');
 
-export type ModerAttrsMoveFunc = (id: number) => void;
 
 @Component({
   selector: 'app-moder-attrs',
@@ -18,10 +17,8 @@ export type ModerAttrsMoveFunc = (id: number) => void;
 })
 @Injectable()
 export class ModerAttrsComponent {
-  public attributes: APIAttrAttribute[];
-  public zones: APIAttrZone[];
-  public moveUp: ModerAttrsMoveFunc;
-  public moveDown: ModerAttrsMoveFunc;
+  public attributes: APIAttrAttribute[] = [];
+  public zones: APIAttrZone[] = [];
 
   constructor(
     private http: HttpClient,
@@ -51,36 +48,36 @@ export class ModerAttrsComponent {
     );
 
     this.loadAttributes();
+  }
 
-    this.moveUp = (id: number) => {
-      this.http
-        .patch<void>('/api/attr/attribute/' + id, {
-          move: 'up'
-        })
-        .subscribe(
-          response => {
-            this.loadAttributes();
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
-    };
+  public moveUp(id: number) {
+    this.http
+      .patch<void>('/api/attr/attribute/' + id, {
+        move: 'up'
+      })
+      .subscribe(
+        response => {
+          this.loadAttributes();
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
+  }
 
-    this.moveDown = (id: number) => {
-      this.http
-        .patch<void>('/api/attr/attribute/' + id, {
-          move: 'down'
-        })
-        .subscribe(
-          response => {
-            this.loadAttributes();
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
-    };
+  public moveDown(id: number) {
+    this.http
+      .patch<void>('/api/attr/attribute/' + id, {
+        move: 'down'
+      })
+      .subscribe(
+        response => {
+          this.loadAttributes();
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
   }
 
   private loadAttributes() {

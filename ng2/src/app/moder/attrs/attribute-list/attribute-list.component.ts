@@ -1,6 +1,5 @@
-import { Component, Injectable, Input } from '@angular/core';
+import { Component, Injectable, Input, Output, EventEmitter } from '@angular/core';
 import { APIAttrAttribute } from '../../../services/attrs';
-import { ModerAttrsMoveFunc } from '../attrs.component';
 
 @Component({
   selector: 'app-moder-attrs-attribute-list',
@@ -9,6 +8,16 @@ import { ModerAttrsMoveFunc } from '../attrs.component';
 @Injectable()
 export class ModerAttrsAttributeListComponent {
   @Input() attributes: APIAttrAttribute[];
-  @Input() moveUp: ModerAttrsMoveFunc;
-  @Input() moveDown: ModerAttrsMoveFunc;
+  @Output() movedUp = new EventEmitter<number>();
+  @Output() movedDown = new EventEmitter<number>();
+
+  public moveUp(id: number) {
+    this.movedUp.emit(id);
+    return false;
+  }
+
+  public moveDown(id: number) {
+    this.movedDown.emit(id);
+    return false;
+  }
 }
