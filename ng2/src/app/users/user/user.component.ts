@@ -1,16 +1,14 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ContactsService } from '../../services/contacts';
 import { MessageDialogService } from '../../services/message-dialog';
 import { ACLService } from '../../services/acl.service';
 import Notify from '../../notify';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { UserService, APIUser } from '../../services/user';
 import {
   Subscription,
   empty,
-  combineLatest,
-  from,
   of,
   forkJoin,
   Observable
@@ -25,7 +23,8 @@ import {
   distinctUntilChanged,
   tap,
   catchError,
-  switchMap
+  switchMap,
+  switchMapTo
 } from 'rxjs/operators';
 
 @Component({
@@ -80,22 +79,26 @@ export class UsersUserComponent implements OnInit, OnDestroy {
     const fields =
       'identity,gravatar_hash,photo,renames,is_moder,reg_date,last_online,accounts,pictures_added,pictures_accepted_count,last_ip';
 
-    this.routeSub = this.route.params
+    this.routeSub = this.auth.getUser()
       .pipe(
+        switchMapTo(this.route.params, (currentUser, params) => ({currentUser, params})),
         distinctUntilChanged(),
         debounceTime(30),
-        switchMap(params => {
-          return this.userService
-            .getByIdentity(params.identity, { fields: fields })
-            .pipe(
-              catchError((err, caught) => {
-                Notify.response(err);
-                return empty();
-              })
-            );
-        }),
-        tap(user => {
-          if (!user) {
+        switchMap(data => this.userService
+          .getByIdentity(data.params.identity, { fields: fields })
+          .pipe(
+            catchError((err, caught) => {
+              Notify.response(err);
+              return empty();
+            })
+          ),
+          (data, user) => ({
+            currentUser: data.currentUser,
+            user: user
+          })
+        ),
+        tap(data => {
+          if (!data.user) {
             this.router.navigate(['/error-404']);
             return;
           }
@@ -109,18 +112,18 @@ export class UsersUserComponent implements OnInit, OnDestroy {
                 name: 'page/62/name',
                 pageId: 62,
                 args: {
-                  USER_NAME: user.name,
-                  USER_IDENTITY: user.identity
-                    ? user.identity
-                    : 'user' + user.id
+                  USER_NAME: data.user.name,
+                  USER_IDENTITY: data.user.identity
+                    ? data.user.identity
+                    : 'user' + data.user.id
                 }
               }),
             0
           );
 
-          this.user = user;
-          this.isMe = this.auth.user && this.auth.user.id === user.id;
-          this.canBeInContacts = this.auth.user && !user.deleted && !this.isMe;
+          this.user = data.user;
+          this.isMe = data.currentUser && data.currentUser.id === data.user.id;
+          this.canBeInContacts = data.currentUser && !data.user.deleted && !this.isMe;
 
           this.acl
             .isAllowed('user', 'ip')
@@ -143,8 +146,8 @@ export class UsersUserComponent implements OnInit, OnDestroy {
               () => (this.canDeleteUser = false)
             );
 
-          if (this.auth.user && !this.isMe) {
-            this.Contacts.isInContacts(user.id).then(
+          if (data.currentUser && !this.isMe) {
+            this.Contacts.isInContacts(data.user.id).then(
               inContacts => {
                 this.inContacts = inContacts;
               },
@@ -154,18 +157,18 @@ export class UsersUserComponent implements OnInit, OnDestroy {
             );
           }
         }),
-        switchMap(user => {
+        switchMap(data => {
           const pictures = this.pictureService.getPictures({
-            owner_id: user.id,
+            owner_id: data.user.id,
             limit: 12,
             order: 1,
             fields: 'url,name_html'
           });
 
           let comments = of(null);
-          if (!this.user.deleted) {
+          if (!data.user.deleted) {
             comments = this.commentService.getComments({
-              user_id: this.user.id,
+              user_id: data.user.id,
               limit: 15,
               order: 'date_desc',
               fields: 'preview,url'
@@ -173,15 +176,15 @@ export class UsersUserComponent implements OnInit, OnDestroy {
           }
 
           let ip = of(null);
-          if (this.user.last_ip) {
-            ip = this.loadBan(this.user.last_ip);
+          if (data.user.last_ip) {
+            ip = this.loadBan(data.user.last_ip);
           }
 
           return forkJoin(pictures, comments, ip).pipe(
-            tap(data => {
-              this.pictures = data[0].pictures;
-              this.comments = data[1].items;
-              this.ip = data[2];
+            tap(data2 => {
+              this.pictures = data2[0].pictures;
+              this.comments = data2[1].items;
+              this.ip = data2[2];
             })
           );
         })

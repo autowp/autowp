@@ -4,23 +4,29 @@ import {
   Component,
   Input,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
+  OnInit,
+  OnDestroy
 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { APIUser } from '../../services/user';
 import Notify from '../../notify';
 import { Router } from '@angular/router';
 import { CommentService, APIComment } from '../../services/comment';
 import { AuthService } from '../../services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-comments',
   templateUrl: './comments.component.html'
 })
 @Injectable()
-export class CommentsComponent implements OnChanges {
+export class CommentsComponent implements OnChanges, OnInit, OnDestroy {
+
+  private sub: Subscription;
+
   public messages: APIComment[] = [];
   public paginator: APIPaginator;
+  public user: APIUser;
 
   @Input() itemID: number;
   @Input() typeID: number;
@@ -28,11 +34,17 @@ export class CommentsComponent implements OnChanges {
   @Input() page: number;
 
   constructor(
-    private http: HttpClient,
     private router: Router,
     private commentService: CommentService,
     public auth: AuthService
-  ) {}
+  ) { }
+
+  ngOnInit(): void {
+    this.sub = this.auth.getUser().subscribe(user => (this.user = user));
+  }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
 
   public onSent(location: string) {
     if (this.limit) {

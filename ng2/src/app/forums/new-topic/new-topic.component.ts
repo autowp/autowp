@@ -1,10 +1,12 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import Notify from '../../notify';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest } from 'rxjs';
 import { APIForumTheme, ForumService } from '../../services/forum';
 import { AuthService } from '../../services/auth.service';
 import { PageEnvService } from '../../services/page-env.service';
+import { APIUser } from '../../services/user';
+import { distinctUntilChanged, debounceTime, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-forums-new-topic',
@@ -21,6 +23,7 @@ export class ForumsNewTopicComponent implements OnInit, OnDestroy {
   };
   public invalidParams: any;
   public theme: APIForumTheme;
+  public user: APIUser;
 
   constructor(
     private router: Router,
@@ -28,13 +31,29 @@ export class ForumsNewTopicComponent implements OnInit, OnDestroy {
     private forumService: ForumService,
     public auth: AuthService,
     private pageEnv: PageEnvService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
-      this.forumService.getTheme(params.theme_id, {}).subscribe(
-        response => {
-          this.theme = response;
+    this.routeSub = combineLatest(
+      this.route.params,
+      this.auth.getUser(),
+      (params, user) => ({ params, user })
+    )
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(
+          data => this.forumService.getTheme(data.params.theme_id, {}),
+          (data, theme) => ({
+            user: data.user,
+            theme: theme
+          })
+        )
+      )
+      .subscribe(
+        data => {
+          this.theme = data.theme;
+          this.user = data.user;
 
           this.pageEnv.set({
             layout: {
@@ -52,7 +71,6 @@ export class ForumsNewTopicComponent implements OnInit, OnDestroy {
           this.router.navigate(['/error-404']);
         }
       );
-    });
   }
 
   ngOnDestroy(): void {

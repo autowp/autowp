@@ -3,10 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../services/auth.service';
 import {
   APILoginServicesGetResponse,
-  APILoginStartPostResponse,
-  APILoginServices
+  APILoginStartPostResponse
 } from '../services/api.service';
 import { PageEnvService } from '../services/page-env.service';
+import { APIUser } from '../services/user';
 
 interface SignInService {
   id: string;
@@ -27,12 +27,16 @@ export class SignInComponent {
     remember: false
   };
   public invalidParams: any = {};
+  public user: APIUser;
 
   constructor(
     public auth: AuthService,
     private http: HttpClient,
     private pageEnv: PageEnvService
   ) {
+
+    this.auth.getUser().subscribe(user => (this.user = user));
+
     setTimeout(
       () =>
         this.pageEnv.set({
@@ -70,7 +74,7 @@ export class SignInComponent {
     this.auth
       .login(this.form.login, this.form.password, this.form.remember)
       .then(
-        user => {},
+        user => { },
         response => {
           if (response.status === 400) {
             this.invalidParams = response.error.invalid_params;

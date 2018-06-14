@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from './services/auth.service';
 import { ACLService } from './services/acl.service';
 import Notify from './notify';
@@ -11,15 +10,6 @@ import { MessageService } from './services/message';
 import { Page, PageService } from './services/page';
 import { PageEnvService, LayoutParams } from './services/page-env.service';
 import { Observable } from 'rxjs';
-
-function replaceArgs(str: string, args: {[key: string]: string}): string {
-  for (const key in args) {
-    if (this.formErrors.hasOwnProperty(key)) {
-      str = str.replace(key, args[key]);
-    }
-  }
-  return str;
-}
 
 @Component({
   selector: 'app-root',
@@ -31,7 +21,7 @@ export class AppComponent implements OnInit {
   public loginInvalidParams: any;
   public languages;
   public path; // = $location.path();
-  public user; // = opt.user;
+  public user: APIUser;
   public isModer; // = opt.isModer;
   public newPersonalMessages; // = opt.sidebar.newPersonalMessages;
   public mainMenu; // = opt.mainMenu;
@@ -52,26 +42,23 @@ export class AppComponent implements OnInit {
     public acl: ACLService,
     private router: Router,
     private translate: TranslateService,
-    private http: HttpClient,
     private pages: PageService,
     private messageService: MessageService,
     private pageEnv: PageEnvService
   ) {
-    translate.setTranslation('en', require('../languages/en.json'));
-    translate.setDefaultLang('en');
+    this.translate.setTranslation('en', require('../languages/en.json'));
+    this.translate.setDefaultLang('en');
 
-    translate.use('en');
+    this.translate.use('en');
 
     this.layoutParams$ = this.pageEnv.layoutParams$.asObservable();
 
-    this.auth.loggedIn$.subscribe(() => {
-      this.updateRights();
+    this.auth.getUser().subscribe(user => {
+      this.user = user;
     });
   }
 
   ngOnInit() {
-    // this.updateRights();
-
     this.mainMenuItems = this.pages.getMenu(2);
     this.secondaryMenuItems = this.pages.getMenu(87);
     this.mainInSecondaryItems = [];
@@ -91,17 +78,9 @@ export class AppComponent implements OnInit {
   }
 
   doLogin() {
-    this.http.post<void>('/api/login', this.loginForm).subscribe(
+    this.auth.login(this.loginForm.login, this.loginForm.password, this.loginForm.remember).then(
       () => {
-        this.http.get<APIUser>('/api/user/me').subscribe(
-          response => {
-            this.user = response;
-            this.router.navigate(['/login/ok']);
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
+        this.router.navigate(['/login/ok']);
       },
       response => {
         if (response.status === 400) {
@@ -113,13 +92,11 @@ export class AppComponent implements OnInit {
     );
   }
 
-  updateRights() {}
-
   signOut(event) {
     event.preventDefault();
 
     this.auth.signOut().then(
-      () => {},
+      () => { },
       error => {
         console.log(error);
       }

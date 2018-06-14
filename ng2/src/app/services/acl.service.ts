@@ -120,7 +120,7 @@ export class ACLService {
   private isAllowedCache: Map<string, boolean> = new Map<string, boolean>();
 
   constructor(private apiACL: APIACL, private auth: AuthService) {
-    auth.loggedIn$.subscribe(() => {
+    this.auth.getUser().subscribe(() => {
       this.flush();
     });
   }

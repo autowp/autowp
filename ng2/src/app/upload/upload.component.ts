@@ -15,6 +15,7 @@ import { PictureService, APIPicture } from '../services/picture';
 import { AuthService } from '../services/auth.service';
 import { PageEnvService } from '../services/page-env.service';
 import { switchMap, catchError, map, tap } from 'rxjs/operators';
+import { APIUser } from '../services/user';
 
 interface UploadProgress {
   filename: string;
@@ -40,7 +41,8 @@ export class UploadComponent implements OnInit, OnDestroy {
   public pictures: APIPicture[] = [];
   public item: APIItem;
   public formHidden = false;
-  private perspective_id: number;
+  private perspectiveID: number;
+  public user: APIUser;
 
   @ViewChild('input') input;
 
@@ -52,7 +54,7 @@ export class UploadComponent implements OnInit, OnDestroy {
     private pictureService: PictureService,
     public auth: AuthService,
     private pageEnv: PageEnvService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     setTimeout(
@@ -66,8 +68,11 @@ export class UploadComponent implements OnInit, OnDestroy {
         }),
       0
     );
+
+    this.auth.getUser().subscribe(user => (this.user = user));
+
     this.querySub = this.route.queryParams.subscribe(params => {
-      this.perspective_id = params.perspective_id;
+      this.perspectiveID = params.perspective_id;
       const replace = parseInt(params.replace, 10);
       if (replace) {
         this.pictureService
@@ -165,8 +170,8 @@ export class UploadComponent implements OnInit, OnDestroy {
     if (this.replace) {
       formData.append('replace_picture_id', this.replace.id + '');
     }
-    if (this.perspective_id) {
-      formData.append('perspective_id', this.perspective_id + '');
+    if (this.perspectiveID) {
+      formData.append('perspective_id', this.perspectiveID + '');
     }
 
     return this.http

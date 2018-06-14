@@ -1,35 +1,24 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { APIService } from './api.service';
 import { APIUser } from './user';
 
 @Injectable()
 export class AuthService {
-  loggedIn: boolean;
-  user: APIUser | undefined = undefined;
-  loggedIn$ = new BehaviorSubject<boolean>(this.loggedIn);
-  private initPromise: Promise<void>;
+  private user$ = new BehaviorSubject<APIUser>(null);
 
-  constructor(private api: APIService) {
-    this.initPromise = new Promise<void>((resolve, reject) => {
-      this.loadMe().then(
-        () => {
-          resolve();
-        },
-        error => {
-          resolve();
-        }
-      );
-    });
+  constructor(private api: APIService) { }
+
+  public setUser(value: APIUser) {
+    console.log('setUser', value);
+    this.user$.next(value);
   }
 
-  setLoggedIn(value: boolean) {
-    // Update login status subject
-    this.loggedIn = value;
-    this.loggedIn$.next(value);
+  public getUser(): Observable<APIUser> {
+    return this.user$;
   }
 
-  login(email: string, password: string, remember: boolean): Promise<APIUser> {
+  public login(email: string, password: string, remember: boolean): Promise<APIUser> {
     return new Promise((resolve, reject) => {
       this.api
         .request('POST', 'login', {
@@ -61,17 +50,15 @@ export class AuthService {
     });
   }
 
-  signOut(): Promise<void> {
+  public signOut(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.api.request('DELETE', 'login').subscribe(
         response => {
-          this.setLoggedIn(false);
-          this.user = undefined;
+          this.setUser(null);
           resolve();
         },
         error => {
-          this.setLoggedIn(false);
-          this.user = undefined;
+          this.setUser(null);
           console.log(error);
           reject();
         }
@@ -79,22 +66,15 @@ export class AuthService {
     });
   }
 
-  get authenticated(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this.initPromise.then(() => resolve(this.loggedIn), () => reject());
-    });
-  }
-
-  loadMe(): Promise<APIUser> {
+  private loadMe(): Promise<APIUser> {
     return new Promise((resolve, reject) => {
       this.api.request<APIUser>('GET', 'user/me').subscribe(
         user => {
-          this.setLoggedIn(true);
-          this.user = user;
+          this.setUser(user);
           resolve(user);
         },
         error => {
-          this.user = undefined;
+          this.setUser(null);
           console.log(error);
           reject('error');
         }

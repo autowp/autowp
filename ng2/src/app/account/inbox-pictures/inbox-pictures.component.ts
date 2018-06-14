@@ -1,16 +1,15 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../services/api.service';
 import Notify from '../../notify';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest, empty } from 'rxjs';
 import {
-  APIPictureGetResponse,
   PictureService,
   APIPicture
 } from '../../services/picture';
 import { PageEnvService } from '../../services/page-env.service';
+import { distinctUntilChanged, debounceTime, switchMap, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-account-inbox-pictures',
@@ -23,13 +22,11 @@ export class AccountInboxPicturesComponent implements OnInit, OnDestroy {
   public paginator: APIPaginator;
 
   constructor(
-    private http: HttpClient,
-    private router: Router,
     private auth: AuthService,
     private route: ActivatedRoute,
     private pictureService: PictureService,
     private pageEnv: PageEnvService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     setTimeout(
@@ -44,27 +41,32 @@ export class AccountInboxPicturesComponent implements OnInit, OnDestroy {
       0
     );
 
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.pictureService
-        .getPictures({
+    this.querySub = combineLatest(
+      this.route.queryParams,
+      this.auth.getUser(),
+      (params, user) => ({ params, user })
+    )
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(data => this.pictureService.getPictures({
           status: 'inbox',
-          owner_id: this.auth.user.id,
+          owner_id: data.user.id,
           fields:
             'owner,thumb_medium,votes,views,comments_count,name_html,name_text',
           limit: 15,
-          page: params.page,
+          page: data.params.page,
           order: 1
+        })),
+        catchError((err, caught) => {
+          Notify.response(err);
+          return empty();
         })
-        .subscribe(
-          response => {
-            this.pictures = response.pictures;
-            this.paginator = response.paginator;
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
-    });
+      )
+      .subscribe(response => {
+        this.pictures = response.pictures;
+        this.paginator = response.paginator;
+      });
   }
 
   ngOnDestroy(): void {

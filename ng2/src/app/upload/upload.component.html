@@ -1,8 +1,8 @@
-<div class="alert alert-warning" *ngIf="!auth.user">
+<div class="alert alert-warning" *ngIf="!user">
   <app-markdown [markdown]="'upload/only-registered'|translate"></app-markdown>
 </div>
 
-<div *ngIf="auth.user">
+<div *ngIf="user">
   <div *ngIf="selected">
     <div class="card card-body mb-4">
       <app-markdown [markdown]="'upload/description'|translate"></app-markdown>

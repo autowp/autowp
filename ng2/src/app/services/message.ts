@@ -54,20 +54,22 @@ export interface APIMessageNewGetResponse {
 @Injectable()
 export class MessageService {
   public newMessagesCount = new BehaviorSubject<number>(0);
+  private user: APIUser;
 
   private handlers: { [key: string]: MessageCallbackType[] } = {
     sent: [],
     deleted: []
   };
 
-  constructor(private http: HttpClient, private authService: AuthService) {
-    authService.loggedIn$.subscribe(value => {
+  constructor(private http: HttpClient, private auth: AuthService) {
+    this.auth.getUser().subscribe(user => {
+      this.user = user;
       this.refreshNewMessagesCount();
     });
   }
 
   public refreshNewMessagesCount() {
-    if (this.authService.loggedIn) {
+    if (this.user) {
       this.getNewCount().then(
         count => {
           this.newMessagesCount.next(count);

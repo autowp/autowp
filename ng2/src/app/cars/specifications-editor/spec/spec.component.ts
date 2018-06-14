@@ -21,6 +21,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, combineLatest } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { map } from 'rxjs/operators';
+import { APIUser } from '../../../services/user';
 
 export interface APIAttrAttributeInSpecEditor extends APIAttrAttribute {
   deep?: number;
@@ -55,15 +56,18 @@ export class CarsSpecificationsEditorSpecComponent
   public userValues = new Map<number, APIAttrUserValue[]>();
   public currentUserValues: { [key: number]: APIAttrUserValue } = {};
   public userValuesLoading = 0;
+  private user: APIUser;
 
   constructor(
     private http: HttpClient,
     private attrsService: AttrsService,
     private translate: TranslateService,
     private auth: AuthService
-  ) {}
+  ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.auth.getUser().subscribe(user => (this.user = user));
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.item) {
@@ -170,7 +174,7 @@ export class CarsSpecificationsEditorSpecComponent
         items.push({
           item_id: this.item.id,
           attribute_id: attribute_id,
-          user_id: this.auth.user.id,
+          user_id: this.user.id,
           value: this.currentUserValues[attribute_id].value,
           empty: this.currentUserValues[attribute_id].empty
         });
@@ -201,7 +205,7 @@ export class CarsSpecificationsEditorSpecComponent
     this.attrsService
       .getUserValues({
         item_id: this.item.id,
-        user_id: this.auth.user.id,
+        user_id: this.user.id,
         zone_id: this.item.attr_zone_id,
         limit: 500,
         fields: 'value'
@@ -228,7 +232,7 @@ export class CarsSpecificationsEditorSpecComponent
             if (!currentUserValues.hasOwnProperty(attr.id)) {
               currentUserValues[attr.id] = {
                 item_id: this.item.id,
-                user_id: this.auth.user.id,
+                user_id: this.user.id,
                 attribute_id: attr.id,
                 value: null,
                 empty: true,

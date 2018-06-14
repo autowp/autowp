@@ -4,16 +4,17 @@ import {
   Injectable,
   Input,
   EventEmitter,
-  Output
+  Output,
+  OnInit,
+  OnDestroy
 } from '@angular/core';
 import Notify from '../../../notify';
-import { HttpClient } from '@angular/common/http';
 import { CommentService, APIComment } from '../../../services/comment';
-import { APIMessage } from '../../../services/message';
-import { APIUser } from '../../../services/user';
 import { AuthService } from '../../../services/auth.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CommentsVotesComponent } from '../votes/votes.component';
+import { Subscription } from 'rxjs';
+import { APIUser } from '../../../services/user';
 
 export interface APICommentInList extends APIComment {
   showReply: boolean;
@@ -24,7 +25,7 @@ export interface APICommentInList extends APIComment {
   templateUrl: './list.component.html'
 })
 @Injectable()
-export class CommentsListComponent {
+export class CommentsListComponent implements OnInit, OnDestroy {
   public canRemoveComments = false;
   public canMoveMessage = false;
 
@@ -35,14 +36,19 @@ export class CommentsListComponent {
   @Output() sent = new EventEmitter<string>();
 
   public isModer: boolean;
+  private sub: Subscription;
+  public user: APIUser;
 
   constructor(
     private acl: ACLService,
-    private http: HttpClient,
     private commentService: CommentService,
     public auth: AuthService,
     private modalService: NgbModal
   ) {
+
+  }
+
+  ngOnInit(): void {
     this.acl
       .isAllowed('comment', 'remove')
       .then(
@@ -56,6 +62,10 @@ export class CommentsListComponent {
         allowed => (this.canMoveMessage = allowed),
         () => (this.canMoveMessage = false)
       );
+    this.sub = this.auth.getUser().subscribe(user => (this.user = user));
+  }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   public vote(message: APIComment, value: number) {

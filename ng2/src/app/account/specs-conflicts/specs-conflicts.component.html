@@ -1,5 +1,5 @@
-<p class="float-right" *ngIf="weight !== null">
-  {{'account/specs/weight'|translate}}: {{weight.toFixed(2)}}
+<p class="float-right" *ngIf="user && user.specs_weight !== null">
+  {{'account/specs/weight'|translate}}: {{user.specs_weight.toFixed(2)}}
 </p>
 
 <div class="nav nav-pills" style="margin-bottom:10px">
@@ -9,8 +9,8 @@
     translate>account/specs/conflicts/filter/i-disagree</a>
   <a class="nav-link" [class.active]="filter == '1'" routerLink="." [queryParams]="{filter: 1}" queryParamsHandling="merge"
     translate>account/specs/conflicts/filter/do-not-agree-with-me</a>
-  <a class="nav-link" [class.active]="filter == 'minus-weight'" routerLink="." [queryParams]="{filter: 'minus-weight'}"
-    queryParamsHandling="merge" translate>account/specs/conflicts/filter/errors</a>
+  <a class="nav-link" [class.active]="filter == 'minus-weight'" routerLink="." [queryParams]="{filter: 'minus-weight'}" queryParamsHandling="merge"
+    translate>account/specs/conflicts/filter/errors</a>
 </div>
 
 <table class="table">
@@ -28,7 +28,7 @@
       <td [textContent]="conflict.attribute"></td>
       <td>
         <ng-container *ngFor="let value of conflict.values">
-          <div *ngIf="value.user_id == auth.user.id">
+          <div *ngIf="value.user_id == user.id">
             <em *ngIf="value.value === null" translate>account/specs/conflicts/my-value/none</em>
             <span *ngIf="value.value !== null">
               {{value.value}}
@@ -42,7 +42,7 @@
       </td>
       <td>
         <ng-container *ngFor="let value of conflict.values">
-          <div *ngIf="value.user_id != auth.user.id">
+          <div *ngIf="value.user_id != user.id">
             <em *ngIf="value.value === null" translate>account/specs/conflicts/my-value/none</em>
             <span *ngIf="value.value !== null">
               {{value.value}}

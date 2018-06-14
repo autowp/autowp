@@ -1,5 +1,4 @@
-import { Component, Injectable, ViewChild, ElementRef } from '@angular/core';
-import * as ngFileUpload from 'ng-file-upload';
+import { Component, Injectable, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import Notify from '../../notify';
 import { TranslateService } from '@ngx-translate/core';
@@ -8,6 +7,8 @@ import { AuthService } from '../../services/auth.service';
 import { APIUser } from '../../services/user';
 import { FileUploader, FileItem, ParsedResponseHeaders } from 'ng2-file-upload';
 import { PageEnvService } from '../../services/page-env.service';
+import { combineLatest, empty, of, Subscription } from 'rxjs';
+import { switchMapTo, switchMap } from 'rxjs/operators';
 
 export interface APITimezoneGetResponse {
   items: string[];
@@ -24,9 +25,10 @@ export interface APILanguageGetResponse {
   templateUrl: './profile.component.html'
 })
 @Injectable()
-export class AccountProfileComponent {
+export class AccountProfileComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput: ElementRef;
 
+  private user: APIUser;
   public profile = {
     name: null
   };
@@ -47,6 +49,7 @@ export class AccountProfileComponent {
     url: '/api/user/me/photo',
     autoUpload: true
   });
+  sub: Subscription;
 
   constructor(
     private translate: TranslateService,
@@ -55,12 +58,6 @@ export class AccountProfileComponent {
     private auth: AuthService,
     private pageEnv: PageEnvService
   ) {
-    if (!this.auth.user) {
-      // TODO: use guard
-      this.router.navigate(['/signin']);
-      return;
-    }
-
     this.uploader.onSuccessItem = () => {
       this.http
         .get<APIUser>('/api/user/me', {
@@ -97,42 +94,49 @@ export class AccountProfileComponent {
       0
     );
 
-    this.http
-      .get<APIUser>('/api/user/me', {
-        params: {
-          fields: 'name,timezone,language,votes_per_day,votes_left,img'
-        }
-      })
-      .subscribe(
-        response => {
-          this.profile.name = response.name;
-          this.settings.timezone = response.timezone;
-          this.settings.language = response.language;
-          this.votesPerDay = response.votes_per_day;
-          this.votesLeft = response.votes_left;
-          this.photo = response.img;
-        },
-        response => {
-          Notify.response(response);
-        }
-      );
 
-    this.http.get<APITimezoneGetResponse>('/api/timezone').subscribe(
-      response => {
-        this.timezones = response.items;
-      },
-      response => {
-        Notify.response(response);
-      }
-    );
+  }
 
-    this.http.get<APILanguageGetResponse>('/api/language').subscribe(
-      response => {
+  ngOnInit(): void {
+
+    this.sub = this.auth.getUser().pipe(
+      switchMap(user => {
+        if (!user) {
+          this.router.navigate(['/signin']);
+          return empty();
+        }
+
+        this.user = user;
+
+        return of(user);
+      }),
+      switchMapTo(combineLatest(
+        this.http
+          .get<APIUser>('/api/user/me', {
+            params: {
+              fields: 'name,timezone,language,votes_per_day,votes_left,img'
+            }
+          }),
+        this.http.get<APITimezoneGetResponse>('/api/timezone'),
+        this.http.get<APILanguageGetResponse>('/api/language'),
+        (user, timezones, languages) => ({ user, timezones, languages })
+      ))
+    ).subscribe(
+      data => {
+        this.profile.name = data.user.name;
+        this.settings.timezone = data.user.timezone;
+        this.settings.language = data.user.language;
+        this.votesPerDay = data.user.votes_per_day;
+        this.votesLeft = data.user.votes_left;
+        this.photo = data.user.img;
+
+        this.timezones = data.timezones.items;
+
         this.languages = [];
-        for (const key in response.items) {
-          if (response.items.hasOwnProperty(key)) {
+        for (const key in data.languages.items) {
+          if (data.languages.items.hasOwnProperty(key)) {
             this.languages.push({
-              name: response.items[key],
+              name: data.languages.items[key],
               value: key
             });
           }
@@ -142,6 +146,10 @@ export class AccountProfileComponent {
         Notify.response(response);
       }
     );
+
+  }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   public sendProfile() {
@@ -149,7 +157,7 @@ export class AccountProfileComponent {
 
     this.http.put<void>('/api/user/me', this.profile).subscribe(
       () => {
-        this.auth.user.name = this.profile.name;
+        this.user.name = this.profile.name;
 
         this.translate
           .get('account/profile/saved')
@@ -252,7 +260,7 @@ export class AccountProfileComponent {
   public resetPhoto() {
     this.http.delete('/api/user/me/photo').subscribe(
       () => {
-        this.auth.user.avatar = null;
+        this.user.avatar = null;
         this.photo = null;
       },
       response => Notify.response(response)

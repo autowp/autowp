@@ -1,7 +1,5 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { APIItem, ItemService } from '../../services/item';
-import Notify from '../../notify';
 import { TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription, combineLatest, of } from 'rxjs';
@@ -11,12 +9,11 @@ import { PageEnvService } from '../../services/page-env.service';
 import {
   debounceTime,
   distinctUntilChanged,
-  tap,
   switchMap,
-  switchMapTo,
   map
 } from 'rxjs/operators';
 import { sprintf } from 'sprintf-js';
+import { APIUser } from '../../services/user';
 
 @Component({
   selector: 'app-donate-vod',
@@ -32,6 +29,7 @@ export class DonateVodComponent implements OnInit, OnDestroy {
   public selectedDate: string;
   public selectedItem: APIItem;
   public anonymous: boolean;
+  public user: APIUser;
   public userID: number;
   public sum: number;
   public dates: APIDonateCarOfDayDate[];
@@ -39,7 +37,6 @@ export class DonateVodComponent implements OnInit, OnDestroy {
 
   constructor(
     private translate: TranslateService,
-    private http: HttpClient,
     private itemService: ItemService,
     private route: ActivatedRoute,
     public auth: AuthService,
@@ -81,16 +78,16 @@ export class DonateVodComponent implements OnInit, OnDestroy {
           });
         })
       ),
-      this.auth.loggedIn$,
+      this.auth.getUser(),
       this.translate.get([
         'donate/vod/order-message',
         'donate/vod/order-target'
       ]),
-      (params, vod, item, loggedIn, translations) => ({
+      (params, vod, item, user, translations) => ({
         params,
         vod,
         item,
-        loggedIn,
+        user,
         translations
       })
     ).subscribe(data => {
@@ -98,7 +95,8 @@ export class DonateVodComponent implements OnInit, OnDestroy {
       this.dates = data.vod.dates;
       this.selectedDate = data.params.date;
       this.selectedItem = data.item;
-      this.userID = this.auth.user ? this.auth.user.id : 0;
+      this.user = data.user;
+      this.userID = data.user ? data.user.id : 0;
       this.anonymous = this.userID ? !!data.params.anonymous : true;
 
       if (!this.selectedItem || !this.selectedDate) {
@@ -135,7 +133,6 @@ export class DonateVodComponent implements OnInit, OnDestroy {
   }
 
   submit(e) {
-    console.log(e, e.defaultPrevented);
     if (e.defaultPrevented) {
       e.target.submit();
     }

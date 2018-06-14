@@ -44,13 +44,13 @@
         <input type="text" class="form-control" placeholder="{{'layout/search'|translate}}" name="q" />
       </form>
       <ul class="nav navbar-nav navbar-right">
-        <li class="nav-item<?=$this->pageEnv()->isOnPath(49) ? ' active' : ''?>" *ngIf="auth.user">
+        <li class="nav-item<?=$this->pageEnv()->isOnPath(49) ? ' active' : ''?>" *ngIf="user">
           <a class="nav-link" routerLink="/account/messages">
             <i class="fa fa-comment"></i>
             <span class="badge badge-pill badge-secondary" [textContent]="newPersonalMessages" *ngIf="newPersonalMessages"></span>
           </a>
         </li>
-        <li class="nav-item<?=$this->pageEnv()->isOnPath(79) ? ' active' : ''?>" *ngIf="!auth.user">
+        <li class="nav-item<?=$this->pageEnv()->isOnPath(79) ? ' active' : ''?>" *ngIf="!user">
           <a routerLink="/login" class="nav-link">
             <i class="fa fa-sign-in"></i>
             {{'login/sign-in'|translate}}
@@ -63,14 +63,14 @@
           </button>
           <div ngbDropdownMenu>
             <ng-container *ngFor="let page of mainInSecondaryItems">
-              <ng-container *ngIf="(!page.registered_only || auth.user) && (!page.guest_only || !auth.user)">
+              <ng-container *ngIf="(!page.registered_only || user) && (!page.guest_only || !user)">
                 <a class="dropdown-item" *ngIf="!page.routerLink" [href]="page.url" [textContent]="page.name | translate" [ngClass]="{'d-block d-sm-block d-md-block d-lg-none': [25, 117].indexOf(+page.id) !== -1, 'd-block d-sm-block d-md-block d-lg-block d-xl-none': page.id == 42}"></a>
                 <a class="dropdown-item" *ngIf="page.routerLink" [routerLink]="page.routerLink" [textContent]="page.name | translate" [ngClass]="{'d-block d-sm-block d-md-block d-lg-none': [25, 117].indexOf(+page.id) !== -1, 'd-block d-sm-block d-md-block d-lg-block d-xl-none': page.id == 42}"></a>
               </ng-container>
             </ng-container>
             <div class="dropdown-divider d-block d-sm-block d-md-block d-lg-block d-xl-none"></div>
             <ng-container *ngFor="let page of secondaryMenuItems">
-              <ng-container *ngIf="(!page.registered_only || auth.user) &amp;&amp; (!page.guest_only || !auth.user)">
+              <ng-container *ngIf="(!page.registered_only || user) &amp;&amp; (!page.guest_only || !user)">
                 <a href="#" *ngIf="page.id == 90" class="dropdown-item" (click)="signOut($event)">
                   <i [ngClass]="page.icon" *ngIf="page.icon"></i>
                   {{page.name | translate}}
@@ -116,9 +116,9 @@
       <router-outlet></router-outlet>
     </div>
     <div class="col-sm-4" *ngIf="(layoutParams$|async).sidebar">
-      <div class="card card-body" *ngIf="auth.user">
+      <div class="card card-body" *ngIf="user">
         <div>
-          <app-user [user]="auth.user"></app-user>
+          <app-user [user]="user"></app-user>
           <br />
           <a routerLink="/account/profile" translate>page/48/name</a>
           <br />
@@ -132,8 +132,8 @@
         </p>
       </div>
 
-      <h3 *ngIf="!auth.user" translate>login/sign-in</h3>
-      <div class="card card-body" *ngIf="!auth.user">
+      <h3 *ngIf="!user" translate>login/sign-in</h3>
+      <div class="card card-body" *ngIf="!user">
         <form (submit)="doLogin()">
           <p>
             <input type="text" name="login" placeholder="{{'login/login-or-email'|translate}}" class="form-control" [(ngModel)]="loginForm.login"

@@ -5,7 +5,7 @@ import { ForumService } from '../../services/forum';
 import { PageService } from '../../services/page';
 import Notify from '../../notify';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
+import { tap } from 'rxjs/operators';
 
 export interface APIPictureUserSummary {
   inboxCount: number;
@@ -37,136 +37,138 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private forumService: ForumService,
     private pageService: PageService,
-    private auth: AuthService,
-    private router: Router
+    private auth: AuthService
   ) {
-    if (!this.auth.user) {
-      // TODO: use guard
-      return;
-    }
 
-    this.items = [
-      {
-        pageId: 129,
-        routerLink: ['/account/profile'],
-        icon: 'user',
-        name: 'page/129/name'
-      },
-      {
-        pageId: 198,
-        routerLink: ['/account/contacts'],
-        icon: 'address-book',
-        name: 'page/198/name'
-      },
-      {
-        pageId: 55,
-        routerLink: ['/account/email'],
-        icon: 'envelope-o',
-        name: 'page/55/name'
-      },
-      {
-        pageId: 133,
-        routerLink: ['/account/access'],
-        icon: 'lock',
-        name: 'page/133/name'
-      },
-      {
-        pageId: 123,
-        routerLink: ['/account/accounts'],
-        icon: 'asterisk',
-        name: 'page/123/name'
-      },
-      {
-        pageId: 130,
-        routerLink: [
-          '/users',
-          this.auth.user.identity
-            ? this.auth.user.identity
-            : 'user' + this.auth.user.id,
-          'pictures'
-        ],
-        icon: 'th',
-        name: 'page/130/name'
-      },
-      {
-        pageId: 94,
-        routerLink: ['/account/inbox-pictures'],
-        icon: 'th',
-        name: 'page/94/name'
-      },
-      {
-        pageId: 57,
-        routerLink: ['/forums/subscriptions'],
-        icon: 'bookmark',
-        name: 'page/57/name'
-      },
-      {
-        name: 'catalogue/specifications'
-      },
-      {
-        pageId: 188,
-        routerLink: ['/account/specs-conflicts'],
-        icon: 'exclamation-triangle',
-        name: 'page/188/name'
-      },
-      {
-        name: 'page/49/name'
-      },
-      {
-        pageId: 128,
-        routerLink: ['/account/messages'],
-        icon: 'comments-o',
-        name: 'page/128/name'
-      },
-      {
-        pageId: 80,
-        routerLink: ['/account/messages'],
-        routerLinkParams: { folder: 'sent' },
-        icon: 'comments-o',
-        name: 'page/80/name'
-      },
-      {
-        pageId: 81,
-        routerLink: ['/account/messages'],
-        routerLinkParams: { folder: 'system' },
-        icon: 'comments',
-        name: 'page/81/name'
-      }
-    ];
-
-    this.loadMessageSummary();
-
-    this.forumService.getUserSummary().then(
-      data => {
-        this.items[7].count = data.subscriptionsCount;
-      },
-      response => {
-        Notify.response(response);
-      }
-    );
-
-    this.http.get<APIPictureUserSummary>('/api/picture/user-summary').subscribe(
-      response => {
-        this.items[6].count = response.inboxCount;
-        this.items[5].count = response.acceptedCount;
-      },
-      response => {
-        Notify.response(response);
-      }
-    );
-
-    for (const item of this.items) {
-      if (item.pageId) {
-        this.pageService.isActive(item.pageId).then(
-          (active: boolean) => {
-            item.active = active;
-          },
-          response => {
-            Notify.response(response);
+    this.auth.getUser()
+      .pipe(
+        tap(user => {
+          if (!user) {
+            return;
           }
-        );
-      }
-    }
+          this.items = [
+            {
+              pageId: 129,
+              routerLink: ['/account/profile'],
+              icon: 'user',
+              name: 'page/129/name'
+            },
+            {
+              pageId: 198,
+              routerLink: ['/account/contacts'],
+              icon: 'address-book',
+              name: 'page/198/name'
+            },
+            {
+              pageId: 55,
+              routerLink: ['/account/email'],
+              icon: 'envelope-o',
+              name: 'page/55/name'
+            },
+            {
+              pageId: 133,
+              routerLink: ['/account/access'],
+              icon: 'lock',
+              name: 'page/133/name'
+            },
+            {
+              pageId: 123,
+              routerLink: ['/account/accounts'],
+              icon: 'asterisk',
+              name: 'page/123/name'
+            },
+            {
+              pageId: 130,
+              routerLink: [
+                '/users',
+                user.identity
+                  ? user.identity
+                  : 'user' + user.id,
+                'pictures'
+              ],
+              icon: 'th',
+              name: 'page/130/name'
+            },
+            {
+              pageId: 94,
+              routerLink: ['/account/inbox-pictures'],
+              icon: 'th',
+              name: 'page/94/name'
+            },
+            {
+              pageId: 57,
+              routerLink: ['/forums/subscriptions'],
+              icon: 'bookmark',
+              name: 'page/57/name'
+            },
+            {
+              name: 'catalogue/specifications'
+            },
+            {
+              pageId: 188,
+              routerLink: ['/account/specs-conflicts'],
+              icon: 'exclamation-triangle',
+              name: 'page/188/name'
+            },
+            {
+              name: 'page/49/name'
+            },
+            {
+              pageId: 128,
+              routerLink: ['/account/messages'],
+              icon: 'comments-o',
+              name: 'page/128/name'
+            },
+            {
+              pageId: 80,
+              routerLink: ['/account/messages'],
+              routerLinkParams: { folder: 'sent' },
+              icon: 'comments-o',
+              name: 'page/80/name'
+            },
+            {
+              pageId: 81,
+              routerLink: ['/account/messages'],
+              routerLinkParams: { folder: 'system' },
+              icon: 'comments',
+              name: 'page/81/name'
+            }
+          ];
+
+          this.loadMessageSummary();
+          this.forumService.getUserSummary().then(
+            data => {
+              this.items[7].count = data.subscriptionsCount;
+            },
+            response => {
+              Notify.response(response);
+            }
+          );
+
+          this.http.get<APIPictureUserSummary>('/api/picture/user-summary').subscribe(
+            response => {
+              this.items[6].count = response.inboxCount;
+              this.items[5].count = response.acceptedCount;
+            },
+            response => {
+              Notify.response(response);
+            }
+          );
+
+          for (const item of this.items) {
+            if (item.pageId) {
+              this.pageService.isActive(item.pageId).then(
+                (active: boolean) => {
+                  item.active = active;
+                },
+                response => {
+                  Notify.response(response);
+                }
+              );
+            }
+          }
+        })
+      );
 
     this.handler = () => {
       this.loadMessageSummary();

@@ -19,7 +19,7 @@
     <p class="alert alert-warning deleted-message" *ngIf="canRemoveComments || message.deleted" translate>comments/message-deleted-by-admin</p>
 
     <div>
-      <span class="vote" *ngIf="auth.user && (message.vote !== undefined)">
+      <span class="vote" *ngIf="user && (message.vote !== undefined)">
         <a href="#" class="vote-up" [class.active]="message.user_vote > 0" (click)="vote(message, 1)">
           <i class="fa fa-thumbs-o-up"></i>
         </a>
@@ -30,13 +30,13 @@
           <i class="fa fa-thumbs-o-down"></i>
         </a>
       </span>
-      <span class="vote" *ngIf="!auth.user && (message.vote !== undefined)">
+      <span class="vote" *ngIf="!user && (message.vote !== undefined)">
         <i class="fa fa-thumbs-o-up"></i>
         <span class="value" [textContent]="message.vote" (click)="showVotes(message)"></span>
         <i class="fa fa-thumbs-o-down"></i>
       </span>
 
-      <button class="btn btn-sm btn-primary reply" *ngIf="auth.user && deep < 21 && !message.deleted" (click)="reply(message, false)">
+      <button class="btn btn-sm btn-primary reply" *ngIf="user && deep < 21 && !message.deleted" (click)="reply(message, false)">
         <i class="fa fa-reply"></i>
         <span class="d-none d-md-inline">{{'comments/reply'|translate}}</span>
       </button>
@@ -72,6 +72,6 @@
   </div>
   <div class="replies" *ngIf="deep < 21">
     <app-comments-list [itemID]="itemID" [typeID]="typeID" (sent)="onSent($event)" [messages]="message.replies" [deep]="deep+1"></app-comments-list>
-    <app-comments-form [itemID]="itemID" [typeID]="typeID" (sent)="onSent($event)" [parentID]="message.id" *ngIf="auth.user && message.showReply"></app-comments-form>
+    <app-comments-form [itemID]="itemID" [typeID]="typeID" (sent)="onSent($event)" [parentID]="message.id" *ngIf="user && message.showReply"></app-comments-form>
   </div>
 </div>

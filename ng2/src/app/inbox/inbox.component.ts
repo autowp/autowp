@@ -1,5 +1,4 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../services/api.service';
 import Notify from '../notify';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -13,12 +12,11 @@ import {
   distinctUntilChanged,
   debounceTime,
   switchMap,
-  catchError
+  catchError,
+  switchMapTo
 } from 'rxjs/operators';
 
 const ALL_BRANDS = 'all';
-
-// url: '/inbox/:brand/:date/:page',
 
 @Component({
   selector: 'app-inbox',
@@ -45,7 +43,6 @@ export class InboxComponent implements OnInit, OnDestroy {
   public brands: APIItem[];
 
   constructor(
-    private http: HttpClient,
     private router: Router,
     private auth: AuthService,
     private route: ActivatedRoute,
@@ -55,12 +52,6 @@ export class InboxComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.auth.authenticated.then(loggedIn => {
-      if (!loggedIn) {
-        this.router.navigate(['/signin']);
-      }
-    });
-
     setTimeout(
       () =>
         this.pageEnv.set({
@@ -73,8 +64,16 @@ export class InboxComponent implements OnInit, OnDestroy {
       0
     );
 
-    this.routeSub = this.route.params
+    this.routeSub = this.auth.getUser()
       .pipe(
+        switchMap(user => {
+          if (!user) {
+            this.router.navigate(['/signin']);
+            return empty();
+          }
+
+          return this.route.params;
+        }),
         distinctUntilChanged(),
         debounceTime(30),
         switchMap(
@@ -104,8 +103,8 @@ export class InboxComponent implements OnInit, OnDestroy {
           Notify.response(err);
           return of(null);
         }),
-        switchMap(
-          data => this.route.queryParams,
+        switchMapTo(
+          this.route.queryParams,
           (data, queryParams) => ({
             params: data.params,
             inbox: data.inbox,

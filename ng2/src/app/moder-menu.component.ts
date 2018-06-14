@@ -1,7 +1,6 @@
-import { Component, Input, Injectable, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { AuthService } from './services/auth.service';
 import { ACLService } from './services/acl.service';
-import { APIPicturesGetResponse } from './services/api.service';
 import { PictureService } from './services/picture';
 import { CommentService } from './services/comment';
 
@@ -29,7 +28,7 @@ export class ModerMenuComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.auth.loggedIn$.subscribe(value => {
+    this.auth.getUser().subscribe(value => {
       this.loadItems();
     });
   }

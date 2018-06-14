@@ -43,8 +43,7 @@ export class AccountDeleteComponent {
       })
       .subscribe(
         () => {
-          this.auth.user = null;
-          this.auth.setLoggedIn(false);
+          this.auth.setUser(null);
           this.router.navigate(['/account/delete/deleted']);
         },
         response => {
