@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import * as $ from 'jquery';
 import { MessageService } from './message';
 import Notify from '../notify';
 import { TranslateService } from '@ngx-translate/core';
@@ -36,27 +35,5 @@ export class MessageDialogService {
       }
     );
     modalRef.componentInstance.userId = userId;
-
-    /*
-
-
-      $modal.on('shown.bs.modal', () => {
-        $textarea.focus();
-      });
-
-      $textarea
-        .on('change keyup click', () => {
-          const val: string = $textarea.val();
-          $textarea.parent().removeClass('error');
-          $btnSend
-            .text(translations['personal-message-dialog/send'])
-            .removeClass('btn-success')
-            .prop('disabled', val.length <= 0);
-        })
-        .triggerHandler('change');
-
-
-
-      */
   }
 }
