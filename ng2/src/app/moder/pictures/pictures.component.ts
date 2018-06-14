@@ -17,8 +17,8 @@ import {
   APIItem
 } from '../../services/item';
 import { chunkBy } from '../../chunk';
-import { UserService } from '../../services/user';
-import { Subscription, Observable, of } from 'rxjs';
+import { UserService, APIUser } from '../../services/user';
+import { Subscription, Observable, of, empty } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   APIPicture,
@@ -26,7 +26,7 @@ import {
   APIGetPicturesOptions
 } from '../../services/picture';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { debounceTime, map, switchMap } from 'rxjs/operators';
+import { debounceTime, map, switchMap, catchError } from 'rxjs/operators';
 import { PageEnvService } from '../../services/page-env.service';
 
 interface VehicleTypeInPictures {
@@ -236,41 +236,13 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
   public lost = false;
   public specialName = false;
 
-  public itemID: number;
-  public itemQuery = '';
-
   public ownerID: number;
   public ownerQuery = '';
-  public ownersDataSource: Observable<any>;
+  public ownersDataSource: (text$: Observable<string>) => Observable<any[]>;
 
-  itemsDataSource = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(200),
-      switchMap(query => {
-        if (query === '') {
-          return of([]);
-        }
-
-        const params: GetItemsServiceOptions = {
-          limit: 10,
-          fields: 'name_text,name_html',
-          id: 0,
-          name: ''
-        };
-        if (query.substring(0, 1) === '#') {
-          params.id = parseInt(query.substring(1), 10);
-        } else {
-          params.name = '%' + query + '%';
-        }
-
-        return this.itemService.getItems(params).pipe(
-          map(response => {
-            console.log('response', response);
-            return response.items;
-          })
-        );
-      })
-    );
+  public itemID: number;
+  public itemQuery = '';
+  public itemsDataSource: (text$: Observable<string>) => Observable<any[]>;
 
   constructor(
     private http: HttpClient,
@@ -284,7 +256,66 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
     private pictureService: PictureService,
     private router: Router,
     private pageEnv: PageEnvService
-  ) {}
+  ) {
+    this.ownersDataSource = (text$: Observable<string>) =>
+      text$.pipe(
+        debounceTime(200),
+        switchMap(query => {
+          if (query === '') {
+            return of([]);
+          }
+
+          const params = {
+            limit: 10,
+            id: [],
+            search: ''
+          };
+          if (query.substring(0, 1) === '#') {
+            params.id.push(parseInt(query.substring(1), 10));
+          } else {
+            params.search = query;
+          }
+
+          return this.userService.get(params).pipe(
+            catchError((err, caught) => {
+              console.log(err, caught);
+              return empty();
+            }),
+            map(response => response.items)
+          );
+        })
+      );
+
+    this.itemsDataSource = (text$: Observable<string>) =>
+      text$.pipe(
+        debounceTime(200),
+        switchMap(query => {
+          if (query === '') {
+            return of([]);
+          }
+
+          const params: GetItemsServiceOptions = {
+            limit: 10,
+            fields: 'name_text,name_html',
+            id: 0,
+            name: ''
+          };
+          if (query.substring(0, 1) === '#') {
+            params.id = parseInt(query.substring(1), 10);
+          } else {
+            params.name = '%' + query + '%';
+          }
+
+          return this.itemService.getItems(params).pipe(
+            catchError((err, caught) => {
+              console.log(err, caught);
+              return empty();
+            }),
+            map(response => response.items)
+          );
+        })
+      );
+  }
 
   ngOnInit(): void {
     setTimeout(
@@ -299,29 +330,6 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
         }),
       0
     );
-
-    /*this.ownersDataSource = Observable.create((observer: any) => {
-      // Runs on every search
-      observer.next(this.ownerQuery);
-    }).mergeMap((query: string) => {
-      const params = {
-        limit: 10,
-        id: [],
-        search: ''
-      };
-      if (query.substring(0, 1) === '#') {
-        params.id.push(parseInt(query.substring(1), 10));
-      } else {
-        params.search = query;
-      }
-
-      return Observable.create(observer => {
-        this.userService.get(params).subscribe(response => {
-          observer.next(response.items);
-          observer.complete();
-        });
-      });
-    });*/
 
     this.vehicleTypeService.getTypes().then(types => {
       this.vehicleTypeOptions = this.defaultVehicleTypeOptions.concat(
@@ -416,14 +424,17 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
     return x.name_text;
   }
 
+  ownerFormatter(x: APIUser) {
+    return x.name;
+  }
+
   itemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
-    console.log(e);
-    /*this.router.navigate([], {
+    this.router.navigate([], {
       queryParamsHandling: 'merge',
       queryParams: {
         item_id: e.item.id
       }
-    });*/
+    });
   }
 
   clearItem(): void {

@@ -1,7 +1,6 @@
 import { Component, Injectable } from '@angular/core';
 import * as showdown from 'showdown';
 import * as escapeRegExp from 'lodash.escaperegexp';
-import * as $ from 'jquery';
 import { UserService, APIUser } from '../services/user';
 import { HttpClient } from '@angular/common/http';
 import Notify from '../notify';
@@ -134,20 +133,30 @@ export class AboutComponent {
   }
 
   private userHtml(user: APIUser): string {
-    const span = $('<span class="user" />');
-    span.toggleClass('muted', user.deleted);
-    span.toggleClass('long-away', user.long_away);
-    span.toggleClass('green-man', user.green);
-    const a = $('<a />', {
-      href: this.router
+    const span = document.createElement('span');
+    const classes = ['user'];
+    if (user.deleted) {
+      classes.push('muted');
+    }
+    if (user.long_away) {
+      classes.push('long-away');
+    }
+    if (user.green) {
+      classes.push('green-man');
+    }
+    span.setAttribute('class', classes.join(' '));
+    const a = document.createElement('a');
+    a.setAttribute(
+      'href',
+      this.router
         .createUrlTree([
           '/users/user',
           user.identity ? user.identity : 'user' + user.id
         ])
-        .toString(),
-      text: user.name
-    });
+        .toString()
+    );
+    a.innerText = user.name;
 
-    return '<i class="fa fa-user"></i> ' + span.append(a)[0].outerHTML;
+    return '<i class="fa fa-user"></i> ' + span.appendChild(a).outerHTML;
   }
 }

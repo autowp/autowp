@@ -52,7 +52,7 @@
         </div>
       </div>
 
-      <ng-template #itemTemplate let-model="item">
+      <ng-template #itemTemplate let-model="result">
         <span [innerHTML]="model.name_html"></span>
       </ng-template>
       <div class="input-group mb-3">
@@ -78,17 +78,20 @@
             [queryParams]="{comments: option.value}" queryParamsHandling="merge">{{option.name|translate}}</a>
         </div>
       </div>
-      <!--
+
+      <ng-template #ownerTemplate let-model="result">
+        <span [innerHTML]="model.name"></span>
+      </ng-template>
       <div class="input-group mb-3">
-        <input [typeahead]="ownersDataSource" [(ngModel)]="ownerQuery" typeaheadOptionField="name" (typeaheadOnSelect)="ownerOnSelect($event)"
-          [typeaheadOptionsLimit]="10" [placeholder]="'moder/picture/filter/owner'|translate" class="form-control" [class.border-primary]="ownerID">
+        <input [ngbTypeahead]="ownersDataSource" name="owner" [(ngModel)]="ownerQuery" [inputFormatter]="ownerFormatter" (selectItem)="ownerOnSelect($event)"
+          [resultTemplate]="ownerTemplate" [placeholder]="'moder/picture/filter/owner'|translate" class="form-control" [class.border-primary]="ownerID">
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" type="button" [disabled]="!ownerID" (click)="clearOwner()">
             <span class="fa fa-close"></span>
           </button>
         </div>
       </div>
--->
+
       <div class="btn-group mb-3" ngbDropdown>
         <button class="btn btn-block" ngbDropdownToggle [class.btn-primary]="replace !== null" [class.btn-outline-secondary]="replace === null"
           type="button" id="dropdownMenuButton">
