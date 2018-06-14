@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { APIPaginator } from './api.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { APIUser } from './user';
 import { APIComment } from './comment';
+import { AuthService } from './auth.service';
+import { switchMap, share } from 'rxjs/operators';
 
 export interface APIForumGetTopicOptions {
   fields?: string;
@@ -90,27 +92,24 @@ const LIMIT = 20;
 
 @Injectable()
 export class ForumService {
-  private promise: Promise<APIForumUserSummaryGetResponse> | null = null;
+  private summary$: Observable<APIForumUserSummaryGetResponse>;
 
-  constructor(private http: HttpClient) {}
-
-  public getUserSummary(): Promise<APIForumUserSummaryGetResponse> {
-    if (this.promise) {
-      return this.promise;
-    }
-
-    this.promise = new Promise<APIForumUserSummaryGetResponse>(
-      (resolve, reject) => {
-        this.http
-          .get<APIForumUserSummaryGetResponse>('/api/forum/user-summary')
-          .subscribe(
-            response => resolve(response),
-            response => reject(response)
-          );
-      }
+  constructor(private http: HttpClient, private auth: AuthService) {
+    this.summary$ = this.auth.getUser().pipe(
+      switchMap(user => {
+        console.log('USER');
+        if (!user) {
+          return of(null);
+        }
+        return this.http.get<APIForumUserSummaryGetResponse>(
+          '/api/forum/user-summary'
+        ).pipe(share());
+      })
     );
+  }
 
-    return this.promise;
+  public getUserSummary(): Observable<APIForumUserSummaryGetResponse> {
+    return this.summary$;
   }
 
   public getLimit(): number {

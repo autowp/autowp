@@ -1,4 +1,11 @@
-import { Component, Injectable, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Injectable,
+  ViewChild,
+  ElementRef,
+  OnInit,
+  OnDestroy
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import Notify from '../../notify';
 import { TranslateService } from '@ngx-translate/core';
@@ -93,60 +100,60 @@ export class AccountProfileComponent implements OnInit, OnDestroy {
         }),
       0
     );
-
-
   }
 
   ngOnInit(): void {
-
-    this.sub = this.auth.getUser().pipe(
-      switchMap(user => {
-        if (!user) {
-          this.router.navigate(['/signin']);
-          return empty();
-        }
-
-        this.user = user;
-
-        return of(user);
-      }),
-      switchMapTo(combineLatest(
-        this.http
-          .get<APIUser>('/api/user/me', {
-            params: {
-              fields: 'name,timezone,language,votes_per_day,votes_left,img'
-            }
-          }),
-        this.http.get<APITimezoneGetResponse>('/api/timezone'),
-        this.http.get<APILanguageGetResponse>('/api/language'),
-        (user, timezones, languages) => ({ user, timezones, languages })
-      ))
-    ).subscribe(
-      data => {
-        this.profile.name = data.user.name;
-        this.settings.timezone = data.user.timezone;
-        this.settings.language = data.user.language;
-        this.votesPerDay = data.user.votes_per_day;
-        this.votesLeft = data.user.votes_left;
-        this.photo = data.user.img;
-
-        this.timezones = data.timezones.items;
-
-        this.languages = [];
-        for (const key in data.languages.items) {
-          if (data.languages.items.hasOwnProperty(key)) {
-            this.languages.push({
-              name: data.languages.items[key],
-              value: key
-            });
+    this.sub = this.auth
+      .getUser()
+      .pipe(
+        switchMap(user => {
+          if (!user) {
+            this.router.navigate(['/signin']);
+            return empty();
           }
-        }
-      },
-      response => {
-        Notify.response(response);
-      }
-    );
 
+          this.user = user;
+
+          return of(user);
+        }),
+        switchMapTo(
+          combineLatest(
+            this.http.get<APIUser>('/api/user/me', {
+              params: {
+                fields: 'name,timezone,language,votes_per_day,votes_left,img'
+              }
+            }),
+            this.http.get<APITimezoneGetResponse>('/api/timezone'),
+            this.http.get<APILanguageGetResponse>('/api/language'),
+            (user, timezones, languages) => ({ user, timezones, languages })
+          )
+        )
+      )
+      .subscribe(
+        data => {
+          this.profile.name = data.user.name;
+          this.settings.timezone = data.user.timezone;
+          this.settings.language = data.user.language;
+          this.votesPerDay = data.user.votes_per_day;
+          this.votesLeft = data.user.votes_left;
+          this.photo = data.user.img;
+
+          this.timezones = data.timezones.items;
+
+          this.languages = [];
+          for (const key in data.languages.items) {
+            if (data.languages.items.hasOwnProperty(key)) {
+              this.languages.push({
+                name: data.languages.items[key],
+                value: key
+              });
+            }
+          }
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
   }
   ngOnDestroy(): void {
     this.sub.unsubscribe();

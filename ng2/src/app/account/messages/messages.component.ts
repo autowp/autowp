@@ -3,7 +3,7 @@ import { APIPaginator } from '../../services/api.service';
 import { MessageService, APIMessage } from '../../services/message';
 import { MessageDialogService } from '../../services/message-dialog';
 import Notify from '../../notify';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { PageEnvService } from '../../services/page-env.service';
 
@@ -23,7 +23,6 @@ export class AccountMessagesComponent implements OnInit, OnDestroy {
   constructor(
     private messageService: MessageService,
     private messageDialogService: MessageDialogService,
-    private router: Router,
     private route: ActivatedRoute,
     private pageEnv: PageEnvService
   ) {}
@@ -88,16 +87,7 @@ export class AccountMessagesComponent implements OnInit, OnDestroy {
           this.items = response.items;
           this.paginator = response.paginator;
 
-          let newFound = false;
-          for (const message of this.items) {
-            if (message.is_new) {
-              newFound = true;
-            }
-          }
-
-          if (newFound) {
-            this.messageService.refreshNewMessagesCount();
-          }
+          this.messageService.seen(response.items);
         },
         response => {
           Notify.response(response);

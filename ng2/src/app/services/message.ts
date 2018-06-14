@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject ,  Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject, combineLatest } from 'rxjs';
 import { AuthService } from './auth.service';
 import Notify from '../notify';
 import { APIPaginator } from './api.service';
 import { APIUser } from './user';
+import { switchMap, map, debounceTime } from 'rxjs/operators';
 
 export type MessageCallbackType = () => void;
 
@@ -53,33 +54,62 @@ export interface APIMessageNewGetResponse {
 
 @Injectable()
 export class MessageService {
-  public newMessagesCount = new BehaviorSubject<number>(0);
   private user: APIUser;
 
-  private handlers: { [key: string]: MessageCallbackType[] } = {
-    sent: [],
-    deleted: []
-  };
+  private summary$: Observable<APIMessageSummaryGetResponse>;
+  private new$: Observable<number>;
+  private deleted$ = new BehaviorSubject<void>(null);
+  private sent$ = new BehaviorSubject<void>(null);
+  private seen$ = new BehaviorSubject<void>(null);
 
   constructor(private http: HttpClient, private auth: AuthService) {
-    this.auth.getUser().subscribe(user => {
-      this.user = user;
-      this.refreshNewMessagesCount();
-    });
+    this.summary$ = combineLatest(
+      this.deleted$,
+      this.sent$,
+      this.seen$,
+      this.auth.getUser(),
+      (a, b, c, user) => user
+    ).pipe(
+      debounceTime(10),
+      switchMap(user => {
+        if (!user) {
+          return of(null as APIMessageSummaryGetResponse);
+        }
+
+        return this.http.get<APIMessageSummaryGetResponse>(
+          '/api/message/summary'
+        );
+      })
+    );
+
+    this.new$ = combineLatest(
+      this.auth.getUser(),
+      this.deleted$,
+      this.seen$,
+      user => user
+    ).pipe(
+      debounceTime(10),
+      switchMap(user => {
+        if (!user) {
+          return of(null as APIMessageNewGetResponse);
+        }
+
+        return this.http.get<APIMessageNewGetResponse>('/api/message/new');
+      }),
+      map(response => response.count)
+    );
   }
 
-  public refreshNewMessagesCount() {
-    if (this.user) {
-      this.getNewCount().then(
-        count => {
-          this.newMessagesCount.next(count);
-        },
-        response => {
-          Notify.response(response);
-        }
-      );
-    } else {
-      this.newMessagesCount.next(0);
+  public seen(messages: APIMessage[]) {
+    let newFound = false;
+    for (const message of messages) {
+      if (message.is_new) {
+        newFound = true;
+      }
+    }
+
+    if (newFound) {
+      this.seen$.next(null);
     }
   }
 
@@ -93,9 +123,7 @@ export class MessageService {
         })
         .subscribe(
           () => {
-            this.trigger('deleted');
-
-            this.refreshNewMessagesCount();
+            this.deleted$.next(null);
 
             resolve();
           },
@@ -108,7 +136,7 @@ export class MessageService {
     return new Promise<void>((resolve, reject) => {
       this.http.delete('/api/message/' + id).subscribe(
         () => {
-          this.trigger('deleted');
+          this.deleted$.next(null);
 
           resolve();
         },
@@ -117,51 +145,24 @@ export class MessageService {
     });
   }
 
-  public getSummary(): Promise<APIMessageSummaryGetResponse> {
-    return new Promise<APIMessageSummaryGetResponse>((resolve, reject) => {
-      this.http
-        .get<APIMessageSummaryGetResponse>('/api/message/summary')
-        .subscribe(response => resolve(response), response => reject(response));
-    });
+  public getSummary(): Observable<APIMessageSummaryGetResponse> {
+    return this.summary$;
   }
 
-  public getNewCount(): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      this.http
-        .get<APIMessageNewGetResponse>('/api/message/new')
-        .subscribe(
-          response => resolve(response.count),
-          response => reject(response)
-        );
-    });
+  public getNew(): Observable<number> {
+    return this.new$;
   }
 
   public send(userId: number, text: string): Promise<void> {
-    const subscription = this.http.post<void>('/api/message', {
-      user_id: userId,
-      text: text
-    });
-
-    return subscription.toPromise().then(() => {
-      this.trigger('sent');
-    });
-  }
-
-  public bind(event: string, handler: MessageCallbackType) {
-    this.handlers[event].push(handler);
-  }
-
-  public unbind(event: string, handler: MessageCallbackType) {
-    const index = this.handlers[event].indexOf(handler);
-    if (index !== -1) {
-      this.handlers[event].splice(index, 1);
-    }
-  }
-
-  public trigger(event: string) {
-    for (const handler of this.handlers[event]) {
-      handler();
-    }
+    return this.http
+      .post<void>('/api/message', {
+        user_id: userId,
+        text: text
+      })
+      .toPromise()
+      .then(() => {
+        this.sent$.next(null);
+      });
   }
 
   public getMessages(

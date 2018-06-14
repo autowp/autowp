@@ -6,6 +6,7 @@ import { PageService } from '../../services/page';
 import Notify from '../../notify';
 import { AuthService } from '../../services/auth.service';
 import { tap } from 'rxjs/operators';
+import { combineLatest, Observable, Subscription } from 'rxjs';
 
 export interface APIPictureUserSummary {
   inboxCount: number;
@@ -30,7 +31,7 @@ interface SidebarItem {
 @Injectable()
 export class AccountSidebarComponent implements OnInit, OnDestroy {
   public items: SidebarItem[];
-  private handler: MessageCallbackType;
+  private sub: Subscription;
 
   constructor(
     private messageService: MessageService,
@@ -38,12 +39,25 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
     private forumService: ForumService,
     private pageService: PageService,
     private auth: AuthService
-  ) {
+  ) {}
 
-    this.auth.getUser()
+  ngOnInit(): void {
+    this.sub = combineLatest(
+      this.auth.getUser().pipe(tap(() => console.log('ddd'))),
+      this.forumService.getUserSummary(),
+      this.messageService.getSummary(),
+      this.http.get<APIPictureUserSummary>('/api/picture/user-summary'),
+      (user, forumSummary, messageSummary, picturesSummary) => ({
+        user,
+        forumSummary,
+        messageSummary,
+        picturesSummary
+      })
+    )
       .pipe(
-        tap(user => {
-          if (!user) {
+        tap(data => {
+          console.log('zzz');
+          if (!data.user) {
             return;
           }
           this.items = [
@@ -81,25 +95,32 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
               pageId: 130,
               routerLink: [
                 '/users',
-                user.identity
-                  ? user.identity
-                  : 'user' + user.id,
+                data.user.identity ? data.user.identity : 'user' + data.user.id,
                 'pictures'
               ],
               icon: 'th',
-              name: 'page/130/name'
+              name: 'page/130/name',
+              count: data.picturesSummary
+                ? data.picturesSummary.acceptedCount
+                : null
             },
             {
               pageId: 94,
               routerLink: ['/account/inbox-pictures'],
               icon: 'th',
-              name: 'page/94/name'
+              name: 'page/94/name',
+              count: data.picturesSummary
+                ? data.picturesSummary.inboxCount
+                : null
             },
             {
               pageId: 57,
               routerLink: ['/forums/subscriptions'],
               icon: 'bookmark',
-              name: 'page/57/name'
+              name: 'page/57/name',
+              count: data.forumSummary
+                ? data.forumSummary.subscriptionsCount
+                : null
             },
             {
               name: 'catalogue/specifications'
@@ -117,48 +138,41 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
               pageId: 128,
               routerLink: ['/account/messages'],
               icon: 'comments-o',
-              name: 'page/128/name'
+              name: 'page/128/name',
+              count: data.messageSummary
+                ? data.messageSummary.inbox.count
+                : null,
+              newCount: data.messageSummary
+                ? data.messageSummary.inbox.new_count
+                : null
             },
             {
               pageId: 80,
               routerLink: ['/account/messages'],
               routerLinkParams: { folder: 'sent' },
               icon: 'comments-o',
-              name: 'page/80/name'
+              name: 'page/80/name',
+              count: data.messageSummary ? data.messageSummary.sent.count : null
             },
             {
               pageId: 81,
               routerLink: ['/account/messages'],
               routerLinkParams: { folder: 'system' },
               icon: 'comments',
-              name: 'page/81/name'
+              name: 'page/81/name',
+              count: data.messageSummary
+                ? data.messageSummary.system.count
+                : null,
+              newCount: data.messageSummary
+                ? data.messageSummary.system.new_count
+                : null
             }
           ];
-
-          this.loadMessageSummary();
-          this.forumService.getUserSummary().then(
-            data => {
-              this.items[7].count = data.subscriptionsCount;
-            },
-            response => {
-              Notify.response(response);
-            }
-          );
-
-          this.http.get<APIPictureUserSummary>('/api/picture/user-summary').subscribe(
-            response => {
-              this.items[6].count = response.inboxCount;
-              this.items[5].count = response.acceptedCount;
-            },
-            response => {
-              Notify.response(response);
-            }
-          );
 
           for (const item of this.items) {
             if (item.pageId) {
               this.pageService.isActive(item.pageId).then(
-                (active: boolean) => {
+                active => {
                   item.active = active;
                 },
                 response => {
@@ -168,36 +182,10 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
             }
           }
         })
-      );
-
-    this.handler = () => {
-      this.loadMessageSummary();
-    };
-  }
-
-  ngOnInit(): void {
-    this.messageService.bind('sent', this.handler);
-    this.messageService.bind('deleted', this.handler);
+      )
+      .subscribe();
   }
   ngOnDestroy(): void {
-    this.messageService.unbind('sent', this.handler);
-    this.messageService.unbind('deleted', this.handler);
-  }
-
-  private loadMessageSummary() {
-    this.messageService.getSummary().then(
-      data => {
-        this.items[11].count = data.inbox.count;
-        this.items[11].newCount = data.inbox.new_count;
-
-        this.items[12].count = data.sent.count;
-
-        this.items[13].count = data.system.count;
-        this.items[13].newCount = data.system.new_count;
-      },
-      response => {
-        Notify.response(response);
-      }
-    );
+    this.sub.unsubscribe();
   }
 }

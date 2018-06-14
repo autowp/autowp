@@ -53,6 +53,8 @@ export class AppComponent implements OnInit {
 
     this.layoutParams$ = this.pageEnv.layoutParams$.asObservable();
 
+    this.auth.loadMe();
+
     this.auth.getUser().subscribe(user => {
       this.user = user;
     });
@@ -68,7 +70,7 @@ export class AppComponent implements OnInit {
       }
     }
 
-    this.messageService.newMessagesCount.subscribe((value) => {
+    this.messageService.getNew().subscribe(value => {
       this.newPersonalMessages = value;
     });
   }
@@ -78,25 +80,31 @@ export class AppComponent implements OnInit {
   }
 
   doLogin() {
-    this.auth.login(this.loginForm.login, this.loginForm.password, this.loginForm.remember).then(
-      () => {
-        this.router.navigate(['/login/ok']);
-      },
-      response => {
-        if (response.status === 400) {
-          this.loginInvalidParams = response.error.invalid_params;
-        } else {
-          Notify.response(response);
+    this.auth
+      .login(
+        this.loginForm.login,
+        this.loginForm.password,
+        this.loginForm.remember
+      )
+      .then(
+        () => {
+          this.router.navigate(['/login/ok']);
+        },
+        response => {
+          if (response.status === 400) {
+            this.loginInvalidParams = response.error.invalid_params;
+          } else {
+            Notify.response(response);
+          }
         }
-      }
-    );
+      );
   }
 
   signOut(event) {
     event.preventDefault();
 
     this.auth.signOut().then(
-      () => { },
+      () => {},
       error => {
         console.log(error);
       }

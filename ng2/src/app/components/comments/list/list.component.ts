@@ -44,9 +44,7 @@ export class CommentsListComponent implements OnInit, OnDestroy {
     private commentService: CommentService,
     public auth: AuthService,
     private modalService: NgbModal
-  ) {
-
-  }
+  ) {}
 
   ngOnInit(): void {
     this.acl

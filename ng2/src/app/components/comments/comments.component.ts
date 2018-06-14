@@ -21,7 +21,6 @@ import { Subscription } from 'rxjs';
 })
 @Injectable()
 export class CommentsComponent implements OnChanges, OnInit, OnDestroy {
-
   private sub: Subscription;
 
   public messages: APIComment[] = [];
@@ -37,7 +36,7 @@ export class CommentsComponent implements OnChanges, OnInit, OnDestroy {
     private router: Router,
     private commentService: CommentService,
     public auth: AuthService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.sub = this.auth.getUser().subscribe(user => (this.user = user));
