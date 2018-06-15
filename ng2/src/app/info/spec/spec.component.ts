@@ -1,20 +1,26 @@
-import { Component, Injectable } from '@angular/core';
+import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import Notify from '../../notify';
 import { SpecService, APISpec } from '../../services/spec';
 import { PageEnvService } from '../../services/page-env.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-info-spec',
   templateUrl: './spec.component.html'
 })
 @Injectable()
-export class InfoSpecComponent {
+export class InfoSpecComponent implements OnInit, OnDestroy {
   public specs: APISpec[];
+  private sub: Subscription;
 
   constructor(
     private specService: SpecService,
     private pageEnv: PageEnvService
   ) {
+
+  }
+
+  ngOnInit(): void {
     setTimeout(
       () =>
         this.pageEnv.set({
@@ -27,11 +33,12 @@ export class InfoSpecComponent {
       0
     );
 
-    this.specService
-      .getSpecs()
-      .then(
-        specs => (this.specs = specs),
-        response => Notify.response(response)
-      );
+    this.sub = this.specService.getSpecs().subscribe(
+      specs => (this.specs = specs),
+      response => Notify.response(response)
+    );
+  }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 }

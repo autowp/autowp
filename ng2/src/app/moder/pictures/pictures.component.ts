@@ -243,6 +243,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
   public itemID: number;
   public itemQuery = '';
   public itemsDataSource: (text$: Observable<string>) => Observable<any[]>;
+  private vehicleTypeSub: Subscription;
 
   constructor(
     private http: HttpClient,
@@ -331,7 +332,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
       0
     );
 
-    this.vehicleTypeService.getTypes().then(types => {
+    this.vehicleTypeSub = this.vehicleTypeService.getTypes().subscribe(types => {
       this.vehicleTypeOptions = this.defaultVehicleTypeOptions.concat(
         toPlainVehicleTypes(types, 0)
       );
@@ -405,6 +406,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.vehicleTypeSub.unsubscribe();
     this.querySub.unsubscribe();
   }
 

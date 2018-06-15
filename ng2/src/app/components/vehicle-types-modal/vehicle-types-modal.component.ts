@@ -4,7 +4,8 @@ import {
   OnInit,
   Input,
   Output,
-  EventEmitter
+  EventEmitter,
+  OnDestroy
 } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import Notify from '../../notify';
@@ -12,29 +13,33 @@ import {
   VehicleTypeService,
   APIVehicleType
 } from '../../services/vehicle-type';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-vehicle-types-modal',
   templateUrl: './vehicle-types-modal.component.html'
 })
 @Injectable()
-export class VehicleTypesModalComponent implements OnInit {
+export class VehicleTypesModalComponent implements OnInit, OnDestroy {
   @Input() ids: number[] = [];
   @Output() changed = new EventEmitter();
   public types: APIVehicleType[];
+  private sub: Subscription;
 
   constructor(
     public activeModal: NgbActiveModal,
     private vehicleTypeService: VehicleTypeService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.vehicleTypeService.getTypes().then(
-      types => {
-        this.types = types;
-      },
+    this.sub = this.vehicleTypeService.getTypes().subscribe(
+      types => types,
       error => Notify.response(error)
     );
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   public isActive(id: number): boolean {

@@ -7,7 +7,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription, Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import {
-  APIForumThemesGetResponse,
   ForumService,
   APIForumTopic,
   APIForumTheme
@@ -44,7 +43,7 @@ export class ForumsComponent implements OnInit, OnDestroy {
     private router: Router,
     private forumService: ForumService,
     private pageEnv: PageEnvService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.acl.isAllowed('forums', 'moderate').then(

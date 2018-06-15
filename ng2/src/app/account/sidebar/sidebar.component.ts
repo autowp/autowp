@@ -6,7 +6,7 @@ import { PageService } from '../../services/page';
 import Notify from '../../notify';
 import { AuthService } from '../../services/auth.service';
 import { tap } from 'rxjs/operators';
-import { combineLatest, Observable, Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 
 export interface APIPictureUserSummary {
   inboxCount: number;
@@ -39,7 +39,7 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
     private forumService: ForumService,
     private pageService: PageService,
     private auth: AuthService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.sub = combineLatest(

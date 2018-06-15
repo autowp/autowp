@@ -2,15 +2,13 @@ import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
 import { APIService } from './api.service';
 import { APIUser } from './user';
-import { share } from 'rxjs/operators';
 
 @Injectable()
 export class AuthService {
   private user$ = new ReplaySubject<APIUser>(1);
-  private shared$: Observable<APIUser>;
 
   constructor(private api: APIService) {
-    this.shared$ = this.user$.pipe(share());
+
   }
 
   public setUser(value: APIUser) {
@@ -19,7 +17,7 @@ export class AuthService {
   }
 
   public getUser(): Observable<APIUser> {
-    return this.shared$;
+    return this.user$;
   }
 
   public login(

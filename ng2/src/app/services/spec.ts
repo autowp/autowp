@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
 
 export interface APISpecGetResponse {
   items: APISpec[];
@@ -14,31 +16,22 @@ export interface APISpec {
 
 @Injectable()
 export class SpecService {
-  private types: APISpec[];
-  private typesInitialized = false;
+  private specs$: Observable<APISpec[]>;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.specs$ = this.http.get<APISpecGetResponse>('/api/spec').pipe(
+      map(response => response.items),
+      shareReplay(1)
+    );
+  }
 
-  public getSpecs(): Promise<APISpec[]> {
-    return new Promise<APISpec[]>((resolve, reject) => {
-      if (this.typesInitialized) {
-        resolve(this.types);
-        return;
-      }
-      this.http.get<APISpecGetResponse>('/api/spec').subscribe(
-        response => {
-          this.types = response.items;
-          this.typesInitialized = true;
-          resolve(this.types);
-        },
-        response => reject(response)
-      );
-    });
+  public getSpecs(): Observable<APISpec[]> {
+    return this.specs$;
   }
 
   public getSpec(id: number): Promise<APISpec> {
     return new Promise<APISpec>((resolve, reject) => {
-      this.getSpecs().then(
+      this.getSpecs().toPromise().then(
         (types: APISpec[]) => {
           const spec = this.findSpec(types, id);
           if (spec) {

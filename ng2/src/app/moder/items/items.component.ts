@@ -1,26 +1,44 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import * as $ from 'jquery';
-import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../services/api.service';
-import { VehicleTypeService } from '../../services/vehicle-type';
-import { SpecService } from '../../services/spec';
+import { VehicleTypeService, APIVehicleType } from '../../services/vehicle-type';
+import { SpecService, APISpec } from '../../services/spec';
 import {
   ItemService,
-  GetItemsServiceOptions,
   APIItem
 } from '../../services/item';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject, combineLatest, BehaviorSubject } from 'rxjs';
 import { PageEnvService } from '../../services/page-env.service';
+import { tap, switchMap, finalize, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
-function toPlain(options: any[], deep: number): any[] {
-  const result: any[] = [];
+interface APIVehicleTypeInItems extends APIVehicleType {
+  deep?: number;
+}
+
+interface APISpecInItems extends APISpec {
+  deep?: number;
+}
+
+function toPlainVehicleType(options: APIVehicleTypeInItems[], deep: number): any[] {
+  const result: APIVehicleTypeInItems[] = [];
   for (const item of options) {
     item.deep = deep;
     result.push(item);
-    for (const subitem of toPlain(item.childs, deep + 1)) {
+    for (const subitem of toPlainVehicleType(item.childs, deep + 1)) {
+      result.push(subitem);
+    }
+  }
+  return result;
+}
+
+function toPlainSpec(options: APISpecInItems[], deep: number): any[] {
+  const result: (APISpecInItems[]) = [];
+  for (const item of options) {
+    item.deep = deep;
+    result.push(item);
+    for (const subitem of toPlainSpec(item.childs, deep + 1)) {
       result.push(subitem);
     }
   }
@@ -56,9 +74,8 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
   public loading = 0;
   public items: APIItem[] = [];
   public paginator: APIPaginator;
-  public vehicleTypeOptions: any[] = [];
-  public specOptions: any[] = [];
-  public page: number;
+  public vehicleTypeOptions: APIVehicleTypeInItems[] = [];
+  public specOptions: APISpecInItems[] = [];
   public filter: IFilter = {
     name: null,
     name_exclude: null,
@@ -73,15 +90,17 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
     order: DEFAULT_ORDER,
     ancestor_id: null
   };
+  private vehicleTypeSub: Subscription;
+  private specsSub: Subscription;
+  private load$ = new BehaviorSubject<null>(null);
 
   constructor(
-    private http: HttpClient,
     private vehicleTypeService: VehicleTypeService,
     private specService: SpecService,
     private itemService: ItemService,
     private route: ActivatedRoute,
     private pageEnv: PageEnvService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     setTimeout(
@@ -97,12 +116,12 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
       0
     );
 
-    this.vehicleTypeService.getTypes().then(types => {
-      this.vehicleTypeOptions = toPlain(types, 0);
+    this.vehicleTypeSub = this.vehicleTypeService.getTypes().subscribe(types => {
+      this.vehicleTypeOptions = toPlainVehicleType(types, 0);
     });
 
-    this.specService.getSpecs().then(types => {
-      this.specOptions = toPlain(types, 0);
+    this.specsSub = this.specService.getSpecs().subscribe(types => {
+      this.specOptions = toPlainSpec(types, 0);
     });
 
     /* const $itemIdElement = $($element[0]).find(':input[name=ancestor_id]');
@@ -161,115 +180,86 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
         }
       );*/
 
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.filter = {
-        name: params.name || null,
-        name_exclude: params.name_exclude || null,
-        item_type_id: parseInt(params.item_type_id, 10) || null,
-        vehicle_type_id: params.vehicle_type_id || null,
-        vehicle_childs_type_id:
-          parseInt(params.vehicle_childs_type_id, 10) || null,
-        spec: params.spec || null,
-        no_parent: params.no_parent ? true : false,
-        text: params.text || null,
-        from_year: params.from_year || null,
-        to_year: params.to_year || null,
-        order: params.order || DEFAULT_ORDER,
-        ancestor_id: params.ancestor_id || null
-      };
-      this.listMode = !!params.list;
+    this.querySub = combineLatest(
+      this.route.queryParams.pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        tap(params => {
+          this.filter = {
+            name: params.name || null,
+            name_exclude: params.name_exclude || null,
+            item_type_id: parseInt(params.item_type_id, 10) || null,
+            vehicle_type_id: params.vehicle_type_id || null,
+            vehicle_childs_type_id:
+              parseInt(params.vehicle_childs_type_id, 10) || null,
+            spec: params.spec || null,
+            no_parent: params.no_parent ? true : false,
+            text: params.text || null,
+            from_year: params.from_year || null,
+            to_year: params.to_year || null,
+            order: params.order || DEFAULT_ORDER,
+            ancestor_id: params.ancestor_id || null
+          };
+          this.listMode = !!params.list;
+        })
+      ),
+      this.load$,
+      (params, load) => params
+    )
+      .pipe(
+        switchMap(params => {
+          this.loading = 1;
+          this.items = [];
 
-      this.page = params.page;
+          let fields = 'name_html';
+          let limit = 500;
+          if (!params.listMode) {
+            fields = [
+              'name_html,name_default,description,has_text,produced',
+              'design,engine_vehicles',
+              'url,spec_editor_url,specs_url,more_pictures_url',
+              'categories.url,categories.name_html,twins_groups',
+              'preview_pictures.picture.thumb_medium,childs_count,total_pictures'
+            ].join(',');
+            limit = 10;
+          }
 
-      this.load();
-    });
+          return this.itemService
+            .getItems({
+              name: this.filter.name ? this.filter.name + '%' : null,
+              name_exclude: this.filter.name_exclude
+                ? this.filter.name_exclude + '%'
+                : null,
+              type_id: this.filter.item_type_id,
+              vehicle_type_id: this.filter.vehicle_type_id,
+              vehicle_childs_type_id: this.filter.vehicle_childs_type_id,
+              spec: this.filter.spec,
+              order: this.filter.order,
+              no_parent: this.filter.no_parent ? true : null,
+              text: this.filter.text ? this.filter.text : null,
+              from_year: this.filter.from_year ? this.filter.from_year : null,
+              to_year: this.filter.to_year ? this.filter.to_year : null,
+              ancestor_id: this.filter.ancestor_id ? this.filter.ancestor_id : null,
+              page: params.page,
+              fields: fields,
+              limit: limit
+            });
+        }),
+        tap(() => (this.loading = 0))
+      )
+      .subscribe(response => {
+        this.items = response.items;
+        this.paginator = response.paginator;
+      });
   }
 
   ngOnDestroy(): void {
     this.querySub.unsubscribe();
-  }
-
-  public getStateParams() {
-    return {
-      name: this.filter.name ? this.filter.name : null,
-      name_exclude: this.filter.name_exclude ? this.filter.name_exclude : null,
-      item_type_id: this.filter.item_type_id,
-      vehicle_type_id: this.filter.vehicle_type_id,
-      vehicle_childs_type_id: this.filter.vehicle_childs_type_id,
-      spec: this.filter.spec,
-      order: this.filter.order === DEFAULT_ORDER ? null : this.filter.order,
-      no_parent: this.filter.no_parent ? 1 : null,
-      text: this.filter.text ? this.filter.text : null,
-      from_year: this.filter.from_year ? this.filter.from_year : null,
-      to_year: this.filter.to_year ? this.filter.to_year : null,
-      ancestor_id: this.filter.ancestor_id ? this.filter.ancestor_id : null,
-      page: this.page,
-      list: this.listMode ? '1' : ''
-    };
+    this.vehicleTypeSub.unsubscribe();
+    this.specsSub.unsubscribe();
   }
 
   public load() {
-    this.loading++;
-    this.items = [];
-
-    const stateParams = this.getStateParams();
-
-    /*this.$state.go(this.$state.current.name, stateParams, {
-      reload: false,
-      location: 'replace',
-      notify: false
-    });*/
-
-    let fields = 'name_html';
-    let limit = 500;
-    if (!this.listMode) {
-      fields = [
-        'name_html,name_default,description,has_text,produced',
-        'design,engine_vehicles',
-        'url,spec_editor_url,specs_url,more_pictures_url',
-        'categories.url,categories.name_html,twins_groups',
-        'preview_pictures.picture.thumb_medium,childs_count,total_pictures'
-      ].join(',');
-      limit = 10;
-    }
-
-    this.itemService
-      .getItems({
-        name: this.filter.name ? this.filter.name + '%' : null,
-        name_exclude: this.filter.name_exclude
-          ? this.filter.name_exclude + '%'
-          : null,
-        type_id: this.filter.item_type_id,
-        vehicle_type_id: this.filter.vehicle_type_id,
-        vehicle_childs_type_id: this.filter.vehicle_childs_type_id,
-        spec: this.filter.spec,
-        order: this.filter.order,
-        no_parent: this.filter.no_parent ? true : null,
-        text: this.filter.text ? this.filter.text : null,
-        from_year: this.filter.from_year ? this.filter.from_year : null,
-        to_year: this.filter.to_year ? this.filter.to_year : null,
-        ancestor_id: this.filter.ancestor_id ? this.filter.ancestor_id : null,
-        page: this.page,
-        fields: fields,
-        limit: limit
-      })
-      .subscribe(
-        response => {
-          this.items = response.items;
-          this.paginator = response.paginator;
-          this.loading--;
-        },
-        () => {
-          this.loading--;
-        }
-      );
-  }
-
-  public setListModeEnabled(value: boolean) {
-    this.listMode = value;
-    if (value) {
-      this.filter.order = 'name';
-    }
-    this.load();
+    this.load$.next(null);
   }
 }

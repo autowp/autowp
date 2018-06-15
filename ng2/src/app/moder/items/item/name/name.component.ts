@@ -2,12 +2,10 @@ import {
   Component,
   Injectable,
   Input,
-  OnInit,
   OnChanges,
   SimpleChanges
 } from '@angular/core';
 import { APIItem } from '../../../../services/item';
-import { ACLService } from '../../../../services/acl.service';
 import { HttpClient } from '@angular/common/http';
 import {
   APIItemLanguage,
@@ -29,16 +27,15 @@ export class ModerItemsItemNameComponent implements OnChanges {
   public currentLanguage: any = null;
 
   constructor(
-    private acl: ACLService,
     private http: HttpClient,
     private itemLanguageService: ItemLanguageService,
     private contentLanguage: ContentLanguageService
-  ) {}
+  ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.item) {
       this.loading++;
-      this.contentLanguage.getList().then(
+      this.contentLanguage.getList().toPromise().then(
         contentLanguages => {
           this.currentLanguage = contentLanguages[0];
 

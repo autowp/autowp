@@ -8,13 +8,13 @@
     <form class="card card-body form-vertical">
       <div class="form-group">
         <label translate>moder/items/filter/name</label>
-        <input placeholder="% - any characters" type="text" name="name" class="form-control" [(ngModel)]="filter.name" (change)="load()"
+        <input placeholder="% - any characters" type="text" name="name" class="form-control" [(ngModel)]="filter.name" (input)="load()"
         />
       </div>
       <div class="form-group">
         <label translate>moder/items/filter/name-exclude</label>
         <input placeholder="_ - any single character" type="text" name="name_exclude" class="form-control" [(ngModel)]="filter.name_exclude"
-          (change)="load()" />
+          (input)="load()" />
       </div>
       <div class="form-group">
         <label translate>moder/items/filter/item-type</label>
@@ -54,19 +54,19 @@
       </div>
       <div class="form-group">
         <label translate>moder/items/filter/from-year</label>
-        <input type="text" name="from_year" class="form-control" [(ngModel)]="filter.from_year" (change)="load()" maxlength="4" />
+        <input type="text" name="from_year" class="form-control" [(ngModel)]="filter.from_year" (input)="load()" maxlength="4" />
       </div>
       <div class="form-group">
         <label translate>moder/items/filter/to-year</label>
-        <input type="text" name="to_year" class="form-control" [(ngModel)]="filter.to_year" (change)="load()" maxlength="4" />
+        <input type="text" name="to_year" class="form-control" [(ngModel)]="filter.to_year" (input)="load()" maxlength="4" />
       </div>
       <div class="form-group">
         <label translate>moder/items/filter/parent</label>
-        <input type="text" name="ancestor_id" class="form-control" />
+        <input type="text" name="ancestor_id" class="form-control" (input)="load()" />
       </div>
       <div class="form-group">
         <label translate>moder/items/filter/text</label>
-        <input type="text" name="text" class="form-control" [(ngModel)]="filter.text" (change)="load()" />
+        <input type="text" name="text" class="form-control" [(ngModel)]="filter.text" (input)="load()" />
       </div>
       <div class="checkbox">
         <label>
@@ -87,12 +87,13 @@
   <div class="col-lg-8 col-md-8">
 
     <div class="btn-group float-right">
-      <button type="button" class="btn btn-outline-secondary" [class.active]="!listMode" (click)="setListModeEnabled(false)">
+      <a routerLink="." [queryParams]="{list: null}" queryParamsHandling="merge" class="btn btn-outline-secondary" [class.active]="!listMode">
         <i class="fa fa-th" aria-hidden="true"></i>
-      </button>
-      <button type="button" class="btn btn-outline-secondary" [class.active]="listMode" (click)="setListModeEnabled(true)">
+      </a>
+      <a routerLink="." [queryParams]="{list: '1', order: 'name'}" queryParamsHandling="merge" class="btn btn-outline-secondary"
+        [class.active]="listMode">
         <i class="fa fa-align-justify" aria-hidden="true"></i>
-      </button>
+      </a>
     </div>
 
     <h2>

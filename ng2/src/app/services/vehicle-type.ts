@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
+import { Observable } from 'rxjs';
+import { map, switchMap, shareReplay } from 'rxjs/operators';
 
 export interface APIVehicleType {
   id: number;
@@ -16,10 +18,24 @@ export interface APIVehicleTypesGetResponse {
 
 @Injectable()
 export class VehicleTypeService {
-  private types: APIVehicleType[];
-  private typesInititalized = false;
 
-  constructor(private http: HttpClient, private translate: TranslateService) {}
+  private types$: Observable<APIVehicleType[]>;
+
+  constructor(private http: HttpClient, private translate: TranslateService) {
+
+    this.types$ = this.http.get<APIVehicleTypesGetResponse>('/api/vehicle-types')
+      .pipe(
+        switchMap(
+          response => this.translate.get(this.collectNames(response.items)),
+          (response, translations) => ({ response, translations })
+        ),
+        map(data => {
+          this.applyTranslations(data.response.items, data.translations);
+          return data.response.items;
+        }),
+        shareReplay(1)
+      );
+  }
 
   private collectNames(types: APIVehicleType[]): string[] {
     const result: string[] = [];
@@ -42,33 +58,8 @@ export class VehicleTypeService {
     }
   }
 
-  public getTypes(): Promise<APIVehicleType[]> {
-    return new Promise<APIVehicleType[]>((resolve, reject) => {
-      if (this.typesInititalized) {
-        resolve(this.types);
-        return;
-      }
-      this.http.get<APIVehicleTypesGetResponse>('/api/vehicle-types').subscribe(
-        response => {
-          this.types = response.items;
-          const names = this.collectNames(this.types);
-
-          this.translate.get(names).subscribe(
-            (translations: any) => {
-              const map = {};
-              for (const name of names) {
-                map[name] = translations[name];
-              }
-              this.applyTranslations(this.types, map);
-              this.typesInititalized = true;
-              resolve(this.types);
-            },
-            () => reject()
-          );
-        },
-        () => reject()
-      );
-    });
+  public getTypes(): Observable<APIVehicleType[]> {
+    return this.types$;
   }
 
   public getTypesById(ids: number[]): Promise<APIVehicleType[]> {
@@ -78,7 +69,7 @@ export class VehicleTypeService {
         return;
       }
 
-      this.getTypes().then(
+      this.types$.toPromise().then(
         (types: APIVehicleType[]) => {
           const result: APIVehicleType[] = [];
           this.walkTypes(types, type => {

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
 
 export interface APIContentLanguageGetResponse {
   items: string[];
@@ -7,26 +9,16 @@ export interface APIContentLanguageGetResponse {
 
 @Injectable()
 export class ContentLanguageService {
-  private cache: string[];
+  private languages$: Observable<string[]>;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.languages$ = this.http.get<APIContentLanguageGetResponse>('/api/content-language').pipe(
+      map(response => response.items),
+      shareReplay(1)
+    );
+  }
 
-  public getList(): Promise<string[]> {
-    return new Promise<string[]>((resolve, reject) => {
-      if (this.cache) {
-        resolve(this.cache);
-        return;
-      }
-
-      this.http
-        .get<APIContentLanguageGetResponse>('/api/content-language')
-        .subscribe(
-          response => {
-            this.cache = response.items;
-            resolve(this.cache);
-          },
-          () => reject()
-        );
-    });
+  public getList(): Observable<string[]> {
+    return this.languages$;
   }
 }

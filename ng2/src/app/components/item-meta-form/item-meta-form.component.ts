@@ -8,7 +8,8 @@ import {
   OnInit,
   Output,
   EventEmitter,
-  NgZone
+  NgZone,
+  OnDestroy
 } from '@angular/core';
 import { APIItem } from '../../services/item';
 import {
@@ -18,8 +19,7 @@ import {
 import { SpecService, APISpec } from '../../services/spec';
 import { LanguageService } from '../../services/language';
 import Notify from '../../notify';
-import { Observable, from } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { VehicleTypesModalComponent } from '../vehicle-types-modal/vehicle-types-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
@@ -32,6 +32,7 @@ import {
   Marker,
   LeafletMouseEvent
 } from 'leaflet';
+import { finalize } from 'rxjs/operators';
 
 function specsToPlain(
   options: ItemMetaFormAPISpec[],
@@ -77,7 +78,8 @@ interface ItemMetaFormAPISpec extends APISpec {
   styleUrls: ['./styles.scss']
 })
 @Injectable()
-export class ItemMetaFormComponent implements OnChanges, OnInit {
+export class ItemMetaFormComponent implements OnChanges, OnInit, OnDestroy {
+
   @Input() item: APIItem;
   @Input() submitNotify: Function;
   @Input() parent: APIItem;
@@ -163,12 +165,12 @@ export class ItemMetaFormComponent implements OnChanges, OnInit {
       deep: 0
     }
   ];
+  private specsSub: Subscription;
 
   constructor(
     private specService: SpecService,
     private vehicleTypeService: VehicleTypeService,
     private languageService: LanguageService,
-    private http: HttpClient,
     private modalService: NgbModal,
     private zone: NgZone
   ) {
@@ -198,22 +200,22 @@ export class ItemMetaFormComponent implements OnChanges, OnInit {
         });
       }
     }
-
-    this.loading++;
-    this.specService.getSpecs().then(
-      types => {
-        this.loading--;
-        this.specOptions = specsToPlain(types, 0);
-      },
-      response => {
-        this.loading--;
-        Notify.response(response);
-      }
-    );
   }
 
   ngOnInit(): void {
+    this.loading++;
+    this.specsSub = this.specService.getSpecs().pipe(
+      finalize(() => (this.loading--)),
+    ).subscribe(
+      types => this.specOptions = specsToPlain(types, 0),
+      response => Notify.response(response)
+    );
+
     this.loadVehicleTypes();
+  }
+
+  ngOnDestroy(): void {
+    this.specsSub.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
