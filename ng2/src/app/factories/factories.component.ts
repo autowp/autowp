@@ -1,5 +1,9 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import { APIItem, ItemService, APIItemRelatedGroupItem } from '../services/item';
+import {
+  APIItem,
+  ItemService,
+  APIItemRelatedGroupItem
+} from '../services/item';
 import Notify from '../notify';
 import { Subscription, empty } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -37,6 +41,7 @@ export class FactoryComponent implements OnInit, OnDestroy {
     zoom: 4,
     center: latLng(50, 20)
   };
+  private aclSub: Subscription;
 
   constructor(
     private itemService: ItemService,
@@ -48,9 +53,9 @@ export class FactoryComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.acl
+    this.aclSub = this.acl
       .inheritsRole('moder')
-      .then(isModer => (this.isModer = isModer), () => (this.isModer = false));
+      .subscribe(isModer => (this.isModer = isModer));
 
     this.querySub = this.route.params
       .pipe(
@@ -131,5 +136,6 @@ export class FactoryComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.querySub.unsubscribe();
+    this.aclSub.unsubscribe();
   }
 }

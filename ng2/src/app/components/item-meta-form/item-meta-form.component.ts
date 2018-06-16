@@ -19,7 +19,7 @@ import {
 import { SpecService, APISpec } from '../../services/spec';
 import { LanguageService } from '../../services/language';
 import Notify from '../../notify';
-import { Subscription } from 'rxjs';
+import { Subscription, BehaviorSubject } from 'rxjs';
 import { VehicleTypesModalComponent } from '../vehicle-types-modal/vehicle-types-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
@@ -32,7 +32,7 @@ import {
   Marker,
   LeafletMouseEvent
 } from 'leaflet';
-import { finalize } from 'rxjs/operators';
+import { finalize, switchMap } from 'rxjs/operators';
 
 function specsToPlain(
   options: ItemMetaFormAPISpec[],
@@ -90,6 +90,7 @@ export class ItemMetaFormComponent implements OnChanges, OnInit, OnDestroy {
   @Output() submit = new EventEmitter<void>();
 
   public vehicleTypes: APIVehicleType[];
+  private vehicleTypeIDs$ = new BehaviorSubject<number[]>([]);
 
   public loading = 0;
   public todayOptions = [
@@ -211,16 +212,21 @@ export class ItemMetaFormComponent implements OnChanges, OnInit, OnDestroy {
       response => Notify.response(response)
     );
 
-    this.loadVehicleTypes();
+    this.vehicleTypeIDs$.pipe(
+      switchMap(ids => this.vehicleTypeService.getTypesById(ids))
+    ).subscribe(types => {
+      this.vehicleTypes = types;
+    });
   }
 
   ngOnDestroy(): void {
     this.specsSub.unsubscribe();
+    this.vehicleTypeIDs$.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.vehicleTypeIDs) {
-      this.loadVehicleTypes();
+      this.vehicleTypeIDs$.next(this.vehicleTypeIDs);
     }
     if (changes.item) {
       this.coordsChanged();
@@ -232,12 +238,6 @@ export class ItemMetaFormComponent implements OnChanges, OnInit, OnDestroy {
     return (
       targetValue && targetValue.toLowerCase().indexOf(value.toLowerCase()) >= 0
     );
-  }
-
-  public loadVehicleTypes(): void {
-    this.vehicleTypeService.getTypesById(this.vehicleTypeIDs).then(types => {
-      this.vehicleTypes = types;
-    });
   }
 
   public coordsChanged() {
@@ -287,7 +287,7 @@ export class ItemMetaFormComponent implements OnChanges, OnInit, OnDestroy {
 
     modalRef.componentInstance.ids = this.vehicleTypeIDs;
     modalRef.componentInstance.changed.subscribe(() => {
-      this.loadVehicleTypes();
+      this.vehicleTypeIDs$.next(this.vehicleTypeIDs);
     });
   }
 

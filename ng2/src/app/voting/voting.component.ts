@@ -5,7 +5,6 @@ import { Subscription, combineLatest } from 'rxjs';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import {
   VotingService,
-  APIVotingVariantVote,
   APIVoting,
   APIVotingVariant
 } from '../services/voting';
@@ -27,6 +26,7 @@ export class VotingComponent implements OnInit, OnDestroy {
   public filter = false;
   public selected: {};
   public isModer = false; // TODO: fetch value
+  private aclSub: Subscription;
 
   constructor(
     private http: HttpClient,
@@ -55,12 +55,9 @@ export class VotingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.acl
+    this.aclSub = this.acl
       .inheritsRole('moder')
-      .then(
-        inherits => (this.isModer = inherits),
-        response => (this.isModer = false)
-      );
+      .subscribe(inherits => (this.isModer = inherits));
 
     this.routeSub = combineLatest(
       this.route.params,
@@ -89,6 +86,7 @@ export class VotingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
+    this.aclSub.unsubscribe();
   }
 
   public vote() {

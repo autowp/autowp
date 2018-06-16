@@ -1,14 +1,7 @@
-import {
-  Component,
-  Injectable,
-  OnInit,
-  OnDestroy,
-  ViewChild
-} from '@angular/core';
+import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ACLService } from '../../../services/acl.service';
 import { ItemService, APIItem } from '../../../services/item';
-import { chunkBy } from '../../../chunk';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription, of, combineLatest } from 'rxjs';
 import { ActivatedRoute, Router, Params } from '@angular/router';
@@ -95,6 +88,7 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
   };
 
   public activeTab = 'meta';
+  private aclSub: Subscription;
 
   constructor(
     private http: HttpClient,
@@ -108,12 +102,9 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.acl
+    this.aclSub = this.acl
       .isAllowed('specifications', 'edit')
-      .then(
-        allow => (this.canEditSpecifications = !!allow),
-        () => (this.canEditSpecifications = false)
-      );
+      .subscribe(allow => (this.canEditSpecifications = allow));
 
     this.routeSub = this.route.params
       .pipe(
@@ -244,6 +235,7 @@ export class ModerItemsItemComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
+    this.aclSub.unsubscribe();
   }
 
   private initTreeTab() {

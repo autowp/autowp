@@ -62,7 +62,18 @@
       </div>
       <div class="form-group">
         <label translate>moder/items/filter/parent</label>
-        <input type="text" name="ancestor_id" class="form-control" (input)="load()" />
+        <ng-template #ancestorTemplate let-model="result">
+          <span [innerHTML]="model.name_html"></span>
+        </ng-template>
+        <div class="input-group mb-3">
+          <input [ngbTypeahead]="ancestorsDataSource" name="ancestor" [(ngModel)]="ancestorQuery" [inputFormatter]="ancestorFormatter"
+            (selectItem)="ancestorOnSelect($event)" [resultTemplate]="ancestorTemplate" class="form-control" [class.border-primary]="ancestorID">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" [disabled]="!ancestorID" (click)="clearAncestor()">
+              <span class="fa fa-close"></span>
+            </button>
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <label translate>moder/items/filter/text</label>

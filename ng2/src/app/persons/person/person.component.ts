@@ -30,6 +30,7 @@ export class PersonsPersonComponent implements OnInit, OnDestroy {
   public contentPicturesPaginator: APIPaginator;
   public item: APIItem;
   public isModer = false;
+  private aclSub: Subscription;
 
   constructor(
     private itemService: ItemService,
@@ -42,9 +43,9 @@ export class PersonsPersonComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.acl
+    this.aclSub = this.acl
       .inheritsRole('moder')
-      .then(isModer => (this.isModer = isModer), () => (this.isModer = false));
+      .subscribe(isModer => (this.isModer = isModer));
 
     this.routeSub = this.route.params
       .pipe(
@@ -151,5 +152,6 @@ export class PersonsPersonComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
+    this.aclSub.unsubscribe();
   }
 }

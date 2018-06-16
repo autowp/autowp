@@ -25,9 +25,8 @@ export class ModerItemsItemPicturesComponent implements OnInit, OnChanges {
 
   constructor(private pictureService: PictureService) {}
 
-  ngOnInit(): void {
-    throw new Error('Method not implemented.');
-  }
+  ngOnInit(): void {}
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.item) {
       this.canUseTurboGroupCreator =

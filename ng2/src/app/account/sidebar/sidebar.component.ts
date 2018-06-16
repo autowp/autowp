@@ -1,17 +1,12 @@
 import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { MessageService, MessageCallbackType } from '../../services/message';
+import { MessageService } from '../../services/message';
 import { ForumService } from '../../services/forum';
 import { PageService } from '../../services/page';
 import Notify from '../../notify';
 import { AuthService } from '../../services/auth.service';
 import { tap } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
-
-export interface APIPictureUserSummary {
-  inboxCount: number;
-  acceptedCount: number;
-}
+import { PictureService } from '../../services/picture';
 
 interface SidebarItem {
   pageId?: number;
@@ -35,18 +30,18 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
 
   constructor(
     private messageService: MessageService,
-    private http: HttpClient,
     private forumService: ForumService,
     private pageService: PageService,
-    private auth: AuthService
+    private auth: AuthService,
+    private pictureService: PictureService
   ) { }
 
   ngOnInit(): void {
     this.sub = combineLatest(
-      this.auth.getUser().pipe(tap(() => console.log('ddd'))),
+      this.auth.getUser(),
       this.forumService.getUserSummary(),
       this.messageService.getSummary(),
-      this.http.get<APIPictureUserSummary>('/api/picture/user-summary'),
+      this.pictureService.getSummary(),
       (user, forumSummary, messageSummary, picturesSummary) => ({
         user,
         forumSummary,
@@ -56,7 +51,6 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
     )
       .pipe(
         tap(data => {
-          console.log('zzz');
           if (!data.user) {
             return;
           }

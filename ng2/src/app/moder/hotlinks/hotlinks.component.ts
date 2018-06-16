@@ -1,4 +1,4 @@
-import { Component, Injectable } from '@angular/core';
+import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {
   APIHotlinksHostsGetResponse,
@@ -6,21 +6,27 @@ import {
 } from '../../services/api.service';
 import { ACLService } from '../../services/acl.service';
 import { PageEnvService } from '../../services/page-env.service';
+import { combineLatest, Subscription, BehaviorSubject } from 'rxjs';
+import { switchMapTo } from 'rxjs/operators';
 
 @Component({
   selector: 'app-moder-hotlinks',
   templateUrl: './hotlinks.component.html'
 })
 @Injectable()
-export class ModerHotlinksComponent {
+export class ModerHotlinksComponent implements OnInit, OnDestroy {
   public hosts: APIHotlinksHost[] = [];
   public canManage = false;
+  private sub: Subscription;
+  private change$ = new BehaviorSubject<null>(null);
 
   constructor(
     private http: HttpClient,
     private acl: ACLService,
     private pageEnv: PageEnvService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     setTimeout(
       () =>
         this.pageEnv.set({
@@ -34,32 +40,28 @@ export class ModerHotlinksComponent {
       0
     );
 
-    this.acl.isAllowed('hotlinks', 'manage').then(
-      allow => {
-        this.canManage = !!allow;
-      },
-      () => {
-        this.canManage = false;
-      }
-    );
-
-    this.loadHosts();
+    this.sub = combineLatest(
+      this.acl.isAllowed('hotlinks', 'manage'),
+      this.change$.pipe(
+        switchMapTo(
+          this.http.get<APIHotlinksHostsGetResponse>('/api/hotlinks/hosts')
+        )
+      )
+    )
+      .pipe()
+      .subscribe(data => {
+        this.canManage = data[0];
+        this.hosts = data[1].items;
+      });
   }
 
-  private loadHosts() {
-    this.http.get<APIHotlinksHostsGetResponse>('/api/hotlinks/hosts').subscribe(
-      response => {
-        this.hosts = response.items;
-      },
-      response => {
-        console.log(response);
-      }
-    );
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
-  public clearAll(host: string) {
+  public clearAll() {
     this.http.delete('/api/hotlinks/hosts').subscribe(() => {
-      this.loadHosts();
+      this.change$.next(null);
     });
   }
 
@@ -67,7 +69,7 @@ export class ModerHotlinksComponent {
     this.http
       .delete('/api/hotlinks/hosts/' + encodeURIComponent(host))
       .subscribe(() => {
-        this.loadHosts();
+        this.change$.next(null);
       });
   }
 
@@ -77,7 +79,7 @@ export class ModerHotlinksComponent {
         host: host
       })
       .subscribe(() => {
-        this.loadHosts();
+        this.change$.next(null);
       });
   }
 
@@ -92,7 +94,7 @@ export class ModerHotlinksComponent {
         host: host
       })
       .subscribe(() => {
-        this.loadHosts();
+        this.change$.next(null);
       });
   }
 }

@@ -38,6 +38,7 @@ export class MuseumComponent implements OnInit, OnDestroy {
     zoom: 4,
     center: latLng(50, 20)
   };
+  private aclSub: Subscription;
 
   constructor(
     private acl: ACLService,
@@ -50,12 +51,9 @@ export class MuseumComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.acl
+    this.aclSub = this.acl
       .inheritsRole('moder')
-      .then(
-        isModer => (this.museumModer = isModer),
-        () => (this.museumModer = false)
-      );
+      .subscribe(isModer => (this.museumModer = isModer));
 
     this.routeSub = this.route.params
       .pipe(
@@ -149,5 +147,6 @@ export class MuseumComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
+    this.aclSub.unsubscribe();
   }
 }

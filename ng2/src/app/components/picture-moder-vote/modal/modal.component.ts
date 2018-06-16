@@ -41,9 +41,7 @@ export class PictureModerVoteModalComponent implements OnInit {
 
     this.moderVoteService
       .vote(this.pictureId, this.vote, this.reason)
-      .then(() => {
-        this.voted.emit();
-      });
+      .subscribe(() => this.voted.emit());
 
     this.activeModal.close();
   }

@@ -13,7 +13,7 @@ import { CommentService, APIComment } from '../../../services/comment';
 import { AuthService } from '../../../services/auth.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CommentsVotesComponent } from '../votes/votes.component';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest } from 'rxjs';
 import { APIUser } from '../../../services/user';
 
 export interface APICommentInList extends APIComment {
@@ -47,21 +47,17 @@ export class CommentsListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.acl
-      .isAllowed('comment', 'remove')
-      .then(
-        allowed => (this.canRemoveComments = allowed),
-        () => (this.canRemoveComments = false)
-      );
-
-    this.acl
-      .isAllowed('forums', 'moderate')
-      .then(
-        allowed => (this.canMoveMessage = allowed),
-        () => (this.canMoveMessage = false)
-      );
-    this.sub = this.auth.getUser().subscribe(user => (this.user = user));
+    this.sub = combineLatest(
+      this.auth.getUser(),
+      this.acl.isAllowed('comment', 'remove'),
+      this.acl.isAllowed('forums', 'moderate')
+    ).subscribe(data => {
+      this.user = data[0];
+      this.canRemoveComments = data[1];
+      this.canMoveMessage = data[2];
+    });
   }
+
   ngOnDestroy(): void {
     this.sub.unsubscribe();
   }

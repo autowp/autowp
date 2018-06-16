@@ -4,7 +4,8 @@ import {
   Input,
   OnInit,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
+  OnDestroy
 } from '@angular/core';
 import { APIItem, ItemService } from '../../../../services/item';
 import {
@@ -13,7 +14,7 @@ import {
   distinctUntilChanged,
   switchMap
 } from 'rxjs/operators';
-import { of, Observable } from 'rxjs';
+import { of, Observable, Subscription } from 'rxjs';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient } from '@angular/common/http';
 import { ACLService } from '../../../../services/acl.service';
@@ -27,7 +28,8 @@ import {
   templateUrl: './catalogue.component.html'
 })
 @Injectable()
-export class ModerItemsItemCatalogueComponent implements OnInit, OnChanges {
+export class ModerItemsItemCatalogueComponent
+  implements OnInit, OnChanges, OnDestroy {
   @Input() item: APIItem;
 
   public loading = 0;
@@ -46,6 +48,7 @@ export class ModerItemsItemCatalogueComponent implements OnInit, OnChanges {
   public organizeTypeId: number;
 
   public itemsDataSource: (text$: Observable<string>) => Observable<APIItem[]>;
+  private aclSub: Subscription;
 
   constructor(
     private acl: ACLService,
@@ -82,9 +85,13 @@ export class ModerItemsItemCatalogueComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.acl
+    this.aclSub = this.acl
       .isAllowed('car', 'move')
-      .then(allow => (this.canMove = !!allow), () => (this.canMove = false));
+      .subscribe(allow => (this.canMove = !!allow));
+  }
+
+  ngOnDestroy(): void {
+    this.aclSub.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

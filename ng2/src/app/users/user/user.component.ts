@@ -11,7 +11,8 @@ import {
   empty,
   of,
   forkJoin,
-  Observable
+  Observable,
+  combineLatest
 } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { PictureService, APIPicture } from '../../services/picture';
@@ -56,10 +57,11 @@ export class UsersUserComponent implements OnInit, OnDestroy {
   public canViewIp = false;
   public canBan = false;
   public isModer = false;
+  private aclSub: Subscription;
 
   constructor(
     private http: HttpClient,
-    private Contacts: ContactsService,
+    private contacts: ContactsService,
     private messageDialogService: MessageDialogService,
     private acl: ACLService,
     private router: Router,
@@ -72,29 +74,43 @@ export class UsersUserComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.acl
+    this.aclSub = this.acl
       .inheritsRole('moder')
-      .then(isModer => (this.isModer = isModer), () => (this.isModer = false));
+      .subscribe(isModer => (this.isModer = isModer));
 
     const fields =
       'identity,gravatar_hash,photo,renames,is_moder,reg_date,last_online,accounts,pictures_added,pictures_accepted_count,last_ip';
 
-    this.routeSub = this.auth.getUser()
+    this.routeSub = this.auth
+      .getUser()
       .pipe(
-        switchMapTo(this.route.params, (currentUser, params) => ({currentUser, params})),
+        switchMapTo(this.route.params, (currentUser, params) => ({
+          currentUser,
+          params
+        })),
         distinctUntilChanged(),
         debounceTime(30),
-        switchMap(data => this.userService
-          .getByIdentity(data.params.identity, { fields: fields })
-          .pipe(
-            catchError((err, caught) => {
-              Notify.response(err);
-              return empty();
-            })
-          ),
+        switchMap(
+          data =>
+            combineLatest(
+              this.userService
+                .getByIdentity(data.params.identity, { fields: fields })
+                .pipe(
+                  catchError((err, caught) => {
+                    Notify.response(err);
+                    return empty();
+                  })
+                ),
+              this.acl.isAllowed('user', 'ip'),
+              this.acl.isAllowed('user', 'ban'),
+              this.acl.isAllowed('user', 'delete')
+            ),
           (data, user) => ({
             currentUser: data.currentUser,
-            user: user
+            user: user[0],
+            canViewIp: user[1],
+            canBan: user[2],
+            canDeleteUser: user[3]
           })
         ),
         tap(data => {
@@ -102,6 +118,10 @@ export class UsersUserComponent implements OnInit, OnDestroy {
             this.router.navigate(['/error-404']);
             return;
           }
+
+          this.canViewIp = data.canViewIp;
+          this.canBan = data.canBan;
+          this.canDeleteUser = data.canDeleteUser;
 
           setTimeout(
             () =>
@@ -123,38 +143,16 @@ export class UsersUserComponent implements OnInit, OnDestroy {
 
           this.user = data.user;
           this.isMe = data.currentUser && data.currentUser.id === data.user.id;
-          this.canBeInContacts = data.currentUser && !data.user.deleted && !this.isMe;
-
-          this.acl
-            .isAllowed('user', 'ip')
-            .then(
-              allow => (this.canViewIp = !!allow),
-              () => (this.canViewIp = false)
-            );
-
-          this.acl
-            .isAllowed('user', 'ban')
-            .then(
-              allow => (this.canBan = !!allow),
-              () => (this.canBan = false)
-            );
-
-          this.acl
-            .isAllowed('user', 'delete')
-            .then(
-              allow => (this.canDeleteUser = !!allow),
-              () => (this.canDeleteUser = false)
-            );
+          this.canBeInContacts =
+            data.currentUser && !data.user.deleted && !this.isMe;
 
           if (data.currentUser && !this.isMe) {
-            this.Contacts.isInContacts(data.user.id).then(
-              inContacts => {
-                this.inContacts = inContacts;
-              },
-              response => {
-                Notify.response(response);
-              }
-            );
+            this.contacts
+              .isInContacts(data.user.id)
+              .subscribe(
+                inContacts => (this.inContacts = inContacts),
+                response => Notify.response(response)
+              );
           }
         }),
         switchMap(data => {
@@ -194,6 +192,7 @@ export class UsersUserComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
+    this.aclSub.unsubscribe();
   }
 
   private loadBan(ip: string): Observable<APIIP> {

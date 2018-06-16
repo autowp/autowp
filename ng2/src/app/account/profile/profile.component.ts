@@ -16,16 +16,8 @@ import { FileUploader, FileItem, ParsedResponseHeaders } from 'ng2-file-upload';
 import { PageEnvService } from '../../services/page-env.service';
 import { combineLatest, empty, of, Subscription } from 'rxjs';
 import { switchMapTo, switchMap } from 'rxjs/operators';
-
-export interface APITimezoneGetResponse {
-  items: string[];
-}
-
-export interface APILanguageGetResponse {
-  items: {
-    [key: string]: string;
-  };
-}
+import { LanguageService } from '../../services/language';
+import { TimezoneService } from '../../services/timezone';
 
 @Component({
   selector: 'app-account-profile',
@@ -63,7 +55,9 @@ export class AccountProfileComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private router: Router,
     private auth: AuthService,
-    private pageEnv: PageEnvService
+    private pageEnv: PageEnvService,
+    private language: LanguageService,
+    private timezone: TimezoneService
   ) {
     this.uploader.onSuccessItem = () => {
       this.http
@@ -123,8 +117,8 @@ export class AccountProfileComponent implements OnInit, OnDestroy {
                 fields: 'name,timezone,language,votes_per_day,votes_left,img'
               }
             }),
-            this.http.get<APITimezoneGetResponse>('/api/timezone'),
-            this.http.get<APILanguageGetResponse>('/api/language'),
+            this.timezone.getTimezones(),
+            this.language.getLanguages(),
             (user, timezones, languages) => ({ user, timezones, languages })
           )
         )
@@ -138,7 +132,7 @@ export class AccountProfileComponent implements OnInit, OnDestroy {
           this.votesLeft = data.user.votes_left;
           this.photo = data.user.img;
 
-          this.timezones = data.timezones.items;
+          this.timezones = data.timezones;
 
           this.languages = [];
           for (const key in data.languages.items) {

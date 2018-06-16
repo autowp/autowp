@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
 
 export interface APIPerspective {
   id: number;
@@ -12,37 +14,12 @@ export interface APIPerspectiveGetResponse {
 
 @Injectable()
 export class PerspectiveService {
-  private promise: Promise<APIPerspective[]> | null = null;
-  private perspectives: APIPerspective[];
-  private perspectivesInitialized = false;
-
   constructor(private http: HttpClient) {}
 
-  public getPerspectives(): Promise<APIPerspective[]> {
-    if (this.promise) {
-      return this.promise;
-    }
-
-    this.promise = new Promise<APIPerspective[]>((resolve, reject) => {
-      if (this.perspectivesInitialized) {
-        resolve(this.perspectives);
-        return;
-      }
-
-      this.http.get<APIPerspectiveGetResponse>('/go-api/perspective').subscribe(
-        response => {
-          this.perspectives = response.items;
-          this.perspectivesInitialized = true;
-          resolve(this.perspectives);
-          this.promise = null;
-        },
-        () => {
-          reject();
-          this.promise = null;
-        }
-      );
-    });
-
-    return this.promise;
+  public getPerspectives(): Observable<APIPerspective[]> {
+    return this.http.get<APIPerspectiveGetResponse>('/go-api/perspective').pipe(
+      map(response => response.items),
+      shareReplay(1)
+    );
   }
 }

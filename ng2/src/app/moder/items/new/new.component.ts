@@ -126,7 +126,7 @@ export class ModerItemsNewComponent implements OnInit, OnDestroy {
                     const specId = parent ? parent.spec_id : null;
 
                     return specId && Number.isInteger(specId as number)
-                      ? from(this.specService.getSpec(specId as number))
+                      ? this.specService.getSpec(specId as number)
                       : of(null as APISpec);
                   },
                   (item, spec) => ({ item, spec })

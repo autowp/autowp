@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
+import { map, shareReplay, tap, switchMapTo } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
 export interface APIPictureModerVoteTemplatePostData {
   vote: number;
@@ -18,76 +21,32 @@ export class APIPictureModerVoteTemplateGetResponse {
 
 @Injectable()
 export class PictureModerVoteTemplateService {
-  private templates: APIPictureModerVoteTemplate[];
-  private templatesInitialized = false;
+  private change$ = new BehaviorSubject<null>(null);
+  constructor(private http: HttpClient, private auth: AuthService) {}
 
-  constructor(private http: HttpClient) {}
-
-  public getTemplates(): Promise<APIPictureModerVoteTemplate[]> {
-    return new Promise<APIPictureModerVoteTemplate[]>((resolve, reject) => {
-      if (this.templatesInitialized) {
-        resolve(this.templates);
-        return;
-      }
-
-      this.http
-        .get<APIPictureModerVoteTemplateGetResponse>(
+  public getTemplates(): Observable<APIPictureModerVoteTemplate[]> {
+    return combineLatest(this.change$, this.auth.getUser()).pipe(
+      switchMapTo(
+        this.http.get<APIPictureModerVoteTemplateGetResponse>(
           '/api/picture-moder-vote-template'
         )
-        .subscribe(
-          response => {
-            this.templates = response.items;
-            this.templatesInitialized = true;
-            resolve(this.templates);
-          },
-          () => reject()
-        );
-    });
+      ),
+      map(response => response.items),
+      shareReplay(1)
+    );
   }
 
-  public deleteTemplate(id: number): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.http
-        .delete<void>('/api/picture-moder-vote-template/' + id)
-        .subscribe(
-          () => {
-            if (this.templates) {
-              for (let i = 0; i < this.templates.length; i++) {
-                if (this.templates[i].id === id) {
-                  this.templates.splice(i, 1);
-                  break;
-                }
-              }
-            }
-            resolve();
-          },
-          () => reject()
-        );
-    });
+  public deleteTemplate(id: number): Observable<void> {
+    return this.http
+      .delete<void>('/api/picture-moder-vote-template/' + id)
+      .pipe(tap(() => this.change$.next(null)));
   }
 
   public createTemplate(
     template: APIPictureModerVoteTemplatePostData
-  ): Promise<APIPictureModerVoteTemplate> {
-    return new Promise<APIPictureModerVoteTemplate>((resolve, reject) => {
-      this.http
-        .post<void>('/api/picture-moder-vote-template', template, {
-          observe: 'response'
-        })
-        .subscribe(
-          response => {
-            const location = response.headers.get('Location');
-
-            this.http.get<APIPictureModerVoteTemplate>(location).subscribe(
-              createdTemplate => {
-                this.templates.push(createdTemplate);
-                resolve(createdTemplate);
-              },
-              () => reject()
-            );
-          },
-          () => reject()
-        );
-    });
+  ): Observable<void> {
+    return this.http
+      .post<void>('/api/picture-moder-vote-template', template)
+      .pipe(tap(() => this.change$.next(null)));
   }
 }

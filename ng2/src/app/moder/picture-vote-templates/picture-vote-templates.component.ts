@@ -1,9 +1,10 @@
-import { Component, Injectable } from '@angular/core';
+import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import {
   PictureModerVoteTemplateService,
   APIPictureModerVoteTemplate
 } from '../../services/picture-moder-vote-template';
 import { PageEnvService } from '../../services/page-env.service';
+import { Subscription } from 'rxjs';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -12,15 +13,18 @@ import { PageEnvService } from '../../services/page-env.service';
   templateUrl: './picture-vote-templates.component.html'
 })
 @Injectable()
-export class ModerPictureVoteTemplatesComponent {
+export class ModerPictureVoteTemplatesComponent implements OnInit, OnDestroy {
   public templates: APIPictureModerVoteTemplate[];
   public vote = -1;
   public name = '';
+  private sub: Subscription;
 
   constructor(
-    private VoteTemplateService: PictureModerVoteTemplateService,
+    private voteTemplateService: PictureModerVoteTemplateService,
     private pageEnv: PageEnvService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     setTimeout(
       () =>
         this.pageEnv.set({
@@ -34,17 +38,16 @@ export class ModerPictureVoteTemplatesComponent {
       0
     );
 
-    this.VoteTemplateService.getTemplates().then(templates => {
-      this.templates = templates;
-    });
+    this.sub = this.voteTemplateService
+      .getTemplates()
+      .subscribe(templates => (this.templates = templates));
+  }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   public deleteTemplate(template: APIPictureModerVoteTemplate) {
-    this.VoteTemplateService.deleteTemplate(template.id).then(() => {
-      this.VoteTemplateService.getTemplates().then(templates => {
-        this.templates = templates;
-      });
-    });
+    this.voteTemplateService.deleteTemplate(template.id).subscribe();
   }
 
   public createTemplate() {
@@ -53,11 +56,6 @@ export class ModerPictureVoteTemplatesComponent {
       name: this.name
     };
 
-    this.VoteTemplateService.createTemplate(template).then(data => {
-      this.name = '';
-      this.VoteTemplateService.getTemplates().then(templates => {
-        this.templates = templates;
-      });
-    });
+    this.voteTemplateService.createTemplate(template).subscribe();
   }
 }

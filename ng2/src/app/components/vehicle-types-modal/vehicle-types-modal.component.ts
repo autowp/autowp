@@ -33,7 +33,7 @@ export class VehicleTypesModalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.sub = this.vehicleTypeService.getTypes().subscribe(
-      types => types,
+      types => this.types = types,
       error => Notify.response(error)
     );
   }

@@ -96,8 +96,8 @@ export class AccountMessagesComponent implements OnInit, OnDestroy {
   }
 
   public deleteMessage(id: number) {
-    this.messageService.deleteMessage(id).then(
-      (response: any) => {
+    this.messageService.deleteMessage(id).subscribe(
+      () => {
         for (let i = 0; i < this.items.length; i++) {
           if (this.items[i].id === id) {
             this.items.splice(i, 1);
@@ -114,7 +114,7 @@ export class AccountMessagesComponent implements OnInit, OnDestroy {
   }
 
   public clearFolder(folder: string) {
-    this.messageService.clearFolder(folder).then(
+    this.messageService.clearFolder(folder).subscribe(
       () => {
         if (this.folder === folder) {
           this.items = [];

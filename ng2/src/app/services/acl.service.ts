@@ -1,8 +1,9 @@
 import { APIService } from './api.service';
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { Observable } from 'rxjs';
+import { Observable, of, observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { catchError, map, shareReplay } from 'rxjs/operators';
 
 export interface APIACLRule {
   role: string;
@@ -47,61 +48,44 @@ export interface APIACLRoles {
 export class APIACL {
   constructor(private api: APIService, private http: HttpClient) {}
 
-  public isAllowed(resource: string, privilege: string): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this.api
-        .request<APIACLIsAllowed>('GET', 'acl/is-allowed', {
-          params: {
-            resource: resource,
-            privilege: privilege
-          }
-        })
-        .subscribe(
-          response => {
-            resolve(response.result);
-          },
-          response => {
-            reject();
-          }
-        );
-    });
+  public isAllowed(resource: string, privilege: string): Observable<boolean> {
+    return this.api
+      .request<APIACLIsAllowed>('GET', 'acl/is-allowed', {
+        params: {
+          resource: resource,
+          privilege: privilege
+        }
+      })
+      .pipe(
+        map(response => response.result),
+        catchError(err => {
+          return of(false);
+        }),
+        shareReplay(1)
+      );
   }
 
-  public inheritsRole(role: string): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this.api
-        .request('GET', 'acl/inherit-roles', {
-          params: {
-            roles: role
-          }
-        })
-        .subscribe(
-          response => {
-            resolve(response[role]);
-          },
-          response => {
-            reject();
-          }
-        );
-    });
+  public inheritsRole(role: string): Observable<boolean> {
+    return this.api
+      .request('GET', 'acl/inherit-roles', {
+        params: {
+          roles: role
+        }
+      })
+      .pipe(
+        map(response => response[role]),
+        catchError(err => {
+          return of(false);
+        }),
+        shareReplay(1)
+      );
   }
 
-  public getRoles(recursive: boolean): Promise<APIACLRoles> {
-    return new Promise<APIACLRoles>((resolve, reject) => {
-      this.http
-        .get<APIACLRoles>('/api/acl/roles', {
-          params: {
-            recursive: recursive ? '1' : ''
-          }
-        })
-        .subscribe(
-          response => {
-            resolve(response);
-          },
-          error => {
-            reject();
-          }
-        );
+  public getRoles(recursive: boolean): Observable<APIACLRoles> {
+    return this.http.get<APIACLRoles>('/api/acl/roles', {
+      params: {
+        recursive: recursive ? '1' : ''
+      }
     });
   }
 
@@ -116,8 +100,8 @@ export class APIACL {
 
 @Injectable()
 export class ACLService {
-  private cache: Map<string, boolean> = new Map<string, boolean>();
-  private isAllowedCache: Map<string, boolean> = new Map<string, boolean>();
+  private cache = new Map<string, Observable<boolean>>();
+  private isAllowedCache = new Map<string, Observable<boolean>>();
 
   constructor(private apiACL: APIACL, private auth: AuthService) {
     this.auth.getUser().subscribe(() => {
@@ -125,44 +109,26 @@ export class ACLService {
     });
   }
 
-  public isAllowed(resource: string, privilege: string): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      const key = resource + '/' + privilege;
+  public isAllowed(resource: string, privilege: string): Observable<boolean> {
+    const key = resource + '/' + privilege;
 
-      if (!this.isAllowedCache.has(key)) {
-        this.apiACL.isAllowed(resource, privilege).then(
-          result => {
-            this.isAllowedCache.set(key, result);
-            resolve(result);
-          },
-          () => {
-            this.isAllowedCache.set(key, false);
-            reject();
-          }
-        );
-      } else {
-        resolve(this.isAllowedCache.get(key));
-      }
-    });
+    if (this.isAllowedCache.has(key)) {
+      return this.isAllowedCache.get(key);
+    }
+
+    const o = this.apiACL.isAllowed(resource, privilege);
+    this.isAllowedCache.set(key, o);
+    return o;
   }
 
-  public inheritsRole(role: string) {
-    return new Promise<boolean>((resolve, reject) => {
-      if (!this.cache.has(role)) {
-        this.apiACL.inheritsRole(role).then(
-          result => {
-            this.cache.set(role, result);
-            resolve(result);
-          },
-          () => {
-            this.cache.set(role, false);
-            reject();
-          }
-        );
-      } else {
-        resolve(this.cache.get(role));
-      }
-    });
+  public inheritsRole(role: string): Observable<boolean> {
+    if (this.cache.has(role)) {
+      return this.cache.get(role);
+    }
+
+    const o = this.apiACL.inheritsRole(role);
+    this.cache.set(role, o);
+    return o;
   }
 
   public flush() {

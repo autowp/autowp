@@ -157,7 +157,6 @@ export class UserService {
   }
 
   public getUser(id: number, options: APIGetUserOptions): Promise<APIUser> {
-    console.log('getUser', id);
     return new Promise<APIUser>((resolve, reject) => {
       const params = this.converUserOptions(options);
 

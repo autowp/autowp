@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, Subject, combineLatest } from 'rxjs';
 import { AuthService } from './auth.service';
-import Notify from '../notify';
 import { APIPaginator } from './api.service';
 import { APIUser } from './user';
-import { switchMap, map, debounceTime } from 'rxjs/operators';
+import { switchMap, map, debounceTime, shareReplay, tap } from 'rxjs/operators';
 
 export type MessageCallbackType = () => void;
 
@@ -54,8 +53,6 @@ export interface APIMessageNewGetResponse {
 
 @Injectable()
 export class MessageService {
-  private user: APIUser;
-
   private summary$: Observable<APIMessageSummaryGetResponse>;
   private new$: Observable<number>;
   private deleted$ = new BehaviorSubject<void>(null);
@@ -79,7 +76,8 @@ export class MessageService {
         return this.http.get<APIMessageSummaryGetResponse>(
           '/api/message/summary'
         );
-      })
+      }),
+      shareReplay(1)
     );
 
     this.new$ = combineLatest(
@@ -113,36 +111,18 @@ export class MessageService {
     }
   }
 
-  public clearFolder(folder: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.http
-        .delete('/api/message', {
-          params: {
-            folder: folder
-          }
-        })
-        .subscribe(
-          () => {
-            this.deleted$.next(null);
-
-            resolve();
-          },
-          response => reject(response)
-        );
-    });
+  public clearFolder(folder: string): Observable<void> {
+    return this.http
+      .delete<void>('/api/message', {
+        params: { folder: folder }
+      })
+      .pipe(tap(() => this.deleted$.next(null)));
   }
 
-  public deleteMessage(id: number): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.http.delete('/api/message/' + id).subscribe(
-        () => {
-          this.deleted$.next(null);
-
-          resolve();
-        },
-        response => reject(response)
-      );
-    });
+  public deleteMessage(id: number): Observable<void> {
+    return this.http
+      .delete<void>('/api/message/' + id)
+      .pipe(tap(() => this.deleted$.next(null)));
   }
 
   public getSummary(): Observable<APIMessageSummaryGetResponse> {

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIUser } from './user';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface APIIP {
   address: string;
@@ -21,31 +23,26 @@ export interface APIIP {
 
 @Injectable()
 export class IpService {
-  private hostnames: Map<string, string> = new Map<string, string>();
+  private hostnames = new Map<string, Observable<string>>();
 
   constructor(private http: HttpClient) {}
 
-  public getHostByAddr(ip: string): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      const hostname = this.hostnames.get(ip);
-      if (hostname !== undefined) {
-        resolve(hostname);
-        return;
-      }
+  public getHostByAddr(ip: string): Observable<string> {
+    const hostname = this.hostnames.get(ip);
+    if (hostname !== undefined) {
+      return hostname;
+    }
 
-      this.http
-        .get<APIIP>('/api/ip/' + ip, {
-          params: {
-            fields: 'hostname'
-          }
-        })
-        .subscribe(
-          response => {
-            this.hostnames.set(ip, response.hostname);
-            resolve(response.hostname);
-          },
-          response => reject(response)
-        );
-    });
+    const o = this.http
+      .get<APIIP>('/api/ip/' + ip, {
+        params: {
+          fields: 'hostname'
+        }
+      })
+      .pipe(map(response => response.hostname));
+
+    this.hostnames.set(ip, o);
+
+    return o;
   }
 }

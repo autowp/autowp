@@ -5,6 +5,7 @@
   </div>
   <div class="modal-body">
     {{ids}}
+    {{types}}
     <button class="btn btn-block" (click)="toggle(type.id)" [class.btn-success]="isActive(type.id)" [class.btn-outline-secondary]="!isActive(type.id)" *ngFor="let type of types">{{type.name|translate}}</button>
   </div>
   <div class="modal-footer">

@@ -29,20 +29,8 @@ export class SpecService {
     return this.specs$;
   }
 
-  public getSpec(id: number): Promise<APISpec> {
-    return new Promise<APISpec>((resolve, reject) => {
-      this.getSpecs().toPromise().then(
-        (types: APISpec[]) => {
-          const spec = this.findSpec(types, id);
-          if (spec) {
-            resolve(spec);
-          } else {
-            reject();
-          }
-        },
-        () => reject()
-      );
-    });
+  public getSpec(id: number): Observable<APISpec> {
+    return this.getSpecs().pipe(map(specs => this.findSpec(specs, id)));
   }
 
   private findSpec(specs: APISpec[], id: number): APISpec | null {

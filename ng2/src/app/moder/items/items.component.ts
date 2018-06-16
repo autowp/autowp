@@ -1,15 +1,34 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { APIPaginator } from '../../services/api.service';
-import { VehicleTypeService, APIVehicleType } from '../../services/vehicle-type';
+import {
+  VehicleTypeService,
+  APIVehicleType
+} from '../../services/vehicle-type';
 import { SpecService, APISpec } from '../../services/spec';
 import {
   ItemService,
-  APIItem
+  APIItem,
+  GetItemsServiceOptions
 } from '../../services/item';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription, Subject, combineLatest, BehaviorSubject } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  Subscription,
+  combineLatest,
+  BehaviorSubject,
+  Observable,
+  of,
+  empty
+} from 'rxjs';
 import { PageEnvService } from '../../services/page-env.service';
-import { tap, switchMap, finalize, distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import {
+  tap,
+  switchMap,
+  distinctUntilChanged,
+  debounceTime,
+  catchError,
+  map
+} from 'rxjs/operators';
+import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -21,7 +40,10 @@ interface APISpecInItems extends APISpec {
   deep?: number;
 }
 
-function toPlainVehicleType(options: APIVehicleTypeInItems[], deep: number): any[] {
+function toPlainVehicleType(
+  options: APIVehicleTypeInItems[],
+  deep: number
+): any[] {
   const result: APIVehicleTypeInItems[] = [];
   for (const item of options) {
     item.deep = deep;
@@ -34,7 +56,7 @@ function toPlainVehicleType(options: APIVehicleTypeInItems[], deep: number): any
 }
 
 function toPlainSpec(options: APISpecInItems[], deep: number): any[] {
-  const result: (APISpecInItems[]) = [];
+  const result: APISpecInItems[] = [];
   for (const item of options) {
     item.deep = deep;
     result.push(item);
@@ -57,7 +79,6 @@ interface IFilter {
   from_year: number | null;
   to_year: number | null;
   order: string;
-  ancestor_id: number | null;
 }
 
 const DEFAULT_ORDER = 'id_desc';
@@ -87,20 +108,54 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
     text: null,
     from_year: null,
     to_year: null,
-    order: DEFAULT_ORDER,
-    ancestor_id: null
+    order: DEFAULT_ORDER
   };
   private vehicleTypeSub: Subscription;
   private specsSub: Subscription;
   private load$ = new BehaviorSubject<null>(null);
+
+  public ancestorID: number;
+  public ancestorQuery = '';
+  public ancestorsDataSource: (text$: Observable<string>) => Observable<any[]>;
 
   constructor(
     private vehicleTypeService: VehicleTypeService,
     private specService: SpecService,
     private itemService: ItemService,
     private route: ActivatedRoute,
+    private router: Router,
     private pageEnv: PageEnvService
-  ) { }
+  ) {
+    this.ancestorsDataSource = (text$: Observable<string>) =>
+      text$.pipe(
+        debounceTime(200),
+        switchMap(query => {
+          if (query === '') {
+            return of([]);
+          }
+
+          const params: GetItemsServiceOptions = {
+            limit: 10,
+            fields: 'name_text,name_html',
+            id: 0,
+            name: ''
+          };
+          if (query.substring(0, 1) === '#') {
+            params.id = parseInt(query.substring(1), 10);
+          } else {
+            params.name = '%' + query + '%';
+          }
+
+          return this.itemService.getItems(params).pipe(
+            catchError((err, caught) => {
+              console.log(err, caught);
+              return empty();
+            }),
+            map(response => response.items)
+          );
+        })
+      );
+  }
 
   ngOnInit(): void {
     setTimeout(
@@ -116,69 +171,15 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
       0
     );
 
-    this.vehicleTypeSub = this.vehicleTypeService.getTypes().subscribe(types => {
-      this.vehicleTypeOptions = toPlainVehicleType(types, 0);
-    });
+    this.vehicleTypeSub = this.vehicleTypeService
+      .getTypes()
+      .subscribe(types => {
+        this.vehicleTypeOptions = toPlainVehicleType(types, 0);
+      });
 
     this.specsSub = this.specService.getSpecs().subscribe(types => {
       this.specOptions = toPlainSpec(types, 0);
     });
-
-    /* const $itemIdElement = $($element[0]).find(':input[name=ancestor_id]');
-    $itemIdElement.val(
-      this.filter.ancestor_id ? '#' + this.filter.ancestor_id : ''
-    );
-    let itemIdLastValue = $itemIdElement.val();
-    $itemIdElement
-      .on('typeahead:select', (ev: any, item: any) => {
-        itemIdLastValue = item.name_text;
-        this.filter.ancestor_id = item.id;
-        this.load();
-      })
-      .bind('change blur', (ev: any, item: any) => {
-        const curValue = $(this).val();
-        if (itemIdLastValue && !curValue) {
-          this.filter.ancestor_id = null;
-          this.load();
-        }
-        itemIdLastValue = curValue;
-      })
-      .typeahead(
-        {},
-        {
-          display: (item: any) => {
-            return item.name_text;
-          },
-          templates: {
-            suggestion: (item: any) => {
-              return $('<div class="tt-suggestion tt-selectable"></div>').html(
-                item.name_html
-              );
-            }
-          },
-          source: (
-            query: string,
-            syncResults: Function,
-            asyncResults: Function
-          ) => {
-            const params: GetItemsServiceOptions = {
-              limit: 10,
-              fields: 'name_text,name_html',
-              id: 0,
-              name: ''
-            };
-            if (query.substring(0, 1) === '#') {
-              params.id = parseInt(query.substring(1), 10);
-            } else {
-              params.name = query + '%';
-            }
-
-            this.itemService.getItems(params).subscribe(response => {
-              asyncResults(response.items);
-            });
-          }
-        }
-      );*/
 
     this.querySub = combineLatest(
       this.route.queryParams.pipe(
@@ -197,9 +198,9 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
             text: params.text || null,
             from_year: params.from_year || null,
             to_year: params.to_year || null,
-            order: params.order || DEFAULT_ORDER,
-            ancestor_id: params.ancestor_id || null
+            order: params.order || DEFAULT_ORDER
           };
+          this.ancestorID = params.ancestor_id || null;
           this.listMode = !!params.list;
         })
       ),
@@ -224,26 +225,25 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
             limit = 10;
           }
 
-          return this.itemService
-            .getItems({
-              name: this.filter.name ? this.filter.name + '%' : null,
-              name_exclude: this.filter.name_exclude
-                ? this.filter.name_exclude + '%'
-                : null,
-              type_id: this.filter.item_type_id,
-              vehicle_type_id: this.filter.vehicle_type_id,
-              vehicle_childs_type_id: this.filter.vehicle_childs_type_id,
-              spec: this.filter.spec,
-              order: this.filter.order,
-              no_parent: this.filter.no_parent ? true : null,
-              text: this.filter.text ? this.filter.text : null,
-              from_year: this.filter.from_year ? this.filter.from_year : null,
-              to_year: this.filter.to_year ? this.filter.to_year : null,
-              ancestor_id: this.filter.ancestor_id ? this.filter.ancestor_id : null,
-              page: params.page,
-              fields: fields,
-              limit: limit
-            });
+          return this.itemService.getItems({
+            name: this.filter.name ? this.filter.name + '%' : null,
+            name_exclude: this.filter.name_exclude
+              ? this.filter.name_exclude + '%'
+              : null,
+            type_id: this.filter.item_type_id,
+            vehicle_type_id: this.filter.vehicle_type_id,
+            vehicle_childs_type_id: this.filter.vehicle_childs_type_id,
+            spec: this.filter.spec,
+            order: this.filter.order,
+            no_parent: this.filter.no_parent ? true : null,
+            text: this.filter.text ? this.filter.text : null,
+            from_year: this.filter.from_year ? this.filter.from_year : null,
+            to_year: this.filter.to_year ? this.filter.to_year : null,
+            ancestor_id: this.ancestorID ? this.ancestorID : null,
+            page: params.page,
+            fields: fields,
+            limit: limit
+          });
         }),
         tap(() => (this.loading = 0))
       )
@@ -257,6 +257,29 @@ export class ModerItemsComponent implements OnInit, OnDestroy {
     this.querySub.unsubscribe();
     this.vehicleTypeSub.unsubscribe();
     this.specsSub.unsubscribe();
+  }
+
+  public ancestorFormatter(x: APIItem) {
+    return x.name_text;
+  }
+
+  public ancestorOnSelect(e: NgbTypeaheadSelectItemEvent): void {
+    this.router.navigate([], {
+      queryParamsHandling: 'merge',
+      queryParams: {
+        ancestor_id: e.item.id
+      }
+    });
+  }
+
+  public clearAncestor(): void {
+    this.ancestorQuery = '';
+    this.router.navigate([], {
+      queryParamsHandling: 'merge',
+      queryParams: {
+        ancestor_id: null
+      }
+    });
   }
 
   public load() {

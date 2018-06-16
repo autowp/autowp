@@ -7,12 +7,9 @@ import { APIUser } from './user';
 export class AuthService {
   private user$ = new ReplaySubject<APIUser>(1);
 
-  constructor(private api: APIService) {
-
-  }
+  constructor(private api: APIService) {}
 
   public setUser(value: APIUser) {
-    console.log('setUser', value);
     this.user$.next(value);
   }
 

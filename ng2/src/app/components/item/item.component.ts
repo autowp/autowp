@@ -1,6 +1,7 @@
-import { Component, Injectable, Input } from '@angular/core';
+import { Component, Injectable, Input, OnInit, OnDestroy } from '@angular/core';
 import { ACLService } from '../../services/acl.service';
 import { APIItem } from '../../services/item';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-item',
@@ -8,25 +9,24 @@ import { APIItem } from '../../services/item';
   styleUrls: ['./styles.scss']
 })
 @Injectable()
-export class ItemComponent {
+export class ItemComponent implements OnInit, OnDestroy {
   @Input() item: APIItem;
   @Input() disableTitle: boolean;
   @Input() disableDescription: boolean;
   @Input() disableDetailsLink: boolean;
 
   public isModer = false;
+  private sub: Subscription;
 
-  constructor(private acl: ACLService) {
-    const self = this;
+  constructor(private acl: ACLService) {}
 
-    this.acl.inheritsRole('moder').then(
-      inherits => {
-        self.isModer = inherits;
-      },
-      () => {
-        self.isModer = false;
-      }
-    );
+  ngOnInit(): void {
+    this.sub = this.acl
+      .inheritsRole('moder')
+      .subscribe(inherits => (this.isModer = inherits));
+  }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   public havePhoto(item: APIItem) {

@@ -25,6 +25,7 @@ export class FactoryItemsComponent implements OnInit, OnDestroy {
   public items: APIItem[] = [];
   public paginator: APIPaginator;
   public isModer = false;
+  private aclSub: Subscription;
 
   constructor(
     private itemService: ItemService,
@@ -35,9 +36,9 @@ export class FactoryItemsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.acl
+    this.aclSub = this.acl
       .inheritsRole('moder')
-      .then(isModer => (this.isModer = isModer), () => (this.isModer = false));
+      .subscribe(isModer => (this.isModer = isModer));
 
     this.routeSub = this.route.params
       .pipe(
@@ -119,5 +120,6 @@ export class FactoryItemsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
+    this.aclSub.unsubscribe();
   }
 }

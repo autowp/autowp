@@ -5,7 +5,8 @@ import {
   Injectable,
   OnInit,
   EventEmitter,
-  Output
+  Output,
+  OnDestroy
 } from '@angular/core';
 import { PictureModerVoteService } from '../../services/picture-moder-vote';
 import {
@@ -14,13 +15,15 @@ import {
 } from '../../services/picture-moder-vote-template';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PictureModerVoteModalComponent } from './modal/modal.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-picture-moder-vote',
   templateUrl: './picture-moder-vote.component.html'
 })
 @Injectable()
-export class PictureModerVoteComponent implements OnInit {
+export class PictureModerVoteComponent implements OnInit, OnDestroy {
+
   @Input() picture: APIPicture;
   @Output() changed = new EventEmitter();
 
@@ -28,34 +31,39 @@ export class PictureModerVoteComponent implements OnInit {
   public vote: any = null;
   public reason = '';
   public save = false;
+  private sub: Subscription;
 
   constructor(
-    private ModerVoteService: PictureModerVoteService,
-    private ModerVoteTemplateService: PictureModerVoteTemplateService,
+    private moderVoteService: PictureModerVoteService,
+    private moderVoteTemplateService: PictureModerVoteTemplateService,
     private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
-    this.ModerVoteTemplateService.getTemplates().then(templates => {
+    this.sub = this.moderVoteTemplateService.getTemplates().subscribe(templates => {
       this.moderVoteTemplateOptions = templates;
     });
   }
 
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
+
   votePicture(vote: number, reason: string): void {
-    this.ModerVoteService.vote(this.picture.id, vote, reason).then(() => {
-      this.changed.emit();
-    });
+    this.moderVoteService
+      .vote(this.picture.id, vote, reason)
+      .subscribe(() => this.changed.emit());
   }
 
   cancelVotePicture(): void {
-    this.ModerVoteService.cancel(this.picture.id).then(() => {
-      this.changed.emit();
-    });
+    this.moderVoteService
+      .cancel(this.picture.id)
+      .subscribe(() => this.changed.emit());
   }
 
   ok(): void {
     if (this.save) {
-      this.ModerVoteTemplateService.createTemplate({
+      this.moderVoteTemplateService.createTemplate({
         vote: this.vote,
         name: this.reason
       });

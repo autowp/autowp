@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { APIUser } from './user';
+import { catchError, map } from 'rxjs/operators';
 
 export interface APIContactsGetOptions {
   fields: string;
@@ -11,33 +12,27 @@ export interface APIContactsGetResponse {
   items: APIUser[];
 }
 
+export interface APIContactsContactGetResponse {
+  contact_user_id: number;
+}
+
 @Injectable()
 export class ContactsService {
-  private hostnames: Map<string, string> = new Map<string, string>();
-
   constructor(private http: HttpClient) {}
 
-  public deleteMessage(id: number): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.http
-        .delete('/api/message/' + id)
-        .subscribe(() => resolve(), response => reject(response));
-    });
-  }
-
-  public isInContacts(userId: number): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this.http.get<APIUser>('/api/contacts/' + userId).subscribe(
-        response => resolve(true),
-        response => {
-          if (response.status === 404) {
-            resolve(false);
-          } else {
-            reject(response);
+  public isInContacts(userId: number): Observable<boolean> {
+    return this.http
+      .get<APIContactsContactGetResponse>('/api/contacts/' + userId)
+      .pipe(
+        map(response => !!response.contact_user_id),
+        catchError(err => {
+          if (err.status === 404) {
+            return of(false);
           }
-        }
+
+          return throwError(err);
+        })
       );
-    });
   }
 
   public getContacts(

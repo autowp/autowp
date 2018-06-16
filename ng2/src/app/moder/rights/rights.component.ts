@@ -1,4 +1,4 @@
-import { Component, Injectable } from '@angular/core';
+import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {
   APIACL,
@@ -7,6 +7,8 @@ import {
   APIACLResource
 } from '../../services/acl.service';
 import { PageEnvService } from '../../services/page-env.service';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
+import { switchMapTo } from 'rxjs/operators';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -30,11 +32,14 @@ interface IAddRuleForm {
   templateUrl: './rights.component.html'
 })
 @Injectable()
-export class ModerRightsComponent {
+export class ModerRightsComponent implements OnInit, OnDestroy {
   public rules: APIACLRule[] = [];
   public resources: APIACLResource[] = [];
   public roles: APIACLRole[] = [];
   public rolesTree: APIACLRole[] = [];
+  private $loadRoles = new BehaviorSubject<null>(null);
+  private $loadRolesTree = new BehaviorSubject<null>(null);
+  private $loadRules = new BehaviorSubject<null>(null);
 
   public addRoleParentForm: IAddRoleParentForm = {
     role: null,
@@ -49,12 +54,15 @@ export class ModerRightsComponent {
     privilege: null,
     allowed: 0
   };
+  private sub: Subscription;
 
   constructor(
     private http: HttpClient,
     private acl: APIACL,
     private pageEnv: PageEnvService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     setTimeout(
       () =>
         this.pageEnv.set({
@@ -68,34 +76,21 @@ export class ModerRightsComponent {
       0
     );
 
-    this.loadRules();
-    this.loadResources();
-    this.loadRoles();
-    this.loadRolesTree();
-  }
-
-  private loadResources() {
-    this.acl.getResources().subscribe(response => {
-      this.resources = response.items;
+    this.sub = combineLatest(
+      this.$loadRolesTree.pipe(switchMapTo(this.acl.getRoles(true))),
+      this.$loadRoles.pipe(switchMapTo(this.acl.getRoles(false))),
+      this.acl.getResources(),
+      this.$loadRules.pipe(switchMapTo(this.acl.getRules()))
+    ).subscribe(data => {
+      this.rolesTree = data[0].items;
+      this.roles = data[1].items;
+      this.resources = data[2].items;
+      this.rules = data[3].items;
     });
   }
 
-  private loadRolesTree() {
-    this.acl.getRoles(true).then(response => {
-      this.rolesTree = response.items;
-    });
-  }
-
-  private loadRoles() {
-    this.acl.getRoles(false).then(response => {
-      this.roles = response.items;
-    });
-  }
-
-  private loadRules() {
-    this.acl.getRules().subscribe(response => {
-      this.rules = response.items;
-    });
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   public addRoleParent() {
@@ -110,8 +105,8 @@ export class ModerRightsComponent {
           }
         )
         .subscribe(() => {
-          this.loadRoles();
-          this.loadRolesTree();
+          this.$loadRoles.next(null);
+          this.$loadRolesTree.next(null);
         });
     }
   }
@@ -122,8 +117,8 @@ export class ModerRightsComponent {
         data: this.addRoleForm
       })
       .subscribe(() => {
-        this.loadRoles();
-        this.loadRolesTree();
+        this.$loadRoles.next(null);
+        this.$loadRolesTree.next(null);
       });
   }
 
@@ -141,7 +136,7 @@ export class ModerRightsComponent {
         allowed: this.addRuleForm.allowed
       })
       .subscribe(() => {
-        this.loadRules();
+        this.$loadRules.next(null);
       });
   }
 }

@@ -1,9 +1,10 @@
-import { Component, Injectable } from '@angular/core';
+import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { IpService } from '../../services/ip';
-import { Router } from '@angular/router';
 import { APIUser } from '../../services/user';
 import { PageEnvService } from '../../services/page-env.service';
+import { Subscription, Observable, merge, BehaviorSubject } from 'rxjs';
+import { map, tap, switchMap, switchMapTo } from 'rxjs/operators';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -29,15 +30,18 @@ export interface APITrafficGetResponse {
   templateUrl: './traffic.component.html'
 })
 @Injectable()
-export class ModerTrafficComponent {
+export class ModerTrafficComponent implements OnInit, OnDestroy {
   public items: APITrafficItem[];
+  private sub: Subscription;
+  private change$ = new BehaviorSubject<null>(null);
 
   constructor(
     private http: HttpClient,
     private ipService: IpService,
-    private router: Router,
     private pageEnv: PageEnvService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     setTimeout(
       () =>
         this.pageEnv.set({
@@ -50,24 +54,31 @@ export class ModerTrafficComponent {
         }),
       0
     );
-    this.load();
+
+    this.sub = this.change$
+      .pipe(
+        switchMapTo(this.http.get<APITrafficGetResponse>('/api/traffic')),
+        map(response => response.items),
+        tap(items => {
+          this.items = items;
+        }),
+        switchMap(items => {
+          const observables: Observable<string>[] = [];
+          for (const item of items) {
+            observables.push(
+              this.ipService
+                .getHostByAddr(item.ip)
+                .pipe(tap(hostname => (item.hostname = hostname)))
+            );
+          }
+
+          return merge(...observables);
+        })
+      )
+      .subscribe();
   }
-
-  private load() {
-    this.http.get<APITrafficGetResponse>('/api/traffic').subscribe(
-      response => {
-        this.items = response.items;
-
-        for (const item of this.items) {
-          this.ipService.getHostByAddr(item.ip).then((hostname: string) => {
-            item.hostname = hostname;
-          });
-        }
-      },
-      () => {
-        this.router.navigate(['/error-404']);
-      }
-    );
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   public addToWhitelist(ip: string) {
@@ -75,9 +86,7 @@ export class ModerTrafficComponent {
       .post<void>('/api/traffic/whitelist', {
         ip: ip
       })
-      .subscribe(response => {
-        this.load();
-      });
+      .subscribe(() => this.change$.next(null));
   }
 
   public addToBlacklist(ip: string) {
@@ -87,16 +96,12 @@ export class ModerTrafficComponent {
         period: 240,
         reason: ''
       })
-      .subscribe(response => {
-        this.load();
-      });
+      .subscribe(() => this.change$.next(null));
   }
 
   public removeFromBlacklist(ip: string) {
     this.http
       .delete<void>('/api/traffic/blacklist/' + ip)
-      .subscribe(response => {
-        this.load();
-      });
+      .subscribe(() => this.change$.next(null));
   }
 }

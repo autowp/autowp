@@ -4,19 +4,22 @@ import {
   Input,
   OnInit,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
+  OnDestroy
 } from '@angular/core';
 import { APIItem } from '../../../../services/item';
 import { ACLService } from '../../../../services/acl.service';
 import { HttpClient } from '@angular/common/http';
 import { APIItemLink, ItemLinkService } from '../../../../services/item-link';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-moder-items-item-links',
   templateUrl: './links.component.html'
 })
 @Injectable()
-export class ModerItemsItemLinksComponent implements OnInit, OnChanges {
+export class ModerItemsItemLinksComponent
+  implements OnInit, OnChanges, OnDestroy {
   @Input() item: APIItem;
 
   public loading = 0;
@@ -29,6 +32,7 @@ export class ModerItemsItemLinksComponent implements OnInit, OnChanges {
     url: '',
     type_id: 'default'
   };
+  private aclSub: Subscription;
 
   constructor(
     private acl: ACLService,
@@ -37,18 +41,15 @@ export class ModerItemsItemLinksComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
-    this.loading++;
-    this.acl.isAllowed('car', 'edit_meta').then(
-      allow => {
-        this.canEditMeta = !!allow;
-        this.loading--;
-      },
-      () => {
-        this.canEditMeta = false;
-        this.loading--;
-      }
-    );
+    this.aclSub = this.acl
+      .isAllowed('car', 'edit_meta')
+      .subscribe(allow => (this.canEditMeta = allow));
   }
+
+  ngOnDestroy(): void {
+    this.aclSub.unsubscribe();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.item) {
       this.loadLinks();

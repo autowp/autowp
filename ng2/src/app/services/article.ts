@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from './api.service';
 import { APIUser } from './user';
+import { Observable } from 'rxjs';
 
 export interface APIArticle {
   id: number;
@@ -31,7 +32,9 @@ export interface APIArticlesGetOptions {
 export class ArticleService {
   constructor(private http: HttpClient) {}
 
-  public getArticles(options: APIArticlesGetOptions) {
+  public getArticles(
+    options: APIArticlesGetOptions
+  ): Observable<APIArticlesGetResponse> {
     const params: { [param: string]: string } = {};
 
     if (options.page) {

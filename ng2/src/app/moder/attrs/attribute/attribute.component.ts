@@ -11,8 +11,9 @@ import {
 import Notify from '../../../notify';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest, BehaviorSubject } from 'rxjs';
 import { PageEnvService } from '../../../services/page-env.service';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-moder-attrs-attribute',
@@ -73,6 +74,7 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
     parent_id: null,
     name: ''
   };
+  private $listOptionsChange = new BehaviorSubject<null>(null);
 
   constructor(
     private http: HttpClient,
@@ -101,79 +103,81 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.routeSub = this.route.params.subscribe(params => {
-      this.attrsService.getAttribute(params.id).then(
-        attribute => {
-          this.attribute = attribute;
-
-          this.translate.get(this.attribute.name).subscribe(
-            (translation: string) => {
-              this.pageEnv.set({
-                layout: {
-                  isAdminPage: true,
-                  needRight: false
-                },
-                name: 'page/101/name',
-                pageId: 101,
-                args: {
-                  ATTR_NAME: translation
+    this.routeSub = combineLatest(
+      this.route.params,
+      this.attrsService.getAttributeTypes(),
+      (params, types) => ({ params, types })
+    )
+      .pipe(
+        switchMap(
+          data => this.attrsService.getAttribute(data.params.id),
+          (data, attribute) => ({ attribute: attribute, types: data.types })
+        ),
+        switchMap(
+          data =>
+            combineLatest(
+              this.http.get<APIAttrAttributeGetResponse>(
+                '/api/attr/attribute',
+                {
+                  params: {
+                    parent_id: data.attribute.id.toString(),
+                    recursive: '0',
+                    fields: 'unit'
+                  }
                 }
-              });
-            },
-            () => {
-              this.pageEnv.set({
-                layout: {
-                  isAdminPage: true,
-                  needRight: false
-                },
-                name: 'page/101/name',
-                pageId: 101,
-                args: {
-                  ATTR_NAME: this.attribute.name
-                }
-              });
-            }
+              ),
+              this.$listOptionsChange.pipe(
+                switchMap(() =>
+                  this.attrsService.getListOptions({
+                    attribute_id: data.attribute.id
+                  })
+                )
+              ),
+              (attributes, listOptions) => ({ attributes, listOptions })
+            ),
+          (data, combined) => ({
+            attribute: data.attribute,
+            types: data.types,
+            attributes: combined.attributes,
+            listOptions: combined.listOptions
+          })
+        )
+      )
+      .subscribe(data => {
+        this.translate
+          .get(data.attribute.name)
+          .subscribe(
+            (translation: string) => this.setPageEnv(translation),
+            () => this.setPageEnv(data.attribute.name)
           );
 
-          this.attrsService.getAttributeTypes().then(
-            types => {
-              this.typeOptions = this.typeOptionsDefaults.slice(0);
-              for (const item of types) {
-                this.typeMap[item.id] = item.name;
-                this.typeOptions.push({
-                  id: item.id,
-                  name: item.name
-                });
-              }
-            },
-            response => {
-              Notify.response(response);
-            }
-          );
-
-          this.http
-            .get<APIAttrAttributeGetResponse>('/api/attr/attribute', {
-              params: {
-                parent_id: this.attribute.id.toString(),
-                recursive: '0',
-                fields: 'unit'
-              }
-            })
-            .subscribe(
-              response => {
-                this.attributes = response.items;
-              },
-              response => {
-                Notify.response(response);
-              }
-            );
-
-          this.loadListOptions();
-        },
-        response => {
-          this.router.navigate(['/error-404']);
+        this.attribute = data.attribute;
+        this.typeOptions = this.typeOptionsDefaults.slice(0);
+        for (const item of data.types) {
+          this.typeMap[item.id] = item.name;
+          this.typeOptions.push({
+            id: item.id,
+            name: item.name
+          });
         }
-      );
+
+        this.prepareListOptionsOptions(data.listOptions.items);
+
+        this.attributes = data.attributes.items;
+      });
+  }
+
+  private setPageEnv(name: string) {
+    this.pageEnv.set({
+      layout: {
+        isAdminPage: true,
+        needRight: false
+      },
+      name: 'page/101/name',
+      pageId: 101,
+      args: {
+        ATTR_NAME: name
+      }
     });
   }
 
@@ -241,7 +245,7 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
         response => {
           this.newListOption.name = '';
 
-          this.loadListOptions();
+          this.$listOptionsChange.next(null);
 
           this.addListOptionLoading--;
         },
@@ -254,28 +258,16 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  public loadListOptions() {
-    this.loading++;
-    this.attrsService
-      .getListOptions({
-        attribute_id: this.attribute.id
-      })
-      .subscribe(
-        response => {
-          this.listOptions = response.items;
-          this.listOptionsOptions = this.listOptionsDefaults.slice(0);
-          for (const item of this.listOptions) {
-            this.listOptionsOptions.push({
-              id: item.id,
-              name: item.name
-            });
-          }
-          this.loading--;
-        },
-        response => {
-          Notify.response(response);
-          this.loading--;
-        }
-      );
+  private prepareListOptionsOptions(listOptions: APIAttrListOption[]) {
+    this.listOptions = listOptions;
+    const options = this.listOptionsDefaults.slice(0);
+    for (const item of listOptions) {
+      options.push({
+        id: item.id,
+        name: item.name
+      });
+    }
+
+    this.listOptionsOptions = options;
   }
 }

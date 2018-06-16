@@ -1,11 +1,12 @@
 import { APIPaginator, APIImage } from './api.service';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { APIUser } from './user';
-import { APIItem } from './item';
 import { APIPictureItem } from './picture-item';
 import { APIIP } from './ip';
+import { switchMap, shareReplay } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
 export interface APIPictureGetResponse {
   pictures: APIPicture[];
@@ -123,9 +124,29 @@ export interface APIGetPicturesOptions {
   exact_item_link_type?: number;
 }
 
+export interface APIPictureUserSummary {
+  inboxCount: number;
+  acceptedCount: number;
+}
+
 @Injectable()
 export class PictureService {
-  constructor(private http: HttpClient) {}
+
+  private summary$: Observable<APIPictureUserSummary>;
+
+  constructor(private http: HttpClient, private auth: AuthService) {
+    this.summary$ = this.auth.getUser().pipe(
+      switchMap(user => {
+        if (!user) {
+          return of(null);
+        }
+        return this.http.get<APIPictureUserSummary>(
+          '/api/picture/user-summary'
+        );
+      }),
+      shareReplay(1)
+    );
+  }
 
   public getPictureByLocation(
     url: string,
@@ -249,5 +270,9 @@ export class PictureService {
     return this.http.get<APIPictureGetResponse>('/api/picture', {
       params: this.converPicturesOptions(options)
     });
+  }
+
+  public getSummary(): Observable<APIPictureUserSummary> {
+    return this.summary$;
   }
 }

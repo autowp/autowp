@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map, switchMap, shareReplay } from 'rxjs/operators';
 
 export interface APIVehicleType {
@@ -18,12 +18,11 @@ export interface APIVehicleTypesGetResponse {
 
 @Injectable()
 export class VehicleTypeService {
-
   private types$: Observable<APIVehicleType[]>;
 
   constructor(private http: HttpClient, private translate: TranslateService) {
-
-    this.types$ = this.http.get<APIVehicleTypesGetResponse>('/api/vehicle-types')
+    this.types$ = this.http
+      .get<APIVehicleTypesGetResponse>('/api/vehicle-types')
       .pipe(
         switchMap(
           response => this.translate.get(this.collectNames(response.items)),
@@ -51,7 +50,10 @@ export class VehicleTypeService {
     });
   }
 
-  private walkTypes(types: APIVehicleType[], callback: (type: APIVehicleType) => void) {
+  private walkTypes(
+    types: APIVehicleType[],
+    callback: (type: APIVehicleType) => void
+  ) {
     for (const type of types) {
       callback(type);
       this.walkTypes(type.childs, callback);
@@ -62,25 +64,20 @@ export class VehicleTypeService {
     return this.types$;
   }
 
-  public getTypesById(ids: number[]): Promise<APIVehicleType[]> {
-    return new Promise<APIVehicleType[]>((resolve, reject) => {
-      if (ids.length <= 0) {
-        resolve([]);
-        return;
-      }
-
-      this.types$.toPromise().then(
-        (types: APIVehicleType[]) => {
-          const result: APIVehicleType[] = [];
-          this.walkTypes(types, type => {
-            if (ids.includes(type.id)) {
-              result.push(type);
-            }
-          });
-          resolve(result);
-        },
-        () => reject()
-      );
-    });
+  public getTypesById(ids: number[]): Observable<APIVehicleType[]> {
+    if (ids.length <= 0) {
+      return of([]);
+    }
+    return this.types$.pipe(
+      map(types => {
+        const result: APIVehicleType[] = [];
+        this.walkTypes(types, type => {
+          if (ids.includes(type.id)) {
+            result.push(type);
+          }
+        });
+        return result;
+      })
+    );
   }
 }

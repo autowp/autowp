@@ -6,12 +6,14 @@ import {
   OnChanges,
   SimpleChanges,
   Output,
-  EventEmitter
+  EventEmitter,
+  OnDestroy
 } from '@angular/core';
 import { APIItem, ItemService } from '../../../services/item';
 import { ACLService } from '../../../services/acl.service';
 import Notify from '../../../notify';
 import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-cars-specifications-editor-engine',
@@ -19,12 +21,13 @@ import { HttpClient } from '@angular/common/http';
 })
 @Injectable()
 export class CarsSpecificationsEditorEngineComponent
-  implements OnInit, OnChanges {
+  implements OnInit, OnChanges, OnDestroy {
   @Input() item: APIItem;
   @Output() changed = new EventEmitter<void>();
   public isAllowedEditEngine = false;
   public engine: APIItem;
   public loading = 0;
+  private aclSub: Subscription;
 
   constructor(
     private acl: ACLService,
@@ -33,12 +36,13 @@ export class CarsSpecificationsEditorEngineComponent
   ) {}
 
   ngOnInit(): void {
-    this.acl
+    this.aclSub = this.acl
       .isAllowed('specifications', 'edit-engine')
-      .then(
-        allow => (this.isAllowedEditEngine = !!allow),
-        () => (this.isAllowedEditEngine = false)
-      );
+      .subscribe(allow => (this.isAllowedEditEngine = !!allow));
+  }
+
+  ngOnDestroy(): void {
+    this.aclSub.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

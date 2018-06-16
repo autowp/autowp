@@ -368,7 +368,7 @@ class ItemController extends AbstractRestfulController
                 $select
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
                     ->where([
-                        'item_parent_cache.parent_id' => $data['parent_id'],
+                        'item_parent_cache.parent_id' => $data['ancestor_id'],
                         'item_parent_cache.item_id <> item_parent_cache.parent_id'
                     ]);
             }

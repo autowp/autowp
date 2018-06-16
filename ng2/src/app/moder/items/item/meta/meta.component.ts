@@ -4,19 +4,22 @@ import {
   OnInit,
   OnChanges,
   Input,
-  SimpleChanges
+  SimpleChanges,
+  OnDestroy
 } from '@angular/core';
 import { APIItem, ItemService } from '../../../../services/item';
 import { ACLService } from '../../../../services/acl.service';
 import { HttpClient } from '@angular/common/http';
 import { APIItemVehicleTypeGetResponse } from '../../../../services/api.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-moder-items-item-meta',
   templateUrl: './meta.component.html'
 })
 @Injectable()
-export class ModerItemsItemMetaComponent implements OnInit, OnChanges {
+export class ModerItemsItemMetaComponent
+  implements OnInit, OnDestroy, OnChanges {
   @Input() item: APIItem;
 
   public loading = 0;
@@ -24,6 +27,7 @@ export class ModerItemsItemMetaComponent implements OnInit, OnChanges {
   public canEditMeta = false;
   public vehicleTypeIDs: number[] = [];
   public invalidParams: any;
+  private aclSub: Subscription;
 
   constructor(
     private acl: ACLService,
@@ -59,18 +63,15 @@ export class ModerItemsItemMetaComponent implements OnInit, OnChanges {
       }
     }
   }
+
   ngOnInit(): void {
-    this.loading++;
-    this.acl.isAllowed('car', 'edit_meta').then(
-      allow => {
-        this.canEditMeta = !!allow;
-        this.loading--;
-      },
-      () => {
-        this.canEditMeta = false;
-        this.loading--;
-      }
-    );
+    this.aclSub = this.acl
+      .isAllowed('car', 'edit_meta')
+      .subscribe(allow => (this.canEditMeta = allow));
+  }
+
+  ngOnDestroy(): void {
+    this.aclSub.unsubscribe();
   }
 
   public saveMeta(e) {

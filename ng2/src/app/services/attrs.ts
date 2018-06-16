@@ -4,6 +4,7 @@ import { APIPaginator } from './api.service';
 import { Observable } from 'rxjs';
 import { APIUser } from './user';
 import { APIItem } from './item';
+import { shareReplay, map } from 'rxjs/operators';
 
 export interface APIAttrListOption {
   id: number;
@@ -123,7 +124,7 @@ export interface APIAttrZone {
 }
 
 export interface APIAttrAttribute {
-  parent_id: number|null;
+  parent_id: number | null;
   id: number;
   type_id: number;
   name: string;
@@ -179,49 +180,50 @@ export interface APIAttrAttributePostOptions {
 
 @Injectable()
 export class AttrsService {
-  constructor(private http: HttpClient) {}
+  private attributeTypes$: Observable<APIAttrAttributeType[]>;
+  private zones$: Observable<APIAttrZone[]>;
 
-  public getZone(id: number | string): Promise<APIAttrZone> {
-    return new Promise<APIAttrZone>((resolve, reject) => {
-      if (typeof id !== 'number') {
-        id = parseInt(id, 10);
-      }
-      this.getZones().then(
-        zones => {
-          for (const zone of zones) {
-            if (zone.id === id) {
-              resolve(zone);
-              return;
-            }
-          }
-          reject();
-        },
-        response => reject(response)
+  constructor(private http: HttpClient) {
+    this.attributeTypes$ = this.http
+      .get<APIAttrsAttributeTypesGetResponse>('/api/attr/attribute-type')
+      .pipe(
+        map(response => response.items),
+        shareReplay(1)
       );
-    });
+
+    this.zones$ = this.http
+      .get<APIAttrsZonesGetResponse>('/api/attr/zone')
+      .pipe(
+        map(response => response.items),
+        shareReplay(1)
+      );
   }
 
-  public getZones(): Promise<APIAttrZone[]> {
-    return new Promise<APIAttrZone[]>((resolve, reject) => {
-      this.http
-        .get<APIAttrsZonesGetResponse>('/api/attr/zone')
-        .subscribe(
-          response => resolve(response.items),
-          response => reject(response)
-        );
-    });
+  public getZone(id: number | string): Observable<APIAttrZone> {
+    if (typeof id !== 'number') {
+      id = parseInt(id, 10);
+    }
+    return this.getZones().pipe(
+      map(zones => {
+        for (const zone of zones) {
+          if (zone.id === id) {
+            return zone;
+          }
+        }
+        return null as APIAttrZone;
+      })
+    );
+  }
+
+  public getZones(): Observable<APIAttrZone[]> {
+    return this.zones$;
   }
 
   public getAttribute(
     id: number,
     options?: GetAttributeServiceOptions
-  ): Promise<APIAttrAttribute> {
-    return new Promise((resolve, reject) => {
-      this.getAttributeByLocation('/api/attr/attribute/' + id).subscribe(
-        response => resolve(response),
-        response => reject(response)
-      );
-    });
+  ): Observable<APIAttrAttribute> {
+    return this.getAttributeByLocation('/api/attr/attribute/' + id);
   }
 
   public getAttributeByLocation(
@@ -230,15 +232,8 @@ export class AttrsService {
     return this.http.get<APIAttrAttribute>(location);
   }
 
-  public getAttributeTypes(): Promise<APIAttrAttributeType[]> {
-    return new Promise<APIAttrAttributeType[]>((resolve, reject) => {
-      this.http
-        .get<APIAttrsAttributeTypesGetResponse>('/api/attr/attribute-type')
-        .subscribe(
-          response => resolve(response.items),
-          response => reject(response)
-        );
-    });
+  public getAttributeTypes(): Observable<APIAttrAttributeType[]> {
+    return this.attributeTypes$;
   }
 
   public getUnits(): Promise<APIAttrUnit[]> {
@@ -389,7 +384,10 @@ export class AttrsService {
     });
   }
 
-  public updateAttribute(id: number, options: APIAttrAttributePatchOptions): Observable<void> {
+  public updateAttribute(
+    id: number,
+    options: APIAttrAttributePatchOptions
+  ): Observable<void> {
     const data: { [param: string]: string } = {};
 
     if (options.hasOwnProperty('description')) {
@@ -419,15 +417,16 @@ export class AttrsService {
     return this.http.patch<void>('/api/attr/attribute/' + id, data);
   }
 
-  public createAttribute(options: APIAttrAttributePostOptions): Observable<HttpResponse<void>> {
-
+  public createAttribute(
+    options: APIAttrAttributePostOptions
+  ): Observable<HttpResponse<void>> {
     const data: { [param: string]: any } = {
       name: options.name,
       type_id: options.type_id,
       unit_id: options.unit_id,
       precision: options.precision,
       is_multiple: options.is_multiple,
-      description: options.description,
+      description: options.description
     };
 
     if (options.parent_id) {

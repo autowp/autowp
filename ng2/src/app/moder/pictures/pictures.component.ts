@@ -18,7 +18,7 @@ import {
 } from '../../services/item';
 import { chunkBy } from '../../chunk';
 import { UserService, APIUser } from '../../services/user';
-import { Subscription, Observable, of, empty } from 'rxjs';
+import { Subscription, Observable, of, empty, forkJoin } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   APIPicture,
@@ -244,6 +244,9 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
   public itemQuery = '';
   public itemsDataSource: (text$: Observable<string>) => Observable<any[]>;
   private vehicleTypeSub: Subscription;
+  private mvtSub: Subscription;
+
+  private perspectiveSub: Subscription;
 
   constructor(
     private http: HttpClient,
@@ -332,25 +335,29 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
       0
     );
 
-    this.vehicleTypeSub = this.vehicleTypeService.getTypes().subscribe(types => {
-      this.vehicleTypeOptions = this.defaultVehicleTypeOptions.concat(
-        toPlainVehicleTypes(types, 0)
-      );
-    });
+    this.vehicleTypeSub = this.vehicleTypeService
+      .getTypes()
+      .subscribe(types => {
+        this.vehicleTypeOptions = this.defaultVehicleTypeOptions.concat(
+          toPlainVehicleTypes(types, 0)
+        );
+      });
 
-    this.perspectiveService.getPerspectives().then(perspectives => {
-      this.perspectiveOptions = this.defaultPerspectiveOptions;
-      for (const perspective of perspectives) {
-        this.perspectiveOptions.push({
-          value: perspective.id,
-          name: perspective.name
-        });
-      }
-    });
+    this.perspectiveSub = this.perspectiveService
+      .getPerspectives()
+      .subscribe(perspectives => {
+        this.perspectiveOptions = this.defaultPerspectiveOptions.slice(0);
+        for (const perspective of perspectives) {
+          this.perspectiveOptions.push({
+            value: perspective.id,
+            name: perspective.name
+          });
+        }
+      });
 
-    this.moderVoteTemplateService.getTemplates().then(templates => {
-      this.moderVoteTemplateOptions = templates;
-    });
+    this.mvtSub = this.moderVoteTemplateService
+      .getTemplates()
+      .subscribe(templates => (this.moderVoteTemplateOptions = templates));
 
     this.querySub = this.route.queryParams.subscribe(params => {
       this.status = params.status ? params.status : null;
@@ -408,6 +415,8 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.vehicleTypeSub.unsubscribe();
     this.querySub.unsubscribe();
+    this.mvtSub.unsubscribe();
+    this.perspectiveSub.unsubscribe();
   }
 
   public onPictureSelect(active: boolean, picture: APIPicture) {
@@ -422,15 +431,15 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
     this.hasSelectedItem = this.selected.length > 0;
   }
 
-  itemFormatter(x: APIItem) {
+  public itemFormatter(x: APIItem) {
     return x.name_text;
   }
 
-  ownerFormatter(x: APIUser) {
+  public ownerFormatter(x: APIUser) {
     return x.name;
   }
 
-  itemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
+  public itemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
     this.router.navigate([], {
       queryParamsHandling: 'merge',
       queryParams: {
@@ -439,7 +448,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
     });
   }
 
-  clearItem(): void {
+  public clearItem(): void {
     this.itemQuery = '';
     this.router.navigate([], {
       queryParamsHandling: 'merge',
@@ -449,7 +458,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
     });
   }
 
-  ownerOnSelect(e: NgbTypeaheadSelectItemEvent): void {
+  public ownerOnSelect(e: NgbTypeaheadSelectItemEvent): void {
     this.router.navigate([], {
       queryParamsHandling: 'merge',
       queryParams: {
@@ -458,7 +467,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
     });
   }
 
-  clearOwner(): void {
+  public clearOwner(): void {
     this.ownerQuery = '';
     this.router.navigate([], {
       queryParamsHandling: 'merge',
@@ -509,7 +518,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
 
   public votePictures(vote: number, reason: string) {
     for (const id of this.selected) {
-      const promises: Promise<void>[] = [];
+      const promises: Observable<void>[] = [];
       for (const picture of this.pictures) {
         if (picture.id === id) {
           const q = this.moderVoteService.vote(picture.id, vote, reason);
@@ -517,7 +526,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
         }
       }
 
-      Promise.all(promises).then(() => {
+      forkJoin(promises).subscribe(() => {
         this.load();
       });
     }

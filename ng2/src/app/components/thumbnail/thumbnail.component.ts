@@ -4,13 +4,15 @@ import {
   Input,
   OnInit,
   Output,
-  EventEmitter
+  EventEmitter,
+  OnDestroy
 } from '@angular/core';
 import { APIPicture } from '../../services/picture';
 import { PerspectiveService } from '../../services/perspective';
 import { PictureItemService } from '../../services/picture-item';
 import { APIPerspective } from '../../services/api.service';
 import { ACLService } from '../../services/acl.service';
+import { Subscription } from 'rxjs';
 
 interface ThumbnailAPIPicture extends APIPicture {
   selected?: boolean;
@@ -22,7 +24,7 @@ interface ThumbnailAPIPicture extends APIPicture {
   styleUrls: ['./styles.scss']
 })
 @Injectable()
-export class ThumbnailComponent implements OnInit {
+export class ThumbnailComponent implements OnInit, OnDestroy {
   @Input() picture: ThumbnailAPIPicture;
   @Input() selectable = false;
   @Output() selected = new EventEmitter<boolean>();
@@ -30,6 +32,8 @@ export class ThumbnailComponent implements OnInit {
   // public onPictureSelect: ($event: any, picture: APIPicture) => void;
   public perspectiveOptions: APIPerspective[] = [];
   public isModer = false;
+  private sub: Subscription;
+  private pserspectiveSub: Subscription;
 
   constructor(
     private perspectiveService: PerspectiveService,
@@ -38,15 +42,20 @@ export class ThumbnailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.acl
+    this.sub = this.acl
       .inheritsRole('moder')
-      .then(isModer => (this.isModer = isModer), () => (this.isModer = false));
+      .subscribe(isModer => (this.isModer = isModer));
 
     if (this.picture.perspective_item) {
-      this.perspectiveService.getPerspectives().then(perspectives => {
-        this.perspectiveOptions = perspectives;
-      });
+      this.pserspectiveSub = this.perspectiveService
+        .getPerspectives()
+        .subscribe(perspectives => (this.perspectiveOptions = perspectives));
     }
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+    this.pserspectiveSub.unsubscribe();
   }
 
   public savePerspective() {

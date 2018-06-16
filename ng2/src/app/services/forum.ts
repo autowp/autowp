@@ -5,7 +5,13 @@ import { Observable, of, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { APIUser } from './user';
 import { APIComment } from './comment';
 import { AuthService } from './auth.service';
-import { switchMap, share, publish, distinctUntilChanged, shareReplay } from 'rxjs/operators';
+import {
+  switchMap,
+  share,
+  publish,
+  distinctUntilChanged,
+  shareReplay
+} from 'rxjs/operators';
 
 export interface APIForumGetTopicOptions {
   fields?: string;
@@ -92,27 +98,19 @@ const LIMIT = 20;
 
 @Injectable()
 export class ForumService {
-  private user$ = new ReplaySubject<APIUser>(1);
   private summary$: Observable<APIForumUserSummaryGetResponse>;
 
   constructor(private http: HttpClient, private auth: AuthService) {
-
-    this.auth.getUser().subscribe(
-      user => this.user$.next(user)
-    );
-
-    this.summary$ = this.user$.pipe(
-      shareReplay(1),
-      // distinctUntilChanged((a, b) => { console.log('CMP', a, b); return a === b; }),
+    this.summary$ = this.auth.getUser().pipe(
       switchMap(user => {
-        console.log('USER');
         if (!user) {
           return of(null);
         }
         return this.http.get<APIForumUserSummaryGetResponse>(
           '/api/forum/user-summary'
         );
-      })
+      }),
+      shareReplay(1)
     );
   }
 

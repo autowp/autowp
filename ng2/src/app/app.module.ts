@@ -205,6 +205,7 @@ import { CarsSpecificationsEditorSpecComponent } from './cars/specifications-edi
 import { VotingVotesComponent } from './voting/votes/votes.component';
 import { MapPopupComponent } from './map/popup/popup.component';
 import { MostsService } from './services/mosts';
+import { TimezoneService } from './services/timezone';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -920,7 +921,8 @@ const appRoutes: Routes = [
     PageEnvService,
     ContentLanguageService,
     LanguageService,
-    MostsService
+    MostsService,
+    TimezoneService
   ],
   bootstrap: [AppComponent]
 })

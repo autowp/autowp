@@ -1,5 +1,5 @@
 import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest, BehaviorSubject } from 'rxjs';
 import { APIItem, ItemService } from '../../services/item';
 import { HttpClient } from '@angular/common/http';
 import { ACLService } from '../../services/acl.service';
@@ -7,6 +7,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PageEnvService } from '../../services/page-env.service';
 import { APIUser } from '../../services/user';
 import Notify from '../../notify';
+import {
+  switchMap,
+  distinctUntilChanged,
+  debounceTime,
+  switchMapTo
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-cars-specifications-editor',
@@ -24,6 +30,7 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
   public tab = 'info';
   public loading = 0;
   public specsWeight: number;
+  private change$ = new BehaviorSubject<null>(null);
 
   constructor(
     private http: HttpClient,
@@ -35,20 +42,6 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.acl
-      .isAllowed('specifications', 'admin')
-      .then(
-        allow => (this.isSpecsAdmin = !!allow),
-        () => (this.isSpecsAdmin = false)
-      );
-
-    this.acl
-      .inheritsRole('moder')
-      .then(
-        inherits => (this.isModer = !!inherits),
-        () => (this.isModer = false)
-      );
-
     this.loading++;
     this.http
       .get<APIUser>('/api/user/me', {
@@ -67,26 +60,33 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
         }
       );
 
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.tab = params.tab || 'info';
+    this.querySub = this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => {
+          this.tab = params.tab || 'info';
 
-      this.loadItem(params.item_id);
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.querySub.unsubscribe();
-  }
-
-  private loadItem(itemID: number) {
-    this.loading++;
-    this.itemService
-      .getItem(itemID, {
-        fields: 'name_html,name_text,engine_id,attr_zone_id'
-      })
+          return combineLatest(
+            this.change$.pipe(
+              switchMapTo(
+                this.itemService.getItem(params.item_id, {
+                  fields: 'name_html,name_text,engine_id,attr_zone_id'
+                })
+              )
+            ),
+            this.acl.isAllowed('specifications', 'admin'),
+            this.acl.inheritsRole('moder'),
+            (item, isSpecsAdmin, isModer) => ({ item, isSpecsAdmin, isModer })
+          );
+        })
+      )
       .subscribe(
-        item => {
-          this.item = item;
+        data => {
+          this.isSpecsAdmin = data.isSpecsAdmin;
+          this.isModer = data.isModer;
+
+          this.item = data.item;
 
           this.pageEnv.set({
             layout: {
@@ -103,18 +103,19 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
 
           if (this.tab === 'spec') {
           }
-
-          this.loading--;
         },
-        response => {
+        () => {
           this.router.navigate(['/error-404']);
-          this.loading--;
         }
       );
   }
 
+  ngOnDestroy(): void {
+    this.querySub.unsubscribe();
+  }
+
   public onEngineChanged() {
-    this.loadItem(this.item.id);
+    this.change$.next(null);
   }
 
   public refreshInheritance() {

@@ -6,9 +6,10 @@ import {
   APIAttrZone,
   APIAttrAttribute
 } from '../../../services/attrs';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { PageEnvService } from '../../../services/page-env.service';
+import { distinctUntilChanged, debounceTime, switchMap } from 'rxjs/operators';
 
 export interface APIAttrZoneAttributesGetResponse {
   items: {
@@ -43,48 +44,53 @@ export class ModerAttrsZoneComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
-      this.attrsService.getZone(params.id).then(
-        zone => {
-          this.zone = zone;
-
-          this.pageEnv.set({
-            layout: {
-              isAdminPage: true,
-              needRight: false
-            },
-            name: 'page/142/name',
-            pageId: 142,
-            args: {
-              ZONE_NAME: this.zone.name,
-              ZONE_ID: this.zone.id + ''
-            }
-          });
-
-          this.loadAttributes();
-
-          this.http
-            .get<APIAttrZoneAttributesGetResponse>('/api/attr/zone-attribute', {
-              params: {
-                zone_id: this.zone.id.toString()
-              }
-            })
-            .subscribe(
-              response => {
-                for (const item of response.items) {
-                  this.zoneAttribute[item.attribute_id] = true;
+    this.routeSub = this.route.params
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => this.attrsService.getZone(params.id)),
+        switchMap(
+          zone =>
+            combineLatest(
+              this.attrsService.getAttributes({ recursive: true }),
+              this.http.get<APIAttrZoneAttributesGetResponse>(
+                '/api/attr/zone-attribute',
+                {
+                  params: {
+                    zone_id: zone.id.toString()
+                  }
                 }
-              },
-              response => {
-                Notify.response(response);
-              }
-            );
-        },
-        response => {
-          Notify.response(response);
+              )
+            ),
+          (zone, combined) => ({
+            zone: zone,
+            attributes: combined[0].items,
+            zoneAttributes: combined[1].items
+          })
+        )
+      )
+      .subscribe(data => {
+        this.zone = data.zone;
+
+        this.pageEnv.set({
+          layout: {
+            isAdminPage: true,
+            needRight: false
+          },
+          name: 'page/142/name',
+          pageId: 142,
+          args: {
+            ZONE_NAME: data.zone.name,
+            ZONE_ID: data.zone.id + ''
+          }
+        });
+
+        this.attributes = data.attributes;
+
+        for (const item of data.zoneAttributes) {
+          this.zoneAttribute[item.attribute_id] = true;
         }
-      );
-    });
+      });
   }
 
   public change(change: APIAttrZoneAttributeChange) {
@@ -114,16 +120,5 @@ export class ModerAttrsZoneComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
-  }
-
-  private loadAttributes() {
-    this.attrsService.getAttributes({ recursive: true }).subscribe(
-      response => {
-        this.attributes = response.items;
-      },
-      response => {
-        Notify.response(response);
-      }
-    );
   }
 }

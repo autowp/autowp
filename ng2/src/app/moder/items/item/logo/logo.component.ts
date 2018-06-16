@@ -4,35 +4,42 @@ import {
   Injectable,
   OnInit,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
+  OnDestroy
 } from '@angular/core';
 import { APIItem } from '../../../../services/item';
 import { ACLService } from '../../../../services/acl.service';
 import { HttpClient } from '@angular/common/http';
 import { APIImage } from '../../../../services/api.service';
 import * as $ from 'jquery';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-moder-items-item-logo',
   templateUrl: './logo.component.html'
 })
 @Injectable()
-export class ModerItemsItemLogoComponent implements OnInit, OnChanges {
+export class ModerItemsItemLogoComponent
+  implements OnInit, OnChanges, OnDestroy {
   @Input() item: APIItem;
 
   public loading = 0;
   public canLogo = false;
+  private aclSub: Subscription;
 
   constructor(private acl: ACLService, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.acl
+    this.aclSub = this.acl
       .isAllowed('brand', 'logo')
-      .then(allow => (this.canLogo = allow), () => (this.canLogo = false));
+      .subscribe(allow => (this.canLogo = allow));
   }
-  ngOnChanges(changes: SimpleChanges): void {
 
+  ngOnDestroy(): void {
+    this.aclSub.unsubscribe();
   }
+
+  ngOnChanges(changes: SimpleChanges): void {}
 
   public uploadLogo() {
     this.loading++;
