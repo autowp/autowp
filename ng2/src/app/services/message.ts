@@ -94,7 +94,7 @@ export class MessageService {
 
         return this.http.get<APIMessageNewGetResponse>('/api/message/new');
       }),
-      map(response => response.count)
+      map(response => (response ? response.count : null))
     );
   }
 
@@ -133,16 +133,13 @@ export class MessageService {
     return this.new$;
   }
 
-  public send(userId: number, text: string): Promise<void> {
+  public send(userId: number, text: string): Observable<void> {
     return this.http
       .post<void>('/api/message', {
         user_id: userId,
         text: text
       })
-      .toPromise()
-      .then(() => {
-        this.sent$.next(null);
-      });
+      .pipe(tap(() => this.sent$.next(null)));
   }
 
   public getMessages(

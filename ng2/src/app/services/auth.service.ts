@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
 import { APIService } from './api.service';
 import { APIUser } from './user';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 
 @Injectable()
 export class AuthService {
@@ -21,67 +22,31 @@ export class AuthService {
     email: string,
     password: string,
     remember: boolean
-  ): Promise<APIUser> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .request('POST', 'login', {
-          body: {
-            login: email,
-            password: password,
-            remember: remember ? '1' : ''
-          },
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          observe: 'response'
-        })
-        .subscribe(
-          response => {
-            this.loadMe().then(
-              user => {
-                resolve(user);
-              },
-              message => {
-                reject(message);
-              }
-            );
-          },
-          response => {
-            reject(response);
-          }
-        );
-    });
+  ): Observable<APIUser> {
+    return this.api
+      .request('POST', 'login', {
+        body: {
+          login: email,
+          password: password,
+          remember: remember ? '1' : ''
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        observe: 'response'
+      })
+      .pipe(switchMap(() => this.loadMe()));
   }
 
-  public signOut(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.api.request('DELETE', 'login').subscribe(
-        response => {
-          this.setUser(null);
-          resolve();
-        },
-        error => {
-          this.setUser(null);
-          console.log(error);
-          reject();
-        }
-      );
-    });
+  public signOut(): Observable<void> {
+    return this.api
+      .request('DELETE', 'login')
+      .pipe(tap(() => this.setUser(null)));
   }
 
-  public loadMe(): Promise<APIUser> {
-    return new Promise((resolve, reject) => {
-      this.api.request<APIUser>('GET', 'user/me').subscribe(
-        user => {
-          this.setUser(user);
-          resolve(user);
-        },
-        error => {
-          this.setUser(null);
-          console.log(error);
-          reject('error');
-        }
-      );
-    });
+  public loadMe(): Observable<APIUser> {
+    return this.api
+      .request<APIUser>('GET', 'user/me')
+      .pipe(tap(user => this.setUser(user)));
   }
 }

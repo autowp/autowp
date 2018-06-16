@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
+import { tap, map, shareReplay } from 'rxjs/operators';
 
 type pageCallbackType = () => void;
 
@@ -52,7 +53,7 @@ export class PageService {
   private pages: Map<number, any> = new Map<number, any>();
   private current = 0;
   private args: any = {};
-  private promises: Map<number, any> = new Map<number, any>();
+  private promises = new Map<number, Observable<void>>();
 
   private handlers: { [key: string]: pageCallbackType[] } = {
     currentChanged: []
@@ -80,7 +81,7 @@ export class PageService {
     return this.args;
   }
 
-  public isActive(id: number): Promise<boolean> {
+  public isActive(id: number): Observable<boolean> {
     return this.isDescendant(this.current, id);
   }
 
@@ -97,73 +98,62 @@ export class PageService {
     return false;
   }
 
-  private loadTree(id: number): Promise<void> {
+  private loadTree(id: number): Observable<void> {
     if (this.promises.has(id)) {
       return this.promises.get(id);
     }
 
-    const promise = new Promise<void>((resolve, reject) => {
-      this.http
-        .get<APIPageParentsGetResponse>('/api/page/parents', {
-          params: {
-            id: id.toString()
+    const o = this.http
+      .get<APIPageParentsGetResponse>('/api/page/parents', {
+        params: {
+          id: id.toString()
+        }
+      })
+      .pipe(
+        tap(response => {
+          for (const page of response.items) {
+            this.pages.set(page.id, page);
           }
-        })
-        .subscribe(
-          response => {
-            for (const page of response.items) {
-              this.pages.set(page.id, page);
-            }
+        }),
+        map(() => null),
+        shareReplay(1)
+      );
 
-            resolve();
-          },
-          response => reject(response)
-        );
-    });
+    this.promises.set(id, o);
 
-    this.promises.set(id, promise);
-
-    return promise;
+    return o;
   }
 
-  public isDescendant(id: number, parentId: number): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this.loadTree(id).then(
-        () => {
-          if (id === parentId) {
-            resolve(true);
-            return;
-          }
+  public isDescendant(id: number, parentId: number): Observable<boolean> {
+    return this.loadTree(id).pipe(
+      map(() => {
+        if (id === parentId) {
+          return true;
+        }
 
-          const result = this.isDescendantPrivate(id, parentId);
-          resolve(result);
-        },
-        response => reject(response)
-      );
-    });
+        return this.isDescendantPrivate(id, parentId);
+      })
+    );
   }
 
-  public getPath(id: number): Promise<APIPage[]> {
-    return new Promise<APIPage[]>((resolve, reject) => {
-      this.loadTree(id).then(
-        () => {
-          let pageId = id;
-          const result = [];
-          while (pageId) {
-            if (!this.pages.has(pageId)) {
-              throw new Error('Page ' + pageId + ' not found');
-            }
-
-            result.push(this.pages.get(pageId));
-
-            pageId = this.pages.get(pageId).parent_id;
+  public getPath(id: number): Observable<APIPage[]> {
+    return this.loadTree(id).pipe(
+      map(() => {
+        let pageId = id;
+        const result = [];
+        while (pageId) {
+          if (!this.pages.has(pageId)) {
+            throw new Error('Page ' + pageId + ' not found');
           }
 
-          resolve(result.reverse());
-        },
-        response => reject(response)
-      );
-    });
+          result.push(this.pages.get(pageId));
+
+          pageId = this.pages.get(pageId).parent_id;
+        }
+
+        return result;
+      })
+    );
   }
 
   public bind(event: string, handler: pageCallbackType) {

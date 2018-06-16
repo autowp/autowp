@@ -46,12 +46,13 @@ export class PictureItemService {
     itemId: number,
     type: number,
     perspectiveId: number
-  ): Promise<void> {
-    return this.http
-      .put<void>('/api/picture-item/' + pictureId + '/' + itemId + '/' + type, {
+  ): Observable<void> {
+    return this.http.put<void>(
+      '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
+      {
         perspective_id: perspectiveId.toString()
-      })
-      .toPromise();
+      }
+    );
   }
 
   public setArea(
@@ -59,12 +60,13 @@ export class PictureItemService {
     itemId: number,
     type: number,
     area: APIPictureItemAreaPostData
-  ): Promise<void> {
-    return this.http
-      .put<void>('/api/picture-item/' + pictureId + '/' + itemId + '/' + type, {
+  ): Observable<void> {
+    return this.http.put<void>(
+      '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
+      {
         area: area
-      })
-      .toPromise();
+      }
+    );
   }
 
   public create(
@@ -72,25 +74,21 @@ export class PictureItemService {
     itemId: number,
     type: number,
     data: APIPictureItemPostData
-  ): Promise<void> {
-    return this.http
-      .post<void>(
-        '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
-        data
-      )
-      .toPromise();
+  ): Observable<void> {
+    return this.http.post<void>(
+      '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
+      data
+    );
   }
 
   public remove(
     pictureId: number,
     itemId: number,
     type: number
-  ): Promise<void> {
-    return this.http
-      .delete<void>(
-        '/api/picture-item/' + pictureId + '/' + itemId + '/' + type
-      )
-      .toPromise();
+  ): Observable<void> {
+    return this.http.delete<void>(
+      '/api/picture-item/' + pictureId + '/' + itemId + '/' + type
+    );
   }
 
   public changeItem(
@@ -98,15 +96,13 @@ export class PictureItemService {
     type: number,
     srcItemId: number,
     dstItemId: number
-  ): Promise<void> {
-    return this.http
-      .put<void>(
-        '/api/picture-item/' + pictureId + '/' + srcItemId + '/' + type,
-        {
-          item_id: dstItemId
-        }
-      )
-      .toPromise();
+  ): Observable<void> {
+    return this.http.put<void>(
+      '/api/picture-item/' + pictureId + '/' + srcItemId + '/' + type,
+      {
+        item_id: dstItemId
+      }
+    );
   }
 
   public get(
@@ -114,21 +110,19 @@ export class PictureItemService {
     itemId: number,
     type: number,
     options: APIPictureItemGetOptions
-  ): Promise<APIPictureItem> {
+  ): Observable<APIPictureItem> {
     const params: { [param: string]: string } = {};
 
     if (options.fields) {
       params.fields = options.fields;
     }
 
-    return this.http
-      .get<APIPictureItem>(
-        '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
-        {
-          params: params
-        }
-      )
-      .toPromise();
+    return this.http.get<APIPictureItem>(
+      '/api/picture-item/' + pictureId + '/' + itemId + '/' + type,
+      {
+        params: params
+      }
+    );
   }
 
   public getItems(

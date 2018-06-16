@@ -1,9 +1,9 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable, empty, forkJoin } from 'rxjs';
 import {
   APIItemParent,
   ItemParentService
@@ -12,6 +12,7 @@ import { APIItem, ItemService } from '../../../../../services/item';
 import { ACLService } from '../../../../../services/acl.service';
 import { PageEnvService } from '../../../../../services/page-env.service';
 import { APIItemVehicleTypeGetResponse } from '../../../../../services/api.service';
+import { switchMap, catchError } from 'rxjs/operators';
 
 // Acl.isAllowed('car', 'move', 'unauthorized');
 
@@ -190,59 +191,52 @@ export class ModerItemsItemOrganizeComponent implements OnInit, OnDestroy {
       .post<void>('/api/item', data, {
         observe: 'response'
       })
+      .pipe(
+        catchError(response => {
+          this.invalidParams = response.error.invalid_params;
+          this.loading--;
+
+          return empty();
+        }),
+        switchMap(response =>
+          this.itemService.getItemByLocation(
+            response.headers.get('Location'),
+            {}
+          )
+        ),
+        switchMap(item => {
+          const promises: Observable<any>[] = [
+            this.itemService.setItemVehicleTypes(item.id, this.vehicleTypeIDs),
+            this.http.post<void>('/api/item-parent', {
+              parent_id: this.item.id,
+              item_id: item.id
+            })
+          ];
+
+          for (const child of this.childs) {
+            if (child.selected) {
+              promises.push(
+                this.http.put<void>(
+                  '/api/item-parent/' + child.item_id + '/' + child.parent_id,
+                  {
+                    parent_id: item.id
+                  }
+                )
+              );
+            }
+          }
+
+          return forkJoin(...promises);
+        })
+      )
       .subscribe(
         response => {
-          const location = response.headers.get('Location');
-
-          this.loading++;
-          this.itemService.getItemByLocation(location, {}).subscribe(item => {
-            const promises: Promise<any>[] = [];
-
-            promises.push(
-              this.itemService.setItemVehicleTypes(item.id, this.vehicleTypeIDs)
-            );
-
-            promises.push(
-              this.http
-                .post<void>('/api/item-parent', {
-                  parent_id: this.item.id,
-                  item_id: item.id
-                })
-                .toPromise()
-            );
-
-            for (const child of this.childs) {
-              if (child.selected) {
-                promises.push(
-                  this.http
-                    .put<void>(
-                      '/api/item-parent/' +
-                        child.item_id +
-                        '/' +
-                        child.parent_id,
-                      {
-                        parent_id: item.id
-                      }
-                    )
-                    .toPromise()
-                );
-              }
-            }
-
-            this.loading++;
-            Promise.all(promises).then(results => {
-              this.router.navigate(['/moder/items/item', this.item.id], {
-                queryParams: {
-                  tab: 'catalogue'
-                }
-              });
-              this.loading--;
-            });
-
-            this.loading--;
-          });
-
           this.loading--;
+          this.router.navigate(['/moder/items/item', this.item.id], {
+            queryParams: {
+              tab: 'catalogue'
+            }
+          });
         },
         response => {
           this.invalidParams = response.error.invalid_params;

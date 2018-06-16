@@ -65,7 +65,7 @@ export class ThumbnailComponent implements OnInit, OnDestroy {
         this.picture.perspective_item.item_id,
         this.picture.perspective_item.type,
         this.picture.perspective_item.perspective_id
-      );
+      ).subscribe();
     }
   }
 

@@ -34,7 +34,7 @@ export class BreadcrumbsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.sub = this.pageEnv.pageID$.subscribe((pageID) => {
+    this.sub = this.pageEnv.pageID$.subscribe(pageID => {
       this.load(pageID);
     });
   }
@@ -46,7 +46,7 @@ export class BreadcrumbsComponent implements OnInit, OnDestroy {
     this.items = [];
     if (pageID) {
       const args = this.pageService.getCurrentArgs();
-      this.pageService.getPath(pageID).then(path => {
+      this.pageService.getPath(pageID).subscribe(path => {
         this.items = [];
         for (const item of path) {
           const bItem: APIPageInBreadcrumbs = item;

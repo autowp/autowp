@@ -6,7 +6,7 @@ import { sprintf } from 'sprintf-js';
 import { HttpClient } from '@angular/common/http';
 import { PictureItemService } from '../../../../services/picture-item';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { PictureService, APIPicture } from '../../../../services/picture';
 import { PageEnvService } from '../../../../services/page-env.service';
 
@@ -79,21 +79,15 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
   }
 
   private load() {
-    const getPicturePromise = this.pictureService.getPicture(this.id, {
-      fields: 'crop,image'
-    });
-
-    const getPictureItemPromise = this.pictureItemService.get(
-      this.id,
-      this.item_id,
-      this.type,
-      {
+    forkJoin(
+      this.pictureService.getPicture(this.id, {
+        fields: 'crop,image'
+      }),
+      this.pictureItemService.get(this.id, this.item_id, this.type, {
         fields: 'area'
-      }
-    );
-
-    Promise.all([getPicturePromise, getPictureItemPromise]).then(
-      (data: any[]) => {
+      })
+    ).subscribe(
+      data => {
         const area = data[1].data.area;
 
         const response = data[0];
@@ -173,7 +167,7 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
     const text =
       Math.round(this.currentCrop.w) + '×' + Math.round(this.currentCrop.h);
     const pw = 4;
-    const ph = pw * this.currentCrop.h / this.currentCrop.w;
+    const ph = (pw * this.currentCrop.h) / this.currentCrop.w;
     const phRound = Math.round(ph * 10) / 10;
 
     this.aspect = pw + ':' + phRound;
@@ -190,7 +184,7 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
 
     this.pictureItemService
       .setArea(this.id, this.item_id, this.type, area)
-      .then(
+      .subscribe(
         () => {
           this.router.navigate(['/moder/pictures', this.picture.id]);
         },

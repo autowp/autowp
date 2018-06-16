@@ -1,14 +1,15 @@
-import { Component, Injectable } from '@angular/core';
+import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import * as showdown from 'showdown';
 import * as escapeRegExp from 'lodash.escaperegexp';
 import { UserService, APIUser } from '../services/user';
 import { HttpClient } from '@angular/common/http';
-import Notify from '../notify';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { BytesPipe } from 'ngx-pipes';
 import { PageEnvService } from '../services/page-env.service';
+import { combineLatest, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 export class APIAbout {
   developer: number;
@@ -42,8 +43,9 @@ function replacePairs(str: string, pairs: { [key: string]: string }): string {
   templateUrl: './about.component.html'
 })
 @Injectable()
-export class AboutComponent {
+export class AboutComponent implements OnInit, OnDestroy {
   public html = '';
+  private sub: Subscription;
 
   constructor(
     private http: HttpClient,
@@ -53,7 +55,9 @@ export class AboutComponent {
     private decimalPipe: DecimalPipe,
     private bytesPipe: BytesPipe,
     private pageEnv: PageEnvService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     setTimeout(
       () =>
         this.pageEnv.set({
@@ -66,70 +70,67 @@ export class AboutComponent {
       0
     );
 
-    this.http.get<APIAbout>('/api/about').subscribe(
-      response => {
-        this.translate.get('about/text').subscribe(
-          translation => {
-            const ids: number[] = response.contributors;
-            ids.push(response.developer);
-            ids.push(response.fr_translator);
-            ids.push(response.zh_translator);
-            ids.push(response.be_translator);
-            ids.push(response.pt_br_translator);
+    this.sub = combineLatest(
+      this.http.get<APIAbout>('/api/about'),
+      this.translate.get('about/text')
+    )
+      .pipe(
+        switchMap(
+          data => {
+            const ids: number[] = data[0].contributors;
+            ids.push(data[0].developer);
+            ids.push(data[0].fr_translator);
+            ids.push(data[0].zh_translator);
+            ids.push(data[0].be_translator);
+            ids.push(data[0].pt_br_translator);
 
-            this.userService.getUserMap(ids).then(
-              (users: Map<number, APIUser>) => {
-                const contributorsHtml: string[] = [];
-                for (const id of response.contributors) {
-                  contributorsHtml.push(this.userHtml(users.get(id)));
-                }
-
-                const markdownConverter = new showdown.Converter({});
-                this.html = replacePairs(
-                  markdownConverter.makeHtml(translation),
-                  {
-                    '%users%': contributorsHtml.join(' '),
-                    '%total-pictures%': this.decimalPipe.transform(
-                      response.total_pictures
-                    ),
-                    '%total-vehicles%': response.total_cars.toString(),
-                    '%total-size%': bytesPipe
-                      .transform(response.pictures_size, 1)
-                      .toString(),
-                    '%total-users%': response.total_users.toString(),
-                    '%total-comments%': response.total_comments.toString(),
-                    '%github%':
-                      '<i class="fa fa-github"></i> <a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a>',
-                    '%developer%': this.userHtml(users.get(response.developer)),
-                    '%fr-translator%': this.userHtml(
-                      users.get(response.fr_translator)
-                    ),
-                    '%zh-translator%': this.userHtml(
-                      users.get(response.zh_translator)
-                    ),
-                    '%be-translator%': this.userHtml(
-                      users.get(response.be_translator)
-                    ),
-                    '%pt-br-translator%': this.userHtml(
-                      users.get(response.pt_br_translator)
-                    )
-                  }
-                );
-              },
-              responses => {
-                console.log('reject', responses);
-              }
-            );
+            return this.userService.getUserMap(ids);
           },
-          responses => {
-            console.log('Failed to translate');
-          }
-        );
-      },
-      response => {
-        Notify.response(response);
-      }
-    );
+          (data, users) => ({
+            users: users,
+            translation: data[1],
+            about: data[0]
+          })
+        )
+      )
+      .subscribe(data => {
+        const contributorsHtml: string[] = [];
+        for (const id of data.about.contributors) {
+          contributorsHtml.push(this.userHtml(data.users.get(id)));
+        }
+
+        const markdownConverter = new showdown.Converter({});
+        this.html = replacePairs(markdownConverter.makeHtml(data.translation), {
+          '%users%': contributorsHtml.join(' '),
+          '%total-pictures%': this.decimalPipe.transform(
+            data.about.total_pictures
+          ),
+          '%total-vehicles%': data.about.total_cars.toString(),
+          '%total-size%': this.bytesPipe
+            .transform(data.about.pictures_size, 1)
+            .toString(),
+          '%total-users%': data.about.total_users.toString(),
+          '%total-comments%': data.about.total_comments.toString(),
+          '%github%':
+            '<i class="fa fa-github"></i> <a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a>',
+          '%developer%': this.userHtml(data.users.get(data.about.developer)),
+          '%fr-translator%': this.userHtml(
+            data.users.get(data.about.fr_translator)
+          ),
+          '%zh-translator%': this.userHtml(
+            data.users.get(data.about.zh_translator)
+          ),
+          '%be-translator%': this.userHtml(
+            data.users.get(data.about.be_translator)
+          ),
+          '%pt-br-translator%': this.userHtml(
+            data.users.get(data.about.pt_br_translator)
+          )
+        });
+      });
+  }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   private userHtml(user: APIUser): string {

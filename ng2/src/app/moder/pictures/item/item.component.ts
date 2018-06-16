@@ -162,7 +162,7 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
 
   public addItem(item: APIItem, type: number) {
     this.pictureItemLoading = true;
-    this.pictureItemService.create(this.id, item.id, type, {}).then(
+    this.pictureItemService.create(this.id, item.id, type, {}).subscribe(
       () => {
         this.loadPicture(() => {
           this.pictureItemLoading = false;
@@ -178,7 +178,7 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
     this.pictureItemLoading = true;
     this.pictureItemService
       .changeItem(this.id, type, srcItemId, dstItemId)
-      .then(
+      .subscribe(
         () => {
           this.loadPicture(() => {
             this.pictureItemLoading = false;
@@ -375,19 +375,21 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
   }
 
   public savePerspective(item: APIPictureItem) {
-    this.pictureItemService.setPerspective(
-      item.picture_id,
-      item.item_id,
-      item.type,
-      item.perspective_id
-    );
+    this.pictureItemService
+      .setPerspective(
+        item.picture_id,
+        item.item_id,
+        item.type,
+        item.perspective_id
+      )
+      .subscribe();
   }
 
   public deletePictureItem(item: APIPictureItem) {
     this.pictureItemLoading = true;
     this.pictureItemService
       .remove(item.picture_id, item.item_id, item.type)
-      .then(
+      .subscribe(
         () => {
           this.loadPicture(() => {
             this.pictureItemLoading = false;

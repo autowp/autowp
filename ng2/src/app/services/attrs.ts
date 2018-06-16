@@ -182,6 +182,7 @@ export interface APIAttrAttributePostOptions {
 export class AttrsService {
   private attributeTypes$: Observable<APIAttrAttributeType[]>;
   private zones$: Observable<APIAttrZone[]>;
+  private units$: Observable<APIAttrUnit[]>;
 
   constructor(private http: HttpClient) {
     this.attributeTypes$ = this.http
@@ -197,6 +198,11 @@ export class AttrsService {
         map(response => response.items),
         shareReplay(1)
       );
+
+    this.units$ = this.http.get<APIAttrsUnitGetResponse>('/api/attr/unit').pipe(
+      map(response => response.items),
+      shareReplay(1)
+    );
   }
 
   public getZone(id: number | string): Observable<APIAttrZone> {
@@ -236,15 +242,8 @@ export class AttrsService {
     return this.attributeTypes$;
   }
 
-  public getUnits(): Promise<APIAttrUnit[]> {
-    return new Promise<APIAttrUnit[]>((resolve, reject) => {
-      this.http
-        .get<APIAttrsUnitGetResponse>('/api/attr/unit')
-        .subscribe(
-          response => resolve(response.items),
-          response => reject(response)
-        );
-    });
+  public getUnits(): Observable<APIAttrUnit[]> {
+    return this.units$;
   }
 
   public getUserValues(

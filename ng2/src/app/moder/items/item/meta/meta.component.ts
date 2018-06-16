@@ -11,7 +11,8 @@ import { APIItem, ItemService } from '../../../../services/item';
 import { ACLService } from '../../../../services/acl.service';
 import { HttpClient } from '@angular/common/http';
 import { APIItemVehicleTypeGetResponse } from '../../../../services/api.service';
-import { Subscription } from 'rxjs';
+import { Subscription, empty, forkJoin } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-moder-items-item-meta',
@@ -99,30 +100,15 @@ export class ModerItemsItemMetaComponent
       lng: this.item.lng
     };
 
-    const promise = this.http
-      .put<void>('/api/item/' + this.item.id, data)
-      .toPromise();
-    promise.then(
-      response => {
-        this.invalidParams = {};
-
-        this.loading--;
-      },
-      response => {
-        this.invalidParams = response.error.invalid_params;
-        this.loading--;
-      }
-    );
-
-    const promises = [promise];
-
-    promises.push(
+    forkJoin(
+      this.http.put<void>('/api/item/' + this.item.id, data).pipe(
+        catchError(response => {
+          this.invalidParams = response.error.invalid_params;
+          return empty();
+        }),
+        tap(() => (this.invalidParams = {}))
+      ),
       this.itemService.setItemVehicleTypes(this.item.id, this.vehicleTypeIDs)
-    );
-
-    this.loading++;
-    Promise.all(promises).then(results => {
-      this.loading--;
-    });
+    ).subscribe(() => {}, () => {}, () => this.loading--);
   }
 }

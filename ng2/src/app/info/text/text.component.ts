@@ -98,7 +98,7 @@ export class InfoTextComponent implements OnInit, OnDestroy {
           this.next = response.next;
 
           if (this.current.user_id) {
-            this.userService.getUser(this.current.user_id, {}).then(
+            this.userService.getUser(this.current.user_id, {}).subscribe(
               user => {
                 this.current.user = user;
               },
@@ -109,7 +109,7 @@ export class InfoTextComponent implements OnInit, OnDestroy {
           }
 
           if (this.prev.user_id) {
-            this.userService.getUser(this.prev.user_id, {}).then(
+            this.userService.getUser(this.prev.user_id, {}).subscribe(
               user => {
                 this.prev.user = user;
               },

@@ -53,7 +53,7 @@ export class AppComponent implements OnInit {
 
     this.layoutParams$ = this.pageEnv.layoutParams$.asObservable();
 
-    this.auth.loadMe();
+    this.auth.loadMe().subscribe();
 
     this.auth.getUser().subscribe(user => {
       this.user = user;
@@ -86,7 +86,7 @@ export class AppComponent implements OnInit {
         this.loginForm.password,
         this.loginForm.remember
       )
-      .then(
+      .subscribe(
         () => {
           this.router.navigate(['/login/ok']);
         },
@@ -103,7 +103,7 @@ export class AppComponent implements OnInit {
   signOut(event) {
     event.preventDefault();
 
-    this.auth.signOut().then(
+    this.auth.signOut().subscribe(
       () => {},
       error => {
         console.log(error);

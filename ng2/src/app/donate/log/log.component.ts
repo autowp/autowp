@@ -38,7 +38,7 @@ export class DonateLogComponent {
 
     for (const item of this.items) {
       if (item.user_id) {
-        this.userService.getUser(item.user_id, {}).then(user => {
+        this.userService.getUser(item.user_id, {}).subscribe(user => {
           item.user = user;
         });
       }

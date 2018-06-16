@@ -1,36 +1,23 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import { sprintf } from 'sprintf-js';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { SpecService, APISpec } from '../../../services/spec';
 import { ItemService, APIItem } from '../../../services/item';
 import Notify from '../../../notify';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription, empty, from, combineLatest, of } from 'rxjs';
+import { Subscription, empty, combineLatest, of, forkJoin } from 'rxjs';
 import { PageEnvService } from '../../../services/page-env.service';
 import {
   distinctUntilChanged,
   debounceTime,
   switchMap,
-  tap,
   finalize,
-  map
+  map,
+  catchError
 } from 'rxjs/operators';
 import { APIItemVehicleTypeGetResponse } from '../../../services/api.service';
 
 // Acl.isAllowed('car', 'add', 'unauthorized');
-
-function toPlain(options: any[], deep: number): any[] {
-  const result: any[] = [];
-  for (const item of options) {
-    item.deep = deep;
-    result.push(item);
-    for (const subitem of toPlain(item.childs, deep + 1)) {
-      result.push(subitem);
-    }
-  }
-  return result;
-}
 
 interface NewItem {
   produced_exactly: boolean;
@@ -239,54 +226,44 @@ export class ModerItemsNewComponent implements OnInit, OnDestroy {
       .post<void>('/api/item', data, {
         observe: 'response'
       })
-      .subscribe(
-        response => {
-          const location = response.headers.get('Location');
-
-          this.loading++;
-          this.itemService.getItemByLocation(location, {}).subscribe(
-            item => {
-              const promises = [];
-
-              promises.push(
-                this.itemService.setItemVehicleTypes(
-                  item.id,
-                  this.vehicleTypeIDs
-                )
-              );
-
-              if (this.parent) {
-                promises.push(
-                  this.http.post<void>('/api/item-parent', {
-                    parent_id: this.parent.id,
-                    item_id: item.id
-                  })
-                );
-              }
-
-              this.loading++;
-              Promise.all(promises).then(results => {
-                this.router.navigate(['/moder/items/item', item.id]);
-                this.loading--;
-              });
-
-              this.loading--;
-            },
-            subresponse => {
-              Notify.response(subresponse);
-            }
-          );
-
-          this.loading--;
-        },
-        response => {
+      .pipe(
+        catchError(response => {
           if (response.status === 400) {
             this.invalidParams = response.error.invalid_params;
           } else {
             Notify.response(response);
           }
-          this.loading--;
-        }
+          return empty();
+        }),
+        switchMap(response =>
+          this.itemService.getItemByLocation(
+            response.headers.get('Location'),
+            {}
+          )
+        ),
+        switchMap(
+          item =>
+            forkJoin(
+              this.itemService.setItemVehicleTypes(
+                item.id,
+                this.vehicleTypeIDs
+              ),
+              this.parent
+                ? this.http.post<void>('/api/item-parent', {
+                    parent_id: this.parent.id,
+                    item_id: item.id
+                  })
+                : of(null)
+            ),
+          item => item
+        )
+      )
+      .subscribe(
+        item => {
+          this.router.navigate(['/moder/items/item', item.id]);
+        },
+        () => {},
+        () => this.loading--
       );
   }
 }

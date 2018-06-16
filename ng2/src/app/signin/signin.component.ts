@@ -34,7 +34,6 @@ export class SignInComponent {
     private http: HttpClient,
     private pageEnv: PageEnvService
   ) {
-
     this.auth.getUser().subscribe(user => (this.user = user));
 
     setTimeout(
@@ -73,8 +72,8 @@ export class SignInComponent {
 
     this.auth
       .login(this.form.login, this.form.password, this.form.remember)
-      .then(
-        user => { },
+      .subscribe(
+        user => {},
         response => {
           if (response.status === 400) {
             this.invalidParams = response.error.invalid_params;

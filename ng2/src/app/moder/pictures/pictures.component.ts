@@ -26,7 +26,7 @@ import {
   APIGetPicturesOptions
 } from '../../services/picture';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { debounceTime, map, switchMap, catchError } from 'rxjs/operators';
+import { debounceTime, map, switchMap, catchError, tap } from 'rxjs/operators';
 import { PageEnvService } from '../../services/page-env.service';
 
 interface VehicleTypeInPictures {
@@ -536,24 +536,20 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
 
   public acceptPictures() {
     for (const id of this.selected) {
-      const promises: Promise<any>[] = [];
+      const promises: Observable<void>[] = [];
       for (const picture of this.pictures) {
         if (picture.id === id) {
-          const q = this.http
-            .put<void>('/api/picture/' + picture.id, {
-              status: 'accepted'
-            })
-            .toPromise();
-
-          q.then(response => {
-            picture.status = 'accepted';
-          });
-
-          promises.push(q);
+          promises.push(
+            this.http
+              .put<void>('/api/picture/' + picture.id, {
+                status: 'accepted'
+              })
+              .pipe(tap(() => (picture.status = 'accepted')))
+          );
         }
       }
 
-      Promise.all(promises).then(() => {
+      forkJoin(promises).subscribe(() => {
         this.load();
       });
     }

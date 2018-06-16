@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { IpService } from '../../services/ip';
 import { APIUser } from '../../services/user';
 import { PageEnvService } from '../../services/page-env.service';
-import { Subscription, Observable, merge, BehaviorSubject } from 'rxjs';
+import { Subscription, Observable, BehaviorSubject, forkJoin } from 'rxjs';
 import { map, tap, switchMap, switchMapTo } from 'rxjs/operators';
 
 // Acl.inheritsRole('moder', 'unauthorized');
@@ -72,7 +72,7 @@ export class ModerTrafficComponent implements OnInit, OnDestroy {
             );
           }
 
-          return merge(...observables);
+          return forkJoin(...observables);
         })
       )
       .subscribe();

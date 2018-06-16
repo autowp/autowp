@@ -5,8 +5,9 @@ import {
   APIPaginator,
   APIImage
 } from './api.service';
-import { Observable, from, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { APIPicture } from './picture';
+import { switchMap } from 'rxjs/operators';
 
 export interface APIItemsGetResponse {
   items: APIItem[];
@@ -123,62 +124,51 @@ export interface GetItemsServiceOptions {
     type_id?: number;
   };
 }
+
 @Injectable()
 export class ItemService {
   constructor(private http: HttpClient) {}
 
-  public setItemVehicleTypes(itemId: number, ids: number[]): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.http
-        .get<APIItemVehicleTypeGetResponse>(
-          '/api/item-vehicle-type?item_id=' + itemId
-        )
-        .subscribe(
-          response => {
-            const promises: Promise<any>[] = [];
+  public setItemVehicleTypes(itemId: number, ids: number[]): Observable<void> {
+    return this.http
+      .get<APIItemVehicleTypeGetResponse>('/api/item-vehicle-type', {
+        params: {
+          item_id: itemId.toString()
+        }
+      })
+      .pipe(
+        switchMap(response => {
+          const promises: Observable<void>[] = [];
 
-            const currentIds: number[] = [];
-            for (const itemVehicleType of response.items) {
-              currentIds.push(itemVehicleType.vehicle_type_id);
-              if (!ids.includes(itemVehicleType.vehicle_type_id)) {
-                promises.push(
-                  this.http
-                    .delete<void>(
-                      '/api/item-vehicle-type/' +
-                        itemId +
-                        '/' +
-                        itemVehicleType.vehicle_type_id
-                    )
-                    .toPromise()
-                );
-              }
+          const currentIds: number[] = [];
+          for (const itemVehicleType of response.items) {
+            currentIds.push(itemVehicleType.vehicle_type_id);
+            if (!ids.includes(itemVehicleType.vehicle_type_id)) {
+              promises.push(
+                this.http.delete<void>(
+                  '/api/item-vehicle-type/' +
+                    itemId +
+                    '/' +
+                    itemVehicleType.vehicle_type_id
+                )
+              );
             }
+          }
 
-            for (const vehicleTypeId of ids) {
-              if (!currentIds.includes(vehicleTypeId)) {
-                promises.push(
-                  this.http
-                    .post<void>(
-                      '/api/item-vehicle-type/' + itemId + '/' + vehicleTypeId,
-                      {}
-                    )
-                    .toPromise()
-                );
-              }
+          for (const vehicleTypeId of ids) {
+            if (!currentIds.includes(vehicleTypeId)) {
+              promises.push(
+                this.http.post<void>(
+                  '/api/item-vehicle-type/' + itemId + '/' + vehicleTypeId,
+                  {}
+                )
+              );
             }
+          }
 
-            Promise.all(promises).then(
-              () => {
-                resolve();
-              },
-              () => {
-                reject();
-              }
-            );
-          },
-          response => reject(response)
-        );
-    });
+          return forkJoin(...promises);
+        })
+      );
   }
 
   public getItemByLocation(

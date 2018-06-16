@@ -1,8 +1,8 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable, of, empty, forkJoin } from 'rxjs';
 import {
   APIPictureItem,
   PictureItemService
@@ -11,6 +11,7 @@ import { APIItem, ItemService } from '../../../../../services/item';
 import { PageEnvService } from '../../../../../services/page-env.service';
 import Notify from '../../../../../notify';
 import { APIItemVehicleTypeGetResponse } from '../../../../../services/api.service';
+import { switchMap, catchError } from 'rxjs/operators';
 
 // Acl.isAllowed('car', 'move', 'unauthorized');
 
@@ -183,98 +184,68 @@ export class ModerItemsItemPicturesOrganizeComponent
       lng: this.newItem.lng
     };
 
-    const promises: Promise<any>[] = [
-      this.http
-        .post<void>('/api/item', data, {
-          observe: 'response'
-        })
-        .toPromise()
-    ];
-
-    if (!this.item.is_group) {
-      promises.push(
-        this.http
-          .put<void>('/api/item/' + this.item.id, {
+    forkJoin(
+      this.http.post<void>('/api/item', data, {
+        observe: 'response'
+      }),
+      this.item.is_group
+        ? of(null)
+        : this.http.put<void>('/api/item/' + this.item.id, {
             is_group: true
           })
-          .toPromise()
-      );
-    }
+    )
+      .pipe(
+        catchError(response => {
+          this.invalidParams = response.error.invalid_params;
+          this.loading--;
+          return empty();
+        }),
+        switchMap(responses =>
+          this.itemService.getItemByLocation(
+            responses[0].headers.get('Location'),
+            {}
+          )
+        ),
+        switchMap(response => {
+          const subpromises: Observable<void>[] = [
+            this.itemService.setItemVehicleTypes(
+              response.id,
+              this.vehicleTypeIDs
+            ),
+            this.http.post<void>('/api/item-parent', {
+              parent_id: this.item.id,
+              item_id: response.id
+            })
+          ];
 
-    Promise.all(promises).then(
-      (responses: any) => {
-        const location = responses[0].headers('Location');
-
-        this.loading++;
-        this.itemService.getItemByLocation(location, {}).subscribe(
-          (response: APIItem) => {
-            const subpromises: Promise<any>[] = [];
-
-            subpromises.push(
-              this.itemService.setItemVehicleTypes(
-                response.id,
-                this.vehicleTypeIDs
-              )
-            );
-
-            subpromises.push(
-              this.http
-                .post<void>('/api/item-parent', {
-                  parent_id: this.item.id,
-                  item_id: response.id
-                })
-                .toPromise()
-            );
-
-            for (const picture of this.pictures) {
-              if (picture.selected) {
-                subpromises.push(
-                  this.http
-                    .put<void>(
-                      '/api/picture-item/' +
-                        picture.picture_id +
-                        '/' +
-                        picture.item_id +
-                        '/' +
-                        picture.type,
-                      {
-                        item_id: response.id
-                      }
-                    )
-                    .toPromise()
-                    .then(
-                      () => {},
-                      subresponse => {
-                        Notify.response(subresponse);
-                      }
-                    )
-                );
-              }
+          for (const picture of this.pictures) {
+            if (picture.selected) {
+              subpromises.push(
+                this.http.put<void>(
+                  '/api/picture-item/' +
+                    picture.picture_id +
+                    '/' +
+                    picture.item_id +
+                    '/' +
+                    picture.type,
+                  {
+                    item_id: response.id
+                  }
+                )
+              );
             }
-
-            this.loading++;
-            Promise.all(subpromises).then(results => {
-              this.router.navigate(['/moder/items/item', response.id], {
-                queryParams: {
-                  tab: 'pictures'
-                }
-              });
-              this.loading--;
-            });
-
-            this.loading--;
-          },
-          subresponse => {
-            Notify.response(subresponse);
           }
-        );
 
+          return forkJoin(...subpromises);
+        }, response => response)
+      )
+      .subscribe(item => {
         this.loading--;
-      },
-      response => {
-        this.invalidParams = response.error.invalid_params;
-        this.loading--;
-      }
-    );
+        this.router.navigate(['/moder/items/item', item.id], {
+          queryParams: {
+            tab: 'pictures'
+          }
+        });
+      });
   }
 }

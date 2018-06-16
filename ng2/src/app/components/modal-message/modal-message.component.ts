@@ -26,7 +26,7 @@ export class ModalMessageComponent implements OnInit {
     this.sending = true;
     this.sent = false;
 
-    this.messageService.send(this.userId, this.text).then(
+    this.messageService.send(this.userId, this.text).subscribe(
       () => {
         this.sending = false;
         this.sent = true;

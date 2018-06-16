@@ -75,6 +75,7 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
     name: ''
   };
   private $listOptionsChange = new BehaviorSubject<null>(null);
+  private unitsSub: Subscription;
 
   constructor(
     private http: HttpClient,
@@ -88,7 +89,7 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.attrsService.getUnits().then(
+    this.unitsSub = this.attrsService.getUnits().subscribe(
       items => {
         this.unitOptions = this.unitOptionsDefaults.slice(0);
         for (const item of items) {
@@ -183,6 +184,7 @@ export class ModerAttrsAttributeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
+    this.unitsSub.unsubscribe();
   }
 
   public saveAttribute() {

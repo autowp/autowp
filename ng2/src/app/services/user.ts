@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIPaginator, APIImage } from './api.service';
-import Notify from '../notify';
-import { Observable, from } from 'rxjs';
+import { Observable, from, forkJoin } from 'rxjs';
 import { APIAccount } from './account.service';
-import { map } from 'rxjs/internal/operators/map';
+import { tap, map } from 'rxjs/operators';
 
 export interface APIGetUserOptions {
   fields?: string;
@@ -62,16 +61,13 @@ export class APIUser {
 @Injectable()
 export class UserService {
   private cache: Map<number, APIUser> = new Map<number, APIUser>();
-  private promises: Map<number, Promise<void>> = new Map<
-    number,
-    Promise<void>
-  >();
+  private promises = new Map<number, Observable<void>>();
 
   constructor(private http: HttpClient) {}
 
-  private queryUsers(ids: number[]): Promise<any> {
+  private queryUsers(ids: number[]): Observable<any> {
     const toRequest: number[] = [];
-    const waitFor: Promise<void>[] = [];
+    const waitFor: Observable<void>[] = [];
     for (const id of ids) {
       const oldUser = this.cache.get(id);
       if (oldUser !== undefined) {
@@ -86,23 +82,17 @@ export class UserService {
     }
 
     if (toRequest.length > 0) {
-      const promise = new Promise<void>((resolve, reject) => {
-        this.get({
-          id: toRequest,
-          limit: toRequest.length
-        }).subscribe(
-          response => {
-            for (const item of response.items) {
-              this.cache.set(item.id, item);
-            }
-            resolve();
-          },
-          response => {
-            Notify.response(response);
-            reject();
+      const promise = this.get({
+        id: toRequest,
+        limit: toRequest.length
+      }).pipe(
+        tap(response => {
+          for (const item of response.items) {
+            this.cache.set(item.id, item);
           }
-        );
-      });
+        }),
+        map(() => null)
+      );
 
       waitFor.push(promise);
 
@@ -111,75 +101,58 @@ export class UserService {
       }
     }
 
-    return Promise.all(waitFor);
+    return forkJoin(waitFor);
   }
 
-  public getUsers(ids: number[]): Promise<APIUser[]> {
-    return new Promise<APIUser[]>((resolve, reject) => {
-      this.queryUsers(ids).then(
-        () => {
-          const result: APIUser[] = [];
-          for (const id of ids) {
-            const user = this.cache.get(id);
-            if (user === undefined) {
-              reject();
-              return;
-            }
-            result.push(user);
+  public getUsers(ids: number[]): Observable<APIUser[]> {
+    return this.queryUsers(ids).pipe(
+      map(() => {
+        const result: APIUser[] = [];
+        for (const id of ids) {
+          const user = this.cache.get(id);
+          if (user === undefined) {
+            throw new Error('Failed to query user ' + id);
           }
-          resolve(result);
-        },
-        () => {
-          reject();
+          result.push(user);
         }
-      );
-    });
+        return result;
+      })
+    );
   }
 
-  public getUserMap(ids: number[]): Promise<Map<number, APIUser>> {
-    return new Promise<Map<number, APIUser>>((resolve, reject) => {
-      this.queryUsers(ids).then(
-        () => {
-          const result: Map<number, APIUser> = new Map<number, APIUser>();
-          for (const id of ids) {
-            const user = this.cache.get(id);
-            if (user === undefined) {
-              reject('Failed to query user ' + id);
-              return;
-            }
-            result.set(id, user);
+  public getUserMap(ids: number[]): Observable<Map<number, APIUser>> {
+    return this.queryUsers(ids).pipe(
+      map(() => {
+        const result = new Map<number, APIUser>();
+        for (const id of ids) {
+          const user = this.cache.get(id);
+          if (user === undefined) {
+            throw new Error('Failed to query user ' + id);
           }
-          resolve(result);
-        },
-        () => reject('Failed to query users ' + ids.join(', '))
-      );
-    });
+          result.set(id, user);
+        }
+        return result;
+      })
+    );
   }
 
-  public getUser(id: number, options: APIGetUserOptions): Promise<APIUser> {
-    return new Promise<APIUser>((resolve, reject) => {
-      const params = this.converUserOptions(options);
+  public getUser(id: number, options: APIGetUserOptions): Observable<APIUser> {
+    const params = this.converUserOptions(options);
 
-      if (Object.keys(params).length) {
-        this.http
-          .get<APIUser>('/api/user/' + id, {
-            params: params
-          })
-          .subscribe(user => resolve(user), error => reject(error));
-        return;
-      }
+    if (Object.keys(params).length) {
+      return this.http.get<APIUser>('/api/user/' + id, {
+        params: params
+      });
+    }
 
-      this.getUsers([id]).then(
-        (users: APIUser[]) => {
-          if (users.length > 0) {
-            resolve(users[0]);
-            return;
-          }
-          reject();
-        },
-        () => reject()
-      );
-    });
+    return this.getUsers([id]).pipe(
+      map(users => {
+        if (users.length > 0) {
+          return users[0];
+        }
+        return null as APIUser;
+      })
+    );
   }
 
   private converUserOptions(

@@ -34,7 +34,7 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
     private pageService: PageService,
     private auth: AuthService,
     private pictureService: PictureService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.sub = combineLatest(
@@ -165,7 +165,7 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
 
           for (const item of this.items) {
             if (item.pageId) {
-              this.pageService.isActive(item.pageId).then(
+              this.pageService.isActive(item.pageId).subscribe(
                 active => {
                   item.active = active;
                 },

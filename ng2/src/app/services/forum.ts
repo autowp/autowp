@@ -10,7 +10,8 @@ import {
   share,
   publish,
   distinctUntilChanged,
-  shareReplay
+  shareReplay,
+  map
 } from 'rxjs/operators';
 
 export interface APIForumGetTopicOptions {
@@ -123,25 +124,21 @@ export class ForumService {
   }
 
   public getMessageStateParams(
-    message_id: number
-  ): Promise<MessageStateParams> {
-    return new Promise<MessageStateParams>((resolve, reject) => {
-      this.http
-        .get<APIComment>('/api/comment/' + message_id, {
-          params: {
-            fields: 'page',
-            limit: LIMIT.toString()
-          }
-        })
-        .subscribe(
-          response =>
-            resolve({
-              topic_id: response.item_id,
-              page: response.page
-            }),
-          response => reject(response)
-        );
-    });
+    messageID: number
+  ): Observable<MessageStateParams> {
+    return this.http
+      .get<APIComment>('/api/comment/' + messageID, {
+        params: {
+          fields: 'page',
+          limit: LIMIT.toString()
+        }
+      })
+      .pipe(
+        map(response => ({
+          topic_id: response.item_id,
+          page: response.page
+        }))
+      );
   }
 
   public getThemes(

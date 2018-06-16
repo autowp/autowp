@@ -1,7 +1,7 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../../../services/api.service';
-import { Subscription } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 import { PictureItemService } from '../../../../services/picture-item';
 import { ItemService, APIItem } from '../../../../services/item';
 import { chunk } from '../../../../chunk';
@@ -12,6 +12,7 @@ import {
   APIItemParent
 } from '../../../../services/item-parent';
 import { PageEnvService } from '../../../../services/page-env.service';
+import { switchMap } from 'rxjs/operators';
 
 // Acl.inheritsRole( 'moder', 'unauthorized' );
 
@@ -229,30 +230,36 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
   }
 
   public selectItem(selection: PictureItemMoveSelection) {
-    console.log('selectItem', selection, this.src_item_id, this.src_type);
     if (this.src_item_id && this.src_type) {
       this.pictureItemService
         .changeItem(this.id, this.src_type, this.src_item_id, selection.itemId)
-        .then(() => {
-          if (selection.perspectiveId) {
-            this.pictureItemService
-              .setPerspective(this.id, selection.itemId, this.src_type, selection.perspectiveId)
-              .then(
-                () => this.router.navigate(['/moder/pictures', this.id]),
-                response => Notify.response(response)
-              );
-          } else {
-            this.router.navigate(['/moder/pictures', this.id]);
-          }
+        .pipe(
+          switchMap(() => {
+            if (!selection.perspectiveId) {
+              return of(null);
+            }
+
+            return this.pictureItemService.setPerspective(
+              this.id,
+              selection.itemId,
+              this.src_type,
+              selection.perspectiveId
+            );
+          })
+        )
+        .subscribe(() => {
+          this.router.navigate(['/moder/pictures', this.id]);
         });
     } else {
       const data = {
         perspective_id: selection.perspectiveId ? selection.perspectiveId : null
       };
 
-      this.pictureItemService.create(this.id, selection.itemId, selection.type, data).then(() => {
-        this.router.navigate(['/moder/pictures', this.id]);
-      });
+      this.pictureItemService
+        .create(this.id, selection.itemId, selection.type, data)
+        .subscribe(() => {
+          this.router.navigate(['/moder/pictures', this.id]);
+        });
     }
 
     return false;
