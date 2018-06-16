@@ -20,7 +20,7 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.routeSub = this.route.params.subscribe(params => {
-      this.forumService.getMessageStateParams(params.message_id).then(
+      this.forumService.getMessageStateParams(params.message_id).subscribe(
         message => {
           this.router.navigate(['/forums/topic', message.topic_id], {
             queryParams: {

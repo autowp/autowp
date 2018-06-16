@@ -78,7 +78,7 @@ export class ForumsMoveMessageComponent implements OnInit, OnDestroy {
       })
       .subscribe(
         response => {
-          this.forumService.getMessageStateParams(this.messageID).then(
+          this.forumService.getMessageStateParams(this.messageID).subscribe(
             params => {
               this.router.navigate(['/forums/topic', params.topic_id], {
                 queryParams: {

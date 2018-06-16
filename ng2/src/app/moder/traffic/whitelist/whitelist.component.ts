@@ -51,7 +51,7 @@ export class ModerTrafficWhitelistComponent {
           this.items = response.items;
 
           /*for(const item of $scope.items) {
-                ipService.getHostByAddr(item.ip).then((hostname) => {
+                ipService.getHostByAddr(item.ip).subscribe((hostname) => {
                     item.hostname = hostname;
                 });
             }*/
@@ -71,7 +71,7 @@ export class ModerTrafficWhitelistComponent {
           this.items.splice(index, 1);
         }
         /*for(const item of $scope.items) {
-                ipService.getHostByAddr(item.ip).then((hostname) => {
+                ipService.getHostByAddr(item.ip).subscribe((hostname) => {
                     item.hostname = hostname;
                 });
             }*/
