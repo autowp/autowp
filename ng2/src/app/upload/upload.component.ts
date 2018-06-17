@@ -54,7 +54,7 @@ export class UploadComponent implements OnInit, OnDestroy {
     private pictureService: PictureService,
     public auth: AuthService,
     private pageEnv: PageEnvService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     setTimeout(
@@ -228,13 +228,6 @@ export class UploadComponent implements OnInit, OnDestroy {
           return empty();
         })
       );
-
-    /* ,
-      evt => {
-        progress.percentage = Math.round(100.0 * evt.loaded / evt.total);
-      }
-
-    return promise;*/
   }
 
   public crop(picture: APIPicture) {

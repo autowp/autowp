@@ -213,46 +213,6 @@ export class AccountProfileComponent implements OnInit, OnDestroy {
     );
   }
 
-  /*public uploadFiles(file: any, errFiles: any) {
-    this.file = file;
-    if (file) {
-      this.photoInvalidParams = {};
-      file.progress = 0;
-
-      file.upload = this.Upload.upload({
-        url: '/api/user/me/photo',
-        data: { file: file }
-      });
-
-      file.upload.then(
-        (response: any) => {
-          file.progress = 0;
-          file.result = response;
-
-
-        },
-        response => {
-          if (response.status > 0) {
-            if (response.status === 400) {
-              this.photoInvalidParams = response.error.invalid_params;
-            } else {
-              Notify.response(response);
-            }
-          }
-          file.progress = 0;
-        },
-        (evt: any) => {
-          file.progress = Math.min(
-            100,
-            Math.round(100.0 * evt.loaded / evt.total)
-          );
-        }
-      );
-    }
-
-    // account/profile/photo/saved
-  }*/
-
   public showFileSelectDialog() {
     this.photoInvalidParams = {};
     this.fileInput.nativeElement.click();

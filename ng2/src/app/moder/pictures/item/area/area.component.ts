@@ -88,7 +88,7 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
       })
     ).subscribe(
       data => {
-        const area = data[1].data.area;
+        const area = data[1].area;
 
         const response = data[0];
 

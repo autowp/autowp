@@ -2,14 +2,16 @@
   <app-markdown *ngIf="canLogo" [markdown]="'moder/brands/logo/description'|translate"></app-markdown>
   <img [src]="item.logo.src" style="max-width:100%" *ngIf="item.logo" />
   <div *ngIf="canLogo">
-    <form method="post" (submit)="uploadLogo()">
-      <div class="form-group">
-        <input type="file" name="logo" id="logo-upload" class="form-control" />
+    <div class="form-group">
+      <input type="file" #input name="file" class="form-control" (change)="onChange($event)" accept="image/*" />
+    </div>
+    <ngb-progressbar class="d-block mb-2" [type]="progress.success ? 'success' : progress.failed ? 'danger' : 'info'" [value]="progress.percentage"
+      *ngIf="progress && !progress.success">
+      <div>
+        <span class="d-inline file-name" [textContent]="progress.filename">: </span>
+        <span class="d-inline percentage" [textContent]="progress.percentage + '% '" *ngIf="progress.percentage < 100"></span>
+        <span class="d-inline" *ngFor="let message of progress.invalidParams | invalidParams : 'file'" [textContent]="message + ' '"></span>
       </div>
-      <button type="submit" class="btn btn-primary" translate>submit</button>
-      <span [hidden]="loading <= 0">
-        <i class="fa fa-spinner fa-spin fa-fw"></i>
-      </span>
-    </form>
+    </ngb-progressbar>
   </div>
 </div>

@@ -1718,6 +1718,39 @@ return [
                 ]
             ],
         ],
+        'api_item_logo_put' => [
+            'file' => [
+                'required'   => true,
+                'validators' => [
+                    [
+                        'name' => 'FileSize',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'max' => 10 * 1024 * 1024
+                        ]
+                    ],
+                    [
+                        'name' => 'FileIsImage',
+                        'break_chain_on_failure' => true,
+                    ],
+                    [
+                        'name' => 'FileMimeType',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'mimeType' => 'image/png'
+                        ]
+                    ],
+                    [
+                        'name' => 'FileImageSize',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'minWidth'  => 50,
+                            'minHeight' => 50
+                        ]
+                    ],
+                ]
+            ]
+        ],
         'api_item_parent_language_put' => [
             'name' => [
                 'required' => false,

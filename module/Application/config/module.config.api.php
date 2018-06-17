@@ -1183,12 +1183,12 @@ return [
                                                     ]
                                                 ]
                                             ],
-                                            'put' => [
+                                            'post' => [
                                                 'type' => 'Method',
                                                 'options' => [
-                                                    'verb' => 'put',
+                                                    'verb' => 'post',
                                                     'defaults' => [
-                                                        'action' => 'put-logo'
+                                                        'action' => 'post-logo'
                                                     ]
                                                 ]
                                             ],

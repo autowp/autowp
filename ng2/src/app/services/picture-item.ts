@@ -35,6 +35,12 @@ export interface APIPictureItem {
   type: number;
   perspective_id: number;
   item: APIItem;
+  area: {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  };
 }
 
 @Injectable()
