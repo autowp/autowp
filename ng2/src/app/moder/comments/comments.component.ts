@@ -1,14 +1,19 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import * as $ from 'jquery';
 import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../services/api.service';
-import { ItemService, GetItemsServiceOptions } from '../../services/item';
+import {
+  ItemService,
+  GetItemsServiceOptions,
+  APIItem
+} from '../../services/item';
 import Notify from '../../notify';
-import { UserService } from '../../services/user';
-import { Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { UserService, APIUser } from '../../services/user';
+import { Subscription, Observable, empty, of } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommentService } from '../../services/comment';
 import { PageEnvService } from '../../services/page-env.service';
+import { switchMap, debounceTime, catchError, map } from 'rxjs/operators';
+import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-moder-comments',
@@ -20,10 +25,15 @@ export class ModerCommentsComponent implements OnInit, OnDestroy {
   public loading = 0;
   public comments = [];
   public paginator: APIPaginator;
-  public user: string | number;
-  public moderator_attention: any;
-  public pictures_of_item_id: number | null;
-  public page: number;
+  public moderatorAttention: any;
+
+  public itemID: number;
+  public itemQuery = '';
+  public itemsDataSource: (text$: Observable<string>) => Observable<any[]>;
+
+  public userID: number;
+  public userQuery = '';
+  public usersDataSource: (text$: Observable<string>) => Observable<any[]>;
 
   constructor(
     private http: HttpClient,
@@ -31,8 +41,70 @@ export class ModerCommentsComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private route: ActivatedRoute,
     private commentService: CommentService,
-    private pageEnv: PageEnvService
+    private pageEnv: PageEnvService,
+    private router: Router
   ) {
+    this.itemsDataSource = (text$: Observable<string>) =>
+      text$.pipe(
+        debounceTime(200),
+        switchMap(query => {
+          if (query === '') {
+            return of([]);
+          }
+
+          const params: GetItemsServiceOptions = {
+            limit: 10,
+            fields: 'name_text,name_html',
+            id: 0,
+            name: ''
+          };
+          if (query.substring(0, 1) === '#') {
+            params.id = parseInt(query.substring(1), 10);
+          } else {
+            params.name = '%' + query + '%';
+          }
+
+          return this.itemService.getItems(params).pipe(
+            catchError((err, caught) => {
+              console.log(err, caught);
+              return empty();
+            }),
+            map(response => response.items)
+          );
+        })
+      );
+
+    this.usersDataSource = (text$: Observable<string>) =>
+      text$.pipe(
+        debounceTime(200),
+        switchMap(query => {
+          if (query === '') {
+            return of([]);
+          }
+
+          const params = {
+            limit: 10,
+            id: [],
+            search: ''
+          };
+          if (query.substring(0, 1) === '#') {
+            params.id.push(parseInt(query.substring(1), 10));
+          } else {
+            params.search = query;
+          }
+
+          return this.userService.get(params).pipe(
+            catchError((err, caught) => {
+              console.log(err, caught);
+              return empty();
+            }),
+            map(response => response.items)
+          );
+        })
+      );
+  }
+
+  ngOnInit(): void {
     setTimeout(
       () =>
         this.pageEnv.set({
@@ -45,154 +117,30 @@ export class ModerCommentsComponent implements OnInit, OnDestroy {
         }),
       0
     );
-  }
 
-  ngOnInit(): void {
-    /* const $userIdElement = $(this.$element[0]).find(':input[name=user_id]');
-    $userIdElement.val(this.user ? '#' + this.user : '');
-    let userIdLastValue = $userIdElement.val();
-    $userIdElement
-      .typeahead(
-        {},
-        {
-          display: (item: any) => {
-            return item.name;
-          },
-          templates: {
-            suggestion: (item: any) => {
-              return $('<div class="tt-suggestion tt-selectable"></div>').text(
-                item.name
-              );
-            }
-          },
-          source: (
-            query: string,
-            syncResults: Function,
-            asyncResults: Function
-          ) => {
-            const params = {
-              limit: 10,
-              id: [],
-              search: ''
-            };
-            if (query.substring(0, 1) === '#') {
-              params.id.push(parseInt(query.substring(1), 10));
-            } else {
-              params.search = query;
-            }
+    this.querySub = this.route.queryParams
+      .pipe(
+        switchMap(params => {
+          this.userID = params.user_id;
+          this.moderatorAttention =
+            params.moderator_attention === undefined
+              ? null
+              : +params.moderator_attention;
+          this.itemID = params.pictures_of_item_id;
 
-            this.userService.get(params).subscribe(response => {
-              asyncResults(response.items);
-            });
-          }
-        }
+          this.loading++;
+
+          return this.commentService.getComments({
+            user: this.userID,
+            moderator_attention: this.moderatorAttention,
+            pictures_of_item_id: this.itemID ? this.itemID : 0,
+            page: params.page,
+            order: 'date_desc',
+            limit: 30,
+            fields: 'preview,user,is_new,status,url'
+          });
+        })
       )
-      .on('typeahead:select', (ev: any, item: any) => {
-        userIdLastValue = item.name;
-        this.user = item.id;
-        this.load();
-      })
-      .bind('change blur', (ev: any, item: any) => {
-        const curValue = $(this).val();
-        if (userIdLastValue && !curValue) {
-          this.user = null;
-          this.load();
-        }
-        userIdLastValue = curValue;
-      });
-
-    const $itemIdElement = $($element[0]).find(
-      ':input[name=pictures_of_item_id]'
-    );
-    $itemIdElement.val(
-      this.pictures_of_item_id ? '#' + this.pictures_of_item_id : ''
-    );
-    let itemIdLastValue = $itemIdElement.val();
-    $itemIdElement
-      .on('typeahead:select', (ev: any, item: any) => {
-        itemIdLastValue = item.name_text;
-        this.pictures_of_item_id = item.id;
-        this.load();
-      })
-      .bind('change blur', (ev: any, item: any) => {
-        const curValue = $(this).val();
-        if (itemIdLastValue && !curValue) {
-          this.pictures_of_item_id = null;
-          this.load();
-        }
-        itemIdLastValue = curValue;
-      })
-      .typeahead(
-        {},
-        {
-          display: (item: any) => {
-            return item.name_text;
-          },
-          templates: {
-            suggestion: (item: any) => {
-              return $('<div class="tt-suggestion tt-selectable"></div>').html(
-                item.name_html
-              );
-            }
-          },
-          source: (
-            query: string,
-            syncResults: Function,
-            asyncResults: Function
-          ) => {
-            const params: GetItemsServiceOptions = {
-              limit: 10,
-              fields: 'name_text,name_html',
-              id: 0,
-              name: ''
-            };
-            if (query.substring(0, 1) === '#') {
-              params.id = parseInt(query.substring(1), 10);
-            } else {
-              params.name = '%' + query + '%';
-            }
-            this.itemService.getItems(params).subscribe(response => {
-              asyncResults(response.items);
-            });
-          }
-        }
-      );*/
-
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.user = params.user;
-      this.moderator_attention = params.moderator_attention;
-      this.pictures_of_item_id = params.pictures_of_item_id;
-      this.page = params.page;
-
-      this.load();
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.querySub.unsubscribe();
-  }
-
-  public load() {
-    this.loading++;
-
-    /*this.$state.go(STATE_NAME, params, {
-      notify: false,
-      reload: false,
-      location: 'replace'
-    });*/
-
-    this.commentService
-      .getComments({
-        user: this.user,
-        moderator_attention: this.moderator_attention,
-        pictures_of_item_id: this.pictures_of_item_id
-          ? this.pictures_of_item_id
-          : 0,
-        page: this.page,
-        order: 'date_desc',
-        limit: 30,
-        fields: 'preview,user,is_new,status,url'
-      })
       .subscribe(
         response => {
           this.comments = response.items;
@@ -204,5 +152,65 @@ export class ModerCommentsComponent implements OnInit, OnDestroy {
           this.loading--;
         }
       );
+  }
+
+  ngOnDestroy(): void {
+    this.querySub.unsubscribe();
+  }
+
+  public setModeratorAttention() {
+    this.router.navigate([], {
+      queryParams: {
+        page: null,
+        moderator_attention: this.moderatorAttention
+      },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  public itemFormatter(x: APIItem) {
+    return x.name_text;
+  }
+
+  public itemOnSelect(e: NgbTypeaheadSelectItemEvent): void {
+    this.router.navigate([], {
+      queryParamsHandling: 'merge',
+      queryParams: {
+        pictures_of_item_id: e.item.id
+      }
+    });
+  }
+
+  public clearItem(): void {
+    this.itemQuery = '';
+    this.router.navigate([], {
+      queryParamsHandling: 'merge',
+      queryParams: {
+        pictures_of_item_id: null
+      }
+    });
+  }
+
+  public userFormatter(x: APIUser) {
+    return x.name;
+  }
+
+  public userOnSelect(e: NgbTypeaheadSelectItemEvent): void {
+    this.router.navigate([], {
+      queryParamsHandling: 'merge',
+      queryParams: {
+        user_id: e.item.id
+      }
+    });
+  }
+
+  public clearUser(): void {
+    this.userQuery = '';
+    this.router.navigate([], {
+      queryParamsHandling: 'merge',
+      queryParams: {
+        user_id: null
+      }
+    });
   }
 }
