@@ -241,8 +241,8 @@ export class ItemMetaFormComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public coordsChanged() {
-    const lat = this.item.lat;
-    const lng = this.item.lng;
+    const lat = this.item ? this.item.lat : NaN;
+    const lng = this.item ? this.item.lng : NaN;
 
     const ll = (isNaN(lat) || isNaN(lng)) ? null : latLng([lat, lng]);
     if (ll) {

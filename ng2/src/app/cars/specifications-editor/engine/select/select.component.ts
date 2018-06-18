@@ -1,17 +1,28 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subscription, BehaviorSubject } from 'rxjs';
+import { Subscription, BehaviorSubject, combineLatest, of } from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
-import { APIItem, ItemService } from '../../../../services/item';
+import {
+  APIItem,
+  ItemService,
+  APIItemsGetResponse
+} from '../../../../services/item';
 import { APIPaginator } from '../../../../services/api.service';
 import {
   APIItemParent,
-  ItemParentService
+  ItemParentService,
+  APIItemParentGetResponse
 } from '../../../../services/item-parent';
 import { PageEnvService } from '../../../../services/page-env.service';
 import Notify from '../../../../notify';
 import { chunk } from '../../../../chunk';
-import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  switchMap,
+  tap
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-cars-engine-select',
@@ -63,94 +74,84 @@ export class CarsEngineSelectComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.querySub = this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(
+          params =>
+            this.itemService.getItem(params.item_id, {
+              fields: 'name_html,name_text'
+            }),
+          (params, item) => ({ params, item })
+        ),
+        tap(data => {
+          this.item = data.item;
+          this.brandId = data.params.brand_id;
 
-    this.search$.pipe(
-      map(str => str.trim()),
-      distinctUntilChanged(),
-      debounceTime(50)
-    ).subscribe(search => {
-      this.loadBrands(search);
-    });
-
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.itemService
-        .getItem(params.item_id, {
-          fields: 'name_html,name_text'
-        })
-        .subscribe(
-          item => {
-            this.item = item;
-
-            this.pageEnv.set({
-              layout: {
-                needRight: false
-              },
-              name: 'page/102/name',
-              pageId: 102,
-              args: {
-                CAR_NAME: this.item.name_text
-              }
-            });
-
-            if (params.brand_id) {
-              this.brandId = params.brand_id;
-              this.itemParentService
-                .getItems({
+          this.pageEnv.set({
+            layout: {
+              needRight: false
+            },
+            name: 'page/102/name',
+            pageId: 102,
+            args: {
+              CAR_NAME: data.item.name_text
+            }
+          });
+        }),
+        switchMap(data => {
+          return combineLatest(
+            data.params.brand_id
+              ? this.itemParentService.getItems({
                   limit: 500,
                   fields: 'item.name_html,item.childs_count',
-                  parent_id: params.brand_id,
+                  parent_id: data.params.brand_id,
                   item_type_id: 2,
-                  page: params.page
+                  page: data.params.page
                 })
-                .subscribe(
-                  response => {
-                    this.items = response.items;
-                    this.paginator = response.paginator;
-                  },
-                  response => {
-                    Notify.response(response);
-                  }
-                );
-            } else {
-              this.brandId = null;
-              this.loadBrands('');
-            }
-          },
-          response => {
-            Notify.response(response);
+              : of(null as APIItemParentGetResponse),
+            data.params.brand_id
+              ? of(null as APIItemsGetResponse)
+              : this.search$.pipe(
+                  map(str => str.trim()),
+                  distinctUntilChanged(),
+                  debounceTime(50),
+                  switchMap(search =>
+                    this.itemService.getItems({
+                      type_id: 5,
+                      order: 'name',
+                      limit: 500,
+                      fields: 'name_only',
+                      have_childs_of_type: 2,
+                      name: search ? '%' + search + '%' : null
+                    })
+                  )
+                ),
+            (items, brands) => ({ items, brands })
+          );
+        })
+      )
+      .subscribe(
+        data => {
+          console.log('this.brandId', this.brandId);
+          if (this.brandId) {
+            this.items = data.items.items;
+            this.paginator = data.items.paginator;
+            this.brands = [];
+          } else {
+            this.items = [];
+            this.brands = chunk<APIItem>(data.brands.items, 6);
+            this.paginator = data.brands.paginator;
           }
-        );
-    });
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
   }
 
   ngOnDestroy(): void {
     this.querySub.unsubscribe();
-  }
-
-  private loadBrands(search: string) {
-    this.loading++;
-
-    this.itemService
-      .getItems({
-        type_id: 5,
-        order: 'name',
-        limit: 500,
-        fields: 'name_only',
-        have_childs_of_type: 2,
-        name: search ? '%' + search + '%' : null
-      })
-      .subscribe(
-        result => {
-          this.brands = chunk<APIItem>(result.items, 6);
-          this.paginator = result.paginator;
-          this.loading--;
-        },
-        response => {
-          if (response.status !== -1) {
-            Notify.response(response);
-          }
-          this.loading--;
-        }
-      );
   }
 }

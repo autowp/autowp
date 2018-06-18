@@ -8,6 +8,7 @@ import { APIUser } from '../services/user';
 import { APIItem } from '../services/item';
 import { APIPicture } from '../services/picture';
 import { PageEnvService } from '../services/page-env.service';
+import { distinctUntilChanged, debounceTime, switchMap } from 'rxjs/operators';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -53,46 +54,49 @@ export class LogComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.querySub = this.route.queryParams.subscribe(params => {
+    this.querySub = this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => {
+          const qParams: { [param: string]: string } = {
+            fields: 'pictures.name_html,items.name_html,user'
+          };
 
-      const qParams: { [param: string]: string } = {};
-
-      if (params.article_id) {
-        qParams.article_id = params.article_id;
-      }
-
-      if (params.item_id) {
-        qParams.item_id = params.item_id;
-      }
-
-      if (params.picture_id) {
-        qParams.picture_id = params.picture_id;
-      }
-
-      if (params.page) {
-        qParams.page = params.page;
-      }
-
-      if (params.user_id) {
-        qParams.user_id = params.user_id;
-      }
-
-      qParams.fields = 'pictures.name_html,items.name_html,user';
-
-      this.http
-        .get<APILogGetResponse>('/api/log', {
-          params: qParams
-        })
-        .subscribe(
-          response => {
-            this.items = response.items;
-            this.paginator = response.paginator;
-          },
-          response => {
-            Notify.response(response);
+          if (params.article_id) {
+            qParams.article_id = params.article_id;
           }
-        );
-    });
+
+          if (params.item_id) {
+            qParams.item_id = params.item_id;
+          }
+
+          if (params.picture_id) {
+            qParams.picture_id = params.picture_id;
+          }
+
+          if (params.page) {
+            qParams.page = params.page;
+          }
+
+          if (params.user_id) {
+            qParams.user_id = params.user_id;
+          }
+
+          return this.http.get<APILogGetResponse>('/api/log', {
+            params: qParams
+          });
+        })
+      )
+      .subscribe(
+        response => {
+          this.items = response.items;
+          this.paginator = response.paginator;
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
   }
 
   ngOnDestroy(): void {

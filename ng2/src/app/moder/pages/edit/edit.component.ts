@@ -8,6 +8,7 @@ import {
   APIPage
 } from '../../../services/page';
 import { PageEnvService } from '../../../services/page-env.service';
+import { switchMap, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 
 // Acl.inheritsRole('pages-moder', 'unauthorized');
 
@@ -48,14 +49,18 @@ export class ModerPagesEditComponent implements OnInit, OnDestroy {
       this.pages = this.pageService.toPlainArray(response.items, 0);
     });
 
-    this.routeSub = this.route.queryParams.subscribe(params => {
-      this.pageService.getPage(params.id).subscribe(
+    this.routeSub = this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => this.pageService.getPage(params.id))
+      )
+      .subscribe(
         response => (this.item = response),
         () => {
           this.router.navigate(['/error-404']);
         }
       );
-    });
   }
 
   ngOnDestroy(): void {

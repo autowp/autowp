@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { tap } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 import { PictureService } from '../../services/picture';
+import { PageEnvService } from '../../services/page-env.service';
 
 interface SidebarItem {
   pageId?: number;
@@ -33,7 +34,8 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
     private forumService: ForumService,
     private pageService: PageService,
     private auth: AuthService,
-    private pictureService: PictureService
+    private pictureService: PictureService,
+    private pageEnv: PageEnvService
   ) {}
 
   ngOnInit(): void {
@@ -165,7 +167,7 @@ export class AccountSidebarComponent implements OnInit, OnDestroy {
 
           for (const item of this.items) {
             if (item.pageId) {
-              this.pageService.isActive(item.pageId).subscribe(
+              this.pageEnv.isActive(item.pageId).subscribe(
                 active => {
                   item.active = active;
                 },

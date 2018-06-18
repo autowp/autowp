@@ -29,7 +29,6 @@ export class ThumbnailComponent implements OnInit, OnDestroy {
   @Input() selectable = false;
   @Output() selected = new EventEmitter<boolean>();
 
-  // public onPictureSelect: ($event: any, picture: APIPicture) => void;
   public perspectiveOptions: APIPerspective[] = [];
   public isModer = false;
   private sub: Subscription;
@@ -55,17 +54,21 @@ export class ThumbnailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
-    this.pserspectiveSub.unsubscribe();
+    if (this.pserspectiveSub) {
+      this.pserspectiveSub.unsubscribe();
+    }
   }
 
   public savePerspective() {
     if (this.picture.perspective_item) {
-      this.pictureItemService.setPerspective(
-        this.picture.id,
-        this.picture.perspective_item.item_id,
-        this.picture.perspective_item.type,
-        this.picture.perspective_item.perspective_id
-      ).subscribe();
+      this.pictureItemService
+        .setPerspective(
+          this.picture.id,
+          this.picture.perspective_item.item_id,
+          this.picture.perspective_item.type,
+          this.picture.perspective_item.perspective_id
+        )
+        .subscribe();
     }
   }
 

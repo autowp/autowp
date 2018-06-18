@@ -18,7 +18,14 @@ import {
 } from '../../services/item';
 import { chunkBy } from '../../chunk';
 import { UserService, APIUser } from '../../services/user';
-import { Subscription, Observable, of, empty, forkJoin } from 'rxjs';
+import {
+  Subscription,
+  Observable,
+  of,
+  empty,
+  forkJoin,
+  BehaviorSubject
+} from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   APIPicture,
@@ -26,7 +33,15 @@ import {
   APIGetPicturesOptions
 } from '../../services/picture';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { debounceTime, map, switchMap, catchError, tap } from 'rxjs/operators';
+import {
+  debounceTime,
+  map,
+  switchMap,
+  catchError,
+  tap,
+  distinctUntilChanged,
+  switchMapTo
+} from 'rxjs/operators';
 import { PageEnvService } from '../../services/page-env.service';
 
 interface VehicleTypeInPictures {
@@ -74,7 +89,6 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
   public chunks: APIPicture[][] = [];
   public paginator: APIPaginator;
   public moderVoteTemplateOptions: APIPictureModerVoteTemplate[] = [];
-  public page: number;
 
   public status: string | null;
   public statusOptions = [
@@ -248,6 +262,8 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
 
   private perspectiveSub: Subscription;
 
+  private change$ = new BehaviorSubject<null>(null);
+
   constructor(
     private http: HttpClient,
     private perspectiveService: PerspectiveService,
@@ -359,57 +375,100 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
       .getTemplates()
       .subscribe(templates => (this.moderVoteTemplateOptions = templates));
 
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.status = params.status ? params.status : null;
-      this.vehicleTypeID = params.vehicle_type_id
-        ? parseInt(params.vehicle_type_id, 10)
-        : null;
-      this.perspectiveID = params.perspective_id
-        ? params.perspective_id === 'null'
-          ? 'null'
-          : parseInt(params.perspective_id, 10)
-        : null;
-      this.itemID = params.item_id ? parseInt(params.item_id, 10) : 0;
-      if (this.itemID && !this.itemQuery) {
-        this.itemQuery = '#' + this.itemID;
-      }
-      switch (params.comments) {
-        case 'true':
-          this.comments = true;
-          break;
-        case 'false':
-          this.comments = false;
-          break;
-        default:
-          this.comments = null;
-          break;
-      }
-      this.ownerID = parseInt(params.owner_id, 10);
-      if (this.ownerID && !this.ownerQuery) {
-        this.ownerQuery = '#' + this.ownerID;
-      }
-      switch (params.replace) {
-        case 'true':
-          this.replace = true;
-          break;
-        case 'false':
-          this.replace = false;
-          break;
-        default:
-          this.replace = null;
-          break;
-      }
-      this.requests = params.requests ? parseInt(params.requests, 10) : null;
-      this.specialName = !!params.special_name;
-      this.lost = !!params.lost;
-      this.gps = !!params.gps;
-      this.similar = !!params.similar;
-      this.order = params.order ? parseInt(params.order, 10) : 1;
+    this.querySub = this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => {
+          this.status = params.status ? params.status : null;
+          this.vehicleTypeID = params.vehicle_type_id
+            ? parseInt(params.vehicle_type_id, 10)
+            : null;
+          this.perspectiveID = params.perspective_id
+            ? params.perspective_id === 'null'
+              ? 'null'
+              : parseInt(params.perspective_id, 10)
+            : null;
+          this.itemID = params.item_id ? parseInt(params.item_id, 10) : 0;
+          if (this.itemID && !this.itemQuery) {
+            this.itemQuery = '#' + this.itemID;
+          }
+          switch (params.comments) {
+            case 'true':
+              this.comments = true;
+              break;
+            case 'false':
+              this.comments = false;
+              break;
+            default:
+              this.comments = null;
+              break;
+          }
+          this.ownerID = parseInt(params.owner_id, 10);
+          if (this.ownerID && !this.ownerQuery) {
+            this.ownerQuery = '#' + this.ownerID;
+          }
+          switch (params.replace) {
+            case 'true':
+              this.replace = true;
+              break;
+            case 'false':
+              this.replace = false;
+              break;
+            default:
+              this.replace = null;
+              break;
+          }
+          this.requests = params.requests
+            ? parseInt(params.requests, 10)
+            : null;
+          this.specialName = !!params.special_name;
+          this.lost = !!params.lost;
+          this.gps = !!params.gps;
+          this.similar = !!params.similar;
+          this.order = params.order ? parseInt(params.order, 10) : 1;
 
-      this.page = params.page;
+          this.loading++;
+          this.pictures = [];
 
-      this.load();
-    });
+          this.selected = [];
+          this.hasSelectedItem = false;
+          const qParams: APIGetPicturesOptions = {
+            status: this.status,
+            car_type_id: this.vehicleTypeID,
+            perspective_id: this.perspectiveID,
+            item_id: this.itemID,
+            owner_id: this.ownerID,
+            requests: this.requests,
+            special_name: this.specialName,
+            lost: this.lost,
+            gps: this.gps,
+            similar: this.similar,
+            order: this.order,
+            page: params.page,
+            comments: this.comments,
+            replace: this.replace,
+            fields:
+              'owner,thumb_medium,moder_vote,votes,similar,views,comments_count,perspective_item,name_html,name_text',
+            limit: 18
+          };
+
+          return this.change$.pipe(
+            switchMapTo(this.pictureService.getPictures(qParams))
+          );
+        })
+      )
+      .subscribe(
+        response => {
+          this.pictures = response.pictures;
+          this.chunks = chunkBy<APIPicture>(this.pictures, 3);
+          this.paginator = response.paginator;
+          this.loading--;
+        },
+        () => {
+          this.loading--;
+        }
+      );
   }
 
   ngOnDestroy(): void {
@@ -477,45 +536,6 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
     });
   }
 
-  public load() {
-    this.loading++;
-    this.pictures = [];
-
-    this.selected = [];
-    this.hasSelectedItem = false;
-    const params: APIGetPicturesOptions = {
-      status: this.status,
-      car_type_id: this.vehicleTypeID,
-      perspective_id: this.perspectiveID,
-      item_id: this.itemID,
-      owner_id: this.ownerID,
-      requests: this.requests,
-      special_name: this.specialName,
-      lost: this.lost,
-      gps: this.gps,
-      similar: this.similar,
-      order: this.order,
-      page: this.page,
-      comments: this.comments,
-      replace: this.replace,
-      fields:
-        'owner,thumb_medium,moder_vote,votes,similar,views,comments_count,perspective_item,name_html,name_text',
-      limit: 18
-    };
-
-    this.pictureService.getPictures(params).subscribe(
-      response => {
-        this.pictures = response.pictures;
-        this.chunks = chunkBy<APIPicture>(this.pictures, 3);
-        this.paginator = response.paginator;
-        this.loading--;
-      },
-      () => {
-        this.loading--;
-      }
-    );
-  }
-
   public votePictures(vote: number, reason: string) {
     for (const id of this.selected) {
       const promises: Observable<void>[] = [];
@@ -527,7 +547,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
       }
 
       forkJoin(promises).subscribe(() => {
-        this.load();
+        this.change$.next(null);
       });
     }
     this.selected = [];
@@ -550,7 +570,7 @@ export class ModerPicturesComponent implements OnInit, OnDestroy {
       }
 
       forkJoin(promises).subscribe(() => {
-        this.load();
+        this.change$.next(null);
       });
     }
     this.selected = [];

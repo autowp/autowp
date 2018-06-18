@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { ArticleService, APIArticle } from '../services/article';
 import { PageEnvService } from '../services/page-env.service';
+import { distinctUntilChanged, debounceTime, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-articles',
@@ -36,24 +37,27 @@ export class ArticlesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.querySub = this.route.queryParams.subscribe(params => {
-      console.log('load');
-      this.articleService
-        .getArticles({
-          page: params.page,
-          limit: 10,
-          fields: 'description,author'
-        })
-        .subscribe(
-          response => {
-            this.articles = response.items;
-            this.paginator = response.paginator;
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
-    });
+    this.querySub = this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params =>
+          this.articleService.getArticles({
+            page: params.page,
+            limit: 10,
+            fields: 'description,author'
+          })
+        )
+      )
+      .subscribe(
+        response => {
+          this.articles = response.items;
+          this.paginator = response.paginator;
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
   }
 
   ngOnDestroy(): void {

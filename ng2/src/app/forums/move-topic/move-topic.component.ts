@@ -9,6 +9,7 @@ import {
   APIForumTheme
 } from '../../services/forum';
 import { PageEnvService } from '../../services/page-env.service';
+import { distinctUntilChanged, debounceTime, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-forums-move-topic',
@@ -30,17 +31,13 @@ export class ForumsMoveTopicComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.pageEnv.set({
-          layout: {
-            needRight: false
-          },
-          name: 'page/83/name',
-          pageId: 83
-        }),
-      0
-    );
+    this.pageEnv.set({
+      layout: {
+        needRight: false
+      },
+      name: 'page/83/name',
+      pageId: 83
+    });
 
     this.forumService.getThemes({}).subscribe(
       response => {
@@ -50,8 +47,14 @@ export class ForumsMoveTopicComponent implements OnInit, OnDestroy {
         Notify.response(response);
       }
     );
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.forumService.getTopic(params.topic_id, {}).subscribe(
+
+    this.querySub = this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => this.forumService.getTopic(params.topic_id, {}))
+      )
+      .subscribe(
         response => {
           this.topic = response;
         },
@@ -59,7 +62,6 @@ export class ForumsMoveTopicComponent implements OnInit, OnDestroy {
           this.router.navigate(['/error-404']);
         }
       );
-    });
   }
 
   ngOnDestroy(): void {

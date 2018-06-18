@@ -61,14 +61,19 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.mainMenuItems = this.pages.getMenu(2);
-    this.secondaryMenuItems = this.pages.getMenu(87);
     this.mainInSecondaryItems = [];
-    for (const page of this.mainMenuItems) {
-      if (this.isSecondaryMenuItem(page)) {
-        this.mainInSecondaryItems.push(page);
+    this.pages.getMenu(2).subscribe(items => {
+      this.mainMenuItems = items;
+      for (const page of this.mainMenuItems) {
+        if (this.isSecondaryMenuItem(page)) {
+          this.mainInSecondaryItems.push(page);
+        }
       }
-    }
+    });
+
+    this.pages.getMenu(87).subscribe(items => {
+      this.secondaryMenuItems = items;
+    });
 
     this.messageService.getNew().subscribe(value => {
       this.newPersonalMessages = value;

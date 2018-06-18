@@ -45,7 +45,6 @@ export class ForumsMoveMessageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.querySub = this.route.queryParams.subscribe(params => {
-      console.log('params', params);
       this.messageID = parseInt(params.message_id, 10);
       this.themeID = parseInt(params.theme_id, 10);
 

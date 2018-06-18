@@ -1,8 +1,0 @@
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item" ng-repeat="item in items" ng-if="!item.is_group_node && !$last">
-            <a ng-href="{{item.url}}" ng-bind="item.name_translated" ng-if="item.url"></a>
-            <span ng-if="!item.url" ng-bind="item.name_translated"></span>
-        </li>
-    </ol>
-</nav>

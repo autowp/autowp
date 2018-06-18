@@ -3,7 +3,8 @@
     <ng-container *ngFor="let item of items; let last = last">
       <li class="breadcrumb-item" *ngIf="!item.is_group_node && !last">
         <a [href]="item.url" *ngIf="item.url" [textContent]="item.name_translated"></a>
-        <span *ngIf="!item.url" [textContent]="item.name_translated"></span>
+        <a [routerLink]="item.routerLink" *ngIf="item.routerLink" [textContent]="item.name_translated"></a>
+        <span *ngIf="!item.url && !item.routerLink" [textContent]="item.name_translated"></span>
       </li>
     </ng-container>
   </ol>

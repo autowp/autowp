@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ForumService, APIForumTopic } from '../../services/forum';
 import { PageEnvService } from '../../services/page-env.service';
+import { distinctUntilChanged, debounceTime, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-forums-subscriptions',
@@ -37,23 +38,27 @@ export class ForumsSubscriptionsComponent implements OnInit, OnDestroy {
       0
     );
 
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.forumService
-        .getTopics({
-          fields: 'author,messages,last_message.datetime,last_message.user',
-          subscription: true,
-          page: params.page
-        })
-        .subscribe(
-          response => {
-            this.topics = response.items;
-            this.paginator = response.paginator;
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
-    });
+    this.querySub = this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params =>
+          this.forumService.getTopics({
+            fields: 'author,messages,last_message.datetime,last_message.user',
+            subscription: true,
+            page: params.page
+          })
+        )
+      )
+      .subscribe(
+        response => {
+          this.topics = response.items;
+          this.paginator = response.paginator;
+        },
+        response => {
+          Notify.response(response);
+        }
+      );
   }
 
   ngOnDestroy(): void {

@@ -9,7 +9,6 @@ import {
   ItemParentService
 } from '../../../../../services/item-parent';
 import { APIItem, ItemService } from '../../../../../services/item';
-import { ACLService } from '../../../../../services/acl.service';
 import { PageEnvService } from '../../../../../services/page-env.service';
 import { APIItemVehicleTypeGetResponse } from '../../../../../services/api.service';
 import { switchMap, catchError } from 'rxjs/operators';
@@ -40,7 +39,6 @@ export class ModerItemsItemOrganizeComponent implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private translate: TranslateService,
-    private acl: ACLService,
     private itemService: ItemService,
     private router: Router,
     private route: ActivatedRoute,
@@ -87,8 +85,8 @@ export class ModerItemsItemOrganizeComponent implements OnInit, OnDestroy {
                     isAdminPage: true,
                     needRight: false
                   },
-                  name: 'page/78/name',
-                  pageId: 78,
+                  name: 'page/215/name',
+                  pageId: 215,
                   args: {
                     CAR_ID: this.item.id + '',
                     CAR_NAME: translation + ': ' + this.item.name_text

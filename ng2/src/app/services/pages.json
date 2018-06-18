@@ -397,6 +397,11 @@
                     "is_group_node": false,
                     "childs": [],
                     "url": ""
+                  },
+                  {
+                    "id": 215,
+                    "is_group_node": false,
+                    "childs": []
                   }
                 ],
                 "routerLink": ["/moder/items/item/%CAR_ID%"]
