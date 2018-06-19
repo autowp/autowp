@@ -1,9 +1,9 @@
-<div class="crop-area" style="margin-bottom:20px">
+<div class="crop-area" style="margin-bottom:20px" *ngIf="picture">
   <img [src]="picture.image.src" />
 </div>
 
 <div style="margin-bottom:100px">
-  <span translate="crop-dialog/resolution-x-aspect-y" [translateParams]="{resolution: resolution, aspect: aspect}"></span>
+  <span translate [translateParams]="{resolution: resolution, aspect: aspect}">crop-dialog/resolution-x-aspect-y</span>
   <button (click)="selectAll()" class="btn btn-secondary" translate>crop-dialog/select-all</button>
   <span class="float-right">
     <a ui-sref="moder-pictures-item({id: picture.id})" class="btn btn-secondary" translate>crop-dialog/close</a>

@@ -9,6 +9,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription, forkJoin } from 'rxjs';
 import { PictureService, APIPicture } from '../../../../services/picture';
 import { PageEnvService } from '../../../../services/page-env.service';
+import {
+  distinctUntilChanged,
+  debounceTime,
+  switchMap,
+  tap
+} from 'rxjs/operators';
 
 // Acl.inheritsRole('moder', 'unauthorized');
 
@@ -28,8 +34,7 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
   private id: number;
   private item_id: number;
   private type: number;
-  private querySub: Subscription;
-  private routeSub: Subscription;
+  private sub: Subscription;
   public aspect = '';
   public resolution = '';
   private jcrop: any;
@@ -65,35 +70,51 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
       0
     );
 
-    this.routeSub = this.route.params.subscribe(params => {
-      this.id = params.id;
-      this.item_id = params.item_id;
-      this.type = params.type;
+    this.sub = this.route.params
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params =>
+          this.pictureService.getPicture(params.id, {
+            fields: 'crop,image'
+          })
+        ),
+        tap(picture => {
+          this.id = picture.id;
+          this.picture = picture;
+        }),
+        switchMap(
+          () =>
+            this.route.queryParams.pipe(
+              distinctUntilChanged(),
+              debounceTime(30)
+            ),
+          (picture, params) => ({ picture, params })
+        ),
+        tap(data => {
+          this.item_id = data.params.item_id;
+          this.type = data.params.type;
+        }),
+        switchMap(data =>
+          this.pictureItemService.get(
+            data.picture.id,
+            data.params.item_id,
+            data.params.type,
+            {
+              fields: 'area'
+            }
+          )
+        )
+      )
+      .subscribe(data => {
+        const area = data[1].area;
 
-      this.load();
-    });
-
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.load();
-    });
+      });
   }
 
   private load() {
-    forkJoin(
-      this.pictureService.getPicture(this.id, {
-        fields: 'crop,image'
-      }),
-      this.pictureItemService.get(this.id, this.item_id, this.type, {
-        fields: 'area'
-      })
-    ).subscribe(
+    forkJoin().subscribe(
       data => {
-        const area = data[1].area;
-
-        const response = data[0];
-
-        this.picture = response;
-
         /* const $body = $($element[0]).find('.crop-area');
         const $img = $body.find('img');
 
@@ -155,8 +176,7 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.routeSub.unsubscribe();
-    this.querySub.unsubscribe();
+    this.sub.unsubscribe();
   }
 
   public selectAll() {

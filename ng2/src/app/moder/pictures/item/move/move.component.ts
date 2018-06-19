@@ -1,11 +1,9 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../../../services/api.service';
 import { Subscription, of, combineLatest, BehaviorSubject } from 'rxjs';
 import { PictureItemService } from '../../../../services/picture-item';
 import { ItemService, APIItem } from '../../../../services/item';
 import { chunk } from '../../../../chunk';
-import Notify from '../../../../notify';
 import { Router, ActivatedRoute } from '@angular/router';
 import {
   ItemParentService,
@@ -18,6 +16,8 @@ import {
   debounceTime,
   tap
 } from 'rxjs/operators';
+import { PictureService } from '../../../../services/picture';
+import { TranslateService } from '@ngx-translate/core';
 
 // Acl.inheritsRole( 'moder', 'unauthorized' );
 
@@ -65,34 +65,43 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
   public searchAuthor$ = new BehaviorSubject<string>('');
 
   constructor(
-    private http: HttpClient,
     private pictureItemService: PictureItemService,
     private itemService: ItemService,
     private router: Router,
     private route: ActivatedRoute,
     private itemParentService: ItemParentService,
-    private pageEnv: PageEnvService
+    private pageEnv: PageEnvService,
+    private translate: TranslateService,
+    private pictureService: PictureService
   ) {}
 
   ngOnInit(): void {
-    setTimeout(
-      () =>
-        this.pageEnv.set({
-          layout: {
-            isAdminPage: true,
-            needRight: false
-          },
-          name: 'page/149/name',
-          pageId: 149
-        }),
-      0
-    );
-
     this.sub = combineLatest(
       this.route.params.pipe(
         tap(params => {
           this.id = params.id;
-        })
+        }),
+        switchMap(params =>
+          combineLatest(
+            this.pictureService.getPicture(params.id),
+            this.translate.get('moder/picture/picture-n-%s'),
+            (picture, translation) => ({ picture, translation })
+          )
+        ),
+        tap(data =>
+          this.pageEnv.set({
+            layout: {
+              isAdminPage: true,
+              needRight: false
+            },
+            name: 'page/149/name',
+            pageId: 149,
+            args: {
+              PICTURE_ID: data.picture.id + '',
+              PICTURE_NAME: sprintf(data.translation, data.picture.id)
+            }
+          })
+        )
       ),
       this.route.queryParams.pipe(
         distinctUntilChanged(),

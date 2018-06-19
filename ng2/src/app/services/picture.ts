@@ -162,6 +162,10 @@ export class PictureService {
   ): { [param: string]: string } {
     const params: { [param: string]: string } = {};
 
+    if (!options) {
+      options = {};
+    }
+
     if (options.fields) {
       params.fields = options.fields;
     }
