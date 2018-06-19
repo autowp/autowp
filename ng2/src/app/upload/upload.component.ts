@@ -9,12 +9,25 @@ import {
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { APIItem, ItemService } from '../services/item';
 import Notify from '../notify';
-import { Subscription, empty, of, forkJoin, Observable, concat } from 'rxjs';
+import {
+  Subscription,
+  empty,
+  of,
+  Observable,
+  concat,
+  combineLatest
+} from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PictureService, APIPicture } from '../services/picture';
 import { AuthService } from '../services/auth.service';
 import { PageEnvService } from '../services/page-env.service';
-import { switchMap, catchError, map, tap } from 'rxjs/operators';
+import {
+  switchMap,
+  catchError,
+  tap,
+  distinctUntilChanged,
+  debounceTime
+} from 'rxjs/operators';
 import { APIUser } from '../services/user';
 
 interface UploadProgress {
@@ -71,45 +84,42 @@ export class UploadComponent implements OnInit, OnDestroy {
 
     this.auth.getUser().subscribe(user => (this.user = user));
 
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.perspectiveID = params.perspective_id;
-      const replace = parseInt(params.replace, 10);
-      if (replace) {
-        this.pictureService
-          .getPicture(replace, {
-            fields: 'name_html'
-          })
-          .subscribe(
-            response => {
-              this.replace = response;
+    this.querySub = this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => {
+          this.perspectiveID = params.perspective_id;
+          const replace = parseInt(params.replace, 10);
+          const itemId = parseInt(params.item_id, 10);
 
-              this.selected = true;
-              this.selectionName = this.replace.name_html;
-            },
-            response => {
-              this.router.navigate(['/error-404']);
-            }
+          return combineLatest(
+            replace
+              ? this.pictureService.getPicture(replace, {
+                  fields: 'name_html'
+                })
+              : of(null),
+            itemId
+              ? this.itemService.getItem(itemId, {
+                  fields: 'name_html'
+                })
+              : of(null)
           );
-      }
+        })
+      )
+      .subscribe(responses => {
+        if (responses[0]) {
+          this.selected = true;
+          this.replace = responses[0];
+          this.selectionName = this.replace.name_html;
+        }
 
-      const itemId = parseInt(params.item_id, 10);
-      if (itemId) {
-        this.itemService
-          .getItem(itemId, {
-            fields: 'name_html'
-          })
-          .subscribe(
-            item => {
-              this.selected = true;
-              this.item = item;
-              this.selectionName = item.name_html;
-            },
-            response => {
-              this.router.navigate(['/error-404']);
-            }
-          );
-      }
-    });
+        if (responses[1]) {
+          this.selected = true;
+          this.item = responses[1];
+          this.selectionName = this.item.name_html;
+        }
+      });
   }
 
   ngOnDestroy(): void {

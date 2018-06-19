@@ -1,7 +1,7 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIPaginator } from '../../../../services/api.service';
-import { Subscription, of } from 'rxjs';
+import { Subscription, of, combineLatest, BehaviorSubject } from 'rxjs';
 import { PictureItemService } from '../../../../services/picture-item';
 import { ItemService, APIItem } from '../../../../services/item';
 import { chunk } from '../../../../chunk';
@@ -12,7 +12,12 @@ import {
   APIItemParent
 } from '../../../../services/item-parent';
 import { PageEnvService } from '../../../../services/page-env.service';
-import { switchMap } from 'rxjs/operators';
+import {
+  switchMap,
+  distinctUntilChanged,
+  debounceTime,
+  tap
+} from 'rxjs/operators';
 
 // Acl.inheritsRole( 'moder', 'unauthorized' );
 
@@ -22,22 +27,16 @@ export interface PictureItemMoveSelection {
   type: number;
 }
 
-type ModerPicturesItemMoveDoSearch = () => void;
-
 @Component({
   selector: 'app-moder-pictures-item-move',
   templateUrl: './move.component.html'
 })
 @Injectable()
 export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
-  private routeSub: Subscription;
-  private querySub: Subscription;
+  private sub: Subscription;
   private id: number;
-  public search: string;
   public concepts_expanded = false;
-  public doSearch: ModerPicturesItemMoveDoSearch;
   private src_item_id: number;
-  private page: number;
   public src_type: number;
   public show_museums: boolean;
   public show_factories: boolean;
@@ -53,12 +52,17 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
   public vehicles: APIItemParent[] = [];
   public engines: APIItemParent[] = [];
   public authors: APIItem[] = [];
-  private authorsSubscription: Subscription;
-  private personsSubscription: Subscription;
   public persons_paginator: APIPaginator;
   public persons: APIItem[] = [];
   public concepts: APIItemParent[] = [];
   public brands: APIItem[][] = [];
+
+  public searchBrand: string;
+  public searchBrand$ = new BehaviorSubject<string>('');
+  public searchPerson: string;
+  public searchPerson$ = new BehaviorSubject<string>('');
+  public searchAuthor: string;
+  public searchAuthor$ = new BehaviorSubject<string>('');
 
   constructor(
     private http: HttpClient,
@@ -84,149 +88,181 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
       0
     );
 
-    this.routeSub = this.route.params.subscribe(params => {
-      this.id = params.id;
-    });
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.page = params.page;
-      this.src_item_id = params.src_item_id;
-      this.src_type = params.src_type;
+    this.sub = combineLatest(
+      this.route.params.pipe(
+        tap(params => {
+          this.id = params.id;
+        })
+      ),
+      this.route.queryParams.pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => {
+          this.src_item_id = params.src_item_id;
+          this.src_type = params.src_type;
 
-      this.show_museums = params.show_museums;
-      this.show_factories = params.show_factories;
-      this.show_persons = params.show_persons;
-      this.show_authors = params.show_authors;
-      this.brand_id = params.brand_id;
+          this.show_museums = params.show_museums;
+          this.show_factories = params.show_factories;
+          this.show_persons = params.show_persons;
+          this.show_authors = params.show_authors;
+          this.brand_id = params.brand_id;
 
-      if (this.src_type === 2) {
-        this.show_authors = true;
-      }
+          if (this.src_type === 2) {
+            this.show_authors = true;
+          }
 
-      if (this.show_museums) {
-        this.itemService
-          .getItems({
-            type_id: 7,
-            fields: 'name_html',
-            limit: 50,
-            page: this.page
-          })
-          .subscribe(
-            response => {
-              this.museums = response.items;
-              this.museums_paginator = response.paginator;
-            },
-            response => {
-              Notify.response(response);
+          let museums$ = of(null);
+          if (this.show_museums) {
+            museums$ = this.itemService
+              .getItems({
+                type_id: 7,
+                fields: 'name_html',
+                limit: 50,
+                page: params.page
+              })
+              .pipe(
+                tap(response => {
+                  this.museums = response.items;
+                  this.museums_paginator = response.paginator;
+                })
+              );
+          }
+
+          let factories$ = of(null);
+          if (this.show_factories) {
+            factories$ = this.itemService
+              .getItems({
+                type_id: 6,
+                fields: 'name_html',
+                limit: 50,
+                page: params.page
+              })
+              .pipe(
+                tap(response => {
+                  this.factories = response.items;
+                  this.factories_paginator = response.paginator;
+                })
+              );
+          }
+
+          let persons$ = of(null);
+          if (this.show_persons) {
+            persons$ = this.searchPerson$.pipe(
+              distinctUntilChanged(),
+              debounceTime(30),
+              switchMap(search =>
+                this.itemService.getItems({
+                  type_id: 8,
+                  fields: 'name_html',
+                  limit: 50,
+                  name: search ? '%' + search + '%' : null,
+                  page: params.page
+                })
+              ),
+              tap(response => {
+                this.persons = response.items;
+                this.persons_paginator = response.paginator;
+              })
+            );
+          }
+
+          let authors$ = of(null);
+          if (this.show_authors) {
+            authors$ = this.searchAuthor$.pipe(
+              distinctUntilChanged(),
+              debounceTime(30),
+              switchMap(search =>
+                this.itemService.getItems({
+                  type_id: 8,
+                  fields: 'name_html',
+                  limit: 50,
+                  name: search ? '%' + search + '%' : null,
+                  page: params.page
+                })
+              ),
+              tap(response => {
+                this.authors = response.items;
+                this.authors_paginator = response.paginator;
+              })
+            );
+          }
+
+          let brandItems$ = of(null);
+          let brands$ = of(null);
+          if (
+            !this.show_museums &&
+            !this.show_factories &&
+            !this.show_persons &&
+            !this.show_authors
+          ) {
+            if (this.brand_id) {
+              brandItems$ = combineLatest(
+                this.itemParentService
+                  .getItems({
+                    item_type_id: 1,
+                    parent_id: this.brand_id,
+                    fields: 'item.name_html,item.childs_count',
+                    limit: 500,
+                    page: 1
+                  })
+                  .pipe(tap(response => (this.vehicles = response.items))),
+                this.itemParentService
+                  .getItems({
+                    item_type_id: 2,
+                    parent_id: this.brand_id,
+                    fields: 'item.name_html,item.childs_count',
+                    limit: 500,
+                    page: 1
+                  })
+                  .pipe(tap(response => (this.engines = response.items))),
+
+                this.itemParentService
+                  .getItems({
+                    item_type_id: 1,
+                    concept: true,
+                    ancestor_id: this.brand_id,
+                    fields: 'item.name_html,item.childs_count',
+                    limit: 500,
+                    page: 1
+                  })
+                  .pipe(tap(response => (this.concepts = response.items)))
+              );
+            } else {
+              brands$ = this.searchBrand$.pipe(
+                distinctUntilChanged(),
+                debounceTime(30),
+                switchMap(search =>
+                  this.itemService.getItems({
+                    type_id: 5,
+                    fields: 'name_html',
+                    limit: 200,
+                    name: search ? '%' + search + '%' : null,
+                    page: params.page
+                  })
+                ),
+                tap(response => {
+                  this.brands = chunk<APIItem>(response.items, 6);
+                  this.brands_paginator = response.paginator;
+                })
+              );
             }
+          }
+
+          return combineLatest(
+            museums$,
+            factories$,
+            persons$,
+            authors$,
+            brandItems$,
+            brands$
           );
-      }
-
-      if (this.show_factories) {
-        this.itemService
-          .getItems({
-            type_id: 6,
-            fields: 'name_html',
-            limit: 50,
-            page: this.page
-          })
-          .subscribe(
-            response => {
-              this.factories = response.items;
-              this.factories_paginator = response.paginator;
-            },
-            response => {
-              Notify.response(response);
-            }
-          );
-      }
-
-      if (this.show_persons) {
-        this.doSearch = () => {
-          this.loadPersons();
-        };
-
-        this.loadPersons();
-      }
-
-      if (this.show_authors) {
-        this.doSearch = () => {
-          this.loadAuthors();
-        };
-
-        this.loadAuthors();
-      }
-
-      if (
-        !this.show_museums &&
-        !this.show_factories &&
-        !this.show_persons &&
-        !this.show_authors
-      ) {
-        if (this.brand_id) {
-          this.itemParentService
-            .getItems({
-              item_type_id: 1,
-              parent_id: this.brand_id,
-              fields: 'item.name_html,item.childs_count',
-              limit: 500,
-              page: 1
-            })
-            .subscribe(
-              response => {
-                this.vehicles = response.items;
-              },
-              response => {
-                Notify.response(response);
-              }
-            );
-          this.itemParentService
-            .getItems({
-              item_type_id: 2,
-              parent_id: this.brand_id,
-              fields: 'item.name_html,item.childs_count',
-              limit: 500,
-              page: 1
-            })
-            .subscribe(
-              response => {
-                this.engines = response.items;
-              },
-              response => {
-                Notify.response(response);
-              }
-            );
-
-          this.itemParentService
-            .getItems({
-              item_type_id: 1,
-              concept: true,
-              ancestor_id: this.brand_id,
-              fields: 'item.name_html,item.childs_count',
-              limit: 500,
-              page: 1
-            })
-            .subscribe(
-              response => {
-                this.concepts = response.items;
-              },
-              response => {
-                Notify.response(response);
-              }
-            );
-        } else {
-          this.doSearch = () => {
-            this.loadBrands();
-          };
-
-          this.loadBrands();
-        }
-      }
-    });
+        })
+      )
+    ).subscribe();
   }
 
   ngOnDestroy(): void {
-    this.routeSub.unsubscribe();
-    this.querySub.unsubscribe();
+    this.sub.unsubscribe();
   }
 
   public selectItem(selection: PictureItemMoveSelection) {
@@ -265,82 +301,20 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  private loadBrands() {
-    this.itemService
-      .getItems({
-        type_id: 5,
-        fields: 'name_html',
-        limit: 200,
-        name: this.search ? '%' + this.search + '%' : null,
-        page: this.page
-      })
-      .subscribe(
-        response => {
-          this.brands = chunk<APIItem>(response.items, 6);
-          this.brands_paginator = response.paginator;
-        },
-        response => {
-          Notify.response(response);
-        }
-      );
-  }
-
   public toggleConcepts() {
     this.concepts_expanded = !this.concepts_expanded;
     return false;
   }
 
-  private loadAuthors() {
-    if (this.authorsSubscription) {
-      this.authorsSubscription.unsubscribe();
-      this.authorsSubscription = null;
-    }
-
-    this.authorsSubscription = this.itemService
-      .getItems({
-        type_id: 8,
-        fields: 'name_html',
-        limit: 50,
-        name: this.search ? '%' + this.search + '%' : null,
-        page: this.page
-      })
-      .subscribe(
-        response => {
-          this.authors = response.items;
-          this.authors_paginator = response.paginator;
-        },
-        response => {
-          if (response.status !== -1) {
-            Notify.response(response);
-          }
-        }
-      );
+  public doSearchBrand() {
+    this.searchBrand$.next(this.searchBrand);
   }
 
-  private loadPersons() {
-    if (this.personsSubscription) {
-      this.personsSubscription.unsubscribe();
-      this.personsSubscription = null;
-    }
+  public doSearchPerson() {
+    this.searchPerson$.next(this.searchPerson);
+  }
 
-    this.personsSubscription = this.itemService
-      .getItems({
-        type_id: 8,
-        fields: 'name_html',
-        limit: 50,
-        name: this.search ? '%' + this.search + '%' : null,
-        page: this.page
-      })
-      .subscribe(
-        response => {
-          this.persons = response.items;
-          this.persons_paginator = response.paginator;
-        },
-        response => {
-          if (response.status !== -1) {
-            Notify.response(response);
-          }
-        }
-      );
+  public doSearchAuthor() {
+    this.searchAuthor$.next(this.searchAuthor);
   }
 }

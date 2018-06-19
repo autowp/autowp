@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { PageEnvService } from '../../services/page-env.service';
+import { distinctUntilChanged, debounceTime, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-account-emailcheck',
@@ -32,13 +33,17 @@ export class AccountEmailcheckComponent implements OnInit, OnDestroy {
         }),
       0
     );
-    this.routeSub = this.route.params.subscribe(params => {
-      this.http
-        .post('/api/user/emailcheck', {
-          code: params.token
-        })
-        .subscribe(() => (this.success = true), () => (this.failure = true));
-    });
+    this.routeSub = this.route.params
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params =>
+          this.http.post<void>('/api/user/emailcheck', {
+            code: params.token
+          })
+        )
+      )
+      .subscribe(() => (this.success = true), () => (this.failure = true));
   }
 
   ngOnDestroy(): void {

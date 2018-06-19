@@ -9,10 +9,18 @@ import {
 import { ItemService, APIItem } from '../../../services/item';
 import { TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest, BehaviorSubject } from 'rxjs';
 import { PictureService, APIPicture } from '../../../services/picture';
 import { APIPerspective } from '../../../services/api.service';
 import { PageEnvService } from '../../../services/page-env.service';
+import {
+  distinctUntilChanged,
+  debounceTime,
+  switchMap,
+  map,
+  tap,
+  switchMapTo
+} from 'rxjs/operators';
 
 // Acl.inheritsRole( 'moder', 'unauthorized' );
 
@@ -46,6 +54,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
   public banReason: string | null = null;
   public perspectives: APIPerspective[] = [];
   private perspectiveSub: Subscription;
+  private change$ = new BehaviorSubject<null>(null);
+  private lastItemSub: Subscription;
 
   constructor(
     private http: HttpClient,
@@ -64,81 +74,78 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       .getPerspectives()
       .subscribe(perspectives => (this.perspectives = perspectives));
 
-    this.routeSub = this.route.params.subscribe(params => {
-      this.id = params.id;
-      this.loadPicture(() => {
-        this.translate
-          .get('moder/picture/picture-n-%s')
-          .subscribe(translation => {
-            this.pageEnv.set({
-              layout: {
-                isAdminPage: true,
-                needRight: false
-              },
-              name: 'page/72/name',
-              pageId: 72,
-              args: {
-                PICTURE_ID: this.picture.id + '',
-                PICTURE_NAME: sprintf(translation, this.picture.id)
-              }
-            });
-          });
-      });
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.routeSub.unsubscribe();
-    this.perspectiveSub.unsubscribe();
-  }
-
-  public pictureVoted() {
-    this.loadPicture();
-  }
-
-  public loadPicture(callback?: Function) {
-    this.pictureService
-      .getPicture(this.id, {
-        fields: [
-          'owner',
-          'thumb',
-          'add_date',
-          'iptc',
-          'exif',
-          'image',
-          'items.item.name_html',
-          'items.item.brands.name_html',
-          'items.area',
-          'special_name',
-          'copyrights',
-          'change_status_user',
-          'rights',
-          'moder_votes',
-          'moder_voted',
-          'is_last',
-          'views',
-          'accepted_count',
-          'similar.picture.thumb',
-          'replaceable',
-          'siblings.name_text',
-          'ip.rights',
-          'ip.blacklist'
-        ].join(',')
-      })
+    this.routeSub = combineLatest(
+      this.route.params.pipe(
+        distinctUntilChanged(),
+        debounceTime(30)
+      ),
+      this.translate.get('moder/picture/picture-n-%s'),
+      (params, translation) => ({ params, translation })
+    )
+      .pipe(
+        tap(data =>
+          this.pageEnv.set({
+            layout: {
+              isAdminPage: true,
+              needRight: false
+            },
+            name: 'page/72/name',
+            pageId: 72,
+            args: {
+              PICTURE_ID: data.params.id + '',
+              PICTURE_NAME: sprintf(data.translation, data.params.id)
+            }
+          })
+        ),
+        switchMap(data =>
+          this.change$.pipe(
+            switchMapTo(
+              this.pictureService.getPicture(data.params.id, {
+                fields: [
+                  'owner',
+                  'thumb',
+                  'add_date',
+                  'iptc',
+                  'exif',
+                  'image',
+                  'items.item.name_html',
+                  'items.item.brands.name_html',
+                  'items.area',
+                  'special_name',
+                  'copyrights',
+                  'change_status_user',
+                  'rights',
+                  'moder_votes',
+                  'moder_voted',
+                  'is_last',
+                  'views',
+                  'accepted_count',
+                  'similar.picture.thumb',
+                  'replaceable',
+                  'siblings.name_text',
+                  'ip.rights',
+                  'ip.blacklist'
+                ].join(',')
+              })
+            )
+          )
+        )
+      )
       .subscribe(
-        response => {
-          this.picture = response;
+        data => {
+          this.picture = data;
+          this.id = this.picture.id;
 
-          if (callback) {
+          /*if (callback) {
             callback();
-          }
+          }*/
         },
         () => {
           this.router.navigate(['/error-404']);
         }
       );
 
-    this.itemService
+    this.lastItemSub = this.itemService
       .getItems({
         last_item: true,
         fields: 'name_html',
@@ -147,6 +154,16 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       .subscribe(response => {
         this.last_item = response.items.length ? response.items[0] : null;
       });
+  }
+
+  ngOnDestroy(): void {
+    this.routeSub.unsubscribe();
+    this.perspectiveSub.unsubscribe();
+    this.lastItemSub.unsubscribe();
+  }
+
+  public pictureVoted() {
+    this.change$.next(null);
   }
 
   public hasItem(itemId: number): boolean {
@@ -164,9 +181,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
     this.pictureItemLoading = true;
     this.pictureItemService.create(this.id, item.id, type, {}).subscribe(
       () => {
-        this.loadPicture(() => {
-          this.pictureItemLoading = false;
-        });
+        this.change$.next(null);
+        this.pictureItemLoading = false;
       },
       () => {
         this.pictureItemLoading = false;
@@ -180,9 +196,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       .changeItem(this.id, type, srcItemId, dstItemId)
       .subscribe(
         () => {
-          this.loadPicture(() => {
-            this.pictureItemLoading = false;
-          });
+          this.change$.next(null);
+          this.pictureItemLoading = false;
         },
         () => {
           this.pictureItemLoading = false;
@@ -231,9 +246,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       })
       .subscribe(
         response => {
-          this.loadPicture(() => {
-            this.statusLoading = false;
-          });
+          this.change$.next(null);
+          this.statusLoading = false;
         },
         () => {
           this.statusLoading = false;
@@ -249,9 +263,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       })
       .subscribe(
         response => {
-          this.loadPicture(() => {
-            this.statusLoading = false;
-          });
+          this.change$.next(null);
+          this.statusLoading = false;
         },
         () => {
           this.statusLoading = false;
@@ -267,9 +280,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       })
       .subscribe(
         response => {
-          this.loadPicture(() => {
-            this.statusLoading = false;
-          });
+          this.change$.next(null);
+          this.statusLoading = false;
         },
         () => {
           this.statusLoading = false;
@@ -285,9 +297,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       })
       .subscribe(
         response => {
-          this.loadPicture(() => {
-            this.statusLoading = false;
-          });
+          this.change$.next(null);
+          this.statusLoading = false;
         },
         () => {
           this.statusLoading = false;
@@ -299,9 +310,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
     this.repairLoading = true;
     this.http.put<void>('/api/picture/' + this.id + '/normalize', {}).subscribe(
       response => {
-        this.loadPicture(() => {
-          this.repairLoading = false;
-        });
+        this.change$.next(null);
+        this.repairLoading = false;
       },
       () => {
         this.repairLoading = false;
@@ -313,9 +323,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
     this.repairLoading = true;
     this.http.put<void>('/api/picture/' + this.id + '/flop', {}).subscribe(
       response => {
-        this.loadPicture(() => {
-          this.repairLoading = false;
-        });
+        this.change$.next(null);
+        this.repairLoading = false;
       },
       () => {
         this.repairLoading = false;
@@ -327,9 +336,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
     this.repairLoading = true;
     this.http.put<void>('/api/picture/' + this.id + '/repair', {}).subscribe(
       response => {
-        this.loadPicture(() => {
-          this.repairLoading = false;
-        });
+        this.change$.next(null);
+        this.repairLoading = false;
       },
       () => {
         this.repairLoading = false;
@@ -343,9 +351,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       .put<void>('/api/picture/' + this.id + '/correct-file-names', {})
       .subscribe(
         response => {
-          this.loadPicture(() => {
-            this.repairLoading = false;
-          });
+          this.change$.next(null);
+          this.repairLoading = false;
         },
         () => {
           this.repairLoading = false;
@@ -364,9 +371,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       )
       .subscribe(
         () => {
-          this.loadPicture(() => {
-            this.similarLoading = false;
-          });
+          this.change$.next(null);
+          this.similarLoading = false;
         },
         () => {
           this.similarLoading = false;
@@ -391,9 +397,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       .remove(item.picture_id, item.item_id, item.type)
       .subscribe(
         () => {
-          this.loadPicture(() => {
-            this.pictureItemLoading = false;
-          });
+          this.change$.next(null);
+          this.pictureItemLoading = false;
         },
         () => {
           this.pictureItemLoading = false;
@@ -410,9 +415,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       })
       .subscribe(
         response => {
-          this.loadPicture(() => {
-            this.replaceLoading = false;
-          });
+          this.change$.next(null);
+          this.replaceLoading = false;
         },
         () => {
           this.replaceLoading = false;
@@ -426,9 +430,8 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
       .put<void>('/api/picture/' + this.id + '/accept-replace', {})
       .subscribe(
         response => {
-          this.loadPicture(() => {
-            this.replaceLoading = false;
-          });
+          this.change$.next(null);
+          this.replaceLoading = false;
         },
         () => {
           this.replaceLoading = false;
@@ -440,7 +443,7 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
     this.http
       .delete<void>('/api/traffic/blacklist/' + ip)
       .subscribe(response => {
-        this.loadPicture();
+        this.change$.next(null);
       });
   }
 
@@ -452,7 +455,7 @@ export class ModerPicturesItemComponent implements OnInit, OnDestroy {
         reason: this.banReason
       })
       .subscribe(response => {
-        this.loadPicture();
+        this.change$.next(null);
       });
   }
 }

@@ -2,7 +2,14 @@ import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription, Observable, of, empty, forkJoin } from 'rxjs';
+import {
+  Subscription,
+  Observable,
+  of,
+  empty,
+  forkJoin,
+  combineLatest
+} from 'rxjs';
 import {
   APIPictureItem,
   PictureItemService
@@ -11,7 +18,13 @@ import { APIItem, ItemService } from '../../../../../services/item';
 import { PageEnvService } from '../../../../../services/page-env.service';
 import Notify from '../../../../../notify';
 import { APIItemVehicleTypeGetResponse } from '../../../../../services/api.service';
-import { switchMap, catchError } from 'rxjs/operators';
+import {
+  switchMap,
+  catchError,
+  distinctUntilChanged,
+  debounceTime,
+  tap
+} from 'rxjs/operators';
 
 // Acl.isAllowed('car', 'move', 'unauthorized');
 
@@ -47,100 +60,99 @@ export class ModerItemsItemPicturesOrganizeComponent
   ) {}
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
-      this.itemService
-        .getItem(params.id, {
-          fields: [
-            'name_text',
-            'name',
-            'is_concept',
-            'name_default',
-            'body',
-            'subscription',
-            'begin_year',
-            'begin_month',
-            'end_year',
-            'end_month',
-            'today',
-            'begin_model_year',
-            'end_model_year',
-            'produced',
-            'is_group',
-            'spec_id',
-            'full_name',
-            'catname',
-            'lat',
-            'lng'
-          ].join(',')
-        })
-        .subscribe(
-          item => {
-            this.item = item;
-            this.newItem = Object.assign({}, this.item);
-            this.newItem.is_group = false;
-            this.translate
-              .get('item/type/' + this.item.item_type_id + '/name')
-              .subscribe(translation => {
-                this.pageEnv.set({
-                  layout: {
-                    isAdminPage: true,
-                    needRight: false
-                  },
-                  name: 'page/78/name',
-                  pageId: 78,
-                  args: {
-                    CAR_ID: this.item.id + '',
-                    CAR_NAME: translation + ': ' + this.item.name_text
-                  }
-                });
-              });
+    this.routeSub = this.route.params
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params =>
+          combineLatest(
+            this.itemService
+              .getItem(params.id, {
+                fields: [
+                  'name_text',
+                  'name',
+                  'is_concept',
+                  'name_default',
+                  'body',
+                  'subscription',
+                  'begin_year',
+                  'begin_month',
+                  'end_year',
+                  'end_month',
+                  'today',
+                  'begin_model_year',
+                  'end_model_year',
+                  'produced',
+                  'is_group',
+                  'spec_id',
+                  'full_name',
+                  'catname',
+                  'lat',
+                  'lng'
+                ].join(',')
+              })
+              .pipe(
+                tap(item => {
+                  this.item = item;
+                  this.newItem = Object.assign({}, item);
+                  this.newItem.is_group = false;
+                }),
+                switchMap(item =>
+                  combineLatest(
+                    this.translate
+                      .get('item/type/' + item.item_type_id + '/name')
+                      .pipe(
+                        tap(translation =>
+                          this.pageEnv.set({
+                            layout: {
+                              isAdminPage: true,
+                              needRight: false
+                            },
+                            name: 'page/78/name',
+                            pageId: 78,
+                            args: {
+                              CAR_ID: item.id + '',
+                              CAR_NAME: translation + ': ' + item.name_text
+                            }
+                          })
+                        )
+                      ),
+                    this.item.item_type_id === 1 || this.item.item_type_id === 4
+                      ? this.http
+                          .get<APIItemVehicleTypeGetResponse>(
+                            '/api/item-vehicle-type',
+                            {
+                              params: {
+                                item_id: this.item.id.toString()
+                              }
+                            }
+                          )
+                          .pipe(
+                            tap(response => {
+                              const ids: number[] = [];
+                              for (const row of response.items) {
+                                ids.push(row.vehicle_type_id);
+                              }
 
-            if (this.item.item_type_id === 1 || this.item.item_type_id === 4) {
-              this.loading++;
-              this.http
-                .get<APIItemVehicleTypeGetResponse>('/api/item-vehicle-type', {
-                  params: {
-                    item_id: this.item.id.toString()
-                  }
-                })
-                .subscribe(
-                  response => {
-                    const ids: number[] = [];
-                    for (const row of response.items) {
-                      ids.push(row.vehicle_type_id);
-                    }
-
-                    this.vehicleTypeIDs = ids;
-
-                    this.loading--;
-                  },
-                  () => {
-                    this.loading--;
-                  }
-                );
-            }
-          },
-          () => {
-            this.router.navigate(['/error-404']);
-          }
-        );
-
-      this.pictureItemService
-        .getItems({
-          item_id: params.id,
-          limit: 500,
-          fields: 'picture.thumb_medium,picture.name_text',
-          order: 'status'
-        })
-        .subscribe(
-          response => {
-            this.pictures = response.items;
-          },
-          response => {
-            Notify.response(response);
-          }
-        );
-    });
+                              this.vehicleTypeIDs = ids;
+                            })
+                          )
+                      : of(null)
+                  )
+                )
+              ),
+            this.pictureItemService
+              .getItems({
+                item_id: params.id,
+                limit: 500,
+                fields: 'picture.thumb_medium,picture.name_text',
+                order: 'status'
+              })
+              .pipe(tap(response => (this.pictures = response.items)))
+          )
+        )
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {

@@ -4,6 +4,7 @@ import Notify from '../../notify';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { PageEnvService } from '../../services/page-env.service';
+import { distinctUntilChanged, debounceTime, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-restore-password-new',
@@ -39,22 +40,21 @@ export class RestorePasswordNewComponent implements OnInit, OnDestroy {
         }),
       0
     );
-    this.routeSub = this.route.params.subscribe(params => {
-      this.form.code = params.code;
+    this.routeSub = this.route.params
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => {
+          this.form.code = params.code;
 
-      this.http
-        .get('/api/restore-password/new', {
-          params: {
-            code: params.code
-          }
+          return this.http.get('/api/restore-password/new', {
+            params: {
+              code: params.code
+            }
+          });
         })
-        .subscribe(
-          () => {},
-          response => {
-            this.router.navigate(['/error-404']);
-          }
-        );
-    });
+      )
+      .subscribe(() => {}, () => this.router.navigate(['/error-404']));
   }
 
   ngOnDestroy(): void {

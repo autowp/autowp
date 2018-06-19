@@ -1,8 +1,9 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import Notify from '../../notify';
-import { MessageStateParams, ForumService } from '../../services/forum';
+import { ForumService } from '../../services/forum';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { distinctUntilChanged, debounceTime, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-forums-message',
@@ -19,8 +20,15 @@ export class MessageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
-      this.forumService.getMessageStateParams(params.message_id).subscribe(
+    this.routeSub = this.route.params
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params =>
+          this.forumService.getMessageStateParams(params.message_id)
+        )
+      )
+      .subscribe(
         message => {
           this.router.navigate(['/forums/topic', message.topic_id], {
             queryParams: {
@@ -32,7 +40,6 @@ export class MessageComponent implements OnInit, OnDestroy {
           Notify.response(response);
         }
       );
-    });
   }
 
   ngOnDestroy(): void {

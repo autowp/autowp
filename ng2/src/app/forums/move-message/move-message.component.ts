@@ -4,12 +4,19 @@ import Notify from '../../notify';
 import { Router, ActivatedRoute } from '@angular/router';
 import {
   ForumService,
-  MessageStateParams,
   APIForumTheme,
   APIForumTopic
 } from '../../services/forum';
-import { Subscription } from 'rxjs';
+import { Subscription, empty, of, combineLatest } from 'rxjs';
 import { PageEnvService } from '../../services/page-env.service';
+import {
+  distinctUntilChanged,
+  debounceTime,
+  switchMap,
+  catchError,
+  map,
+  switchMapTo
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-forums-move-message',
@@ -44,26 +51,43 @@ export class ForumsMoveMessageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.querySub = this.route.queryParams.subscribe(params => {
-      this.messageID = parseInt(params.message_id, 10);
-      this.themeID = parseInt(params.theme_id, 10);
+    this.querySub = this.route.queryParams
+      .pipe(
+        distinctUntilChanged(),
+        debounceTime(30),
+        switchMap(params => {
+          this.messageID = parseInt(params.message_id, 10);
+          this.themeID = parseInt(params.theme_id, 10);
 
-      if (this.themeID) {
-        this.forumService
-          .getTopics({ theme_id: this.themeID })
-          .subscribe(
-            response => (this.topics = response.items),
-            response => Notify.response(response)
-          );
-      } else {
-        this.forumService
-          .getThemes({})
-          .subscribe(
-            response => (this.themes = response.items),
-            response => Notify.response(response)
-          );
-      }
-    });
+          let topics = of(null as APIForumTopic[]);
+          let themes = of(null as APIForumTheme[]);
+          if (this.themeID) {
+            topics = this.forumService
+              .getTopics({ theme_id: this.themeID })
+              .pipe(
+                catchError(response => {
+                  Notify.response(response);
+                  return empty();
+                }),
+                map(response => response.items)
+              );
+          } else {
+            themes = this.forumService.getThemes({}).pipe(
+              catchError(response => {
+                Notify.response(response);
+                return empty();
+              }),
+              map(response => response.items)
+            );
+          }
+
+          return combineLatest(topics, themes);
+        })
+      )
+      .subscribe(data => {
+        this.topics = data[0];
+        this.themes = data[1];
+      });
   }
 
   ngOnDestroy(): void {
@@ -75,24 +99,17 @@ export class ForumsMoveMessageComponent implements OnInit, OnDestroy {
       .put<void>('/api/comment/' + this.messageID, {
         item_id: topic.id
       })
+      .pipe(
+        switchMapTo(this.forumService.getMessageStateParams(this.messageID))
+      )
       .subscribe(
-        response => {
-          this.forumService.getMessageStateParams(this.messageID).subscribe(
-            params => {
-              this.router.navigate(['/forums/topic', params.topic_id], {
-                queryParams: {
-                  page: params.page
-                }
-              });
-            },
-            subresponse => {
-              Notify.response(subresponse);
+        params =>
+          this.router.navigate(['/forums/topic', params.topic_id], {
+            queryParams: {
+              page: params.page
             }
-          );
-        },
-        response => {
-          Notify.response(response);
-        }
+          }),
+        subresponse => Notify.response(subresponse)
       );
   }
 }

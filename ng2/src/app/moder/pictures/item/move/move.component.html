@@ -39,7 +39,7 @@
 
   <div class="card card-body">
     <div style="margin-bottom:20px">
-      <input type="text" [(ngModel)]="search" (input)="doSearch()" class="form-control" placeholder="Type to search ..." auto-focus
+      <input type="text" [(ngModel)]="searchPerson" (input)="doSearchPerson()" class="form-control" placeholder="Type to search ..." auto-focus
       />
     </div>
     <ng-container *ngFor="let item of persons">
@@ -55,7 +55,7 @@
 
   <div class="card card-body">
     <div style="margin-bottom:20px">
-      <input type="text" [(ngModel)]="search" (input)="doSearch()" class="form-control" placeholder="Type to search ..." auto-focus
+      <input type="text" [(ngModel)]="searchAuthor" (input)="doSearchAuthor()" class="form-control" placeholder="Type to search ..." auto-focus
       />
     </div>
     <ng-container *ngFor="let item of authors">
@@ -73,7 +73,7 @@
 
     <div class="card card-body">
       <div style="margin-bottom:20px">
-        <input type="text" [(ngModel)]="search" (input)="doSearch()" class="form-control" placeholder="Type to search ..." auto-focus
+        <input type="text" [(ngModel)]="searchBrand" (input)="doSearchBrand()" class="form-control" placeholder="Type to search ..." auto-focus
         />
       </div>
       <div class="row">
