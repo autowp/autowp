@@ -104,6 +104,8 @@ RUN php ./composer.phar install --no-dev --no-progress --no-interaction --no-sug
     php ./composer.phar clearcache
 
 COPY package.json /app/package.json
+COPY ng2/package.json /app/ng2/package.json
+
 RUN npm install -y --production && \
     cd ng2 && \
     npm install -y --production && \
