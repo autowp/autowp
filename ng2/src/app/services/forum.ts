@@ -75,6 +75,7 @@ export interface APIForumTheme {
     items: APIForumTopic[];
     paginator: APIPaginator;
   };
+  disable_topics: boolean;
 }
 
 export interface APIForumTopicsGetResponse {

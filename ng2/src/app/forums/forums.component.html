@@ -1,7 +1,7 @@
 <div class="row" *ngFor="let theme of themes">
   <div class="col-md-6">
     <div class="card card-body mb-4">
-      <p>
+      <p ngPreserveWhitespaces>
         <i class="fa fa-th-list"></i>
         <strong>
           <a [routerLink]="['/forums', theme.id]" [textContent]="theme.name|translate"></a>
@@ -9,7 +9,7 @@
       </p>
       <p [textContent]="theme.description|translate" *ngIf="theme.description"></p>
       <p [translateParams]="{topics: theme.topics_count, messages: theme.messages_count}" translate>{{'{topics} topics and {messages} messages'}}</p>
-      <div *ngIf="theme.subthemes && theme.subthemes.length > 0">
+      <div *ngIf="theme.subthemes && theme.subthemes.length > 0" ngPreserveWhitespaces>
         {{'forums/subforums'|translate}}
         <a [href]="subtheme.url" *ngFor="let subtheme of theme.subthemes" [textContent]="subtheme.name|translate"></a>
       </div>
@@ -20,7 +20,7 @@
   </div>
   <div class="col-md-6" *ngIf="theme.last_topic">
     <div class="m-4 transparent">
-      <div *ngIf="theme.last_message">
+      <div *ngIf="theme.last_message" ngPreserveWhitespaces>
         <p>
           <i class="fa fa-comment"></i>
           <a [routerLink]="['/forums/topic', theme.last_topic.id]" [translateParams]="{topic_name: theme.last_topic.name}" translate>{{'forums/last-message-in-topic-{topic_name}'}}</a>
@@ -55,7 +55,7 @@
     </thead>
     <tbody *ngIf="theme">
       <tr *ngFor="let topic of theme.topics.items">
-        <td>
+        <td ngPreserveWhitespaces>
           <span class="fa fa-lock" *ngIf="topic.status == 'closed'"></span>
           <a [routerLink]="['/forums/topic', topic.id]" [textContent]="topic.name"></a>
           <span class="badge badge-pill badge-secondary">
@@ -67,7 +67,7 @@
           <br />
           <app-user [user]="topic.author" *ngIf="topic.author"></app-user>
         </td>
-        <td>
+        <td ngPreserveWhitespaces>
           <div *ngIf="topic.last_message">
             <ng-container *ngIf="topic.last_message.datetime">
               <small>
@@ -82,7 +82,7 @@
           </div>
           <span *ngIf="!topic.last_message">&#x2014;</span>
         </td>
-        <td *ngIf="forumAdmin">
+        <td *ngIf="forumAdmin" ngPreserveWhitespaces>
           <div class="btn-group">
             <button [title]="'forums/topic/open'|translate" class="btn btn-sm btn-warning open" (click)="openTopic(topic)" *ngIf="topic.status == 'closed'">
               <i class="fa fa-check-circle"></i>

@@ -54,7 +54,7 @@
     </h2>
 
     <ul class="comments">
-      <li *ngFor="let comment of comments">
+      <li *ngFor="let comment of comments" ngPreserveWhitespaces>
         <span class="badge badge-warning" *ngIf="comment.is_new" translate>moder/comments/not-readed</span>
         <span class="badge badge-{{comment.status.class}}" *ngIf="comment.status">{{comment.status.name|translate}}</span>
         <a [href]="comment.url" [textContent]="comment.preview"></a>

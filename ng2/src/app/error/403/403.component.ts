@@ -1,9 +1,9 @@
-import { Component, Injectable } from '@angular/core';
-import { PageEnvService } from '../../services/page-env.service';
+import { Component, Injectable } from "@angular/core";
+import { PageEnvService } from "../../services/page-env.service";
 
 @Component({
-  selector: 'app-error-403',
-  templateUrl: './error-403.component.html'
+  selector: "app-error-403",
+  templateUrl: "./403.component.html"
 })
 @Injectable()
 export class Error403Component {
@@ -15,7 +15,7 @@ export class Error403Component {
             isAdminPage: true,
             needRight: true
           },
-          title: '403 Forbidden'
+          title: "403 Forbidden"
         }),
       0
     );

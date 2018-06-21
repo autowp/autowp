@@ -36,8 +36,8 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
   private sub: Subscription;
   private id: number;
   public concepts_expanded = false;
-  private src_item_id: number;
-  public src_type: number;
+  public srcItemID: number;
+  public srcType: number;
   public show_museums: boolean;
   public show_factories: boolean;
   public show_persons: boolean;
@@ -107,8 +107,8 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
         distinctUntilChanged(),
         debounceTime(30),
         switchMap(params => {
-          this.src_item_id = params.src_item_id;
-          this.src_type = params.src_type;
+          this.srcItemID = params.src_item_id;
+          this.srcType = params.src_type;
 
           this.show_museums = params.show_museums;
           this.show_factories = params.show_factories;
@@ -116,7 +116,7 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
           this.show_authors = params.show_authors;
           this.brand_id = params.brand_id;
 
-          if (this.src_type === 2) {
+          if (this.srcType === 2) {
             this.show_authors = true;
           }
 
@@ -275,9 +275,9 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
   }
 
   public selectItem(selection: PictureItemMoveSelection) {
-    if (this.src_item_id && this.src_type) {
+    if (this.srcItemID && this.srcType) {
       this.pictureItemService
-        .changeItem(this.id, this.src_type, this.src_item_id, selection.itemId)
+        .changeItem(this.id, this.srcType, this.srcItemID, selection.itemId)
         .pipe(
           switchMap(() => {
             if (!selection.perspectiveId) {
@@ -287,7 +287,7 @@ export class ModerPicturesItemMoveComponent implements OnInit, OnDestroy {
             return this.pictureItemService.setPerspective(
               this.id,
               selection.itemId,
-              this.src_type,
+              this.srcType,
               selection.perspectiveId
             );
           })

@@ -68,10 +68,29 @@ export interface APIItem {
   brands: APIItem[];
   public_urls?: string[];
 
+  has_text?: boolean;
+
   preview_pictures: {
     picture: APIPicture;
     url: string;
   }[];
+
+  engine_vehicles?: [
+    {
+      url: string;
+      name_html: string;
+    }
+  ];
+
+  tuning?: {
+    url: string;
+    count: number;
+  };
+  sport?: {
+    url: string;
+    count: number;
+  };
+  more_pictures_url?: string;
 }
 
 export interface APIItemRelatedGroupItem {

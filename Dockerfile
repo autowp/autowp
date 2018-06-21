@@ -52,7 +52,7 @@ RUN apk update && apk upgrade && \
         php7-tokenizer \
         php7-xml \
         php7-xmlwriter \
-        php7-zip \ 
+        php7-zip \
         php7-zlib \
         rsyslog \
         ssmtp \
@@ -105,6 +105,9 @@ RUN php ./composer.phar install --no-dev --no-progress --no-interaction --no-sug
 
 COPY package.json /app/package.json
 RUN npm install -y --production && \
+    cd ng2 && \
+    npm install -y --production && \
+    cd .. && \
     npm cache clean --force
 
 COPY . /app
@@ -115,6 +118,10 @@ RUN chmod +x zf && \
     go build -o ./goautowp/goautowp ./goautowp/
 
 RUN ./node_modules/.bin/webpack -p
+
+RUN cd ng2 && \
+    ng build --base-href=/ng/ --output-path=../public_html/ng/ --prod --aot && \
+    cd ..
 
 RUN rm -rf ./node_modules/ \
     && apk del \

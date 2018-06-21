@@ -6,7 +6,7 @@
 
 <app-moder-menu></app-moder-menu>
 
-<div class="navbar navbar-expand-md navbar-dark bg-dark" *ngIf="!blankPage">
+<div class="navbar navbar-expand-md navbar-dark bg-dark">
   <div class="container">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler"
       aria-expanded="false" aria-label="Toggle navigation">
@@ -167,7 +167,7 @@
     </div>
   </div>
 
-  <div class="bottom-line" *ngIf="!blankPage &amp;&amp; !isAdminPage">
+  <div class="bottom-line" *ngIf="!(layoutParams$|async).isAdminPage">
     <p>
       <strong>
         {{'layout/brand'|translate}} '2005&ndash;{{'present-time-abbr'|translate}}
@@ -175,7 +175,7 @@
     </p>
   </div>
 
-  <footer class="footer" *ngIf="!blankPage &amp;&amp; !isAdminPage">
+  <footer class="footer" *ngIf="!(layoutParams$|async).isAdminPage">
     <div class="row">
       <div class="col-md-6">
         <p class="links">
