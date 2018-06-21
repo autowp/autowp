@@ -91,6 +91,7 @@ export interface APIItem {
     count: number;
   };
   more_pictures_url?: string;
+  total_pictures?: number;
 }
 
 export interface APIItemRelatedGroupItem {

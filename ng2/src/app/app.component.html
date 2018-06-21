@@ -37,11 +37,11 @@
           </ul>
         </li>
       </ul>
-      <form action="//www.google.com/search" method="get" class="form-inline my-2 my-lg-0 mr-4" *ngIf="mainMenu">
+      <form action="//www.google.com/search" method="get" class="form-inline my-2 my-lg-0 mr-4" *ngIf="searchHostname" ngNoForm>
         <input type="hidden" name="ie" value="utf-8" />
-        <input type="hidden" name="domains" value="{{mainMenu.searchHostname}}" />
-        <input type="hidden" name="sitesearch" value="{{mainMenu.searchHostname}}" />
-        <input type="text" class="form-control" placeholder="{{'layout/search'|translate}}" name="q" />
+        <input type="hidden" name="domains" [value]="searchHostname" />
+        <input type="hidden" name="sitesearch" [value]="searchHostname" />
+        <input type="text" class="form-control" [placeholder]="'layout/search'|translate" name="q" />
       </form>
       <ul class="nav navbar-nav navbar-right">
         <li class="nav-item<?=$this->pageEnv()->isOnPath(49) ? ' active' : ''?>" *ngIf="user">

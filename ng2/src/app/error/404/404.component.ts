@@ -1,9 +1,9 @@
-import { Component, Injectable } from "@angular/core";
-import { PageEnvService } from "../../services/page-env.service";
+import { Component, Injectable } from '@angular/core';
+import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
-  selector: "app-error-404",
-  templateUrl: "./404.component.html"
+  selector: 'app-error-404',
+  templateUrl: './404.component.html'
 })
 @Injectable()
 export class Error404Component {
@@ -15,7 +15,7 @@ export class Error404Component {
             isAdminPage: true,
             needRight: true
           },
-          title: "404 Not Found"
+          title: '404 Not Found'
         }),
       0
     );
