@@ -122,7 +122,7 @@ RUN chmod +x zf && \
 RUN ./node_modules/.bin/webpack -p
 
 RUN cd ng2 && \
-    ng build --base-href=/ng/ --output-path=../public_html/ng/ --prod --aot && \
+    ./node_modules/.bin/ng build --base-href=/ng/ --output-path=../public_html/ng/ --prod --aot && \
     cd ..
 
 RUN rm -rf ./node_modules/ \

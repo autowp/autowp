@@ -100,9 +100,6 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
           });
 
           this.enginesCount = this.item.engine_id ? 1 : 0;
-
-          if (this.tab === 'spec') {
-          }
         },
         () => {
           this.router.navigate(['/error-404']);
@@ -122,7 +119,7 @@ export class CarsSpecificationsEditorComponent implements OnInit, OnDestroy {
     this.http
       .post<void>('/api/item/' + this.item.id + '/refresh-inheritance', {})
       .subscribe(
-        response => {
+        () => {
           this.router.navigate(['/cars/specifications-editor'], {
             queryParams: {
               item_id: this.item.id,

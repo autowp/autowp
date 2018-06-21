@@ -4,7 +4,8 @@ import {
   Injectable,
   Component,
   Input,
-  SimpleChanges
+  SimpleChanges,
+  OnDestroy
 } from '@angular/core';
 import { APIItem } from '../../../services/item';
 import { HttpClient } from '@angular/common/http';
@@ -14,13 +15,24 @@ import {
   APIAttrUserValue,
   APIAttrValue,
   APIAttrAttribute,
-  APIAttrUserValueGetResponse,
-  APIAttrAttributesGetResponse
+  APIAttrUserValueGetResponse
 } from '../../../services/attrs';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, combineLatest } from 'rxjs';
+import {
+  Observable,
+  Subscription,
+  forkJoin,
+  BehaviorSubject,
+  combineLatest
+} from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { map } from 'rxjs/operators';
+import {
+  map,
+  tap,
+  switchMap,
+  switchMapTo,
+  distinctUntilChanged
+} from 'rxjs/operators';
 import { APIUser } from '../../../services/user';
 
 export interface APIAttrAttributeInSpecEditor extends APIAttrAttribute {
@@ -48,8 +60,9 @@ function toPlain(
 })
 @Injectable()
 export class CarsSpecificationsEditorSpecComponent
-  implements OnInit, OnChanges {
+  implements OnInit, OnChanges, OnDestroy {
   @Input() item: APIItem;
+  private item$ = new BehaviorSubject<APIItem>(null);
   public loading = 0;
   public attributes: APIAttrAttributeInSpecEditor[] = [];
   public values = new Map<number, APIAttrValue>();
@@ -57,114 +70,202 @@ export class CarsSpecificationsEditorSpecComponent
   public currentUserValues: { [key: number]: APIAttrUserValue } = {};
   public userValuesLoading = 0;
   private user: APIUser;
+  private sub: Subscription;
+  private change$ = new BehaviorSubject<null>(null);
 
   constructor(
     private http: HttpClient,
     private attrsService: AttrsService,
     private translate: TranslateService,
     private auth: AuthService
-  ) { }
+  ) {}
+
+  private applyCurrentUserValues(values) {
+    const currentUserValues: { [key: number]: APIAttrUserValue } = {};
+    for (const value of values) {
+      const attribute = this.getAttribute(value.attribute_id);
+      if (attribute.type_id === 2 || attribute.type_id === 3) {
+        if (value.value !== null) {
+          value.value = +value.value;
+        }
+      }
+      if (attribute.is_multiple) {
+        if (!(value.value instanceof Array)) {
+          value.value = [value.value.toString()];
+        }
+      }
+      currentUserValues[value.attribute_id] = value;
+    }
+
+    for (const attr of this.attributes) {
+      if (!currentUserValues.hasOwnProperty(attr.id)) {
+        currentUserValues[attr.id] = {
+          item_id: this.item.id,
+          user_id: this.user.id,
+          attribute_id: attr.id,
+          value: null,
+          empty: true,
+          value_text: '',
+          user: null,
+          update_date: null,
+          item: null,
+          unit: null,
+          path: null
+        };
+      }
+    }
+
+    this.currentUserValues = currentUserValues;
+  }
 
   ngOnInit(): void {
-    this.auth.getUser().subscribe(user => (this.user = user));
+    this.sub = this.item$
+      .pipe(
+        distinctUntilChanged(),
+        switchMap(item =>
+          combineLatest(
+            combineLatest(
+              this.auth.getUser().pipe(tap(user => (this.user = user))),
+              this.change$
+            ).pipe(
+              switchMap(user =>
+                combineLatest(
+                  this.attrsService
+                    .getValues({
+                      item_id: item.id,
+                      zone_id: item.attr_zone_id,
+                      limit: 500,
+                      fields: 'value,value_text'
+                    })
+                    .pipe(
+                      tap(values => {
+                        this.values.clear();
+                        for (const value of values.items) {
+                          this.values.set(value.attribute_id, value);
+                        }
+                      })
+                    ),
+                  this.attrsService
+                    .getUserValues({
+                      item_id: item.id,
+                      user_id: user[0].id,
+                      zone_id: item.attr_zone_id,
+                      limit: 500,
+                      fields: 'value'
+                    })
+                    .pipe(
+                      tap(response =>
+                        this.applyCurrentUserValues(response.items)
+                      )
+                    ),
+                  this.attrsService
+                    .getUserValues({
+                      item_id: item.id,
+                      page: 1,
+                      zone_id: item.attr_zone_id,
+                      limit: 500,
+                      fields: 'value_text,user'
+                    })
+                    .pipe(
+                      tap(response => {
+                        this.userValues.clear();
+                        this.applyUserValues(response.items);
+                      }),
+                      switchMap(response => {
+                        const observables: Observable<
+                          APIAttrUserValueGetResponse
+                        >[] = [];
+                        for (
+                          let i = 2;
+                          i <= response.paginator.pageCount;
+                          i++
+                        ) {
+                          observables.push(
+                            this.attrsService
+                              .getUserValues({
+                                item_id: item.id,
+                                page: i,
+                                zone_id: item.attr_zone_id,
+                                limit: 500,
+                                fields: 'value_text,user'
+                              })
+                              .pipe(
+                                tap(subresponse => {
+                                  this.userValues.clear();
+                                  this.applyUserValues(subresponse.items);
+                                })
+                              )
+                          );
+                        }
+
+                        return forkJoin(...observables);
+                      })
+                    )
+                )
+              )
+            ),
+            combineLatest(
+              this.attrsService.getAttributes({
+                fields: 'unit,options,childs.unit,childs.options',
+                zone_id: item.attr_zone_id,
+                recursive: true
+              }),
+              this.translate.get([
+                'specifications/boolean/false',
+                'specifications/boolean/true'
+              ]),
+              (attributes, translations: string[]) => ({
+                attributes,
+                translations
+              })
+            ).pipe(
+              tap(data => {
+                const booleanOptions = [
+                  {
+                    name: '—',
+                    id: null
+                  },
+                  {
+                    name: data.translations[1],
+                    id: 0
+                  },
+                  {
+                    name: data.translations[2],
+                    id: 1
+                  }
+                ];
+
+                const attibutes = toPlain(data.attributes.items, 0);
+                for (const attribute of attibutes) {
+                  if (attribute.options) {
+                    attribute.options.splice(0, 0, {
+                      name: '—',
+                      id: null
+                    });
+                  }
+
+                  if (attribute.type_id === 5) {
+                    attribute.options = booleanOptions;
+                  }
+                }
+
+                this.attributes = attibutes;
+              })
+            )
+          )
+        )
+      )
+      .subscribe(() => {}, response => Notify.response(response));
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.item) {
-      this.load();
+      this.item$.next(changes.item.currentValue);
     }
-  }
-
-  private load() {
-    this.loading++;
-    combineLatest(
-      this.attrsService.getAttributes({
-        fields: 'unit,options,childs.unit,childs.options',
-        zone_id: this.item.attr_zone_id,
-        recursive: true
-      }),
-      this.translate.get([
-        'specifications/boolean/false',
-        'specifications/boolean/true'
-      ]),
-      (attributes: APIAttrAttributesGetResponse, translations: string[]) => ({
-        attributes,
-        translations
-      })
-    )
-      .pipe(
-        map(data => {
-          const booleanOptions = [
-            {
-              name: '—',
-              id: null
-            },
-            {
-              name: data.translations[1],
-              id: 0
-            },
-            {
-              name: data.translations[2],
-              id: 1
-            }
-          ];
-
-          const attibutes = toPlain(data.attributes.items, 0);
-          for (const attribute of attibutes) {
-            if (attribute.options) {
-              attribute.options.splice(0, 0, {
-                name: '—',
-                id: null
-              });
-            }
-
-            if (attribute.type_id === 5) {
-              attribute.options = booleanOptions;
-            }
-          }
-
-          return {
-            attributes: attibutes
-          };
-        })
-      )
-      .subscribe(
-        data => {
-          this.attributes = data.attributes;
-
-          this.loading++;
-          this.attrsService
-            .getValues({
-              item_id: this.item.id,
-              zone_id: this.item.attr_zone_id,
-              limit: 500,
-              fields: 'value,value_text'
-            })
-            .subscribe(
-              subresponse => {
-                this.values.clear();
-                for (const value of subresponse.items) {
-                  this.values.set(value.attribute_id, value);
-                }
-                this.loading--;
-              },
-              subresponse => {
-                Notify.response(subresponse);
-                this.loading--;
-              }
-            );
-
-          this.loadUserValues();
-
-          this.loadAllValues();
-
-          this.loading--;
-        },
-        response => {
-          Notify.response(response);
-          this.loading--;
-        }
-      );
   }
 
   public saveSpecs() {
@@ -187,91 +288,19 @@ export class CarsSpecificationsEditorSpecComponent
         items: items
       })
       .subscribe(
-        response => {
-          this.loadUserValues();
-          this.loadAllValues();
+        () => {
+          this.change$.next(null);
           this.loading--;
         },
         response => {
           Notify.response(response);
           this.loading--;
-        }
-      );
-  }
-
-  private loadUserValues() {
-    this.loading++;
-    this.userValuesLoading++;
-    this.attrsService
-      .getUserValues({
-        item_id: this.item.id,
-        user_id: this.user.id,
-        zone_id: this.item.attr_zone_id,
-        limit: 500,
-        fields: 'value'
-      })
-      .subscribe(
-        response => {
-          const currentUserValues: { [key: number]: APIAttrUserValue } = {};
-          for (const value of response.items) {
-            const attribute = this.getAttribute(value.attribute_id);
-            if (attribute.type_id === 2 || attribute.type_id === 3) {
-              if (value.value !== null) {
-                value.value = +value.value;
-              }
-            }
-            if (attribute.is_multiple) {
-              if (!(value.value instanceof Array)) {
-                value.value = [value.value.toString()];
-              }
-            }
-            currentUserValues[value.attribute_id] = value;
-          }
-
-          for (const attr of this.attributes) {
-            if (!currentUserValues.hasOwnProperty(attr.id)) {
-              currentUserValues[attr.id] = {
-                item_id: this.item.id,
-                user_id: this.user.id,
-                attribute_id: attr.id,
-                value: null,
-                empty: true,
-                value_text: '',
-                user: null,
-                update_date: null,
-                item: null,
-                unit: null,
-                path: null
-              };
-            }
-          }
-
-          this.currentUserValues = currentUserValues;
-          this.loading--;
-          this.userValuesLoading--;
-        },
-        response => {
-          Notify.response(response);
-          this.loading--;
-          this.userValuesLoading--;
         }
       );
   }
 
   public getStep(attribute: APIAttrAttribute): number {
     return Math.pow(10, -attribute.precision);
-  }
-
-  private httpUserValues(
-    page: number
-  ): Observable<APIAttrUserValueGetResponse> {
-    return this.attrsService.getUserValues({
-      item_id: this.item.id,
-      // exclude_user_id: this.$scope.user.id,
-      zone_id: this.item.attr_zone_id,
-      limit: 500,
-      fields: 'value_text,user'
-    });
   }
 
   private applyUserValues(items: APIAttrUserValue[]) {
@@ -284,37 +313,6 @@ export class CarsSpecificationsEditorSpecComponent
         this.userValues.set(value.attribute_id, values);
       }
     }
-  }
-
-  private loadAllValues() {
-    this.loading++;
-
-    this.httpUserValues(1).subscribe(
-      response => {
-        this.userValues.clear();
-        this.applyUserValues(response.items);
-
-        for (let i = 2; i <= response.paginator.pageCount; i++) {
-          this.loading++;
-          this.httpUserValues(i).subscribe(
-            subresponse => {
-              this.applyUserValues(subresponse.items);
-              this.loading--;
-            },
-            subresponse => {
-              Notify.response(subresponse);
-              this.loading--;
-            }
-          );
-        }
-
-        this.loading--;
-      },
-      response => {
-        Notify.response(response);
-        this.loading--;
-      }
-    );
   }
 
   private getAttribute(id: number): APIAttrAttribute {
