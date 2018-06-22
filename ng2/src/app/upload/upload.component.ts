@@ -241,7 +241,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   }
 
   public crop(picture: APIPicture) {
-    /* const cropDialog = new CropDialog({
+    const cropDialog = new CropDialog({
       sourceUrl: picture.image_gallery_full.src,
       crop: {
         x: picture.crop ? picture.crop.left : 0,
@@ -288,6 +288,6 @@ export class UploadComponent implements OnInit, OnDestroy {
       }
     });
 
-    cropDialog.show();*/
+    cropDialog.show();
   }
 }

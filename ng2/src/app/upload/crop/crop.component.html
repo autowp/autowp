@@ -1,0 +1,19 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h3 class="modal-title" translate>crop-dialog/title</h3>
+    <a class="close" (click)="activeModal.dismiss()">×</a>
+  </div>
+  <div class="modal-body">
+    <img [src]="url" (load)="onLoad($event)" />
+  </div>
+  <div class="modal-footer">
+    <button type="button"  class="btn btn-secondary" translate>who-online/close</button>
+    <button type="button" class="btn btn-secondary float-left select-all">
+      <i class="fa fa-arrows-alt"></i>
+      <span translate>crop-dialog/select-all</span>
+    </button>
+    <button type="button" disabled class="btn btn-secondary float-left selection"></button>
+    <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()" translate>crop-dialog/close</button>
+    <button type="button" class="btn btn-primary" translate>crop-dialog/save</button>
+  </div>
+</div>

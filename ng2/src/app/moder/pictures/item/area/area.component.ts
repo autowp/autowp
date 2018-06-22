@@ -1,19 +1,17 @@
 import { Component, Injectable, OnInit, OnDestroy } from '@angular/core';
 import * as $ from 'jquery';
-require('jcrop-0.9.12/css/jquery.Jcrop.css');
-require('jcrop-0.9.12/js/jquery.Jcrop');
-import { sprintf } from 'sprintf-js';
-import { HttpClient } from '@angular/common/http';
+import Jcrop from '../../../../jcrop/jquery.Jcrop.js';
 import { PictureItemService } from '../../../../services/picture-item';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription, forkJoin } from 'rxjs';
+import { Subscription, BehaviorSubject } from 'rxjs';
 import { PictureService, APIPicture } from '../../../../services/picture';
 import { PageEnvService } from '../../../../services/page-env.service';
 import {
   distinctUntilChanged,
   debounceTime,
   switchMap,
-  tap
+  tap,
+  switchMapTo
 } from 'rxjs/operators';
 
 // Acl.inheritsRole('moder', 'unauthorized');
@@ -46,9 +44,9 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
   };
   private minSize = [50, 50];
   public picture: APIPicture;
+  public img$ = new BehaviorSubject<HTMLElement>(null);
 
   constructor(
-    private http: HttpClient,
     private pictureItemService: PictureItemService,
     private router: Router,
     private route: ActivatedRoute,
@@ -104,75 +102,68 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
               fields: 'area'
             }
           )
-        )
+        ),
+        switchMapTo(this.img$, (data, img) => ({ pictureItem: data, img: img }))
       )
-      .subscribe(data => {
-        const area = data[1].area;
+      .subscribe(
+        data => {
+          const area = data.pictureItem.area;
 
-      });
-  }
+          if (data.img) {
+            const $img = $(data.img);
+            const $body = $img.parent();
 
-  private load() {
-    forkJoin().subscribe(
-      data => {
-        /* const $body = $($element[0]).find('.crop-area');
-        const $img = $body.find('img');
+            this.jcrop = null;
+            if (area) {
+              this.currentCrop = {
+                w: area.width,
+                h: area.height,
+                x: area.left,
+                y: area.top
+              };
+            } else {
+              this.currentCrop = {
+                w: this.picture.width,
+                h: this.picture.height,
+                x: 0,
+                y: 0
+              };
+            }
 
-        this.jcrop = null;
-        if (area) {
-          this.currentCrop = {
-            w: area.width,
-            h: area.height,
-            x: area.left,
-            y: area.top
-          };
-        } else {
-          this.currentCrop = {
-            w: this.picture.width,
-            h: this.picture.height,
-            x: 0,
-            y: 0
-          };
+            const bWidth = $body.width() || 1;
+
+            const scale = this.picture.width / bWidth,
+              width = this.picture.width / scale,
+              height = this.picture.height / scale;
+
+            $img.css({
+              width: width,
+              height: height
+            });
+
+            this.jcrop = Jcrop($img[0], {
+              onSelect: (c: Crop) => {
+                this.currentCrop = c;
+                this.updateSelectionText();
+              },
+              setSelect: [
+                this.currentCrop.x,
+                this.currentCrop.y,
+                this.currentCrop.x + this.currentCrop.w,
+                this.currentCrop.y + this.currentCrop.h
+              ],
+              minSize: this.minSize,
+              boxWidth: width,
+              boxHeight: height,
+              trueSize: [this.picture.width, this.picture.height],
+              keySupport: false
+            });
+          }
+        },
+        () => {
+          this.router.navigate(['/error-404']);
         }
-
-        const bWidth = $body.width() || 1;
-
-        const scale = this.picture.width / bWidth,
-          width = this.picture.width / scale,
-          height = this.picture.height / scale;
-
-        $img
-          .css({
-            width: width,
-            height: height
-          })
-          .on('load', () => {
-            // sometimes Jcrop fails without delay
-            setTimeout(() => {
-              this.jcrop = $.Jcrop($img[0], {
-                onSelect: (c: Crop) => {
-                  this.currentCrop = c;
-                  this.updateSelectionText();
-                },
-                setSelect: [
-                  this.currentCrop.x,
-                  this.currentCrop.y,
-                  this.currentCrop.x + this.currentCrop.w,
-                  this.currentCrop.y + this.currentCrop.h
-                ],
-                minSize: this.minSize,
-                boxWidth: width,
-                boxHeight: height,
-                trueSize: [this.picture.width, this.picture.height],
-                keySupport: false
-              });
-            }, 100);
-          });*/
-      },
-      () => {
-        this.router.navigate(['/error-404']);
-      }
-    );
+      );
   }
 
   ngOnDestroy(): void {
@@ -210,5 +201,9 @@ export class ModerPicturesItemAreaComponent implements OnInit, OnDestroy {
         },
         () => {}
       );
+  }
+
+  public onLoad(e) {
+    this.img$.next(e.target);
   }
 }

@@ -35,7 +35,6 @@ export class VotingVotesComponent implements OnChanges, OnInit {
   }
 
   private load() {
-    console.log('load', this.votingID, this.variantID);
     this.votes = [];
 
     const votingID = this.votingID ? this.votingID : 0;
