@@ -3,12 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
-import {
-  TranslateModule,
-  TranslateLoader,
-  TranslateCompiler
-} from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { TranslateModule, TranslateCompiler } from '@ngx-translate/core';
 import { TranslateMessageFormatCompiler } from 'ngx-translate-messageformat-compiler';
 import { MomentModule } from 'ngx-moment';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -206,6 +201,8 @@ import { VotingVotesComponent } from './voting/votes/votes.component';
 import { MapPopupComponent } from './map/popup/popup.component';
 import { MostsService } from './services/mosts';
 import { TimezoneService } from './services/timezone';
+import { Error403Component } from './error/403/403.component';
+import { Error404Component } from './error/404/404.component';
 
 // AoT requires an exported function for factories
 /* export function HttpLoaderFactory(http: HttpClient) {
@@ -561,19 +558,19 @@ const appRoutes: Routes = [
     children: [
       {
         path: '',
-        component: MostsComponent,
+        component: MostsComponent
       },
       {
         path: ':rating_catname',
-        component: MostsComponent,
+        component: MostsComponent
       },
       {
         path: ':rating_catname/:type_catname',
-        component: MostsComponent,
+        component: MostsComponent
       },
       {
         path: ':rating_catname/:type_catname/:years_catname',
-        component: MostsComponent,
+        component: MostsComponent
       }
     ]
   },
@@ -847,7 +844,9 @@ const appRoutes: Routes = [
     CarsSpecificationsEditorResultComponent,
     CarsSpecificationsEditorSpecComponent,
     VotingVotesComponent,
-    MapPopupComponent
+    MapPopupComponent,
+    Error403Component,
+    Error404Component
   ],
   entryComponents: [
     ModalMessageComponent,

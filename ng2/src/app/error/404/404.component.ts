@@ -3,7 +3,7 @@ import { PageEnvService } from '../../services/page-env.service';
 
 @Component({
   selector: 'app-error-404',
-  templateUrl: './error-404.component.html'
+  templateUrl: './404.component.html'
 })
 @Injectable()
 export class Error404Component {

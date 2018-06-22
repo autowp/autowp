@@ -89,6 +89,10 @@ export interface APIPicture {
   change_status_user: APIUser;
   ip: APIIP;
   add_date: string;
+  moder_vote: {
+    vote: number;
+    count: number;
+  };
 }
 
 export interface APIPictureModerVote {
@@ -131,7 +135,6 @@ export interface APIPictureUserSummary {
 
 @Injectable()
 export class PictureService {
-
   private summary$: Observable<APIPictureUserSummary>;
 
   constructor(private http: HttpClient, private auth: AuthService) {

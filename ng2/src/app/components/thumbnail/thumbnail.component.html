@@ -8,7 +8,7 @@
       <a [href]="picture.url" [innerHtml]="picture.name_html"></a>
     </h6>
 
-    <p class="picture-behaviour clearfix" *ngIf="!disableBehaviour">
+    <p class="picture-behaviour clearfix">
       <span title="Status" *ngIf="picture.status">
         <i class="fa fa-check text-success" *ngIf="picture.status=='accepted'"></i>
         <i class="fa fa-hourglass text-warning" *ngIf="picture.status=='inbox'"></i>

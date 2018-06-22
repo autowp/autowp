@@ -17,10 +17,7 @@ export class LanguageService {
   constructor(private http: HttpClient) {
     this.languages$ = this.http
       .get<APILanguageGetResponse>('/api/language')
-
-      .pipe(
-        shareReplay(1)
-      );
+      .pipe(shareReplay(1));
   }
 
   public getLanguage() {

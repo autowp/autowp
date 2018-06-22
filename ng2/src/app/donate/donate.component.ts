@@ -1,6 +1,7 @@
 import { Component, Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { PageEnvService } from '../services/page-env.service';
+import { LanguageService } from '../services/language';
 
 @Component({
   selector: 'app-donate',
@@ -9,11 +10,15 @@ import { PageEnvService } from '../services/page-env.service';
 @Injectable()
 export class DonateComponent {
   public frameUrl: string;
+  public language: string;
 
   constructor(
     private translate: TranslateService,
-    private pageEnv: PageEnvService
+    private pageEnv: PageEnvService,
+    private languageService: LanguageService
   ) {
+    this.language = this.languageService.getLanguage();
+
     setTimeout(
       () =>
         this.pageEnv.set({

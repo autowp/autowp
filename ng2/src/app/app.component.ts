@@ -10,6 +10,7 @@ import { MessageService } from './services/message';
 import { Page, PageService } from './services/page';
 import { PageEnvService, LayoutParams } from './services/page-env.service';
 import { Observable } from 'rxjs';
+import { LanguageService } from './services/language';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,43 @@ import { Observable } from 'rxjs';
   styleUrls: ['./app.component.less']
 })
 export class AppComponent implements OnInit {
+  private hosts = {
+    en: {
+      hostname: 'en.wheelsage.org',
+      name: 'English',
+      flag: 'flag-icon flag-icon-gb'
+    },
+    zh: {
+      hostname: 'zh.wheelsage.org',
+      name: '中文 (beta)',
+      flag: 'flag-icon flag-icon-cn'
+    },
+    ru: {
+      hostname: 'www.autowp.ru',
+      name: 'Русский',
+      flag: 'flag-icon flag-icon-ru'
+    },
+    'pt-br': {
+      hostname: 'br.wheelsage.org',
+      name: 'Português brasileiro',
+      flag: 'flag-icon flag-icon-br'
+    },
+    fr: {
+      hostname: 'fr.wheelsage.org',
+      name: 'Français (beta)',
+      flag: 'flag-icon flag-icon-fr'
+    },
+    be: {
+      hostname: 'be.wheelsage.org',
+      name: 'Беларуская',
+      flag: 'flag-icon flag-icon-by'
+    },
+    uk: {
+      hostname: 'uk.wheelsage.org',
+      name: 'Українська (beta)',
+      flag: 'flag-icon flag-icon-ua'
+    }
+  };
   public layoutParams$: Observable<LayoutParams>;
   public loginInvalidParams: any;
   public languages;
@@ -24,18 +62,18 @@ export class AppComponent implements OnInit {
   public user: APIUser;
   public isModer; // = opt.isModer;
   public newPersonalMessages; // = opt.sidebar.newPersonalMessages;
-  public mainMenu; // = opt.mainMenu;
+  public searchHostname: string;
   public mainMenuItems: Page[] = [];
   public secondaryMenuItems: Page[] = [];
   public mainInSecondaryItems: Page[] = [];
   public categories = [];
   public moderMenu; // = opt.moderMenu;
-  public searchHostname; // = opt.searchHostname;
   public loginForm = {
     login: '',
     password: '',
     remember: false
   };
+  public language: string;
 
   constructor(
     public auth: AuthService,
@@ -44,8 +82,10 @@ export class AppComponent implements OnInit {
     private translate: TranslateService,
     private pages: PageService,
     private messageService: MessageService,
-    private pageEnv: PageEnvService
+    private pageEnv: PageEnvService,
+    private languageService: LanguageService
   ) {
+    this.language = this.languageService.getLanguage();
     this.translate.setTranslation('en', require('../languages/en.json'));
     this.translate.setDefaultLang('en');
 
@@ -58,6 +98,15 @@ export class AppComponent implements OnInit {
     this.auth.getUser().subscribe(user => {
       this.user = user;
     });
+
+    let searchHostname = 'wheelsage.org';
+    for (const itemLanguage in this.hosts) {
+      if (itemLanguage === this.language) {
+        searchHostname = this.hosts[itemLanguage]['hostname'];
+      }
+    }
+
+    this.searchHostname = searchHostname;
   }
 
   ngOnInit() {

@@ -6,7 +6,7 @@
 
 <app-moder-menu></app-moder-menu>
 
-<div class="navbar navbar-expand-md navbar-dark bg-dark" *ngIf="!blankPage">
+<div class="navbar navbar-expand-md navbar-dark bg-dark">
   <div class="container">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler"
       aria-expanded="false" aria-label="Toggle navigation">
@@ -37,11 +37,11 @@
           </ul>
         </li>
       </ul>
-      <form action="//www.google.com/search" method="get" class="form-inline my-2 my-lg-0 mr-4" *ngIf="mainMenu">
+      <form action="//www.google.com/search" method="get" class="form-inline my-2 my-lg-0 mr-4" *ngIf="searchHostname" ngNoForm>
         <input type="hidden" name="ie" value="utf-8" />
-        <input type="hidden" name="domains" value="{{mainMenu.searchHostname}}" />
-        <input type="hidden" name="sitesearch" value="{{mainMenu.searchHostname}}" />
-        <input type="text" class="form-control" placeholder="{{'layout/search'|translate}}" name="q" />
+        <input type="hidden" name="domains" [value]="searchHostname" />
+        <input type="hidden" name="sitesearch" [value]="searchHostname" />
+        <input type="text" class="form-control" [placeholder]="'layout/search'|translate" name="q" />
       </form>
       <ul class="nav navbar-nav navbar-right">
         <li class="nav-item<?=$this->pageEnv()->isOnPath(49) ? ' active' : ''?>" *ngIf="user">
@@ -167,7 +167,7 @@
     </div>
   </div>
 
-  <div class="bottom-line" *ngIf="!blankPage &amp;&amp; !isAdminPage">
+  <div class="bottom-line" *ngIf="!(layoutParams$|async).isAdminPage">
     <p>
       <strong>
         {{'layout/brand'|translate}} '2005&ndash;{{'present-time-abbr'|translate}}
@@ -175,7 +175,7 @@
     </p>
   </div>
 
-  <footer class="footer" *ngIf="!blankPage &amp;&amp; !isAdminPage">
+  <footer class="footer" *ngIf="!(layoutParams$|async).isAdminPage">
     <div class="row">
       <div class="col-md-6">
         <p class="links">
