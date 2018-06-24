@@ -61,7 +61,7 @@
     </a>
     <select *ngIf="picture.perspective_item" class="form-control form-control-sm mr-1 mb-2" [(ngModel)]="picture.perspective_item.perspective_id"
       (change)="savePerspective()">
-      <option value="">--</option>
+      <option [ngValue]="null">--</option>
       <option *ngFor="let item of perspectiveOptions" [ngValue]="item.id">{{item.name|translate}}</option>
     </select>
     <p class="alert alert-warning" role="alert" *ngIf="picture.similar">

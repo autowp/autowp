@@ -40,8 +40,8 @@ class CatnameNotExists extends AbstractValidator
         $this->setValue($value);
 
         $row = $this->item->getRow([
-            'catname'    => (string)$value,
-            'exclude_id' => (int)$this->exclude
+            'catname'         => (string)$value,
+            'exclude_id != ?' => (int)$this->exclude
         ]);
 
         if ($row) {

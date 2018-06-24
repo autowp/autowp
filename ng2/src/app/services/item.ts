@@ -186,6 +186,10 @@ export class ItemService {
             }
           }
 
+          if (promises.length <= 0) {
+            promises.push(of(null));
+          }
+
           return forkJoin(...promises);
         })
       );

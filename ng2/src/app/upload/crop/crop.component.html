@@ -4,16 +4,16 @@
     <a class="close" (click)="activeModal.dismiss()">×</a>
   </div>
   <div class="modal-body">
-    <img [src]="url" (load)="onLoad($event)" />
+    <img [src]="picture.image_gallery_full.src" (load)="onLoad($event)" *ngIf="picture && picture.image_gallery_full" />
   </div>
   <div class="modal-footer">
-    <button type="button"  class="btn btn-secondary" translate>who-online/close</button>
-    <button type="button" class="btn btn-secondary float-left select-all">
+    <button type="button" class="btn btn-secondary float-left select-all" (click)="selectAll()">
       <i class="fa fa-arrows-alt"></i>
       <span translate>crop-dialog/select-all</span>
     </button>
-    <button type="button" disabled class="btn btn-secondary float-left selection"></button>
+    <span></span>
+    <button type="button" disabled class="btn btn-secondary float-left" translate [translateParams]="{resolution: resolution, aspect: aspect}">crop-dialog/resolution-x-aspect-y</button>
     <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()" translate>crop-dialog/close</button>
-    <button type="button" class="btn btn-primary" translate>crop-dialog/save</button>
+    <button type="button" class="btn btn-primary" (click)="onSave()" translate>crop-dialog/save</button>
   </div>
 </div>

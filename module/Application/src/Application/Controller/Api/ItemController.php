@@ -956,7 +956,7 @@ class ItemController extends AbstractRestfulController
                 ],
             ]
         ];
-
+        //var_dump(1235); exit;
         $pointFields = in_array($itemTypeId, [
             Item::FACTORY,
             Item::MUSEUM

@@ -29,6 +29,8 @@ import {
   debounceTime
 } from 'rxjs/operators';
 import { APIUser } from '../services/user';
+import { UploadCropComponent } from './crop/crop.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 interface UploadProgress {
   filename: string;
@@ -66,7 +68,8 @@ export class UploadComponent implements OnInit, OnDestroy {
     private router: Router,
     private pictureService: PictureService,
     public auth: AuthService,
-    private pageEnv: PageEnvService
+    private pageEnv: PageEnvService,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -241,53 +244,39 @@ export class UploadComponent implements OnInit, OnDestroy {
   }
 
   public crop(picture: APIPicture) {
-    const cropDialog = new CropDialog({
-      sourceUrl: picture.image_gallery_full.src,
-      crop: {
-        x: picture.crop ? picture.crop.left : 0,
-        y: picture.crop ? picture.crop.top : 0,
-        w: picture.crop ? picture.crop.width : picture.width,
-        h: picture.crop ? picture.crop.height : picture.height
-      },
-      width: picture.width,
-      height: picture.height,
-      onSave: (crop: any, callback: Function) => {
-        this.http
-          .put<void>('/api/picture/' + picture.id, {
-              crop: {
-                left: crop.x,
-                top: crop.y,
-                width: crop.w,
-                height: crop.h
-              }
-          })
-          .subscribe(
-            () => {
-              this.pictureService
-                .getPicture(picture.id, {
-                  fields: 'crop,thumb_medium'
-                })
-                .subscribe(
-                  response => {
-                    picture.crop = response.crop;
-                    picture.thumb_medium = response.thumb_medium;
-                  },
-                  response => {
-                    Notify.response(response);
-                  }
-                );
-
-              cropDialog.hide();
-
-              callback();
-            },
-            response => {
-              Notify.response(response);
-            }
-          );
-      }
+    const modalRef = this.modalService.open(UploadCropComponent, {
+      size: 'lg',
+      centered: true
     });
 
-    cropDialog.show();
+    modalRef.componentInstance.picture = picture;
+    modalRef.componentInstance.changed.subscribe(() => {
+      this.http
+        .put<void>('/api/picture/' + picture.id, {
+          crop: picture.crop
+        })
+        .subscribe(
+          () => {
+            this.pictureService
+              .getPicture(picture.id, {
+                fields: 'crop,thumb_medium'
+              })
+              .subscribe(
+                response => {
+                  picture.crop = response.crop;
+                  picture.thumb_medium = response.thumb_medium;
+                },
+                response => {
+                  Notify.response(response);
+                }
+              );
+          },
+          response => {
+            Notify.response(response);
+          }
+        );
+    });
+
+    return false;
   }
 }
