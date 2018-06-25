@@ -71,6 +71,7 @@ web:
   links:
   - memcached
   - mysql:5.7
+  - frontend
 
 memcached:
   image: memcached
@@ -97,3 +98,9 @@ mysql:
   ports:
   - "3306:3306"
 
+frontend:
+  image: autowp/autowp-frontend
+  container_name: autowp_test_frontend
+  restart: always
+  volumes:
+  - "./public_html/ng:/usr/share/nginx/html/ng"

@@ -74,6 +74,7 @@ web:
   links:
   - memcached
   - mysql
+  - frontend
 
 memcached:
   image: memcached
@@ -96,3 +97,8 @@ mysql:
   - "./mysql.conf.d:/etc/mysql/conf.d"
   expose:
   - "3306"
+
+frontend:
+  image: autowp/autowp-frontend
+  container_name: autowp_test_frontend
+  restart: always
