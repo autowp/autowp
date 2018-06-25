@@ -1,8 +1,0 @@
-<a [routerLink]="['/moder/items/item', item.id]" [textContent]="item.name"></a>
-<ul *ngIf="item.childs.length">
-  <li [class.tuning]="item.type == 1" [class.sport]="item.type == 2" *ngFor="let item of item.childs">
-    <span *ngIf="item.type == 1" translate>catalogue/related</span>
-    <span *ngIf="item.type == 2" translate>catalogue/sport</span>
-    <app-moder-items-item-tree [item]="item"></app-moder-items-item-tree>
-  </li>
-</ul>
