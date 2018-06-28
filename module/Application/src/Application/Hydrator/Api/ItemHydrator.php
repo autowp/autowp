@@ -371,6 +371,12 @@ class ItemHydrator extends RestHydrator
             }
         }
 
+        if ($this->filterComposite->filter('descendants_count')) {
+            $result['descendants_count'] = $this->itemModel->getCount([
+                'ancestor' => $object['id']
+            ]);
+        }
+
         if ($isModer) {
             if ($this->filterComposite->filter('body')) {
                 $result['body'] = (string)$object['body'];

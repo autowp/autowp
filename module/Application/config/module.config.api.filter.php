@@ -1328,7 +1328,8 @@ return [
                             'end_year', 'body', 'lat', 'lng',
                             'pictures_count', 'current_pictures_count',
                             'is_compiles_item_of_day', 'item_of_day_pictures',
-                            'related_group_pictures', 'engine_id', 'attr_zone_id']]
+                            'related_group_pictures', 'engine_id', 'attr_zone_id',
+                            'descendants_count']]
                     ]
                 ]
             ],
@@ -1556,7 +1557,8 @@ return [
                             'end_year', 'body', 'lat', 'lng',
                             'pictures_count', 'current_pictures_count',
                             'is_compiles_item_of_day', 'item_of_day_pictures',
-                            'related_group_pictures', 'engine_id', 'attr_zone_id']]
+                            'related_group_pictures', 'engine_id', 'attr_zone_id',
+                            'descendants_count']]
                     ]
                 ]
             ],
