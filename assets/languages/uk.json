@@ -1,4 +1,11 @@
 {
+    "specs/attrs/157/options/euro-6c": "Euro 6c",
+    "specs/attrs/157/options/euro-5a": "Euro 5a",
+    "specs/attrs/157/options/euro-5b": "Euro 5b",
+    "item/type/9/add-sub-item": "Add sub copyright block",
+    "item/type/9/name": "Copyright block",
+    "item/type/9/new-item": "New copyright block",
+    "item/type/9/name-plural": "Copyright blocks",
     "specs/attrs/22/23/options/common-rail": "Common Rail",
     "specs/attrs/22/23/options/common-rail/mechanical": "Common Rail (механічне впорскування)",
     "specs/attrs/22/23/options/common-rail/electronic": "Common Rail (електронне впорскування)",

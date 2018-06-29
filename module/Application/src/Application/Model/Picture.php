@@ -154,6 +154,33 @@ class Picture
         }
     }
 
+    private function applyExcludeAncestorFilter(Sql\Select $select, $options, $idColumn)
+    {
+        if (! is_array($options)) {
+            $options = ['id' => $options];
+        }
+
+        $defaults = [
+            'id' => null
+        ];
+        $options = array_replace($defaults, $options);
+
+        if ($options['id']) {
+            $subSelect = new Sql\Select();
+            $subSelect
+                ->from('picture_item')
+                ->columns(['picture_id'])
+                ->join(
+                    ['ipc_exclude_ancestor' => 'item_parent_cache'],
+                    'picture_item.item_id = ipc_exclude_ancestor.item_id',
+                    []
+                )
+                ->where(['ipc_exclude_ancestor.parent_id' => (int) $options['id']]);
+
+            $select->where([new Sql\Predicate\NotIn($idColumn, $subSelect)]);
+        }
+    }
+
     private function applyEngineFilter(Sql\Select $select, $options)
     {
         $defaults = [
@@ -178,6 +205,7 @@ class Picture
             'id'                  => null,
             'item_type_id'        => null,
             'ancestor_or_self'    => null,
+            'exclude_ancestor_or_self' => null,
             'perspective'         => null,
             'perspective_is_null' => null,
             'perspective_exclude' => null,
@@ -219,6 +247,10 @@ class Picture
 
         if ($options['ancestor_or_self'] !== null) {
             $this->applyAncestorFilter($select, $options['ancestor_or_self'], 'picture_item.item_id');
+        }
+
+        if ($options['exclude_ancestor_or_self'] !== null) {
+            $this->applyExcludeAncestorFilter($select, $options['exclude_ancestor_or_self'], 'pictures.id');
         }
 
         if ($options['perspective'] !== null) {
@@ -347,6 +379,7 @@ class Picture
             'add_date'         => null,
             'accept_date'      => null,
             'timezone'         => null,
+            'added_from'       => null
         ];
         $options = array_replace($defaults, $options);
 
@@ -409,6 +442,26 @@ class Picture
             }
 
             $this->setDateFilter($select, 'pictures.accept_datetime', $options['accept_date'], $options['timezone']);
+        }
+
+        if ($options['added_from']) {
+            if (! isset($options['timezone'])) {
+                throw new Exception("Timezone not provided");
+            }
+
+            $timezone = new DateTimeZone($options['timezone']);
+            $dbTimezine = new DateTimeZone(MYSQL_TIMEZONE);
+
+            $date = DateTime::createFromFormat('Y-m-d', $options['added_from'], $timezone);
+
+            $start = clone $date;
+            $start->setTime(0, 0, 0);
+            $start->setTimezone($dbTimezine);
+
+
+            $select->where([
+                'pictures.add_date > ?' => $start->format(MYSQL_DATETIME_FORMAT)
+            ]);
         }
 
         if ($options['status'] !== null) {

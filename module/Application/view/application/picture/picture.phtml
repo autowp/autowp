@@ -143,6 +143,12 @@
             </div>
         <?php } ?>
 
+        <?php foreach ($this->copyrightTexts as $text) { ?>
+            <div>
+                <?=$this->markdown($text) ?>
+            </div>
+        <?php } ?>
+
         <?php /*if (count($this->modifications) > 0) { ?>
             <p>
                 <?php foreach ($this->modifications as $modification) { ?>

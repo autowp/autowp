@@ -48,10 +48,6 @@ class SpecController extends AbstractRestfulController
 
     public function indexAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
         return new JsonModel([
             'items' => $this->getSpecOptions(0),
         ]);

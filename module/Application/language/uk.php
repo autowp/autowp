@@ -1,7 +1,14 @@
 <?php return array (
+  'specs/attrs/157/options/euro-6c' => 'Euro 6c',
+  'specs/attrs/157/options/euro-5a' => 'Euro 5a',
+  'specs/attrs/157/options/euro-5b' => 'Euro 5b',
   'persons/content-persons' => 'Персони на фото',
   'persons/author-persons' => 'Автори',
   'mosts/most' => 'Самі',
+  'item/type/9/add-sub-item' => 'Add sub copyright block',
+  'item/type/9/name' => 'Copyright block',
+  'item/type/9/new-item' => 'New copyright block',
+  'item/type/9/name-plural' => 'Copyright blocks',
   'specs/attrs/wheels/auto-pumping-tires' => 'Автопідкачка шин',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'кількість задніх передач',
   'specs/attrs/dynamic/max-reverse-speed' => 'максимальна швидкість (назад)',
@@ -1831,7 +1838,6 @@ E-mail: %2$s
   'page/2/title' => '',
   'page/20/title' => '',
   'page/1/breadcrumbs' => '',
-  'item/type/8/add-sub-item"' => 'Додати суб-персону',
   'page/178/breadcrumbs' => 'Вибір заводу',
   'forums/need-wait-to-post' => 'Щоб додати нове повідомлення вам потрібно зачекати деякий час',
 );

@@ -61,7 +61,8 @@ class ItemParent
             Item::VEHICLE => true,
             Item::ENGINE  => true,
         ],
-        Item::PERSON => []
+        Item::PERSON => [],
+        Item::COPYRIGHT => [],
     ];
 
     private $catnameBlacklist = ['sport', 'tuning', 'related', 'pictures', 'specifications'];

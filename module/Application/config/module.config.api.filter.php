@@ -1255,6 +1255,7 @@ return [
                                 Model\Item::FACTORY,
                                 Model\Item::MUSEUM,
                                 Model\Item::PERSON,
+                                Model\Item::COPYRIGHT,
                             ]
                         ]
                     ]
@@ -2487,6 +2488,15 @@ return [
                     ['name' => 'Digits']
                 ]
             ],
+            'exclude_item_id' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
             'type_id' => [
                 'required' => false
             ],
@@ -2554,6 +2564,20 @@ return [
                     ]
                 ]
             ],
+            'added_from' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'Date',
+                        'options' => [
+                            'format' => 'Y-m-d'
+                        ]
+                    ]
+                ]
+            ]
         ],
         'api_picture_list_public' => [
             'limit' => [
@@ -2684,7 +2708,7 @@ return [
                     [
                         'name'    => 'FileSize',
                         'options' => [
-                            'max'           => 1024*1024*20,
+                            'max'           => 1024 * 1024 * 20,
                             'useByteString' => false
                         ]
                     ],

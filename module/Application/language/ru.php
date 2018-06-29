@@ -1,7 +1,14 @@
 <?php return array (
+  'specs/attrs/157/options/euro-6c' => 'Euro 6c',
+  'specs/attrs/157/options/euro-5a' => 'Euro 5a',
+  'specs/attrs/157/options/euro-5b' => 'Euro 5b',
   'persons/content-persons' => 'Персоны на фото',
   'persons/author-persons' => 'Авторы',
   'mosts/most' => 'Самые',
+  'item/type/9/add-sub-item' => 'Add sub copyright block',
+  'item/type/9/name' => 'Блок копирайтов',
+  'item/type/9/new-item' => 'Новый блок копирайтов',
+  'item/type/9/name-plural' => 'Блоки копирайтов',
   'specs/attrs/wheels/auto-pumping-tires' => 'автоподкачка шин',
   'specs/attrs/transmission/gearbox/reverse-gears' => 'количество задних передач',
   'specs/attrs/dynamic/max-reverse-speed' => 'максимальная скорость (назад)',
@@ -1825,7 +1832,6 @@ E-mail: %2$s
   'page/2/title' => '',
   'page/20/title' => '',
   'page/1/breadcrumbs' => '',
-  'item/type/8/add-sub-item"' => 'Добавить суб-персону',
   'page/178/breadcrumbs' => 'Выбор завода',
   'forums/need-wait-to-post' => 'Для добавления нового сообщения вам необходимо подождать некоторое время',
 );

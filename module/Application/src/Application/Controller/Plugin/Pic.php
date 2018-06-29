@@ -1014,6 +1014,19 @@ class Pic extends AbstractPlugin
             $copyrights = $this->textStorage->getText($picture['copyrights_text_id']);
         }
 
+        $copyrightTexts = [];
+        $copyrightRows = $this->itemModel->getRows([
+            'item_type_id' => Item::COPYRIGHT,
+            'pictures' => [
+                'id'   => $picture['id']
+            ],
+            'limit' => 3
+        ]);
+        foreach ($copyrightRows as $copyrightRow) {
+            $texts = $this->itemModel->getTextsOfItem($copyrightRow['id'], $language);
+            $copyrightTexts[] = $texts['text'];
+        }
+
         $point = null;
         if ($picture['point']) {
             $point = \geoPHP::load(substr($picture['point'], 4), 'wkb');
@@ -1095,7 +1108,8 @@ class Pic extends AbstractPlugin
                 'name' => 'api/comment/subscribe'
             ]),
             'galleryImage'      => $galleryImage,
-            'twitterCreatorId'  => $twitterCreatorId
+            'twitterCreatorId'  => $twitterCreatorId,
+            'copyrightTexts'    => $copyrightTexts
         ];
 
         $this->pictureView->inc($picture['id']);
