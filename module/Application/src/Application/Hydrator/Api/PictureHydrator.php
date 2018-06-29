@@ -425,6 +425,7 @@ class PictureHydrator extends RestHydrator
                 if ($object['copyrights_text_id']) {
                     $text = $this->textStorage->getText($object['copyrights_text_id']);
                     $picture['copyrights'] = $text;
+                    $picture['copyrights_text_id'] = (int) $object['copyrights_text_id'];
                 }
             }
 

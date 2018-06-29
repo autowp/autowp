@@ -21,7 +21,6 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.js'],
         alias: {
             requireLib: 'require',
-            chart: require.resolve('chart.js'),
             markdown: require.resolve('markdown/lib/markdown.js')
         }
     },
@@ -31,11 +30,7 @@ module.exports = {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
                 exclude: /node_modules|vendor/
-            },
-            { test: /ui-leaflet/, use: {
-                loader: 'imports-loader',
-                options: {'L': 'leaflet'}
-            }}, {
+            }, {
                 test: /\.js$/, // include .js files
                 exclude: /node_modules/, // exclude any and all files in the node_modules folder
                 use:[
@@ -49,14 +44,7 @@ module.exports = {
                       }
                   }
                 ]
-            }, { test: /angular-markdown-directive/, use: {
-                loader: 'imports-loader',
-                options: {'showdown': 'showdown'}
-            }}, { test: /webgl-heatmap-leaflet/, use: {
-                loader: 'imports-loader',
-                options: {'L': 'leaflet'}
-            }},
-            { test: /bootstrap/, use: {
+            }, { test: /bootstrap/, use: {
                 loader: 'imports-loader',
                 options: {'jQuery': 'jquery'}
             }},

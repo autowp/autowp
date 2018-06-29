@@ -117,17 +117,12 @@ class InboxController extends AbstractRestfulController
             $service->setCurrentDate($lastDate);
         }
 
-        $paginator = $service->getPaginator()
-            ->setItemCountPerPage(self::PER_PAGE)
-            ->setCurrentPageNumber($values['page']);
-
         $prevDate = $service->getPrevDate();
         $currentDate = $service->getCurrentDate();
         $nextDate = $service->getNextDate();
 
         return new JsonModel([
             'brands'    => $this->getBrandControl(),
-            'paginator' => $paginator->getPages(),
             'prev'      => [
                 'date'  => $prevDate ? $prevDate->format('Y-m-d') : null,
                 'count' => $service->getPrevDateCount()

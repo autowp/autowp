@@ -113,9 +113,9 @@ class RatingController extends AbstractActionController
 
             $users[] = [
                 'user'   => $this->userHydrator->extract($user),
-                'volume' => $user['specs_volume'],
+                'volume' => (float) $user['specs_volume'],
                 'brands' => $brands,
-                'weight' => $user['specs_weight']
+                'weight' => (float) $user['specs_weight']
             ];
         }
 

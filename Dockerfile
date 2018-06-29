@@ -52,7 +52,7 @@ RUN apk update && apk upgrade && \
         php7-tokenizer \
         php7-xml \
         php7-xmlwriter \
-        php7-zip \ 
+        php7-zip \
         php7-zlib \
         rsyslog \
         ssmtp \
@@ -104,7 +104,8 @@ RUN php ./composer.phar install --no-dev --no-progress --no-interaction --no-sug
     php ./composer.phar clearcache
 
 COPY package.json /app/package.json
-RUN npm install -y --production && \
+
+RUN npm install -y -qq --production && \
     npm cache clean --force
 
 COPY . /app

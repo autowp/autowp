@@ -1,2 +1,0 @@
-import './spec';
-import './text';

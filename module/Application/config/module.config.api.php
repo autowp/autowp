@@ -50,7 +50,7 @@ return [
             Controller\Api\DonateController::class          => Controller\Api\DonateControllerFactory::class,
             Controller\Api\FeedbackController::class        => Controller\Api\FeedbackControllerFactory::class,
             Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
-            Controller\Api\HotlinksController::class        => InvokableFactory::class,
+            Controller\Api\HotlinksController::class        => Controller\Api\HotlinksControllerFactory::class,
             Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
             Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class            => Controller\Api\Service\ItemControllerFactory::class,
@@ -1183,12 +1183,12 @@ return [
                                                     ]
                                                 ]
                                             ],
-                                            'put' => [
+                                            'post' => [
                                                 'type' => 'Method',
                                                 'options' => [
-                                                    'verb' => 'put',
+                                                    'verb' => 'post',
                                                     'defaults' => [
-                                                        'action' => 'put-logo'
+                                                        'action' => 'post-logo'
                                                     ]
                                                 ]
                                             ],

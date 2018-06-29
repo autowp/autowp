@@ -1,2 +1,0 @@
-import './rating';
-import './user';

@@ -3,8 +3,6 @@ var $ = require("jquery");
 var i18next = require('i18next');
 import notify from 'notify';
 
-require("angular.app");
-require('app.module');
 require("bootstrap/bootstrap");
 require("styles.scss");
 require("flags/flags");

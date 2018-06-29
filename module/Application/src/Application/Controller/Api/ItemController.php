@@ -63,6 +63,11 @@ class ItemController extends AbstractRestfulController
     private $itemInputFilter;
 
     /**
+     * @var InputFilter
+     */
+    private $itemLogoPutFilter;
+
+    /**
      * @var SpecificationsService
      */
     private $specificationsService;
@@ -120,6 +125,7 @@ class ItemController extends AbstractRestfulController
         ItemNameFormatter $itemNameFormatter,
         InputFilter $listInputFilter,
         InputFilter $itemInputFilter,
+        InputFilter $itemLogoPutFilter,
         SpecificationsService $specificationsService,
         ItemParent $itemParent,
         HostManager $hostManager,
@@ -136,6 +142,7 @@ class ItemController extends AbstractRestfulController
         $this->itemNameFormatter = $itemNameFormatter;
         $this->listInputFilter = $listInputFilter;
         $this->itemInputFilter = $itemInputFilter;
+        $this->itemLogoPutFilter = $itemLogoPutFilter;
         $this->specificationsService = $specificationsService;
         $this->itemParent = $itemParent;
         $this->hostManager = $hostManager;
@@ -368,7 +375,7 @@ class ItemController extends AbstractRestfulController
                 $select
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', [])
                     ->where([
-                        'item_parent_cache.parent_id' => $data['parent_id'],
+                        'item_parent_cache.parent_id' => $data['ancestor_id'],
                         'item_parent_cache.item_id <> item_parent_cache.parent_id'
                     ]);
             }
@@ -718,7 +725,7 @@ class ItemController extends AbstractRestfulController
         }
 
         return new JsonModel([
-            'groups' => $groups
+            'groups' => array_values($groups)
         ]);
     }
 
@@ -949,7 +956,7 @@ class ItemController extends AbstractRestfulController
                 ],
             ]
         ];
-
+        //var_dump(1235); exit;
         $pointFields = in_array($itemTypeId, [
             Item::FACTORY,
             Item::MUSEUM
@@ -1730,7 +1737,7 @@ class ItemController extends AbstractRestfulController
         ]));
     }
 
-    public function putLogoAction()
+    public function postLogoAction()
     {
         if (! $this->user()->isAllowed('brand', 'logo')) {
             return $this->forbiddenAction();
@@ -1741,52 +1748,22 @@ class ItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $filePath = tempnam(sys_get_temp_dir(), 'logo');
-        file_put_contents($filePath, $this->getRequest()->getContent());
+        $data = array_merge(
+            $this->params()->fromPost(),
+            $this->getRequest()->getFiles()->toArray()
+        );
 
-        $factory = new \Zend\InputFilter\Factory();
-        $input = $factory->createInput([
-            'required'   => true,
-            'validators' => [
-                ['name' => 'FileIsImage'],
-                [
-                    'name' => 'FileSize',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'max' => 10 * 1024 * 1024
-                    ]
-                ],
-                [
-                    'name' => 'FileIsImage',
-                    'break_chain_on_failure' => true,
-                ],
-                [
-                    'name' => 'FileMimeType',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'mimeType' => 'image/png'
-                    ]
-                ],
-                [
-                    'name' => 'FileImageSize',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'minWidth'  => 50,
-                        'minHeight' => 50
-                    ]
-                ],
-            ]
-        ]);
+        $this->itemLogoPutFilter->setData($data);
 
-        $input->setValue($filePath);
-
-        if (! $input->isValid()) {
-            return $this->inputResponse($input);
+        if (! $this->itemLogoPutFilter->isValid()) {
+            return $this->inputFilterResponse($this->itemLogoPutFilter);
         }
+
+        $values = $this->itemLogoPutFilter->getValues();
 
         $oldImageId = $item['logo_id'];
 
-        $imageId = $this->imageStorage()->addImageFromFile($filePath, 'brand');
+        $imageId = $this->imageStorage()->addImageFromFile($values['file']['tmp_name'], 'brand');
 
         $this->itemModel->getTable()->update([
             'logo_id' => $imageId

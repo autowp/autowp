@@ -160,6 +160,8 @@ class PictureItemController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
+        $userId = $this->user()->get()['id'];
+
         $picture = $this->picture->getRow(['id' => (int)$this->params('picture_id')]);
         if (! $picture) {
             return $this->notFoundAction();
@@ -182,7 +184,8 @@ class PictureItemController extends AbstractRestfulController
 
         $this->hydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => $data['fields']
+            'fields'   => $data['fields'],
+            'user_id'  => $userId
         ]);
 
         $row = $this->pictureItem->getPictureItemData($picture['id'], $item['id'], $type);

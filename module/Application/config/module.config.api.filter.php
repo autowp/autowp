@@ -304,7 +304,7 @@ return [
                 ]
             ],
             'type_id' => [
-                'required' => true,
+                'required' => false,
                 'validators' => [
                     ['name' => 'Digits'],
                     ['name' => Validator\Attr\TypeId::class]
@@ -677,7 +677,7 @@ return [
                     [
                         'name'    => 'Between',
                         'options' => [
-                            'min' => 1,
+                            'min' => 0,
                             'max' => 500
                         ]
                     ]
@@ -800,7 +800,7 @@ return [
                     [
                         'name'    => 'Between',
                         'options' => [
-                            'min' => 1,
+                            'min' => 0,
                             'max' => 500
                         ]
                     ]
@@ -1329,7 +1329,8 @@ return [
                             'end_year', 'body', 'lat', 'lng',
                             'pictures_count', 'current_pictures_count',
                             'is_compiles_item_of_day', 'item_of_day_pictures',
-                            'related_group_pictures', 'engine_id', 'attr_zone_id']]
+                            'related_group_pictures', 'engine_id', 'attr_zone_id',
+                            'descendants_count']]
                     ]
                 ]
             ],
@@ -1557,7 +1558,8 @@ return [
                             'end_year', 'body', 'lat', 'lng',
                             'pictures_count', 'current_pictures_count',
                             'is_compiles_item_of_day', 'item_of_day_pictures',
-                            'related_group_pictures', 'engine_id', 'attr_zone_id']]
+                            'related_group_pictures', 'engine_id', 'attr_zone_id',
+                            'descendants_count']]
                     ]
                 ]
             ],
@@ -1718,6 +1720,39 @@ return [
                     ]
                 ]
             ],
+        ],
+        'api_item_logo_put' => [
+            'file' => [
+                'required'   => true,
+                'validators' => [
+                    [
+                        'name' => 'FileSize',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'max' => 10 * 1024 * 1024
+                        ]
+                    ],
+                    [
+                        'name' => 'FileIsImage',
+                        'break_chain_on_failure' => true,
+                    ],
+                    [
+                        'name' => 'FileMimeType',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'mimeType' => 'image/png'
+                        ]
+                    ],
+                    [
+                        'name' => 'FileImageSize',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'minWidth'  => 50,
+                            'minHeight' => 50
+                        ]
+                    ],
+                ]
+            ]
         ],
         'api_item_parent_language_put' => [
             'name' => [
@@ -2377,7 +2412,7 @@ return [
                     [
                         'name'    => 'Between',
                         'options' => [
-                            'min' => 1,
+                            'min' => 0,
                             'max' => 500
                         ]
                     ]
@@ -2555,7 +2590,7 @@ return [
                     [
                         'name'    => 'Between',
                         'options' => [
-                            'min' => 1,
+                            'min' => 0,
                             'max' => 32
                         ]
                     ]

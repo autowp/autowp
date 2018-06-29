@@ -299,6 +299,7 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('engine_id')) {
             $result['engine_id'] = $object['engine_item_id'] ? (int) $object['engine_item_id'] : null;
+            $result['engine_inherit'] = (bool) $object['engine_inherit'];
         }
 
         if ($this->filterComposite->filter('specs_url')) {
@@ -368,6 +369,12 @@ class ItemHydrator extends RestHydrator
             } else {
                 $result['childs_count'] = $this->itemParent->getChildItemsCount($object['id']);
             }
+        }
+
+        if ($this->filterComposite->filter('descendants_count')) {
+            $result['descendants_count'] = $this->itemModel->getCount([
+                'ancestor' => $object['id']
+            ]);
         }
 
         if ($isModer) {

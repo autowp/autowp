@@ -133,10 +133,12 @@ class CommentHydrator extends RestHydrator
     {
         $canRemove = false;
         $isModer = false;
+        $canViewIP = false;
         $role = $this->getUserRole();
         if ($role) {
             $canRemove = $this->acl->isAllowed($role, 'comment', 'remove');
             $isModer = $this->acl->inheritsRole($role, 'moder');
+            $canViewIP = $this->acl->isAllowed($role, 'user', 'ip');
         }
 
         $result = [
@@ -249,8 +251,13 @@ class CommentHydrator extends RestHydrator
                 $result['status'] = $status;
             }
         }
+
         if ($this->filterComposite->filter('page') && $this->limit > 0) {
             $result['page'] = $this->comments->service()->getMessagePage($object, $this->limit);
+        }
+
+        if ($canViewIP) {
+            $result['ip'] = inet_ntop($object['ip']);
         }
 
         return $result;

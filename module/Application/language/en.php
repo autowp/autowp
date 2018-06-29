@@ -352,7 +352,7 @@ All images are posted for educational purposes.
 Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.',
   'upload/only-registered' => 'Only registered users can upload pictures
 
-[Login](/ng/login) or [register](/ng/signup)',
+[Login](/ng2/login) or [register](/ng/signup)',
   'catalogue/other-pictures-of-%1$s' => 'Other pictures of %1$s',
   'catalogue/all-pictures-of-%1$s' => 'All pictures of %1$s',
   'catalogue/brand/logo-of-%s' => '%s logotype',
@@ -393,7 +393,7 @@ All images are posted for educational purposes.
   'factories/factory/pictures' => 'Pictures',
   'comments/title' => 'Comments',
   'comments/reply' => 'reply',
-  'comments/what-to-do-for-write-comments' => 'To be able to post a comment, you must [create an account or sign in using social networks account](/ng/login)',
+  'comments/what-to-do-for-write-comments' => 'To be able to post a comment, you must [create an account or sign in using social networks account](/ng2/login)',
   'comments/it-requires-attention-of-moderators' => 'It requires attention of moderators',
   'comments/message' => 'Message',
   'comments/form-title' => 'Add comment',
