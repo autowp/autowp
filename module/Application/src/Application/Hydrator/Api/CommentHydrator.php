@@ -138,7 +138,7 @@ class CommentHydrator extends RestHydrator
         if ($role) {
             $canRemove = $this->acl->isAllowed($role, 'comment', 'remove');
             $isModer = $this->acl->inheritsRole($role, 'moder');
-            $canViewIp = $this->acl->isAllowed($role, 'user', 'ip');
+            $canViewIP = $this->acl->isAllowed($role, 'user', 'ip');
         }
 
         $result = [
@@ -256,7 +256,7 @@ class CommentHydrator extends RestHydrator
             $result['page'] = $this->comments->service()->getMessagePage($object, $this->limit);
         }
 
-        if ($canViewIp) {
+        if ($canViewIP) {
             $result['ip'] = inet_ntop($object['ip']);
         }
 
