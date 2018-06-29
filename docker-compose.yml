@@ -103,4 +103,6 @@ frontend:
   container_name: autowp_test_frontend
   restart: always
   volumes:
-  - "./public_html/ng:/usr/share/nginx/html/ng"
+  - "./frontend:/usr/share/nginx/html"
+  - "../autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
+  - "../autowp-frontend/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
