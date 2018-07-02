@@ -1588,7 +1588,8 @@ INSERT INTO `item_type` (`id`, `name`) VALUES
 (5, 'brand'),
 (6, 'factory'),
 (7, 'museum'),
-(8, 'person');
+(8, 'person'),
+(9, "copyrights block");
 /*!40000 ALTER TABLE `item_type` ENABLE KEYS */;
 
 --
