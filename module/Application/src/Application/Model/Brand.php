@@ -252,8 +252,12 @@ class Brand
             uksort($line, function ($a, $b) use ($language) {
                 return $this->compareName($a, $b, $language);
             });
+
+            $line = array_values($line);
         }
         unset($line);
+
+        $result = array_values($result);
 
         return $result;
     }
