@@ -42,6 +42,11 @@ class AttrUserValueCollectionInputFilter extends InputFilter
      */
     public function getInputFilter(int $attributeId)
     {
+        $valueSpec = $this->specService->getFilterSpec($attributeId);
+        if (! $valueSpec) {
+            return null;
+        }
+
         $spec = [
             'user_id'  => [
                 'required'   => true,
@@ -77,7 +82,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
                     ['name' => 'StringTrim']
                 ]
             ],
-            'value'  => $this->specService->getFilterSpec($attributeId),
+            'value'  => $valueSpec
         ];
 
         $inputFilter = new InputFilter();
@@ -136,6 +141,15 @@ class AttrUserValueCollectionInputFilter extends InputFilter
 
         foreach ($this->data as $key => $data) {
             $inputFilter = $this->getInputFilter($data['attribute_id']);
+            if (! $inputFilter) {
+                continue;
+            }
+
+            $attribute = $this->specService->getAttribute($data['attribute_id']);
+            if ($attribute['isMultiple']) {
+                $data['value'] = (array)$data['value'];
+            }
+
             $inputFilter->setData($data);
 
             if ($inputFilter->isValid()) {
