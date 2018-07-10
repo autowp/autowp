@@ -1,5 +1,5 @@
 {
-    "specs/attrs/157/options/euro-6c": "Euro 6c",
+    "specs/attrs/157/options/euro-6d": "Euro 6d",
     "specs/attrs/157/options/euro-5a": "Euro 5a",
     "specs/attrs/157/options/euro-5b": "Euro 5b",
     "item/type/9/add-sub-item": "Add sub copyright block",
@@ -26,7 +26,7 @@
     "forums/theme/all-other/description": "Інші теми, які не ввійшли до перелічених вище розділів",
     "forums/theme/german-cars/description": "Audi, BMW, Mercedes-Benz, Opel, Volkswagen, ...",
     "forums/theme/italian-cars/description": "Alfa Romeo, Ferrari, Fiat, Lamborghini, Lancia, ...",
-    "forums/theme/french-cars/description": "Peugeot, Renault, Citroen, Delahaye ...",
+    "forums/theme/french-cars/description": "Peugeot, Renault, Citroën, Delahaye ...",
     "forums/theme/japan-cars/description": "Nissan, Toyota, Honda, Mazda, ...",
     "forums/theme/korean-cars/description": "Kia, Hyundai, ...",
     "forums/theme/chinese-cars/description": "Chery, Geely, Great Wall, ...",

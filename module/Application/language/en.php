@@ -1,5 +1,5 @@
 <?php return array (
-  'specs/attrs/157/options/euro-6c' => 'Euro 6c',
+  'specs/attrs/157/options/euro-6d' => 'Euro 6d',
   'specs/attrs/157/options/euro-5a' => 'Euro 5a',
   'specs/attrs/157/options/euro-5b' => 'Euro 5b',
   'persons/content-persons' => 'Persons on photo',
@@ -648,7 +648,7 @@ We will be happy if you want to [perform selfless donation](/ng/donate) to an ar
 Thank you for your support.
 
 We will try not to disappoint you.',
-  'donate/vod/wants-to-select?' => 'Wants choose next?',
+  'donate/vod/wants-to-select?' => 'Want to choose next?',
   'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s )',
   'car-type/roadster' => 'Roadster',
   'car-type/spyder' => 'Spyder',
@@ -870,7 +870,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/189/name' => 'Too many conflicts',
   'page/196/name' => 'Donate',
   'page/197/name' => 'Text history',
-  'page/1/title' => 'Encyclopedia of cars in the pictures. WheelsAge.org',
+  'page/1/title' => 'Encyclopedia of cars in pictures. WheelsAge.org',
   'page/14/title' => '%BRAND_NAME% in chronological order',
   'page/15/title' => 'Last pictures of %BRAND_NAME%',
   'page/19/title' => 'Brands',
@@ -1147,7 +1147,7 @@ Sincerely, robot www.wheelsage.org
 
 
 Все значения, которые здесь вводятся - отображаются на сайте, в характеристиках, используются в построении разделы "самые-самые", а также отображаются в некоторых других местах сайта.',
-  'specifications-editor/not-save' => 'Data not save because of error. Details below',
+  'specifications-editor/not-save' => 'Data not saved because of error. Details below',
   'specifications-editor/parameter' => 'Parameter',
   'specifications-editor/your-value' => 'Your value',
   'specifications-editor/actual-value' => 'Current value',

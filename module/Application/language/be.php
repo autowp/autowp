@@ -1,5 +1,5 @@
 <?php return array (
-  'specs/attrs/157/options/euro-6c' => 'Euro 6c',
+  'specs/attrs/157/options/euro-6d' => 'Euro 6d',
   'specs/attrs/157/options/euro-5a' => 'Euro 5a',
   'specs/attrs/157/options/euro-5b' => 'Euro 5b',
   'persons/content-persons' => 'Persons on photo',
