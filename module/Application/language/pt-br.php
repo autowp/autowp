@@ -1,5 +1,5 @@
 <?php return array (
-  'specs/attrs/157/options/euro-6c' => 'Euro 6c',
+  'specs/attrs/157/options/euro-6d' => 'Euro 6d',
   'specs/attrs/157/options/euro-5a' => 'Euro 5a',
   'specs/attrs/157/options/euro-5b' => 'Euro 5b',
   'persons/content-persons' => 'Pessoas nas fotos',
@@ -21,7 +21,7 @@
 Se você acha que os usuários do site cometeram algum erro em postar esta imagem nessa seção, você pode deixar um comentário apontando o erro.
 
 Você pode discutir sobre carros ou outros assuntos do site em [nosso fórum](/ng/forums/)',
-  'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroën, ...',
+  'forums/theme/french-cars/description' => 'Peugeot, Renault, Citroën, Delahaye, ...',
   'forums/theme/japan-cars/description' => 'Nissan, Toyota, Honda, Mitsubishi, ...',
   'forums/theme/korean-cars/description' => 'Kia, Hyundai, SsangYong, ...',
   'forums/theme/chinese-cars/description' => 'Chery, Geely, Great Wall, ...',
