@@ -24,6 +24,7 @@ class ItemControllerFactory implements FactoryInterface
             $container->get(\Application\ItemNameFormatter::class),
             $filters->get('api_item_list'),
             $filters->get('api_item_item'),
+            $filters->get('api_item_logo_put'),
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\Model\ItemParent::class),
             $container->get(\Application\HostManager::class),

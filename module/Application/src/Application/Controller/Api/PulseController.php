@@ -150,29 +150,39 @@ class PulseController extends AbstractActionController
             while ($now > $cDate) {
                 $dateStr = $cDate->format($format);
 
-                $line[$dateStr] = isset($dates[$dateStr]) ? $dates[$dateStr] : 0;
+                $line[] = isset($dates[$dateStr]) ? $dates[$dateStr] : 0;
 
                 $cDate->add($subPeriod);
             }
 
             $color = $this->randomColor();
 
-            $grid[$uid] = [
-                'line'  => $line,
-                'color' => $color
-            ];
-
             $user = $this->userModel->getRow((int)$uid);
 
-            $legend[$uid] = [
+            $grid[] = [
+                'line'  => $line,
+                'color' => $color,
+                'label' => $user ? $user['name'] : ''
+            ];
+
+            $legend[] = [
                 'user'  => $user ? $this->userHydrator->extract($user) : null,
                 'color' => $color
             ];
         }
 
+        $labels = [];
+        $cDate = clone $from;
+        while ($now > $cDate) {
+            $labels[] = $cDate->format($format);
+
+            $cDate->add($subPeriod);
+        }
+
         return new JsonModel([
             'grid'   => $grid,
-            'legend' => $legend
+            'legend' => $legend,
+            'labels' => $labels
         ]);
     }
 }

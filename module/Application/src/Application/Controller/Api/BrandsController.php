@@ -28,7 +28,7 @@ class BrandsController extends AbstractActionController
 
         $language = $this->language();
 
-        $cacheKey = 'brands_list_45_' . $language . '_' . ($isHttps ? 'HTTPS' : 'HTTP');
+        $cacheKey = 'brands_list_46_' . $language . '_' . ($isHttps ? 'HTTPS' : 'HTTP');
 
         $items = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
@@ -53,7 +53,8 @@ class BrandsController extends AbstractActionController
         }
 
         return new JsonModel([
-            'items' => $items
+            'items' => $items,
+            'icons' => '/img/brands.png'
         ]);
     }
 }

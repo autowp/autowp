@@ -627,7 +627,7 @@ Nous serions heureux si vous souhaitiez [faire une donation désintéressée](/n
   'donate/vod/select-date' => '1. Choisissez une date',
   'donate/vod/date-busy' => 'busy',
   'donate/vod/select-item' => '2. Choisissez un véhicule',
-  'donate/vod/select-item-text' => 'Virtuellement tous les véhicules peuvent être “Véhicule du jour”, tant qu\'ils respectent les conditions suivantes: 
+  'donate/vod/select-item-text' => 'Virtuellement tous les véhicules peuvent être “Véhicule du jour”, tant qu\'ils respectent les conditions suivantes:
 
 - le véhicule ne doit pas avoir déjà été sélectionné
 - le véhicule doit avoir au moins 3 photos',
@@ -1053,9 +1053,9 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'brand/name' => 'Nom',
   'brand/logo' => 'Logotype',
   'moder/brands/meta-data/full-name' => 'Nom complet',
-  'moder/brands/logo/description' => '* Les logos doivent être au format d\'image PNG ; 
-* Les zones transparentes doivent bien être transparentes et non pas blanches! 
-* L\'image doit être recadrée aux bords du logo. Les marges ne sont pas nécessaires ; 
+  'moder/brands/logo/description' => '* Les logos doivent être au format d\'image PNG ;
+* Les zones transparentes doivent bien être transparentes et non pas blanches!
+* L\'image doit être recadrée aux bords du logo. Les marges ne sont pas nécessaires ;
 * Les images doivent avoir la plus grande définition possible - pour garantir la qualité ainsi qu\'une réutilisation future. Le site se charge automatiquement de la mise à l\'échelle.',
   'moder/brands/logo/saved' => 'Logo enregistré',
   'moder/edit-object' => 'modifier',

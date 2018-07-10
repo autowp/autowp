@@ -458,27 +458,36 @@ class PictureController extends AbstractRestfulController
 
         $paginator = $this->picture->getPaginator($filter);
 
-        $data['limit'] = $data['limit'] ? $data['limit'] : 1;
-
-        $paginator
-            ->setItemCountPerPage($data['limit'])
-            ->setCurrentPageNumber($data['page']);
-
-        $this->hydrator->setOptions([
-            'language' => $this->language(),
-            'user_id'  => $user ? $user['id'] : null,
-            'fields'   => $data['fields'],
-        ]);
-
-        $pictures = [];
-        foreach ($paginator->getCurrentItems() as $pictureRow) {
-            $pictures[] = $this->hydrator->extract($pictureRow);
+        if (strlen($data['limit']) > 0) {
+            $limit = (int)$data['limit'];
+            $limit = $limit >= 0 ? $limit : 0;
+        } else {
+            $limit = 1;
         }
 
-        return new JsonModel([
-            'paginator' => get_object_vars($paginator->getPages()),
-            'pictures'  => $pictures,
-        ]);
+        $paginator
+            ->setItemCountPerPage($limit ? $limit : 1)
+            ->setCurrentPageNumber($data['page']);
+
+        $result = [
+            'paginator' => get_object_vars($paginator->getPages())
+        ];
+
+        if ($limit > 0) {
+            $this->hydrator->setOptions([
+                'language' => $this->language(),
+                'user_id'  => $user ? $user['id'] : null,
+                'fields'   => $data['fields'],
+            ]);
+
+            $pictures = [];
+            foreach ($paginator->getCurrentItems() as $pictureRow) {
+                $pictures[] = $this->hydrator->extract($pictureRow);
+            }
+            $result['pictures'] = $pictures;
+        }
+
+        return new JsonModel($result);
     }
 
     private function canAccept($picture)
@@ -577,6 +586,9 @@ class PictureController extends AbstractRestfulController
 
         $data = (array)$this->processBodyContent($this->getRequest());
         $validationGroup = array_keys($data); // TODO: intersect with real keys
+        if (! $validationGroup) {
+            return $this->forbiddenAction();
+        }
         $this->editInputFilter->setValidationGroup($validationGroup);
         $this->editInputFilter->setData($data);
 

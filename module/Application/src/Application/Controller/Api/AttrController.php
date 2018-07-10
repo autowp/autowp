@@ -689,7 +689,22 @@ class AttrController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $this->attributeItemPatchInputFilter->setData($this->processBodyContent($this->getRequest()));
+        $data = $this->processBodyContent($this->getRequest());
+
+        $fields = [];
+        foreach (array_keys($data) as $key) {
+            if ($this->attributeItemPatchInputFilter->has($key)) {
+                $fields[] = $key;
+            }
+        }
+
+        if (! $fields) {
+            return new ApiProblemResponse(new ApiProblem(400, 'No fields provided'));
+        }
+
+        $this->attributeItemPatchInputFilter->setValidationGroup($fields);
+
+        $this->attributeItemPatchInputFilter->setData($data);
 
         if (! $this->attributeItemPatchInputFilter->isValid()) {
             return $this->inputFilterResponse($this->attributeItemPatchInputFilter);

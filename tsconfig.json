@@ -18,7 +18,6 @@
     "public_html"
   ],
   "files": [
-    "assets/autowp.d.ts",
-    "assets/jquery-Jcrop.d.ts"
+    "assets/autowp.d.ts"
   ]
 }

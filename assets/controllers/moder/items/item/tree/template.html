@@ -1,8 +1,0 @@
-<a ui-sref="moder-items-item({id: item.id})" ng-bind="item.name"></a>
-<ul ng-if="item.childs.length">
-    <li ng-class="{tuning: item.type == 1, sport: item.type == 2}" ng-repeat="item in item.childs">
-        <span ng-if="item.type == 1"><span translate>catalogue/related</span></span>
-        <span ng-if="item.type == 2"><span translate>catalogue/sport</span></span>
-        <autowp-moder-item-tree item="item"></autowp-moder-item-tree>
-    </li>
-</ul>
