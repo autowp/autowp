@@ -1,7 +1,6 @@
 var Navbar = require("navbar/navbar.js");
 var $ = require("jquery");
 var i18next = require('i18next');
-import notify from 'notify';
 
 require("bootstrap/bootstrap");
 require("styles.scss");
@@ -122,7 +121,7 @@ $(function() {
                 });
 
             } else {
-                notify.response(response);
+                console.log(response);
             }
         });
     });
@@ -135,8 +134,6 @@ $(function() {
 
             window.location = '/ng/login';
 
-        }, function(response) {
-            notify.response(response);
         });
     });
 });
