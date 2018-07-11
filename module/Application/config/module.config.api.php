@@ -618,6 +618,16 @@ return [
                                         'action' => 'index'
                                     ]
                                 ]
+                            ],
+                            'icons' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route'    => '/icons',
+                                    'defaults' => [
+                                        'controller' => Controller\Api\BrandsController::class,
+                                        'action'     => 'icons'
+                                    ],
+                                ],
                             ]
                         ]
                     ],
