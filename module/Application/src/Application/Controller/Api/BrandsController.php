@@ -53,8 +53,15 @@ class BrandsController extends AbstractActionController
         }
 
         return new JsonModel([
-            'items' => $items,
-            'icons' => '/img/brands.png'
+            'items' => $items
+        ]);
+    }
+
+    public function iconsAction()
+    {
+        return new JsonModel([
+            'image' => '/img/brands.png',
+            'css'   => '/img/brands.css'
         ]);
     }
 }
