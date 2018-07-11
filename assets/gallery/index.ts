@@ -493,7 +493,7 @@ export class Gallery {
                     } else {
                         $item.removeClass('crop');
                     }
-                    self.fixSize($item);
+                    self.fixSize($item as any);
                 }
             }
         );
@@ -965,7 +965,7 @@ export class Gallery {
 
         // this.carousel.hide();
 
-        $(document).off('keyup', this.escHandler);
+        $(document).off('keyup' as any, this.escHandler as any);
     }
 
     private show() {
