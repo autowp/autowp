@@ -25,6 +25,10 @@ class SessionDispatchListener extends AbstractListenerAggregate
      */
     public function onBootstrap(MvcEvent $e)
     {
+        if (php_sapi_name() == "cli") {
+            return;
+        }
+
         $request = $e->getRequest();
         if ($request instanceof Request) {
             $serviceManager = $e->getApplication()->getServiceManager();
