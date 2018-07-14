@@ -1,4 +1,4 @@
-FROM alpine
+FROM ubuntu:bionic
 
 LABEL maintainer "dmitry@pereslegin.ru"
 
@@ -7,18 +7,20 @@ WORKDIR /app
 EXPOSE 80
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
-ENV WAITFORIT_VERSION="v2.1.0"
+ENV WAITFORIT_VERSION="v2.2.0"
 
-RUN apk update && apk upgrade && \
-    apk add \
+RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get update -qq -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -qq -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -qq -y \
         autoconf \
         automake \
         bash \
-        build-base \
+        build-essential \
         ca-certificates \
         curl \
         git \
-        go \
+        golang \
         imagemagick \
         libpng-dev \
         libtool \
@@ -26,68 +28,48 @@ RUN apk update && apk upgrade && \
         logrotate \
         nasm \
         nginx \
-        openssh \
-        php7 \
-        php7-ctype \
-        php7-curl \
-        php7-dom \
-        php7-exif \
-        php7-fileinfo \
-        php7-fpm \
-        php7-ftp \
-        php7-iconv \
-        php7-imagick \
-        php7-intl \
-        php7-json \
-        php7-gd \
-        php7-mbstring \
-        php7-memcached \
-        php7-opcache \
-        php7-openssl \
-        php7-pcntl \
-        php7-pdo \
-        php7-pdo_mysql \
-        php7-phar \
-        php7-simplexml \
-        php7-tokenizer \
-        php7-xml \
-        php7-xmlwriter \
-        php7-zip \
-        php7-zlib \
+        openssh-client \
+        optipng \
+        php \
+        php-ctype \
+        php-curl \
+        php-dom \
+        php-exif \
+        php-fileinfo \
+        php-fpm \
+        php-ftp \
+        php-iconv \
+        php-imagick \
+        php-intl \
+        php-json \
+        php-gd \
+        php-mbstring \
+        php-memcached \
+        php-mysql \
+        php-opcache \
+        php-pdo \
+        php-phar \
+        php-simplexml \
+        php-tokenizer \
+        php-xml \
+        php-xmlwriter \
+        php-zip \
+        pngquant \
         rsyslog \
         ssmtp \
         supervisor \
-        tzdata \
-    && \
-    apk add nodejs 'nodejs-npm<8' --update-cache --repository http://dl-3.alpinelinux.org/alpine/v3.6/main/ \
-    && \
-    apk add optipng --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
-    && \
-    apk add pngquant --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/ \
-    && \
-    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+        tzdata
+
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    apt-get install -qq -y nodejs
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get autoclean -qq -y
+
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php --quiet && \
-    rm composer-setup.php \
-    && \
-    mkdir -p node_modules/pngquant-bin/vendor/ && \
-    mkdir -p node_modules/optipng-bin/vendor/ && \
-    ln -s /usr/bin/pngquant node_modules/pngquant-bin/vendor/pngquant && \
-    ln -s /usr/bin/optipng node_modules/optipng-bin/vendor/optipng && \
-    \
-    curl -Lk -o phantomjs.tar.gz https://github.com/fgrehm/docker-phantomjs2/releases/download/v2.0.0-20150722/dockerized-phantomjs.tar.gz \
-    && tar -xf phantomjs.tar.gz -C /tmp/ \
-    && cp -R /tmp/etc/fonts /etc/ \
-    && cp -R /tmp/lib/* /lib/ \
-    && cp -R /tmp/lib64 / \
-    && cp -R /tmp/usr/lib/* /usr/lib/ \
-    && cp -R /tmp/usr/lib/x86_64-linux-gnu /usr/ \
-    && cp -R /tmp/usr/share/* /usr/share/ \
-    && cp /tmp/usr/local/bin/phantomjs /usr/bin/ \
-    && rm -fr phantomjs.tar.gz  /tmp/* \
-    && mkdir -p /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/ \
-    && ln -s /usr/bin/phantomjs /app/node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs \
-    && \
-    curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
+    rm composer-setup.php
+
+RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
     chmod +x /usr/local/bin/waitforit
 
 RUN go get \
@@ -117,16 +99,6 @@ RUN chmod +x zf && \
 
 RUN ./node_modules/.bin/webpack -p
 
-RUN rm -rf ./node_modules/ \
-    && apk del \
-        autoconf \
-        automake \
-        build-base \
-        libtool \
-        nasm \
-        nodejs \
-        nodejs-npm \
-        optipng \
-        pngquant
+RUN rm -rf ./node_modules/
 
 CMD ["./start.sh"]
