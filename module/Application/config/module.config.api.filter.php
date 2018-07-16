@@ -1288,7 +1288,7 @@ return [
                     ['name' => 'StringTrim']
                 ],
                 'validators' => [
-                    ['name' => 'Digits'],
+                    ['name' => 'Digits'], // Order matters in ItemController
                     [
                         'name'    => 'Between',
                         'options' => [

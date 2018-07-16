@@ -195,7 +195,16 @@ class ItemController extends AbstractRestfulController
 
         $user = $this->user()->get();
 
-        $this->listInputFilter->setData($this->params()->fromQuery());
+        $params = $this->params()->fromQuery();
+
+        if (isset($params['type_id'])) {
+            $typeID = (int)$params['type_id'];
+            if ($typeID == Item::BRAND) {
+                $this->listInputFilter->get('limit')->getValidatorChain()->getValidators()[1]['instance']->setMax(5000);
+            }
+        }
+
+        $this->listInputFilter->setData($params);
 
         if (! $this->listInputFilter->isValid()) {
             return $this->inputFilterResponse($this->listInputFilter);
