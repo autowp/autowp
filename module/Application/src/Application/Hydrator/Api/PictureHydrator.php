@@ -216,7 +216,7 @@ class PictureHydrator extends RestHydrator
             'owner_id'       => $object['owner_id'] ? (int)$object['owner_id'] : null,
             'width'          => (int)$object['width'],
             'height'         => (int)$object['height'],
-            'filesize'       => $object['filesize']
+            'filesize'       => (int)$object['filesize']
         ];
 
         if ($isModer) {
