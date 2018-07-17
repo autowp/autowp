@@ -1526,7 +1526,10 @@ class CatalogueController extends AbstractActionController
 
             foreach ($pictureRows as $pictureRow) {
                 if ($pictureRow) {
-                    $imageInfo = $imageStorage->getFormatedImage($pictureRow['image_id'], 'picture-thumb');
+                    $imageInfo = null;
+                    if ($pictureRow['image_id']) {
+                        $imageStorage->getFormatedImage($pictureRow['image_id'], 'picture-thumb');
+                    }
 
                     $pictures[] = [
                         'src'  => $imageInfo ? $imageInfo->getSrc() : null,
