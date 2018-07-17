@@ -15,7 +15,7 @@ export function bind(element) {
 
                 $modal.find('.modal-title').text(i18next.t("who-online/title"));
                 $modal.find('.btn-primary').text(i18next.t("who-online/refresh"));
-                $modal.find('.btn-secondary').text(i18next.t("who-online/close"));
+                $modal.find('.btn-secondary').text(i18next.t("dialog/close"));
 
                 $body = $modal.find('.modal-body');
                 $btnRefresh = $modal.find('.btn-primary').on('click', function(e) {

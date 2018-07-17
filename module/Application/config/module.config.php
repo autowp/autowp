@@ -361,12 +361,6 @@ return [
         'privateKey' => getenv('AUTOWP_RECAPTCHA_PRIVATEKEY')
     ],
 
-    'oneskyapp' => [
-        'api_key'    => getenv('ONESKYAPP_KEY'),
-        'api_secret' => getenv('ONESKYAPP_SECRET'),
-        'project_id' => getenv('ONESKYAPP_PROJECT_ID'),
-    ],
-
     'rollbar' => [
         'logger' => [
             'access_token' => getenv('ROLLBAR_ACCESS_TOKEN'),

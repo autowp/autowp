@@ -7,7 +7,6 @@ return [
         'factories' => [
             Controller\Console\BuildController::class     => Controller\Console\BuildControllerFactory::class,
             Controller\Console\CatalogueController::class => Controller\Console\Service\CatalogueControllerFactory::class,
-            Controller\Console\OneskyappController::class => Controller\Console\OneskyappControllerFactory::class,
             Controller\Console\PicturesController::class  => Controller\Console\Service\PicturesControllerFactory::class,
             Controller\Console\RefererController::class   => Controller\Console\RefererControllerFactory::class,
             Controller\Console\SpecsController::class     => Controller\Console\Service\SpecsControllerFactory::class,
@@ -30,14 +29,6 @@ return [
                         'route'    => 'catalogue (refresh-brand-vehicle|rebuild-car-order-cache):action',
                         'defaults' => [
                             'controller' => Controller\Console\CatalogueController::class,
-                        ]
-                    ]
-                ],
-                'oneskyapp' => [
-                    'options' => [
-                        'route'    => 'oneskyapp (download):action',
-                        'defaults' => [
-                            'controller' => Controller\Console\OneskyappController::class,
                         ]
                     ]
                 ],

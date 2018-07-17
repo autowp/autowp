@@ -50,9 +50,6 @@ web:
     AUTOWP_RECAPTCHA_PUBLICKEY: "public"
     AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
     AUTOWP_GO_LISTEN: ":81"
-    ONESKYAPP_KEY: "2a1C12oZU5VIK409AJd0xUfVntGyhLWa"
-    ONESKYAPP_SECRET: ""
-    ONESKYAPP_PROJECT_ID: 129670
     ROLLBAR_ACCESS_TOKEN: ""
     ROLLBAR_CLIENT_ACCESS_TOKEN: ""
     ROLLBAR_ENVIRONMENT: development
@@ -62,7 +59,7 @@ web:
   - ./cache:/app/cache
   - ./assets:/app/assets
   - ./module:/app/module
-  - ./public_html:/app/public_html
+  #- ./public_html:/app/public_html
   - ./vendor:/app/vendor
   - ./etc/nginx/conf.d:/etc/nginx/conf.d
   #- ./goautowp:/app/goautowp
