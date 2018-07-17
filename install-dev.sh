@@ -1,2 +1,6 @@
-apk add php7-xdebug --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/
+#!/bin/bash
+
+set -e
+
+DEBIAN_FRONTEND=noninteractive apt-get install php-xdebug
 php ./composer.phar install --no-progress --no-interaction --no-suggest --optimize-autoloader
