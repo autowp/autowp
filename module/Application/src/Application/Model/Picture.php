@@ -764,6 +764,10 @@ class Picture
 
         $date = DateTime::createFromFormat('Y-m-d', $date, $timezone);
 
+        if ($date === false) {
+            throw new Exception("Failed to parse date `$date`");
+        }
+
         $start = clone $date;
         $start->setTime(0, 0, 0);
         $start->setTimezone($dbTimezine);
