@@ -171,12 +171,21 @@ class Referer
                 ->order('count desc')
                 ->limit(20);
 
+            $links = [];
+            foreach ($this->table->selectWith($select) as $link) {
+                $links[] = [
+                    'url'    => $link['url'],
+                    'count'  => $link['count'],
+                    'accept' => $link['accept'],
+                ];
+            }
+
             $items[] = [
                 'host'        => $row['host'],
                 'count'       => (int)$row['count'],
                 'whitelisted' => $this->isHostWhitelisted($row['host']),
                 'blacklisted' => $this->isHostBlacklisted($row['host']),
-                'links'       => $this->table->selectWith($select)
+                'links'       => $links
             ];
         }
 
