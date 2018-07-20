@@ -572,11 +572,13 @@ class UserController extends AbstractRestfulController
                 $isGreen = $row['role'] && $this->acl->isAllowed($row['role'], 'status', 'be-green');
 
                 $result[] = [
+                    'id'        => $row['id'],
                     'name'      => $row['name'],
                     'deleted'   => $deleted,
                     'url'       => '/ng/users/' . ($row['identity'] ? $row['identity'] : 'user' . $row['id']),
                     'long_away' => $longAway,
-                    'green'     => $isGreen
+                    'green'     => $isGreen,
+                    'identity'  => $row['identity'],
                 ];
             }
         }
