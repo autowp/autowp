@@ -1,4 +1,9 @@
 <?php return array (
+  'picture/text' => 'Toutes les images ont des propriétaires.
+
+Si vous pensez que les utilisateurs du site se sont trompés en affichant cette image dans cette section, ce serait bien si vous en parliez dans les commentaires et si vous indiquiez où se trouve l\'erreur.
+
+Partagez votre joie! Que vous souhaitiez bavarder sur les automobiles ou tout autre chose, vous pouvez le faire sur [notre forum](/ng/forums/).',
   'specs/attrs/157/options/euro-6d' => 'Euro 6d',
   'specs/attrs/157/options/euro-5a' => 'Euro 5a',
   'specs/attrs/157/options/euro-5b' => 'Euro 5b',

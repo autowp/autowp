@@ -1,4 +1,9 @@
 <?php return array (
+  'picture/text' => '任何图片都有权益人。
+
+如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。
+
+前往[论坛](/ng/forums/)可以讨论任何车型的任何话题。',
   'specs/attrs/157/options/euro-6d' => 'Euro 6d',
   'specs/attrs/157/options/euro-5a' => 'Euro 5a',
   'specs/attrs/157/options/euro-5b' => 'Euro 5b',

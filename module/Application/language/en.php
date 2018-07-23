@@ -1,4 +1,9 @@
 <?php return array (
+  'picture/text' => 'All images have their owners.
+
+If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
+
+Discuss anything and just talk about cars and not only can you on [the forum](/ng/forums/).',
   'specs/attrs/157/options/euro-6d' => 'Euro 6d',
   'specs/attrs/157/options/euro-5a' => 'Euro 5a',
   'specs/attrs/157/options/euro-5b' => 'Euro 5b',
