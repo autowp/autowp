@@ -1,5 +1,5 @@
 <?php return array (
-  'picture/text' => 'Todas as imagens têm proprietários.
+  'picture/text' => 'Todas as imagens têm seus proprietários.
 
 Se você acha que os usuários do site cometeram algum erro em postar esta imagem nessa seção, você pode deixar um comentário apontando o erro.
 
@@ -38,7 +38,7 @@ Você pode discutir sobre carros ou outros assuntos do site em [nosso fórum](/n
   'forums/theme/russian-cars/description' => 'VAZ, GAZ, UAZ, ...',
   'forums/theme/american-cars/description' => 'Cadillac, Chrysler, Chevrolet, Dodge, Ford, Hummer, Pontiac, ...',
   'forums/theme/british-cars/description' => 'Aston Martin, Bentley, MG, Rover, ...',
-  'rules' => '1. ## Geral
+  'rules' => '1. ## Gerais
 
 1. Ao enviar qualquer material para o site, certifique-se de indicara fonte;
 2. É proibida a utilização demais de uma conta por usuário;
@@ -222,7 +222,7 @@ Todas as imagens são para fins educacionais
   'kW' => 'kW',
   'hp' => 'hp',
   'next' => 'próximo',
-  'previous' => 'previous',
+  'previous' => 'anterior',
   'index/brands' => 'Marcas',
   'index/factories' => 'Fábricas',
   'index/specifications' => 'Especificações',
@@ -795,7 +795,7 @@ Faremos o possível para não lhe desapontar.',
 
 Este site deve sua existência a todas as pessoas que vêm até aqui e investem todo seu tempo e conhecimento.
 
-Alguns adicionam fotos e materiais. Alguns ajudam a encontrar e solucionar erros nos já disponíveis. Uns especializam-se em determinada marca. Outros têm tempo e material para tudo. Alguns adicionam fotos em série. Já outros adicionam poucas mas raras imagens.
+Alguns usuários adicionam fotos e materiais. Alguns ajudam a encontrar e solucionar erros nos já disponíveis. Uns especializam-se em determinada marca. Outros têm tempo e material para tudo. Alguns adicionam fotos em série. Já outros adicionam poucas fotos, porém raras.
 
 Somos muitos, somos diferentes, mas estamos ligados por uma mesma paixão. Aqui estão alguns de nós:
 
