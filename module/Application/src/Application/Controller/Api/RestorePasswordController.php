@@ -174,9 +174,11 @@ class RestorePasswordController extends AbstractRestfulController
 
         $this->transport->send($mail);
 
-        $this->getResponse()->setContent($url);
+        $this->getResponse()->setStatusCode(201);
 
-        return $this->getResponse()->setStatusCode(201);
+        return new JsonModel([
+            'ok' => true
+        ]);
     }
 
     public function newGetAction()
