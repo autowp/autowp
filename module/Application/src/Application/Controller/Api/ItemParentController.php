@@ -125,6 +125,8 @@ class ItemParentController extends AbstractRestfulController
 
         $data = $this->listInputFilter->getValues();
 
+        $group = false;
+
         $select = new Sql\Select($this->itemParent->getTable()->getTable());
         $select->join('item', 'item_parent.item_id = item.id', []);
 
@@ -149,6 +151,8 @@ class ItemParentController extends AbstractRestfulController
                 ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.item_id', [])
                 ->where(['item_parent_cache.parent_id' => $data['ancestor_id']])
                 ->group(['item_parent.item_id', 'item_parent.parent_id']);
+
+            $group = true;
         }
 
         if ($isModer) {
@@ -193,6 +197,10 @@ class ItemParentController extends AbstractRestfulController
                     'item.end_order_cache'
                 ]);
                 break;
+        }
+
+        if ($group) {
+            $select->group(['item_parent.item_id', 'item_parent.parent_id']);
         }
 
         $paginator = new Paginator\Paginator(
