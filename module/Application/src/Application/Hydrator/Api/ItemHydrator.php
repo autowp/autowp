@@ -139,6 +139,8 @@ class ItemHydrator extends RestHydrator
         $this->linkTable = $tables->get('links');
         $this->specTable = $tables->get('spec');
 
+        $this->comments = $serviceManager->get(\Application\Comments::class);
+
         $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $this->perspective = $serviceManager->get(Perspective::class);
@@ -172,6 +174,9 @@ class ItemHydrator extends RestHydrator
 
         $strategy = new Strategy\Items($serviceManager);
         $this->addStrategy('categories', $strategy);
+
+        $strategy = new Strategy\Items($serviceManager);
+        $this->addStrategy('childs', $strategy);
 
         $strategy = new Strategy\Items($serviceManager);
         $this->addStrategy('twins_groups', $strategy);
@@ -375,6 +380,24 @@ class ItemHydrator extends RestHydrator
             $result['descendants_count'] = $this->itemModel->getCount([
                 'ancestor' => $object['id']
             ]);
+        }
+
+        if ($this->filterComposite->filter('accepted_pictures_count')) {
+            $result['accepted_pictures_count'] = $this->picture->getCount([
+                'item'   => $object['id'],
+                'status' => Picture::STATUS_ACCEPTED,
+            ]);
+        }
+
+        if ($this->filterComposite->filter('has_child_specs')) {
+            $result['has_child_specs'] = $this->specificationsService->hasChildSpecs($object['id']);
+        }
+
+        if ($this->filterComposite->filter('comments_topic_stat')) {
+            $result['comments_topic_stat'] = $this->comments->service()->getTopicStat(
+                \Application\Comments::ITEM_TYPE_ID,
+                $object['id']
+            );
         }
 
         if ($isModer) {
@@ -621,6 +644,14 @@ class ItemHydrator extends RestHydrator
                 ]);
 
                 $result['brands'] = $this->extractValue('brands', $rows);
+            }
+
+            if ($this->filterComposite->filter('childs')) {
+                $rows = $this->itemModel->getRows([
+                    'parent' => $object['id']
+                ]);
+
+                $result['childs'] = $this->extractValue('childs', $rows);
             }
 
             if ($this->filterComposite->filter('categories')) {
