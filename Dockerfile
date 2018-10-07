@@ -31,6 +31,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         openssh-client \
         optipng \
         php \
+        php-bcmath \
         php-ctype \
         php-curl \
         php-dom \
