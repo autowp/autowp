@@ -25,7 +25,7 @@ class ConfigProvider
                 'routes' => [
                     'traffic' => [
                         'options' => [
-                            'route'    => 'traffic (autoban|google|gc):action',
+                            'route'    => 'traffic (autoban|google):action',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
                             ]

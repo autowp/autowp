@@ -9,9 +9,17 @@ use DateTimeZone;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Json\Json;
+
+use Application\Service\RabbitMQ;
 
 class TrafficControl
 {
+    /**
+     * @var RabbitMQ
+     */
+    private $rabbitmq;
+
     /**
      * @var TableGateway
      */
@@ -58,10 +66,12 @@ class TrafficControl
     ];
 
     public function __construct(
+        RabbitMQ $rabbitmq,
         TableGateway $bannedTable,
         TableGateway $whitelistTable,
         TableGateway $monitoringTable
     ) {
+        $this->rabbitmq = $rabbitmq;
         $this->bannedTable = $bannedTable;
         $this->whitelistTable = $whitelistTable;
         $this->monitoringTable = $monitoringTable;
@@ -301,20 +311,12 @@ class TrafficControl
         ];
     }
 
-    /**
-     * @param string $ip
-     */
-    public function pushHit($ip)
+    public function pushHit(string $ip): void
     {
-        if ($ip) {
-            $sql = '
-                INSERT INTO ip_monitoring4 (ip, day_date, hour, tenminute, minute, count)
-                VALUES (INET6_ATON(?), CURDATE(), HOUR(NOW()), FLOOR(MINUTE(NOW())/10), MINUTE(NOW()), 1)
-                ON DUPLICATE KEY UPDATE count=count+1
-            ';
-            $stmt = $this->monitoringTable->getAdapter()->query($sql);
-            $stmt->execute([$ip]);
-        }
+        $this->rabbitmq->send('input', Json::encode([
+            'ip'        => $ip,
+            'timestamp' => (new \DateTime())->format(\DateTime::RFC3339)
+        ]));
     }
 
     public function autoWhitelist()
@@ -385,18 +387,5 @@ class TrafficControl
 
             print PHP_EOL;
         }
-    }
-
-    public function garbageCollect()
-    {
-        $count = $this->monitoringTable->delete([
-            'day_date < CURDATE()'
-        ]);
-
-        $count += $this->bannedTable->delete(
-            'up_to < NOW()'
-        );
-
-        return $count;
     }
 }

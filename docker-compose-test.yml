@@ -75,6 +75,7 @@ web:
   - memcached
   - mysql
   - frontend
+  - rabbitmq
 
 memcached:
   image: memcached
@@ -102,3 +103,27 @@ frontend:
   image: autowp/autowp-frontend
   container_name: autowp_test_frontend
   restart: always
+
+rabbitmq:
+  image: rabbitmq
+  container_name: autowp_test_rabbitmq
+
+traffic:
+  image: autowp/traffic
+  container_name: autowp_test_traffic
+  restart: always
+  links:
+  - rabbitmq
+  - mysql
+  environment:
+  - TRAFFIC_INPUT_HOST=autowp_test_rabbitmq
+  - TRAFFIC_INPUT_PORT=5672
+  - TRAFFIC_INPUT_QUEUE=input
+  - TRAFFIC_MYSQL_HOST=autowp_test_mysql
+  - TRAFFIC_MYSQL_PORT=3306
+  - TRAFFIC_MYSQL_USERNAME=autowp_test
+  - TRAFFIC_MYSQL_PASSWORD=test
+  - TRAFFIC_MYSQL_DBNAME=autowp_test
+  - TRAFFIC_ROLLBAR_TOKEN=
+  - TRAFFIC_ROLLBAR_ENVIRONMENT=development
+  - TRAFFIC_ROLLBAR_PERIOD=1m

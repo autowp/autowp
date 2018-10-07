@@ -31,13 +31,4 @@ class ConsoleController extends AbstractActionController
 
         $this->getResponse()->setContent("done\n");
     }
-
-    public function gcAction()
-    {
-        $count = $this->service->garbageCollect();
-
-        $this->getResponse()->setContent(
-            sprintf("%d ip monitoring and banned ip rows was deleted\ndone\n", $count)
-        );
-    }
 }

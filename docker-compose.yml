@@ -59,7 +59,7 @@ web:
   - ./cache:/app/cache
   - ./assets:/app/assets
   - ./module:/app/module
-  #- ./public_html:/app/public_html
+  - ./public_html:/app/public_html
   - ./vendor:/app/vendor
   - ./etc/nginx/conf.d:/etc/nginx/conf.d
   #- ./goautowp:/app/goautowp
@@ -69,6 +69,7 @@ web:
   - memcached
   - mysql:5.7
   - frontend
+  - rabbitmq
 
 memcached:
   image: memcached
@@ -103,3 +104,32 @@ frontend:
   - "./frontend:/usr/share/nginx/html"
   - "../autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
   - "../autowp-frontend/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
+
+rabbitmq:
+  image: rabbitmq:management
+  container_name: autowp_test_rabbitmq
+  ports:
+  - "5672:5672"
+  - "15672:15672"
+
+traffic:
+  image: autowp/traffic
+  container_name: autowp_test_traffic
+  restart: always
+  links:
+  - rabbitmq
+  - mysql
+  volumes:
+  - "./traffic/logs:/var/log"
+  environment:
+  - TRAFFIC_INPUT_HOST=autowp_test_rabbitmq
+  - TRAFFIC_INPUT_PORT=5672
+  - TRAFFIC_INPUT_QUEUE=input
+  - TRAFFIC_MYSQL_HOST=autowp_test_mysql
+  - TRAFFIC_MYSQL_PORT=3306
+  - TRAFFIC_MYSQL_USERNAME=autowp_test
+  - TRAFFIC_MYSQL_PASSWORD=test
+  - TRAFFIC_MYSQL_DBNAME=autowp_test
+  - TRAFFIC_ROLLBAR_TOKEN=
+  - TRAFFIC_ROLLBAR_ENVIRONMENT=development
+  - TRAFFIC_ROLLBAR_PERIOD=1m

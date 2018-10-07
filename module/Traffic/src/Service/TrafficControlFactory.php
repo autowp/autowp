@@ -14,6 +14,7 @@ class TrafficControlFactory implements FactoryInterface
     {
         $tables = $container->get('TableManager');
         return new \Autowp\Traffic\TrafficControl(
+            $container->get('RabbitMQ'),
             $tables->get('banned_ip'),
             $tables->get('ip_whitelist'),
             $tables->get('ip_monitoring4')

@@ -36,6 +36,7 @@ class Module implements
             __DIR__ . '/config/module.config.moder.php',
             __DIR__ . '/config/module.config.log.php',
             __DIR__ . '/config/module.config.view.php',
+            __DIR__ . '/config/module.config.rabbitmq.php',
         ];
 
         // Merge all module config options
