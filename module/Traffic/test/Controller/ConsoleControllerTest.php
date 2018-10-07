@@ -36,15 +36,4 @@ class ConsoleControllerTest extends AbstractConsoleControllerTestCase
         $this->assertActionName('google');
         $this->assertConsoleOutputContains("done");
     }
-
-    public function testGc()
-    {
-        $this->dispatch('traffic gc');
-
-        $this->assertResponseStatusCode(0);
-        $this->assertControllerName(ConsoleController::class);
-        $this->assertMatchedRouteName('traffic');
-        $this->assertActionName('gc');
-        $this->assertConsoleOutputContains("done");
-    }
 }
