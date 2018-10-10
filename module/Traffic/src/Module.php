@@ -60,7 +60,7 @@ class Module implements
     public function getConsoleUsage(Console $console)
     {
         return [
-            'traffic autoban|google|gc|clear-referer-monitoring' => 'Usage'
+            'traffic autoban|gc|clear-referer-monitoring' => 'Usage'
         ];
     }
 

@@ -24,11 +24,4 @@ class ConsoleController extends AbstractActionController
 
         $this->getResponse()->setContent("done\n");
     }
-
-    public function googleAction()
-    {
-        $this->service->autoWhitelist();
-
-        $this->getResponse()->setContent("done\n");
-    }
 }
