@@ -1,4 +1,3 @@
- *  * * * * cd /app && ./zf traffic autoban
 42  3 * * * cd /app && ./zf traffic clear-referer-monitoring
 
  0  0 * * * cd /app && ./zf cron midnight

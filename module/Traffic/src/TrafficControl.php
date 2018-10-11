@@ -35,36 +35,6 @@ class TrafficControl
      */
     private $monitoringTable;
 
-    /**
-     * @var array
-     */
-    private $autobanProfiles = [
-        [
-            'limit'  => 4000,
-            'reason' => 'daily limit',
-            'group'  => [],
-            'time'   => 10 * 24 * 3600
-        ],
-        [
-            'limit'  => 1800,
-            'reason' => 'hourly limit',
-            'group'  => ['hour'],
-            'time'   => 5 * 24 * 3600
-        ],
-        [
-            'limit'  => 600,
-            'reason' => 'ten min limit',
-            'group'  => ['hour', 'tenminute'],
-            'time'   => 24 * 3600
-        ],
-        [
-            'limit'  => 150,
-            'reason' => 'min limit',
-            'group'  => ['hour', 'tenminute', 'minute'],
-            'time'   => 12 * 3600
-        ],
-    ];
-
     public function __construct(
         RabbitMQ $rabbitmq,
         TableGateway $bannedTable,
@@ -127,47 +97,6 @@ class TrafficControl
         $this->bannedTable->delete([
             'ip = INET6_ATON(?)' => $ip
         ]);
-    }
-
-    /**
-     * @param array $profile
-     * @return void
-     */
-    private function autoBanByProfile(array $profile)
-    {
-        $group = array_merge(['ip'], $profile['group']);
-
-        $rows = $this->monitoringTable->select(function (Select $select) use ($profile, $group) {
-            $select
-                ->columns(['ip', 'c' => new Expression('SUM(count)')])
-                ->where('day_date = CURDATE()')
-                ->group($group)
-                ->having([
-                    'c > ?' => $profile['limit']
-                ]);
-        });
-
-        foreach ($rows as $row) {
-            $ip = inet_ntop($row['ip']);
-
-            /*if ($this->inWhiteList($ip)) {
-                continue;
-            }*/
-
-            print $profile['reason'] . ' ' . $ip . PHP_EOL;
-
-            $this->ban($ip, $profile['time'], 9, $profile['reason']);
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public function autoBan()
-    {
-        foreach ($this->autobanProfiles as $profile) {
-            $this->autoBanByProfile($profile);
-        }
     }
 
     /**
