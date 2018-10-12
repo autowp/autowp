@@ -21,7 +21,6 @@ class Module implements
     {
         $provider = new ConfigProvider();
         return [
-            'console'         => $provider->getConsoleConfig(),
             'controllers'     => $provider->getControllersConfig(),
             'service_manager' => $provider->getDependencyConfig(),
             'router'          => $provider->getRouterConfig(),
