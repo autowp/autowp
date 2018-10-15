@@ -5,10 +5,14 @@ namespace Application\Model;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
+use Application\Service\RabbitMQ;
+
 class Referer
 {
-    const MAX_URL = 1000;
-    const MAX_ACCEPT = 1000;
+    /**
+     * @var RabbitMQ
+     */
+    private $rabbitmq;
 
     /**
      * @var TableGateway
@@ -26,41 +30,24 @@ class Referer
     private $blacklistTable;
 
     public function __construct(
+        RabbitMQ $rabbitmq,
         TableGateway $table,
         TableGateway $whitelistTable,
         TableGateway $blacklistTable
     ) {
+        $this->rabbitmq = $rabbitmq;
         $this->table = $table;
         $this->whitelistTable = $whitelistTable;
         $this->blacklistTable = $blacklistTable;
     }
 
-    public function addUrl($url, $accept)
+    public function addUrl(string $url, string $accept): void
     {
-        $host = @parse_url($url, PHP_URL_HOST);
-
-        if (! $host) {
-            return;
-        }
-
-        $whitelisted = $this->isHostWhitelisted($host);
-
-        if ($whitelisted) {
-            return;
-        }
-
-        if (mb_strlen($url) > self::MAX_URL) {
-            $url = mb_substr($url, 0, self::MAX_URL);
-        }
-
-        $adapter = $this->table->getAdapter();
-        $stmt = $adapter->query('
-            insert into referer (host, url, count, last_date, accept)
-            values (?, ?, 1, NOW(), LEFT(?, ?))
-            on duplicate key
-            update count=count+1, host=VALUES(host), last_date=VALUES(last_date), accept=VALUES(accept)
-        ', $adapter::QUERY_MODE_PREPARE);
-        $stmt->execute([$host, $url, $accept, self::MAX_ACCEPT]);
+        $this->rabbitmq->send('hotlink', Json::encode([
+            'url'       => $url,
+            'accept'    => $accept,
+            'timestamp' => (new \DateTime())->format(\DateTime::RFC3339)
+        ]));
     }
 
     public function isImageRequest(string $accept): bool
@@ -93,16 +80,6 @@ class Referer
         return (bool)$this->blacklistTable->select([
             'host' => $host
         ])->current();
-    }
-
-    public function isUrlWhitelisted(string $url): bool
-    {
-        $host = @parse_url($url, PHP_URL_HOST);
-        if ($host) {
-            return $this->isHostWhitelisted($host);
-        }
-
-        return false;
     }
 
     public function isUrlBlacklisted(string $url): bool
@@ -190,12 +167,5 @@ class Referer
         }
 
         return $items;
-    }
-
-    public function garbageCollect(): int
-    {
-        return $this->table->delete([
-            'last_date < DATE_SUB(NOW(), INTERVAL 1 DAY)'
-        ]);
     }
 }

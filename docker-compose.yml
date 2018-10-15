@@ -122,9 +122,10 @@ traffic:
   volumes:
   - "./traffic/logs:/var/log"
   environment:
-  - TRAFFIC_INPUT_HOST=autowp_test_rabbitmq
-  - TRAFFIC_INPUT_PORT=5672
-  - TRAFFIC_INPUT_QUEUE=input
+  - TRAFFIC_RABBITMQ_HOST=autowp_test_rabbitmq
+  - TRAFFIC_RABBITMQ_PORT=5672
+  - TRAFFIC_MONITORING_QUEUE=input
+  - TRAFFIC_HOTLINK_QUEUE=hotlink
   - TRAFFIC_MYSQL_HOST=autowp_test_mysql
   - TRAFFIC_MYSQL_PORT=3306
   - TRAFFIC_MYSQL_USERNAME=autowp_test

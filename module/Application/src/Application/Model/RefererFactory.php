@@ -14,6 +14,7 @@ class RefererFactory implements FactoryInterface
     {
         $tables = $container->get('TableManager');
         return new Referer(
+            $container->get('RabbitMQ'),
             $tables->get('referer'),
             $tables->get('referer_whitelist'),
             $tables->get('referer_blacklist')
