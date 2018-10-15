@@ -9,8 +9,6 @@ use Zend\ModuleManager\Feature;
 class Module implements
     Feature\AutoloaderProviderInterface,
     Feature\BootstrapListenerInterface,
-    Feature\ConsoleUsageProviderInterface,
-    Feature\ConsoleBannerProviderInterface,
     //Feature\ControllerProviderInterface,
     Feature\ConfigProviderInterface
 {
@@ -43,24 +41,6 @@ class Module implements
     {
         $trafficListener = new TrafficRouteListener();
         $trafficListener->attach($e->getApplication()->getEventManager());
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function getConsoleBanner(Console $console)
-    {
-        return __NAMESPACE__ . ' Module';
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function getConsoleUsage(Console $console)
-    {
-        return [
-            'traffic gc|clear-referer-monitoring' => 'Usage'
-        ];
     }
 
     /*public function getControllerConfig()

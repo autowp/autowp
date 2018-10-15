@@ -1,4 +1,2 @@
-42  3 * * * cd /app && ./zf traffic clear-referer-monitoring
-
  0  0 * * * cd /app && ./zf cron midnight
 27  4 * * * cd /app && ./zf cron daily-maintenance
