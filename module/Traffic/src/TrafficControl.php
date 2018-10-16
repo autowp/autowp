@@ -6,6 +6,7 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 
+use GuzzleHttp\Client;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
@@ -47,56 +48,41 @@ class TrafficControl
         $this->monitoringTable = $monitoringTable;
     }
 
-    /**
-     * @param string $ip
-     * @param int $seconds
-     * @param int|null $byUserId
-     * @param string $reason
-     */
-    public function ban(string $ip, int $seconds, $byUserId, $reason)
+    private function getClient(): Client
     {
-        $seconds = (int)$seconds;
+        return new Client([
+            'base_uri' => 'http://traffic',
+            'timeout'  => 10.0,
+        ]);
+    }
 
+    public function ban(string $ip, int $seconds, int $byUserId, string $reason): void
+    {
         if ($seconds <= 0) {
             throw new \InvalidArgumentException("Seconds must be > 0");
         }
 
-        $reason = trim($reason);
+        $response = $this->getClient()->request('POST', '/ban', [
+            'form_params' => [
+                'ip'         => $ip,
+                'duration'   => 1000000000 * $seconds,
+                'by_user_id' => $byUserId,
+                'reason'     => trim($reason)
+            ]
+        ]);
 
-        $row = $this->bannedTable->select([
-            'ip = INET6_ATON(?)' => $ip
-        ])->current();
-
-        $datetime = new DateTime();
-        $datetime->setTimezone(new DateTimeZone(MYSQL_TIMEZONE));
-        $datetime->add(new DateInterval('PT'.$seconds.'S'));
-        $dateStr = $datetime->format(MYSQL_DATETIME_FORMAT);
-
-        $data = [
-            'up_to'      => $dateStr,
-            'by_user_id' => $byUserId,
-            'reason'     => $reason
-        ];
-
-        if (! $row) {
-            $this->bannedTable->insert(array_replace($data, [
-                'ip' => new Expression('INET6_ATON(?)', $ip)
-            ]));
-        } else {
-            $this->bannedTable->update($data, [
-                'ip = INET6_ATON(?)' => $ip
-            ]);
+        if ($response->getStatusCode() != 201) {
+            throw new \Exception("Failed to add ban");
         }
     }
 
-    /**
-     * @param string $ip
-     */
-    public function unban(string $ip)
+    public function unban(string $ip): void
     {
-        $this->bannedTable->delete([
-            'ip = INET6_ATON(?)' => $ip
-        ]);
+        $response = $this->getClient()->request('DELETE', '/ban/' . $ip);
+
+        if ($response->getStatusCode() != 204) {
+            throw new \Exception("Failed to unban");
+        }
     }
 
     /**
