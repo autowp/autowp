@@ -371,5 +371,9 @@ return [
             'period' => 60
         ],
         'client_access_token' => getenv('ROLLBAR_CLIENT_ACCESS_TOKEN')
+    ],
+
+    'traffic' => [
+        'url' => getenv('TRAFFIC_URL')
     ]
 ];

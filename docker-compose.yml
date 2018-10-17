@@ -53,6 +53,7 @@ web:
     ROLLBAR_ACCESS_TOKEN: ""
     ROLLBAR_CLIENT_ACCESS_TOKEN: ""
     ROLLBAR_ENVIRONMENT: development
+    TRAFFIC_URL: http://traffic
   volumes:
   - ./config:/app/config
   - ./data:/app/data

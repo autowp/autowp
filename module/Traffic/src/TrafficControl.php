@@ -31,11 +31,18 @@ class TrafficControl
      */
     private $monitoringTable;
 
+    /**
+     * @var string
+     */
+    private $url;
+
     public function __construct(
+        string $url,
         RabbitMQ $rabbitmq,
         TableGateway $whitelistTable,
         TableGateway $monitoringTable
     ) {
+        $this->url = $url;
         $this->rabbitmq = $rabbitmq;
         $this->whitelistTable = $whitelistTable;
         $this->monitoringTable = $monitoringTable;
@@ -44,7 +51,7 @@ class TrafficControl
     private function getClient(): Client
     {
         return new Client([
-            'base_uri' => 'http://traffic',
+            'base_uri' => $this->url,
             'timeout'  => 10.0,
         ]);
     }
@@ -73,7 +80,7 @@ class TrafficControl
 
     public function unban(string $ip): void
     {
-        $response = $this->getClient()->request('DELETE', '/ban/' . $ip, null, [
+        $response = $this->getClient()->request('DELETE', '/ban/' . $ip, [
             'http_errors' => false
         ]);
 
@@ -198,7 +205,7 @@ class TrafficControl
      */
     public function getBanInfo(string $ip)
     {
-        $response = $this->getClient()->request('GET', '/ban/' . $ip, null, [
+        $response = $this->getClient()->request('GET', '/ban/' . $ip, [
             'http_errors' => false
         ]);
 
