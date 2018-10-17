@@ -56,6 +56,7 @@ class TrafficControl
         }
 
         $response = $this->getClient()->request('POST', '/ban', [
+            'http_errors' => false,
             'json' => [
                 'ip'         => $ip,
                 'duration'   => 1000000000 * $seconds,
@@ -64,17 +65,21 @@ class TrafficControl
             ]
         ]);
 
-        if ($response->getStatusCode() != 201) {
-            throw new \Exception("Failed to add ban");
+        $code = $response->getStatusCode();
+        if ($code != 201) {
+            throw new \Exception("Unexpected status code `$code`");
         }
     }
 
     public function unban(string $ip): void
     {
-        $response = $this->getClient()->request('DELETE', '/ban/' . $ip);
+        $response = $this->getClient()->request('DELETE', '/ban/' . $ip, null, [
+            'http_errors' => false
+        ]);
 
-        if ($response->getStatusCode() != 204) {
-            throw new \Exception("Failed to unban");
+        $code = $response->getStatusCode();
+        if ($code != 204) {
+            throw new \Exception("Unexpected status code `$code`");
         }
     }
 
@@ -193,7 +198,9 @@ class TrafficControl
      */
     public function getBanInfo(string $ip)
     {
-        $response = $this->getClient()->request('GET', '/ban/' . $ip);
+        $response = $this->getClient()->request('GET', '/ban/' . $ip, null, [
+            'http_errors' => false
+        ]);
 
         $code = $response->getStatusCode();
 
