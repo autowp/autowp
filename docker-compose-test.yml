@@ -76,6 +76,7 @@ web:
   - mysql
   - frontend
   - rabbitmq
+  - traffic
 
 memcached:
   image: memcached
