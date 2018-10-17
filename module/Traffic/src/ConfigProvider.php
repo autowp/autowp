@@ -80,7 +80,6 @@ class ConfigProvider
     public function getTablesConfig(): array
     {
         return [
-            'banned_ip'      => [],
             'ip_monitoring4' => [],
             'ip_whitelist'   => [],
         ];

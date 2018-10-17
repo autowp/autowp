@@ -24,11 +24,6 @@ class TrafficControl
     /**
      * @var TableGateway
      */
-    private $bannedTable;
-
-    /**
-     * @var TableGateway
-     */
     private $whitelistTable;
 
     /**
@@ -38,12 +33,10 @@ class TrafficControl
 
     public function __construct(
         RabbitMQ $rabbitmq,
-        TableGateway $bannedTable,
         TableGateway $whitelistTable,
         TableGateway $monitoringTable
     ) {
         $this->rabbitmq = $rabbitmq;
-        $this->bannedTable = $bannedTable;
         $this->whitelistTable = $whitelistTable;
         $this->monitoringTable = $monitoringTable;
     }
@@ -63,7 +56,7 @@ class TrafficControl
         }
 
         $response = $this->getClient()->request('POST', '/ban', [
-            'form_params' => [
+            'json' => [
                 'ip'         => $ip,
                 'duration'   => 1000000000 * $seconds,
                 'by_user_id' => $byUserId,
@@ -128,15 +121,10 @@ class TrafficControl
         $result = [];
 
         foreach ($rows as $row) {
-            $banRow = $this->bannedTable->select([
-                'ip = unhex(?)' => bin2hex($row['ip']),
-                'up_to >= NOW()'
-            ])->current();
-
             $result[] = [
                 'ip'        => $row['ip_text'],
                 'count'     => $row['count'],
-                'ban'       => $banRow,
+                'ban'       => $this->getBanInfo($row['ip_text']),
                 'whitelist' => $this->inWhiteListBin($row['ip'])
             ];
         }
@@ -201,29 +189,23 @@ class TrafficControl
     }
 
     /**
-     * @param string $ip
      * @return boolean|array
      */
-    public function getBanInfo($ip)
+    public function getBanInfo(string $ip)
     {
-        $row = $this->bannedTable->select([
-            'ip = INET6_ATON(?)' => (string)$ip,
-            'up_to >= NOW()'
-        ])->current();
+        $response = $this->getClient()->request('GET', '/ban/' . $ip);
 
-        if (! $row) {
+        $code = $response->getStatusCode();
+
+        if ($code == 404) {
             return false;
         }
 
-        return [
-            'up_to'   => DateTime::createFromFormat(
-                MYSQL_DATETIME_FORMAT,
-                $row['up_to'],
-                new DateTimeZone(MYSQL_TIMEZONE)
-            ),
-            'user_id' => $row['by_user_id'],
-            'reason'  => $row['reason']
-        ];
+        if ($code != 200) {
+            throw new \Exception("Unexpected response code `$code`");
+        }
+
+        return Json::decode($response->getBody(), Json::TYPE_ARRAY);
     }
 
     public function pushHit(string $ip): void
