@@ -22,38 +22,33 @@ class TrafficControl
     private $rabbitmq;
 
     /**
-     * @var TableGateway
-     */
-    private $whitelistTable;
-
-    /**
-     * @var TableGateway
-     */
-    private $monitoringTable;
-
-    /**
      * @var string
      */
     private $url;
 
+    /**
+     * @var Client
+     */
+    private $client;
+
     public function __construct(
         string $url,
-        RabbitMQ $rabbitmq,
-        TableGateway $whitelistTable,
-        TableGateway $monitoringTable
+        RabbitMQ $rabbitmq
     ) {
         $this->url = $url;
         $this->rabbitmq = $rabbitmq;
-        $this->whitelistTable = $whitelistTable;
-        $this->monitoringTable = $monitoringTable;
     }
 
     private function getClient(): Client
     {
-        return new Client([
-            'base_uri' => $this->url,
-            'timeout'  => 10.0,
-        ]);
+        if (! $this->client) {
+            $this->client = new Client([
+                'base_uri' => $this->url,
+                'timeout'  => 5.0,
+            ]);
+        }
+
+        return $this->client;
     }
 
     public function ban(string $ip, int $seconds, int $byUserId, string $reason): void
@@ -90,113 +85,69 @@ class TrafficControl
         }
     }
 
-    /**
-     * @param string $ip
-     * @return bool
-     */
-    private function inWhiteListBin($ip)
+    public function getTopData(): array
     {
-        return (bool)$this->whitelistTable->select([
-            'ip = UNHEX(?)' => bin2hex($ip)
-        ])->current();
-    }
-
-    /**
-     * @param string $ip
-     * @return bool
-     */
-    public function inWhiteList($ip)
-    {
-        return (bool)$this->whitelistTable->select([
-            'ip = INET6_ATON(?)' => (string)$ip
-        ])->current();
-    }
-
-    /**
-     * @return array
-     */
-    public function getTopData()
-    {
-        $rows = $this->monitoringTable->select(function (Select $select) {
-            $select
-                ->columns([
-                    'ip',
-                    'ip_text' => new Expression('INET6_NTOA(ip)'),
-                    'count'   => new Expression('SUM(count)')
-                ])
-                ->where('day_date = CURDATE()')
-                ->group('ip')
-                ->order('count DESC')
-                ->limit(50);
-        });
-
-        $result = [];
-
-        foreach ($rows as $row) {
-            $result[] = [
-                'ip'        => $row['ip_text'],
-                'count'     => $row['count'],
-                'ban'       => $this->getBanInfo($row['ip_text']),
-                'whitelist' => $this->inWhiteListBin($row['ip'])
-            ];
-        }
-        unset($row);
-
-        return $result;
-    }
-
-    /**
-     * @return array
-     */
-    public function getWhitelistData()
-    {
-        $rows = $this->whitelistTable->select(function (Select $select) {
-            $select
-                ->columns([
-                    'description',
-                    'ip_text' => new Expression('INET6_NTOA(ip)')
-                ])
-                ->order('ip');
-        });
-
-        $items = [];
-        foreach ($rows as $row) {
-            $items[] = [
-                'ip'          => $row['ip_text'],
-                'description' => $row['description']
-            ];
-        }
-
-        return $items;
-    }
-
-    /**
-     * @param string $ip
-     */
-    public function deleteFromWhitelist($ip)
-    {
-        $this->whitelistTable->delete([
-            'ip = INET6_ATON(?)' => $ip
+        $response = $this->getClient()->request('GET', '/top', [
+            'http_errors' => false
         ]);
+
+        $code = $response->getStatusCode();
+
+        if ($code == 404) {
+            return false;
+        }
+
+        if ($code != 200) {
+            throw new \Exception("Unexpected response code `$code`");
+        }
+
+        return Json::decode($response->getBody(), Json::TYPE_ARRAY);
     }
 
-    /**
-     * @param string $ip
-     * @param string $description
-     */
-    public function addToWhitelist($ip, $description)
+    public function getWhitelistData(): array
     {
-        $this->unban($ip);
+        $response = $this->getClient()->request('GET', '/whitelist', [
+            'http_errors' => false
+        ]);
 
-        $row = $this->whitelistTable->select([
-            'ip = inet6_aton(?)' => $ip
-        ])->current();
+        $code = $response->getStatusCode();
 
-        if (! $row) {
-            $this->whitelistTable->insert([
-                'ip'          => new Expression('inet6_aton(?)', $ip),
-                'description' => $description
-            ]);
+        if ($code == 404) {
+            return false;
+        }
+
+        if ($code != 200) {
+            throw new \Exception("Unexpected response code `$code`");
+        }
+
+        return Json::decode($response->getBody(), Json::TYPE_ARRAY);
+    }
+
+    public function deleteFromWhitelist(string $ip): void
+    {
+        $response = $this->getClient()->request('DELETE', '/whitelist/' . $ip, [
+            'http_errors' => false
+        ]);
+
+        $code = $response->getStatusCode();
+        if ($code != 204) {
+            throw new \Exception("Unexpected status code `$code`");
+        }
+    }
+
+    public function addToWhitelist(string $ip, string $description): void
+    {
+        $response = $this->getClient()->request('POST', '/whitelist', [
+            'http_errors' => false,
+            'json' => [
+                'ip'          => $ip,
+                'description' => trim($description)
+            ]
+        ]);
+
+        $code = $response->getStatusCode();
+        if ($code != 201) {
+            throw new \Exception("Unexpected status code `$code`");
         }
     }
 
