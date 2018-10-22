@@ -13,7 +13,6 @@ class ConfigProvider
             'controllers'  => $this->getControllersConfig(),
             'dependencies' => $this->getDependencyConfig(),
             'router'       => $this->getRouterConfig(),
-            'tables'       => $this->getTablesConfig()
         ];
     }
 
@@ -74,14 +73,6 @@ class ConfigProvider
                     ]
                 ]
             ]
-        ];
-    }
-
-    public function getTablesConfig(): array
-    {
-        return [
-            'ip_monitoring4' => [],
-            'ip_whitelist'   => [],
         ];
     }
 }

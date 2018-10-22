@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use GuzzleHttp\Client;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Json\Json;
@@ -16,30 +17,33 @@ class Referer
     private $rabbitmq;
 
     /**
-     * @var TableGateway
+     * @var string
      */
-    private $table;
+    private $url;
 
     /**
-     * @var TableGateway
+     * @var Client
      */
-    private $whitelistTable;
-
-    /**
-     * @var TableGateway
-     */
-    private $blacklistTable;
+    private $client;
 
     public function __construct(
-        RabbitMQ $rabbitmq,
-        TableGateway $table,
-        TableGateway $whitelistTable,
-        TableGateway $blacklistTable
+        string $url,
+        RabbitMQ $rabbitmq
     ) {
+        $this->url = $url;
         $this->rabbitmq = $rabbitmq;
-        $this->table = $table;
-        $this->whitelistTable = $whitelistTable;
-        $this->blacklistTable = $blacklistTable;
+    }
+
+    private function getClient(): Client
+    {
+        if (! $this->client) {
+            $this->client = new Client([
+                'base_uri' => $this->url,
+                'timeout'  => 5.0,
+            ]);
+        }
+
+        return $this->client;
     }
 
     public function addUrl(string $url, string $accept): void
@@ -71,16 +75,40 @@ class Referer
 
     public function isHostWhitelisted(string $host): bool
     {
-        return (bool)$this->whitelistTable->select([
-            'host' => $host
-        ])->current();
+        $response = $this->getClient()->request('GET', '/hotlink/whitelist/' . urlencode($host), [
+            'http_errors' => false
+        ]);
+
+        $code = $response->getStatusCode();
+
+        if ($code == 404) {
+            return false;
+        }
+
+        if ($code != 200) {
+            throw new \Exception("Unexpected response code `$code`");
+        }
+
+        return (bool) Json::decode($response->getBody(), Json::TYPE_ARRAY);
     }
 
     public function isHostBlacklisted(string $host): bool
     {
-        return (bool)$this->blacklistTable->select([
-            'host' => $host
-        ])->current();
+        $response = $this->getClient()->request('GET', '/hotlink/blacklist/' . urlencode($host), [
+            'http_errors' => false
+        ]);
+
+        $code = $response->getStatusCode();
+
+        if ($code == 404) {
+            return false;
+        }
+
+        if ($code != 200) {
+            throw new \Exception("Unexpected response code `$code`");
+        }
+
+        return (bool) Json::decode($response->getBody(), Json::TYPE_ARRAY);
     }
 
     public function isUrlBlacklisted(string $url): bool
@@ -93,80 +121,77 @@ class Referer
         return false;
     }
 
-    public function addToWhitelist(string $host)
+    public function addToWhitelist(string $host): void
     {
-        $this->blacklistTable->delete([
-            'host = ?' => $host
+        $response = $this->getClient()->request('POST', '/hotlink/whitelist', [
+            'http_errors' => false,
+            'json' => [
+                'host' => $host
+            ]
         ]);
 
-        $this->whitelistTable->insert([
-            'host' => $host
-        ]);
+        $code = $response->getStatusCode();
+        if ($code != 201) {
+            throw new \Exception("Unexpected status code `$code`");
+        }
     }
 
-    public function addToBlacklist(string $host)
+    public function addToBlacklist(string $host): void
     {
-        $this->whitelistTable->delete([
-            'host = ?' => $host
+        $response = $this->getClient()->request('POST', '/hotlink/blacklist', [
+            'http_errors' => false,
+            'json' => [
+                'host' => $host
+            ]
         ]);
 
-        $this->blacklistTable->insert([
-            'host' => $host
-        ]);
+        $code = $response->getStatusCode();
+        if ($code != 201) {
+            throw new \Exception("Unexpected status code `$code`");
+        }
     }
 
-    public function flushHost(string $host)
+    public function flushHost(string $host): void
     {
-        $this->table->delete([
-            'host = ?' => $host
+        $response = $this->getClient()->request('DELETE', '/hotlink/monitoring', [
+            'http_errors' => false,
+            'query'       => ['host' => $host]
         ]);
+
+        $code = $response->getStatusCode();
+        if ($code != 204) {
+            throw new \Exception("Unexpected status code `$code`");
+        }
     }
 
-    public function flush()
+    public function flush(): void
     {
-        $this->table->delete([]);
+        $response = $this->getClient()->request('DELETE', '/hotlink/monitoring', [
+            'http_errors' => false
+        ]);
+
+        $code = $response->getStatusCode();
+        if ($code != 204) {
+            throw new \Exception("Unexpected status code `$code`");
+        }
     }
 
     public function getData(): array
     {
-        $select = new Sql\Select($this->table->getTable());
-        $select->columns(['host', 'count' => new Sql\Expression('SUM(count)')])
-            ->where(['last_date >= DATE_SUB(NOW(), INTERVAL 1 DAY)'])
-            ->group('host')
-            ->order('count desc')
-            ->limit(100);
+        $response = $this->getClient()->request('GET', '/hotlink/monitoring', [
+            'http_errors' => false
+        ]);
 
-        $rows = $this->table->selectWith($select);
+        $code = $response->getStatusCode();
 
-        $items = [];
-        foreach ($rows as $row) {
-            $select = new Sql\Select($this->table->getTable());
-            $select
-                ->where([
-                    'host' => (string)$row['host'],
-                    'last_date >= DATE_SUB(NOW(), INTERVAL 1 DAY)'
-                ])
-                ->order('count desc')
-                ->limit(20);
-
-            $links = [];
-            foreach ($this->table->selectWith($select) as $link) {
-                $links[] = [
-                    'url'    => $link['url'],
-                    'count'  => $link['count'],
-                    'accept' => $link['accept'],
-                ];
-            }
-
-            $items[] = [
-                'host'        => $row['host'],
-                'count'       => (int)$row['count'],
-                'whitelisted' => $this->isHostWhitelisted($row['host']),
-                'blacklisted' => $this->isHostBlacklisted($row['host']),
-                'links'       => $links
-            ];
+        if ($code == 404) {
+            return false;
         }
 
-        return $items;
+        if ($code != 200) {
+            throw new \Exception("Unexpected response code `$code`");
+        }
+
+        return (bool) Json::decode($response->getBody(), Json::TYPE_ARRAY);
     }
 }

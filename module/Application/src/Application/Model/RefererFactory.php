@@ -12,12 +12,10 @@ class RefererFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get('TableManager');
+        $config = $container->get('Config');
         return new Referer(
-            $container->get('RabbitMQ'),
-            $tables->get('referer'),
-            $tables->get('referer_whitelist'),
-            $tables->get('referer_blacklist')
+            $config['traffic']['url'],
+            $container->get('RabbitMQ')
         );
     }
 }

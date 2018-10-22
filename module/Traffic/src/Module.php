@@ -22,7 +22,6 @@ class Module implements
             'controllers'     => $provider->getControllersConfig(),
             'service_manager' => $provider->getDependencyConfig(),
             'router'          => $provider->getRouterConfig(),
-            'tables'          => $provider->getTablesConfig(),
         ];
     }
 
@@ -42,10 +41,4 @@ class Module implements
         $trafficListener = new TrafficRouteListener();
         $trafficListener->attach($e->getApplication()->getEventManager());
     }
-
-    /*public function getControllerConfig()
-    {
-        $provider = new ConfigProvider();
-        return $provider->getControllersConfig();
-    }*/
 }
