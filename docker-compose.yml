@@ -63,6 +63,7 @@ web:
   - ./public_html:/app/public_html
   - ./vendor:/app/vendor
   - ./etc/nginx/conf.d:/etc/nginx/conf.d
+  - ./composer.json:/app/composer.json
   #- ./goautowp:/app/goautowp
   ports:
   - "80:80"

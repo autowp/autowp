@@ -7,7 +7,7 @@ WORKDIR /app
 EXPOSE 80
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
-ENV WAITFORIT_VERSION="v2.2.0"
+ENV WAITFORIT_VERSION="v2.4.1"
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
     DEBIAN_FRONTEND=noninteractive apt-get update -qq -y && \
