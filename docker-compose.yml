@@ -122,7 +122,7 @@ traffic:
   restart: always
   links:
   - rabbitmq
-  - mysql
+  - traffic-mysql
   volumes:
   - "./traffic/logs:/var/log"
   environment:
@@ -130,11 +130,21 @@ traffic:
   - TRAFFIC_RABBITMQ_PORT=5672
   - TRAFFIC_MONITORING_QUEUE=input
   - TRAFFIC_HOTLINK_QUEUE=hotlink
-  - TRAFFIC_MYSQL_HOST=autowp_test_mysql
+  - TRAFFIC_MYSQL_HOST=autowp_test_traffic_mysql
   - TRAFFIC_MYSQL_PORT=3306
-  - TRAFFIC_MYSQL_USERNAME=autowp_test
-  - TRAFFIC_MYSQL_PASSWORD=test
-  - TRAFFIC_MYSQL_DBNAME=autowp_test
+  - TRAFFIC_MYSQL_USERNAME=root
+  - TRAFFIC_MYSQL_PASSWORD=password
+  - TRAFFIC_MYSQL_DBNAME=traffic
   - TRAFFIC_ROLLBAR_TOKEN=
   - TRAFFIC_ROLLBAR_ENVIRONMENT=development
   - TRAFFIC_ROLLBAR_PERIOD=1m
+
+traffic-mysql:
+  image: mysql:8
+  container_name: autowp_test_traffic_mysql
+  restart: always
+  environment:
+  - MYSQL_ROOT_PASSWORD=password
+  - MYSQL_DATABASE=traffic
+  volumes:
+  - "./traffic.dump.sql:/docker-entrypoint-initdb.d/dump.sql"
