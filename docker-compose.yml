@@ -65,6 +65,7 @@ web:
   - ./etc/nginx/conf.d:/etc/nginx/conf.d
   - ./composer.json:/app/composer.json
   #- ./goautowp:/app/goautowp
+  - ./start.sh:/app/start.sh
   ports:
   - "80:80"
   links:
