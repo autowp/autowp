@@ -4,7 +4,6 @@ namespace Application\Hydrator\Api;
 
 use Traversable;
 
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Stdlib\ArrayUtils;
 
 use Autowp\User\Model\User;
@@ -32,9 +31,6 @@ class TrafficHydrator extends RestHydrator
         $this->router = $serviceManager->get('HttpRouter');
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
         $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
-
-        $strategy = new DateTimeFormatterStrategy();
-        $this->addStrategy('up_to', $strategy);
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('ban_user', $strategy);
@@ -71,8 +67,7 @@ class TrafficHydrator extends RestHydrator
         ]);*/
 
         if ($object['ban']) {
-            $date = \Autowp\Commons\Db\Table\Row::getDateTimeByColumnType('timestamp', $object['ban']['up_to']);
-            $object['ban']['up_to'] = $this->extractValue('up_to', $date);
+            $object['ban']['up_to'] = $object['ban']['up_to'];
             $object['ban']['user'] = null;
             if ($object['ban']['by_user_id']) {
                 $user = $this->userModel->getRow((int) $object['ban']['by_user_id']);
