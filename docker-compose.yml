@@ -146,5 +146,3 @@ traffic-mysql:
   environment:
   - MYSQL_ROOT_PASSWORD=password
   - MYSQL_DATABASE=traffic
-  volumes:
-  - "./traffic.dump.sql:/docker-entrypoint-initdb.d/dump.sql"
