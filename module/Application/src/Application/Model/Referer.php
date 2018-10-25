@@ -192,6 +192,6 @@ class Referer
             throw new \Exception("Unexpected response code `$code`");
         }
 
-        return (bool) Json::decode($response->getBody(), Json::TYPE_ARRAY);
+        return Json::decode($response->getBody(), Json::TYPE_ARRAY);
     }
 }
