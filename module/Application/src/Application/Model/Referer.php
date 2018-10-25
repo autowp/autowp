@@ -89,7 +89,7 @@ class Referer
             throw new \Exception("Unexpected response code `$code`");
         }
 
-        return (bool) Json::decode($response->getBody(), Json::TYPE_ARRAY);
+        return (bool) Json::decode($response->getBody(true), Json::TYPE_ARRAY);
     }
 
     public function isHostBlacklisted(string $host): bool
@@ -108,7 +108,7 @@ class Referer
             throw new \Exception("Unexpected response code `$code`");
         }
 
-        return (bool) Json::decode($response->getBody(), Json::TYPE_ARRAY);
+        return (bool) Json::decode($response->getBody(true), Json::TYPE_ARRAY);
     }
 
     public function isUrlBlacklisted(string $url): bool
@@ -192,6 +192,6 @@ class Referer
             throw new \Exception("Unexpected response code `$code`");
         }
 
-        return Json::decode($response->getBody(), Json::TYPE_ARRAY);
+        return Json::decode($response->getBody(true), Json::TYPE_ARRAY);
     }
 }
