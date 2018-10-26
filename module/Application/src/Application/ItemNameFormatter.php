@@ -164,7 +164,7 @@ class ItemNameFormatter
         $result = $item['name'];
 
         if ($item['spec']) {
-            $result .= ' ' . $item['spec'];
+            $result .= ' [' . $item['spec'] . ']';
         }
 
         if (strlen($item['body']) > 0) {
