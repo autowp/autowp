@@ -127,7 +127,7 @@ class TrafficController extends AbstractRestfulController
             $ip,
             $data['period'] * 3600,
             $this->user()->get()['id'],
-            $data['reason']
+            (string) $data['reason']
         );
 
         return $this->getResponse()->setStatusCode(201);
