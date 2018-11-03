@@ -9,6 +9,7 @@ use Zend\Db\Sql;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\DuplicateFinder;
 use Application\ExifGPSExtractor;
 use Application\Model\Picture;
 
@@ -19,9 +20,15 @@ class PicturesController extends AbstractActionController
      */
     private $picture;
 
-    public function __construct(Picture $picture)
+    /**
+     * @var DuplicateFinder
+     */
+    private $df;
+
+    public function __construct(Picture $picture, DuplicateFinder $df)
     {
         $this->picture = $picture;
+        $this->df = $df;
     }
 
     public function fillPointAction()
@@ -56,5 +63,17 @@ class PicturesController extends AbstractActionController
         }
 
         $console->writeLine("Done");
+    }
+
+    public function dfIndexAction()
+    {
+        $table = $this->picture->getTable();
+        $select = $table->getSql()->select()
+            ->columns(['id']);
+
+        foreach ($table->selectWith($select) as $row) {
+            print $row['id'] . PHP_EOL;
+            $this->df->indexImage($row['id']);
+        }
     }
 }

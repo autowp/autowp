@@ -138,3 +138,26 @@ traffic-mysql:
   environment:
   - MYSQL_ROOT_PASSWORD=password
   - MYSQL_DATABASE=traffic
+
+goautowp:
+  image: autowp/goautowp
+  container_name: autowp_test_goautowp
+  restart: always
+  links:
+  - rabbitmq
+  - mysql
+  volumes:
+  - ./public_html/pictures:/app/pictures:ro
+  environment:
+  - AUTOWP_RABBITMQ_HOST=autowp_test_rabbitmq
+  - AUTOWP_RABBITMQ_PORT=5672
+  - AUTOWP_DUPLICATE_FINDER_QUEUE=duplicate_finder
+  - AUTOWP_MYSQL_HOST=autowp_test_mysql
+  - AUTOWP_MYSQL_PORT=3306
+  - AUTOWP_MYSQL_USERNAME=autowp_test
+  - AUTOWP_MYSQL_PASSWORD=test
+  - AUTOWP_MYSQL_DBNAME=autowp_test
+  - AUTOWP_ROLLBAR_TOKEN=
+  - AUTOWP_ROLLBAR_ENVIRONMENT=development
+  - AUTOWP_ROLLBAR_PERIOD=1m
+  - AUTOWP_IMAGES_DIR=/app/pictures

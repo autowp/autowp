@@ -33,7 +33,7 @@ return [
                 ],
                 'pictures' => [
                     'options' => [
-                        'route'    => 'pictures (fill-point):action',
+                        'route'    => 'pictures (fill-point|df-index):action',
                         'defaults' => [
                             'controller' => Controller\Console\PicturesController::class,
                         ]

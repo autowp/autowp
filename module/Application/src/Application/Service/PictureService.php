@@ -176,7 +176,7 @@ class PictureService
             'replace_picture_id' => $replacePictureId ? $replacePictureId : null,
         ]);
 
-        $pictureId = $this->picture->getTable()->getLastInsertValue();
+        $pictureId = (int) $this->picture->getTable()->getLastInsertValue();
 
         $picture = $this->picture->getRow(['id' => (int)$pictureId]);
 
@@ -246,7 +246,7 @@ class PictureService
         $this->imageStorage->getFormatedImage($picture['image_id'], 'picture-gallery-full');
 
         // index
-        $this->duplicateFinder->indexImage($pictureId, $path);
+        $this->duplicateFinder->indexImage($pictureId);
 
         $this->telegram->notifyInbox($pictureId);
 

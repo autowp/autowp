@@ -14,7 +14,7 @@ class DuplicateFinderFactory implements FactoryInterface
     {
         $tables = $container->get('TableManager');
         return new \Application\DuplicateFinder(
-            $tables->get('df_hash'),
+            $container->get('RabbitMQ'),
             $tables->get('df_distance')
         );
     }
