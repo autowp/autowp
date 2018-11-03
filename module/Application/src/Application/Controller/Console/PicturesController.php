@@ -69,7 +69,9 @@ class PicturesController extends AbstractActionController
     {
         $table = $this->picture->getTable();
         $select = $table->getSql()->select()
-            ->columns(['id']);
+            ->columns(['id'])
+            ->join('df_hash', 'pictures.id = df_hash.picture_id', [])
+            ->where(['df_hash.picture_id IS NULL']);
 
         foreach ($table->selectWith($select) as $row) {
             print $row['id'] . PHP_EOL;
