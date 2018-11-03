@@ -128,7 +128,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
-                $tables->get('df_hash'),
+                $serviceManager->get('RabbitMQ'),
                 $tables->get('df_distance')
             ])
             ->getMock();
