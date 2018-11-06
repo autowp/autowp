@@ -20,7 +20,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         ca-certificates \
         curl \
         git \
-        golang \
         imagemagick \
         libpng-dev \
         libtool \
@@ -72,13 +71,6 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
 
 RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
     chmod +x /usr/local/bin/waitforit
-
-RUN go get \
-        github.com/gin-gonic/gin \
-        github.com/go-sql-driver/mysql \
-        github.com/Masterminds/squirrel \
-    && echo $GOROOT \
-    && echo $GOPATH
 
 COPY ./etc/ /etc/
 

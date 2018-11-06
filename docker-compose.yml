@@ -63,6 +63,8 @@ web:
   - ./public_html:/app/public_html
   - ./vendor:/app/vendor
   - ./etc/nginx/conf.d:/etc/nginx/conf.d
+  - ./etc/nginx/sites-available:/etc/nginx/sites-available
+  - ./etc/supervisor/conf.d/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
   - ./composer.json:/app/composer.json
   #- ./goautowp:/app/goautowp
   - ./start.sh:/app/start.sh
@@ -74,6 +76,7 @@ web:
   - frontend
   - rabbitmq
   - traffic
+  - goautowp
 
 memcached:
   image: memcached
@@ -170,3 +173,4 @@ goautowp:
   - AUTOWP_ROLLBAR_ENVIRONMENT=development
   - AUTOWP_ROLLBAR_PERIOD=1m
   - AUTOWP_IMAGES_DIR=/app/pictures
+  - AUTOWP_MIGRATIONS_DIR=/app/migrations

@@ -78,6 +78,7 @@ web:
   - frontend
   - rabbitmq
   - traffic
+  - goautowp
 
 memcached:
   image: memcached
@@ -96,7 +97,6 @@ mysql:
     MYSQL_USER: autowp_test
     MYSQL_PASSWORD: test
   volumes:
-  - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
   - "./mysql.conf.d:/etc/mysql/conf.d"
   expose:
   - "3306"
@@ -161,3 +161,4 @@ goautowp:
   - AUTOWP_ROLLBAR_ENVIRONMENT=development
   - AUTOWP_ROLLBAR_PERIOD=1m
   - AUTOWP_IMAGES_DIR=/app/pictures
+  - AUTOWP_MIGRATIONS_DIR=/app/migrations

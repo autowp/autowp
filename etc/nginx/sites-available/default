@@ -48,7 +48,7 @@ server {
     }
 
     location /go-api/ {
-        proxy_pass http://localhost:81;
+        proxy_pass http://goautowp;
     }
 
     location / {
