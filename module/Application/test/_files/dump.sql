@@ -15,28 +15,6 @@ INSERT IGNORE INTO `acl_roles_privileges_allowed` (`role_id`, `privilege_id`)
 VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9),(5,10),(5,11),(5,12),(5, 13),(5,14),(5,17),(5,18),(5,19),(5,20),(5,16),(5,21),(5,22);
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` ENABLE KEYS */;
 
-/*!40000 ALTER TABLE `attrs_user_values` DISABLE KEYS */;
-INSERT INTO `attrs_user_values` (`attribute_id`, `item_id`, `user_id`, `add_date`, `update_date`, `conflict`, `weight`)
-VALUES (20,1,1,'2016-11-25 18:31:46','2016-11-25 18:31:46',0,1);
-/*!40000 ALTER TABLE `attrs_user_values` ENABLE KEYS */;
-
-/*!40000 ALTER TABLE `attrs_user_values_list` DISABLE KEYS */;
-INSERT INTO `attrs_user_values_list` (`attribute_id`, `item_id`, `user_id`, `value`, `ordering`)
-VALUES (20,1,1,1,1);
-/*!40000 ALTER TABLE `attrs_user_values_list` ENABLE KEYS */;
-
-/*!40000 ALTER TABLE `attrs_values` DISABLE KEYS */;
-INSERT INTO `attrs_values` (`attribute_id`, `item_id`, `conflict`, `update_date`) VALUES (20,1,0,'2016-11-25 18:31:46');
-/*!40000 ALTER TABLE `attrs_values` ENABLE KEYS */;
-
-/*!40000 ALTER TABLE `attrs_values_list` DISABLE KEYS */;
-INSERT INTO `attrs_values_list` (`attribute_id`, `item_id`, `value`, `ordering`) VALUES (20,1,1,1);
-/*!40000 ALTER TABLE `attrs_values_list` ENABLE KEYS */;
-
-/*!40000 ALTER TABLE `forums_topics` DISABLE KEYS */;
-INSERT INTO `forums_topics` (`id`, `theme_id`, `name`, `author_id`, `add_datetime`, `_messages`, `views`, `status`, `author_ip`) VALUES (1,1,'Test topic',1,'2016-11-25 18:31:48',0,0,'normal',0x30);
-/*!40000 ALTER TABLE `forums_topics` ENABLE KEYS */;
-
 /*!40000 ALTER TABLE `item` DISABLE KEYS */;
 INSERT INTO `item` (`id`, `name`, `begin_year`, `end_year`, `body`, `spec_id`, `spec_inherit`, `produced`, `produced_exactly`, `is_concept`, `pictures_count`, `today`, `add_datetime`, `begin_month`, `end_month`, `begin_order_cache`, `end_order_cache`, `begin_model_year`, `end_model_year`, `_html`, `is_group`, `car_type_inherit`, `is_concept_inherit`, `engine_item_id`, `engine_inherit`, `text_id`, `full_text_id`, `item_type_id`, `catname`, `full_name`, `position`, `logo_id`)
 VALUES (1,'test car',1999,NULL,'',NULL,1,100,1,0,0,1,'2016-11-25 18:31:47',2,NULL,NULL,NULL,2000,NULL,NULL,0,0,0,1,1,NULL,NULL,1,NULL,NULL,0,NULL),
@@ -67,10 +45,8 @@ VALUES (1,'test car',1999,NULL,'',NULL,1,100,1,0,0,1,'2016-11-25 18:31:47',2,NUL
 (198,'test car 198',2008,2008,'',NULL,1,41663,1,0,0,0,'2016-11-25 18:31:47',12,9,NULL,NULL,2008,2008,NULL,0,0,0,NULL,1,NULL,NULL,1,NULL,NULL,0,NULL),(199,'test car 199',1990,1991,'',NULL,1,727,0,0,0,0,'2016-11-25 18:31:47',10,8,NULL,NULL,1990,1991,NULL,0,0,0,NULL,1,NULL,NULL,1,NULL,NULL,0,NULL),(200,'test car 200',1973,1981,'',NULL,1,50120,0,0,0,0,'2016-11-25 18:31:47',10,4,NULL,NULL,1974,1981,NULL,0,0,0,NULL,1,NULL,NULL,1,NULL,NULL,0,NULL),(201,'test car 201',2003,2007,'',NULL,1,32557,1,0,0,0,'2016-11-25 18:31:47',4,7,NULL,NULL,2004,2007,NULL,0,0,0,NULL,1,NULL,NULL,1,NULL,NULL,0,NULL),(202,'test car 202',1909,1910,'',NULL,1,5563,1,0,0,0,'2016-11-25 18:31:47',8,7,NULL,NULL,1910,1910,NULL,0,0,0,NULL,1,NULL,NULL,1,NULL,NULL,0,NULL),(203,'test car 203',1911,1918,'',NULL,1,67707,0,0,0,1,'2016-11-25 18:31:47',7,9,NULL,NULL,1912,1918,NULL,0,0,0,NULL,1,NULL,NULL,1,NULL,NULL,0,NULL),(204,'BMW',NULL,NULL,'',NULL,1,NULL,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,0,NULL,1,NULL,NULL,5,'bmw',NULL,0,NULL),(205,'Test brand',NULL,NULL,'',NULL,1,NULL,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,0,NULL,1,NULL,NULL,5,'test-brand',NULL,0,NULL);
 /*!40000 ALTER TABLE `item` ENABLE KEYS */;
 
-
 INSERT INTO item_language (item_id, language, name)
 VALUES (1, 'xx', 'test car'), (2, 'xx', 'test concept car');
-
 
 /*!40000 ALTER TABLE `item_parent` DISABLE KEYS */;
 INSERT INTO `item_parent` (`item_id`, `parent_id`, `is_primary`, `catname`, `type`, `timestamp`, `name`, `manual_catname`) VALUES (1,204,0,'first-car',0,NULL,NULL,0),(2,204,0,'second-car',0,NULL,NULL,0),(3,204,0,'test-car-3',0,NULL,NULL,0),(4,204,0,'test-car-4',0,NULL,NULL,0),(5,204,0,'test-car-5',0,NULL,NULL,0),(6,204,0,'test-car-6',0,NULL,NULL,0),(7,204,0,'test-car-7',0,NULL,NULL,0),(8,204,0,'test-car-8',0,NULL,NULL,0),(9,204,0,'test-car-9',0,NULL,NULL,0),(10,204,0,'test-car-10',0,NULL,NULL,0),(11,204,0,'test-car-11',0,NULL,NULL,0),(12,204,0,'test-car-12',0,NULL,NULL,0),(13,204,0,'test-car-13',0,NULL,NULL,0),(14,204,0,'test-car-14',0,NULL,NULL,0),(15,204,0,'test-car-15',0,NULL,NULL,0),(16,204,0,'test-car-16',0,NULL,NULL,0),(17,204,0,'test-car-17',0,NULL,NULL,0),(18,204,0,'test-car-18',0,NULL,NULL,0),(19,204,0,'test-car-19',0,NULL,NULL,0),(20,204,0,'test-car-20',0,NULL,NULL,0),(21,204,0,'test-car-21',0,NULL,NULL,0),(22,204,0,'test-car-22',0,NULL,NULL,0),(23,204,0,'test-car-23',0,NULL,NULL,0),(24,204,0,'test-car-24',0,NULL,NULL,0),(25,204,0,'test-car-25',0,NULL,NULL,0),(26,204,0,'test-car-26',0,NULL,NULL,0),(27,204,0,'test-car-27',0,NULL,NULL,0),(28,204,0,'test-car-28',0,NULL,NULL,0),(29,204,0,'test-car-29',0,NULL,NULL,0),(30,204,0,'test-car-30',0,NULL,NULL,0),(31,204,0,'test-car-31',0,NULL,NULL,0),(32,204,0,'test-car-32',0,NULL,NULL,0),(33,204,0,'test-car-33',0,NULL,NULL,0),(34,204,0,'test-car-34',0,NULL,NULL,0),(35,204,0,'test-car-35',0,NULL,NULL,0),(36,204,0,'test-car-36',0,NULL,NULL,0),(37,204,0,'test-car-37',0,NULL,NULL,0),(38,204,0,'test-car-38',0,NULL,NULL,0),(39,204,0,'test-car-39',0,NULL,NULL,0),(40,204,0,'test-car-40',0,NULL,NULL,0),(41,204,0,'test-car-41',0,NULL,NULL,0),(42,204,0,'test-car-42',0,NULL,NULL,0),(43,204,0,'test-car-43',0,NULL,NULL,0),(44,204,0,'test-car-44',0,NULL,NULL,0),(45,204,0,'test-car-45',0,NULL,NULL,0),(46,204,0,'test-car-46',0,NULL,NULL,0),(47,204,0,'test-car-47',0,NULL,NULL,0),(48,204,0,'test-car-48',0,NULL,NULL,0),(49,204,0,'test-car-49',0,NULL,NULL,0),(50,204,0,'test-car-50',0,NULL,NULL,0),(51,204,0,'test-car-51',0,NULL,NULL,0),(52,204,0,'test-car-52',0,NULL,NULL,0),(53,204,0,'test-car-53',0,NULL,NULL,0),(54,204,0,'test-car-54',0,NULL,NULL,0),(55,204,0,'test-car-55',0,NULL,NULL,0),(56,204,0,'test-car-56',0,NULL,NULL,0),(57,204,0,'test-car-57',0,NULL,NULL,0),(58,204,0,'test-car-58',0,NULL,NULL,0),(59,204,0,'test-car-59',0,NULL,NULL,0),(60,204,0,'test-car-60',0,NULL,NULL,0),(61,204,0,'test-car-61',0,NULL,NULL,0),(62,204,0,'test-car-62',0,NULL,NULL,0),(63,204,0,'test-car-63',0,NULL,NULL,0),(64,204,0,'test-car-64',0,NULL,NULL,0),(65,204,0,'test-car-65',0,NULL,NULL,0),(66,204,0,'test-car-66',0,NULL,NULL,0),(67,204,0,'test-car-67',0,NULL,NULL,0),(68,204,0,'test-car-68',0,NULL,NULL,0),(69,204,0,'test-car-69',0,NULL,NULL,0),(70,204,0,'test-car-70',0,NULL,NULL,0),(71,204,0,'test-car-71',0,NULL,NULL,0),(72,204,0,'test-car-72',0,NULL,NULL,0),(73,204,0,'test-car-73',0,NULL,NULL,0),(74,204,0,'test-car-74',0,NULL,NULL,0),(75,204,0,'test-car-75',0,NULL,NULL,0),(76,204,0,'test-car-76',0,NULL,NULL,0),(77,204,0,'test-car-77',0,NULL,NULL,0),(78,204,0,'test-car-78',0,NULL,NULL,0),(79,204,0,'test-car-79',0,NULL,NULL,0),(80,204,0,'test-car-80',0,NULL,NULL,0),(81,204,0,'test-car-81',0,NULL,NULL,0),(82,204,0,'test-car-82',0,NULL,NULL,0),(83,204,0,'test-car-83',0,NULL,NULL,0),(84,204,0,'test-car-84',0,NULL,NULL,0),(85,204,0,'test-car-85',0,NULL,NULL,0),(86,204,0,'test-car-86',0,NULL,NULL,0),(87,204,0,'test-car-87',0,NULL,NULL,0),(88,204,0,'test-car-88',0,NULL,NULL,0),
@@ -101,3 +77,18 @@ insert into voting_variant(id, voting_id, name, votes, position, text)
 values (1, 1, "First variant", 0, 1, "First variant text"),
 (2, 1, "Second variant", 0, 2, "Second variant text");
 /*!40000 ALTER TABLE `voting_variant` ENABLE KEYS */;
+
+INSERT INTO `attrs_user_values` (`attribute_id`, `item_id`, `user_id`, `add_date`, `update_date`, `conflict`, `weight`)
+VALUES (20,1,1,'2016-11-25 18:31:46','2016-11-25 18:31:46',0,1);
+
+INSERT INTO `attrs_user_values_list` (`attribute_id`, `item_id`, `user_id`, `value`, `ordering`)
+VALUES (20,1,1,1,1);
+
+INSERT INTO `attrs_values` (`attribute_id`, `item_id`, `conflict`, `update_date`)
+VALUES (20,1,0,'2016-11-25 18:31:46');
+
+INSERT INTO `attrs_values_list` (`attribute_id`, `item_id`, `value`, `ordering`)
+VALUES (20,1,1,1);
+
+INSERT INTO `forums_topics` (`id`, `theme_id`, `name`, `author_id`, `add_datetime`, `_messages`, `views`, `status`, `author_ip`)
+VALUES (1,1,'Test topic',1,'2016-11-25 18:31:48',0,0,'normal',0x30);
