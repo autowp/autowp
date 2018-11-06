@@ -1,10 +1,10 @@
 use autowp_test;
 
-INSERT INTO `users` (`id`, `login`, `password`, `e_mail`, `name`, `reg_date`, `last_online`, `icq`, `url`, `own_car`, `dream_car`, `forums_topics`, `forums_messages`, `pictures_added`, `e_mail_checked`, `hide_e_mail`, `authority`, `pictures_ratio`, `email_to_check`, `email_check_code`, `role`, `photo`, `messaging_interval`, `last_message_time`, `deleted`, `identity`, `img`, `votes_per_day`, `votes_left`, `timezone`, `specs_volume`, `specs_volume_valid`, `specs_positives`, `specs_negatives`, `specs_weight`, `last_ip`, `language`)
+INSERT INTO `users` (`id`, `login`, `password`, `e_mail`, `name`, `reg_date`, `last_online`, `icq`, `url`, `own_car`, `dream_car`, `forums_topics`, `forums_messages`, `pictures_added`, `e_mail_checked`, `hide_e_mail`, `authority`, `pictures_ratio`, `email_to_check`, `email_check_code`, `role`, `messaging_interval`, `last_message_time`, `deleted`, `identity`, `img`, `votes_per_day`, `votes_left`, `timezone`, `specs_volume`, `specs_volume_valid`, `specs_positives`, `specs_negatives`, `specs_weight`, `last_ip`, `language`)
 VALUES
-(1, 'test','26cc2d23a03a8f07ed1e3d000a244636','test@example.com', 'tester',                 NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user', NULL,10,NULL,0,NULL,NULL,1,1000000,'Europe/Moscow',0,0,NULL,NULL,0,0x7F000001,'ru'),
-(2,   NULL,                                '',              NULL,'tester2',                 NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user', NULL,10,NULL,0,'identity',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru'),
-(3,'admin','72a4a00d16ecf16d8bef792ef553c2d7',              NULL,  'admin','2004-11-25 18:31:52','2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'admin',NULL,0,NULL,0,'admin',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru');
+(1, 'test','26cc2d23a03a8f07ed1e3d000a244636','test@example.com', 'tester',                 NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user', 10,NULL,0,NULL,NULL,1,1000000,'Europe/Moscow',0,0,NULL,NULL,0,0x7F000001,'ru'),
+(2,   NULL,                                '',              NULL,'tester2',                 NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user', 10,NULL,0,'identity',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru'),
+(3,'admin','72a4a00d16ecf16d8bef792ef553c2d7',              NULL,  'admin','2004-11-25 18:31:52','2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'admin',0,NULL,0,'admin',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru');
 
 /*!40000 ALTER TABLE `acl_roles_parents` DISABLE KEYS */;
 INSERT IGNORE INTO `acl_roles_parents` (`role_id`, `parent_role_id`) VALUES (14,6),(5,9),(5,10),(5,14),(10,14),(5,58),(5,13);
