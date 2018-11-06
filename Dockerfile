@@ -88,10 +88,7 @@ COPY . /app
 RUN chmod +x zf && \
     chmod +x start.sh && \
     crontab ./crontab && \
-    go build -o ./goautowp/goautowp ./goautowp/
-
-RUN ./node_modules/.bin/webpack -p
-
-RUN rm -rf ./node_modules/
+    ./node_modules/.bin/webpack -p && \
+    rm -rf ./node_modules/
 
 CMD ["./start.sh"]
