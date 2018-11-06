@@ -25,6 +25,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         libtool \
         libxml2 \
         logrotate \
+        mysql-client \
         nasm \
         nginx \
         openssh-client \
