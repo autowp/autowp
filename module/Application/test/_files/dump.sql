@@ -471,4 +471,4 @@ INSERT INTO `attrs_values_list` (`attribute_id`, `item_id`, `value`, `ordering`)
 VALUES (20,1,1,1);
 
 INSERT INTO `forums_topics` (`id`, `theme_id`, `name`, `author_id`, `add_datetime`, `_messages`, `views`, `status`, `author_ip`)
-VALUES (1,1,'Test topic',1,'2016-11-25 18:31:48',0,0,'normal',0x30);
+VALUES (1,2,'Test topic',1,'2016-11-25 18:31:48',0,0,'normal',0x30);
