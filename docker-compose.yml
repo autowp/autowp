@@ -66,6 +66,7 @@ web:
   - ./etc/nginx/sites-available:/etc/nginx/sites-available
   - ./etc/supervisor/conf.d/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
   - ./composer.json:/app/composer.json
+  - ./install-dev-db.sh:/app/install-dev-db.sh
   #- ./goautowp:/app/goautowp
   - ./start.sh:/app/start.sh
   ports:

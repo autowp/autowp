@@ -120,7 +120,7 @@ class ContactsController extends AbstractRestfulController
 
         $currentUser = $this->user()->get();
         if (! $currentUser) {
-            return $this->notFoundAction();
+            return $this->forbiddenAction();
         }
 
         if ($currentUser['id'] == $id) {
