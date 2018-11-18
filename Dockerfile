@@ -9,6 +9,9 @@ EXPOSE 80
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV WAITFORIT_VERSION="v2.4.1"
 
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl -f http://localhost/ || exit 1
+
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
     DEBIAN_FRONTEND=noninteractive apt-get update -qq -y && \
     DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -qq -y && \
