@@ -41,6 +41,8 @@ class ItemNameFormatter
         $defaults = [
             'begin_model_year' => null,
             'end_model_year'   => null,
+            'begin_model_year_fraction' => null,
+            'end_model_year_fraction'   => null,
             'spec'             => null,
             'spec_full'        => null,
             'body'             => null,
@@ -80,6 +82,9 @@ class ItemNameFormatter
         $bmy = (int)$item['begin_model_year'];
         $emy = (int)$item['end_model_year'];
 
+        $bmyf = $item['begin_model_year_fraction'];
+        $emyf = $item['end_model_year_fraction'];
+
         $bs = (int)($by / 100);
         $es = (int)($ey / 100);
 
@@ -93,7 +98,7 @@ class ItemNameFormatter
             $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/model-years', $language));
             $result = '<span title="' . $title . '">' .
                           $this->renderer->escapeHtml(
-                              $this->getModelYearsPrefix($bmy, $emy, $item['today'], $language)
+                              $this->getModelYearsPrefix($bmy, $bmyf, $emy, $emyf, $item['today'], $language)
                           ) .
                       '</span> ' .
                       $result;
@@ -149,6 +154,8 @@ class ItemNameFormatter
         $defaults = [
             'begin_model_year' => null,
             'end_model_year'   => null,
+            'begin_model_year_fraction' => null,
+            'end_model_year_fraction'   => null,
             'spec'             => null,
             'spec_full'        => null,
             'body'             => null,
@@ -179,6 +186,9 @@ class ItemNameFormatter
         $bmy = (int)$item['begin_model_year'];
         $emy = (int)$item['end_model_year'];
 
+        $bmyf = $item['begin_model_year_fraction'];
+        $emyf = $item['end_model_year_fraction'];
+
         $bs = (int)($by / 100);
         $es = (int)($ey / 100);
 
@@ -189,7 +199,7 @@ class ItemNameFormatter
         $equalM = $equalY && $bm && $em && ($bm == $em);
 
         if ($useModelYear) {
-            $result = $this->getModelYearsPrefix($bmy, $emy, $item['today'], $language) . ' ' . $result;
+            $result = $this->getModelYearsPrefix($bmy, $bmyf, $emy, $emyf, $item['today'], $language) . ' ' . $result;
         }
 
         if ($by > 0 || $ey > 0) {
@@ -209,38 +219,38 @@ class ItemNameFormatter
         return $result;
     }
 
-    private function getModelYearsPrefix($begin, $end, $today, $language)
+    private function getModelYearsPrefix($begin, $beginFraction, $end, $endFraction, $today, $language)
     {
         $bms = (int)($begin / 100);
         $ems = (int)($end / 100);
 
-        if ($end == $begin) {
-            return $begin;
+        if ($end == $begin && $beginFraction == $endFraction) {
+            return $begin . $endFraction;
         }
 
         if ($bms == $ems) {
-            return $begin . '–' . sprintf('%02d', $end % 100);
+            return $begin . $beginFraction . '–' . sprintf('%02d', $end % 100) . $endFraction;
         }
 
         if (! $begin) {
-            return '????–' . $end;
+            return '????–' . $end . $endFraction;
         }
 
         if ($end) {
-            return $begin . '–' . $end;
+            return $begin . $beginFraction . '–' . $end . $endFraction;
         }
 
         if (! $today) {
-            return $begin . '–??';
+            return $begin . $beginFraction . '–??';
         }
 
         $currentYear = (int)date('Y');
 
         if ($begin >= $currentYear) {
-            return $begin;
+            return $begin . $beginFraction;
         }
 
-        return $begin . '–' . $this->translate('present-time-abbr', $language);
+        return $begin . $beginFraction . '–' . $this->translate('present-time-abbr', $language);
     }
 
     private function monthsRange($from, $to)

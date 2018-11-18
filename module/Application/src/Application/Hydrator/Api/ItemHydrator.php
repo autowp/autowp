@@ -256,6 +256,8 @@ class ItemHydrator extends RestHydrator
         return [
             'begin_model_year' => $object['begin_model_year'],
             'end_model_year'   => $object['end_model_year'],
+            'begin_model_year_fraction' => $object['begin_model_year_fraction'],
+            'end_model_year_fraction'   => $object['end_model_year_fraction'],
             'spec'             => $spec,
             'spec_full'        => $specFull,
             'body'             => $object['body'],
@@ -406,11 +408,15 @@ class ItemHydrator extends RestHydrator
             if ($this->filterComposite->filter('begin_model_year')) {
                 $value = (int)$object['begin_model_year'];
                 $result['begin_model_year'] = $value > 0 ? $value : null;
+                $value = $object['begin_model_year_fraction'];
+                $result['begin_model_year_fraction'] = $value ? $value : null;
             }
 
             if ($this->filterComposite->filter('end_model_year')) {
                 $value = (int)$object['end_model_year'];
                 $result['end_model_year'] = $value > 0 ? $value : null;
+                $value = $object['end_model_year_fraction'];
+                $result['end_model_year_fraction'] = $value ? $value : null;
             }
 
             if ($this->filterComposite->filter('begin_year')) {

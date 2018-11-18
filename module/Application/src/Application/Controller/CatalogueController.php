@@ -1555,6 +1555,8 @@ class CatalogueController extends AbstractActionController
                 'end_month'        => $modification['end_month'],
                 'begin_model_year' => $modification['begin_model_year'],
                 'end_model_year'   => $modification['end_model_year'],
+                'begin_model_year_fraction' => $modification['begin_model_year_fraction'],
+                'end_model_year_fraction'   => $modification['end_model_year_fraction'],
                 'today'            => $modification['today']
             ];
             foreach ($nameParams as $key => &$nameParam) {

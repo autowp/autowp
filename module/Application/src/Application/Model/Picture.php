@@ -1090,6 +1090,7 @@ class Picture
             $columns = [
                 'id',
                 'begin_model_year', 'end_model_year',
+                'begin_model_year_fraction', 'end_model_year_fraction',
                 'body',
                 'name' => new Sql\Expression('(' . $subSelect . ')'),
                 'begin_year', 'end_year', 'today',
@@ -1111,6 +1112,8 @@ class Picture
                 $data = [
                     'begin_model_year' => $row['begin_model_year'],
                     'end_model_year'   => $row['end_model_year'],
+                    'begin_model_year_fraction' => $row['begin_model_year_fraction'],
+                    'end_model_year_fraction'   => $row['end_model_year_fraction'],
                     'spec'             => $row['spec'],
                     'spec_full'        => $row['spec_full'],
                     'body'             => $row['body'],

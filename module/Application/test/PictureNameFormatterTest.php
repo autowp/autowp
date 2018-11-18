@@ -415,7 +415,24 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                 ],
                 "BMW 3 Series '" . date('Y'),
                 "BMW 3 Series '" . date('Y')
-            ]
+            ],
+            [
+                [
+                    'items' => [
+                        [
+                            'perspective'      => null,
+                            'name'             => 'BMW 3 Series',
+                            'body'             => 'E46',
+                            'spec'             => 'UK-spec',
+                            'begin_model_year' => '1999',
+                            'begin_model_year_fraction' => '½',
+                            'today'            => true
+                        ]
+                    ]
+                ],
+                '1999½–pr. BMW 3 Series [UK-spec] (E46)',
+                '<span title="model&#x20;years">1999½–pr.</span> BMW 3 Series <span class="badge badge-info">UK-spec</span> (E46)'
+            ],
         ];
     }
 

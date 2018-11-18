@@ -871,6 +871,20 @@ class ItemController extends AbstractRestfulController
                     ['name' => 'Digits']
                 ]
             ],
+            'begin_model_year_fraction' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => ['¼', '½', '¾']
+                        ]
+                    ]
+                ]
+            ],
             'end_model_year' => [
                 'required' => false,
                 'filters'  => [
@@ -878,6 +892,20 @@ class ItemController extends AbstractRestfulController
                 ],
                 'validators' => [
                     ['name' => 'Digits']
+                ]
+            ],
+            'end_model_year_fraction' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => ['¼', '½', '¾']
+                        ]
+                    ]
                 ]
             ],
             'begin_year' => [
@@ -991,6 +1019,7 @@ class ItemController extends AbstractRestfulController
             unset($spec['is_concept']);
             unset($spec['produced'], $spec['produced_exactly']);
             unset($spec['begin_model_year'], $spec['end_model_year']);
+            unset($spec['begin_model_year_fraction'], $spec['end_model_year_fraction']);
             unset($spec['spec_id']);
             unset($spec['body']);
         }
@@ -1104,6 +1133,14 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('end_model_year', $values)) {
             $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
+        }
+
+        if (array_key_exists('begin_model_year_fraction', $values)) {
+            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction'] ? $values['begin_model_year_fraction'] : null;
+        }
+
+        if (array_key_exists('end_model_year_fraction', $values)) {
+            $set['end_model_year_fraction'] = $values['end_model_year_fraction'] ? $values['end_model_year_fraction'] : null;
         }
 
         if (array_key_exists('is_concept', $values)) {
@@ -1334,6 +1371,18 @@ class ItemController extends AbstractRestfulController
             $notifyMeta = true;
             $subscribe = true;
             $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
+        }
+
+        if (array_key_exists('begin_model_year_fraction', $values)) {
+            $notifyMeta = true;
+            $subscribe = true;
+            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction'] ? $values['begin_model_year_fraction'] : null;
+        }
+
+        if (array_key_exists('end_model_year_fraction', $values)) {
+            $notifyMeta = true;
+            $subscribe = true;
+            $set['end_model_year_fraction'] = $values['end_model_year_fraction'] ? $values['end_model_year_fraction'] : null;
         }
 
         if (array_key_exists('is_concept', $values)) {
@@ -1669,6 +1718,8 @@ class ItemController extends AbstractRestfulController
             'is_group'         => ['bool', 'moder/vehicle/changes/is-group-%s-%s'],
             'begin_model_year' => ['int', 'moder/vehicle/changes/model-years/from-%s-%s'],
             'end_model_year'   => ['int', 'moder/vehicle/changes/model-years/to-%s-%s'],
+            'begin_model_year_fraction' => ['int', 'moder/vehicle/changes/model-years-fraction/from-%s-%s'],
+            'end_model_year_fraction'   => ['int', 'moder/vehicle/changes/model-years-fraction/to-%s-%s'],
             'spec_id'          => ['spec_id', 'moder/vehicle/changes/spec-%s-%s'],
             //'vehicle_type_id'  => ['vehicle_type_id', 'moder/vehicle/changes/car-type-%s-%s']
         ];

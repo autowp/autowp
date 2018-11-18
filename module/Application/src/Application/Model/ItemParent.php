@@ -185,6 +185,7 @@ class ItemParent
             }
         }
 
+        // TODO: fractions
         if (! $name && $vehicleRow['begin_model_year']) {
             $modelYearsDifferent = $vehicleRow['begin_model_year'] != $parentRow['begin_model_year']
                 || $vehicleRow['end_model_year'] != $parentRow['end_model_year'];

@@ -372,6 +372,8 @@ class Item
         return [
             'begin_model_year' => $row['begin_model_year'],
             'end_model_year'   => $row['end_model_year'],
+            'begin_model_year_fraction' => $row['begin_model_year_fraction'],
+            'end_model_year_fraction'   => $row['end_model_year_fraction'],
             'spec'             => $spec,
             'spec_full'        => $specFull,
             'body'             => $row['body'],
@@ -533,6 +535,17 @@ class Item
         return $resultIds;
     }
 
+    private function fractionToMonth($fraction)
+    {
+        switch ($fraction) {
+            case '¼': return 1;
+            case '½': return 4;
+            case '¾': return 7;
+        }
+
+        return 10;
+    }
+
     public function updateOrderCache(int $itemId): bool
     {
         $primaryKey = ['id' => $itemId];
@@ -554,7 +567,7 @@ class Item
             $begin = new DateTime();
             $begin->setDate( // approximation
                 $row['begin_model_year'] - 1,
-                10,
+                $this->fractionToMonth($row['begin_model_year_fraction']),
                 1
             );
         } else {
@@ -578,7 +591,7 @@ class Item
             $end = new DateTime();
             $end->setDate( // approximation
                 $row['end_model_year'],
-                9,
+                $this->fractionToMonth($row['end_model_year_fraction']) - 1,
                 30
             );
         } else {
@@ -1384,6 +1397,7 @@ class Item
                         $columns = array_merge($columns, [
                             'begin_year', 'end_year', 'today',
                             'begin_model_year', 'end_model_year',
+                            'begin_model_year_fraction', 'end_model_year_fraction',
                             'body',
                             /*'name' => $this->getNameSelect(
                                 'item.id',
