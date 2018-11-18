@@ -538,9 +538,9 @@ class Item
     private function fractionToMonth($fraction)
     {
         switch ($fraction) {
-            case '¼': return 1;
-            case '½': return 4;
-            case '¾': return 7;
+            case '¼': return 13;
+            case '½': return 16;
+            case '¾': return 19;
         }
 
         return 10;
