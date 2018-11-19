@@ -24,7 +24,10 @@ class UserRename
         ]);
     }
 
-    public function add(int $userId, string $oldName, string $newName)
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
+    public function add(int $userId, string $oldName, string $newName): void
     {
         $this->table->insert([
             'user_id'  => $userId,
@@ -34,7 +37,7 @@ class UserRename
         ]);
     }
 
-    public function getRenames(int $userId)
+    public function getRenames(int $userId): array
     {
         $select = new Sql\Select($this->table->getTable());
         $select->where(['user_id' => $userId])

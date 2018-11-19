@@ -95,15 +95,20 @@ class Votings
         foreach ($vvRows as $vvRow) {
             switch ($filter) {
                 case 1:
-                    $row = $this->voteTable->select(function (Sql\Select $select) use ($vvRow) {
-                        $select
-                            ->columns(['count' => new Sql\Expression('count(1)')])
-                            ->join('users', 'voting_variant_vote.user_id = users.id', [])
-                            ->where([
-                                'voting_variant_vote.voting_variant_id' => $vvRow['id'],
-                                'users.pictures_added > 100'
-                            ]);
-                    })->current();
+                    $row = $this->voteTable->select(
+                        /**
+                         * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+                         */
+                        function (Sql\Select $select) use ($vvRow) {
+                            $select
+                                ->columns(['count' => new Sql\Expression('count(1)')])
+                                ->join('users', 'voting_variant_vote.user_id = users.id', [])
+                                ->where([
+                                    'voting_variant_vote.voting_variant_id' => $vvRow['id'],
+                                    'users.pictures_added > 100'
+                                ]);
+                        }
+                    )->current();
                     $votes = (int)$row['count'];
                     break;
 
@@ -182,6 +187,9 @@ class Votings
         return $rows;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function vote(int $id, $variantId, int $userId)
     {
         $voting = $this->votingTable->select([
@@ -236,11 +244,16 @@ class Votings
 
     private function updateVariantVotesCount(int $variantId)
     {
-        $count = $this->voteTable->select(function (Sql\Select $select) use ($variantId) {
-            $select
-                ->columns(['count' => new Sql\Expression('count(1)')])
-                ->where(['voting_variant_id' => $variantId]);
-        })->current();
+        $count = $this->voteTable->select(
+            /**
+             * @suppress PhanDeprecatedFunction
+             */
+            function (Sql\Select $select) use ($variantId) {
+                $select
+                    ->columns(['count' => new Sql\Expression('count(1)')])
+                    ->where(['voting_variant_id' => $variantId]);
+            }
+        )->current();
 
         $this->variantTable->update([
             'votes' => $count['count']
@@ -251,12 +264,17 @@ class Votings
 
     private function updateVotingVotesCount(int $votingId)
     {
-        $count = $this->voteTable->select(function (Sql\Select $select) use ($votingId) {
-            $select
-                ->columns(['count' => new Sql\Expression('count(distinct voting_variant_vote.user_id)')])
-                ->join('voting_variant', 'voting_variant_vote.voting_variant_id = voting_variant.id', [])
-                ->where(['voting_variant.voting_id' => $votingId]);
-        })->current();
+        $count = $this->voteTable->select(
+            /**
+             * @suppress PhanDeprecatedFunction
+             */
+            function (Sql\Select $select) use ($votingId) {
+                $select
+                    ->columns(['count' => new Sql\Expression('count(distinct voting_variant_vote.user_id)')])
+                    ->join('voting_variant', 'voting_variant_vote.voting_variant_id = voting_variant.id', [])
+                    ->where(['voting_variant.voting_id' => $votingId]);
+            }
+        )->current();
         $this->votingTable->update([
             'votes' => $count['count']
         ], [

@@ -35,6 +35,9 @@ class Module implements
         ];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function onBootstrap(Event $e)
     {
         $application = $e->getApplication();
@@ -46,5 +49,7 @@ class Module implements
 
         $maintenance = new Maintenance();
         $maintenance->attach($serviceManager->get('CronEventManager')); // TODO: move CronEventManager to zf-components
+
+        return [];
     }
 }

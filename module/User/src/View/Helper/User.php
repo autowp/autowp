@@ -22,8 +22,14 @@ class User extends AbstractHelper
      */
     private $userModel;
 
+    /**
+     * @var array
+     */
     private $users = [];
 
+    /**
+     * @var array|\ArrayObject|null
+     */
     private $user = null;
 
     /**
@@ -66,35 +72,35 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return array|\ArrayObject|bool
+     * @return array|\ArrayObject|null
      */
     private function getLogedInUser()
     {
         $auth = new AuthenticationService();
 
         if (! $auth->hasIdentity()) {
-            return false;
+            return null;
         }
 
         return $this->user($auth->getIdentity());
     }
 
-    /**
-     * @return bool
-     */
-    public function logedIn()
+    public function logedIn(): bool
     {
         return (bool)$this->getLogedInUser();
     }
 
     /**
-     * @return array|\ArrayObject
+     * @return array|\ArrayObject|null
      */
     public function get()
     {
         return $this->user;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function __toString()
     {
         $result = '';
@@ -147,7 +153,10 @@ class User extends AbstractHelper
         return $result;
     }
 
-    public function avatar()
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
+    public function avatar(): string
     {
         $user = $this->user;
 
@@ -177,11 +186,9 @@ class User extends AbstractHelper
     }
 
     /**
-     * @param  string $resource
-     * @param  string $privilege
-     * @return boolean
+     * @suppress PhanTypeArraySuspiciousNullable
      */
-    public function isAllowed($resource = null, $privilege = null)
+    public function isAllowed(string $resource, string $privilege): bool
     {
         return $this->user
             && $this->user['role']
@@ -189,10 +196,9 @@ class User extends AbstractHelper
     }
 
     /**
-     * @param  string $inherit
-     * @return boolean
+     * @suppress PhanTypeArraySuspiciousNullable
      */
-    public function inheritsRole($inherit)
+    public function inheritsRole(string $inherit): bool
     {
         return $this->user
             && $this->user['role']
@@ -200,6 +206,9 @@ class User extends AbstractHelper
             && $this->acl->inheritsRole($this->user['role'], $inherit);
     }
 
+    /**
+     * @suppress PhanTypeArraySuspiciousNullable
+     */
     public function timezone()
     {
         return $this->user && $this->user['timezone']
@@ -207,6 +216,9 @@ class User extends AbstractHelper
             : 'UTC';
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function humanTime(DateTime $time = null)
     {
         if ($time === null) {
@@ -220,6 +232,9 @@ class User extends AbstractHelper
         return $this->view->humanTime($time);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function humanDate(DateTime $time = null)
     {
         if ($time === null) {

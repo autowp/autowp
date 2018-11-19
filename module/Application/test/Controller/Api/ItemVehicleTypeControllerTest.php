@@ -16,7 +16,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
-    private function createItem($params)
+    private function createItem($params): int
     {
         $this->reset();
 
@@ -34,7 +34,7 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $parts = explode('/', $uri->getPath());
         $itemId = $parts[count($parts) - 1];
 
-        return $itemId;
+        return (int) $itemId;
     }
 
     private function addItemParent(int $itemId, int $parentId, array $params = [])
