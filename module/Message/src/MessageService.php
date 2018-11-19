@@ -81,7 +81,7 @@ class MessageService
                 ]);
         })->current();
 
-        return $row ? (int)$row['count'] : null;
+        return $row ? (int)$row['count'] : 0;
     }
 
     public function delete(int $userId, int $messageId)

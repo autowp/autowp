@@ -217,8 +217,8 @@ class CommentsService
     }
 
     /**
-     * @param int $type
-     * @param int $item
+     * @param int $typeId
+     * @param int $itemId
      * @param int $userId
      */
     public function updateTopicView($typeId, $itemId, $userId)

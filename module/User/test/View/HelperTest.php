@@ -86,7 +86,7 @@ class HelperTest extends AbstractHttpControllerTestCase
 
     public function testTimezone()
     {
-        $this->assertEquals('UTC', $this->getHelper()->__invoke()->timezone('moder'));
+        $this->assertEquals('UTC', $this->getHelper()->__invoke()->timezone());
 
         $serviceManager = $this->getApplicationServiceLocator();
         $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
@@ -97,7 +97,7 @@ class HelperTest extends AbstractHttpControllerTestCase
         $auth = new AuthenticationService();
         $auth->authenticate($adapter);
 
-        $this->assertEquals('Europe/Moscow', $this->getHelper()->__invoke()->timezone('moder'));
+        $this->assertEquals('Europe/Moscow', $this->getHelper()->__invoke()->timezone());
     }
 
     public function testHumanTime()

@@ -241,7 +241,6 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/' . $pictureId, Request::METHOD_POST, [
-            'moderator_attention' => 0,
             'parent_id'           => null,
             'message'             => 'Test comment',
             'moderator_attention' => 1

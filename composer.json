@@ -77,7 +77,8 @@
 		"zendframework/zend-coding-standard" : "~1.0.0",
 		"phpmd/phpmd" : "^2.6",
 		"onesky/api-library-php5" : "^1.0",
-		"wapmorgan/php-code-fixer": "dev-master"
+		"wapmorgan/php-code-fixer": "dev-master",
+		"phan/phan": "^1.1"
 	},
 	"autoload-dev" : {
 		"psr-4" : {

@@ -8,7 +8,6 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\Commons\Db\Table\Row;
-use Autowp\User\Model\User;
 
 class Votings
 {
@@ -167,7 +166,7 @@ class Votings
         ])->current();
 
         if (! $variant) {
-            return null;
+            return [];
         }
 
         $select = $this->voteTable->getSql()->select()

@@ -96,7 +96,7 @@ class PluginTest extends AbstractHttpControllerTestCase
     {
         $this->getApplication(); // to initialize
 
-        $this->assertEquals('UTC', $this->getPlugin()->__invoke()->timezone('moder'));
+        $this->assertEquals('UTC', $this->getPlugin()->__invoke()->timezone());
 
         $serviceManager = $this->getApplicationServiceLocator();
         $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
@@ -107,6 +107,6 @@ class PluginTest extends AbstractHttpControllerTestCase
         $auth = new AuthenticationService();
         $auth->authenticate($adapter);
 
-        $this->assertEquals('Europe/Moscow', $this->getPlugin()->__invoke()->timezone('moder'));
+        $this->assertEquals('Europe/Moscow', $this->getPlugin()->__invoke()->timezone());
     }
 }
