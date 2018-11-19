@@ -122,6 +122,9 @@ class Forums
         $this->updateThemeStat($topic['theme_id']);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function updateThemeStat($themeId)
     {
         $theme = $this->themeTable->select([
@@ -280,6 +283,7 @@ class Forums
     }
 
     /**
+     * @suppress PhanDeprecatedFunction
      *
      * @param array $values
      * @throws \Exception
@@ -366,6 +370,9 @@ class Forums
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTopics($themeId)
     {
         $select = new Sql\Select($this->topicTable->getTable());
@@ -507,6 +514,9 @@ class Forums
         ];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function registerTopicView($topicId, $userId)
     {
         $this->topicTable->update([
@@ -664,6 +674,9 @@ class Forums
         return $topics;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getSubscribedTopicsCount(int $userId): int
     {
         $select = new Sql\Select($this->topicTable->getTable());

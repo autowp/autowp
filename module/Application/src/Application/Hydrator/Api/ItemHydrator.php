@@ -270,6 +270,9 @@ class ItemHydrator extends RestHydrator
         ];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function getCountBySelect(Sql\Select $select, TableGateway $table): int
     {
         $select->columns(['count' => new Sql\Expression('count(1)')]);

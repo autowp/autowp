@@ -236,6 +236,9 @@ class PageController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function postAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

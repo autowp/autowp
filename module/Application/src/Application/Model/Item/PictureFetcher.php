@@ -194,6 +194,9 @@ abstract class PictureFetcher
         return $select;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTotalPictures(array $itemIds, $onlyExactly)
     {
         $result = [];

@@ -30,6 +30,9 @@ class User
         $this->table = $table;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function updateSpecsVolumes()
     {
         $select = $this->table->getSql()->select()
@@ -252,6 +255,9 @@ class User
         return (bool)$this->table->selectWith($select)->current();
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function registerVisit(int $userId, Request $request)
     {
         $user = $this->getRow($userId);
@@ -309,6 +315,9 @@ class User
         return (string)$user['role'];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function decVotes(int $userId)
     {
         $this->table->update([

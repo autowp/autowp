@@ -93,6 +93,9 @@ class AccountController extends AbstractRestfulController
         return $service;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function startAction()
     {
         $user = $this->user()->get();

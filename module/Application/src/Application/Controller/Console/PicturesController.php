@@ -31,6 +31,9 @@ class PicturesController extends AbstractActionController
         $this->df = $df;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function fillPointAction()
     {
         $console = Console::getInstance();

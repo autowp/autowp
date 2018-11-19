@@ -201,6 +201,9 @@ class Item
         $this->itemLanguageTable->update($set, $primaryKey);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getUsedLanguagesCount(int $id): int
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
@@ -233,6 +236,9 @@ class Item
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTextsOfItem(int $id, string $language): array
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
@@ -270,6 +276,9 @@ class Item
         ];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTextOfItem(int $id, string $language): string
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
@@ -797,6 +806,9 @@ class Item
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function setPoint(int $itemId, $point)
     {
         $primaryKey = ['item_id' => $itemId];
@@ -1262,6 +1274,9 @@ class Item
         }
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function getNameSelect($value, string $valueType, string $language): Sql\Select
     {
         $predicate = new Sql\Predicate\Operator(
@@ -1291,6 +1306,9 @@ class Item
         return $select;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function getItemParentNameSelect(string $itemParentAlias, string $language): Sql\Select
     {
         $predicate1 = new Sql\Predicate\Operator(
@@ -1328,6 +1346,9 @@ class Item
         return $select;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getSelect(array $options): Sql\Select
     {
         $defaults = [
@@ -1588,6 +1609,9 @@ class Item
         return $this->getPaginator($options)->getTotalItemCount();
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getCountDistinct(array $options): int
     {
         $select = $this->getSelect($options);
@@ -1611,6 +1635,9 @@ class Item
         return (int) $row['count'];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getCountPairs(array $options): array
     {
         $select = $this->getSelect($options);

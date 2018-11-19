@@ -26,6 +26,9 @@ class Brakes extends AbstractAdapter
         $this->order = $value;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getCars(Sql\Select $select, $language)
     {
         $rear = $this->attributes['rear'];

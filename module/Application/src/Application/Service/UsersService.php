@@ -125,6 +125,9 @@ class UsersService
         $this->logEventUserTable = $logEventUserTable;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getPasswordHashExpr(string $password): Sql\Expression
     {
         if (strlen($password) <= 0) {
@@ -158,6 +161,8 @@ class UsersService
     }
 
     /**
+     * @suppress PhanDeprecatedFunction
+     *
      * @param array $values
      * @param string $hostname
      */
@@ -395,6 +400,9 @@ class UsersService
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function restoreVotes()
     {
         $this->userModel->getTable()->update([

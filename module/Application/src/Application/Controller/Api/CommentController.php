@@ -332,6 +332,9 @@ class CommentController extends AbstractRestfulController
         return false;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function postAction()
     {
         $currentUser = $this->user()->get();

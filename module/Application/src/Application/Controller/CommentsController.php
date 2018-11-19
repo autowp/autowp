@@ -134,6 +134,9 @@ class CommentsController extends AbstractRestfulController
         ];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function addAction()
     {
         if (! $this->canAddComments()) {

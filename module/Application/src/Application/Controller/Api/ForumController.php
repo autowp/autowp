@@ -348,6 +348,9 @@ class ForumController extends AbstractRestfulController
         return false;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function postTopicAction()
     {
         $user = $this->user()->get();

@@ -190,6 +190,9 @@ class LoginController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function startAction()
     {
         if ($this->user()->logedIn()) {

@@ -143,6 +143,9 @@ class IndexController extends AbstractActionController
         return $itemOfDayInfo;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function factories()
     {
         $cacheKey = 'INDEX_FACTORIES_5';
@@ -194,6 +197,9 @@ class IndexController extends AbstractActionController
         return $factories;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function indexAction()
     {
         $language = $this->language();

@@ -13,6 +13,9 @@ class UserPicture
         $this->userTable = $userTable;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function refreshAllPicturesCount()
     {
         $select = new Sql\Select($this->pictureTable->getTable());
@@ -45,6 +48,9 @@ class UserPicture
         ], $filter);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function refreshPicturesCount($userId)
     {
         $select = new Sql\Select($this->pictureTable->getTable());
@@ -63,6 +69,9 @@ class UserPicture
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function incrementUploads($userId)
     {
         $this->userTable->update([

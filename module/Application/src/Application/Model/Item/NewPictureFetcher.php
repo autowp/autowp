@@ -38,6 +38,9 @@ class NewPictureFetcher extends PictureFetcher
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTotalPictures(array $itemIds, $onlyExactly)
     {
         $result = [];

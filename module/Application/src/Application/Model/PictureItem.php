@@ -405,6 +405,9 @@ class PictureItem
         return $this->table;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function updateContentCount(int $pictureId)
     {
         $select = $this->table->getSql()->select()

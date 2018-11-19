@@ -67,6 +67,9 @@ class Brand
         }
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTopBrandsList(string $language)
     {
         $subSelect = new Sql\Select(['product' => 'item']);
@@ -142,6 +145,9 @@ class Brand
         return $number;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getFullBrandsList(string $language)
     {
         $select = new Sql\Select(['ipc_all' => 'item_parent_cache']);

@@ -70,6 +70,9 @@ class MessageService
         }
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getNewCount(int $userId): int
     {
         $row = $this->table->select(function (Sql\Select $select) use ($userId) {

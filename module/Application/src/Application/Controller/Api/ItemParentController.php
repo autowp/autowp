@@ -108,6 +108,9 @@ class ItemParentController extends AbstractRestfulController
         $this->vehicleType = $vehicleType;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function indexAction()
     {
         $user = $this->user()->get();

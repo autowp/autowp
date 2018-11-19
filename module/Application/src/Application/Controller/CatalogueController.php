@@ -335,6 +335,9 @@ class CatalogueController extends AbstractActionController
         });
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function getBrandFactories(int $brandId)
     {
         $rows = $this->itemModel->getRows([

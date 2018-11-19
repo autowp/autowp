@@ -23,6 +23,9 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/voting/item/get');
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function testVoteAndGetVotes()
     {
         $tables = $this->getApplication()->getServiceManager()->get('TableManager');

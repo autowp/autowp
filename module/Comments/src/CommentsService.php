@@ -62,6 +62,8 @@ class CommentsService
     }
 
     /**
+     * @suppress PhanDeprecatedFunction
+     *
      * @param array $data
      * @return int
      */
@@ -114,6 +116,9 @@ class CommentsService
         return $messageId;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function updateMessageRepliesCount($messageId)
     {
         $row = $this->messageTable->select(function (Sql\Select $select) use ($messageId) {
@@ -232,6 +237,9 @@ class CommentsService
         $statement->execute([$userId, $typeId, $itemId]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function queueDeleteMessage(int $id, int $userId): bool
     {
         $comment = $this->getMessageRow($id);
@@ -339,6 +347,8 @@ class CommentsService
     }
 
     /**
+     * @suppress PhanDeprecatedFunction
+     *
      * @todo Change $message to $messageId
      */
     private function updateVote($message)
@@ -471,6 +481,8 @@ class CommentsService
     }
 
     /**
+     * @suppress PhanDeprecatedFunction
+     *
      * @param array $message
      * @param int $perPage
      * @return int
@@ -736,6 +748,9 @@ class CommentsService
         $statement->execute([$itemId, $typeId, $lastUpdate, $messagesCount]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function getMessagesCountFromTimestamp($typeId, $itemId, $timestamp): int
     {
         $countRow = $this->messageTable->select(function (Sql\Select $select) use ($itemId, $typeId, $timestamp) {
@@ -794,6 +809,9 @@ class CommentsService
         return reset($result);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function countMessages($typeId, $itemId)
     {
         $countRow = $this->messageTable->select(function (Sql\Select $select) use ($itemId, $typeId) {
@@ -1023,6 +1041,9 @@ class CommentsService
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getUserAvgVote($userId)
     {
         $row = $this->messageTable->select(function (Sql\Select $select) use ($userId) {
@@ -1234,6 +1255,9 @@ class CommentsService
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTopAuthors(int $limit): array
     {
         $select = $this->messageTable->getSql()->select()

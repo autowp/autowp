@@ -361,6 +361,9 @@ class VehicleType
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getBrandVehicleTypes(int $brandId): array
     {
         $select = new Sql\Select($this->vehicleTypeTable->getTable());

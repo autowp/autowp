@@ -344,6 +344,9 @@ class Picture
         $select->columns($result);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getSelect(array $options)
     {
         $defaults = [
@@ -800,6 +803,9 @@ class Picture
         return $this->getPaginator($options)->getTotalItemCount();
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getCountDistinct(array $options): int
     {
         $select = $this->getSelect($options);
@@ -1004,6 +1010,9 @@ class Picture
         return $votes <= 0;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function accept(int $pictureId, int $userId, &$isFirstTimeAccepted): bool
     {
         $primaryKey = ['id' => $pictureId];
@@ -1051,6 +1060,9 @@ class Picture
         return Rand::getString(1, $alpha) . Rand::getString(self::IDENTITY_LENGTH - 1, $alpha . $number);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTotalPicturesSize(): int
     {
         $select = $this->table->getSql()->select();
@@ -1059,6 +1071,9 @@ class Picture
         return $row ? (int)$row['sum'] : 0;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getNameData($rows, array $options = [])
     {
         $result = [];
@@ -1182,6 +1197,9 @@ class Picture
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTopLikes(int $limit): array
     {
         $select = $this->table->getSql()->select()
@@ -1200,6 +1218,9 @@ class Picture
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTopOwnerFans(int $userId, int $limit): array
     {
         $select = $this->table->getSql()->select()

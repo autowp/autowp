@@ -19,6 +19,9 @@ class Modification
         $this->modTable = $modificationTable;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function canDelete(int $id)
     {
         $select = new Sql\Select($this->modTable->getTable());

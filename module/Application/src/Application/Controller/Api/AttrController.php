@@ -457,6 +457,9 @@ class AttrController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function attributePostAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {
@@ -827,6 +830,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function zoneAttributePostAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {
@@ -952,6 +958,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function listOptionPostAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {

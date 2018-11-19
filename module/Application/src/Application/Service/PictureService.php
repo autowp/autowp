@@ -119,6 +119,9 @@ class PictureService
         }
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function addPictureFromFile(
         string $path,
         int $userId,

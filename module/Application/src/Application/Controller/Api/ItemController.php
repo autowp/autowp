@@ -189,6 +189,9 @@ class ItemController extends AbstractRestfulController
         }
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function indexAction()
     {
         $isModer = $this->user()->inheritsRole('moder');
@@ -701,6 +704,9 @@ class ItemController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function alphaAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -1029,6 +1035,9 @@ class ItemController extends AbstractRestfulController
         return $factory->createInputFilter($spec);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function postAction()
     {
         if (! $this->user()->isAllowed('car', 'add')) {

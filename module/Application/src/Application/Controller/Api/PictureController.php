@@ -571,6 +571,9 @@ class PictureController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function updateAction()
     {
         $user = $this->user()->get();
@@ -1096,6 +1099,9 @@ class PictureController extends AbstractRestfulController
         return $can1 && $can2 && $this->user()->isAllowed('picture', 'move');
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function acceptReplaceAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

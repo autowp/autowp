@@ -80,6 +80,9 @@ class ChartController extends AbstractRestfulController
         return array_merge($ids, $result);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function dataAction()
     {
         $id = (int)$this->params()->fromQuery('id');
