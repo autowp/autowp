@@ -333,7 +333,7 @@ class CommentController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function postAction()
     {

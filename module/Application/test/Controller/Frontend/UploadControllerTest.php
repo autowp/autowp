@@ -12,6 +12,9 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testUploadVehicle()
     {
         /**

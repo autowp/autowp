@@ -96,6 +96,9 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function createAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

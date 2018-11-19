@@ -24,7 +24,7 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function testVoteAndGetVotes()
     {

@@ -33,6 +33,9 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($vehicleId)
     {
         $this->reset();
@@ -76,6 +79,9 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
         return $pictureId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -97,6 +103,9 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testVote()
     {
         $itemId = $this->createItem([

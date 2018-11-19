@@ -56,6 +56,9 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
         }
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function redirect(MvcEvent $e, $url)
     {
         $response = $e->getResponse();

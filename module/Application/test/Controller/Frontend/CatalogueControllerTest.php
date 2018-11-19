@@ -36,6 +36,9 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function setPerspective($itemId, $pictureId, $perspectiveId)
     {
         $this->reset();
@@ -51,6 +54,9 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('update');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($itemId)
     {
         $this->reset();
@@ -94,6 +100,9 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         return $pictureId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getPicture($itemId)
     {
         $this->reset();
@@ -113,6 +122,9 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         return $json;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function acceptPicture($pictureId)
     {
         $this->reset();
@@ -131,6 +143,9 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('update');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -152,6 +167,9 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addItemParent($itemId, $parentId, array $params = [])
     {
         $this->reset();
@@ -173,6 +191,9 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getRandomBrand()
     {
         $this->reset();
@@ -197,6 +218,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrand(string $token)
@@ -224,6 +247,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testCars(string $token)
@@ -255,6 +280,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testRecent(string $token)
@@ -278,6 +305,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testConcepts(string $token)
@@ -322,6 +351,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testOther(string $token)
@@ -343,6 +374,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testMixed(string $token)
@@ -365,6 +398,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testLogotypes(string $token)
@@ -387,6 +422,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testOtherPicture(string $token)
@@ -409,6 +446,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testMixedPicture(string $token)
@@ -432,6 +471,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testLogotypesPicture(string $token)
@@ -455,6 +496,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testOtherGallery(string $token)
@@ -478,6 +521,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testMixedGallery(string $token)
@@ -501,6 +546,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testLogotypesGallery(string $token)
@@ -540,6 +587,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }*/
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandMosts(string $token)
@@ -569,6 +618,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandFactories(string $token)
@@ -605,6 +656,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandItem(string $token)
@@ -637,6 +690,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandItemSubitem(string $token)
@@ -687,6 +742,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandItemGroup(string $token)
@@ -732,6 +789,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandItemPictures(string $token)
@@ -772,6 +831,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandItemPicturesPicture(string $token)
@@ -815,6 +876,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandItemGallery(string $token)
@@ -858,6 +921,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandEngines(string $token)
@@ -890,6 +955,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandItemSpecifications(string $token)
@@ -927,6 +994,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @dataProvider userTokenProvider
      */
     public function testBrandItemRelatedAndSportSubitem(string $token)

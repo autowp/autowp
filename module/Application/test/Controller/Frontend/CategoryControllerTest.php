@@ -14,6 +14,9 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -35,6 +38,9 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addItemParent($itemId, $parentId, array $params = [])
     {
         $this->reset();
@@ -76,6 +82,9 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($vehicleId)
     {
         $this->reset();
@@ -148,6 +157,9 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery("h1");
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCategoryAddItemAndGet()
     {
         $catname = 'catname-' . (10000 * microtime(true));

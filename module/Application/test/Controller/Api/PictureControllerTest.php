@@ -33,6 +33,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($vehicleId)
     {
         $this->reset();
@@ -76,6 +79,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         return $pictureId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -97,6 +103,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getItemById($itemId)
     {
         $this->reset();
@@ -116,6 +125,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         return $json;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function acceptPicture($pictureId)
     {
         $this->reset();
@@ -134,6 +146,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('update');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testGetList()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

@@ -34,6 +34,9 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($itemId)
     {
         $this->reset();
@@ -86,6 +89,9 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         )->current();
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCommentAndSubcomment()
     {
         $pictureId = $this->addPictureToItem(1);
@@ -124,6 +130,9 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('add');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCommentAndVote()
     {
         $pictureId = $this->addPictureToItem(1);
@@ -185,6 +194,9 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('votes');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCommentAndDeleteAndRestore()
     {
         $pictureId = $this->addPictureToItem(1);
@@ -233,6 +245,9 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('put');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCommentAndResolve()
     {
         $pictureId = $this->addPictureToItem(1);

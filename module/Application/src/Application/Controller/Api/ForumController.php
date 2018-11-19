@@ -349,7 +349,7 @@ class ForumController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function postTopicAction()
     {

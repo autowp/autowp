@@ -30,6 +30,9 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->assertResponseStatusCode(403);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateTopic()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

@@ -151,6 +151,9 @@ class ItemLinkController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function postAction()
     {
         if (! $this->user()->isAllowed('car', 'edit_meta')) {

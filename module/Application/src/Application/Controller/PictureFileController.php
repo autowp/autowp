@@ -24,6 +24,9 @@ class PictureFileController extends AbstractActionController
         $this->referer = $referer;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function indexAction()
     {
         $request = $this->getRequest();

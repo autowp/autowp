@@ -98,6 +98,9 @@ class ItemVehicleTypeController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function createAction()
     {
         $canMove = $this->user()->isAllowed('car', 'move');

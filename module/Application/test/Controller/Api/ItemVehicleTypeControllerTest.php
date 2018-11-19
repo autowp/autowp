@@ -16,6 +16,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params): int
     {
         $this->reset();
@@ -37,6 +40,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         return (int) $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addItemParent(int $itemId, int $parentId, array $params = [])
     {
         $this->reset();
@@ -58,6 +64,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function setItemVehicleTypes(int $itemId, array $vehicleTypeIds)
     {
         $this->reset();
@@ -99,6 +108,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         }
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getItemVehicleTypeIds(int $itemId)
     {
         $this->reset();
@@ -138,6 +150,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
         $this->assertEquals($inheritedExpected, $this->getItemInheritedVehicleTypeIds($itemId));
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testList()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

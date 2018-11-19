@@ -265,6 +265,9 @@ class ItemParentController extends AbstractRestfulController
         return new JsonModel($this->hydrator->extract($row));
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function postAction()
     {
         $canMove = $this->user()->isAllowed('car', 'move');

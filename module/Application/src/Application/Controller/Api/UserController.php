@@ -471,6 +471,9 @@ class UserController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function postAction()
     {
         $request = $this->getRequest();

@@ -35,6 +35,9 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($itemId)
     {
         $this->reset();
@@ -77,6 +80,9 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         return $pictureId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -98,6 +104,9 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addItemParent($itemId, $parentId, array $params = [])
     {
         $this->reset();
@@ -119,6 +128,9 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getRandomBrand()
     {
         $this->reset();
@@ -152,6 +164,9 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('twins');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testGroup()
     {
         $groupName = 'Daihatsu / Toyota Cordoba';

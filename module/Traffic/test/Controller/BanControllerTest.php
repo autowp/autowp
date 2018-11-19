@@ -32,6 +32,9 @@ class BanControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('forbidden');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testBanUnbanIp()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

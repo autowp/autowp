@@ -18,6 +18,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -55,6 +58,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function setEngineToVehicle($engineId, $vehicleId)
     {
         $this->reset();
@@ -75,6 +81,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('put');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getRandomBrand()
     {
         $this->reset();
@@ -98,6 +107,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return $json['items'][0];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addItemParent($itemId, $parentId, array $params = [])
     {
         $this->reset();
@@ -138,6 +150,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($vehicleId)
     {
         $this->reset();
@@ -181,6 +196,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return $pictureId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function setPerspective($pictureId, $itemId, $perspectiveId)
     {
         $this->reset();
@@ -201,6 +219,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('update');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function acceptPicture($pictureId)
     {
         $this->reset();
@@ -219,6 +240,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('update');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getItemParent($itemId, $parentId)
     {
         $this->reset();
@@ -238,6 +262,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testEngineUnderTheHoodPreviews()
     {
         $vehicleId = $this->createVehicle();
@@ -274,6 +301,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($json);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCarAndAddToBrand()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -318,6 +348,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testTree()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -330,6 +363,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('tree');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateBrand()
     {
         $catname = 'test-brand-' . (10000 * microtime(true));
@@ -395,6 +431,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testBlacklistedCatnameNotAllowedManually()
     {
         $parentVehicleId = $this->createVehicle([
@@ -433,6 +472,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEquals('sport', $json['catname']);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testSubscription()
     {
         $brand = $this->getRandomBrand();
@@ -485,6 +527,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertEquals('sedan', $itemParent['catname']);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testItemPoint()
     {
         $itemId = $this->createItem([
@@ -512,6 +557,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertSame(-15, $json['lng']);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testEngineVehicles()
     {
         $engineId = $this->createItem([
@@ -558,6 +606,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         }
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testFields()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

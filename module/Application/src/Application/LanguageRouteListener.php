@@ -129,6 +129,9 @@ class LanguageRouteListener extends AbstractListenerAggregate
         return null;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function redirect(MvcEvent $e, $url)
     {
         $response = $e->getResponse();

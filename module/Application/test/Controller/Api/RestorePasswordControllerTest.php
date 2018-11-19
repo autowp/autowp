@@ -13,6 +13,9 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createUser(string $email, string $password, string $name): int
     {
         $this->reset();

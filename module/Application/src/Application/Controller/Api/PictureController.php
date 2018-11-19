@@ -518,6 +518,9 @@ class PictureController extends AbstractRestfulController
         ]) . 'ng/moder/pictures/' . $picture['id'];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function postAction()
     {
         $user = $this->user()->get();
