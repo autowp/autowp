@@ -12,6 +12,7 @@ before_install:
 script:
   - docker exec -it autowp_test_web sh -c "./install-dev-db.sh" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "./install-dev.sh" || travis_terminate 1;
+  - docker exec -it autowp_test_web sh -c "./vendor/bin/phpcf module" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "./composer.phar phpmd" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --coverage-clover ./logs/clover.xml" || travis_terminate 1;
 

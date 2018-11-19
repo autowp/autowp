@@ -76,7 +76,8 @@
 		"codeclimate/php-test-reporter" : "^0.4",
 		"zendframework/zend-coding-standard" : "~1.0.0",
 		"phpmd/phpmd" : "^2.6",
-		"onesky/api-library-php5" : "^1.0"
+		"onesky/api-library-php5" : "^1.0",
+		"wapmorgan/php-code-fixer": "dev-master"
 	},
 	"autoload-dev" : {
 		"psr-4" : {
