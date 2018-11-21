@@ -68,7 +68,7 @@ class Brand
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getTopBrandsList(string $language)
     {
@@ -268,6 +268,9 @@ class Brand
         return $result;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function fetchBrand(string $language, $callback)
     {
         $select = $this->item->getSelect([

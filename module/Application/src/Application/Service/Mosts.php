@@ -621,6 +621,9 @@ class Mosts
         return $data;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getData($options)
     {
         $defaults = [

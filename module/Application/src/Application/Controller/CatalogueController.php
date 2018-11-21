@@ -1397,6 +1397,9 @@ class CatalogueController extends AbstractActionController
             ->limit(1);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getModgroupPictureList(int $carId, int $modId, array $perspectiveGroupIds)
     {
         $pictures = [];

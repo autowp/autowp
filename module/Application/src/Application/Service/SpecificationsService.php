@@ -979,6 +979,9 @@ class SpecificationsService
         return $attributes;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getActualValue(int $attribute, int $itemId)
     {
         if (! $itemId) {
@@ -1693,6 +1696,7 @@ class SpecificationsService
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
      * @param int|array $itemId
      * @return boolean|array
      */
@@ -1732,7 +1736,7 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getSpecsCount(int $itemId): int
     {
@@ -1746,6 +1750,7 @@ class SpecificationsService
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
      * @param int|array $itemId
      * @return boolean|array
      */

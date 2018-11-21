@@ -54,6 +54,9 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function itemAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

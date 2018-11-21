@@ -202,7 +202,7 @@ class Item
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getUsedLanguagesCount(int $id): int
     {
@@ -341,6 +341,9 @@ class Item
         return $result;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getLanguageName(int $itemId, string $language): string
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
@@ -355,6 +358,9 @@ class Item
         return $row ? $row['name'] : '';
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getName(int $itemId, string $language)
     {
         $select = $this->getNameSelect($itemId, Sql\ExpressionInterface::TYPE_VALUE, $language);
@@ -1656,6 +1662,9 @@ class Item
         return $result;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getRow(array $options)
     {
         $select = $this->getSelect($options);
@@ -1664,6 +1673,9 @@ class Item
         return $this->itemTable->selectWith($select)->current();
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function isExists(array $options): bool
     {
         $select = $this->getSelect($options);

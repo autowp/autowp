@@ -78,7 +78,7 @@ class PictureModerVote
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getVoteCount(int $pictureId): array
     {
@@ -138,7 +138,7 @@ class PictureModerVote
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getPositiveVotesCount(int $pictureId)
     {
@@ -154,7 +154,7 @@ class PictureModerVote
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getNegativeVotesCount(int $pictureId)
     {

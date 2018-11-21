@@ -20,7 +20,7 @@ class Modification
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function canDelete(int $id)
     {

@@ -104,6 +104,9 @@ class PageController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function itemPutAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

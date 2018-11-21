@@ -271,7 +271,7 @@ class ItemHydrator extends RestHydrator
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     private function getCountBySelect(Sql\Select $select, TableGateway $table): int
     {

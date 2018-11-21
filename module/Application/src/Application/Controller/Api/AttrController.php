@@ -679,6 +679,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function attributeItemPatchAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {
@@ -831,7 +834,7 @@ class AttrController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function zoneAttributePostAction()
     {
@@ -959,7 +962,7 @@ class AttrController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function listOptionPostAction()
     {

@@ -150,6 +150,9 @@ class ForumController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getThemeAction()
     {
         $isModerator = $this->user()->inheritsRole('moder');
@@ -421,6 +424,9 @@ class ForumController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getTopicAction()
     {
         $this->topicGetInputFilter->setData($this->params()->fromQuery());

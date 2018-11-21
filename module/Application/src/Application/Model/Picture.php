@@ -829,6 +829,9 @@ class Picture
         return (int) $row['count'];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getRow(array $options)
     {
         $select = $this->getSelect($options);
@@ -837,6 +840,9 @@ class Picture
         return $this->table->selectWith($select)->current();
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function isExists(array $options): bool
     {
         $select = $this->getSelect($options);
@@ -879,6 +885,9 @@ class Picture
         return $this->table;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getFileNamePattern(int $pictureId): string
     {
         $result = rand(1, 9999);
@@ -1061,7 +1070,7 @@ class Picture
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getTotalPicturesSize(): int
     {

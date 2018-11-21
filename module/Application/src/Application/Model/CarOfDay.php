@@ -149,6 +149,9 @@ class CarOfDay
         return false;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getCurrent()
     {
         $select = $this->table->getSql()->select();
@@ -587,6 +590,9 @@ class CarOfDay
         ];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getOrientedPictureList(int $itemId)
     {
         $perspectivesGroupIds = $this->perspective->getPageGroupIds(5);

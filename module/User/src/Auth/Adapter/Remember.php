@@ -32,6 +32,9 @@ class Remember implements AdapterInterface
         $this->userModel = $userModel;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function authenticate()
     {
         $this->authenticateSetup();

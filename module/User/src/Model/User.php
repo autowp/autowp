@@ -209,6 +209,9 @@ class User
         return $select;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getRow($options)
     {
         $select = $this->getSelect($options);
@@ -243,6 +246,9 @@ class User
         return $this->getPaginator($options)->getTotalItemCount();
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function isExists(array $options): bool
     {
         $select = $this->getSelect($options);
@@ -285,6 +291,9 @@ class User
         }
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getUserLanguage(int $userId): string
     {
         $select = $this->table->getSql()->select()
@@ -300,6 +309,9 @@ class User
         return (string)$user['language'];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getUserRole(int $userId): string
     {
         $select = $this->table->getSql()->select()

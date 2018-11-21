@@ -123,7 +123,7 @@ class Forums
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function updateThemeStat($themeId)
     {
@@ -245,6 +245,9 @@ class Forums
         ];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getThemePage($themeId, $page, $userId, $isModerator)
     {
         $select = new Sql\Select($this->themeTable->getTable());
@@ -452,6 +455,9 @@ class Forums
         return true;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getTopic($topicId, array $options = [])
     {
         $defaults = [
@@ -675,7 +681,7 @@ class Forums
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getSubscribedTopicsCount(int $userId): int
     {

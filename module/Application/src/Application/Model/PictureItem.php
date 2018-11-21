@@ -386,6 +386,9 @@ class PictureItem
         return in_array($type, $allowed[$itemTypeId]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function isAllowedTypeByItemId(int $itemId, int $type)
     {
         $select = $this->itemTable->getSql()->select()
@@ -406,7 +409,7 @@ class PictureItem
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function updateContentCount(int $pictureId)
     {

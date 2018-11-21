@@ -687,7 +687,7 @@ class ItemParent
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getNamePreferLanguage(int $parentId, int $itemId, string $language): string
     {
@@ -848,6 +848,9 @@ class ItemParent
         return $updates;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function hasChildItems(int $parentId): bool
     {
         $select = new Sql\Select($this->itemParentTable->getTable());
@@ -859,7 +862,7 @@ class ItemParent
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getChildItemsCount(int $parentId): int
     {
@@ -872,7 +875,7 @@ class ItemParent
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
      */
     public function getParentItemsCount(int $itemId): int
     {

@@ -244,6 +244,8 @@ class DayPictures
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @return string|null
      */
     public function getLastDateStr()
@@ -268,6 +270,8 @@ class DayPictures
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @return DayPictures
      */
     private function calcPrevDate()
@@ -351,6 +355,8 @@ class DayPictures
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
+     *
      * @return DayPictures
      */
     private function calcNextDate()

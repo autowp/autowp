@@ -9,6 +9,9 @@ class DistinctItemPictureFetcher extends PictureFetcher
     const PERSPECTIVE_GROUP_ID = 31;
     const COUNT = 4;
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function fetch($item, array $options = [])
     {
 

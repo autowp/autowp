@@ -65,6 +65,7 @@ class Catalogue
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
      * @param int $id
      * @param array $options
      * @return array

@@ -207,6 +207,9 @@ class TelegramService
         }
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function notifyPicture(int $pictureId)
     {
         $picture = $this->picture->getRow(['id' => $pictureId]);
