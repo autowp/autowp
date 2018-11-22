@@ -11,7 +11,6 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Math\Rand;
 use Zend\Paginator;
 
-use Autowp\Image;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 use Application\Model\Item as ItemModel;

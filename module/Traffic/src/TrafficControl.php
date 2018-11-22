@@ -2,14 +2,9 @@
 
 namespace Autowp\Traffic;
 
-use DateInterval;
 use DateTime;
-use DateTimeZone;
 
 use GuzzleHttp\Client;
-use Zend\Db\Sql\Expression;
-use Zend\Db\Sql\Select;
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Json\Json;
 
 use Application\Service\RabbitMQ;
@@ -177,7 +172,7 @@ class TrafficControl
     {
         $this->rabbitmq->send('input', Json::encode([
             'ip'        => $ip,
-            'timestamp' => (new \DateTime())->format(\DateTime::RFC3339)
+            'timestamp' => (new DateTime())->format(DateTime::RFC3339)
         ]));
     }
 }

@@ -3,7 +3,6 @@
 namespace Application\Service;
 
 use Interop\Container\ContainerInterface;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 class RabbitMQFactory implements FactoryInterface

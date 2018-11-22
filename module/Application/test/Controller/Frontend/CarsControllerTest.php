@@ -7,7 +7,6 @@ use Zend\Http\Request;
 use Application\Test\AbstractHttpControllerTestCase;
 
 use Application\Controller\Api\ItemController;
-use Application\Controller\CarsController;
 use Application\Controller\Api\AttrController;
 
 class CarsControllerTest extends AbstractHttpControllerTestCase

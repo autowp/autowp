@@ -3,8 +3,6 @@
 namespace Application\Model;
 
 use GuzzleHttp\Client;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Json\Json;
 
 use Application\Service\RabbitMQ;

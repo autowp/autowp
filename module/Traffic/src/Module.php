@@ -2,7 +2,6 @@
 
 namespace Autowp\Traffic;
 
-use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\EventManager\EventInterface as Event;
 use Zend\ModuleManager\Feature;
 

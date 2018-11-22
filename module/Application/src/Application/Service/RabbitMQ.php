@@ -2,13 +2,11 @@
 
 namespace Application\Service;
 
-use Interop\Container\ContainerInterface;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 class RabbitMQ
 {
