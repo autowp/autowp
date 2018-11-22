@@ -104,7 +104,7 @@ class PictureNameFormatter
             $result = [];
             if ($item['perspective']) {
                 $perspective = $this->translate($item['perspective'], $language);
-                $result[] = $this->renderer->escapeHtml(self::mbUcfirst($perspective, $language));
+                $result[] = $this->renderer->escapeHtml(self::mbUcfirst($perspective));
             }
 
             $result[] = $this->itemNameFormatter->formatHtml($item, $language);

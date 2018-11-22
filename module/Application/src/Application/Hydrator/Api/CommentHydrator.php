@@ -273,7 +273,7 @@ class CommentHydrator extends RestHydrator
 
     public function setFields(array $fields)
     {
-        $this->getFilter('fields')->addFilter('fields', new PropertyFilter(array_keys($fields)));
+        $this->getFilter()->addFilter('fields', new PropertyFilter(array_keys($fields)));
 
         foreach ($fields as $name => $value) {
             if (! is_array($value)) {

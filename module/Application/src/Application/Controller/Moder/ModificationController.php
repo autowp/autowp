@@ -68,7 +68,7 @@ class ModificationController extends AbstractActionController
 
     private function redirectToCar($carId, $tab = null)
     {
-        return $this->redirect($this->carModerUrl($carId, true, $tab));
+        return $this->redirect()->toUrl($this->carModerUrl($carId, true, $tab));
     }
 
     public function addAction()

@@ -43,9 +43,7 @@ class Catalogue extends ListBuilder
 
     public function getDetailsUrl($item)
     {
-        $paths = $this->getPathsToBrand($item['id'], $this->brand['id'], [
-            'breakOnFirst' => true
-        ]);
+        $paths = $this->getPathsToBrand($item['id'], $this->brand['id']);
 
         if (count($paths) <= 0) {
             return null;
@@ -65,9 +63,7 @@ class Catalogue extends ListBuilder
 
     public function getPicturesUrl($item)
     {
-        $paths = $this->getPathsToBrand($item['id'], $this->brand['id'], [
-            'breakOnFirst' => true
-        ]);
+        $paths = $this->getPathsToBrand($item['id'], $this->brand['id']);
 
         if (count($paths) <= 0) {
             return null;
@@ -94,9 +90,7 @@ class Catalogue extends ListBuilder
             return false;
         }
 
-        $paths = $this->getPathsToBrand($item['id'], $this->brand['id'], [
-            'breakOnFirst' => true
-        ]);
+        $paths = $this->getPathsToBrand($item['id'], $this->brand['id']);
 
         if (count($paths) <= 0) {
             return null;
@@ -116,9 +110,7 @@ class Catalogue extends ListBuilder
 
     public function getPictureUrl($item, $picture)
     {
-        $paths = $this->getPathsToBrand($item['id'], $this->brand['id'], [
-            'breakOnFirst' => true
-        ]);
+        $paths = $this->getPathsToBrand($item['id'], $this->brand['id']);
 
         if (count($paths) <= 0) {
             return $this->picHelper->url($picture['identity']);

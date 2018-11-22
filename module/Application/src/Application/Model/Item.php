@@ -951,7 +951,7 @@ class Item
         return $this->applyFilters($select, array_replace(
             ['language' => $language],
             $options
-        ), $alias . '.item_id', $alias, $language);
+        ), $alias . '.item_id', $alias);
     }
 
     private function applyParentFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
@@ -1071,7 +1071,7 @@ class Item
         $subGroup = $this->applyFilters($select, array_replace(
             ['language' => $language],
             $options
-        ), $alias . '.item_id', $alias, $language);
+        ), $alias . '.item_id', $alias);
         $group = array_merge($group, $subGroup);
 
         return $group;
@@ -1198,7 +1198,7 @@ class Item
                 $subGroup = $this->applyFilters($select, array_replace(
                     ['language' => $language],
                     $options['descendant_or_self']
-                ), $alias . '.item_id', $alias, $language);
+                ), $alias . '.item_id', $alias);
                 $group = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.item_id' => $options['descendant_or_self']]);
@@ -1215,7 +1215,7 @@ class Item
                 $subGroup = $this->applyFilters($select, array_replace(
                     ['language' => $language],
                     $options['ancestor']
-                ), $alias . '.parent_id', $alias, $language);
+                ), $alias . '.parent_id', $alias);
                 $group = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.parent_id' => $options['ancestor']]);
@@ -1240,7 +1240,7 @@ class Item
                 $subGroup = $this->applyFilters($select, array_replace(
                     ['language' => $language],
                     $options['ancestor_or_self']
-                ), $alias . '.parent_id', $alias, $language);
+                ), $alias . '.parent_id', $alias);
                 $group = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.parent_id' => $options['ancestor_or_self']]);
@@ -1478,7 +1478,7 @@ class Item
         $group = $this->applyFilters($select, array_replace(
             ['language' => $language],
             $recursiveOptions
-        ), 'item.id', '', $language);
+        ), 'item.id', '');
 
         if ($options['item_type_id']) {
             if (is_array($options['item_type_id'])) {

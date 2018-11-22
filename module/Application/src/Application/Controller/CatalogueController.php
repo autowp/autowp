@@ -899,7 +899,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandAction(function ($brand) use ($type) {
 
-            $filter = $this->typePicturesFilter($brand['id'], $type, false);
+            $filter = $this->typePicturesFilter($brand['id'], $type);
 
             return $this->pictureAction($filter, function (array $filter, $picture) use ($brand, $type) {
                 return [
@@ -936,7 +936,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandAction(function ($brand) use ($type) {
 
-            $filter = $this->typePicturesFilter($brand['id'], $type, false);
+            $filter = $this->typePicturesFilter($brand['id'], $type);
 
             switch ($this->params('gallery')) {
                 case 'inbox':
