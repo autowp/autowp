@@ -190,7 +190,7 @@ class ItemController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function indexAction()
     {

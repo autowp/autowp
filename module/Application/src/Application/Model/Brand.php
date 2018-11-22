@@ -68,7 +68,7 @@ class Brand
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      */
     public function getTopBrandsList(string $language)
     {
@@ -146,7 +146,7 @@ class Brand
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getFullBrandsList(string $language)
     {

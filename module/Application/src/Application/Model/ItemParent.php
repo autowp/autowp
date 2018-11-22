@@ -687,7 +687,7 @@ class ItemParent
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      */
     public function getNamePreferLanguage(int $parentId, int $itemId, string $language): string
     {
@@ -888,7 +888,7 @@ class ItemParent
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getChildItemsCountArray(array $parentIds): array
     {
@@ -910,7 +910,7 @@ class ItemParent
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getChildItemsCountArrayByTypes(array $parentIds, array $typeIds): array
     {
@@ -954,7 +954,7 @@ class ItemParent
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getChildItemLinkTypesCount(int $itemId): array
     {

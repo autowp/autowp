@@ -144,7 +144,7 @@ class IndexController extends AbstractActionController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     private function factories()
     {
@@ -294,17 +294,21 @@ class IndexController extends AbstractActionController
                 'specsService' => $this->specsService
             ]),
             'disableDescription'   => true,
-            'callback'             => function (&$item) {
-                $contribPairs = $this->specsService->getContributors([$item['id']]);
-                if ($contribPairs) {
-                    $item['contributors'] = $this->userModel->getRows([
-                        'id' => array_keys($contribPairs),
-                        'not_deleted'
-                    ]);
-                } else {
-                    $item['contributors'] = [];
+            'callback'             =>
+                /**
+                 * @suppress PhanPluginMixedKeyNoKey
+                 */
+                function (&$item) {
+                    $contribPairs = $this->specsService->getContributors([$item['id']]);
+                    if ($contribPairs) {
+                        $item['contributors'] = $this->userModel->getRows([
+                            'id' => array_keys($contribPairs),
+                            'not_deleted'
+                        ]);
+                    } else {
+                        $item['contributors'] = [];
+                    }
                 }
-            }
         ]);
 
         $cacheKey = 'INDEX_PERSONS_CONTENT_' . $language;

@@ -1443,6 +1443,8 @@ class SpecificationsService
     }
 
     /**
+     * @suppress PhanPluginMixedKeyNoKey
+     *
      * @param array $attribute
      * @param int $itemId
      * @return mixed
@@ -1520,6 +1522,9 @@ class SpecificationsService
         }
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     private function calcInheritedValue($attribute, int $itemId)
     {
         $actualValue = [
@@ -1824,7 +1829,7 @@ class SpecificationsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getContributors($itemId): array
     {

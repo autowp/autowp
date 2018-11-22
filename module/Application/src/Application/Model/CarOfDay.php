@@ -448,6 +448,9 @@ class CarOfDay
         print 'ok' . PHP_EOL;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getNextDates()
     {
         $now = new DateTime();

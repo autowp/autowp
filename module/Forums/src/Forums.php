@@ -123,7 +123,7 @@ class Forums
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      */
     public function updateThemeStat($themeId)
     {
@@ -146,15 +146,19 @@ class Forums
 
         $messages = $this->comments->getTotalMessagesCount([
             'type'     => \Application\Comments::FORUMS_TYPE_ID,
-            'callback' => function ($select) use ($theme) {
-                $select
-                    ->join('forums_topics', 'comment_message.item_id = forums_topics.id', [])
-                    ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])
-                    ->where([
-                        'forums_theme_parent.parent_id = ?' => $theme['id'],
-                        new Sql\Predicate\In('forums_topics.status', [self::STATUS_NORMAL, self::STATUS_CLOSED])
-                    ]);
-            }
+            'callback' =>
+                /**
+                 * @suppress PhanPluginMixedKeyNoKey
+                 */
+                function ($select) use ($theme) {
+                    $select
+                        ->join('forums_topics', 'comment_message.item_id = forums_topics.id', [])
+                        ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])
+                        ->where([
+                            'forums_theme_parent.parent_id = ?' => $theme['id'],
+                            new Sql\Predicate\In('forums_topics.status', [self::STATUS_NORMAL, self::STATUS_CLOSED])
+                        ]);
+                }
         ]);
         $theme = $this->themeTable->update([
             'topics'   => $topics['count'],
@@ -164,6 +168,9 @@ class Forums
         ]);
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getTopicList($themeId, $page, $userId)
     {
         $select = new Sql\Select($this->topicTable->getTable());

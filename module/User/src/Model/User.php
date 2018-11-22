@@ -31,7 +31,7 @@ class User
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function updateSpecsVolumes()
     {

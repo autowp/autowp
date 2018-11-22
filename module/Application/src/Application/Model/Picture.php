@@ -1081,7 +1081,7 @@ class Picture
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getNameData($rows, array $options = [])
     {
@@ -1207,7 +1207,7 @@ class Picture
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getTopLikes(int $limit): array
     {
@@ -1228,7 +1228,7 @@ class Picture
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getTopOwnerFans(int $userId, int $limit): array
     {

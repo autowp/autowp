@@ -39,7 +39,7 @@ class NewPictureFetcher extends PictureFetcher
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getTotalPictures(array $itemIds, $onlyExactly)
     {

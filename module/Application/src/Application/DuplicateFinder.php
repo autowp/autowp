@@ -37,20 +37,25 @@ class DuplicateFinder
 
     public function findSimilar($id)
     {
-        $row = $this->distanceTable->select(function (Select $select) use ($id) {
-            $select
-                ->columns([
-                    'dst_picture_id',
-                    'distance'
-                ])
-                ->where([
-                    'src_picture_id' => $id,
-                    'src_picture_id <> dst_picture_id',
-                    'not hide'
-                ])
-                ->order('distance ASC')
-                ->limit(1);
-        })->current();
+        $row = $this->distanceTable->select(
+            /**
+             * @suppress PhanPluginMixedKeyNoKey
+             */
+            function (Select $select) use ($id) {
+                $select
+                    ->columns([
+                        'dst_picture_id',
+                        'distance'
+                    ])
+                    ->where([
+                        'src_picture_id' => $id,
+                        'src_picture_id <> dst_picture_id',
+                        'not hide'
+                    ])
+                    ->order('distance ASC')
+                    ->limit(1);
+            }
+        )->current();
 
         if (! $row) {
             return null;

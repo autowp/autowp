@@ -101,6 +101,9 @@ class Item
         $this->languagePriority = new LanguagePriority();
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getEngineVehiclesGroups(int $engineId, array $options = []): array
     {
         $defaults = [
@@ -217,6 +220,13 @@ class Item
         return $row ? (int)$row['count'] : 0;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     *
+     * @param array $ids
+     * @param string $language
+     * @return array
+     */
     public function getLanguageNamesOfItems(array $ids, string $language): array
     {
         if (! $ids) {
@@ -277,7 +287,7 @@ class Item
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getTextOfItem(int $id, string $language): string
     {
@@ -308,6 +318,9 @@ class Item
         return $text ? $text : '';
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function hasFullText(int $id): bool
     {
         $rows = $this->itemLanguageTable->select([
@@ -327,6 +340,9 @@ class Item
         return (bool)$this->textStorage->getFirstText($ids);
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getNames(int $itemId): array
     {
         $rows = $this->itemLanguageTable->select([
@@ -401,6 +417,9 @@ class Item
         ];
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     private function getAncestorsId(int $itemId, array $itemTypes): array
     {
         $select = new Sql\Select($this->itemParentCacheTable->getTable());
@@ -621,6 +640,9 @@ class Item
         return true;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     private function getChildVehicleTypesByWhitelist($parentId, array $whitelist): array
     {
         if (count($whitelist) <= 0) {
@@ -1353,7 +1375,7 @@ class Item
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getSelect(array $options): Sql\Select
     {
@@ -1642,7 +1664,7 @@ class Item
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getCountPairs(array $options): array
     {

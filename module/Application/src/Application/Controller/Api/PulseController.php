@@ -64,7 +64,7 @@ class PulseController extends AbstractActionController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function indexAction()
     {

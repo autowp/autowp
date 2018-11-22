@@ -33,7 +33,7 @@ class Remember implements AdapterInterface
     }
 
     /**
-     * @suppress PhanUndeclaredMethod
+     * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      */
     public function authenticate()
     {

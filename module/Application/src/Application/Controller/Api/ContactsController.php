@@ -114,6 +114,9 @@ class ContactsController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function putAction()
     {
         $id = (int)$this->params('id');

@@ -336,7 +336,7 @@ class CatalogueController extends AbstractActionController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     private function getBrandFactories(int $brandId)
     {

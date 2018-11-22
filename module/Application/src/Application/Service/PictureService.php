@@ -75,6 +75,9 @@ class PictureService
         $this->userPicture = $userPicture;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function clearQueue()
     {
         $select = $this->picture->getTable()->getSql()->select();

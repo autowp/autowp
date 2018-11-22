@@ -37,6 +37,9 @@ class PictureModerVote
         return $result;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getNegativeVotes(int $pictureId): array
     {
         $rows = $this->table->select([
@@ -98,7 +101,7 @@ class PictureModerVote
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getVoteCountArray(array $ids): array
     {
@@ -138,7 +141,7 @@ class PictureModerVote
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      */
     public function getPositiveVotesCount(int $pictureId)
     {
@@ -154,7 +157,7 @@ class PictureModerVote
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      */
     public function getNegativeVotesCount(int $pictureId)
     {

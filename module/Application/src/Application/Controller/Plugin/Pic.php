@@ -826,6 +826,9 @@ class Pic extends AbstractPlugin
         return $result;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function picPageData($picture, array $filter, $brandIds = [], array $options = [])
     {
         $options = array_replace([

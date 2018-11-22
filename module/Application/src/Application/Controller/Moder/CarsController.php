@@ -185,6 +185,9 @@ class CarsController extends AbstractActionController
         return $model->setTerminal(true);
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function carModificationPicturesAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

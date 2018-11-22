@@ -218,6 +218,9 @@ class PictureItem
         return $result;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getPictureItemsByItemType(int $pictureId, $itemType): array
     {
         $select = $this->table->getSql()->select();
@@ -242,6 +245,9 @@ class PictureItem
         return $result;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getData(array $options): array
     {
         $defaults = [

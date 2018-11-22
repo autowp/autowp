@@ -86,6 +86,9 @@ class CatalogueController extends AbstractActionController
         return "done\n";
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function acceptOldUnsortedAction()
     {
         $select = $this->picture->getTable()->getSql()->select();

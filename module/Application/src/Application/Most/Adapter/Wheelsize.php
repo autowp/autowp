@@ -29,7 +29,7 @@ class Wheelsize extends AbstractAdapter
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getCars(Sql\Select $select, $language)
     {

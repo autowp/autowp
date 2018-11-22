@@ -38,7 +38,7 @@ class Categories
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     private function getCategoriesSelect($parentId, $order)
     {

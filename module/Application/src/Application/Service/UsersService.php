@@ -228,6 +228,8 @@ class UsersService
     }
 
     /**
+     * @suppress PhanPluginMixedKeyNoKey
+     *
      * @param string $code
      * @return boolean|array|\ArrayObject
      */
@@ -430,6 +432,9 @@ class UsersService
         ])->current();
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function deleteUnused()
     {
         $table = $this->userModel->getTable();

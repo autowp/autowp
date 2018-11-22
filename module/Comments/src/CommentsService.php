@@ -491,16 +491,21 @@ class CommentsService
     {
         $root = $this->getMessageRoot($message);
 
-        $row = $this->messageTable->select(function (Sql\Select $select) use ($root) {
-            $select
-                ->columns(['count' => new Sql\Expression('COUNT(1)')])
-                ->where([
-                    'item_id = ?'  => $root['item_id'],
-                    'type_id = ?'  => $root['type_id'],
-                    'datetime < ?' => $root['datetime'],
-                    'parent_id is null'
-                ]);
-        })->current();
+        $row = $this->messageTable->select(
+            /**
+             * @suppress PhanPluginMixedKeyNoKey
+             */
+            function (Sql\Select $select) use ($root) {
+                $select
+                    ->columns(['count' => new Sql\Expression('COUNT(1)')])
+                    ->where([
+                        'item_id = ?'  => $root['item_id'],
+                        'type_id = ?'  => $root['type_id'],
+                        'datetime < ?' => $root['datetime'],
+                        'parent_id is null'
+                    ]);
+            }
+        )->current();
 
         return ceil(($row['count'] + 1) / $perPage);
     }
@@ -623,28 +628,33 @@ class CommentsService
 
         $rows = [];
         if (count($itemId) > 0) {
-            $rows = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemId, $userId) {
-                $select
-                    ->columns(['item_id', 'messages'])
-                    ->where([
-                        'comment_topic.type_id = ?' => $typeId,
-                        new Sql\Predicate\In('comment_topic.item_id', $itemId)
-                    ])
-                    ->join(
-                        'comment_topic_view',
-                        new Sql\Predicate\PredicateSet([
-                            new Sql\Predicate\Expression('comment_topic.type_id = comment_topic_view.type_id'),
-                            new Sql\Predicate\Expression('comment_topic.item_id = comment_topic_view.item_id'),
-                            new Sql\Predicate\Operator(
-                                'comment_topic_view.user_id',
-                                Sql\Predicate\Operator::OP_EQ,
-                                $userId
-                            )
-                        ]),
-                        ['timestamp'],
-                        $select::JOIN_LEFT
-                    );
-            });
+            $rows = $this->topicTable->select(
+                /**
+                 * @suppress PhanPluginMixedKeyNoKey
+                 */
+                function (Sql\Select $select) use ($typeId, $itemId, $userId) {
+                    $select
+                        ->columns(['item_id', 'messages'])
+                        ->where([
+                            'comment_topic.type_id = ?' => $typeId,
+                            new Sql\Predicate\In('comment_topic.item_id', $itemId)
+                        ])
+                        ->join(
+                            'comment_topic_view',
+                            new Sql\Predicate\PredicateSet([
+                                new Sql\Predicate\Expression('comment_topic.type_id = comment_topic_view.type_id'),
+                                new Sql\Predicate\Expression('comment_topic.item_id = comment_topic_view.item_id'),
+                                new Sql\Predicate\Operator(
+                                    'comment_topic_view.user_id',
+                                    Sql\Predicate\Operator::OP_EQ,
+                                    $userId
+                                )
+                            ]),
+                            ['timestamp'],
+                            $select::JOIN_LEFT
+                        );
+                }
+            );
         }
 
         $result = [];
@@ -692,14 +702,19 @@ class CommentsService
         $result = [];
 
         if (count($itemId) > 0) {
-            $rows = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemId) {
-                $select
-                    ->columns(['item_id', 'messages'])
-                    ->where([
-                        'comment_topic.type_id = ?' => $typeId,
-                        new Sql\Predicate\In('comment_topic.item_id', $itemId)
-                    ]);
-            });
+            $rows = $this->topicTable->select(
+                /**
+                 * @suppress PhanPluginMixedKeyNoKey
+                 */
+                function (Sql\Select $select) use ($typeId, $itemId) {
+                    $select
+                        ->columns(['item_id', 'messages'])
+                        ->where([
+                            'comment_topic.type_id = ?' => $typeId,
+                            new Sql\Predicate\In('comment_topic.item_id', $itemId)
+                        ]);
+                }
+            );
 
             foreach ($rows as $row) {
                 $result[$row['item_id']] = [
@@ -779,15 +794,20 @@ class CommentsService
 
         $rows = [];
         if (count($itemId) > 0) {
-            $rows = $this->topicViewTable->select(function (Sql\Select $select) use ($typeId, $userId, $itemId) {
-                $select
-                    ->columns(['item_id', 'timestamp'])
-                    ->where([
-                        'type_id = ?' => $typeId,
-                        'user_id = ?' => $userId,
-                        new Sql\Predicate\In('item_id', $itemId)
-                    ]);
-            });
+            $rows = $this->topicViewTable->select(
+                /**
+                 * @suppress PhanPluginMixedKeyNoKey
+                 */
+                function (Sql\Select $select) use ($typeId, $userId, $itemId) {
+                    $select
+                        ->columns(['item_id', 'timestamp'])
+                        ->where([
+                            'type_id = ?' => $typeId,
+                            'user_id = ?' => $userId,
+                            new Sql\Predicate\In('item_id', $itemId)
+                        ]);
+                }
+            );
         }
 
         $result = [];
@@ -842,14 +862,19 @@ class CommentsService
 
     public function getMessagesCounts($typeId, array $itemIds)
     {
-        $rows = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemIds) {
-            $select
-                ->columns(['item_id', 'messages'])
-                ->where([
-                    'type_id = ?' => $typeId,
-                    new Sql\Predicate\In('item_id', $itemIds)
-                ]);
-        });
+        $rows = $this->topicTable->select(
+            /**
+             * @suppress PhanPluginMixedKeyNoKey
+             */
+            function (Sql\Select $select) use ($typeId, $itemIds) {
+                $select
+                    ->columns(['item_id', 'messages'])
+                    ->where([
+                        'type_id = ?' => $typeId,
+                        new Sql\Predicate\In('item_id', $itemIds)
+                    ]);
+            }
+        );
 
         $result = [];
         foreach ($rows as $row) {
@@ -892,6 +917,8 @@ class CommentsService
     }
 
     /**
+     * @suppress PhanPluginMixedKeyNoKey
+     *
      * @param int $type
      * @param int $item
      * @return Paginator\Paginator
@@ -1046,14 +1073,19 @@ class CommentsService
      */
     public function getUserAvgVote($userId)
     {
-        $row = $this->messageTable->select(function (Sql\Select $select) use ($userId) {
-            $select
-                ->columns(['avg_vote' => new Sql\Expression('avg(vote)')])
-                ->where([
-                    'author_id = ?' => (int)$userId,
-                    'vote <> 0'
-                ]);
-        })->current();
+        $row = $this->messageTable->select(
+            /**
+             * @suppress PhanPluginMixedKeyNoKey
+             */
+            function (Sql\Select $select) use ($userId) {
+                $select
+                    ->columns(['avg_vote' => new Sql\Expression('avg(vote)')])
+                    ->where([
+                        'author_id = ?' => (int)$userId,
+                        'vote <> 0'
+                    ]);
+            }
+        )->current();
 
         return $row ? $row['avg_vote'] : 0;
     }
@@ -1256,7 +1288,7 @@ class CommentsService
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
     public function getTopAuthors(int $limit): array
     {

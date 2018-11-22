@@ -72,7 +72,7 @@ class Twins
     }
 
     /**
-     * @suppress PhanDeprecatedFunction
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      *
      * @param array $groupId
      * @return array

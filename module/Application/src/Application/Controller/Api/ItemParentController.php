@@ -480,6 +480,9 @@ class ItemParentController extends AbstractRestfulController
         ]) . $url;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function deleteAction()
     {
         if (! $this->user()->isAllowed('car', 'move')) {
