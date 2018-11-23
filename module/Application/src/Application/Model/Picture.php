@@ -897,7 +897,9 @@ class Picture
         $select
             ->columns(['id', 'name', 'item_type_id'])
             ->join('picture_item', 'item.id = picture_item.item_id', ['type'])
-            ->where(['picture_item.picture_id' => $pictureId]);
+            ->where(['picture_item.picture_id' => $pictureId])
+            ->order([new Sql\Expression('picture_item.type = ? DESC', PictureItem::PICTURE_CONTENT)])
+            ->limit(3);
 
         $items = [];
         foreach ($this->itemTable->selectWith($select) as $itemRow) {
