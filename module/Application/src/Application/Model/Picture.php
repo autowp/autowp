@@ -895,16 +895,23 @@ class Picture
 
         $select = new Sql\Select($this->itemTable->getTable());
         $select
-            ->join('picture_item', 'item.id = picture_item.item_id', [])
-            ->where(['picture_item.picture_id' => $pictureId])
-            ->limit(1);
+            ->columns(['id', 'name', 'item_type_id'])
+            ->join('picture_item', 'item.id = picture_item.item_id', ['type'])
+            ->where(['picture_item.picture_id' => $pictureId]);
 
-        $cars = [];
+        $items = [];
         foreach ($this->itemTable->selectWith($select) as $itemRow) {
-            $cars[] = $itemRow;
+            $items[] = $itemRow;
         }
 
-        if (count($cars) > 1) {
+        $primaryItems = [];
+        foreach ($items as $item) {
+            if ($item['type'] == PictureItem::PICTURE_CONTENT) {
+                $primaryItems[] = $item;
+            }
+        }
+
+        if (count($primaryItems) > 1) {
             $select = new Sql\Select($this->itemTable->getTable());
             $select
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
@@ -924,11 +931,19 @@ class Picture
             sort($f, SORT_STRING);
 
             $brandsFolder = implode('/', $f);
-            $firstChar = mb_substr($brandsFolder, 0, 1);
 
-            $result = $firstChar . '/' . $brandsFolder .'/mixed';
-        } elseif (count($cars) == 1) {
-            $car = $cars[0];
+            $parts = [];
+            foreach ($primaryItems as $item) {
+                $parts[] = $filenameFilter->filter($item['name']);
+            }
+            $itemCatname = implode('/', $parts);
+            $itemFilename = implode('_', $parts);
+
+            $result = ($brandsFolder ? $brandsFolder . '/' : '') . $itemCatname . '/' . $itemFilename;
+            $firstChar = mb_substr($result, 0, 1);
+            $result = $firstChar . '/' . $result;
+        } elseif (count($primaryItems) == 1) {
+            $car = $primaryItems[0];
 
             $carCatname = $filenameFilter->filter($car['name']);
 
@@ -989,6 +1004,14 @@ class Picture
                     $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
                 }
             }
+        } elseif (count($items) > 0) {
+            $parts = [];
+            foreach ($items as $item) {
+                $parts[] = $filenameFilter->filter($item['name']);
+            }
+            $folder = implode('/', $parts);
+            $firstChar = mb_substr($folder, 0, 1);
+            $result = $firstChar . '/' . $folder;
         }
 
         $result = str_replace('//', '/', $result);
