@@ -173,7 +173,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $filename = $this->getPictureFilename($pictureID);
 
-        $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin_[0-9]+\.jpeg$/', $filename);
+        $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 
     public function testPersonAndCopyrightPictureFilenamePattern()
@@ -192,7 +192,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $filename = $this->getPictureFilename($pictureID);
 
-        $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin_[0-9]+\.jpeg$/', $filename);
+        $this->assertRegExp('/^a\/a\.s\._pushkin\/a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 
     public function testAuthorAndVehiclePictureFilenamePattern()
@@ -211,7 +211,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $filename = $this->getPictureFilename($pictureID);
 
-        $this->assertRegExp('/^t\/toyota_corolla\/toyota_corolla_[0-9]+\.jpeg$/', $filename);
+        $this->assertRegExp('/^t\/toyota_corolla\/toyota_corolla(_[0-9]+)?\.jpeg$/', $filename);
     }
 
     public function testPersonAndVehiclePictureFilenamePattern()
@@ -231,6 +231,6 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $filename = $this->getPictureFilename($pictureID);
 
-        $this->assertRegExp('/^t\/toyota_corolla\/a\.s\._pushkin\/toyota_corolla_a\.s\._pushkin_[0-9]+\.jpeg$/', $filename);
+        $this->assertRegExp('/^t\/toyota_corolla\/a\.s\._pushkin\/toyota_corolla_a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
     }
 }
