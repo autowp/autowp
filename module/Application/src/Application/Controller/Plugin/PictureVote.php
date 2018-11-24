@@ -77,6 +77,7 @@ class PictureVote extends AbstractPlugin
             'negative' => []
         ];
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->getController()->user()->get();
 
         if ($user) {
@@ -107,10 +108,12 @@ class PictureVote extends AbstractPlugin
 
         $controller = $this->getController();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $controller->user()->inheritsRole('moder')) {
             return false;
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $controller->user()->get();
         $voteExists = $this->pictureModerVote->hasVote($picture['id'], $user['id']);
 
@@ -133,6 +136,7 @@ class PictureVote extends AbstractPlugin
             'apiUrl'            => $controller->url()->fromRoute('api/picture/picture/update', [
                 'id' => $picture['id']
             ]),
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             'canVote'           => ! $voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
             'voteExists'        => $voteExists,
             'moderVotes'        => $moderVotes,
@@ -150,11 +154,14 @@ class PictureVote extends AbstractPlugin
         }
 
         $canDelete = false;
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->getController()->user()->get();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->getController()->user()->isAllowed('picture', 'remove')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $canDelete = true;
             }
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         } elseif ($this->getController()->user()->isAllowed('picture', 'remove_by_vote')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);

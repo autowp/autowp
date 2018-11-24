@@ -28,6 +28,7 @@ class PictureVoteController extends AbstractRestfulController
      */
     public function update($id, $data)
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->forbiddenAction();

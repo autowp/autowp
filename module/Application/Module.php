@@ -70,6 +70,7 @@ class Module implements
 
         \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $application = $e->getApplication();
         $serviceManager = $application->getServiceManager();
         $eventManager = $application->getEventManager();

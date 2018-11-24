@@ -38,6 +38,7 @@ class Module implements
     public function onBootstrap(Event $e)
     {
         $trafficListener = new TrafficRouteListener();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $trafficListener->attach($e->getApplication()->getEventManager());
     }
 }

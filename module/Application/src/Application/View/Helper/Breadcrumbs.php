@@ -41,8 +41,10 @@ class Breadcrumbs extends AbstractHelper
                 $url = $node['url'];
 
                 if ($url) {
+                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $items[] = '<li class="breadcrumb-item">'.$this->view->htmlA(['href' => $url], $name).'</li>';
                 } else {
+                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $items[] = '<li class="breadcrumb-item">'.$this->view->escapeHtml($name).'</li>';
                 }
             }

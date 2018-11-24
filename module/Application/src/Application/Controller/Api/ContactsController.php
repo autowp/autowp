@@ -55,6 +55,7 @@ class ContactsController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -94,6 +95,7 @@ class ContactsController extends AbstractRestfulController
     {
         $id = (int)$this->params('id');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->notFoundAction();
@@ -122,6 +124,7 @@ class ContactsController extends AbstractRestfulController
     {
         $id = (int)$this->params('id');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->forbiddenAction();
@@ -154,6 +157,7 @@ class ContactsController extends AbstractRestfulController
     {
         $id = (int)$this->params('id');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->notFoundAction();

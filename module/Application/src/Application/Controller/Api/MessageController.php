@@ -54,6 +54,7 @@ class MessageController extends AbstractRestfulController
 
     public function postAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->forbiddenAction();
@@ -63,6 +64,7 @@ class MessageController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -91,6 +93,7 @@ class MessageController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -144,6 +147,7 @@ class MessageController extends AbstractRestfulController
 
     public function deleteListAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -176,6 +180,7 @@ class MessageController extends AbstractRestfulController
 
     public function deleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -190,6 +195,7 @@ class MessageController extends AbstractRestfulController
 
     public function summaryAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -213,6 +219,7 @@ class MessageController extends AbstractRestfulController
 
     public function newAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {

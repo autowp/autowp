@@ -278,6 +278,7 @@ class User
             $set['last_online'] = new Sql\Expression('NOW()');
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $remoteAddr = $request->getServer('REMOTE_ADDR');
         if ($remoteAddr) {
             $ip = inet_pton($remoteAddr);

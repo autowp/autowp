@@ -111,6 +111,7 @@ class Car extends AbstractPlugin
         $controller = $this->getController();
         $pluginManager = $controller->getPluginManager();
         $picHelper = $pluginManager->get('pic');
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $userHelper = $controller->user();
         $imageStorage = $controller->imageStorage();
 

@@ -78,6 +78,7 @@ class ItemLinkController extends AbstractRestfulController
 
     public function getAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -95,6 +96,7 @@ class ItemLinkController extends AbstractRestfulController
 
     public function putAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
@@ -165,6 +167,7 @@ class ItemLinkController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -194,6 +197,7 @@ class ItemLinkController extends AbstractRestfulController
 
     public function deleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }

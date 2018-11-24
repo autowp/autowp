@@ -28,6 +28,7 @@ class StatController extends AbstractActionController
 
     public function globalSummaryAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -44,6 +45,7 @@ class StatController extends AbstractActionController
 
         $db = $this->item->getTable()->getAdapter();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $row = $db->query('
             select count(1) as count
             from attrs_attributes
@@ -52,12 +54,14 @@ class StatController extends AbstractActionController
         ')->execute()->current();
         $totalCarAttrs = $row ? (int)$row['count'] : null;
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $row = $db->query('
             select count(1) as count
             from attrs_values
         ')->execute()->current();
         $carAttrsValues = $row ? (int)$row['count'] : null;
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $carsWith4OrMorePictures = $db->query('
             select count(1) as count from (
                 select item.id, count(pictures.id) as c

@@ -30,6 +30,7 @@ class FuelTank
 
         if ($html) {
             $html .= ' <span class="unit" title="">' .
+                         /* @phan-suppress-next-line PhanUndeclaredMethod */
                          $view->escapeHtml($view->translate('specs/unit/12/abbr')) .
                      '</span>';
         }

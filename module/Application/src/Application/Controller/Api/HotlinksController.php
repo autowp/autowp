@@ -24,6 +24,7 @@ class HotlinksController extends AbstractRestfulController
 
     public function hostsAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'view')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -35,6 +36,7 @@ class HotlinksController extends AbstractRestfulController
 
     public function hostsDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -47,6 +49,7 @@ class HotlinksController extends AbstractRestfulController
 
     public function hostDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -59,6 +62,7 @@ class HotlinksController extends AbstractRestfulController
 
     public function whitelistPostAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
@@ -79,6 +83,7 @@ class HotlinksController extends AbstractRestfulController
 
     public function blacklistPostAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }

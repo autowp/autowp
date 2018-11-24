@@ -95,6 +95,7 @@ class UserText extends AbstractHtmlElement
      */
     private function preparePlainText($text)
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $out = $this->view->escapeHtml($text);
         $out = str_replace("\r", '', $out);
         $out = str_replace("\n", '<br />', $out);
@@ -137,6 +138,7 @@ class UserText extends AbstractHtmlElement
             }
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return '<a href="'.$this->view->escapeHtmlAttr($url).'">' . $this->view->escapeHtml($url) . '</a>';
     }
 
@@ -161,6 +163,7 @@ class UserText extends AbstractHtmlElement
             $user = $this->userModel->getRow(['id' => (int)$userId]);
 
             if ($user) {
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 return $this->view->user($user)->__toString();
             }
         }
@@ -171,6 +174,7 @@ class UserText extends AbstractHtmlElement
             ]);
 
             if ($user) {
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 return $this->view->user($user)->__toString();
             }
         }
@@ -216,6 +220,7 @@ class UserText extends AbstractHtmlElement
             ]);
 
             if ($picture) {
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 return $this->view->inlinePicture($picture);
             }
         }

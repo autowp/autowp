@@ -47,10 +47,12 @@ class ApiData extends AbstractHelper
         }
 
         $moderMenu = null;
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->view->user()->inheritsRole('moder')) {
             $moderMenu = $this->view->moderMenu(true);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->view->user()->get();
         $userData = null;
         if ($user) {
@@ -64,6 +66,7 @@ class ApiData extends AbstractHelper
 
         return [
             'languages'  => $languages,
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             'isModer'    => $this->view->user()->inheritsRole('moder'),
             'mainMenu'   => $this->view->mainMenu(true, true),
             'moderMenu'  => $moderMenu,

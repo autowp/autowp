@@ -152,6 +152,7 @@ class CarsController extends AbstractActionController
 
     public function carModificationsAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -190,6 +191,7 @@ class CarsController extends AbstractActionController
      */
     public function carModificationPicturesAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -206,6 +208,7 @@ class CarsController extends AbstractActionController
 
 
         $request = $this->getRequest();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($request->isPost()) {
             $picture = (array)$this->params('picture', []);
 
@@ -290,7 +293,9 @@ class CarsController extends AbstractActionController
 
             $pictures[] = [
                 'id'              => $pictureRow['id'],
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'name'            => $this->pic()->name($pictureRow, $language),
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'url'             => $this->pic()->href($pictureRow),
                 'src'             => $imageInfo ? $imageInfo->getSrc() : null,
                 'modificationIds' => $modificationIds

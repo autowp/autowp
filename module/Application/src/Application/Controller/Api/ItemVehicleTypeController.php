@@ -31,6 +31,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -67,6 +68,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
 
     public function itemAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -85,6 +87,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
 
     public function deleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canMove = $this->user()->isAllowed('car', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();

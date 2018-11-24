@@ -128,6 +128,7 @@ class CarOfDay
             LIMIT 1
         ';
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $resultSet = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, 5]);
         $row = $resultSet->current();
 
@@ -814,6 +815,7 @@ class CarOfDay
             HAVING p_count >= ?
             LIMIT 1
         ';
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $resultSet = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, $itemId, 3]);
         $row = $resultSet->current();
 

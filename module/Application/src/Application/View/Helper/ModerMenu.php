@@ -30,6 +30,7 @@ class ModerMenu extends AbstractHtmlElement
     {
         $items = [];
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->view->user()->inheritsRole('moder')) {
             $inboxCount = $this->picture->getCount([
                 'status' => Picture::STATUS_INBOX
@@ -57,6 +58,7 @@ class ModerMenu extends AbstractHtmlElement
                 'icon'  => 'fa fa-comment'
             ];
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($this->view->user()->inheritsRole('pages-moder')) {
                 $items[] = [
                     'href'  => '/ng/moder/pages',
@@ -76,6 +78,7 @@ class ModerMenu extends AbstractHtmlElement
             return $items;
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->view->partial('application/moder-menu', [
             'items' => $items
         ]);

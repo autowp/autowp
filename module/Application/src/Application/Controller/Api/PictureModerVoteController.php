@@ -83,8 +83,10 @@ class PictureModerVoteController extends AbstractRestfulController
     private function notifyVote($picture, $vote, $reason)
     {
         $owner = $this->userModel->getRow((int)$picture['owner_id']);
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
         if ($ownerIsModer) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($owner['id'] != $this->user()->get()['id']) {
                 $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
@@ -109,6 +111,7 @@ class PictureModerVoteController extends AbstractRestfulController
     {
         $previousStatusUserId = $picture['change_status_user_id'];
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->picture->getTable()->update([
@@ -124,12 +127,13 @@ class PictureModerVoteController extends AbstractRestfulController
 
         $this->log(sprintf(
             'С картинки %s снят статус "принято"',
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), [
             'pictures' => $picture['id']
         ]);
 
-
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $pictureUrl = $this->pic()->url($picture['identity'], true);
         if ($previousStatusUserId != $user['id']) {
             $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
@@ -175,6 +179,7 @@ class PictureModerVoteController extends AbstractRestfulController
      */
     public function update($id, $data)
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('picture', 'moder_vote')) {
             return $this->forbiddenAction();
         }
@@ -184,6 +189,7 @@ class PictureModerVoteController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         $voteExists = $this->pictureModerVote->hasVote($picture['id'], $user['id']);
 
@@ -238,6 +244,7 @@ class PictureModerVoteController extends AbstractRestfulController
             $vote
                 ? 'Подана заявка на принятие картинки %s'
                 : 'Подана заявка на удаление картинки %s',
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         );
         $this->log($message, [
@@ -267,6 +274,7 @@ class PictureModerVoteController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return $this->forbiddenAction();
@@ -281,6 +289,7 @@ class PictureModerVoteController extends AbstractRestfulController
 
         $message = sprintf(
             'Отменена заявка на принятие/удаление картинки %s',
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         );
         $this->log($message, [

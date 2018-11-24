@@ -113,11 +113,13 @@ class ItemParentController extends AbstractRestfulController
      */
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
 
         $this->listInputFilter->setData($this->params()->fromQuery());
@@ -235,6 +237,7 @@ class ItemParentController extends AbstractRestfulController
 
     public function itemAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
@@ -279,6 +282,7 @@ class ItemParentController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -329,6 +333,7 @@ class ItemParentController extends AbstractRestfulController
             'items' => [$item['id'], $parentItem['id']]
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $subscribers = [];
@@ -373,6 +378,7 @@ class ItemParentController extends AbstractRestfulController
 
     public function putAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canMove = $this->user()->isAllowed('car', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
@@ -487,6 +493,7 @@ class ItemParentController extends AbstractRestfulController
      */
     public function deleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'move')) {
             return $this->forbiddenAction();
         }
@@ -532,7 +539,7 @@ class ItemParentController extends AbstractRestfulController
             'items' => $item['id'], $parentItem['id']
         ]);
 
-
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $subscribers = [];

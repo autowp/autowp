@@ -47,12 +47,14 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $request->getHeaders()
             ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test1.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getFiles()->fromArray([
             'file' => [
                 'tmp_name' => $file,
@@ -83,6 +85,7 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
     {
         // get comment row
         $db = $this->getApplication()->getServiceManager()->get(\Zend\Db\Adapter\AdapterInterface::class);
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $db->query(
             'select * from comment_message order by id desc limit 1',
             Adapter::QUERY_MODE_EXECUTE

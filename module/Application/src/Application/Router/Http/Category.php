@@ -40,6 +40,7 @@ class Category implements RouteInterface
             return;
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $path = $request->getUri()->getPath();
 
         $length = strlen($path);

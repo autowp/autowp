@@ -19,6 +19,7 @@ class MainMenu extends AbstractHtmlElement
 
     public function __invoke(bool $data = false, bool $full = false)
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $full ? null : $this->view->user()->get();
         $menu = $this->mainMenu->getMenu($user ? $user : null, $full);
 
@@ -26,6 +27,7 @@ class MainMenu extends AbstractHtmlElement
             return $menu;
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->view->partial('application/main-menu', $menu);
     }
 }

@@ -194,8 +194,10 @@ class ItemController extends AbstractRestfulController
      */
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $params = $this->params()->fromQuery();
@@ -709,6 +711,7 @@ class ItemController extends AbstractRestfulController
      */
     public function alphaAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -746,6 +749,7 @@ class ItemController extends AbstractRestfulController
 
     public function itemAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->itemInputFilter->setData($this->params()->fromQuery());
@@ -1050,6 +1054,7 @@ class ItemController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -1258,6 +1263,7 @@ class ItemController extends AbstractRestfulController
 
     public function putAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
@@ -1267,6 +1273,7 @@ class ItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $request = $this->getRequest();
@@ -1463,10 +1470,12 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('engine_id', $values)) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
                 return $this->forbiddenAction();
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if (! $this->user()->isAllowed('specifications', 'edit')) {
                 return $this->forbiddenAction();
             }
@@ -1486,6 +1495,7 @@ class ItemController extends AbstractRestfulController
                     'items' => $item['id']
                 ]);
 
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $user = $this->user()->get();
 
                 foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
@@ -1522,6 +1532,7 @@ class ItemController extends AbstractRestfulController
                         'items' => $item['id']
                     ]);
 
+                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $user = $this->user()->get();
 
                     foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
@@ -1633,6 +1644,7 @@ class ItemController extends AbstractRestfulController
                 'items' => $item['id']
             ]);
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $user = $this->user()->get();
             foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
                 if ($subscriber && ($subscriber['id'] != $user['id'])) {
@@ -1790,6 +1802,7 @@ class ItemController extends AbstractRestfulController
 
     public function getLogoAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -1810,6 +1823,7 @@ class ItemController extends AbstractRestfulController
 
     public function postLogoAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('brand', 'logo')) {
             return $this->forbiddenAction();
         }
@@ -1821,7 +1835,7 @@ class ItemController extends AbstractRestfulController
 
         $data = array_merge(
             $this->params()->fromPost(),
-            $this->getRequest()->getFiles()->toArray()
+            $this->getRequest()->getFiles()->toArray() // @phan-suppress-current-line PhanUndeclaredMethod
         );
 
         $this->itemLogoPutFilter->setData($data);
@@ -1887,6 +1901,7 @@ class ItemController extends AbstractRestfulController
 
     public function treeAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -1903,6 +1918,7 @@ class ItemController extends AbstractRestfulController
 
     public function refreshInheritanceAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forbiddenAction();
         }
@@ -1922,6 +1938,7 @@ class ItemController extends AbstractRestfulController
 
     public function specificationsAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }

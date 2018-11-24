@@ -46,6 +46,7 @@ class Pictures extends AbstractHelper
 
     private function isPictureModer()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->view->user()->inheritsRole('pictures-moder');
     }
 
@@ -78,6 +79,7 @@ class Pictures extends AbstractHelper
             $data['crop_resolution'] = $picture['crop_width'] . '×' . $picture['crop_height'];
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->view->partial('application/picture-behaviour', $data);
     }
 
@@ -88,10 +90,12 @@ class Pictures extends AbstractHelper
             $picture = (array)$picture;
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->view->user()->logedIn()) {
             $commentsStat = $this->comments->getTopicStatForUser(
                 \Application\Comments::PICTURES_TYPE_ID,
                 $picture['id'],
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $this->view->user()->get()['id']
             );
             $msgCount = $commentsStat['messages'];
@@ -106,6 +110,7 @@ class Pictures extends AbstractHelper
         }
 
         $data = [
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             'url'         => $this->view->pic($picture)->url(),
             'width'       => $picture['width'],
             'height'      => $picture['height'],
@@ -145,11 +150,15 @@ class Pictures extends AbstractHelper
 
         $isModer = $this->isPictureModer();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $name = $view->pic()->name($picture, $this->view->language());
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $escName = $view->escape($name);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $url = $view->pic($picture)->url();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $imageHtml = $this->view->img($picture['image_id'], [
             'format'  => 'picture-thumb',
             'alt'     => $name,
@@ -158,6 +167,7 @@ class Pictures extends AbstractHelper
         ]);
 
         if ($isModer && $picture['name']) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $title = $this->view->escapeHtmlAttr($this->view->translate('picture-preview/special-name'));
             $escName = '<span style="color:darkgreen" title="'.$title.'">' . $escName . '</span>';
         }
@@ -177,7 +187,9 @@ class Pictures extends AbstractHelper
 
         return '<div class="'.implode(' ', $classes).'">' .
                     '<div class="thumbnail">' .
+                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $view->htmlA($url, $imageHtml, false) .
+                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         '<p>' . $view->htmlA($url, $escName, false) . '</p>' .
                         $this->userBehaviour($picture, $isModer) .
                     '</div>' .

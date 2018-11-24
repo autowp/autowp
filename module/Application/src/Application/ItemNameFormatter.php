@@ -55,22 +55,26 @@ class ItemNameFormatter
         ];
         $item = array_replace($defaults, $item);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $this->renderer->escapeHtml($item['name']);
 
         if ($item['spec']) {
             $attrs = ['class="badge badge-info"'];
             if ($item['spec_full']) {
                 $attrs = array_merge($attrs, [
+                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     'title="' . $this->renderer->escapeHtmlAttr($item['spec_full']) . '"',
                     'data-toggle="tooltip"',
                     'data-placement="top"'
                 ]);
             }
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $escapedSpec = $this->renderer->escapeHtml($item['spec']);
             $result .= ' <span '.implode(' ', $attrs).'>' . $escapedSpec . '</span>';
         }
 
         if (strlen($item['body']) > 0) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $result .= ' ('.$this->renderer->escapeHtml($item['body']).')';
         }
 
@@ -95,15 +99,17 @@ class ItemNameFormatter
         $equalM = $equalY && $bm && $em && ($bm == $em);
 
         if ($useModelYear) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/model-years', $language));
             $result = '<span title="' . $title . '">' .
-                          $this->renderer->escapeHtml(
+                          $this->renderer->escapeHtml( // @phan-suppress-current-line PhanUndeclaredMethod
                               $this->getModelYearsPrefix($bmy, $bmyf, $emy, $emyf, $item['today'], $language)
                           ) .
                       '</span> ' .
                       $result;
 
             if ($by > 0 || $ey > 0) {
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/years', $language));
                 $result .=
                     '<small>'.
@@ -325,7 +331,7 @@ class ItemNameFormatter
                 (
                     $ey
                         ? '–' . ($em ? sprintf($this->monthFormat, $em) : '') . $ey
-                        : $this->renderer->escapeHtml(
+                        : $this->renderer->escapeHtml( // @phan-suppress-currenet-line PhanUndeclaredMethod
                             $this->missedEndYearYearsSuffix($today, $by, $language)
                         )
                 );

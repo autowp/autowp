@@ -123,6 +123,7 @@ class IndexController extends AbstractActionController
     private function itemOfDay()
     {
         $language = $this->language();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
         $itemOfDay = $this->itemOfDay->getCurrent();
@@ -211,6 +212,7 @@ class IndexController extends AbstractActionController
             'limit'            => 6
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $newPicturesData = $this->pic()->listData($rows, [
             'width' => 6
         ]);
@@ -371,6 +373,7 @@ class IndexController extends AbstractActionController
         $path = $this->params('path');
 
         if ($path) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $uri = $this->getRequest()->getUri();
 
             $query = $uri->getQuery();

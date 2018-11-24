@@ -233,6 +233,7 @@ class CommentsService
             values (?, ?, ?, NOW())
             on duplicate key update `timestamp` = values(`timestamp`)
         ';
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $statement = $this->topicTable->getAdapter()->query($sql);
         $statement->execute([$userId, $typeId, $itemId]);
     }
@@ -528,6 +529,7 @@ class CommentsService
     {
         $db = $this->messageTable->getAdapter();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $db->query('
             create temporary table __cms
             select type_id, item_id, parent_id as id, count(1) as count
@@ -536,6 +538,7 @@ class CommentsService
             group by type_id, item_id, parent_id
         ', $db::QUERY_MODE_EXECUTE);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $statement = $db->query('
             update comment_message
                 inner join __cms
@@ -759,6 +762,7 @@ class CommentsService
             VALUES (?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE last_update=VALUES(last_update), messages=VALUES(messages)
         ';
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $statement = $this->topicTable->getAdapter()->query($sql);
         $statement->execute([$itemId, $typeId, $lastUpdate, $messagesCount]);
     }
@@ -1171,6 +1175,7 @@ class CommentsService
     public function cleanTopics()
     {
         $adapter = $this->topicViewTable->getAdapter();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $adapter->query('
             DELETE comment_topic_view
                 FROM comment_topic_view
@@ -1182,6 +1187,7 @@ class CommentsService
         $affected = $result->getAffectedRows();
 
         $adapter = $this->topicTable->getAdapter();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $adapter->query('
             DELETE comment_topic
                 FROM comment_topic

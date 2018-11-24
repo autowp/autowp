@@ -24,6 +24,7 @@ class LanguagePicker
     {
         $languages = [];
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $uri = $this->request->getUri();
         foreach ($this->hosts as $itemLanguage => $item) {
             $clone = clone $uri;

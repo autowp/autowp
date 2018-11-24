@@ -42,6 +42,7 @@ class PageController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -81,6 +82,7 @@ class PageController extends AbstractRestfulController
 
     public function itemAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -302,6 +304,7 @@ class PageController extends AbstractRestfulController
 
     public function itemDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }

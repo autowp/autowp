@@ -70,10 +70,12 @@ class PictureItemController extends AbstractRestfulController
 
     private function canChangePerspective($picture)
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->user()->inheritsRole('moder')) {
             return true;
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return false;
@@ -90,10 +92,12 @@ class PictureItemController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->listInputFilter->setData($this->params()->fromQuery());
@@ -156,10 +160,12 @@ class PictureItemController extends AbstractRestfulController
 
     public function itemAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $userId = $this->user()->get()['id'];
 
         $picture = $this->picture->getRow(['id' => (int)$this->params('picture_id')]);
@@ -198,6 +204,7 @@ class PictureItemController extends AbstractRestfulController
 
     public function deleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canMove = $this->user()->isAllowed('picture', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
@@ -329,6 +336,7 @@ class PictureItemController extends AbstractRestfulController
 
             $this->log(sprintf(
                 'Установка ракурса картинки %s',
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
                 'pictures' => $picture['id']
@@ -336,6 +344,7 @@ class PictureItemController extends AbstractRestfulController
         }
 
         if (isset($data['area'])) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if (! $this->user()->inheritsRole('moder')) {
                 return $this->forbiddenAction();
             }
@@ -381,6 +390,7 @@ class PictureItemController extends AbstractRestfulController
 
             $this->log(sprintf(
                 'Выделение области на картинке %s',
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
                 'pictures' => $picture['id'],
@@ -389,6 +399,7 @@ class PictureItemController extends AbstractRestfulController
         }
 
         if (isset($data['item_id'])) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $canMove = $this->user()->isAllowed('picture', 'move');
             if (! $canMove) {
                 return $this->forbiddenAction();
@@ -405,6 +416,7 @@ class PictureItemController extends AbstractRestfulController
 
             $this->pictureItem->changePictureItem($picture['id'], $type, $srcItem['id'], $dstItem['id']);
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $userId = $this->user()->get()['id'];
 
             $this->log->addEvent($userId, sprintf(

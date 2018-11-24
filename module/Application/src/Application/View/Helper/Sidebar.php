@@ -21,7 +21,9 @@ class Sidebar extends AbstractHtmlElement
     public function __invoke($data = false)
     {
         $newPersonalMessages = null;
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->view->user()->logedIn()) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $count = $this->message->getNewCount($this->view->user()->get()['id']);
 
             $newPersonalMessages = (int)$count;
@@ -33,6 +35,7 @@ class Sidebar extends AbstractHtmlElement
             ];
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->view->partial('application/sidebar-right', [
             'newPersonalMessages' => $newPersonalMessages
         ]);

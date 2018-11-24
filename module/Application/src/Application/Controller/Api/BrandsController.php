@@ -24,6 +24,7 @@ class BrandsController extends AbstractActionController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isHttps = (bool)$this->getRequest()->getServer('HTTPS');
 
         $language = $this->language();

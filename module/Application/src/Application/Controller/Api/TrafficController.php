@@ -29,6 +29,7 @@ class TrafficController extends AbstractRestfulController
 
     public function listAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -53,6 +54,7 @@ class TrafficController extends AbstractRestfulController
 
     public function whitelistListAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -74,6 +76,7 @@ class TrafficController extends AbstractRestfulController
 
     public function whitelistCreateAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -101,6 +104,7 @@ class TrafficController extends AbstractRestfulController
 
     public function whitelistItemDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -113,6 +117,7 @@ class TrafficController extends AbstractRestfulController
 
     public function blacklistCreateAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canBan = $this->user()->isAllowed('user', 'ban');
         if (! $canBan) {
             return $this->forbiddenAction();
@@ -129,7 +134,7 @@ class TrafficController extends AbstractRestfulController
         $this->service->ban(
             $ip,
             $data['period'] * 3600,
-            $this->user()->get()['id'],
+            $this->user()->get()['id'], // @phan-suppress-current-line PhanUndeclaredMethod
             (string) $data['reason']
         );
 
@@ -139,6 +144,7 @@ class TrafficController extends AbstractRestfulController
 
     public function blacklistItemDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canBan = $this->user()->isAllowed('user', 'ban');
         if (! $canBan) {
             return $this->forbiddenAction();

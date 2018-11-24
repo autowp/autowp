@@ -38,6 +38,7 @@ class PastTimeIndicator extends AbstractHtmlElement
 
         $icon = $time > $this->pastLimit ? 'fa-clock-o' : 'fa-calendar';
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return '<i class="fa ' . $icon . '"></i> ' . $this->view->escapeHtml($this->view->user()->humanTime($time));
     }
 }

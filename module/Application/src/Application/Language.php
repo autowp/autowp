@@ -27,6 +27,7 @@ class Language
         }
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $hostname = $request->getServer('HTTP_HOST');
             if (isset($map[$hostname])) {
                 $this->language = $map[$hostname];

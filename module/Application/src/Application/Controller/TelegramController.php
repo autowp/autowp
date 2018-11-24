@@ -21,6 +21,7 @@ class TelegramController extends AbstractActionController
 
     public function webhookAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }

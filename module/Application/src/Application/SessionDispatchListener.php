@@ -67,6 +67,7 @@ class SessionDispatchListener extends AbstractListenerAggregate
 
     private function getHostCookieDomain(Request $request, $hosts)
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $hostname = $request->getUri()->getHost();
 
         foreach ($hosts as $host) {

@@ -42,6 +42,7 @@ class AccountController extends AbstractRestfulController
 
     private function canRemoveAccount(int $id): bool
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return false;
@@ -61,6 +62,7 @@ class AccountController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -98,6 +100,7 @@ class AccountController extends AbstractRestfulController
      */
     public function startAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -134,6 +137,7 @@ class AccountController extends AbstractRestfulController
 
     public function deleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return $this->forbiddenAction();

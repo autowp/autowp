@@ -90,6 +90,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
         $request = $e->getRequest();
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($this->matchWhitelist($request->getUri()->getPath())) {
                 return;
             }
@@ -109,6 +110,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 }
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $ip = $request->getServer('REMOTE_ADDR');
 
             if ($ip) {
