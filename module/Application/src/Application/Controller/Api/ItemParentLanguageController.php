@@ -127,6 +127,7 @@ class ItemParentLanguageController extends AbstractRestfulController
             ], false);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

@@ -323,6 +323,7 @@ class AttrController extends AbstractRestfulController
 
         $this->specsService->deleteUserValue($attributeId, $itemId, $userId);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -454,6 +455,7 @@ class AttrController extends AbstractRestfulController
             }
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -513,6 +515,7 @@ class AttrController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -794,6 +797,7 @@ class AttrController extends AbstractRestfulController
             }
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -872,6 +876,7 @@ class AttrController extends AbstractRestfulController
             'position'     => $maxPosition + 1
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -889,6 +894,7 @@ class AttrController extends AbstractRestfulController
             'attribute_id' => $attributeId
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -1001,6 +1007,7 @@ class AttrController extends AbstractRestfulController
             'position'      => 1 + $max
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 }

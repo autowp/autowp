@@ -144,6 +144,7 @@ class LoginController extends AbstractRestfulController
             $this->service->clearRememberCookie($this->language());
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -153,6 +154,7 @@ class LoginController extends AbstractRestfulController
         $auth->clearIdentity();
         $this->service->clearRememberCookie($this->language());
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 

@@ -95,6 +95,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
             $this->params('vehicle_type_id')
         );
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -128,6 +129,7 @@ class ItemVehicleTypeController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 }

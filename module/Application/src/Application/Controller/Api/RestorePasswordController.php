@@ -174,6 +174,7 @@ class RestorePasswordController extends AbstractRestfulController
 
         $this->transport->send($mail);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(201);
 
         return new JsonModel([
@@ -241,6 +242,7 @@ class RestorePasswordController extends AbstractRestfulController
         $auth = new AuthenticationService();
         $auth->authenticate($adapter);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

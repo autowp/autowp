@@ -234,6 +234,7 @@ class PictureItemController extends AbstractRestfulController
             }
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -298,6 +299,7 @@ class PictureItemController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -419,6 +421,7 @@ class PictureItemController extends AbstractRestfulController
             $namespace->lastCarId = $dstItem['id'];
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

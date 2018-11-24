@@ -148,6 +148,7 @@ class ItemLinkController extends AbstractRestfulController
             $this->table->update($set, ['id' => $row['id']]);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -187,6 +188,7 @@ class ItemLinkController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -206,6 +208,7 @@ class ItemLinkController extends AbstractRestfulController
 
         $this->table->delete(['id' => $row['id']]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

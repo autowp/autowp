@@ -63,6 +63,7 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
     {
         $response = $e->getResponse();
         $response->getHeaders()->addHeaderLine('Location', $url);
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $response->setStatusCode(302);
 
         return $response;

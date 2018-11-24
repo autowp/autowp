@@ -52,7 +52,7 @@ class PictureTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      */
-    private function createItem($params)
+    private function createItem($params): int
     {
         $this->reset();
 
@@ -70,13 +70,13 @@ class PictureTest extends AbstractHttpControllerTestCase
         $parts = explode('/', $uri->getPath());
         $itemId = $parts[count($parts) - 1];
 
-        return $itemId;
+        return (int) $itemId;
     }
 
     /**
      * @suppress PhanUndeclaredMethod
      */
-    private function addPictureToItem(int $itemID)
+    private function addPictureToItem(int $itemID): int
     {
         $this->reset();
 
@@ -116,7 +116,7 @@ class PictureTest extends AbstractHttpControllerTestCase
         $parts = explode('/', $uri->getPath());
         $pictureID = $parts[count($parts) - 1];
 
-        return $pictureID;
+        return (int) $pictureID;
     }
 
     /**
@@ -165,10 +165,10 @@ class PictureTest extends AbstractHttpControllerTestCase
 
     public function testPersonPictureFilenamePattern()
     {
-        $personID = $this->createItem(array_replace([
+        $personID = $this->createItem([
             'item_type_id' => 8,
             'name'         => 'A.S. Pushkin'
-        ]));
+        ]);
         $pictureID = $this->addPictureToItem($personID);
 
         $filename = $this->getPictureFilename($pictureID);
@@ -178,16 +178,16 @@ class PictureTest extends AbstractHttpControllerTestCase
 
     public function testPersonAndCopyrightPictureFilenamePattern()
     {
-        $personID = $this->createItem(array_replace([
+        $personID = $this->createItem([
             'item_type_id' => 8,
             'name'         => 'A.S. Pushkin'
-        ]));
+        ]);
         $pictureID = $this->addPictureToItem($personID);
 
-        $copyrightID = $this->createItem(array_replace([
+        $copyrightID = $this->createItem([
             'item_type_id' => 9,
             'name'         => 'Copyrights'
-        ]));
+        ]);
         $this->addPictureItem($pictureID, $copyrightID, 3);
 
         $filename = $this->getPictureFilename($pictureID);
@@ -197,16 +197,16 @@ class PictureTest extends AbstractHttpControllerTestCase
 
     public function testAuthorAndVehiclePictureFilenamePattern()
     {
-        $vehicleID = $this->createItem(array_replace([
+        $vehicleID = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Toyota Corolla'
-        ]));
+        ]);
         $pictureID = $this->addPictureToItem($vehicleID);
 
-        $personID = $this->createItem(array_replace([
+        $personID = $this->createItem([
             'item_type_id' => 8,
             'name'         => 'A.S. Pushkin'
-        ]));
+        ]);
         $this->addPictureItem($pictureID, $personID, 2);
 
         $filename = $this->getPictureFilename($pictureID);
@@ -216,16 +216,16 @@ class PictureTest extends AbstractHttpControllerTestCase
 
     public function testPersonAndVehiclePictureFilenamePattern()
     {
-        $vehicleID = $this->createItem(array_replace([
+        $vehicleID = $this->createItem([
             'item_type_id' => 1,
             'name'         => 'Toyota Corolla'
-        ]));
+        ]);
         $pictureID = $this->addPictureToItem($vehicleID);
 
-        $personID = $this->createItem(array_replace([
+        $personID = $this->createItem([
             'item_type_id' => 8,
             'name'         => 'A.S. Pushkin'
-        ]));
+        ]);
 
         $this->addPictureItem($pictureID, $personID, 1);
 

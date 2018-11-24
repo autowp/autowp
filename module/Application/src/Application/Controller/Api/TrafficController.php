@@ -83,6 +83,7 @@ class TrafficController extends AbstractRestfulController
         $ip = trim($data['ip']);
 
         if (! $ip) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             return $this->getResponse()->setStatusCode(400);
         }
 
@@ -94,6 +95,7 @@ class TrafficController extends AbstractRestfulController
                 'id' => $ip
             ])
         );*/
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -105,6 +107,7 @@ class TrafficController extends AbstractRestfulController
 
         $this->service->deleteFromWhitelist($this->params('ip'));
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -130,6 +133,7 @@ class TrafficController extends AbstractRestfulController
             (string) $data['reason']
         );
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -148,6 +152,7 @@ class TrafficController extends AbstractRestfulController
 
         $this->service->unban($ip);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 }

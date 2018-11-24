@@ -86,6 +86,7 @@ class PictureFileController extends AbstractActionController
             $accept = (string)$request->getServer('HTTP_ACCEPT');
 
             if ($accept && $blacklisted && $this->referer->isImageRequest($accept)) {
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 return $this->getResponse()->setStatusCode(429);
             }
 

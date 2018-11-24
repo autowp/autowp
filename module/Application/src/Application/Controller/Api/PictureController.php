@@ -571,6 +571,7 @@ class PictureController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -890,6 +891,7 @@ class PictureController extends AbstractRestfulController
             ]);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -976,6 +978,7 @@ class PictureController extends AbstractRestfulController
             'pictures' => $row['id']
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -1008,6 +1011,7 @@ class PictureController extends AbstractRestfulController
             'pictures' => $row['id']
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -1028,6 +1032,7 @@ class PictureController extends AbstractRestfulController
             ]);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -1048,6 +1053,7 @@ class PictureController extends AbstractRestfulController
             ]);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -1066,6 +1072,7 @@ class PictureController extends AbstractRestfulController
             'pictures' => [$srcPicture['id'], $dstPicture['id']]
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -1214,6 +1221,7 @@ class PictureController extends AbstractRestfulController
             'pictures' => [$picture['id'], $replacePicture['id']]
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 

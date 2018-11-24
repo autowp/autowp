@@ -107,6 +107,7 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(200);
 
         return new JsonModel([
@@ -141,6 +142,7 @@ class ContactsController extends AbstractRestfulController
 
         $this->contact->create($currentUser['id'], $user['id']);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(200);
 
         return new JsonModel([
@@ -171,6 +173,7 @@ class ContactsController extends AbstractRestfulController
 
         $this->contact->delete($currentUser['id'], $user['id']);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(204);
 
         return new JsonModel([

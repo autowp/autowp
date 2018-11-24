@@ -41,6 +41,7 @@ class HotlinksController extends AbstractRestfulController
 
         $this->referer->flush();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -52,6 +53,7 @@ class HotlinksController extends AbstractRestfulController
 
         $this->referer->flushHost((string)$this->params('host'));
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -71,6 +73,7 @@ class HotlinksController extends AbstractRestfulController
 
         $this->referer->addToWhitelist($host);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -90,6 +93,7 @@ class HotlinksController extends AbstractRestfulController
 
         $this->referer->addToBlacklist($host);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 }

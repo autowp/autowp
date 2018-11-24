@@ -117,6 +117,7 @@ class PictureController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $this->getResponse()->setStatusCode(404);
         }
 

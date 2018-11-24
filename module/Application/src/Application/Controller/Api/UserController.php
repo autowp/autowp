@@ -424,7 +424,7 @@ class UserController extends AbstractRestfulController
             $this->userService->setPassword($row, $values['password']);
         }
 
-
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -468,6 +468,7 @@ class UserController extends AbstractRestfulController
             'users' => $row['id']
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -537,6 +538,7 @@ class UserController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -644,6 +646,7 @@ class UserController extends AbstractRestfulController
             $imageStorage->removeImage($oldImageId);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -670,6 +673,7 @@ class UserController extends AbstractRestfulController
             $auth->authenticate($adapter);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

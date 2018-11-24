@@ -85,6 +85,7 @@ class MessageController extends AbstractRestfulController
 
         $this->message->send($currentUser['id'], $user['id'], $data['text']);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -169,6 +170,7 @@ class MessageController extends AbstractRestfulController
                 return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -182,6 +184,7 @@ class MessageController extends AbstractRestfulController
 
         $this->message->delete($user['id'], (int)$this->params('id'));
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 

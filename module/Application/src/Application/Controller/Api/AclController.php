@@ -210,6 +210,7 @@ class AclController extends AbstractRestfulController
 
         $this->resetCache();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -382,6 +383,7 @@ class AclController extends AbstractRestfulController
 
         $this->resetCache();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -480,6 +482,7 @@ class AclController extends AbstractRestfulController
 
         $this->resetCache();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 

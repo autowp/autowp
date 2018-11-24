@@ -96,6 +96,7 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
             'id'      => (int)$this->params('id')
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -135,6 +136,8 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
                 'id' => $id
             ])
         );
+
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 }

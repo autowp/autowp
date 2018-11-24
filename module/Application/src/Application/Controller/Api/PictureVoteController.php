@@ -37,6 +37,7 @@ class PictureVoteController extends AbstractRestfulController
 
         $this->model->vote($id, $currentUser['id'], $value);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(200);
 
         return new JsonModel($this->model->getVote($id, $currentUser['id']));

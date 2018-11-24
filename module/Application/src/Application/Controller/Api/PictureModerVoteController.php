@@ -188,12 +188,14 @@ class PictureModerVoteController extends AbstractRestfulController
         $voteExists = $this->pictureModerVote->hasVote($picture['id'], $user['id']);
 
         if ($voteExists) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             return $this->getResponse()->setStatusCode(400);
         }
 
         $this->voteForm->setData($data);
 
         if (! $this->voteForm->isValid()) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $this->getResponse()->setStatusCode(400);
             return new JsonModel([
                 'details' => $this->voteForm->getMessages()
@@ -244,6 +246,7 @@ class PictureModerVoteController extends AbstractRestfulController
 
         $this->notifyVote($picture, $vote, $values['reason']);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(200);
 
         return new JsonModel([
@@ -284,6 +287,7 @@ class PictureModerVoteController extends AbstractRestfulController
             'pictures' => $picture['id']
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 }
