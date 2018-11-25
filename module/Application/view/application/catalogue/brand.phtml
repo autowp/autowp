@@ -60,12 +60,7 @@
         </li>
         <?php if ($this->haveTwins) { ?>
             <li class="nav-item">
-                <?=$this->htmlA([
-                    'class' => 'nav-link',
-                    'href'  => $this->url('twins/brand', [
-                        'brand_catname' => $this->brand['catname']
-                    ])
-                ], '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(25)->name), false)?>
+                <?=$this->htmlA('/ng/twins/' . $this->brand['catname'], '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(25)->name), false)?>
             </li>
         <?php } ?>
         <?php if ($this->mostsActive) { ?>

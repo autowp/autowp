@@ -139,6 +139,8 @@ class ItemHydrator extends RestHydrator
         $this->linkTable = $tables->get('links');
         $this->specTable = $tables->get('spec');
 
+        $this->comments = $serviceManager->get(\Application\Comments::class);
+
         $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
 
         $this->perspective = $serviceManager->get(Perspective::class);
@@ -174,10 +176,16 @@ class ItemHydrator extends RestHydrator
         $this->addStrategy('categories', $strategy);
 
         $strategy = new Strategy\Items($serviceManager);
+        $this->addStrategy('childs', $strategy);
+
+        $strategy = new Strategy\Items($serviceManager);
         $this->addStrategy('twins_groups', $strategy);
 
         $strategy = new Strategy\PreviewPictures($serviceManager);
         $this->addStrategy('preview_pictures', $strategy);
+
+        $strategy = new Strategy\Picture($serviceManager);
+        $this->addStrategy('front_picture', $strategy);
 
         $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('logo', $strategy);
@@ -382,6 +390,37 @@ class ItemHydrator extends RestHydrator
             ]);
         }
 
+        if ($this->filterComposite->filter('accepted_pictures_count')) {
+            $result['accepted_pictures_count'] = $this->picture->getCount([
+                'item'   => [
+                    'ancestor_or_self' => $object['id'],
+                ],
+                'status' => Picture::STATUS_ACCEPTED,
+            ]);
+        }
+
+        if ($this->filterComposite->filter('has_child_specs')) {
+            $result['has_child_specs'] = $this->specificationsService->hasChildSpecs($object['id']);
+        }
+
+        if ($this->filterComposite->filter('comments_topic_stat')) {
+            $result['comments_topic_stat'] = $this->comments->service()->getTopicStat(
+                \Application\Comments::ITEM_TYPE_ID,
+                $object['id']
+            );
+        }
+
+        if ($this->filterComposite->filter('front_picture')) {
+            $picture = $this->picture->getRow([
+               'status' => Picture::STATUS_ACCEPTED,
+               'item' => [
+                   'ancestor_or_self' => (int)$object['id']
+               ],
+               'order' => 'front_angle'
+           ]);
+           $result['front_picture'] = $picture ? $this->extractValue('front_picture', $picture) : null;
+        }
+
         if ($isModer) {
             if ($this->filterComposite->filter('body')) {
                 $result['body'] = (string)$object['body'];
@@ -571,7 +610,6 @@ class ItemHydrator extends RestHydrator
                 $result['item_of_day_pictures'] = $this->carOfDay->getItemOfDayPictures($object['id'], $this->language);
             }
 
-
             if ($showTotalPictures) {
                 $result['total_pictures'] = $totalPictures;
             }
@@ -630,6 +668,14 @@ class ItemHydrator extends RestHydrator
                 ]);
 
                 $result['brands'] = $this->extractValue('brands', $rows);
+            }
+
+            if ($this->filterComposite->filter('childs')) {
+                $rows = $this->itemModel->getRows([
+                    'parent' => $object['id']
+                ]);
+
+                $result['childs'] = $this->extractValue('childs', $rows);
             }
 
             if ($this->filterComposite->filter('categories')) {

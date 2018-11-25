@@ -249,20 +249,10 @@ return [
                     'route'    => '/twins',
                     'defaults' => [
                         'controller' => Controller\TwinsController::class,
-                        'action'     => 'index'
                     ],
                 ],
                 'may_terminate' => true,
                 'child_routes'  => [
-                    'brand' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/:brand_catname[/page:page]',
-                            'defaults' => [
-                                'action' => 'brand',
-                            ]
-                        ]
-                    ],
                     'group' => [
                         'type' => 'Segment',
                         'options' => [
@@ -322,13 +312,7 @@ return [
                                 ]
                             ],
                         ]
-                    ],
-                    'page'    => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/page:page',
-                        ]
-                    ],
+                    ]
                 ]
             ],
             'yandex' => [

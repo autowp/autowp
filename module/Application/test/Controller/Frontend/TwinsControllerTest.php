@@ -156,16 +156,6 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         return $json['items'][0];
     }
 
-    public function testIndexActionCanBeAccessed()
-    {
-        $this->dispatch('http://www.autowp.ru/twins', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(TwinsController::class);
-        $this->assertMatchedRouteName('twins');
-    }
-
     /**
      * @suppress PhanUndeclaredMethod
      */
