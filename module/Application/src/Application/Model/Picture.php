@@ -756,6 +756,8 @@ class Picture
             $select->limit($options['limit']);
         }
 
+        //print_r($select->getSqlString($this->table->getAdapter()->getPlatform())); exit;
+
         return $select;
     }
 

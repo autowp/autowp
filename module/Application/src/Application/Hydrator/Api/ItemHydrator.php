@@ -184,6 +184,9 @@ class ItemHydrator extends RestHydrator
         $strategy = new Strategy\PreviewPictures($serviceManager);
         $this->addStrategy('preview_pictures', $strategy);
 
+        $strategy = new Strategy\Picture($serviceManager);
+        $this->addStrategy('front_picture', $strategy);
+
         $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('logo', $strategy);
 
@@ -389,7 +392,9 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('accepted_pictures_count')) {
             $result['accepted_pictures_count'] = $this->picture->getCount([
-                'item'   => $object['id'],
+                'item'   => [
+                    'ancestor_or_self' => $object['id'],
+                ],
                 'status' => Picture::STATUS_ACCEPTED,
             ]);
         }
@@ -403,6 +408,17 @@ class ItemHydrator extends RestHydrator
                 \Application\Comments::ITEM_TYPE_ID,
                 $object['id']
             );
+        }
+
+        if ($this->filterComposite->filter('front_picture')) {
+            $picture = $this->picture->getRow([
+               'status' => Picture::STATUS_ACCEPTED,
+               'item' => [
+                   'ancestor_or_self' => (int)$object['id']
+               ],
+               'order' => 'front_angle'
+           ]);
+           $result['front_picture'] = $picture ? $this->extractValue('front_picture', $picture) : null;
         }
 
         if ($isModer) {
@@ -593,7 +609,6 @@ class ItemHydrator extends RestHydrator
             if ($this->filterComposite->filter('item_of_day_pictures')) {
                 $result['item_of_day_pictures'] = $this->carOfDay->getItemOfDayPictures($object['id'], $this->language);
             }
-
 
             if ($showTotalPictures) {
                 $result['total_pictures'] = $totalPictures;

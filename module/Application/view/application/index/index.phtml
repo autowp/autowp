@@ -52,7 +52,7 @@ html {
 <div class="row">
 
     <div class="col-md-6">
-        <h4><?=$this->escapeHtml($this->page(25)->name) ?> <small><?=$this->htmlA('/twins', $this->translate('all-link'))?></small></h4>
+        <h4><?=$this->escapeHtml($this->page(25)->name) ?> <small><?=$this->htmlA('/ng/twins', $this->translate('all-link'))?></small></h4>
         <p>
             <?php foreach ($this->twinsBlock['brands'] as $brand) { ?>
                 <?=$this->htmlA($brand['url'], $brand['name']) ?>
@@ -62,7 +62,7 @@ html {
                 …
                 <?=$this->escapeHtml($this->translate('and'))?>
                 <?=$this->htmlA(
-                    '/twins',
+                    '/ng/twins',
                     sprintf($this->translatePlural('brands/more-companies', 'brands/more-companies', $more), $more)
                 )?>
             <?php } ?>

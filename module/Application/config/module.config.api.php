@@ -83,6 +83,7 @@ return [
             Controller\Api\TextController::class            => Controller\Api\TextControllerFactory::class,
             Controller\Api\TimezoneController::class        => InvokableFactory::class,
             Controller\Api\TrafficController::class         => Controller\Api\Service\TrafficControllerFactory::class,
+            Controller\Api\TwinsController::class           => Controller\Api\TwinsControllerFactory::class,
             Controller\Api\UserController::class            => Controller\Api\UserControllerFactory::class,
             Controller\Api\VehicleTypesController::class    => Controller\Api\VehicleTypesControllerFactory::class,
             Controller\Api\VotingController::class          => Controller\Api\VotingControllerFactory::class,
@@ -2448,6 +2449,36 @@ return [
                                     ]
                                 ]
                             ]
+                        ]
+                    ],
+                    'twins' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route'    => '/twins',
+                            'defaults' => [
+                                'controller' => Controller\Api\TwinsController::class,
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'brands' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/brands',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'list' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'get-brands'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
                         ]
                     ],
                     'user' => [

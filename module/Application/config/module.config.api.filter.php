@@ -1331,7 +1331,7 @@ return [
                             'is_compiles_item_of_day', 'item_of_day_pictures',
                             'related_group_pictures', 'engine_id', 'attr_zone_id',
                             'descendants_count', 'has_child_specs', 'accepted_pictures_count',
-                            'comments_topic_stat']]
+                            'comments_topic_stat', 'front_picture']]
                     ]
                 ]
             ],
@@ -1561,7 +1561,7 @@ return [
                             'is_compiles_item_of_day', 'item_of_day_pictures',
                             'related_group_pictures', 'engine_id', 'attr_zone_id',
                             'descendants_count', 'has_child_specs', 'accepted_pictures_count',
-                            'comments_topic_stat']]
+                            'comments_topic_stat', 'front_picture']]
                     ]
                 ]
             ],
