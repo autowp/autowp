@@ -124,6 +124,9 @@ class RatingController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function picturesAction()
     {
         $rows = $this->userModel->getRows([

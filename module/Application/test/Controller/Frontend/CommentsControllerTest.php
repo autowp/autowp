@@ -24,7 +24,7 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
-                $tables->get('df_hash'),
+                $serviceManager->get('RabbitMQ'),
                 $tables->get('df_distance')
             ])
             ->getMock();
@@ -34,6 +34,9 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($itemId)
     {
         $this->reset();
@@ -44,12 +47,14 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $request->getHeaders()
             ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test1.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getFiles()->fromArray([
             'file' => [
                 'tmp_name' => $file,
@@ -80,12 +85,16 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
     {
         // get comment row
         $db = $this->getApplication()->getServiceManager()->get(\Zend\Db\Adapter\AdapterInterface::class);
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $db->query(
             'select * from comment_message order by id desc limit 1',
             Adapter::QUERY_MODE_EXECUTE
         )->current();
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCommentAndSubcomment()
     {
         $pictureId = $this->addPictureToItem(1);
@@ -124,6 +133,9 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('add');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCommentAndVote()
     {
         $pictureId = $this->addPictureToItem(1);
@@ -185,6 +197,9 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('votes');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCommentAndDeleteAndRestore()
     {
         $pictureId = $this->addPictureToItem(1);
@@ -233,6 +248,9 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('put');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCommentAndResolve()
     {
         $pictureId = $this->addPictureToItem(1);
@@ -241,7 +259,6 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/' . $pictureId, Request::METHOD_POST, [
-            'moderator_attention' => 0,
             'parent_id'           => null,
             'message'             => 'Test comment',
             'moderator_attention' => 1

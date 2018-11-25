@@ -73,6 +73,9 @@ class Log
         $this->userModel = $userModel;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function addEvent(int $userId, string $message, array $objects)
     {
         $this->eventTable->insert([

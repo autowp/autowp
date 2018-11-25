@@ -1,137 +1,61 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application;
 
-use Zend\Db\Adapter\Exception\InvalidQueryException;
-use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Json\Json;
 
-use Jenssegers\ImageHash\ImageHash;
-
-use InvalidArgumentException;
+use Application\Service\RabbitMQ;
 
 class DuplicateFinder
 {
-    private $threshold = 3;
-
     /**
-     * @var TableGateway
+     * @var RabbitMQ
      */
-    private $hashTable;
+    private $rabbitmq;
 
     /**
      * @var TableGateway
      */
     private $distanceTable;
 
-    public function __construct(TableGateway $hashTable, TableGateway $distanceTable)
+    public function __construct(RabbitMQ $rabbitmq, TableGateway $distanceTable)
     {
-        $this->hashTable = $hashTable;
+        $this->rabbitmq = $rabbitmq;
         $this->distanceTable = $distanceTable;
     }
 
-    public function indexImage($id, $filepath)
+    public function indexImage(int $id): void
     {
-        $id = (int)$id;
-
-        if (! $id) {
-            throw new InvalidArgumentException("Invalid id provided");
-        }
-
-        $row = $this->hashTable->select([
+        $this->rabbitmq->send('duplicate_finder', Json::encode([
             'picture_id' => $id
-        ])->current();
-        if (! $row) {
-            $hasher = new ImageHash(null, ImageHash::DECIMAL);
-            try {
-                $hash = $hasher->hash($filepath);
-            } catch (InvalidArgumentException $e) {
-                return null;
-            }
-            $this->hashTable->insert([
-                'picture_id' => $id,
-                'hash'       => $hash
-            ]);
-        } else {
-            $this->hashTable->update([
-                'hash'       => $hash
-            ], [
-                'picture_id' => $id
-            ]);
-        }
-
-        $this->updateDistance($id);
-
-        return null;
-    }
-
-    public function updateDistance($id)
-    {
-        $id = (int)$id;
-
-        if (! $id) {
-            throw new InvalidArgumentException("Invalid id provided");
-        }
-
-        $row = $this->hashTable->select([
-            'picture_id' => $id
-        ])->current();
-
-        if (! $row) {
-            return;
-        }
-
-        $similarRows = $this->hashTable->select(function (Select $select) use ($id, $row) {
-            $select
-                ->columns([
-                    'picture_id',
-                    'distance' => new Expression('BIT_COUNT(hash ^ ?)', [$row['hash']]),
-                ])
-                ->where([
-                    'picture_id <> ?' => $id
-                ])
-                ->having([
-                    'distance <= ?' => $this->threshold
-                ]);
-        });
-
-        foreach ($similarRows as $similarRow) {
-            try {
-                $this->distanceTable->insert([
-                    'src_picture_id' => $id,
-                    'dst_picture_id' => $similarRow['picture_id'],
-                    'distance'       => $similarRow['distance']
-                ]);
-            } catch (InvalidQueryException $e) {
-            }
-            try {
-                $this->distanceTable->insert([
-                    'src_picture_id' => $similarRow['picture_id'],
-                    'dst_picture_id' => $id,
-                    'distance'       => $similarRow['distance']
-                ]);
-            } catch (InvalidQueryException $e) {
-            }
-        }
+        ]));
     }
 
     public function findSimilar($id)
     {
-        $row = $this->distanceTable->select(function (Select $select) use ($id) {
-            $select
-                ->columns([
-                    'dst_picture_id',
-                    'distance'
-                ])
-                ->where([
-                    'src_picture_id' => $id,
-                    'src_picture_id <> dst_picture_id',
-                    'not hide'
-                ])
-                ->order('distance ASC')
-                ->limit(1);
-        })->current();
+        $row = $this->distanceTable->select(
+            /**
+             * @suppress PhanPluginMixedKeyNoKey
+             */
+            function (Select $select) use ($id) {
+                $select
+                    ->columns([
+                        'dst_picture_id',
+                        'distance'
+                    ])
+                    ->where([
+                        'src_picture_id' => $id,
+                        'src_picture_id <> dst_picture_id',
+                        'not hide'
+                    ])
+                    ->order('distance ASC')
+                    ->limit(1);
+            }
+        )->current();
 
         if (! $row) {
             return null;

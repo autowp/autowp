@@ -33,7 +33,7 @@ class AttrValueHydrator extends RestHydrator
         ];
 
         if ($this->filterComposite->filter('value')) {
-            $result['value'] = $this->specService->getActualValue($object['attribute_id'], $object['item_id'], $this->language);
+            $result['value'] = $this->specService->getActualValue($object['attribute_id'], $object['item_id']);
         }
 
         if ($this->filterComposite->filter('value_text')) {

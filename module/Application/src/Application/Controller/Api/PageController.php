@@ -42,6 +42,7 @@ class PageController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -81,6 +82,7 @@ class PageController extends AbstractRestfulController
 
     public function itemAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -104,6 +106,9 @@ class PageController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function itemPutAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -233,9 +238,13 @@ class PageController extends AbstractRestfulController
             ]);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function postAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -289,11 +298,13 @@ class PageController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
     public function itemDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -305,6 +316,7 @@ class PageController extends AbstractRestfulController
 
         $page->delete();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 

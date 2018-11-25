@@ -34,6 +34,7 @@ class PictureVote
                 timestamp = VALUES(timestamp)
         ';
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $statement = $this->voteTable->getAdapter()->query($sql);
         $statement->execute([(int)$pictureId, (int)$userId, $value]);
 
@@ -76,6 +77,7 @@ class PictureVote
                 positive = VALUES(positive),
                 negative = VALUES(negative)
         ';
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $statement = $this->summaryTable->getAdapter()->query($sql);
         $statement->execute([$pictureId, $pictureId, $pictureId]);
     }

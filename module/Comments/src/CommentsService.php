@@ -62,6 +62,8 @@ class CommentsService
     }
 
     /**
+     * @suppress PhanDeprecatedFunction
+     *
      * @param array $data
      * @return int
      */
@@ -114,6 +116,9 @@ class CommentsService
         return $messageId;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function updateMessageRepliesCount($messageId)
     {
         $row = $this->messageTable->select(function (Sql\Select $select) use ($messageId) {
@@ -217,8 +222,8 @@ class CommentsService
     }
 
     /**
-     * @param int $type
-     * @param int $item
+     * @param int $typeId
+     * @param int $itemId
      * @param int $userId
      */
     public function updateTopicView($typeId, $itemId, $userId)
@@ -228,10 +233,14 @@ class CommentsService
             values (?, ?, ?, NOW())
             on duplicate key update `timestamp` = values(`timestamp`)
         ';
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $statement = $this->topicTable->getAdapter()->query($sql);
         $statement->execute([$userId, $typeId, $itemId]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function queueDeleteMessage(int $id, int $userId): bool
     {
         $comment = $this->getMessageRow($id);
@@ -339,6 +348,8 @@ class CommentsService
     }
 
     /**
+     * @suppress PhanDeprecatedFunction
+     *
      * @todo Change $message to $messageId
      */
     private function updateVote($message)
@@ -471,6 +482,8 @@ class CommentsService
     }
 
     /**
+     * @suppress PhanDeprecatedFunction
+     *
      * @param array $message
      * @param int $perPage
      * @return int
@@ -479,16 +492,21 @@ class CommentsService
     {
         $root = $this->getMessageRoot($message);
 
-        $row = $this->messageTable->select(function (Sql\Select $select) use ($root) {
-            $select
-                ->columns(['count' => new Sql\Expression('COUNT(1)')])
-                ->where([
-                    'item_id = ?'  => $root['item_id'],
-                    'type_id = ?'  => $root['type_id'],
-                    'datetime < ?' => $root['datetime'],
-                    'parent_id is null'
-                ]);
-        })->current();
+        $row = $this->messageTable->select(
+            /**
+             * @suppress PhanPluginMixedKeyNoKey
+             */
+            function (Sql\Select $select) use ($root) {
+                $select
+                    ->columns(['count' => new Sql\Expression('COUNT(1)')])
+                    ->where([
+                        'item_id = ?'  => $root['item_id'],
+                        'type_id = ?'  => $root['type_id'],
+                        'datetime < ?' => $root['datetime'],
+                        'parent_id is null'
+                    ]);
+            }
+        )->current();
 
         return ceil(($row['count'] + 1) / $perPage);
     }
@@ -511,6 +529,7 @@ class CommentsService
     {
         $db = $this->messageTable->getAdapter();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $db->query('
             create temporary table __cms
             select type_id, item_id, parent_id as id, count(1) as count
@@ -519,6 +538,7 @@ class CommentsService
             group by type_id, item_id, parent_id
         ', $db::QUERY_MODE_EXECUTE);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $statement = $db->query('
             update comment_message
                 inner join __cms
@@ -611,28 +631,33 @@ class CommentsService
 
         $rows = [];
         if (count($itemId) > 0) {
-            $rows = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemId, $userId) {
-                $select
-                    ->columns(['item_id', 'messages'])
-                    ->where([
-                        'comment_topic.type_id = ?' => $typeId,
-                        new Sql\Predicate\In('comment_topic.item_id', $itemId)
-                    ])
-                    ->join(
-                        'comment_topic_view',
-                        new Sql\Predicate\PredicateSet([
-                            new Sql\Predicate\Expression('comment_topic.type_id = comment_topic_view.type_id'),
-                            new Sql\Predicate\Expression('comment_topic.item_id = comment_topic_view.item_id'),
-                            new Sql\Predicate\Operator(
-                                'comment_topic_view.user_id',
-                                Sql\Predicate\Operator::OP_EQ,
-                                $userId
-                            )
-                        ]),
-                        ['timestamp'],
-                        $select::JOIN_LEFT
-                    );
-            });
+            $rows = $this->topicTable->select(
+                /**
+                 * @suppress PhanPluginMixedKeyNoKey
+                 */
+                function (Sql\Select $select) use ($typeId, $itemId, $userId) {
+                    $select
+                        ->columns(['item_id', 'messages'])
+                        ->where([
+                            'comment_topic.type_id = ?' => $typeId,
+                            new Sql\Predicate\In('comment_topic.item_id', $itemId)
+                        ])
+                        ->join(
+                            'comment_topic_view',
+                            new Sql\Predicate\PredicateSet([
+                                new Sql\Predicate\Expression('comment_topic.type_id = comment_topic_view.type_id'),
+                                new Sql\Predicate\Expression('comment_topic.item_id = comment_topic_view.item_id'),
+                                new Sql\Predicate\Operator(
+                                    'comment_topic_view.user_id',
+                                    Sql\Predicate\Operator::OP_EQ,
+                                    $userId
+                                )
+                            ]),
+                            ['timestamp'],
+                            $select::JOIN_LEFT
+                        );
+                }
+            );
         }
 
         $result = [];
@@ -680,14 +705,19 @@ class CommentsService
         $result = [];
 
         if (count($itemId) > 0) {
-            $rows = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemId) {
-                $select
-                    ->columns(['item_id', 'messages'])
-                    ->where([
-                        'comment_topic.type_id = ?' => $typeId,
-                        new Sql\Predicate\In('comment_topic.item_id', $itemId)
-                    ]);
-            });
+            $rows = $this->topicTable->select(
+                /**
+                 * @suppress PhanPluginMixedKeyNoKey
+                 */
+                function (Sql\Select $select) use ($typeId, $itemId) {
+                    $select
+                        ->columns(['item_id', 'messages'])
+                        ->where([
+                            'comment_topic.type_id = ?' => $typeId,
+                            new Sql\Predicate\In('comment_topic.item_id', $itemId)
+                        ]);
+                }
+            );
 
             foreach ($rows as $row) {
                 $result[$row['item_id']] = [
@@ -732,10 +762,14 @@ class CommentsService
             VALUES (?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE last_update=VALUES(last_update), messages=VALUES(messages)
         ';
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $statement = $this->topicTable->getAdapter()->query($sql);
         $statement->execute([$itemId, $typeId, $lastUpdate, $messagesCount]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function getMessagesCountFromTimestamp($typeId, $itemId, $timestamp): int
     {
         $countRow = $this->messageTable->select(function (Sql\Select $select) use ($itemId, $typeId, $timestamp) {
@@ -764,15 +798,20 @@ class CommentsService
 
         $rows = [];
         if (count($itemId) > 0) {
-            $rows = $this->topicViewTable->select(function (Sql\Select $select) use ($typeId, $userId, $itemId) {
-                $select
-                    ->columns(['item_id', 'timestamp'])
-                    ->where([
-                        'type_id = ?' => $typeId,
-                        'user_id = ?' => $userId,
-                        new Sql\Predicate\In('item_id', $itemId)
-                    ]);
-            });
+            $rows = $this->topicViewTable->select(
+                /**
+                 * @suppress PhanPluginMixedKeyNoKey
+                 */
+                function (Sql\Select $select) use ($typeId, $userId, $itemId) {
+                    $select
+                        ->columns(['item_id', 'timestamp'])
+                        ->where([
+                            'type_id = ?' => $typeId,
+                            'user_id = ?' => $userId,
+                            new Sql\Predicate\In('item_id', $itemId)
+                        ]);
+                }
+            );
         }
 
         $result = [];
@@ -794,6 +833,9 @@ class CommentsService
         return reset($result);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function countMessages($typeId, $itemId)
     {
         $countRow = $this->messageTable->select(function (Sql\Select $select) use ($itemId, $typeId) {
@@ -824,14 +866,19 @@ class CommentsService
 
     public function getMessagesCounts($typeId, array $itemIds)
     {
-        $rows = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemIds) {
-            $select
-                ->columns(['item_id', 'messages'])
-                ->where([
-                    'type_id = ?' => $typeId,
-                    new Sql\Predicate\In('item_id', $itemIds)
-                ]);
-        });
+        $rows = $this->topicTable->select(
+            /**
+             * @suppress PhanPluginMixedKeyNoKey
+             */
+            function (Sql\Select $select) use ($typeId, $itemIds) {
+                $select
+                    ->columns(['item_id', 'messages'])
+                    ->where([
+                        'type_id = ?' => $typeId,
+                        new Sql\Predicate\In('item_id', $itemIds)
+                    ]);
+            }
+        );
 
         $result = [];
         foreach ($rows as $row) {
@@ -874,6 +921,8 @@ class CommentsService
     }
 
     /**
+     * @suppress PhanPluginMixedKeyNoKey
+     *
      * @param int $type
      * @param int $item
      * @return Paginator\Paginator
@@ -1023,16 +1072,24 @@ class CommentsService
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getUserAvgVote($userId)
     {
-        $row = $this->messageTable->select(function (Sql\Select $select) use ($userId) {
-            $select
-                ->columns(['avg_vote' => new Sql\Expression('avg(vote)')])
-                ->where([
-                    'author_id = ?' => (int)$userId,
-                    'vote <> 0'
-                ]);
-        })->current();
+        $row = $this->messageTable->select(
+            /**
+             * @suppress PhanPluginMixedKeyNoKey
+             */
+            function (Sql\Select $select) use ($userId) {
+                $select
+                    ->columns(['avg_vote' => new Sql\Expression('avg(vote)')])
+                    ->where([
+                        'author_id = ?' => (int)$userId,
+                        'vote <> 0'
+                    ]);
+            }
+        )->current();
 
         return $row ? $row['avg_vote'] : 0;
     }
@@ -1118,6 +1175,7 @@ class CommentsService
     public function cleanTopics()
     {
         $adapter = $this->topicViewTable->getAdapter();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $adapter->query('
             DELETE comment_topic_view
                 FROM comment_topic_view
@@ -1129,6 +1187,7 @@ class CommentsService
         $affected = $result->getAffectedRows();
 
         $adapter = $this->topicTable->getAdapter();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $adapter->query('
             DELETE comment_topic
                 FROM comment_topic
@@ -1234,6 +1293,9 @@ class CommentsService
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getTopAuthors(int $limit): array
     {
         $select = $this->messageTable->getSql()->select()

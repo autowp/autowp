@@ -90,6 +90,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
         $request = $e->getRequest();
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($this->matchWhitelist($request->getUri()->getPath())) {
                 return;
             }
@@ -109,21 +110,25 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 }
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $ip = $request->getServer('REMOTE_ADDR');
 
-            $service = $serviceManager->get(TrafficControl::class);
+            if ($ip) {
+                $service = $serviceManager->get(TrafficControl::class);
 
-            $banInfo = $service->getBanInfo($ip);
-            if ($banInfo) {
-                $response = $e->getResponse();
-                $response->setStatusCode(403);
-                $response->setContent('Access denied: ' . $banInfo['reason']);
+                $banInfo = $service->getBanInfo($ip);
+                if ($banInfo) {
+                    $response = $e->getResponse();
+                    /* @phan-suppress-next-line PhanUndeclaredMethod */
+                    $response->setStatusCode(403);
+                    $response->setContent('Access denied: ' . $banInfo['reason']);
 
-                return $response;
-            }
+                    return $response;
+                }
 
-            if (! $unlimitedTraffic) { //  && ! $service->inWhiteList($ip)
-                $service->pushHit($ip);
+                if (! $unlimitedTraffic) {
+                    $service->pushHit($ip);
+                }
             }
         }
     }

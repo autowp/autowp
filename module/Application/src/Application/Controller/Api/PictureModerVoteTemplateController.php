@@ -28,10 +28,12 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $select = new Sql\Select($this->table->getTable());
@@ -54,6 +56,9 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function itemAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -84,18 +89,23 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
 
     public function deleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $this->table->delete([
-            'user_id' => $this->user()->get()['id'],
+            'user_id' => $this->user()->get()['id'], // @phan-suppress-current-line PhanUndeclaredMethod
             'id'      => (int)$this->params('id')
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function createAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -129,6 +139,8 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
                 'id' => $id
             ])
         );
+
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 }

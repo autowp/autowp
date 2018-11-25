@@ -14,6 +14,10 @@ class TwinsTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../config/application.config.php';
 
+
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -35,6 +39,9 @@ class TwinsTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addItemParent($itemId, $parentId, array $params = [])
     {
         $this->reset();

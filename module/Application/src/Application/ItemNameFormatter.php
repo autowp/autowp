@@ -41,6 +41,8 @@ class ItemNameFormatter
         $defaults = [
             'begin_model_year' => null,
             'end_model_year'   => null,
+            'begin_model_year_fraction' => null,
+            'end_model_year_fraction'   => null,
             'spec'             => null,
             'spec_full'        => null,
             'body'             => null,
@@ -53,22 +55,26 @@ class ItemNameFormatter
         ];
         $item = array_replace($defaults, $item);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $this->renderer->escapeHtml($item['name']);
 
         if ($item['spec']) {
             $attrs = ['class="badge badge-info"'];
             if ($item['spec_full']) {
                 $attrs = array_merge($attrs, [
+                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     'title="' . $this->renderer->escapeHtmlAttr($item['spec_full']) . '"',
                     'data-toggle="tooltip"',
                     'data-placement="top"'
                 ]);
             }
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $escapedSpec = $this->renderer->escapeHtml($item['spec']);
             $result .= ' <span '.implode(' ', $attrs).'>' . $escapedSpec . '</span>';
         }
 
         if (strlen($item['body']) > 0) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $result .= ' ('.$this->renderer->escapeHtml($item['body']).')';
         }
 
@@ -80,6 +86,9 @@ class ItemNameFormatter
         $bmy = (int)$item['begin_model_year'];
         $emy = (int)$item['end_model_year'];
 
+        $bmyf = $item['begin_model_year_fraction'];
+        $emyf = $item['end_model_year_fraction'];
+
         $bs = (int)($by / 100);
         $es = (int)($ey / 100);
 
@@ -90,15 +99,17 @@ class ItemNameFormatter
         $equalM = $equalY && $bm && $em && ($bm == $em);
 
         if ($useModelYear) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/model-years', $language));
             $result = '<span title="' . $title . '">' .
-                          $this->renderer->escapeHtml(
-                              $this->getModelYearsPrefix($bmy, $emy, $item['today'], $language)
+                          $this->renderer->escapeHtml( // @phan-suppress-current-line PhanUndeclaredMethod
+                              $this->getModelYearsPrefix($bmy, $bmyf, $emy, $emyf, $item['today'], $language)
                           ) .
                       '</span> ' .
                       $result;
 
             if ($by > 0 || $ey > 0) {
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/years', $language));
                 $result .=
                     '<small>'.
@@ -149,6 +160,8 @@ class ItemNameFormatter
         $defaults = [
             'begin_model_year' => null,
             'end_model_year'   => null,
+            'begin_model_year_fraction' => null,
+            'end_model_year_fraction'   => null,
             'spec'             => null,
             'spec_full'        => null,
             'body'             => null,
@@ -164,7 +177,7 @@ class ItemNameFormatter
         $result = $item['name'];
 
         if ($item['spec']) {
-            $result .= ' ' . $item['spec'];
+            $result .= ' [' . $item['spec'] . ']';
         }
 
         if (strlen($item['body']) > 0) {
@@ -179,6 +192,9 @@ class ItemNameFormatter
         $bmy = (int)$item['begin_model_year'];
         $emy = (int)$item['end_model_year'];
 
+        $bmyf = $item['begin_model_year_fraction'];
+        $emyf = $item['end_model_year_fraction'];
+
         $bs = (int)($by / 100);
         $es = (int)($ey / 100);
 
@@ -189,7 +205,7 @@ class ItemNameFormatter
         $equalM = $equalY && $bm && $em && ($bm == $em);
 
         if ($useModelYear) {
-            $result = $this->getModelYearsPrefix($bmy, $emy, $item['today'], $language) . ' ' . $result;
+            $result = $this->getModelYearsPrefix($bmy, $bmyf, $emy, $emyf, $item['today'], $language) . ' ' . $result;
         }
 
         if ($by > 0 || $ey > 0) {
@@ -209,38 +225,38 @@ class ItemNameFormatter
         return $result;
     }
 
-    private function getModelYearsPrefix($begin, $end, $today, $language)
+    private function getModelYearsPrefix($begin, $beginFraction, $end, $endFraction, $today, $language)
     {
         $bms = (int)($begin / 100);
         $ems = (int)($end / 100);
 
-        if ($end == $begin) {
-            return $begin;
+        if ($end == $begin && $beginFraction == $endFraction) {
+            return $begin . $endFraction;
         }
 
         if ($bms == $ems) {
-            return $begin . '–' . sprintf('%02d', $end % 100);
+            return $begin . $beginFraction . '–' . sprintf('%02d', $end % 100) . $endFraction;
         }
 
         if (! $begin) {
-            return '????–' . $end;
+            return '????–' . $end . $endFraction;
         }
 
         if ($end) {
-            return $begin . '–' . $end;
+            return $begin . $beginFraction . '–' . $end . $endFraction;
         }
 
         if (! $today) {
-            return $begin . '–??';
+            return $begin . $beginFraction . '–??';
         }
 
         $currentYear = (int)date('Y');
 
         if ($begin >= $currentYear) {
-            return $begin;
+            return $begin . $beginFraction;
         }
 
-        return $begin . '–' . $this->translate('present-time-abbr', $language);
+        return $begin . $beginFraction . '–' . $this->translate('present-time-abbr', $language);
     }
 
     private function monthsRange($from, $to)
@@ -315,7 +331,7 @@ class ItemNameFormatter
                 (
                     $ey
                         ? '–' . ($em ? sprintf($this->monthFormat, $em) : '') . $ey
-                        : $this->renderer->escapeHtml(
+                        : $this->renderer->escapeHtml( // @phan-suppress-currenet-line PhanUndeclaredMethod
                             $this->missedEndYearYearsSuffix($today, $by, $language)
                         )
                 );

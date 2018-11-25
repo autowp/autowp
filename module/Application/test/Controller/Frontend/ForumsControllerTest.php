@@ -30,11 +30,14 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->assertResponseStatusCode(403);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateTopic()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/api/forum/topic', Request::METHOD_POST, [
-            'theme_id'            => 1,
+            'theme_id'            => 2,
             'name'                => 'Test topic',
             'text'                => 'Test topic text',
             'moderator_attention' => 0,

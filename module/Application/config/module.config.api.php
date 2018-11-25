@@ -1900,7 +1900,7 @@ return [
                                     ],
                                 ]
                             ],
-                            [
+                            'parents' => [
                                 'type' => 'Literal',
                                 'options' => [
                                     'route'    => '/parents',

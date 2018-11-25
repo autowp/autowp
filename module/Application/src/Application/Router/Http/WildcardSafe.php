@@ -32,6 +32,7 @@ class WildcardSafe extends Wildcard
             return;
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $uri  = $request->getUri();
         $path = $uri->getPath() ?: '';
 

@@ -17,6 +17,9 @@ class Contact
         $this->table = $table;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function create(int $userId, int $contactUserId)
     {
         $primaryKey = [

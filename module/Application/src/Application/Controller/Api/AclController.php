@@ -103,13 +103,14 @@ class AclController extends AbstractRestfulController
 
     public function isAllowedAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
         return new JsonModel([
-            'result' => $this->user()->isAllowed(
+            'result' => $this->user()->isAllowed( // @phan-suppress-current-line PhanUndeclaredMethod
                 $this->params()->fromQuery('resource'),
                 $this->params()->fromQuery('privilege')
             )
@@ -118,11 +119,13 @@ class AclController extends AbstractRestfulController
 
     public function inheritRolesAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         $result = [
             $user->role => true
@@ -132,6 +135,7 @@ class AclController extends AbstractRestfulController
         $roles = explode(',', $roles);
 
         foreach ($roles as $role) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $result[$role] = $this->user()->inheritsRole($role);
         }
 
@@ -191,6 +195,7 @@ class AclController extends AbstractRestfulController
 
     public function rolesPostAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('rights', 'edit')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -210,6 +215,7 @@ class AclController extends AbstractRestfulController
 
         $this->resetCache();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -305,6 +311,7 @@ class AclController extends AbstractRestfulController
 
     public function rulesPostAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('rights', 'edit')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -382,6 +389,7 @@ class AclController extends AbstractRestfulController
 
         $this->resetCache();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -430,6 +438,7 @@ class AclController extends AbstractRestfulController
 
     public function roleParentsPostAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('rights', 'edit')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -480,6 +489,7 @@ class AclController extends AbstractRestfulController
 
         $this->resetCache();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 

@@ -50,6 +50,7 @@ class YandexController extends AbstractActionController
     {
         $request = $this->getRequest();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $request->isPost()) {
             return $this->forbiddenAction();
         }
@@ -115,6 +116,7 @@ class YandexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

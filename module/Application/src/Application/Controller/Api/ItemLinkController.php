@@ -78,6 +78,7 @@ class ItemLinkController extends AbstractRestfulController
 
     public function getAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -95,6 +96,7 @@ class ItemLinkController extends AbstractRestfulController
 
     public function putAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
@@ -148,9 +150,13 @@ class ItemLinkController extends AbstractRestfulController
             $this->table->update($set, ['id' => $row['id']]);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function postAction()
     {
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
@@ -161,6 +167,7 @@ class ItemLinkController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -184,11 +191,13 @@ class ItemLinkController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
     public function deleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
@@ -203,6 +212,7 @@ class ItemLinkController extends AbstractRestfulController
 
         $this->table->delete(['id' => $row['id']]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

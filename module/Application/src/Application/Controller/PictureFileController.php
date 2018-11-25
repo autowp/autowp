@@ -24,6 +24,9 @@ class PictureFileController extends AbstractActionController
         $this->referer = $referer;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function indexAction()
     {
         $request = $this->getRequest();
@@ -65,6 +68,7 @@ class PictureFileController extends AbstractActionController
         }
 
         // referer
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $referer = (string)$request->getServer('HTTP_REFERER');
 
         if ($referer) {
@@ -80,9 +84,11 @@ class PictureFileController extends AbstractActionController
                     ]);
             }*/
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $accept = (string)$request->getServer('HTTP_ACCEPT');
 
             if ($accept && $blacklisted && $this->referer->isImageRequest($accept)) {
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 return $this->getResponse()->setStatusCode(429);
             }
 

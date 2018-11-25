@@ -7,7 +7,10 @@ WORKDIR /app
 EXPOSE 80
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
-ENV WAITFORIT_VERSION="v2.2.0"
+ENV WAITFORIT_VERSION="v2.4.1"
+
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl -f http://localhost/ || exit 1
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
     DEBIAN_FRONTEND=noninteractive apt-get update -qq -y && \
@@ -20,17 +23,18 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         ca-certificates \
         curl \
         git \
-        golang \
         imagemagick \
         libpng-dev \
         libtool \
         libxml2 \
         logrotate \
+        mysql-client \
         nasm \
         nginx \
         openssh-client \
         optipng \
         php \
+        php-bcmath \
         php-ctype \
         php-curl \
         php-dom \
@@ -72,13 +76,6 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
 RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
     chmod +x /usr/local/bin/waitforit
 
-RUN go get \
-        github.com/gin-gonic/gin \
-        github.com/go-sql-driver/mysql \
-        github.com/Masterminds/squirrel \
-    && echo $GOROOT \
-    && echo $GOPATH
-
 COPY ./etc/ /etc/
 
 COPY composer.json /app/composer.json
@@ -95,10 +92,7 @@ COPY . /app
 RUN chmod +x zf && \
     chmod +x start.sh && \
     crontab ./crontab && \
-    go build -o ./goautowp/goautowp ./goautowp/
-
-RUN ./node_modules/.bin/webpack -p
-
-RUN rm -rf ./node_modules/
+    ./node_modules/.bin/webpack -p && \
+    rm -rf ./node_modules/
 
 CMD ["./start.sh"]

@@ -91,6 +91,7 @@ class RestorePasswordController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -106,6 +107,7 @@ class RestorePasswordController extends AbstractRestfulController
                     $captchaResponse = (string)$data['captcha'];
                 }
 
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
 
                 if (! $result->isSuccess()) {
@@ -174,6 +176,7 @@ class RestorePasswordController extends AbstractRestfulController
 
         $this->transport->send($mail);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(201);
 
         return new JsonModel([
@@ -206,6 +209,7 @@ class RestorePasswordController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -241,6 +245,7 @@ class RestorePasswordController extends AbstractRestfulController
         $auth = new AuthenticationService();
         $auth->authenticate($adapter);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

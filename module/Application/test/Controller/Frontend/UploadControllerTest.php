@@ -12,6 +12,9 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testUploadVehicle()
     {
         /**
@@ -21,12 +24,14 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
         $request->getHeaders()
             ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getFiles()->fromArray([
             'file' => [
                 'tmp_name' => $file,

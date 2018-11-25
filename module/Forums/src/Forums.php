@@ -122,6 +122,9 @@ class Forums
         $this->updateThemeStat($topic['theme_id']);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     */
     public function updateThemeStat($themeId)
     {
         $theme = $this->themeTable->select([
@@ -143,15 +146,19 @@ class Forums
 
         $messages = $this->comments->getTotalMessagesCount([
             'type'     => \Application\Comments::FORUMS_TYPE_ID,
-            'callback' => function ($select) use ($theme) {
-                $select
-                    ->join('forums_topics', 'comment_message.item_id = forums_topics.id', [])
-                    ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])
-                    ->where([
-                        'forums_theme_parent.parent_id = ?' => $theme['id'],
-                        new Sql\Predicate\In('forums_topics.status', [self::STATUS_NORMAL, self::STATUS_CLOSED])
-                    ]);
-            }
+            'callback' =>
+                /**
+                 * @suppress PhanPluginMixedKeyNoKey
+                 */
+                function ($select) use ($theme) {
+                    $select
+                        ->join('forums_topics', 'comment_message.item_id = forums_topics.id', [])
+                        ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])
+                        ->where([
+                            'forums_theme_parent.parent_id = ?' => $theme['id'],
+                            new Sql\Predicate\In('forums_topics.status', [self::STATUS_NORMAL, self::STATUS_CLOSED])
+                        ]);
+                }
         ]);
         $theme = $this->themeTable->update([
             'topics'   => $topics['count'],
@@ -161,6 +168,9 @@ class Forums
         ]);
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getTopicList($themeId, $page, $userId)
     {
         $select = new Sql\Select($this->topicTable->getTable());
@@ -242,6 +252,9 @@ class Forums
         ];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getThemePage($themeId, $page, $userId, $isModerator)
     {
         $select = new Sql\Select($this->themeTable->getTable());
@@ -280,6 +293,7 @@ class Forums
     }
 
     /**
+     * @suppress PhanDeprecatedFunction
      *
      * @param array $values
      * @throws \Exception
@@ -366,6 +380,9 @@ class Forums
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTopics($themeId)
     {
         $select = new Sql\Select($this->topicTable->getTable());
@@ -445,6 +462,9 @@ class Forums
         return true;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getTopic($topicId, array $options = [])
     {
         $defaults = [
@@ -507,6 +527,9 @@ class Forums
         ];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function registerTopicView($topicId, $userId)
     {
         $this->topicTable->update([
@@ -664,6 +687,9 @@ class Forums
         return $topics;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function getSubscribedTopicsCount(int $userId): int
     {
         $select = new Sql\Select($this->topicTable->getTable());

@@ -101,6 +101,9 @@ class Item
         $this->languagePriority = new LanguagePriority();
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getEngineVehiclesGroups(int $engineId, array $options = []): array
     {
         $defaults = [
@@ -201,6 +204,9 @@ class Item
         $this->itemLanguageTable->update($set, $primaryKey);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function getUsedLanguagesCount(int $id): int
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
@@ -214,6 +220,13 @@ class Item
         return $row ? (int)$row['count'] : 0;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     *
+     * @param array $ids
+     * @param string $language
+     * @return array
+     */
     public function getLanguageNamesOfItems(array $ids, string $language): array
     {
         if (! $ids) {
@@ -233,6 +246,9 @@ class Item
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getTextsOfItem(int $id, string $language): array
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
@@ -270,6 +286,9 @@ class Item
         ];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getTextOfItem(int $id, string $language): string
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
@@ -299,6 +318,9 @@ class Item
         return $text ? $text : '';
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function hasFullText(int $id): bool
     {
         $rows = $this->itemLanguageTable->select([
@@ -318,6 +340,9 @@ class Item
         return (bool)$this->textStorage->getFirstText($ids);
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getNames(int $itemId): array
     {
         $rows = $this->itemLanguageTable->select([
@@ -332,6 +357,9 @@ class Item
         return $result;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getLanguageName(int $itemId, string $language): string
     {
         $select = new Sql\Select($this->itemLanguageTable->getTable());
@@ -346,6 +374,9 @@ class Item
         return $row ? $row['name'] : '';
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getName(int $itemId, string $language)
     {
         $select = $this->getNameSelect($itemId, Sql\ExpressionInterface::TYPE_VALUE, $language);
@@ -372,6 +403,8 @@ class Item
         return [
             'begin_model_year' => $row['begin_model_year'],
             'end_model_year'   => $row['end_model_year'],
+            'begin_model_year_fraction' => $row['begin_model_year_fraction'],
+            'end_model_year_fraction'   => $row['end_model_year_fraction'],
             'spec'             => $spec,
             'spec_full'        => $specFull,
             'body'             => $row['body'],
@@ -384,6 +417,9 @@ class Item
         ];
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     private function getAncestorsId(int $itemId, array $itemTypes): array
     {
         $select = new Sql\Select($this->itemParentCacheTable->getTable());
@@ -533,6 +569,17 @@ class Item
         return $resultIds;
     }
 
+    private function fractionToMonth($fraction)
+    {
+        switch ($fraction) {
+            case '¼': return 13;
+            case '½': return 16;
+            case '¾': return 19;
+        }
+
+        return 10;
+    }
+
     public function updateOrderCache(int $itemId): bool
     {
         $primaryKey = ['id' => $itemId];
@@ -554,7 +601,7 @@ class Item
             $begin = new DateTime();
             $begin->setDate( // approximation
                 $row['begin_model_year'] - 1,
-                10,
+                $this->fractionToMonth($row['begin_model_year_fraction']),
                 1
             );
         } else {
@@ -578,7 +625,7 @@ class Item
             $end = new DateTime();
             $end->setDate( // approximation
                 $row['end_model_year'],
-                9,
+                $this->fractionToMonth($row['end_model_year_fraction']) - 1,
                 30
             );
         } else {
@@ -593,6 +640,9 @@ class Item
         return true;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     private function getChildVehicleTypesByWhitelist($parentId, array $whitelist): array
     {
         if (count($whitelist) <= 0) {
@@ -784,6 +834,9 @@ class Item
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function setPoint(int $itemId, $point)
     {
         $primaryKey = ['item_id' => $itemId];
@@ -898,7 +951,7 @@ class Item
         return $this->applyFilters($select, array_replace(
             ['language' => $language],
             $options
-        ), $alias . '.item_id', $alias, $language);
+        ), $alias . '.item_id', $alias);
     }
 
     private function applyParentFilters(Sql\Select $select, $options, $prefix, $language, string $id): array
@@ -1018,7 +1071,7 @@ class Item
         $subGroup = $this->applyFilters($select, array_replace(
             ['language' => $language],
             $options
-        ), $alias . '.item_id', $alias, $language);
+        ), $alias . '.item_id', $alias);
         $group = array_merge($group, $subGroup);
 
         return $group;
@@ -1145,7 +1198,7 @@ class Item
                 $subGroup = $this->applyFilters($select, array_replace(
                     ['language' => $language],
                     $options['descendant_or_self']
-                ), $alias . '.item_id', $alias, $language);
+                ), $alias . '.item_id', $alias);
                 $group = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.item_id' => $options['descendant_or_self']]);
@@ -1162,7 +1215,7 @@ class Item
                 $subGroup = $this->applyFilters($select, array_replace(
                     ['language' => $language],
                     $options['ancestor']
-                ), $alias . '.parent_id', $alias, $language);
+                ), $alias . '.parent_id', $alias);
                 $group = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.parent_id' => $options['ancestor']]);
@@ -1187,7 +1240,7 @@ class Item
                 $subGroup = $this->applyFilters($select, array_replace(
                     ['language' => $language],
                     $options['ancestor_or_self']
-                ), $alias . '.parent_id', $alias, $language);
+                ), $alias . '.parent_id', $alias);
                 $group = array_merge($group, $subGroup);
             } else {
                 $select->where([$alias . '.parent_id' => $options['ancestor_or_self']]);
@@ -1249,6 +1302,9 @@ class Item
         }
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function getNameSelect($value, string $valueType, string $language): Sql\Select
     {
         $predicate = new Sql\Predicate\Operator(
@@ -1278,6 +1334,9 @@ class Item
         return $select;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function getItemParentNameSelect(string $itemParentAlias, string $language): Sql\Select
     {
         $predicate1 = new Sql\Predicate\Operator(
@@ -1315,6 +1374,9 @@ class Item
         return $select;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getSelect(array $options): Sql\Select
     {
         $defaults = [
@@ -1384,6 +1446,7 @@ class Item
                         $columns = array_merge($columns, [
                             'begin_year', 'end_year', 'today',
                             'begin_model_year', 'end_model_year',
+                            'begin_model_year_fraction', 'end_model_year_fraction',
                             'body',
                             /*'name' => $this->getNameSelect(
                                 'item.id',
@@ -1415,7 +1478,7 @@ class Item
         $group = $this->applyFilters($select, array_replace(
             ['language' => $language],
             $recursiveOptions
-        ), 'item.id', '', $language);
+        ), 'item.id', '');
 
         if ($options['item_type_id']) {
             if (is_array($options['item_type_id'])) {
@@ -1574,6 +1637,9 @@ class Item
         return $this->getPaginator($options)->getTotalItemCount();
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getCountDistinct(array $options): int
     {
         $select = $this->getSelect($options);
@@ -1597,6 +1663,9 @@ class Item
         return (int) $row['count'];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getCountPairs(array $options): array
     {
         $select = $this->getSelect($options);
@@ -1615,6 +1684,9 @@ class Item
         return $result;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getRow(array $options)
     {
         $select = $this->getSelect($options);
@@ -1623,6 +1695,9 @@ class Item
         return $this->itemTable->selectWith($select)->current();
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function isExists(array $options): bool
     {
         $select = $this->getSelect($options);

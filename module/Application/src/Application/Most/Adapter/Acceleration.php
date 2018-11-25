@@ -25,6 +25,9 @@ class Acceleration extends AbstractAdapter
         $this->order = $value;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getCars(Sql\Select $select, $language)
     {
         $axises = [

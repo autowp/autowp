@@ -45,6 +45,7 @@ class Gearbox
             }
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $view->escapeHtml($result);
     }
 }

@@ -37,6 +37,9 @@ class UserPasswordRemind
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     */
     public function getUserId(string $token): int
     {
         $uprRow = $this->table->select([
@@ -47,6 +50,9 @@ class UserPasswordRemind
         return $uprRow ? (int)$uprRow['user_id'] : 0;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod, PhanDeprecatedFunction
+     */
     public function createToken(int $userId): string
     {
         do {

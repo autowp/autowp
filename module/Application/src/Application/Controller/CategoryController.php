@@ -467,6 +467,7 @@ class CategoryController extends AbstractActionController
                     );
 
                     $otherPictures[] = [
+                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         'name' => $this->pic()->name($pictureRow, $language),
                         'src'  => $imageInfo ? $imageInfo->getSrc() : null,
                         'url'  => $this->url()->fromRoute('categories', [
@@ -521,6 +522,7 @@ class CategoryController extends AbstractActionController
                 ->setItemCountPerPage($this->catalogue()->getPicturesPerPage())
                 ->setCurrentPageNumber($this->params('page'));
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
                 'width' => 4,
                 'url'   => function ($picture) use ($currentCategory, $isOther, $path) {
@@ -572,6 +574,7 @@ class CategoryController extends AbstractActionController
             return [
                 'breadcrumbs' => $breadcrumbs,
                 'picture'     => array_replace(
+                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $this->pic()->picPageData($picture, $filter, []),
                     [
                         'galleryUrl' => $this->url()->fromRoute('categories', [
@@ -610,6 +613,7 @@ class CategoryController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             return new JsonModel($this->pic()->gallery2($filter, [
                 'page'        => $this->params()->fromQuery('page'),
                 'pictureId'   => $this->params()->fromQuery('pictureId'),

@@ -43,6 +43,7 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
         $request = $e->getRequest();
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $hostname = $request->getUri()->getHost();
 
             $isAllowed = in_array($hostname, $this->hostnameWhitelist);
@@ -56,10 +57,14 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
         }
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function redirect(MvcEvent $e, $url)
     {
         $response = $e->getResponse();
         $response->getHeaders()->addHeaderLine('Location', $url);
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $response->setStatusCode(302);
 
         return $response;

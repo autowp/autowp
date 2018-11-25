@@ -68,11 +68,12 @@ class ModificationController extends AbstractActionController
 
     private function redirectToCar($carId, $tab = null)
     {
-        return $this->redirect($this->carModerUrl($carId, true, $tab));
+        return $this->redirect()->toUrl($this->carModerUrl($carId, true, $tab));
     }
 
     public function addAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -96,6 +97,7 @@ class ModificationController extends AbstractActionController
         ]);
 
         $request = $this->getRequest();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($request->isPost() && $form->isValid($request->getPost())) {
             $values = $form->getValues();
 
@@ -150,6 +152,7 @@ class ModificationController extends AbstractActionController
 
     public function editAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -192,6 +195,7 @@ class ModificationController extends AbstractActionController
         ]);
 
         $request = $this->getRequest();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($request->isPost() && $form->isValid($request->getPost())) {
             $values = $form->getValues();
 
@@ -247,6 +251,7 @@ class ModificationController extends AbstractActionController
 
     public function mapAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -349,6 +354,7 @@ class ModificationController extends AbstractActionController
 
     public function deleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }

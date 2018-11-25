@@ -277,9 +277,12 @@ class Pic extends AbstractPlugin
 
         $controller = $this->getController();
         $imageStorage = $controller->imageStorage();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $controller->user()->inheritsRole('pictures-moder');
         $userId = null;
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($controller->user()->logedIn()) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $user = $controller->user()->get();
             $userId = $user ? $user['id'] : null;
         }
@@ -443,6 +446,7 @@ class Pic extends AbstractPlugin
         $controller = $this->getController();
 
         $language = $controller->language();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $controller->user()->inheritsRole('moder');
 
         if ($isModer) {
@@ -520,12 +524,14 @@ class Pic extends AbstractPlugin
                     ];
                 }
 
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 if ($controller->user()->isAllowed('specifications', 'edit')) {
                     $specsEditUrl = '/ng/cars/specifications-editor?item_id=' . $item['id'];
                 }
             }
 
             $uploadUrl = null;
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($controller->user()->logedIn()) {
                 $uploadUrl = '/ng/upload?item_id=' . $item['id'];
             }
@@ -712,6 +718,7 @@ class Pic extends AbstractPlugin
             }
 
             $specsEditUrl = null;
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($controller->user()->isAllowed('specifications', 'edit')) {
                 $specsEditUrl = '/ng/cars/specifications-editor?item_id=' . $engineRow['id'];
             }
@@ -826,6 +833,9 @@ class Pic extends AbstractPlugin
         return $result;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function picPageData($picture, array $filter, $brandIds = [], array $options = [])
     {
         $options = array_replace([
@@ -838,6 +848,7 @@ class Pic extends AbstractPlugin
         $controller = $this->getController();
         $imageStorage = $controller->imageStorage();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $controller->user()->inheritsRole('moder');
 
         $brandIds = $this->itemModel->getIds([
@@ -867,9 +878,11 @@ class Pic extends AbstractPlugin
         if ($picture['replace_picture_id']) {
             $replacePictureRow = $this->picture->getRow(['id' => (int)$picture['replace_picture_id']]);
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $replacePicture = $controller->pic()->href($replacePictureRow);
 
             if ($replacePictureRow['status'] == Picture::STATUS_REMOVING) {
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 if (! $controller->user()->inheritsRole('moder')) {
                     $replacePicture = null;
                 }
@@ -1034,6 +1047,7 @@ class Pic extends AbstractPlugin
 
         $itemIds = $this->pictureItem->getPictureItems($picture['id'], PictureItem::PICTURE_CONTENT);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $controller->user()->get();
         $votes = $this->pictureVote->getVote($picture['id'], $user ? $user['id'] : null);
 
@@ -1241,7 +1255,9 @@ class Pic extends AbstractPlugin
 
         // comments
         $userId = null;
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($controller->user()->logedIn()) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $userId = $controller->user()->get()['id'];
         }
 

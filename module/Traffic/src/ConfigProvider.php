@@ -10,29 +10,9 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
-            'console'      => $this->getConsoleConfig(),
             'controllers'  => $this->getControllersConfig(),
             'dependencies' => $this->getDependencyConfig(),
             'router'       => $this->getRouterConfig(),
-            'tables'       => $this->getTablesConfig()
-        ];
-    }
-
-    public function getConsoleConfig(): array
-    {
-        return [
-            'router' => [
-                'routes' => [
-                    'traffic' => [
-                        'options' => [
-                            'route'    => 'traffic (autoban|google|gc):action',
-                            'defaults' => [
-                                'controller' => Controller\ConsoleController::class,
-                            ]
-                        ]
-                    ],
-                ]
-            ]
         ];
     }
 
@@ -40,7 +20,6 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                Controller\ConsoleController::class => Controller\ConsoleControllerFactory::class,
                 Controller\BanController::class     => Controller\BanControllerFactory::class,
             ]
         ];
@@ -94,15 +73,6 @@ class ConfigProvider
                     ]
                 ]
             ]
-        ];
-    }
-
-    public function getTablesConfig(): array
-    {
-        return [
-            'banned_ip'      => [],
-            'ip_monitoring4' => [],
-            'ip_whitelist'   => [],
         ];
     }
 }

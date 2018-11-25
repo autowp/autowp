@@ -20,6 +20,7 @@ class Log extends AbstractPlugin
 
     public function __invoke(string $message, array $objects)
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->getController()->user()->get();
         if (! $user) {
             throw new \Exception('User id not detected');

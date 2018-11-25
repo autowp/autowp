@@ -556,6 +556,9 @@ class SpecificationsService
         return isset($this->attributes[$id]) ? $this->attributes[$id] : null;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function setUserValue2(int $uid, int $attributeId, int $itemId, $value, bool $empty)
     {
         $attribute = $this->getAttribute($attributeId);
@@ -672,6 +675,9 @@ class SpecificationsService
         }
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function setUserValue(int $uid, int $attributeId, int $itemId, $value)
     {
         $attribute = $this->getAttribute($attributeId);
@@ -876,6 +882,9 @@ class SpecificationsService
         }
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function specPicture($car, $perspectives)
     {
         $order = [];
@@ -970,6 +979,9 @@ class SpecificationsService
         return $attributes;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getActualValue(int $attribute, int $itemId)
     {
         if (! $itemId) {
@@ -1431,6 +1443,8 @@ class SpecificationsService
     }
 
     /**
+     * @suppress PhanPluginMixedKeyNoKey
+     *
      * @param array $attribute
      * @param int $itemId
      * @return mixed
@@ -1508,6 +1522,9 @@ class SpecificationsService
         }
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     private function calcInheritedValue($attribute, int $itemId)
     {
         $actualValue = [
@@ -1579,6 +1596,9 @@ class SpecificationsService
         return $actualValue;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     private function setActualValue($attribute, int $itemId, array $actualValue)
     {
         $valueDataTable = $this->getValueDataTable($attribute['typeId']);
@@ -1681,6 +1701,7 @@ class SpecificationsService
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
      * @param int|array $itemId
      * @return boolean|array
      */
@@ -1719,6 +1740,9 @@ class SpecificationsService
         return $this->hasChildSpecs($groupIds);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function getSpecsCount(int $itemId): int
     {
         $select = new Sql\Select($this->valueTable->getTable());
@@ -1731,6 +1755,7 @@ class SpecificationsService
     }
 
     /**
+     * @suppress PhanUndeclaredMethod
      * @param int|array $itemId
      * @return boolean|array
      */
@@ -1803,6 +1828,9 @@ class SpecificationsService
         }
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getContributors($itemId): array
     {
         if (! $itemId) {
@@ -2259,6 +2287,9 @@ class SpecificationsService
         $this->refreshUserConflicts($affectedUserIds);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function refreshUserConflicts($userId)
     {
         $userId = (array)$userId;
@@ -2381,6 +2412,9 @@ class SpecificationsService
         $this->refreshUserConflicts($userIds);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function refreshUsersConflictsStat()
     {
         $pSelect = 'SELECT sum(weight) FROM attrs_user_values WHERE user_id = users.id AND weight > 0';

@@ -29,6 +29,7 @@ class TrafficController extends AbstractRestfulController
 
     public function listAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -53,6 +54,7 @@ class TrafficController extends AbstractRestfulController
 
     public function whitelistListAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -74,6 +76,7 @@ class TrafficController extends AbstractRestfulController
 
     public function whitelistCreateAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -83,6 +86,7 @@ class TrafficController extends AbstractRestfulController
         $ip = trim($data['ip']);
 
         if (! $ip) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             return $this->getResponse()->setStatusCode(400);
         }
 
@@ -94,22 +98,26 @@ class TrafficController extends AbstractRestfulController
                 'id' => $ip
             ])
         );*/
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
     public function whitelistItemDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $this->service->deleteFromWhitelist($this->params('ip'));
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
     public function blacklistCreateAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canBan = $this->user()->isAllowed('user', 'ban');
         if (! $canBan) {
             return $this->forbiddenAction();
@@ -126,15 +134,17 @@ class TrafficController extends AbstractRestfulController
         $this->service->ban(
             $ip,
             $data['period'] * 3600,
-            $this->user()->get()['id'],
-            $data['reason']
+            $this->user()->get()['id'], // @phan-suppress-current-line PhanUndeclaredMethod
+            (string) $data['reason']
         );
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
     public function blacklistItemDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canBan = $this->user()->isAllowed('user', 'ban');
         if (! $canBan) {
             return $this->forbiddenAction();
@@ -148,6 +158,7 @@ class TrafficController extends AbstractRestfulController
 
         $this->service->unban($ip);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 }

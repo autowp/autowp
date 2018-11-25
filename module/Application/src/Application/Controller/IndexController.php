@@ -123,6 +123,7 @@ class IndexController extends AbstractActionController
     private function itemOfDay()
     {
         $language = $this->language();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
         $itemOfDay = $this->itemOfDay->getCurrent();
@@ -143,6 +144,9 @@ class IndexController extends AbstractActionController
         return $itemOfDayInfo;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     private function factories()
     {
         $cacheKey = 'INDEX_FACTORIES_5';
@@ -194,6 +198,9 @@ class IndexController extends AbstractActionController
         return $factories;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function indexAction()
     {
         $language = $this->language();
@@ -205,6 +212,7 @@ class IndexController extends AbstractActionController
             'limit'            => 6
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $newPicturesData = $this->pic()->listData($rows, [
             'width' => 6
         ]);
@@ -288,17 +296,21 @@ class IndexController extends AbstractActionController
                 'specsService' => $this->specsService
             ]),
             'disableDescription'   => true,
-            'callback'             => function (&$item) {
-                $contribPairs = $this->specsService->getContributors([$item['id']]);
-                if ($contribPairs) {
-                    $item['contributors'] = $this->userModel->getRows([
-                        'id' => array_keys($contribPairs),
-                        'not_deleted'
-                    ]);
-                } else {
-                    $item['contributors'] = [];
+            'callback'             =>
+                /**
+                 * @suppress PhanPluginMixedKeyNoKey
+                 */
+                function (&$item) {
+                    $contribPairs = $this->specsService->getContributors([$item['id']]);
+                    if ($contribPairs) {
+                        $item['contributors'] = $this->userModel->getRows([
+                            'id' => array_keys($contribPairs),
+                            'not_deleted'
+                        ]);
+                    } else {
+                        $item['contributors'] = [];
+                    }
                 }
-            }
         ]);
 
         $cacheKey = 'INDEX_PERSONS_CONTENT_' . $language;
@@ -361,6 +373,7 @@ class IndexController extends AbstractActionController
         $path = $this->params('path');
 
         if ($path) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $uri = $this->getRequest()->getUri();
 
             $query = $uri->getQuery();

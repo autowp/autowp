@@ -26,6 +26,7 @@ class PictureView
         ';
 
         $adapter = $this->table->getAdapter();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $stmt = $adapter->query($sql);
         $stmt->execute([$pictureId]);
     }

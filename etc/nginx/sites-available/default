@@ -1,5 +1,3 @@
-limit_req_zone $binary_remote_addr zone=pictures:30m rate=1r/s;
-
 server {
     listen 80;
     listen [::]:80;
@@ -20,6 +18,7 @@ server {
 
     set_real_ip_from 127.0.0.1;
     set_real_ip_from 172.17.0.1;
+    set_real_ip_from 172.19.0.1;
     set_real_ip_from 172.20.0.1;
     real_ip_header X-Real-IP;
 
@@ -34,9 +33,6 @@ server {
     }
 
     location ^~ /pic-accel/ {
-        limit_req zone=pictures burst=20;
-        limit_rate_after 256k;
-        limit_rate 512k;
         internal;
         alias   /app/public_html/;
     }
@@ -52,7 +48,7 @@ server {
     }
 
     location /go-api/ {
-        proxy_pass http://localhost:81;
+        proxy_pass http://goautowp;
     }
 
     location / {

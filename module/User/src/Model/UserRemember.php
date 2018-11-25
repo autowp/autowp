@@ -30,6 +30,9 @@ class UserRemember
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod, PhanDeprecatedFunction
+     */
     public function createToken(int $userId): string
     {
         do {
@@ -48,6 +51,9 @@ class UserRemember
         return $token;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getUserToken(int $userId): string
     {
         $select = new Sql\Select($this->table->getTable());

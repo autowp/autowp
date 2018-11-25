@@ -89,12 +89,14 @@ class PictureNameFormatter
     public function formatHtml(array $picture, $language)
     {
         if (isset($picture['name']) && $picture['name']) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             return $this->renderer->escapeHtml($picture['name']);
         }
 
         $result = [];
         if (count($picture['items']) > 1) {
             foreach ($picture['items'] as $item) {
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $result[] = $this->renderer->escapeHtml($item['name']);
             }
             return implode(', ', $result);
@@ -104,7 +106,8 @@ class PictureNameFormatter
             $result = [];
             if ($item['perspective']) {
                 $perspective = $this->translate($item['perspective'], $language);
-                $result[] = $this->renderer->escapeHtml(self::mbUcfirst($perspective, $language));
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
+                $result[] = $this->renderer->escapeHtml(self::mbUcfirst($perspective));
             }
 
             $result[] = $this->itemNameFormatter->formatHtml($item, $language);

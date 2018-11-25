@@ -8,7 +8,6 @@ return [
             Controller\Console\BuildController::class     => Controller\Console\BuildControllerFactory::class,
             Controller\Console\CatalogueController::class => Controller\Console\Service\CatalogueControllerFactory::class,
             Controller\Console\PicturesController::class  => Controller\Console\Service\PicturesControllerFactory::class,
-            Controller\Console\RefererController::class   => Controller\Console\RefererControllerFactory::class,
             Controller\Console\SpecsController::class     => Controller\Console\Service\SpecsControllerFactory::class,
             Controller\Console\TelegramController::class  => Controller\Console\Service\TelegramControllerFactory::class
         ]
@@ -34,17 +33,9 @@ return [
                 ],
                 'pictures' => [
                     'options' => [
-                        'route'    => 'pictures (fill-point):action',
+                        'route'    => 'pictures (fill-point|df-index):action',
                         'defaults' => [
                             'controller' => Controller\Console\PicturesController::class,
-                        ]
-                    ]
-                ],
-                'referer' => [
-                    'options' => [
-                        'route'    => 'traffic (clear-referer-monitoring):action',
-                        'defaults' => [
-                            'controller' => Controller\Console\RefererController::class,
                         ]
                     ]
                 ],

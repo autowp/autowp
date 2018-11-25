@@ -212,6 +212,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
                 'width' => 6
             ]);
@@ -335,6 +336,9 @@ class CatalogueController extends AbstractActionController
         });
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     private function getBrandFactories(int $brandId)
     {
         $rows = $this->itemModel->getRows([
@@ -386,8 +390,10 @@ class CatalogueController extends AbstractActionController
 
             $language = $this->language();
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $isModer = $this->user()->inheritsRole('pictures-moder');
 
             $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_10_' . $language . '_' . $httpsFlag . '_' . (int)$isModer;
@@ -402,6 +408,7 @@ class CatalogueController extends AbstractActionController
                     'limit'  => 12
                 ]);
 
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $topPictures = $this->pic()->listData($pictureRows, [
                     'width' => 4,
                     'url'   => function ($picture) use ($brand) {
@@ -414,6 +421,7 @@ class CatalogueController extends AbstractActionController
                         ]);
 
                         if (! $row) {
+                            /* @phan-suppress-next-line PhanUndeclaredMethod */
                             return $this->pic()->url($picture['identity']);
                         }
 
@@ -423,6 +431,7 @@ class CatalogueController extends AbstractActionController
                         ]);
 
                         if (count($paths) <= 0 || $paths[0]['type'] != 'brand-item') {
+                            /* @phan-suppress-next-line PhanUndeclaredMethod */
                             return $this->pic()->url($picture['identity']);
                         }
 
@@ -471,6 +480,7 @@ class CatalogueController extends AbstractActionController
 
             $inboxPictures = null;
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($this->user()->isAllowed('picture', 'move')) {
                 $inboxPictures = $this->picture->getCountDistinct([
                     'status' => Picture::STATUS_INBOX,
@@ -481,6 +491,7 @@ class CatalogueController extends AbstractActionController
             }
 
             $requireAttention = 0;
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $isModerator = $this->user()->inheritsRole('moder');
             if ($isModerator) {
                 $requireAttention = $this->getItemModerAttentionCount($brand['id']);
@@ -859,6 +870,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
                 'width' => 4,
                 'url'   => function ($row) {
@@ -896,11 +908,12 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandAction(function ($brand) use ($type) {
 
-            $filter = $this->typePicturesFilter($brand['id'], $type, false);
+            $filter = $this->typePicturesFilter($brand['id'], $type);
 
             return $this->pictureAction($filter, function (array $filter, $picture) use ($brand, $type) {
                 return [
                     'picture'     => array_replace(
+                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $this->pic()->picPageData($picture, $filter),
                         [
                             'galleryUrl' => $this->url()->fromRoute('catalogue', [
@@ -933,7 +946,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandAction(function ($brand) use ($type) {
 
-            $filter = $this->typePicturesFilter($brand['id'], $type, false);
+            $filter = $this->typePicturesFilter($brand['id'], $type);
 
             switch ($this->params('gallery')) {
                 case 'inbox':
@@ -947,6 +960,7 @@ class CatalogueController extends AbstractActionController
                     break;
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             return new JsonModel($this->pic()->gallery2($filter, [
                 'page'      => $this->params()->fromQuery('page'),
                 'pictureId' => $this->params()->fromQuery('pictureId'),
@@ -1223,6 +1237,7 @@ class CatalogueController extends AbstractActionController
             $currentPictures = [];
             $currentPicturesCount = 0;
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $canAcceptPicture = $this->user()->isAllowed('picture', 'accept');
 
             $inboxCount = 0;
@@ -1231,6 +1246,7 @@ class CatalogueController extends AbstractActionController
             }
 
             $requireAttention = 0;
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $isModerator = $this->user()->inheritsRole('moder');
             if ($isModerator) {
                 $requireAttention = $this->getItemModerAttentionCount($currentCarId);
@@ -1394,6 +1410,9 @@ class CatalogueController extends AbstractActionController
             ->limit(1);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getModgroupPictureList(int $carId, int $modId, array $perspectiveGroupIds)
     {
         $pictures = [];
@@ -1469,6 +1488,7 @@ class CatalogueController extends AbstractActionController
             if ($picture) {
                 $format = 'picture-thumb';
 
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $url = $this->pic()->href($picture);
 
                 /*if ($urlCallback) {
@@ -1555,6 +1575,8 @@ class CatalogueController extends AbstractActionController
                 'end_month'        => $modification['end_month'],
                 'begin_model_year' => $modification['begin_model_year'],
                 'end_model_year'   => $modification['end_model_year'],
+                'begin_model_year_fraction' => $modification['begin_model_year_fraction'],
+                'end_model_year_fraction'   => $modification['end_model_year_fraction'],
                 'today'            => $modification['today']
             ];
             foreach ($nameParams as $key => &$nameParam) {
@@ -1576,6 +1598,7 @@ class CatalogueController extends AbstractActionController
             ];
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canAcceptPicture = $this->user()->isAllowed('picture', 'accept');
 
         $inboxCount = 0;
@@ -1584,6 +1607,7 @@ class CatalogueController extends AbstractActionController
         }
 
         $requireAttention = 0;
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModerator = $this->user()->inheritsRole('moder');
         if ($isModerator) {
             $requireAttention = $this->getItemModerAttentionCount($currentCarId);
@@ -1605,7 +1629,7 @@ class CatalogueController extends AbstractActionController
             'inboxCount'       => $inboxCount,
             'requireAttention' => $requireAttention,
             'hasHtml'          => $hasHtml,
-            'isCarModer'       => $this->user()->inheritsRole('cars-moder')
+            'isCarModer'       => $this->user()->inheritsRole('cars-moder') // @phan-suppress-current-line PhanUndeclaredMethod
         ];
     }
 
@@ -1678,6 +1702,7 @@ class CatalogueController extends AbstractActionController
                 );
 
                 $currentPictures[] = [
+                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     'name' => $this->pic()->name($pictureRow, $language),
                     'src'  => $imageInfo ? $imageInfo->getSrc() : null,
                     'url'  => $this->url()->fromRoute('catalogue', [
@@ -1694,6 +1719,7 @@ class CatalogueController extends AbstractActionController
             $currentPicturesCount = $pPaginator->getTotalItemCount();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canAcceptPicture = $this->user()->isAllowed('picture', 'accept');
 
         $inboxCount = 0;
@@ -1702,6 +1728,7 @@ class CatalogueController extends AbstractActionController
         }
 
         $requireAttention = 0;
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModerator = $this->user()->inheritsRole('moder');
         if ($isModerator) {
             $requireAttention = $this->getItemModerAttentionCount($currentCarId);
@@ -1860,6 +1887,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
                 'width' => 4,
                 'url'   => function ($row) use ($brand, $brandItemCatname, $path, $exact) {
@@ -1901,9 +1929,11 @@ class CatalogueController extends AbstractActionController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
 
         if ($picture['status'] == Picture::STATUS_REMOVING) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();
@@ -1958,6 +1988,7 @@ class CatalogueController extends AbstractActionController
                 return [
                     'breadcrumbs' => $breadcrumbs,
                     'picture'     => array_replace(
+                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $this->pic()->picPageData($picture, $filter),
                         [
                             'galleryUrl' => $this->url()->fromRoute('catalogue', [
@@ -2002,6 +2033,7 @@ class CatalogueController extends AbstractActionController
                     break;
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             return new JsonModel($this->pic()->gallery2($filter, [
                 'page'      => $this->params()->fromQuery('page'),
                 'pictureId' => $this->params()->fromQuery('pictureId'),

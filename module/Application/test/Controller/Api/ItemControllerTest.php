@@ -18,6 +18,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -55,6 +58,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function setEngineToVehicle($engineId, $vehicleId)
     {
         $this->reset();
@@ -75,6 +81,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('put');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getRandomBrand()
     {
         $this->reset();
@@ -98,6 +107,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return $json['items'][0];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addItemParent($itemId, $parentId, array $params = [])
     {
         $this->reset();
@@ -128,7 +140,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
-                $tables->get('df_hash'),
+                $serviceManager->get('RabbitMQ'),
                 $tables->get('df_distance')
             ])
             ->getMock();
@@ -138,6 +150,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($vehicleId)
     {
         $this->reset();
@@ -148,12 +163,14 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $request->getHeaders()
             ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getFiles()->fromArray([
             'file' => [
                 'tmp_name' => $file,
@@ -181,6 +198,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return $pictureId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function setPerspective($pictureId, $itemId, $perspectiveId)
     {
         $this->reset();
@@ -201,6 +221,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('update');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function acceptPicture($pictureId)
     {
         $this->reset();
@@ -219,6 +242,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('update');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getItemParent($itemId, $parentId)
     {
         $this->reset();
@@ -238,6 +264,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testEngineUnderTheHoodPreviews()
     {
         $vehicleId = $this->createVehicle();
@@ -274,6 +303,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($json);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCarAndAddToBrand()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -318,6 +350,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testTree()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -330,6 +365,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('tree');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateBrand()
     {
         $catname = 'test-brand-' . (10000 * microtime(true));
@@ -395,6 +433,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testBlacklistedCatnameNotAllowedManually()
     {
         $parentVehicleId = $this->createVehicle([
@@ -433,6 +474,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertNotEquals('sport', $json['catname']);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testSubscription()
     {
         $brand = $this->getRandomBrand();
@@ -485,6 +529,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertEquals('sedan', $itemParent['catname']);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testItemPoint()
     {
         $itemId = $this->createItem([
@@ -512,6 +559,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         $this->assertSame(-15, $json['lng']);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testEngineVehicles()
     {
         $engineId = $this->createItem([
@@ -558,6 +608,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
         }
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testFields()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

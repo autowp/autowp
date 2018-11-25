@@ -12,6 +12,9 @@ class UserControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testDelete()
     {
         $email = 'test'.microtime(true).'@example.com';

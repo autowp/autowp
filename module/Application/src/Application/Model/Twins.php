@@ -32,6 +32,8 @@ class Twins
     }
 
     /**
+     * @suppress PhanDeprecatedFunction
+     *
      * @param array $options
      * @return array
      */
@@ -70,6 +72,8 @@ class Twins
     }
 
     /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     *
      * @param array $groupId
      * @return array
      */

@@ -136,9 +136,7 @@ class ListBuilder
             return false;
         }
 
-        $cataloguePaths = $this->getCataloguePath($item, [
-            'toBrand' => true
-        ]);
+        $cataloguePaths = $this->getCataloguePath($item);
         foreach ($cataloguePaths as $path) {
             return $this->router->assemble([
                 'action'        => 'brand-item-specifications',

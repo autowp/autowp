@@ -13,6 +13,7 @@ class ForbiddenAction extends AbstractPlugin
         $routeMatch = $event->getRouteMatch();
         $routeMatch->setParam('action', 'forbidden');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $event->getResponse()->setStatusCode(403);
 
         $model = new ViewModel(['content' => 'Forbidden']);

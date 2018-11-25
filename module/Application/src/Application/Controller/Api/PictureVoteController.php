@@ -28,6 +28,7 @@ class PictureVoteController extends AbstractRestfulController
      */
     public function update($id, $data)
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->forbiddenAction();
@@ -37,6 +38,7 @@ class PictureVoteController extends AbstractRestfulController
 
         $this->model->vote($id, $currentUser['id'], $value);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(200);
 
         return new JsonModel($this->model->getVote($id, $currentUser['id']));

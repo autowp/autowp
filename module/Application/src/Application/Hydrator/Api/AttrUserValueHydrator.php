@@ -119,8 +119,7 @@ class AttrUserValueHydrator extends RestHydrator
             $value = $this->specService->getUserValue2(
                 $object['attribute_id'],
                 $object['item_id'],
-                $object['user_id'],
-                $this->language
+                $object['user_id']
             );
             $result['value'] = $value['value'];
             $result['empty'] = $value['empty'];

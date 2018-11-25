@@ -7,13 +7,15 @@ use Zend\Http\Request;
 use Application\Test\AbstractHttpControllerTestCase;
 
 use Application\Controller\Api\ItemController;
-use Application\Controller\CarsController;
 use Application\Controller\Api\AttrController;
 
 class CarsControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -35,6 +37,9 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testSelectCarEngine()
     {
         // create engine
@@ -84,6 +89,9 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('put');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCarsSpecificationsEditor()
     {
         $this->reset();

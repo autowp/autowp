@@ -199,6 +199,7 @@ class AttrController extends AbstractRestfulController
 
     public function conflictIndexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -234,12 +235,14 @@ class AttrController extends AbstractRestfulController
 
     public function userValueIndexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -313,6 +316,7 @@ class AttrController extends AbstractRestfulController
 
     public function userValueItemDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forbiddenAction();
         }
@@ -323,17 +327,20 @@ class AttrController extends AbstractRestfulController
 
         $this->specsService->deleteUserValue($attributeId, $itemId, $userId);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
     public function userValuePatchAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -454,11 +461,16 @@ class AttrController extends AbstractRestfulController
             }
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function attributePostAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -470,6 +482,7 @@ class AttrController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -510,17 +523,20 @@ class AttrController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
     public function attributeItemGetAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -550,12 +566,14 @@ class AttrController extends AbstractRestfulController
 
     public function attributeIndexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -592,12 +610,14 @@ class AttrController extends AbstractRestfulController
 
     public function valueIndexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -676,6 +696,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function attributeItemPatchAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {
@@ -788,6 +811,7 @@ class AttrController extends AbstractRestfulController
             }
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -827,6 +851,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function zoneAttributePostAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {
@@ -838,6 +865,7 @@ class AttrController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -863,11 +891,13 @@ class AttrController extends AbstractRestfulController
             'position'     => $maxPosition + 1
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
     public function zoneAttributeItemDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -880,17 +910,20 @@ class AttrController extends AbstractRestfulController
             'attribute_id' => $attributeId
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
     public function attributeTypeIndexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -910,12 +943,14 @@ class AttrController extends AbstractRestfulController
 
     public function unitIndexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -927,12 +962,14 @@ class AttrController extends AbstractRestfulController
 
     public function listOptionIndexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -952,6 +989,9 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function listOptionPostAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {
@@ -963,6 +1003,7 @@ class AttrController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -989,6 +1030,7 @@ class AttrController extends AbstractRestfulController
             'position'      => 1 + $max
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 }

@@ -43,6 +43,7 @@ class VotingController extends AbstractRestfulController
         $id = (int)$this->params('id');
         $filter = (int)$this->params()->fromQuery('filter');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $data = $this->service->getVoting($id, $filter, $user ? (int)$user['id'] : 0);
@@ -88,6 +89,7 @@ class VotingController extends AbstractRestfulController
 
     public function patchItemAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return $this->forbiddenAction();
@@ -107,6 +109,7 @@ class VotingController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

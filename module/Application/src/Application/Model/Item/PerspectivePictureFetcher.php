@@ -80,6 +80,9 @@ class PerspectivePictureFetcher extends PictureFetcher
         return $this;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function fetch($item, array $options = [])
     {
         $pictures = [];

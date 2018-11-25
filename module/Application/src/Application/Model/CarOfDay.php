@@ -128,6 +128,7 @@ class CarOfDay
             LIMIT 1
         ';
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $resultSet = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, 5]);
         $row = $resultSet->current();
 
@@ -149,6 +150,9 @@ class CarOfDay
         return false;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getCurrent()
     {
         $select = $this->table->getSql()->select();
@@ -445,6 +449,9 @@ class CarOfDay
         print 'ok' . PHP_EOL;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function getNextDates()
     {
         $now = new DateTime();
@@ -587,6 +594,9 @@ class CarOfDay
         ];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getOrientedPictureList(int $itemId)
     {
         $perspectivesGroupIds = $this->perspective->getPageGroupIds(5);
@@ -805,6 +815,7 @@ class CarOfDay
             HAVING p_count >= ?
             LIMIT 1
         ';
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $resultSet = $this->table->getAdapter()->query($sql, [Picture::STATUS_ACCEPTED, $itemId, 3]);
         $row = $resultSet->current();
 

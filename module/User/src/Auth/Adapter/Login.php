@@ -42,6 +42,9 @@ class Login implements AdapterInterface
         $this->credentialExpr = $credentialExpr;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function authenticate()
     {
         $this->authenticateSetup();

@@ -60,7 +60,6 @@ class Power extends AbstractAdapter
             $volume = $specService->getActualValue($this->attributes['volume'], $car['id']);
             $cylindersLayout = $specService->getActualValueText(
                 $this->attributes['cylindersLayout'],
-                1,
                 $car['id'],
                 $language
             );

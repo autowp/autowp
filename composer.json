@@ -19,7 +19,8 @@
 		"ext-json" : "*",
 		"ext-intl" : "*",
 		"ext-gd" : "*",
-		"ext-fileinfo" : "*",
+        "ext-fileinfo" : "*",
+        "ext-bcmath": "*",
 		"irazasyed/telegram-bot-sdk" : "^2.2.0",
 		"phayes/geophp" : "^1.2",
 		"michelf/php-markdown" : "^1.8.0",
@@ -46,7 +47,6 @@
 		"zendframework/zend-view" : ">=2.10.0",
 		"zfcampus/zf-oauth2" : "^1.4.0",
 		"autowp/image" : "^3.0.2",
-		"jenssegers/imagehash" : "^0.4.1",
 		"facebook/graph-sdk" : "^5.4",
 		"zendframework/zend-hydrator" : "^2.4.0",
 		"autowp/cron" : "^0.1.1",
@@ -54,7 +54,8 @@
 		"zendframework/zend-inputfilter" : ">=2.8.2",
 		"league/oauth1-client" : "^1.7",
 		"google/recaptcha" : "^1.1.3",
-		"rollbar/rollbar": "^1.5.3"
+		"rollbar/rollbar": "^1.5.3",
+		"php-amqplib/php-amqplib": "^2.7"
 	},
 	"autoload" : {
 		"psr-4" : {
@@ -75,7 +76,9 @@
 		"codeclimate/php-test-reporter" : "^0.4",
 		"zendframework/zend-coding-standard" : "~1.0.0",
 		"phpmd/phpmd" : "^2.6",
-		"onesky/api-library-php5" : "^1.0"
+		"onesky/api-library-php5" : "^1.0",
+		"wapmorgan/php-code-fixer": "dev-master",
+		"phan/phan": "^1.1"
 	},
 	"autoload-dev" : {
 		"psr-4" : {

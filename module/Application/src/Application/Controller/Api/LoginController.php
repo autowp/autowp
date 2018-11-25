@@ -107,6 +107,7 @@ class LoginController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -137,6 +138,7 @@ class LoginController extends AbstractRestfulController
 
 
         if ($values['remember']) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $token = $this->userRemember->createToken($this->user()->get()['id']);
 
             $this->service->setRememberCookie($token, $this->language());
@@ -144,6 +146,7 @@ class LoginController extends AbstractRestfulController
             $this->service->clearRememberCookie($this->language());
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -153,6 +156,7 @@ class LoginController extends AbstractRestfulController
         $auth->clearIdentity();
         $this->service->clearRememberCookie($this->language());
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
@@ -190,8 +194,12 @@ class LoginController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function startAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->user()->logedIn()) {
             return $this->redirect()->toUrl($this->url()->fromRoute('login'));
         }
@@ -276,6 +284,7 @@ class LoginController extends AbstractRestfulController
                     throw new Exception("Account `{$stateRow['user_id']}` not found");
                 }
             } else {
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $ip = $this->getRequest()->getServer('REMOTE_ADDR');
                 if (! $ip) {
                     $ip = '127.0.0.1';

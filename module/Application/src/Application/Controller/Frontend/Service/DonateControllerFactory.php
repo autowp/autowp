@@ -14,13 +14,6 @@ class DonateControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $container->get('Config');
-        return new Controller(
-            $container->get(\Application\Model\CarOfDay::class),
-            $config['yandex'],
-            $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\ItemParent::class),
-            $container->get(\Application\Model\Brand::class)
-        );
+        return new Controller();
     }
 }

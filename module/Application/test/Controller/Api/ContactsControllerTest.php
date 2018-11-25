@@ -13,6 +13,9 @@ class ContactsControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateDeleteContact()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

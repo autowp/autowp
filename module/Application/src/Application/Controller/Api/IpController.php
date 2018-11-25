@@ -30,6 +30,7 @@ class IpController extends AbstractRestfulController
 
     public function itemAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -42,6 +43,7 @@ class IpController extends AbstractRestfulController
 
         $data = $this->itemInputFilter->getValues();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->hydrator->setOptions([

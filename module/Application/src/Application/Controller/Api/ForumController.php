@@ -95,6 +95,7 @@ class ForumController extends AbstractRestfulController
 
     public function userSummaryAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -108,9 +109,11 @@ class ForumController extends AbstractRestfulController
 
     public function getThemesAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModerator = $this->user()->inheritsRole('moder');
 
         $this->themeListInputFilter->setData($this->params()->fromQuery());
@@ -150,6 +153,9 @@ class ForumController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getThemeAction()
     {
         $isModerator = $this->user()->inheritsRole('moder');
@@ -174,6 +180,7 @@ class ForumController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
@@ -189,6 +196,7 @@ class ForumController extends AbstractRestfulController
 
     public function getTopicsAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
@@ -263,11 +271,13 @@ class ForumController extends AbstractRestfulController
 
     public function putTopicAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return $this->forbiddenAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
 
         $row = $this->forums->getTopic((int)$this->params('id'));
@@ -332,11 +342,13 @@ class ForumController extends AbstractRestfulController
             }
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
     private function needWait()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if ($user) {
             $nextMessageTime = $this->userModel->getNextMessageTime($user['id']);
@@ -348,6 +360,9 @@ class ForumController extends AbstractRestfulController
         return false;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function postTopicAction()
     {
         $user = $this->user()->get();
@@ -359,6 +374,7 @@ class ForumController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -398,6 +414,7 @@ class ForumController extends AbstractRestfulController
 
         $data['user_id'] = $user['id'];
         $data['theme_id'] = $theme['id'];
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $data['ip'] = $request->getServer('REMOTE_ADDR');
 
         $topicId = $this->forums->addTopic($data);
@@ -415,9 +432,13 @@ class ForumController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getTopicAction()
     {
         $this->topicGetInputFilter->setData($this->params()->fromQuery());

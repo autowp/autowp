@@ -25,7 +25,7 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
-                $tables->get('df_hash'),
+                $serviceManager->get('RabbitMQ'),
                 $tables->get('df_distance')
             ])
             ->getMock();
@@ -35,6 +35,9 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($itemId)
     {
         $this->reset();
@@ -45,12 +48,14 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         $request->getHeaders()
             ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
         $filename = '640x480.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getFiles()->fromArray([
             'file' => [
                 'tmp_name' => $file,
@@ -77,6 +82,9 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         return $pictureId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -98,6 +106,9 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addItemParent($itemId, $parentId, array $params = [])
     {
         $this->reset();
@@ -119,6 +130,9 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('post');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getRandomBrand()
     {
         $this->reset();
@@ -152,6 +166,9 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('twins');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testGroup()
     {
         $groupName = 'Daihatsu / Toyota Cordoba';

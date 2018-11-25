@@ -125,6 +125,7 @@ class UserController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->listInputFilter->setData($this->params()->fromQuery());
@@ -187,6 +188,7 @@ class UserController extends AbstractRestfulController
 
         $data = $this->itemInputFilter->getValues();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $id = $this->params('id');
@@ -214,6 +216,7 @@ class UserController extends AbstractRestfulController
 
     public function putAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -278,6 +281,7 @@ class UserController extends AbstractRestfulController
         $values = $this->putInputFilter->getValues();
 
         if (array_key_exists('deleted', $values)) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $can = $this->user()->isAllowed('user', 'delete');
 
             if (! $can) {
@@ -424,12 +428,13 @@ class UserController extends AbstractRestfulController
             $this->userService->setPassword($row, $values['password']);
         }
 
-
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
     public function deletePhotoAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $id = $this->params('id');
@@ -445,6 +450,7 @@ class UserController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $can = $this->user()->isAllowed('user', 'ban');
         if (! $can) {
             return $this->forbiddenAction();
@@ -468,15 +474,20 @@ class UserController extends AbstractRestfulController
             'users' => $row['id']
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function postAction()
     {
         $request = $this->getRequest();
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -492,6 +503,7 @@ class UserController extends AbstractRestfulController
                     $captchaResponse = (string)$data['captcha'];
                 }
 
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
 
                 if (! $result->isSuccess()) {
@@ -517,6 +529,7 @@ class UserController extends AbstractRestfulController
 
         $values = $this->postInputFilter->getValues();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $ip = $request->getServer('REMOTE_ADDR');
         if (! $ip) {
             $ip = '127.0.0.1';
@@ -534,6 +547,7 @@ class UserController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -590,6 +604,7 @@ class UserController extends AbstractRestfulController
 
     public function postPhotoAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -606,7 +621,7 @@ class UserController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $data = $this->getRequest()->getFiles()->toArray();
+        $data = $this->getRequest()->getFiles()->toArray(); // @phan-suppress-current-line PhanUndeclaredMethod
 
         $this->postPhotoInputFilter->setData($data);
         if (! $this->postPhotoInputFilter->isValid()) {
@@ -641,6 +656,7 @@ class UserController extends AbstractRestfulController
             $imageStorage->removeImage($oldImageId);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
@@ -650,6 +666,7 @@ class UserController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -660,6 +677,7 @@ class UserController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(400, 'Code is invalid'));
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->logedIn()) {
             $adapter = new IdAuthAdapter($this->userModel);
             $adapter->setIdentity($user['id']);
@@ -667,6 +685,7 @@ class UserController extends AbstractRestfulController
             $auth->authenticate($adapter);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

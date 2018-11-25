@@ -48,6 +48,7 @@ class Wheel
             );
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $view->escapeHtml($diskName) . '<br />' . $view->escapeHtml($tyreName);
     }
 }

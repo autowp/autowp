@@ -124,6 +124,9 @@ class ForumThemeHydrator extends RestHydrator
         return $this;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     */
     public function extract($object)
     {
         $result = [

@@ -189,10 +189,15 @@ class ItemController extends AbstractRestfulController
         }
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $params = $this->params()->fromQuery();
@@ -701,8 +706,12 @@ class ItemController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function alphaAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -740,6 +749,7 @@ class ItemController extends AbstractRestfulController
 
     public function itemAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->itemInputFilter->setData($this->params()->fromQuery());
@@ -871,6 +881,20 @@ class ItemController extends AbstractRestfulController
                     ['name' => 'Digits']
                 ]
             ],
+            'begin_model_year_fraction' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => ['¼', '½', '¾']
+                        ]
+                    ]
+                ]
+            ],
             'end_model_year' => [
                 'required' => false,
                 'filters'  => [
@@ -878,6 +902,20 @@ class ItemController extends AbstractRestfulController
                 ],
                 'validators' => [
                     ['name' => 'Digits']
+                ]
+            ],
+            'end_model_year_fraction' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => ['¼', '½', '¾']
+                        ]
+                    ]
                 ]
             ],
             'begin_year' => [
@@ -991,6 +1029,7 @@ class ItemController extends AbstractRestfulController
             unset($spec['is_concept']);
             unset($spec['produced'], $spec['produced_exactly']);
             unset($spec['begin_model_year'], $spec['end_model_year']);
+            unset($spec['begin_model_year_fraction'], $spec['end_model_year_fraction']);
             unset($spec['spec_id']);
             unset($spec['body']);
         }
@@ -1000,6 +1039,9 @@ class ItemController extends AbstractRestfulController
         return $factory->createInputFilter($spec);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function postAction()
     {
         if (! $this->user()->isAllowed('car', 'add')) {
@@ -1012,6 +1054,7 @@ class ItemController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -1104,6 +1147,14 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('end_model_year', $values)) {
             $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
+        }
+
+        if (array_key_exists('begin_model_year_fraction', $values)) {
+            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction'] ? $values['begin_model_year_fraction'] : null;
+        }
+
+        if (array_key_exists('end_model_year_fraction', $values)) {
+            $set['end_model_year_fraction'] = $values['end_model_year_fraction'] ? $values['end_model_year_fraction'] : null;
         }
 
         if (array_key_exists('is_concept', $values)) {
@@ -1206,11 +1257,13 @@ class ItemController extends AbstractRestfulController
         ]);
         $this->getResponse()->getHeaders()->addHeaderLine('Location', $url);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
     public function putAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
@@ -1220,6 +1273,7 @@ class ItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $request = $this->getRequest();
@@ -1336,6 +1390,18 @@ class ItemController extends AbstractRestfulController
             $set['end_model_year'] = $values['end_model_year'] ? $values['end_model_year'] : null;
         }
 
+        if (array_key_exists('begin_model_year_fraction', $values)) {
+            $notifyMeta = true;
+            $subscribe = true;
+            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction'] ? $values['begin_model_year_fraction'] : null;
+        }
+
+        if (array_key_exists('end_model_year_fraction', $values)) {
+            $notifyMeta = true;
+            $subscribe = true;
+            $set['end_model_year_fraction'] = $values['end_model_year_fraction'] ? $values['end_model_year_fraction'] : null;
+        }
+
         if (array_key_exists('is_concept', $values)) {
             $notifyMeta = true;
             $subscribe = true;
@@ -1404,10 +1470,12 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('engine_id', $values)) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
                 return $this->forbiddenAction();
             }
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if (! $this->user()->isAllowed('specifications', 'edit')) {
                 return $this->forbiddenAction();
             }
@@ -1427,6 +1495,7 @@ class ItemController extends AbstractRestfulController
                     'items' => $item['id']
                 ]);
 
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $user = $this->user()->get();
 
                 foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
@@ -1463,6 +1532,7 @@ class ItemController extends AbstractRestfulController
                         'items' => $item['id']
                     ]);
 
+                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $user = $this->user()->get();
 
                     foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
@@ -1574,6 +1644,7 @@ class ItemController extends AbstractRestfulController
                 'items' => $item['id']
             ]);
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $user = $this->user()->get();
             foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
                 if ($subscriber && ($subscriber['id'] != $user['id'])) {
@@ -1598,6 +1669,7 @@ class ItemController extends AbstractRestfulController
             }
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -1669,6 +1741,8 @@ class ItemController extends AbstractRestfulController
             'is_group'         => ['bool', 'moder/vehicle/changes/is-group-%s-%s'],
             'begin_model_year' => ['int', 'moder/vehicle/changes/model-years/from-%s-%s'],
             'end_model_year'   => ['int', 'moder/vehicle/changes/model-years/to-%s-%s'],
+            'begin_model_year_fraction' => ['int', 'moder/vehicle/changes/model-years-fraction/from-%s-%s'],
+            'end_model_year_fraction'   => ['int', 'moder/vehicle/changes/model-years-fraction/to-%s-%s'],
             'spec_id'          => ['spec_id', 'moder/vehicle/changes/spec-%s-%s'],
             //'vehicle_type_id'  => ['vehicle_type_id', 'moder/vehicle/changes/car-type-%s-%s']
         ];
@@ -1728,6 +1802,7 @@ class ItemController extends AbstractRestfulController
 
     public function getLogoAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -1748,6 +1823,7 @@ class ItemController extends AbstractRestfulController
 
     public function postLogoAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('brand', 'logo')) {
             return $this->forbiddenAction();
         }
@@ -1759,7 +1835,7 @@ class ItemController extends AbstractRestfulController
 
         $data = array_merge(
             $this->params()->fromPost(),
-            $this->getRequest()->getFiles()->toArray()
+            $this->getRequest()->getFiles()->toArray() // @phan-suppress-current-line PhanUndeclaredMethod
         );
 
         $this->itemLogoPutFilter->setData($data);
@@ -1791,6 +1867,7 @@ class ItemController extends AbstractRestfulController
             'items' => $item['id']
         ]);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
@@ -1824,6 +1901,7 @@ class ItemController extends AbstractRestfulController
 
     public function treeAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -1840,6 +1918,7 @@ class ItemController extends AbstractRestfulController
 
     public function refreshInheritanceAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forbiddenAction();
         }
@@ -1853,11 +1932,13 @@ class ItemController extends AbstractRestfulController
 
         $this->specsService->updateActualValues($item['id']);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 
     public function specificationsAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }

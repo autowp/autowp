@@ -24,6 +24,7 @@ class HotlinksController extends AbstractRestfulController
 
     public function hostsAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'view')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -35,28 +36,33 @@ class HotlinksController extends AbstractRestfulController
 
     public function hostsDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
         $this->referer->flush();
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
     public function hostDeleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
         $this->referer->flushHost((string)$this->params('host'));
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
     public function whitelistPostAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
@@ -71,11 +77,13 @@ class HotlinksController extends AbstractRestfulController
 
         $this->referer->addToWhitelist($host);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
     public function blacklistPostAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
@@ -90,6 +98,7 @@ class HotlinksController extends AbstractRestfulController
 
         $this->referer->addToBlacklist($host);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 }

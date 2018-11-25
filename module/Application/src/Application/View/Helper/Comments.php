@@ -30,6 +30,7 @@ class Comments extends AbstractHelper
         $type = (int)$options['type'];
         $item = (int)$options['item_id'];
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->view->user()->get();
 
         $comments = $this->comments->get($type, $item, $user ? $user['id'] : 0);
@@ -39,6 +40,7 @@ class Comments extends AbstractHelper
         }
 
         $canAddComments = (bool)$user;
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canRemoveComments = $this->view->user()->isAllowed('comment', 'remove');
 
         $form = null;
@@ -56,6 +58,7 @@ class Comments extends AbstractHelper
             $this->comments->markSubscriptionAwaiting($type, $item, $user['id']);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->view->partial('application/comments/comments', [
             'comments'          => $comments,
             'itemId'            => $item,

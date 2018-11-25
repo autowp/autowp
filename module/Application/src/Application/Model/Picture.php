@@ -11,7 +11,6 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Math\Rand;
 use Zend\Paginator;
 
-use Autowp\Image;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 use Application\Model\Item as ItemModel;
@@ -344,6 +343,9 @@ class Picture
         $select->columns($result);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getSelect(array $options)
     {
         $defaults = [
@@ -800,6 +802,9 @@ class Picture
         return $this->getPaginator($options)->getTotalItemCount();
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getCountDistinct(array $options): int
     {
         $select = $this->getSelect($options);
@@ -823,6 +828,9 @@ class Picture
         return (int) $row['count'];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getRow(array $options)
     {
         $select = $this->getSelect($options);
@@ -831,6 +839,9 @@ class Picture
         return $this->table->selectWith($select)->current();
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function isExists(array $options): bool
     {
         $select = $this->getSelect($options);
@@ -873,6 +884,9 @@ class Picture
         return $this->table;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getFileNamePattern(int $pictureId): string
     {
         $result = rand(1, 9999);
@@ -881,16 +895,25 @@ class Picture
 
         $select = new Sql\Select($this->itemTable->getTable());
         $select
-            ->join('picture_item', 'item.id = picture_item.item_id', [])
+            ->columns(['id', 'name', 'item_type_id'])
+            ->join('picture_item', 'item.id = picture_item.item_id', ['type'])
             ->where(['picture_item.picture_id' => $pictureId])
-            ->limit(1);
+            ->order([new Sql\Expression('picture_item.type = ? DESC', PictureItem::PICTURE_CONTENT)])
+            ->limit(3);
 
-        $cars = [];
+        $items = [];
         foreach ($this->itemTable->selectWith($select) as $itemRow) {
-            $cars[] = $itemRow;
+            $items[] = $itemRow;
         }
 
-        if (count($cars) > 1) {
+        $primaryItems = [];
+        foreach ($items as $item) {
+            if ($item['type'] == PictureItem::PICTURE_CONTENT) {
+                $primaryItems[] = $item;
+            }
+        }
+
+        if (count($primaryItems) > 1) {
             $select = new Sql\Select($this->itemTable->getTable());
             $select
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', [])
@@ -910,11 +933,19 @@ class Picture
             sort($f, SORT_STRING);
 
             $brandsFolder = implode('/', $f);
-            $firstChar = mb_substr($brandsFolder, 0, 1);
 
-            $result = $firstChar . '/' . $brandsFolder .'/mixed';
-        } elseif (count($cars) == 1) {
-            $car = $cars[0];
+            $parts = [];
+            foreach ($primaryItems as $item) {
+                $parts[] = $filenameFilter->filter($item['name']);
+            }
+            $itemCatname = implode('/', $parts);
+            $itemFilename = implode('_', $parts);
+
+            $result = ($brandsFolder ? $brandsFolder . '/' : '') . $itemCatname . '/' . $itemFilename;
+            $firstChar = mb_substr($result, 0, 1);
+            $result = $firstChar . '/' . $result;
+        } elseif (count($primaryItems) == 1) {
+            $car = $primaryItems[0];
 
             $carCatname = $filenameFilter->filter($car['name']);
 
@@ -975,6 +1006,14 @@ class Picture
                     $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
                 }
             }
+        } elseif (count($items) > 0) {
+            $parts = [];
+            foreach ($items as $item) {
+                $parts[] = $filenameFilter->filter($item['name']);
+            }
+            $folder = implode('/', $parts);
+            $firstChar = mb_substr($folder, 0, 1);
+            $result = $firstChar . '/' . $folder;
         }
 
         $result = str_replace('//', '/', $result);
@@ -1004,6 +1043,9 @@ class Picture
         return $votes <= 0;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function accept(int $pictureId, int $userId, &$isFirstTimeAccepted): bool
     {
         $primaryKey = ['id' => $pictureId];
@@ -1051,6 +1093,9 @@ class Picture
         return Rand::getString(1, $alpha) . Rand::getString(self::IDENTITY_LENGTH - 1, $alpha . $number);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function getTotalPicturesSize(): int
     {
         $select = $this->table->getSql()->select();
@@ -1059,6 +1104,9 @@ class Picture
         return $row ? (int)$row['sum'] : 0;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getNameData($rows, array $options = [])
     {
         $result = [];
@@ -1090,6 +1138,7 @@ class Picture
             $columns = [
                 'id',
                 'begin_model_year', 'end_model_year',
+                'begin_model_year_fraction', 'end_model_year_fraction',
                 'body',
                 'name' => new Sql\Expression('(' . $subSelect . ')'),
                 'begin_year', 'end_year', 'today',
@@ -1111,6 +1160,8 @@ class Picture
                 $data = [
                     'begin_model_year' => $row['begin_model_year'],
                     'end_model_year'   => $row['end_model_year'],
+                    'begin_model_year_fraction' => $row['begin_model_year_fraction'],
+                    'end_model_year_fraction'   => $row['end_model_year_fraction'],
                     'spec'             => $row['spec'],
                     'spec_full'        => $row['spec_full'],
                     'body'             => $row['body'],
@@ -1179,6 +1230,9 @@ class Picture
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getTopLikes(int $limit): array
     {
         $select = $this->table->getSql()->select()
@@ -1197,6 +1251,9 @@ class Picture
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getTopOwnerFans(int $userId, int $limit): array
     {
         $select = $this->table->getSql()->select()

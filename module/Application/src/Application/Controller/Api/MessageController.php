@@ -54,6 +54,7 @@ class MessageController extends AbstractRestfulController
 
     public function postAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->forbiddenAction();
@@ -63,6 +64,7 @@ class MessageController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -85,11 +87,13 @@ class MessageController extends AbstractRestfulController
 
         $this->message->send($currentUser['id'], $user['id'], $data['text']);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(201);
     }
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -143,6 +147,7 @@ class MessageController extends AbstractRestfulController
 
     public function deleteListAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -169,11 +174,13 @@ class MessageController extends AbstractRestfulController
                 return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
     public function deleteAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -182,11 +189,13 @@ class MessageController extends AbstractRestfulController
 
         $this->message->delete($user['id'], (int)$this->params('id'));
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(204);
     }
 
     public function summaryAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -210,6 +219,7 @@ class MessageController extends AbstractRestfulController
 
     public function newAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {

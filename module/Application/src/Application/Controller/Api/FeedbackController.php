@@ -54,6 +54,7 @@ class FeedbackController extends AbstractRestfulController
         if ($this->requestHasContentType($request, self::CONTENT_TYPE_JSON)) {
             $data = $this->jsonDecode($request->getContent());
         } else {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $request->getPost()->toArray();
         }
 
@@ -69,6 +70,7 @@ class FeedbackController extends AbstractRestfulController
                     $captchaResponse = (string)$data['captcha'];
                 }
 
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $result = $recaptcha->verify($captchaResponse, $this->getRequest()->getServer('REMOTE_ADDR'));
 
                 if (! $result->isSuccess()) {
@@ -118,6 +120,7 @@ class FeedbackController extends AbstractRestfulController
 
         $this->transport->send($mail);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 }

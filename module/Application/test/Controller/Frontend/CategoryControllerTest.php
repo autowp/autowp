@@ -14,6 +14,9 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -35,6 +38,9 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addItemParent($itemId, $parentId, array $params = [])
     {
         $this->reset();
@@ -66,7 +72,7 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
-                $tables->get('df_hash'),
+                $serviceManager->get('RabbitMQ'),
                 $tables->get('df_distance')
             ])
             ->getMock();
@@ -76,6 +82,9 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($vehicleId)
     {
         $this->reset();
@@ -86,12 +95,14 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $request->getHeaders()
             ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getFiles()->fromArray([
             'file' => [
                 'tmp_name' => $file,
@@ -148,6 +159,9 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery("h1");
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testCreateCategoryAddItemAndGet()
     {
         $catname = 'catname-' . (10000 * microtime(true));

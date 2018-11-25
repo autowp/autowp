@@ -105,7 +105,7 @@ class IpHydrator extends RestHydrator
                 $result['blacklist'] = null;
                 $ban = $this->trafficControl->getBanInfo($ip);
                 if ($ban) {
-                    $user = $this->userModel->getRow((int)$ban['user_id']);
+                    $user = $this->userModel->getRow((int)$ban['by_user_id']);
                     $ban['user'] = $user ? $this->extractValue('user', $user) : null;
                     $ban['up_to'] = $this->extractValue('up_to', $ban['up_to']);
 

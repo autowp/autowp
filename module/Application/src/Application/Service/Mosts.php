@@ -567,6 +567,9 @@ class Mosts
         return $pictures;
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     private function getCarsData(array $cMost, int $carTypeId, $cYear, int $brandId, string $language)
     {
         $select = new Sql\Select($this->itemTable->getTable());
@@ -621,6 +624,9 @@ class Mosts
         return $data;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     */
     public function getData($options)
     {
         $defaults = [

@@ -12,11 +12,10 @@ class TrafficControlFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get('TableManager');
+        $config = $container->get('Config');
         return new \Autowp\Traffic\TrafficControl(
-            $tables->get('banned_ip'),
-            $tables->get('ip_whitelist'),
-            $tables->get('ip_monitoring4')
+            $config['traffic']['url'],
+            $container->get('RabbitMQ')
         );
     }
 }

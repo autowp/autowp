@@ -30,6 +30,9 @@ class User
         $this->table = $table;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function updateSpecsVolumes()
     {
         $select = $this->table->getSql()->select()
@@ -206,6 +209,9 @@ class User
         return $select;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getRow($options)
     {
         $select = $this->getSelect($options);
@@ -240,6 +246,9 @@ class User
         return $this->getPaginator($options)->getTotalItemCount();
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function isExists(array $options): bool
     {
         $select = $this->getSelect($options);
@@ -252,6 +261,9 @@ class User
         return (bool)$this->table->selectWith($select)->current();
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function registerVisit(int $userId, Request $request)
     {
         $user = $this->getRow($userId);
@@ -266,6 +278,7 @@ class User
             $set['last_online'] = new Sql\Expression('NOW()');
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $remoteAddr = $request->getServer('REMOTE_ADDR');
         if ($remoteAddr) {
             $ip = inet_pton($remoteAddr);
@@ -279,6 +292,9 @@ class User
         }
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getUserLanguage(int $userId): string
     {
         $select = $this->table->getSql()->select()
@@ -294,6 +310,9 @@ class User
         return (string)$user['language'];
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function getUserRole(int $userId): string
     {
         $select = $this->table->getSql()->select()
@@ -309,6 +328,9 @@ class User
         return (string)$user['role'];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function decVotes(int $userId)
     {
         $this->table->update([

@@ -63,6 +63,7 @@ class MostsController extends AbstractActionController
 
     public function getItemsAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $language = $this->language();

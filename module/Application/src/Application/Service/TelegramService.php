@@ -175,6 +175,9 @@ class TelegramService
         return $this->getApi()->commandsHandler($webhook);
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function notifyInbox(int $pictureId)
     {
         $picture = $this->picture->getRow(['id' => $pictureId]);
@@ -207,6 +210,9 @@ class TelegramService
         }
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function notifyPicture(int $pictureId)
     {
         $picture = $this->picture->getRow(['id' => $pictureId]);
@@ -292,6 +298,9 @@ class TelegramService
         return \Zend\Uri\UriFactory::factory('http://wheelsage.org');
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function notifyMessage($fromId, int $userId, $text)
     {
         $fromName = "New personal message";

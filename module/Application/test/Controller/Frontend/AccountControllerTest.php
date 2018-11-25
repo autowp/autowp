@@ -15,6 +15,9 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../../../../config/application.config.php';
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createUser(string $email, string $password, string $name): int
     {
         $this->reset();
@@ -60,6 +63,9 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('emailcheck');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function getUser(int $userId)
     {
         $this->reset();
@@ -75,6 +81,9 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         return Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testSpecsConflicts()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -87,6 +96,9 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('conflict-index');
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testProfileRename()
     {
         $email = 'test'.microtime(true).'@example.com';

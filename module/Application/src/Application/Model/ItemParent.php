@@ -185,6 +185,7 @@ class ItemParent
             }
         }
 
+        // TODO: fractions
         if (! $name && $vehicleRow['begin_model_year']) {
             $modelYearsDifferent = $vehicleRow['begin_model_year'] != $parentRow['begin_model_year']
                 || $vehicleRow['end_model_year'] != $parentRow['end_model_year'];
@@ -263,6 +264,9 @@ class ItemParent
         return isset($this->allowedCombinations[$parentItemTypeId][$itemTypeId]);
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function create(int $parentId, int $itemId, array $options = [])
     {
         $parentRow = $this->itemTable->select(['id' => $parentId])->current();
@@ -611,6 +615,9 @@ class ItemParent
         return true;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction
+     */
     public function getParentRows(int $itemId, bool $stockFirst = false): array
     {
         $select = new Sql\Select($this->itemParentTable->getTable());
@@ -679,6 +686,9 @@ class ItemParent
         return $bvlRow['name'];
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     */
     public function getNamePreferLanguage(int $parentId, int $itemId, string $language): string
     {
         $select = new Sql\Select($this->itemParentLanguageTable->getTable());
@@ -838,6 +848,9 @@ class ItemParent
         return $updates;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function hasChildItems(int $parentId): bool
     {
         $select = new Sql\Select($this->itemParentTable->getTable());
@@ -848,6 +861,9 @@ class ItemParent
         return (bool)$this->itemParentTable->selectWith($select)->current();
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function getChildItemsCount(int $parentId): int
     {
         $select = new Sql\Select($this->itemParentTable->getTable());
@@ -858,6 +874,9 @@ class ItemParent
         return $row ? (int)$row['count'] : 0;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     */
     public function getParentItemsCount(int $itemId): int
     {
         $select = new Sql\Select($this->itemParentTable->getTable());
@@ -868,6 +887,9 @@ class ItemParent
         return $row ? (int)$row['count'] : 0;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getChildItemsCountArray(array $parentIds): array
     {
         if (count($parentIds) <= 0) {
@@ -887,6 +909,9 @@ class ItemParent
         return $result;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getChildItemsCountArrayByTypes(array $parentIds, array $typeIds): array
     {
         if (count($parentIds) <= 0) {
@@ -928,6 +953,9 @@ class ItemParent
         return $this->itemParentTable;
     }
 
+    /**
+     * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     */
     public function getChildItemLinkTypesCount(int $itemId): array
     {
         $select = new Sql\Select($this->itemParentTable->getTable());

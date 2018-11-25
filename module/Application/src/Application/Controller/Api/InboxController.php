@@ -100,7 +100,7 @@ class InboxController extends AbstractRestfulController
 
         $service = new DayPictures([
             'picture'      => $this->picture,
-            'timezone'     => $this->user()->timezone(),
+            'timezone'     => $this->user()->timezone(), // @phan-suppress-current-line PhanUndeclaredMethod
             'dbTimezone'   => MYSQL_TIMEZONE,
             'select'       => $select,
             'orderColumn'  => 'add_date',

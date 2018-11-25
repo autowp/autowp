@@ -55,6 +55,7 @@ class ContactsController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -94,6 +95,7 @@ class ContactsController extends AbstractRestfulController
     {
         $id = (int)$this->params('id');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->notFoundAction();
@@ -107,6 +109,7 @@ class ContactsController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(200);
 
         return new JsonModel([
@@ -114,13 +117,17 @@ class ContactsController extends AbstractRestfulController
         ]);
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function putAction()
     {
         $id = (int)$this->params('id');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
-            return $this->notFoundAction();
+            return $this->forbiddenAction();
         }
 
         if ($currentUser['id'] == $id) {
@@ -138,6 +145,7 @@ class ContactsController extends AbstractRestfulController
 
         $this->contact->create($currentUser['id'], $user['id']);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(200);
 
         return new JsonModel([
@@ -149,6 +157,7 @@ class ContactsController extends AbstractRestfulController
     {
         $id = (int)$this->params('id');
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->notFoundAction();
@@ -168,6 +177,7 @@ class ContactsController extends AbstractRestfulController
 
         $this->contact->delete($currentUser['id'], $user['id']);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $this->getResponse()->setStatusCode(204);
 
         return new JsonModel([

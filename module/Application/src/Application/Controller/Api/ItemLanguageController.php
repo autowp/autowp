@@ -82,6 +82,7 @@ class ItemLanguageController extends AbstractRestfulController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -103,6 +104,7 @@ class ItemLanguageController extends AbstractRestfulController
 
     public function getAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -121,6 +123,7 @@ class ItemLanguageController extends AbstractRestfulController
 
     public function putAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -130,6 +133,7 @@ class ItemLanguageController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $data = $this->processBodyContent($this->getRequest());
@@ -269,6 +273,7 @@ class ItemLanguageController extends AbstractRestfulController
             ]);
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->getResponse()->setStatusCode(200);
     }
 

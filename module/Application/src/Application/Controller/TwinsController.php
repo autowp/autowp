@@ -143,6 +143,7 @@ class TwinsController extends AbstractActionController
             ->setItemCountPerPage($this->catalogue()->getPicturesPerPage())
             ->setCurrentPageNumber($this->params('page'));
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
         $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
             'width' => 4,
             'url'   => function ($row) use ($group) {
@@ -366,6 +367,7 @@ class TwinsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canEdit = $this->user()->isAllowed('twins', 'edit');
 
         $paginator = $this->twins->getGroupsPaginator($brand['id'])
@@ -386,6 +388,7 @@ class TwinsController extends AbstractActionController
 
     public function indexAction()
     {
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canEdit = $this->user()->isAllowed('twins', 'edit');
 
         $paginator = $this->twins->getGroupsPaginator()
@@ -439,6 +442,7 @@ class TwinsController extends AbstractActionController
                 ]
             ];
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $data = $this->pic()->picPageData($picture, $filter, [], [
                 'paginator' => [
                     'route'     => 'twins/group/pictures/picture',
@@ -472,6 +476,7 @@ class TwinsController extends AbstractActionController
                 ]
             ];
 
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             return new JsonModel($this->pic()->gallery2($filter, [
                 'page'      => $this->params()->fromQuery('page'),
                 'pictureId' => $this->params()->fromQuery('pictureId'),

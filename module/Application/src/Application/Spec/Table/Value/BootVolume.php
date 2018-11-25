@@ -24,8 +24,10 @@ class BootVolume
         $max = isset($values[$this->max]) ? $values[$this->max] : null;
 
         if ($min && $max && ($min != $max)) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $html = $view->escapeHtml($min) . '&ndash;' . $max;
         } elseif ($min) {
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $html = $view->escapeHtml($min);
         } else {
             $html = '';
@@ -33,7 +35,9 @@ class BootVolume
 
         if ($html && isset($attribute['unit']) && $attribute['unit']) {
             $html .=
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
             ' <span class="unit" title="' . $view->escapeHtmlAttr($attribute['unit']['name']) . '">' .
+            /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $view->escapeHtml($view->translate($attribute['unit']['abbr'])) .
             '</span>';
         }

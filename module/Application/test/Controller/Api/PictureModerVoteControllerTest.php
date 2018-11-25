@@ -23,7 +23,7 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
         $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
-                $tables->get('df_hash'),
+                $serviceManager->get('RabbitMQ'),
                 $tables->get('df_distance')
             ])
             ->getMock();
@@ -33,6 +33,9 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
         $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function addPictureToItem($vehicleId)
     {
         $this->reset();
@@ -43,12 +46,14 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
         $request->getHeaders()
             ->addHeader(Cookie::fromString('Cookie: remember=admin-token'))
             ->addHeaderLine('Content-Type', 'multipart/form-data');
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getServer()->set('REMOTE_ADDR', '127.0.0.1');
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
         copy(__DIR__ . '/../../_files/' . $filename, $file);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $request->getFiles()->fromArray([
             'file' => [
                 'tmp_name' => $file,
@@ -76,6 +81,9 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
         return $pictureId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function createItem($params)
     {
         $this->reset();
@@ -97,6 +105,9 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
         return $itemId;
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     public function testVote()
     {
         $itemId = $this->createItem([

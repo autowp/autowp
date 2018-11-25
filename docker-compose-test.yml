@@ -67,6 +67,7 @@ web:
     ROLLBAR_ACCESS_TOKEN: ""
     ROLLBAR_CLIENT_ACCESS_TOKEN: ""
     ROLLBAR_ENVIRONMENT: development
+    TRAFFIC_URL: http://traffic
   volumes:
   - ./config/autoload/local.php:/app/config/autoload/local.php:ro
   - ./module/Application/test/_files/image:/app/public_html/image
@@ -75,6 +76,9 @@ web:
   - memcached
   - mysql
   - frontend
+  - rabbitmq
+  - traffic
+  - goautowp
 
 memcached:
   image: memcached
@@ -93,7 +97,6 @@ mysql:
     MYSQL_USER: autowp_test
     MYSQL_PASSWORD: test
   volumes:
-  - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
   - "./mysql.conf.d:/etc/mysql/conf.d"
   expose:
   - "3306"
@@ -102,3 +105,60 @@ frontend:
   image: autowp/autowp-frontend
   container_name: autowp_test_frontend
   restart: always
+
+rabbitmq:
+  image: rabbitmq
+  container_name: autowp_test_rabbitmq
+
+traffic:
+  image: autowp/traffic
+  container_name: autowp_test_traffic
+  restart: always
+  links:
+  - rabbitmq
+  - traffic-mysql
+  environment:
+  - TRAFFIC_RABBITMQ_HOST=autowp_test_rabbitmq
+  - TRAFFIC_RABBITMQ_PORT=5672
+  - TRAFFIC_MONITORING_QUEUE=input
+  - TRAFFIC_HOTLINK_QUEUE=hotlink
+  - TRAFFIC_MYSQL_HOST=autowp_test_traffic_mysql
+  - TRAFFIC_MYSQL_PORT=3306
+  - TRAFFIC_MYSQL_USERNAME=root
+  - TRAFFIC_MYSQL_PASSWORD=password
+  - TRAFFIC_MYSQL_DBNAME=traffic
+  - TRAFFIC_ROLLBAR_TOKEN=
+  - TRAFFIC_ROLLBAR_ENVIRONMENT=development
+  - TRAFFIC_ROLLBAR_PERIOD=1m
+
+traffic-mysql:
+  image: mysql:8
+  container_name: autowp_test_traffic_mysql
+  restart: always
+  environment:
+  - MYSQL_ROOT_PASSWORD=password
+  - MYSQL_DATABASE=traffic
+
+goautowp:
+  image: autowp/goautowp
+  container_name: autowp_test_goautowp
+  restart: always
+  links:
+  - rabbitmq
+  - mysql
+  volumes:
+  - ./public_html/pictures:/app/pictures:ro
+  environment:
+  - AUTOWP_RABBITMQ_HOST=autowp_test_rabbitmq
+  - AUTOWP_RABBITMQ_PORT=5672
+  - AUTOWP_DUPLICATE_FINDER_QUEUE=duplicate_finder
+  - AUTOWP_MYSQL_HOST=autowp_test_mysql
+  - AUTOWP_MYSQL_PORT=3306
+  - AUTOWP_MYSQL_USERNAME=autowp_test
+  - AUTOWP_MYSQL_PASSWORD=test
+  - AUTOWP_MYSQL_DBNAME=autowp_test
+  - AUTOWP_ROLLBAR_TOKEN=
+  - AUTOWP_ROLLBAR_ENVIRONMENT=development
+  - AUTOWP_ROLLBAR_PERIOD=1m
+  - AUTOWP_IMAGES_DIR=/app/pictures
+  - AUTOWP_MIGRATIONS_DIR=/app/migrations

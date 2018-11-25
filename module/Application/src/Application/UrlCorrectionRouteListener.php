@@ -36,6 +36,7 @@ class UrlCorrectionRouteListener extends AbstractListenerAggregate
                 $filteredUri = preg_replace('|^/index\.php|isu', '', $uri);
 
                 if ($filteredUri != $uri) {
+                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $requestUri = $request->getUri();
                     $redirectUrl = $requestUri->getScheme() . '://' .
                         $requestUri->getHost() . $filteredUri;
@@ -46,10 +47,14 @@ class UrlCorrectionRouteListener extends AbstractListenerAggregate
         }
     }
 
+    /**
+     * @suppress PhanUndeclaredMethod
+     */
     private function redirect(MvcEvent $e, $url)
     {
         $response = $e->getResponse();
         $response->getHeaders()->addHeaderLine('Location', $url);
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $response->setStatusCode(302);
 
         return $response;

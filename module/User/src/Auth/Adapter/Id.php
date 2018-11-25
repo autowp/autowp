@@ -13,7 +13,7 @@ class Id implements AdapterInterface
     /**
      * Identity value
      *
-     * @var string
+     * @var int
      */
     private $identity = null;
 
@@ -69,7 +69,7 @@ class Id implements AdapterInterface
      */
     private function authenticateSetup()
     {
-        if ($this->identity == '') {
+        if (! $this->identity) {
             $exception = 'A value for the identity was not provided prior to authentication.';
             throw new InvalidArgumentException($exception);
         }
@@ -86,12 +86,12 @@ class Id implements AdapterInterface
     /**
      * setIdentity() - set the value to be used as the identity
      *
-     * @param  string $value
+     * @param  int $value
      * @return Id Provides a fluent interface
      */
     public function setIdentity($value)
     {
-        $this->identity = $value;
+        $this->identity = (int) $value;
         return $this;
     }
 }

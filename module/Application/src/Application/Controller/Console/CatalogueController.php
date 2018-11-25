@@ -86,6 +86,9 @@ class CatalogueController extends AbstractActionController
         return "done\n";
     }
 
+    /**
+     * @suppress PhanPluginMixedKeyNoKey
+     */
     public function acceptOldUnsortedAction()
     {
         $select = $this->picture->getTable()->getSql()->select();
@@ -134,6 +137,7 @@ class CatalogueController extends AbstractActionController
 
                     $message = sprintf(
                         $this->translate('pm/your-picture-accepted-%s', 'default', $owner['language']),
+                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $this->pic()->url($picture['identity'], true, $uri)
                     );
 
@@ -148,6 +152,7 @@ class CatalogueController extends AbstractActionController
                 if ($prevUser) {
                     $message = sprintf(
                         'Принята картинка %s',
+                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $this->pic()->url($picture['identity'], true)
                     );
                     $this->message->send(null, $prevUser['id'], $message);
@@ -156,6 +161,7 @@ class CatalogueController extends AbstractActionController
 
             $this->log(sprintf(
                 'Картинка %s принята',
+                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
                 'pictures' => $picture['id']

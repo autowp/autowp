@@ -26,9 +26,11 @@ class AclTest extends AbstractHttpControllerTestCase
 
         $view = $services->get(PhpRenderer::class);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $view->user()->inheritsRole('moder');
         $this->assertInternalType('bool', $result);
 
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $result = $view->user()->isAllowed('pictures', 'edit');
         $this->assertInternalType('bool', $result);
     }
