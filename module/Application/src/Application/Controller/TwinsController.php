@@ -87,9 +87,7 @@ class TwinsController extends AbstractActionController
             ]);
 
             foreach ($arr as &$brand) {
-                $brand['url'] = $this->url()->fromRoute('twins/brand', [
-                    'brand_catname' => $brand['catname']
-                ]);
+                $brand['url'] = '/ng/twins/' . $brand['catname'];
             }
             unset($brand);
 
