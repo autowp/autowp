@@ -1,4 +1,5 @@
 <?php return array (
+  'select' => 'select',
   'picture/text' => 'Todas as imagens têm seus proprietários.
 
 Se você acha que os usuários do site cometeram algum erro em postar esta imagem nessa seção, você pode deixar um comentário apontando o erro.
@@ -226,7 +227,7 @@ Todas as imagens são para fins educacionais
   'index/brands' => 'Marcas',
   'index/factories' => 'Fábricas',
   'index/specifications' => 'Especificações',
-  'index/twins/description' => 'Você sabia que o Daewoo Matiz tem seis [irmãos gêmeos](/twins/group118812)? O que há em comum [entre um Lotus e um Kia](/twins/group118750)? Temos certeza que você achará esta seção muito interessante.',
+  'index/twins/description' => 'Você sabia que o Daewoo Matiz tem seis [irmãos gêmeos](/ng/twins/group/118812)? O que há em comum [entre um Lotus e um Kia](/ng/twins/group/118750)? Temos certeza que você achará esta seção muito interessante.',
   'index/categories/description' => 'А знаете ли вы, какая техника помогала блюсти правопорядок на улицах мировых городов в разное время? А на каких автомобилях ездил Папа Римский? Нет? Тогда вам точно в этот раздел.',
   'index/categories/mosts' => 'Qual o carro mais veloz? Quanto pesa um caminhão de mineração? Venha descobrir!',
   'mosts/fastest/roadster' => 'Roadsters mais rápidos',

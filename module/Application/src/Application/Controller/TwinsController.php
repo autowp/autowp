@@ -6,25 +6,16 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-use Autowp\Comments;
-use Autowp\TextStorage;
-
-use Application\Model\Item;
-use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
 class TwinsController extends AbstractActionController
 {
-    const GROUPS_PER_PAGE = 20;
-
     /**
      * @var Twins
      */
     private $twins;
-
-    private $textStorage;
 
     private $cache;
 
@@ -34,42 +25,18 @@ class TwinsController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var Comments\CommentsService
-     */
-    private $comments;
-
-    /**
-     * @var Perspective
-     */
-    private $perspective;
-
-    /**
-     * @var Item
-     */
-    private $itemModel;
-
-    /**
      * @var Picture
      */
     private $picture;
 
     public function __construct(
-        TextStorage\Service $textStorage,
         $cache,
         SpecificationsService $specsService,
-        Comments\CommentsService $comments,
-        Perspective $perspective,
-        Item $itemModel,
         Picture $picture,
         Twins $twins
     ) {
-
-        $this->textStorage = $textStorage;
         $this->cache = $cache;
         $this->specsService = $specsService;
-        $this->comments = $comments;
-        $this->perspective = $perspective;
-        $this->itemModel = $itemModel;
         $this->picture = $picture;
         $this->twins = $twins;
     }
@@ -158,72 +125,6 @@ class TwinsController extends AbstractActionController
             'group'        => $group,
             'paginator'    => $paginator,
             'picturesData' => $picturesData
-        ];
-    }
-
-    public function groupAction()
-    {
-        $twins = $this->twins;
-
-        $group = $twins->getGroup($this->params('id'));
-        if (! $group) {
-            return $this->notFoundAction();
-        }
-
-        $carList = $twins->getGroupCars($group['id']);
-
-        $hasSpecs = false;
-
-        foreach ($carList as $car) {
-            $hasSpecs = $hasSpecs || $this->specsService->hasSpecs($car['id']);
-        }
-
-        $picturesCount = $this->picture->getCount([
-            'status' => Picture::STATUS_ACCEPTED,
-            'item'   => [
-                'ancestor_or_self' => (int)$group['id']
-            ]
-        ]);
-
-
-        $description = $this->itemModel->getTextOfItem($group['id'], $this->language());
-
-        $this->getBrands($this->twins->getGroupBrandIds($group['id']));
-
-        return [
-            //'name'               => $this->itemModel->getNameData($group, $this->language()),
-            'group'              => $group,
-            'description'        => $description,
-            'cars'               => $this->car()->listData($carList, [
-                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureModel'         => $this->picture,
-                    'itemModel'            => $this->itemModel,
-                    'perspective'          => $this->perspective,
-                    'type'                 => null,
-                    'onlyExactlyPictures'  => false,
-                    'dateSort'             => false,
-                    'disableLargePictures' => true,
-                    'perspectivePageId'    => null,
-                    'onlyChilds'           => []
-                ]),
-                'disableTwins'         => true,
-                'disableSpecs'         => true,
-                'listBuilder' => new \Application\Model\Item\ListBuilder\Twins([
-                    'catalogue'    => $this->catalogue(),
-                    'router'       => $this->getEvent()->getRouter(),
-                    'picHelper'    => $this->getPluginManager()->get('pic'),
-                    'group'        => $group,
-                    'specsService' => $this->specsService
-                ])
-            ]),
-            'picturesCount'      => $picturesCount,
-            'hasSpecs'           => $hasSpecs,
-            'specsUrl'           => $this->url()->fromRoute('twins/group/specifications', [
-                'id' => $group['id']
-            ]),
-            'picturesUrl'        => $this->url()->fromRoute('twins/group/pictures', [
-                'id' => $group['id'],
-            ])
         ];
     }
 

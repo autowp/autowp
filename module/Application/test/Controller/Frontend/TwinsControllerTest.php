@@ -196,17 +196,6 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         foreach ($tokens as $token) {
             $this->reset();
             $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
-            $this->dispatch('http://www.autowp.ru/twins/group' . $groupId, Request::METHOD_GET);
-
-            $this->assertResponseStatusCode(200);
-            $this->assertModuleName('application');
-            $this->assertControllerName(TwinsController::class);
-            $this->assertMatchedRouteName('twins/group');
-
-            $this->assertXpathQuery("//h1[contains(text(), '$groupName')]");
-
-            $this->reset();
-            $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=' . $token));
             $this->dispatch('http://www.autowp.ru/twins/group' . $groupId.'/pictures', Request::METHOD_GET);
 
             $this->assertResponseStatusCode(200);

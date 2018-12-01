@@ -1,9 +1,10 @@
 <?php return array (
-  'picture/text' => 'Toutes les images ont des propriétaires.
+  'select' => 'select',
+  'picture/text' => 'Toutes les images ont leurs propriétaires.
 
 Si vous pensez que les utilisateurs du site se sont trompés en affichant cette image dans cette section, ce serait bien si vous en parliez dans les commentaires et si vous indiquiez où se trouve l\'erreur.
 
-Partagez votre joie! Que vous souhaitiez bavarder sur les automobiles ou tout autre chose, vous pouvez le faire sur [notre forum](/ng/forums/).',
+Que vous vouliez bavarder d\'automobiles ou tout autre chose, vous pouvez le faire sur [notre forum](/ng/forums/).',
   'specs/attrs/157/options/euro-6d' => 'Euro 6d',
   'specs/attrs/157/options/euro-5a' => 'Euro 5a',
   'specs/attrs/157/options/euro-5b' => 'Euro 5b',
@@ -221,7 +222,7 @@ Toutes les images sont postées à des fins éducatives.
   'index/brands' => 'Marques',
   'index/factories' => 'Usines',
   'index/specifications' => 'Caractéristiques',
-  'index/twins/description' => 'Savez-vous que la Daewoo Matiz a [six clones](/twins/group118812)? Savez-vous quel est le point commun entre [Lotus et Kia](/twins/group118750)? Cette section va sûrement vous intéresser!',
+  'index/twins/description' => 'Savez-vous que la Daewoo Matiz a [six clones](/ng/twins/group/118812)? Savez-vous quel est le point commun entre [Lotus et Kia](/ng/twins/group/118750)? Cette section va sûrement vous intéresser!',
   'index/categories/description' => 'Savez-vous quelle technique a permis d\'observer la loi et l\'ordre dans les rues de villes du monde à des moments différents? Et pas de voitures voyagé Pape? Non? Ensuite, vous êtes exactement dans cette section.',
   'index/categories/mosts' => 'Vous voulez savoir quelle voiture est la plus rapide? Ou combien pèse le plus puissant camion d\'exploitation minière? C\'est ici que vous trouverez les réponses!',
   'mosts/fastest/roadster' => 'Les roadsters les plus rapides',
@@ -486,9 +487,9 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
   'perspective/boot' => 'coffre',
   'perspective/logo' => 'logo',
   'perspective/mascot' => 'mascot',
-  'perspective/sketch' => 'sketch',
+  'perspective/sketch' => 'croquis',
   'perspective/mixed' => 'mixed',
-  'perspective/exterior-details' => 'exterior details',
+  'perspective/exterior-details' => 'détails extérieurs',
   'login/sign-in' => 'Connexion',
   'login/sign-out' => 'Sortie',
   'login/login-or-email' => 'login ou e-mail',
@@ -509,7 +510,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
   'account/personal-message/system-notification' => 'Système notification',
   'account/personal-message/delete-all-sent' => 'Supprimer tous les messages envoyés',
   'account/personal-message/delete-all-system' => 'Supprimer toutes les notifications système',
-  'account/personal-message/new' => 'new',
+  'account/personal-message/new' => 'nouveau',
   'account/personal-message/sent' => 'Message envoyé',
   'account/profile/personal' => 'Les données personnelles',
   'account/profile/photo' => 'Photo',
@@ -1158,7 +1159,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'moder/vehicle/twins/select-or-create' => 'Sélectionner ou créer un groupe …',
   'moder/vehicle/twins/group-not-selected' => 'Groupe non sélectionné',
   'moder/vehicle/twins/remove' => 'Remove',
-  'moder/vehicle/twins/inherited-from' => 'Inherited from',
+  'moder/vehicle/twins/inherited-from' => 'Hérité de',
   'moder/vehicle/factories/select-factory' => 'Sélectionner une usine …',
   'moder/vehicle/factories/factory-not-selected' => 'Usine non sélectionnée',
   'moder/vehicle/factories/remove' => 'Remove',

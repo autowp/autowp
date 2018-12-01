@@ -61,9 +61,11 @@ class PreviewPictureHydrator extends RestHydrator
 
     public function extract($object)
     {
-        $result = [
-            'url' => $object['url']
-        ];
+        $result = [];
+
+        if (isset($object['url'])) {
+            $result['url'] = $object['url'];
+        }
 
         if ($this->filterComposite->filter('picture')) {
             $result['picture'] = $this->extractValue('picture', $object['row']);

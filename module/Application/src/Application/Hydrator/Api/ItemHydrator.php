@@ -421,6 +421,68 @@ class ItemHydrator extends RestHydrator
            $result['front_picture'] = $picture ? $this->extractValue('front_picture', $picture) : null;
         }
 
+        $totalPictures = null;
+        $pictures = [];
+        $cFetcher = null;
+        $showTotalPictures = $this->filterComposite->filter('total_pictures');
+        $showMorePicturesUrl = $this->filterComposite->filter('more_pictures_url');
+        $showPreviewPictures = $this->filterComposite->filter('preview_pictures');
+        $onlyExactlyPictures = false;
+
+        if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
+            $pictureItemTypeId = null;
+            if (isset($this->previewPictures['type_id']) && $this->previewPictures['type_id']) {
+                $pictureItemTypeId = $this->previewPictures['type_id'];
+            }
+
+            $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
+                'pictureModel'         => $this->picture,
+                'itemModel'            => $this->itemModel,
+                'perspective'          => $this->perspective,
+                'type'                 => null,
+                'onlyExactlyPictures'  => $onlyExactlyPictures,
+                'dateSort'             => false,
+                'disableLargePictures' => false,
+                'perspectivePageId'    => null,
+                'onlyChilds'           => [],
+                'pictureItemTypeId'    => $pictureItemTypeId
+            ]);
+
+            $carsTotalPictures = $cFetcher->getTotalPictures([$object['id']], $onlyExactlyPictures);
+            $totalPictures = isset($carsTotalPictures[$object['id']]) ? (int)$carsTotalPictures[$object['id']] : 0;
+        }
+
+        if ($showPreviewPictures) {
+            $pictures = $cFetcher->fetch($object, [
+                'totalPictures' => $totalPictures
+            ]);
+
+            $extractUrl = isset($this->fields['preview_pictures']['url']);
+
+            foreach ($pictures as &$picture) {
+                if ($picture && $extractUrl) {
+                    if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
+                        $url = $this->picHelper->href($picture['row']);
+                    } else {
+                        $url = $listBuilder->getPictureUrl($object, $picture['row']);
+                    }
+                    $picture['url'] = $url;
+                }
+            }
+            unset($picture);
+
+            $result['preview_pictures'] = $this->extractValue('preview_pictures', $pictures);
+        }
+
+        if ($this->filterComposite->filter('brands')) {
+            $rows = $this->itemModel->getRows([
+                'item_type_id'       => Item::BRAND,
+                'descendant_or_self' => $object['id']
+            ]);
+
+            $result['brands'] = $this->extractValue('brands', $rows);
+        }
+
         if ($isModer) {
             if ($this->filterComposite->filter('body')) {
                 $result['body'] = (string)$object['body'];
@@ -555,57 +617,6 @@ class ItemHydrator extends RestHydrator
                 $result['related_group_pictures'] = $carPictures;
             }
 
-            $totalPictures = null;
-            $pictures = [];
-            $cFetcher = null;
-            $showTotalPictures = $this->filterComposite->filter('total_pictures');
-            $showMorePicturesUrl = $this->filterComposite->filter('more_pictures_url');
-            $showPreviewPictures = $this->filterComposite->filter('preview_pictures');
-            $onlyExactlyPictures = false;
-
-            if ($showTotalPictures || $showMorePicturesUrl || $showPreviewPictures) {
-                $pictureItemTypeId = null;
-                if (isset($this->previewPictures['type_id']) && $this->previewPictures['type_id']) {
-                    $pictureItemTypeId = $this->previewPictures['type_id'];
-                }
-
-                $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
-                    'pictureModel'         => $this->picture,
-                    'itemModel'            => $this->itemModel,
-                    'perspective'          => $this->perspective,
-                    'type'                 => null,
-                    'onlyExactlyPictures'  => $onlyExactlyPictures,
-                    'dateSort'             => false,
-                    'disableLargePictures' => false,
-                    'perspectivePageId'    => null,
-                    'onlyChilds'           => [],
-                    'pictureItemTypeId'    => $pictureItemTypeId
-                ]);
-
-                $carsTotalPictures = $cFetcher->getTotalPictures([$object['id']], $onlyExactlyPictures);
-                $totalPictures = isset($carsTotalPictures[$object['id']]) ? (int)$carsTotalPictures[$object['id']] : 0;
-            }
-
-            if ($showPreviewPictures) {
-                $pictures = $cFetcher->fetch($object, [
-                    'totalPictures' => $totalPictures
-                ]);
-
-                foreach ($pictures as &$picture) {
-                    if ($picture) {
-                        if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
-                            $url = $this->picHelper->href($picture['row']);
-                        } else {
-                            $url = $listBuilder->getPictureUrl($object, $picture['row']);
-                        }
-                        $picture['url'] = $url;
-                    }
-                }
-                unset($picture);
-
-                $result['preview_pictures'] = $this->extractValue('preview_pictures', $pictures);
-            }
-
             if ($this->filterComposite->filter('item_of_day_pictures')) {
                 $result['item_of_day_pictures'] = $this->carOfDay->getItemOfDayPictures($object['id'], $this->language);
             }
@@ -661,15 +672,6 @@ class ItemHydrator extends RestHydrator
                 $result['name_default'] = $nameData['name'] == $name ? null : $name;
             }
 
-            if ($this->filterComposite->filter('brands')) {
-                $rows = $this->itemModel->getRows([
-                    'item_type_id'       => Item::BRAND,
-                    'descendant_or_self' => $object['id']
-                ]);
-
-                $result['brands'] = $this->extractValue('brands', $rows);
-            }
-
             if ($this->filterComposite->filter('childs')) {
                 $rows = $this->itemModel->getRows([
                     'parent' => $object['id']
@@ -711,11 +713,7 @@ class ItemHydrator extends RestHydrator
                         ]);
                         break;
                     case Item::TWINS:
-                        $url = $this->router->assemble([
-                            'id' => $object['id'],
-                        ], [
-                            'name' => 'twins/group'
-                        ]);
+                        $url = '/ng/twins/group/' . $object['id'];
                         break;
 
                     case Item::ENGINE:
@@ -862,11 +860,7 @@ class ItemHydrator extends RestHydrator
 
         if ($item['item_type_id'] == Item::TWINS) {
             return [
-                $this->router->assemble([
-                    'id' => $item['id'],
-                ], [
-                    'name' => 'twins/group'
-                ])
+                '/ng/twins/group/' . $item['id']
             ];
         }
 

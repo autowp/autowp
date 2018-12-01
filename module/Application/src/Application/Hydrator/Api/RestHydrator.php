@@ -21,6 +21,11 @@ abstract class RestHydrator extends AbstractHydrator implements HydratorOptionsI
     protected $language;
 
     /**
+     * @var $fields
+     */
+    protected $fields = [];
+
+    /**
      * @param  array|Traversable $options
      * @return RestHydrator
      * @throws \Zend\Hydrator\Exception\InvalidArgumentException
@@ -49,6 +54,7 @@ abstract class RestHydrator extends AbstractHydrator implements HydratorOptionsI
 
     public function setFields(array $fields)
     {
+        $this->fields = $fields;
         $this->getFilter()->addFilter('fields', new PropertyFilter(array_keys($fields)));
 
         foreach ($this->strategies as $strategy) {

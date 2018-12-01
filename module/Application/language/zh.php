@@ -1,4 +1,5 @@
 <?php return array (
+  'select' => 'select',
   'picture/text' => '任何图片都有权益人。
 
 如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。
@@ -221,7 +222,7 @@
   'index/brands' => '品牌',
   'index/factories' => '工厂',
   'index/specifications' => '性能参数',
-  'index/twins/description' => '你或许早就知道大宇曼蒂兹有了6个[克隆车](/twins/group118812)? 可是你知道 [莲花和起亚的姊妹车型](/twins/group118750)吗? 我们相信这是一个很有趣的版块。',
+  'index/twins/description' => '你或许早就知道大宇曼蒂兹有了6个[克隆车](/ng/twins/group/118812)? 可是你知道 [莲花和起亚的姊妹车型](/ng/twins/group/118750)吗? 我们相信这是一个很有趣的版块。',
   'index/categories/description' => '你知道在不同时期是哪种技术帮助了全世界的城市街道遵守法律和秩序的吗？教皇乘坐哪些车？不知道？那么你应该阅读这一版块。',
   'index/categories/mosts' => '想知道哪款车是最快的？想知道最强大的矿用卡车有多重？快来了解一下。',
   'mosts/fastest/roadster' => '最快的敞篷跑车',

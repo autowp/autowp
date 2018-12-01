@@ -1,4 +1,5 @@
 <?php return array (
+  'select' => 'select',
   'picture/text' => 'All images have their owners.
 
 If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.
@@ -224,7 +225,7 @@ All images are posted for educational purposes.
   'index/brands' => 'Brands',
   'index/factories' => 'Factories',
   'index/specifications' => 'Specifications',
-  'index/twins/description' => 'Do you know that Daewoo Matiz has as many as [six clones](/twins/group118812)? And you know what [common in Lotus and Kia](/twins/group118750)? We are sure that you will find this section interesting.',
+  'index/twins/description' => 'Do you know that Daewoo Matiz has as many as [six clones](/ng/twins/group/118812)? And you know what [common in Lotus and Kia](/ng/twins/group/118750)? We are sure that you will find this section interesting.',
   'index/categories/description' => 'А знаете ли вы, какая техника помогала блюсти правопорядок на улицах мировых городов в разное время? А на каких автомобилях ездил Папа Римский? Нет? Тогда вам точно в этот раздел.',
   'index/categories/mosts' => 'Want to know which car was the fastest? Do you want to know how much the most powerful mining truck weighs? Come and find out.',
   'mosts/fastest/roadster' => 'Most fastest roadsters',

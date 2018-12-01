@@ -131,10 +131,10 @@ class Comments
                         $url = $this->router->assemble([
                             'id' => $item['id']
                         ], [
-                            'name'            => 'twins/group',
+                            'name'            => 'ng',
                             'force_canonical' => $canonical,
                             'uri'             => $uri
-                        ]);
+                        ]) . 'twins/group/' . $item['id'];
                         break;
                     case Item::MUSEUM:
                         $url = $this->router->assemble([], [

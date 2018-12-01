@@ -762,11 +762,7 @@ class CarOfDay
             foreach ($this->twins->getCarGroups($car['id']) as $twinsGroup) {
                 $items[] = [
                     'icon'  => 'adjust',
-                    'url'   => $this->router->assemble([
-                        'id' => $twinsGroup['id']
-                    ], [
-                        'name' => 'twins/group'
-                    ]),
+                    'url'   => '/ng/twins/group/' . $twinsGroup['id'],
                     'text'  => $this->translator->translate('carlist/twins')
                 ];
             }

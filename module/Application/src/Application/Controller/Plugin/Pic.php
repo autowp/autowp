@@ -483,11 +483,7 @@ class Pic extends AbstractPlugin
 
                 foreach ($twinsGroupsRows as $twinsGroup) {
                     $twins[] = [
-                        'url' => $this->httpRouter->assemble([
-                            'id' => $twinsGroup['id']
-                        ], [
-                            'name' => 'twins/group'
-                        ])
+                        'url' => '/ng/twins/group/' . $twinsGroup['id']
                     ];
                 }
 

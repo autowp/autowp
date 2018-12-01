@@ -176,9 +176,7 @@ class Car extends AbstractPlugin
                 foreach ($twinsGroups as $twinsGroup) {
                     $carsTwinsGroups[$carId][] = [
                         'name' => $twinsGroup['name'],
-                        'url'  => $controller->url()->fromRoute('twins/group', [
-                            'id' => $twinsGroup['id']
-                        ]),
+                        'url'  => '/ng/twins/group/' . $twinsGroup['id'],
                     ];
                 }
             }
