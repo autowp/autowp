@@ -323,6 +323,17 @@ class ItemController extends AbstractRestfulController
                 break;
         }
 
+        if ($data['no_parent']) {
+            $select
+                ->join(
+                    ['np_ip' => 'item_parent'],
+                    'item.id = np_ip.item_id',
+                    [],
+                    $select::JOIN_LEFT
+                )
+                ->where(['np_ip.item_id IS NULL']);
+        }
+
         if ($isModer) {
             if ($data['last_item']) {
                 $namespace = new \Zend\Session\Container('Moder_Car');
@@ -406,17 +417,6 @@ class ItemController extends AbstractRestfulController
                 $select
                     ->join('item_parent', 'item.id = item_parent.item_id', [])
                     ->where(['item_parent.parent_id' => $data['parent_id']]);
-            }
-
-            if ($data['no_parent']) {
-                $select
-                    ->join(
-                        ['np_ip' => 'item_parent'],
-                        'item.id = np_ip.item_id',
-                        [],
-                        $select::JOIN_LEFT
-                    )
-                    ->where(['np_ip.item_id IS NULL']);
             }
 
             if ($data['text']) {

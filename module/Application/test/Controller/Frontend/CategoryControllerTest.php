@@ -129,36 +129,6 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         return $pictureId;
     }
 
-    public function testIndex()
-    {
-        $name = 'Category ' . microtime(true);
-
-        $categoryId = $this->createItem([
-            'item_type_id' => 3,
-            'name'         => $name
-        ]);
-
-        $vehicleId = $this->createItem([
-            'item_type_id' => 1,
-            'name'         => 'Vehicle in category'
-        ]);
-
-        $this->addItemParent($vehicleId, $categoryId);
-
-        $this->addPictureToItem($vehicleId);
-
-        $this->reset();
-        $this->dispatch('https://www.autowp.ru/category', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\CategoryController::class);
-        $this->assertMatchedRouteName('categories');
-        $this->assertActionName('index');
-
-        $this->assertQuery("h1");
-    }
-
     /**
      * @suppress PhanUndeclaredMethod
      */

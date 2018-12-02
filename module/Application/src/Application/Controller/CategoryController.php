@@ -71,65 +71,7 @@ class CategoryController extends AbstractActionController
 
     public function indexAction()
     {
-        $language = $this->language();
-
-        $key = 'CATEGORY_INDEX48_' . $language;
-
-        $categories = $this->cache->getItem($key, $success);
-        if (! $success) {
-            $categories = [];
-
-            $rows = $this->itemModel->getRows([
-                'item_type_id' => Item::CATEGORY,
-                'no_parents'   => true,
-                'order'        => 'name'
-            ]);
-
-            foreach ($rows as $row) {
-                $langName = $this->itemModel->getName($row['id'], $language);
-                $carsCount = $this->itemModel->getVehiclesAndEnginesCount($row['id']);
-
-                $categories[] = [
-                    'id'             => $row['id'],
-                    'url'            => $this->url()->fromRoute('categories', [
-                        'action'           => 'category',
-                        'category_catname' => $row['catname'],
-                    ]),
-                    'name'           => $langName ? $langName : $row['name'],
-                    'short_name'     => $langName ? $langName : $row['name'],
-                    'cars_count'     => $carsCount,
-                    'new_cars_count' => $carsCount //$row->getWeekCarsCount(),
-                ];
-            }
-
-            $this->cache->setItem($key, $categories);
-        }
-
-        foreach ($categories as &$category) {
-            $picture = $this->picture->getRow([
-                'status' => Picture::STATUS_ACCEPTED,
-                'item'   => [
-                    'ancestor_or_self' => $category['id']
-                ],
-                'order'  => 'front_angle'
-            ]);
-
-            $image = null;
-            if ($picture) {
-                $image = $this->imageStorage()->getFormatedImage(
-                    $picture['image_id'],
-                    'picture-thumb'
-                );
-            }
-
-            $category['top_picture'] = [
-                'image' => $image
-            ];
-        }
-
-        return [
-            'categories' => $categories
-        ];
+        return $this->redirect()->toUrl('/ng/category');
     }
 
     private function categoriesMenuActive(&$menu, $categoryParentIds, $isOther)
