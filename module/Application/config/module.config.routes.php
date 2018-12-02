@@ -260,15 +260,6 @@ return [
                         ],
                         'may_terminate' => false,
                         'child_routes'  => [
-                            'specifications' => [
-                                'type' => 'Literal',
-                                'options' => [
-                                    'route' => '/specifications',
-                                    'defaults' => [
-                                        'action' => 'specifications',
-                                    ]
-                                ],
-                            ],
                             'pictures' => [
                                 'type' => 'Literal',
                                 'options' => [
