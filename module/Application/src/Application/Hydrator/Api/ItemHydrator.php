@@ -417,8 +417,8 @@ class ItemHydrator extends RestHydrator
                    'ancestor_or_self' => (int)$object['id']
                ],
                'order' => 'front_angle'
-           ]);
-           $result['front_picture'] = $picture ? $this->extractValue('front_picture', $picture) : null;
+            ]);
+            $result['front_picture'] = $picture ? $this->extractValue('front_picture', $picture) : null;
         }
 
         $totalPictures = null;
