@@ -89,45 +89,6 @@ class TwinsController extends AbstractActionController
         ];
     }
 
-    public function picturesAction()
-    {
-        $group = $this->twins->getGroup($this->params('id'));
-        if (! $group) {
-            return $this->notFoundAction();
-        }
-
-        $paginator = $this->picture->getPaginator([
-            'status' => Picture::STATUS_ACCEPTED,
-            'item'   => [
-                'ancestor_or_self' => $group['id']
-            ],
-            'order'  => 'resolution_desc'
-        ]);
-
-        $paginator
-            ->setItemCountPerPage($this->catalogue()->getPicturesPerPage())
-            ->setCurrentPageNumber($this->params('page'));
-
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
-            'width' => 4,
-            'url'   => function ($row) use ($group) {
-                return $this->url()->fromRoute('twins/group/pictures/picture', [
-                    'id'         => $group['id'],
-                    'picture_id' => $row['identity']
-                ]);
-            }
-        ]);
-
-        $this->getBrands($this->twins->getGroupBrandIds($group['id']));
-
-        return [
-            'group'        => $group,
-            'paginator'    => $paginator,
-            'picturesData' => $picturesData
-        ];
-    }
-
     private function doPictureAction($callback)
     {
         $group = $this->twins->getGroup($this->params('id'));
