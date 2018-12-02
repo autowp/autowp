@@ -1299,12 +1299,30 @@ return [
                                         ],
                                         'may_terminate' => false,
                                         'child_routes' => [
-                                            'post' => [
+                                            'get' => [
                                                 'type' => 'Method',
                                                 'options' => [
                                                     'verb' => 'get',
                                                     'defaults' => [
                                                         'action' => 'specifications'
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ],
+                                    'child-specifications' => [
+                                        'type' => 'Literal',
+                                        'options' => [
+                                            'route' => '/child-specifications',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'get' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'get',
+                                                    'defaults' => [
+                                                        'action' => 'child-specifications'
                                                     ]
                                                 ]
                                             ]

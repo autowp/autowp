@@ -16,7 +16,6 @@ class TwinsControllerFactory implements FactoryInterface
     {
         return new Controller(
             $container->get('longCache'),
-            $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\Twins::class)
         );

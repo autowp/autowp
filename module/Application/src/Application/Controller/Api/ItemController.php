@@ -1958,4 +1958,27 @@ class ItemController extends AbstractRestfulController
 
         return $viewModel->setTerminal(true);
     }
+
+    public function childSpecificationsAction()
+    {
+        $item = $this->itemModel->getRow(['id' => (int)$this->params('id')]);
+        if (! $item) {
+            return $this->notFoundAction();
+        }
+
+        $childItems = $this->itemModel->getRows([
+            'order'  => $this->catalogue()->itemOrdering(),
+            'parent' => $item['id']
+        ]);
+
+        $specs = $this->specsService->specifications($childItems, [
+            'language' => $this->language()
+        ]);
+
+        $viewModel = new ViewModel([
+            'specs' => $specs,
+        ]);
+
+        return $viewModel->setTerminal(true);
+    }
 }

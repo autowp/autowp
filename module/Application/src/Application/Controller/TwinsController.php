@@ -20,23 +20,16 @@ class TwinsController extends AbstractActionController
     private $cache;
 
     /**
-     * @var SpecificationsService
-     */
-    private $specsService = null;
-
-    /**
      * @var Picture
      */
     private $picture;
 
     public function __construct(
         $cache,
-        SpecificationsService $specsService,
         Picture $picture,
         Twins $twins
     ) {
         $this->cache = $cache;
-        $this->specsService = $specsService;
         $this->picture = $picture;
         $this->twins = $twins;
     }
@@ -70,23 +63,6 @@ class TwinsController extends AbstractActionController
         ]);
         $sideBarModel->setTemplate('application/twins/partial/sidebar');
         $this->layout()->addChild($sideBarModel, 'sidebar');
-    }
-
-    public function specificationsAction()
-    {
-        $group = $this->twins->getGroup($this->params('id'));
-        if (! $group) {
-            return $this->notFoundAction();
-        }
-
-        $specs = $this->specsService->specifications($this->twins->getGroupCars($group['id']), [
-            'language' => $this->language()
-        ]);
-
-        return [
-            'group' => $group,
-            'specs' => $specs,
-        ];
     }
 
     private function doPictureAction($callback)
