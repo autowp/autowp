@@ -251,17 +251,14 @@ return [
                         'controller' => Controller\TwinsController::class,
                     ],
                 ],
-                'may_terminate' => true,
+                'may_terminate' => false,
                 'child_routes'  => [
                     'group' => [
                         'type' => 'Segment',
                         'options' => [
                             'route' => '/group:id',
-                            'defaults' => [
-                                'action' => 'group',
-                            ]
                         ],
-                        'may_terminate' => true,
+                        'may_terminate' => false,
                         'child_routes'  => [
                             'specifications' => [
                                 'type' => 'Literal',
@@ -276,11 +273,8 @@ return [
                                 'type' => 'Literal',
                                 'options' => [
                                     'route' => '/pictures',
-                                    'defaults' => [
-                                        'action' => 'pictures',
-                                    ]
                                 ],
-                                'may_terminate' => true,
+                                'may_terminate' => false,
                                 'child_routes'  => [
                                     'picture' => [
                                         'type' => 'Segment',
@@ -302,13 +296,7 @@ return [
                                                 ],
                                             ],
                                         ]
-                                    ],
-                                    'page'    => [
-                                        'type' => 'Segment',
-                                        'options' => [
-                                            'route' => '/page:page',
-                                        ]
-                                    ],
+                                    ]
                                 ]
                             ],
                         ]
