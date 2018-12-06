@@ -483,6 +483,14 @@ class ItemHydrator extends RestHydrator
             $result['brands'] = $this->extractValue('brands', $rows);
         }
 
+        if ($this->filterComposite->filter('childs')) {
+            $rows = $this->itemModel->getRows([
+                'parent' => $object['id']
+            ]);
+
+            $result['childs'] = $this->extractValue('childs', $rows);
+        }
+
         if ($isModer) {
             if ($this->filterComposite->filter('body')) {
                 $result['body'] = (string)$object['body'];
@@ -670,14 +678,6 @@ class ItemHydrator extends RestHydrator
             if ($this->filterComposite->filter('name_default')) {
                 $name = $this->itemModel->getLanguageName($object['id'], 'xx');
                 $result['name_default'] = $nameData['name'] == $name ? null : $name;
-            }
-
-            if ($this->filterComposite->filter('childs')) {
-                $rows = $this->itemModel->getRows([
-                    'parent' => $object['id']
-                ]);
-
-                $result['childs'] = $this->extractValue('childs', $rows);
             }
 
             if ($this->filterComposite->filter('categories')) {
