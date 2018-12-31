@@ -202,8 +202,6 @@ class ItemController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $langName = $this->itemModel->getName($currentCategory['id'], $language);
-
         $breadcrumbs = [[
             'catname' => null,
             'item'    => $currentCategory
