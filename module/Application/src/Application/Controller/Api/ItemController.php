@@ -191,8 +191,6 @@ class ItemController extends AbstractRestfulController
 
     public function pathAction()
     {
-        $language = $this->language();
-
         $currentCategory = $this->itemModel->getRow([
             'item_type_id' => Item::CATEGORY,
             'catname'      => (string)$this->params()->fromQuery('catname')
