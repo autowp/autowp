@@ -1147,6 +1147,24 @@ return [
                                     ]
                                 ]
                             ],
+                            'path' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/path'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'path'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
                             'item' => [
                                 'type' => 'Segment',
                                 'options' => [

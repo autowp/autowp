@@ -16,12 +16,8 @@ class CategoryControllerFactory implements FactoryInterface
     {
         return new Controller(
             $container->get('longCache'),
-            $container->get(\Autowp\TextStorage\Service::class),
             $container->get(\Application\Model\Categories::class),
-            $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\ItemParent::class),
             $container->get(\Application\Model\Picture::class)
         );
     }

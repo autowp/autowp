@@ -696,24 +696,14 @@ class CarOfDay
         if ($car['item_type_id'] == Item::CATEGORY) {
             $items[] = [
                 'icon'  => 'align-left',
-                'url'   => $this->router->assemble([
-                    'action'           => 'category',
-                    'category_catname' => $car['catname'],
-                ], [
-                    'name' => 'categories'
-                ]),
+                'url'   => '/ng/category/' . urlencode($car['catname']),
                 'text'  => $this->translator->translate('carlist/details')
             ];
 
             if ($totalPictures > 6) {
                 $items[] = [
                     'icon'  => 'th',
-                    'url'   => $this->router->assemble([
-                        'action'           => 'category-pictures',
-                        'category_catname' => $car['catname'],
-                    ], [
-                    'name' => 'categories'
-                    ]),
+                    'url'   => '/ng/category/' . urlencode($car['catname']) . '/pictures',
                     'text'  => $this->translator->translate('carlist/all pictures'),
                     'count' => $totalPictures
                 ];
@@ -780,12 +770,7 @@ class CarOfDay
             foreach ($categoryRows as $category) {
                 $items[] = [
                     'icon'  => 'tag',
-                    'url'   => $this->router->assemble([
-                        'action'           => 'category',
-                        'category_catname' => $category['catname'],
-                    ], [
-                        'name' => 'categories'
-                    ]),
+                    'url'   => '/ng/category/' . urlencode($category['catname']),
                     'text'  => $this->itemNameFormatter->format(
                         $category,
                         $language

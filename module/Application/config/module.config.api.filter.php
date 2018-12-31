@@ -1347,7 +1347,8 @@ return [
                                 'id_desc',
                                 'id_asc',
                                 'age',
-                                'name_nat'
+                                'name_nat',
+                                'categories_first'
                             ]
                         ]
                     ]

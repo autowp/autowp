@@ -189,6 +189,91 @@ class ItemController extends AbstractRestfulController
         }
     }
 
+    public function pathAction()
+    {
+        $language = $this->language();
+
+        $currentCategory = $this->itemModel->getRow([
+            'item_type_id' => Item::CATEGORY,
+            'catname'      => (string)$this->params()->fromQuery('catname')
+        ]);
+
+        if (! $currentCategory) {
+            return $this->notFoundAction();
+        }
+
+        $langName = $this->itemModel->getName($currentCategory['id'], $language);
+
+        $breadcrumbs = [[
+            'catname' => null,
+            'item'    => $currentCategory
+        ]];
+
+        $parentCategory = $currentCategory;
+
+        while (true) {
+            $parentCategory = $this->itemModel->getRow([
+                'item_type_id' => Item::CATEGORY,
+                'child'        => $parentCategory['id']
+            ]);
+
+            if (! $parentCategory) {
+                break;
+            }
+
+            array_unshift($breadcrumbs, [
+                'catname'   => null,
+                'item'      => $parentCategory,
+            ]);
+        }
+
+        $path = (string)$this->params()->fromQuery('path');
+        $path = $path ? explode('/', $path) : [];
+
+        $currentCar = $currentCategory;
+        foreach ($path as $pathNode) {
+            $currentCar = $this->itemModel->getRow([
+                'parent' => [
+                    'id'           => $currentCar['id'],
+                    'link_catname' => $pathNode
+                ]
+            ]);
+
+            if (! $currentCar) {
+                return $this->notFoundAction();
+            }
+
+            $breadcrumbs[] = [
+                'catname'   => $pathNode,
+                'item'      => $currentCar
+            ];
+        }
+
+        $user = $this->user()->get();
+
+        $this->hydrator->setOptions([
+            'language' => $this->language(),
+            'fields'   => ['name_html' => true, 'name_text' => true, 'name_only' => true, 'catname' => true],
+            'user_id'  => $user ? $user['id'] : null,
+        ]);
+
+        $items = [];
+
+        $parentID = null;
+        foreach ($breadcrumbs as $item) {
+            $items[] = [
+                'catname'   => $item['catname'],
+                'parent_id' => $parentID,
+                'item'      => $this->hydrator->extract($item['item']),
+            ];
+            $parentID = (int)$item['item']['id'];
+        }
+
+        return new JsonModel([
+            'path' => $items
+        ]);
+    }
+
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      */
@@ -312,6 +397,11 @@ class ItemController extends AbstractRestfulController
             case 'name_nat':
                 $select->order(['item.name']);
                 break;
+            case 'categories_first':
+                $select->order(array_merge([
+                    new Sql\Expression('item.item_type_id != ?', Item::CATEGORY)
+                ], $this->catalogue()->itemOrdering()));
+                break;
             default:
                 $select->order([
                     'item.name',
@@ -332,6 +422,12 @@ class ItemController extends AbstractRestfulController
                     $select::JOIN_LEFT
                 )
                 ->where(['np_ip.item_id IS NULL']);
+        }
+
+        if ($data['parent_id']) {
+            $select
+                ->join('item_parent', 'item.id = item_parent.item_id', [])
+                ->where(['item_parent.parent_id' => $data['parent_id']]);
         }
 
         if ($isModer) {
@@ -411,12 +507,6 @@ class ItemController extends AbstractRestfulController
 
             if ($data['to_year']) {
                 $select->where(['item.end_year' => $data['to_year']]);
-            }
-
-            if ($data['parent_id']) {
-                $select
-                    ->join('item_parent', 'item.id = item_parent.item_id', [])
-                    ->where(['item_parent.parent_id' => $data['parent_id']]);
             }
 
             if ($data['text']) {

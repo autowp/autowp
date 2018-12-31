@@ -319,10 +319,9 @@ class ItemHydrator extends RestHydrator
             $result['specs_url'] = $listBuilder->getSpecificationsUrl($object);
         }
 
-        if ($this->filterComposite->filter('spec_editor_url')) {
-            if ($this->isAllowed('specifications', 'edit')) {
-                $result['spec_editor_url'] = '/ng/cars/specifications-editor?item_id=' . $object['id'];
-            }
+        if ($this->filterComposite->filter('can_edit_specs')) {
+            $isSpecsAvailabe = in_array($object['item_type_id'], [Item::ENGINE, Item::TWINS, Item::VEHICLE]);
+            $result['can_edit_specs'] = $isSpecsAvailabe && $this->isAllowed('specifications', 'edit');
         }
 
         $showLat = $this->filterComposite->filter('lat');
@@ -705,12 +704,7 @@ class ItemHydrator extends RestHydrator
                 $url = null;
                 switch ($object['item_type_id']) {
                     case Item::CATEGORY:
-                        $url = $this->router->assemble([
-                            'action'           => 'category',
-                            'category_catname' => $object['catname'],
-                        ], [
-                            'name' => 'categories'
-                        ]);
+                        $url = '/ng/category/' . urlencode($object['catname']);
                         break;
                     case Item::TWINS:
                         $url = '/ng/twins/group/' . $object['id'];
@@ -849,12 +843,7 @@ class ItemHydrator extends RestHydrator
 
         if ($item['item_type_id'] == Item::CATEGORY) {
             return [
-                $this->router->assemble([
-                    'action'           => 'category',
-                    'category_catname' => $item['catname'],
-                ], [
-                    'name' => 'categories'
-                ])
+                '/ng/category/' . urlencode($item['catname'])
             ];
         }
 

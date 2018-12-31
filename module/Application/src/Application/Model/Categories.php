@@ -113,12 +113,7 @@ class Categories
             $category = [
                 'id'             => $item['id'],
                 'catname'        => $item['catname'],
-                'url'            => $this->router->assemble([
-                    'action'           => 'category',
-                    'category_catname' => $item['catname']
-                ], [
-                    'name' => 'categories'
-                ]),
+                'url'            => '/ng/category/' . urlencode($item['catname']),
                 'name'           => $langName ? $langName : $item['name'],
                 'short_name'     => $langName ? $langName : $item['name'],
                 'cars_count'     => $item['cars_count'],

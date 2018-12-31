@@ -66,16 +66,5 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(\Application\Controller\Api\ItemParentController::class);
         $this->assertMatchedRouteName('api/item-parent/post');
         $this->assertActionName('post');
-
-        // request category page
-        $this->reset();
-
-        $this->dispatch('https://www.autowp.ru/category/' . $catname, Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\CategoryController::class);
-        $this->assertMatchedRouteName('categories');
-        $this->assertActionName('category');
     }
 }

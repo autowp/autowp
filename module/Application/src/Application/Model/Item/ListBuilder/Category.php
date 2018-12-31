@@ -62,12 +62,7 @@ class Category extends ListBuilder
     public function getDetailsUrl($item)
     {
         if ($item['item_type_id'] == Item::CATEGORY) {
-            return $this->router->assemble([
-                'action'           => 'category',
-                'category_catname' => $item['catname']
-            ], [
-                'name' => 'categories'
-            ]);
+            return '/ng/category/' . urlencode($item['catname']);
         }
 
         $hasChilds = $this->itemParent->hasChildItems($item['id']);
@@ -90,27 +85,13 @@ class Category extends ListBuilder
             $currentPath = [];
         }
 
-        return $this->router->assemble([
-            'action'           => 'category',
-            'category_catname' => $this->category['catname'],
-            'other'            => $this->isOther,
-            'path'             => $currentPath,
-            'page'             => 1
-        ], [
-            'name' => 'categories'
-        ]);
+        return '/ng/category/' . urlencode($this->category['catname']) . ($currentPath ? '/' . implode('/', $currentPath) : '');
     }
 
     public function getPicturesUrl($item)
     {
         if ($item['item_type_id'] == Item::CATEGORY) {
-            return $this->router->assemble([
-                'action'           => 'category-pictures',
-                'category_catname' => $item['catname'],
-                'path'             => $this->path,
-            ], [
-                'name' => 'categories'
-            ]);
+            return '/ng/category/' . urlencode($item['catname']) . '/pictures';
         }
 
         // found parent row
@@ -127,15 +108,7 @@ class Category extends ListBuilder
             $currentPath = [];
         }
 
-        return $this->router->assemble([
-            'action'           => 'category-pictures',
-            'category_catname' => $this->category['catname'],
-            'other'            => $this->isOther,
-            'path'             => $currentPath,
-            'page'             => 1
-        ], [
-            'name' => 'categories'
-        ]);
+        return '/ng/category/' . urlencode($this->category['catname']) . ($currentPath ? '/' . implode('/', $currentPath) : '') . '/pictures';
     }
 
     public function getSpecificationsUrl($item)

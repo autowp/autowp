@@ -585,12 +585,7 @@ class Pic extends AbstractPlugin
             foreach ($categoryRows as $row) {
                 $categories[$row['id']] = [
                     'name' => $row,
-                    'url'  => $this->httpRouter->assemble([
-                        'action'           => 'category',
-                        'category_catname' => $row['catname'],
-                    ], [
-                        'name' => 'categories'
-                    ])
+                    'url'  => '/ng/category/' . urlencode($row['catname'])
                 ];
             }
 

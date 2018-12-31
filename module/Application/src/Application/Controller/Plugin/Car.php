@@ -158,10 +158,7 @@ class Car extends AbstractPlugin
                         $category,
                         $language
                     ),
-                    'url'  => $controller->url()->fromRoute('categories', [
-                        'action'           => 'category',
-                        'category_catname' => $category['catname'],
-                    ]),
+                    'url'  => '/ng/category/' . urlencode($category['catname']),
                 ];
             }
         }
