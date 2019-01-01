@@ -115,9 +115,6 @@ class ItemParentController extends AbstractRestfulController
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
-        if (! $user) {
-            return $this->forbiddenAction();
-        }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');

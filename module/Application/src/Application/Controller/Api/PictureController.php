@@ -301,7 +301,7 @@ class PictureController extends AbstractRestfulController
         }
 
         if (! $isModer) {
-            if (! $data['item_id'] && ! $data['owner_id'] && ! $data['status']) {
+            if (! $data['exact_item_id'] && ! $data['item_id'] && ! $data['owner_id'] && ! $data['status']) {
                 return new ApiProblemResponse(
                     new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
                         'invalid_params' => [
