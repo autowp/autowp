@@ -426,6 +426,15 @@ class ItemController extends AbstractRestfulController
                 ->where(['item_parent.parent_id' => $data['parent_id']]);
         }
 
+        if ($data['have_common_childs_with']) {
+            $select
+                ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', [])
+                ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', [])
+                ->where(['ipc2.parent_id' => (int)$data['have_common_childs_with']]);
+
+            $group = true;
+        }
+
         if ($isModer) {
             if ($data['last_item']) {
                 $namespace = new \Zend\Session\Container('Moder_Car');
@@ -543,15 +552,6 @@ class ItemController extends AbstractRestfulController
                     ->join(['ipc3' => 'item_parent_cache'], 'item.id = ipc3.parent_id', [])
                     ->join(['child' => 'item'], 'ipc3.item_id = child.id', [])
                     ->where(['child.item_type_id' => (int)$data['have_childs_of_type']]);
-
-                $group = true;
-            }
-
-            if ($data['have_common_childs_with']) {
-                $select
-                    ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', [])
-                    ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', [])
-                    ->where(['ipc2.parent_id' => (int)$data['have_common_childs_with']]);
 
                 $group = true;
             }
