@@ -2744,7 +2744,7 @@ return [
                     [
                         'name'    => 'FileSize',
                         'options' => [
-                            'max'           => 1024 * 1024 * 20,
+                            'max'           => 1024 * 1024 * 50,
                             'useByteString' => false
                         ]
                     ],
