@@ -1331,7 +1331,7 @@ return [
                             'is_compiles_item_of_day', 'item_of_day_pictures',
                             'related_group_pictures', 'engine_id', 'attr_zone_id',
                             'descendants_count', 'has_child_specs', 'accepted_pictures_count',
-                            'comments_topic_stat', 'front_picture']]
+                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names']]
                     ]
                 ]
             ],
@@ -1562,7 +1562,7 @@ return [
                             'is_compiles_item_of_day', 'item_of_day_pictures',
                             'related_group_pictures', 'engine_id', 'attr_zone_id',
                             'descendants_count', 'has_child_specs', 'accepted_pictures_count',
-                            'comments_topic_stat', 'front_picture']]
+                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names']]
                     ]
                 ]
             ],
@@ -2405,6 +2405,21 @@ return [
             ]
         ],
         'api_picture_list' => [
+            'identity' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 20
+                        ]
+                    ]
+                ]
+            ],
             'limit' => [
                 'required' => false,
                 'filters'  => [
@@ -2450,7 +2465,9 @@ return [
                             'moder_votes', 'moder_voted', 'is_last',
                             'accepted_count', 'crop', 'replaceable',
                             'perspective_item', 'siblings', 'ip',
-                            'name_html', 'name_text', 'image_gallery_full'
+                            'name_html', 'name_text', 'image_gallery_full',
+                            'preview_large', 'dpi', 'point', 'authors',
+                            'categories', 'twins', 'factories', 'of_links'
                         ]]
                     ]
                 ]
@@ -2583,6 +2600,21 @@ return [
             ]
         ],
         'api_picture_list_public' => [
+            'identity' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'StringLength',
+                        'options' => [
+                            'min' => 1,
+                            'max' => 20
+                        ]
+                    ]
+                ]
+            ],
             'limit' => [
                 'required' => false,
                 'filters'  => [
@@ -2622,7 +2654,8 @@ return [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => [
                             'owner', 'thumbnail', 'votes',
-                            'comments_count', 'name_html', 'name_text', 'image_gallery_full'
+                            'comments_count', 'name_html', 'name_text', 'image_gallery_full',
+                            'preview_large', 'dpi', 'point', 'authors', 'categories', 'twins', 'factories', 'of_links'
                         ]]
                     ]
                 ]
@@ -2727,8 +2760,8 @@ return [
                         'options' => [
                             'minWidth'  => 640,
                             'minHeight' => 360,
-                            'maxWidth'  => 4096,
-                            'maxHeight' => 4096
+                            'maxWidth'  => 10000,
+                            'maxHeight' => 10000
                         ]
                     ]
                 ]
@@ -2888,7 +2921,9 @@ return [
                             'moder_votes', 'moder_voted', 'is_last',
                             'accepted_count', 'crop', 'replaceable',
                             'perspective_item', 'siblings', 'ip',
-                            'name_html', 'name_text', 'image_gallery_full'
+                            'name_html', 'name_text', 'image_gallery_full',
+                            'preview_large', 'dpi', 'point', 'authors',
+                            'categories', 'twins', 'factories', 'of_links'
                         ]]
                     ]
                 ]

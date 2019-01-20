@@ -395,7 +395,7 @@ Para facilitar a aceitação de qualquer imagem no site e evitar possíveis erro
 
 Requisitos para as imagens:
 
-* Formatos [JPEG](https://pt.wikipedia.org/wiki/Joint_Photographic_Experts_Group) ou [PNG](https://pt.wikipedia.org/wiki/PNG). Resolução de 640×360 até 4096×4096.
+* Formatos [JPEG](https://pt.wikipedia.org/wiki/Joint_Photographic_Experts_Group) ou [PNG](https://pt.wikipedia.org/wiki/PNG). Resolução de 640×360 até 10000×10000.
 * Toda imagem deve, na medida do possível, ter a mais alta qualidade, não apresentar distorções de redimensionamento, borrões, manchas ou qualquer outro tipo de marca que prejudique a qualidade da foto. A exceção seria uma foto extremamente rara. Lembre-se que todas as fotos passam pela verificação de uma equipe de moderação antes de serem aceitas no site.
 * Ausência de marcas d\'água e logotipos de outros sites.
 * O veículo deve ter a aparência original de como quando saiu da fábrica. Isento de modificações e personalizações pessoais, bem como sem quaisquer sinais de envelhecimento.

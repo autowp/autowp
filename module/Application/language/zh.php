@@ -390,7 +390,7 @@
 
 添加照片相关要求：
 
-* [JPEG](http://ru.wikipedia.org/wiki/JPEG)或[PNG](http://ru.wikipedia.org/wiki/PNG)格式。分辨率范围: 从640×360至4096×4096。
+* [JPEG](http://ru.wikipedia.org/wiki/JPEG)或[PNG](http://ru.wikipedia.org/wiki/PNG)格式。分辨率范围: 从640×360至10000×10000。
 * 图像质量应尽可能高，且没有被调整过尺寸或压缩（模糊、模糊化、颜色失真、罗纹线等）。珍贵的扫描图片(生产商拍摄)例外。图片在网站的存留由一部分管理员决定。
 * 图像不能有非该图像的作者/所有者添加的水印。
 * 图像车辆必须保持原厂状态，不能存在<em>个人改装</em>，因年代久远产生的老化则可以接受。

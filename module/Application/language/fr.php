@@ -390,7 +390,7 @@ Ce serait formidable si vous aviez indiqué qu\'une voiture est représentée su
 
 Exigences pour les images ajoutées:
 
-* Le format [JPEG](http://ru.wikipedia.org/wiki/JPEG) ou [PNG](http://ru.wikipedia.org/wiki/PNG). Résolution: 640×360 jusqu\'à 4096×4096.
+* Le format [JPEG](http://ru.wikipedia.org/wiki/JPEG) ou [PNG](http://ru.wikipedia.org/wiki/PNG). Résolution: 640×360 jusqu\'à 10000×10000.
 * L\'image doit être d\'excellente qualité, ne contient pas les différents artefacts redimensionnement ou compression (flou, la couleur propagation, nervures droites etc.). Les exceptions sont rares photos (fabricant), scans de brochures. La décision d\'abandonner cette photo sur le site a fait l\'équipe de modérateur.
 * L\'absence d\'inscriptions et les logos des sites étrangers, ne causé aucun auteurs/propriétaires des images.
 * La voiture doit avoir un premier regard à la sortie de l\'usine. Il ne doit pas présenter des signes de <em>tuning maison</em>, de préférence l\'absence de changements liés à la voiture de vieillissement.
@@ -690,7 +690,7 @@ Nous serions heureux si vous souhaitiez [faire une donation désintéressée](/n
   'donate/vod/select-date' => '1. Choisissez une date',
   'donate/vod/date-busy' => 'busy',
   'donate/vod/select-item' => '2. Choisissez un véhicule',
-  'donate/vod/select-item-text' => 'Virtuellement tous les véhicules peuvent être “Véhicule du jour”, tant qu\'ils respectent les conditions suivantes: 
+  'donate/vod/select-item-text' => 'Virtuellement tous les véhicules peuvent être “Véhicule du jour”, tant qu\'ils respectent les conditions suivantes:
 
 - le véhicule ne doit pas avoir déjà été sélectionné
 - le véhicule doit avoir au moins 3 photos',
@@ -1265,9 +1265,9 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'brand/name' => 'Nom',
   'brand/logo' => 'Logotype',
   'moder/brands/meta-data/full-name' => 'Nom complet',
-  'moder/brands/logo/description' => '* Les logos doivent être au format d\'image PNG ; 
-* Les zones transparentes doivent bien être transparentes et non pas blanches! 
-* L\'image doit être recadrée aux bords du logo. Les marges ne sont pas nécessaires ; 
+  'moder/brands/logo/description' => '* Les logos doivent être au format d\'image PNG ;
+* Les zones transparentes doivent bien être transparentes et non pas blanches!
+* L\'image doit être recadrée aux bords du logo. Les marges ne sont pas nécessaires ;
 * Les images doivent avoir la plus grande définition possible - pour garantir la qualité ainsi qu\'une réutilisation future. Le site se charge automatiquement de la mise à l\'échelle.',
   'moder/brands/logo/saved' => 'Logo enregistré',
   'moder/brands/links' => 'Liens',
