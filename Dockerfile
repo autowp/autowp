@@ -62,7 +62,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         rsyslog \
         ssmtp \
         supervisor \
-        tzdata
+        tzdata \
+        xmlstarlet
 
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     apt-get install -qq -y nodejs && \
