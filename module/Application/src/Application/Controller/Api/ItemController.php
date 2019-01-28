@@ -247,16 +247,29 @@ class ItemController extends AbstractRestfulController
 
         $user = $this->user()->get();
 
+        $fields = [
+            'name_html'   => true,
+            'name_text'   => true,
+            'name_only'   => true,
+            'catname'     => true,
+        ];
+
         $this->hydrator->setOptions([
             'language' => $this->language(),
-            'fields'   => ['name_html' => true, 'name_text' => true, 'name_only' => true, 'catname' => true],
+            'fields'   => $fields,
             'user_id'  => $user ? $user['id'] : null,
         ]);
 
         $items = [];
 
         $parentID = null;
-        foreach ($breadcrumbs as $item) {
+        foreach ($breadcrumbs as $idx => $item) {
+
+            if ($idx == count($breadcrumbs) - 1) {
+                $fields['description'] = true;
+                $this->hydrator->setFields($fields);
+            }
+
             $items[] = [
                 'catname'   => $item['catname'],
                 'parent_id' => $parentID,
