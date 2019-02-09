@@ -145,6 +145,29 @@ class Catalogue
             }
         }
 
+        if ($toBrand === false) {
+            $select = new Sql\Select($this->itemTable->getTable());
+            $select
+                ->columns(['id'])
+                ->where([
+                    'id'           => $id,
+                    'item_type_id' => Item::PERSON
+                ]);
+
+            $person = $this->itemTable->selectWith($select)->current();
+
+            if ($person) {
+                $result[] = [
+                    'type' => 'person',
+                    'id'   => $person['id']
+                ];
+
+                if ($breakOnFirst && count($result)) {
+                    return $result;
+                }
+            }
+        }
+
         $parentRows = $this->itemParent->getParentRows($id, $stockFirst);
 
         foreach ($parentRows as $parentRow) {

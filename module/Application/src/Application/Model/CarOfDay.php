@@ -540,6 +540,9 @@ class CarOfDay
                                 'name' => 'categories'
                             ]);
                             break;
+                        case 'person':
+                            $url = '/ng/persons/' . $path['id'];
+                            break;
                     }
                 }
 
