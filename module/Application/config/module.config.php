@@ -248,6 +248,7 @@ return [
     'hostname_whitelist' => ['www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
         'i.' . $host, 'en.' . $host, 'fr.' . $host, 'ru.' . $host,
         'zh.' . $host, 'be.' . $host, 'br.' . $host, 'uk.' . $host, 'www.' . $host, $host],
+    'force_https' => (bool) getenv('AUTOWP_FORCE_HTTPS'),
 
     'pictures_hostname' => getenv('AUTOWP_PICTURES_HOST'),
 

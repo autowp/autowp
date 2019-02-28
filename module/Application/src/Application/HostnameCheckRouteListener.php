@@ -18,9 +18,15 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
      */
     private $hostnameWhitelist = ['localhost'];
 
-    public function __construct(array $whitelist)
+    /**
+     * @var bool
+     */
+    private $forceHttps;
+
+    public function __construct(array $whitelist, bool $forceHttps)
     {
         $this->hostnameWhitelist = $whitelist;
+        $this->forceHttps = $forceHttps;
     }
 
     /**
@@ -49,8 +55,16 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
             $isAllowed = in_array($hostname, $this->hostnameWhitelist);
 
             if (! $isAllowed) {
-                $redirectUrl = $request->getUri()->getScheme() . '://' .
+                $scheme = $this->forceHttps ? 'https' : $request->getUri()->getScheme();
+                $redirectUrl = $scheme . '://' .
                     $this->defaultHostname . $request->getRequestUri();
+
+                return $this->redirect($e, $redirectUrl);
+            }
+
+            if ($this->forceHttps && $request->getUri()->getScheme() != 'https') {
+                $redirectUrl = 'https://' .
+                    $request->getUri()->getHost() . $request->getRequestUri();
 
                 return $this->redirect($e, $redirectUrl);
             }

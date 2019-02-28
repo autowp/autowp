@@ -14,7 +14,8 @@ class HostnameCheckRouteListenerFactory implements FactoryInterface
     {
         $config = $container->get('Config');
         return new HostnameCheckRouteListener(
-            $config['hostname_whitelist']
+            $config['hostname_whitelist'],
+            $config['force_https']
         );
     }
 }
