@@ -54,6 +54,7 @@ web:
     ROLLBAR_CLIENT_ACCESS_TOKEN: ""
     ROLLBAR_ENVIRONMENT: development
     TRAFFIC_URL: http://traffic
+    AUTOWP_FORCE_HTTPS: ""
   volumes:
   - ./config:/app/config
   - ./data:/app/data
