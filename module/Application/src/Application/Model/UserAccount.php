@@ -90,7 +90,7 @@ class UserAccount
     {
         $this->table->update([
             'name' => $data['name'],
-            'link' => $data['link'],
+            'link' => (string) $data['link'],
         ], [
             'service_id'  => $service,
             'external_id' => $externalId,
