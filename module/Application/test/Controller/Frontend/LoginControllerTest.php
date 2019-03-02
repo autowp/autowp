@@ -104,7 +104,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertRegExp(
             '|^https://www\.facebook\.com/v[0-9.]+/dialog/oauth'.
-                '\?scope=public_profile%2Cuser_friends&state=[0-9a-z]+' .
+                '\?scope=public_profile&state=[0-9a-z]+' .
                 '&response_type=code&approval_prompt=auto' .
                 '&redirect_uri=https%3A%2F%2Fen\.localhost%2Flogin%2Fcallback' .
                 '&client_id=facebook_test_clientid$|iu',
