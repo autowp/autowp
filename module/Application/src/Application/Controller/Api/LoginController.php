@@ -164,28 +164,34 @@ class LoginController extends AbstractRestfulController
     {
         $services = [
             'facebook'    => [
-                'name' => 'Facebook',
-                'icon' => 'fa-facebook'
+                'name'  => 'Facebook',
+                'icon'  => 'fa-facebook',
+                'color' => '#3b5998'
             ],
             'vk'          => [
                 'name' => 'VK',
-                'icon' => 'fa-vk'
+                'icon' => 'fa-vk',
+                'color' => '#43648c'
             ],
             'google-plus' => [
                 'name' => 'Google+',
-                'icon' => 'fa-google-plus'
+                'icon' => 'fa-google',
+                'color' => '#dd4b39'
             ],
             'twitter'     => [
                 'name' => 'Twitter',
-                'icon' => 'fa-twitter'
+                'icon' => 'fa-twitter',
+                'color' => '#55acee'
             ],
             'github'     => [
                 'name' => 'Github',
-                'icon' => 'fa-github'
+                'icon' => 'fa-github',
+                'color' => '#000000'
             ],
             'linkedin'     => [
                 'name' => 'LinkedIn',
-                'icon' => 'fa-linkedin'
+                'icon' => 'fa-linkedin',
+                'color' => '#046293'
             ],
         ];
 
