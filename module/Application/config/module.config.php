@@ -291,17 +291,17 @@ return [
         \Autowp\ExternalLoginService\Vk::class => [
             'clientId'     => getenv('AUTOWP_ELS_VK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_VK_SECRET'),
-            'redirectUri'  => 'http://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/login/callback'
         ],
         \Autowp\ExternalLoginService\GooglePlus::class => [
             'clientId'     => getenv('AUTOWP_ELS_GOOGLEPLUS_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GOOGLEPLUS_SECRET'),
-            'redirectUri'  => 'http://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/login/callback'
         ],
         \Autowp\ExternalLoginService\Twitter::class => [
             'consumerKey'    => getenv('AUTOWP_ELS_TWITTER_CLIENTID'),
             'consumerSecret' => getenv('AUTOWP_ELS_TWITTER_SECRET'),
-            'redirectUri'  => 'http://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/login/callback'
         ],
         \Autowp\ExternalLoginService\Facebook::class => [
             'clientId'     => getenv('AUTOWP_ELS_FACEBOOK_CLIENTID'),
@@ -313,12 +313,12 @@ return [
         \Autowp\ExternalLoginService\Github::class => [
             'clientId'     => getenv('AUTOWP_ELS_GITHUB_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GITHUB_SECRET'),
-            'redirectUri'  => 'http://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/login/callback'
         ],
         \Autowp\ExternalLoginService\Linkedin::class => [
             'clientId'     => getenv('AUTOWP_ELS_LINKEDIN_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_LINKEDIN_SECRET'),
-            'redirectUri'  => 'http://en.'.$host.'/login/callback'
+            'redirectUri'  => 'https://en.'.$host.'/login/callback'
         ]
     ],
 
