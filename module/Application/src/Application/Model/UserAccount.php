@@ -105,7 +105,7 @@ class UserAccount
             'user_id'      => $data['user_id'],
             'used_for_reg' => $data['used_for_reg'],
             'name'         => $data['name'],
-            'link'         => $data['link']
+            'link'         => (string) $data['link']
         ]);
     }
 }
