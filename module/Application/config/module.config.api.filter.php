@@ -2467,7 +2467,8 @@ return [
                             'perspective_item', 'siblings', 'ip',
                             'name_html', 'name_text', 'image_gallery_full',
                             'preview_large', 'dpi', 'point', 'authors',
-                            'categories', 'twins', 'factories', 'of_links'
+                            'categories', 'twins', 'factories', 'of_links',
+                            'copyright_blocks'
                         ]]
                     ]
                 ]
@@ -2655,7 +2656,8 @@ return [
                         'options' => ['fields' => [
                             'owner', 'thumbnail', 'votes',
                             'comments_count', 'name_html', 'name_text', 'image_gallery_full',
-                            'preview_large', 'dpi', 'point', 'authors', 'categories', 'twins', 'factories', 'of_links'
+                            'preview_large', 'dpi', 'point', 'authors', 'categories', 'twins',
+                            'factories', 'of_links', 'copyright_blocks'
                         ]]
                     ]
                 ]
@@ -2744,7 +2746,7 @@ return [
                     [
                         'name'    => 'FileSize',
                         'options' => [
-                            'max'           => 1024 * 1024 * 50,
+                            'max'           => 1024 * 1024 * 100,
                             'useByteString' => false
                         ]
                     ],
@@ -2923,7 +2925,8 @@ return [
                             'perspective_item', 'siblings', 'ip',
                             'name_html', 'name_text', 'image_gallery_full',
                             'preview_large', 'dpi', 'point', 'authors',
-                            'categories', 'twins', 'factories', 'of_links'
+                            'categories', 'twins', 'factories', 'of_links',
+                            'copyright_blocks'
                         ]]
                     ]
                 ]
