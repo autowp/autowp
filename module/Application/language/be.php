@@ -1,4 +1,15 @@
 <?php return array (
+  'perspective/mockup' => 'Mockup',
+  'catalogue/specifications-of-{name}' => 'Тэхнічныя характарыстыкі {name}',
+  'moder/picture/edit-item' => 'Кіраванне',
+  'moder/picture/edit-picture-{id}' => 'Кіраванне выявай №{id}',
+  'page/141/ng-name' => 'Дададзеныя карцінкі {brand}',
+  'page/28/ng-name' => 'Усе карцінкі {group_name}',
+  'page/102/ng-name' => 'Рэдактар характарыстык {item_name}',
+  'page/27/ng-name' => 'Тэхнічныя характарыстыкі {group_name}',
+  'page/136/name' => 'Аб праекце',
+  'page/136/title' => 'About us',
+  '{count} vehicles' => '{count, plural, one {{count} vehicle} other {{count} vehicles}}',
   'select' => 'select',
   'picture/text' => 'Усе выявы з\'яўляюцца чыёй-небудзь ўласнасцю.
 
@@ -76,7 +87,6 @@
   'page/18/name' => '%PICTURE_NAME%',
   'page/23/name' => '%CATEGORY_NAME%',
   'page/26/name' => '%TWINS_GROUP_NAME%',
-  'page/32/name' => '%ARTICLE_NAME%',
   'page/33/name' => '%CAR_NAME%',
   'page/43/name' => '%THEME_NAME%',
   'page/44/name' => '%TOPIC_NAME%',
@@ -557,7 +567,7 @@ other {У вас {messages} новых паведамленняў}
   'account/accounts/remove' => 'Выдаліць',
   'account/accounts/removed' => 'Акаўнт выдалены',
   'account/accounts/connect-failed' => 'Не атрымалася прывязаць акаўнт. Магчыма адбылася памылка або доступ да дадатку забаронены карыстальнікам.',
-  'account/accounts/disconnect-failed' => 'Не атрымалася выдаліць акаўнт.
+  'account/accounts/disconnect-failed' => 'Не атрымалася выдаліць акаўнт. 
 
 Такое бывае, калі прывязаны аккаўнт з\'яўляецца адзіным спосабам аўтарызацыі, г.зн. не зададзены e-mail або іншыя акаўнты.',
   'account/delete/text' => 'Мы шкадуем, што вам прыйшлося апынуцца на гэтай старонцы, і вы плануеце пакінуць наш сайт назаўжды, але не можам вам у гэтым адмовіць.
@@ -862,7 +872,6 @@ Brazilian portuguese site translation: %pt-br-translator%
   'page/28/name' => 'Усе карцінкі %TWINS_GROUP_NAME%',
   'page/29/name' => 'Дадаць карцінку',
   'page/30/name' => 'Выбар брэнда',
-  'page/31/name' => 'Артыкулы пра аўтамабілі',
   'page/34/name' => 'Усе карцінкі %CAR_NAME%',
   'page/36/name' => 'Тэхнічныя характарыстыкі %CAR_NAME%',
   'page/37/name' => 'Канцэпты і прататыпы %BRAND_NAME%',
@@ -926,7 +935,6 @@ Brazilian portuguese site translation: %pt-br-translator%
   'page/133/name' => 'Кіраванне доступам',
   'page/134/name' => 'Новы пароль',
   'page/135/name' => 'Новы пароль захаваны',
-  'page/136/name' => 'Аб праекце',
   'page/137/name' => 'Выдаленне акаўнта',
   'page/138/name' => '%CAR_TYPE_NAME% %BRAND_NAME% ў храналагічным парадку',
   'page/141/name' => 'Дададзеныя карцінкі %BRAND_NAME%',
@@ -977,7 +985,6 @@ Brazilian portuguese site translation: %pt-br-translator%
   'page/114/title' => 'Часопіс ТТХ',
   'page/122/title' => 'Тэхнічныя характарыстыкі',
   'page/130/title' => 'Мае карцінкі',
-  'page/136/title' => 'Аб праекце',
   'page/138/title' => '%CAR_TYPE_NAME% %BRAND_NAME% ў храналагічным парадку',
   'page/153/title' => 'Двайняты %BRAND_NAME%',
   'page/162/title' => 'Усе выявы',
@@ -1001,7 +1008,6 @@ Brazilian portuguese site translation: %pt-br-translator%
   'page/66/breadcrumbs' => 'Усе карцінкі',
   'page/102/breadcrumbs' => 'Рэдактар характарыстык аўтамабіля',
   'page/122/breadcrumbs' => 'Тэхнічныя характарыстыкі',
-  'page/136/breadcrumbs' => 'Аб праекце',
   'page/162/breadcrumbs' => 'Усе выявы',
   'page/164/breadcrumbs' => 'Самыя-самыя',
   'page/180/breadcrumbs' => 'Заводы',
@@ -1194,7 +1200,7 @@ Brazilian portuguese site translation: %pt-br-translator%
   'moder/picture/edit-brand-%s' => 'Кіраванне брэндам %s',
   'moder/picture/edit-engine-%s' => 'Кіраванне рухавіком %s',
   'moder/picture/edit-factory-%s' => 'Кіраванне заводам %s',
-  'moder/picture/picture-n-%s' => 'Выява №%s',
+  'moder/picture/picture-n' => 'Выява №{id}',
   'moder/picture/previous' => '<< папярэдняя',
   'moder/picture/next' => 'наступная >>',
   'moder/picture/previous-new' => '<< папярэдняя ня апрацаваная',

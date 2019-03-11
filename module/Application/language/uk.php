@@ -1,4 +1,15 @@
 <?php return array (
+  'perspective/mockup' => 'Макет',
+  'catalogue/specifications-of-{name}' => 'Технічні характеристики {name}',
+  'moder/picture/edit-item' => 'Управління',
+  'moder/picture/edit-picture-{id}' => 'Управління зображенням №{id}',
+  'page/141/ng-name' => 'Додані зображення {brand}',
+  'page/28/ng-name' => 'Всі зображення {group_name}',
+  'page/102/ng-name' => 'Редактор характеристик {item_name}',
+  'page/27/ng-name' => 'Технічні характеристики {group_name}',
+  'page/136/name' => 'Про проект',
+  'page/136/title' => 'About us',
+  '{count} vehicles' => '{count, plural, one {{count} vehicle} other {{count} vehicles}}',
   'select' => 'select',
   'picture/text' => 'Всі зображення є чиєюсь власністю.
 
@@ -76,7 +87,6 @@
   'page/18/name' => '%PICTURE_NAME%',
   'page/23/name' => '%CATEGORY_NAME%',
   'page/26/name' => '%TWINS_GROUP_NAME%',
-  'page/32/name' => '%ARTICLE_NAME%',
   'page/33/name' => '%CAR_NAME%',
   'page/43/name' => '%THEME_NAME%',
   'page/44/name' => '%TOPIC_NAME%',
@@ -864,7 +874,6 @@ E-mail: %2$s
   'page/28/name' => 'Всі зображення %TWINS_GROUP_NAME%',
   'page/29/name' => 'Додати зображення',
   'page/30/name' => 'Вибір бренду',
-  'page/31/name' => 'Статті про автомобілі',
   'page/34/name' => 'Всі зображення %CAR_NAME%',
   'page/36/name' => 'Технічні характеристики %CAR_NAME%',
   'page/37/name' => 'Концепти і прототипи %BRAND_NAME%',
@@ -928,7 +937,6 @@ E-mail: %2$s
   'page/133/name' => 'Керування доступом',
   'page/134/name' => 'Новий пароль',
   'page/135/name' => 'Новий пароль збережений',
-  'page/136/name' => 'Про проект',
   'page/137/name' => 'Видалення облікового запису',
   'page/138/name' => '%CAR_TYPE_NAME% %BRAND_NAME% в хронологічному порядку',
   'page/141/name' => 'Додані зображення %BRAND_NAME%',
@@ -979,7 +987,6 @@ E-mail: %2$s
   'page/114/title' => 'Журнал ТТХ',
   'page/122/title' => 'Технічні характеристики',
   'page/130/title' => 'Мої зображення',
-  'page/136/title' => 'Про проект',
   'page/138/title' => '%CAR_TYPE_NAME% %BRAND_NAME% в хронологічному порядку',
   'page/153/title' => 'Близнята %BRAND_NAME%',
   'page/162/title' => 'Всі зображення',
@@ -1003,7 +1010,6 @@ E-mail: %2$s
   'page/66/breadcrumbs' => 'Всі зображення',
   'page/102/breadcrumbs' => 'Редактор характеристик автомобіля',
   'page/122/breadcrumbs' => 'Технічні характеристики',
-  'page/136/breadcrumbs' => 'Про проект',
   'page/162/breadcrumbs' => 'Всі зображення',
   'page/164/breadcrumbs' => 'Най-най',
   'page/180/breadcrumbs' => 'Заводи',
@@ -1196,7 +1202,7 @@ E-mail: %2$s
   'moder/picture/edit-brand-%s' => 'Управління брендом %s',
   'moder/picture/edit-engine-%s' => 'Управління двигуном %s',
   'moder/picture/edit-factory-%s' => 'Управління заводом %s',
-  'moder/picture/picture-n-%s' => 'Зображення №%s',
+  'moder/picture/picture-n' => 'Зображення №{id}',
   'moder/picture/previous' => '<< попереднє',
   'moder/picture/next' => 'наступне >>',
   'moder/picture/previous-new' => '<< попереднє не оброблене',
@@ -1621,7 +1627,7 @@ E-mail: %2$s
   'specs/attrs/22/32/173/description' => 'Стандарт для США з 1971-72.
 Трансмісія не враховується. Навісне обладнання - враховується',
   'specs/attrs/22/32/174' => 'максимальна потужність (SAE gross)',
-  'specs/attrs/22/32/174/description' => 'Стандарт США 1972 року, приблизно
+  'specs/attrs/22/32/174/description' => 'Стандарт США 1972 року, приблизно 
 відповідний технології виміру потужності до 1972.
 Трансмісія - не враховується',
   'specs/attrs/22/32/177' => 'максимальна потужність (JIS D 1001)',

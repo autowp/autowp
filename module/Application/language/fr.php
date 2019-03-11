@@ -1,4 +1,15 @@
 <?php return array (
+  'perspective/mockup' => 'Mockup',
+  'catalogue/specifications-of-{name}' => 'Caractéristiques de {name}',
+  'moder/picture/edit-item' => 'Modifier l\'élément',
+  'moder/picture/edit-picture-{id}' => 'Modifier l\'image №{id}',
+  'page/141/ng-name' => 'Images de {brand}',
+  'page/28/ng-name' => 'Toutes les photos de {group_name}',
+  'page/102/ng-name' => '{item_name} spécifications éditeur',
+  'page/27/ng-name' => 'Caractéristiques de {group_name}',
+  'page/136/name' => 'À propos',
+  'page/136/title' => 'À propos de nous',
+  '{count} vehicles' => '{count, plural, one {{count} vehicle} other {{count} vehicles}}',
   'select' => 'select',
   'picture/text' => 'Toutes les images ont leurs propriétaires.
 
@@ -76,7 +87,6 @@ Que vous vouliez bavarder d\'automobiles ou tout autre chose, vous pouvez le fai
   'page/18/name' => '%PICTURE_NAME%',
   'page/23/name' => '%CATEGORY_NAME%',
   'page/26/name' => '%TWINS_GROUP_NAME%',
-  'page/32/name' => '%ARTICLE_NAME%',
   'page/33/name' => '%CAR_NAME%',
   'page/43/name' => '%THEME_NAME%',
   'page/44/name' => '%TOPIC_NAME%',
@@ -690,7 +700,7 @@ Nous serions heureux si vous souhaitiez [faire une donation désintéressée](/n
   'donate/vod/select-date' => '1. Choisissez une date',
   'donate/vod/date-busy' => 'busy',
   'donate/vod/select-item' => '2. Choisissez un véhicule',
-  'donate/vod/select-item-text' => 'Virtuellement tous les véhicules peuvent être “Véhicule du jour”, tant qu\'ils respectent les conditions suivantes:
+  'donate/vod/select-item-text' => 'Virtuellement tous les véhicules peuvent être “Véhicule du jour”, tant qu\'ils respectent les conditions suivantes: 
 
 - le véhicule ne doit pas avoir déjà été sélectionné
 - le véhicule doit avoir au moins 3 photos',
@@ -705,7 +715,7 @@ Nous serions heureux si vous souhaitiez [faire une donation désintéressée](/n
   'donate/vod/message' => 'Vos souhaits',
   'donate/vod/price:' => 'Prix: ',
   'donate/vod/price/currency' => ' roubles',
-  'donate/vod/price-aroud' => 'about {price}',
+  'donate/vod/price-aroud' => 'environ {price}',
   'donate/vod/method/credit-card' => 'Carte bancaire',
   'donate/vod/method/mobile' => 'Forfait de téléphonie mobile',
   'donate/vod/method/yandex.money' => 'Yandex.Money',
@@ -865,7 +875,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/28/name' => 'Toutes les photos de %TWINS_GROUP_NAME%',
   'page/29/name' => 'Ajouter une image',
   'page/30/name' => 'Sélectionnez la marque',
-  'page/31/name' => 'Articles',
   'page/34/name' => 'Toutes les images de %CAR_NAME%',
   'page/36/name' => 'Caractéristiques de %CAR_NAME%',
   'page/37/name' => 'Concepts et prototypes de %BRAND_NAME%',
@@ -929,7 +938,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/133/name' => 'Contrôle d\'accès',
   'page/134/name' => 'Neuve passvord',
   'page/135/name' => 'Nouveau mot de passe sauvegardé',
-  'page/136/name' => 'À propos',
   'page/137/name' => 'Suppression du compte',
   'page/138/name' => '%BRAND_NAME% %CAR_TYPE_NAME% dans l\'ordre chronologique',
   'page/141/name' => 'Images de %BRAND_NAME%',
@@ -980,7 +988,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/114/title' => 'Log de caractéristiques',
   'page/122/title' => 'Caractéristiques',
   'page/130/title' => 'Mes images',
-  'page/136/title' => 'À propos',
   'page/138/title' => '%BRAND_NAME% %CAR_TYPE_NAME% dans l\'ordre chronologique',
   'page/153/title' => '%BRAND_NAME% jumeaux',
   'page/162/title' => 'Toutes les images',
@@ -1004,7 +1011,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'page/66/breadcrumbs' => 'Toutes les images',
   'page/102/breadcrumbs' => 'Spécifications éditeur',
   'page/122/breadcrumbs' => 'Caractéristiques',
-  'page/136/breadcrumbs' => 'À propos',
   'page/162/breadcrumbs' => 'Toutes les images',
   'page/164/breadcrumbs' => 'Les meilleurs',
   'page/180/breadcrumbs' => 'Des usines',
@@ -1197,7 +1203,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'moder/picture/edit-brand-%s' => 'Modifier la marque %s',
   'moder/picture/edit-engine-%s' => 'Modifier le moteur %s',
   'moder/picture/edit-factory-%s' => 'Modifier l\'usine %s',
-  'moder/picture/picture-n-%s' => 'Image №%s',
+  'moder/picture/picture-n' => 'Image №{id}',
   'moder/picture/previous' => '<< précédent',
   'moder/picture/next' => 'suivant >>',
   'moder/picture/previous-new' => '<< previous new',
@@ -1265,9 +1271,9 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
   'brand/name' => 'Nom',
   'brand/logo' => 'Logotype',
   'moder/brands/meta-data/full-name' => 'Nom complet',
-  'moder/brands/logo/description' => '* Les logos doivent être au format d\'image PNG ;
-* Les zones transparentes doivent bien être transparentes et non pas blanches!
-* L\'image doit être recadrée aux bords du logo. Les marges ne sont pas nécessaires ;
+  'moder/brands/logo/description' => '* Les logos doivent être au format d\'image PNG ; 
+* Les zones transparentes doivent bien être transparentes et non pas blanches! 
+* L\'image doit être recadrée aux bords du logo. Les marges ne sont pas nécessaires ; 
 * Les images doivent avoir la plus grande définition possible - pour garantir la qualité ainsi qu\'une réutilisation future. Le site se charge automatiquement de la mise à l\'échelle.',
   'moder/brands/logo/saved' => 'Logo enregistré',
   'moder/brands/links' => 'Liens',
