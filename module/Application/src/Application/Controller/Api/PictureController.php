@@ -318,6 +318,10 @@ class PictureController extends AbstractRestfulController
             'timezone' => $this->user()->timezone() // @phan-suppress-current-line PhanUndeclaredMethod
         ];
 
+        if ($data['identity']) {
+            $filter['identity'] = $data['identity'];
+        }
+
         if ($data['item_id']) {
             $filter['item']['ancestor_or_self']['id'] = $data['item_id'];
         }

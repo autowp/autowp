@@ -5,6 +5,8 @@ namespace Application\Hydrator\Api;
 use Exception;
 use Traversable;
 
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Stdlib\ArrayUtils;
 
@@ -96,6 +98,16 @@ class PictureHydrator extends RestHydrator
      */
     private $itemsOptions = [];
 
+    /**
+     * @var Item
+     */
+    private $itemModel;
+
+    /**
+     * @var TableGateway
+     */
+    private $linksTable;
+
     public function __construct(
         $serviceManager
     ) {
@@ -103,6 +115,7 @@ class PictureHydrator extends RestHydrator
 
         $this->picture = $serviceManager->get(Picture::class);
         $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->itemModel = $serviceManager->get(Item::class);
 
         $this->pictureView = $serviceManager->get(PictureView::class);
         $this->pictureModerVote = $serviceManager->get(PictureModerVote::class);
@@ -118,11 +131,14 @@ class PictureHydrator extends RestHydrator
         $this->textStorage = $serviceManager->get(\Autowp\TextStorage\Service::class);
         $this->perspective = $serviceManager->get(\Application\Model\Perspective::class);
 
+        $this->linksTable = $serviceManager->get('TableManager')->get('links');
+
         $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('image', $strategy);
         $this->addStrategy('thumb', $strategy);
         $this->addStrategy('thumb_medium', $strategy);
         $this->addStrategy('image_gallery_full', $strategy);
+        $this->addStrategy('preview_large', $strategy);
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('owner', $strategy);
@@ -144,6 +160,18 @@ class PictureHydrator extends RestHydrator
 
         $strategy = new Strategy\Ip($serviceManager);
         $this->addStrategy('ip', $strategy);
+
+        $strategy = new Strategy\Item($serviceManager);
+        $this->addStrategy('twins', $strategy);
+
+        $strategy = new Strategy\Item($serviceManager);
+        $this->addStrategy('categories', $strategy);
+
+        $strategy = new Strategy\Item($serviceManager);
+        $this->addStrategy('factories', $strategy);
+
+        $strategy = new Strategy\Item($serviceManager);
+        $this->addStrategy('copyright_blocks', $strategy);
     }
 
     /**
@@ -219,6 +247,131 @@ class PictureHydrator extends RestHydrator
             'filesize'       => (int)$object['filesize']
         ];
 
+        if ($this->filterComposite->filter('subscribed')) {
+            $subscribed = false;
+            if ($this->user) {
+                $subscribed = $this->comments->userSubscribed(
+                    \Application\Comments::PICTURES_TYPE_ID,
+                    $object['id'],
+                    $this->user['id']
+                );
+            }
+
+            $picture['subscribed'] = $subscribed;
+        }
+
+        if ($this->filterComposite->filter('copyright_blocks')) {
+            $rows = $this->itemModel->getRows([
+                'language'     => $this->language,
+                'item_type_id' => Item::COPYRIGHT,
+                'pictures' => [
+                    'id'   => $picture['id']
+                ],
+                'limit' => 3
+            ]);
+
+            $blocks = [];
+            foreach ($rows as $row) {
+                $blocks[] = $this->extractValue('copyright_blocks', $row);
+            }
+
+            $picture['copyright_blocks'] = $blocks;
+        }
+
+        if ($this->filterComposite->filter('factories')) {
+            $rows = $this->itemModel->getRows([
+                'language'     => $this->language,
+                'item_type_id' => Item::FACTORY,
+                'descendant_or_self' => [
+                    'pictures' => [
+                        'id' => $object['id']
+                    ]
+                ]
+            ]);
+
+            $factories = [];
+            foreach ($rows as $row) {
+                $factories[] = $this->extractValue('factories', $row);
+            }
+
+            $picture['factories'] = $factories;
+        }
+
+        if ($this->filterComposite->filter('twins')) {
+            $rows = $this->itemModel->getRows([
+                'language'     => $this->language,
+                'item_type_id' => Item::TWINS,
+                'descendant_or_self' => [
+                    'pictures' => [
+                        'id' => $object['id']
+                    ]
+                ]
+            ]);
+
+            $twins = [];
+            foreach ($rows as $row) {
+                $twins[] = $this->extractValue('twins', $row);
+            }
+
+            $picture['twins'] = $twins;
+        }
+
+        if ($this->filterComposite->filter('categories')) {
+            $categoryRows = $this->itemModel->getRows([
+                'language'     => $this->language,
+                'item_type_id' => Item::CATEGORY,
+                'descendant_or_self' => [
+                    'pictures' => [
+                        'id' => $object['id']
+                    ]
+                ]
+            ]);
+
+            $categories = [];
+            foreach ($categoryRows as $row) {
+                $categories[] = $this->extractValue('categories', $row);
+            }
+
+            $picture['categories'] = $categories;
+        }
+
+        if ($this->filterComposite->filter('authors')) {
+            $authors = [];
+            $pictureAuthors = $this->pictureItem->getPictureItemsData($object['id'], PictureItem::PICTURE_AUTHOR);
+            foreach ($pictureAuthors as $pictureAuthor) {
+                $item = $this->itemModel->getRow([
+                    'id'       => $pictureAuthor['item_id'],
+                    'language' => $this->language,
+                    'columns'  => ['name']
+                ]);
+
+                $authors[] = [
+                    'id'   => $pictureAuthor['item_id'],
+                    'name' => $item['name']
+                ];
+            }
+
+            $picture['authors'] = $authors;
+        }
+
+        if ($this->filterComposite->filter('dpi')) {
+            $picture['dpi_x'] = $object['dpi_x'];
+            $picture['dpi_y'] = $object['dpi_y'];
+        }
+
+        if ($this->filterComposite->filter('point')) {
+            $picture['point'] = null;
+            if ($object['point']) {
+                $point = \geoPHP::load(substr($object['point'], 4), 'wkb');
+                if ($point) {
+                    $picture['point'] = [
+                        'lng' => $point->x(),
+                        'lat' => $point->y()
+                    ];
+                }
+            }
+        }
+
         if ($isModer) {
             $crop = $this->imageStorage->getImageCrop($object['image_id']);
             $picture['cropped']         = (bool)$crop;
@@ -272,7 +425,7 @@ class PictureHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('votes')) {
-            $picture['votes'] = $this->pictureVote->getVote($object['id'], null);
+            $picture['votes'] = $this->pictureVote->getVote($object['id'], $this->userId);
         }
 
         if ($this->filterComposite->filter('comments_count')) {
@@ -296,6 +449,13 @@ class PictureHydrator extends RestHydrator
             $picture['image_gallery_full'] = $this->extractValue('image_gallery_full', [
                 'image'  => $object['image_id'],
                 'format' => 'picture-gallery-full'
+            ]);
+        }
+
+        if ($this->filterComposite->filter('preview_large')) {
+            $picture['preview_large'] = $this->extractValue('preview_large', [
+                'image'  => $object['image_id'],
+                'format' => 'picture-preview-large'
             ]);
         }
 
@@ -334,13 +494,73 @@ class PictureHydrator extends RestHydrator
             }
         }
 
-        if ($isModer) {
-            if ($this->filterComposite->filter('image')) {
-                $picture['image'] = $this->extractValue('image', [
-                    'image'  => $object['image_id']
-                ]);
+        if ($this->filterComposite->filter('items')) {
+            $typeId = 0;
+            if (isset($this->itemsOptions['type_id'])) {
+                $typeId = (int) $this->itemsOptions['type_id'];
             }
 
+            $rows = $this->pictureItem->getPictureItemsData($object['id'], $typeId);
+            $picture['items'] = $this->extractValue('items', $rows);
+        }
+
+        if ($this->filterComposite->filter('moder_vote')) {
+            $picture['moder_vote'] = $this->pictureModerVote->getVoteCount($object['id']);
+        }
+
+        if ($this->filterComposite->filter('moder_votes')) {
+            $moderVotes = [];
+            foreach ($this->pictureModerVote->getVotes($object['id']) as $row) {
+                $user = $this->userModel->getRow((int)$row['user_id']);
+                $moderVotes[] = [
+                    'reason' => $row['reason'],
+                    'vote'   => (int)$row['vote'],
+                    'user'   => $user ? $this->extractValue('moder_vote_user', $user) : null
+                ];
+            }
+            $picture['moder_votes'] = $moderVotes;
+        }
+
+        if ($this->filterComposite->filter('image')) {
+            $picture['image'] = $this->extractValue('image', [
+                'image' => $object['image_id']
+            ]);
+        }
+
+        if ($this->filterComposite->filter('of_links')) {
+            $brandIds = $this->itemModel->getIds([
+                'item_type_id'       => Item::BRAND,
+                'descendant_or_self' => [
+                    'pictures' => [
+                        'id' => $object['id']
+                    ]
+                ]
+            ]);
+
+            $ofLinks = [];
+            if (count($brandIds)) {
+                $links = $this->linksTable->select([
+                    new Sql\Predicate\In('item_id', $brandIds),
+                    'type' => 'official'
+                ]);
+                foreach ($links as $link) {
+                    $ofLinks[$link['id']] = $link;
+                }
+            }
+
+            $picture['of_links'] = $ofLinks;
+        }
+
+        if ($this->filterComposite->filter('copyrights')) {
+            $picture['copyrights'] = null;
+            if ($object['copyrights_text_id']) {
+                $text = $this->textStorage->getText($object['copyrights_text_id']);
+                $picture['copyrights'] = $text;
+                $picture['copyrights_text_id'] = (int) $object['copyrights_text_id'];
+            }
+        }
+
+        if ($isModer) {
             if ($this->filterComposite->filter('iptc')) {
                 $picture['iptc'] = $this->imageStorage->getImageIPTC($object['image_id']);
             }
@@ -377,23 +597,6 @@ class PictureHydrator extends RestHydrator
                 $picture['add_date'] = $this->extractValue('add_date', $addDate);
             }
 
-            if ($this->filterComposite->filter('moder_vote')) {
-                $picture['moder_vote'] = $this->pictureModerVote->getVoteCount($object['id']);
-            }
-
-            if ($this->filterComposite->filter('moder_votes')) {
-                $moderVotes = [];
-                foreach ($this->pictureModerVote->getVotes($object['id']) as $row) {
-                    $user = $this->userModel->getRow((int)$row['user_id']);
-                    $moderVotes[] = [
-                        'reason' => $row['reason'],
-                        'vote'   => (int)$row['vote'],
-                        'user'   => $user ? $this->extractValue('moder_vote_user', $user) : null
-                    ];
-                }
-                $picture['moder_votes'] = $moderVotes;
-            }
-
             if ($this->filterComposite->filter('moder_voted')) {
                 $picture['moder_voted'] = $this->pictureModerVote->hasVote($object['id'], $this->userId);
             }
@@ -406,27 +609,8 @@ class PictureHydrator extends RestHydrator
                 }
             }
 
-            if ($this->filterComposite->filter('items')) {
-                $typeId = 0;
-                if (isset($this->itemsOptions['type_id'])) {
-                    $typeId = (int) $this->itemsOptions['type_id'];
-                }
-
-                $rows = $this->pictureItem->getPictureItemsData($object['id'], $typeId);
-                $picture['items'] = $this->extractValue('items', $rows);
-            }
-
             if ($this->filterComposite->filter('special_name')) {
                 $picture['special_name'] = $object['name'];
-            }
-
-            if ($this->filterComposite->filter('copyrights')) {
-                $picture['copyrights'] = null;
-                if ($object['copyrights_text_id']) {
-                    $text = $this->textStorage->getText($object['copyrights_text_id']);
-                    $picture['copyrights'] = $text;
-                    $picture['copyrights_text_id'] = (int) $object['copyrights_text_id'];
-                }
             }
 
             if ($this->filterComposite->filter('change_status_user')) {

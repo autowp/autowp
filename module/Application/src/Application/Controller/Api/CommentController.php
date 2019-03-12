@@ -278,22 +278,21 @@ class CommentController extends AbstractRestfulController
 
         $paginator = $this->comments->service()->getMessagesPaginator($options);
 
+        $limit = null;
         if (strlen($values['limit']) > 0) {
             $limit = (int)$values['limit'];
             $limit = $limit >= 0 ? $limit : 0;
-        } else {
-            $limit = 1;
         }
 
         $paginator
-            ->setItemCountPerPage($limit ? $limit : 500)
+            ->setItemCountPerPage($limit ? $limit : 50000)
             ->setCurrentPageNumber($values['page']);
 
         $result = [
             'paginator' => get_object_vars($paginator->getPages())
         ];
 
-        if ($limit > 0) {
+        if ($limit > 0 || $limit === null) {
             $this->hydrator->setOptions([
                 'fields'   => $values['fields'],
                 'language' => $this->language(),

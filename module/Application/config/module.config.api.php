@@ -54,6 +54,7 @@ return [
             Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
             Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class            => Controller\Api\Service\ItemControllerFactory::class,
+            Controller\Api\ItemGalleryController::class     => Controller\Api\ItemGalleryControllerFactory::class,
             Controller\Api\ItemLanguageController::class    => Controller\Api\ItemLanguageControllerFactory::class,
             Controller\Api\ItemLinkController::class        => Controller\Api\ItemLinkControllerFactory::class,
             Controller\Api\ItemParentController::class      => Controller\Api\ItemParentControllerFactory::class,
@@ -1346,6 +1347,25 @@ return [
                                             ]
                                         ]
                                     ],
+                                    'gallery' => [
+                                        'type' => 'Literal',
+                                        'options' => [
+                                            'route' => '/gallery',
+                                        ],
+                                        'may_terminate' => false,
+                                        'child_routes' => [
+                                            'get' => [
+                                                'type' => 'Method',
+                                                'options' => [
+                                                    'verb' => 'get',
+                                                    'defaults' => [
+                                                        'controller' => Controller\Api\ItemGalleryController::class,
+                                                        'action'     => 'gallery'
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
                                 ]
                             ]
                         ]

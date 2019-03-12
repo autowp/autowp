@@ -309,6 +309,7 @@ class Picture
                 case 'height':
                 case 'image_id':
                 case 'filesize':
+                case 'status':
                     if (is_numeric($key)) {
                         $result[] = $column;
                     } else {

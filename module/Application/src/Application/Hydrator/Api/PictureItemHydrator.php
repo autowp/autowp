@@ -110,13 +110,13 @@ class PictureItemHydrator extends RestHydrator
             $isModer = $this->acl->inheritsRole($role, 'moder');
         }
 
+        if ($this->filterComposite->filter('item')) {
+            $row = $this->item->getRow(['id' => (int)$object['item_id']]);
+
+            $result['item'] = $row ? $this->extractValue('item', $row) : null;
+        }
+
         if ($isModer) {
-            if ($this->filterComposite->filter('item')) {
-                $row = $this->item->getRow(['id' => (int)$object['item_id']]);
-
-                $result['item'] = $row ? $this->extractValue('item', $row) : null;
-            }
-
             if ($this->filterComposite->filter('picture')) {
                 $row = $this->picture->getRow(['id' => (int)$object['picture_id']]);
 

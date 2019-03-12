@@ -15,7 +15,6 @@ class TwinsControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(
-            $container->get('longCache'),
             $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\Twins::class)
         );

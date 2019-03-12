@@ -264,7 +264,6 @@ class ItemController extends AbstractRestfulController
 
         $parentID = null;
         foreach ($breadcrumbs as $idx => $item) {
-
             if ($idx == count($breadcrumbs) - 1) {
                 $fields['description'] = true;
                 $this->hydrator->setFields($fields);

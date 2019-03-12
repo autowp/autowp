@@ -310,6 +310,50 @@ class ItemHydrator extends RestHydrator
             'item_type_id' => (int)$object['item_type_id']
         ];
 
+        if ($this->filterComposite->filter('alt_names')) {
+            // alt names
+            $altNames = [];
+            $altNames2 = [];
+
+            $langNames = $this->itemModel->getNames($object['id']);
+
+            $currentLangName = null;
+            foreach ($langNames as $lang => $langName) {
+                if ($lang == 'xx') {
+                    continue;
+                }
+                $name = $langName;
+                if (! isset($altNames[$name])) {
+                    $altNames[$langName] = [];
+                }
+                $altNames[$name][] = $lang;
+
+                if ($this->language == $lang) {
+                    $currentLangName = $name;
+                }
+            }
+
+            foreach ($altNames as $name => $codes) {
+                if (strcmp($name, $currentLangName) != 0) {
+                    $altNames2[$name] = $codes;
+                }
+            }
+
+            if ($currentLangName) {
+                unset($altNames2[$currentLangName]);
+            }
+
+            $a = [];
+            foreach ($altNames2 as $name => $languages) {
+                $a[] = [
+                    'languages' => $languages,
+                    'name'      => $name
+                ];
+            }
+
+            $result['alt_names'] = $a;
+        }
+
         if ($this->filterComposite->filter('engine_id')) {
             $result['engine_id'] = $object['engine_item_id'] ? (int) $object['engine_item_id'] : null;
             $result['engine_inherit'] = (bool) $object['engine_inherit'];
@@ -396,6 +440,10 @@ class ItemHydrator extends RestHydrator
                 ],
                 'status' => Picture::STATUS_ACCEPTED,
             ]);
+        }
+
+        if ($this->filterComposite->filter('has_specs')) {
+            $result['has_specs'] = $this->specificationsService->hasSpecs($object['id']);
         }
 
         if ($this->filterComposite->filter('has_child_specs')) {
