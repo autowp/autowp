@@ -243,57 +243,6 @@ return [
                     ],
                 ],
             ],
-            'twins' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/twins',
-                    'defaults' => [
-                        'controller' => Controller\TwinsController::class,
-                    ],
-                ],
-                'may_terminate' => false,
-                'child_routes'  => [
-                    'group' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/group:id',
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'pictures' => [
-                                'type' => 'Literal',
-                                'options' => [
-                                    'route' => '/pictures',
-                                ],
-                                'may_terminate' => false,
-                                'child_routes'  => [
-                                    'picture' => [
-                                        'type' => 'Segment',
-                                        'options' => [
-                                            'route' => '/:picture_id',
-                                            'defaults' => [
-                                                'action' => 'picture',
-                                            ]
-                                        ],
-                                        'may_terminate' => true,
-                                        'child_routes' => [
-                                            'gallery' => [
-                                                'type' => 'Literal',
-                                                'options' => [
-                                                    'route' => '/gallery',
-                                                    'defaults' => [
-                                                        'action' => 'picture-gallery',
-                                                    ]
-                                                ],
-                                            ],
-                                        ]
-                                    ]
-                                ]
-                            ],
-                        ]
-                    ]
-                ]
-            ],
             'yandex' => [
                 'type' => 'Literal',
                 'options' => [
