@@ -228,14 +228,6 @@ class ItemGalleryController extends AbstractRestfulController
             $name = isset($names[$id]) ? $names[$id] : null;
             $name = $this->pictureNameFormatter->format($name, $language);
 
-            $url = $this->url()->fromRoute('twins/group/pictures/picture', [
-                'action'     => 'picture',
-                'id'         => $id,
-                //'picture_id' => $picture['identity']
-                'picture_id' => $row['identity'],
-                'gallery'    => null,
-            ], [], false);
-
             $itemsData = $this->pictureItem->getData([
                 'picture'      => $row['id'],
                 'onlyWithArea' => true
@@ -261,7 +253,6 @@ class ItemGalleryController extends AbstractRestfulController
             $gallery[] = [
                 'id'          => $id,
                 'identity'    => $row['identity'],
-                'url'         => $url,
                 'sourceUrl'   => $sUrl,
                 'crop'        => $crop,
                 'full'        => $full,
