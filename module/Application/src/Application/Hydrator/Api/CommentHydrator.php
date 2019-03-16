@@ -257,7 +257,7 @@ class CommentHydrator extends RestHydrator
         }
 
         if ($canViewIP) {
-            $result['ip'] = inet_ntop($object['ip']);
+            $result['ip'] = $object['ip'] ? inet_ntop($object['ip']) : null;
         }
 
         return $result;
