@@ -2598,6 +2598,18 @@ return [
                         ]
                     ]
                 ]
+            ],
+            'paginator' => [
+                'type'    => InputFilter::class,
+                'item_id' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits'],
+                    ]
+                ],
             ]
         ],
         'api_picture_list_public' => [
@@ -2738,6 +2750,18 @@ return [
                     ['name' => 'Digits']
                 ]
             ],
+            'paginator' => [
+                'type'    => InputFilter::class,
+                'item_id' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Digits'],
+                    ]
+                ],
+            ]
         ],
         'api_picture_post' => [
             'file' => [

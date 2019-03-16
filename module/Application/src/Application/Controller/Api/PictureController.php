@@ -489,6 +489,7 @@ class PictureController extends AbstractRestfulController
                 'language' => $this->language(),
                 'user_id'  => $user ? $user['id'] : null,
                 'fields'   => $data['fields'],
+                'item_id'  => $data['paginator']['item_id'],
             ]);
 
             $pictures = [];
@@ -946,7 +947,7 @@ class PictureController extends AbstractRestfulController
         $this->hydrator->setOptions([
             'language' => $this->language(),
             'user_id'  => $user ? $user['id'] : null,
-            'fields'   => $data['fields']
+            'fields'   => $data['fields'],
         ]);
 
         $row = $this->picture->getRow(['id' => (int)$this->params('id')]);

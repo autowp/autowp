@@ -47,6 +47,11 @@ class PictureHydrator extends RestHydrator
     private $userRole = null;
 
     /**
+     * @var int
+     */
+    private $itemID = 0;
+
+    /**
      * @var PictureNameFormatter
      */
     private $pictureNameFormatter;
@@ -199,6 +204,10 @@ class PictureHydrator extends RestHydrator
             $this->itemsOptions = $options['items'];
         }
 
+        if (isset($options['item_id'])) {
+            $this->itemID = (int) $options['item_id'];
+        }
+
         return $this;
     }
 
@@ -246,6 +255,69 @@ class PictureHydrator extends RestHydrator
             'height'         => (int)$object['height'],
             'filesize'       => (int)$object['filesize']
         ];
+
+        if ($this->filterComposite->filter('paginator') && $this->itemID) {
+            $filter = [
+                'order'  => 'resolution_desc',
+                'status' => $object['status'],
+                'item'   => [
+                    'ancestor_or_self' => $this->itemID
+                ]
+            ];
+            $paginator = $this->picture->getPaginator($filter);
+
+            $total = $paginator->getTotalItemCount();
+
+            if ($total < 500) {
+                $paginatorPicturesFilter = $filter;
+                $paginatorPicturesFilter['columns'] = ['id', 'identity'];
+
+                $paginatorPictures = $this->picture->getRows($paginatorPicturesFilter);
+
+                $pageNumber = 0;
+                foreach ($paginatorPictures as $n => $p) {
+                    if ($p['id'] == $object['id']) {
+                        $pageNumber = $n + 1;
+                        break;
+                    }
+                }
+
+                $paginator
+                    ->setItemCountPerPage(1)
+                    ->setPageRange(15)
+                    ->setCurrentPageNumber($pageNumber);
+
+                $pages = $paginator->getPages();
+
+                if (isset($pages->previous)) {
+                    $pages->previous = $paginatorPictures[$pages->previous - 1]['identity'];
+                }
+                if (isset($pages->next)) {
+                    $pages->next = $paginatorPictures[$pages->next - 1]['identity'];
+                }
+                if (isset($pages->first)) {
+                    $pages->first = $paginatorPictures[$pages->first - 1]['identity'];
+                }
+                if (isset($pages->last)) {
+                    $pages->last = $paginatorPictures[$pages->last - 1]['identity'];
+                }
+                if (isset($pages->current)) {
+                    $pages->current = $paginatorPictures[$pages->current - 1]['identity'];
+                }
+                $pagesInRange = [];
+                foreach ($pages->pagesInRange as $i) {
+                    $pagesInRange[] = [
+                        'page'     => $i,
+                        'identity' => $paginatorPictures[$i - 1]['identity']
+                    ];
+                }
+                $pages->pagesInRange = $pagesInRange;
+
+                $picture['paginator'] = $pages;
+            } else {
+                $paginator = false;
+            }
+        }
 
         if ($this->filterComposite->filter('subscribed')) {
             $subscribed = false;
