@@ -71,11 +71,12 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     \
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php --quiet && \
-    rm composer-setup.php
-    #&& \
-    #\
-    #cat /etc/ImageMagick-6/policy.xml | xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v '2GiB' > /etc/ImageMagick-6/policy.xml && \
-    #cat /etc/ImageMagick-6/policy.xml | xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='disk']/@value" -v '10GiB' > /etc/ImageMagick-6/policy.xml
+    rm composer-setup.php && \
+    \
+    cat /etc/ImageMagick-6/policy.xml | \
+        xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v "2GiB" | \
+        xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='disk']/@value" -v "10GiB" > /etc/ImageMagick-6/policy2.xml && \
+    cat /etc/ImageMagick-6/policy2.xml > /etc/ImageMagick-6/policy.xml
 
 RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
     chmod +x /usr/local/bin/waitforit
