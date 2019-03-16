@@ -620,7 +620,7 @@ class PictureHydrator extends RestHydrator
                 }
             }
 
-            $picture['of_links'] = $ofLinks;
+            $picture['of_links'] = array_values($ofLinks);
         }
 
         if ($this->filterComposite->filter('copyrights')) {
