@@ -12,8 +12,6 @@ class ItemGalleryControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $tables = $container->get('TableManager');
-
         return new ItemGalleryController(
             $container->get(\Application\Model\Picture::class),
             $container->get(\Application\Model\PictureItem::class),
