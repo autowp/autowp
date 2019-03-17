@@ -532,13 +532,8 @@ class CarOfDay
                             ]);
                             break;
                         case 'category':
-                            $url = $this->router->assemble([
-                                'action'           => 'category-picture',
-                                'category_catname' => $path['category_catname'],
-                                'picture_id'       => $row['identity']
-                            ], [
-                                'name' => 'categories'
-                            ]);
+                            $url = '/ng/category/' . urlencode($path['category_catname']) .
+                                   '/' . urlencode($row['identity']);
                             break;
                         case 'person':
                             $url = '/ng/persons/' . $path['id'];

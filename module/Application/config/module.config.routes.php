@@ -71,16 +71,6 @@ return [
                     ]
                 ]
             ],
-            'categories' => [
-                'type' => Router\Http\Category::class,
-                'options' => [
-                    'route'    => '/category',
-                    'defaults' => [
-                        'controller' => Controller\CategoryController::class,
-                        'action'     => 'index',
-                    ],
-                ]
-            ],
             'category-newcars' => [
                 'type' => 'Segment',
                 'options' => [
