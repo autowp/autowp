@@ -17,11 +17,6 @@ class Page extends AbstractHelper
     /**
      * @var array
      */
-    private $parentsCache = [];
-
-    /**
-     * @var array
-     */
     private $pages = [];
 
     public function __construct(TableGateway $pageTable)
