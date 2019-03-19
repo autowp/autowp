@@ -61,13 +61,13 @@ class TrafficController extends AbstractRestfulController
 
         $data = $this->service->getWhitelistData();
 
-        foreach ($data as &$row) {
-            //$row['users'] = [];
-            /*$users->fetchAll([
+        /*foreach ($data as &$row) {
+            $row['users'] = [];
+            $users->fetchAll([
             'last_ip = INET_ATON(?)' => $row['ip']
-            ]);*/
+            ]);
         }
-        unset($row);
+        unset($row);*/
 
         return new JsonModel([
             'items' => $data

@@ -3,9 +3,9 @@
     $items = count($this->items);
     $rows = ceil($items / $cols);
 ?>
-<?php for ($i=0; $i<$rows; $i++) { ?>
+<?php for ($i = 0; $i < $rows; $i++) { ?>
     <div class="row">
-        <?php foreach (array_slice($this->items, $i*$rows, $cols) as $item) { ?>
+        <?php foreach (array_slice($this->items, $i * $rows, $cols) as $item) { ?>
             <div class="col-md-6">
                 <div class="car item-list-item" data-module="car-list">
 
@@ -43,7 +43,7 @@
 
                     <ul class="list-inline">
 
-                        <?php if (!$this->disableDetailsLink && ($item['hasHtml'] || $item['childsCount']) && isset($item['details']['url'])) { ?>
+                        <?php if (! $this->disableDetailsLink && ($item['hasHtml'] || $item['childsCount']) && isset($item['details']['url'])) { ?>
                             <li class="list-inline-item">
                                 <i class="fa fa-align-left"></i>
                                 <?=$this->htmlA($item['details']['url'], $this->translate('carlist/details') . ( $item['childsCount'] > 1 ? ' (' . $item['childsCount'] . ')' : '')) ?>

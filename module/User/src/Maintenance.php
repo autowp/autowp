@@ -29,15 +29,15 @@ class Maintenance extends AbstractListenerAggregate
         $application = $event->getApplication();
         $serviceManager = $application->getServiceManager();
 
-        $userRemember = $serviceManager->get(\Autowp\User\Model\UserRemember::class);
+        $userRemember = $serviceManager->get(Model\UserRemember::class);
         $count = $userRemember->garbageCollect();
         print sprintf("%d user remember rows was deleted\ndone\n", $count);
 
-        $userPasswordRemind = $serviceManager->get(\Autowp\User\Model\UserPasswordRemind::class);
+        $userPasswordRemind = $serviceManager->get(Model\UserPasswordRemind::class);
         $count = $userPasswordRemind->garbageCollect();
         print sprintf("%d password remind rows was deleted\ndone\n", $count);
 
-        $userRename = $serviceManager->get(\Autowp\User\Model\UserRename::class);
+        $userRename = $serviceManager->get(Model\UserRename::class);
         $count = $userRename->garbageCollect();
         print sprintf("%d user rename rows was deleted\ndone\n", $count);
     }

@@ -258,7 +258,7 @@ class CarOfDay
         $headers = $server->getHeaders($tokenCredentials, 'POST', $url, $params);
 
         try {
-            $response = $server->createHttpClient()->post($url, [
+            $server->createHttpClient()->post($url, [
                 'headers'     => $headers,
                 'form_params' => $params
             ]);

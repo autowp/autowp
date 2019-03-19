@@ -270,17 +270,17 @@ class Carousel {
                 this._getItemByDirection(direction, activeElement));
         const nextElementIndex = this._getItemIndex(nextElement);
 
-        let directionalClassName: string;
-        let orderClassName: string;
+        // let directionalClassName: string;
+        // let orderClassName: string;
         let eventDirectionName: string;
 
         if (direction === Direction.NEXT) {
-            directionalClassName = ClassName.LEFT;
-            orderClassName = ClassName.NEXT;
+            // directionalClassName = ClassName.LEFT;
+            // orderClassName = ClassName.NEXT;
             eventDirectionName = Direction.LEFT;
         } else {
-            directionalClassName = ClassName.RIGHT;
-            orderClassName = ClassName.PREV;
+            // directionalClassName = ClassName.RIGHT;
+            // orderClassName = ClassName.PREV;
             eventDirectionName = Direction.RIGHT;
         }
 

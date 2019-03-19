@@ -652,6 +652,7 @@ class ItemController extends AbstractRestfulController
                 }
 
                 if (! $itemLanguageJoined) {
+                    /** @noinspection PhpUnusedLocalVariableInspection */
                     $itemLanguageJoined = true;
                     $select->join('item_language', 'item.id = item_language.item_id', []);
                 }
@@ -1264,13 +1265,13 @@ class ItemController extends AbstractRestfulController
 
         if (array_key_exists('catname', $values)) {
             if (! $values['catname'] || $values['catname'] == '_') {
-                $filter = new \Autowp\ZFComponents\Filter\FilenameSafe();
+                $filter = new FilenameSafe();
                 $values['catname'] = $filter->filter($values['name']);
             }
 
             $set['catname'] = $values['catname'];
         } else {
-            $filter = new \Autowp\ZFComponents\Filter\FilenameSafe();
+            $filter = new FilenameSafe();
             $values['catname'] = $filter->filter($values['name']);
         }
 
@@ -1513,7 +1514,7 @@ class ItemController extends AbstractRestfulController
             $notifyMeta = true;
             $subscribe = true;
             if (! $values['catname']) {
-                $filter = new \Autowp\ZFComponents\Filter\FilenameSafe();
+                $filter = new FilenameSafe();
                 $values['catname'] = $filter->filter($values['name']);
             }
 

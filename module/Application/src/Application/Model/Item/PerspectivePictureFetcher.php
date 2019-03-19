@@ -92,7 +92,6 @@ class PerspectivePictureFetcher extends PictureFetcher
         $itemOnlyChilds = isset($this->onlyChilds[$item['id']]) ? $this->onlyChilds[$item['id']] : null;
 
         $pPageId = null;
-        $useLargeFormat = false;
         if ($this->perspectivePageId) {
             $pPageId = $this->perspectivePageId;
         } else {

@@ -10,7 +10,7 @@ $singleThumbPart = round(12 / $thumbColumns);
 <?php foreach ($this->items as $item) { ?>
     <div class="car item-list-item" data-module="car-list">
 
-        <?php if (!$this->disableTitle) { ?>
+        <?php if (! $this->disableTitle) { ?>
             <h3>
                 <?=$this->car()->htmlTitle($item['nameData'])?>
                 <?php if ($item['designProject']) { ?>
@@ -85,12 +85,12 @@ $singleThumbPart = round(12 / $thumbColumns);
                         <?php } ?>
                     </div>
                     <div class="col-md-6">
-                        <?php for ($row=0; $row<2; $row++) { ?>
+                        <?php for ($row = 0; $row < 2; $row++) { ?>
                             <div class="row">
-                                <?php for ($col=0; $col<2; $col++) { ?>
+                                <?php for ($col = 0; $col < 2; $col++) { ?>
                                     <div class="col">
                                         <?php
-                                            $idx = 1 + $row*2 + $col;
+                                            $idx = 1 + $row * 2 + $col;
                                             $picture = isset($item['pictures'][$idx]) ? $item['pictures'][$idx] : null;
                                         ?>
                                         <?php if ($picture) { ?>
@@ -157,7 +157,7 @@ $singleThumbPart = round(12 / $thumbColumns);
         </div>
 
 
-        <?php if (!$this->disableDescription && strlen($item['description'])) { ?>
+        <?php if (! $this->disableDescription && strlen($item['description'])) { ?>
             <div class="text"><?=$this->markdown($item['description'])?></div>
         <?php } ?>
 
@@ -172,7 +172,7 @@ $singleThumbPart = round(12 / $thumbColumns);
 
         <ul class="list-inline">
 
-            <?php if (!$this->disableDetailsLink && ($item['hasHtml'] || $item['childsCount']) && isset($item['details']['url'])) { ?>
+            <?php if (! $this->disableDetailsLink && ($item['hasHtml'] || $item['childsCount']) && isset($item['details']['url'])) { ?>
                 <li class="list-inline-item">
                     <i class="fa fa-align-left"></i>
                     <?=$this->htmlA($item['details']['url'], $this->translate('carlist/details') . ( $item['childsCount'] > 1 ? ' (' . $item['childsCount'] . ')' : '')) ?>

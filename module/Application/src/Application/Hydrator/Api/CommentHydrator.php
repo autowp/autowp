@@ -62,11 +62,11 @@ class CommentHydrator extends RestHydrator
     {
         parent::__construct();
 
-        $this->comments = $serviceManager->get(\Application\Comments::class);
+        $this->comments = $serviceManager->get(Comments::class);
         $this->router = $serviceManager->get('HttpRouter');
 
         $this->picture = $serviceManager->get(Picture::class);
-        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->userModel = $serviceManager->get(User::class);
 
         $this->userText = $serviceManager->get('ViewHelperManager')->get('userText');
 
@@ -216,7 +216,7 @@ class CommentHydrator extends RestHydrator
         if ($this->filterComposite->filter('status')) {
             if ($isModer) {
                 $status = null;
-                if ($object['type_id'] == \Application\Comments::PICTURES_TYPE_ID) {
+                if ($object['type_id'] == Comments::PICTURES_TYPE_ID) {
                     $picture = $this->picture->getRow(['id' => (int)$object['item_id']]);
                     if ($picture) {
                         switch ($picture['status']) {

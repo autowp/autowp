@@ -170,19 +170,19 @@ class CommentsController extends AbstractRestfulController
 
             $object = null;
             switch ($typeId) {
-                case \Application\Comments::PICTURES_TYPE_ID:
+                case Comments::PICTURES_TYPE_ID:
                     $object = $this->picture->getRow(['id' => $itemId]);
                     break;
 
-                case \Application\Comments::ITEM_TYPE_ID:
+                case Comments::ITEM_TYPE_ID:
                     $object = $this->item->getRow(['id' => $itemId]);
                     break;
 
-                case \Application\Comments::VOTINGS_TYPE_ID:
+                case Comments::VOTINGS_TYPE_ID:
                     $object = $this->votings->isVotingExists($itemId);
                     break;
 
-                case \Application\Comments::ARTICLES_TYPE_ID:
+                case Comments::ARTICLES_TYPE_ID:
                     $object = $this->articleTable->select(['id' => $itemId])->current();
                     break;
 

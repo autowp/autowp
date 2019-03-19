@@ -956,7 +956,6 @@ class SpecificationsService
                 }
             } else {
                 if ($parent !== null) {
-                    $ids = [];
                     foreach ($this->childs[$parent] as $id) {
                         $attributes[] = $this->attributes[$id];
                     }
@@ -1057,7 +1056,7 @@ class SpecificationsService
         $this->updateActualValue($attribute['id'], $itemId);
     }
 
-    private function loadValues($attributes, int $itemId, string $language)
+    /*private function loadValues($attributes, int $itemId, string $language)
     {
         $values = [];
         foreach ($attributes as $attribute) {
@@ -1065,16 +1064,16 @@ class SpecificationsService
             $valueText = $this->valueToText($attribute, $value, $language);
             $values[$attribute['id']] = $valueText;
 
-            /*if ($valueText === null) {
+            //if ($valueText === null) {
                 // load child values
-            }*/
+            //}
 
             foreach ($this->loadValues($attribute['childs'], $itemId, $language) as $id => $value) {
                 $values[$id] = $value;
             }
         }
         return $values;
-    }
+    }*/
 
     public function specifications($cars, array $options)
     {
@@ -1095,7 +1094,6 @@ class SpecificationsService
         }
 
         $result = [];
-        $attributes = [];
 
         $zoneIds = [];
         foreach ($cars as $car) {

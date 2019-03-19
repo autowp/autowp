@@ -89,7 +89,7 @@ var Comments = function(element) {
                 $modal.remove();
             });
 
-            var $btnClose = $modal.find('.btn-secondary');
+            // var $btnClose = $modal.find('.btn-secondary');
 
             // $btnClose.button('loading');
             $.get('/comments/votes', {id: $vote.data('id')}, function(html) {
@@ -109,7 +109,7 @@ var Comments = function(element) {
         $form.find(':input[name=parent_id]').val($msg.data('id'));
         $form.find(':input[name=resolve]').val('');
 
-        if ($textarea.val() == resolveText) {
+        if ($textarea.val() === resolveText) {
             $textarea.val('');
         }
     });
@@ -131,7 +131,7 @@ var Comments = function(element) {
         $element.find('.form-holder').append($form);
         $form.find(':input[name=resolve]').val('');
 
-        if ($textarea.val() == resolveText) {
+        if ($textarea.val() === resolveText) {
             $textarea.val('');
         }
     });
@@ -152,7 +152,7 @@ $.extend(Comments.prototype, {
             data: {
                 user_vote: value
             }
-        }).then(function(json) {
+        }).then(function() {
             $.getJSON('/api/comment/' + id, {fields: 'vote'}, function(json) {
                 success(json.vote);
             });

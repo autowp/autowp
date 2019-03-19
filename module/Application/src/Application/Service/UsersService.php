@@ -366,7 +366,7 @@ class UsersService
         return $affected;
     }
 
-    public function updateUserVoteLimit(int $userId)
+    public function updateUserVoteLimit(int $userId): bool
     {
         $userRow = $this->userModel->getRow($userId);
         if (! $userRow) {
@@ -400,6 +400,8 @@ class UsersService
         ], [
             'id' => $userId
         ]);
+
+        return true;
     }
 
     /**

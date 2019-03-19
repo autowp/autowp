@@ -51,9 +51,9 @@ class ForumThemeHydrator extends RestHydrator
     {
         parent::__construct();
 
-        $this->comments = $serviceManager->get(\Application\Comments::class);
+        $this->comments = $serviceManager->get(Comments::class);
 
-        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->userModel = $serviceManager->get(User::class);
 
         $this->userId = null;
 
@@ -151,7 +151,7 @@ class ForumThemeHydrator extends RestHydrator
                 ->where([
                     new Sql\Predicate\In('forums_topics.status', [Forums::STATUS_NORMAL, Forums::STATUS_CLOSED]),
                     'forums_theme_parent.parent_id' => $object['id'],
-                    'comment_topic.type_id'         => \Application\Comments::FORUMS_TYPE_ID
+                    'comment_topic.type_id'         => Comments::FORUMS_TYPE_ID
                 ])
                 ->order('comment_topic.last_update DESC')
                 ->limit(1);
@@ -167,7 +167,7 @@ class ForumThemeHydrator extends RestHydrator
 
                 if ($fetchLastMessage) {
                     $lastMessageRow = $this->comments->service()->getLastMessageRow(
-                        \Application\Comments::FORUMS_TYPE_ID,
+                        Comments::FORUMS_TYPE_ID,
                         $lastTopicRow['id']
                     );
                     /*if ($lastMessageRow) {
@@ -213,7 +213,7 @@ class ForumThemeHydrator extends RestHydrator
                 ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', [])
                 ->where([
                     new Sql\Predicate\In('forums_topics.status', [Forums::STATUS_CLOSED, Forums::STATUS_NORMAL]),
-                    'comment_topic.type_id = ?' => \Application\Comments::FORUMS_TYPE_ID,
+                    'comment_topic.type_id = ?' => Comments::FORUMS_TYPE_ID,
                     'forums_topics.theme_id' => (int)$object['id']
                 ])
                 ->order('comment_topic.last_update DESC');

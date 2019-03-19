@@ -4,6 +4,7 @@ namespace Application\Controller\Moder;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -73,7 +74,8 @@ class CarsController extends AbstractActionController
 
     /**
      * @param array|\ArrayObject $car
-     * @return void
+     * @param $tab
+     * @return Response
      */
     private function redirectToCar($car, $tab = null)
     {

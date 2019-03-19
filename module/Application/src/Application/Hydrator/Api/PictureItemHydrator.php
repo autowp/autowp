@@ -44,7 +44,7 @@ class PictureItemHydrator extends RestHydrator
 
         $this->item = $serviceManager->get(Item::class);
         $this->picture = $serviceManager->get(Picture::class);
-        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->userModel = $serviceManager->get(User::class);
 
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
 

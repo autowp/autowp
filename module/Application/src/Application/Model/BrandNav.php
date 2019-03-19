@@ -87,7 +87,7 @@ class BrandNav
             'columns'      => ['id', 'catname']
         ]);
         if (! $brand) {
-            return;
+            return [];
         }
 
         $carId = (int)$params['item_id'];
@@ -341,7 +341,6 @@ class BrandNav
         array $section,
         bool $conceptsSeparatly
     ) {
-        $rows = [];
         if ($section['car_type_id']) {
             $select = $this->carSectionGroupsSelect(
                 $brandId,

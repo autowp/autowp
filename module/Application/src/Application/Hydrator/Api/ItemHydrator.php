@@ -141,7 +141,7 @@ class ItemHydrator extends RestHydrator
 
         $this->comments = $serviceManager->get(\Application\Comments::class);
 
-        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->userModel = $serviceManager->get(User::class);
 
         $this->perspective = $serviceManager->get(Perspective::class);
         $this->userItemSubscribe = $serviceManager->get(UserItemSubscribe::class);
@@ -151,7 +151,7 @@ class ItemHydrator extends RestHydrator
         $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
         $this->router = $serviceManager->get('HttpRouter');
 
-        $this->itemModel = $serviceManager->get(\Application\Model\Item::class);
+        $this->itemModel = $serviceManager->get(Item::class);
         $this->itemParent = $serviceManager->get(ItemParent::class);
 
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
@@ -292,7 +292,7 @@ class ItemHydrator extends RestHydrator
     {
         $nameData = $this->getNameData($object, $this->language);
 
-        $listBuilder = new \Application\Model\Item\ListBuilder([
+        $listBuilder = new Item\ListBuilder([
             'catalogue'    => $this->catalogue,
             'router'       => $this->router,
             'picHelper'    => $this->picHelper,
@@ -482,7 +482,7 @@ class ItemHydrator extends RestHydrator
                 $pictureItemTypeId = $this->previewPictures['type_id'];
             }
 
-            $cFetcher = new \Application\Model\Item\PerspectivePictureFetcher([
+            $cFetcher = new Item\PerspectivePictureFetcher([
                 'pictureModel'         => $this->picture,
                 'itemModel'            => $this->itemModel,
                 'perspective'          => $this->perspective,

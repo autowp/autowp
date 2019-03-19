@@ -5,8 +5,6 @@ namespace Application\Controller\Api;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
-use Application\Hydrator\Api\RestHydrator;
-use Application\Model\Item;
 use Application\Model\Twins;
 
 class TwinsController extends AbstractRestfulController

@@ -7,7 +7,6 @@ use Zend\Http\Request;
 
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemParentController;
-use Application\Controller\Api\PictureController;
 use Application\Test\AbstractHttpControllerTestCase;
 
 class CategoryControllerTest extends AbstractHttpControllerTestCase
@@ -32,7 +31,7 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\Api\ItemController::class);
+        $this->assertControllerName(ItemController::class);
         $this->assertMatchedRouteName('api/item/post');
         $this->assertActionName('post');
 
@@ -63,7 +62,7 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(201);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\Api\ItemParentController::class);
+        $this->assertControllerName(ItemParentController::class);
         $this->assertMatchedRouteName('api/item-parent/post');
         $this->assertActionName('post');
     }

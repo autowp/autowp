@@ -29,7 +29,7 @@ class Contact
 
         $row = $this->table->select($primaryKey)->current();
         if (! $row) {
-            $row = $this->table->insert(array_merge([
+            $this->table->insert(array_merge([
                 'timestamp' => new Sql\Expression('now()')
             ], $primaryKey));
         }

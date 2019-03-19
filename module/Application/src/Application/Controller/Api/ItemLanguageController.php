@@ -195,8 +195,6 @@ class ItemLanguageController extends AbstractRestfulController
             }
         }
 
-        $fullTextChanged = false;
-
         if (array_key_exists('full_text', $data)) {
             $fullText = $data['full_text'];
             $fullTextChanged = false;

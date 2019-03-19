@@ -276,7 +276,6 @@ class NewController extends AbstractRestfulController
                 'type'     => 'pictures',
                 'pictures' => $picturesBuffer
             ];
-            $picturesBuffer = [];
         }
 
         /*foreach ($items as &$item) {

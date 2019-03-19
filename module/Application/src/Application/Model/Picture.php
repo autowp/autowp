@@ -366,7 +366,6 @@ class Picture
             'has_moder_votes'  => null,
             'has_accept_votes' => null,
             'has_delete_votes' => null,
-            'has_moder_votes'  => null,
             'has_likes'        => null,
             'has_dislikes'     => null,
             'is_replace'       => null,

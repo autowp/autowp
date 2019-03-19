@@ -38,7 +38,7 @@ class IpHydrator extends RestHydrator
 
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
         $this->trafficControl = $serviceManager->get(TrafficControl::class);
-        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->userModel = $serviceManager->get(User::class);
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('user', $strategy);

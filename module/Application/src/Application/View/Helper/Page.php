@@ -92,33 +92,4 @@ class Page extends AbstractHelper
 
         return $row;
     }
-
-    private function isParentOrSelf($child, $parent)
-    {
-        if (! $parent || ! $child) {
-            return false;
-        }
-
-        $childId = $child['id'];
-        $parentId = $parent['id'];
-
-        if ($parentId == $childId) {
-            return true;
-        }
-
-        if ($parentId == $child['parent_id']) {
-            return true;
-        }
-
-        if (isset($this->parentsCache[$childId][$parentId])) {
-            return $this->parentsCache[$childId][$parentId];
-        }
-
-        $cParent = $child['parent_id'] ? $this->getPageById($child['parent_id']) : false;
-        $result = $this->isParentOrSelf($cParent, $parent);
-
-        $this->parentsCache[$childId][$parentId] = $result;
-
-        return $result;
-    }
 }

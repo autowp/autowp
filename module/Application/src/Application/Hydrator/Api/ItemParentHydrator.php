@@ -53,7 +53,7 @@ class ItemParentHydrator extends RestHydrator
         $this->item = $serviceManager->get(Item::class);
 
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
-        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->userModel = $serviceManager->get(User::class);
 
         $strategy = new Strategy\Item($serviceManager);
         $this->addStrategy('item', $strategy);

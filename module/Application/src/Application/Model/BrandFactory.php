@@ -13,7 +13,7 @@ class BrandFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Brand(
-            $container->get(\Application\Model\Item::class)
+            $container->get(Item::class)
         );
     }
 }

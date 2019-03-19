@@ -253,7 +253,7 @@ class CommentController extends AbstractRestfulController
             }
 
             if ($values['pictures_of_item_id']) {
-                $options['type'] = \Application\Comments::PICTURES_TYPE_ID;
+                $options['type'] = Comments::PICTURES_TYPE_ID;
                 $options['callback'] = function (Sql\Select $select) use ($values) {
                     $select
                         ->join('pictures', 'comment_message.item_id = pictures.id', [])
@@ -384,23 +384,23 @@ class CommentController extends AbstractRestfulController
 
         $object = null;
         switch ($typeId) {
-            case \Application\Comments::PICTURES_TYPE_ID:
+            case Comments::PICTURES_TYPE_ID:
                 $object = $this->picture->getRow(['id' => $itemId]);
                 break;
 
-            case \Application\Comments::ITEM_TYPE_ID:
+            case Comments::ITEM_TYPE_ID:
                 $object = $this->item->getRow(['id' => $itemId]);
                 break;
 
-            case \Application\Comments::VOTINGS_TYPE_ID:
+            case Comments::VOTINGS_TYPE_ID:
                 $object = $this->votings->isVotingExists($itemId);
                 break;
 
-            case \Application\Comments::ARTICLES_TYPE_ID:
+            case Comments::ARTICLES_TYPE_ID:
                 $object = $this->articleTable->select(['id' => $itemId])->current();
                 break;
 
-            case \Application\Comments::FORUMS_TYPE_ID:
+            case Comments::FORUMS_TYPE_ID:
                 $object = $this->forums->getTopicTable()->select(['id' => $itemId])->current();
                 break;
 
@@ -452,7 +452,7 @@ class CommentController extends AbstractRestfulController
             }
         }
 
-        if ($typeId == \Application\Comments::FORUMS_TYPE_ID) {
+        if ($typeId == Comments::FORUMS_TYPE_ID) {
             $this->userModel->getTable()->update([
                 'forums_messages'   => new Sql\Expression('forums_messages + 1'),
                 'last_message_time' => new Sql\Expression('NOW()')
@@ -592,7 +592,7 @@ class CommentController extends AbstractRestfulController
         }
 
         if (array_key_exists('item_id', $values)) {
-            $isForum = $row['type_id'] == \Application\Comments::FORUMS_TYPE_ID;
+            $isForum = $row['type_id'] == Comments::FORUMS_TYPE_ID;
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($isForum && $this->user()->isAllowed('forums', 'moderate')) {
                 $this->comments->service()->moveMessage($row['id'], $row['type_id'], $values['item_id']);

@@ -6,7 +6,6 @@ use Traversable;
 
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
-use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
@@ -48,14 +47,6 @@ class ArticleHydrator extends RestHydrator
     public function setOptions($options)
     {
         parent::setOptions($options);
-
-        if ($options instanceof \Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new \Zend\Hydrator\Exception\InvalidArgumentException(
-                'The options parameter must be an array or a Traversable'
-            );
-        }
 
         return $this;
     }

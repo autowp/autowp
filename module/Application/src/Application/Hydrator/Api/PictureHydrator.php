@@ -119,7 +119,7 @@ class PictureHydrator extends RestHydrator
         parent::__construct();
 
         $this->picture = $serviceManager->get(Picture::class);
-        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->userModel = $serviceManager->get(User::class);
         $this->itemModel = $serviceManager->get(Item::class);
 
         $this->pictureView = $serviceManager->get(PictureView::class);
@@ -127,14 +127,14 @@ class PictureHydrator extends RestHydrator
 
         $this->router = $serviceManager->get('HttpRouter');
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
-        $this->pictureVote = $serviceManager->get(\Application\Model\PictureVote::class);
-        $this->comments = $serviceManager->get(\Application\Comments::class);
+        $this->pictureVote = $serviceManager->get(PictureVote::class);
+        $this->comments = $serviceManager->get(Comments::class);
         $this->pictureNameFormatter = $serviceManager->get(PictureNameFormatter::class);
         $this->duplicateFinder = $serviceManager->get(DuplicateFinder::class);
         $this->pictureItem = $serviceManager->get(PictureItem::class);
         $this->imageStorage = $serviceManager->get(Image\Storage::class);
         $this->textStorage = $serviceManager->get(\Autowp\TextStorage\Service::class);
-        $this->perspective = $serviceManager->get(\Application\Model\Perspective::class);
+        $this->perspective = $serviceManager->get(Perspective::class);
 
         $this->linksTable = $serviceManager->get('TableManager')->get('links');
 
@@ -323,7 +323,7 @@ class PictureHydrator extends RestHydrator
             $subscribed = false;
             if ($this->user) {
                 $subscribed = $this->comments->userSubscribed(
-                    \Application\Comments::PICTURES_TYPE_ID,
+                    Comments::PICTURES_TYPE_ID,
                     $object['id'],
                     $this->user['id']
                 );
@@ -502,12 +502,12 @@ class PictureHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('comments_count')) {
             $msgCount = $this->comments->service()->getMessagesCount(
-                \Application\Comments::PICTURES_TYPE_ID,
+                Comments::PICTURES_TYPE_ID,
                 $object['id']
             );
 
             $newMessages = $this->comments->service()->getNewMessages(
-                \Application\Comments::PICTURES_TYPE_ID,
+                Comments::PICTURES_TYPE_ID,
                 $object['id'],
                 $this->userId
             );

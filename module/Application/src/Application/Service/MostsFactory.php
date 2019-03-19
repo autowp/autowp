@@ -14,7 +14,7 @@ class MostsFactory implements FactoryInterface
     {
         $tables = $container->get('TableManager');
         return new Mosts(
-            $container->get(\Application\Service\SpecificationsService::class),
+            $container->get(SpecificationsService::class),
             $container->get(\Application\Model\Perspective::class),
             $container->get(\Application\Model\VehicleType::class),
             $container->get(\Application\Model\Picture::class),

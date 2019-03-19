@@ -59,5 +59,7 @@ class Breadcrumbs extends AbstractHelper
         } catch (Exception $e) {
             print $e->getMessage();
         }
+
+        return '';
     }
 }

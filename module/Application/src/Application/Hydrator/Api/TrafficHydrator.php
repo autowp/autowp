@@ -30,7 +30,7 @@ class TrafficHydrator extends RestHydrator
 
         $this->router = $serviceManager->get('HttpRouter');
         $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
-        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->userModel = $serviceManager->get(User::class);
 
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('ban_user', $strategy);
@@ -67,7 +67,6 @@ class TrafficHydrator extends RestHydrator
         ]);*/
 
         if ($object['ban']) {
-            $object['ban']['up_to'] = $object['ban']['up_to'];
             $object['ban']['user'] = null;
             if ($object['ban']['by_user_id']) {
                 $user = $this->userModel->getRow((int) $object['ban']['by_user_id']);

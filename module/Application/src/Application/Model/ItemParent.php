@@ -417,7 +417,7 @@ class ItemParent
         $parentRow = $this->itemTable->select(['id' => $parentId])->current();
         $itemRow = $this->itemTable->select(['id' => $itemId])->current();
         if (! $parentRow || ! $itemRow) {
-            return false;
+            return;
         }
 
         $itemId = (int)$itemRow['id'];
@@ -799,22 +799,18 @@ class ItemParent
                 $set = [];
                 if ($row['diff'] != $info['diff']) {
                     $set['diff'] = $info['diff'];
-                    $changes = true;
                 }
 
                 if ($row['tuning'] xor $info['tuning']) {
                     $set['tuning'] = $info['tuning'] ? 1 : 0;
-                    $changes = true;
                 }
 
                 if ($row['sport'] xor $info['sport']) {
                     $set['sport'] = $info['sport'] ? 1 : 0;
-                    $changes = true;
                 }
 
                 if ($row['design'] xor $info['design']) {
                     $set['design'] = $info['design'] ? 1 : 0;
-                    $changes = true;
                 }
 
                 if ($set) {

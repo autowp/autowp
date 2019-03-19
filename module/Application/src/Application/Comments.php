@@ -280,18 +280,18 @@ class Comments
         return $affected;
     }
 
-    public function notifySubscribers($messageId)
+    public function notifySubscribers($messageId): void
     {
         $comment = $this->service->getMessageRow($messageId);
 
         if (! $comment) {
-            return false;
+            return;
         }
 
         $author = $this->userModel->getRow(['id' => (int)$comment['author_id']]);
 
         if (! $author) {
-            return false;
+            return;
         }
 
         $ids = $this->service->getSubscribersIds($comment['type_id'], $comment['item_id'], true);

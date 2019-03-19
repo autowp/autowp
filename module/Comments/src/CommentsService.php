@@ -318,7 +318,7 @@ class CommentsService
         $vote = $vote > 0 ? 1 : -1;
 
         if (! $voteRow) {
-            $voteRow = $this->voteTable->insert([
+            $this->voteTable->insert([
                 'comment_id' => $message['id'],
                 'user_id'    => $userId,
                 'vote'       => $vote

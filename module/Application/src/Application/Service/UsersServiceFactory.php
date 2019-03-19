@@ -19,7 +19,7 @@ class UsersServiceFactory implements FactoryInterface
             $config['hosts'],
             $container->get('MvcTranslator'),
             $container->get(\Zend\Mail\Transport\TransportInterface::class),
-            $container->get(\Application\Service\SpecificationsService::class),
+            $container->get(SpecificationsService::class),
             $container->get(\Autowp\Image\Storage::class),
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get(\Application\Model\UserItemSubscribe::class),

@@ -103,8 +103,6 @@ class User extends AbstractHelper
      */
     public function __toString()
     {
-        $result = '';
-
         try {
             $user = $this->user;
 

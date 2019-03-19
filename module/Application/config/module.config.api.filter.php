@@ -768,19 +768,6 @@ return [
                         'name' => 'InArray',
                         'options' => [
                             'haystack' => [
-                                'date_asc'
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            'order' => [
-                'required' => false,
-                'validators' => [
-                    [
-                        'name' => 'InArray',
-                        'options' => [
-                            'haystack' => [
                                 'date_desc',
                                 'date_asc',
                                 'vote_desc',

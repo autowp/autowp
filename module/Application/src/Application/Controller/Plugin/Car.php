@@ -82,7 +82,7 @@ class Car extends AbstractPlugin
     {
         return $this->categoryPictureFetcher
             ? $this->categoryPictureFetcher
-            : $this->categoryPictureFetcher = new \Application\Model\Item\DistinctItemPictureFetcher([
+            : $this->categoryPictureFetcher = new Item\DistinctItemPictureFetcher([
                 'pictureModel' => $this->picture,
                 'itemModel'    => $this->itemModel,
                 'dateSort'     => false

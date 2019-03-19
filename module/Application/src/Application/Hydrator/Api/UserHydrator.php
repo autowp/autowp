@@ -255,8 +255,6 @@ class UserHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('last_ip')) {
-                $isGreen = $object['role'] && $this->acl->isAllowed($object['role'], 'user', 'ip');
-
                 $canViewIp = false;
                 $role = $this->getUserRole();
                 if ($role) {

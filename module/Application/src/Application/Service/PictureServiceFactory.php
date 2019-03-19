@@ -16,7 +16,7 @@ class PictureServiceFactory implements FactoryInterface
             $container->get(\Application\Model\Picture::class),
             $container->get(\Autowp\Comments\CommentsService::class),
             $container->get(\Autowp\Image\Storage::class),
-            $container->get(\Application\Service\TelegramService::class),
+            $container->get(TelegramService::class),
             $container->get(\Application\DuplicateFinder::class),
             $container->get(\Application\Model\PictureItem::class),
             $container->get(\Application\Model\UserPicture::class)

@@ -101,7 +101,7 @@ class TelegramService
             new MeCommand(
                 $this->serviceManager->get(\Autowp\Message\MessageService::class),
                 $this->telegramChatTable,
-                $this->serviceManager->get(\Autowp\User\Model\User::class)
+                $this->serviceManager->get(User::class)
             ),
             new NewCommand($this->telegramItemTable, $this->telegramChatTable, $this->item->getTable()),
             new InboxCommand($this->telegramItemTable, $this->telegramChatTable, $this->item->getTable()),

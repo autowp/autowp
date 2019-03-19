@@ -111,7 +111,7 @@ $(function() {
         }).then(function() {
             window.location = '/ng/login/ok';
         }, function(response) {
-            if (response.status == 400) {
+            if (response.status === 400) {
                 $.each(response.responseJSON.invalid_params, function(field, errors) {
                     var $input = $form.find(':input[name='+field+']');
                     $.map(errors, function(message) {

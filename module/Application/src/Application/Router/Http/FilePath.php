@@ -33,7 +33,7 @@ class FilePath implements RouteInterface
     public function match(Request $request)
     {
         if (! method_exists($request, 'getUri')) {
-            return;
+            return false;
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */

@@ -52,9 +52,9 @@ class ForumTopicHydrator extends RestHydrator
     {
         parent::__construct();
 
-        $this->comments = $serviceManager->get(\Application\Comments::class);
+        $this->comments = $serviceManager->get(Comments::class);
 
-        $this->userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $this->userModel = $serviceManager->get(User::class);
 
         $this->userId = null;
 
@@ -138,7 +138,7 @@ class ForumTopicHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('last_message')) {
             $lastMessageRow = $this->comments->service()->getLastMessageRow(
-                \Application\Comments::FORUMS_TYPE_ID,
+                Comments::FORUMS_TYPE_ID,
                 $object['id']
             );
             $lastMessage = false;
@@ -161,7 +161,7 @@ class ForumTopicHydrator extends RestHydrator
         if ($this->filterComposite->filter('messages')) {
             if ($this->userId) {
                 $stat = $this->comments->service()->getTopicStatForUser(
-                    \Application\Comments::FORUMS_TYPE_ID,
+                    Comments::FORUMS_TYPE_ID,
                     $object['id'],
                     $this->userId
                 );
@@ -169,7 +169,7 @@ class ForumTopicHydrator extends RestHydrator
                 $newMessages = $stat['newMessages'];
             } else {
                 $stat = $this->comments->service()->getTopicStat(
-                    \Application\Comments::FORUMS_TYPE_ID,
+                    Comments::FORUMS_TYPE_ID,
                     $object['id']
                 );
                 $messages = $stat['messages'];

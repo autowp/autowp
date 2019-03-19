@@ -246,14 +246,14 @@ class CatalogueController extends AbstractActionController
             return [
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
-                    'listBuilder' => new \Application\Model\Item\ListBuilder\Catalogue([
+                    'listBuilder' => new Item\ListBuilder\Catalogue([
                         'catalogue'       => $this->catalogue(),
                         'router'          => $this->getEvent()->getRouter(),
                         'picHelper'       => $this->getPluginManager()->get('pic'),
                         'brand'           => $brand,
                         'specsService'    => $this->specsService
                     ]),
-                    'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'pictureFetcher' => new Item\PerspectivePictureFetcher([
                         'pictureModel'         => $this->picture,
                         'itemModel'            => $this->itemModel,
                         'perspective'          => $this->perspective,
@@ -313,7 +313,7 @@ class CatalogueController extends AbstractActionController
                 'cartype'   => $cartype,
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
-                    'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'pictureFetcher' => new Item\PerspectivePictureFetcher([
                         'pictureModel'         => $this->picture,
                         'itemModel'            => $this->itemModel,
                         'perspective'          => $this->perspective,
@@ -324,7 +324,7 @@ class CatalogueController extends AbstractActionController
                         'perspectivePageId'    => null,
                         'onlyChilds'           => []
                     ]),
-                    'listBuilder' => new \Application\Model\Item\ListBuilder\Catalogue([
+                    'listBuilder' => new Item\ListBuilder\Catalogue([
                         'catalogue'       => $this->catalogue(),
                         'router'          => $this->getEvent()->getRouter(),
                         'picHelper'       => $this->getPluginManager()->get('pic'),
@@ -700,7 +700,6 @@ class CatalogueController extends AbstractActionController
         array $section,
         bool $conceptsSeparatly
     ) {
-        $rows = [];
         if ($section['car_type_id']) {
             $select = $this->carSectionGroupsSelect(
                 $brandId,
@@ -1100,7 +1099,6 @@ class CatalogueController extends AbstractActionController
                 $topCarName = $carFullName;
             }
 
-            $bvName = false;
             $bvName = $this->itemParent->getName($brand['id'], $topItemId, $language);
             if (! $bvName) {
                 $bvName = $this->stripName($brand, $topCarName);
@@ -1280,7 +1278,7 @@ class CatalogueController extends AbstractActionController
                     'exact'         => true
                 ], [], true),
                 'childListData' => $this->car()->listData($listCars, [
-                    'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'pictureFetcher' => new Item\PerspectivePictureFetcher([
                         'pictureModel'         => $this->picture,
                         'itemModel'            => $this->itemModel,
                         'perspective'          => $this->perspective,
@@ -1291,7 +1289,7 @@ class CatalogueController extends AbstractActionController
                         'perspectivePageId'    => null,
                         'onlyChilds'           => []
                     ]),
-                    'listBuilder' => new \Application\Model\Item\ListBuilder\CatalogueItem([
+                    'listBuilder' => new Item\ListBuilder\CatalogueItem([
                         'catalogue'        => $this->catalogue(),
                         'router'           => $this->getEvent()->getRouter(),
                         'picHelper'        => $this->getPluginManager()->get('pic'),
@@ -1789,7 +1787,7 @@ class CatalogueController extends AbstractActionController
                 'page'          => null
             ], [], true),
             'childListData' => $this->car()->listData($listCars, [
-                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                'pictureFetcher' => new Item\PerspectivePictureFetcher([
                     'pictureModel'         => $this->picture,
                     'itemModel'            => $this->itemModel,
                     'perspective'          => $this->perspective,
@@ -1800,7 +1798,7 @@ class CatalogueController extends AbstractActionController
                     'perspectivePageId'    => null,
                     'onlyChilds'           => []
                 ]),
-                'listBuilder' => new \Application\Model\Item\ListBuilder\CatalogueGroupItem([
+                'listBuilder' => new Item\ListBuilder\CatalogueGroupItem([
                     'itemModel'        => $this->itemModel,
                     'catalogue'        => $this->catalogue(),
                     'router'           => $this->getEvent()->getRouter(),
@@ -1829,7 +1827,7 @@ class CatalogueController extends AbstractActionController
         return $this->comments->getTotalMessagesCount([
             'attention' => Comments\Attention::REQUIRED,
             'type'      => \Application\Comments::PICTURES_TYPE_ID,
-            'callback'  => function (\Zend\Db\Sql\Select $select) use ($carId) {
+            'callback'  => function (Sql\Select $select) use ($carId) {
                 $select
                     ->join('pictures', 'comment_message.item_id = pictures.id', [])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
@@ -2279,7 +2277,7 @@ class CatalogueController extends AbstractActionController
             return [
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
-                    'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'pictureFetcher' => new Item\PerspectivePictureFetcher([
                         'pictureModel'         => $this->picture,
                         'itemModel'            => $this->itemModel,
                         'perspective'          => $this->perspective,
@@ -2290,7 +2288,7 @@ class CatalogueController extends AbstractActionController
                         'perspectivePageId'    => null,
                         'onlyChilds'           => []
                     ]),
-                    'listBuilder' => new \Application\Model\Item\ListBuilder\Catalogue([
+                    'listBuilder' => new Item\ListBuilder\Catalogue([
                         'catalogue'       => $this->catalogue(),
                         'router'          => $this->getEvent()->getRouter(),
                         'picHelper'       => $this->getPluginManager()->get('pic'),

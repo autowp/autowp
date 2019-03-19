@@ -29,7 +29,7 @@ class WildcardSafe extends Wildcard
     public function match(Request $request, $pathOffset = null)
     {
         if (! method_exists($request, 'getUri')) {
-            return;
+            return null;
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -48,7 +48,7 @@ class WildcardSafe extends Wildcard
         $params  = explode($this->paramDelimiter, $path);
 
         if (count($params) > 1 && ($params[0] !== '')) {
-            return;
+            return null;
         }
 
         if ($this->keyValueDelimiter === $this->paramDelimiter) {

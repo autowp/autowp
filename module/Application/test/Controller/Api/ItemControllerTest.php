@@ -76,7 +76,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\Api\ItemController::class);
+        $this->assertControllerName(ItemController::class);
         $this->assertMatchedRouteName('api/item/item/put');
         $this->assertActionName('put');
     }

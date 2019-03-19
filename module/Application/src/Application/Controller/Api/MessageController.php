@@ -162,13 +162,12 @@ class MessageController extends AbstractRestfulController
 
         $params = $this->listInputFilter->getValues();
 
-        $messages = [];
         switch ($params['folder']) {
             case 'sent':
-                $messages = $this->message->deleteAllSent($user['id']);
+                $this->message->deleteAllSent($user['id']);
                 break;
             case 'system':
-                $messages = $this->message->deleteAllSystem($user['id']);
+                $this->message->deleteAllSystem($user['id']);
                 break;
             default:
                 return $this->notFoundAction();

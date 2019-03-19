@@ -71,12 +71,12 @@ class Forums
 
     public function subscribe($topicId, $userId)
     {
-        return $this->comments->subscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
+        $this->comments->subscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
-    public function unSubscribe($topicId, $userId)
+    public function unsubscribe($topicId, $userId)
     {
-        return $this->comments->unSubscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
+        $this->comments->unSubscribe(\Application\Comments::FORUMS_TYPE_ID, $topicId, $userId);
     }
 
     public function open(int $topicId)
@@ -125,13 +125,13 @@ class Forums
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
      */
-    public function updateThemeStat($themeId)
+    public function updateThemeStat($themeId): void
     {
         $theme = $this->themeTable->select([
             'id = ?' => (int)$themeId
         ])->current();
         if (! $theme) {
-            return false;
+            return;
         }
 
         $select = new Sql\Select($this->topicTable->getTable());
@@ -160,7 +160,7 @@ class Forums
                         ]);
                 }
         ]);
-        $theme = $this->themeTable->update([
+        $this->themeTable->update([
             'topics'   => $topics['count'],
             'messages' => $messages
         ], [

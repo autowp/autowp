@@ -62,7 +62,7 @@ class StatController extends AbstractActionController
         $carAttrsValues = $row ? (int)$row['count'] : null;
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $carsWith4OrMorePictures = $db->query('
+        $row = $db->query('
             select count(1) as count from (
                 select item.id, count(pictures.id) as c
                 from item

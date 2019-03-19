@@ -35,14 +35,6 @@ class VotingVariantVoteHydrator extends RestHydrator
     {
         parent::setOptions($options);
 
-        if ($options instanceof \Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new \Zend\Hydrator\Exception\InvalidArgumentException(
-                'The options parameter must be an array or a Traversable'
-            );
-        }
-
         return $this;
     }
 
