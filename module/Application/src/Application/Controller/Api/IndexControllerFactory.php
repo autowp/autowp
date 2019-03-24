@@ -22,8 +22,10 @@ class IndexControllerFactory implements FactoryInterface
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Autowp\User\Model\User::class),
             $container->get(\Application\Model\CarOfDay::class),
+            $container->get(\Application\Model\Catalogue::class),
             $hydrators->get(\Application\Hydrator\Api\ItemHydrator::class),
-            $hydrators->get(\Application\Hydrator\Api\UserHydrator::class)
+            $hydrators->get(\Application\Hydrator\Api\UserHydrator::class),
+            $container->get('HttpRouter')
         );
     }
 }

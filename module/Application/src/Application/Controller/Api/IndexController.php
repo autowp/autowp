@@ -12,6 +12,7 @@ use Application\Hydrator\Api\ItemHydrator;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Brand;
 use Application\Model\CarOfDay;
+use Application\Model\Catalogue;
 use Application\Model\Categories;
 use Application\Model\Item;
 use Application\Model\Picture;
@@ -68,6 +69,13 @@ class IndexController extends AbstractRestfulController
      */
     private $itemOfDay;
 
+    /**
+     * @var Catalogue
+     */
+    private $catalogue;
+
+    private $router;
+
     public function __construct(
         $cache,
         Brand $brand,
@@ -77,8 +85,10 @@ class IndexController extends AbstractRestfulController
         SpecificationsService $specsService,
         User $userModel,
         CarOfDay $itemOfDay,
+        Catalogue $catalogue,
         ItemHydrator $itemHydrator,
-        RestHydrator $userHydrator
+        RestHydrator $userHydrator,
+        $router
     ) {
         $this->cache = $cache;
         $this->brand = $brand;
@@ -88,8 +98,10 @@ class IndexController extends AbstractRestfulController
         $this->specsService = $specsService;
         $this->userModel = $userModel;
         $this->itemOfDay = $itemOfDay;
+        $this->catalogue = $catalogue;
         $this->itemHydrator = $itemHydrator;
         $this->userHydrator = $userHydrator;
+        $this->router = $router;
     }
 
     public function brandsAction()
@@ -390,17 +402,13 @@ class IndexController extends AbstractRestfulController
         $itemOfDayInfo = null;
 
         if ($itemOfDay) {
-            $key = 'API_ITEM_OF_DAY_117_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
+            $key = 'API_ITEM_OF_DAY_119_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
 
             $success = false;
             $itemOfDayInfo = $this->cache->getItem($key, $success);
             if (! $success) {
                 $item = $this->item->getRow([
-                    'id'     => $itemOfDay['item_id'],
-                    'fields' => [
-                        'name_html'            => true,
-                        'item_of_day_pictures' => true
-                    ],
+                    'id'       => $itemOfDay['item_id'],
                     'language' => $language
                 ]);
 
@@ -411,13 +419,38 @@ class IndexController extends AbstractRestfulController
                     $this->itemHydrator->setOptions([
                         'language' => $language,
                         'fields'   => [
-                            'name_html'            => true,
-                            'item_of_day_pictures' => true
+                            'name_html'               => true,
+                            'item_of_day_pictures'    => true,
+                            'accepted_pictures_count' => true,
+                            'twins_groups'            => true,
+                            'categories'              => [
+                                'name_html' => true,
+                                'catname'   => true
+                            ],
                         ],
                         'user_id'  => $user ? $user['id'] : null,
                     ]);
 
                     $item = $this->itemHydrator->extract($item);
+
+                    if ($item['accepted_pictures_count'] > 6 && $item['item_type_id'] != Item::CATEGORY) {
+                        $cataloguePaths = $this->catalogue->getCataloguePaths($item['id'], [
+                            'breakOnFirst' => true
+                        ]);
+
+                        foreach ($cataloguePaths as $path) {
+                            $url = $this->router->assemble([
+                                'action'        => 'brand-item-pictures',
+                                'brand_catname' => $path['brand_catname'],
+                                'car_catname'   => $path['car_catname'],
+                                'path'          => $path['path']
+                            ], [
+                                'name' => 'catalogue'
+                            ]);
+                            $item['public_url'] = $url;
+                            break;
+                        }
+                    }
                 }
 
                 $itemOfDayUser = null;
