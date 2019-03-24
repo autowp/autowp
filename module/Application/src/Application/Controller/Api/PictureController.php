@@ -400,6 +400,10 @@ class PictureController extends AbstractRestfulController
             $filter['item']['link_type'] = $data['exact_item_link_type'];
         }
 
+        if ($data['accepted_in_days']) {
+            $filter['accepted_in_days'] = $data['accepted_in_days'];
+        }
+
         if ($isModer) {
             if (strlen($data['comments'])) {
                 if ($data['comments'] == '1') {

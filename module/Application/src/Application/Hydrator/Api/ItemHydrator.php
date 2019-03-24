@@ -482,6 +482,11 @@ class ItemHydrator extends RestHydrator
                 $pictureItemTypeId = $this->previewPictures['type_id'];
             }
 
+            $perspectivePageId = null;
+            if (isset($this->previewPictures['perspective_page_id']) && $this->previewPictures['perspective_page_id']) {
+                $perspectivePageId = $this->previewPictures['perspective_page_id'];
+            }
+
             $cFetcher = new Item\PerspectivePictureFetcher([
                 'pictureModel'         => $this->picture,
                 'itemModel'            => $this->itemModel,
@@ -490,7 +495,7 @@ class ItemHydrator extends RestHydrator
                 'onlyExactlyPictures'  => $onlyExactlyPictures,
                 'dateSort'             => false,
                 'disableLargePictures' => false,
-                'perspectivePageId'    => null,
+                'perspectivePageId'    => $perspectivePageId,
                 'onlyChilds'           => [],
                 'pictureItemTypeId'    => $pictureItemTypeId
             ]);
@@ -731,8 +736,8 @@ class ItemHydrator extends RestHydrator
                 $rows = $this->itemModel->getRows([
                     'item_type_id' => Item::CATEGORY,
                     'child'        => [
-                        'item_type_id' => [Item::VEHICLE, Item::ENGINE],
-                        'descendant'   => $object['id']
+                        'item_type_id'       => [Item::VEHICLE, Item::ENGINE],
+                        'descendant_or_self' => $object['id']
                     ]
                 ]);
 

@@ -61,6 +61,11 @@ class IndexController extends AbstractActionController
      */
     private $userModel;
 
+    /**
+     * @var Categories
+     */
+    private $categories;
+
     public function __construct(
         $cache,
         SpecificationsService $specsService,

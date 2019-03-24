@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -40,7 +41,7 @@ class CategoryController extends AbstractActionController
 
         $rows = $this->itemModel->getRows([
             'item_type_id' => [Item::VEHICLE, Item::ENGINE],
-            'order' => 'ip1.timestamp DESC',
+            'order' => new Sql\Expression('MAX(ip1.timestamp) DESC'),
             'parent' => [
                 'item_type_id'     => Item::CATEGORY,
                 'ancestor_or_self' => $category['id'],

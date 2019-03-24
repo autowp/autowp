@@ -386,7 +386,7 @@ class Item
         return $row ? $row['name'] : '';
     }
 
-    public function getNameData($row, string $language = 'en')
+    public function getNameData($row, string $language)
     {
         $name = $this->getName($row['id'], $language);
 

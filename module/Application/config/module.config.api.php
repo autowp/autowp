@@ -52,6 +52,7 @@ return [
             Controller\Api\ForumController::class           => Controller\Api\ForumControllerFactory::class,
             Controller\Api\HotlinksController::class        => Controller\Api\HotlinksControllerFactory::class,
             Controller\Api\InboxController::class           => Controller\Api\InboxControllerFactory::class,
+            Controller\Api\IndexController::class           => Controller\Api\IndexControllerFactory::class,
             Controller\Api\IpController::class              => Controller\Api\Service\IpControllerFactory::class,
             Controller\Api\ItemController::class            => Controller\Api\Service\ItemControllerFactory::class,
             Controller\Api\ItemGalleryController::class     => Controller\Api\ItemGalleryControllerFactory::class,
@@ -1088,6 +1089,162 @@ return [
                                     ]
                                 ]
                             ],
+                        ]
+                    ],
+                    'index' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route' => '/index',
+                            'defaults' => [
+                                'controller' => Controller\Api\IndexController::class
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'brands' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/brands',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'brands'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            'persons-content' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/persons-content',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'persons-content'
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            'persons-author' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/persons-author',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'persons-author'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'categories' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/categories',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'categories'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'factories' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/factories',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'factories'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'twins' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/twins',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'twins'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'spec-items' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/spec-items',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'spec-items'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'item-of-day' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/item-of-day',
+                                ],
+                                'may_terminate' => false,
+                                'child_routes' => [
+                                    'get' => [
+                                        'type' => 'Method',
+                                        'options' => [
+                                            'verb' => 'get',
+                                            'defaults' => [
+                                                'action' => 'item-of-day'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
                         ]
                     ],
                     'ip' => [
