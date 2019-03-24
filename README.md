@@ -17,9 +17,7 @@
 
 The following versions of PHP are supported.
 
-* PHP 7.0
-* PHP 7.1
-
+* PHP 7.2
 
 ## Credits
 
@@ -30,3 +28,8 @@ The following versions of PHP are supported.
 ## License
 
 The MIT License (MIT). Please see [License File](https://github.com/thephpleague/oauth2-facebook/blob/master/LICENSE) for more information.
+
+## Tools
+
+<a href="https://framework.zend.com/"><img src="zf-logo.png" height="80" ></a>
+<a href="https://www.jetbrains.com/phpstorm/"><img src="phpstorm.svg" height="80" ></a>
