@@ -136,8 +136,9 @@ class IndexController extends AbstractActionController
         $itemOfDayInfo = null;
 
         if ($itemOfDay) {
-            $key = 'ITEM_OF_DAY_113_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
+            $key = 'ITEM_OF_DAY_117_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
 
+            $success = false;
             $itemOfDayInfo = $this->cache->getItem($key, $success);
             if (! $success) {
                 $itemOfDayInfo = $this->itemOfDay->getItemOfDay($itemOfDay['item_id'], $itemOfDay['user_id'], $language);
@@ -155,6 +156,7 @@ class IndexController extends AbstractActionController
     private function factories()
     {
         $cacheKey = 'INDEX_FACTORIES_5';
+        $success = false;
         $factories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             $select = new Sql\Select($this->item->getTable()->getTable());

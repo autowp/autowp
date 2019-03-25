@@ -397,6 +397,7 @@ class CatalogueController extends AbstractActionController
             $isModer = $this->user()->inheritsRole('pictures-moder');
 
             $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_10_' . $language . '_' . $httpsFlag . '_' . (int)$isModer;
+            $success = false;
             $topPictures = $this->cache->getItem($key, $success);
             if (! $success) {
                 $pictureRows = $this->picture->getRows([
@@ -540,12 +541,12 @@ class CatalogueController extends AbstractActionController
     private function otherGroups(
         int $brandId,
         string $brandCatname,
-        bool $conceptsSeparatly
+        bool $conceptsSeparately
     ) {
 
         $groups = [];
 
-        if ($conceptsSeparatly) {
+        if ($conceptsSeparately) {
             // concepts
             $hasConcepts = $this->itemModel->isExists([
                 'ancestor'   => $brandId,

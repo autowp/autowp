@@ -520,6 +520,13 @@ class CarOfDay
                 $url = null;
                 foreach ($paths as $path) {
                     switch ($path['type']) {
+                        case 'brand':
+                            $url = $this->router->assemble([
+                                'picture_id' => $row['identity']
+                            ], [
+                                'name' => 'picture/picture'
+                            ]);
+                            break;
                         case 'brand-item':
                             $url = $this->router->assemble([
                                 'action'        => 'brand-item-picture',
@@ -711,20 +718,35 @@ class CarOfDay
 
             if ($totalPictures > 6) {
                 foreach ($cataloguePaths as $path) {
-                    $url = $this->router->assemble([
-                        'action'        => 'brand-item-pictures',
-                        'brand_catname' => $path['brand_catname'],
-                        'car_catname'   => $path['car_catname'],
-                        'path'          => $path['path']
-                    ], [
-                        'name' => 'catalogue'
-                    ]);
-                    $items[] = [
-                        'icon'  => 'th',
-                        'url'   => $url,
-                        'text'  => $this->translator->translate('carlist/all pictures'),
-                        'count' => $totalPictures
-                    ];
+                    if ($path['type'] == 'brand') {
+                        $url = $this->router->assemble([
+                            'action'        => 'brand',
+                            'brand_catname' => $path['brand_catname'],
+                        ], [
+                            'name' => 'catalogue'
+                        ]);
+                        $items[] = [
+                            'icon'  => 'th',
+                            'url'   => $url,
+                            'text'  => $this->translator->translate('carlist/details'),
+                            'count' => $totalPictures
+                        ];
+                    } else {
+                        $url = $this->router->assemble([
+                            'action' => 'brand-item-pictures',
+                            'brand_catname' => $path['brand_catname'],
+                            'car_catname' => $path['car_catname'],
+                            'path' => $path['path']
+                        ], [
+                            'name' => 'catalogue'
+                        ]);
+                        $items[] = [
+                            'icon'  => 'th',
+                            'url'   => $url,
+                            'text'  => $this->translator->translate('carlist/all pictures'),
+                            'count' => $totalPictures
+                        ];
+                    }
                     break;
                 }
             }
