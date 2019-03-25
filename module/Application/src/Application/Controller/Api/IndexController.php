@@ -402,7 +402,7 @@ class IndexController extends AbstractRestfulController
         $itemOfDayInfo = null;
 
         if ($itemOfDay) {
-            $key = 'API_ITEM_OF_DAY_119_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
+            $key = 'API_ITEM_OF_DAY_120_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
 
             $success = false;
             $itemOfDayInfo = $this->cache->getItem($key, $success);
@@ -439,14 +439,23 @@ class IndexController extends AbstractRestfulController
                         ]);
 
                         foreach ($cataloguePaths as $path) {
-                            $url = $this->router->assemble([
-                                'action'        => 'brand-item-pictures',
-                                'brand_catname' => $path['brand_catname'],
-                                'car_catname'   => $path['car_catname'],
-                                'path'          => $path['path']
-                            ], [
-                                'name' => 'catalogue'
-                            ]);
+                            if ($path['type'] == 'brand') {
+                                $url = $this->router->assemble([
+                                    'action'        => 'brand',
+                                    'brand_catname' => $path['brand_catname'],
+                                ], [
+                                    'name' => 'catalogue'
+                                ]);
+                            } else {
+                                $url = $this->router->assemble([
+                                    'action'        => 'brand-item-pictures',
+                                    'brand_catname' => $path['brand_catname'],
+                                    'car_catname'   => $path['car_catname'],
+                                    'path'          => $path['path']
+                                ], [
+                                    'name' => 'catalogue'
+                                ]);
+                            }
                             $item['public_url'] = $url;
                             break;
                         }
