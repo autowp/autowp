@@ -2759,16 +2759,13 @@ return [
                 ],
             ],
             'accepted_in_days' => [
-                'type'    => InputFilter::class,
-                'item_id' => [
-                    'required' => false,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        ['name' => 'Digits'],
-                    ]
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
                 ],
+                'validators' => [
+                    ['name' => 'Digits'],
+                ]
             ]
         ],
         'api_picture_post' => [
