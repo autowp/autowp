@@ -402,7 +402,7 @@ class IndexController extends AbstractRestfulController
         $itemOfDayInfo = null;
 
         if ($itemOfDay) {
-            $key = 'API_ITEM_OF_DAY_120_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
+            $key = 'API_ITEM_OF_DAY_121_' . $itemOfDay['item_id'] . '_' . $language . '_' . $httpsFlag;
 
             $success = false;
             $itemOfDayInfo = $this->cache->getItem($key, $success);

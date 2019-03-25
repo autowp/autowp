@@ -543,6 +543,10 @@ class ItemHydrator extends RestHydrator
             $result['childs'] = $this->extractValue('childs', $rows);
         }
 
+        if ($this->filterComposite->filter('item_of_day_pictures')) {
+            $result['item_of_day_pictures'] = $this->carOfDay->getItemOfDayPictures($object['id'], $this->language);
+        }
+
         if ($isModer) {
             if ($this->filterComposite->filter('body')) {
                 $result['body'] = (string)$object['body'];
@@ -675,10 +679,6 @@ class ItemHydrator extends RestHydrator
                 }
 
                 $result['related_group_pictures'] = $carPictures;
-            }
-
-            if ($this->filterComposite->filter('item_of_day_pictures')) {
-                $result['item_of_day_pictures'] = $this->carOfDay->getItemOfDayPictures($object['id'], $this->language);
             }
 
             if ($showTotalPictures) {
