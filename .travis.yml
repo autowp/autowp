@@ -2,7 +2,15 @@ sudo: required
 language: generic
 services:
   - docker
+
+addons:
+  sonarcloud:
+    organization: "autowp-github"
+    token:
+      secure: $SONARCLOUD_TOKEN
+
 before_install:
+  - sonar-scanner || travis_terminate 1;
   - docker pull $DOCKER_REPO || true
   - docker build --cache-from $DOCKER_REPO -t $DOCKER_REPO . || travis_terminate 1;
   - docker-compose -f docker-compose-test.yml up -d || travis_terminate 1;
