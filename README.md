@@ -2,8 +2,9 @@
 [![Docker Build Status](https://img.shields.io/docker/build/autowp/autowp.svg)](https://hub.docker.com/r/autowp/autowp/)
 [![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
 [![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
-[![Dependencies](https://david-dm.org/autowp/autowp.svg)](https://david-dm.org/autowp/autowp)&nbsp;
+[![Dependencies](https://david-dm.org/autowp/autowp.svg)](https://david-dm.org/autowp/autowp)
 [![Dependencies](https://david-dm.org/autowp/autowp/dev-status.svg)](https://david-dm.org/autowp/autowp)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=autowp_autowp&metric=alert_status)](https://sonarcloud.io/dashboard?id=autowp_autowp)
 
 # Wheelsage.org / AutoWP.ru website sources
 
