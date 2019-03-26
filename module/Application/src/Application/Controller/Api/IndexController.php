@@ -381,7 +381,6 @@ class IndexController extends AbstractRestfulController
                 foreach ($contributors as $contributor) {
                     $extracted['contributors'][] = $this->userHydrator->extract($contributor);
                 }
-
             }
             $items[] = $extracted;
         }
