@@ -1409,17 +1409,9 @@ class SpecificationsService
         $maxValueRatio = 0;
         $maxValueIdx = null;
         foreach ($ratios as $idx => $ratio) {
-            if (is_null($maxValueIdx)) {
+            if (is_null($maxValueIdx) || $maxValueRatio <= $ratio) {
                 $maxValueIdx = $idx;
                 $maxValueRatio = $ratio;
-            } elseif ($maxValueRatio <= $ratio) {
-                if ($freshness[$idx] > $freshness[$maxValueIdx]) {
-                    $maxValueIdx = $idx;
-                    $maxValueRatio = $ratio;
-                } else {
-                    $maxValueIdx = $idx;
-                    $maxValueRatio = $ratio;
-                }
             }
         }
         $actualValue = $registry[$maxValueIdx];
