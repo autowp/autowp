@@ -48,7 +48,7 @@
                 'href'  => $this->url('catalogue', [
                     'action' => 'cars'
                 ], [], true)
-            ], '<i class="fa fa-road"></i> ' . $this->escapeHtml($this->translate('catalogue/chronological')), false)?>
+            ], '<i class="fa fa-road" aria-hidden="true"></i> ' . $this->escapeHtml($this->translate('catalogue/chronological')), false)?>
         </li>
         <li class="nav-item">
             <?=$this->htmlA([
@@ -56,14 +56,14 @@
                 'href'  => $this->url('catalogue', [
                     'action' => 'recent'
                 ], [], true)
-            ], '<i class="fa fa-th"></i> '. $this->escapeHtml($this->translate('catalogue/brand/new-pictures')), false)?>
+            ], '<i class="fa fa-th" aria-hidden="true"></i> '. $this->escapeHtml($this->translate('catalogue/brand/new-pictures')), false)?>
         </li>
         <?php if ($this->haveTwins) { ?>
             <li class="nav-item">
                 <?=$this->htmlA([
                     'href'  => '/ng/twins/' . $this->brand['catname'],
                     'class' => 'nav-link'
-                ], '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(25)->name), false)?>
+                ], '<i class="fa fa-adjust" aria-hidden="true"></i> ' . $this->escapeHtml($this->page(25)->name), false)?>
             </li>
         <?php } ?>
         <?php if ($this->mostsActive) { ?>
@@ -74,7 +74,7 @@
                         'action'        => 'brand-mosts',
                         'brand_catname' => $this->brand['catname']
                     ])
-                ], '<i class="fa fa-sort-amount-desc"></i> ' . $this->escapeHtml($this->page(21)->name), false)?>
+                ], '<i class="fa fa-sort-amount-desc" aria-hidden="true"></i> ' . $this->escapeHtml($this->page(21)->name), false)?>
             </li>
         <?php } ?>
         <?php if ($this->inboxPictures) { ?>
@@ -85,7 +85,7 @@
                         'status'  => Application\Model\Picture::STATUS_INBOX,
                         'item_id' => $this->brand['id'],
                     ])
-                ], '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge badge-pill badge-secondary">' . $this->inboxPictures . '</span>', false)?>
+                ], '<i class="fa-fw fa fa-th" aria-hidden="true"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge badge-pill badge-secondary">' . $this->inboxPictures . '</span>', false)?>
             </li>
         <?php } ?>
         <?php if ($this->requireAttention) { ?>
@@ -100,7 +100,7 @@
                             ]
                         ])
                     ],
-                    '<i class="fa fa-comment"></i> ' .
+                    '<i class="fa fa-comment" aria-hidden="true"></i> ' .
                         $this->escapeHtml($this->translate('catalogue/vehicle/comments')) .
                         ' <span class="badge badge-pill badge-secondary">'.$this->requireAttention.'</span>',
                     false
@@ -114,7 +114,7 @@
                         'class' => 'nav-link',
                         'href'  => '/ng/moder/items/item/' . $this->brand['id']
                     ],
-                    '<i class="fa fa-cog"></i> ' . $this->translate('moder/edit-object'),
+                    '<i class="fa fa-cog" aria-hidden="true"></i> ' . $this->translate('moder/edit-object'),
                     false
                 ) ?>
             </li>

@@ -56,12 +56,12 @@
         <p>
             <?php foreach ($this->itemOfDay['links'] as $i => $item) { ?>
                 <?php if ($i) { ?> &#xa0; <?php } ?>
-                <span class="fa fa-<?=$item['icon']?>"></span>
+                <span class="fa fa-<?=$item['icon']?>" aria-hidden="true"></span>
                 <?=$this->htmlA($item['url'], $item['text'] . (isset($item['count']) ? ' ('.$item['count'].')' : ''))?>
             <?php } ?>
 
             <?php if ($this->itemOfDay['links']) { ?> &#xa0; <?php } ?>
-            <span class="fa fa-trophy"></span>
+            <span class="fa fa-trophy" aria-hidden="true"></span>
             <?=$this->htmlA('/ng/donate/vod', $this->translate('donate/vod/wants-to-select?'))?>
         </p>
     <?php } ?>

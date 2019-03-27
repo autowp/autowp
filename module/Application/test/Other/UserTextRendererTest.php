@@ -39,11 +39,11 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
         return [
             [
                 'http://www.autowp.ru/users/user1',
-                '<i class="fa fa-user"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;user1">tester</a>'
+                '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;user1">tester</a>'
             ],
             [
                 'http://www.autowp.ru/ng/users/user1',
-                '<i class="fa fa-user"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;user1">tester</a>'
+                '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;user1">tester</a>'
             ],
             [
                 'http://www.autowp.ru/users/user9999999999/',
@@ -51,11 +51,11 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
             ],
             [
                 'http://www.autowp.ru/users/identity',
-                '<i class="fa fa-user"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;identity">tester2</a>'
+                '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;identity">tester2</a>'
             ],
             [
                 'http://www.autowp.ru/ng/users/identity',
-                '<i class="fa fa-user"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;identity">tester2</a>'
+                '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;<a href="&#x2F;ng&#x2F;users&#x2F;identity">tester2</a>'
             ],
         ];
     }

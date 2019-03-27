@@ -52,11 +52,11 @@
 
 <?php if ($this->user()->inheritsRole('moder')) { ?>
     <p>
-        <i class="fa fa-cog"></i>
+        <i class="fa fa-cog" aria-hidden="true"></i>
         <?=$this->htmlA('/ng/moder/items/item/' . $this->car['id'], $this->translate('moder/edit-object'))?>
 
         <?php if ($this->user()->isAllowed('car', 'add') && $this->car['is_group']) { ?>
-            <i class="fa fa-plus"></i>
+            <i class="fa fa-plus" aria-hidden="true"></i>
             <?=$this->htmlA(
                 '/ng/moder/items/new?item_type_id='.$this->car['item_type_id'].'&parent_id=' . $this->car['id'],
                 mb_strtolower($this->translate('item/type/'.$this->car['item_type_id'].'/add-sub-item'))
@@ -64,7 +64,7 @@
         <?php } ?>
 
         <?php if ($this->canAcceptPicture && $this->inboxCount) { ?>
-            <i class="fa fa-th"></i>
+            <i class="fa fa-th" aria-hidden="true"></i>
             <?=$this->htmlA('/ng/moder/pictures?' . http_build_query([
                 'item_id' => $this->car['id'],
                 'status'  => 'inbox'
@@ -72,7 +72,7 @@
         <?php } ?>
 
         <?php if ($this->requireAttention) { ?>
-            <i class="fa fa-comment"></i>
+            <i class="fa fa-comment" aria-hidden="true"></i>
             <?=$this->htmlA($this->url('ng', ['path' => 'moder/comments'], [
                 'query' => [
                     'pictures_of_item_id' => $this->car['id'],
@@ -141,7 +141,7 @@
         </div>
 
         <?php if ($this->currentPicturesCount > 4) { ?>
-            <i class="fa fa-th"></i>
+            <i class="fa fa-th" aria-hidden="true"></i>
             <?=$this->htmlA($this->currentPicturesUrl, $this->translate('carlist/all pictures').' ('.$this->currentPicturesCount.')')?>
         <?php } ?>
     <?php } ?>
@@ -183,14 +183,14 @@
 
             <?php if (isset($modification['url']) && $modification['url']) { ?>
                 <li class="list-inline-item">
-                    <span class="fa fa-th"></span>
+                    <span class="fa fa-th" aria-hidden="true"></span>
                     <?=$this->htmlA($modification['url'], $this->translate('carlist/all pictures').' ('.$modification['totalPictures'].')')?>
                 </li>
             <?php } ?>
 
             <?php if ($this->isCarModer) { ?>
                 <li class="list-inline-item">
-                    <i class="fa fa-cog"></i>
+                    <i class="fa fa-cog" aria-hidden="true"></i>
                     <?=$this->htmlA('#' /*$item['moderUrl']*/, $this->translate('moder/edit-object')) ?>
                 </li>
             <?php } ?>

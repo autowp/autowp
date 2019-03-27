@@ -12,13 +12,13 @@
                             'href' => $item['href'],
                             'class' => 'dropdown-item'
                         ],
-                        (isset($item['icon']) ? '<i class="fa-fw '.$item['icon'].'"></i> ' : '') . $this->escapeHtml($item['label']) . (isset($item['count']) ? ' <span class="badge badge-pill badge-secondary">'.$item['count'].'</span>' : ''),
+                        (isset($item['icon']) ? '<i class="fa-fw '.$item['icon'].'" aria-hidden="true"></i> ' : '') . $this->escapeHtml($item['label']) . (isset($item['count']) ? ' <span class="badge badge-pill badge-secondary">'.$item['count'].'</span>' : ''),
                         false
                     ) ?>
                 <?php } ?>
                 <div class="dropdown-divider"></div>
                 <a href="/ng/moder" class="dropdown-item">
-                    <i class="fa fa-cog"></i>
+                    <i class="fa fa-cog" aria-hidden="true"></i>
                     <?=$this->escapeHtml($this->page(67)->name)?>
                 </a>
             </div>

@@ -45,35 +45,35 @@
 
                         <?php if (! $this->disableDetailsLink && ($item['hasHtml'] || $item['childsCount']) && isset($item['details']['url'])) { ?>
                             <li class="list-inline-item">
-                                <i class="fa fa-align-left"></i>
+                                <i class="fa fa-align-left" aria-hidden="true"></i>
                                 <?=$this->htmlA($item['details']['url'], $this->translate('carlist/details') . ( $item['childsCount'] > 1 ? ' (' . $item['childsCount'] . ')' : '')) ?>
                             </li>
                         <?php } ?>
 
                         <?php if (isset($item['tuning']) && $item['tuning']) { ?>
                             <li class="list-inline-item">
-                                <i class="fa fa-align-left"></i>
+                                <i class="fa fa-align-left" aria-hidden="true"></i>
                                 <?=$this->htmlA($item['tuning']['url'], $this->translate('catalogue/related') . ' ('.$item['tuning']['count'].')')?>
                             </li>
                         <?php } ?>
 
                         <?php if (isset($item['sport']) && $item['sport']) { ?>
                             <li class="list-inline-item">
-                                <i class="fa fa-align-left"></i>
+                                <i class="fa fa-align-left" aria-hidden="true"></i>
                                 <?=$this->htmlA($item['sport']['url'], $this->translate('catalogue/sport') . ' ('.$item['sport']['count'].')')?>
                             </li>
                         <?php } ?>
 
                         <?php if (isset($item['allPicturesUrl']) && $item['allPicturesUrl']) { ?>
                             <li class="list-inline-item">
-                                <span class="fa fa-th"></span>
+                                <span class="fa fa-th" aria-hidden="true"></span>
                                 <?=$this->htmlA($item['allPicturesUrl'], $this->translate('carlist/all pictures').' ('.$item['totalPictures'].')')?>
                             </li>
                         <?php } ?>
 
                         <?php if (count($item['specsLinks']) > 1) { ?>
                             <li class="list-inline-item">
-                                <i class="fa fa-list-alt"></i>
+                                <i class="fa fa-list-alt" aria-hidden="true"></i>
                                 <?=$this->escapeHtml($this->translate('carlist/specifications'))?>
                                 <?php foreach ($item['specsLinks'] as $specLink) { ?>
                                     <?=$this->htmlA($specLink['url'], $specLink['name'])?>
@@ -82,7 +82,7 @@
                         <?php } else { ?>
                             <?php foreach ($item['specsLinks'] as $specLink) { ?>
                                 <li class="list-inline-item">
-                                    <i class="fa fa-list-alt"></i>
+                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
                                     <?=$this->htmlA($specLink['url'], $this->translate('carlist/specifications'))?>
                                 </li>
                             <?php } ?>
@@ -91,7 +91,7 @@
                         <?php if (isset($item['twinsGroups'])) { ?>
                             <?php foreach ($item['twinsGroups'] as $twinsGroup) { ?>
                                 <li class="list-inline-item">
-                                    <i class="fa fa-adjust"></i>
+                                    <i class="fa fa-adjust" aria-hidden="true"></i>
                                     <?=$this->htmlA($twinsGroup['url'], $this->translate('carlist/twins')) ?>
                                 </li>
                             <?php } ?>
@@ -99,21 +99,21 @@
 
                         <?php foreach ($item['categories'] as $category) { ?>
                             <li class="list-inline-item">
-                                <i class="fa fa-tag"></i>
+                                <i class="fa fa-tag" aria-hidden="true"></i>
                                 <?=$this->htmlA($category['url'], $category['name'])?>
                             </li>
                         <?php } ?>
 
                         <?php if ($this->isCarModer) { ?>
                             <li class="list-inline-item">
-                                <i class="fa fa-cog"></i>
+                                <i class="fa fa-cog" aria-hidden="true"></i>
                                 <?=$this->htmlA($item['moderUrl'], $this->translate('moder/edit-object')) ?>
                             </li>
                         <?php } ?>
 
                         <?php if ($this->specEditor) { ?>
                             <li class="list-inline-item">
-                                <i class="fa fa-pencil"></i>
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
                                 <?=$this->htmlA($item['specEditorUrl'], $this->translate('carlist/edit-specs')) ?>
                             </li>
                         <?php } ?>

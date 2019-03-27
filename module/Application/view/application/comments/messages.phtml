@@ -51,7 +51,7 @@
                         <?=$this->htmlA([
                             'href'  => '#',
                             'class' => 'vote-up' . ($comment['userVote'] > 0 ? ' active' : '')
-                        ], '<i class="fa fa-thumbs-o-up"></i>', false)?>
+                        ], '<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>', false)?>
                         <?=$this->htmlA([
                             'href'  => '#',
                             'class' => 'value' . ($comment['vote'] == 0 ? ' zero' : '')
@@ -59,17 +59,17 @@
                         <?=$this->htmlA([
                             'href'  => '#',
                             'class' => 'vote-down' . ($comment['userVote'] < 0 ? ' active' : '')
-                        ], '<i class="fa fa-thumbs-o-down"></i>', false)?>
+                        ], '<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>', false)?>
                     <?php } else { ?>
-                        <i class="fa fa-thumbs-o-up"></i>
+                        <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
                         <span class="value"><?=$comment['vote'] ?></span>
-                        <i class="fa fa-thumbs-o-down"></i>
+                        <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
                     <?php } ?>
                 </span>
 
                 <?php if ($this->user()->logedIn() && $deep < 21) { ?>
                     <button class="btn btn-sm btn-primary reply">
-                        <i class="fa fa-reply"></i>
+                        <i class="fa fa-reply" aria-hidden="true"></i>
                         <span class="d-none d-md-inline">
                             <?=$this->escapeHtml($this->translate('comments/reply'))?>
                         </span>
@@ -78,7 +78,7 @@
 
                 <?php if ($moderAttention && $isModer) { ?>
                     <button class="btn btn-sm btn-success resolve">
-                        <i class="fa fa-reply"></i>
+                        <i class="fa fa-reply" aria-hidden="true"></i>
                         <?=$this->escapeHtml($this->translate('comments/reply'))?> &amp; resolve
                     </button>
                 <?php } ?>
@@ -87,11 +87,11 @@
                     <?=$this->htmlA([
                         'href'  => '#',
                         'class' => 'btn btn-danger btn-sm float-right comment-remove-button',
-                    ], '<i class="fa fa-trash"></i></span> <span class="d-none d-md-inline">' . $this->escapeHtml($this->translate('comments/message/delete')) . '</span>', false) ?>
+                    ], '<i class="fa fa-trash" aria-hidden="true"></i></span> <span class="d-none d-md-inline">' . $this->escapeHtml($this->translate('comments/message/delete')) . '</span>', false) ?>
                     <?=$this->htmlA([
                         'href'  => '#',
                         'class' => 'btn btn-success btn-sm float-right comment-restore-button',
-                    ], '<i class="fa fa-arrow-up"></i> ' . $this->escapeHtml($this->translate('comments/message/restore')), false) ?>
+                    ], '<i class="fa fa-arrow-up" aria-hidden="true"></i> ' . $this->escapeHtml($this->translate('comments/message/restore')), false) ?>
                 <?php } ?>
 
                 <?php if ($this->canMoveMessage) { ?>
@@ -100,16 +100,16 @@
                             'id' => $comment['id']
                         ])),
                         'class' => 'btn btn-secondary btn-sm float-right',
-                    ], '<i class="fa fa-arrows"></i> ' . $this->escapeHtml($this->translate('comments/message/move')), false) ?>
+                    ], '<i class="fa fa-arrows" aria-hidden="true"></i> ' . $this->escapeHtml($this->translate('comments/message/move')), false) ?>
                 <?php } ?>
 
                 <?php if ($this->canViewIp && $comment['ip']) { ?>
-                    <i class="float-right fa fa-eye" data-toggle="tooltip" title="<?=$comment['ip'] ?>" style="margin-right:20px"></i>
+                    <i class="float-right fa fa-eye" data-toggle="tooltip" title="<?=$comment['ip'] ?>" style="margin-right:20px" aria-hidden="true"></i>
                 <?php } ?>
 
                 <?php if ($moderAttention) { ?>
                     <div class="moderator-attention-sign">
-                        <i class="fa fa-info-circle"></i>
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
                         <?=$this->escapeHtml($this->translate('comments/it-requires-attention-of-moderators'))?>
                     </div>
                 <?php } ?>

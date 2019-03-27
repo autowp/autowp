@@ -111,7 +111,7 @@ class User extends AbstractHelper
             }
 
             if ($user['deleted']) {
-                return '<span class="muted"><i class="fa fa-user"></i> ' .
+                return '<span class="muted"><i class="fa fa-user" aria-hidden="true"></i> ' .
                            /* @phan-suppress-next-line PhanUndeclaredMethod */
                            $this->view->escapeHtml($this->view->translate('deleted-user')).
                        '</span>';
@@ -140,7 +140,7 @@ class User extends AbstractHelper
 
             $result =
                 '<span class="'.implode(' ', $classes).'">' .
-                    '<i class="fa fa-user"></i>&#xa0;' .
+                    '<i class="fa fa-user" aria-hidden="true"></i>&#xa0;' .
                     /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $this->view->htmlA($url, $user['name']) .
                 '</span>';

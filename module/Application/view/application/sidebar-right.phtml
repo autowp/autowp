@@ -3,14 +3,14 @@
         <div>
             <?=$this->user() ?><br />
             <?=$this->htmlA('/ng/account/profile', $this->page(48)->name)?><br />
-            <i class="fa fa-sign-out"></i>
+            <i class="fa fa-sign-out" aria-hidden="true"></i>
             <?=$this->htmlA([
                 'href'  => '#',
                 'class' => 'logout'
             ], $this->translate('login/sign-out'))?>
         </div>
         <p>
-            <i class="fa fa-comment"></i>
+            <i class="fa fa-comment" aria-hidden="true"></i>
             <?php if ($this->newPersonalMessages > 0) { ?>
                 <?=$this->htmlA([
                     'href'  => '/ng/account/messages',

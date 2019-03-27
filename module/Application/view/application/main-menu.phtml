@@ -63,14 +63,14 @@
                         <?=$this->htmlA([
                             'class' => 'nav-link',
                             'href'  => '/ng/account/messages'
-                        ], '<i class="fa fa-comment"></i>' . ($this->pm ? ' <span class="badge badge-pill badge-secondary">'.$this->pm.'</span>' : ''), false)?>
+                        ], '<i class="fa fa-comment" aria-hidden="true"></i>' . ($this->pm ? ' <span class="badge badge-pill badge-secondary">'.$this->pm.'</span>' : ''), false)?>
                     </li>
                 <?php } else { ?>
                     <li class="nav-item<?=$this->pageEnv()->isOnPath(79) ? 'active' : ''?>">
                         <?=$this->htmlA([
                             'class' => 'nav-link',
                             'href'  => '/ng/login'
-                        ], '<i class="fa fa-sign-in"></i> ' . $this->escapeHtml($this->translate('login/sign-in')), false)?>
+                        ], '<i class="fa fa-sign-in" aria-hidden="true"></i> ' . $this->escapeHtml($this->translate('login/sign-in')), false)?>
                     </li>
                 <?php } ?>
                 <li class="nav-item dropdown">

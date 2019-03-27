@@ -92,7 +92,7 @@
                             'class' => 'fa fa-2x vote-up ' . ($this->votes['value'] > 0 ? 'fa-thumbs-up' : 'fa-thumbs-o-up')
                         ], '')?>
                     <?php } else { ?>
-                        <i class="fa fa-2x fa-thumbs-o-up"></i>
+                        <i class="fa fa-2x fa-thumbs-o-up" aria-hidden="true"></i>
                     <?php } ?>
                     <span class="positive<?=$this->votes['positive'] ? '' : ' zero'?>"><?=$this->votes['positive']?></span>
                     <?php if ($this->user()->logedIn()) { ?>
@@ -101,7 +101,7 @@
                             'class' => 'fa fa-2x vote-down ' . ($this->votes['value'] < 0 ? 'fa-thumbs-down' : 'fa-thumbs-o-down')
                         ], '')?>
                     <?php } else { ?>
-                        <i class="fa fa-2x fa-thumbs-o-down"></i>
+                        <i class="fa fa-2x fa-thumbs-o-down" aria-hidden="true"></i>
                     <?php } ?>
                     <span class="negative<?=$this->votes['negative'] ? '' : ' zero'?>"><?=$this->votes['negative']?></span>
                 </div>
@@ -109,11 +109,11 @@
             <div class="col-xs-6 text-right">
                 <?php if ($this->user()->logedIn()) { ?>
                     <a href="#" class="picture-subscription subscription<?=$this->subscribed ? ' subscribed' : ''?>" data-url="<?=$this->escapeHtmlAttr($this->subscribeUrl) ?>">
-                        <span class="fa fa-2x fa-envelope-o subscribe" title="<?=$this->escapeHtmlAttr($this->translate('comments/subscribe'))?>"></span>
-                        <span class="fa fa-2x fa-envelope unsubscribe" title="<?=$this->escapeHtmlAttr($this->translate('comments/unsubscribe'))?>"></span>
+                        <span class="fa fa-2x fa-envelope-o subscribe" aria-hidden="true" title="<?=$this->escapeHtmlAttr($this->translate('comments/subscribe'))?>"></span>
+                        <span class="fa fa-2x fa-envelope unsubscribe" aria-hidden="true" title="<?=$this->escapeHtmlAttr($this->translate('comments/unsubscribe'))?>"></span>
                     </a>
                 <?php } ?>
-                <a href="#" class="fa fa-2x fa-share-alt btn-share-dialog" title="Share ..."></a>
+                <a href="#" class="fa fa-2x fa-share-alt btn-share-dialog" aria-hidden="true" title="Share ..."></a>
             </div>
         </div>
 
@@ -172,7 +172,7 @@
             <?php } ?>
             <?php if ($item['detailsUrl']) { ?>
                 <p>
-                    <i class="fa fa-align-left"></i>
+                    <i class="fa fa-align-left" aria-hidden="true"></i>
                     <?=$this->htmlA($item['detailsUrl'], $this->translate('carlist/details')) ?>
                 </p>
             <?php } ?>
@@ -209,7 +209,7 @@
             <?php } ?>
             <?php if ($this->point) { ?>
                 <li>
-                    <span class="fa fa-map-pin"></span>
+                    <span class="fa fa-map-pin" aria-hidden="true"></span>
                     <?=$this->htmlA(
                         'https://www.openstreetmap.org/?mlat='.$this->point->y().'&mlon='.$this->point->x().'#map=6/'.$this->point->y().'/'.$this->point->x(),
                         $this->translate('picture/location')
@@ -232,7 +232,7 @@
             $list = [];
 
             foreach ($this->ofLinks as $link) {
-                $list[] = $this->htmlA($link['url'], '<i class="fa fa-globe"></i> ' . $this->escapeHtml($link['name']), false);
+                $list[] = $this->htmlA($link['url'], '<i class="fa fa-globe" aria-hidden="true"></i> ' . $this->escapeHtml($link['name']), false);
             }
 
             foreach ($this->items as $item) {
@@ -240,7 +240,7 @@
                 foreach ($item['categories'] as $category) {
                     $list[$category['url']] = $this->htmlA(
                         $category['url'],
-                        '<i class="fa fa-tag"></i> ' . $this->car()->htmlTitle($category['name']),
+                        '<i class="fa fa-tag" aria-hidden="true"></i> ' . $this->car()->htmlTitle($category['name']),
                         false
                     );
                 }
@@ -248,7 +248,7 @@
                 if ($item['specsEditUrl']) {
                     $list[] = $this->htmlA(
                         $item['specsEditUrl'],
-                        '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')),
+                        '<i class="fa fa-pencil" aria-hidden="true"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')),
                         false
                     );
                 }
@@ -256,7 +256,7 @@
                 if ($item['hasSpecs'] && $item['specsUrl']) {
                     $list[] = $this->htmlA(
                         $item['specsUrl'],
-                        '<i class="fa fa-list-alt"></i> ' .
+                        '<i class="fa fa-list-alt" aria-hidden="true"></i> ' .
                         sprintf(
                             $this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')),
                             $this->car()->htmlTitle($item['name'])
@@ -275,7 +275,7 @@
                 foreach ($item['twins'] as $twinsGroup) {
                     $list[] = $this->htmlA(
                         $twinsGroup['url'],
-                        '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(25)->name),
+                        '<i class="fa fa-adjust" aria-hidden="true"></i> ' . $this->escapeHtml($this->page(25)->name),
                         false
                     );
                 }
@@ -283,7 +283,7 @@
                 foreach ($item['factories'] as $factory) {
                     $list[] = $this->htmlA(
                         $factory['url'],
-                        '<i class="fa fa-cogs"></i> ' . $this->escapeHtml($factory['name']),
+                        '<i class="fa fa-cogs" aria-hidden="true"></i> ' . $this->escapeHtml($factory['name']),
                         false
                     );
                 }
@@ -305,7 +305,7 @@
                                 'href'  => $item['uploadUrl'],
                                 'class' => "dropdown-item"
                             ],
-                            '<i class="fa fa-upload"></i> ' .
+                            '<i class="fa fa-upload" aria-hidden="true"></i> ' .
                             $this->escapeHtml($this->page(29)->name) . ' ' .
                             $this->car()->htmlTitle($item['name']),
                             false
@@ -326,7 +326,7 @@
                     if ($item['uploadUrl']) {
                         $list[] = $this->htmlA(
                             $item['uploadUrl'],
-                            '<i class="fa fa-upload"></i> ' .
+                            '<i class="fa fa-upload" aria-hidden="true"></i> ' .
                             $this->escapeHtml($this->page(29)->name) . ' ' .
                             $this->car()->htmlTitle($item['name']),
                             false
@@ -354,7 +354,7 @@
                 if ($engine['hasSpecs']) {
                     $list[] = $this->htmlA(
                         $engine['specsUrl'],
-                        '<i class="fa fa-list-alt"></i> ' .
+                        '<i class="fa fa-list-alt" aria-hidden="true"></i> ' .
                         sprintf(
                             $this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')),
                             $this->escapeHtml($engine['name'])
@@ -366,7 +366,7 @@
                 if ($engine['specsEditUrl']) {
                     $list[] = $this->htmlA(
                         $engine['specsEditUrl'],
-                        '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')),
+                        '<i class="fa fa-pencil" aria-hidden="true"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')),
                         false
                     );
                 }
@@ -402,7 +402,7 @@
                 if (count($this->items) || count($this->engines)) {
                     $list[] = $this->htmlA(
                         '/ng/upload?replace=' . $this->picture['id'],
-                        '<i class="fa fa-exchange"></i> ' . $this->escapeHtml($this->translate('picture/propose-image-replacement')),
+                        '<i class="fa fa-exchange" aria-hidden="true"></i> ' . $this->escapeHtml($this->translate('picture/propose-image-replacement')),
                         false
                     );
                 }
@@ -437,11 +437,11 @@
             <?php foreach ($this->moderVotes as $moderVote) { ?>
                 <li>
                     <?php if ($moderVote['vote']) { ?>
-                        <i style="color:green" class="fa fa-thumbs-up"></i>
+                        <i style="color:green" class="fa fa-thumbs-up" aria-hidden="true"></i>
                         <?=$this->user($moderVote['user'])?>
                         <span style="color:green"><?=$this->escapeHtml($moderVote['reason'])?></span>
                     <?php } else { ?>
-                        <i style="color:red" class="fa fa-thumbs-down"></i>
+                        <i style="color:red" class="fa fa-thumbs-down" aria-hidden="true"></i>
                         <?=$this->user($moderVote['user'])?>
                         <span style="color:red"><?=$this->escapeHtml($moderVote['reason'])?></span>
                     <?php } ?>
@@ -460,7 +460,7 @@
             </div>
             <div class="col-md-6">
                 <?php foreach ($this->moderLinks as $url => $name) { ?>
-                    <p><i class="fa fa-cog"></i> <?=$this->htmlA($url, $name)?></p>
+                    <p><i class="fa fa-cog" aria-hidden="true"></i> <?=$this->htmlA($url, $name)?></p>
                 <?php } ?>
             </div>
             <?php if (count($this->items)) { ?>
