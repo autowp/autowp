@@ -146,7 +146,6 @@ class ListBuilder
             ], [
                 'name' => 'catalogue'
             ]);
-            break;
         }
 
         return null;

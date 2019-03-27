@@ -133,7 +133,7 @@ ga('send', 'pageview');
                         <?php foreach ($this->languagePicker() as $item) { ?>
                             <?php if ($item['language'] != $this->language()) { ?>
                                 <a href="<?=$this->escapeHtmlAttr($item['url'])?>">
-                                    <i class="<?=$this->escapeHtmlAttr($item['flag'])?>"></i>
+                                    <i class="<?=$this->escapeHtmlAttr($item['flag'])?>" aria-hidden="true"></i>
                                     <?=$this->escapeHtml($item['name'])?>
                                 </a>
                             <?php } ?>

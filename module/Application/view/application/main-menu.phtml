@@ -135,7 +135,7 @@
                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
                         <?php foreach ($this->languages as $item) { ?>
                             <?php if ($item['language'] == $this->language()) { ?>
-                                <i class="<?=$this->escapeHtmlAttr($item['flag'])?>"></i>
+                                <i class="<?=$this->escapeHtmlAttr($item['flag'])?>" aria-hidden="true"></i>
                             <?php } ?>
                         <?php } ?>
                     </a>
@@ -149,7 +149,7 @@
                                 ]);
                             ?>
                             <a href="<?=$this->escapeHtmlAttr($item['url'])?>" class="dropdown-item<?=$item['language'] == $this->language() ? ' active' : ''?>">
-                                <i class="<?=$this->escapeHtmlAttr($item['flag'])?>"></i>
+                                <i class="<?=$this->escapeHtmlAttr($item['flag'])?>" aria-hidden="true"></i>
                                 <?=$this->escapeHtml($item['name'])?>
                             </a>
                         <?php } ?>
