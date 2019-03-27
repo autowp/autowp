@@ -272,7 +272,8 @@ class CarsController extends AbstractActionController
 
         $pictures = [];
 
-        $pictureRows = $this->picture->getTable()->fetchAll(
+        $pictureTable = $this->picture->getTable();
+        $pictureRows = $pictureTable->fetchAll(
             $pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
