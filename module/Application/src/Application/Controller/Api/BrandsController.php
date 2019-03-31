@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
@@ -15,6 +16,9 @@ use Application\Model\Brand;
  */
 class BrandsController extends AbstractActionController
 {
+    /**
+     * @var StorageInterface
+     */
     private $cache;
 
     /**
@@ -22,7 +26,7 @@ class BrandsController extends AbstractActionController
      */
     private $brand;
 
-    public function __construct($cache, Brand $brand)
+    public function __construct(StorageInterface $cache, Brand $brand)
     {
         $this->cache = $cache;
         $this->brand = $brand;

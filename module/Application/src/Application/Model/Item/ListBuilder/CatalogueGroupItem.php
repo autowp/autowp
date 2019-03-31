@@ -4,6 +4,8 @@ namespace Application\Model\Item\ListBuilder;
 
 use Exception;
 
+use Autowp\TextStorage;
+
 use Application\Model\Item;
 use Application\Model\ItemParent;
 
@@ -14,6 +16,9 @@ class CatalogueGroupItem extends CatalogueItem
      */
     private $language;
 
+    /**
+     * @var TextStorage\Service
+     */
     private $textStorage;
 
     /**
@@ -42,7 +47,7 @@ class CatalogueGroupItem extends CatalogueItem
         return $this;
     }
 
-    public function setTextStorage($textStorage)
+    public function setTextStorage(TextStorage\Service $textStorage)
     {
         $this->textStorage = $textStorage;
 

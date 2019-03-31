@@ -28,6 +28,9 @@ use Application\Service\Mosts;
  */
 class MostsController extends AbstractActionController
 {
+    /**
+     * @var TextStorage\Service
+     */
     private $textStorage;
 
     /**
@@ -54,6 +57,11 @@ class MostsController extends AbstractActionController
      * @var PictureNameFormatter
      */
     private $pictureNameFormatter;
+
+    /**
+     * @var Item
+     */
+    private $itemModel;
 
     public function __construct(
         TextStorage\Service $textStorage,

@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
@@ -19,6 +20,7 @@ use ZF\ApiProblem\ApiProblemResponse;
  * @package Application\Controller\Api
  *
  * @method User user()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */
 class AclController extends AbstractRestfulController
 {
@@ -27,6 +29,9 @@ class AclController extends AbstractRestfulController
      */
     private $cacheKey = 'acl_cache_key';
 
+    /**
+     * @var StorageInterface
+     */
     private $cache;
 
     /**
@@ -80,7 +85,7 @@ class AclController extends AbstractRestfulController
     private $rulesPostFilter;
 
     public function __construct(
-        $cache,
+        StorageInterface $cache,
         InputFilter $rolesInputFilter,
         InputFilter $rolesPostFilter,
         InputFilter $roleParentsPostFilter,

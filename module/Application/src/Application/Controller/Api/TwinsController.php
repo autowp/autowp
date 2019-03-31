@@ -2,11 +2,18 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Application\Model\Twins;
 
+/**
+ * Class TwinsController
+ * @package Application\Controller\Api
+ *
+ * @method string language()
+ */
 class TwinsController extends AbstractRestfulController
 {
     /**
@@ -14,9 +21,12 @@ class TwinsController extends AbstractRestfulController
      */
     private $twins;
 
+    /**
+     * @var StorageInterface
+     */
     private $cache;
 
-    public function __construct(Twins $twins, $cache)
+    public function __construct(Twins $twins, StorageInterface $cache)
     {
         $this->twins = $twins;
         $this->cache = $cache;

@@ -2,10 +2,12 @@
 
 namespace Application\Controller;
 
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\I18n\Translator\TranslatorInterface;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Paginator\Adapter\DbSelect;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Zend\Paginator\Paginator;
@@ -13,6 +15,7 @@ use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\Comments;
 use Autowp\Image\Storage;
+use Autowp\TextStorage;
 use Autowp\User\Model\User;
 
 use Application\Controller\Plugin\Car;
@@ -43,8 +46,14 @@ class CatalogueController extends AbstractActionController
 {
     private $mostsMinCarsCount = 1;
 
+    /**
+     * @var TextStorage\Service
+     */
     private $textStorage;
 
+    /**
+     * @var StorageInterface
+     */
     private $cache;
 
     /**
@@ -128,8 +137,8 @@ class CatalogueController extends AbstractActionController
     private $translator;
 
     public function __construct(
-        $textStorage,
-        $cache,
+        TextStorage\Service $textStorage,
+        StorageInterface $cache,
         SpecificationsService $specsService,
         ItemParent $itemParent,
         ItemNameFormatter $itemNameFormatter,
@@ -1539,7 +1548,7 @@ class CatalogueController extends AbstractActionController
             $pictureRows = $this->getModgroupPictureList($currentCarId, $modification['id'], $g);
             $select = $this->getModgroupPicturesSelect($currentCarId, $modification['id']);
             $pPaginator = new Paginator(
-                new \Zend\Paginator\Adapter\DbSelect($select, $this->picture->getTable()->getAdapter())
+                new DbSelect($select, $this->picture->getTable()->getAdapter())
             );
 
             foreach ($pictureRows as $pictureRow) {

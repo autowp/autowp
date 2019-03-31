@@ -12,6 +12,7 @@ use ZF\ApiProblem\ApiProblemResponse;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
+use Autowp\TextStorage;
 use Autowp\User\Model\User;
 
 use Application\Controller\Plugin\ForbiddenAction;
@@ -104,6 +105,9 @@ class PictureController extends AbstractRestfulController
      */
     private $editInputFilter;
 
+    /**
+     * @var TextStorage\Service
+     */
     private $textStorage;
 
     /**
@@ -151,7 +155,7 @@ class PictureController extends AbstractRestfulController
         InputFilter $listInputFilter,
         InputFilter $publicListInputFilter,
         InputFilter $editInputFilter,
-        $textStorage,
+        TextStorage\Service $textStorage,
         CommentsService $comments,
         PictureModerVote $pictureModerVote,
         Item $item,

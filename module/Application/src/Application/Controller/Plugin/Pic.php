@@ -2,14 +2,17 @@
 
 namespace Application\Controller\Plugin;
 
+use ArrayIterator;
 use Exception;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
+use Autowp\TextStorage;
 use Autowp\User\Model\User;
 
 use Application\ItemNameFormatter;
@@ -25,7 +28,6 @@ use Application\Model\PictureVote;
 use Application\Model\UserAccount;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
-use Zend\Router\Http\TreeRouteStack;
 
 class Pic extends AbstractPlugin
 {
@@ -34,6 +36,9 @@ class Pic extends AbstractPlugin
      */
     private $pictureView = null;
 
+    /**
+     * @var TextStorage\Service
+     */
     private $textStorage;
 
     private $translator;
@@ -124,7 +129,7 @@ class Pic extends AbstractPlugin
     private $httpRouter;
 
     public function __construct(
-        $textStorage,
+        TextStorage\Service $textStorage,
         $translator,
         PictureNameFormatter $pictureNameFormatter,
         ItemNameFormatter $itemNameFormatter,
@@ -291,7 +296,7 @@ class Pic extends AbstractPlugin
 
         $ids = [];
 
-        if ($pictures instanceof \ArrayIterator) {
+        if ($pictures instanceof ArrayIterator) {
             $rows = [];
             foreach ($pictures as $picture) {
                 $rows[] = (array)$picture;

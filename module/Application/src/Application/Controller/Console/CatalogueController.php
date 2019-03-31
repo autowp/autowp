@@ -4,8 +4,10 @@ namespace Application\Controller\Console;
 
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Uri\UriFactory;
 
 use Autowp\Message\MessageService;
+use Autowp\TextStorage;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 
@@ -18,7 +20,6 @@ use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
-use Zend\Uri\UriFactory;
 
 /**
  * Class CatalogueController
@@ -41,6 +42,9 @@ class CatalogueController extends AbstractActionController
      */
     private $pictureItem;
 
+    /**
+     * @var TextStorage\Service
+     */
     private $textStorage;
 
     /**
@@ -90,7 +94,7 @@ class CatalogueController extends AbstractActionController
         HostManager $hostManager,
         TelegramService $telegram,
         MessageService $message,
-        $textStorage,
+        TextStorage\Service $textStorage,
         DuplicateFinder $duplicateFinder,
         Item $itemModel,
         Picture $picture,

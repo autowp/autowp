@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
@@ -29,6 +30,9 @@ use Application\Service\SpecificationsService;
  */
 class IndexController extends AbstractRestfulController
 {
+    /**
+     * @var StorageInterface
+     */
     private $cache;
 
     /**
@@ -84,7 +88,7 @@ class IndexController extends AbstractRestfulController
     private $router;
 
     public function __construct(
-        $cache,
+        StorageInterface $cache,
         Brand $brand,
         Item $item,
         Categories $categories,

@@ -2,14 +2,18 @@
 
 namespace Application\Hydrator\Api;
 
+use Application\Comments;
 use Traversable;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Hydrator\Exception\InvalidArgumentException;
+use Zend\Permissions\Acl\Acl;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Image\StorageInterface;
+use Autowp\TextStorage;
 use Autowp\User\Model\User;
 
 use Application\ItemNameFormatter;
@@ -65,7 +69,7 @@ class ItemHydrator extends RestHydrator
     private $itemModel;
 
     /**
-     * @var \Autowp\TextStorage\Service
+     * @var TextStorage\Service
      */
     private $textStorage;
 
@@ -115,7 +119,7 @@ class ItemHydrator extends RestHydrator
     private $imageStorage;
 
     /**
-     * @var \Zend\Permissions\Acl\Acl
+     * @var Acl
      */
     private $acl;
 
@@ -129,6 +133,8 @@ class ItemHydrator extends RestHydrator
      */
     private $previewPictures = [];
 
+    private $comments;
+
     public function __construct(
         $serviceManager
     ) {
@@ -139,7 +145,7 @@ class ItemHydrator extends RestHydrator
         $this->linkTable = $tables->get('links');
         $this->specTable = $tables->get('spec');
 
-        $this->comments = $serviceManager->get(\Application\Comments::class);
+        $this->comments = $serviceManager->get(Comments::class);
 
         $this->userModel = $serviceManager->get(User::class);
 
@@ -154,8 +160,8 @@ class ItemHydrator extends RestHydrator
         $this->itemModel = $serviceManager->get(Item::class);
         $this->itemParent = $serviceManager->get(ItemParent::class);
 
-        $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
-        $this->textStorage = $serviceManager->get(\Autowp\TextStorage\Service::class);
+        $this->acl = $serviceManager->get(Acl::class);
+        $this->textStorage = $serviceManager->get(TextStorage\Service::class);
 
         $this->catalogue = $serviceManager->get(Catalogue::class);
 
@@ -197,7 +203,7 @@ class ItemHydrator extends RestHydrator
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
-     * @throws \Zend\Hydrator\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setOptions($options)
     {
@@ -206,7 +212,7 @@ class ItemHydrator extends RestHydrator
         if ($options instanceof \Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
-            throw new \Zend\Hydrator\Exception\InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'The options parameter must be an array or a Traversable'
             );
         }
@@ -452,7 +458,7 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('comments_topic_stat')) {
             $result['comments_topic_stat'] = $this->comments->service()->getTopicStat(
-                \Application\Comments::ITEM_TYPE_ID,
+                Comments::ITEM_TYPE_ID,
                 $object['id']
             );
         }

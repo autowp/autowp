@@ -2,10 +2,12 @@
 
 namespace Application\Hydrator\Api;
 
+use Autowp\TextStorage;
+
 class ItemLanguageHydrator extends RestHydrator
 {
     /**
-     * @var \Autowp\TextStorage\Service
+     * @var TextStorage\Service
      */
     private $textStorage;
 
@@ -14,7 +16,7 @@ class ItemLanguageHydrator extends RestHydrator
     ) {
         parent::__construct();
 
-        $this->textStorage = $serviceManager->get(\Autowp\TextStorage\Service::class);
+        $this->textStorage = $serviceManager->get(TextStorage\Service::class);
     }
 
     public function extract($object)

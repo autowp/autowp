@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api;
 
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -15,6 +16,9 @@ use Application\Model\Picture;
 
 class RatingController extends AbstractActionController
 {
+    /**
+     * @var StorageInterface
+     */
     private $cache;
 
     /**
@@ -43,7 +47,7 @@ class RatingController extends AbstractActionController
     private $userHydrator;
 
     public function __construct(
-        $cache,
+        StorageInterface $cache,
         Comments $comments,
         Picture $picture,
         Item $item,

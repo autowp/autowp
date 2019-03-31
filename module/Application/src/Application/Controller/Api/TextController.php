@@ -9,6 +9,9 @@ use Autowp\TextStorage;
 
 class TextController extends AbstractRestfulController
 {
+    /**
+     * @var TextStorage\Service
+     */
     private $textStorage;
 
     public function __construct(TextStorage\Service $textStorage)

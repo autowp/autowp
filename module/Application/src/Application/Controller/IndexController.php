@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 
@@ -27,6 +28,9 @@ use Application\Model\PictureItem;
  */
 class IndexController extends AbstractActionController
 {
+    /**
+     * @var StorageInterface
+     */
     private $cache;
 
     /**
@@ -75,7 +79,7 @@ class IndexController extends AbstractActionController
     private $categories;
 
     public function __construct(
-        $cache,
+        StorageInterface $cache,
         SpecificationsService $specsService,
         CarOfDay $itemOfDay,
         Categories $categories,

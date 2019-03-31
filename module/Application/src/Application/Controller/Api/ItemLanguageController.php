@@ -74,6 +74,11 @@ class ItemLanguageController extends AbstractRestfulController
      */
     private $item;
 
+    /**
+     * @var MessageService
+     */
+    private $message;
+
     public function __construct(
         TableGateway $table,
         TextStorage $textStorage,

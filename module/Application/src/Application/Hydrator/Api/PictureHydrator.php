@@ -8,10 +8,12 @@ use Traversable;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\Image;
+use Autowp\TextStorage;
 use Autowp\User\Model\User;
 
 use Application\Comments;
@@ -81,6 +83,9 @@ class PictureHydrator extends RestHydrator
      */
     private $imageStorage;
 
+    /**
+     * @var TextStorage\Service
+     */
     private $textStorage;
 
     /**
@@ -113,6 +118,8 @@ class PictureHydrator extends RestHydrator
      */
     private $linksTable;
 
+    private $router;
+
     public function __construct(
         $serviceManager
     ) {
@@ -126,14 +133,14 @@ class PictureHydrator extends RestHydrator
         $this->pictureModerVote = $serviceManager->get(PictureModerVote::class);
 
         $this->router = $serviceManager->get('HttpRouter');
-        $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
+        $this->acl = $serviceManager->get(Acl::class);
         $this->pictureVote = $serviceManager->get(PictureVote::class);
         $this->comments = $serviceManager->get(Comments::class);
         $this->pictureNameFormatter = $serviceManager->get(PictureNameFormatter::class);
         $this->duplicateFinder = $serviceManager->get(DuplicateFinder::class);
         $this->pictureItem = $serviceManager->get(PictureItem::class);
         $this->imageStorage = $serviceManager->get(Image\Storage::class);
-        $this->textStorage = $serviceManager->get(\Autowp\TextStorage\Service::class);
+        $this->textStorage = $serviceManager->get(TextStorage\Service::class);
         $this->perspective = $serviceManager->get(Perspective::class);
 
         $this->linksTable = $serviceManager->get('TableManager')->get('links');

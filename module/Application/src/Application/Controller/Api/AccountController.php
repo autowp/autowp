@@ -12,6 +12,7 @@ use Zend\View\Model\JsonModel;
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
 use Autowp\User\Controller\Plugin\User;
 
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\UserAccount;
 
 /**
@@ -19,6 +20,8 @@ use Application\Model\UserAccount;
  * @package Application\Controller\Api
  *
  * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method string language()
  */
 class AccountController extends AbstractRestfulController
 {

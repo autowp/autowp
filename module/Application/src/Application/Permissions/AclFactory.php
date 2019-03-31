@@ -4,6 +4,7 @@ namespace Application\Permissions;
 
 use Exception;
 
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\ServiceManager\FactoryInterface;
@@ -22,6 +23,9 @@ class AclFactory implements FactoryInterface
     {
         $services = $container->get('ServiceManager');
 
+        /**
+         * @var StorageInterface
+         */
         $cache = $services->get('longCache');
 
         $key = 'acl_cache_key';
