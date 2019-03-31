@@ -18,7 +18,7 @@ use Application\Model\Contact;
  * Class ContactsController
  * @package Application\Controller\Api
  *
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()

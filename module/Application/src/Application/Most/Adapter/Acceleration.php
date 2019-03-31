@@ -2,6 +2,7 @@
 
 namespace Application\Most\Adapter;
 
+use Exception;
 use Zend\Db\Sql;
 
 class Acceleration extends AbstractAdapter
@@ -11,6 +12,14 @@ class Acceleration extends AbstractAdapter
     protected $order;
 
     const MPH60_TO_KMH100 = 0.98964381346271110050637609692728;
+    /**
+     * @var array|\ArrayObject|null
+     */
+    private $kmhAttribute;
+    /**
+     * @var array|\ArrayObject|null
+     */
+    private $mphAttribute;
 
     public function setAttributes(array $value)
     {
@@ -27,6 +36,10 @@ class Acceleration extends AbstractAdapter
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param Sql\Select $select
+     * @param $language
+     * @return array
+     * @throws Exception
      */
     public function getCars(Sql\Select $select, $language)
     {

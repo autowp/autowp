@@ -3,10 +3,12 @@
 namespace Application\Hydrator\Api;
 
 use Exception;
+use geoPHP;
 use Traversable;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
@@ -189,16 +191,16 @@ class PictureHydrator extends RestHydrator
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
-     * @throws \Zend\Hydrator\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setOptions($options)
     {
         parent::setOptions($options);
 
-        if ($options instanceof \Traversable) {
+        if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
-            throw new \Zend\Hydrator\Exception\InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'The options parameter must be an array or a Traversable'
             );
         }
@@ -321,8 +323,6 @@ class PictureHydrator extends RestHydrator
                 $pages->pagesInRange = $pagesInRange;
 
                 $picture['paginator'] = $pages;
-            } else {
-                $paginator = false;
             }
         }
 
@@ -441,7 +441,7 @@ class PictureHydrator extends RestHydrator
         if ($this->filterComposite->filter('point')) {
             $picture['point'] = null;
             if ($object['point']) {
-                $point = \geoPHP::load(substr($object['point'], 4), 'wkb');
+                $point = geoPHP::load(substr($object['point'], 4), 'wkb');
                 if ($point) {
                     $picture['point'] = [
                         'lng' => $point->x(),
@@ -816,10 +816,13 @@ class PictureHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 
     private function getUserRole()

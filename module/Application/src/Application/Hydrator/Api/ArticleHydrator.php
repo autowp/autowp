@@ -2,13 +2,17 @@
 
 namespace Application\Hydrator\Api;
 
+use Exception;
 use Traversable;
 
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
+
+use Application\Controller\Api\ArticleController;
 
 class ArticleHydrator extends RestHydrator
 {
@@ -42,7 +46,7 @@ class ArticleHydrator extends RestHydrator
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
-     * @throws \Zend\Hydrator\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setOptions($options)
     {
@@ -55,7 +59,7 @@ class ArticleHydrator extends RestHydrator
     {
         $previewUrl = null;
         if ($object['preview_filename']) {
-            $previewUrl = \Application\Controller\Api\ArticleController::PREVIEW_CAT_PATH . $object['preview_filename'];
+            $previewUrl = ArticleController::PREVIEW_CAT_PATH . $object['preview_filename'];
         }
 
         $date = Row::getDateTimeByColumnType('timestamp', $object['first_enabled_datetime']);
@@ -91,9 +95,12 @@ class ArticleHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 }

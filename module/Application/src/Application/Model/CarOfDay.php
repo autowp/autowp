@@ -5,7 +5,9 @@ namespace Application\Model;
 use DateInterval;
 use DateTime;
 
+use Exception;
 use Facebook;
+use GuzzleHttp\Exception\BadResponseException;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Twitter;
 use Zend\Db\TableGateway\TableGateway;
@@ -210,6 +212,7 @@ class CarOfDay
         /* Hardcoded perspective priority list */
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
+        $picture = null;
         foreach ($perspectives as $perspective) {
             $picture = $this->pictureByPerspective($car['id'], $perspective);
             if ($picture) {
@@ -262,12 +265,12 @@ class CarOfDay
                 'headers'     => $headers,
                 'form_params' => $params
             ]);
-        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+        } catch (BadResponseException $e) {
             $response = $e->getResponse();
             $body = $response->getBody();
             $statusCode = $response->getStatusCode();
 
-            throw new \Exception(
+            throw new Exception(
                 "Received error [$body] with status code [$statusCode] when retrieving token credentials."
             );
         }
@@ -305,6 +308,7 @@ class CarOfDay
         /* Hardcoded perspective priority list */
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
+        $picture = null;
         foreach ($perspectives as $perspective) {
             $picture = $this->pictureByPerspective($car['id'], $perspective);
             if ($picture) {
@@ -387,6 +391,7 @@ class CarOfDay
         /* Hardcoded perspective priority list */
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
+        $picture = null;
         foreach ($perspectives as $perspective) {
             $picture = $this->pictureByPerspective($car['id'], $perspective);
             if ($picture) {
@@ -432,12 +437,12 @@ class CarOfDay
             ->send();
 
         if (! $response->isSuccess()) {
-            throw new \Exception("Failed to post to vk" . $response->getReasonPhrase());
+            throw new Exception("Failed to post to vk" . $response->getReasonPhrase());
         }
 
         $json = Json::decode($response->getBody(), Json::TYPE_ARRAY);
         if (isset($json['error'])) {
-            throw new \Exception("Failed to post to vk" . $json['error']['error_msg']);
+            throw new Exception("Failed to post to vk" . $json['error']['error_msg']);
         }
 
         $this->table->update([
@@ -601,6 +606,9 @@ class CarOfDay
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $itemId
+     * @return array
+     * @throws Exception
      */
     private function getOrientedPictureList(int $itemId)
     {

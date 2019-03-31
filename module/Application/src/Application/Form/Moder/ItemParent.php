@@ -2,6 +2,8 @@
 
 namespace Application\Form\Moder;
 
+use Application\Validator\ItemParent\CatnameNotExists;
+use Autowp\ZFComponents\Filter\FilenameSafe;
 use Traversable;
 
 use Zend\Form\Element;
@@ -126,7 +128,7 @@ class ItemParent extends Form implements InputFilterProviderInterface
                 'filters' => [
                     ['name' => 'StringTrim'],
                     ['name' => SingleSpaces::class],
-                    ['name' => \Autowp\ZFComponents\Filter\FilenameSafe::class]
+                    ['name' => FilenameSafe::class]
                 ],
                 'validators' => [
                     [
@@ -137,7 +139,7 @@ class ItemParent extends Form implements InputFilterProviderInterface
                         ]
                     ],
                     [
-                        'name' => \Application\Validator\ItemParent\CatnameNotExists::class,
+                        'name' => CatnameNotExists::class,
                         'options' => [
                             'parentId'     => $this->parentId,
                             'ignoreItemId' => $this->itemId

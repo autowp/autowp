@@ -32,7 +32,7 @@ use Application\Service\UsersService;
  * Class UserController
  * @package Application\Controller\Api
  *
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method ForbiddenAction forbiddenAction()
  * @method string language()
@@ -260,6 +260,7 @@ class UserController extends AbstractRestfulController
 
         if (in_array('language', $fields)) {
             // preload filter options
+            $languages = [];
             foreach (array_keys($this->hosts) as $language) {
                 $languages[] = $language;
             }
@@ -269,6 +270,7 @@ class UserController extends AbstractRestfulController
 
         if (in_array('timezone', $fields)) {
             // preload filter options
+            $list = [];
             foreach (DateTimeZone::listAbbreviations() as $group) {
                 foreach ($group as $timeZone) {
                     $tzId = $timeZone['timezone_id'];

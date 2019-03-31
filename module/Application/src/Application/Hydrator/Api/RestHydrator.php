@@ -5,6 +5,7 @@ namespace Application\Hydrator\Api;
 use Traversable;
 
 use Zend\Hydrator\AbstractHydrator;
+use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Hydrator\HydratorOptionsInterface;
 use Zend\Stdlib\ArrayUtils;
 
@@ -28,14 +29,14 @@ abstract class RestHydrator extends AbstractHydrator implements HydratorOptionsI
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
-     * @throws \Zend\Hydrator\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setOptions($options)
     {
         if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
-            throw new \Zend\Hydrator\Exception\InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'The options parameter must be an array or a Traversable'
             );
         }

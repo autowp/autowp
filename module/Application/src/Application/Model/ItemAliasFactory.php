@@ -9,6 +9,10 @@ class ItemAliasFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return ItemAlias
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

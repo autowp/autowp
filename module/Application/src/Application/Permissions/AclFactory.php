@@ -18,6 +18,11 @@ class AclFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return Acl
+     * @throws Exception
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -30,6 +35,7 @@ class AclFactory implements FactoryInterface
 
         $key = 'acl_cache_key';
 
+        $success = false;
         $acl = $cache->getItem($key, $success);
 
         if (! $success) {

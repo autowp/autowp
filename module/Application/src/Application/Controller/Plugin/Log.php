@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Plugin;
 
+use Exception;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\Log as Model;
@@ -23,7 +24,7 @@ class Log extends AbstractPlugin
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->getController()->user()->get();
         if (! $user) {
-            throw new \Exception('User id not detected');
+            throw new Exception('User id not detected');
         }
 
         $this->log->addEvent($user['id'], $message, $objects);

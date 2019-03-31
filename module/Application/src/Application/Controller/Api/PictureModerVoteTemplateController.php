@@ -17,7 +17,7 @@ use Application\Controller\Plugin\ForbiddenAction;
  * Class PictureModerVoteTemplateController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */

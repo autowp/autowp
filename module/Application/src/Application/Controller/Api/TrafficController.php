@@ -15,7 +15,7 @@ use Application\Hydrator\Api\RestHydrator;
  * Class TrafficController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  */
 class TrafficController extends AbstractRestfulController

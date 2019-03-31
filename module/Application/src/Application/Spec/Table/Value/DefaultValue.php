@@ -8,6 +8,11 @@ class DefaultValue
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param PhpRenderer $view
+     * @param $attribute
+     * @param $value
+     * @param $values
+     * @return mixed|string
      */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {

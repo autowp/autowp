@@ -3,6 +3,7 @@
 namespace Application\Model;
 
 use Zend\Db\Sql;
+use Zend\Paginator\Paginator;
 
 class Twins
 {
@@ -74,7 +75,7 @@ class Twins
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      *
-     * @param array $groupId
+     * @param array $groupIds
      * @return array
      */
     public function getGroupsPicturesCount(array $groupIds): array
@@ -129,7 +130,7 @@ class Twins
 
     /**
      * @param int $brandId
-     * @return \Zend\Paginator\Paginator
+     * @return Paginator
      */
     public function getGroupsPaginator(int $brandId = 0)
     {
@@ -161,6 +162,7 @@ class Twins
     /**
      * @param int $groupId
      * @return NULL|array
+     * @throws \Exception
      */
     public function getGroup(int $groupId)
     {

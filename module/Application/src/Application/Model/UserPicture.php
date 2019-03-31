@@ -7,6 +7,16 @@ use Zend\Db\TableGateway\TableGateway;
 
 class UserPicture
 {
+    /**
+     * @var TableGateway
+     */
+    private $pictureTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $userTable;
+
     public function __construct(TableGateway $pictureTable, TableGateway $userTable)
     {
         $this->pictureTable = $pictureTable;
@@ -50,8 +60,9 @@ class UserPicture
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $userId
      */
-    public function refreshPicturesCount($userId)
+    public function refreshPicturesCount(int $userId): void
     {
         $select = new Sql\Select($this->pictureTable->getTable());
         $select->columns(['count' => new Sql\Expression('count(1)')])
@@ -71,8 +82,9 @@ class UserPicture
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $userId
      */
-    public function incrementUploads($userId)
+    public function incrementUploads(int $userId): void
     {
         $this->userTable->update([
             'pictures_added' => new Sql\Expression('pictures_added+1')

@@ -2,6 +2,7 @@
 
 namespace Application\Hydrator\Api;
 
+use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -49,9 +50,12 @@ class PerspectivePageHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 }

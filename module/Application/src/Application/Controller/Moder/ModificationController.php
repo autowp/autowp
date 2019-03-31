@@ -17,7 +17,7 @@ use Application\Model\Item;
  * Class ModificationController
  * @package Application\Controller\Moder
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  */
 class ModificationController extends AbstractActionController
@@ -153,10 +153,10 @@ class ModificationController extends AbstractActionController
             return $this->redirectToCar($car['id'], 'modifications');
         }
 
-        $this->view->assign([
+        return [
             'form'   => $form,
             'carUrl' => $this->carModerUrl($car['id'], false, 'modifications')
-        ]);
+        ];
     }
 
     public function editAction()
@@ -251,10 +251,10 @@ class ModificationController extends AbstractActionController
             return $this->redirectToCar($car['id'], 'modifications');
         }
 
-        $this->view->assign([
+        return [
             'form'   => $form,
             'carUrl' => $this->carModerUrl($car['id'], false, 'modifications'),
-        ]);
+        ];
     }
 
     public function mapAction()
@@ -330,11 +330,11 @@ class ModificationController extends AbstractActionController
             }
         }*/
 
-        $this->view->assign([
+        return [
             'combinations' => $combinations,
             'values'       => $values,
             'names'        => $names
-        ]);
+        ];
     }
 
     private function groupCombinations($groups)

@@ -2,6 +2,7 @@
 
 namespace Autowp\User\Controller\Plugin;
 
+use ArrayObject;
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Permissions\Acl\Acl;
@@ -26,7 +27,7 @@ class User extends AbstractPlugin
     private $users = [];
 
     /**
-     * @var array|\ArrayObject
+     * @var array|ArrayObject
      */
     private $user = null;
 
@@ -38,7 +39,7 @@ class User extends AbstractPlugin
 
     /**
      * @param int $id
-     * @return array|\ArrayObject
+     * @return array|ArrayObject
      */
     private function user($id)
     {
@@ -63,7 +64,7 @@ class User extends AbstractPlugin
             $user = $this->getLogedInUser();
         }
 
-        if (! (is_array($user) || $user instanceof \ArrayObject)) {
+        if (! (is_array($user) || $user instanceof ArrayObject)) {
             $user = $this->user($user);
         }
 
@@ -73,14 +74,14 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return array|\ArrayObject
+     * @return array|ArrayObject
      */
     private function getLogedInUser()
     {
         $auth = new AuthenticationService();
 
         if (! $auth->hasIdentity()) {
-            return false;
+            return null;
         }
 
         return $this->user($auth->getIdentity());
@@ -95,7 +96,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return array|\ArrayObject
+     * @return array|ArrayObject
      */
     public function get()
     {

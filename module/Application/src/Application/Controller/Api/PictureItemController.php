@@ -24,7 +24,7 @@ use Application\Model\PictureItem;
  * Class PictureItemController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()

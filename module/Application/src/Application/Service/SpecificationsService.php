@@ -2,6 +2,8 @@
 
 namespace Application\Service;
 
+use Application\Validator\Attrs\IsFloatOrNull;
+use Application\Validator\Attrs\IsIntOrNull;
 use Exception;
 use NumberFormatter;
 
@@ -389,6 +391,7 @@ class SpecificationsService
 
         $multioptions = $this->getListsOptions([$attributeId]);
 
+        $maxlength = null;
         if ($type['maxlength']) {
             $maxlength = $type['maxlength'];
         }
@@ -412,7 +415,7 @@ class SpecificationsService
                 $filters = [['name' => 'StringTrim']];
                 $validators = [
                     [
-                        'name'    => \Application\Validator\Attrs\IsIntOrNull::class,
+                        'name'    => IsIntOrNull::class,
                         'options' => ['locale' => 'en_US']
                     ]
                 ];
@@ -422,7 +425,7 @@ class SpecificationsService
                 $filters = [['name' => 'StringTrim']];
                 $validators = [
                     [
-                        'name'    => \Application\Validator\Attrs\IsFloatOrNull::class,
+                        'name'    => IsFloatOrNull::class,
                         'options' => ['locale' => 'en_US']
                     ]
                 ];
@@ -558,6 +561,12 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $uid
+     * @param int $attributeId
+     * @param int $itemId
+     * @param $value
+     * @param bool $empty
+     * @throws Exception
      */
     public function setUserValue2(int $uid, int $attributeId, int $itemId, $value, bool $empty)
     {
@@ -677,6 +686,11 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $uid
+     * @param int $attributeId
+     * @param int $itemId
+     * @param $value
+     * @throws Exception
      */
     public function setUserValue(int $uid, int $attributeId, int $itemId, $value)
     {
@@ -884,6 +898,10 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param $car
+     * @param $perspectives
+     * @return array|\ArrayObject|null
+     * @throws Exception
      */
     private function specPicture($car, $perspectives)
     {
@@ -980,6 +998,10 @@ class SpecificationsService
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $attribute
+     * @param int $itemId
+     * @return array|null
+     * @throws Exception
      */
     public function getActualValue(int $attribute, int $itemId)
     {
@@ -1366,6 +1388,7 @@ class SpecificationsService
                     $value[$valueRow['ordering']] = $valueRow['value'];
                 }
             } else {
+                $value = null;
                 foreach ($valueRows as $valueRow) {
                     $value = $valueRow['value'];
                 }
@@ -1438,6 +1461,7 @@ class SpecificationsService
      * @param array $attribute
      * @param int $itemId
      * @return mixed
+     * @throws Exception
      */
     private function calcEngineValue($attribute, int $itemId)
     {
@@ -1514,6 +1538,10 @@ class SpecificationsService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param $attribute
+     * @param int $itemId
+     * @return array
+     * @throws Exception
      */
     private function calcInheritedValue($attribute, int $itemId)
     {
@@ -1588,6 +1616,11 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param $attribute
+     * @param int $itemId
+     * @param array $actualValue
+     * @return bool
+     * @throws Exception
      */
     private function setActualValue($attribute, int $itemId, array $actualValue)
     {
@@ -1732,6 +1765,8 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @param int $itemId
+     * @return int
      */
     public function getSpecsCount(int $itemId): int
     {
@@ -1820,6 +1855,8 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param $itemId
+     * @return array
      */
     public function getContributors($itemId): array
     {
@@ -2025,6 +2062,7 @@ class SpecificationsService
     /**
      * @param array $itemIds
      * @return array
+     * @throws Exception
      */
     private function getItemsActualValues($itemIds)
     {
@@ -2141,6 +2179,7 @@ class SpecificationsService
     /**
      * @param int $typeId
      * @return array
+     * @throws Exception
      */
     public function getType(int $typeId)
     {
@@ -2279,6 +2318,7 @@ class SpecificationsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param $userId
      */
     public function refreshUserConflicts($userId)
     {

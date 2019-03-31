@@ -2,6 +2,7 @@
 
 namespace Application\Service;
 
+use Exception;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -52,7 +53,7 @@ class RabbitMQ
                     $this->config['password'],
                     $this->config['vhost']
                 );
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $exception = $e;
                 Rollbar::log(Level::ERROR, $e);
                 sleep(1);

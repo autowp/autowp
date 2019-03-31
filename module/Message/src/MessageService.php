@@ -2,6 +2,7 @@
 
 namespace Autowp\Message;
 
+use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
@@ -50,11 +51,11 @@ class MessageService
         $msgLength = mb_strlen($message);
 
         if ($msgLength <= 0) {
-            throw new \Exception('Message is empty');
+            throw new Exception('Message is empty');
         }
 
         if ($msgLength > self::MAX_TEXT) {
-            throw new \Exception('Message is too long');
+            throw new Exception('Message is too long');
         }
 
         $this->table->insert([
@@ -72,6 +73,8 @@ class MessageService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $userId
+     * @return int
      */
     public function getNewCount(int $userId): int
     {
@@ -111,8 +114,9 @@ class MessageService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $userId
      */
-    public function deleteAllSystem(int $userId)
+    public function deleteAllSystem(int $userId): void
     {
         $this->table->delete([
             'to_user_id = ?' => $userId,
@@ -120,7 +124,7 @@ class MessageService
         ]);
     }
 
-    public function deleteAllSent(int $userId)
+    public function deleteAllSent(int $userId): void
     {
         $this->table->update([
             'deleted_by_from' => 1
@@ -147,8 +151,10 @@ class MessageService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $userId
+     * @return Sql\Select
      */
-    private function getSystemSelect($userId)
+    private function getSystemSelect(int $userId)
     {
         return $this->table->getSql()->select()
             ->where([
@@ -161,8 +167,10 @@ class MessageService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $userId
+     * @return Sql\Select
      */
-    private function getInboxSelect($userId)
+    private function getInboxSelect(int $userId)
     {
         return $this->table->getSql()->select()
             ->where([
@@ -175,8 +183,10 @@ class MessageService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $userId
+     * @return Sql\Select
      */
-    private function getSentSelect($userId)
+    private function getSentSelect(int $userId)
     {
         return $this->table->getSql()->select()
             ->where([

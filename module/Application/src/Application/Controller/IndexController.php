@@ -153,7 +153,11 @@ class IndexController extends AbstractActionController
             $success = false;
             $itemOfDayInfo = $this->cache->getItem($key, $success);
             if (! $success) {
-                $itemOfDayInfo = $this->itemOfDay->getItemOfDay($itemOfDay['item_id'], $itemOfDay['user_id'], $language);
+                $itemOfDayInfo = $this->itemOfDay->getItemOfDay(
+                    $itemOfDay['item_id'],
+                    $itemOfDay['user_id'],
+                    $language
+                );
 
                 $this->cache->setItem($key, $itemOfDayInfo);
             }

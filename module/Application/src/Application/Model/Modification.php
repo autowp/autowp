@@ -21,6 +21,8 @@ class Modification
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @param int $id
+     * @return bool
      */
     public function canDelete(int $id)
     {

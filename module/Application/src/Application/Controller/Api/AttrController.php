@@ -24,7 +24,7 @@ use Application\Service\SpecificationsService;
  * Class AttrController
  * @package Application\Controller\Api
  *
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method string language()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
@@ -397,7 +397,11 @@ class AttrController extends AbstractRestfulController
                         $cUserValueRow = $this->userValueTable->select($dstPrimaryKey)->current();
 
                         if ($cUserValueRow) {
-                            $rowId = implode('/', [$dstItemId, $eUserValueRow['attribute_id'], $eUserValueRow['user_id']]);
+                            $rowId = implode('/', [
+                                $dstItemId,
+                                $eUserValueRow['attribute_id'],
+                                $eUserValueRow['user_id']
+                            ]);
                             throw new Exception("Value row $rowId already exists");
                         }
 

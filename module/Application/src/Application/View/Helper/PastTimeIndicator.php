@@ -2,6 +2,7 @@
 
 namespace Application\View\Helper;
 
+use Exception;
 use Zend\View\Helper\AbstractHtmlElement;
 
 use DateInterval;
@@ -23,8 +24,9 @@ class PastTimeIndicator extends AbstractHtmlElement
     }
 
     /**
-     * @param DateTime $date
+     * @param DateTime|string $time
      * @return string
+     * @throws Exception
      */
     public function __invoke($time)
     {
@@ -39,6 +41,7 @@ class PastTimeIndicator extends AbstractHtmlElement
         $icon = $time > $this->pastLimit ? 'fa-clock-o' : 'fa-calendar';
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
-        return '<i class="fa ' . $icon . '" aria-hidden="true"></i> ' . $this->view->escapeHtml($this->view->user()->humanTime($time));
+        return '<i class="fa ' . $icon . '" aria-hidden="true"></i> ' .
+               $this->view->escapeHtml($this->view->user()->humanTime($time));
     }
 }

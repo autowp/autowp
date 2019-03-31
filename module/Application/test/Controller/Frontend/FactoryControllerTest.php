@@ -2,6 +2,7 @@
 
 namespace ApplicationTest\Frontend\Controller;
 
+use Exception;
 use Zend\Http\Request;
 use Zend\Http\Header\Cookie;
 
@@ -39,6 +40,10 @@ class FactoryControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $itemId
+     * @param $parentId
+     * @param array $params
+     * @throws Exception
      */
     private function addItemParent($itemId, $parentId, array $params = [])
     {

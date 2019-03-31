@@ -4,6 +4,7 @@ namespace Application\Hydrator\Api;
 
 use Application\Hydrator\Api\Strategy\Perspectives as HydratorPerspectivesStrategy;
 use Application\Model\Perspective;
+use Exception;
 
 class PerspectiveGroupHydrator extends RestHydrator
 {
@@ -41,9 +42,12 @@ class PerspectiveGroupHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 }

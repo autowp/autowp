@@ -19,6 +19,11 @@ class Gearbox
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param PhpRenderer $view
+     * @param $attribute
+     * @param $value
+     * @param $values
+     * @return mixed
      */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {

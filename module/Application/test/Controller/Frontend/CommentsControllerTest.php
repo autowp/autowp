@@ -2,7 +2,10 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
+use Application\DuplicateFinder;
+use Exception;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\Adapter\AdapterInterface;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
@@ -21,7 +24,7 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
 
         $tables = $serviceManager->get('TableManager');
 
-        $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
+        $mock = $this->getMockBuilder(DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
@@ -31,13 +34,16 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
 
         $mock->method('indexImage')->willReturn(true);
 
-        $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
+        $serviceManager->setService(DuplicateFinder::class, $mock);
     }
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $itemId
+     * @return int
+     * @throws Exception
      */
-    private function addPictureToItem($itemId)
+    private function addPictureToItem($itemId): int
     {
         $this->reset();
 
@@ -84,7 +90,7 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
     private function fetchLastComment()
     {
         // get comment row
-        $db = $this->getApplication()->getServiceManager()->get(\Zend\Db\Adapter\AdapterInterface::class);
+        $db = $this->getApplication()->getServiceManager()->get(AdapterInterface::class);
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $db->query(
             'select * from comment_message order by id desc limit 1',

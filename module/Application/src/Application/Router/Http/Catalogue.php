@@ -4,6 +4,7 @@ namespace Application\Router\Http;
 
 use Exception;
 
+use Traversable;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\RouteInterface;
 use Zend\Router\Http\RouteMatch;
@@ -31,7 +32,7 @@ class Catalogue implements RouteInterface
     /**
      * Create a new route with given options.
      *
-     * @param  array|\Traversable $options
+     * @param  array|Traversable $options
      * @return Catalogue
      */
     public static function factory($options = [])
@@ -742,9 +743,10 @@ class Catalogue implements RouteInterface
      *
      * Assemble the route.
      *
-     * @param  array $params
-     * @param  array $options
+     * @param array $params
+     * @param array $options
      * @return mixed
+     * @throws Exception
      */
     public function assemble(array $params = [], array $options = [])
     {
@@ -950,5 +952,6 @@ class Catalogue implements RouteInterface
      */
     public function getAssembledParams()
     {
+        return [];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Autowp\User\Model;
 
+use Autowp\Commons\Db\Table\Row;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -26,6 +27,9 @@ class UserRename
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $userId
+     * @param string $oldName
+     * @param string $newName
      */
     public function add(int $userId, string $oldName, string $newName): void
     {
@@ -48,7 +52,7 @@ class UserRename
             $result[] = [
                 'old_name' => $row['old_name'],
                 'new_name' => $row['new_name'],
-                'date'     => \Autowp\Commons\Db\Table\Row::getDateTimeByColumnType('timestamp', $row['date'])
+                'date'     => Row::getDateTimeByColumnType('timestamp', $row['date'])
             ];
         }
 

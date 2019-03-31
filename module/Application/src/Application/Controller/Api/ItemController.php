@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api;
 
+use ArrayObject;
 use Autowp\Image\Storage;
 use Collator;
 use Exception;
@@ -10,10 +11,14 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\Factory;
 use Zend\InputFilter\InputFilter;
+use Zend\InputFilter\InputFilterInterface;
 use Zend\InputFilter\InputFilterPluginManager;
 use Zend\Hydrator\Strategy\StrategyInterface;
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Paginator\Adapter\DbSelect;
+use Zend\Paginator\Paginator;
 use Zend\Session\Container;
+use Zend\Uri\Uri;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use ZF\ApiProblem\ApiProblem;
@@ -45,7 +50,7 @@ use Application\Service\SpecificationsService;
  * Class ItemController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
@@ -611,6 +616,8 @@ class ItemController extends AbstractRestfulController
                 $endYear = false;
                 $today = false;
                 $body = false;
+                $beginModelYear = null;
+                $endModelYear = null;
 
                 $pattern = "|^" .
                     "(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?" .
@@ -763,8 +770,8 @@ class ItemController extends AbstractRestfulController
         }
 
         try {
-            $paginator = new \Zend\Paginator\Paginator(
-                new \Zend\Paginator\Adapter\DbSelect(
+            $paginator = new Paginator(
+                new DbSelect(
                     $select,
                     $this->itemModel->getTable()->getAdapter()
                 )
@@ -893,7 +900,8 @@ class ItemController extends AbstractRestfulController
     /**
      * @param int $itemTypeId
      * @param bool $post
-     * @return \Zend\InputFilter\InputFilterInterface
+     * @param $itemId
+     * @return InputFilterInterface
      */
     private function getInputFilter($itemTypeId, $post, $itemId)
     {
@@ -1265,11 +1273,15 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('begin_model_year_fraction', $values)) {
-            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction'] ? $values['begin_model_year_fraction'] : null;
+            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction']
+                ? $values['begin_model_year_fraction']
+                : null;
         }
 
         if (array_key_exists('end_model_year_fraction', $values)) {
-            $set['end_model_year_fraction'] = $values['end_model_year_fraction'] ? $values['end_model_year_fraction'] : null;
+            $set['end_model_year_fraction'] = $values['end_model_year_fraction']
+                ? $values['end_model_year_fraction']
+                : null;
         }
 
         if (array_key_exists('is_concept', $values)) {
@@ -1507,13 +1519,17 @@ class ItemController extends AbstractRestfulController
         if (array_key_exists('begin_model_year_fraction', $values)) {
             $notifyMeta = true;
             $subscribe = true;
-            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction'] ? $values['begin_model_year_fraction'] : null;
+            $set['begin_model_year_fraction'] = $values['begin_model_year_fraction']
+                ? $values['begin_model_year_fraction']
+                : null;
         }
 
         if (array_key_exists('end_model_year_fraction', $values)) {
             $notifyMeta = true;
             $subscribe = true;
-            $set['end_model_year_fraction'] = $values['end_model_year_fraction'] ? $values['end_model_year_fraction'] : null;
+            $set['end_model_year_fraction'] = $values['end_model_year_fraction']
+                ? $values['end_model_year_fraction']
+                : null;
         }
 
         if (array_key_exists('is_concept', $values)) {
@@ -1801,9 +1817,9 @@ class ItemController extends AbstractRestfulController
     }
 
     /**
-     * @param array|\ArrayObject $user
+     * @param array|ArrayObject $user
      * @param bool $full
-     * @param \Zend\Uri\Uri $uri
+     * @param Uri $uri
      * @return string
      */
     private function userModerUrl($user, $full = false, $uri = null)
@@ -1815,7 +1831,10 @@ class ItemController extends AbstractRestfulController
     }
 
     /**
-     * @param array|\ArrayObject $item
+     * @param array|ArrayObject $item
+     * @param bool $full
+     * @param null $tab
+     * @param null $uri
      * @return string
      */
     private function itemModerUrl($item, $full = false, $tab = null, $uri = null)

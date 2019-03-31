@@ -5,10 +5,16 @@ namespace Application\Controller\Api;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
+use Application\Hydrator\Api\ArticleHydrator;
+
 class ArticleControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return ArticleController
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -18,7 +24,7 @@ class ArticleControllerFactory implements FactoryInterface
         return new ArticleController(
             $tables->get('articles'),
             $filters->get('api_article_list'),
-            $hydrators->get(\Application\Hydrator\Api\ArticleHydrator::class)
+            $hydrators->get(ArticleHydrator::class)
         );
     }
 }

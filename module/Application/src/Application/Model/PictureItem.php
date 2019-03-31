@@ -2,6 +2,8 @@
 
 namespace Application\Model;
 
+use ArrayObject;
+use Exception;
 use InvalidArgumentException;
 
 use Zend\Db\Sql;
@@ -36,7 +38,10 @@ class PictureItem
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @param int $pictureId
+     * @param int $itemId
+     * @param int $type
+     * @return array|ArrayObject|null
      */
     private function getRow(int $pictureId, int $itemId, int $type)
     {
@@ -115,7 +120,7 @@ class PictureItem
         $row = $this->getRow($pictureId, $oldItemId, $type);
 
         if (! $row) {
-            throw new \Exception("Item not found");
+            throw new Exception("Item not found");
         }
 
         if (! $this->isAllowedTypeByItemId($newItemId, $type)) {
@@ -220,6 +225,9 @@ class PictureItem
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $pictureId
+     * @param $itemType
+     * @return array
      */
     public function getPictureItemsByItemType(int $pictureId, $itemType): array
     {
@@ -247,6 +255,8 @@ class PictureItem
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param array $options
+     * @return array
      */
     public function getData(array $options): array
     {
@@ -394,6 +404,9 @@ class PictureItem
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $itemId
+     * @param int $type
+     * @return bool
      */
     public function isAllowedTypeByItemId(int $itemId, int $type)
     {
@@ -416,6 +429,7 @@ class PictureItem
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @param int $pictureId
      */
     public function updateContentCount(int $pictureId)
     {

@@ -2,6 +2,9 @@
 
 namespace ApplicationTest\Api\Controller;
 
+use Application\DuplicateFinder;
+use Application\Model\CarOfDay;
+use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
@@ -20,7 +23,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
         $tables = $serviceManager->get('TableManager');
 
-        $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
+        $mock = $this->getMockBuilder(DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
@@ -30,13 +33,16 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
         $mock->method('indexImage')->willReturn(true);
 
-        $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
+        $serviceManager->setService(DuplicateFinder::class, $mock);
     }
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $vehicleId
+     * @return
+     * @throws Exception
      */
-    private function addPictureToItem($vehicleId)
+    private function addPictureToItem(int $vehicleId)
     {
         $this->reset();
 
@@ -83,6 +89,9 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $params
+     * @return
+     * @throws Exception
      */
     private function createItem($params)
     {
@@ -107,8 +116,11 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $itemId
+     * @return mixed
+     * @throws Exception
      */
-    private function getItemById($itemId)
+    private function getItemById(int $itemId)
     {
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
@@ -129,8 +141,10 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $pictureId
+     * @throws Exception
      */
-    private function acceptPicture($pictureId)
+    private function acceptPicture(int $pictureId)
     {
         $this->reset();
 
@@ -215,7 +229,7 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
 
     public function testCarOfDayPicture()
     {
-        $itemOfDay = $this->getApplicationServiceLocator()->get(\Application\Model\CarOfDay::class);
+        $itemOfDay = $this->getApplicationServiceLocator()->get(CarOfDay::class);
         $row = $itemOfDay->getCurrent();
         $itemId = $row ? $row['item_id'] : null;
 

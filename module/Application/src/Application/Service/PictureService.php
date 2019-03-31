@@ -2,6 +2,8 @@
 
 namespace Application\Service;
 
+use Application\Comments;
+use Autowp\Comments\Attention;
 use Exception;
 
 use geoPHP;
@@ -102,7 +104,7 @@ class PictureService
                 $this->pictureItem->setPictureItems($picture['id'], PictureItem::PICTURE_AUTHOR, []);
 
                 $this->comments->deleteTopic(
-                    \Application\Comments::PICTURES_TYPE_ID,
+                    Comments::PICTURES_TYPE_ID,
                     $picture['id']
                 );
 
@@ -124,6 +126,15 @@ class PictureService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param string $path
+     * @param int $userId
+     * @param string $remoteAddr
+     * @param int $itemId
+     * @param int $perspectiveId
+     * @param int $replacePictureId
+     * @param string $note
+     * @return array|\ArrayObject|null
+     * @throws Image\Storage\Exception
      */
     public function addPictureFromFile(
         string $path,
@@ -214,18 +225,18 @@ class PictureService
         // add comment
         if ($note) {
             $this->comments->add([
-                'typeId'             => \Application\Comments::PICTURES_TYPE_ID,
+                'typeId'             => Comments::PICTURES_TYPE_ID,
                 'itemId'             => $pictureId,
                 'parentId'           => null,
                 'authorId'           => $userId,
                 'message'            => $note,
                 'ip'                 => $remoteAddr,
-                'moderatorAttention' => \Autowp\Comments\Attention::NONE
+                'moderatorAttention' => Attention::NONE
             ]);
         }
 
         $this->comments->subscribe(
-            \Application\Comments::PICTURES_TYPE_ID,
+            Comments::PICTURES_TYPE_ID,
             $pictureId,
             $userId
         );

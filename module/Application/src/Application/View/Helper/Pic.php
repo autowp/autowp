@@ -2,6 +2,7 @@
 
 namespace Application\View\Helper;
 
+use ArrayObject;
 use Zend\View\Helper\AbstractHtmlElement;
 
 use Application\Model\Picture;
@@ -10,7 +11,7 @@ use Application\PictureNameFormatter;
 class Pic extends AbstractHtmlElement
 {
     /**
-     * @var array|\ArrayObject
+     * @var array|ArrayObject
      */
     private $picture = null;
 
@@ -61,7 +62,7 @@ class Pic extends AbstractHtmlElement
 
     public function name($pictureRow, $language)
     {
-        if ($pictureRow instanceof \ArrayObject) {
+        if ($pictureRow instanceof ArrayObject) {
             $pictureRow = (array)$pictureRow;
         }
 

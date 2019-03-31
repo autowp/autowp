@@ -3,6 +3,8 @@
 namespace ApplicationTest\Controller;
 
 use Application\Test\AbstractHttpControllerTestCase;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Adapter\AdapterInterface;
 
 class EnvTest extends AbstractHttpControllerTestCase
 {
@@ -10,10 +12,10 @@ class EnvTest extends AbstractHttpControllerTestCase
 
     public function testDbTimezone()
     {
-        $db = $this->getApplication()->getServiceManager()->get(\Zend\Db\Adapter\AdapterInterface::class);
+        $db = $this->getApplication()->getServiceManager()->get(AdapterInterface::class);
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
-        $timezone = $db->query('select @@session.time_zone as timezone', \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        $timezone = $db->query('select @@session.time_zone as timezone', Adapter::QUERY_MODE_EXECUTE);
         $timezone = $timezone->current();
 
         $this->assertEquals('UTC', $timezone['timezone']);

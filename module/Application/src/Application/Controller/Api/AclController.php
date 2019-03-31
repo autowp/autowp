@@ -19,7 +19,7 @@ use ZF\ApiProblem\ApiProblemResponse;
  * Class AclController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */
 class AclController extends AbstractRestfulController

@@ -2,6 +2,7 @@
 
 namespace ApplicationTest\Other;
 
+use Application\Service\UsersService;
 use Application\Test\AbstractHttpControllerTestCase;
 
 class RegistrationTest extends AbstractHttpControllerTestCase
@@ -11,7 +12,7 @@ class RegistrationTest extends AbstractHttpControllerTestCase
     public function testRegistration()
     {
         $serviceManager = $this->getApplicationServiceLocator();
-        $usersService = $serviceManager->get(\Application\Service\UsersService::class);
+        $usersService = $serviceManager->get(UsersService::class);
 
         $user = $usersService->addUser([
             'email'    => 'reg-test@autowp.ru',

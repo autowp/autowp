@@ -16,6 +16,10 @@ class OAuth2PluginFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return OAuth2Plugin
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

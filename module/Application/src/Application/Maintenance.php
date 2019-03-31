@@ -2,6 +2,7 @@
 
 namespace Application;
 
+use Autowp\User\Model\User;
 use Exception;
 
 use Zend\EventManager\EventManagerInterface;
@@ -10,6 +11,7 @@ use Zend\EventManager\AbstractListenerAggregate;
 use Autowp\Cron;
 
 use Application\Service\PictureService;
+use Zend\Session\SessionManager;
 
 class Maintenance extends AbstractListenerAggregate
 {
@@ -40,10 +42,10 @@ class Maintenance extends AbstractListenerAggregate
         $pictureService = $serviceManager->get(PictureService::class);
         $pictureService->clearQueue();
 
-        $sessionManager = $serviceManager->get(\Zend\Session\SessionManager::class);
+        $sessionManager = $serviceManager->get(SessionManager::class);
         $this->clearSessions($sessionManager);
 
-        $userModel = $serviceManager->get(\Autowp\User\Model\User::class);
+        $userModel = $serviceManager->get(User::class);
         $userModel->updateSpecsVolumes();
 
         $usersService = $serviceManager->get(Service\UsersService::class);

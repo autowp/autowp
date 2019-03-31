@@ -2,6 +2,8 @@
 
 namespace ApplicationTest\Model;
 
+use Application\DuplicateFinder;
+use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
@@ -34,7 +36,7 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $tables = $serviceManager->get('TableManager');
 
-        $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
+        $mock = $this->getMockBuilder(DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
@@ -44,13 +46,16 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $mock->method('indexImage')->willReturn(true);
 
-        $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
+        $serviceManager->setService(DuplicateFinder::class, $mock);
     }
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param array $params
+     * @return int
+     * @throws Exception
      */
-    private function createItem($params): int
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -73,6 +78,9 @@ class PictureTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $itemID
+     * @return int
+     * @throws Exception
      */
     private function addPictureToItem(int $itemID): int
     {
@@ -121,6 +129,10 @@ class PictureTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $pictureID
+     * @param int $itemID
+     * @param int $typeID
+     * @throws Exception
      */
     private function addPictureItem(int $pictureID, int $itemID, int $typeID)
     {
@@ -231,6 +243,9 @@ class PictureTest extends AbstractHttpControllerTestCase
 
         $filename = $this->getPictureFilename($pictureID);
 
-        $this->assertRegExp('/^t\/toyota_corolla\/a\.s\._pushkin\/toyota_corolla_a\.s\._pushkin(_[0-9]+)?\.jpeg$/', $filename);
+        $this->assertRegExp(
+            '/^t\/toyota_corolla\/a\.s\._pushkin\/toyota_corolla_a\.s\._pushkin(_[0-9]+)?\.jpeg$/',
+            $filename
+        );
     }
 }

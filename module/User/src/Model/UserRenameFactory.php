@@ -9,6 +9,10 @@ class UserRenameFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return UserRename
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

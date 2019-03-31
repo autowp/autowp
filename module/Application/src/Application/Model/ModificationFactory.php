@@ -9,6 +9,10 @@ class ModificationFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return Modification
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

@@ -2,6 +2,7 @@
 
 namespace Application\Model\Item;
 
+use ArrayObject;
 use Zend\Router\Http\TreeRouteStack;
 
 use Application\Controller\Plugin\Pic;
@@ -92,7 +93,7 @@ class ListBuilder
     }
 
     /**
-     * @param \ArrayObject|array $item
+     * @param ArrayObject|array $item
      * @return mixed|string|NULL
      */
     public function getDetailsUrl($item)
@@ -116,7 +117,7 @@ class ListBuilder
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      *
-     * @param \ArrayObject|array $item
+     * @param ArrayObject|array $item
      * @return string|NULL
      */
     public function getPicturesUrl($item)
@@ -125,7 +126,7 @@ class ListBuilder
     }
 
     /**
-     * @param \ArrayObject|array $item
+     * @param ArrayObject|array $item
      * @return string|NULL
      */
     public function getSpecificationsUrl($item)
@@ -153,6 +154,9 @@ class ListBuilder
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param $item
+     * @param $type
+     * @return null
      */
     public function getTypeUrl($item, $type)
     {
@@ -161,6 +165,9 @@ class ListBuilder
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param $item
+     * @param $picture
+     * @return mixed|null
      */
     public function getPictureUrl($item, $picture)
     {

@@ -2,6 +2,7 @@
 
 namespace Application\Service;
 
+use Autowp\Message\MessageService;
 use Exception;
 
 use Telegram\Bot\Api;
@@ -19,6 +20,7 @@ use Application\Telegram\Command\MeCommand;
 use Application\Telegram\Command\NewCommand;
 use Application\Telegram\Command\StartCommand;
 use Application\Telegram\Command\MessagesCommand;
+use Zend\Uri\UriFactory;
 
 class TelegramService
 {
@@ -91,6 +93,7 @@ class TelegramService
 
     /**
      * @return Api
+     * @throws \Telegram\Bot\Exceptions\TelegramSDKException
      */
     private function getApi()
     {
@@ -99,7 +102,7 @@ class TelegramService
         $api->addCommands([
             StartCommand::class,
             new MeCommand(
-                $this->serviceManager->get(\Autowp\Message\MessageService::class),
+                $this->serviceManager->get(MessageService::class),
                 $this->telegramChatTable,
                 $this->serviceManager->get(User::class)
             ),
@@ -132,12 +135,12 @@ class TelegramService
     public function sendMessage(array $params)
     {
         if (! isset($params['chat_id'])) {
-            throw new \Exception("`chat_id` not provided");
+            throw new Exception("`chat_id` not provided");
         }
 
         try {
             $this->getApi()->sendMessage($params);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $message = $e->getMessage();
 
             if (strpos($message, 'deactivated') !== false) {
@@ -177,6 +180,8 @@ class TelegramService
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $pictureId
+     * @throws Exception
      */
     public function notifyInbox(int $pictureId)
     {
@@ -212,6 +217,8 @@ class TelegramService
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $pictureId
+     * @throws Exception
      */
     public function notifyPicture(int $pictureId)
     {
@@ -295,11 +302,15 @@ class TelegramService
             }
         }
 
-        return \Zend\Uri\UriFactory::factory('http://wheelsage.org');
+        return UriFactory::factory('http://wheelsage.org');
     }
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param $fromId
+     * @param int $userId
+     * @param $text
+     * @throws Exception
      */
     public function notifyMessage($fromId, int $userId, $text)
     {

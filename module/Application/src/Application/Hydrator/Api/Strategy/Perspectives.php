@@ -12,7 +12,7 @@ class Perspectives extends HydratorStrategy
     protected function getHydrator()
     {
         if (! $this->hydrator) {
-            $this->hydrator = new Hydrator($this->serviceManager);
+            $this->hydrator = new Hydrator();
         }
 
         return $this->hydrator;

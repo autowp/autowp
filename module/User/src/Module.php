@@ -37,6 +37,8 @@ class Module implements
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param Event $e
+     * @return array
      */
     public function onBootstrap(Event $e)
     {

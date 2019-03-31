@@ -25,7 +25,7 @@ use Application\Service\SpecificationsService;
  * Class IndexController
  * @package Application\Controller\Api
  *
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method string language()
  */
 class IndexController extends AbstractRestfulController

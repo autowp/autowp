@@ -5,6 +5,7 @@ namespace AutowpTest\User\View;
 use Application\Test\AbstractHttpControllerTestCase;
 
 use Autowp\User\View\Helper\User;
+use DateTime;
 use Zend\Authentication\AuthenticationService;
 use Autowp\User\Auth\Adapter\Id;
 
@@ -103,7 +104,7 @@ class HelperTest extends AbstractHttpControllerTestCase
     public function testHumanTime()
     {
         $time = gmmktime(0, 0, 0, 1, 1, 2000);
-        $dt = new \DateTime();
+        $dt = new DateTime();
         $dt->setTimestamp($time);
 
         $serviceManager = $this->getApplicationServiceLocator();
@@ -121,7 +122,7 @@ class HelperTest extends AbstractHttpControllerTestCase
     public function testHumanDate()
     {
         $time = gmmktime(0, 0, 0, 1, 1, 2000);
-        $dt = new \DateTime();
+        $dt = new DateTime();
         $dt->setTimestamp($time);
 
         $serviceManager = $this->getApplicationServiceLocator();

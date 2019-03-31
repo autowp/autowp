@@ -3,6 +3,7 @@
 namespace Application\Hydrator\Api;
 
 use Application\Comments;
+use Exception;
 use Traversable;
 
 use Zend\Db\Sql;
@@ -64,7 +65,7 @@ class ItemHydrator extends RestHydrator
     private $specsService = null;
 
     /**
-     * @var \Application\Model\Item
+     * @var Item
      */
     private $itemModel;
 
@@ -209,7 +210,7 @@ class ItemHydrator extends RestHydrator
     {
         parent::setOptions($options);
 
-        if ($options instanceof \Traversable) {
+        if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
             throw new InvalidArgumentException(
@@ -252,7 +253,7 @@ class ItemHydrator extends RestHydrator
     private function getNameData($object, string $language = 'en'): array
     {
         if (! is_string($language)) {
-            throw new \Exception('`language` is not string');
+            throw new Exception('`language` is not string');
         }
 
         $name = $this->itemModel->getName($object['id'], $language);
@@ -286,6 +287,9 @@ class ItemHydrator extends RestHydrator
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @param Sql\Select $select
+     * @param TableGateway $table
+     * @return int
      */
     private function getCountBySelect(Sql\Select $select, TableGateway $table): int
     {
@@ -654,7 +658,10 @@ class ItemHydrator extends RestHydrator
 
                         $src = null;
                         if ($pictureRow) {
-                            $imagesInfo = $this->imageStorage->getFormatedImage($pictureRow['image_id'], 'picture-thumb');
+                            $imagesInfo = $this->imageStorage->getFormatedImage(
+                                $pictureRow['image_id'],
+                                'picture-thumb'
+                            );
                             $src = $imagesInfo->getSrc();
                         }
 
@@ -817,7 +824,10 @@ class ItemHydrator extends RestHydrator
 
             if ($this->filterComposite->filter('attr_zone_id')) {
                 $vehicleTypeIds = $this->vehicleType->getVehicleTypes($object['id']);
-                $result['attr_zone_id'] = $this->specificationsService->getZoneIdByCarTypeId($object['item_type_id'], $vehicleTypeIds);
+                $result['attr_zone_id'] = $this->specificationsService->getZoneIdByCarTypeId(
+                    $object['item_type_id'],
+                    $vehicleTypeIds
+                );
             }
         }
 
@@ -826,10 +836,13 @@ class ItemHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 
     private function getUserRole()

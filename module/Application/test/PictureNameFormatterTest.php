@@ -12,6 +12,9 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider dataProvider
+     * @param $data
+     * @param $textExpected
+     * @param $htmlExpected
      */
     public function testFormat($data, $textExpected, $htmlExpected)
     {
@@ -26,6 +29,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider escapeDataProvider
+     * @param $data
+     * @param $expected
      */
     public function testEscape($data, $expected)
     {

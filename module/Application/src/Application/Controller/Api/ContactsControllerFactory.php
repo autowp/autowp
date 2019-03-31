@@ -2,6 +2,9 @@
 
 namespace Application\Controller\Api;
 
+use Application\Hydrator\Api\UserHydrator;
+use Application\Model\Contact;
+use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -9,6 +12,10 @@ class ContactsControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return ContactsController
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -17,11 +24,11 @@ class ContactsControllerFactory implements FactoryInterface
         $hydrators = $container->get('HydratorManager');
 
         return new ContactsController(
-            $container->get(\Application\Model\Contact::class),
+            $container->get(Contact::class),
             $tables->get('users'),
-            $container->get(\Autowp\User\Model\User::class),
+            $container->get(User::class),
             $filters->get('api_contacts_list'),
-            $hydrators->get(\Application\Hydrator\Api\UserHydrator::class)
+            $hydrators->get(UserHydrator::class)
         );
     }
 }

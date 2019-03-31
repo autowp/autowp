@@ -2,6 +2,8 @@
 
 namespace Application;
 
+use Application\InputFilter\AttrUserValueCollectionInputFilter;
+use Autowp\Comments\Attention;
 use Zend\InputFilter\InputFilter;
 
 use Autowp\Comments\CommentsService;
@@ -489,7 +491,7 @@ return [
                 ]
             ],
             'items' => [
-                'type' => \Application\InputFilter\AttrUserValueCollectionInputFilter::class
+                'type' => AttrUserValueCollectionInputFilter::class
             ]
         ],
         'api_attr_value_get' => [
@@ -604,9 +606,9 @@ return [
                         'name' => 'InArray',
                         'options' => [
                             'haystack' => [
-                                \Autowp\Comments\Attention::NONE,
-                                \Autowp\Comments\Attention::REQUIRED,
-                                \Autowp\Comments\Attention::COMPLETED
+                                Attention::NONE,
+                                Attention::REQUIRED,
+                                Attention::COMPLETED
                             ]
                         ]
                     ]
@@ -714,9 +716,9 @@ return [
                         'name' => 'InArray',
                         'options' => [
                             'haystack' => [
-                                \Autowp\Comments\Attention::NONE,
-                                \Autowp\Comments\Attention::REQUIRED,
-                                \Autowp\Comments\Attention::COMPLETED
+                                Attention::NONE,
+                                Attention::REQUIRED,
+                                Attention::COMPLETED
                             ]
                         ]
                     ]

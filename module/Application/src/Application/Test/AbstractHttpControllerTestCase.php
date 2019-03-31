@@ -2,6 +2,8 @@
 
 namespace Application\Test;
 
+use Exception;
+use Zend\Db\Adapter\AdapterInterface;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase as ZendTestCase;
 
 /**
@@ -17,7 +19,7 @@ abstract class AbstractHttpControllerTestCase extends ZendTestCase
     protected function setUp()
     {
         if (! $this->applicationConfigPath) {
-            throw new \Exception("Application config path not provided");
+            throw new Exception("Application config path not provided");
         }
 
         $this->setApplicationConfig(include $this->applicationConfigPath);
@@ -31,7 +33,7 @@ abstract class AbstractHttpControllerTestCase extends ZendTestCase
 
         $container = $this->getApplicationServiceLocator();
 
-        $db = $container->get(\Zend\Db\Adapter\AdapterInterface::class);
+        $db = $container->get(AdapterInterface::class);
         $db->driver->getConnection()->disconnect();
     }
 }

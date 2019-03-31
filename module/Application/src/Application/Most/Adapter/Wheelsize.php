@@ -2,6 +2,7 @@
 
 namespace Application\Most\Adapter;
 
+use Exception;
 use Zend\Db\Sql;
 
 use Application\WheelSize as WheelsizeObject;
@@ -30,6 +31,10 @@ class Wheelsize extends AbstractAdapter
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param Sql\Select $select
+     * @param $language
+     * @return array
+     * @throws Exception
      */
     public function getCars(Sql\Select $select, $language)
     {

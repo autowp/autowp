@@ -2,6 +2,22 @@
 
 namespace Application\Controller\Api;
 
+use Application\DuplicateFinder;
+use Application\HostManager;
+use Application\Hydrator\Api\PictureHydrator;
+use Application\Model\CarOfDay;
+use Application\Model\Item;
+use Application\Model\Log;
+use Application\Model\Picture;
+use Application\Model\PictureItem;
+use Application\Model\PictureModerVote;
+use Application\Model\UserPicture;
+use Application\Service\PictureService;
+use Application\Service\TelegramService;
+use Autowp\Comments\CommentsService;
+use Autowp\Message\MessageService;
+use Autowp\TextStorage\Service;
+use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -9,33 +25,37 @@ class PictureControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return PictureController
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $hydrators = $container->get('HydratorManager');
         $filters = $container->get('InputFilterManager');
         return new PictureController(
-            $hydrators->get(\Application\Hydrator\Api\PictureHydrator::class),
-            $container->get(\Application\Model\PictureItem::class),
-            $container->get(\Application\DuplicateFinder::class),
-            $container->get(\Application\Model\UserPicture::class),
-            $container->get(\Application\Model\Log::class),
-            $container->get(\Application\HostManager::class),
-            $container->get(\Application\Service\TelegramService::class),
-            $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Application\Model\CarOfDay::class),
+            $hydrators->get(PictureHydrator::class),
+            $container->get(PictureItem::class),
+            $container->get(DuplicateFinder::class),
+            $container->get(UserPicture::class),
+            $container->get(Log::class),
+            $container->get(HostManager::class),
+            $container->get(TelegramService::class),
+            $container->get(MessageService::class),
+            $container->get(CarOfDay::class),
             $filters->get('api_picture_item'),
             $filters->get('api_picture_post'),
             $filters->get('api_picture_list'),
             $filters->get('api_picture_list_public'),
             $filters->get('api_picture_edit'),
-            $container->get(\Autowp\TextStorage\Service::class),
-            $container->get(\Autowp\Comments\CommentsService::class),
-            $container->get(\Application\Model\PictureModerVote::class),
-            $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\Picture::class),
-            $container->get(\Autowp\User\Model\User::class),
-            $container->get(\Application\Service\PictureService::class)
+            $container->get(Service::class),
+            $container->get(CommentsService::class),
+            $container->get(PictureModerVote::class),
+            $container->get(Item::class),
+            $container->get(Picture::class),
+            $container->get(User::class),
+            $container->get(PictureService::class)
         );
     }
 }

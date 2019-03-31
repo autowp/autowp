@@ -20,7 +20,7 @@ use Application\PictureNameFormatter;
  * Class ItemGalleryController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method Storage imageStorage()
  * @method string language()
  */
@@ -186,6 +186,7 @@ class ItemGalleryController extends AbstractRestfulController
 
         // comments
         $userId = $this->user()->get()['id'];
+        $newMessages = [];
         if ($userId) {
             $newMessages = $this->comments->getNewMessages(
                 Comments::PICTURES_TYPE_ID,

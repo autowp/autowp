@@ -10,6 +10,8 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider hyperlinksProvider
+     * @param $text
+     * @param $expected
      */
     public function testHyperlinks($text, $expected)
     {
@@ -23,6 +25,8 @@ class UserTextRendererTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider usersProvider
+     * @param $text
+     * @param $expected
      */
     public function testUsers($text, $expected)
     {

@@ -2,6 +2,7 @@
 
 namespace Autowp\User\View\Helper;
 
+use ArrayObject;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -28,7 +29,7 @@ class User extends AbstractHelper
     private $users = [];
 
     /**
-     * @var array|\ArrayObject|null
+     * @var array|ArrayObject|null
      */
     private $user = null;
 
@@ -62,7 +63,7 @@ class User extends AbstractHelper
             $user = $this->getLogedInUser();
         }
 
-        if (! ($user instanceof \ArrayObject || is_array($user))) {
+        if (! ($user instanceof ArrayObject || is_array($user))) {
             $user = $this->user($user);
         }
 
@@ -72,7 +73,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return array|\ArrayObject|null
+     * @return array|ArrayObject|null
      */
     private function getLogedInUser()
     {
@@ -91,7 +92,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return array|\ArrayObject|null
+     * @return array|ArrayObject|null
      */
     public function get()
     {
@@ -188,6 +189,9 @@ class User extends AbstractHelper
 
     /**
      * @suppress PhanTypeArraySuspiciousNullable
+     * @param string $resource
+     * @param string $privilege
+     * @return bool
      */
     public function isAllowed(string $resource, string $privilege): bool
     {
@@ -198,6 +202,8 @@ class User extends AbstractHelper
 
     /**
      * @suppress PhanTypeArraySuspiciousNullable
+     * @param string $inherit
+     * @return bool
      */
     public function inheritsRole(string $inherit): bool
     {
@@ -219,6 +225,8 @@ class User extends AbstractHelper
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param DateTime|null $time
+     * @return string
      */
     public function humanTime(DateTime $time = null)
     {
@@ -235,6 +243,8 @@ class User extends AbstractHelper
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param DateTime|null $time
+     * @return string
      */
     public function humanDate(DateTime $time = null)
     {

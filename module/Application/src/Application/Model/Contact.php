@@ -19,6 +19,8 @@ class Contact
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $userId
+     * @param int $contactUserId
      */
     public function create(int $userId, int $contactUserId)
     {

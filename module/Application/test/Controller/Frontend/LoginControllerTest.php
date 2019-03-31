@@ -2,6 +2,10 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
+use Autowp\ExternalLoginService\Facebook;
+use Autowp\ExternalLoginService\PluginManager;
+use Autowp\ExternalLoginService\Result;
+use DateTime;
 use Zend\Http\Request;
 use Zend\Json\Json;
 use Zend\Uri\UriFactory;
@@ -47,20 +51,20 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
 
         $config = $serviceManager->get('config');
 
-        $serviceMock = $this->getMockBuilder(\Autowp\ExternalLoginService\Facebook::class)
+        $serviceMock = $this->getMockBuilder(Facebook::class)
             ->setMethods(['getData', 'callback'])
             ->setConstructorArgs([
-                $config['external_login_services'][\Autowp\ExternalLoginService\Facebook::class]
+                $config['external_login_services'][Facebook::class]
             ])
             ->getMock();
 
         $serviceMock->method('getData')->willReturnCallback(function () use ($serviceMock, $photoUrl) {
-            return new \Autowp\ExternalLoginService\Result([
+            return new Result([
                 'externalId' => 'test-external-id',
                 'name'       => 'test-name',
                 'profileUrl' => 'http://example.com/',
                 'photoUrl'   => $photoUrl, //'http://example.com/photo.jpg',
-                'birthday'   => new \DateTime(),
+                'birthday'   => new DateTime(),
                 'email'      => 'test@example.com',
                 'gender'     => 1,
                 'location'   => 'London',
@@ -72,7 +76,7 @@ class LoginControllerTest extends AbstractHttpControllerTestCase
             return true;
         });
 
-        $mock = $this->getMockBuilder(\Autowp\ExternalLoginService\PluginManager::class)
+        $mock = $this->getMockBuilder(PluginManager::class)
             ->setMethods(['get'])
             ->setConstructorArgs([$serviceManager])
             ->getMock();

@@ -2,13 +2,15 @@
 
 namespace Application;
 
+use Zend\Log\Logger;
+
 return [
     'log' => [
         'ErrorLog' => [
             'writers' => [
                 [
                     'name' => 'stream',
-                    'priority' => \Zend\Log\Logger::ERR,
+                    'priority' => Logger::ERR,
                     'options' => [
                         'stream' => __DIR__ . '/../../../logs/zf-error.log',
                         'processors' => [

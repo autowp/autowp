@@ -10,6 +10,11 @@ class Power extends AbstractAdapter
 
     protected $order;
 
+    /**
+     * @var array
+     */
+    private $attributes;
+
     public function setAttributes(array $value)
     {
         $this->attributes = $value;

@@ -14,7 +14,7 @@ use Application\Model\PictureVote;
  * Class PictureVoteController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  */
 class PictureVoteController extends AbstractRestfulController

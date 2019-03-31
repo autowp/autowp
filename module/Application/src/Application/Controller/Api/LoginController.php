@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api;
 
+use Autowp\ExternalLoginService\AbstractService;
 use Exception;
 use Imagick;
 
@@ -28,7 +29,7 @@ use Application\Service\UsersService;
  * Class LoginController
  * @package Application\Controller\Api
  *
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method Storage imageStorage()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
@@ -99,7 +100,7 @@ class LoginController extends AbstractRestfulController
 
     /**
      * @param string $serviceId
-     * @return \Autowp\ExternalLoginService\AbstractService
+     * @return AbstractService
      */
     private function getExternalLoginService($serviceId)
     {

@@ -2,6 +2,11 @@
 
 namespace Application\Controller\Api;
 
+use Application\Hydrator\Api\ItemHydrator;
+use Application\Hydrator\Api\PictureHydrator;
+use Application\Model\Item;
+use Application\Model\Picture;
+use Application\Model\PictureItem;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -9,6 +14,10 @@ class NewControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return NewController
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -16,13 +25,13 @@ class NewControllerFactory implements FactoryInterface
         $hydrators = $container->get('HydratorManager');
 
         return new NewController(
-            $container->get(\Application\Model\Picture::class),
-            $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\PictureItem::class),
+            $container->get(Picture::class),
+            $container->get(Item::class),
+            $container->get(PictureItem::class),
             $filters->get('api_new_get'),
-            $hydrators->get(\Application\Hydrator\Api\PictureHydrator::class),
-            $hydrators->get(\Application\Hydrator\Api\PictureHydrator::class),
-            $hydrators->get(\Application\Hydrator\Api\ItemHydrator::class)
+            $hydrators->get(PictureHydrator::class),
+            $hydrators->get(PictureHydrator::class),
+            $hydrators->get(ItemHydrator::class)
         );
     }
 }

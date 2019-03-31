@@ -3,6 +3,7 @@
 namespace Application;
 
 use Zend\Session\SaveHandler\SaveHandlerInterface;
+use Zend\Session\Storage\SessionArrayStorage;
 
 return [
     'service_manager' => [
@@ -20,6 +21,6 @@ return [
         'name'                => 'sid'
     ],
     'session_storage' => [
-        'type' => \Zend\Session\Storage\SessionArrayStorage::class
+        'type' => SessionArrayStorage::class
     ]
 ];

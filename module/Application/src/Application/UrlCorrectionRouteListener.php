@@ -4,7 +4,9 @@ namespace Application;
 
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
+use Zend\Http\Request;
 use Zend\Mvc\MvcEvent;
+use Zend\Stdlib\ResponseInterface;
 
 class UrlCorrectionRouteListener extends AbstractListenerAggregate
 {
@@ -32,7 +34,7 @@ class UrlCorrectionRouteListener extends AbstractListenerAggregate
 
             $method = $request->getMethod();
 
-            if ($method == \Zend\Http\Request::METHOD_GET) {
+            if ($method == Request::METHOD_GET) {
                 $filteredUri = preg_replace('|^/index\.php|isu', '', $uri);
 
                 if ($filteredUri != $uri) {
@@ -49,6 +51,9 @@ class UrlCorrectionRouteListener extends AbstractListenerAggregate
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param MvcEvent $e
+     * @param $url
+     * @return ResponseInterface
      */
     private function redirect(MvcEvent $e, $url)
     {

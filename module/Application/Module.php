@@ -2,11 +2,15 @@
 
 namespace Application;
 
+use Autowp\ZFComponents\Rollbar\ErrorListener;
+use Throwable;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\EventManager\EventInterface as Event;
 use Zend\Mail;
 use Zend\ModuleManager\Feature;
 use Zend\Mvc\MvcEvent;
+use Zend\Stdlib\ArrayUtils;
+use Zend\View\Helper\PaginationControl;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
@@ -41,7 +45,7 @@ class Module implements
 
         // Merge all module config options
         foreach ($configFiles as $configFile) {
-            $config = \Zend\Stdlib\ArrayUtils::merge($config, include $configFile);
+            $config = ArrayUtils::merge($config, include $configFile);
         }
 
         return $config;
@@ -68,7 +72,7 @@ class Module implements
         defined('MYSQL_TIMEZONE') || define('MYSQL_TIMEZONE', 'UTC');
         defined('MYSQL_DATETIME_FORMAT') || define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
 
-        \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
+        PaginationControl::setDefaultViewPartial('paginator');
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $application = $e->getApplication();
@@ -100,7 +104,7 @@ class Module implements
         $maintenance->attach($serviceManager->get('CronEventManager'));
 
         if ($config['rollbar']['logger']['access_token']) {
-            $rollbarListener = new \Autowp\ZFComponents\Rollbar\ErrorListener();
+            $rollbarListener = new ErrorListener();
             $rollbarListener->attach($eventManager);
         }
     }
@@ -124,7 +128,7 @@ class Module implements
         }
     }
 
-    private function sendErrorEmail(\Throwable $exception, $serviceManager)
+    private function sendErrorEmail(Throwable $exception, $serviceManager)
     {
         $message = get_class($exception) . PHP_EOL .
             'File: ' . $exception->getFile() . ' (' . $exception->getLine(). ')' . PHP_EOL .
@@ -145,6 +149,8 @@ class Module implements
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param Console $console
+     * @return string
      */
     public function getConsoleBanner(Console $console)
     {
@@ -153,6 +159,8 @@ class Module implements
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param Console $console
+     * @return array
      */
     public function getConsoleUsage(Console $console)
     {

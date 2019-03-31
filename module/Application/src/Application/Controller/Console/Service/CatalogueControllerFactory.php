@@ -2,6 +2,16 @@
 
 namespace Application\Controller\Console\Service;
 
+use Application\DuplicateFinder;
+use Application\HostManager;
+use Application\Model\Item;
+use Application\Model\ItemParent;
+use Application\Model\Picture;
+use Application\Model\PictureItem;
+use Application\Service\SpecificationsService;
+use Application\Service\TelegramService;
+use Autowp\Message\MessageService;
+use Autowp\TextStorage\Service;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -11,20 +21,24 @@ class CatalogueControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return Controller
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(
-            $container->get(\Application\Model\ItemParent::class),
-            $container->get(\Application\Model\PictureItem::class),
-            $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Application\HostManager::class),
-            $container->get(\Application\Service\TelegramService::class),
-            $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Autowp\TextStorage\Service::class),
-            $container->get(\Application\DuplicateFinder::class),
-            $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\Picture::class)
+            $container->get(ItemParent::class),
+            $container->get(PictureItem::class),
+            $container->get(SpecificationsService::class),
+            $container->get(HostManager::class),
+            $container->get(TelegramService::class),
+            $container->get(MessageService::class),
+            $container->get(Service::class),
+            $container->get(DuplicateFinder::class),
+            $container->get(Item::class),
+            $container->get(Picture::class)
         );
     }
 }

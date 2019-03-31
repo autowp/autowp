@@ -5,7 +5,6 @@ namespace Application\View\Helper;
 use Zend\View\Exception;
 use Zend\View\Helper\Placeholder\Container\AbstractContainer;
 use Zend\View\Helper\Placeholder\Container\AbstractStandalone;
-use Zend\View\Helper\HeadTitle;
 use Zend\View\Helper\TranslatorAwareTrait;
 
 class PageTitle extends AbstractStandalone
@@ -29,9 +28,9 @@ class PageTitle extends AbstractStandalone
     /**
      * Retrieve placeholder for title element and optionally set state
      *
-     * @param  string $title
-     * @param  string $setType
-     * @return HeadTitle
+     * @param string $title
+     * @param string $setType
+     * @return PageTitle
      */
     public function __invoke($title = null, $setType = null)
     {
@@ -110,9 +109,8 @@ class PageTitle extends AbstractStandalone
     /**
      * Set a default order to add titles
      *
-     * @param  string $setType
-     * @throws Exception\DomainException
-     * @return HeadTitle
+     * @param string $setType
+     * @return PageTitle
      */
     public function setDefaultAttachOrder($setType)
     {

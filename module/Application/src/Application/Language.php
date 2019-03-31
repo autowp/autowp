@@ -2,6 +2,8 @@
 
 namespace Application;
 
+use Zend\Http\PhpEnvironment\Request;
+
 class Language
 {
     /**
@@ -26,7 +28,7 @@ class Language
             }
         }
 
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+        if ($request instanceof Request) {
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             $hostname = $request->getServer('HTTP_HOST');
             if (isset($map[$hostname])) {

@@ -6,6 +6,7 @@ use ReCaptcha\ReCaptcha;
 use Zend\InputFilter\InputFilter;
 use Zend\Mail;
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Session\Container;
 use ZF\ApiProblem\ApiProblemResponse;
 use ZF\ApiProblem\ApiProblem;
 
@@ -64,7 +65,7 @@ class FeedbackController extends AbstractRestfulController
         }
 
         if ($this->captchaEnabled) {
-            $namespace = new \Zend\Session\Container('Captcha');
+            $namespace = new Container('Captcha');
             $verified = isset($namespace->success) && $namespace->success;
 
             if (! $verified) {

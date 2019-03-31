@@ -2,6 +2,7 @@
 
 namespace Application\View\Helper\Service;
 
+use Application\HostManager;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -11,11 +12,15 @@ class HostManagerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return Helper
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Helper(
-            $container->get(\Application\HostManager::class)
+            $container->get(HostManager::class)
         );
     }
 }

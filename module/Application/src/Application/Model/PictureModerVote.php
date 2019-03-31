@@ -39,6 +39,8 @@ class PictureModerVote
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $pictureId
+     * @return array
      */
     public function getNegativeVotes(int $pictureId): array
     {
@@ -60,6 +62,10 @@ class PictureModerVote
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $pictureId
+     * @param int $userId
+     * @param int $vote
+     * @param string $reason
      */
     public function add(int $pictureId, int $userId, int $vote, string $reason)
     {
@@ -82,6 +88,8 @@ class PictureModerVote
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @param int $pictureId
+     * @return array
      */
     public function getVoteCount(int $pictureId): array
     {
@@ -102,6 +110,8 @@ class PictureModerVote
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param array $ids
+     * @return array
      */
     public function getVoteCountArray(array $ids): array
     {
@@ -142,6 +152,8 @@ class PictureModerVote
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @param int $pictureId
+     * @return int
      */
     public function getPositiveVotesCount(int $pictureId)
     {
@@ -158,6 +170,8 @@ class PictureModerVote
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @param int $pictureId
+     * @return int
      */
     public function getNegativeVotesCount(int $pictureId)
     {

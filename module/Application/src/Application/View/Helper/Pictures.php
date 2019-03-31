@@ -2,6 +2,7 @@
 
 namespace Application\View\Helper;
 
+use ArrayObject;
 use Zend\View\Helper\AbstractHelper;
 
 use Autowp\Comments;
@@ -59,10 +60,9 @@ class Pictures extends AbstractHelper
     /**
      * @param array $picture
      * @param bool $isModer
-     * @param bool $logedIn
      * @return string
      */
-    private function renderBehaviour(array $picture, $isModer)
+    private function renderBehaviour(array $picture, bool $isModer)
     {
         $data = [
             'isModer'         => $isModer,
@@ -86,7 +86,7 @@ class Pictures extends AbstractHelper
 
     private function userBehaviour($picture, bool $isModer)
     {
-        if ($picture instanceof \ArrayObject) {
+        if ($picture instanceof ArrayObject) {
             $picture = (array)$picture;
         }
 

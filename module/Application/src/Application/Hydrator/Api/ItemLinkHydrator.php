@@ -2,6 +2,8 @@
 
 namespace Application\Hydrator\Api;
 
+use Exception;
+
 class ItemLinkHydrator extends RestHydrator
 {
     public function extract($object)
@@ -16,9 +18,12 @@ class ItemLinkHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 }

@@ -2,6 +2,15 @@
 
 namespace Application\Controller\Api\Service;
 
+use Application\HostManager;
+use Application\Hydrator\Api\ItemHydrator;
+use Application\ItemNameFormatter;
+use Application\Model\Item;
+use Application\Model\ItemParent;
+use Application\Model\UserItemSubscribe;
+use Application\Model\VehicleType;
+use Application\Service\SpecificationsService;
+use Autowp\Message\MessageService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -12,6 +21,10 @@ class ItemControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return Controller
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -19,22 +32,22 @@ class ItemControllerFactory implements FactoryInterface
         $filters = $container->get('InputFilterManager');
         $tables = $container->get('TableManager');
         return new Controller(
-            $hydrators->get(\Application\Hydrator\Api\ItemHydrator::class),
+            $hydrators->get(ItemHydrator::class),
             new Image($container),
-            $container->get(\Application\ItemNameFormatter::class),
+            $container->get(ItemNameFormatter::class),
             $filters->get('api_item_list'),
             $filters->get('api_item_item'),
             $filters->get('api_item_logo_put'),
-            $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Application\Model\ItemParent::class),
-            $container->get(\Application\HostManager::class),
-            $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Application\Model\UserItemSubscribe::class),
+            $container->get(SpecificationsService::class),
+            $container->get(ItemParent::class),
+            $container->get(HostManager::class),
+            $container->get(MessageService::class),
+            $container->get(UserItemSubscribe::class),
             $tables->get('spec'),
-            $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\VehicleType::class),
+            $container->get(Item::class),
+            $container->get(VehicleType::class),
             $container->get('InputFilterManager'),
-            $container->get(\Application\Service\SpecificationsService::class)
+            $container->get(SpecificationsService::class)
         );
     }
 }

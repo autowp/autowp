@@ -4,7 +4,9 @@ namespace Application;
 
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
+use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\MvcEvent;
+use Zend\Stdlib\ResponseInterface;
 
 class HostnameCheckRouteListener extends AbstractListenerAggregate
 {
@@ -41,14 +43,14 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
     }
 
     /**
-     * @param  MvcEvent $e
-     * @return null
+     * @param MvcEvent $e
+     * @return void
      */
-    public function onRoute(MvcEvent $e)
+    public function onRoute(MvcEvent $e): void
     {
         $request = $e->getRequest();
 
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+        if ($request instanceof Request) {
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             $hostname = $request->getUri()->getHost();
 
@@ -73,6 +75,9 @@ class HostnameCheckRouteListener extends AbstractListenerAggregate
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param MvcEvent $e
+     * @param $url
+     * @return ResponseInterface
      */
     private function redirect(MvcEvent $e, $url)
     {

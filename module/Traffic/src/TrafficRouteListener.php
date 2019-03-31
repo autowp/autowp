@@ -7,9 +7,11 @@ namespace Autowp\Traffic;
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
+use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\MvcEvent;
 
 use Autowp\User\Model\User;
+use Zend\Permissions\Acl\Acl;
 
 class TrafficRouteListener extends AbstractListenerAggregate
 {
@@ -89,10 +91,10 @@ class TrafficRouteListener extends AbstractListenerAggregate
     {
         $request = $e->getRequest();
 
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+        if ($request instanceof Request) {
             /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($this->matchWhitelist($request->getUri()->getPath())) {
-                return;
+                return null;
             }
 
             $serviceManager = $e->getApplication()->getServiceManager();
@@ -105,7 +107,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 $user = $userModel->getRow(['id' => (int)$auth->getIdentity()]);
 
                 if ($user) {
-                    $acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
+                    $acl = $serviceManager->get(Acl::class);
                     $unlimitedTraffic = $acl->isAllowed($user['role'], 'website', 'unlimited-traffic');
                 }
             }
@@ -131,5 +133,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 }
             }
         }
+        
+        return null;
     }
 }

@@ -19,7 +19,7 @@ use Application\Model\ItemParent;
  * Class ItemParentLanguageController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */

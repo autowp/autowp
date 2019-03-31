@@ -2,6 +2,7 @@
 
 namespace Application;
 
+use ArrayObject;
 use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -97,7 +98,7 @@ class MainMenu
     /**
      * @param int $id
      * @param boolean $logedIn
-     * @param string $language
+     * @param bool $full
      * @return array
      */
     private function getMenuData($id, bool $logedIn, bool $full = false)
@@ -210,7 +211,8 @@ class MainMenu
     }
 
     /**
-     * @param array|\ArrayObject $user
+     * @param array|ArrayObject $user
+     * @param bool $full
      * @return array
      */
     public function getMenu($user = null, $full = false)

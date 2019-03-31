@@ -5,11 +5,13 @@ namespace Application\Controller\Api;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\User\Controller\Plugin\User;
+
 /**
  * Class ContentLanguageController
  * @package Application\Controller\Api
  *
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method User user($user = null)
  */
 class ContentLanguageController extends AbstractRestfulController
 {

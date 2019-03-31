@@ -24,7 +24,7 @@ use Application\Model\Picture;
  * Class CommentsController
  * @package Application\Controller
  *
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method string translate(string $message, string $textDomain = 'default', $locale = null)
  */

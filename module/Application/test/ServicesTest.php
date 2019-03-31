@@ -2,7 +2,21 @@
 
 namespace ApplicationTest\Controller;
 
+use Application\FileSize;
+use Application\HostManager;
+use Application\ItemNameFormatter;
+use Application\Language;
+use Application\LanguagePicker;
+use Application\MainMenu;
+use Application\PictureNameFormatter;
+use Application\Service\SpecificationsService;
+use Application\Service\TelegramService;
+use Application\Service\UsersService;
 use Application\Test\AbstractHttpControllerTestCase;
+use Autowp\Image\Storage;
+use Autowp\Message\MessageService;
+use Autowp\TextStorage\Service;
+use Zend\Permissions\Acl\Acl;
 
 class ServicesTest extends AbstractHttpControllerTestCase
 {
@@ -10,6 +24,7 @@ class ServicesTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider servicesProvider
+     * @param $serviceName
      */
     public function testServiceRegistered($serviceName)
     {
@@ -23,20 +38,20 @@ class ServicesTest extends AbstractHttpControllerTestCase
     public static function servicesProvider()
     {
         return [
-            [\Autowp\Message\MessageService::class],
-            [\Application\ItemNameFormatter::class],
-            [\Application\PictureNameFormatter::class],
-            [\Autowp\Image\Storage::class],
-            [\Application\HostManager::class],
-            [\Application\Service\UsersService::class],
-            [\Application\Service\TelegramService::class],
-            [\Application\LanguagePicker::class],
-            [\Application\MainMenu::class],
-            [\Application\Language::class],
-            [\Autowp\TextStorage\Service::class],
-            [\Zend\Permissions\Acl\Acl::class],
-            [\Application\FileSize::class],
-            [\Application\Service\SpecificationsService::class],
+            [MessageService::class],
+            [ItemNameFormatter::class],
+            [PictureNameFormatter::class],
+            [Storage::class],
+            [HostManager::class],
+            [UsersService::class],
+            [TelegramService::class],
+            [LanguagePicker::class],
+            [MainMenu::class],
+            [Language::class],
+            [Service::class],
+            [Acl::class],
+            [FileSize::class],
+            [SpecificationsService::class],
         ];
     }
 }

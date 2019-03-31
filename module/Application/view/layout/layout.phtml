@@ -23,7 +23,8 @@
     if (isset($this->layout()->moduleName)) {
         $module = $this->layout()->moduleName;
     }
-?>
+
+use Zend\Json\Json; ?>
 <?=$this->doctype() . PHP_EOL ?>
 <html dir="ltr" lang="<?=$this->language()?>"<?=$module ? ' data-page-module="'.$this->escapeHtmlAttr($module).'"' : ''?><?=$moduleOptions ? ' data-page-module-options="'.$this->escapeHtmlAttr(Zend\Json\Json::encode($moduleOptions)).'"' : ''?>>
     <head>
@@ -58,7 +59,7 @@
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-ga('create', 'UA-24654784-1', <?=\Zend\Json\Json::encode($this->hostManager()->getCookieDomain($this->language()))?>);
+ga('create', 'UA-24654784-1', <?=Json::encode($this->hostManager()->getCookieDomain($this->language()))?>);
 ga('send', 'pageview');
 </script>
         <?php } ?>

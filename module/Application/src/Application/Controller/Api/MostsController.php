@@ -21,7 +21,7 @@ use Application\Service\Mosts;
  * Class MostsController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method string language()
  * @method Storage imageStorage()
  * @method Catalogue catalogue()
@@ -156,7 +156,9 @@ class MostsController extends AbstractActionController
                     }
 
                     $pictures[] = [
-                        'name' => isset($names[$id]) ? $this->pictureNameFormatter->format($names[$id], $language) : null,
+                        'name' => isset($names[$id])
+                            ? $this->pictureNameFormatter->format($names[$id], $language)
+                            : null,
                         'src'  => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
                         'url'  => $url
                     ];

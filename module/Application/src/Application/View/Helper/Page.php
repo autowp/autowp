@@ -2,6 +2,7 @@
 
 namespace Application\View\Helper;
 
+use ArrayObject;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\View\Helper\AbstractHelper;
 
@@ -29,7 +30,7 @@ class Page extends AbstractHelper
         if ($value) {
             $doc = null;
 
-            if (($value instanceof \ArrayObject) || is_array($value)) {
+            if (($value instanceof ArrayObject) || is_array($value)) {
                 $doc = $value;
             } elseif (is_numeric($value)) {
                 $doc = $this->getPageById($value);

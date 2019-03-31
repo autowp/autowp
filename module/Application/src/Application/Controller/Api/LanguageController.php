@@ -21,6 +21,7 @@ class LanguageController extends AbstractRestfulController
 
     public function listAction()
     {
+        $languages = [];
         foreach (array_keys($this->hosts) as $language) {
             $languages[$language] = Locale::getDisplayLanguage($language, $language);
         }

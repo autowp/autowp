@@ -10,7 +10,6 @@ use Zend\View\Model\ViewModel;
 use Autowp\User\Controller\Plugin\User;
 
 use Application\Controller\Plugin\Pic;
-use Application\Language;
 use Application\Model\Brand;
 use Application\Model\Picture;
 
@@ -19,7 +18,7 @@ use Application\Model\Picture;
  * @package Application\Controller
  *
  * @method Pic pic()
- * @method User user()
+ * @method User user($user = null)
  * @method string language()
  */
 class PictureController extends AbstractActionController

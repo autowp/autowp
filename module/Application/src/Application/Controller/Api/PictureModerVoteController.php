@@ -21,7 +21,7 @@ use Application\Model\UserPicture;
  * Class PictureModerVoteController
  * @package Application\Controller\Api
  *
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method Pic pic()
  * @method string language()
  * @method ForbiddenAction forbiddenAction()
@@ -63,6 +63,10 @@ class PictureModerVoteController extends AbstractRestfulController
      * @var User
      */
     private $userModel;
+    /**
+     * @var TableGateway
+     */
+    private $templateTable;
 
     public function __construct(
         HostManager $hostManager,

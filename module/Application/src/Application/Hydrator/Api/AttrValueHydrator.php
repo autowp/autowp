@@ -4,6 +4,7 @@ namespace Application\Hydrator\Api;
 
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
+use Exception;
 
 class AttrValueHydrator extends RestHydrator
 {
@@ -37,7 +38,11 @@ class AttrValueHydrator extends RestHydrator
         }
 
         if ($this->filterComposite->filter('value_text')) {
-            $result['value_text'] = $this->specService->getActualValueText($object['attribute_id'], $object['item_id'], $this->language);
+            $result['value_text'] = $this->specService->getActualValueText(
+                $object['attribute_id'],
+                $object['item_id'],
+                $this->language
+            );
         }
 
         return $result;
@@ -45,9 +50,12 @@ class AttrValueHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 }

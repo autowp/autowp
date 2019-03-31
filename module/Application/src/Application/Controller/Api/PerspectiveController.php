@@ -16,7 +16,7 @@ use Application\Hydrator\Api\RestHydrator;
  * Class PerspectiveController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method string language()
  */

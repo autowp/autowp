@@ -2,6 +2,8 @@
 
 namespace ApplicationTest\Api\Controller;
 
+use Application\DuplicateFinder;
+use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
@@ -20,7 +22,7 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
 
         $tables = $serviceManager->get('TableManager');
 
-        $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
+        $mock = $this->getMockBuilder(DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
@@ -30,13 +32,16 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
 
         $mock->method('indexImage')->willReturn(true);
 
-        $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
+        $serviceManager->setService(DuplicateFinder::class, $mock);
     }
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $vehicleId
+     * @return
+     * @throws Exception
      */
-    private function addPictureToItem($vehicleId)
+    private function addPictureToItem(int $vehicleId)
     {
         $this->reset();
 
@@ -83,6 +88,9 @@ class PictureModerControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $params
+     * @return
+     * @throws Exception
      */
     private function createItem($params)
     {

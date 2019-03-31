@@ -39,6 +39,8 @@ class UserPasswordRemind
 
     /**
      * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @param string $token
+     * @return int
      */
     public function getUserId(string $token): int
     {
@@ -52,6 +54,8 @@ class UserPasswordRemind
 
     /**
      * @suppress PhanUndeclaredMethod, PhanDeprecatedFunction
+     * @param int $userId
+     * @return string
      */
     public function createToken(int $userId): string
     {

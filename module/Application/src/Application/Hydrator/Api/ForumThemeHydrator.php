@@ -2,11 +2,14 @@
 
 namespace Application\Hydrator\Api;
 
+use Exception;
 use Traversable;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Paginator;
+use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Forums\Forums;
@@ -57,7 +60,7 @@ class ForumThemeHydrator extends RestHydrator
 
         $this->userId = null;
 
-        $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
+        $this->acl = $serviceManager->get(Acl::class);
 
         $tables = $serviceManager->get('TableManager');
         $this->themeTable = $tables->get('forums_themes');
@@ -85,16 +88,16 @@ class ForumThemeHydrator extends RestHydrator
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
-     * @throws \Zend\Hydrator\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setOptions($options)
     {
         parent::setOptions($options);
 
-        if ($options instanceof \Traversable) {
+        if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
-            throw new \Zend\Hydrator\Exception\InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'The options parameter must be an array or a Traversable'
             );
         }
@@ -126,6 +129,8 @@ class ForumThemeHydrator extends RestHydrator
 
     /**
      * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @param $object
+     * @return array
      */
     public function extract($object)
     {
@@ -239,10 +244,13 @@ class ForumThemeHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 
     private function getUserRole()

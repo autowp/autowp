@@ -3,6 +3,7 @@
 namespace Application\Hydrator\Api;
 
 use Autowp\TextStorage;
+use Exception;
 
 class ItemLanguageHydrator extends RestHydrator
 {
@@ -45,9 +46,12 @@ class ItemLanguageHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 }

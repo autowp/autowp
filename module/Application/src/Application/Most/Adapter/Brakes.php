@@ -2,6 +2,7 @@
 
 namespace Application\Most\Adapter;
 
+use Exception;
 use Zend\Db\Sql;
 
 class Brakes extends AbstractAdapter
@@ -28,6 +29,10 @@ class Brakes extends AbstractAdapter
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param Sql\Select $select
+     * @param $language
+     * @return array
+     * @throws Exception
      */
     public function getCars(Sql\Select $select, $language)
     {
@@ -58,7 +63,7 @@ class Brakes extends AbstractAdapter
             $diameter  = $this->attributeTable->select(['id' => $axis['diameter']])->current();
             $diameterValuesTable = $specService->getValueDataTable($diameter['type_id'])->getTable();
 
-            $thickness = $this->attributesTable->select(['id' => $axis['thickness']])->current();
+            $thickness = $this->attributeTable->select(['id' => $axis['thickness']])->current();
             $thicknessValuesTable = $specService->getValueDataTable($thickness['type_id'])->getTable();
 
             $axisSelect

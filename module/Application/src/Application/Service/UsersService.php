@@ -2,6 +2,7 @@
 
 namespace Application\Service;
 
+use ArrayObject;
 use DateTime;
 use Exception;
 
@@ -127,6 +128,9 @@ class UsersService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param string $password
+     * @return Sql\Expression
+     * @throws Exception
      */
     public function getPasswordHashExpr(string $password): Sql\Expression
     {
@@ -164,7 +168,9 @@ class UsersService
      * @suppress PhanDeprecatedFunction
      *
      * @param array $values
-     * @param string $hostname
+     * @param string $language
+     * @return ArrayObject|array
+     * @throws Exception
      */
     public function addUser(array $values, $language)
     {
@@ -205,9 +211,10 @@ class UsersService
     }
 
     /**
-     * @param array|\ArrayObject $user
+     * @param array|ArrayObject $user
      * @param string $email
      * @param string $language
+     * @throws Exception
      */
     public function changeEmailStart($user, $email, $language)
     {
@@ -231,7 +238,7 @@ class UsersService
      * @suppress PhanPluginMixedKeyNoKey
      *
      * @param string $code
-     * @return boolean|array|\ArrayObject
+     * @return boolean|array|ArrayObject
      */
     public function emailChangeFinish(string $code)
     {
@@ -262,7 +269,7 @@ class UsersService
     }
 
     /**
-     * @param array|\ArrayObject $user
+     * @param array|ArrayObject $user
      * @param string $hostname
      */
     public function sendRegistrationConfirmEmail($user, $hostname)
@@ -299,7 +306,7 @@ class UsersService
     }
 
     /**
-     * @param array|\ArrayObject $user
+     * @param array|ArrayObject $user
      * @param string $hostname
      */
     public function sendChangeConfirmEmail($user, $hostname)
@@ -338,6 +345,7 @@ class UsersService
      * @param string $login
      * @param string $password
      * @return LoginAuthAdapter
+     * @throws Exception
      */
     public function getAuthAdapterLogin($login, $password)
     {

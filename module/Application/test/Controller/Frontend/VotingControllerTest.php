@@ -79,7 +79,8 @@ class VotingControllerTest extends AbstractHttpControllerTestCase
 
         // get votes
         $this->reset();
-        $this->dispatch('https://www.autowp.ru/api/voting/' . $id . '/variant/' . $variantId . '/vote', Request::METHOD_GET, [
+        $url = 'https://www.autowp.ru/api/voting/' . $id . '/variant/' . $variantId . '/vote';
+        $this->dispatch($url, Request::METHOD_GET, [
             'fields' => 'user'
         ]);
 

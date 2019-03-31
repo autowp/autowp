@@ -30,6 +30,7 @@ class FileSize extends AbstractHelper
      *
      * @param integer $fileSize Filesize in bytes
      * @param integer $precision Precision
+     * @return string
      */
     public function __invoke($fileSize, $precision = 0)
     {

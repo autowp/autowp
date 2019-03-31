@@ -2,6 +2,8 @@
 
 namespace Application\Controller\Api;
 
+use Application\Hydrator\Api\UserHydrator;
+use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -9,6 +11,10 @@ class PulseControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return PulseController
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -16,8 +22,8 @@ class PulseControllerFactory implements FactoryInterface
         $hydrators = $container->get('HydratorManager');
         return new PulseController(
             $tables->get('log_events'),
-            $container->get(\Autowp\User\Model\User::class),
-            $hydrators->get(\Application\Hydrator\Api\UserHydrator::class)
+            $container->get(User::class),
+            $hydrators->get(UserHydrator::class)
         );
     }
 }

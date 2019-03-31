@@ -2,8 +2,11 @@
 
 namespace Autowp\Forums;
 
+use Exception;
+
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Paginator;
 
 use Autowp\Comments;
 use Autowp\Commons\Db\Table\Row;
@@ -97,7 +100,7 @@ class Forums
         ]);
     }
 
-    public function delete(int $topicId)
+    public function delete(int $topicId): bool
     {
         $topic = $this->topicTable->select(['id = ?' => $topicId])->current();
         if (! $topic) {
@@ -110,7 +113,7 @@ class Forums
         );
 
         if ($needAttention) {
-            throw new \Exception("Cannot delete row when moderator attention not closed");
+            throw new Exception("Cannot delete row when moderator attention not closed");
         }
 
         $this->topicTable->update([
@@ -120,12 +123,15 @@ class Forums
         ]);
 
         $this->updateThemeStat($topic['theme_id']);
+
+        return true;
     }
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @param int $themeId
      */
-    public function updateThemeStat($themeId): void
+    public function updateThemeStat(int $themeId): void
     {
         $theme = $this->themeTable->select([
             'id = ?' => (int)$themeId
@@ -150,7 +156,7 @@ class Forums
                 /**
                  * @suppress PhanPluginMixedKeyNoKey
                  */
-                function ($select) use ($theme) {
+                function (Sql\Select $select) use ($theme) {
                     $select
                         ->join('forums_topics', 'comment_message.item_id = forums_topics.id', [])
                         ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])
@@ -170,8 +176,13 @@ class Forums
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $themeId
+     * @param int $page
+     * @param int $userId
+     * @return array
+     * @throws Exception
      */
-    public function getTopicList($themeId, $page, $userId)
+    public function getTopicList(int $themeId, int $page, int $userId)
     {
         $select = new Sql\Select($this->topicTable->getTable());
         $select
@@ -188,8 +199,8 @@ class Forums
             $select->where(['forums_topics.theme_id IS NULL']);
         }
 
-        $paginator = new \Zend\Paginator\Paginator(
-            new \Zend\Paginator\Adapter\DbSelect($select, $this->topicTable->getAdapter())
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->topicTable->getAdapter())
         );
 
         $paginator
@@ -254,6 +265,12 @@ class Forums
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $themeId
+     * @param $page
+     * @param $userId
+     * @param $isModerator
+     * @return array
+     * @throws Exception
      */
     public function getThemePage($themeId, $page, $userId, $isModerator)
     {
@@ -296,18 +313,19 @@ class Forums
      * @suppress PhanDeprecatedFunction
      *
      * @param array $values
-     * @throws \Exception
+     * @return int
+     * @throws Exception
      */
-    public function addTopic($values)
+    public function addTopic($values): int
     {
         $userId = (int)$values['user_id'];
         if (! $userId) {
-            throw new \Exception("User id not provided");
+            throw new Exception("User id not provided");
         }
 
         $theme = $this->getTheme($values['theme_id']);
         if (! $theme || $theme['disable_topics']) {
-            return false;
+            return 0;
         }
 
         if (! $values['ip']) {
@@ -382,8 +400,10 @@ class Forums
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $themeId
+     * @return array
      */
-    public function getTopics($themeId)
+    public function getTopics(int $themeId)
     {
         $select = new Sql\Select($this->topicTable->getTable());
         $select
@@ -464,6 +484,9 @@ class Forums
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $topicId
+     * @param array $options
+     * @return array|bool
      */
     public function getTopic($topicId, array $options = [])
     {
@@ -529,8 +552,10 @@ class Forums
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $topicId
+     * @param int $userId
      */
-    public function registerTopicView($topicId, $userId)
+    public function registerTopicView(int $topicId, int $userId)
     {
         $this->topicTable->update([
             'views' => new Sql\Expression('views+1')
@@ -610,7 +635,7 @@ class Forums
         ]);
 
         if (! $messageId) {
-            throw new \Exception("Message add fails");
+            throw new Exception("Message add fails");
         }
 
         if ($values['resolve'] && $values['parent_id']) {
@@ -689,6 +714,8 @@ class Forums
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @param int $userId
+     * @return int
      */
     public function getSubscribedTopicsCount(int $userId): int
     {

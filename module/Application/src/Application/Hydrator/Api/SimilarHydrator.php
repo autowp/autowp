@@ -4,6 +4,7 @@ namespace Application\Hydrator\Api;
 
 use Application\Hydrator\Api\Strategy\Picture as HydratorPictureStrategy;
 use Application\Model\Picture;
+use Exception;
 
 class SimilarHydrator extends RestHydrator
 {
@@ -43,9 +44,12 @@ class SimilarHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 }

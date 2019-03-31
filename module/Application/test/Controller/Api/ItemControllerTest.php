@@ -2,6 +2,8 @@
 
 namespace ApplicationTest\Controller\Api;
 
+use Application\DuplicateFinder;
+use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
@@ -20,6 +22,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $params
+     * @return
+     * @throws Exception
      */
     private function createItem($params)
     {
@@ -60,6 +65,9 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $engineId
+     * @param $vehicleId
+     * @throws Exception
      */
     private function setEngineToVehicle($engineId, $vehicleId)
     {
@@ -109,6 +117,10 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $itemId
+     * @param $parentId
+     * @param array $params
+     * @throws Exception
      */
     private function addItemParent($itemId, $parentId, array $params = [])
     {
@@ -137,7 +149,7 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
         $tables = $serviceManager->get('TableManager');
 
-        $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
+        $mock = $this->getMockBuilder(DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
@@ -147,11 +159,14 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
         $mock->method('indexImage')->willReturn(true);
 
-        $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
+        $serviceManager->setService(DuplicateFinder::class, $mock);
     }
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $vehicleId
+     * @return
+     * @throws Exception
      */
     private function addPictureToItem($vehicleId)
     {
@@ -200,6 +215,10 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $pictureId
+     * @param $itemId
+     * @param $perspectiveId
+     * @throws Exception
      */
     private function setPerspective($pictureId, $itemId, $perspectiveId)
     {
@@ -223,6 +242,8 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $pictureId
+     * @throws Exception
      */
     private function acceptPicture($pictureId)
     {
@@ -244,6 +265,10 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $itemId
+     * @param $parentId
+     * @return mixed
+     * @throws Exception
      */
     private function getItemParent($itemId, $parentId)
     {

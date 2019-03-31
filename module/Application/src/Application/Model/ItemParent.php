@@ -266,6 +266,11 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $parentId
+     * @param int $itemId
+     * @param array $options
+     * @return bool
+     * @throws Exception
      */
     public function create(int $parentId, int $itemId, array $options = [])
     {
@@ -617,6 +622,9 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $itemId
+     * @param bool $stockFirst
+     * @return array
      */
     public function getParentRows(int $itemId, bool $stockFirst = false): array
     {
@@ -688,6 +696,10 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @param int $parentId
+     * @param int $itemId
+     * @param string $language
+     * @return string
      */
     public function getNamePreferLanguage(int $parentId, int $itemId, string $language): string
     {
@@ -846,6 +858,8 @@ class ItemParent
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $parentId
+     * @return bool
      */
     public function hasChildItems(int $parentId): bool
     {
@@ -859,6 +873,8 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @param int $parentId
+     * @return int
      */
     public function getChildItemsCount(int $parentId): int
     {
@@ -885,6 +901,8 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param array $parentIds
+     * @return array
      */
     public function getChildItemsCountArray(array $parentIds): array
     {
@@ -907,6 +925,9 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param array $parentIds
+     * @param array $typeIds
+     * @return array
      */
     public function getChildItemsCountArrayByTypes(array $parentIds, array $typeIds): array
     {
@@ -951,6 +972,8 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param int $itemId
+     * @return array
      */
     public function getChildItemLinkTypesCount(int $itemId): array
     {

@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api\Service;
 
+use Application\Model\PictureVote;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -11,11 +12,15 @@ class PictureVoteControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return Controller
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(
-            $container->get(\Application\Model\PictureVote::class)
+            $container->get(PictureVote::class)
         );
     }
 }

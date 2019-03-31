@@ -2,9 +2,11 @@
 
 namespace Application\Controller\Api;
 
+use ArrayObject;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Uri\Uri;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblemResponse;
 
@@ -24,7 +26,7 @@ use Application\Model\Item;
  * Class ItemLanguageController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
@@ -293,9 +295,9 @@ class ItemLanguageController extends AbstractRestfulController
     }
 
     /**
-     * @param array|\ArrayObject $user
+     * @param array|ArrayObject $user
      * @param bool $full
-     * @param \Zend\Uri\Uri $uri
+     * @param Uri $uri
      * @return string
      */
     private function userModerUrl($user, $full = false, $uri = null)
@@ -307,7 +309,10 @@ class ItemLanguageController extends AbstractRestfulController
     }
 
     /**
-     * @param array|\ArrayObject $car
+     * @param $item
+     * @param bool $full
+     * @param null $tab
+     * @param null $uri
      * @return string
      */
     private function itemModerUrl($item, $full = false, $tab = null, $uri = null)

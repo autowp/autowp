@@ -9,6 +9,10 @@ class RefererFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return Referer
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

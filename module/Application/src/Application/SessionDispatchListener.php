@@ -2,6 +2,7 @@
 
 namespace Application;
 
+use Exception;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Http\Request;
@@ -43,7 +44,7 @@ class SessionDispatchListener extends AbstractListenerAggregate
 
             try {
                 $sessionManager->start();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 session_unset();
                 $params = session_get_cookie_params();
                 setcookie(

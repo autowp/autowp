@@ -4,6 +4,7 @@ namespace Application\Router\Http;
 
 use Exception;
 
+use Traversable;
 use Zend\Router\Http\RouteInterface;
 use Zend\Router\Http\RouteMatch;
 use Zend\Stdlib\RequestInterface as Request;
@@ -17,7 +18,7 @@ class FilePath implements RouteInterface
     /**
      * Create a new route with given options.
      *
-     * @param  array|\Traversable $options
+     * @param  array|Traversable $options
      * @return FilePath
      */
     public static function factory($options = [])
@@ -61,6 +62,10 @@ class FilePath implements RouteInterface
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $params
+     * @param array $options
+     * @return string
+     * @throws Exception
      */
     public function assemble(array $params = [], array $options = [])
     {
@@ -86,5 +91,6 @@ class FilePath implements RouteInterface
      */
     public function getAssembledParams()
     {
+        return [];
     }
 }

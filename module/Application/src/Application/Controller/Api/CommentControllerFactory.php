@@ -2,6 +2,15 @@
 
 namespace Application\Controller\Api;
 
+use Application\Comments;
+use Application\HostManager;
+use Application\Hydrator\Api\CommentHydrator;
+use Application\Model\Item;
+use Application\Model\Picture;
+use Autowp\Forums\Forums;
+use Autowp\Message\MessageService;
+use Autowp\User\Model\User;
+use Autowp\Votings\Votings;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -9,6 +18,10 @@ class CommentControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return CommentController
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -16,22 +29,22 @@ class CommentControllerFactory implements FactoryInterface
         $filters = $container->get('InputFilterManager');
         $tables = $container->get('TableManager');
         return new CommentController(
-            $container->get(\Application\Comments::class),
-            $hydrators->get(\Application\Hydrator\Api\CommentHydrator::class),
+            $container->get(Comments::class),
+            $hydrators->get(CommentHydrator::class),
             $tables->get('users'),
             $filters->get('api_comments_get'),
             $filters->get('api_comments_get_public'),
             $filters->get('api_comments_post'),
             $filters->get('api_comments_put'),
             $filters->get('api_comments_item_get'),
-            $container->get(\Autowp\User\Model\User::class),
-            $container->get(\Application\HostManager::class),
-            $container->get(\Autowp\Message\MessageService::class),
-            $container->get(\Application\Model\Picture::class),
-            $container->get(\Application\Model\Item::class),
-            $container->get(\Autowp\Votings\Votings::class),
+            $container->get(User::class),
+            $container->get(HostManager::class),
+            $container->get(MessageService::class),
+            $container->get(Picture::class),
+            $container->get(Item::class),
+            $container->get(Votings::class),
             $tables->get('articles'),
-            $container->get(\Autowp\Forums\Forums::class)
+            $container->get(Forums::class)
         );
     }
 }

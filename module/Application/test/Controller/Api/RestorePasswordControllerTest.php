@@ -2,12 +2,14 @@
 
 namespace ApplicationTest\Api\Controller;
 
+use Exception;
 use Zend\Http\Request;
 
 use Application\Controller\Api\LoginController;
 use Application\Controller\Api\RestorePasswordController;
 use Application\Controller\Api\UserController;
 use Application\Test\AbstractHttpControllerTestCase;
+use Zend\Mail\Transport\TransportInterface;
 
 class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 {
@@ -15,6 +17,11 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param string $email
+     * @param string $password
+     * @param string $name
+     * @return int
+     * @throws Exception
      */
     private function createUser(string $email, string $password, string $name): int
     {
@@ -44,7 +51,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
 
     private function activateUser()
     {
-        $mailTransport = $this->getApplicationServiceLocator()->get(\Zend\Mail\Transport\TransportInterface::class);
+        $mailTransport = $this->getApplicationServiceLocator()->get(TransportInterface::class);
         $message = $mailTransport->getLastMessage();
 
         preg_match('|http://en.localhost/ng/account/emailcheck/([0-9a-f]+)|u', $message->getBody(), $match);
@@ -84,7 +91,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('request');
 
         // parse message for url with token
-        $mailTransport = $this->getApplicationServiceLocator()->get(\Zend\Mail\Transport\TransportInterface::class);
+        $mailTransport = $this->getApplicationServiceLocator()->get(TransportInterface::class);
         $message = $mailTransport->getLastMessage();
 
         preg_match('|https?://en.localhost/ng/restore-password/new\?code=([0-9a-f]+)|u', $message->getBody(), $match);

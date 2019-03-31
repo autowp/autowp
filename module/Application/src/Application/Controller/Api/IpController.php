@@ -16,9 +16,10 @@ use Application\Hydrator\Api\RestHydrator;
  * Class IpController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
  */
 class IpController extends AbstractRestfulController
 {

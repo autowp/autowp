@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Moder;
 
+use ArrayObject;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Http\Response;
@@ -22,7 +23,7 @@ use Application\Model\Picture;
  * Class CarsController
  * @package Application\Controller\Moder
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method Catalogue catalogue()
  * @method Storage imageStorage()
@@ -72,7 +73,10 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param array|\ArrayObject $car
+     * @param $item
+     * @param bool $full
+     * @param null $tab
+     * @param null $uri
      * @return string
      */
     private function carModerUrl($item, $full = false, $tab = null, $uri = null)
@@ -92,7 +96,7 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param array|\ArrayObject $car
+     * @param array|ArrayObject $car
      * @param $tab
      * @return Response
      */

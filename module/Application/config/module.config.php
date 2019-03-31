@@ -2,6 +2,17 @@
 
 namespace Application;
 
+use Autowp\ExternalLoginService\Facebook;
+use Autowp\ExternalLoginService\Github;
+use Autowp\ExternalLoginService\GooglePlus;
+use Autowp\ExternalLoginService\Linkedin;
+use Autowp\ExternalLoginService\Twitter;
+use Autowp\ExternalLoginService\Vk;
+use Autowp\ZFComponents\Resources;
+use Exception;
+use Zend\I18n\Translator\Loader\PhpArray;
+use Zend\InputFilter\InputFilterAbstractServiceFactory;
+use Zend\Mvc\I18n\TranslatorFactory;
 use Zend\Permissions\Acl\Acl;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
@@ -28,10 +39,10 @@ $mailTypes = [
 
 $mailType = getenv('AUTOWP_MAIL_TYPE');
 if (! $mailType) {
-    throw new \Exception("Mail type not provided");
+    throw new Exception("Mail type not provided");
 }
 if (! isset($mailTypes[$mailType])) {
-    throw new \Exception("Mail type `$mailType` not found");
+    throw new Exception("Mail type `$mailType` not found");
 }
 $mailTransport = $mailTypes[$mailType];
 
@@ -76,29 +87,29 @@ return [
         'fallbackLocale' => 'en',
         'translation_file_patterns' => [
             [
-                'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
+                'type'     => PhpArray::class,
                 'base_dir' => __DIR__ . '/../language',
                 'pattern'  => '%s.php'
             ],
             [
-                'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
+                'type'     => PhpArray::class,
                 'base_dir' => __DIR__ . '/../language/plural',
                 'pattern'  => '%s.php'
             ],
             [
-                'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
+                'type'     => PhpArray::class,
                 'base_dir' => \Zend\I18n\Translator\Resources::getBasePath(),
                 'pattern'  => \Zend\I18n\Translator\Resources::getPatternForValidator()
             ],
             [
-                'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
+                'type'     => PhpArray::class,
                 'base_dir' => \Zend\I18n\Translator\Resources::getBasePath(),
                 'pattern'  => \Zend\I18n\Translator\Resources::getPatternForCaptcha()
             ],
             [
-                'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
-                'base_dir' => \Autowp\ZFComponents\Resources::getBasePath(),
-                'pattern'  => \Autowp\ZFComponents\Resources::getPatternForViewHelpers()
+                'type'     => PhpArray::class,
+                'base_dir' => Resources::getBasePath(),
+                'pattern'  => Resources::getPatternForViewHelpers()
             ]
         ],
     ],
@@ -144,7 +155,7 @@ return [
             Service\TelegramService::class       => Service\TelegramServiceFactory::class,
             Service\UsersService::class          => Service\UsersServiceFactory::class,
             ItemNameFormatter::class             => Service\ItemNameFormatterFactory::class,
-            'translator'                         => \Zend\Mvc\I18n\TranslatorFactory::class,
+            'translator'                         => TranslatorFactory::class,
             Provider\UserId\OAuth2UserIdProvider::class => Provider\UserId\OAuth2UserIdProviderFactory::class,
         ],
         'aliases' => [
@@ -287,34 +298,34 @@ return [
     ],
 
     'external_login_services' => [
-        \Autowp\ExternalLoginService\Vk::class => [
+        Vk::class => [
             'clientId'     => getenv('AUTOWP_ELS_VK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_VK_SECRET'),
             'redirectUri'  => 'https://en.'.$host.'/login/callback'
         ],
-        \Autowp\ExternalLoginService\GooglePlus::class => [
+        GooglePlus::class => [
             'clientId'     => getenv('AUTOWP_ELS_GOOGLEPLUS_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GOOGLEPLUS_SECRET'),
             'redirectUri'  => 'https://en.'.$host.'/login/callback'
         ],
-        \Autowp\ExternalLoginService\Twitter::class => [
+        Twitter::class => [
             'consumerKey'    => getenv('AUTOWP_ELS_TWITTER_CLIENTID'),
             'consumerSecret' => getenv('AUTOWP_ELS_TWITTER_SECRET'),
             'redirectUri'  => 'https://en.'.$host.'/login/callback'
         ],
-        \Autowp\ExternalLoginService\Facebook::class => [
+        Facebook::class => [
             'clientId'     => getenv('AUTOWP_ELS_FACEBOOK_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_FACEBOOK_SECRET'),
             'scope'        => ['public_profile'],
             'graphApiVersion' => 'v3.2',
             'redirectUri'  => 'https://en.'.$host.'/login/callback'
         ],
-        \Autowp\ExternalLoginService\Github::class => [
+        Github::class => [
             'clientId'     => getenv('AUTOWP_ELS_GITHUB_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_GITHUB_SECRET'),
             'redirectUri'  => 'https://en.'.$host.'/login/callback'
         ],
-        \Autowp\ExternalLoginService\Linkedin::class => [
+        Linkedin::class => [
             'clientId'     => getenv('AUTOWP_ELS_LINKEDIN_CLIENTID'),
             'clientSecret' => getenv('AUTOWP_ELS_LINKEDIN_SECRET'),
             'redirectUri'  => 'https://en.'.$host.'/login/callback'
@@ -343,7 +354,7 @@ return [
             InputFilter\AttrUserValueCollectionInputFilter::class => InputFilter\AttrUserValueCollectionInputFilterFactory::class
         ],
         'abstract_factories' => [
-            \Zend\InputFilter\InputFilterAbstractServiceFactory::class
+            InputFilterAbstractServiceFactory::class
         ]
     ],
 

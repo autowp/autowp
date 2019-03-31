@@ -17,7 +17,7 @@ use Application\Model\Log;
  * Class LogController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method ForbiddenAction forbiddenAction()
  * @method string language()

@@ -14,7 +14,7 @@ use Application\Model\VehicleType;
  * Class VehicleTypesController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  */
 class VehicleTypesController extends AbstractRestfulController

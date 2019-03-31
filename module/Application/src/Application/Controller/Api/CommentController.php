@@ -30,7 +30,7 @@ use Application\Model\Picture;
  * Class CommentController
  * @package Application\Controller\Api
  *
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
@@ -273,13 +273,19 @@ class CommentController extends AbstractRestfulController
         } else {
             if (! $values['item_id'] && ! $values['user_id']) {
                 return new ApiProblemResponse(
-                    new ApiProblem(400, 'Data is invalid. Check `detail`.', null, 'Validation error', [
-                        'invalid_params' => [
-                            'item_id' => [
-                                'invalid' => 'item_id or user_id is required'
+                    new ApiProblem(
+                        400,
+                        'Data is invalid. Check `detail`.',
+                        null,
+                        'Validation error',
+                        [
+                            'invalid_params' => [
+                                'item_id' => [
+                                    'invalid' => 'item_id or user_id is required'
+                                ]
                             ]
                         ]
-                    ])
+                    )
                 );
             }
         }
@@ -412,7 +418,7 @@ class CommentController extends AbstractRestfulController
                 break;
 
             default:
-                throw new \Exception('Unknown type_id');
+                throw new Exception('Unknown type_id');
         }
 
         if (! $object) {

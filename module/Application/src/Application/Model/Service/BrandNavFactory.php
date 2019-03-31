@@ -2,6 +2,11 @@
 
 namespace Application\Model\Service;
 
+use Application\Model\Item;
+use Application\Model\ItemAlias;
+use Application\Model\ItemParent;
+use Application\Model\Picture;
+use Application\Model\VehicleType;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -11,6 +16,10 @@ class BrandNavFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return Model
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -18,11 +27,11 @@ class BrandNavFactory implements FactoryInterface
             $container->get('fastCache'),
             $container->get('MvcTranslator'),
             $container->get('HttpRouter'),
-            $container->get(\Application\Model\ItemParent::class),
-            $container->get(\Application\Model\ItemAlias::class),
-            $container->get(\Application\Model\Picture::class),
-            $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\VehicleType::class)
+            $container->get(ItemParent::class),
+            $container->get(ItemAlias::class),
+            $container->get(Picture::class),
+            $container->get(Item::class),
+            $container->get(VehicleType::class)
         );
     }
 }

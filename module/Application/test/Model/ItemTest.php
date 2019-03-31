@@ -4,6 +4,8 @@ namespace ApplicationTest\Model;
 
 use Application\Model\Item;
 use Application\Test\AbstractHttpControllerTestCase;
+use Exception;
+use stdClass;
 
 class ItemTest extends AbstractHttpControllerTestCase
 {
@@ -34,10 +36,10 @@ class ItemTest extends AbstractHttpControllerTestCase
         $this->assertEmpty($result);
 
         try {
-            $result = $model->getRow(['id' => new \stdClass()]);
+            $result = $model->getRow(['id' => new stdClass()]);
             $this->assertEmpty($result);
             $this->assertTrue(false);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->assertTrue(true);
         }
 
@@ -51,7 +53,7 @@ class ItemTest extends AbstractHttpControllerTestCase
                 'test' => null
             ]]);
             $this->assertEmpty($result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->assertTrue(true);
         }
 

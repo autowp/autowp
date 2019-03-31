@@ -2,6 +2,8 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
+use Application\DuplicateFinder;
+use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
@@ -23,7 +25,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $tables = $serviceManager->get('TableManager');
 
-        $mock = $this->getMockBuilder(\Application\DuplicateFinder::class)
+        $mock = $this->getMockBuilder(DuplicateFinder::class)
             ->setMethods(['indexImage'])
             ->setConstructorArgs([
                 $serviceManager->get('RabbitMQ'),
@@ -33,17 +35,22 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
         $mock->method('indexImage')->willReturn(true);
 
-        $serviceManager->setService(\Application\DuplicateFinder::class, $mock);
+        $serviceManager->setService(DuplicateFinder::class, $mock);
     }
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $itemId
+     * @param $pictureId
+     * @param $perspectiveId
+     * @throws Exception
      */
     private function setPerspective($itemId, $pictureId, $perspectiveId)
     {
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId . '/1', Request::METHOD_PUT, [
+        $url = 'https://www.autowp.ru/api/picture-item/' . $pictureId . '/' . $itemId . '/1';
+        $this->dispatch($url, Request::METHOD_PUT, [
             'perspective_id' => $perspectiveId
         ]);
 
@@ -56,8 +63,11 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $itemId
+     * @return int
+     * @throws Exception
      */
-    private function addPictureToItem($itemId)
+    private function addPictureToItem($itemId): int
     {
         $this->reset();
 
@@ -104,6 +114,9 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $itemId
+     * @return mixed
+     * @throws Exception
      */
     private function getPicture($itemId)
     {
@@ -126,6 +139,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $pictureId
+     * @throws Exception
      */
     private function acceptPicture($pictureId)
     {
@@ -147,6 +162,9 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $params
+     * @return
+     * @throws Exception
      */
     private function createItem($params)
     {
@@ -171,6 +189,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $itemId
+     * @param $parentId
+     * @param array $params
+     * @throws Exception
      */
     private function addItemParent($itemId, $parentId, array $params = [])
     {
@@ -223,6 +245,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrand(string $token)
     {
@@ -252,6 +276,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testCars(string $token)
     {
@@ -285,6 +311,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testRecent(string $token)
     {
@@ -310,6 +338,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testConcepts(string $token)
     {
@@ -356,6 +386,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testOther(string $token)
     {
@@ -379,6 +411,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testMixed(string $token)
     {
@@ -403,6 +437,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testLogotypes(string $token)
     {
@@ -427,6 +463,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testOtherPicture(string $token)
     {
@@ -451,6 +489,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testMixedPicture(string $token)
     {
@@ -476,6 +516,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testLogotypesPicture(string $token)
     {
@@ -501,6 +543,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testOtherGallery(string $token)
     {
@@ -526,6 +570,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testMixedGallery(string $token)
     {
@@ -551,6 +597,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testLogotypesGallery(string $token)
     {
@@ -592,6 +640,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandMosts(string $token)
     {
@@ -623,6 +673,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandFactories(string $token)
     {
@@ -661,6 +713,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandItem(string $token)
     {
@@ -695,6 +749,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandItemSubitem(string $token)
     {
@@ -747,6 +803,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandItemGroup(string $token)
     {
@@ -794,6 +852,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandItemPictures(string $token)
     {
@@ -836,6 +896,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandItemPicturesPicture(string $token)
     {
@@ -881,6 +943,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandItemGallery(string $token)
     {
@@ -926,6 +990,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandEngines(string $token)
     {
@@ -960,6 +1026,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandItemSpecifications(string $token)
     {
@@ -999,6 +1067,8 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
      * @suppress PhanUndeclaredMethod
      *
      * @dataProvider userTokenProvider
+     * @param string $token
+     * @throws Exception
      */
     public function testBrandItemRelatedAndSportSubitem(string $token)
     {

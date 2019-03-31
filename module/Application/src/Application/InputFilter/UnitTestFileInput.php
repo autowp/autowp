@@ -2,7 +2,9 @@
 
 namespace Application\InputFilter;
 
-class UnitTestFileInput extends \Zend\InputFilter\FileInput
+use Zend\InputFilter\FileInput;
+
+class UnitTestFileInput extends FileInput
 {
     /**
      * @var bool

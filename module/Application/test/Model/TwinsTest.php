@@ -2,6 +2,7 @@
 
 namespace ApplicationTest\Model;
 
+use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
@@ -17,8 +18,11 @@ class TwinsTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param array $params
+     * @return int
+     * @throws Exception
      */
-    private function createItem($params)
+    private function createItem(array $params): int
     {
         $this->reset();
 
@@ -41,8 +45,12 @@ class TwinsTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $itemId
+     * @param int $parentId
+     * @param array $params
+     * @throws Exception
      */
-    private function addItemParent($itemId, $parentId, array $params = [])
+    private function addItemParent(int $itemId, int $parentId, array $params = []): void
     {
         $this->reset();
 

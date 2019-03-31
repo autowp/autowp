@@ -2,12 +2,15 @@
 
 namespace ApplicationTest\Other;
 
-class AutoloadingTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+use Zend\Form\Form;
+
+class AutoloadingTest extends TestCase
 {
     public function testProjectIsAutoloads()
     {
-        $form = new \Zend\Form\Form();
+        $form = new Form();
 
-        $this->assertTrue($form instanceof \Zend\Form\Form);
+        $this->assertTrue($form instanceof Form);
     }
 }

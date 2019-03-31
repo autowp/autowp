@@ -2,6 +2,8 @@
 
 namespace Application\Model;
 
+use Zend\Db\Adapter\Adapter;
+
 class LanguagePriority
 {
     private $values = [
@@ -28,7 +30,7 @@ class LanguagePriority
         return array_merge([$language], $this->values['xx']);
     }
 
-    public function getOrderByExpression(string $language, \Zend\Db\Adapter\Adapter $adapter): string
+    public function getOrderByExpression(string $language, Adapter $adapter): string
     {
         $languages = $this->getList($language);
 
@@ -40,7 +42,7 @@ class LanguagePriority
         return 'FIELD(language, '.implode(', ', $quoted).')';
     }
 
-    public function getSelectItemName(string $language, \Zend\Db\Adapter\Adapter $adapter): string
+    public function getSelectItemName(string $language, Adapter $adapter): string
     {
         $languages = $this->getList($language);
 

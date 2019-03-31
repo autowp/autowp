@@ -19,6 +19,11 @@ class EngineConfiguration
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param PhpRenderer $view
+     * @param $attribute
+     * @param $value
+     * @param $values
+     * @return mixed|string|null
      */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {

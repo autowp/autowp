@@ -30,7 +30,7 @@ class Oauth2 extends AbstractPlugin
     /**
      * Constructor
      *
-     * @param OAuth2Server $server
+     * @param OAuth2Server $serverFactory
      * @param UserIdProviderInterface $userIdProvider
      */
     public function __construct($serverFactory, UserIdProviderInterface $userIdProvider)
@@ -58,9 +58,7 @@ class Oauth2 extends AbstractPlugin
      * is invoked with the provided $type as an argument, and the value
      * returned.
      *
-     * @param string $type
      * @return OAuth2Server
-     * @throws RuntimeException if the factory does not return an OAuth2Server instance.
      */
     private function getOAuth2Server()
     {

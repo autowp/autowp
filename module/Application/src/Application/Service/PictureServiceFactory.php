@@ -2,6 +2,12 @@
 
 namespace Application\Service;
 
+use Application\DuplicateFinder;
+use Application\Model\Picture;
+use Application\Model\PictureItem;
+use Application\Model\UserPicture;
+use Autowp\Comments\CommentsService;
+use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -9,17 +15,21 @@ class PictureServiceFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return PictureService
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new PictureService(
-            $container->get(\Application\Model\Picture::class),
-            $container->get(\Autowp\Comments\CommentsService::class),
-            $container->get(\Autowp\Image\Storage::class),
+            $container->get(Picture::class),
+            $container->get(CommentsService::class),
+            $container->get(Storage::class),
             $container->get(TelegramService::class),
-            $container->get(\Application\DuplicateFinder::class),
-            $container->get(\Application\Model\PictureItem::class),
-            $container->get(\Application\Model\UserPicture::class)
+            $container->get(DuplicateFinder::class),
+            $container->get(PictureItem::class),
+            $container->get(UserPicture::class)
         );
     }
 }

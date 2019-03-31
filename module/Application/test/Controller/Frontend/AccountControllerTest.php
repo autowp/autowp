@@ -2,9 +2,13 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
+use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
+use Zend\Mail\Transport\TransportInterface;
+
+use Autowp\User\Model\UserRemember;
 
 use Application\Controller\Api\AttrController;
 use Application\Controller\Api\LoginController;
@@ -17,6 +21,11 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param string $email
+     * @param string $password
+     * @param string $name
+     * @return int
+     * @throws Exception
      */
     private function createUser(string $email, string $password, string $name): int
     {
@@ -46,7 +55,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 
     private function activateUser()
     {
-        $mailTransport = $this->getApplicationServiceLocator()->get(\Zend\Mail\Transport\TransportInterface::class);
+        $mailTransport = $this->getApplicationServiceLocator()->get(TransportInterface::class);
         $message = $mailTransport->getLastMessage();
 
         preg_match('|http://en.localhost/ng/account/emailcheck/([0-9a-f]+)|u', $message->getBody(), $match);
@@ -65,6 +74,9 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $userId
+     * @return mixed
+     * @throws Exception
      */
     private function getUser(int $userId)
     {
@@ -126,7 +138,7 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/login/login');
         $this->assertActionName('login');
 
-        $token = $this->getApplicationServiceLocator()->get(\Autowp\User\Model\UserRemember::class)
+        $token = $this->getApplicationServiceLocator()->get(UserRemember::class)
             ->getUserToken($userId);
 
         $this->assertNotEmpty($token);

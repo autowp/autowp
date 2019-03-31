@@ -2,6 +2,8 @@
 
 namespace Application;
 
+use ArrayAccess;
+use Exception;
 use Zend\View\Renderer\PhpRenderer;
 
 class ItemNameFormatter
@@ -30,11 +32,11 @@ class ItemNameFormatter
 
     public function formatHtml($item, $language)
     {
-        if (! $item instanceof \ArrayAccess && ! is_array($item)) {
-            throw new \Exception("`item` must be array or ArrayAccess");
+        if (! $item instanceof ArrayAccess && ! is_array($item)) {
+            throw new Exception("`item` must be array or ArrayAccess");
         }
 
-        if ($item instanceof \ArrayAccess) {
+        if ($item instanceof ArrayAccess) {
             $item = (array)$item;
         }
 
@@ -149,11 +151,11 @@ class ItemNameFormatter
 
     public function format($item, $language)
     {
-        if (! $item instanceof \ArrayAccess && ! is_array($item)) {
-            throw new \Exception("`item` must be array or ArrayAccess");
+        if (! $item instanceof ArrayAccess && ! is_array($item)) {
+            throw new Exception("`item` must be array or ArrayAccess");
         }
 
-        if ($item instanceof \ArrayAccess) {
+        if ($item instanceof ArrayAccess) {
             $item = (array)$item;
         }
 

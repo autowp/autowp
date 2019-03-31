@@ -5,10 +5,23 @@ namespace Application\Controller\Api;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
+use Autowp\User\Model\User;
+
+use Application\Hydrator\Api\AttrAttributeHydrator;
+use Application\Hydrator\Api\AttrConflictHydrator;
+use Application\Hydrator\Api\AttrUserValueHydrator;
+use Application\Hydrator\Api\AttrValueHydrator;
+use Application\Model\Item;
+use Application\Service\SpecificationsService;
+
 class AttrControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return AttrController
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -16,13 +29,13 @@ class AttrControllerFactory implements FactoryInterface
         $filters = $container->get('InputFilterManager');
         $tables = $container->get('TableManager');
         return new AttrController(
-            $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Autowp\User\Model\User::class),
-            $hydrators->get(\Application\Hydrator\Api\AttrConflictHydrator::class),
-            $hydrators->get(\Application\Hydrator\Api\AttrUserValueHydrator::class),
-            $hydrators->get(\Application\Hydrator\Api\AttrAttributeHydrator::class),
-            $hydrators->get(\Application\Hydrator\Api\AttrValueHydrator::class),
+            $container->get(Item::class),
+            $container->get(SpecificationsService::class),
+            $container->get(User::class),
+            $hydrators->get(AttrConflictHydrator::class),
+            $hydrators->get(AttrUserValueHydrator::class),
+            $hydrators->get(AttrAttributeHydrator::class),
+            $hydrators->get(AttrValueHydrator::class),
             $filters->get('api_attr_conflict_get'),
             $filters->get('api_attr_user_value_get'),
             $filters->get('api_attr_user_value_patch_query'),

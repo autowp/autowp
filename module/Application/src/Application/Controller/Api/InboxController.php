@@ -19,7 +19,7 @@ use Application\Model\Picture;
  * Class InboxController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method string language()
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  */

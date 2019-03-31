@@ -2,8 +2,10 @@
 
 namespace Application\Hydrator\Api;
 
+use Exception;
 use Traversable;
 
+use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Stdlib\ArrayUtils;
 
 use Autowp\User\Model\User;
@@ -52,16 +54,16 @@ class AttrAttributeHydrator extends RestHydrator
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
-     * @throws \Zend\Hydrator\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setOptions($options)
     {
         parent::setOptions($options);
 
-        if ($options instanceof \Traversable) {
+        if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
-            throw new \Zend\Hydrator\Exception\InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'The options parameter must be an array or a Traversable'
             );
         }
@@ -75,7 +77,7 @@ class AttrAttributeHydrator extends RestHydrator
 
     /**
      * @param int|null $userId
-     * @return AttrConflictHydrator
+     * @return AttrAttributeHydrator
      */
     public function setUserId($userId = null)
     {
@@ -115,10 +117,13 @@ class AttrAttributeHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 
     public function setFields(array $fields)

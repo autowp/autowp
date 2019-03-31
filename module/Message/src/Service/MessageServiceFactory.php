@@ -2,6 +2,8 @@
 
 namespace Autowp\Message\Service;
 
+use Application\Service\TelegramService;
+use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -14,14 +16,18 @@ class MessageServiceFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return MessageService
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $tables = $container->get('TableManager');
         return new MessageService(
-            $container->get(\Application\Service\TelegramService::class),
+            $container->get(TelegramService::class),
             $tables->get('personal_messages'),
-            $container->get(\Autowp\User\Model\User::class)
+            $container->get(User::class)
         );
     }
 }

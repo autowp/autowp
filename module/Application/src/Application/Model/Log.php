@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Zend\Db\Adapter\Exception\InvalidQueryException;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
@@ -75,6 +76,9 @@ class Log
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $userId
+     * @param string $message
+     * @param array $objects
      */
     public function addEvent(int $userId, string $message, array $objects)
     {
@@ -104,7 +108,7 @@ class Log
                     'log_event_id' => $id,
                     'item_id'      => $item
                 ]);
-            } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $e) {
+            } catch (InvalidQueryException $e) {
                 if (strpos($e->getMessage(), 'Duplicate entry') === false) {
                     throw $e;
                 }
@@ -117,7 +121,7 @@ class Log
                     'log_event_id' => $id,
                     'picture_id'   => $item
                 ]);
-            } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $e) {
+            } catch (InvalidQueryException $e) {
                 if (strpos($e->getMessage(), 'Duplicate entry') === false) {
                     throw $e;
                 }
@@ -130,7 +134,7 @@ class Log
                     'log_event_id' => $id,
                     'user_id'      => $item
                 ]);
-            } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $e) {
+            } catch (InvalidQueryException $e) {
                 if (strpos($e->getMessage(), 'Duplicate entry') === false) {
                     throw $e;
                 }
@@ -143,7 +147,7 @@ class Log
                     'log_event_id' => $id,
                     'article_id'      => $item
                 ]);
-            } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $e) {
+            } catch (InvalidQueryException $e) {
                 if (strpos($e->getMessage(), 'Duplicate entry') === false) {
                     throw $e;
                 }

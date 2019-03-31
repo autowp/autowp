@@ -2,6 +2,7 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
+use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Application\Test\AbstractHttpControllerTestCase;
@@ -15,6 +16,9 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $params
+     * @return
+     * @throws Exception
      */
     private function createItem($params)
     {

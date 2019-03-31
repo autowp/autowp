@@ -2,9 +2,12 @@
 
 namespace Application\Controller\Api;
 
+use Application\Comments;
+use ArrayObject;
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Uri\Uri;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
@@ -37,7 +40,7 @@ use Application\Service\TelegramService;
  * @method Pic pic()
  * @method string language()
  * @method Storage imageStorage()
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method ForbiddenAction forbiddenAction()
  * @method void log(string $message, array $objects)
@@ -526,9 +529,9 @@ class PictureController extends AbstractRestfulController
     }
 
     /**
-     * @param array|\ArrayObject $user
+     * @param array|ArrayObject $user
      * @param bool $full
-     * @param \Zend\Uri\Uri $uri
+     * @param Uri $uri
      * @return string
      */
     private function userModerUrl($user, $full = false, $uri = null)
@@ -1198,9 +1201,9 @@ class PictureController extends AbstractRestfulController
 
         // comments
         $this->comments->moveMessages(
-            \Application\Comments::PICTURES_TYPE_ID,
+            Comments::PICTURES_TYPE_ID,
             $replacePicture['id'],
-            \Application\Comments::PICTURES_TYPE_ID,
+            Comments::PICTURES_TYPE_ID,
             $picture['id']
         );
 

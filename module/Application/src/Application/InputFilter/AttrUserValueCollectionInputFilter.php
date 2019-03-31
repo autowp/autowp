@@ -38,9 +38,10 @@ class AttrUserValueCollectionInputFilter extends InputFilter
     /**
      * Get the input filter used when looping the data
      *
-     * @return BaseInputFilter
+     * @param int $attributeId
+     * @return InputFilter|null
      */
-    public function getInputFilter(int $attributeId)
+    public function getInputFilter(int $attributeId): ?InputFilter
     {
         $valueSpec = $this->specService->getFilterSpec($attributeId);
         if (! $valueSpec) {

@@ -4,9 +4,12 @@ namespace Application\Hydrator\Api;
 
 use DateTime;
 use DateInterval;
+use Exception;
 use Traversable;
 
+use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Commons\Db\Table\Row;
@@ -54,7 +57,7 @@ class UserHydrator extends RestHydrator
         parent::__construct();
 
         $this->router = $serviceManager->get('HttpRouter');
-        $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
+        $this->acl = $serviceManager->get(Acl::class);
         $this->userModel = $serviceManager->get(User::class);
         $this->userRename = $serviceManager->get(UserRename::class);
         $this->userAccount = $serviceManager->get(UserAccount::class);
@@ -78,16 +81,16 @@ class UserHydrator extends RestHydrator
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
-     * @throws \Zend\Hydrator\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setOptions($options)
     {
         parent::setOptions($options);
 
-        if ($options instanceof \Traversable) {
+        if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
-            throw new \Zend\Hydrator\Exception\InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'The options parameter must be an array or a Traversable'
             );
         }
@@ -282,10 +285,13 @@ class UserHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 
     public function setUserId($userId)

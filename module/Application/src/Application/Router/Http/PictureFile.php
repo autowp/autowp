@@ -4,6 +4,7 @@ namespace Application\Router\Http;
 
 use Exception;
 
+use Traversable;
 use Zend\Router\Http\RouteInterface;
 use Zend\Router\Http\RouteMatch;
 use Zend\Stdlib\RequestInterface as Request;
@@ -17,8 +18,8 @@ class PictureFile implements RouteInterface
     /**
      * Create a new route with given options.
      *
-     * @param  array|\Traversable $options
-     * @return FilePath
+     * @param  array|Traversable $options
+     * @return PictureFile
      */
     public static function factory($options = [])
     {
@@ -30,10 +31,14 @@ class PictureFile implements RouteInterface
         $this->defaults = $options['defaults'];
     }
 
+    /**
+     * @param Request $request
+     * @return \Zend\Router\RouteMatch|null
+     */
     public function match(Request $request)
     {
         if (! method_exists($request, 'getUri')) {
-            return;
+            return null;
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -49,10 +54,10 @@ class PictureFile implements RouteInterface
         }
 
         if (! count($path)) {
-            return false;
+            return null;
         }
         if ($path[0] != 'pictures') {
-            return false;
+            return null;
         }
 
         $variables = [
@@ -95,5 +100,6 @@ class PictureFile implements RouteInterface
      */
     public function getAssembledParams()
     {
+        return [];
     }
 }

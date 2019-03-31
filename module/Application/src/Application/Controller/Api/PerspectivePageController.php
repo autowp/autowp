@@ -19,7 +19,7 @@ use Application\Hydrator\Api\RestHydrator;
  * @package Application\Controller\Api
  *
  * @method ForbiddenAction forbiddenAction()
- * @method User user()
+ * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  */

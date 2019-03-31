@@ -3,6 +3,7 @@
 namespace Application\Controller\Api;
 
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
 
 class RecaptchaController extends AbstractRestfulController
@@ -20,13 +21,11 @@ class RecaptchaController extends AbstractRestfulController
     /**
      * Update an existing resource
      *
-     * @param  mixed $id
-     * @param  mixed $data
      * @return mixed
      */
     public function getAction()
     {
-        $namespace = new \Zend\Session\Container('Captcha');
+        $namespace = new Container('Captcha');
 
         return new JsonModel([
             'publicKey' => $this->publicKey,

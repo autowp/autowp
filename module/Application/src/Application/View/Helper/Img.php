@@ -2,6 +2,7 @@
 
 namespace Application\View\Helper;
 
+use Exception;
 use Zend\View\Helper\AbstractHtmlElement;
 
 class Img extends AbstractHtmlElement
@@ -53,7 +54,7 @@ class Img extends AbstractHtmlElement
             if (isset($this->attribs['src'])) {
                 return $this->view->htmlImg($this->attribs);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             print $e->getMessage();
         }
 

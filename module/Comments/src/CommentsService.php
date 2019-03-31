@@ -2,9 +2,11 @@
 
 namespace Autowp\Comments;
 
+use ArrayObject;
 use Autowp\Commons\Db\Table\Row;
 use Autowp\User\Model\User;
 
+use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
@@ -118,6 +120,7 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param $messageId
      */
     private function updateMessageRepliesCount($messageId)
     {
@@ -145,10 +148,11 @@ class CommentsService
      * @param int $type
      * @param int $item
      * @param int $parentId
-     * @param int $user
+     * @param int $userId
      * @param int $perPage
      * @param int $page
      * @return array
+     * @throws Exception
      */
     private function getRecursive($type, $item, $parentId, int $userId, $perPage = 0, $page = 0)
     {
@@ -214,7 +218,11 @@ class CommentsService
     /**
      * @param int $type
      * @param int $item
+     * @param int $userId
+     * @param int $perPage
+     * @param int $page
      * @return array
+     * @throws Exception
      */
     public function get($type, $item, int $userId, $perPage = 0, $page = 0)
     {
@@ -240,6 +248,9 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $id
+     * @param int $userId
+     * @return bool
      */
     public function queueDeleteMessage(int $id, int $userId): bool
     {
@@ -350,6 +361,8 @@ class CommentsService
     /**
      * @suppress PhanDeprecatedFunction
      *
+     * @param $message
+     * @return mixed
      * @todo Change $message to $messageId
      */
     private function updateVote($message)
@@ -371,13 +384,13 @@ class CommentsService
 
     /**
      * @param int $id
-     * @return array
+     * @return array|null
      */
-    public function getVotes($id)
+    public function getVotes($id): ?array
     {
         $message = $this->getMessageRow($id);
         if (! $message) {
-            return false;
+            return null;
         }
 
         $voteRows = $this->voteTable->select([
@@ -423,8 +436,9 @@ class CommentsService
     /**
      * @param int $type
      * @param int $item
+     * @return array|ArrayObject|null
      */
-    public function getLastMessageRow($type, $item)
+    public function getLastMessageRow(int $type, int $item)
     {
         return $this->messageTable->select(function (Sql\Select $select) use ($type, $item) {
             $select
@@ -453,7 +467,7 @@ class CommentsService
 
     /**
      * @param int $id
-     * @return array|\ArrayObject
+     * @return array|ArrayObject
      */
     public function getMessageRow(int $id)
     {
@@ -464,7 +478,7 @@ class CommentsService
 
     /**
      * @param array $message
-     * @return int
+     * @return array|ArrayObject|null
      */
     private function getMessageRoot($message)
     {
@@ -769,6 +783,10 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param $typeId
+     * @param $itemId
+     * @param $timestamp
+     * @return int
      */
     private function getMessagesCountFromTimestamp($typeId, $itemId, $timestamp): int
     {
@@ -789,7 +807,7 @@ class CommentsService
      * @param int $typeId
      * @param int|array $itemId
      * @param int $userId
-     * @return array
+     * @return array|int
      */
     public function getNewMessages($typeId, $itemId, $userId)
     {
@@ -835,8 +853,11 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $typeId
+     * @param int $itemId
+     * @return mixed
      */
-    private function countMessages($typeId, $itemId)
+    private function countMessages(int $typeId, int $itemId)
     {
         $countRow = $this->messageTable->select(function (Sql\Select $select) use ($itemId, $typeId) {
             $select
@@ -1074,8 +1095,10 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $userId
+     * @return int|mixed
      */
-    public function getUserAvgVote($userId)
+    public function getUserAvgVote(int $userId)
     {
         $row = $this->messageTable->select(
             /**
@@ -1223,7 +1246,7 @@ class CommentsService
     public function subscribe($typeId, $itemId, $userId)
     {
         if (! $this->canSubscribe($typeId, $itemId, $userId)) {
-            throw new \Exception('Already subscribed');
+            throw new Exception('Already subscribed');
         }
 
         $this->topicSubscribeTable->insert([
@@ -1237,7 +1260,7 @@ class CommentsService
     public function unSubscribe($typeId, $itemId, $userId)
     {
         if (! $this->canUnSubscribe($typeId, $itemId, $userId)) {
-            throw new \Exception('User not subscribed');
+            throw new Exception('User not subscribed');
         }
 
         $this->topicSubscribeTable->delete([
@@ -1295,6 +1318,8 @@ class CommentsService
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param int $limit
+     * @return array
      */
     public function getTopAuthors(int $limit): array
     {

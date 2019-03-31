@@ -10,6 +10,9 @@ class TranslatorTest extends AbstractHttpControllerTestCase
 
     /**
      * @dataProvider translationsProvider
+     * @param $text
+     * @param $expected
+     * @param $language
      */
     public function testTranslatorWorks($text, $expected, $language)
     {

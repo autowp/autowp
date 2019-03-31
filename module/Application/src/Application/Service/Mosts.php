@@ -569,6 +569,12 @@ class Mosts
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param array $cMost
+     * @param int $carTypeId
+     * @param $cYear
+     * @param int $brandId
+     * @param string $language
+     * @throws Exception
      */
     private function getCarsData(array $cMost, int $carTypeId, $cYear, int $brandId, string $language)
     {
@@ -626,8 +632,11 @@ class Mosts
 
     /**
      * @suppress PhanUndeclaredMethod, PhanPluginMixedKeyNoKey
+     * @param array $options
+     * @return array
+     * @throws Exception
      */
-    public function getData($options)
+    public function getData(array $options)
     {
         $defaults = [
             'language' => null,

@@ -21,6 +21,11 @@ class Wheel
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param PhpRenderer $view
+     * @param $attribute
+     * @param $value
+     * @param $values
+     * @return string
      */
     public function render(PhpRenderer $view, $attribute, $value, $values)
     {

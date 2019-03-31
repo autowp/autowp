@@ -39,6 +39,9 @@ class Categories
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param $parentId
+     * @param $order
+     * @return Sql\Select
      */
     private function getCategoriesSelect($parentId, $order)
     {

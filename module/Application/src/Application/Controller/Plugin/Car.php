@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Plugin;
 
+use Exception;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Router\Http\TreeRouteStack;
 
@@ -94,7 +95,7 @@ class Car extends AbstractPlugin
         $listBuilder          = $options['listBuilder'];
         $pictureFetcher       = $options['pictureFetcher'];
         if (! $pictureFetcher instanceof PictureFetcher) {
-            throw new \Exception("Invalid picture fetcher provided");
+            throw new Exception("Invalid picture fetcher provided");
         }
         $disableTitle         = isset($options['disableTitle']) && $options['disableTitle'];
         $disableDescription   = isset($options['disableDescription']) && $options['disableDescription'];
@@ -384,14 +385,18 @@ class Car extends AbstractPlugin
 
                     $picture['name'] = isset($pictureNames[$id]) ? $pictureNames[$id] : null;
                     if ($item['largeFormat'] && $idx == 0) {
-                        $large = isset($imagesInfo['picture-thumb-large'][$id]) ? $imagesInfo['picture-thumb-large'][$id] : null;
+                        $large = isset($imagesInfo['picture-thumb-large'][$id])
+                            ? $imagesInfo['picture-thumb-large'][$id]
+                            : null;
                         $picture['large'] = $large ? [
                             'src'    => $large->getSrc(),
                             'width'  => $large->getWidth(),
                             'height' => $large->getHeight()
                         ] : null;
                     } else {
-                        $medium = isset($imagesInfo['picture-thumb-medium'][$id]) ? $imagesInfo['picture-thumb-medium'][$id] : null;
+                        $medium = isset($imagesInfo['picture-thumb-medium'][$id])
+                            ? $imagesInfo['picture-thumb-medium'][$id]
+                            : null;
                         $picture['medium'] = $medium ? [
                             'src'    => $medium->getSrc(),
                             'width'  => $medium->getWidth(),

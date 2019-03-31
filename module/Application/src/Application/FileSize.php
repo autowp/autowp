@@ -5,8 +5,9 @@ namespace Application;
 class FileSize
 {
     /**
-     * @param integer $fileSize Filesize in bytes
+     * @param integer $bytes Filesize in bytes
      * @param integer $precision Precision
+     * @return string
      */
     public function __invoke($bytes, $precision = 0)
     {

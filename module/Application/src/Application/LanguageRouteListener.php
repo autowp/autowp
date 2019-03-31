@@ -7,9 +7,11 @@ use Locale;
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
+use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\MvcEvent;
 
 use Autowp\User\Model\User;
+use Zend\Stdlib\ResponseInterface;
 
 class LanguageRouteListener extends AbstractListenerAggregate
 {
@@ -55,7 +57,7 @@ class LanguageRouteListener extends AbstractListenerAggregate
     {
         $request = $e->getRequest();
 
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+        if ($request instanceof Request) {
             $serviceManager = $e->getApplication()->getServiceManager();
 
             $hosts = $serviceManager->get('Config')['hosts'];
@@ -135,6 +137,9 @@ class LanguageRouteListener extends AbstractListenerAggregate
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param MvcEvent $e
+     * @param $url
+     * @return ResponseInterface
      */
     private function redirect(MvcEvent $e, $url)
     {

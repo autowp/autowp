@@ -6,6 +6,7 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 
+use Exception;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Http\PhpEnvironment\Request;
@@ -123,7 +124,7 @@ class User
         }
 
         if (! is_scalar($value)) {
-            throw new \Exception('`id` must be scalar or array of scalar');
+            throw new Exception('`id` must be scalar or array of scalar');
         }
 
         $select->where([$id => $value]);
@@ -211,6 +212,8 @@ class User
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $options
+     * @return array|\ArrayObject|null
      */
     public function getRow($options)
     {
@@ -248,6 +251,8 @@ class User
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param array $options
+     * @return bool
      */
     public function isExists(array $options): bool
     {
@@ -263,6 +268,9 @@ class User
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $userId
+     * @param Request $request
+     * @throws Exception
      */
     public function registerVisit(int $userId, Request $request)
     {
@@ -294,6 +302,8 @@ class User
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $userId
+     * @return string
      */
     public function getUserLanguage(int $userId): string
     {
@@ -312,6 +322,8 @@ class User
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $userId
+     * @return string
      */
     public function getUserRole(int $userId): string
     {
@@ -330,6 +342,7 @@ class User
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $userId
      */
     public function decVotes(int $userId)
     {

@@ -2,6 +2,12 @@
 
 namespace Application\Service;
 
+use Application\ItemNameFormatter;
+use Application\Model\Item;
+use Application\Model\ItemParent;
+use Application\Model\Picture;
+use Application\Model\VehicleType;
+use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -9,18 +15,22 @@ class SpecificationsServiceFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return SpecificationsService
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $tables = $container->get('TableManager');
         return new SpecificationsService(
             $container->get('MvcTranslator'),
-            $container->get(\Application\ItemNameFormatter::class),
-            $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\ItemParent::class),
-            $container->get(\Application\Model\Picture::class),
-            $container->get(\Application\Model\VehicleType::class),
-            $container->get(\Autowp\User\Model\User::class),
+            $container->get(ItemNameFormatter::class),
+            $container->get(Item::class),
+            $container->get(ItemParent::class),
+            $container->get(Picture::class),
+            $container->get(VehicleType::class),
+            $container->get(User::class),
             $tables->get('attrs_units'),
             $tables->get('attrs_list_options'),
             $tables->get('attrs_types'),

@@ -15,6 +15,10 @@ class OAuth2UserIdProviderFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return OAuth2UserIdProvider
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

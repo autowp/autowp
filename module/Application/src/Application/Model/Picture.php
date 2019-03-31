@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Application\Comments;
 use DateTime;
 use DateTimeZone;
 use Exception;
@@ -89,7 +90,7 @@ class Picture
         }
 
         if (! is_scalar($value)) {
-            throw new \Exception('`id` must be scalar or array of scalar');
+            throw new Exception('`id` must be scalar or array of scalar');
         }
 
         $select->where([$id => $value]);
@@ -321,7 +322,7 @@ class Picture
                         new Sql\Predicate\Operator(
                             'ct.type_id',
                             Sql\Predicate\Operator::OPERATOR_EQUAL_TO,
-                            \Application\Comments::PICTURES_TYPE_ID
+                            Comments::PICTURES_TYPE_ID
                         ),
                         new Sql\Predicate\Operator(
                             'ct.item_id',
@@ -346,6 +347,9 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param array $options
+     * @return Sql\Select
+     * @throws Exception
      */
     public function getSelect(array $options)
     {
@@ -718,7 +722,7 @@ class Picture
                 'comment_topic',
                 new Sql\Expression(
                     'pictures.id = comment_topic.item_id and comment_topic.type_id = ?',
-                    [\Application\Comments::PICTURES_TYPE_ID]
+                    [Comments::PICTURES_TYPE_ID]
                 ),
                 [],
                 $select::JOIN_LEFT
@@ -726,7 +730,7 @@ class Picture
         } elseif ($joinComments) {
             $select
                 ->join('comment_topic', 'pictures.id = comment_topic.item_id', [])
-                ->where(['comment_topic.type_id' => \Application\Comments::PICTURES_TYPE_ID]);
+                ->where(['comment_topic.type_id' => Comments::PICTURES_TYPE_ID]);
         }
 
         if ($joinPdr) {
@@ -806,6 +810,9 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param array $options
+     * @return int
+     * @throws Exception
      */
     public function getCountDistinct(array $options): int
     {
@@ -832,6 +839,9 @@ class Picture
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param array $options
+     * @return
+     * @throws Exception
      */
     public function getRow(array $options)
     {
@@ -843,6 +853,9 @@ class Picture
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param array $options
+     * @return bool
+     * @throws Exception
      */
     public function isExists(array $options): bool
     {
@@ -1047,6 +1060,11 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $pictureId
+     * @param int $userId
+     * @param $isFirstTimeAccepted
+     * @return bool
+     * @throws Exception
      */
     public function accept(int $pictureId, int $userId, &$isFirstTimeAccepted): bool
     {
@@ -1108,6 +1126,9 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param $rows
+     * @param array $options
+     * @return array
      */
     public function getNameData($rows, array $options = [])
     {
@@ -1234,6 +1255,8 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param int $limit
+     * @return array
      */
     public function getTopLikes(int $limit): array
     {
@@ -1255,6 +1278,9 @@ class Picture
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param int $userId
+     * @param int $limit
+     * @return array
      */
     public function getTopOwnerFans(int $userId, int $limit): array
     {

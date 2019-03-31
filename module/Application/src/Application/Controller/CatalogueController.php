@@ -38,7 +38,7 @@ use Application\Service\SpecificationsService;
  * @method Storage imageStorage()
  * @method string language()
  * @method Pic pic()
- * @method \Autowp\User\Controller\Plugin\User user()
+ * @method \Autowp\User\Controller\Plugin\User user($user = null)
  * @method Car car()
  * @method Catalogue catalogue()
  */
@@ -361,6 +361,8 @@ class CatalogueController extends AbstractActionController
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param int $brandId
+     * @return array
      */
     private function getBrandFactories(int $brandId)
     {

@@ -108,7 +108,9 @@ abstract class PictureFetcher
             )
             ->where([
                 'pictures.status'   => Picture::STATUS_ACCEPTED,
-                'picture_item.type' => $this->pictureItemTypeId ? $this->pictureItemTypeId : PictureItem::PICTURE_CONTENT,
+                'picture_item.type' => $this->pictureItemTypeId
+                    ? $this->pictureItemTypeId
+                    : PictureItem::PICTURE_CONTENT,
             ])
             ->limit($options['limit']);
 
@@ -196,8 +198,11 @@ abstract class PictureFetcher
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param array $itemIds
+     * @param bool $onlyExactly
+     * @return array
      */
-    public function getTotalPictures(array $itemIds, $onlyExactly)
+    public function getTotalPictures(array $itemIds, bool $onlyExactly)
     {
         $result = [];
         foreach ($itemIds as $itemId) {

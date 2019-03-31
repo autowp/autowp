@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Api;
 
+use Autowp\ExternalLoginService\AbstractService;
 use Exception;
 
 use Zend\Db\Sql;
@@ -19,7 +20,7 @@ use Application\Model\UserAccount;
  * Class AccountController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  * @method string language()
  */
@@ -91,7 +92,8 @@ class AccountController extends AbstractRestfulController
 
     /**
      * @param string $serviceId
-     * @return \Autowp\ExternalLoginService\AbstractService
+     * @return AbstractService
+     * @throws Exception
      */
     private function getExternalLoginService($serviceId)
     {

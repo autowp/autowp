@@ -2,9 +2,10 @@
 
 namespace Application\Hydrator\Api;
 
+use Exception;
 use Traversable;
 
-use Zend\Stdlib\ArrayUtils;
+use Zend\Hydrator\Exception\InvalidArgumentException;
 
 use Autowp\User\Model\User;
 
@@ -29,7 +30,7 @@ class VotingVariantVoteHydrator extends RestHydrator
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
-     * @throws \Zend\Hydrator\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setOptions($options)
     {
@@ -55,9 +56,12 @@ class VotingVariantVoteHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 }

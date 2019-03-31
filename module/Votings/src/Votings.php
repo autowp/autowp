@@ -189,6 +189,10 @@ class Votings
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param int $id
+     * @param int|array $variantId
+     * @param int $userId
+     * @return bool
      */
     public function vote(int $id, $variantId, int $userId)
     {

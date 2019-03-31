@@ -2,6 +2,18 @@
 
 namespace Application\Controller\Frontend\Service;
 
+use Application\ItemNameFormatter;
+use Application\Model\Brand;
+use Application\Model\Item;
+use Application\Model\ItemParent;
+use Application\Model\Perspective;
+use Application\Model\Picture;
+use Application\Model\VehicleType;
+use Application\Service\Mosts;
+use Application\Service\SpecificationsService;
+use Autowp\Comments\CommentsService;
+use Autowp\TextStorage\Service;
+use Autowp\User\Model\User;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -11,29 +23,33 @@ class CatalogueControllerFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return Controller
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('Config');
         $tables = $container->get('TableManager');
         return new Controller(
-            $container->get(\Autowp\TextStorage\Service::class),
+            $container->get(Service::class),
             $container->get('longCache'),
-            $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Application\Model\ItemParent::class),
-            $container->get(\Application\ItemNameFormatter::class),
+            $container->get(SpecificationsService::class),
+            $container->get(ItemParent::class),
+            $container->get(ItemNameFormatter::class),
             $config['mosts_min_vehicles_count'],
-            $container->get(\Autowp\Comments\CommentsService::class),
-            $container->get(\Application\Model\Item::class),
-            $container->get(\Application\Model\Perspective::class),
+            $container->get(CommentsService::class),
+            $container->get(Item::class),
+            $container->get(Perspective::class),
             $tables->get('links'),
-            $container->get(\Application\Service\Mosts::class),
-            $container->get(\Application\Model\VehicleType::class),
-            $container->get(\Application\Model\Picture::class),
+            $container->get(Mosts::class),
+            $container->get(VehicleType::class),
+            $container->get(Picture::class),
             $tables->get('modification'),
             $tables->get('modification_group'),
-            $container->get(\Application\Model\Brand::class),
-            $container->get(\Autowp\User\Model\User::class),
+            $container->get(Brand::class),
+            $container->get(User::class),
             $container->get('HttpRouter'),
             $container->get('MvcTranslator')
         );

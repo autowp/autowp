@@ -15,7 +15,7 @@ use Application\Model\Picture;
  * Class StatController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  */
 class StatController extends AbstractActionController

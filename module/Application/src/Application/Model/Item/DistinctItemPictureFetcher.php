@@ -11,6 +11,9 @@ class DistinctItemPictureFetcher extends PictureFetcher
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $item
+     * @param array $options
+     * @return array
      */
     public function fetch($item, array $options = [])
     {

@@ -41,8 +41,10 @@ class VehicleType
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $vehicleId
+     * @param int $type
      */
-    public function removeVehicleType(int $vehicleId, int $type)
+    public function removeVehicleType(int $vehicleId, int $type): void
     {
         $deleted = $this->itemVehicleTypeTable->delete([
             'vehicle_id = ?'      => $vehicleId,
@@ -151,8 +153,9 @@ class VehicleType
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $vehicleId
      */
-    public function refreshInheritanceFromParents(int $vehicleId)
+    public function refreshInheritanceFromParents(int $vehicleId): void
     {
         $typeIds = $this->getVehicleTypes($vehicleId);
 
@@ -190,6 +193,9 @@ class VehicleType
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $vehicleId
+     * @param bool $inherited
+     * @return array
      */
     public function getVehicleTypes(int $vehicleId, bool $inherited = false): array
     {
@@ -372,6 +378,8 @@ class VehicleType
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param int $brandId
+     * @return array
      */
     public function getBrandVehicleTypes(int $brandId): array
     {

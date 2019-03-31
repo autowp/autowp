@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Autowp\TextStorage\Service;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -9,6 +10,10 @@ class ItemFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return Item
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -18,7 +23,7 @@ class ItemFactory implements FactoryInterface
             $tables->get('item_point'),
             $tables->get('car_types_parents'),
             $tables->get('item_language'),
-            $container->get(\Autowp\TextStorage\Service::class),
+            $container->get(Service::class),
             $tables->get('item'),
             $tables->get('item_parent'),
             $tables->get('item_parent_language'),

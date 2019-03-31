@@ -2,8 +2,11 @@
 
 namespace Application\View\Helper;
 
+use Application\Controller\CatalogueController;
+use Application\Controller\PictureController;
 use Exception;
 
+use Zend\Http\Exception\InvalidArgumentException;
 use Zend\Http\Request;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Uri;
@@ -134,7 +137,7 @@ class UserText extends AbstractHtmlElement
                         return $result;
                     }
                 }
-            } catch (\Zend\Http\Exception\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
             }
         }
 
@@ -185,16 +188,17 @@ class UserText extends AbstractHtmlElement
     /**
      * @param array $params
      * @return boolean
+     * @throws Exception
      */
     private function tryPictureLinkParams(array $params)
     {
         $map = [
             [
-                'controller' => \Application\Controller\PictureController::class,
+                'controller' => PictureController::class,
                 'action'     => 'index'
             ],
             [
-                'controller' => \Application\Controller\CatalogueController::class,
+                'controller' => CatalogueController::class,
                 'action'     => 'brand-item-picture'
             ]
         ];

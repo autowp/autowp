@@ -2,6 +2,8 @@
 
 namespace Autowp\Comments;
 
+use Zend\Form\Form;
+
 class ConfigProvider
 {
     public function __invoke(): array
@@ -58,7 +60,7 @@ class ConfigProvider
     {
         return [
             'CommentForm' => [
-                'type'     => \Zend\Form\Form::class,
+                'type'     => Form::class,
                 'attributes'  => [
                     'method' => 'post',
                     'legend' => 'comments/form-title',

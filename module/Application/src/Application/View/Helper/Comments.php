@@ -13,6 +13,8 @@ class Comments extends AbstractHelper
      */
     private $comments;
 
+    private $form;
+
     public function __construct($form, CommentsService $comments)
     {
         $this->form = $form;

@@ -31,6 +31,10 @@ class PageEnv extends AbstractHelper
         $this->language = $language->getLanguage();
     }
 
+    /**
+     * @param array $options
+     * @return $this
+     */
     public function __invoke(array $options = [])
     {
         if ($options === []) {
@@ -126,6 +130,8 @@ class PageEnv extends AbstractHelper
         if (isset($pageTitle)) {
             $view->pageTitle($pageTitle, 'SET');
         }
+
+        return $this;
     }
 
     private function replaceArgs($str, $args)

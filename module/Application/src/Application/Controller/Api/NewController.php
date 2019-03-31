@@ -19,7 +19,7 @@ use Application\Service\DayPictures;
  * Class NewController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  */

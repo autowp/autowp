@@ -2,10 +2,13 @@
 
 namespace Application\Hydrator\Api;
 
+use Exception;
 use Traversable;
 
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Hydrator\Exception\InvalidArgumentException;
 use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
+use Zend\Permissions\Acl\Acl;
 use Zend\Stdlib\ArrayUtils;
 
 use Autowp\Commons\Db\Table\Row;
@@ -58,7 +61,7 @@ class ForumTopicHydrator extends RestHydrator
 
         $this->userId = null;
 
-        $this->acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
+        $this->acl = $serviceManager->get(Acl::class);
 
         $tables = $serviceManager->get('TableManager');
         $this->themeTable = $tables->get('forums_themes');
@@ -88,16 +91,16 @@ class ForumTopicHydrator extends RestHydrator
     /**
      * @param  array|Traversable $options
      * @return RestHydrator
-     * @throws \Zend\Hydrator\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setOptions($options)
     {
         parent::setOptions($options);
 
-        if ($options instanceof \Traversable) {
+        if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (! is_array($options)) {
-            throw new \Zend\Hydrator\Exception\InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'The options parameter must be an array or a Traversable'
             );
         }
@@ -202,9 +205,12 @@ class ForumTopicHydrator extends RestHydrator
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param array $data
+     * @param $object
+     * @throws Exception
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Exception("Not supported");
+        throw new Exception("Not supported");
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Application\Model;
 
+use DateTime;
+use Exception;
 use GuzzleHttp\Client;
 use Zend\Json\Json;
 
@@ -49,7 +51,7 @@ class Referer
         $this->rabbitmq->send('hotlink', Json::encode([
             'url'       => $url,
             'accept'    => $accept,
-            'timestamp' => (new \DateTime())->format(\DateTime::RFC3339)
+            'timestamp' => (new DateTime())->format(DateTime::RFC3339)
         ]));
     }
 
@@ -84,7 +86,7 @@ class Referer
         }
 
         if ($code != 200) {
-            throw new \Exception("Unexpected response code `$code`");
+            throw new Exception("Unexpected response code `$code`");
         }
 
         return (bool) Json::decode($response->getBody(), Json::TYPE_ARRAY);
@@ -103,7 +105,7 @@ class Referer
         }
 
         if ($code != 200) {
-            throw new \Exception("Unexpected response code `$code`");
+            throw new Exception("Unexpected response code `$code`");
         }
 
         return (bool) Json::decode($response->getBody(), Json::TYPE_ARRAY);
@@ -130,7 +132,7 @@ class Referer
 
         $code = $response->getStatusCode();
         if ($code != 201) {
-            throw new \Exception("Unexpected status code `$code`");
+            throw new Exception("Unexpected status code `$code`");
         }
     }
 
@@ -145,7 +147,7 @@ class Referer
 
         $code = $response->getStatusCode();
         if ($code != 201) {
-            throw new \Exception("Unexpected status code `$code`");
+            throw new Exception("Unexpected status code `$code`");
         }
     }
 
@@ -158,7 +160,7 @@ class Referer
 
         $code = $response->getStatusCode();
         if ($code != 204) {
-            throw new \Exception("Unexpected status code `$code`");
+            throw new Exception("Unexpected status code `$code`");
         }
     }
 
@@ -170,7 +172,7 @@ class Referer
 
         $code = $response->getStatusCode();
         if ($code != 204) {
-            throw new \Exception("Unexpected status code `$code`");
+            throw new Exception("Unexpected status code `$code`");
         }
     }
 
@@ -187,7 +189,7 @@ class Referer
         }
 
         if ($code != 200) {
-            throw new \Exception("Unexpected response code `$code`");
+            throw new Exception("Unexpected response code `$code`");
         }
 
         return Json::decode($response->getBody(), Json::TYPE_ARRAY);

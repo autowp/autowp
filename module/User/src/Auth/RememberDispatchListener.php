@@ -5,6 +5,7 @@ namespace Autowp\User\Auth;
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
+use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\MvcEvent;
 
 use Autowp\User\Model\User;
@@ -23,14 +24,13 @@ class RememberDispatchListener extends AbstractListenerAggregate
     }
 
     /**
-     * @param  MvcEvent $e
-     * @return null
+     * @param MvcEvent $e
      */
-    public function onDispatch(MvcEvent $e)
+    public function onDispatch(MvcEvent $e): void
     {
         $request = $e->getRequest();
 
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+        if ($request instanceof Request) {
             $auth = new AuthenticationService();
             if (! $auth->hasIdentity()) {
                 $cookies = $request->getCookie();

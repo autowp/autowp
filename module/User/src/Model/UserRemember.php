@@ -32,6 +32,8 @@ class UserRemember
 
     /**
      * @suppress PhanUndeclaredMethod, PhanDeprecatedFunction
+     * @param int $userId
+     * @return string
      */
     public function createToken(int $userId): string
     {
@@ -53,6 +55,8 @@ class UserRemember
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $userId
+     * @return string
      */
     public function getUserToken(int $userId): string
     {

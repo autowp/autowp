@@ -11,6 +11,7 @@ class TimezoneController extends AbstractRestfulController
 {
     public function listAction()
     {
+        $list = [];
         foreach (DateTimeZone::listAbbreviations() as $group) {
             foreach ($group as $timeZone) {
                 $tzId = $timeZone['timezone_id'];

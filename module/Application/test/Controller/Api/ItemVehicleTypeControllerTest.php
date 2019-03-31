@@ -2,6 +2,7 @@
 
 namespace ApplicationTest\Controller\Api;
 
+use Exception;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 use Zend\Json\Json;
@@ -18,6 +19,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param $params
+     * @return int
+     * @throws Exception
      */
     private function createItem($params): int
     {
@@ -42,6 +46,10 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $itemId
+     * @param int $parentId
+     * @param array $params
+     * @throws Exception
      */
     private function addItemParent(int $itemId, int $parentId, array $params = [])
     {
@@ -66,6 +74,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $itemId
+     * @param array $vehicleTypeIds
+     * @throws Exception
      */
     private function setItemVehicleTypes(int $itemId, array $vehicleTypeIds)
     {

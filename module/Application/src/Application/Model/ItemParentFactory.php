@@ -9,6 +9,10 @@ class ItemParentFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @param array|null $options
+     * @return ItemParent
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

@@ -5,6 +5,7 @@ namespace Application;
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
+use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\MvcEvent;
 
 use Autowp\User\Model\User;
@@ -32,7 +33,7 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
     {
         $request = $e->getRequest();
 
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+        if ($request instanceof Request) {
             $auth = new AuthenticationService();
             if ($auth->hasIdentity()) {
                 $serviceManager = $e->getApplication()->getServiceManager();

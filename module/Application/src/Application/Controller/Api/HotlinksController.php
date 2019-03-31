@@ -16,7 +16,7 @@ use Application\Model\Referer;
  * Class HotlinksController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ForbiddenAction forbiddenAction()
  */
 class HotlinksController extends AbstractRestfulController

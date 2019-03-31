@@ -22,6 +22,7 @@ class Maintenance extends AbstractListenerAggregate
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param Cron\CronEvent $event
      */
     public function dailyMaintenance(Cron\CronEvent $event)
     {

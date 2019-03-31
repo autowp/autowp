@@ -8,6 +8,7 @@ use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Paginator;
+use Zend\Uri\Uri;
 use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
@@ -29,7 +30,7 @@ use Application\Service\SpecificationsService;
  * Class ItemParentController
  * @package Application\Controller\Api
  *
- * @method User user()
+ * @method User user($user = null)
  * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
  * @method string language()
  * @method ForbiddenAction forbiddenAction()
@@ -459,9 +460,9 @@ class ItemParentController extends AbstractRestfulController
     }
 
     /**
-     * @param array|\ArrayObject $user
+     * @param array|ArrayObject $user
      * @param bool $full
-     * @param \Zend\Uri\Uri $uri
+     * @param Uri $uri
      * @return string
      */
     private function userModerUrl($user, $full = false, $uri = null)
@@ -473,7 +474,10 @@ class ItemParentController extends AbstractRestfulController
     }
 
     /**
-     * @param array|ArrayObject $car
+     * @param $item
+     * @param bool $full
+     * @param null $tab
+     * @param null $uri
      * @return string
      */
     private function itemModerUrl($item, $full = false, $tab = null, $uri = null)

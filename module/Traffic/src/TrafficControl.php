@@ -4,7 +4,10 @@ namespace Autowp\Traffic;
 
 use DateTime;
 
+use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use InvalidArgumentException;
 use Zend\Json\Json;
 
 use Application\Service\RabbitMQ;
@@ -49,7 +52,7 @@ class TrafficControl
     public function ban(string $ip, int $seconds, int $byUserId, string $reason): void
     {
         if ($seconds <= 0) {
-            throw new \InvalidArgumentException("Seconds must be > 0");
+            throw new InvalidArgumentException("Seconds must be > 0");
         }
 
         $response = $this->getClient()->request('POST', '/ban', [
@@ -64,7 +67,7 @@ class TrafficControl
 
         $code = $response->getStatusCode();
         if ($code != 201) {
-            throw new \Exception("Unexpected status code `$code`");
+            throw new Exception("Unexpected status code `$code`");
         }
     }
 
@@ -76,11 +79,11 @@ class TrafficControl
 
         $code = $response->getStatusCode();
         if ($code != 204) {
-            throw new \Exception("Unexpected status code `$code`");
+            throw new Exception("Unexpected status code `$code`");
         }
     }
 
-    public function getTopData(): array
+    public function getTopData(): ?array
     {
         $response = $this->getClient()->request('GET', '/top', [
             'http_errors' => false
@@ -89,17 +92,17 @@ class TrafficControl
         $code = $response->getStatusCode();
 
         if ($code == 404) {
-            return false;
+            return null;
         }
 
         if ($code != 200) {
-            throw new \Exception("Unexpected response code `$code`");
+            throw new Exception("Unexpected response code `$code`");
         }
 
         return Json::decode($response->getBody(), Json::TYPE_ARRAY);
     }
 
-    public function getWhitelistData(): array
+    public function getWhitelistData(): ?array
     {
         $response = $this->getClient()->request('GET', '/whitelist', [
             'http_errors' => false
@@ -108,11 +111,11 @@ class TrafficControl
         $code = $response->getStatusCode();
 
         if ($code == 404) {
-            return false;
+            return null;
         }
 
         if ($code != 200) {
-            throw new \Exception("Unexpected response code `$code`");
+            throw new Exception("Unexpected response code `$code`");
         }
 
         return Json::decode($response->getBody(), Json::TYPE_ARRAY);
@@ -126,7 +129,7 @@ class TrafficControl
 
         $code = $response->getStatusCode();
         if ($code != 204) {
-            throw new \Exception("Unexpected status code `$code`");
+            throw new Exception("Unexpected status code `$code`");
         }
     }
 
@@ -142,12 +145,14 @@ class TrafficControl
 
         $code = $response->getStatusCode();
         if ($code != 201) {
-            throw new \Exception("Unexpected status code `$code`");
+            throw new Exception("Unexpected status code `$code`");
         }
     }
 
     /**
+     * @param string $ip
      * @return boolean|array
+     * @throws GuzzleException
      */
     public function getBanInfo(string $ip)
     {
@@ -162,7 +167,7 @@ class TrafficControl
         }
 
         if ($code != 200) {
-            throw new \Exception("Unexpected response code `$code`");
+            throw new Exception("Unexpected response code `$code`");
         }
 
         return Json::decode($response->getBody(), Json::TYPE_ARRAY);

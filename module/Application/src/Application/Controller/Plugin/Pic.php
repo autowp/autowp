@@ -3,8 +3,10 @@
 namespace Application\Controller\Plugin;
 
 use ArrayIterator;
+use ArrayObject;
 use Exception;
 
+use geoPHP;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
@@ -371,6 +373,7 @@ class Pic extends AbstractPlugin
         ]);
 
         // comments
+        $newMessages = [];
         if (! $options['disableBehaviour']) {
             if ($userId) {
                 $newMessages = $this->comments->getNewMessages(
@@ -454,6 +457,7 @@ class Pic extends AbstractPlugin
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $controller->user()->inheritsRole('moder');
 
+        $multioptions = [];
         if ($isModer) {
             $multioptions = array_replace([
                 '' => '--'
@@ -831,6 +835,12 @@ class Pic extends AbstractPlugin
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param $picture
+     * @param array $filter
+     * @param array $brandIds
+     * @param array $options
+     * @return array
+     * @throws Exception
      */
     public function picPageData($picture, array $filter, $brandIds = [], array $options = [])
     {
@@ -1038,7 +1048,7 @@ class Pic extends AbstractPlugin
 
         $point = null;
         if ($picture['point']) {
-            $point = \geoPHP::load(substr($picture['point'], 4), 'wkb');
+            $point = geoPHP::load(substr($picture['point'], 4), 'wkb');
         }
 
         $itemIds = $this->pictureItem->getPictureItems($picture['id'], PictureItem::PICTURE_CONTENT);
@@ -1257,6 +1267,7 @@ class Pic extends AbstractPlugin
             $userId = $controller->user()->get()['id'];
         }
 
+        $newMessages = [];
         if ($userId) {
             $newMessages = $this->comments->getNewMessages(
                 \Application\Comments::PICTURES_TYPE_ID,
@@ -1363,7 +1374,7 @@ class Pic extends AbstractPlugin
 
     public function name($pictureRow, $language)
     {
-        if ($pictureRow instanceof \ArrayObject) {
+        if ($pictureRow instanceof ArrayObject) {
             $pictureRow = (array)$pictureRow;
         }
 

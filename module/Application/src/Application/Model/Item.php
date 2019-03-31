@@ -103,6 +103,9 @@ class Item
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $engineId
+     * @param array $options
+     * @return array
      */
     public function getEngineVehiclesGroups(int $engineId, array $options = []): array
     {
@@ -206,6 +209,8 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @param int $id
+     * @return int
      */
     public function getUsedLanguagesCount(int $id): int
     {
@@ -248,6 +253,9 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $id
+     * @param string $language
+     * @return array
      */
     public function getTextsOfItem(int $id, string $language): array
     {
@@ -288,6 +296,9 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param int $id
+     * @param string $language
+     * @return string
      */
     public function getTextOfItem(int $id, string $language): string
     {
@@ -320,6 +331,8 @@ class Item
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $id
+     * @return bool
      */
     public function hasFullText(int $id): bool
     {
@@ -342,6 +355,8 @@ class Item
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $itemId
+     * @return array
      */
     public function getNames(int $itemId): array
     {
@@ -359,6 +374,9 @@ class Item
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $itemId
+     * @param string $language
+     * @return string
      */
     public function getLanguageName(int $itemId, string $language): string
     {
@@ -376,6 +394,9 @@ class Item
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $itemId
+     * @param string $language
+     * @return string
      */
     public function getName(int $itemId, string $language)
     {
@@ -419,6 +440,9 @@ class Item
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param int $itemId
+     * @param array $itemTypes
+     * @return array
      */
     private function getAncestorsId(int $itemId, array $itemTypes): array
     {
@@ -645,6 +669,9 @@ class Item
 
     /**
      * @suppress PhanPluginMixedKeyNoKey
+     * @param $parentId
+     * @param array $whitelist
+     * @return array
      */
     private function getChildVehicleTypesByWhitelist($parentId, array $whitelist): array
     {
@@ -839,6 +866,8 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param int $itemId
+     * @param $point
      */
     public function setPoint(int $itemId, $point)
     {
@@ -900,7 +929,7 @@ class Item
                     break;
                 case 'link_name':
                     if (! $language) {
-                        throw new \Exception("Language is required for `name` select");
+                        throw new Exception("Language is required for `name` select");
                     }
                     $nameSelect = $this->getItemParentNameSelect(
                         $itemParentAlias,
@@ -1067,7 +1096,7 @@ class Item
                     $select->where([$alias . '.design']);
                     break;
                 default:
-                    throw new \Exception("Unexpected link_type");
+                    throw new Exception("Unexpected link_type");
             }
         }
 
@@ -1113,7 +1142,7 @@ class Item
         }
 
         if (! is_scalar($value)) {
-            throw new \Exception('`id` must be scalar or array of scalar');
+            throw new Exception('`id` must be scalar or array of scalar');
         }
 
         $select->where([$id => $value]);
@@ -1307,6 +1336,10 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param $value
+     * @param string $valueType
+     * @param string $language
+     * @return Sql\Select
      */
     private function getNameSelect($value, string $valueType, string $language): Sql\Select
     {
@@ -1339,6 +1372,9 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param string $itemParentAlias
+     * @param string $language
+     * @return Sql\Select
      */
     private function getItemParentNameSelect(string $itemParentAlias, string $language): Sql\Select
     {
@@ -1379,6 +1415,9 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param array $options
+     * @return Sql\Select
+     * @throws Exception
      */
     public function getSelect(array $options): Sql\Select
     {
@@ -1441,10 +1480,13 @@ class Item
                         break;
                     case 'name':
                         if (! $language) {
-                            throw new \Exception("Language is required for `name` select");
+                            throw new Exception("Language is required for `name` select");
                         }
 
-                        $subSelect = $this->languagePriority->getSelectItemName($language, $this->itemTable->getAdapter());
+                        $subSelect = $this->languagePriority->getSelectItemName(
+                            $language,
+                            $this->itemTable->getAdapter()
+                        );
 
                         $columns = array_merge($columns, [
                             'begin_year', 'end_year', 'today',
@@ -1642,6 +1684,9 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @param array $options
+     * @return int
+     * @throws Exception
      */
     public function getCountDistinct(array $options): int
     {
@@ -1668,6 +1713,9 @@ class Item
 
     /**
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
+     * @param array $options
+     * @return array
+     * @throws Exception
      */
     public function getCountPairs(array $options): array
     {
@@ -1689,6 +1737,9 @@ class Item
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param array $options
+     * @return array|\ArrayObject|null
+     * @throws Exception
      */
     public function getRow(array $options)
     {
@@ -1700,6 +1751,9 @@ class Item
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param array $options
+     * @return bool
+     * @throws Exception
      */
     public function isExists(array $options): bool
     {
