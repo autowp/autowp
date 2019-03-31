@@ -54,7 +54,7 @@ class RestorePasswordControllerTest extends AbstractHttpControllerTestCase
         $mailTransport = $this->getApplicationServiceLocator()->get(TransportInterface::class);
         $message = $mailTransport->getLastMessage();
 
-        preg_match('|http://en.localhost/ng/account/emailcheck/([0-9a-f]+)|u', $message->getBody(), $match);
+        preg_match('|https://en.localhost/ng/account/emailcheck/([0-9a-f]+)|u', $message->getBody(), $match);
 
         $this->reset();
         $this->dispatch('http://en.localhost/api/user/emailcheck', Request::METHOD_POST, [
