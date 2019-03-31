@@ -25,7 +25,7 @@ class UrlCorrectionRouteListener extends AbstractListenerAggregate
      * @param  MvcEvent $e
      * @return null
      */
-    public function onRoute(MvcEvent $e)
+    public function onRoute(MvcEvent $e): void
     {
         $request = $e->getRequest();
 
@@ -43,7 +43,8 @@ class UrlCorrectionRouteListener extends AbstractListenerAggregate
                     $redirectUrl = $requestUri->getScheme() . '://' .
                         $requestUri->getHost() . $filteredUri;
 
-                    return $this->redirect($e, $redirectUrl);
+                    $this->redirect($e, $redirectUrl);
+                    return;
                 }
             }
         }

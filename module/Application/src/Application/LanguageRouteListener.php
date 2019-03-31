@@ -53,7 +53,7 @@ class LanguageRouteListener extends AbstractListenerAggregate
      * @param  MvcEvent $e
      * @return null
      */
-    public function onRoute(MvcEvent $e)
+    public function onRoute(MvcEvent $e): void
     {
         $request = $e->getRequest();
 
@@ -81,7 +81,8 @@ class LanguageRouteListener extends AbstractListenerAggregate
                     $redirectUrl = $request->getUri()->getScheme() . '://' .
                         $hosts[$userLanguage]['hostname'] . $request->getRequestUri();
 
-                    return $this->redirect($e, $redirectUrl);
+                    $this->redirect($e, $redirectUrl);
+                    return;
                 }
             }
 
@@ -91,7 +92,8 @@ class LanguageRouteListener extends AbstractListenerAggregate
                     $redirectUrl = $request->getUri()->getScheme() . '://' .
                         $host['hostname'] . $request->getRequestUri();
 
-                    return $this->redirect($e, $redirectUrl);
+                    $this->redirect($e, $redirectUrl);
+                    return;
                 }
             }
 
