@@ -17,13 +17,15 @@ before_install:
   - docker exec -it autowp_test_web bash -c "waitforit -host=autowp_test_goautowp -port=80 -timeout=60" || travis_terminate 1;
 
 script:
-  - sonar-scanner || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "./install-dev-db.sh" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "./install-dev.sh" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "./vendor/bin/security-checker security:check composer.lock"
   - docker exec -it autowp_test_web sh -c "./vendor/bin/phpcf module" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "./composer.phar phpmd" || travis_terminate 1;
-  - docker exec -it autowp_test_web sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --coverage-clover ./logs/clover.xml" || travis_terminate 1;
+  - docker exec -it autowp_test_web sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./logs/clover.xml" || travis_terminate 1;
+  - docker cp autowp_test_web:/app/logs/junit.xml junit.xml || travis_terminate 1;
+  - docker cp autowp_test_web:/app/logs/clover.xml clover.xml || travis_terminate 1;
+  - sonar-scanner || travis_terminate 1;
 
 after_success:
   - docker exec -it autowp_test_web bash -c "./vendor/bin/coveralls -v"
