@@ -888,6 +888,8 @@ class ItemParent
 
     /**
      * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @param int $itemId
+     * @return int
      */
     public function getParentItemsCount(int $itemId): int
     {

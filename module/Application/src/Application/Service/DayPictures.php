@@ -326,6 +326,7 @@ class DayPictures
 
     /**
      * @return false|DateTime
+     * @throws Exception
      */
     public function getPrevDate()
     {
@@ -336,6 +337,7 @@ class DayPictures
 
     /**
      * @return string
+     * @throws Exception
      */
     public function getPrevDateStr()
     {
@@ -348,6 +350,7 @@ class DayPictures
 
     /**
      * @return int
+     * @throws Exception
      */
     public function getPrevDateCount()
     {
@@ -402,6 +405,7 @@ class DayPictures
 
     /**
      * @return false|DateTime
+     * @throws Exception
      */
     public function getNextDate()
     {
@@ -412,6 +416,7 @@ class DayPictures
 
     /**
      * @return string
+     * @throws Exception
      */
     public function getNextDateStr()
     {
@@ -424,6 +429,7 @@ class DayPictures
 
     /**
      * @return int
+     * @throws Exception
      */
     public function getNextDateCount()
     {

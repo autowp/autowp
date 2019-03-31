@@ -185,7 +185,7 @@ class Referer
         $code = $response->getStatusCode();
 
         if ($code == 404) {
-            return false;
+            return null;
         }
 
         if ($code != 200) {

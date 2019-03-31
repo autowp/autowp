@@ -66,6 +66,8 @@ class TelegramService
      */
     private $userModel;
 
+    private $serviceManager;
+
     public function __construct(
         array $options,
         TreeRouteStack $router,

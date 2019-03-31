@@ -121,6 +121,9 @@ class ItemVehicleTypeControllerTest extends AbstractHttpControllerTestCase
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param int $itemId
+     * @return array
+     * @throws Exception
      */
     private function getItemVehicleTypeIds(int $itemId)
     {

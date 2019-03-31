@@ -17,7 +17,6 @@ return [
             Hydrator\Api\ForumTopicHydrator::class         => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\IpHydrator::class                 => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
-            Hydrator\Api\ItemHydrator::class               => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemLanguageHydrator::class       => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemLinkHydrator::class           => Hydrator\Api\RestHydratorFactory::class,
             Hydrator\Api\ItemParentHydrator::class         => Hydrator\Api\RestHydratorFactory::class,

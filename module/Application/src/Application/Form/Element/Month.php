@@ -25,9 +25,10 @@ class Month extends Select implements InputProviderInterface
     private $language = 'en';
 
     /**
-     * @param  array|Traversable $options
+     * @param array|Traversable $options
      * @return Month|ElementInterface
      * @throws InvalidArgumentException
+     * @throws \Exception
      */
     public function setOptions($options)
     {

@@ -143,6 +143,16 @@ class PictureController extends AbstractRestfulController
      */
     private $pictureService;
 
+    /**
+     * @var TelegramService
+     */
+    private $telegram;
+
+    /**
+     * @var MessageService
+     */
+    private $message;
+
     public function __construct(
         RestHydrator $hydrator,
         PictureItem $pictureItem,

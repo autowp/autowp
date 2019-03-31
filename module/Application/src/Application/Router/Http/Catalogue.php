@@ -62,7 +62,7 @@ class Catalogue implements RouteInterface
     public function match(Request $request)
     {
         if (! method_exists($request, 'getUri')) {
-            return false;
+            return null;
         }
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -80,11 +80,11 @@ class Catalogue implements RouteInterface
         }
 
         if (! count($path)) {
-            return false;
+            return null;
         }
 
         if (strlen($path[0]) <= 0) {
-            return false;
+            return null;
         }
 
         $brand = $this->itemTable->select([
@@ -93,7 +93,7 @@ class Catalogue implements RouteInterface
         ])->current();
 
         if (! $brand) {
-            return false;
+            return null;
         }
 
         $data['brand_catname'] = $brand['catname'];
@@ -133,10 +133,10 @@ class Catalogue implements RouteInterface
                         ], $length);
                     }
 
-                    return false;
+                    return null;
                 }
 
-                return false;
+                return null;
                 break;
 
             case 'mosts':
@@ -212,7 +212,7 @@ class Catalogue implements RouteInterface
                         ], $length);
                     }
 
-                    return false;
+                    return null;
                 }
 
                 $cartypeCatname = array_shift($path);
@@ -240,10 +240,10 @@ class Catalogue implements RouteInterface
                         ], $length);
                     }
 
-                    return false;
+                    return null;
                 }
 
-                return false;
+                return null;
                 break;
 
             case 'recent':
@@ -270,10 +270,10 @@ class Catalogue implements RouteInterface
                         ], $length);
                     }
 
-                    return false;
+                    return null;
                 }
 
-                return false;
+                return null;
                 break;
 
             case 'other':
@@ -302,7 +302,7 @@ class Catalogue implements RouteInterface
                         ], $length);
                     }
 
-                    return false;
+                    return null;
                 }
 
                 if ($path[0] == 'gallery') {
@@ -328,10 +328,10 @@ class Catalogue implements RouteInterface
                             ], $length);
                         }
 
-                        return false;
+                        return null;
                     }
 
-                    return false;
+                    return null;
                 }
 
                 if (count($path)) {
@@ -347,10 +347,10 @@ class Catalogue implements RouteInterface
                         ], $length);
                     }
 
-                    return false;
+                    return null;
                 }
 
-                return false;
+                return null;
                 break;
             case 'concepts':
                 $action = array_shift($path);
@@ -376,10 +376,10 @@ class Catalogue implements RouteInterface
                         ], $length);
                     }
 
-                    return false;
+                    return null;
                 }
 
-                return false;
+                return null;
                 break;
         }
 
@@ -439,7 +439,7 @@ class Catalogue implements RouteInterface
                     ], $length);
                 }
 
-                return false;
+                return null;
             }
 
             switch ($path[0]) {
@@ -474,7 +474,7 @@ class Catalogue implements RouteInterface
                             ], $length);
                         }
 
-                        return false;
+                        return null;
                     }
 
                     switch ($path[0]) {
@@ -492,11 +492,11 @@ class Catalogue implements RouteInterface
                                 ], $length);
                             }
 
-                            return false;
+                            return null;
                             break;
                     }
 
-                    return false;
+                    return null;
                     break;
 
                 case 'specifications':
@@ -512,7 +512,7 @@ class Catalogue implements RouteInterface
                         ], $length);
                     }
 
-                    return false;
+                    return null;
                     break;
 
                 case 'exact':
@@ -545,7 +545,7 @@ class Catalogue implements RouteInterface
                             ], $length);
                         }
 
-                        return false;
+                        return null;
                     }
 
                     switch ($path[0]) {
@@ -555,7 +555,7 @@ class Catalogue implements RouteInterface
                             break;
                     }
 
-                    return false;
+                    return null;
                     break;
 
                 case 'pictures':
@@ -568,7 +568,7 @@ class Catalogue implements RouteInterface
                     array_shift($path);
 
                     if (! $path) {
-                        return false;
+                        return null;
                     }
 
                     $mod = array_shift($path);
@@ -587,7 +587,7 @@ class Catalogue implements RouteInterface
                     array_shift($path);
 
                     if (! $path) {
-                        return false;
+                        return null;
                     }
 
                     $modgroup = array_shift($path);
@@ -603,10 +603,10 @@ class Catalogue implements RouteInterface
                     break;
             }
 
-            return false;
+            return null;
         }
 
-        return false;
+        return null;
     }
 
     private function matchCarPictures($path, $brand, $brandItemRow, $treePath, $exact, $length)

@@ -22,6 +22,7 @@ class HostManager
     /**
      * @param string $language
      * @return Uri
+     * @throws Exception
      */
     public function getUriByLanguage($language)
     {

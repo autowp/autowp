@@ -29,7 +29,7 @@ class OAuth2UserIdProviderFactory implements FactoryInterface
 
     /**
      * @param ServiceLocatorInterface $services
-     * @return AuthenticationService
+     * @return OAuth2UserIdProvider
      */
     public function createService(ServiceLocatorInterface $services)
     {

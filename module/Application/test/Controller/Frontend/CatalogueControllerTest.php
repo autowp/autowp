@@ -163,10 +163,10 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      * @param $params
-     * @return
+     * @return int
      * @throws Exception
      */
-    private function createItem($params)
+    private function createItem($params): int
     {
         $this->reset();
 

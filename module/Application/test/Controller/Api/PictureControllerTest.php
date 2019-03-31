@@ -39,10 +39,10 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      * @param int $vehicleId
-     * @return
+     * @return int
      * @throws Exception
      */
-    private function addPictureToItem(int $vehicleId)
+    private function addPictureToItem(int $vehicleId): int
     {
         $this->reset();
 
@@ -90,10 +90,10 @@ class PictureControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      * @param $params
-     * @return
+     * @return int
      * @throws Exception
      */
-    private function createItem($params)
+    private function createItem($params): int
     {
         $this->reset();
 

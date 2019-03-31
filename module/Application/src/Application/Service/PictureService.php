@@ -117,7 +117,7 @@ class PictureService
 
                     $this->imageStorage->removeImage($imageId);
                 } else {
-                    print "Brokern image `{$picture['id']}`. Skip\n";
+                    print "Broken image `{$picture['id']}`. Skip\n";
                 }
             }
         } else {

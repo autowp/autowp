@@ -95,6 +95,11 @@ class ItemParentController extends AbstractRestfulController
      */
     private $vehicleType;
 
+    /**
+     * @var InputFilter
+     */
+    private $putInputFilter;
+
     public function __construct(
         RestHydrator $hydrator,
         InputFilter $listInputFilter,

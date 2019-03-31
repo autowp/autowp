@@ -22,8 +22,8 @@ class UrlCorrectionRouteListener extends AbstractListenerAggregate
     }
 
     /**
-     * @param  MvcEvent $e
-     * @return null
+     * @param MvcEvent $e
+     * @return void
      */
     public function onRoute(MvcEvent $e): void
     {

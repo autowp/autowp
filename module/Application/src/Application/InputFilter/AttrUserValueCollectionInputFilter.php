@@ -2,6 +2,7 @@
 
 namespace Application\InputFilter;
 
+use InvalidArgumentException;
 use Traversable;
 
 use Zend\InputFilter\InputFilter;
@@ -100,7 +101,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
     public function setData($data)
     {
         if (! (is_array($data) || $data instanceof Traversable)) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable collection; invalid collection of type %s provided',
                 __METHOD__,
                 is_object($data) ? get_class($data) : gettype($data)
@@ -112,7 +113,7 @@ class AttrUserValueCollectionInputFilter extends InputFilter
                 continue;
             }
 
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 '%s expects each item in a collection to be an array or Traversable; '
                 . 'invalid item in collection of type %s detected',
                 __METHOD__,

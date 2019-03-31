@@ -61,6 +61,8 @@ class CommentHydrator extends RestHydrator
      */
     private $limit;
 
+    private $router;
+
     public function __construct($serviceManager)
     {
         parent::__construct();

@@ -2,19 +2,21 @@
 
 namespace ApplicationTest\Controller\Api;
 
-use Application\DuplicateFinder;
 use Exception;
+
 use Zend\Http\Header\Cookie;
+use Zend\Http\Headers;
 use Zend\Http\Request;
 use Zend\Json\Json;
 
-use Application\Test\AbstractHttpControllerTestCase;
 use Application\Controller\Api\ItemController;
 use Application\Controller\Api\ItemLanguageController;
 use Application\Controller\Api\ItemLinkController;
 use Application\Controller\Api\ItemParentController;
 use Application\Controller\Api\PictureController;
 use Application\Controller\Api\PictureItemController;
+use Application\DuplicateFinder;
+use Application\Test\AbstractHttpControllerTestCase;
 
 class ItemControllerTest extends AbstractHttpControllerTestCase
 {
@@ -23,10 +25,10 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      * @param $params
-     * @return
+     * @return int
      * @throws Exception
      */
-    private function createItem($params)
+    private function createItem($params):int
     {
         $this->reset();
 
@@ -165,10 +167,10 @@ class ItemControllerTest extends AbstractHttpControllerTestCase
     /**
      * @suppress PhanUndeclaredMethod
      * @param $vehicleId
-     * @return
+     * @return int
      * @throws Exception
      */
-    private function addPictureToItem($vehicleId)
+    private function addPictureToItem($vehicleId): int
     {
         $this->reset();
 

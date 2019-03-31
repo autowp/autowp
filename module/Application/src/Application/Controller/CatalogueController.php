@@ -363,6 +363,7 @@ class CatalogueController extends AbstractActionController
      * @suppress PhanDeprecatedFunction, PhanPluginMixedKeyNoKey
      * @param int $brandId
      * @return array
+     * @throws \Exception
      */
     private function getBrandFactories(int $brandId)
     {

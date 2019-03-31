@@ -101,6 +101,7 @@ class LoginController extends AbstractRestfulController
     /**
      * @param string $serviceId
      * @return AbstractService
+     * @throws Exception
      */
     private function getExternalLoginService($serviceId)
     {

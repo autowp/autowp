@@ -184,9 +184,10 @@ class PictureModerVoteController extends AbstractRestfulController
     /**
      * Update an existing resource
      *
-     * @param  mixed $id
-     * @param  mixed $data
+     * @param mixed $id
+     * @param mixed $data
      * @return mixed
+     * @throws \Exception
      */
     public function update($id, $data)
     {
@@ -272,8 +273,9 @@ class PictureModerVoteController extends AbstractRestfulController
     /**
      * Delete an existing resource
      *
-     * @param  mixed $id
+     * @param mixed $id
      * @return mixed
+     * @throws \Exception
      */
     public function delete($id)
     {

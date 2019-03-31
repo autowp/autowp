@@ -58,6 +58,8 @@ class AclFactory implements FactoryInterface
 
     /**
      * @param ServiceLocatorInterface $controllers
+     * @return Acl
+     * @throws Exception
      */
     public function createService(ServiceLocatorInterface $controllers)
     {

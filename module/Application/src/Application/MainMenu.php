@@ -159,9 +159,10 @@ class MainMenu
 
     /**
      * @param boolean $logedIn
+     * @param bool $full
      * @return array
      */
-    private function getSecondaryMenu(bool$logedIn, bool $full = false)
+    private function getSecondaryMenu(bool $logedIn, bool $full = false)
     {
         $language = $this->language->getLanguage();
 
@@ -189,6 +190,7 @@ class MainMenu
 
     /**
      * @param boolean $logedIn
+     * @param bool $full
      * @return array
      */
     private function getPrimaryMenu(bool $logedIn, bool $full = false)

@@ -25,6 +25,11 @@ class ArticleController extends AbstractActionController
      */
     private $hydrator;
 
+    /**
+     * @var TableGateway
+     */
+    private $table;
+
     public function __construct(
         TableGateway $table,
         InputFilter $listInputFilter,

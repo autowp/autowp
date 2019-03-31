@@ -262,6 +262,10 @@ class Brand
 
     /**
      * @suppress PhanUndeclaredMethod
+     * @param string $language
+     * @param $callback
+     * @return array|null
+     * @throws \Exception
      */
     private function fetchBrand(string $language, $callback)
     {

@@ -840,7 +840,7 @@ class Picture
     /**
      * @suppress PhanUndeclaredMethod
      * @param array $options
-     * @return
+     * @return array|\ArrayObject|null
      * @throws Exception
      */
     public function getRow(array $options)
