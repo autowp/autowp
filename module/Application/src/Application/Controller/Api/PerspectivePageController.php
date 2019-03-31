@@ -7,9 +7,22 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblemResponse;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 
+/**
+ * Class PerspectivePageController
+ * @package Application\Controller\Api
+ *
+ * @method ForbiddenAction forbiddenAction()
+ * @method User user()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ */
 class PerspectivePageController extends AbstractRestfulController
 {
     /**
@@ -36,7 +49,6 @@ class PerspectivePageController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }

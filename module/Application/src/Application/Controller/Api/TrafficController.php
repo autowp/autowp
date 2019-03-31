@@ -6,9 +6,18 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Autowp\Traffic\TrafficControl;
+use Autowp\User\Controller\Plugin\User;
 
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 
+/**
+ * Class TrafficController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ */
 class TrafficController extends AbstractRestfulController
 {
     /**
@@ -29,7 +38,6 @@ class TrafficController extends AbstractRestfulController
 
     public function listAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -54,7 +62,6 @@ class TrafficController extends AbstractRestfulController
 
     public function whitelistListAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -76,7 +83,6 @@ class TrafficController extends AbstractRestfulController
 
     public function whitelistCreateAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -104,7 +110,6 @@ class TrafficController extends AbstractRestfulController
 
     public function whitelistItemDeleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -117,7 +122,6 @@ class TrafficController extends AbstractRestfulController
 
     public function blacklistCreateAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canBan = $this->user()->isAllowed('user', 'ban');
         if (! $canBan) {
             return $this->forbiddenAction();
@@ -134,7 +138,7 @@ class TrafficController extends AbstractRestfulController
         $this->service->ban(
             $ip,
             $data['period'] * 3600,
-            $this->user()->get()['id'], // @phan-suppress-current-line PhanUndeclaredMethod
+            $this->user()->get()['id'],
             (string) $data['reason']
         );
 
@@ -144,7 +148,6 @@ class TrafficController extends AbstractRestfulController
 
     public function blacklistItemDeleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canBan = $this->user()->isAllowed('user', 'ban');
         if (! $canBan) {
             return $this->forbiddenAction();

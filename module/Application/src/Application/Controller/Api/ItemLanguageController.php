@@ -6,16 +6,32 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\Message\MessageService;
 use Autowp\TextStorage\Service as TextStorage;
+use Autowp\User\Controller\Plugin\User;
 
+use Application\Controller\Plugin\Car;
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\ItemParent;
 use Application\Model\UserItemSubscribe;
 use Application\Model\Item;
 
+/**
+ * Class ItemLanguageController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ * @method Car car()
+ * @method void log(string $message, array $objects)
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class ItemLanguageController extends AbstractRestfulController
 {
     /**
@@ -82,7 +98,6 @@ class ItemLanguageController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -104,7 +119,6 @@ class ItemLanguageController extends AbstractRestfulController
 
     public function getAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -123,7 +137,6 @@ class ItemLanguageController extends AbstractRestfulController
 
     public function putAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -133,7 +146,6 @@ class ItemLanguageController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $data = $this->processBodyContent($this->getRequest());

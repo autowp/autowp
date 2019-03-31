@@ -5,12 +5,23 @@ namespace Application\Controller\Api;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 
+/**
+ * Class MessageController
+ * @package Application\Controller\Api
+ *
+ * @method \Autowp\User\Controller\Plugin\User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ */
 class MessageController extends AbstractRestfulController
 {
     /**
@@ -54,7 +65,6 @@ class MessageController extends AbstractRestfulController
 
     public function postAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->forbiddenAction();
@@ -93,7 +103,6 @@ class MessageController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -147,7 +156,6 @@ class MessageController extends AbstractRestfulController
 
     public function deleteListAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -179,7 +187,6 @@ class MessageController extends AbstractRestfulController
 
     public function deleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -194,7 +201,6 @@ class MessageController extends AbstractRestfulController
 
     public function summaryAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -218,7 +224,6 @@ class MessageController extends AbstractRestfulController
 
     public function newAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {

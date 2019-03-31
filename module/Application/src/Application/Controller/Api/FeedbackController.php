@@ -2,14 +2,19 @@
 
 namespace Application\Controller\Api;
 
+use ReCaptcha\ReCaptcha;
 use Zend\InputFilter\InputFilter;
 use Zend\Mail;
 use Zend\Mvc\Controller\AbstractRestfulController;
-
-use ReCaptcha\ReCaptcha;
 use ZF\ApiProblem\ApiProblemResponse;
 use ZF\ApiProblem\ApiProblem;
 
+/**
+ * Class FeedbackController
+ * @package Application\Controller\Api
+ *
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ */
 class FeedbackController extends AbstractRestfulController
 {
     /**

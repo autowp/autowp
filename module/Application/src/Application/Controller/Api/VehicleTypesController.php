@@ -5,8 +5,18 @@ namespace Application\Controller\Api;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\VehicleType;
 
+/**
+ * Class VehicleTypesController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ */
 class VehicleTypesController extends AbstractRestfulController
 {
     /**
@@ -21,7 +31,6 @@ class VehicleTypesController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }

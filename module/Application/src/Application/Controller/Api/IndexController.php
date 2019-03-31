@@ -20,6 +20,13 @@ use Application\Model\PictureItem;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
+/**
+ * Class IndexController
+ * @package Application\Controller\Api
+ *
+ * @method \Autowp\User\Controller\Plugin\User user()
+ * @method string language()
+ */
 class IndexController extends AbstractRestfulController
 {
     private $cache;
@@ -327,7 +334,6 @@ class IndexController extends AbstractRestfulController
             $this->cache->setItem($cacheKey, $cars);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->itemHydrator->setOptions([
@@ -412,7 +418,6 @@ class IndexController extends AbstractRestfulController
                 ]);
 
                 if ($item) {
-                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $user = $this->user()->get();
 
                     $this->itemHydrator->setOptions([

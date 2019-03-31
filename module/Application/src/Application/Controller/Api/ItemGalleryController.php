@@ -2,10 +2,13 @@
 
 namespace Application\Controller\Api;
 
+use Application\Comments;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Autowp\Comments\CommentsService;
+use Autowp\Image\Storage;
+use Autowp\User\Controller\Plugin\User;
 
 use Application\ItemNameFormatter;
 use Application\Model\Item;
@@ -13,6 +16,14 @@ use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\PictureNameFormatter;
 
+/**
+ * Class ItemGalleryController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method Storage imageStorage()
+ * @method string language()
+ */
 class ItemGalleryController extends AbstractRestfulController
 {
     /**
@@ -21,7 +32,7 @@ class ItemGalleryController extends AbstractRestfulController
     private $picture;
 
     /**
-     * @var Comments
+     * @var CommentsService
      */
     private $comments;
 
@@ -174,11 +185,10 @@ class ItemGalleryController extends AbstractRestfulController
         ]);
 
         // comments
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $userId = $this->user()->get()['id'];
         if ($userId) {
             $newMessages = $this->comments->getNewMessages(
-                \Application\Comments::PICTURES_TYPE_ID,
+                Comments::PICTURES_TYPE_ID,
                 $ids,
                 $userId
             );

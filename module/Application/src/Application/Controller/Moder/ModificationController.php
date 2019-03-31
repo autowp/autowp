@@ -6,10 +6,20 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Form\Modification as ModificationForm;
 use Application\Model\Modification;
 use Application\Model\Item;
 
+/**
+ * Class ModificationController
+ * @package Application\Controller\Moder
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ */
 class ModificationController extends AbstractActionController
 {
     /**
@@ -73,7 +83,6 @@ class ModificationController extends AbstractActionController
 
     public function addAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -152,7 +161,6 @@ class ModificationController extends AbstractActionController
 
     public function editAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -251,7 +259,6 @@ class ModificationController extends AbstractActionController
 
     public function mapAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -354,7 +361,6 @@ class ModificationController extends AbstractActionController
 
     public function deleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }

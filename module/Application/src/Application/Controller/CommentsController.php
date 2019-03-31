@@ -15,10 +15,19 @@ use Autowp\User\Model\User;
 use Autowp\Votings\Votings;
 
 use Application\Comments;
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;
 use Application\Model\Item;
 use Application\Model\Picture;
 
+/**
+ * Class CommentsController
+ * @package Application\Controller
+ *
+ * @method \Autowp\User\Controller\Plugin\User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class CommentsController extends AbstractRestfulController
 {
     /**
@@ -87,13 +96,11 @@ class CommentsController extends AbstractRestfulController
 
     private function canAddComments()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $this->user()->logedIn();
     }
 
     private function nextMessageTime()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return null;
@@ -194,11 +201,9 @@ class CommentsController extends AbstractRestfulController
                 return $this->notFoundAction();
             }
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $user = $this->user()->get();
 
             $moderatorAttention = false;
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($this->user()->isAllowed('comment', 'moderator-attention')) {
                 $moderatorAttention = (bool)$values['moderator_attention'];
             }
@@ -229,7 +234,6 @@ class CommentsController extends AbstractRestfulController
                 'id' => $user['id']
             ]);
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($this->user()->inheritsRole('moder')) {
                 if ($values['parent_id'] && $values['resolve']) {
                     $this->comments->service()->completeMessage($values['parent_id']);
@@ -279,7 +283,6 @@ class CommentsController extends AbstractRestfulController
         $type = (int)$this->params('type');
         $item = (int)$this->params('item_id');
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $comments = $this->comments->service()->get($type, $item, $user ? $user['id'] : 0);
@@ -289,13 +292,11 @@ class CommentsController extends AbstractRestfulController
         }
 
         $canAddComments = $this->canAddComments();
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canRemoveComments = $this->user()->isAllowed('comment', 'remove');
 
         $form = null;
         if ($canAddComments) {
             $form = $this->getAddForm([
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'canModeratorAttention' => $this->user()->isAllowed('comment', 'moderator-attention'),
                 'action' => $this->url()->fromRoute('comments/add', [
                     'type_id' => $type,

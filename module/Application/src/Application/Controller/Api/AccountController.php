@@ -10,9 +10,16 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
+use Autowp\User\Controller\Plugin\User;
 
 use Application\Model\UserAccount;
 
+/**
+ * Class AccountController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ */
 class AccountController extends AbstractRestfulController
 {
     /**
@@ -42,7 +49,6 @@ class AccountController extends AbstractRestfulController
 
     private function canRemoveAccount(int $id): bool
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return false;
@@ -62,7 +68,6 @@ class AccountController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -100,7 +105,6 @@ class AccountController extends AbstractRestfulController
      */
     public function startAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -137,7 +141,6 @@ class AccountController extends AbstractRestfulController
 
     public function deleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return $this->forbiddenAction();

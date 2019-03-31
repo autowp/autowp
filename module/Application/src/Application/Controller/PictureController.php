@@ -7,9 +7,21 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\Pic;
+use Application\Language;
 use Application\Model\Brand;
 use Application\Model\Picture;
 
+/**
+ * Class PictureController
+ * @package Application\Controller
+ *
+ * @method Pic pic()
+ * @method User user()
+ * @method string language()
+ */
 class PictureController extends AbstractActionController
 {
     /**
@@ -45,7 +57,6 @@ class PictureController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $picturesData = $this->pic()->listData([$picture]);
         $viewModel = new ViewModel([
             'picturesData' => $picturesData,
@@ -98,7 +109,6 @@ class PictureController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $url = $this->pic()->href($picture, [
             'fallback' => false
         ]);
@@ -107,11 +117,9 @@ class PictureController extends AbstractActionController
             return $this->redirect()->toUrl($url);
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
 
         if ($picture['status'] == Picture::STATUS_REMOVING) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();
@@ -141,7 +149,6 @@ class PictureController extends AbstractActionController
             $brands[] = $brand['id'];
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $data = $this->pic()->picPageData($picture, $picFilter, $brands, [
             'paginator' => [
                 'route'     => 'picture/picture',
@@ -168,11 +175,9 @@ class PictureController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
 
         if ($picture['status'] == Picture::STATUS_REMOVING) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();
@@ -185,7 +190,6 @@ class PictureController extends AbstractActionController
 
         $filter = $this->getPicturesFilter($picture);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return new JsonModel($this->pic()->gallery2($filter, [
             'page'      => $this->params()->fromQuery('page'),
             'pictureId' => $this->params()->fromQuery('pictureId'),

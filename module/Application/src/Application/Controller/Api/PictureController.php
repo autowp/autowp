@@ -9,9 +9,13 @@ use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
+use Autowp\Comments\CommentsService;
+use Autowp\Image\Storage;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\User;
 
+use Application\Controller\Plugin\ForbiddenAction;
+use Application\Controller\Plugin\Pic;
 use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
@@ -25,6 +29,19 @@ use Application\Model\UserPicture;
 use Application\Service\PictureService;
 use Application\Service\TelegramService;
 
+/**
+ * Class PictureController
+ * @package Application\Controller\Api
+ *
+ * @method Pic pic()
+ * @method string language()
+ * @method Storage imageStorage()
+ * @method \Autowp\User\Controller\Plugin\User user()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ForbiddenAction forbiddenAction()
+ * @method void log(string $message, array $objects)
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class PictureController extends AbstractRestfulController
 {
     /**
@@ -90,7 +107,7 @@ class PictureController extends AbstractRestfulController
     private $textStorage;
 
     /**
-     * @var \Autowp\Comments\CommentsService
+     * @var CommentsService
      */
     private $comments;
 
@@ -135,7 +152,7 @@ class PictureController extends AbstractRestfulController
         InputFilter $publicListInputFilter,
         InputFilter $editInputFilter,
         $textStorage,
-        \Autowp\Comments\CommentsService $comments,
+        CommentsService $comments,
         PictureModerVote $pictureModerVote,
         Item $item,
         Picture $picture,
@@ -182,9 +199,7 @@ class PictureController extends AbstractRestfulController
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'page'   => $this->pic()->url($pictureRow['identity'], true)
             ];
         }
@@ -209,9 +224,7 @@ class PictureController extends AbstractRestfulController
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'page'   => $this->pic()->url($pictureRow['identity'], true)
             ];
         }
@@ -262,9 +275,7 @@ class PictureController extends AbstractRestfulController
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'page'   => $this->pic()->url($pictureRow['identity'], true)
             ];
         }
@@ -274,9 +285,7 @@ class PictureController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $inputFilter = $isModer ? $this->listInputFilter : $this->publicListInputFilter;
@@ -315,7 +324,7 @@ class PictureController extends AbstractRestfulController
         }
 
         $filter = [
-            'timezone' => $this->user()->timezone() // @phan-suppress-current-line PhanUndeclaredMethod
+            'timezone' => $this->user()->timezone()
         ];
 
         if ($data['identity']) {
@@ -509,7 +518,7 @@ class PictureController extends AbstractRestfulController
     private function canAccept($picture)
     {
         return $this->picture->canAccept($picture)
-            && $this->user()->isAllowed('picture', 'accept'); // @phan-suppress-current-line PhanUndeclaredMethod
+            && $this->user()->isAllowed('picture', 'accept');
     }
 
     /**
@@ -534,9 +543,6 @@ class PictureController extends AbstractRestfulController
         ]) . 'ng/moder/pictures/' . $picture['id'];
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function postAction()
     {
         $user = $this->user()->get();
@@ -621,13 +627,11 @@ class PictureController extends AbstractRestfulController
 
         $data = $this->editInputFilter->getValues();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
 
         $set = [];
 
         if (isset($data['crop'])) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $canCrop = $this->user()->isAllowed('picture', 'crop')
                     || ($picture['owner_id'] == $user['id']) && ($picture['status'] == Picture::STATUS_INBOX);
 
@@ -664,7 +668,6 @@ class PictureController extends AbstractRestfulController
 
             $this->log(sprintf(
                 'Выделение области на картинке %s',
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
                 'pictures' => $picture['id']
@@ -679,7 +682,6 @@ class PictureController extends AbstractRestfulController
                         return $this->notFoundAction();
                     }
 
-                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     if (! $this->user()->isAllowed('picture', 'move')) {
                         return $this->forbiddenAction();
                     }
@@ -689,9 +691,7 @@ class PictureController extends AbstractRestfulController
                     // log
                     $this->log(sprintf(
                         'Замена %s на %s отклонена',
-                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
-                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         htmlspecialchars($this->pic()->name($picture, $this->language()))
                     ), [
                         'pictures' => [$picture['id'], $replacePicture['id']]
@@ -706,7 +706,6 @@ class PictureController extends AbstractRestfulController
             if (isset($data['copyrights'])) {
                 $text = $data['copyrights'];
 
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $user = $this->user()->get();
 
                 if ($picture['copyrights_text_id']) {
@@ -718,7 +717,6 @@ class PictureController extends AbstractRestfulController
 
                 $this->log(sprintf(
                     'Редактирование текста копирайтов изображения %s',
-                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     htmlspecialchars($this->pic()->name($picture, $this->language()))
                 ), [
                     'pictures' => $picture['id']
@@ -740,7 +738,6 @@ class PictureController extends AbstractRestfulController
                                         $userRow['language']
                                     ),
                                     $this->userModerUrl($user, true, $uri),
-                                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                                     $this->pic()->name($picture, $userRow['language']),
                                     $this->pictureUrl($picture, true, $uri)
                                 );
@@ -753,7 +750,6 @@ class PictureController extends AbstractRestfulController
             }
 
             if (isset($data['status'])) {
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $user = $this->user()->get();
                 $previousStatusUserId = $picture['change_status_user_id'];
 
@@ -778,7 +774,6 @@ class PictureController extends AbstractRestfulController
 
                                 $message = sprintf(
                                     $this->translate('pm/your-picture-accepted-%s', 'default', $owner['language']),
-                                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                                     $this->pic()->url($picture['identity'], true, $uri)
                                 );
 
@@ -795,7 +790,6 @@ class PictureController extends AbstractRestfulController
                         if ($prevUser) {
                             $message = sprintf(
                                 'Принята картинка %s',
-                                /* @phan-suppress-next-line PhanUndeclaredMethod */
                                 $this->pic()->url($picture['identity'], true)
                             );
                             $this->message->send(null, $prevUser['id'], $message);
@@ -804,7 +798,6 @@ class PictureController extends AbstractRestfulController
 
                     $this->log(sprintf(
                         'Картинка %s принята',
-                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         htmlspecialchars($this->pic()->name($picture, $this->language()))
                     ), [
                         'pictures' => $picture['id']
@@ -813,7 +806,6 @@ class PictureController extends AbstractRestfulController
 
                 if ($data['status'] == Picture::STATUS_INBOX) {
                     if ($picture['status'] == Picture::STATUS_REMOVING) {
-                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $canRestore = $this->user()->isAllowed('picture', 'restore');
                         if (! $canRestore) {
                             return $this->forbiddenAction();
@@ -826,13 +818,11 @@ class PictureController extends AbstractRestfulController
 
                         $this->log(sprintf(
                             'Картинки `%s` восстановлена из очереди удаления',
-                            /* @phan-suppress-next-line PhanUndeclaredMethod */
                             htmlspecialchars($this->pic()->name($picture, $this->language()))
                         ), [
                             'pictures' => $picture['id']
                         ]);
                     } elseif ($picture['status'] == Picture::STATUS_ACCEPTED) {
-                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $canUnaccept = $this->user()->isAllowed('picture', 'unaccept');
                         if (! $canUnaccept) {
                             return $this->forbiddenAction();
@@ -851,13 +841,11 @@ class PictureController extends AbstractRestfulController
 
                         $this->log(sprintf(
                             'С картинки %s снят статус "принято"',
-                            /* @phan-suppress-next-line PhanUndeclaredMethod */
                             htmlspecialchars($this->pic()->name($picture, $this->language()))
                         ), [
                             'pictures' => $picture['id']
                         ]);
 
-                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $pictureUrl = $this->pic()->url($picture['identity'], true);
                         if ($previousStatusUserId != $user['id']) {
                             $prevUser = $this->userModel->getRow((int)$previousStatusUserId);
@@ -878,7 +866,6 @@ class PictureController extends AbstractRestfulController
                         return $this->forbiddenAction();
                     }
 
-                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $user = $this->user()->get();
                     $set = array_replace($set, [
                         'status'                => Picture::STATUS_REMOVING,
@@ -902,7 +889,6 @@ class PictureController extends AbstractRestfulController
 
                         $message = sprintf(
                             $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner['language']),
-                            /* @phan-suppress-next-line PhanUndeclaredMethod */
                             $this->pic()->url($picture['identity'], true, $uri),
                             implode("\n", $reasons)
                         );
@@ -912,7 +898,6 @@ class PictureController extends AbstractRestfulController
 
                     $this->log(sprintf(
                         'Картинка %s поставлена в очередь на удаление',
-                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         htmlspecialchars($this->pic()->name($picture, $this->language()))
                     ), [
                         'pictures' => $picture['id']
@@ -933,7 +918,6 @@ class PictureController extends AbstractRestfulController
 
     public function itemAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -969,14 +953,12 @@ class PictureController extends AbstractRestfulController
         }
 
         $canDelete = false;
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->user()->isAllowed('picture', 'remove')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $canDelete = true;
             }
-        } elseif ($this->user()->isAllowed('picture', 'remove_by_vote')) {  // @phan-suppress-current-line PhanUndeclaredMethod
+        } elseif ($this->user()->isAllowed('picture', 'remove_by_vote')) {
             if ($this->pictureModerVote->hasVote($picture['id'], $user['id'])) {
                 $acceptVotes = $this->pictureModerVote->getPositiveVotesCount($picture['id']);
                 $deleteVotes = $this->pictureModerVote->getNegativeVotesCount($picture['id']);
@@ -990,7 +972,6 @@ class PictureController extends AbstractRestfulController
 
     public function normalizeAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -1001,7 +982,7 @@ class PictureController extends AbstractRestfulController
         }
 
         $canNormalize = $row['status'] == Picture::STATUS_INBOX
-                     && $this->user()->isAllowed('picture', 'normalize'); // @phan-suppress-current-line PhanUndeclaredMethod
+                     && $this->user()->isAllowed('picture', 'normalize');
 
         if (! $canNormalize) {
             return $this->forbiddenAction();
@@ -1013,7 +994,6 @@ class PictureController extends AbstractRestfulController
 
         $this->log(sprintf(
             'К картинке %s применён normalize',
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             htmlspecialchars($this->pic()->name($row, $this->language()))
         ), [
             'pictures' => $row['id']
@@ -1036,7 +1016,7 @@ class PictureController extends AbstractRestfulController
         }
 
         $canFlop = $row['status'] == Picture::STATUS_INBOX
-                && $this->user()->isAllowed('picture', 'flop'); // @phan-suppress-current-line PhanUndeclaredMethod
+                && $this->user()->isAllowed('picture', 'flop');
 
         if (! $canFlop) {
             return $this->forbiddenAction();
@@ -1048,7 +1028,6 @@ class PictureController extends AbstractRestfulController
 
         $this->log(sprintf(
             'К картинке %s применён flop',
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             htmlspecialchars($this->pic()->name($row, $this->language()))
         ), [
             'pictures' => $row['id']
@@ -1060,7 +1039,6 @@ class PictureController extends AbstractRestfulController
 
     public function repairAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -1082,7 +1060,6 @@ class PictureController extends AbstractRestfulController
 
     public function correctFileNamesAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -1130,7 +1107,6 @@ class PictureController extends AbstractRestfulController
                 break;
 
             case Picture::STATUS_INBOX:
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $can1 = $this->user()->isAllowed('picture', 'accept');
                 break;
         }
@@ -1138,13 +1114,11 @@ class PictureController extends AbstractRestfulController
         $can2 = false;
         switch ($replacedPicture['status']) {
             case Picture::STATUS_ACCEPTED:
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $can2 = $this->user()->isAllowed('picture', 'unaccept')
                      && $this->user()->isAllowed('picture', 'remove_by_vote');
                 break;
 
             case Picture::STATUS_INBOX:
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $can2 = $this->user()->isAllowed('picture', 'remove_by_vote');
                 break;
 
@@ -1154,7 +1128,6 @@ class PictureController extends AbstractRestfulController
                 break;
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         return $can1 && $can2 && $this->user()->isAllowed('picture', 'move');
     }
 
@@ -1163,7 +1136,6 @@ class PictureController extends AbstractRestfulController
      */
     public function acceptReplaceAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -1186,7 +1158,6 @@ class PictureController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         // statuses
@@ -1244,9 +1215,7 @@ class PictureController extends AbstractRestfulController
             foreach ($recepients as $recepient) {
                 $uri = $this->hostManager->getUriByLanguage($recepient['language']);
 
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $url = $this->pic()->url($picture['identity'], true, $uri);
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $replaceUrl = $this->pic()->url($replacePicture['identity'], true, $uri);
 
                 $moderUrl = $this->url()->fromRoute('ng', ['path' => ''], [
@@ -1268,9 +1237,7 @@ class PictureController extends AbstractRestfulController
         // log
         $this->log(sprintf(
             'Замена %s на %s',
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), [
             'pictures' => [$picture['id'], $replacePicture['id']]
@@ -1282,7 +1249,6 @@ class PictureController extends AbstractRestfulController
 
     public function userSummaryAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {

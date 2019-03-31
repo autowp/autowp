@@ -18,7 +18,7 @@ class Log extends AbstractPlugin
         $this->log = $log;
     }
 
-    public function __invoke(string $message, array $objects)
+    public function __invoke(string $message, array $objects): void
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->getController()->user()->get();

@@ -13,7 +13,10 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\Message\MessageService;
+use Autowp\User\Controller\Plugin\User;
 
+use Application\Controller\Plugin\Car;
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
@@ -22,6 +25,18 @@ use Application\Model\UserItemSubscribe;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
 
+/**
+ * Class ItemParentController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ * @method ForbiddenAction forbiddenAction()
+ * @method void log(string $message, array $objects)
+ * @method Car car()
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class ItemParentController extends AbstractRestfulController
 {
     /**
@@ -113,10 +128,8 @@ class ItemParentController extends AbstractRestfulController
      */
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
 
         $this->listInputFilter->setData($this->params()->fromQuery());
@@ -234,7 +247,6 @@ class ItemParentController extends AbstractRestfulController
 
     public function itemAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
@@ -265,9 +277,6 @@ class ItemParentController extends AbstractRestfulController
         return new JsonModel($this->hydrator->extract($row));
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function postAction()
     {
         $canMove = $this->user()->isAllowed('car', 'move');
@@ -330,7 +339,6 @@ class ItemParentController extends AbstractRestfulController
             'items' => [$item['id'], $parentItem['id']]
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $subscribers = [];
@@ -375,7 +383,6 @@ class ItemParentController extends AbstractRestfulController
 
     public function putAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canMove = $this->user()->isAllowed('car', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
@@ -490,7 +497,6 @@ class ItemParentController extends AbstractRestfulController
      */
     public function deleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'move')) {
             return $this->forbiddenAction();
         }
@@ -536,7 +542,6 @@ class ItemParentController extends AbstractRestfulController
             'items' => $item['id'], $parentItem['id']
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $subscribers = [];

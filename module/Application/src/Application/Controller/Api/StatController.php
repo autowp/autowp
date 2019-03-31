@@ -5,9 +5,19 @@ namespace Application\Controller\Api;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\Item;
 use Application\Model\Picture;
 
+/**
+ * Class StatController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ */
 class StatController extends AbstractActionController
 {
     /**
@@ -28,7 +38,6 @@ class StatController extends AbstractActionController
 
     public function globalSummaryAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }

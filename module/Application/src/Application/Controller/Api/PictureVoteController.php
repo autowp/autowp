@@ -5,8 +5,18 @@ namespace Application\Controller\Api;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\PictureVote;
 
+/**
+ * Class PictureVoteController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ */
 class PictureVoteController extends AbstractRestfulController
 {
     /**
@@ -28,7 +38,6 @@ class PictureVoteController extends AbstractRestfulController
      */
     public function update($id, $data)
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->forbiddenAction();

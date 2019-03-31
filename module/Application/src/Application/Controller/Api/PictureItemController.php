@@ -5,14 +5,33 @@ namespace Application\Controller\Api;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Paginator;
+use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblemResponse;
 
+use Autowp\Image\Storage;
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
+use Application\Controller\Plugin\Pic;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
 use Application\Model\Log;
 use Application\Model\Picture;
 use Application\Model\PictureItem;
 
+/**
+ * Class PictureItemController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ * @method void log(string $message, array $objects)
+ * @method Storage imageStorage()
+ * @method Pic pic()
+ */
 class PictureItemController extends AbstractRestfulController
 {
     /**
@@ -70,12 +89,10 @@ class PictureItemController extends AbstractRestfulController
 
     private function canChangePerspective($picture)
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->user()->inheritsRole('moder')) {
             return true;
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return false;
@@ -92,12 +109,10 @@ class PictureItemController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->listInputFilter->setData($this->params()->fromQuery());
@@ -160,12 +175,10 @@ class PictureItemController extends AbstractRestfulController
 
     public function itemAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $userId = $this->user()->get()['id'];
 
         $picture = $this->picture->getRow(['id' => (int)$this->params('picture_id')]);
@@ -204,7 +217,6 @@ class PictureItemController extends AbstractRestfulController
 
     public function deleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $canMove = $this->user()->isAllowed('picture', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
@@ -245,9 +257,6 @@ class PictureItemController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function createAction()
     {
         $canMove = $this->user()->isAllowed('picture', 'move');
@@ -287,7 +296,7 @@ class PictureItemController extends AbstractRestfulController
             ]);
         }
 
-        $namespace = new \Zend\Session\Container('Moder_Car');
+        $namespace = new Container('Moder_Car');
         $namespace->lastCarId = $item['id'];
 
         $this->log->addEvent($userId, sprintf(
@@ -336,7 +345,6 @@ class PictureItemController extends AbstractRestfulController
 
             $this->log(sprintf(
                 'Установка ракурса картинки %s',
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
                 'pictures' => $picture['id']
@@ -344,7 +352,6 @@ class PictureItemController extends AbstractRestfulController
         }
 
         if (isset($data['area'])) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if (! $this->user()->inheritsRole('moder')) {
                 return $this->forbiddenAction();
             }
@@ -390,7 +397,6 @@ class PictureItemController extends AbstractRestfulController
 
             $this->log(sprintf(
                 'Выделение области на картинке %s',
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
                 'pictures' => $picture['id'],
@@ -399,7 +405,6 @@ class PictureItemController extends AbstractRestfulController
         }
 
         if (isset($data['item_id'])) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $canMove = $this->user()->isAllowed('picture', 'move');
             if (! $canMove) {
                 return $this->forbiddenAction();
@@ -416,7 +421,6 @@ class PictureItemController extends AbstractRestfulController
 
             $this->pictureItem->changePictureItem($picture['id'], $type, $srcItem['id'], $dstItem['id']);
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $userId = $this->user()->get()['id'];
 
             $this->log->addEvent($userId, sprintf(
@@ -429,7 +433,7 @@ class PictureItemController extends AbstractRestfulController
                 'pictures' => $picture['id']
             ]);
 
-            $namespace = new \Zend\Session\Container('Moder_Car');
+            $namespace = new Container('Moder_Car');
             $namespace->lastCarId = $dstItem['id'];
         }
 

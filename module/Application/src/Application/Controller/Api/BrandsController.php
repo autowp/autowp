@@ -7,6 +7,12 @@ use Zend\View\Model\JsonModel;
 
 use Application\Model\Brand;
 
+/**
+ * Class BrandsController
+ * @package Application\Controller\Api
+ *
+ * @method string language()
+ */
 class BrandsController extends AbstractActionController
 {
     private $cache;

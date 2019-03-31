@@ -2,13 +2,20 @@
 
 namespace Application\Controller\Frontend;
 
-use Zend\Mvc\Controller\AbstractActionController;
-
-use Application\Model\CarOfDay;
-
 use DateTime;
 use DateTimeZone;
 
+use Zend\Mvc\Controller\AbstractActionController;
+
+use Application\Controller\Plugin\ForbiddenAction;
+use Application\Model\CarOfDay;
+
+/**
+ * Class YandexController
+ * @package Application\Controller\Frontend
+ *
+ * @method ForbiddenAction forbiddenAction()
+ */
 class YandexController extends AbstractActionController
 {
     const DATE_FORMAT = 'Y-m-d';

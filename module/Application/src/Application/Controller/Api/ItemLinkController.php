@@ -9,8 +9,19 @@ use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 
+/**
+ * Class ItemLinkController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ForbiddenAction forbiddenAction()
+ */
 class ItemLinkController extends AbstractRestfulController
 {
     /**
@@ -78,7 +89,6 @@ class ItemLinkController extends AbstractRestfulController
 
     public function getAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -96,7 +106,6 @@ class ItemLinkController extends AbstractRestfulController
 
     public function putAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
@@ -154,9 +163,6 @@ class ItemLinkController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function postAction()
     {
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
@@ -197,7 +203,6 @@ class ItemLinkController extends AbstractRestfulController
 
     public function deleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }

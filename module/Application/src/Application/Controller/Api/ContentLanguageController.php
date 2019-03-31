@@ -5,6 +5,12 @@ namespace Application\Controller\Api;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+/**
+ * Class ContentLanguageController
+ * @package Application\Controller\Api
+ *
+ * @method \Autowp\User\Controller\Plugin\User user()
+ */
 class ContentLanguageController extends AbstractRestfulController
 {
     /**
@@ -19,7 +25,6 @@ class ContentLanguageController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }

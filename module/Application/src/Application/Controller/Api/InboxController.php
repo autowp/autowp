@@ -6,12 +6,23 @@ use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblemResponse;
+
+use Autowp\User\Controller\Plugin\User;
 
 use Application\Service\DayPictures;
 use Application\Model\Brand;
 use Application\Model\Item;
 use Application\Model\Picture;
 
+/**
+ * Class InboxController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method string language()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ */
 class InboxController extends AbstractRestfulController
 {
     const PER_PAGE = 18;

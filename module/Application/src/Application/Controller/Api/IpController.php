@@ -5,9 +5,21 @@ namespace Application\Controller\Api;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblemResponse;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 
+/**
+ * Class IpController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ */
 class IpController extends AbstractRestfulController
 {
     /**
@@ -30,7 +42,6 @@ class IpController extends AbstractRestfulController
 
     public function itemAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -43,7 +54,6 @@ class IpController extends AbstractRestfulController
 
         $data = $this->itemInputFilter->getValues();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->hydrator->setOptions([

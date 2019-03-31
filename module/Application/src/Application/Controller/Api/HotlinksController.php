@@ -4,12 +4,21 @@ namespace Application\Controller\Api;
 
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Model\Referer;
 
+/**
+ * Class HotlinksController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ */
 class HotlinksController extends AbstractRestfulController
 {
     /**
@@ -24,7 +33,6 @@ class HotlinksController extends AbstractRestfulController
 
     public function hostsAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'view')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -36,7 +44,6 @@ class HotlinksController extends AbstractRestfulController
 
     public function hostsDeleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -49,7 +56,6 @@ class HotlinksController extends AbstractRestfulController
 
     public function hostDeleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -62,7 +68,6 @@ class HotlinksController extends AbstractRestfulController
 
     public function whitelistPostAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
@@ -83,7 +88,6 @@ class HotlinksController extends AbstractRestfulController
 
     public function blacklistPostAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }

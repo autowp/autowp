@@ -6,13 +6,23 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
-
 use ZF\ApiProblem\ApiProblemResponse;
 use ZF\ApiProblem\ApiProblem;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\ItemParent;
 
+/**
+ * Class ItemParentLanguageController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ */
 class ItemParentLanguageController extends AbstractRestfulController
 {
     /**
@@ -49,7 +59,6 @@ class ItemParentLanguageController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -71,7 +80,6 @@ class ItemParentLanguageController extends AbstractRestfulController
 
     public function getAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -91,7 +99,6 @@ class ItemParentLanguageController extends AbstractRestfulController
 
     public function putAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }

@@ -9,6 +9,12 @@ use Zend\View\Model\JsonModel;
 
 use Application\Service\SpecificationsService;
 
+/**
+ * Class ChartController
+ * @package Application\Controller\Api
+ *
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class ChartController extends AbstractRestfulController
 {
     private $parameters = [

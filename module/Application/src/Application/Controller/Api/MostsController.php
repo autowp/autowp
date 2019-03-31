@@ -5,15 +5,27 @@ namespace Application\Controller\Api;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\Image\Storage;
+use Autowp\User\Controller\Plugin\User;
 use Autowp\TextStorage;
 
 use Application\Hydrator\Api\RestHydrator;
+use Application\Model\Catalogue;
 use Application\Model\Item;
 use Application\Model\Perspective;
 use Application\Model\Picture;
 use Application\PictureNameFormatter;
 use Application\Service\Mosts;
 
+/**
+ * Class MostsController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method string language()
+ * @method Storage imageStorage()
+ * @method Catalogue catalogue()
+ */
 class MostsController extends AbstractActionController
 {
     private $textStorage;
@@ -63,7 +75,6 @@ class MostsController extends AbstractActionController
 
     public function getItemsAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $language = $this->language();

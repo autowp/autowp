@@ -2,13 +2,13 @@
 
 namespace Application\Controller\Api;
 
+use ReCaptcha\ReCaptcha;
 use Zend\Authentication\AuthenticationService;
 use Zend\InputFilter\InputFilter;
 use Zend\Mail;
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
-
-use ReCaptcha\ReCaptcha;
 use ZF\ApiProblem\ApiProblemResponse;
 use ZF\ApiProblem\ApiProblem;
 
@@ -19,6 +19,13 @@ use Autowp\User\Model\UserPasswordRemind;
 use Application\HostManager;
 use Application\Service\UsersService;
 
+/**
+ * Class RestorePasswordController
+ * @package Application\Controller\Api
+ *
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class RestorePasswordController extends AbstractRestfulController
 {
     /**
@@ -96,7 +103,7 @@ class RestorePasswordController extends AbstractRestfulController
         }
 
         if ($this->captchaEnabled) {
-            $namespace = new \Zend\Session\Container('Captcha');
+            $namespace = new Container('Captcha');
             $verified = isset($namespace->success) && $namespace->success;
 
             if (! $verified) {

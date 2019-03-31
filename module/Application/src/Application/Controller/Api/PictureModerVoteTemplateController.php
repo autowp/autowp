@@ -7,7 +7,20 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblemResponse;
 
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\ForbiddenAction;
+
+/**
+ * Class PictureModerVoteTemplateController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ */
 class PictureModerVoteTemplateController extends AbstractRestfulController
 {
     /**
@@ -28,12 +41,10 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $select = new Sql\Select($this->table->getTable());
@@ -56,9 +67,6 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function itemAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -89,13 +97,12 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
 
     public function deleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $this->table->delete([
-            'user_id' => $this->user()->get()['id'], // @phan-suppress-current-line PhanUndeclaredMethod
+            'user_id' => $this->user()->get()['id'],
             'id'      => (int)$this->params('id')
         ]);
 
@@ -103,9 +110,6 @@ class PictureModerVoteTemplateController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function createAction()
     {
         if (! $this->user()->inheritsRole('moder')) {

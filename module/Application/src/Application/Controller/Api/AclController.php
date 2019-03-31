@@ -9,9 +9,17 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Validator;
 use Zend\View\Model\JsonModel;
 
+use Autowp\User\Controller\Plugin\User;
+
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
+/**
+ * Class AclController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ */
 class AclController extends AbstractRestfulController
 {
     /**
@@ -103,7 +111,6 @@ class AclController extends AbstractRestfulController
 
     public function isAllowedAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
@@ -119,13 +126,11 @@ class AclController extends AbstractRestfulController
 
     public function inheritRolesAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         $result = [
             $user->role => true
@@ -135,7 +140,6 @@ class AclController extends AbstractRestfulController
         $roles = explode(',', $roles);
 
         foreach ($roles as $role) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $result[$role] = $this->user()->inheritsRole($role);
         }
 
@@ -195,7 +199,6 @@ class AclController extends AbstractRestfulController
 
     public function rolesPostAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('rights', 'edit')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -311,7 +314,6 @@ class AclController extends AbstractRestfulController
 
     public function rulesPostAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('rights', 'edit')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -438,7 +440,6 @@ class AclController extends AbstractRestfulController
 
     public function roleParentsPostAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('rights', 'edit')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }

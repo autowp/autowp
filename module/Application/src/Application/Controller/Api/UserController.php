@@ -8,24 +8,38 @@ use DateTimeZone;
 use Exception;
 use Imagick;
 
+use ReCaptcha\ReCaptcha;
 use Zend\Authentication\AuthenticationService;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Permissions\Acl\Acl;
+use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
-
-use ReCaptcha\ReCaptcha;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\Commons\Db\Table\Row;
+use Autowp\Image\Storage;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRename;
 
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Service\UsersService;
 
+/**
+ * Class UserController
+ * @package Application\Controller\Api
+ *
+ * @method \Autowp\User\Controller\Plugin\User user()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method ForbiddenAction forbiddenAction()
+ * @method string language()
+ * @method void log(string $message, array $objects)
+ * @method Storage imageStorage()
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class UserController extends AbstractRestfulController
 {
     /**
@@ -125,7 +139,6 @@ class UserController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->listInputFilter->setData($this->params()->fromQuery());
@@ -188,7 +201,6 @@ class UserController extends AbstractRestfulController
 
         $data = $this->itemInputFilter->getValues();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $id = $this->params('id');
@@ -216,7 +228,6 @@ class UserController extends AbstractRestfulController
 
     public function putAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -281,7 +292,6 @@ class UserController extends AbstractRestfulController
         $values = $this->putInputFilter->getValues();
 
         if (array_key_exists('deleted', $values)) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $can = $this->user()->isAllowed('user', 'delete');
 
             if (! $can) {
@@ -434,7 +444,6 @@ class UserController extends AbstractRestfulController
 
     public function deletePhotoAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $id = $this->params('id');
@@ -450,7 +459,6 @@ class UserController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $can = $this->user()->isAllowed('user', 'ban');
         if (! $can) {
             return $this->forbiddenAction();
@@ -478,9 +486,6 @@ class UserController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(204);
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function postAction()
     {
         $request = $this->getRequest();
@@ -492,7 +497,7 @@ class UserController extends AbstractRestfulController
         }
 
         if ($this->captchaEnabled) {
-            $namespace = new \Zend\Session\Container('Captcha');
+            $namespace = new Container('Captcha');
             $verified = isset($namespace->success) && $namespace->success;
 
             if (! $verified) {
@@ -604,7 +609,6 @@ class UserController extends AbstractRestfulController
 
     public function postPhotoAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -677,7 +681,6 @@ class UserController extends AbstractRestfulController
             return new ApiProblemResponse(new ApiProblem(400, 'Code is invalid'));
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->logedIn()) {
             $adapter = new IdAuthAdapter($this->userModel);
             $adapter->setIdentity($user['id']);

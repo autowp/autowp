@@ -15,8 +15,20 @@ use ZF\ApiProblem\ApiProblemResponse;
 use Autowp\Forums\Forums;
 use Autowp\User\Model\User;
 
+use Application\Comments;
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 
+/**
+ * Class ForumController
+ * @package Application\Controller\Api
+ *
+ * @method \Autowp\User\Controller\Plugin\User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class ForumController extends AbstractRestfulController
 {
     /**
@@ -95,7 +107,6 @@ class ForumController extends AbstractRestfulController
 
     public function userSummaryAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -109,11 +120,9 @@ class ForumController extends AbstractRestfulController
 
     public function getThemesAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModerator = $this->user()->inheritsRole('moder');
 
         $this->themeListInputFilter->setData($this->params()->fromQuery());
@@ -153,9 +162,6 @@ class ForumController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function getThemeAction()
     {
         $isModerator = $this->user()->inheritsRole('moder');
@@ -180,7 +186,6 @@ class ForumController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
@@ -196,7 +201,6 @@ class ForumController extends AbstractRestfulController
 
     public function getTopicsAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         $userId = $user ? $user['id'] : null;
 
@@ -214,7 +218,7 @@ class ForumController extends AbstractRestfulController
         $select
             ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', [])
             ->where([
-                'comment_topic.type_id' => \Application\Comments::FORUMS_TYPE_ID,
+                'comment_topic.type_id' => Comments::FORUMS_TYPE_ID,
             ])
             ->order('comment_topic.last_update DESC');
 
@@ -240,7 +244,7 @@ class ForumController extends AbstractRestfulController
                 )
                 ->where([
                     'comment_topic_subscribe.user_id' => $userId,
-                    'comment_topic_subscribe.type_id' => \Application\Comments::FORUMS_TYPE_ID,
+                    'comment_topic_subscribe.type_id' => Comments::FORUMS_TYPE_ID,
                 ]);
         }
 
@@ -271,13 +275,11 @@ class ForumController extends AbstractRestfulController
 
     public function putTopicAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
 
         $row = $this->forums->getTopic((int)$this->params('id'));
@@ -348,7 +350,6 @@ class ForumController extends AbstractRestfulController
 
     private function needWait()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if ($user) {
             $nextMessageTime = $this->userModel->getNextMessageTime($user['id']);
@@ -361,7 +362,7 @@ class ForumController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction
      */
     public function postTopicAction()
     {
@@ -436,9 +437,6 @@ class ForumController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(201);
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function getTopicAction()
     {
         $this->topicGetInputFilter->setData($this->params()->fromQuery());

@@ -10,13 +10,25 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Paginator;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\User\Model\User;
 
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
 use Application\Service\SpecificationsService;
 
+/**
+ * Class AttrController
+ * @package Application\Controller\Api
+ *
+ * @method \Autowp\User\Controller\Plugin\User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method string language()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ */
 class AttrController extends AbstractRestfulController
 {
     /**
@@ -199,7 +211,6 @@ class AttrController extends AbstractRestfulController
 
     public function conflictIndexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -235,14 +246,12 @@ class AttrController extends AbstractRestfulController
 
     public function userValueIndexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -316,7 +325,6 @@ class AttrController extends AbstractRestfulController
 
     public function userValueItemDeleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forbiddenAction();
         }
@@ -333,14 +341,12 @@ class AttrController extends AbstractRestfulController
 
     public function userValuePatchAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -466,11 +472,10 @@ class AttrController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction
      */
     public function attributePostAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -529,14 +534,12 @@ class AttrController extends AbstractRestfulController
 
     public function attributeItemGetAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -566,14 +569,12 @@ class AttrController extends AbstractRestfulController
 
     public function attributeIndexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -610,14 +611,12 @@ class AttrController extends AbstractRestfulController
 
     public function valueIndexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -696,9 +695,6 @@ class AttrController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function attributeItemPatchAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {
@@ -852,7 +848,7 @@ class AttrController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction
      */
     public function zoneAttributePostAction()
     {
@@ -897,7 +893,6 @@ class AttrController extends AbstractRestfulController
 
     public function zoneAttributeItemDeleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -916,14 +911,12 @@ class AttrController extends AbstractRestfulController
 
     public function attributeTypeIndexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -943,14 +936,12 @@ class AttrController extends AbstractRestfulController
 
     public function unitIndexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -962,14 +953,12 @@ class AttrController extends AbstractRestfulController
 
     public function listOptionIndexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
             return $this->forbiddenAction();
         }
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
@@ -990,7 +979,7 @@ class AttrController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction
      */
     public function listOptionPostAction()
     {

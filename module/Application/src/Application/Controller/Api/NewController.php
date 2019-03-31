@@ -5,6 +5,9 @@ namespace Application\Controller\Api;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblemResponse;
+
+use Autowp\User\Controller\Plugin\User;
 
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
@@ -12,6 +15,14 @@ use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Service\DayPictures;
 
+/**
+ * Class NewController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ */
 class NewController extends AbstractRestfulController
 {
     const PER_PAGE = 30;
@@ -72,7 +83,6 @@ class NewController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->inputFilter->setData($this->params()->fromQuery());
@@ -88,7 +98,7 @@ class NewController extends AbstractRestfulController
 
         $service = new DayPictures([
             'picture'      => $this->picture,
-            'timezone'     => $this->user()->timezone(), // @phan-suppress-current-line PhanUndeclaredMethod
+            'timezone'     => $this->user()->timezone(),
             'dbTimezone'   => MYSQL_TIMEZONE,
             'select'       => $select,
             'orderColumn'  => 'accept_datetime',
@@ -167,7 +177,7 @@ class NewController extends AbstractRestfulController
                         'id' => $groupData['item_id']
                     ],
                     'accept_date' => $values['date'],
-                    'timezone'    => $this->user()->timezone() // @phan-suppress-current-line PhanUndeclaredMethod
+                    'timezone'    => $this->user()->timezone()
                 ]);
             } else {
                 $group['pictures'] = [];

@@ -2,18 +2,20 @@
 
 namespace Application\Controller\Api;
 
+use Autowp\Image\Storage;
 use Collator;
 use Exception;
 
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\InputFilter\Factory;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterPluginManager;
 use Zend\Hydrator\Strategy\StrategyInterface;
 use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
-
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
@@ -21,20 +23,38 @@ use geoPHP;
 use Point;
 
 use Autowp\Message\MessageService;
+use Autowp\User\Controller\Plugin\User;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
+use Application\Controller\Plugin\Car;
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Hydrator\Api\Strategy\Image;
 use Application\ItemNameFormatter;
 use Application\Model\Brand;
+use Application\Model\Catalogue;
 use Application\Model\Item;
 use Application\Model\ItemParent;
 use Application\Model\UserItemSubscribe;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
 
+/**
+ * Class ItemController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ * @method Catalogue catalogue()
+ * @method Car car()
+ * @method void log(string $message, array $objects)
+ * @method Storage imageStorage()
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class ItemController extends AbstractRestfulController
 {
     /**
@@ -287,10 +307,8 @@ class ItemController extends AbstractRestfulController
      */
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $params = $this->params()->fromQuery();
@@ -449,7 +467,7 @@ class ItemController extends AbstractRestfulController
 
         if ($isModer) {
             if ($data['last_item']) {
-                $namespace = new \Zend\Session\Container('Moder_Car');
+                $namespace = new Container('Moder_Car');
                 $itemId = isset($namespace->lastCarId) ? (int)$namespace->lastCarId : 0;
                 $select->where(['item.id' => $itemId]);
             }
@@ -810,7 +828,6 @@ class ItemController extends AbstractRestfulController
      */
     public function alphaAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -848,7 +865,6 @@ class ItemController extends AbstractRestfulController
 
     public function itemAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->itemInputFilter->setData($this->params()->fromQuery());
@@ -1133,13 +1149,13 @@ class ItemController extends AbstractRestfulController
             unset($spec['body']);
         }
 
-        $factory = new \Zend\InputFilter\Factory();
+        $factory = new Factory();
         $this->inputFilterManager->populateFactoryPluginManagers($factory);
         return $factory->createInputFilter($spec);
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction
      */
     public function postAction()
     {
@@ -1334,7 +1350,7 @@ class ItemController extends AbstractRestfulController
 
         $this->vehicleType->refreshInheritanceFromParents($itemId);
 
-        $namespace = new \Zend\Session\Container('Moder_Car');
+        $namespace = new Container('Moder_Car');
         $namespace->lastCarId = $itemId;
 
         $this->userItemSubscribe->subscribe($user['id'], $itemId);
@@ -1362,7 +1378,6 @@ class ItemController extends AbstractRestfulController
 
     public function putAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('car', 'edit_meta')) {
             return $this->forbiddenAction();
         }
@@ -1569,12 +1584,10 @@ class ItemController extends AbstractRestfulController
         }
 
         if (array_key_exists('engine_id', $values)) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
                 return $this->forbiddenAction();
             }
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if (! $this->user()->isAllowed('specifications', 'edit')) {
                 return $this->forbiddenAction();
             }
@@ -1594,7 +1607,6 @@ class ItemController extends AbstractRestfulController
                     'items' => $item['id']
                 ]);
 
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 $user = $this->user()->get();
 
                 foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
@@ -1631,7 +1643,6 @@ class ItemController extends AbstractRestfulController
                         'items' => $item['id']
                     ]);
 
-                    /* @phan-suppress-next-line PhanUndeclaredMethod */
                     $user = $this->user()->get();
 
                     foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
@@ -1743,7 +1754,6 @@ class ItemController extends AbstractRestfulController
                 'items' => $item['id']
             ]);
 
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $user = $this->user()->get();
             foreach ($this->userItemSubscribe->getItemSubscribers($item['id']) as $subscriber) {
                 if ($subscriber && ($subscriber['id'] != $user['id'])) {
@@ -1901,7 +1911,6 @@ class ItemController extends AbstractRestfulController
 
     public function getLogoAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -1922,7 +1931,6 @@ class ItemController extends AbstractRestfulController
 
     public function postLogoAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('brand', 'logo')) {
             return $this->forbiddenAction();
         }
@@ -2017,7 +2025,6 @@ class ItemController extends AbstractRestfulController
 
     public function refreshInheritanceAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forbiddenAction();
         }
@@ -2037,7 +2044,6 @@ class ItemController extends AbstractRestfulController
 
     public function specificationsAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }

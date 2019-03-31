@@ -20,11 +20,22 @@ use Autowp\User\Model\User;
 use Autowp\Votings\Votings;
 
 use Application\Comments;
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\HostManager;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Item;
 use Application\Model\Picture;
 
+/**
+ * Class CommentController
+ * @package Application\Controller\Api
+ *
+ * @method \Autowp\User\Controller\Plugin\User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class CommentController extends AbstractRestfulController
 {
     /**
@@ -145,7 +156,6 @@ class CommentController extends AbstractRestfulController
 
     public function subscribeAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return $this->forbiddenAction();
@@ -178,10 +188,8 @@ class CommentController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $isModer = $this->user()->inheritsRole('moder');
 
         $inputFilter = $isModer ? $this->listInputFilter : $this->publicListInputFilter;
@@ -316,7 +324,6 @@ class CommentController extends AbstractRestfulController
 
     private function nextMessageTime()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return null;
@@ -336,7 +343,7 @@ class CommentController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction
      */
     public function postAction()
     {
@@ -414,7 +421,6 @@ class CommentController extends AbstractRestfulController
 
 
         $moderatorAttention = false;
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->user()->isAllowed('comment', 'moderator-attention')) {
             $moderatorAttention = (bool)$data['moderator_attention'];
         }
@@ -445,7 +451,6 @@ class CommentController extends AbstractRestfulController
             'id' => $currentUser['id']
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->user()->inheritsRole('moder')) {
             if ($data['parent_id'] && $data['resolve']) {
                 $this->comments->service()->completeMessage($data['parent_id']);
@@ -500,7 +505,6 @@ class CommentController extends AbstractRestfulController
 
     public function putAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
         if (! $user) {
             return $this->forbiddenAction();
@@ -581,7 +585,6 @@ class CommentController extends AbstractRestfulController
         }
 
         if (array_key_exists('deleted', $values)) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($this->user()->isAllowed('comment', 'remove')) {
                 if ($values['deleted']) {
                     $this->comments->service()->queueDeleteMessage($row['id'], $user['id']);
@@ -593,7 +596,6 @@ class CommentController extends AbstractRestfulController
 
         if (array_key_exists('item_id', $values)) {
             $isForum = $row['type_id'] == Comments::FORUMS_TYPE_ID;
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             if ($isForum && $this->user()->isAllowed('forums', 'moderate')) {
                 $this->comments->service()->moveMessage($row['id'], $row['type_id'], $values['item_id']);
             }
@@ -605,7 +607,6 @@ class CommentController extends AbstractRestfulController
 
     public function getAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         $this->getInputFilter->setData($this->params()->fromQuery());

@@ -6,12 +6,23 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use ZF\ApiProblem\ApiProblemResponse;
 
 use Autowp\User\Model\User;
 
+use Application\Controller\Plugin\ForbiddenAction;
 use Application\Hydrator\Api\RestHydrator;
 use Application\Model\Contact;
 
+/**
+ * Class ContactsController
+ * @package Application\Controller\Api
+ *
+ * @method \Autowp\User\Controller\Plugin\User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ */
 class ContactsController extends AbstractRestfulController
 {
     /**
@@ -55,7 +66,6 @@ class ContactsController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $user = $this->user()->get();
 
         if (! $user) {
@@ -95,7 +105,6 @@ class ContactsController extends AbstractRestfulController
     {
         $id = (int)$this->params('id');
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->notFoundAction();
@@ -124,7 +133,6 @@ class ContactsController extends AbstractRestfulController
     {
         $id = (int)$this->params('id');
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->forbiddenAction();
@@ -157,7 +165,6 @@ class ContactsController extends AbstractRestfulController
     {
         $id = (int)$this->params('id');
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $currentUser = $this->user()->get();
         if (! $currentUser) {
             return $this->notFoundAction();

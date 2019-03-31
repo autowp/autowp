@@ -10,9 +10,18 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\User\Controller\Plugin\User;
+
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
+/**
+ * Class PageController
+ * @package Application\Controller\Api
+ *
+ * @method User user()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ */
 class PageController extends AbstractRestfulController
 {
     /**
@@ -42,7 +51,6 @@ class PageController extends AbstractRestfulController
 
     public function indexAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -82,7 +90,6 @@ class PageController extends AbstractRestfulController
 
     public function itemAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }
@@ -106,9 +113,6 @@ class PageController extends AbstractRestfulController
         ]);
     }
 
-    /**
-     * @suppress PhanUndeclaredMethod
-     */
     public function itemPutAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -243,7 +247,7 @@ class PageController extends AbstractRestfulController
     }
 
     /**
-     * @suppress PhanDeprecatedFunction, PhanUndeclaredMethod
+     * @suppress PhanDeprecatedFunction
      */
     public function postAction()
     {
@@ -304,7 +308,6 @@ class PageController extends AbstractRestfulController
 
     public function itemDeleteAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return new ApiProblemResponse(new ApiProblem(403, 'Forbidden'));
         }

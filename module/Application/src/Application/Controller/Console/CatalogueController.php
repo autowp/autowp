@@ -2,8 +2,14 @@
 
 namespace Application\Controller\Console;
 
+use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\Message\MessageService;
+use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
+use Autowp\User\Model\User;
+
+use Application\Controller\Plugin\Pic;
 use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Model\Item;
@@ -12,13 +18,17 @@ use Application\Model\Picture;
 use Application\Model\PictureItem;
 use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
+use Zend\Uri\UriFactory;
 
-use Autowp\Message\MessageService;
-use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
-use Autowp\User\Model\User;
-
-use Zend\Authentication\AuthenticationService;
-
+/**
+ * Class CatalogueController
+ * @package Application\Controller\Console
+ *
+ * @method Pic pic()
+ * @method void log(string $message, array $objects)
+ * @method string language()
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class CatalogueController extends AbstractActionController
 {
     /**
@@ -52,6 +62,26 @@ class CatalogueController extends AbstractActionController
      * @var User
      */
     private $userModel;
+
+    /**
+     * @var SpecificationsService
+     */
+    private $specService;
+
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
+
+    /**
+     * @var TelegramService
+     */
+    private $telegram;
+
+    /**
+     * @var DuplicateFinder
+     */
+    private $duplicateFinder;
 
     public function __construct(
         ItemParent $itemParent,
@@ -132,12 +162,11 @@ class CatalogueController extends AbstractActionController
                     $uri = $this->hostManager->getUriByLanguage($owner['language']);
 
                     if (! $uri) {
-                        $uri = \Zend\Uri\UriFactory::factory('https://www.autowp.ru');
+                        $uri = UriFactory::factory('https://www.autowp.ru');
                     }
 
                     $message = sprintf(
                         $this->translate('pm/your-picture-accepted-%s', 'default', $owner['language']),
-                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $this->pic()->url($picture['identity'], true, $uri)
                     );
 
@@ -152,7 +181,6 @@ class CatalogueController extends AbstractActionController
                 if ($prevUser) {
                     $message = sprintf(
                         'Принята картинка %s',
-                        /* @phan-suppress-next-line PhanUndeclaredMethod */
                         $this->pic()->url($picture['identity'], true)
                     );
                     $this->message->send(null, $prevUser['id'], $message);
@@ -161,7 +189,6 @@ class CatalogueController extends AbstractActionController
 
             $this->log(sprintf(
                 'Картинка %s принята',
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [
                 'pictures' => $picture['id']

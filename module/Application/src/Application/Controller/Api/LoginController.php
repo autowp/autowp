@@ -12,11 +12,11 @@ use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Uri\Http as HttpUri;
 use Zend\View\Model\JsonModel;
-
 use ZF\ApiProblem\ApiProblemResponse;
 use ZF\ApiProblem\ApiProblem;
 
 use Autowp\ExternalLoginService\PluginManager as ExternalLoginServices;
+use Autowp\Image\Storage;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\User;
 use Autowp\User\Model\UserRemember;
@@ -24,6 +24,16 @@ use Autowp\User\Model\UserRemember;
 use Application\Model\UserAccount;
 use Application\Service\UsersService;
 
+/**
+ * Class LoginController
+ * @package Application\Controller\Api
+ *
+ * @method \Autowp\User\Controller\Plugin\User user()
+ * @method Storage imageStorage()
+ * @method ApiProblemResponse inputFilterResponse(InputFilter $inputFilter)
+ * @method string language()
+ * @method string translate(string $message, string $textDomain = 'default', $locale = null)
+ */
 class LoginController extends AbstractRestfulController
 {
     /**
@@ -138,7 +148,6 @@ class LoginController extends AbstractRestfulController
 
 
         if ($values['remember']) {
-            /* @phan-suppress-next-line PhanUndeclaredMethod */
             $token = $this->userRemember->createToken($this->user()->get()['id']);
 
             $this->service->setRememberCookie($token, $this->language());
@@ -205,7 +214,6 @@ class LoginController extends AbstractRestfulController
      */
     public function startAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if ($this->user()->logedIn()) {
             return $this->redirect()->toUrl($this->url()->fromRoute('login'));
         }

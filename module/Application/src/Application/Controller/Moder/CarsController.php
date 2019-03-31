@@ -8,9 +8,28 @@ use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Image\Storage;
+use Autowp\User\Controller\Plugin\User;
+
+use Application\Controller\Plugin\Car;
+use Application\Controller\Plugin\ForbiddenAction;
+use Application\Controller\Plugin\Pic;
+use Application\Model\Catalogue;
 use Application\Model\Modification;
 use Application\Model\Picture;
 
+/**
+ * Class CarsController
+ * @package Application\Controller\Moder
+ *
+ * @method User user()
+ * @method ForbiddenAction forbiddenAction()
+ * @method Catalogue catalogue()
+ * @method Storage imageStorage()
+ * @method string language()
+ * @method Pic pic()
+ * @method Car car()
+ */
 class CarsController extends AbstractActionController
 {
     /**
@@ -154,7 +173,6 @@ class CarsController extends AbstractActionController
 
     public function carModificationsAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -193,7 +211,6 @@ class CarsController extends AbstractActionController
      */
     public function carModificationPicturesAction()
     {
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
@@ -296,9 +313,7 @@ class CarsController extends AbstractActionController
 
             $pictures[] = [
                 'id'              => $pictureRow['id'],
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'name'            => $this->pic()->name($pictureRow, $language),
-                /* @phan-suppress-next-line PhanUndeclaredMethod */
                 'url'             => $this->pic()->href($pictureRow),
                 'src'             => $imageInfo ? $imageInfo->getSrc() : null,
                 'modificationIds' => $modificationIds

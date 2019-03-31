@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\User\Model\User;
 
+use Application\Controller\Plugin\Pic;
 use Application\Model\CarOfDay;
 use Application\Model\Categories;
 use Application\Model\Brand;
@@ -17,6 +18,13 @@ use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Application\Model\PictureItem;
 
+/**
+ * Class IndexController
+ * @package Application\Controller
+ *
+ * @method Pic pic()
+ * @method string language()
+ */
 class IndexController extends AbstractActionController
 {
     private $cache;
@@ -219,7 +227,6 @@ class IndexController extends AbstractActionController
             'limit'            => 6
         ]);
 
-        /* @phan-suppress-next-line PhanUndeclaredMethod */
         $newPicturesData = $this->pic()->listData($rows, [
             'width' => 6
         ]);
