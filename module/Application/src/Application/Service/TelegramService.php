@@ -6,6 +6,7 @@ use Autowp\Message\MessageService;
 use Exception;
 
 use Telegram\Bot\Api;
+use Telegram\Bot\Exceptions\TelegramSDKException;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
@@ -93,7 +94,7 @@ class TelegramService
 
     /**
      * @return Api
-     * @throws \Telegram\Bot\Exceptions\TelegramSDKException
+     * @throws TelegramSDKException
      */
     private function getApi()
     {

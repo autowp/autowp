@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use ArrayObject;
 use DateTime;
 use Exception;
 
@@ -1738,7 +1739,7 @@ class Item
     /**
      * @suppress PhanUndeclaredMethod
      * @param array $options
-     * @return array|\ArrayObject|null
+     * @return array|ArrayObject|null
      * @throws Exception
      */
     public function getRow(array $options)

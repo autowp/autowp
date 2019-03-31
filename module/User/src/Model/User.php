@@ -2,6 +2,7 @@
 
 namespace Autowp\User\Model;
 
+use ArrayObject;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -213,7 +214,7 @@ class User
     /**
      * @suppress PhanUndeclaredMethod
      * @param $options
-     * @return array|\ArrayObject|null
+     * @return array|ArrayObject|null
      */
     public function getRow($options)
     {

@@ -2,6 +2,7 @@
 
 namespace Application\Most\Adapter;
 
+use ArrayObject;
 use Exception;
 use Zend\Db\Sql;
 
@@ -13,11 +14,11 @@ class Acceleration extends AbstractAdapter
 
     const MPH60_TO_KMH100 = 0.98964381346271110050637609692728;
     /**
-     * @var array|\ArrayObject|null
+     * @var array|ArrayObject|null
      */
     private $kmhAttribute;
     /**
-     * @var array|\ArrayObject|null
+     * @var array|ArrayObject|null
      */
     private $mphAttribute;
 

@@ -133,7 +133,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 }
             }
         }
-        
+
         return null;
     }
 }

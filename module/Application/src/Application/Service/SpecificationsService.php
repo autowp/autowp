@@ -4,6 +4,7 @@ namespace Application\Service;
 
 use Application\Validator\Attrs\IsFloatOrNull;
 use Application\Validator\Attrs\IsIntOrNull;
+use ArrayObject;
 use Exception;
 use NumberFormatter;
 
@@ -900,7 +901,7 @@ class SpecificationsService
      * @suppress PhanDeprecatedFunction
      * @param $car
      * @param $perspectives
-     * @return array|\ArrayObject|null
+     * @return array|ArrayObject|null
      * @throws Exception
      */
     private function specPicture($car, $perspectives)

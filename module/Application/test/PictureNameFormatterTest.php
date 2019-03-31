@@ -117,7 +117,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                     ]
                 ],
                 '1999–?? BMW 3 Series [UK-spec] (E46)',
-                '<span title="model&#x20;years">1999–??</span> BMW 3 Series <span class="badge badge-info">UK-spec</span> (E46)'
+                '<span title="model&#x20;years">1999–??</span> BMW 3 Series ' .
+                '<span class="badge badge-info">UK-spec</span> (E46)'
             ],
             [
                 [
@@ -132,7 +133,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                     ]
                 ],
                 '????–1999 BMW 3 Series [UK-spec] (E46)',
-                '<span title="model&#x20;years">????–1999</span> BMW 3 Series <span class="badge badge-info">UK-spec</span> (E46)'
+                '<span title="model&#x20;years">????–1999</span> BMW 3 Series ' .
+                '<span class="badge badge-info">UK-spec</span> (E46)'
             ],
             [
                 [
@@ -148,7 +150,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                     ]
                 ],
                 '1999–pr. BMW 3 Series [UK-spec] (E46)',
-                '<span title="model&#x20;years">1999–pr.</span> BMW 3 Series <span class="badge badge-info">UK-spec</span> (E46)'
+                '<span title="model&#x20;years">1999–pr.</span> BMW 3 Series ' .
+                '<span class="badge badge-info">UK-spec</span> (E46)'
             ],
             [
                 [
@@ -164,7 +167,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                     ]
                 ],
                 '????–1999 BMW 3 Series [UK-spec] (E46)',
-                '<span title="model&#x20;years">????–1999</span> BMW 3 Series <span class="badge badge-info">UK-spec</span> (E46)'
+                '<span title="model&#x20;years">????–1999</span> BMW 3 Series ' .
+                '<span class="badge badge-info">UK-spec</span> (E46)'
             ],
             [
                 [
@@ -180,7 +184,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                     ]
                 ],
                 date('Y') . ' BMW 3 Series [UK-spec] (E46)',
-                '<span title="model&#x20;years">' . date('Y') . '</span> BMW 3 Series <span class="badge badge-info">UK-spec</span> (E46)'
+                '<span title="model&#x20;years">' . date('Y') .
+                '</span> BMW 3 Series <span class="badge badge-info">UK-spec</span> (E46)'
             ],
             [
                 [
@@ -274,7 +279,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                     ]
                 ],
                 "BMW 3 Series [UK-spec] (E46) '11.1998–????",
-                "BMW 3 Series <span class=\"badge badge-info\">UK-spec</span> (E46) '<small class=\"month\">11.</small>1998–????"
+                "BMW 3 Series <span class=\"badge badge-info\">UK-spec</span> (E46) " .
+                "'<small class=\"month\">11.</small>1998–????"
             ],
             [
                 [
@@ -348,7 +354,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                     ]
                 ],
                 "1998–99 BMW 3 Series '1998–99",
-                "<span title=\"model&#x20;years\">1998–99</span> BMW 3 Series<small> '<span class=\"realyears\" title=\"years&#x20;of&#x20;production\">1998–99</span></small>"
+                "<span title=\"model&#x20;years\">1998–99</span> BMW 3 Series<small> " .
+                "'<span class=\"realyears\" title=\"years&#x20;of&#x20;production\">1998–99</span></small>"
             ],
             [
                 [
@@ -436,7 +443,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                     ]
                 ],
                 '1999½–pr. BMW 3 Series [UK-spec] (E46)',
-                '<span title="model&#x20;years">1999½–pr.</span> BMW 3 Series <span class="badge badge-info">UK-spec</span> (E46)'
+                '<span title="model&#x20;years">1999½–pr.</span> BMW 3 Series ' .
+                '<span class="badge badge-info">UK-spec</span> (E46)'
             ],
         ];
     }
@@ -462,7 +470,8 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                         ]
                     ]
                 ],
-                'B&amp;B B&amp;B <span class="badge badge-info" title="B&amp;B" data-toggle="tooltip" data-placement="top">B&amp;B</span> (B&amp;B)'
+                'B&amp;B B&amp;B <span class="badge badge-info" title="B&amp;B" ' .
+                'data-toggle="tooltip" data-placement="top">B&amp;B</span> (B&amp;B)'
             ],
         ];
     }

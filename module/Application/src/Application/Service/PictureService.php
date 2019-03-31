@@ -3,6 +3,7 @@
 namespace Application\Service;
 
 use Application\Comments;
+use ArrayObject;
 use Autowp\Comments\Attention;
 use Exception;
 
@@ -133,7 +134,7 @@ class PictureService
      * @param int $perspectiveId
      * @param int $replacePictureId
      * @param string $note
-     * @return array|\ArrayObject|null
+     * @return array|ArrayObject|null
      * @throws Image\Storage\Exception
      */
     public function addPictureFromFile(

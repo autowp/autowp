@@ -319,7 +319,11 @@ class CommentController extends AbstractRestfulController
             }
 
             if ($user && $values['item_id'] && $values['type_id']) {
-                $this->comments->service()->markSubscriptionAwaiting($values['type_id'], $values['item_id'], $user['id']);
+                $this->comments->service()->markSubscriptionAwaiting(
+                    $values['type_id'],
+                    $values['item_id'],
+                    $user['id']
+                );
             }
 
             $result['items'] = $comments;

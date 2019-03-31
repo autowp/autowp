@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Exception;
 use Zend\Db\Sql;
 use Zend\Paginator\Paginator;
 
@@ -162,7 +163,7 @@ class Twins
     /**
      * @param int $groupId
      * @return NULL|array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getGroup(int $groupId)
     {
