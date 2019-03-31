@@ -25,10 +25,8 @@ class StringUtils
             $text = implode("\n", $lines);
         }
 
-        if ($maxlength) {
-            if (mb_strlen($text) > $maxlength) {
-                $text = mb_substr($text, 0, $maxlength) . '...';
-            }
+        if ($maxlength && mb_strlen($text) > $maxlength) {
+            $text = mb_substr($text, 0, $maxlength) . '...';
         }
 
         return $text;

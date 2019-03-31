@@ -1478,10 +1478,8 @@ class ItemController extends AbstractRestfulController
             $endYear = $values['end_year'] ? $values['end_year'] : null;
             $set['end_year'] = $endYear;
 
-            if ($endYear) {
-                if ($endYear < date('Y')) {
-                    $values['today'] = false;
-                }
+            if ($endYear && $endYear < date('Y')) {
+                $values['today'] = false;
             }
         }
 

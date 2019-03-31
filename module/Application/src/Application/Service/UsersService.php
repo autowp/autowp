@@ -278,7 +278,7 @@ class UsersService
             $values = [
                 'email' => $user['email_to_check'],
                 'name'  => $user['name'],
-                'url'   => 'http://'.$hostname.'/ng/account/emailcheck/' . $user['email_check_code']
+                'url'   => 'https://'.$hostname.'/ng/account/emailcheck/' . $user['email_check_code']
             ];
 
             $subject = $this->translator->translate('users/registration/email-confirm-subject');
@@ -315,7 +315,7 @@ class UsersService
             $values = [
                 'email' => $user['email_to_check'],
                 'name'  => $user['name'],
-                'url'   => 'http://'.$hostname.'/ng/account/emailcheck/' . $user['email_check_code']
+                'url'   => 'https://'.$hostname.'/ng/account/emailcheck/' . $user['email_check_code']
             ];
 
             $subject = $this->translator->translate('users/change-email/confirm-subject');
