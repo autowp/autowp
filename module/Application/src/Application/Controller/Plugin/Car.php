@@ -100,7 +100,7 @@ class Car extends AbstractPlugin
         $disableTitle         = isset($options['disableTitle']) && $options['disableTitle'];
         $disableDescription   = isset($options['disableDescription']) && $options['disableDescription'];
         $disableDetailsLink   = isset($options['disableDetailsLink']) && $options['disableDetailsLink'];
-        $onlyExactlyPictures  = isset($options['onlyExactlyPictures']) ? $options['onlyExactlyPictures'] : null;
+        $onlyExactlyPictures  = isset($options['onlyExactlyPictures']) && $options['onlyExactlyPictures'];
         $hideEmpty            = isset($options['hideEmpty']) && $options['hideEmpty'];
         $disableTwins         = isset($options['disableTwins']) && $options['disableTwins'];
         $disableSpecs         = isset($options['disableSpecs']) && $options['disableSpecs'];
