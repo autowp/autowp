@@ -477,6 +477,14 @@ class IndexController extends AbstractRestfulController
                     ]);
                 }
 
+                if ($itemOfDayUser) {
+                    $this->userHydrator->setOptions([
+                        'language' => $language,
+                        'fields'   => [],
+                        'user_id'  => null
+                    ]);
+                    $itemOfDayUser = $this->userHydrator->extract($itemOfDayUser);
+                }
 
                 $itemOfDayInfo = [
                     'item' => $item,
