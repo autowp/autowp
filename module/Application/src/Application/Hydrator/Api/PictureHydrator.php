@@ -399,9 +399,12 @@ class PictureHydrator extends RestHydrator
             $categoryRows = $this->itemModel->getRows([
                 'language'     => $this->language,
                 'item_type_id' => Item::CATEGORY,
-                'descendant_or_self' => [
-                    'pictures' => [
-                        'id' => $object['id']
+                'child'        => [
+                    'item_type_id' => [Item::VEHICLE, Item::ENGINE],
+                    'descendant_or_self' => [
+                        'pictures' => [
+                            'id' => $object['id']
+                        ]
                     ]
                 ]
             ]);
