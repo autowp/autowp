@@ -4,6 +4,8 @@ namespace Application\Controller\Api;
 
 use Application\Comments;
 use ArrayObject;
+use geoPHP;
+use Point;
 use Zend\Db\Sql;
 use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -919,6 +921,16 @@ class PictureController extends AbstractRestfulController
                     ), [
                         'pictures' => $picture['id']
                     ]);
+                }
+            }
+
+            if (isset($data['point']['lat'], $data['point']['lng'])) {
+                if ($data['point']['lat'] && $data['point']['lng']) {
+                    geoPHP::version();
+                    $point = new Point($data['point']['lng'], $data['point']['lat']);
+                    $set['point'] = new Sql\Expression('GeomFromText(?)', [$point->out('wkt')]);
+                } else {
+                    $set['point'] = null;
                 }
             }
         }

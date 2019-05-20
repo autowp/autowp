@@ -2938,7 +2938,22 @@ return [
                 'validators' => [
                     ['name' => 'Digits']
                 ]
-            ]
+            ],
+            'point' => [
+                'required' => false,
+                'lat' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'lng' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ]
+            ],
         ],
         'api_picture_item' => [
             'fields' => [
