@@ -2,6 +2,8 @@
 
 namespace Application;
 
+use Application\Controller\Api\CommentController;
+use Application\Controller\Api\CommentControllerFactory;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 return [
@@ -44,6 +46,7 @@ return [
             Controller\Api\BrandsController::class          => Controller\Api\BrandsControllerFactory::class,
             Controller\Api\ChartController::class           => Controller\Api\ChartControllerFactory::class,
             Controller\Api\CommentController::class         => Controller\Api\CommentControllerFactory::class,
+            Controller\Api\ConfigController::class          => Controller\Api\ConfigControllerFactory::class,
             Controller\Api\ContactsController::class        => Controller\Api\ContactsControllerFactory::class,
             Controller\Api\ContentLanguageController::class => Controller\Api\ContentLanguageControllerFactory::class,
             Controller\Api\DonateController::class          => Controller\Api\DonateControllerFactory::class,
@@ -728,6 +731,16 @@ return [
                                 ]
                             ],
                         ]
+                    ],
+                    'config' => [
+                        'type'    => 'Literal',
+                        'options' => [
+                            'route'    => '/config',
+                            'defaults' => [
+                                'controller' => Controller\Api\ConfigController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
                     ],
                     'contacts' => [
                         'type'    => 'Literal',

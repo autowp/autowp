@@ -119,7 +119,7 @@ class IndexController extends AbstractRestfulController
     {
         $language = $this->language();
 
-        $cacheKey = 'API_INDEX_BRANDS_' . $language;
+        $cacheKey = 'API_INDEX_BRANDS_2_' . $language;
         $success = false;
         $brands = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
@@ -127,10 +127,6 @@ class IndexController extends AbstractRestfulController
 
             $items = $this->brand->getTopBrandsList($language);
             foreach ($items as &$item) {
-                $item['url'] = $this->url()->fromRoute('catalogue', [
-                    'action'        => 'brand',
-                    'brand_catname' => $item['catname'],
-                ]);
                 $item['new_cars_url'] = $this->url()->fromRoute('brands/newcars', [
                     'brand_id' => $item['id']
                 ]);

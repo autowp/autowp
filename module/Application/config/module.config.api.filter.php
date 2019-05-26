@@ -1319,8 +1319,10 @@ return [
                             'pictures_count', 'current_pictures_count',
                             'is_compiles_item_of_day', 'item_of_day_pictures',
                             'related_group_pictures', 'engine_id', 'attr_zone_id',
-                            'descendants_count', 'has_child_specs', 'accepted_pictures_count',
-                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names']]
+                            'descendants_count', 'has_child_specs', 'accepted_pictures_count', 'inbox_pictures_count',
+                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names',
+                            'descendant_twins_groups_count', 'comments_attentions_count', 'mosts_active',
+                            'exact_picture']]
                     ]
                 ]
             ],
@@ -1401,6 +1403,15 @@ return [
                 ]
             ],
             'engine_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
+            'factories_of_brand' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
@@ -1550,8 +1561,10 @@ return [
                             'pictures_count', 'current_pictures_count',
                             'is_compiles_item_of_day', 'item_of_day_pictures',
                             'related_group_pictures', 'engine_id', 'attr_zone_id',
-                            'descendants_count', 'has_child_specs', 'accepted_pictures_count',
-                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names']]
+                            'descendants_count', 'has_child_specs', 'accepted_pictures_count', 'inbox_pictures_count',
+                            'comments_topic_stat', 'front_picture', 'has_specs', 'alt_names',
+                            'descendant_twins_groups_count', 'comments_attentions_count', 'mosts_active',
+                            'exact_picture']]
                     ]
                 ]
             ],
@@ -2457,7 +2470,7 @@ return [
                             'name_html', 'name_text', 'image_gallery_full',
                             'preview_large', 'dpi', 'point', 'authors',
                             'categories', 'twins', 'factories', 'of_links',
-                            'copyright_blocks'
+                            'copyright_blocks', 'path'
                         ]]
                     ]
                 ]
@@ -2667,7 +2680,7 @@ return [
                             'owner', 'thumbnail', 'votes',
                             'comments_count', 'name_html', 'name_text', 'image_gallery_full',
                             'preview_large', 'dpi', 'point', 'authors', 'categories', 'twins',
-                            'factories', 'of_links', 'copyright_blocks'
+                            'factories', 'of_links', 'copyright_blocks', 'path'
                         ]]
                     ]
                 ]
@@ -2957,7 +2970,7 @@ return [
                             'name_html', 'name_text', 'image_gallery_full',
                             'preview_large', 'dpi', 'point', 'authors',
                             'categories', 'twins', 'factories', 'of_links',
-                            'copyright_blocks'
+                            'copyright_blocks', 'path'
                         ]]
                     ]
                 ]

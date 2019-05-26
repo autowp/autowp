@@ -1,0 +1,1125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="GROUP_BY_SEVERITY" value="true" />
+    <option name="ANALYZE_TEST_SOURCES" value="false" />
+    <option name="SCOPE_TYPE" value="8" />
+    <option name="CUSTOM_SCOPE_NAME" value="module" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="20f66d31-b9c9-4309-a2c8-47616a31960e" name="Default Changelist" comment="extract user of item of the day">
+      <change afterPath="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ConfigController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ConfigControllerFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/config/module.config.api.filter.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/config/module.config.api.filter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/config/module.config.api.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/config/module.config.api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/config/module.config.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/config/module.config.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/IndexController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ItemController.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ItemController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/PictureController.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/PictureController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/src/Application/Controller/Frontend/Service/IndexControllerFactory.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/src/Application/Controller/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/src/Application/Controller/IndexController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/src/Application/Hydrator/Api/ItemHydrator.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/src/Application/Hydrator/Api/ItemHydrator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/src/Application/Hydrator/Api/PictureHydrator.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/src/Application/Hydrator/Api/PictureHydrator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/src/Application/Model/Brand.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/src/Application/Model/Brand.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/Application/src/Application/Validator/Item/CatnameNotExists.php" beforeDir="false" afterPath="$PROJECT_DIR$/module/Application/src/Application/Validator/Item/CatnameNotExists.php" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/public_html/dist/js/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="autowp_test@localhost" type="feb32156:DbDataSourceImpl" />
+      </path>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="autowp_test@localhost" type="feb32156:DbDataSourceImpl" />
+        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
+      </path>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="autowp_test@localhost" type="feb32156:DbDataSourceImpl" />
+        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
+        <item name="autowp_test: schema" type="76f4a085:MysqlImplModel$Schema" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="autowp" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/LoginController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="748">
+              <caret line="386" column="48" selection-start-line="386" selection-start-column="44" selection-end-line="386" selection-end-column="48" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/Application/config/module.config.routes.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="447">
+              <caret line="193" column="28" selection-start-line="193" selection-start-column="21" selection-end-line="193" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>api_item_lis</find>
+      <find>public_urls</find>
+      <find>likes</find>
+      <find>catname</find>
+      <find>putAc</find>
+      <find>brandAc</find>
+      <find>copyright_blocks</find>
+      <find>public_ur</find>
+      <find>'url</find>
+      <find>$this-&gt;pictureItem</find>
+      <find>link</find>
+      <find>have_childs_of_type</find>
+      <find>have_common_childs_with</find>
+      <find>have_childs_with_parent_of_type</find>
+      <find>api_item_</find>
+      <find>picture_item</find>
+      <find>columns(</find>
+      <find>factories_of_brand</find>
+      <find>columns</find>
+      <find>1</find>
+      <find>front</find>
+      <find>order</find>
+      <find>ipc2</find>
+      <find>cars_count_desc</find>
+      <find>item_id</find>
+      <find>itemID</find>
+      <find>getItemRoute</find>
+      <find>exact_picture</find>
+      <find>front_picture</find>
+      <find>callbac</find>
+    </findStrings>
+    <dirStrings>
+      <dir>$PROJECT_DIR$/module/Application/src</dir>
+      <dir>$PROJECT_DIR$/../zf-components</dir>
+      <dir>$PROJECT_DIR$/module/User/src/Controller</dir>
+      <dir>$PROJECT_DIR$/module/Application/src/Application/Controller</dir>
+      <dir>$PROJECT_DIR$/vendor/zendframework/zend-cache/src</dir>
+      <dir>$PROJECT_DIR$/module/Application</dir>
+      <dir>$PROJECT_DIR$</dir>
+      <dir>$PROJECT_DIR$/module</dir>
+    </dirStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/module/Application/test/PictureNameFormatterTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Other/UserTextRendererTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/Plugin/Car.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Permissions/AclFactory.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/CatalogueController.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Service/DayPictures.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/HostManager.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/LoginController.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Form/Element/Month.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/PictureModerVoteController.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Controller/Frontend/CarsControllerTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Controller/Frontend/CatalogueControllerTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Controller/Frontend/FactoryControllerTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Model/ItemParent.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Controller/Api/ItemVehicleTypeControllerTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/LanguageRouteListener.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/MainMenu.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Provider/UserId/OAuth2UserIdProviderFactory.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Model/Picture.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Controller/Api/PictureControllerTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Controller/Api/PictureModerVoteControllerTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/UrlCorrectionRouteListener.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Router/Http/Catalogue.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Model/Referer.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Controller/Api/ItemControllerTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ArticleController.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Hydrator/Api/CommentHydrator.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ItemParentController.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Service/TelegramService.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/InputFilter/AttrUserValueCollectionInputFilter.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Controller/Console/CronControllerTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Service/PictureService.php" />
+        <option value="$PROJECT_DIR$/.travis.yml" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/StringUtils.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Service/UsersService.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Controller/Api/RestorePasswordControllerTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/test/Controller/Frontend/AccountControllerTest.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Model/Brand.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ConfigControllerFactory.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ConfigController.php" />
+        <option value="$PROJECT_DIR$/module/Application/config/module.config.api.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/IndexController.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/IndexController.php" />
+        <option value="$PROJECT_DIR$/module/Application/config/module.config.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Validator/Item/CatnameNotExists.php" />
+        <option value="$PROJECT_DIR$/module/Application/config/module.config.api.filter.php" />
+        <option value="$APPLICATION_CONFIG_DIR$/consoles/db/53def1d9-9018-46e1-8ee0-fc8499a0616d/console.sql" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/PictureController.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Hydrator/Api/PictureHydrator.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ItemController.php" />
+        <option value="$PROJECT_DIR$/module/Application/src/Application/Hydrator/Api/ItemHydrator.php" />
+      </list>
+    </option>
+  </component>
+  <component name="NamedScopeManager">
+    <scope name="module" pattern="file[autowp]:module//*" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/myclabs/deep-copy" />
+      <path value="$PROJECT_DIR$/vendor/paragonie/random_compat" />
+      <path value="$PROJECT_DIR$/vendor/felixfbecker/advanced-json-rpc" />
+      <path value="$PROJECT_DIR$/vendor/firebase/php-jwt" />
+      <path value="$PROJECT_DIR$/vendor/rollbar/rollbar" />
+      <path value="$PROJECT_DIR$/vendor/phpseclib/phpseclib" />
+      <path value="$PROJECT_DIR$/vendor/michelf/php-markdown" />
+      <path value="$PROJECT_DIR$/vendor/irazasyed/telegram-bot-sdk" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-docblock" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/type-resolver" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-common" />
+      <path value="$PROJECT_DIR$/vendor/monolog/monolog" />
+      <path value="$PROJECT_DIR$/vendor/sabre/event" />
+      <path value="$PROJECT_DIR$/vendor/padraic/phar-updater" />
+      <path value="$PROJECT_DIR$/vendor/padraic/humbug_get_contents" />
+      <path value="$PROJECT_DIR$/vendor/guzzle/guzzle" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/global-state" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/comparator" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/environment" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/exporter" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/recursion-context" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/object-enumerator" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/object-reflector" />
+      <path value="$PROJECT_DIR$/vendor/autowp/cron" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/resource-operations" />
+      <path value="$PROJECT_DIR$/vendor/webmozart/assert" />
+      <path value="$PROJECT_DIR$/vendor/autowp/image" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/code-unit-reverse-lookup" />
+      <path value="$PROJECT_DIR$/vendor/autowp/external-login-service" />
+      <path value="$PROJECT_DIR$/vendor/phpspec/prophecy" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/diff" />
+      <path value="$PROJECT_DIR$/vendor/autowp/zf-components" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/version" />
+      <path value="$PROJECT_DIR$/vendor/autowp/textstorage" />
+      <path value="$PROJECT_DIR$/vendor/docopt/docopt" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/guzzle" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/psr7" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/promises" />
+      <path value="$PROJECT_DIR$/vendor/container-interop/container-interop" />
+      <path value="$PROJECT_DIR$/vendor/nesbot/carbon" />
+      <path value="$PROJECT_DIR$/vendor/google/auth" />
+      <path value="$PROJECT_DIR$/vendor/google/apiclient-services" />
+      <path value="$PROJECT_DIR$/vendor/google/apiclient" />
+      <path value="$PROJECT_DIR$/vendor/google/recaptcha" />
+      <path value="$PROJECT_DIR$/vendor/microsoft/tolerant-php-parser" />
+      <path value="$PROJECT_DIR$/vendor/jakeasmith/http_build_url" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-mvc-i18n" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-http" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-math" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-file" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-hydrator" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-test" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-modulemanager" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-permissions-acl" />
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-cache" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-inputfilter" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-i18n-resources" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-escaper" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-mail" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-mime" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-console" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-authentication" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-eventmanager" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-router" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-loader" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-form" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-mvc" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-crypt" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-paginator" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-json" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-config" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-dom" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-db" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-log" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-text" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-filter" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-uri" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-stdlib" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-validator" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/instantiator" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-session" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/inflector" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-coding-standard" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-i18n" />
+      <path value="$PROJECT_DIR$/vendor/zfcampus/zf-oauth2" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-mvc-console" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-captcha" />
+      <path value="$PROJECT_DIR$/vendor/symfony/console" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-view" />
+      <path value="$PROJECT_DIR$/vendor/symfony/debug" />
+      <path value="$PROJECT_DIR$/vendor/zfcampus/zf-api-problem" />
+      <path value="$PROJECT_DIR$/vendor/symfony/dependency-injection" />
+      <path value="$PROJECT_DIR$/vendor/zfcampus/zf-content-negotiation" />
+      <path value="$PROJECT_DIR$/vendor/phan/phan" />
+      <path value="$PROJECT_DIR$/vendor/symfony/contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/filesystem" />
+      <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher" />
+      <path value="$PROJECT_DIR$/vendor/wapmorgan/php-code-fixer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/vendor/league/oauth1-client" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation" />
+      <path value="$PROJECT_DIR$/vendor/league/oauth2-client" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring" />
+      <path value="$PROJECT_DIR$/vendor/squizlabs/php_codesniffer" />
+      <path value="$PROJECT_DIR$/vendor/league/oauth2-instagram" />
+      <path value="$PROJECT_DIR$/vendor/symfony/config" />
+      <path value="$PROJECT_DIR$/vendor/league/oauth2-github" />
+      <path value="$PROJECT_DIR$/vendor/symfony/stopwatch" />
+      <path value="$PROJECT_DIR$/vendor/phpmd/phpmd" />
+      <path value="$PROJECT_DIR$/vendor/league/oauth2-google" />
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/vendor/league/oauth2-linkedin" />
+      <path value="$PROJECT_DIR$/vendor/phar-io/manifest" />
+      <path value="$PROJECT_DIR$/vendor/league/oauth2-facebook" />
+      <path value="$PROJECT_DIR$/vendor/phar-io/version" />
+      <path value="$PROJECT_DIR$/vendor/illuminate/contracts" />
+      <path value="$PROJECT_DIR$/vendor/illuminate/support" />
+      <path value="$PROJECT_DIR$/vendor/pdepend/pdepend" />
+      <path value="$PROJECT_DIR$/vendor/facebook/graph-sdk" />
+      <path value="$PROJECT_DIR$/vendor/true/punycode" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit" />
+      <path value="$PROJECT_DIR$/vendor/onesky/api-library-php5" />
+      <path value="$PROJECT_DIR$/vendor/satooshi/php-coveralls" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-timer" />
+      <path value="$PROJECT_DIR$/vendor/theseer/tokenizer" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-file-iterator" />
+      <path value="$PROJECT_DIR$/vendor/netresearch/jsonmapper" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-text-template" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-token-stream" />
+      <path value="$PROJECT_DIR$/vendor/codeclimate/php-test-reporter" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit-mock-objects" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-code-coverage" />
+      <path value="$PROJECT_DIR$/vendor/sensiolabs/security-checker" />
+      <path value="$PROJECT_DIR$/vendor/php-amqplib/php-amqplib" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-servicemanager" />
+      <path value="$PROJECT_DIR$/vendor/j4k/oauth2-vkontakte" />
+      <path value="$PROJECT_DIR$/vendor/phayes/geophp" />
+      <path value="$PROJECT_DIR$/vendor/psr/container" />
+      <path value="$PROJECT_DIR$/vendor/psr/http-message" />
+      <path value="$PROJECT_DIR$/vendor/psr/cache" />
+      <path value="$PROJECT_DIR$/vendor/psr/log" />
+      <path value="$PROJECT_DIR$/vendor/bshaffer/oauth2-server-php" />
+      <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
+    </include_path>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="293" />
+    <option name="y" value="47" />
+    <option name="width" value="1390" />
+    <option name="height" value="936" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="mysql" />
+    <property name="SONARLINT_PRECOMMIT_ANALYSIS" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="database.console.LAST_STATE" value="false" />
+    <property name="editor.config.ad.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../zf-components" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../zf-components" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="PHPUnit.UserTextRendererTest.testUsers">
+    <configuration name="CatalogueControllerTest.testBrand" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="ApplicationTest\Controller\Frontend\CatalogueControllerTest" file="$PROJECT_DIR$/module/Application/test/Controller/Frontend/CatalogueControllerTest.php" method="testBrand" scope="Method" />
+      <method v="2" />
+    </configuration>
+    <configuration name="CatalogueControllerTest.testMixedPicture" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="ApplicationTest\Controller\Frontend\CatalogueControllerTest" file="$PROJECT_DIR$/module/Application/test/Controller/Frontend/CatalogueControllerTest.php" method="testMixedPicture" scope="Method" />
+      <method v="2" />
+    </configuration>
+    <configuration name="PictureNameFormatterTest.testFormat" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="ApplicationTest\Controller\PictureNameFormatterTest" file="$PROJECT_DIR$/module/Application/test/PictureNameFormatterTest.php" method="testFormat" scope="Method" />
+      <method v="2" />
+    </configuration>
+    <configuration name="UserTextRendererTest.testUsers" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="ApplicationTest\Other\UserTextRendererTest" file="$PROJECT_DIR$/module/Application/test/Other/UserTextRendererTest.php" method="testUsers" scope="Method" />
+      <method v="2" />
+    </configuration>
+    <configuration name="phpunit.xml" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner scope="XML" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="PHPUnit.UserTextRendererTest.testUsers" />
+        <item itemvalue="PHPUnit.PictureNameFormatterTest.testFormat" />
+        <item itemvalue="PHPUnit.CatalogueControllerTest.testMixedPicture" />
+        <item itemvalue="PHPUnit.CatalogueControllerTest.testBrand" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="20f66d31-b9c9-4309-a2c8-47616a31960e" name="Default Changelist" comment="" />
+      <created>1553022658730</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1553022658730</updated>
+      <workItem from="1553022662170" duration="1299000" />
+      <workItem from="1553024342433" duration="397000" />
+      <workItem from="1553025449423" duration="4254000" />
+      <workItem from="1553029744294" duration="1269000" />
+      <workItem from="1553106534691" duration="2891000" />
+      <workItem from="1553199848653" duration="100000" />
+      <workItem from="1553285877176" duration="6571000" />
+      <workItem from="1553367755702" duration="26285000" />
+      <workItem from="1553538967393" duration="3195000" />
+      <workItem from="1553625944076" duration="16000" />
+      <workItem from="1553627061396" duration="10022000" />
+      <workItem from="1553976274024" duration="4583000" />
+      <workItem from="1553985765692" duration="8000" />
+      <workItem from="1553992727394" duration="9245000" />
+      <workItem from="1554047468437" duration="12981000" />
+      <workItem from="1554064690231" duration="39000" />
+      <workItem from="1554064780603" duration="6472000" />
+      <workItem from="1554574285137" duration="6327000" />
+      <workItem from="1554672059057" duration="2068000" />
+      <workItem from="1554927067371" duration="145000" />
+      <workItem from="1555159665080" duration="22410000" />
+      <workItem from="1555762246644" duration="594000" />
+      <workItem from="1555802038128" duration="161000" />
+      <workItem from="1555841279486" duration="594000" />
+      <workItem from="1556225396406" duration="1422000" />
+    </task>
+    <task id="LOCAL-00001" summary="Fix issues found with phpstorm">
+      <created>1553030300147</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1553030300147</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Remove unused property">
+      <created>1553031076914</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1553031076914</updated>
+    </task>
+    <task id="LOCAL-00003" summary="NG index">
+      <created>1553438522354</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1553438522354</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Add tools logos">
+      <created>1553447540324</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1553447540324</updated>
+    </task>
+    <task id="LOCAL-00005" summary="PHP logo">
+      <created>1553447792833</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1553447792833</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Item of day links">
+      <created>1553459652732</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1553459652732</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Handle brand theme of the day">
+      <created>1553539642251</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1553539642251</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Handle brand theme of the day in ng">
+      <created>1553540368192</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1553540368192</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Fix public accepted_in_days filter">
+      <created>1553545199804</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1553545199804</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Allow item_of_day_pictures for all">
+      <created>1553546538570</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1553546538570</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Sonarcloud">
+      <created>1553628102112</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1553628102112</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Sonar">
+      <created>1553632042860</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1553632042860</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Sonar exclusions">
+      <created>1553632969265</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1553632969265</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Sonar">
+      <created>1553633552987</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1553633552987</updated>
+    </task>
+    <task id="LOCAL-00015" summary="aria-hidden=&quot;true&quot;">
+      <created>1553710770830</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1553710770830</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Bug fixes">
+      <created>1553712365079</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1553712365079</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Fix unused variable">
+      <created>1553714649597</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1553714649597</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Fix problems found with sonarcloud">
+      <created>1553715894503</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1553715894503</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Fix problems found with PHPStorm">
+      <created>1554042014823</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1554042014823</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Fix problems found with PHPStorm">
+      <created>1554042981009</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1554042981009</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Upload coverage to sonarcloud">
+      <created>1554043237999</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1554043237999</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Upload coverage to sonarcloud">
+      <created>1554060789966</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1554060789966</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Fix returns">
+      <created>1554061664150</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1554061664150</updated>
+    </task>
+    <task id="LOCAL-00024" summary="CS check">
+      <created>1554062118641</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1554062118641</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Fix parameter type">
+      <created>1554062718232</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1554062718232</updated>
+    </task>
+    <task id="LOCAL-00026" summary="FIx issues found by PHPStorm">
+      <created>1554064519494</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1554064519494</updated>
+    </task>
+    <task id="LOCAL-00027" summary="httpS in registration confirm e-mail">
+      <created>1554065633140</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1554065633140</updated>
+    </task>
+    <task id="LOCAL-00028" summary="httpS in registration confirm e-mail">
+      <created>1554066470700</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1554066470700</updated>
+    </task>
+    <task id="LOCAL-00029" summary="extract user of item of the day">
+      <created>1554150974583</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1554150974583</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Fix categories fetch on picture page">
+      <created>1554575043034</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1554575043034</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="123348000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="70" y="27" width="1850" height="948" extended-state="6" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49910554" visible="true" weight="0.20121951" />
+      <window_info id="Structure" order="1" sideWeight="0.5008944" side_tool="true" weight="0.24958494" />
+      <window_info id="npm" order="2" sideWeight="0.5008944" side_tool="true" weight="0.24958494" />
+      <window_info id="Favorites" order="3" sideWeight="0.5008944" side_tool="true" weight="0.24958494" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4997233" weight="0.32893157" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" sideWeight="0.4997233" weight="0.48139256" />
+      <window_info anchor="bottom" id="Database Changes" order="9" />
+      <window_info anchor="bottom" id="TypeScript" order="10" />
+      <window_info anchor="bottom" id="Inspection Results" order="11" sideWeight="0.4964029" visible="true" weight="0.4429772" />
+      <window_info anchor="bottom" id="Terminal" order="12" sideWeight="0.4991699" weight="0.32893157" />
+      <window_info anchor="bottom" id="Event Log" order="13" sideWeight="0.50359714" side_tool="true" weight="0.4429772" />
+      <window_info anchor="bottom" id="Database Console" order="14" weight="0.3277311" />
+      <window_info anchor="bottom" id="Messages" order="15" />
+      <window_info anchor="bottom" id="SonarLint" order="16" weight="0.32893157" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" side_tool="true" visible="true" weight="0.18514413" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Remove unused property" />
+    <MESSAGE value="NG index" />
+    <MESSAGE value="Add tools logos" />
+    <MESSAGE value="PHP logo" />
+    <MESSAGE value="Item of day links" />
+    <MESSAGE value="Handle brand theme of the day" />
+    <MESSAGE value="Handle brand theme of the day in ng" />
+    <MESSAGE value="Fix public accepted_in_days filter" />
+    <MESSAGE value="Allow item_of_day_pictures for all" />
+    <MESSAGE value="Sonarcloud" />
+    <MESSAGE value="Sonar exclusions" />
+    <MESSAGE value="Sonar" />
+    <MESSAGE value="aria-hidden=&quot;true&quot;" />
+    <MESSAGE value="Bug fixes" />
+    <MESSAGE value="Fix unused variable" />
+    <MESSAGE value="Fix problems found with sonarcloud" />
+    <MESSAGE value="Fix problems found with PHPStorm" />
+    <MESSAGE value="Upload coverage to sonarcloud" />
+    <MESSAGE value="Fix returns" />
+    <MESSAGE value="CS check" />
+    <MESSAGE value="Fix parameter type" />
+    <MESSAGE value="FIx issues found by PHPStorm" />
+    <MESSAGE value="httpS in registration confirm e-mail" />
+    <MESSAGE value="extract user of item of the day" />
+    <MESSAGE value="Fix categories fetch on picture page" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix categories fetch on picture page" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/composer.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1768">
+          <caret line="104" column="44" selection-start-line="104" selection-start-column="22" selection-end-line="104" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Message/src/Maintenance.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="37" column="17" selection-start-line="37" selection-start-column="17" selection-end-line="37" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/config/module.config.session.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="19" column="42" selection-start-line="19" selection-start-column="42" selection-end-line="19" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Service/PictureService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1734">
+          <caret line="119" column="32" selection-start-line="119" selection-start-column="32" selection-end-line="119" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Model/Referer.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="16" column="14" selection-start-line="16" selection-start-column="14" selection-end-line="16" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/language/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="102">
+            <caret line="6" column="55" selection-start-line="6" selection-start-column="55" selection-end-line="6" selection-end-column="55" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ArticleController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="40" column="5" lean-forward="true" selection-start-line="40" selection-start-column="5" selection-end-line="40" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/StringUtils.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="27" column="58" lean-forward="true" selection-start-line="27" selection-start-column="58" selection-end-line="27" selection-end-column="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/ExifGPSExtractor.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-564">
+          <caret line="6" column="11" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/ng/account-account-module-ngfactory.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1238" column="161" selection-start-line="1238" selection-start-column="161" selection-end-line="1238" selection-end-column="161" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Service/UsersService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="159">
+          <caret line="317" column="53" selection-start-line="317" selection-start-column="53" selection-end-line="317" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/test/Controller/Api/RestorePasswordControllerTest.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="56" column="45" lean-forward="true" selection-start-line="56" selection-start-column="45" selection-end-line="56" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/test/Controller/Frontend/AccountControllerTest.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="245">
+          <caret line="64" column="31" lean-forward="true" selection-start-line="64" selection-start-column="31" selection-end-line="64" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/CommentControllerFactory.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="16" column="6" selection-start-line="16" selection-start-column="6" selection-end-line="16" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/AboutController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="15" column="6" selection-start-line="15" selection-start-column="6" selection-end-line="15" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.travis.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="18" selection-start-line="18" selection-end-line="28" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ConfigController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="14" column="22" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/config/module.config.console.php">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ContactsController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="28" column="19" selection-end-line="194" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ConfigControllerFactory.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="35" selection-start-line="20" selection-start-column="19" selection-end-line="20" selection-end-column="35" />
+          <folding>
+            <element signature="e#46#87#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ContactsControllerFactory.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="19" column="29" selection-end-line="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sonar-project.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="28" selection-end-line="9" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Plugin/Pic.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="522">
+          <caret line="591" column="15" selection-start-line="578" selection-start-column="12" selection-end-line="591" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/view/application/catalogue/brand.phtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" selection-end-line="211" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Frontend/Service/CategoryControllerFactory.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Frontend/Service/CatalogueControllerFactory.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="40" column="47" selection-start-line="40" selection-start-column="12" selection-end-line="40" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Model/Brand.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="97">
+          <caret line="65" column="22" lean-forward="true" selection-start-line="65" selection-start-column="22" selection-end-line="65" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Frontend/Service/IndexControllerFactory.php" />
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/IndexController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="271">
+          <caret line="16" column="1" selection-start-line="16" selection-start-column="1" selection-end-line="16" selection-end-column="1" />
+          <folding>
+            <element signature="e#42#91#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/config/module.config.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="714">
+          <caret line="57" column="83" selection-start-line="57" selection-start-column="83" selection-end-line="57" selection-end-column="83" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Validator/Item/CatnameNotExists.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="492">
+          <caret line="42" column="21" selection-start-line="42" selection-start-column="21" selection-end-line="42" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Model/ItemParent.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="268">
+          <caret line="628" column="20" selection-start-line="628" selection-start-column="20" selection-end-line="628" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Model/PictureItem.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="13" column="10" selection-start-line="13" selection-start-column="10" selection-end-line="13" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ItemLinkController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="65" column="31" selection-start-line="65" selection-start-column="20" selection-end-line="65" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/config/module.config.cache.php">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/config/module.config.api.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="263">
+          <caret line="1546" column="71" selection-start-line="1546" selection-start-column="71" selection-end-line="1546" selection-end-column="71" />
+          <folding>
+            <element signature="e#31#80#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/zendframework/zend-db/src/Sql/Select.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="250">
+          <caret line="129" column="25" lean-forward="true" selection-start-line="129" selection-start-column="25" selection-end-line="129" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Model/Picture.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4279">
+          <caret line="353" column="20" selection-start-line="353" selection-start-column="20" selection-end-line="353" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Hydrator/Api/RestHydrator.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="268">
+          <caret line="33" column="20" selection-start-line="33" selection-start-column="20" selection-end-line="33" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Hydrator/Api/ItemHydrator.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="148">
+          <caret line="206" column="41" selection-start-line="206" selection-start-column="41" selection-end-line="206" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Hydrator/Api/PictureHydrator.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4131">
+          <caret line="269" column="10" selection-start-line="269" selection-start-column="10" selection-end-line="269" selection-end-column="10" />
+          <folding>
+            <element signature="e#44#77#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="das://53def1d9-9018-46e1-8ee0-fc8499a0616d/schema/autowp_test/table/item">
+      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
+        <state>
+          <filtering enabled="true">
+            <filter text="204" />
+            <filter text="id=292" />
+          </filtering>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/CatalogueController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6307">
+          <caret line="398" column="40" selection-start-line="398" selection-start-column="40" selection-end-line="398" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/ItemController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="13702">
+          <caret line="849" column="9" selection-start-line="849" selection-start-column="9" selection-end-line="849" selection-end-column="9" />
+          <folding>
+            <element signature="e#46#62#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/PictureController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7956">
+          <caret line="497" column="9" selection-start-line="497" selection-start-column="9" selection-end-line="497" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/consoles/db/53def1d9-9018-46e1-8ee0-fc8499a0616d/console.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="95" selection-start-line="1" selection-start-column="83" selection-end-line="1" selection-end-column="95" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/config/module.config.api.filter.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22338">
+          <caret line="1322" column="57" selection-start-line="1322" selection-start-column="52" selection-end-line="1322" selection-end-column="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Model/Item.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="23" column="23" selection-start-line="23" selection-start-column="23" selection-end-line="23" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/IndexController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1683">
+          <caret line="116" selection-start-line="116" selection-end-line="116" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/config/module.config.routes.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="447">
+          <caret line="193" column="28" selection-start-line="193" selection-start-column="21" selection-end-line="193" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/Application/src/Application/Controller/Api/LoginController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="748">
+          <caret line="386" column="48" selection-start-line="386" selection-start-column="44" selection-end-line="386" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <last-edited>module</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+          <order>
+            <scope name="module" />
+          </order>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

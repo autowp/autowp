@@ -435,4 +435,21 @@ class Brand
 
         file_put_contents($destCss, implode(' ', $css));
     }
+
+    /**
+     * @return string[]
+     */
+    public function getCatnames(): array
+    {
+        $select = $this->item->getTable()->getSql()->select();
+        $select->columns(['catname'])
+            ->where(['item_type_id' => Item::BRAND]);
+
+        $items = [];
+        foreach ($this->item->getTable()->selectWith($select) as $row) {
+            $items[] = $row['catname'];
+        }
+
+        return $items;
+    }
 }

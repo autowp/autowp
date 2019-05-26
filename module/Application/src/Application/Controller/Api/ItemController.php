@@ -42,6 +42,7 @@ use Application\Model\Brand;
 use Application\Model\Catalogue;
 use Application\Model\Item;
 use Application\Model\ItemParent;
+use Application\Model\Picture;
 use Application\Model\UserItemSubscribe;
 use Application\Model\VehicleType;
 use Application\Service\SpecificationsService;
@@ -336,6 +337,7 @@ class ItemController extends AbstractRestfulController
         $select = new Sql\Select($this->itemModel->getTable()->getTable());
 
         $group = false;
+        $columns = [Sql\Select::SQL_STAR];
         $itemLanguageJoined = false;
 
         $match = $data['descendant_pictures']
@@ -399,6 +401,24 @@ class ItemController extends AbstractRestfulController
             ]);
         }
 
+        if ($data['factories_of_brand']) {
+            $select
+                ->join(['fab_ipc1' => 'item_parent_cache'], 'fab_ipc1.parent_id = item.id', [])
+                ->join(['fab_ipc2' => 'item_parent_cache'], 'fab_ipc1.item_id = fab_ipc2.item_id', [])
+                ->join(['fab_pi' => 'picture_item'], 'item.id = fab_pi.item_id', [])
+                ->join(['fab_p' => 'pictures'], 'fab_pi.picture_id = fab_p.id', [])
+                ->where([
+                    'fab_ipc2.parent_id' => (int) $data['factories_of_brand'],
+                    'fab_p.status'       => Picture::STATUS_ACCEPTED,
+                    'item.item_type_id'  => Item::FACTORY,
+                ]);
+
+            $group = true;
+            $data['order'] = 'cars_count_desc';
+            $data['fields']['factories_of_brand_cars_count'] = true;
+            $columns['factories_of_brand_cars_count'] = new Sql\Expression('count(1)');
+        }
+
         switch ($data['order']) {
             case 'id_asc':
                 $select->order('item.id ASC');
@@ -432,6 +452,9 @@ class ItemController extends AbstractRestfulController
                 $select->order(array_merge([
                     new Sql\Expression('item.item_type_id != ?', Item::CATEGORY)
                 ], $this->catalogue()->itemOrdering()));
+                break;
+            case 'cars_count_desc':
+                $select->order('factories_of_brand_cars_count desc');
                 break;
             default:
                 $select->order([
@@ -768,6 +791,8 @@ class ItemController extends AbstractRestfulController
         if ($group) {
             $select->group('item.id');
         }
+
+        $select->columns($columns);
 
         try {
             $paginator = new Paginator(

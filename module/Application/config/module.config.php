@@ -55,7 +55,7 @@ return [
             Controller\CommentsController::class        => Controller\Frontend\Service\CommentsControllerFactory::class,
             Controller\DonateController::class          => Controller\Frontend\Service\DonateControllerFactory::class,
             Controller\FactoriesController::class       => Controller\Frontend\Service\FactoriesControllerFactory::class,
-            Controller\IndexController::class           => Controller\Frontend\Service\IndexControllerFactory::class,
+            Controller\IndexController::class           => InvokableFactory::class,
             Controller\InboxController::class           => InvokableFactory::class,
             Controller\PictureController::class         => Controller\Frontend\PictureControllerFactory::class,
             Controller\PictureFileController::class     => Controller\Frontend\Service\PictureFileControllerFactory::class,

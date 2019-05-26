@@ -2,6 +2,7 @@
 
 namespace Application\Hydrator\Api;
 
+use Application\Model\ItemParent;
 use Exception;
 use geoPHP;
 use Traversable;
@@ -54,6 +55,11 @@ class PictureHydrator extends RestHydrator
      * @var int
      */
     private $itemID = 0;
+
+    /**
+     * @var int
+     */
+    private $paginatorItemID = 0;
 
     /**
      * @var PictureNameFormatter
@@ -122,6 +128,11 @@ class PictureHydrator extends RestHydrator
 
     private $router;
 
+    /**
+     * @var ItemParent
+     */
+    private $itemParentModel;
+
     public function __construct(
         $serviceManager
     ) {
@@ -130,6 +141,7 @@ class PictureHydrator extends RestHydrator
         $this->picture = $serviceManager->get(Picture::class);
         $this->userModel = $serviceManager->get(User::class);
         $this->itemModel = $serviceManager->get(Item::class);
+        $this->itemParentModel = $serviceManager->get(ItemParent::class);
 
         $this->pictureView = $serviceManager->get(PictureView::class);
         $this->pictureModerVote = $serviceManager->get(PictureModerVote::class);
@@ -217,6 +229,10 @@ class PictureHydrator extends RestHydrator
             $this->itemID = (int) $options['item_id'];
         }
 
+        if (isset($options['paginator_item_id'])) {
+            $this->paginatorItemID = (int) $options['paginator_item_id'];
+        }
+
         return $this;
     }
 
@@ -231,6 +247,66 @@ class PictureHydrator extends RestHydrator
         $this->getStrategy('items')->setUserId($this->userId);
 
         return $this;
+    }
+
+    private function getPath(int $pictureID, int $targetItemID): array
+    {
+        $piRows = $this->pictureItem->getPictureItemsData($pictureID, PictureItem::PICTURE_CONTENT);
+        $result = [];
+        foreach ($piRows as $piRow) {
+            $result[] = [
+                'type'           => (int) $piRow['type'],
+                'perspective_id' => $piRow['perspective_id'] ? (int)$piRow['perspective_id'] : null,
+                'item'           => $this->getItemRoute($piRow['item_id'], $targetItemID)
+            ];
+            //exit;
+        }
+        return $result;
+    }
+
+    private function getItemRoute(int $itemID, int $targetItemID): ?array
+    {
+        //print "getItemRoute($itemID, $targetItemID)\n";
+        //var_dump($targetItemID);
+        $row = $this->itemModel->getRow([
+            'id' => $itemID
+        ]);
+        if (! $row) {
+            return null;
+        }
+
+        $parents = [];
+        if (in_array($row['item_type_id'], [Item::CATEGORY, Item::ENGINE, Item::VEHICLE])) {
+            $parents = $this->getItemParentRoute($row['id'], $targetItemID);
+        }
+
+        $isMatched = ! $targetItemID || $parents || $itemID == $targetItemID;
+        //var_dump($isMatched, $parents, $row['id']);
+        if (! $isMatched) {
+            return null;
+        }
+
+        return [
+            'item_type_id' => (int)$row['item_type_id'],
+            'catname'      => $row['catname'],
+            'parents'      => $parents,
+        ];
+    }
+
+    private function getItemParentRoute(int $itemID, int $targetItemID): array
+    {
+        $result = [];
+        foreach ($this->itemParentModel->getParentRows($itemID) as $row) {
+            $item = $this->getItemRoute($row['parent_id'], $targetItemID);
+            if ($item) {
+                $result[] = [
+                    'catname' => $row['catname'],
+                    'item'    => $item
+                ];
+            }
+        }
+
+        return $result;
     }
 
     public function extract($object)
@@ -265,12 +341,16 @@ class PictureHydrator extends RestHydrator
             'filesize'       => (int)$object['filesize']
         ];
 
-        if ($this->filterComposite->filter('paginator') && $this->itemID) {
+        if ($this->filterComposite->filter('path')) {
+            $picture['path'] = $this->getPath($object['id'], $this->itemID);
+        }
+
+        if ($this->filterComposite->filter('paginator') && $this->paginatorItemID) {
             $filter = [
                 'order'  => 'resolution_desc',
                 'status' => $object['status'],
                 'item'   => [
-                    'ancestor_or_self' => $this->itemID
+                    'ancestor_or_self' => $this->paginatorItemID
                 ]
             ];
             $paginator = $this->picture->getPaginator($filter);

@@ -519,7 +519,8 @@ class PictureController extends AbstractRestfulController
                 'language' => $this->language(),
                 'user_id'  => $user ? $user['id'] : null,
                 'fields'   => $data['fields'],
-                'item_id'  => $data['paginator']['item_id'],
+                'item_id'  => (int) $data['item_id'],
+                'paginator_item_id'  => (int) $data['paginator']['item_id'],
             ]);
 
             $pictures = [];
