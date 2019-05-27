@@ -80,6 +80,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-message" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/simple-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/ralouphie/getallheaders" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/rollbar/rollbar" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/sabre/event" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/satooshi/php-coveralls" />

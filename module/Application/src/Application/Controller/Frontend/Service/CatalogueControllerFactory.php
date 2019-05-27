@@ -34,7 +34,6 @@ class CatalogueControllerFactory implements FactoryInterface
         $tables = $container->get('TableManager');
         return new Controller(
             $container->get(Service::class),
-            $container->get('longCache'),
             $container->get(SpecificationsService::class),
             $container->get(ItemParent::class),
             $container->get(ItemNameFormatter::class),
@@ -50,8 +49,7 @@ class CatalogueControllerFactory implements FactoryInterface
             $tables->get('modification_group'),
             $container->get(Brand::class),
             $container->get(User::class),
-            $container->get('HttpRouter'),
-            $container->get('MvcTranslator')
+            $container->get('HttpRouter')
         );
     }
 }

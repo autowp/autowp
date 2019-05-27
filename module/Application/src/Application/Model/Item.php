@@ -1423,6 +1423,7 @@ class Item
     public function getSelect(array $options): Sql\Select
     {
         $defaults = [
+            'id'              => null,
             'columns'         => null,
             'language'        => null,
             'item_type_id'    => null,
@@ -1532,6 +1533,10 @@ class Item
             } else {
                 $select->where(['item.item_type_id' => $options['item_type_id']]);
             }
+        }
+
+        if (isset($options['id'])) {
+            $select->where(['item.id' => $options['id']]);
         }
 
         if (isset($options['position'])) {
