@@ -1,5 +1,7 @@
 {
-    "perspective/mockup": "Макет",
+    "perspective/chassis": "Шасси",
+    "brands/more-{count}-companies": "ещё {count, plural, one {{count} компания} few {{count} компании} many {{count} компаний} other {{count} компаний}}",
+    "perspective/mockup": "макет",
     "catalogue/specifications-of-{name}": "Технические характеристики {name}",
     "moder/picture/edit-item": "Управление",
     "moder/picture/edit-picture-{id}": "Управление изображением №{id}",

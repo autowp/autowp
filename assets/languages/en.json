@@ -1,5 +1,7 @@
 {
-    "perspective/mockup": "Mockup",
+    "perspective/chassis": "Chassis",
+    "brands/more-{count}-companies": "more {count, plural, one {{count} company} other {{count} companies}}",
+    "perspective/mockup": "mockup",
     "catalogue/specifications-of-{name}": "Specifications of {name}",
     "moder/picture/edit-item": "Edit item",
     "moder/picture/edit-picture-{id}": "Edit picture №{id}",

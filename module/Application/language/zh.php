@@ -1,5 +1,7 @@
 <?php return array (
-  'perspective/mockup' => 'Mockup',
+  'perspective/chassis' => '机箱',
+  'brands/more-{count}-companies' => '全部{count}个品牌',
+  'perspective/mockup' => 'mockup',
   'catalogue/specifications-of-{name}' => '{name}的性能参数',
   'moder/picture/edit-item' => '编辑',
   'moder/picture/edit-picture-{id}' => '编辑图片№{id}',
