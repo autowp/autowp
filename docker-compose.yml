@@ -111,8 +111,8 @@ frontend:
   restart: always
   volumes:
   - "./frontend:/usr/share/nginx/html"
-  - "../autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
-  - "../autowp-frontend/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
+  - "../../WebstormProjects/autowp-frontend//etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
+  - "../../WebstormProjects/autowp-frontend//etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
 
 rabbitmq:
   image: rabbitmq:management

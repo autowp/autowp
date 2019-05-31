@@ -201,37 +201,6 @@ class CatalogueController extends AbstractActionController
         return $shortName;
     }
 
-    public function recentAction()
-    {
-        return $this->doBrandAction(function ($brand) {
-
-            $paginator = $this->picture->getPaginator([
-                'status' => Picture::STATUS_ACCEPTED,
-                'item'   => [
-                    'ancestor_or_self' => $brand['id']
-                ],
-                'order'  => 'accept_datetime_desc'
-            ]);
-
-            $paginator
-                ->setItemCountPerPage(24)
-                ->setCurrentPageNumber($this->params('page'));
-
-            if ($paginator->getTotalItemCount() <= 0) {
-                return $this->notFoundAction();
-            }
-
-            $picturesData = $this->pic()->listData($paginator->getCurrentItems(), [
-                'width' => 6
-            ]);
-
-            return [
-                'paginator'    => $paginator,
-                'picturesData' => $picturesData,
-            ];
-        });
-    }
-
     public function conceptsAction()
     {
         return $this->doBrandAction(function ($brand) {

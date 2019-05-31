@@ -380,7 +380,7 @@ class PictureController extends AbstractRestfulController
                 break;
         }
 
-        if ($data['order']) {
+        if ($data['order'] && isset($orders[$data['order']])) {
             $filter['order'] = $orders[$data['order']];
         } else {
             $filter['order'] = $orders[1];
