@@ -207,13 +207,16 @@
                     <?=$this->escapeHtml($this->user()->humanTime($this->addDate)) ?>
                 </li>
             <?php } ?>
-            <?php if ($this->point) { ?>
+            <?php if ($this->point || $this->takenDate) { ?>
                 <li>
-                    <span class="fa fa-map-pin" aria-hidden="true"></span>
-                    <?=$this->htmlA(
-                        'https://www.openstreetmap.org/?mlat='.$this->point->y().'&mlon='.$this->point->x().'#map=6/'.$this->point->y().'/'.$this->point->x(),
-                        $this->translate('picture/location')
-                    )?>
+                    <?=$this->escapeHtml($this->takenDate) . ($this->point && $this->takenDate ? ', ' : '') ?>
+                    <?php if ($this->point) { ?>
+                        <span class="fa fa-map-pin" aria-hidden="true"></span>
+                        <?=$this->htmlA(
+                            'https://www.openstreetmap.org/?mlat='.$this->point->y().'&mlon='.$this->point->x().'#map=6/'.$this->point->y().'/'.$this->point->x(),
+                            $this->translate('picture/location')
+                        )?>
+                    <?php } ?>
                 </li>
             <?php } ?>
             <li>

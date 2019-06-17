@@ -265,6 +265,12 @@ class PictureHydrator extends RestHydrator
             'filesize'       => (int)$object['filesize']
         ];
 
+        if ($this->filterComposite->filter('taken')) {
+            $picture['taken_year'] = $object['taken_year'] ? (int)$object['taken_year'] : null;
+            $picture['taken_month'] = $object['taken_month'] ? (int)$object['taken_month'] : null;
+            $picture['taken_day'] = $object['taken_day'] ? (int)$object['taken_day'] : null;
+        }
+
         if ($this->filterComposite->filter('paginator') && $this->itemID) {
             $filter = [
                 'order'  => 'resolution_desc',

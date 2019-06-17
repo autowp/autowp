@@ -4,6 +4,7 @@ namespace Application\Controller\Api;
 
 use Application\Comments;
 use ArrayObject;
+use Exception;
 use geoPHP;
 use Point;
 use Zend\Db\Sql;
@@ -202,6 +203,11 @@ class PictureController extends AbstractRestfulController
         $this->pictureService = $pictureService;
     }
 
+    /**
+     * @return JsonModel
+     * @throws Storage\Exception
+     * @throws Exception
+     */
     public function randomPictureAction()
     {
         $pictureRow = $this->picture->getRow([
@@ -227,6 +233,11 @@ class PictureController extends AbstractRestfulController
     }
 
 
+    /**
+     * @return JsonModel
+     * @throws Storage\Exception
+     * @throws Exception
+     */
     public function newPictureAction()
     {
         $pictureRow = $this->picture->getRow([
@@ -252,6 +263,11 @@ class PictureController extends AbstractRestfulController
     }
 
 
+    /**
+     * @return JsonModel
+     * @throws Storage\Exception
+     * @throws Exception
+     */
     public function carOfDayPictureAction()
     {
         $itemOfDay = $this->carOfDay->getCurrent();
@@ -382,7 +398,7 @@ class PictureController extends AbstractRestfulController
                 break;
         }
 
-        if ($data['order']) {
+        if ($data['order'] && isset($orders[$data['order']])) {
             $filter['order'] = $orders[$data['order']];
         } else {
             $filter['order'] = $orders[1];
@@ -562,6 +578,10 @@ class PictureController extends AbstractRestfulController
         ]) . 'ng/moder/pictures/' . $picture['id'];
     }
 
+    /**
+     * @return ForbiddenAction|ApiProblemResponse
+     * @throws Storage\Exception
+     */
     public function postAction()
     {
         $user = $this->user()->get();
@@ -618,6 +638,7 @@ class PictureController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @throws Exception
      */
     public function updateAction()
     {
@@ -716,6 +737,18 @@ class PictureController extends AbstractRestfulController
                         'pictures' => [$picture['id'], $replacePicture['id']]
                     ]);
                 }
+            }
+
+            if (array_key_exists('taken_year', $data)) {
+                $set['taken_year'] = $data['taken_year'];
+            }
+
+            if (array_key_exists('taken_month', $data)) {
+                $set['taken_month'] = $data['taken_month'];
+            }
+
+            if (array_key_exists('taken_day', $data)) {
+                $set['taken_day'] = $data['taken_day'];
             }
 
             if (isset($data['special_name'])) {
@@ -945,6 +978,10 @@ class PictureController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @return ForbiddenAction|array|JsonModel|ApiProblemResponse
+     * @throws Exception
+     */
     public function itemAction()
     {
         $user = $this->user()->get();
@@ -999,6 +1036,10 @@ class PictureController extends AbstractRestfulController
         return $canDelete;
     }
 
+    /**
+     * @return ForbiddenAction|array
+     * @throws Storage\Exception
+     */
     public function normalizeAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -1032,6 +1073,10 @@ class PictureController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @return ForbiddenAction|array
+     * @throws Storage\Exception
+     */
     public function flopAction()
     {
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -1066,6 +1111,10 @@ class PictureController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @return ForbiddenAction|array
+     * @throws Exception
+     */
     public function repairAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -1087,6 +1136,10 @@ class PictureController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @return ForbiddenAction|array
+     * @throws Storage\Exception
+     */
     public function correctFileNamesAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -1108,6 +1161,10 @@ class PictureController extends AbstractRestfulController
         return $this->getResponse()->setStatusCode(200);
     }
 
+    /**
+     * @return array
+     * @throws Exception
+     */
     public function deleteSimilarAction()
     {
         $srcPicture = $this->picture->getRow(['id' => (int)$this->params('id')]);
@@ -1162,6 +1219,7 @@ class PictureController extends AbstractRestfulController
 
     /**
      * @suppress PhanDeprecatedFunction
+     * @throws Exception
      */
     public function acceptReplaceAction()
     {
