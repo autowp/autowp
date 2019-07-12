@@ -23,6 +23,9 @@ server {
     real_ip_header X-Real-IP;
 
     server_tokens off;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Xss-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
 
     location = /_.gif {
         empty_gif;
