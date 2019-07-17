@@ -1,6 +1,6 @@
-FROM ubuntu:bionic
+FROM ubuntu:disco
 
-LABEL maintainer "dmitry@pereslegin.ru"
+LABEL maintainer="dmitry@pereslegin.ru"
 
 WORKDIR /app
 
