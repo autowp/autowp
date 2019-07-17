@@ -19,7 +19,8 @@ return [
                 'url'  => 'http://i.' . $host . '/image/format/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'
-                ]
+                ],
+                'bucket' => getenv('AUTOWP_IMAGE_FORMAT_BUCKET')
             ],
             'museum' => [
                 'path' => $imageDir . "museum",
@@ -29,7 +30,8 @@ return [
                     'options'  => [
                         'deep' => 2
                     ]
-                ]
+                ],
+                'bucket' => getenv('AUTOWP_IMAGE_MUSEUM_BUCKET')
             ],
             'user' => [
                 'path' => $imageDir . "user",
@@ -39,21 +41,24 @@ return [
                     'options'  => [
                         'deep' => 2
                     ]
-                ]
+                ],
+                'bucket' => getenv('AUTOWP_IMAGE_USER_BUCKET')
             ],
             'brand' => [
                 'path' => $imageDir . "brand",
                 'url'  => 'http://i.' . $host . '/image/brand/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'
-                ]
+                ],
+                'bucket' => getenv('AUTOWP_IMAGE_BRAND_BUCKET')
             ],
             'picture' => [
                 'path' => __DIR__ . '/../../../public_html/pictures/',
                 'url'  => 'http://i.' . $host . '/pictures/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'
-                ]
+                ],
+                'bucket' => getenv('AUTOWP_IMAGE_PICTURE_BUCKET')
             ]
         ],
 
@@ -164,6 +169,17 @@ return [
                 'strip'      => 1,
                 'format'     => 'jpeg'
             ]
+        ],
+        'formatToS3' => true,
+        's3' => [
+            'region' => '',
+            'version' => 'latest',
+            'endpoint' => getenv('AUTOWP_S3_ENDPOINT'),
+            'credentials' => [
+                'key' => getenv('AUTOWP_S3_KEY'),
+                'secret' => getenv('AUTOWP_S3_SECRET')
+            ],
+            'use_path_style_endpoint' => true
         ]
     ]
 ];

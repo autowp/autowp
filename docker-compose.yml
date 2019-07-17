@@ -55,6 +55,14 @@ web:
     ROLLBAR_ENVIRONMENT: development
     TRAFFIC_URL: http://traffic
     AUTOWP_FORCE_HTTPS: ""
+    AUTOWP_S3_KEY:
+    AUTOWP_S3_SECRET:
+    AUTOWP_S3_ENDPOINT:
+    AUTOWP_IMAGE_FORMAT_BUCKET: dev-format
+    AUTOWP_IMAGE_MUSEUM_BUCKET: dev-museum
+    AUTOWP_IMAGE_USER_BUCKET: dev-user
+    AUTOWP_IMAGE_BRAND_BUCKET: dev-brand
+    AUTOWP_IMAGE_PICTURE_BUCKET: dev-picture
   volumes:
   - ./config:/app/config
   - ./data:/app/data
@@ -111,8 +119,8 @@ frontend:
   restart: always
   volumes:
   - "./frontend:/usr/share/nginx/html"
-  - "../autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
-  - "../autowp-frontend/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
+  - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
+  - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
 
 rabbitmq:
   image: rabbitmq:management

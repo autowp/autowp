@@ -46,7 +46,7 @@
 		"zendframework/zend-uri" : ">=2.6.1",
 		"zendframework/zend-view" : ">=2.10.0",
 		"zfcampus/zf-oauth2" : "^1.4.0",
-		"autowp/image" : "^3.0.2",
+		"autowp/image" : "^4.0.1",
 		"facebook/graph-sdk" : "^5.4",
 		"zendframework/zend-hydrator" : "^2.4.0",
 		"autowp/cron" : "^0.1.1",
