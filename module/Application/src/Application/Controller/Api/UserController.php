@@ -646,7 +646,9 @@ class UserController extends AbstractRestfulController
         $format = $imageStorage->getFormat('photo');
         $imageSampler->convertImagick($imagick, null, $format);
 
-        $newImageId = $imageStorage->addImageFromImagick($imagick, 'user');
+        $newImageId = $imageStorage->addImageFromImagick($imagick, 'user', [
+            's3' => true
+        ]);
 
         $imagick->clear();
 

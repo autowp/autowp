@@ -339,7 +339,9 @@ class LoginController extends AbstractRestfulController
                         $format = $this->imageStorage()->getFormat('photo');
                         $imageSampler->convertImagick($imagick, null, $format);
 
-                        $newImageId = $this->imageStorage()->addImageFromImagick($imagick, 'user');
+                        $newImageId = $this->imageStorage()->addImageFromImagick($imagick, 'user', [
+                            's3' => true
+                        ]);
 
                         $imagick->clear();
 
