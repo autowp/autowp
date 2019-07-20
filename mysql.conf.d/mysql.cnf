@@ -10,3 +10,5 @@ max_heap_table_size=256M
 #query_cache_size    = 256M
 
 innodb_buffer_pool_size=256M
+
+default_authentication_plugin=mysql_native_password
