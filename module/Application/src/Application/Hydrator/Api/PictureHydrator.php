@@ -657,7 +657,7 @@ class PictureHydrator extends RestHydrator
                 $exif = $this->imageStorage->getImageEXIF($object['image_id']);
                 $exifStr = '';
                 $notSections = ['FILE', 'COMPUTED'];
-                if ($exif !== false) {
+                if ($exif) {
                     foreach ($exif as $key => $section) {
                         if (array_search($key, $notSections) !== false) {
                             continue;
