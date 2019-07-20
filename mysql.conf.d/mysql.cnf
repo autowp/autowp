@@ -6,7 +6,7 @@ explicit_defaults_for_timestamp
 tmp_table_size=256M
 max_heap_table_size=256M
 
-query_cache_limit   = 256M
-query_cache_size    = 256M
+#query_cache_limit   = 256M
+#query_cache_size    = 256M
 
 innodb_buffer_pool_size=256M
