@@ -21,6 +21,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         bash \
         build-essential \
         ca-certificates \
+        composer \
         curl \
         git \
         imagemagick \
@@ -63,15 +64,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         ssmtp \
         supervisor \
         tzdata \
+        unzip \
         xmlstarlet
 
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     apt-get install -qq -y nodejs && \
     DEBIAN_FRONTEND=noninteractive apt-get autoclean -qq -y && \
-    \
-    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    php composer-setup.php --quiet && \
-    rm composer-setup.php && \
     \
     cat /etc/ImageMagick-6/policy.xml | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v "2GiB" | \
@@ -84,8 +82,8 @@ RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit
 COPY ./etc/ /etc/
 
 COPY composer.json /app/composer.json
-RUN php ./composer.phar install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader && \
-    php ./composer.phar clearcache
+RUN composer install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader && \
+    composer clearcache
 
 COPY package.json /app/package.json
 
