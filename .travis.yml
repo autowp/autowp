@@ -23,7 +23,7 @@ script:
   - docker exec -it autowp_test_web sh -c "./vendor/bin/phpcs --encoding=utf-8" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "./vendor/bin/phpcf module" || travis_terminate 1;
   - docker exec -it autowp_test_web sh -c "composer phpmd" || travis_terminate 1;
-  - docker exec -it autowp_test_web sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./logs/clover.xml" || travis_terminate 1;
+  - docker exec -it autowp_test_web sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml" || travis_terminate 1;
   - docker cp autowp_test_web:/app/logs/junit.xml junit.xml || travis_terminate 1;
   - docker cp autowp_test_web:/app/logs/clover.xml clover.xml || travis_terminate 1;
   - sonar-scanner || travis_terminate 1;
