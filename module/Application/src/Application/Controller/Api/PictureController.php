@@ -961,7 +961,7 @@ class PictureController extends AbstractRestfulController
                 if ($data['point']['lat'] && $data['point']['lng']) {
                     geoPHP::version();
                     $point = new Point($data['point']['lng'], $data['point']['lat']);
-                    $set['point'] = new Sql\Expression('GeomFromText(?)', [$point->out('wkt')]);
+                    $set['point'] = new Sql\Expression('ST_GeomFromText(?)', [$point->out('wkt')]);
                 } else {
                     $set['point'] = null;
                 }

@@ -65,18 +65,18 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         supervisor \
         tzdata \
         unzip \
-        xmlstarlet
-
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
-    apt-get install -qq -y nodejs && \
+        xmlstarlet \
+    && \
+    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -qq -y nodejs && \
     DEBIAN_FRONTEND=noninteractive apt-get autoclean -qq -y && \
     \
     cat /etc/ImageMagick-6/policy.xml | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v "2GiB" | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='disk']/@value" -v "10GiB" > /etc/ImageMagick-6/policy2.xml && \
-    cat /etc/ImageMagick-6/policy2.xml > /etc/ImageMagick-6/policy.xml
-
-RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
+    cat /etc/ImageMagick-6/policy2.xml > /etc/ImageMagick-6/policy.xml && \
+    \
+    curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
     chmod +x /usr/local/bin/waitforit
 
 COPY ./etc/ /etc/
