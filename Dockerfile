@@ -21,6 +21,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         bash \
         build-essential \
         ca-certificates \
+        composer \
         curl \
         git \
         imagemagick \
@@ -63,29 +64,26 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -qq -y && \
         ssmtp \
         supervisor \
         tzdata \
-        xmlstarlet
-
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
-    apt-get install -qq -y nodejs && \
+        unzip \
+        xmlstarlet \
+    && \
+    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -qq -y nodejs && \
     DEBIAN_FRONTEND=noninteractive apt-get autoclean -qq -y && \
-    \
-    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    php composer-setup.php --quiet && \
-    rm composer-setup.php && \
     \
     cat /etc/ImageMagick-6/policy.xml | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='memory']/@value" -v "2GiB" | \
         xmlstarlet ed -u "/policymap/policy[@domain='resource'][@name='disk']/@value" -v "10GiB" > /etc/ImageMagick-6/policy2.xml && \
-    cat /etc/ImageMagick-6/policy2.xml > /etc/ImageMagick-6/policy.xml
-
-RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
+    cat /etc/ImageMagick-6/policy2.xml > /etc/ImageMagick-6/policy.xml && \
+    \
+    curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
     chmod +x /usr/local/bin/waitforit
 
 COPY ./etc/ /etc/
 
 COPY composer.json /app/composer.json
-RUN php ./composer.phar install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader && \
-    php ./composer.phar clearcache
+RUN composer install --no-dev --no-progress --no-interaction --no-suggest --optimize-autoloader && \
+    composer clearcache
 
 COPY package.json /app/package.json
 

@@ -80,7 +80,7 @@ class MapController extends AbstractActionController
                     : ['id', 'name', 'begin_year', 'end_year', 'item_type_id']
         )
             ->join('item_point', 'item.id = item_point.item_id', ['point'])
-            ->where(['ST_Contains(GeomFromText(?), item_point.point)' => $polygon->out('wkt')])
+            ->where(['ST_Contains(ST_GeomFromText(?), item_point.point)' => $polygon->out('wkt')])
             ->order('item.name');
 
         $factories = $this->itemTable->selectWith($select);
