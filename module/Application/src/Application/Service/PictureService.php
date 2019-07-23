@@ -251,7 +251,7 @@ class PictureService
             $point = new Point($gps['lng'], $gps['lat']);
 
             $this->picture->getTable()->update([
-                'point' => new Sql\Expression('GeomFromWKB(?)', [$point->out('wkb')])
+                'point' => new Sql\Expression('ST_GeomFromWKB(?)', [$point->out('wkb')])
             ], [
                 'id' => $pictureId
             ]);
