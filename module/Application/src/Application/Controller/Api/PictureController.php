@@ -414,8 +414,21 @@ class PictureController extends AbstractRestfulController
             if ($data['perspective_id'] == 'null') {
                 $filter['item']['perspective_is_null'] = true;
             } else {
-                $filter['item']['perspective'] = $data['perspective_id'];
+                $filter['item']['perspective'] = (int) $data['perspective_id'];
             }
+        }
+
+        if ($data['perspective_exclude_id']) {
+            $parts = explode(',', $data['perspective_id']);
+            $value = [];
+            foreach ($parts as $part) {
+                $part = (int)$part;
+                if ($part) {
+                    $value[] = $part;
+                }
+            }
+
+            $filter['item']['perspective_exclude'] = $value;
         }
 
         if ($data['exact_item_id']) {

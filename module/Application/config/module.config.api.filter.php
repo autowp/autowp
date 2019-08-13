@@ -2484,6 +2484,9 @@ return [
             'perspective_id' => [
                 'required' => false
             ],
+            'perspective_exclude_id' => [
+                'required' => false
+            ],
             'exact_item_id' => [
                 'required' => false,
                 'filters' => [
@@ -2741,6 +2744,9 @@ return [
                 ]
             ],
             'perspective_id' => [
+                'required' => false
+            ],
+            'perspective_exclude_id' => [
                 'required' => false
             ],
             'exact_item_id' => [
