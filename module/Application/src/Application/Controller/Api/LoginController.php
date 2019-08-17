@@ -265,7 +265,7 @@ class LoginController extends AbstractRestfulController
             $url = $this->url()->fromRoute('login/callback', [], [
                 'force_canonical' => true,
                 'query'           => $params,
-                'uri'             => new HttpUri('http://' . $this->hosts[$stateRow['language']]['hostname'])
+                'uri'             => new HttpUri('https://' . $this->hosts[$stateRow['language']]['hostname'])
             ]);
             return $this->redirect()->toUrl($url);
         }
@@ -339,7 +339,9 @@ class LoginController extends AbstractRestfulController
                         $format = $this->imageStorage()->getFormat('photo');
                         $imageSampler->convertImagick($imagick, null, $format);
 
-                        $newImageId = $this->imageStorage()->addImageFromImagick($imagick, 'user');
+                        $newImageId = $this->imageStorage()->addImageFromImagick($imagick, 'user', [
+                            's3' => true
+                        ]);
 
                         $imagick->clear();
 

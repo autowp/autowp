@@ -880,7 +880,7 @@ class Item
         }
 
         $set = [
-            'point' => new Sql\Expression('GeomFromText(?)', [$point->out('wkt')])
+            'point' => new Sql\Expression('ST_GeomFromText(?)', [$point->out('wkt')])
         ];
 
         $row = $this->itemPointTable->select($primaryKey)->current();

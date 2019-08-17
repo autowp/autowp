@@ -229,7 +229,7 @@ class CarOfDay
             return;
         }
 
-        $url = 'http://wheelsage.org/picture/' . $picture['identity'];
+        $url = 'https://wheelsage.org/picture/' . $picture['identity'];
 
         if ($car['item_type_id'] == Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
@@ -325,7 +325,7 @@ class CarOfDay
             return;
         }
 
-        $url = 'http://wheelsage.org/picture/' . $picture['identity'];
+        $url = 'https://wheelsage.org/picture/' . $picture['identity'];
 
         if ($car['item_type_id'] == Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'en');
@@ -410,7 +410,7 @@ class CarOfDay
 
 
 
-        $url = 'http://autowp.ru/picture/' . $picture['identity'];
+        $url = 'https://autowp.ru/picture/' . $picture['identity'];
 
         if ($car['item_type_id'] == Item::VEHICLE) {
             $title = $this->translator->translate('car-of-day', 'default', 'ru');
@@ -545,7 +545,7 @@ class CarOfDay
                             break;
                         case 'category':
                             $url = '/ng/category/' . urlencode($path['category_catname']) .
-                                   '/' . urlencode($row['identity']);
+                                   '/pictures/' . urlencode($row['identity']);
                             break;
                         case 'person':
                             $url = '/ng/persons/' . $path['id'];

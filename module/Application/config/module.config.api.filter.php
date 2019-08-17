@@ -3,9 +3,9 @@
 namespace Application;
 
 use Application\InputFilter\AttrUserValueCollectionInputFilter;
-use Autowp\Comments\Attention;
 use Zend\InputFilter\InputFilter;
 
+use Autowp\Comments\Attention;
 use Autowp\Comments\CommentsService;
 use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
@@ -2862,6 +2862,56 @@ return [
             ]
         ],
         'api_picture_edit' => [
+            'taken_year' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'GreaterThan',
+                        'options' => [
+                            'min'       => 1800,
+                            'inclusive' => true
+                        ]
+                    ],
+                    [
+                        'name'    => 'LessThan',
+                        'options' => [
+                            'max'       => 2030,
+                            'inclusive' => true
+                        ]
+                    ]
+                ]
+            ],
+            'taken_month' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
+                        'options' => [
+                            'haystack' => range(1, 12)
+                        ]
+                    ]
+                ]
+            ],
+            'taken_day' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'InArray',
+                        'options' => [
+                            'haystack' => range(1, 31)
+                        ]
+                    ]
+                ]
+            ],
             'status' => [
                 'required' => false,
                 'filters'  => [
@@ -2957,7 +3007,22 @@ return [
                 'validators' => [
                     ['name' => 'Digits']
                 ]
-            ]
+            ],
+            'point' => [
+                'required' => false,
+                'lat' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'lng' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ]
+            ],
         ],
         'api_picture_item' => [
             'fields' => [

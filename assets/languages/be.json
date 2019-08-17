@@ -1,5 +1,7 @@
 {
-    "perspective/mockup": "Mockup",
+    "perspective/chassis": "Шасі",
+    "brands/more-{count}-companies": "яшчэ {count, plural, one {{count} кампанія} few {{count} кампаніі} many {{count} кампаній} other {{count} кампаній}}",
+    "perspective/mockup": "mockup",
     "catalogue/specifications-of-{name}": "Тэхнічныя характарыстыкі {name}",
     "moder/picture/edit-item": "Кіраванне",
     "moder/picture/edit-picture-{id}": "Кіраванне выявай №{id}",
