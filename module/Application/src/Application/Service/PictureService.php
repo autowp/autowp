@@ -169,7 +169,8 @@ class PictureService
 
         $imageId = $this->imageStorage->addImageFromFile($path, 'picture', [
             'extension' => $ext,
-            'pattern'   => 'autowp_' . rand()
+            'pattern'   => 'autowp_' . rand(),
+            's3'        => true
         ]);
 
         $image = $this->imageStorage->getImage($imageId);
