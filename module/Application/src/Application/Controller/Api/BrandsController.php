@@ -149,8 +149,8 @@ class BrandsController extends AbstractActionController
             $sections,
             [
                 [
-                    'name'   => 'Other',
-                    'url'    => null,
+                    'name'       => 'Other',
+                    'routerLink' => null,
                     'groups' => $this->otherGroups(
                         $brandId,
                         $brandCatname,
@@ -187,11 +187,8 @@ class BrandsController extends AbstractActionController
 
             if ($hasConcepts) {
                 $groups['concepts'] = [
-                    'url' => $this->url()->fromRoute('catalogue', [
-                        'action'        => 'concepts',
-                        'brand_catname' => $brandCatname
-                    ]),
-                    'name' => $this->translator->translate('concepts and prototypes'),
+                    'routerLink' => ['/', $brandCatname, 'concepts'],
+                    'name'       => $this->translator->translate('concepts and prototypes'),
                 ];
             }
         }
@@ -207,10 +204,7 @@ class BrandsController extends AbstractActionController
 
         if ($logoPicturesCount > 0) {
             $groups['logo'] = [
-                'url' => $this->url()->fromRoute('catalogue', [
-                    'action'        => 'logotypes',
-                    'brand_catname' => $brandCatname
-                ]),
+                'routerLink' => ['/', $brandCatname, 'logotypes'],
                 'name'  => $this->translator->translate('logotypes'),
                 'count' => $logoPicturesCount
             ];
@@ -226,10 +220,7 @@ class BrandsController extends AbstractActionController
         ]);
         if ($mixedPicturesCount > 0) {
             $groups['mixed'] = [
-                'url' => $this->url()->fromRoute('catalogue', [
-                    'action' => 'mixed',
-                    'brand_catname' => $brandCatname
-                ]),
+                'routerLink' => ['/', $brandCatname, 'mixed'],
                 'name'  => $this->translator->translate('mixed'),
                 'count' => $mixedPicturesCount
             ];
@@ -245,10 +236,7 @@ class BrandsController extends AbstractActionController
         ]);
         if ($unsortedPicturesCount > 0) {
             $groups['unsorted'] = [
-                'url'     => $this->url()->fromRoute('catalogue', [
-                    'action'        => 'other',
-                    'brand_catname' => $brandCatname
-                ]),
+                'routerLink' => ['/', $brandCatname, 'other'],
                 'name'  => $this->translator->translate('unsorted'),
                 'count' => $unsortedPicturesCount
             ];
@@ -293,12 +281,7 @@ class BrandsController extends AbstractActionController
                 'name'        => 'catalogue/section/engines',
                 'car_type_id' => null,
                 'item_type_id' => Item::ENGINE,
-                'url'          => $this->router->assemble([
-                    'brand_catname' => $brandCatname,
-                    'action'        => 'engines'
-                ], [
-                    'name' => 'catalogue'
-                ])
+                'router_link'  => ['/', $brandCatname, 'engines']
             ]
         ];
 
@@ -317,9 +300,9 @@ class BrandsController extends AbstractActionController
             });
 
             $sections[] = [
-                'name'   => $sectionsPreset['name'],
-                'url'    => isset($sectionsPreset['url']) ? $sectionsPreset['url'] : null,
-                'groups' => $sectionGroups
+                'name'       => $sectionsPreset['name'],
+                'routerLink' => isset($sectionsPreset['router_link']) ? $sectionsPreset['router_link'] : null,
+                'groups'     => $sectionGroups
             ];
         }
 
@@ -368,18 +351,10 @@ class BrandsController extends AbstractActionController
 
         $groups = [];
         foreach ($rows as $brandItemRow) {
-            $url = $this->url()->fromRoute('catalogue', [
-                'action'        => 'brand-item',
-                'brand_catname' => $brandCatname,
-                'car_catname'   => $brandItemRow['brand_item_catname']
-            ]);
-
-            $name = $this->itemModel->getName($brandItemRow['item_id'], $language);
-
             $groups[] = [
-                'item_id' => $brandItemRow['item_id'],
-                'url'     => $url,
-                'name'    => $name,
+                'item_id'    => $brandItemRow['item_id'],
+                'routerLink' => ['/', $brandCatname, $brandItemRow['brand_item_catname']],
+                'name'       => $this->itemModel->getName($brandItemRow['item_id'], $language),
             ];
         }
 
