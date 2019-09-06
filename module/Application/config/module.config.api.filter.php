@@ -1825,6 +1825,12 @@ return [
                     ['name' => 'Digits']
                 ]
             ],
+            'catname' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
             'limit' => [
                 'required' => false,
                 'filters'  => [
