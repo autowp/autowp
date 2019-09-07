@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Console;
 
+use Autowp\Image\StorageInterface;
 use geoPHP;
 use Point;
 
@@ -25,10 +26,16 @@ class PicturesController extends AbstractActionController
      */
     private $df;
 
-    public function __construct(Picture $picture, DuplicateFinder $df)
+    /**
+     * @var StorageInterface
+     */
+    private $imageStorage;
+
+    public function __construct(Picture $picture, DuplicateFinder $df, StorageInterface $storage)
     {
         $this->picture = $picture;
         $this->df = $df;
+        $this->imageStorage = $storage;
     }
 
     /**
@@ -78,7 +85,8 @@ class PicturesController extends AbstractActionController
 
         foreach ($table->selectWith($select) as $row) {
             print $row['id'] . PHP_EOL;
-            $this->df->indexImage($row['id']);
+            $image = $this->imageStorage->getImage($row['id']);
+            $this->df->indexImage($row['id'], $image->getSrc());
         }
     }
 }
