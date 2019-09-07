@@ -79,14 +79,16 @@ class PicturesController extends AbstractActionController
     {
         $table = $this->picture->getTable();
         $select = $table->getSql()->select()
-            ->columns(['id'])
+            ->columns(['id', 'pictures.image_id'])
             ->join('df_hash', 'pictures.id = df_hash.picture_id', [], Sql\Select::JOIN_LEFT)
             ->where(['df_hash.picture_id IS NULL']);
 
         foreach ($table->selectWith($select) as $row) {
-            print $row['id'] . PHP_EOL;
-            $image = $this->imageStorage->getImage($row['id']);
-            $this->df->indexImage($row['id'], $image->getSrc());
+            print $row['id'] . ' / ' . $row['image_id'] . PHP_EOL;
+            $image = $this->imageStorage->getImage($row['image_id']);
+            if ($image) {
+                $this->df->indexImage($row['id'], $image->getSrc());
+            }
         }
     }
 }

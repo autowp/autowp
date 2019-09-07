@@ -265,8 +265,10 @@ class PictureService
         $this->imageStorage->getFormatedImage($picture['image_id'], 'picture-gallery-full');
 
         // index
-        $image = $this->imageStorage->getImage($pictureId);
-        $this->duplicateFinder->indexImage($pictureId, $image->getSrc());
+        $image = $this->imageStorage->getImage($picture['image_id']);
+        if ($image) {
+            $this->duplicateFinder->indexImage($pictureId, $image->getSrc());
+        }
 
         $this->telegram->notifyInbox($pictureId);
 
