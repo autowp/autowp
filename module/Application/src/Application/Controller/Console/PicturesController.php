@@ -79,7 +79,7 @@ class PicturesController extends AbstractActionController
     {
         $table = $this->picture->getTable();
         $select = $table->getSql()->select()
-            ->columns(['id', 'pictures.image_id'])
+            ->columns(['id', 'image_id'])
             ->join('df_hash', 'pictures.id = df_hash.picture_id', [], Sql\Select::JOIN_LEFT)
             ->where(['df_hash.picture_id IS NULL']);
 
