@@ -650,7 +650,7 @@ class PictureHydrator extends RestHydrator
 
         if ($isModer) {
             if ($this->filterComposite->filter('iptc')) {
-                $picture['iptc'] = $this->imageStorage->getImageIPTC($object['image_id']);
+                $picture['iptc'] = null;
             }
 
             if ($this->filterComposite->filter('exif')) {

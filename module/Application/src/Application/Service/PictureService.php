@@ -5,9 +5,11 @@ namespace Application\Service;
 use Application\Comments;
 use ArrayObject;
 use Autowp\Comments\Attention;
+use Autowp\TextStorage;
 use Exception;
 
 use geoPHP;
+use ImagickException;
 use Point;
 
 use Zend\Db\Sql;
@@ -60,6 +62,11 @@ class PictureService
      */
     private $userPicture;
 
+    /**
+     * @var TextStorage\Service
+     */
+    private $textStorage;
+
     public function __construct(
         Picture $picture,
         CommentsService $comments,
@@ -67,7 +74,8 @@ class PictureService
         TelegramService $telegram,
         DuplicateFinder $duplicateFinder,
         PictureItem $pictureItem,
-        UserPicture $userPicture
+        UserPicture $userPicture,
+        TextStorage\Service $textStorage
     ) {
         $this->picture = $picture;
         $this->comments = $comments;
@@ -76,6 +84,7 @@ class PictureService
         $this->duplicateFinder = $duplicateFinder;
         $this->pictureItem = $pictureItem;
         $this->userPicture = $userPicture;
+        $this->textStorage = $textStorage;
     }
 
     /**
@@ -136,6 +145,8 @@ class PictureService
      * @param string $note
      * @return array|ArrayObject|null
      * @throws Image\Storage\Exception
+     * @throws ImagickException
+     * @throws Exception
      */
     public function addPictureFromFile(
         string $path,
@@ -223,6 +234,20 @@ class PictureService
         $this->imageStorage->changeImageName($imageId, [
             'pattern' => $this->picture->getFileNamePattern($picture['id'])
         ]);
+
+        $exif = $this->imageStorage->getImageEXIF($imageId);
+        if ($exif) {
+            $copyrights = strip_tags(trim($exif['COMPUTED']['Copyright']));
+
+            if ($copyrights) {
+                $textId = $this->textStorage->createText($copyrights, $userId);
+                $this->picture->getTable()->update([
+                    'copyrights_text_id' => $textId
+                ], [
+                    'id' => $pictureId
+                ]);
+            }
+        }
 
         // add comment
         if ($note) {
