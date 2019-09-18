@@ -236,7 +236,7 @@ class PictureService
         ]);
 
         $exif = $this->imageStorage->getImageEXIF($imageId);
-        if ($exif) {
+        if ($exif && isset($exif['COMPUTED']['Copyright'])) {
             $copyrights = strip_tags(trim($exif['COMPUTED']['Copyright']));
 
             if ($copyrights) {
