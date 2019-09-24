@@ -28,10 +28,11 @@ class DuplicateFinder
         $this->distanceTable = $distanceTable;
     }
 
-    public function indexImage(int $id): void
+    public function indexImage(int $id, string $url): void
     {
         $this->rabbitmq->send('duplicate_finder', Json::encode([
-            'picture_id' => $id
+            'picture_id' => $id,
+            'url'        => $url
         ]));
     }
 

@@ -8,6 +8,7 @@ use Application\Model\PictureItem;
 use Application\Model\UserPicture;
 use Autowp\Comments\CommentsService;
 use Autowp\Image\Storage;
+use Autowp\TextStorage;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -29,7 +30,8 @@ class PictureServiceFactory implements FactoryInterface
             $container->get(TelegramService::class),
             $container->get(DuplicateFinder::class),
             $container->get(PictureItem::class),
-            $container->get(UserPicture::class)
+            $container->get(UserPicture::class),
+            $container->get(TextStorage\Service::class)
         );
     }
 }
