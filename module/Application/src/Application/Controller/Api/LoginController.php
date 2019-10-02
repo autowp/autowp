@@ -326,7 +326,8 @@ class LoginController extends AbstractRestfulController
             ]);
 
             if (! $stateRow['user_id']) { // first login
-                if ($photoUrl = $data->getPhotoUrl()) {
+                $photoUrl = $data->getPhotoUrl();
+                if ($photoUrl) {
                     $photo = file_get_contents($photoUrl);
 
                     if ($photo) {

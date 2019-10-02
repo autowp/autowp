@@ -41,19 +41,19 @@ class Image implements StrategyInterface
         $photo = null;
 
         if (isset($value['image'], $value['format'])) {
-            $imageInfo = null;
             try {
                 $imageInfo = $this->getImageStorage()->getFormatedImage($value['image'], $value['format']);
             } catch (Storage\Exception $e) {
+                $imageInfo = null;
             }
             if ($imageInfo) {
                 $photo = $imageInfo->toArray();
             }
         } elseif (isset($value['image'])) {
-            $imageInfo = null;
             try {
                 $imageInfo = $this->getImageStorage()->getImage($value['image']);
             } catch (Storage\Exception $e) {
+                $imageInfo = null;
             }
             if ($imageInfo) {
                 $photo = $imageInfo->toArray();

@@ -4,6 +4,7 @@ namespace Application\Controller\Plugin;
 
 use ArrayIterator;
 use ArrayObject;
+use DateTime;
 use Exception;
 
 use geoPHP;
@@ -1053,7 +1054,7 @@ class Pic extends AbstractPlugin
 
         $takenDate = null;
         if ($picture['taken_year']) {
-            $date = new \DateTime();
+            $date = new DateTime();
             $date->setDate($picture['taken_year'], 1, 1);
             $format = 'Y';
             if ($picture['taken_month']) {
