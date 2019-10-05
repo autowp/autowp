@@ -2,12 +2,12 @@
 
 namespace Application\Controller\Console\Service;
 
+use Application\Controller\Console\PicturesController as Controller;
 use Application\DuplicateFinder;
 use Application\Model\Picture;
+use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
-use Application\Controller\Console\PicturesController as Controller;
 
 class PicturesControllerFactory implements FactoryInterface
 {
@@ -22,7 +22,8 @@ class PicturesControllerFactory implements FactoryInterface
     {
         return new Controller(
             $container->get(Picture::class),
-            $container->get(DuplicateFinder::class)
+            $container->get(DuplicateFinder::class),
+            $container->get(Storage::class)
         );
     }
 }
