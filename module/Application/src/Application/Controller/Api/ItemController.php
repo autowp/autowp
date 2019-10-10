@@ -394,6 +394,12 @@ class ItemController extends AbstractRestfulController
             $group = true;
         }
 
+        if ($data['dateful']) {
+            $select->where([
+                '(item.begin_year is not null or item.begin_model_year is not null)'
+            ]);
+        }
+
         if ($data['dateless']) {
             $select->where([
                 'item.begin_year is null',
@@ -2127,5 +2133,16 @@ class ItemController extends AbstractRestfulController
         ]);
 
         return $viewModel->setTerminal(true);
+    }
+
+    public function vehicleTypeAction()
+    {
+        $brandID = (int) $this->params()->fromQuery('brand_id');
+
+        $list = $this->vehicleType->getBrandVehicleTypes($brandID);
+
+        return new JsonModel([
+            'items' => $list
+        ]);
     }
 }
