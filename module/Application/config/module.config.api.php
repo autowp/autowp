@@ -1317,6 +1317,15 @@ return [
                                     ]
                                 ]
                             ],
+                            'vehicle-type' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/vehicle-type',
+                                    'defaults' => [
+                                        'action' => 'vehicle-type'
+                                    ]
+                                ]
+                            ],
                             'path' => [
                                 'type' => 'Literal',
                                 'options' => [

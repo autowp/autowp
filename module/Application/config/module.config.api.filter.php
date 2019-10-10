@@ -1542,7 +1542,16 @@ return [
                 'validators' => [
                     ['name' => 'Digits']
                 ]
-            ]
+            ],
+            'dateful' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ],
         ],
         'api_item_item' => [
             'fields' => [
