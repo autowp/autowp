@@ -163,8 +163,20 @@ class ItemParentController extends AbstractRestfulController
             $select->where(['item_parent.catname' => $data['catname']]);
         }
 
-        if ($data['concept']) {
-            $select->where(['item.is_concept']);
+        if (strlen($data['concept'])) {
+            if ($data['concept']) {
+                $select->where(['item.is_concept']);
+            } else {
+                $select->where(['NOT item.is_concept']);
+            }
+        }
+
+        if (strlen($data['concept_inherit'])) {
+            if ($data['concept_inherit']) {
+                $select->where(['item.is_concept_inherit']);
+            } else {
+                $select->where(['NOT item.is_concept_inherit']);
+            }
         }
 
         if ($data['exclude_concept']) {

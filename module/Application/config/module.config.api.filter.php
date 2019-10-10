@@ -1250,6 +1250,18 @@ return [
                     ]
                 ]
             ],
+            'concept' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ],
+            'concept_inherit' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ],
             'vehicle_type_id' => [
                 'required' => false,
                 'filters'  => [
