@@ -68,6 +68,14 @@ web:
     ROLLBAR_CLIENT_ACCESS_TOKEN: ""
     ROLLBAR_ENVIRONMENT: development
     TRAFFIC_URL: http://traffic
+    AUTOWP_S3_KEY: ${AUTOWP_S3_KEY}
+    AUTOWP_S3_SECRET: ${AUTOWP_S3_SECRET}
+    AUTOWP_S3_ENDPOINT: ${AUTOWP_S3_ENDPOINT}
+    AUTOWP_IMAGE_FORMAT_BUCKET: autowp-travis-format
+    AUTOWP_IMAGE_MUSEUM_BUCKET: autowp-travis-museum
+    AUTOWP_IMAGE_USER_BUCKET: autowp-travis-user
+    AUTOWP_IMAGE_BRAND_BUCKET: autowp-travis-brand
+    AUTOWP_IMAGE_PICTURE_BUCKET: autowp-travis-picture
   volumes:
   - ./config/autoload/local.php:/app/config/autoload/local.php:ro
   - ./module/Application/test/_files/image:/app/public_html/image
@@ -88,7 +96,7 @@ memcached:
   - "11211"
 
 mysql:
-  image: mysql:5.7
+  image: mysql:8
   container_name: autowp_test_mysql
   restart: always
   environment:

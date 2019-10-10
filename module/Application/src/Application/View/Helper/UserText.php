@@ -105,6 +105,12 @@ class UserText extends AbstractHtmlElement
         return $out;
     }
 
+    /**
+     * @param $url
+     * @return bool|string
+     * @throws Exception
+     * @SuppressWarnings(PHPMD.EmptyCatchBlock)
+     */
     private function processHref($url)
     {
         try {

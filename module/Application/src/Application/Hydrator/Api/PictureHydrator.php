@@ -341,6 +341,12 @@ class PictureHydrator extends RestHydrator
             'filesize'       => (int)$object['filesize']
         ];
 
+        if ($this->filterComposite->filter('taken')) {
+            $picture['taken_year'] = $object['taken_year'] ? (int)$object['taken_year'] : null;
+            $picture['taken_month'] = $object['taken_month'] ? (int)$object['taken_month'] : null;
+            $picture['taken_day'] = $object['taken_day'] ? (int)$object['taken_day'] : null;
+        }
+
         if ($this->filterComposite->filter('path')) {
             $picture['path'] = $this->getPath($object['id'], $this->itemID);
         }
@@ -724,14 +730,14 @@ class PictureHydrator extends RestHydrator
 
         if ($isModer) {
             if ($this->filterComposite->filter('iptc')) {
-                $picture['iptc'] = $this->imageStorage->getImageIPTC($object['image_id']);
+                $picture['iptc'] = null;
             }
 
             if ($this->filterComposite->filter('exif')) {
                 $exif = $this->imageStorage->getImageEXIF($object['image_id']);
                 $exifStr = '';
                 $notSections = ['FILE', 'COMPUTED'];
-                if ($exif !== false) {
+                if ($exif) {
                     foreach ($exif as $key => $section) {
                         if (array_search($key, $notSections) !== false) {
                             continue;

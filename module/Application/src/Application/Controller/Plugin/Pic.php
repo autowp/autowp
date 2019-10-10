@@ -4,6 +4,7 @@ namespace Application\Controller\Plugin;
 
 use ArrayIterator;
 use ArrayObject;
+use DateTime;
 use Exception;
 
 use geoPHP;
@@ -1051,6 +1052,22 @@ class Pic extends AbstractPlugin
             $point = geoPHP::load(substr($picture['point'], 4), 'wkb');
         }
 
+        $takenDate = null;
+        if ($picture['taken_year']) {
+            $date = new DateTime();
+            $date->setDate($picture['taken_year'], 1, 1);
+            $format = 'Y';
+            if ($picture['taken_month']) {
+                $date->setDate($picture['taken_year'], $picture['taken_month'], 1);
+                $format = 'm.Y';
+                if ($picture['taken_day']) {
+                    $date->setDate($picture['taken_year'], $picture['taken_month'], $picture['taken_day']);
+                    $format = 'd.m.Y';
+                }
+            }
+            $takenDate = $date->format($format);
+        }
+
         $itemIds = $this->pictureItem->getPictureItems($picture['id'], PictureItem::PICTURE_CONTENT);
 
         /* @phan-suppress-next-line PhanUndeclaredMethod */
@@ -1090,6 +1107,7 @@ class Pic extends AbstractPlugin
             'id'                => $picture['id'],
             'authors'           => $authors,
             'point'             => $point,
+            'takenDate'         => $takenDate,
             'copyrights'        => $copyrights,
             'identity'          => $picture['identity'],
             'name'              => $name,

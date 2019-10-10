@@ -45,7 +45,7 @@ class Picture
 
     private $pictureItemTable;
 
-    private $prefixedPerspectives = [5, 6, 17, 20, 21, 22, 23, 24];
+    private $prefixedPerspectives = [5, 6, 17, 20, 21, 22, 23, 24, 28];
 
     private $perspective;
 

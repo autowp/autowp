@@ -210,6 +210,9 @@ class ItemHydrator extends RestHydrator
         $this->addStrategy('logo', $strategy);
 
         $strategy = new Strategy\Image($serviceManager);
+        $this->addStrategy('logo120', $strategy);
+
+        $strategy = new Strategy\Image($serviceManager);
         $this->addStrategy('brandicon', $strategy);
     }
 
@@ -621,6 +624,13 @@ class ItemHydrator extends RestHydrator
             ]);
 
             $result['categories'] = $this->extractValue('categories', $rows);
+        }
+
+        if ($this->filterComposite->filter('logo120')) {
+            $result['logo120'] = $this->extractValue('logo120', [
+                'image'  => $object['logo_id'],
+                'format' => 'logo'
+            ]);
         }
 
         if ($isModer) {

@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Console;
 
+use Autowp\Image\StorageInterface;
 use geoPHP;
 use Point;
 
@@ -25,10 +26,16 @@ class PicturesController extends AbstractActionController
      */
     private $df;
 
-    public function __construct(Picture $picture, DuplicateFinder $df)
+    /**
+     * @var StorageInterface
+     */
+    private $imageStorage;
+
+    public function __construct(Picture $picture, DuplicateFinder $df, StorageInterface $storage)
     {
         $this->picture = $picture;
         $this->df = $df;
+        $this->imageStorage = $storage;
     }
 
     /**
@@ -58,7 +65,7 @@ class PicturesController extends AbstractActionController
                 $point = new Point($gps['lng'], $gps['lat']);
 
                 $this->picture->getTable()->update([
-                    'point' => new Sql\Expression('GeomFromWKB(?)', [$point->out('wkb')])
+                    'point' => new Sql\Expression('ST_GeomFromWKB(?)', [$point->out('wkb')])
                 ], [
                     'id' => $row['id']
                 ]);
@@ -72,13 +79,16 @@ class PicturesController extends AbstractActionController
     {
         $table = $this->picture->getTable();
         $select = $table->getSql()->select()
-            ->columns(['id'])
+            ->columns(['id', 'image_id'])
             ->join('df_hash', 'pictures.id = df_hash.picture_id', [], Sql\Select::JOIN_LEFT)
             ->where(['df_hash.picture_id IS NULL']);
 
         foreach ($table->selectWith($select) as $row) {
-            print $row['id'] . PHP_EOL;
-            $this->df->indexImage($row['id']);
+            print $row['id'] . ' / ' . $row['image_id'] . PHP_EOL;
+            $image = $this->imageStorage->getImage($row['image_id']);
+            if ($image) {
+                $this->df->indexImage($row['id'], $image->getSrc());
+            }
         }
     }
 }

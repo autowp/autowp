@@ -159,6 +159,10 @@ class ItemParentController extends AbstractRestfulController
             $select->where(['item_parent.parent_id' => $data['parent_id']]);
         }
 
+        if ($data['catname']) {
+            $select->where(['item_parent.catname' => $data['catname']]);
+        }
+
         if ($data['concept']) {
             $select->where(['item.is_concept']);
         }

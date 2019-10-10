@@ -1,5 +1,7 @@
 <?php return array (
-  'perspective/mockup' => 'Макет',
+  'perspective/chassis' => 'Шасі',
+  'brands/more-{count}-companies' => 'ще {count, plural, one {{count} компанія} few {{count} компанії} many {{count} компаній} other {{count} компаній}}',
+  'perspective/mockup' => 'макет',
   'catalogue/specifications-of-{name}' => 'Технічні характеристики {name}',
   'moder/picture/edit-item' => 'Управління',
   'moder/picture/edit-picture-{id}' => 'Управління зображенням №{id}',

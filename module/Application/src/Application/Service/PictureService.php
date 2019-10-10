@@ -5,9 +5,11 @@ namespace Application\Service;
 use Application\Comments;
 use ArrayObject;
 use Autowp\Comments\Attention;
+use Autowp\TextStorage;
 use Exception;
 
 use geoPHP;
+use ImagickException;
 use Point;
 
 use Zend\Db\Sql;
@@ -60,6 +62,11 @@ class PictureService
      */
     private $userPicture;
 
+    /**
+     * @var TextStorage\Service
+     */
+    private $textStorage;
+
     public function __construct(
         Picture $picture,
         CommentsService $comments,
@@ -67,7 +74,8 @@ class PictureService
         TelegramService $telegram,
         DuplicateFinder $duplicateFinder,
         PictureItem $pictureItem,
-        UserPicture $userPicture
+        UserPicture $userPicture,
+        TextStorage\Service $textStorage
     ) {
         $this->picture = $picture;
         $this->comments = $comments;
@@ -76,6 +84,7 @@ class PictureService
         $this->duplicateFinder = $duplicateFinder;
         $this->pictureItem = $pictureItem;
         $this->userPicture = $userPicture;
+        $this->textStorage = $textStorage;
     }
 
     /**
@@ -136,6 +145,8 @@ class PictureService
      * @param string $note
      * @return array|ArrayObject|null
      * @throws Image\Storage\Exception
+     * @throws ImagickException
+     * @throws Exception
      */
     public function addPictureFromFile(
         string $path,
@@ -169,7 +180,8 @@ class PictureService
 
         $imageId = $this->imageStorage->addImageFromFile($path, 'picture', [
             'extension' => $ext,
-            'pattern'   => 'autowp_' . rand()
+            'pattern'   => 'autowp_' . rand(),
+            's3'        => true
         ]);
 
         $image = $this->imageStorage->getImage($imageId);
@@ -223,6 +235,20 @@ class PictureService
             'pattern' => $this->picture->getFileNamePattern($picture['id'])
         ]);
 
+        $exif = $this->imageStorage->getImageEXIF($imageId);
+        if ($exif && isset($exif['COMPUTED']['Copyright'])) {
+            $copyrights = strip_tags(trim($exif['COMPUTED']['Copyright']));
+
+            if ($copyrights) {
+                $textId = $this->textStorage->createText($copyrights, $userId);
+                $this->picture->getTable()->update([
+                    'copyrights_text_id' => $textId
+                ], [
+                    'id' => $pictureId
+                ]);
+            }
+        }
+
         // add comment
         if ($note) {
             $this->comments->add([
@@ -251,7 +277,7 @@ class PictureService
             $point = new Point($gps['lng'], $gps['lat']);
 
             $this->picture->getTable()->update([
-                'point' => new Sql\Expression('GeomFromWKB(?)', [$point->out('wkb')])
+                'point' => new Sql\Expression('ST_GeomFromWKB(?)', [$point->out('wkb')])
             ], [
                 'id' => $pictureId
             ]);
@@ -264,7 +290,10 @@ class PictureService
         $this->imageStorage->getFormatedImage($picture['image_id'], 'picture-gallery-full');
 
         // index
-        $this->duplicateFinder->indexImage($pictureId);
+        $image = $this->imageStorage->getImage($picture['image_id']);
+        if ($image) {
+            $this->duplicateFinder->indexImage($pictureId, $image->getSrc());
+        }
 
         $this->telegram->notifyInbox($pictureId);
 
