@@ -420,8 +420,18 @@ class ItemHydrator extends RestHydrator
             $result['factories_of_brand_cars_count'] = (int) $object['factories_of_brand_cars_count'];
         }
 
-        if ($this->filterComposite->filter('description')) {
-            $result['description'] = $this->itemModel->getTextOfItem($object['id'], $this->language);
+        $textRequested = $this->filterComposite->filter('text');
+        $descRequested = $this->filterComposite->filter('description');
+
+        if ($textRequested || $descRequested) {
+            $texts = $this->itemModel->getTextsOfItem($object['id'], $this->language);
+            if ($descRequested) {
+                $result['description'] = $texts['text'];
+            }
+
+            if ($textRequested) {
+                $result['text'] = $texts['full_text'];
+            }
         }
 
         if ($this->filterComposite->filter('name_text')) {
@@ -440,6 +450,19 @@ class ItemHydrator extends RestHydrator
 
         if ($this->filterComposite->filter('name_only')) {
             $result['name_only'] = $this->itemModel->getName($object['id'], $this->language);
+        }
+
+        if ($this->filterComposite->filter('other_names')) {
+            $otherNames = [];
+            foreach ($this->itemModel->getNames($object['id']) as $name) {
+                if ($object['name'] != $name) {
+                    if (! in_array($name, $otherNames)) {
+                        $otherNames[] = $name;
+                    }
+                }
+            }
+
+            $result['other_names'] = $otherNames;
         }
 
         if ($this->filterComposite->filter('catname')) {

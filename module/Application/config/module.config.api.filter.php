@@ -1321,7 +1321,7 @@ return [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => ['childs_count', 'name_html',
-                            'name_text', 'name_default', 'name_only', 'description',
+                            'name_text', 'name_default', 'name_only', 'other_names', 'description', 'text',
                             'has_text', 'brands',
                             'spec_editor_url', 'specs_url', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
@@ -1572,7 +1572,7 @@ return [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
                         'options' => ['fields' => ['childs_count', 'name_html',
-                            'name_text', 'name_default', 'name_only', 'description',
+                            'name_text', 'name_default', 'name_only', 'other_names', 'description', 'text',
                             'has_text', 'brands',
                             'spec_editor_url', 'specs_url', 'categories',
                             'twins_groups', 'url', 'more_pictures_url',
@@ -1808,6 +1808,12 @@ return [
                 ]
             ],
             'concept' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+            ],
+            'concept_inherit' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
