@@ -151,6 +151,10 @@ class ItemParentController extends AbstractRestfulController
         $select = new Sql\Select($this->itemParent->getTable()->getTable());
         $select->join('item', 'item_parent.item_id = item.id', []);
 
+        if ($data['type_id']) {
+            $select->where(['item_parent.type' => (int) $data['type_id']]);
+        }
+
         if ($data['item_type_id']) {
             $select->where(['item.item_type_id' => $data['item_type_id']]);
         }

@@ -1320,7 +1320,7 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['childs_count', 'name_html',
+                        'options' => ['fields' => ['childs_count', 'childs_counts', 'name_html',
                             'name_text', 'name_default', 'name_only', 'other_names', 'description', 'text',
                             'has_text', 'brands',
                             'spec_editor_url', 'specs_url', 'categories',
@@ -1571,7 +1571,7 @@ return [
                 'filters'  => [
                     [
                         'name' => Filter\Api\FieldsFilter::class,
-                        'options' => ['fields' => ['childs_count', 'name_html',
+                        'options' => ['fields' => ['childs_count', 'childs_counts', 'name_html',
                             'name_text', 'name_default', 'name_only', 'other_names', 'description', 'text',
                             'has_text', 'brands',
                             'spec_editor_url', 'specs_url', 'categories',
@@ -1824,6 +1824,15 @@ return [
                 'filters'  => [
                     ['name' => 'StringTrim']
                 ],
+            ],
+            'type_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
             ],
             'item_type_id' => [
                 'required' => false,

@@ -379,6 +379,19 @@ class ItemHydrator extends RestHydrator
             $result['alt_names'] = $a;
         }
 
+        if ($this->filterComposite->filter('childs_counts')) {
+            $pairs = $this->itemParent->getChildItemLinkTypesCount($object['id']);
+
+            $result['childs_counts'] = [
+                'stock'  => isset($pairs[ItemParent::TYPE_DEFAULT])
+                    ? $pairs[ItemParent::TYPE_DEFAULT] : 0,
+                'tuning' => isset($pairs[ItemParent::TYPE_TUNING])
+                    ? $pairs[ItemParent::TYPE_TUNING] : 0,
+                'sport'  => isset($pairs[ItemParent::TYPE_SPORT])
+                    ? $pairs[ItemParent::TYPE_SPORT] : 0
+            ];
+        }
+
         if ($this->filterComposite->filter('mosts_active')) {
             $carsCount = $this->itemModel->getCount([
                 'ancestor' => $object['id']
