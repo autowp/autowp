@@ -82,11 +82,11 @@ class ListBuilder
         return false;
     }
 
-    private function getCataloguePath($item)
+    private function getCataloguePath($item, array $options)
     {
         $id = $item['id'];
         if (! isset($this->cataloguePaths[$id])) {
-            $this->cataloguePaths[$id] = $this->catalogue->getCataloguePaths($item['id']);
+            $this->cataloguePaths[$id] = $this->catalogue->getCataloguePaths($item['id'], $options);
         }
 
         return $this->cataloguePaths[$id];
@@ -94,21 +94,15 @@ class ListBuilder
 
     /**
      * @param ArrayObject|array $item
-     * @return mixed|string|NULL
+     * @param array $options
+     * @return string[]|null
      */
-    public function getDetailsUrl($item)
+    public function getDetailsRoute($item, array $options)
     {
-        $cataloguePaths = $this->getCataloguePath($item);
+        $cataloguePaths = $this->getCataloguePath($item, $options);
 
         foreach ($cataloguePaths as $cPath) {
-            return $this->router->assemble([
-                'action'        => 'brand-item',
-                'brand_catname' => $cPath['brand_catname'],
-                'car_catname'   => $cPath['car_catname'],
-                'path'          => $cPath['path']
-            ], [
-                'name' => 'catalogue'
-            ]);
+            return array_merge(['/', $cPath['brand_catname'], $cPath['car_catname']], $cPath['path']);
         }
 
         return null;
@@ -137,7 +131,10 @@ class ListBuilder
             return false;
         }
 
-        $cataloguePaths = $this->getCataloguePath($item);
+        $cataloguePaths = $this->getCataloguePath($item, [
+            'toBrand'      => true,
+            'breakOnFirst' => true
+        ]);
         foreach ($cataloguePaths as $path) {
             return $this->router->assemble([
                 'action'        => 'brand-item-specifications',

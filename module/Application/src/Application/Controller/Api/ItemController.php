@@ -846,7 +846,8 @@ class ItemController extends AbstractRestfulController
             'language' => $this->language(),
             'fields'   => $data['fields'],
             'user_id'  => $user ? $user['id'] : null,
-            'preview_pictures' => $previewPictures
+            'preview_pictures' => $previewPictures,
+            'route_brand_id' => $data['route_brand_id']
         ]);
 
         $rows = [];

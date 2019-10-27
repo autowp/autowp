@@ -1564,6 +1564,15 @@ return [
                     ['name' => 'Digits']
                 ]
             ],
+            'route_brand_id' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ]
         ],
         'api_item_item' => [
             'fields' => [

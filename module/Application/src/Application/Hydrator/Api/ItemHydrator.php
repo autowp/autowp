@@ -140,7 +140,15 @@ class ItemHydrator extends RestHydrator
      */
     private $comments;
 
+    /**
+     * @var int
+     */
     private $mostsMinCarsCount = 1;
+
+    /**
+     * @var int
+     */
+    private $routeBrandID;
 
     public function __construct(
         $serviceManager
@@ -239,6 +247,10 @@ class ItemHydrator extends RestHydrator
 
         if (isset($options['preview_pictures'])) {
             $this->setPreviewPictures($options['preview_pictures']);
+        }
+
+        if (isset($options['route_brand_id'])) {
+            $this->routeBrandID = (int)$options['route_brand_id'];
         }
 
         return $this;
@@ -805,24 +817,16 @@ class ItemHydrator extends RestHydrator
                             'breakOnFirst' => true
                         ]);
 
-                        $url = null;
+                        $route = null;
                         foreach ($cataloguePaths as $cataloguePath) {
-                            $url = $this->router->assemble([
-                                'controller'    => 'catalogue',
-                                'action'        => 'brand-item',
-                                'brand_catname' => $cataloguePath['brand_catname'],
-                                'car_catname'   => $cataloguePath['car_catname'],
-                                'path'          => $cataloguePath['path']
-                            ], [
-                                'name' => 'catalogue'
-                            ]);
+                            $route = array_merge(['/', $cataloguePath['brand_catname'], $cataloguePath['car_catname']], $cataloguePath['path']);
                             break;
                         }
 
                         $carPictures[] = [
-                            'name' => $this->itemNameFormatter->format($car, $this->language),
-                            'src'  => $src,
-                            'url'  => $url
+                            'name'   => $this->itemNameFormatter->format($car, $this->language),
+                            'src'    => $src,
+                            'route'  => $route
                         ];
                     }
                 }
@@ -881,23 +885,27 @@ class ItemHydrator extends RestHydrator
                 $result['name_default'] = $nameData['name'] == $name ? null : $name;
             }
 
-            if ($this->filterComposite->filter('url')) {
-                $url = null;
+            if ($this->filterComposite->filter('route')) {
+                $route = null;
                 switch ($object['item_type_id']) {
                     case Item::CATEGORY:
-                        $url = '/ng/category/' . urlencode($object['catname']);
+                        $route = ['/category', $object['catname']];
                         break;
                     case Item::TWINS:
-                        $url = '/ng/twins/group/' . $object['id'];
+                        $route = ['/twins/group/', (string)$object['id']];
                         break;
 
                     case Item::ENGINE:
                     case Item::VEHICLE:
-                        $url = $listBuilder->getDetailsUrl($object);
+                        $route = $listBuilder->getDetailsRoute($object, [
+                            'breakOnFirst' => true,
+                            'toBrand'      => $this->routeBrandID,
+                            'stockFirst'   => true
+                        ]);
                         break;
                 }
 
-                $result['url'] = $url;
+                $result['route'] = $route;
             }
 
             if ($this->filterComposite->filter('produced')) {
@@ -907,7 +915,7 @@ class ItemHydrator extends RestHydrator
             }
 
             if ($this->filterComposite->filter('design')) {
-                $result['design'] = $this->itemModel->getDesignInfo($this->router, $object['id'], $this->language);
+                $result['design'] = $this->itemModel->getDesignInfo($object['id'], $this->language);
             }
 
             if ($this->filterComposite->filter('engine_vehicles')) {
@@ -916,8 +924,8 @@ class ItemHydrator extends RestHydrator
                 }
             }
 
-            if ($this->filterComposite->filter('public_urls')) {
-                $result['public_urls'] = $this->getItemPublicUrls($object);
+            if ($this->filterComposite->filter('public_routes')) {
+                $result['public_routes'] = $this->getItemPublicRoutes($object);
             }
 
             if ($this->filterComposite->filter('logo')) {
@@ -1003,14 +1011,7 @@ class ItemHydrator extends RestHydrator
                             $this->itemModel->getNameData($row, $this->language),
                             $this->language
                         ),
-                        'url'  => $this->router->assemble([
-                            'action'        => 'brand-item',
-                            'brand_catname' => $cPath['brand_catname'],
-                            'car_catname'   => $cPath['car_catname'],
-                            'path'          => $cPath['path']
-                        ], [
-                            'name' => 'catalogue'
-                        ])
+                        'route'  => array_merge(['/', $cPath['brand_catname'], $cPath['car_catname']], $cPath['path'])
                     ];
                     break;
                 }
@@ -1020,38 +1021,38 @@ class ItemHydrator extends RestHydrator
         return $result;
     }
 
-    private function getItemPublicUrls($item)
+    private function getItemPublicRoutes($item)
     {
         if ($item['item_type_id'] == Item::FACTORY) {
             return [
-                '/ng/factories/' . $item['id']
+                ['/factories', (string)$item['id']]
             ];
         }
 
         if ($item['item_type_id'] == Item::CATEGORY) {
             return [
-                '/ng/category/' . urlencode($item['catname'])
+                ['/category', $item['catname']]
             ];
         }
 
         if ($item['item_type_id'] == Item::TWINS) {
             return [
-                '/ng/twins/group/' . $item['id']
+                ['/twins', 'group', $item['id']]
             ];
         }
 
         if ($item['item_type_id'] == Item::BRAND) {
             return [
-                '/ng/' . urlencode($item['catname'])
+                ['/' . $item['catname']]
             ];
         }
 
         return $this->walkUpUntilBrand((int)$item['id'], []);
     }
 
-    private function walkUpUntilBrand(int $id, array $path)
+    private function walkUpUntilBrand(int $id, array $path): array
     {
-        $urls = [];
+        $routes = [];
 
         $parentRows = $this->itemParent->getParentRows($id);
 
@@ -1062,22 +1063,15 @@ class ItemHydrator extends RestHydrator
             ]);
 
             if ($brand) {
-                $urls[] = $this->router->assemble([
-                    'action'        => 'brand-item',
-                    'brand_catname' => $brand['catname'],
-                    'car_catname'   => $parentRow['catname'],
-                    'path'          => $path
-                ], [
-                    'name' => 'catalogue'
-                ]);
+                $routes[] = array_merge(['/', $brand['catname'], $parentRow['catname']], $path);
             }
 
-            $urls = array_merge(
-                $urls,
+            $routes = array_merge(
+                $routes,
                 $this->walkUpUntilBrand((int)$parentRow['parent_id'], array_merge([$parentRow['catname']], $path))
             );
         }
 
-        return $urls;
+        return $routes;
     }
 }

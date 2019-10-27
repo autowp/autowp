@@ -497,7 +497,7 @@ class Pic extends AbstractPlugin
                     ];
                 }
 
-                $designProject = $this->itemModel->getDesignInfo($this->httpRouter, $item['id'], $language);
+                $designProject = $this->itemModel->getDesignInfo($item['id'], $language);
 
                 $texts = $this->itemModel->getTextsOfItem($item['id'], $language);
 

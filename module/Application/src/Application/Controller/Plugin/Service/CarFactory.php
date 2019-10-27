@@ -4,10 +4,6 @@ namespace Application\Controller\Plugin\Service;
 
 use Application\ItemNameFormatter;
 use Application\Model\Item;
-use Application\Model\ItemParent;
-use Application\Model\Picture;
-use Application\Model\Twins;
-use Application\Service\SpecificationsService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -25,13 +21,8 @@ class CarFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Plugin(
-            $container->get(SpecificationsService::class),
             $container->get(ItemNameFormatter::class),
-            $container->get(Item::class),
-            $container->get(ItemParent::class),
-            $container->get(Picture::class),
-            $container->get(Twins::class),
-            $container->get('HttpRouter')
+            $container->get(Item::class)
         );
     }
 }

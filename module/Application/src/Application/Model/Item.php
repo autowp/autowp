@@ -1798,7 +1798,7 @@ class Item
         return $result;
     }
 
-    public function getDesignInfo(TreeRouteStack $url, int $itemId, string $language)
+    public function getDesignInfo(int $itemId, string $language)
     {
         $brand = $this->getRow([
             'language'     => $language,
@@ -1815,14 +1815,8 @@ class Item
 
         if ($brand) {
             return [
-                'name' => $brand['name'], //TODO: formatter
-                'url'  => $url->assemble([
-                    'action'        => 'brand-item',
-                    'brand_catname' => $brand['catname'],
-                    'car_catname'   => $brand['brand_item_catname']
-                ], [
-                    'name' => 'catalogue'
-                ])
+                'name'  => $brand['name'], //TODO: formatter
+                'route' => ['/', $brand['catname'], $brand['brand_item_catname']]
             ];
         }
 
@@ -1845,14 +1839,8 @@ class Item
 
         if ($brand) {
             return [
-                'name' => $brand['name'], //TODO: formatter
-                'url'  => $url->assemble([
-                    'action'        => 'brand-item',
-                    'brand_catname' => $brand['catname'],
-                    'car_catname'   => $brand['brand_item_catname']
-                ], [
-                    'name' => 'catalogue'
-                ])
+                'name'  => $brand['name'], //TODO: formatter
+                'route' => ['/', $brand['catname'], $brand['brand_item_catname']]
             ];
         }
 
@@ -1875,14 +1863,8 @@ class Item
 
         if ($brand) {
             return [
-                'name' => $brand['name'], //TODO: formatter
-                'url'  => $url->assemble([
-                    'action'        => 'brand-item',
-                    'brand_catname' => $brand['catname'],
-                    'car_catname'   => $brand['brand_item_catname']
-                ], [
-                    'name' => 'catalogue'
-                ])
+                'name'  => $brand['name'], //TODO: formatter
+                'route' => ['/', $brand['catname'], $brand['brand_item_catname']]
             ];
         }
 
