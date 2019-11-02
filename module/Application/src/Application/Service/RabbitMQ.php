@@ -6,8 +6,6 @@ use Exception;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
-use Rollbar\Rollbar;
-use Rollbar\Payload\Level;
 
 class RabbitMQ
 {
@@ -55,7 +53,6 @@ class RabbitMQ
                 );
             } catch (Exception $e) {
                 $exception = $e;
-                Rollbar::log(Level::ERROR, $e);
                 sleep(1);
             }
         }
