@@ -98,7 +98,10 @@ class Module implements
         $config = $serviceManager->get('Config');
 
         if (isset($config['sentry']['dsn']) && $config['sentry']['dsn']) {
-            \Sentry\init(['dsn' => $config['sentry']['dsn']]);
+            \Sentry\init([
+                'dsn'         => $config['sentry']['dsn'],
+                'environment' => $config['sentry']['environment']
+            ]);
         }
 
         $languageListener = new LanguageRouteListener([$config['pictures_hostname']]);

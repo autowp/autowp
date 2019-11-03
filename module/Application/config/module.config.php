@@ -372,7 +372,8 @@ return [
     ],
 
     'sentry' => [
-        'dsn' => getenv('SENTRY_DSN')
+        'dsn'         => getenv('SENTRY_DSN'),
+        'environment' => getenv('SENTRY_ENVIRONMENT'),
     ],
 
     'traffic' => [

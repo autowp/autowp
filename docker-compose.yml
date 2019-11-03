@@ -51,6 +51,7 @@ web:
     AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
     AUTOWP_GO_LISTEN: ":81"
     SENTRY_DSN: ""
+    SENTRY_ENVIRONMENT: "development"
     TRAFFIC_URL: http://traffic
     AUTOWP_FORCE_HTTPS: ""
     AUTOWP_S3_KEY:
