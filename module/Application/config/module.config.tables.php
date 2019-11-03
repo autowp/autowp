@@ -28,7 +28,6 @@ return [
         'brand_alias' => [], //TODO: rename to item_alias
         'car_types'   => [], //TODO: rename to vehicle_type
         'car_types_parents' => [], //TODO: rename to vehicle_type_parent
-        'combination_modification' => [],
         'contact' => [],
         'df_distance' => [],
         'df_hash' => [],
@@ -46,9 +45,6 @@ return [
         'log_events_pictures' => [],
         'log_events_user' => [],
         'login_state' => [],
-        'modification' => [],
-        'modification_group' => [],
-        'modification_picture' => [],
         'of_day' => [],
         'pages' => [], //TODO: rename to page
         'perspectives' => [],

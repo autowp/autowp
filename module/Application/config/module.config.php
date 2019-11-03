@@ -135,7 +135,6 @@ return [
             Model\ItemAlias::class               => Model\ItemAliasFactory::class,
             Model\ItemParent::class              => Model\ItemParentFactory::class,
             Model\Log::class                     => Model\Service\LogFactory::class,
-            Model\Modification::class            => Model\ModificationFactory::class,
             Model\Perspective::class             => Model\PerspectiveFactory::class,
             Model\Picture::class                 => Model\PictureFactory::class,
             Model\PictureItem::class             => Model\PictureItemFactory::class,

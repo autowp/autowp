@@ -379,7 +379,6 @@ class Picture
             'has_copyrights'   => null,
             'limit'            => null,
             'accepted_in_days' => null,
-            'modification'     => null,
             'log'              => null,
             'group'            => [],
             'add_date'         => null,
@@ -584,11 +583,6 @@ class Picture
                     [(int)$options['accepted_in_days']]
                 )
             ]);
-        }
-
-        if ($options['modification']) {
-            $select->join('modification_picture', 'pictures.id = modification_picture.picture_id', []);
-            $this->applyIdFilter($select, $options['modification'], 'modification_picture.modification_id');
         }
 
         if ($options['log']) {
