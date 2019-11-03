@@ -107,16 +107,6 @@ class CatalogueController extends AbstractActionController
     private $picture;
 
     /**
-     * @var TableGateway
-     */
-    private $modificationTable;
-
-    /**
-     * @var TableGateway
-     */
-    private $modificationGroupTable;
-
-    /**
      * @var Brand
      */
     private $brand;
@@ -150,8 +140,6 @@ class CatalogueController extends AbstractActionController
         Mosts $mosts,
         VehicleType $vehicleType,
         Picture $picture,
-        TableGateway $modificationTable,
-        TableGateway $modificationGroupTable,
         Brand $brand,
         User $userModel,
         TreeRouteStack $router,
@@ -171,8 +159,6 @@ class CatalogueController extends AbstractActionController
         $this->mosts = $mosts;
         $this->vehicleType = $vehicleType;
         $this->picture = $picture;
-        $this->modificationTable = $modificationTable;
-        $this->modificationGroupTable = $modificationGroupTable;
         $this->brand = $brand;
         $this->userModel = $userModel;
         $this->router = $router;
@@ -1193,42 +1179,12 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandItemAction(function ($currentCar, $breadcrumbs, $brand, $brandItemCatname, $path) {
 
-            $modification = null;
-            $modId = (int)$this->params('mod');
-            if ($modId) {
-                $modification = $this->modificationTable->select(['id' => (int)$modId])->current();
-                if (! $modification) {
-                    return $this->notFoundAction();
-                }
-            }
-
-            $modgroupId = (int)$this->params('modgroup');
-            if ($modgroupId) {
-                $modgroup = $this->modificationGroupTable->select(['id' => (int)$modgroupId])->current();
-                if (! $modgroup) {
-                    return $this->notFoundAction();
-                }
-            }
-
-            if ($modgroupId) {
-                return $this->brandItemModgroup(
-                    $brand,
-                    $currentCar,
-                    $brandItemCatname,
-                    $path,
-                    $modgroupId,
-                    $modId,
-                    $breadcrumbs
-                );
-            }
-
             if ($currentCar['is_group']) {
                 return $this->brandItemGroup(
                     $brand,
                     $currentCar,
                     $brandItemCatname,
                     $path,
-                    $modId,
                     $breadcrumbs
                 );
             }
@@ -1276,7 +1232,6 @@ class CatalogueController extends AbstractActionController
 
             return [
                 'car'           => $currentCar,
-                'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
                 'breadcrumbs'   => $breadcrumbs,
                 'type'          => $type,
                 'stockCount'    => $counts['stock'],
@@ -1327,326 +1282,11 @@ class CatalogueController extends AbstractActionController
         });
     }
 
-    private function brandItemGroupModifications(int $carId, int $groupId, int $modificationId)
-    {
-        $select = new Sql\Select($this->modificationTable->getTable());
-        $select->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
-            ->where(['item_parent_cache.item_id' => $carId])
-            ->order('modification.name');
-
-        if ($groupId) {
-            $select->where(['modification.group_id' => $groupId]);
-        } else {
-            $select->where(['modification.group_id IS NULL']);
-        }
-
-        $modifications = [];
-        foreach ($this->modificationTable->selectWith($select) as $mRow) {
-            $count = $this->picture->getCount([
-                'item' => [
-                    'ancestor_or_self' => $carId
-                ],
-                'modification' => $mRow['id']
-            ]);
-
-            $modifications[] = [
-                'name'      => $mRow['name'],
-                'url'       => $this->url()->fromRoute('catalogue', [
-                    'action' => 'brand-item', // -pictures
-                    'mod'    => $mRow['id'],
-                ], [], true),
-                'count'     => $count,
-                'active' => $mRow['id'] == $modificationId
-            ];
-        }
-
-        return $modifications;
-    }
-
-    private function brandItemModifications(int $carId, int $modificationId)
-    {
-        // modifications
-        $modificationGroups = [];
-
-        $select = new Sql\Select($this->modificationGroupTable->getTable());
-
-        $select
-            ->join('modification', 'modification_group.id = modification.group_id', [])
-            ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
-            ->where(['item_parent_cache.item_id' => $carId])
-            ->group('modification_group.id')
-            ->order('modification_group.name');
-        $mgRows = $this->modificationGroupTable->selectWith($select);
-
-        foreach ($mgRows as $mgRow) {
-            $modifications = $this->brandItemGroupModifications($carId, $mgRow['id'], $modificationId);
-
-            if ($modifications) {
-                $modificationGroups[] = [
-                    'name'          => $mgRow['name'],
-                    'modifications' => $modifications,
-                    'url'           => $this->url()->fromRoute('catalogue', [
-                        'action'   => 'brand-item',
-                        'modgroup' => $mgRow['id'],
-                    ], [], true)
-                ];
-            }
-        }
-
-        $modifications = $this->brandItemGroupModifications($carId, 0, $modificationId);
-        if ($modifications) {
-            $modificationGroups[] = [
-                'name'          => null,
-                'modifications' => $modifications
-            ];
-        }
-
-        return $modificationGroups;
-    }
-
-    private function getModgroupPicturesSelect(int $carId, int $modId): Sql\Select
-    {
-        $select = $this->picture->getTable()->getSql()->select();
-
-        return $select->columns(
-            [
-                    'id', 'name', 'image_id', 'width', 'height', 'identity'
-                ]
-        )
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
-            ->join('modification_picture', 'pictures.id = modification_picture.picture_id', [])
-            ->where([
-                'pictures.status'                      => Picture::STATUS_ACCEPTED,
-                'item_parent_cache.parent_id'          => $carId,
-                'modification_picture.modification_id' => $modId
-            ])
-            ->limit(1);
-    }
-
-    private function getModgroupPictureList(int $carId, int $modId, array $perspectiveGroupIds)
-    {
-        $pictures = [];
-        $usedIds = [];
-
-        foreach ($perspectiveGroupIds as $groupId) {
-            $select = $this->getModgroupPicturesSelect($carId, $modId)
-                ->join(
-                    ['mp' => 'perspectives_groups_perspectives'],
-                    'picture_item.perspective_id = mp.perspective_id',
-                    []
-                )
-                ->where(['mp.group_id' => $groupId])
-                ->order([
-                    //'item.is_concept asc',
-                    'item_parent_cache.sport asc',
-                    'item_parent_cache.tuning asc',
-                    'mp.position'
-                ])
-                ->limit(1);
-
-            /*
-            if (isset($options['type'])) {
-                switch ($options['type']) {
-                    case ItemParent::TYPE_DEFAULT:
-                        break;
-                    case ItemParent::TYPE_TUNING:
-                        $select->where('item_parent_cache.tuning');
-                        break;
-                    case ItemParent::TYPE_SPORT:
-                        $select->where('item_parent_cache.sport');
-                        break;
-                }
-            }
-            */
-
-            if ($usedIds) {
-                $select->where([new Sql\Predicate\NotIn('pictures.id', $usedIds)]);
-            }
-
-            $picture = $this->picture->getTable()->selectWith($select)->current();
-
-            if ($picture) {
-                $pictures[] = $picture;
-                $usedIds[] = (int)$picture['id'];
-            } else {
-                $pictures[] = null;
-            }
-        }
-
-        foreach ($pictures as &$picture) {
-            if (! $picture) {
-                $select = $this->getModgroupPicturesSelect($carId, $modId)->limit(1)
-                    ->order([
-                        //'item.is_concept asc',
-                        'item_parent_cache.sport asc',
-                        'item_parent_cache.tuning asc'
-                    ]);
-                if ($usedIds) {
-                    $select->where([new Sql\Predicate\NotIn('pictures.id', $usedIds)]);
-                }
-
-                $picture = $this->picture->getTable()->selectWith($select)->current();
-                if ($picture) {
-                    $usedIds[] = $picture['id'];
-                }
-            }
-        }
-        unset($picture);
-
-        $result = [];
-        foreach ($pictures as $picture) {
-            if ($picture) {
-                $format = 'picture-thumb';
-
-                $url = $this->pic()->href($picture);
-
-                /*if ($urlCallback) {
-                    $url = $urlCallback($car, $picture);
-                } else {
-
-                }*/
-
-                $result[] = [
-                    'format' => $format,
-                    'row'    => $picture,
-                    'url'    => $url,
-                ];
-            } else {
-                $result[] = false;
-            }
-        }
-
-        return $result;
-    }
-
-    private function brandItemModgroup(
-        $brand,
-        $currentCar,
-        $brandItemCatname,
-        $path,
-        int $modgroupId,
-        int $modId,
-        $breadcrumbs
-    ) {
-        $currentCarId = $currentCar['id'];
-
-        $imageStorage = $this->imageStorage();
-
-        $g = $this->perspective->getPageGroupIds(2);
-
-        $select = new Sql\Select($this->modificationTable->getTable());
-        $select->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', [])
-            ->where([
-                'item_parent_cache.item_id' => $currentCarId,
-                'modification.group_id'     => $modgroupId
-            ])
-            ->group('modification.id')
-            ->order('modification.name');
-
-        $modifications = [];
-        foreach ($this->modificationTable->selectWith($select) as $modification) {
-            $pictures = [];
-
-            $pictureRows = $this->getModgroupPictureList($currentCarId, $modification['id'], $g);
-            $select = $this->getModgroupPicturesSelect($currentCarId, $modification['id']);
-            $pPaginator = new Paginator(
-                new DbSelect($select, $this->picture->getTable()->getAdapter())
-            );
-
-            foreach ($pictureRows as $pictureRow) {
-                if ($pictureRow) {
-                    $imageInfo = null;
-                    if ($pictureRow['image_id']) {
-                        $imageStorage->getFormatedImage($pictureRow['image_id'], 'picture-thumb');
-                    }
-
-                    $pictures[] = [
-                        'src'  => $imageInfo ? $imageInfo->getSrc() : null,
-                        'url'  => $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-picture',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $brandItemCatname,
-                            'path'          => $path,
-                            'exact'         => false,
-                            'picture_id'    => $pictureRow['row']['identity']
-                        ], [], true)
-                    ];
-                } else {
-                    $pictures[] = false;
-                }
-            }
-
-            $nameParams = [
-                'spec'             => $modification['name'],
-                'begin_year'       => $modification['begin_year'],
-                'end_year'         => $modification['end_year'],
-                'begin_month'      => $modification['begin_month'],
-                'end_month'        => $modification['end_month'],
-                'begin_model_year' => $modification['begin_model_year'],
-                'end_model_year'   => $modification['end_model_year'],
-                'begin_model_year_fraction' => $modification['begin_model_year_fraction'],
-                'end_model_year_fraction'   => $modification['end_model_year_fraction'],
-                'today'            => $modification['today']
-            ];
-            foreach ($nameParams as $key => &$nameParam) {
-                if (! isset($nameParam)) {
-                    unset($nameParams[$key]);
-                }
-            }
-            unset($nameParam);
-
-            $modifications[] = [
-                'nameParams' => $nameParams,
-                'name'       => $modification['name'],
-                'url'        => $this->url()->fromRoute('catalogue', [
-                    'action' => 'brand-item-pictures',
-                    'mod'    => $modification['id']
-                ], [], true),
-                'pictures'      => $pictures,
-                'totalPictures' => $pPaginator->getTotalItemCount()
-            ];
-        }
-
-        $canAcceptPicture = $this->user()->isAllowed('picture', 'accept');
-
-        $inboxCount = 0;
-        if ($canAcceptPicture) {
-            $inboxCount = $this->getCarInboxCount($currentCarId);
-        }
-
-        $requireAttention = 0;
-        $isModerator = $this->user()->inheritsRole('moder');
-        if ($isModerator) {
-            $requireAttention = $this->getItemModerAttentionCount($currentCarId);
-        }
-
-        $texts = $this->itemModel->getTextsOfItem($currentCar['id'], $this->language());
-
-        $currentCar['description'] = $texts['text'];
-        $currentCar['text'] = $texts['full_text'];
-        $hasHtml = (bool)$currentCar['text'];
-
-        return [
-            'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
-            'modgroup'         => true,
-            'breadcrumbs'      => $breadcrumbs,
-            'car'              => (array) $currentCar,
-            'modifications'    => $modifications,
-            'canAcceptPicture' => $canAcceptPicture,
-            'inboxCount'       => $inboxCount,
-            'requireAttention' => $requireAttention,
-            'hasHtml'          => $hasHtml,
-            'isCarModer'       => $this->user()->inheritsRole('cars-moder')
-        ];
-    }
-
     private function brandItemGroup(
         $brand,
         $currentCar,
         $brandItemCatname,
         $path,
-        int $modId,
         $breadcrumbs
     ) {
         $currentCarId = $currentCar['id'];
@@ -1774,7 +1414,6 @@ class CatalogueController extends AbstractActionController
         return [
             'car'           => $currentCar,
             'otherNames'    => $otherNames,
-            'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
             'paginator'     => $paginator,
             'breadcrumbs'   => $breadcrumbs,
             'type'          => $type,
@@ -1872,17 +1511,6 @@ class CatalogueController extends AbstractActionController
                 $filter['item']['ancestor_or_self'] = $currentCar['id'];
             }
 
-            $modification = null;
-            $modId = (int)$this->params('mod');
-            if ($modId) {
-                $modification = $this->modificationTable->select(['id' => (int)$modId])->current();
-                if (! $modification) {
-                    return $this->notFoundAction();
-                }
-
-                $filter['modification'] = $modId;
-            }
-
             $paginator = $this->picture->getPaginator($filter);
             $paginator
                 ->setItemCountPerPage($this->catalogue()->getPicturesPerPage())
@@ -1917,8 +1545,6 @@ class CatalogueController extends AbstractActionController
                 'sportCount'    => $counts['sport'],
                 'picturesCount' => $paginator->getTotalItemCount(),
                 'type'          => null,
-                'modification'  => $modification,
-                'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
             ];
         });
     }

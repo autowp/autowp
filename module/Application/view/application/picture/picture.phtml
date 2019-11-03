@@ -149,21 +149,6 @@
             </div>
         <?php } ?>
 
-        <?php /*if (count($this->modifications) > 0) { ?>
-            <p>
-                <?php foreach ($this->modifications as $modification) { ?>
-                    <?php if ($modification['url']) { ?>
-                        <?=$this->htmlA([
-                            'class' => 'badge badge-info',
-                            'href'  => $modification['url']
-                        ], $modification['name'])?>
-                    <?php } else { ?>
-                        <span class="badge badge-info"><?=$this->escapeHtml($modification['name'])?></span>
-                    <?php } ?>
-                <?php } ?>
-            </p>
-        <?php } */ ?>
-
         <?php foreach ($this->items as $item) { ?>
             <?php if ($item['description']) { ?>
                 <div style="margin-bottom:10px">

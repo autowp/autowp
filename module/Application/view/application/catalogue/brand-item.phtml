@@ -83,27 +83,25 @@
     </p>
 <?php } ?>
 
-<?php if (!isset($this->modgroup)) { ?>
-    <?=$this->partial('application/catalogue/partial/brand-item-menu', [
-        'title' => $this->carFullName,
-        'stock' => [
-            'count'  => $this->stockCount,
-            'active' => $this->type == Application\Model\ItemParent::TYPE_DEFAULT
-        ],
-        'tuning' => [
-            'count'  => $this->tuningCount,
-            'active' => $this->type == Application\Model\ItemParent::TYPE_TUNING
-        ],
-        'sport' => [
-            'count'  => $this->sportCount,
-            'active' => $this->type == Application\Model\ItemParent::TYPE_SPORT
-        ],
-        'pictures' => [
-            'count'  => $this->picturesCount,
-            'active' => false
-        ],
-    ]) ?>
-<?php } ?>
+<?=$this->partial('application/catalogue/partial/brand-item-menu', [
+    'title' => $this->carFullName,
+    'stock' => [
+        'count'  => $this->stockCount,
+        'active' => $this->type == Application\Model\ItemParent::TYPE_DEFAULT
+    ],
+    'tuning' => [
+        'count'  => $this->tuningCount,
+        'active' => $this->type == Application\Model\ItemParent::TYPE_TUNING
+    ],
+    'sport' => [
+        'count'  => $this->sportCount,
+        'active' => $this->type == Application\Model\ItemParent::TYPE_SPORT
+    ],
+    'pictures' => [
+        'count'  => $this->picturesCount,
+        'active' => false
+    ],
+]) ?>
 
 <?php if ($this->hasHtml) { ?>
     <div class="text">
@@ -115,86 +113,34 @@
     </div>
 <?php } ?>
 
-<?=$this->render('application/catalogue/partial/modification-filter')?>
+<?=$this->partial('application/cars', $this->childListData)?>
 
-<?php if (!isset($this->modgroup)) { ?>
-    <?=$this->partial('application/cars', $this->childListData)?>
+<?php if ($this->currentPicturesCount) { ?>
+    <h3><?=$this->escapeHtml(sprintf($this->translate('catalogue/other-pictures-of-%1$s'), $this->carFullName)) ?></h3>
 
-    <?php if ($this->currentPicturesCount) { ?>
-        <h3><?=$this->escapeHtml(sprintf($this->translate('catalogue/other-pictures-of-%1$s'), $this->carFullName)) ?></h3>
-
-        <div class="row">
-            <?php foreach ($this->currentPictures as $picture) { ?>
-                <div class="col-md-3">
-                    <?=$this->htmlA([
-                        'href'  => $picture['url'],
-                        'class' => 'd-block rounded mb-4'
-                    ], $this->htmlImg([
-                        'src'     => $picture['src'],
-                        'alt'     => $picture['name'],
-                        'title'   => $picture['name'],
-                        'shuffle' => true,
-                        'class'   => 'rounded w-100 border border-light'
-                    ]), false)?>
-                </div>
-            <?php } ?>
-        </div>
-
-        <?php if ($this->currentPicturesCount > 4) { ?>
-            <i class="fa fa-th" aria-hidden="true"></i>
-            <?=$this->htmlA($this->currentPicturesUrl, $this->translate('carlist/all pictures').' ('.$this->currentPicturesCount.')')?>
+    <div class="row">
+        <?php foreach ($this->currentPictures as $picture) { ?>
+            <div class="col-md-3">
+                <?=$this->htmlA([
+                    'href'  => $picture['url'],
+                    'class' => 'd-block rounded mb-4'
+                ], $this->htmlImg([
+                    'src'     => $picture['src'],
+                    'alt'     => $picture['name'],
+                    'title'   => $picture['name'],
+                    'shuffle' => true,
+                    'class'   => 'rounded w-100 border border-light'
+                ]), false)?>
+            </div>
         <?php } ?>
+    </div>
+
+    <?php if ($this->currentPicturesCount > 4) { ?>
+        <i class="fa fa-th" aria-hidden="true"></i>
+        <?=$this->htmlA($this->currentPicturesUrl, $this->translate('carlist/all pictures').' ('.$this->currentPicturesCount.')')?>
     <?php } ?>
+<?php } ?>
 
-    <?php if (isset($this->paginator)) { ?>
-        <?=$this->paginationControl($this->paginator) ?>
-    <?php } ?>
-
-<?php } else { ?>
-
-    <?php foreach ($this->modifications as $modification) { ?>
-        <?php /* if (!$modification['totalPictures']) { continue; } */ ?>
-        <h3>
-            <?=$this->car()->htmlTitle(array_replace($this->car, $modification['nameParams']))?>
-        </h3>
-
-        <div class="row">
-            <?php foreach ($modification['pictures'] as $picture) { ?>
-                <div class="col-md-3">
-                    <?php if ($picture) { ?>
-                        <?=$this->htmlA([
-                            'href'  => $picture['url'],
-                            'class' => 'd-block rounded mb-4'
-                        ], $this->htmlImg([
-                            'src'     => $picture['src'],
-                            /*'alt'     => $picture['name'],
-                            'title'   => $picture['name'],*/
-                            'shuffle' => true,
-                            'class'   => 'rounded w-100 border border-light'
-                        ]), false)?>
-                    <?php } else { ?>
-                        &nbsp;
-                    <?php } ?>
-                </div>
-            <?php } ?>
-        </div>
-
-        <ul class="list-inline">
-
-            <?php if (isset($modification['url']) && $modification['url']) { ?>
-                <li class="list-inline-item">
-                    <span class="fa fa-th" aria-hidden="true"></span>
-                    <?=$this->htmlA($modification['url'], $this->translate('carlist/all pictures').' ('.$modification['totalPictures'].')')?>
-                </li>
-            <?php } ?>
-
-            <?php if ($this->isCarModer) { ?>
-                <li class="list-inline-item">
-                    <i class="fa fa-cog" aria-hidden="true"></i>
-                    <?=$this->htmlA('#' /*$item['moderUrl']*/, $this->translate('moder/edit-object')) ?>
-                </li>
-            <?php } ?>
-
-        </ul>
-    <?php } ?>
+<?php if (isset($this->paginator)) { ?>
+    <?=$this->paginationControl($this->paginator) ?>
 <?php } ?>

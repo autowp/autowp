@@ -46,8 +46,6 @@ class CatalogueControllerFactory implements FactoryInterface
             $container->get(Mosts::class),
             $container->get(VehicleType::class),
             $container->get(Picture::class),
-            $tables->get('modification'),
-            $tables->get('modification_group'),
             $container->get(Brand::class),
             $container->get(User::class),
             $container->get('HttpRouter'),
