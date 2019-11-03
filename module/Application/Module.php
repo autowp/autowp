@@ -112,7 +112,6 @@ class Module implements
     {
         $exception = $e->getParam('exception');
         if ($exception) {
-
             captureException($exception);
 
             $serviceManager = $e->getApplication()->getServiceManager();
