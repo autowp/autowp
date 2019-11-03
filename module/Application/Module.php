@@ -2,7 +2,6 @@
 
 namespace Application;
 
-use Autowp\ZFComponents\Rollbar\ErrorListener;
 use Throwable;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\EventManager\EventInterface as Event;
@@ -11,6 +10,7 @@ use Zend\ModuleManager\Feature;
 use Zend\Mvc\MvcEvent;
 use Zend\Stdlib\ArrayUtils;
 use Zend\View\Helper\PaginationControl;
+use function Sentry\captureException;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
@@ -97,22 +97,23 @@ class Module implements
 
         $config = $serviceManager->get('Config');
 
+        if (isset($config['sentry']['dsn']) && $config['sentry']['dsn']) {
+            \Sentry\init(['dsn' => $config['sentry']['dsn']]);
+        }
+
         $languageListener = new LanguageRouteListener([$config['pictures_hostname']]);
         $languageListener->attach($eventManager);
 
         $maintenance = new Maintenance();
         $maintenance->attach($serviceManager->get('CronEventManager'));
-
-        if ($config['rollbar']['logger']['access_token']) {
-            $rollbarListener = new ErrorListener();
-            $rollbarListener->attach($eventManager);
-        }
     }
 
     public function handleError(MvcEvent $e)
     {
         $exception = $e->getParam('exception');
         if ($exception) {
+            captureException($exception);
+
             $serviceManager = $e->getApplication()->getServiceManager();
             $serviceManager->get('ErrorLog')->crit($exception);
 
