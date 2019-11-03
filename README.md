@@ -35,3 +35,4 @@ The MIT License (MIT). Please see [License File](https://github.com/thephpleague
 <a href="https://php.net/"><img src="php.svg" height="80" ></a>
 <a href="https://framework.zend.com/"><img src="zf-logo.png" height="80" ></a>
 <a href="https://www.jetbrains.com/phpstorm/"><img src="phpstorm.svg" height="80" ></a>
+<a href="https://sentry.io/"><img src="sentry.svg" height="80" ></a>
