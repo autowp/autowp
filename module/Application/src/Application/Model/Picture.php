@@ -764,17 +764,17 @@ class Picture
         $timezone = new DateTimeZone($timezone);
         $dbTimezine = new DateTimeZone(MYSQL_TIMEZONE);
 
-        $date = DateTime::createFromFormat('Y-m-d', $date, $timezone);
+        $dateObj = DateTime::createFromFormat('Y-m-d', $date, $timezone);
 
-        if ($date === false) {
+        if ($dateObj === false) {
             throw new Exception("Failed to parse date `$date`");
         }
 
-        $start = clone $date;
+        $start = clone $dateObj;
         $start->setTime(0, 0, 0);
         $start->setTimezone($dbTimezine);
 
-        $end = clone $date;
+        $end = clone $dateObj;
         $end->setTime(23, 59, 59);
         $end->setTimezone($dbTimezine);
 
