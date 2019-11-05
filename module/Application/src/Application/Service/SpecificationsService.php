@@ -624,7 +624,7 @@ class SpecificationsService
             $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
         } else {
             if (strlen($value) > 0 || $empty) {
-                // insert/update value decsriptor
+                // insert/update value descriptor
                 $userValue = $this->userValueTable->select($userValuePrimaryKey)->current();
 
                 // insert update value
@@ -643,24 +643,20 @@ class SpecificationsService
                 }
 
                 if (! $userValue || $valueChanged) {
-                    if (! $userValue) {
-                        $this->userValueTable->insert(array_replace([
-                            'add_date'    => new Sql\Expression('NOW()'),
-                            'update_date' => new Sql\Expression('NOW()')
-                        ], $userValuePrimaryKey));
-                    } else {
-                        $this->userValueTable->update([
-                            'update_date' => new Sql\Expression('NOW()')
-                        ], $userValuePrimaryKey);
-                    }
 
-                    $set = ['value' => $value];
+                    $this->userValueTable->getAdapter()->query('
+                        INSERT INTO attrs_user_values (attribute_id, item_id, user_id, add_date, update_date) 
+                        VALUES (:attribute_id, :item_id, :user_id, NOW(), NOW())
+                        ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
+                    ', $userValuePrimaryKey);
 
-                    if ($userValueData) {
-                        $userValueDataTable->update($set, $userValuePrimaryKey);
-                    } else {
-                        $userValueDataTable->insert(array_merge($set, $userValuePrimaryKey));
-                    }
+                    $userValueDataTable->getAdapter()->query('
+                        INSERT INTO `' . $userValueDataTable->getTable() . '` (attribute_id, item_id, user_id, value) 
+                        VALUES (:attribute_id, :item_id, :user_id, :value)
+                        ON DUPLICATE KEY UPDATE value = VALUES(value)
+                    ', array_replace($userValuePrimaryKey, [
+                        'value' => $value
+                    ]));
 
                     $somethingChanged = $this->updateAttributeActualValue($attribute, $itemId);
                 }
