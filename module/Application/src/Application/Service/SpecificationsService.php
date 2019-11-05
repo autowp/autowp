@@ -643,7 +643,6 @@ class SpecificationsService
                 }
 
                 if (! $userValue || $valueChanged) {
-
                     $this->userValueTable->getAdapter()->query('
                         INSERT INTO attrs_user_values (attribute_id, item_id, user_id, add_date, update_date) 
                         VALUES (:attribute_id, :item_id, :user_id, NOW(), NOW())
