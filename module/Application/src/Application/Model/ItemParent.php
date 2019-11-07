@@ -441,7 +441,15 @@ class ItemParent
         $this->rebuildCache($itemRow['id']);
     }
 
-    public function setItemParentLanguage(int $parentId, int $itemId, string $language, array $values, $forceIsAuto)
+    /**
+     * @param int $parentId
+     * @param int $itemId
+     * @param string $language
+     * @param array $values
+     * @param bool $forceIsAuto
+     * @throws Exception
+     */
+    public function setItemParentLanguage(int $parentId, int $itemId, string $language, array $values, bool $forceIsAuto): void
     {
         $primaryKey = [
             'item_id'   => $itemId,
@@ -450,8 +458,6 @@ class ItemParent
         ];
 
         $bvlRow = $this->itemParentLanguageTable->select($primaryKey)->current();
-
-        $set = [];
 
         if ($forceIsAuto) {
             $isAuto = true;
@@ -473,20 +479,25 @@ class ItemParent
             $isAuto = true;
         }
 
-        $set['name'] = mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME);
-        $set['is_auto'] = $isAuto ? 1 : 0;
-
-        if ($bvlRow) {
-            $this->itemParentLanguageTable->update($set, $primaryKey);
-            return;
-        }
-
-        $this->itemParentLanguageTable->insert(array_replace($set, $primaryKey));
+        $this->itemParentLanguageTable->getAdapter()->query('
+            INSERT INTO item_parent_language (item_id, parent_id, language, name, is_auto) 
+            VALUES (:item_id, :parent_id, :language, :name, :is_auto)
+            ON DUPLICATE KEY UPDATE name = VALUES(name), is_auto = VALUES(is_auto)
+        ', array_replace([
+            'name'    => mb_substr($values['name'], 0, self::MAX_LANGUAGE_NAME),
+            'is_auto' => $isAuto ? 1 : 0
+        ], $primaryKey));
     }
 
-    private function setItemParentLanguages(int $parentId, int $itemId, array $values, $forceIsAuto)
+    /**
+     * @param int $parentId
+     * @param int $itemId
+     * @param array $values
+     * @param bool $forceIsAuto
+     * @throws Exception
+     */
+    private function setItemParentLanguages(int $parentId, int $itemId, array $values, bool $forceIsAuto): void
     {
-        $success = true;
         foreach ($this->languages as $language) {
             $languageValues = [
                 'name' => null
@@ -494,12 +505,8 @@ class ItemParent
             if (isset($values[$language])) {
                 $languageValues = $values[$language];
             }
-            if (! $this->setItemParentLanguage($parentId, $itemId, $language, $languageValues, $forceIsAuto)) {
-                $success = false;
-            }
+            $this->setItemParentLanguage($parentId, $itemId, $language, $languageValues, $forceIsAuto);
         }
-
-        return $success;
     }
 
     public function setItemParent(int $parentId, int $itemId, array $values, $forceIsAuto)
