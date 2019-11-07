@@ -24,7 +24,7 @@
 		"irazasyed/telegram-bot-sdk" : "dev-patch-3",
 		"phayes/geophp" : "^1.2",
 		"michelf/php-markdown" : "^1.8.0",
-		"autowp/external-login-service" : ">=1.3.0",
+		"autowp/external-login-service" : "^1.4.0",
 		"autowp/textstorage" : "^2.0.2",
 		"autowp/zf-components" : "^2.0.0",
 		"zendframework/zend-authentication" : "^2.6.0",

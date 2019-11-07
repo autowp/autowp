@@ -449,8 +449,13 @@ class ItemParent
      * @param bool $forceIsAuto
      * @throws Exception
      */
-    public function setItemParentLanguage(int $parentId, int $itemId, string $language, array $values, bool $forceIsAuto): void
-    {
+    public function setItemParentLanguage(
+        int $parentId,
+        int $itemId,
+        string $language,
+        array $values,
+        bool $forceIsAuto
+    ): void {
         $primaryKey = [
             'item_id'   => $itemId,
             'parent_id' => $parentId,
