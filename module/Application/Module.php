@@ -100,7 +100,8 @@ class Module implements
         if (isset($config['sentry']['dsn']) && $config['sentry']['dsn']) {
             \Sentry\init([
                 'dsn'         => $config['sentry']['dsn'],
-                'environment' => $config['sentry']['environment']
+                'environment' => $config['sentry']['environment'],
+                'release'     => $config['sentry']['release'],
             ]);
         }
 
