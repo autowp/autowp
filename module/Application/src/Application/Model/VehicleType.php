@@ -2,6 +2,7 @@
 
 namespace Application\Model;
 
+use Zend\Db\Adapter\Driver\ResultInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -112,27 +113,18 @@ class VehicleType
 
     private function setRow(int $vehicleId, int $type, bool $inherited): bool
     {
-        $primaryKey = [
+        /* @var $result ResultInterface */
+        $result = $this->itemVehicleTypeTable->getAdapter()->query('
+            INSERT INTO vehicle_vehicle_type (vehicle_id, vehicle_type_id, inherited) 
+            VALUES (:vehicle_id, :vehicle_type_id, :inherited)
+            ON DUPLICATE KEY UPDATE inherited = VALUES(inherited)
+        ', [
             'vehicle_id'      => $vehicleId,
-            'vehicle_type_id' => $type
-        ];
-        $set = [
-            'inherited' => $inherited ? 1 : 0
-        ];
+            'vehicle_type_id' => $type,
+            'inherited'       => $inherited ? 1 : 0
+        ]);
 
-        $row = $this->itemVehicleTypeTable->select($primaryKey)->current();
-        if (! $row) {
-            $this->itemVehicleTypeTable->insert(array_replace($set, $primaryKey));
-            return true;
-        }
-
-        if ($inherited !== (bool)$row['inherited']) {
-            $this->itemVehicleTypeTable->update($set, $primaryKey);
-
-            return true;
-        }
-
-        return false;
+        return $result->getAffectedRows() > 0;
     }
 
     private function getInheritedIds(int $vehicleId): array

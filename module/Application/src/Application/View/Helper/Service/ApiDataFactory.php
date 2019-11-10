@@ -20,10 +20,8 @@ class ApiDataFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $hydrators = $container->get('HydratorManager');
-        $config = $container->get('Config');
         return new Helper(
-            $hydrators->get(UserHydrator::class),
-            $config['rollbar']
+            $hydrators->get(UserHydrator::class)
         );
     }
 }

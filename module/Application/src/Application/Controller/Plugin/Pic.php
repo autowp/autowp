@@ -107,11 +107,6 @@ class Pic extends AbstractPlugin
     private $pictureModerVote;
 
     /**
-     * @var TableGateway
-     */
-    private $modificationTable;
-
-    /**
      * @var Brand
      */
     private $brand;
@@ -148,7 +143,6 @@ class Pic extends AbstractPlugin
         UserAccount $userAccount,
         TableGateway $itemLinkTable,
         PictureModerVote $pictureModerVote,
-        TableGateway $modificationTable,
         Brand $brand,
         Picture $picture,
         User $userModel
@@ -169,7 +163,6 @@ class Pic extends AbstractPlugin
         $this->userAccount = $userAccount;
         $this->itemLinkTable = $itemLinkTable;
         $this->pictureModerVote = $pictureModerVote;
-        $this->modificationTable = $modificationTable;
         $this->brand = $brand;
         $this->picture = $picture;
         $this->userModel = $userModel;
@@ -985,50 +978,6 @@ class Pic extends AbstractPlugin
         ]);
         $name = $names[$picture['id']];
 
-
-        $select = new Sql\Select($this->modificationTable->getTable());
-
-        $select->join('modification_picture', 'modification.id = modification_picture.modification_id', [])
-            ->where(['modification_picture.picture_id' => $picture['id']])
-            ->order('modification.name');
-        $mRows = $this->modificationTable->selectWith($select);
-
-        $modifications = [];
-
-        foreach ($mRows as $mRow) {
-            $url = null;
-
-            $carRow = $this->itemModel->getRow([
-                'id'       => $mRow['item_id'],
-                'columns'  => ['id', 'name'],
-                'language' => $language
-            ]);
-
-            if ($carRow) {
-                $paths = $this->catalogue->getCataloguePaths($carRow['id'], [
-                    'breakOnFirst' => true
-                ]);
-                if (count($paths) > 0) {
-                    $path = $paths[0];
-
-                    $url = $this->httpRouter->assemble([
-                        'action'        => 'brand-item-pictures',
-                        'brand_catname' => $path['brand_catname'],
-                        'car_catname'   => $path['car_catname'],
-                        'path'          => $path['path'],
-                        'mod'           => $mRow['id']
-                    ], [
-                        'name' => 'catalogue'
-                    ]);
-                }
-            }
-
-            $modifications[] = [
-                'name' => $mRow['name'], // TODO: formatter
-                'url'  => $url
-            ];
-        }
-
         $copyrights = null;
         if ($picture['copyrights_text_id']) {
             $copyrights = $this->textStorage->getText($picture['copyrights_text_id']);
@@ -1129,7 +1078,6 @@ class Pic extends AbstractPlugin
             'paginator'         => $paginator,
             'paginatorPictures' => $pageNumbers,
             'moderLinks'        => $moderLinks,
-            'modifications'     => $modifications,
             'pictureVote'       => $this->getController()->pictureVote($picture['id'], [
                 'hideVote' => true
             ]),

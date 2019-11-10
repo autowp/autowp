@@ -50,7 +50,6 @@ class CatalogueController extends AbstractActionController
      */
     private $brand;
 
-
     public function __construct(
         $mostsMinCarsCount,
         Item $itemModel,

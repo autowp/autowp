@@ -50,14 +50,14 @@ web:
     AUTOWP_RECAPTCHA_PUBLICKEY: "public"
     AUTOWP_RECAPTCHA_PRIVATEKEY: "private"
     AUTOWP_GO_LISTEN: ":81"
-    ROLLBAR_ACCESS_TOKEN: ""
-    ROLLBAR_CLIENT_ACCESS_TOKEN: ""
-    ROLLBAR_ENVIRONMENT: development
+    SENTRY_DSN: ""
+    SENTRY_ENVIRONMENT: "development"
+    SENTRY_RELEASE: "dev"
     TRAFFIC_URL: http://traffic
     AUTOWP_FORCE_HTTPS: ""
-    AUTOWP_S3_KEY:
-    AUTOWP_S3_SECRET:
-    AUTOWP_S3_ENDPOINT:
+    AUTOWP_S3_KEY: ""
+    AUTOWP_S3_SECRET: ""
+    AUTOWP_S3_ENDPOINT: ""
     AUTOWP_IMAGE_FORMAT_BUCKET: dev-format
     AUTOWP_IMAGE_MUSEUM_BUCKET: dev-museum
     AUTOWP_IMAGE_USER_BUCKET: dev-user
@@ -119,8 +119,8 @@ frontend:
   restart: always
   volumes:
   - "./frontend:/usr/share/nginx/html"
-  - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
-  - "/home/dvp/WebstormProjects/autowp-frontend/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
+  - "/home/dmitry/eclipse-workspace/autowp-frontend/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
+  - "/home/dmitry/eclipse-workspace/autowp-frontend/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
 
 rabbitmq:
   image: rabbitmq:management
@@ -184,3 +184,4 @@ goautowp:
   - AUTOWP_ROLLBAR_PERIOD=1m
   - AUTOWP_IMAGES_DIR=/app/pictures
   - AUTOWP_MIGRATIONS_DIR=/app/migrations
+

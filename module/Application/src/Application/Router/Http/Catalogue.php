@@ -563,44 +563,6 @@ class Catalogue implements RouteInterface
 
                     return $this->matchCarPictures($path, $brand, $brandItemRow, $treePath, false, $length);
                     break;
-
-                case 'mod':
-                    array_shift($path);
-
-                    if (! $path) {
-                        return null;
-                    }
-
-                    $mod = array_shift($path);
-
-                    // :brand/:car_catname/:path[]/mod/:mod
-                    return $this->assembleMatch([
-                        'action'        => 'brand-item',
-                        'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandItemRow['catname'],
-                        'path'          => $treePath,
-                        'mod'           => $mod
-                    ], $length);
-                    break;
-
-                case 'modgroup':
-                    array_shift($path);
-
-                    if (! $path) {
-                        return null;
-                    }
-
-                    $modgroup = array_shift($path);
-
-                    // :brand/:car_catname/:path[]/modgroup/:modgroup
-                    return $this->assembleMatch([
-                        'action'        => 'brand-item',
-                        'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandItemRow['catname'],
-                        'path'          => $treePath,
-                        'modgroup'      => $modgroup
-                    ], $length);
-                    break;
             }
 
             return null;
@@ -823,14 +785,6 @@ class Catalogue implements RouteInterface
                     foreach ($data['path'] as $node) {
                         $url[] = $node;
                     }
-                }
-                if (isset($data['modgroup']) && $data['modgroup']) {
-                    $url[] = 'modgroup';
-                    $url[] = $data['modgroup'];
-                }
-                if (isset($data['mod']) && $data['mod']) {
-                    $url[] = 'mod';
-                    $url[] = $data['mod'];
                 }
                 if (isset($data['type']) && $data['type']) {
                     $url[] = $data['type'];

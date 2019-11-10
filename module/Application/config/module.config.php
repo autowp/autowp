@@ -135,7 +135,6 @@ return [
             Model\ItemAlias::class               => Model\ItemAliasFactory::class,
             Model\ItemParent::class              => Model\ItemParentFactory::class,
             Model\Log::class                     => Model\Service\LogFactory::class,
-            Model\Modification::class            => Model\ModificationFactory::class,
             Model\Perspective::class             => Model\PerspectiveFactory::class,
             Model\Picture::class                 => Model\PictureFactory::class,
             Model\PictureItem::class             => Model\PictureItemFactory::class,
@@ -293,7 +292,8 @@ return [
             Validator\ItemParent\CatnameNotExists::class => Validator\ItemParent\CatnameNotExistsFactory::class,
             Validator\User\EmailExists::class            => Validator\User\EmailExistsFactory::class,
             Validator\User\EmailNotExists::class         => Validator\User\EmailNotExistsFactory::class,
-            Validator\User\Login::class                  => Validator\User\LoginFactory::class ,
+            Validator\User\Login::class                  => Validator\User\LoginFactory::class,
+            Validator\DateString::class                  => InvokableFactory::class
         ],
     ],
 
@@ -372,16 +372,10 @@ return [
         'privateKey' => getenv('AUTOWP_RECAPTCHA_PRIVATEKEY')
     ],
 
-    'rollbar' => [
-        'logger' => [
-            'access_token' => getenv('ROLLBAR_ACCESS_TOKEN'),
-            'environment'  => getenv('ROLLBAR_ENVIRONMENT')
-        ],
-        'debounce' => [
-            'file'   => __DIR__ . '/../../../data/rollbar-debounce',
-            'period' => 60
-        ],
-        'client_access_token' => getenv('ROLLBAR_CLIENT_ACCESS_TOKEN')
+    'sentry' => [
+        'dsn'         => getenv('SENTRY_DSN'),
+        'environment' => getenv('SENTRY_ENVIRONMENT'),
+        'release'     => getenv('SENTRY_RELEASE'),
     ],
 
     'traffic' => [

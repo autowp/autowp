@@ -2,11 +2,12 @@
 
 namespace Application\Hydrator\Api;
 
+use DateTime;
+use DateTimeZone;
 use Exception;
 use Traversable;
 
 use Zend\Hydrator\Exception\InvalidArgumentException;
-use Zend\Hydrator\Strategy\DateTimeFormatterStrategy;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Stdlib\ArrayUtils;
 
@@ -60,9 +61,6 @@ class AttrUserValueHydrator extends RestHydrator
         $this->itemNameFormatter = $serviceManager->get(ItemNameFormatter::class);
         $this->router = $serviceManager->get('HttpRouter');
 
-        $strategy = new DateTimeFormatterStrategy();
-        $this->addStrategy('update_date', $strategy);
-
         $strategy = new Strategy\User($serviceManager);
         $this->addStrategy('user', $strategy);
 
@@ -110,8 +108,14 @@ class AttrUserValueHydrator extends RestHydrator
 
     public function extract($object)
     {
+        $updateDate = null;
+        if ($object['update_date']) {
+            $timezone = new DateTimeZone(MYSQL_TIMEZONE);
+            $updateDate = DateTime::createFromFormat(MYSQL_DATETIME_FORMAT, $object['update_date'], $timezone);
+        }
+
         $result = [
-            'update_date'  => $this->extractValue('update_date', $object['update_date']),
+            'update_date'  => $updateDate ? $updateDate->format(DateTime::ISO8601) : null,
             'item_id'      => (int)$object['item_id'],
             'attribute_id' => (int)$object['attribute_id'],
             'user_id'      => (int)$object['user_id'],
