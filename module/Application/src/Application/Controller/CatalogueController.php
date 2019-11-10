@@ -7,8 +7,6 @@ use Zend\View\Model\ViewModel;
 
 use Autowp\Image\Storage;
 
-use Application\Controller\Plugin\Car;
-use Application\Controller\Plugin\Pic;
 use Application\Model\Brand;
 use Application\Model\Catalogue;
 use Application\Model\Item;
@@ -21,9 +19,6 @@ use Application\Service\Mosts;
  *
  * @method Storage imageStorage()
  * @method string language()
- * @method Pic pic()
- * @method \Autowp\User\Controller\Plugin\User user($user = null)
- * @method Car car()
  * @method Catalogue catalogue()
  */
 class CatalogueController extends AbstractActionController
