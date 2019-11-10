@@ -1156,6 +1156,14 @@ return [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\DateString::class,
+                        'options' => [
+                            'format' => 'Y-m-d'
+                        ]
+                    ]
                 ]
             ],
             'page' => [
@@ -2162,6 +2170,14 @@ return [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\DateString::class,
+                        'options' => [
+                            'format' => 'Y-m-d'
+                        ]
+                    ]
                 ]
             ],
             'page' => [
@@ -2553,7 +2569,7 @@ return [
                 ],
                 'validators' => [
                     [
-                        'name'    => 'Date',
+                        'name'    => Validator\DateString::class,
                         'options' => [
                             'format' => 'Y-m-d'
                         ]
@@ -2567,7 +2583,7 @@ return [
                 ],
                 'validators' => [
                     [
-                        'name'    => 'Date',
+                        'name'    => Validator\DateString::class,
                         'options' => [
                             'format' => 'Y-m-d'
                         ]
@@ -2706,7 +2722,7 @@ return [
                 ],
                 'validators' => [
                     [
-                        'name'    => 'Date',
+                        'name'    => Validator\DateString::class,
                         'options' => [
                             'format' => 'Y-m-d'
                         ]
@@ -2720,7 +2736,7 @@ return [
                 ],
                 'validators' => [
                     [
-                        'name'    => 'Date',
+                        'name'    => Validator\DateString::class,
                         'options' => [
                             'format' => 'Y-m-d'
                         ]

@@ -292,7 +292,8 @@ return [
             Validator\ItemParent\CatnameNotExists::class => Validator\ItemParent\CatnameNotExistsFactory::class,
             Validator\User\EmailExists::class            => Validator\User\EmailExistsFactory::class,
             Validator\User\EmailNotExists::class         => Validator\User\EmailNotExistsFactory::class,
-            Validator\User\Login::class                  => Validator\User\LoginFactory::class ,
+            Validator\User\Login::class                  => Validator\User\LoginFactory::class,
+            Validator\DateString::class                  => InvokableFactory::class
         ],
     ],
 
