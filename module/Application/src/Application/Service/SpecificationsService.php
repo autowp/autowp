@@ -1645,13 +1645,11 @@ class SpecificationsService
             ];
 
             // descriptor
-            $valueRow = $this->valueTable->select($primaryKey)->current();
-            if (! $valueRow) {
-                $this->valueTable->insert(array_replace([
-                    'update_date'  => new Sql\Expression('now()')
-                ], $primaryKey));
-                $somethingChanges = true;
-            }
+            $this->valueTable->getAdapter()->query('
+                INSERT INTO attrs_values (attribute_id, item_id, update_date) 
+                VALUES (:attribute_id, :item_id, NOW())
+                ON DUPLICATE KEY UPDATE update_date = VALUES(update_date)
+            ', $primaryKey);
 
             // value
             if ($attribute['isMultiple']) {
