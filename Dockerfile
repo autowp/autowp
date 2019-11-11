@@ -6,8 +6,13 @@ WORKDIR /app
 
 EXPOSE 80
 
-ENV COMPOSER_ALLOW_SUPERUSER 1
-ENV WAITFORIT_VERSION="v2.4.1"
+ARG COMMIT
+
+ENV COMPOSER_ALLOW_SUPERUSER="1" \
+    WAITFORIT_VERSION="v2.4.1" \
+    SENTRY_RELEASE=$COMMIT
+
+CMD ["./start.sh"]
 
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost/ || exit 1
@@ -97,5 +102,3 @@ RUN chmod +x zf && \
     crontab ./crontab && \
     ./node_modules/.bin/webpack -p && \
     rm -rf ./node_modules/
-
-CMD ["./start.sh"]

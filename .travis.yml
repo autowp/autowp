@@ -11,7 +11,7 @@ addons:
 
 before_install:
   - docker pull $DOCKER_REPO || true
-  - docker build --cache-from $DOCKER_REPO -t $DOCKER_REPO . || travis_terminate 1;
+  - docker build --build-arg COMMIT=$TRAVIS_COMMIT --cache-from $DOCKER_REPO -t $DOCKER_REPO . || travis_terminate 1;
   - docker-compose -f docker-compose-test.yml up -d || travis_terminate 1;
   - docker exec -it autowp_test_web bash -c "waitforit -host=autowp_test_mysql -port=3306 -timeout=60" || travis_terminate 1;
   - docker exec -it autowp_test_web bash -c "waitforit -host=autowp_test_goautowp -port=80 -timeout=60" || travis_terminate 1;
@@ -26,7 +26,7 @@ script:
   - docker exec -it autowp_test_web sh -c "php -dzend_extension=xdebug.so -dmemory_limit=768M vendor/bin/phpunit --log-junit ./logs/junit.xml --coverage-clover ./logs/clover.xml" || travis_terminate 1;
   - docker cp autowp_test_web:/app/logs/junit.xml junit.xml || travis_terminate 1;
   - docker cp autowp_test_web:/app/logs/clover.xml clover.xml || travis_terminate 1;
-  - sonar-scanner || travis_terminate 1;
+  - sonar-scanner || true
 
 after_success:
   - docker exec -it autowp_test_web bash -c "./vendor/bin/coveralls -v"
