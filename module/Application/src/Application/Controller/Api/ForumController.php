@@ -316,7 +316,10 @@ class ForumController extends AbstractRestfulController
                     $this->forums->close($row['id']);
                     break;
                 case Forums::STATUS_DELETED:
-                    $this->forums->delete($row['id']);
+                    $success = $this->forums->delete($row['id']);
+                    if (! $success) {
+                        return $this->forbiddenAction();
+                    }
                     break;
                 case Forums::STATUS_NORMAL:
                     $this->forums->open($row['id']);

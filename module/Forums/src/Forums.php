@@ -113,7 +113,7 @@ class Forums
         );
 
         if ($needAttention) {
-            throw new Exception("Cannot delete row when moderator attention not closed");
+            return false;
         }
 
         $this->topicTable->update([
