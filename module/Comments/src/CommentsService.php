@@ -321,36 +321,24 @@ class CommentsService
             ];
         }
 
-        $voteRow = $this->voteTable->select([
+        $result = $this->voteTable->getAdapter()->query('
+            INSERT INTO comment_vote (comment_id, user_id, vote) 
+            VALUES (:comment_id, :user_id, :vote)
+            ON DUPLICATE KEY UPDATE vote = VALUES(vote)
+        ', [
             'comment_id' => $message['id'],
-            'user_id'    => $userId
-        ])->current();
+            'user_id'    => $userId,
+            'vote'       => $vote > 0 ? 1 : -1,
+        ]);
 
-        $vote = $vote > 0 ? 1 : -1;
-
-        if (! $voteRow) {
-            $this->voteTable->insert([
-                'comment_id' => $message['id'],
-                'user_id'    => $userId,
-                'vote'       => $vote
-            ]);
-        } else {
-            if ($voteRow['vote'] == $vote) {
-                return [
-                    'success' => false,
-                    'error'   => 'Alreay voted'
-                ];
-            }
-
-            $this->voteTable->update([
-                'vote' => $vote
-            ], [
-                'comment_id' => $message['id'],
-                'user_id'    => $userId
-            ]);
+        if ($result->getAffectedRows() == 0) {
+            return [
+                'success' => false,
+                'error'   => 'Already voted'
+            ];
         }
 
-        $newVote = $this->updateVote($message);
+        $newVote = $this->updateVote((int) $message['id']);
 
         return [
             'success' => true,
@@ -361,25 +349,24 @@ class CommentsService
     /**
      * @suppress PhanDeprecatedFunction
      *
-     * @param $message
-     * @return mixed
-     * @todo Change $message to $messageId
+     * @param int $messageId
+     * @return int
      */
-    private function updateVote($message)
+    private function updateVote(int $messageId): int
     {
-        $row = $this->voteTable->select(function (Sql\Select $select) use ($message) {
+        $row = $this->voteTable->select(function (Sql\Select $select) use ($messageId) {
             $select
                 ->columns(['count' => new Sql\Expression('sum(vote)')])
-                ->where(['comment_id = ?' => $message['id']]);
+                ->where(['comment_id' => $messageId]);
         })->current();
 
         $this->messageTable->update([
             'vote' => $row['count']
         ], [
-            'id = ?' => $message['id']
+            'id = ?' => $messageId
         ]);
 
-        return $row['count'];
+        return (int) $row['count'];
     }
 
     /**
