@@ -1666,24 +1666,14 @@ class SpecificationsService
                     $somethingChanges = true;
                 }
             } else {
-                $set = ['value' => $actualValue['value']];
-                $row = $valueDataTable->select($primaryKey)->current();
-                if (! $row) {
-                    $valueDataTable->insert(array_replace($set, $primaryKey));
-                    $somethingChanges = true;
-                } else {
-                    if ($actualValue['value'] === null || $row['value'] === null) {
-                        $valueDifferent = $actualValue['value'] !== $row['value'];
-                    } else {
-                        $valueDifferent = $actualValue['value'] != $row['value'];
-                    }
-                    if ($valueDifferent) {
-                        $affected = $valueDataTable->update($set, $primaryKey);
-                        if ($affected > 0) {
-                            $somethingChanges = true;
-                        }
-                    }
-                }
+                $result = $valueDataTable->getAdapter()->query('
+                    INSERT INTO ' . $valueDataTable->getTable() . ' (attribute_id, item_id, value) 
+                    VALUES (:attribute_id, :item_id, :value)
+                    ON DUPLICATE KEY UPDATE value = VALUES(value)
+                ', array_replace([
+                    'value' => $actualValue['value']
+                ], $primaryKey));
+                $somethingChanges = $result->getAffectedRows() > 0;
             }
 
             if ($somethingChanges) {
