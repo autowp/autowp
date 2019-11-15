@@ -630,7 +630,7 @@ class Picture
                     break;
                 case 'moder_votes':
                     $joinPdr = true;
-                    $select->order('MAX(pdr.day_date) DESC');
+                    $select->order(new Sql\Expression('MAX(pdr.day_date) DESC'));
                     break;
                 case 'similarity':
                     $select->order('df_distance.distance ASC');
