@@ -196,7 +196,7 @@ class ItemLanguageController extends AbstractRestfulController
         }
 
         if (array_key_exists('text', $data)) {
-            $text = $data['text'];
+            $text = (string) $data['text'];
             $textChanged = false;
             if ($row && $row['text_id']) {
                 $textChanged = ($text != $this->textStorage->getText($row['text_id']));
